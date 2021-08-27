@@ -40,7 +40,7 @@ from core.utils.common import (
 from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
 from core.utils.io import find_dir, find_file, read_yaml
 
-from data_manager.functions import get_prepared_queryset, is_ordering_enabled
+from data_manager.functions import get_prepared_queryset
 from data_manager.models import View
 
 logger = logging.getLogger(__name__)

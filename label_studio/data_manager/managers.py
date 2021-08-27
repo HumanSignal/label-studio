@@ -363,14 +363,10 @@ class PreparedTaskManager(models.Manager):
         :return: TaskQuerySet with filtered, ordered, annotated tasks
         """
         if prepare_params is None:
-            queryset = self.get_queryset()
-            queryset.prepare_params = prepare_params
-            return queryset
+            return self.get_queryset()
 
         fields_for_annotation = get_fields_for_annotation(prepare_params)
-        queryset = self.get_queryset(fields_for_annotation).prepared(prepare_params=prepare_params)
-        queryset.prepare_params = prepare_params
-        return queryset
+        return self.get_queryset(fields_for_annotation).prepared(prepare_params=prepare_params)
 
 
 class TaskManager(models.Manager):

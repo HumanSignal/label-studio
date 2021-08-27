@@ -224,14 +224,6 @@ def get_prepared_queryset(request, project):
     return queryset
 
 
-def is_ordering_enabled(request, project):
-    prepare_params = get_prepare_params(request, project)
-    if prepare_params.ordering:
-        return True
-    else:
-        return False
-
-
 def evaluate_predictions(tasks):
     """ Call ML backend for prediction evaluation of the task queryset
     """
