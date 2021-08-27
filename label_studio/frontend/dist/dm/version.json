@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #9 from heartexlabs/feature/regex-filter\n\n[ext] Add regex filter support",
-  "commit": "e67fb3ab5bcabfb663a4e010503c83ecb3d2ed44",
+  "message": "Remove permissions field from Action model",
+  "commit": "e43c78af7d47d61912f98479ff9fc271b68d956e",
   "branch": "master",
-  "date": "2021-08-17T13:41:09Z"
+  "date": "2021-08-27T12:22:53Z"
 }
