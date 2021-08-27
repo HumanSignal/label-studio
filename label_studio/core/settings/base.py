@@ -13,6 +13,9 @@ import os
 import re
 import logging
 
+import google.cloud.logging
+from google.auth.exceptions import GoogleAuthError
+
 # for printing messages before main logging config applied
 if not logging.getLogger().hasHandlers():
     logging.basicConfig(level=logging.DEBUG, format='%(message)s')
@@ -120,6 +123,20 @@ LOGGING = {
         'level': get_env('LOG_LEVEL', 'WARNING'),
     }
 }
+
+if get_env('GOOGLE_LOGGING_ENABLED', False):
+    try:
+        client = google.cloud.logging.Client()
+        client.setup_logging()
+
+        LOGGING['handlers']['google_cloud_logging'] = {
+            'level': get_env('LOG_LEVEL', 'WARNING'),
+            'class': 'google.cloud.logging.handlers.CloudLoggingHandler',
+            'client': client
+        }
+        LOGGING['root']['handlers'].append('google_cloud_logging')
+    except GoogleAuthError as e:
+        logger.exception('Google Cloud Logging handler could not be setup.')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
