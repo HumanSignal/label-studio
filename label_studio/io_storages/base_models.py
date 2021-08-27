@@ -215,11 +215,15 @@ class ExportStorageLink(models.Model):
         _('object exists'), help_text='Whether object under external link still exists', default=True)
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
 
+    @staticmethod
+    def get_key(annotation):
+        if get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False):
+            return str(annotation.task.id)
+        return str(annotation.id)
+
     @property
     def key(self):
-        if get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False):
-            return str(self.annotation.task.id)
-        return str(self.annotation.id)
+        return self.get_key(self.annotation)
 
     @classmethod
     def exists(cls, annotation, storage):

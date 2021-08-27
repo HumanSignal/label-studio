@@ -106,10 +106,15 @@ class RedisExportStorage(ExportStorage, RedisStorageMixin):
         client = self.get_client()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
-        with transaction.atomic():
-            # Create export storage link
-            link = RedisExportStorageLink.create(annotation, self)
-            client.set(link.key, json.dumps(ser_annotation))
+
+        # get key that identifies this object in storage
+        key = RedisExportStorageLink.get_key(annotation)
+
+        # put object into storage
+        client.set(key, json.dumps(ser_annotation))
+
+        # create link if everything ok
+        RedisExportStorageLink.create(annotation, self)
 
 
 @receiver(post_save, sender=Annotation)
