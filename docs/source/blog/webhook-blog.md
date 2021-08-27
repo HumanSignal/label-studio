@@ -1,15 +1,15 @@
 ---
-title: From raw data to a trained model&#58; Automate your ML pipeline with Label Studio & SageMaker
+title: From raw data to a trained model&#58; Automate your ML pipeline with Label Studio & Amazon SageMaker
 type: blog
 order: 90
-image: /images/webhook-blog/sagemaker-illustration.png
+image: /images/webhook-blog/sagemaker-illustration-big.png
 meta_title: 
-meta_description: Use webhooks from open source data labeling software Label Studio to seamlessly integrate your Amazon Sagemaker model development pipeline for your machine learning and data science projects using AWS Lambda, Amazon S3, and public domain bird images.
+meta_description: Use webhooks from open source data labeling software Label Studio to seamlessly integrate your Amazon SageMaker model development workflow for your machine learning and data science projects using AWS Lambda, Amazon S3, and public domain bird images.
 ---
 
 It can be difficult to get from raw data to a fully trained model, but the more you can do to automate your machine learning pipeline, the easier the process is. If you're using Amazon SageMaker but have complex labeling scenarios and corner cases, add Label Studio to your Amazon SageMaker machine learning pipeline and simplify annotating your data.
 
-Especially if you have a machine learning pipeline, or retrain your models frequently based on newly-annotated data, you know that it can be challenging to automate that process. Now that Label Studio supports webhooks, you can automatically receive updates every time a new annotation is created or a project is updated to include different labels. 
+If you have a machine learning pipeline, or retrain your models frequently based on newly-annotated data, you know that it can be challenging to automate that process. Now that Label Studio supports webhooks, you can automatically receive updates every time a new annotation is created or a project is updated to include different labels. 
 
 <br/><img src="/images/webhook-blog/sagemaker-illustration.png" alt="" class="gif-border" width="800px" height="377px" />
 
@@ -45,12 +45,12 @@ This example uses an AWS region of `us-east-2`, so if you prefer to use a differ
 
 Add the bird images to Amazon S3 so that you can annotate them in Label Studio and so that Amazon SageMaker can easily access the annotations and source images. 
 
-1. Make sure that you downloaded the [bird image dataset]() and save the images to a folder called `bird-images`.
+1. Make sure that you downloaded the [bird image dataset](https://ibb.co/album/DPcxnZ) and save the images to a folder called `bird-images`.
 2. From the command line, run the following:
 ```bash
 aws s3 mb s3://showcase-bucket
 ```
-3. Log in to the S3 management console and create folders to function as prefixes for the data. Create the following folders:
+3. Log in to the S3 Management Console and create folders to function as prefixes for the data. Create the following folders:
    
 | Folder name | Description | Full URL |
 | --- | --- | --- |
@@ -63,7 +63,10 @@ aws s3 mb s3://showcase-bucket
 ```bash
 aws s3 cp --recursive bird-images/ s3://showcase-bucket/bird-images/
 ```
-5. Copy and save the data preprocessing script as `preprocessing.py`. This script works with the SageMaker pipeline to process your image annotations into a format that ResNet50 can use for training. 
+
+The SageMaker pipeline also runs two scripts to manage the data for the model training process. A preprocessing script retrieves the bird images and annotations from the S3 bucket, transforms the data into a format needed by the training process, and prompts the model to train on the newly-annotated images. The preprocessing script also creates additional prefixes in the S3 bucket to split the data into a training and validation set. A cleanup script runs after the model trains to remove the additional prefixes in the S3 bucket.
+
+1. Copy and save the data preprocessing script as `preprocessing.py`. This script is run by the SageMaker pipeline to process your image annotations into a format that ResNet50 can use for training. 
 <br/>
 {% details <b>Click here to expand the preprocessing script</b> %}
 {% codeblock lang:python %}
@@ -147,19 +150,57 @@ if __name__=='__main__':
 
 {% endcodeblock %}
 {% enddetails %}
-<br/>   
-6. Copy the preprocessing script to the correct bucket prefix. From the command line, run the following:
+<br/>
+2. Copy the preprocessing script to the correct bucket prefix. From the command line, run the following:
 ```bash
 aws s3 cp preprocessing.py s3://showcase-bucket/script/
+```
+3. Copy and save the data cleanup script as `cleanup.py`. This script runs at the end of the SageMaker pipeline to remove temporary files used to split your dataset into training and validation sets. 
+<br/>
+{% details <b>Click here to expand the cleanup script</b> %}
+{% codeblock lang:python %}
+import boto3
+import argparse
+from urllib.parse import urlparse
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--s3_validation_annotation_path', type=str, default=None)
+    parser.add_argument('--s3_validation_path', type=str, default=None)
+    parser.add_argument('--s3_train_annotation_path', type=str, default=None)
+    parser.add_argument('--s3_train_path', type=str, default=None)
+
+    args, _ = parser.parse_known_args()
+    print(f"Cleaning up ARGS: {args}")
+    s3_val = args.s3_validation_annotation_path
+    s3_val_data = args.s3_validation_path
+    s3_train_path = args.s3_train_path
+    s3_train_annotation_path = args.s3_train_annotation_path
+
+    s3 = boto3.resource('s3')
+    print(f"Cleaning up storage folders: {[s3_val, s3_val_data, s3_train_path, s3_train_annotation_path]}")
+    for item in [s3_val, s3_val_data, s3_train_path, s3_train_annotation_path]:
+        o = urlparse(item)
+        bucket = s3.Bucket(o.netloc)
+        prefix = item.replace('s3://' + o.netloc + "/", "")
+        print(f"Cleaning bucket {bucket} folder {prefix}")
+        for key in bucket.objects.filter(Prefix=prefix):
+            print('Deleting', key)
+            key.delete()
+    print("Finished cleaning up bucket!")
+{% endcodeblock %}
+{% enddetails %}
+<br/>
+4. Copy the cleanup script to the correct bucket prefix. From the command line, run the following:
+```bash
+aws s3 cp cleanup.py s3://showcase-bucket/script/
 ```
 
 After you prepare your datasets, deploy the model pipeline in Amazon SageMaker.
 
 ## Set up your model pipeline in Amazon SageMaker
 
-Create an image segmentation model pipeline in Amazon SageMaker using the ResNet50 pretrained model. The SageMaker pipeline uses a preprocessing script to retrieve the bird images and annotations from the S3 bucket, transform the data into a format needed by the training process, and prompts the model to train on the newly-annotated images. The preprocessing script also creates additional prefixes in the S3 bucket to manage the data, such as by splitting it into a training and validation set, and deletes those prefixes after the model retrains.
-
-Start by setting up the IAM policies needed to create and run the pipeline, then define and deploy the pipeline itself. 
+Create an image segmentation model pipeline in Amazon SageMaker using the ResNet50 pretrained model. Start by setting up the IAM policies needed to create and run the pipeline, then define and deploy the pipeline itself. 
 
 ### Configure IAM permissions for SageMaker
 
@@ -195,11 +236,11 @@ Now you're ready to define the SageMaker pipeline.
 
 ### Create a SageMaker pipeline
 
-In Amazon SageMaker, create a model training pipeline for the ResNet50 model, using the source images and annotations created in Label Studio and stored in Amazon S3.
+In Amazon SageMaker, create a model training pipeline with a pretrained ResNet50 semantic image segmentation model. using the source images and annotations created in Label Studio and stored in Amazon S3. The pipeline runs the preprocessing script to split the raw and annotation data from the S3 bucket into training and validation sets, retrains the ResNet50 model, and outputs the results to the S3 bucket prefixed with `model`. 
 
-You need to update this example Amazon SageMaker pipeline definition with the RoleArn of the SageMaker role that you set up in previous steps. Replace the `$SageMakerRoleArn` with the actual RoleArn value. 
+This example Amazon SageMaker pipeline definition has been updated to match the S3 bucket names that you created earlier, but you need to update it with the `RoleArn` of the role that you set up in previous steps. Replace `$SageMakerRoleArn` with the actual `RoleArn` value that you saved.
 
-> If you're using a region other than `us-east-2`, you'll need to update the image registries for the `sagemaker-debugger-rules` and `sagemaker-scikit-learn` packages to the region you're using. See [Docker Registry Paths and Example Code](https://docs.aws.amazon.com/sagemaker/latest/dg/sagemaker-algo-docker-registry-paths.html) in the Amazon SageMaker Developer Guide for replacement URIs.
+> If you're using a region other than `us-east-2`, you also need to update the image registries for the `sagemaker-debugger-rules` and `sagemaker-scikit-learn` packages to the region you're using. See [Docker Registry Paths and Example Code](https://docs.aws.amazon.com/sagemaker/latest/dg/sagemaker-algo-docker-registry-paths.html) in the Amazon SageMaker Developer Guide for replacement URIs.
 
 Copy the following pipeline definition, make any necessary updates, and save the pipeline definition and details as `BirdPipeline.json`. 
 
@@ -208,7 +249,7 @@ Copy the following pipeline definition, make any necessary updates, and save the
 	"PipelineName": "WebhookShowcase",
 	"PipelineDisplayName": "WebhookShowcase",
 	"RoleArn": "$SageMakerRoleArn",
-	"PipelineDefinition": "{\"Version\": \"2020-12-01\", \"Metadata\": {}, \"Parameters\": [{\"Name\": \"ProcessingInstanceType\", \"Type\": \"String\", \"DefaultValue\": \"ml.m5.xlarge\"}, {\"Name\": \"ProcessingInstanceCount\", \"Type\": \"Integer\", \"DefaultValue\": 1}, {\"Name\": \"TrainingInstanceType\", \"Type\": \"String\", \"DefaultValue\": \"ml.m5.xlarge\"}, {\"Name\": \"ModelApprovalStatus\", \"Type\": \"String\", \"DefaultValue\": \"PendingManualApproval\"}], \"PipelineExperimentConfig\": {\"ExperimentName\": {\"Get\": \"Execution.PipelineName\"}, \"TrialName\": {\"Get\": \"Execution.PipelineExecutionId\"}}, \"Steps\": [{\"Name\": \"ProcessingStepWebhook\", \"Type\": \"Processing\", \"Arguments\": {\"ProcessingResources\": {\"ClusterConfig\": {\"InstanceType\": \"ml.m5.xlarge\", \"InstanceCount\": 1, \"VolumeSizeInGB\": 30}}, \"AppSpecification\": {\"ImageUri\": \"257758044811.dkr.ecr.us-east-2.amazonaws.com/sagemaker-scikit-learn:0.20.0-cpu-py3\", \"ContainerArguments\": [\"--train-test-split-ratio\", \"20\"], \"ContainerEntrypoint\": [\"python3\", \"/opt/ml/processing/input/code/preprocessing.py\"]}, \"RoleArn\": \"ROLE_FOR_SAGEMAKER_PIPELINE\", \"ProcessingInputs\": [{\"InputName\": \"input-1\", \"AppManaged\": false, \"S3Input\": {\"S3Uri\": \"S3://showcase-bucket/annotations/\", \"LocalPath\": \"/opt/ml/processing/input/raw\", \"S3DataType\": \"S3Prefix\", \"S3InputMode\": \"File\", \"S3DataDistributionType\": \"FullyReplicated\", \"S3CompressionType\": \"None\"}}, {\"InputName\": \"input-2\", \"AppManaged\": false, \"S3Input\": {\"S3Uri\": \"S3://showcase-bucket/bird-images/\", \"LocalPath\": \"/opt/ml/processing/input/train\", \"S3DataType\": \"S3Prefix\", \"S3InputMode\": \"File\", \"S3DataDistributionType\": \"FullyReplicated\", \"S3CompressionType\": \"None\"}}, {\"InputName\": \"code\", \"AppManaged\": false, \"S3Input\": {\"S3Uri\": \"s3://showcase-bucket/script/preprocessing.py\", \"LocalPath\": \"/opt/ml/processing/input/code\", \"S3DataType\": \"S3Prefix\", \"S3InputMode\": \"File\", \"S3DataDistributionType\": \"FullyReplicated\", \"S3CompressionType\": \"None\"}}], \"ProcessingOutputConfig\": {\"Outputs\": [{\"OutputName\": \"train_1\", \"AppManaged\": false, \"S3Output\": {\"S3Uri\": \"S3://showcase-bucket/temp/train\", \"LocalPath\": \"/opt/ml/processing/output/train_1\", \"S3UploadMode\": \"EndOfJob\"}}, {\"OutputName\": \"train_1_annotation\", \"AppManaged\": false, \"S3Output\": {\"S3Uri\": \"S3://showcase-bucket/temp/train_annotation\", \"LocalPath\": \"/opt/ml/processing/output/train_1_annotation\", \"S3UploadMode\": \"EndOfJob\"}}, {\"OutputName\": \"val_annotation\", \"AppManaged\": false, \"S3Output\": {\"S3Uri\": \"S3://showcase-bucket/temp/validation_annotation\", \"LocalPath\": \"/opt/ml/processing/output/validation_annotation\", \"S3UploadMode\": \"EndOfJob\"}}, {\"OutputName\": \"val_data\", \"AppManaged\": false, \"S3Output\": {\"S3Uri\": \"S3://showcase-bucket/temp/validation\", \"LocalPath\": \"/opt/ml/processing/output/validation\", \"S3UploadMode\": \"EndOfJob\"}}]}}}, {\"Name\": \"ImageSegmentationTrain\", \"Type\": \"Training\", \"Arguments\": {\"AlgorithmSpecification\": {\"TrainingInputMode\": \"File\", \"TrainingImage\": \"825641698319.dkr.ecr.us-east-2.amazonaws.com/semantic-segmentation:1\"}, \"OutputDataConfig\": {\"S3OutputPath\": \"S3://showcase-bucket/output/\"}, \"StoppingCondition\": {\"MaxRuntimeInSeconds\": 36000}, \"ResourceConfig\": {\"InstanceCount\": 1, \"InstanceType\": \"ml.p3.2xlarge\", \"VolumeSizeInGB\": 100}, \"RoleArn\": \"ROLE_FOR_SAGEMAKER_PIPELINE\", \"InputDataConfig\": [{\"DataSource\": {\"S3DataSource\": {\"S3DataType\": \"S3Prefix\", \"S3Uri\": \"S3://showcase-bucket/temp/train\", \"S3DataDistributionType\": \"FullyReplicated\"}}, \"ContentType\": \"application/x-image\", \"ChannelName\": \"train\"}, {\"DataSource\": {\"S3DataSource\": {\"S3DataType\": \"S3Prefix\", \"S3Uri\": \"S3://showcase-bucket/temp/validation\", \"S3DataDistributionType\": \"FullyReplicated\"}}, \"ContentType\": \"application/x-image\", \"ChannelName\": \"validation\"}, {\"DataSource\": {\"S3DataSource\": {\"S3DataType\": \"S3Prefix\", \"S3Uri\": \"S3://showcase-bucket/temp/train_annotation\", \"S3DataDistributionType\": \"FullyReplicated\"}}, \"ContentType\": \"application/x-image\", \"ChannelName\": \"train_annotation\"}, {\"DataSource\": {\"S3DataSource\": {\"S3DataType\": \"S3Prefix\", \"S3Uri\": \"S3://showcase-bucket/temp/validation_annotation\", \"S3DataDistributionType\": \"FullyReplicated\"}}, \"ContentType\": \"application/x-image\", \"ChannelName\": \"validation_annotation\"}], \"HyperParameters\": {\"backbone\": \"resnet-50\", \"algorithm\": \"fcn\", \"use_pretrained_model\": \"True\", \"num_classes\": \"4\", \"epochs\": \"10\", \"learning_rate\": \"0.0001\", \"optimizer\": \"rmsprop\", \"lr_scheduler\": \"poly\", \"mini_batch_size\": \"2\", \"validation_mini_batch_size\": \"2\"}, \"ProfilerRuleConfigurations\": [{\"RuleConfigurationName\": \"ProfilerReport-1629795191\", \"RuleEvaluatorImage\": \"915447279597.dkr.ecr.us-east-2.amazonaws.com/sagemaker-debugger-rules:latest\", \"RuleParameters\": {\"rule_to_invoke\": \"ProfilerReport\"}}], \"ProfilerConfig\": {\"S3OutputPath\": \"S3://showcase-bucket/output/\"}}, \"DependsOn\": [\"ProcessingStepWebhook\"]}, {\"Name\": \"CleanupStepWebhook\", \"Type\": \"Processing\", \"Arguments\": {\"ProcessingResources\": {\"ClusterConfig\": {\"InstanceType\": \"ml.m5.xlarge\", \"InstanceCount\": 1, \"VolumeSizeInGB\": 30}}, \"AppSpecification\": {\"ImageUri\": \"257758044811.dkr.ecr.us-east-2.amazonaws.com/sagemaker-scikit-learn:0.20.0-cpu-py3\", \"ContainerArguments\": [\"--s3_validation_annotation_path\", \"S3://showcase-bucket/temp/validation_annotation\", \"--s3_validation_path\", \"S3://showcase-bucket/temp/validation\", \"--s3_train_annotation_path\", \"S3://showcase-bucket/temp/train_annotation\", \"--s3_train_path\", \"S3://showcase-bucket/temp/train\"], \"ContainerEntrypoint\": [\"python3\", \"/opt/ml/processing/input/code/aws-cleanup.py\"]}, \"RoleArn\": \"ROLE_FOR_SAGEMAKER_PIPELINE\", \"ProcessingInputs\": [{\"InputName\": \"code\", \"AppManaged\": false, \"S3Input\": {\"S3Uri\": \"s3://label-studio-testdata/preprocessing/aws-cleanup.py\", \"LocalPath\": \"/opt/ml/processing/input/code\", \"S3DataType\": \"S3Prefix\", \"S3InputMode\": \"File\", \"S3DataDistributionType\": \"FullyReplicated\", \"S3CompressionType\": \"None\"}}]}, \"DependsOn\": [\"ImageSegmentationTrain\"]}]}"
+	"PipelineDefinition": "{\"Version\": \"2020-12-01\", \"Metadata\": {}, \"Parameters\": [{\"Name\": \"ProcessingInstanceType\", \"Type\": \"String\", \"DefaultValue\": \"ml.m5.xlarge\"}, {\"Name\": \"ProcessingInstanceCount\", \"Type\": \"Integer\", \"DefaultValue\": 1}, {\"Name\": \"TrainingInstanceType\", \"Type\": \"String\", \"DefaultValue\": \"ml.m5.xlarge\"}, {\"Name\": \"ModelApprovalStatus\", \"Type\": \"String\", \"DefaultValue\": \"PendingManualApproval\"}], \"PipelineExperimentConfig\": {\"ExperimentName\": {\"Get\": \"Execution.PipelineName\"}, \"TrialName\": {\"Get\": \"Execution.PipelineExecutionId\"}}, \"Steps\": [{\"Name\": \"ProcessingStepWebhook\", \"Type\": \"Processing\", \"Arguments\": {\"ProcessingResources\": {\"ClusterConfig\": {\"InstanceType\": \"ml.m5.xlarge\", \"InstanceCount\": 1, \"VolumeSizeInGB\": 30}}, \"AppSpecification\": {\"ImageUri\": \"257758044811.dkr.ecr.us-east-2.amazonaws.com/sagemaker-scikit-learn:0.20.0-cpu-py3\", \"ContainerArguments\": [\"--train-test-split-ratio\", \"20\"], \"ContainerEntrypoint\": [\"python3\", \"/opt/ml/processing/input/code/preprocessing.py\"]}, \"RoleArn\": \"ROLE_FOR_SAGEMAKER_PIPELINE\", \"ProcessingInputs\": [{\"InputName\": \"input-1\", \"AppManaged\": false, \"S3Input\": {\"S3Uri\": \"S3://showcase-bucket/annotations/\", \"LocalPath\": \"/opt/ml/processing/input/raw\", \"S3DataType\": \"S3Prefix\", \"S3InputMode\": \"File\", \"S3DataDistributionType\": \"FullyReplicated\", \"S3CompressionType\": \"None\"}}, {\"InputName\": \"input-2\", \"AppManaged\": false, \"S3Input\": {\"S3Uri\": \"S3://showcase-bucket/bird-images/\", \"LocalPath\": \"/opt/ml/processing/input/train\", \"S3DataType\": \"S3Prefix\", \"S3InputMode\": \"File\", \"S3DataDistributionType\": \"FullyReplicated\", \"S3CompressionType\": \"None\"}}, {\"InputName\": \"code\", \"AppManaged\": false, \"S3Input\": {\"S3Uri\": \"s3://showcase-bucket/script/preprocessing.py\", \"LocalPath\": \"/opt/ml/processing/input/code\", \"S3DataType\": \"S3Prefix\", \"S3InputMode\": \"File\", \"S3DataDistributionType\": \"FullyReplicated\", \"S3CompressionType\": \"None\"}}], \"ProcessingOutputConfig\": {\"Outputs\": [{\"OutputName\": \"train_1\", \"AppManaged\": false, \"S3Output\": {\"S3Uri\": \"S3://showcase-bucket/temp/train\", \"LocalPath\": \"/opt/ml/processing/output/train_1\", \"S3UploadMode\": \"EndOfJob\"}}, {\"OutputName\": \"train_1_annotation\", \"AppManaged\": false, \"S3Output\": {\"S3Uri\": \"S3://showcase-bucket/temp/train_annotation\", \"LocalPath\": \"/opt/ml/processing/output/train_1_annotation\", \"S3UploadMode\": \"EndOfJob\"}}, {\"OutputName\": \"val_annotation\", \"AppManaged\": false, \"S3Output\": {\"S3Uri\": \"S3://showcase-bucket/temp/validation_annotation\", \"LocalPath\": \"/opt/ml/processing/output/validation_annotation\", \"S3UploadMode\": \"EndOfJob\"}}, {\"OutputName\": \"val_data\", \"AppManaged\": false, \"S3Output\": {\"S3Uri\": \"S3://showcase-bucket/temp/validation\", \"LocalPath\": \"/opt/ml/processing/output/validation\", \"S3UploadMode\": \"EndOfJob\"}}]}}}, {\"Name\": \"ImageSegmentationTrain\", \"Type\": \"Training\", \"Arguments\": {\"AlgorithmSpecification\": {\"TrainingInputMode\": \"File\", \"TrainingImage\": \"825641698319.dkr.ecr.us-east-2.amazonaws.com/semantic-segmentation:1\"}, \"OutputDataConfig\": {\"S3OutputPath\": \"S3://showcase-bucket/output/\"}, \"StoppingCondition\": {\"MaxRuntimeInSeconds\": 36000}, \"ResourceConfig\": {\"InstanceCount\": 1, \"InstanceType\": \"ml.p3.2xlarge\", \"VolumeSizeInGB\": 100}, \"RoleArn\": \"ROLE_FOR_SAGEMAKER_PIPELINE\", \"InputDataConfig\": [{\"DataSource\": {\"S3DataSource\": {\"S3DataType\": \"S3Prefix\", \"S3Uri\": \"S3://showcase-bucket/temp/train\", \"S3DataDistributionType\": \"FullyReplicated\"}}, \"ContentType\": \"application/x-image\", \"ChannelName\": \"train\"}, {\"DataSource\": {\"S3DataSource\": {\"S3DataType\": \"S3Prefix\", \"S3Uri\": \"S3://showcase-bucket/temp/validation\", \"S3DataDistributionType\": \"FullyReplicated\"}}, \"ContentType\": \"application/x-image\", \"ChannelName\": \"validation\"}, {\"DataSource\": {\"S3DataSource\": {\"S3DataType\": \"S3Prefix\", \"S3Uri\": \"S3://showcase-bucket/temp/train_annotation\", \"S3DataDistributionType\": \"FullyReplicated\"}}, \"ContentType\": \"application/x-image\", \"ChannelName\": \"train_annotation\"}, {\"DataSource\": {\"S3DataSource\": {\"S3DataType\": \"S3Prefix\", \"S3Uri\": \"S3://showcase-bucket/temp/validation_annotation\", \"S3DataDistributionType\": \"FullyReplicated\"}}, \"ContentType\": \"application/x-image\", \"ChannelName\": \"validation_annotation\"}], \"HyperParameters\": {\"backbone\": \"resnet-50\", \"algorithm\": \"fcn\", \"use_pretrained_model\": \"True\", \"num_classes\": \"4\", \"epochs\": \"10\", \"learning_rate\": \"0.0001\", \"optimizer\": \"rmsprop\", \"lr_scheduler\": \"poly\", \"mini_batch_size\": \"2\", \"validation_mini_batch_size\": \"2\"}, \"ProfilerRuleConfigurations\": [{\"RuleConfigurationName\": \"ProfilerReport-1629795191\", \"RuleEvaluatorImage\": \"915447279597.dkr.ecr.us-east-2.amazonaws.com/sagemaker-debugger-rules:latest\", \"RuleParameters\": {\"rule_to_invoke\": \"ProfilerReport\"}}], \"ProfilerConfig\": {\"S3OutputPath\": \"S3://showcase-bucket/model/\"}}, \"DependsOn\": [\"ProcessingStepWebhook\"]}, {\"Name\": \"CleanupStepWebhook\", \"Type\": \"Processing\", \"Arguments\": {\"ProcessingResources\": {\"ClusterConfig\": {\"InstanceType\": \"ml.m5.xlarge\", \"InstanceCount\": 1, \"VolumeSizeInGB\": 30}}, \"AppSpecification\": {\"ImageUri\": \"257758044811.dkr.ecr.us-east-2.amazonaws.com/sagemaker-scikit-learn:0.20.0-cpu-py3\", \"ContainerArguments\": [\"--s3_validation_annotation_path\", \"S3://showcase-bucket/temp/validation_annotation\", \"--s3_validation_path\", \"S3://showcase-bucket/temp/validation\", \"--s3_train_annotation_path\", \"S3://showcase-bucket/temp/train_annotation\", \"--s3_train_path\", \"S3://showcase-bucket/temp/train\"], \"ContainerEntrypoint\": [\"python3\", \"/opt/ml/processing/input/code/cleanup.py\"]}, \"RoleArn\": \"ROLE_FOR_SAGEMAKER_PIPELINE\", \"ProcessingInputs\": [{\"InputName\": \"code\", \"AppManaged\": false, \"S3Input\": {\"S3Uri\": \"s3://showcase-bucket/script/cleanup.py\", \"LocalPath\": \"/opt/ml/processing/input/code\", \"S3DataType\": \"S3Prefix\", \"S3InputMode\": \"File\", \"S3DataDistributionType\": \"FullyReplicated\", \"S3CompressionType\": \"None\"}}]}, \"DependsOn\": [\"ImageSegmentationTrain\"]}]}"
 } 
 ```
 
@@ -314,11 +355,7 @@ zip LsCustomWebhook.zip LsCustomWebhook.py
 aws lambda create-function --function-name LsCustomWebhook --role $ROLE_ARN --runtime python3.8 --handler LsCustomWebhook.lambda_handler --zip-file fileb://LsCustomWebhook.zip
 ```
 After the function is created, you see JSON results that contain the FunctionArn of `arn:aws:lambda:us-east-2:USERID:function:LsCustomWebhook` and the role ARN used by the function, `arn:aws:iam::USERID:role/LsCustomWebhook`.
-4. Update the function to specify the endpoint of the Sagemaker model. From the command line, run the following:
-```bash
-aws lambda update-function-configuration --function-name LsCustomWebhook --environment Variables='{ENDPOINT_NAME="< SageMaker Endpoint Name >"}'
-```
-5. Store the ARN of the Lambda function so that the webhook function script can reference it. From the command line, run the following:
+4. Store the ARN of the Lambda function so that the webhook function script can reference it. From the command line, run the following:
 ```bash
 LAMBDAARN=$(aws lambda list-functions --query "Functions[?FunctionName==\`LsCustomWebhook\`].FunctionArn" --output text) 
 ```
@@ -330,7 +367,7 @@ After you set up and configure the AWS Lambda function, set up the Amazon API Ga
 
 Set up the Amazon API Gateway to allow the webhook events sent from Label Studio to reach the AWS Lambda function. If you're using an Amazon VPC to host Label Studio, you can use a VPC endpoint instead of the Amazon API gateway, but this example only covers the setup for the Amazon API Gateway.
 
-1. Specify a region. This example uses us-east-2 as a default region. If you're using a different AWS region, update the `REGION` variable to the AWS region that you're using. From the command line, run the following:
+1. Specify a region. This example uses `us-east-2` as a default region. If you're using a different AWS region, update the `REGION` variable to the AWS region that you're using. From the command line, run the following:
 ```bash
 REGION=us-east-2
 ```
@@ -470,7 +507,7 @@ After you set up the project, you can start labeling!
 3. To make it easier to draw overlapping polygons, use the eye icon in the **Regions** sidebar to hide polygonal regions after you create them.
 4. When you're finished labeling the parts of the bird, click **Submit** to move onto the next task.
 
-<br/><img src="/images/webhook-blog/GifOfLabeledBird.gif" alt="" class="gif-border" width="800px" height="" />
+<br/><img src="/images/webhook-blog/owl-labeling.gif" alt="" class="gif-border" width="800px" height="" />
 
 Label at least 16 bird images to trigger the SageMaker pipeline.
 
