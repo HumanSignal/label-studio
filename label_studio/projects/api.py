@@ -357,7 +357,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             next_task = self._get_random_unlocked(tasks)
         return next_task
 
-    def _make_response(self, next_task, request, use_task_lock=True):
+    def _make_response(self, next_task, request, use_task_lock=True, queue=''):
         """Once next task has chosen, this function triggers inference and prepare the API response"""
         user = request.user
         project = next_task.project
@@ -387,6 +387,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         if not project.show_collab_predictions:
             response['predictions'] = []
 
+        response['queue'] = queue
         return Response(response)
 
     def get(self, request, *args, **kwargs):
@@ -429,49 +430,56 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 next_task = not_solved_tasks.first()
                 if not next_task:
                     raise NotFound('No more tasks found')
-                return self._make_response(next_task, request, use_task_lock=False)
+                return self._make_response(next_task, request, use_task_lock=False, queue='Manually assigned queue')
 
             # If current user has already lock one task - return it (without setting the lock again)
             next_task = Task.get_locked_by(user, tasks=not_solved_tasks)
             if next_task:
-                return self._make_response(next_task, request, use_task_lock=False)
+                return self._make_response(next_task, request, use_task_lock=False, queue='Task lock')
 
             if project.show_ground_truth_first:
                 logger.debug(f'User={request.user} tries ground truth from {not_solved_tasks_count} tasks')
                 next_task = self._try_ground_truth(not_solved_tasks, project)
                 if next_task:
-                    return self._make_response(next_task, request)
+                    return self._make_response(next_task, request, queue='Ground truth queue')
 
+            queue_info = ''
+
+            # show tasks with overlap > 1 first
             if project.show_overlap_first:
                 # don't output anything - just filter tasks with overlap
                 logger.debug(f'User={request.user} tries overlap first from {not_solved_tasks_count} tasks')
                 _, not_solved_tasks = self._try_tasks_with_overlap(not_solved_tasks)
+                queue_info += 'Show overlap first'
 
-            # don't use this mode for data manager sorting, because the sorting becomes not obvious
-            if project.sampling != project.SEQUENCE:
-                # if there any tasks in progress (with maximum number of annotations), randomly sampling from them
-                logger.debug(f'User={request.user} tries depth first from {not_solved_tasks_count} tasks')
-                next_task = self._try_breadth_first(not_solved_tasks)
-                if next_task:
-                    return self._make_response(next_task, request)
+            # if there any tasks in progress (with maximum number of annotations), randomly sampling from them
+            logger.debug(f'User={request.user} tries depth first from {not_solved_tasks_count} tasks')
+            next_task = self._try_breadth_first(not_solved_tasks)
+            if next_task:
+                queue_info += (' & ' if queue_info else '') + 'Breadth first queue'
+                return self._make_response(next_task, request, queue=queue_info)
 
             if project.sampling == project.UNCERTAINTY:
+                queue_info += (' & ' if queue_info else '') + 'Active learning or random queue'
                 logger.debug(f'User={request.user} tries uncertainty sampling from {not_solved_tasks_count} tasks')
                 next_task = self._try_uncertainty_sampling(not_solved_tasks, project, user_solved_tasks_array)
 
             elif project.sampling == project.UNIFORM:
+                queue_info += (' & ' if queue_info else '') + 'Uniform random queue'
                 logger.debug(f'User={request.user} tries random sampling from {not_solved_tasks_count} tasks')
                 next_task = self._get_random_unlocked(not_solved_tasks)
 
             elif project.sampling == project.SEQUENCE:
+                queue_info += (' & ' if queue_info else '') + 'Data manager queue'
                 logger.debug(f'User={request.user} tries sequence sampling from {not_solved_tasks_count} tasks')
                 next_task = self._get_first_unlocked(not_solved_tasks)
 
             if next_task:
-                return self._make_response(next_task, request)
+                return self._make_response(next_task, request, queue=queue_info)
             else:
                 raise NotFound(
-                    f'There are still some tasks to complete for the user={user}, but they seem to be locked by another user.')
+                    f'There are still some tasks to complete for the user={user}, '
+                    f'but they seem to be locked by another user.')
 
 
 @method_decorator(name='post', decorator=swagger_auto_schema(
