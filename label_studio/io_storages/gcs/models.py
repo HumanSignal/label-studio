@@ -187,15 +187,17 @@ class GCSExportStorage(GCSStorageMixin, ExportStorage):
         bucket = self.get_bucket()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
-        with transaction.atomic():
-            # Create export storage link
-            link = GCSExportStorageLink.create(annotation, self)
-            key = str(self.prefix) + '/' + link.key if self.prefix else link.key
-            try:
-                blob = bucket.blob(key)
-                blob.upload_from_string(json.dumps(ser_annotation))
-            except Exception as exc:
-                logger.error(f"Can't export annotation {annotation} to GCS storage {self}. Reason: {exc}", exc_info=True)
+
+        # get key that identifies this object in storage
+        key = GCSExportStorageLink.get_key(annotation)
+        key = str(self.prefix) + '/' + key if self.prefix else key
+
+        # put object into storage
+        blob = bucket.blob(key)
+        blob.upload_from_string(json.dumps(ser_annotation))
+
+        # create link if everything ok
+        GCSExportStorageLink.create(annotation, self)
 
 
 @receiver(post_save, sender=Annotation)
