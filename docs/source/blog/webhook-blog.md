@@ -11,7 +11,7 @@ It can be difficult to get from raw data to a fully trained model, but the more 
 
 If you have a machine learning pipeline, or retrain your models frequently based on newly-annotated data, you know that it can be challenging to automate that process. Now that Label Studio supports webhooks, you can automatically receive updates every time a new annotation is created or a project is updated to include different labels. 
 
-<br/><img src="/images/webhook-blog/sagemaker-illustration.png" alt="" class="gif-border" width="800px" height="377px" />
+<br/><img src="/images/webhook-blog/sagemaker-illustration.png" alt="Decorative image showing Label Studio logo with birds flying to Amazon SageMaker and then returning with model predictions to Label Studio" class="gif-border" width="800px" height="527px" />
 
 This blog post walks you through an example of using webhooks with Label Studio to trigger specific actions in an image segmentation machine learning pipeline built in Amazon Web Services (AWS) such as Amazon API Gateway, AWS Lambda, and Amazon SageMaker. 
 
@@ -26,10 +26,9 @@ This example covers the following steps:
 4. Configuring Amazon API Gateway to securely communicate between Label Studio and the AWS Lambda function.
 5. Setting up a labeling project in Label Studio and annotating images.
 
-<br/><img src="/images/webhook-blog/sagemaker-webhooks.png" alt="" class="gif-border" width="800px" height="661px" />
+<br/><img src="/images/webhook-blog/sagemaker-webhooks.png" alt="Diagram showing data flow from bird images to an S3 bucket, flowing to Label Studio, which outputs annotations to the S3 bucket and sends a webhook to the Amazon API Gateway, which passes that information to the AWS Lambda function, which triggers the Amazon SageMaker training pipeline when the annotation count reaches at least 16, then outputs the resulting model to the S3 bucket." class="gif-border" width="800px" height="661px" />
 
 Follow along with the entire process to go from a Label Studio installation to a full-fledged model retraining pipeline using Amazon services and Label Studio.
-
  
 ## Before you start 
 
@@ -437,7 +436,7 @@ To start annotating bird images, set up an image segmentation project and connec
 
 To perform image segmentation labeling in Label Studio, you want to set up a project to organize your dataset and annotation settings. The SageMaker pipeline defined earlier includes a model that expects 4 classes for image segmentation, so you want to make sure to set up 4 classes in the segmentation labeling project in Label Studio.
 
-<br/><img src="/images/webhook-blog/project-setup.png" alt="" class="gif-border" width="800px" height="430px" />
+<br/><img src="/images/webhook-blog/project-setup.png" alt="Screenshot of creating a project with the semantic segmentation with polygons template with custom labels for labeling birds." class="gif-border" width="800px" height="430px" />
 
 1. In the Label Studio UI, click **Create** to create a project. 
 2. Add a project name of **Bird Segmentation**.
@@ -458,7 +457,7 @@ Next, connect Label Studio and Amazon S3 so that you can retrieve the source ima
 
 Connect the S3 bucket and prefixes to Label Studio to ease the automation of your machine learning workflow. 
 
-<br/><img src="/images/webhook-blog/cloud-storage.png" alt="" class="gif-border" width="800px" height="448px" />
+<br/><img src="/images/webhook-blog/cloud-storage.png" alt="Screenshot of the configured cloud storage settings for source and target S3 storage." class="gif-border" width="800px" height="448px" />
 
 1. In the Label Studio UI, click **Settings** to open the project settings.
 2. Click **Cloud Storage**.
@@ -470,9 +469,9 @@ Connect the S3 bucket and prefixes to Label Studio to ease the automation of you
 8. Specify the Access Key ID, Secret Access Key, and Session Token for a user with access to S3 buckets. You can use the credentials of the user account that you used to create the S3 bucket.
 9. Select the option to **Treat every bucket object as a source file**. 
 10. Click **Add Storage**.
-11. Click **Sync** to sync the images.
+11. Click **Sync Storage** to sync the images.
 
-<br/><img src="/images/webhook-blog/data-manager.png" alt="" class="gif-border" width="800px" height="577px" />
+<br/><img src="/images/webhook-blog/data-manager.png" alt="Screenshot of the Label Studio UI showing bird images and annotation progress on the data manager." class="gif-border" width="800px" height="577px" />
 
 As the images sync to Label Studio using pre-signed URLs, set up the target storage to store annotations. 
 1. In the Label Studio Cloud Storage Settings, click **Add Target Storage**.
@@ -494,29 +493,33 @@ Set up the webhook URL so that you can send `ANNOTATION_CREATED` events from Lab
 6. For **Send Payload for**, select **Annotation created**. You only want to send events to the AWS Lambda function when an annotation is created.
 6. Click **Add Webhook** to save your webhook.
 
-<br/><img src="/images/webhook-blog/webhook-setup.png" alt="" class="gif-border" width="800px" height="732px" />
+<br/><img src="/images/webhook-blog/webhook-setup.png" alt="Screenshot of the partially configured webhook settings in Label Studio UI." class="gif-border" width="800px" height="732px" />
 
 ## Start annotating data in Label Studio
 
 After you set up the project, you can start labeling! 
 
-<br/><img src="/images/webhook-blog/woodpecker-labeled-full.png" alt="" class="gif-border" width="800px" height="527px" />
+<br/><img src="/images/webhook-blog/woodpecker-labeled-full.png" alt="Screenshot of the Label Studio labeling UI with a woodpecker sitting on a bird feeder with the beak, head, wing, and body labeled with different colored polygons, and the labeled regions visible on the right hand sidebar." class="gif-border" width="800px" height="527px" />
 
+1. In the Label Studio UI, return to the data manager by clicking **Bird Segmentation** in the breadcrumbs. 
 1. From the data manager for the Bird Segmentation project, click **Label All Tasks**.
 2. Select a label and click points on the image to draw a polygon around parts of the bird. 
 3. To make it easier to draw overlapping polygons, use the eye icon in the **Regions** sidebar to hide polygonal regions after you create them.
 4. When you're finished labeling the parts of the bird, click **Submit** to move onto the next task.
 
-<br/><img src="/images/webhook-blog/owl-labeling.gif" alt="" class="gif-border" width="800px" height="" />
+<br/><img src="/images/webhook-blog/owl-labeling.gif" alt="Gif of an adorable owl sitting on pavement being labeled in the Label Studio UI with polygons around its beak, head, wing, and body, hiding the polygons after each is created to avoid accidentally interacting with an already-created polygon." class="gif-border" width="800px" height="" />
 
 Label at least 16 bird images to trigger the SageMaker pipeline.
 
 ## What the pipeline does behind the scenes
 
-<br/><img src="/images/webhook-blog/sagemaker-webhooks.png" alt="" class="gif-border" width="800px" height="661px" />
+As you start annotating data, Label Studio saves the annotations to your S3 bucket with the `/annotations/` prefix, and sends an event and payload through the Amazon API Gateway to the AWS Lambda function for each annotation created. 
 
-As you start annotating data, Label Studio saves the annotations to your S3 bucket with the `/annotations/` prefix, and sends an event and payload through the Amazon API Gateway to the AWS Lambda function for each annotation created. After you create at least 16 annotations, the Lambda function invokes the SageMaker pipeline that you created and starts processing the data using the preprocessing script and training the ResNet50 model in the SageMaker pipeline.  
+<br/><img src="/images/webhook-blog/sagemaker-webhooks.png" alt="The same diagram as earlier showing data flow from bird images to an S3 bucket, flowing to Label Studio, which outputs annotations to the S3 bucket and sends a webhook to the Amazon API Gateway, which passes that information to the AWS Lambda function, which triggers the Amazon SageMaker training pipeline when the annotation count reaches at least 16, then outputs the resulting model to the S3 bucket." class="gif-border" width="800px" height="661px" />
 
+After you create at least 16 annotations, the Lambda function invokes the SageMaker pipeline that you created and starts processing the data using the preprocessing script and training the ResNet50 model in the SageMaker pipeline.
+
+To see the status of the pipeline, you need the pipeline execution ARN generated when the Lambda function executes the pipeline. After you retrieve the execution ARN, you can run the following from the command line:
 ```bash
 aws sagemaker list-pipeline-execution-steps --pipeline-execution-arn {ARN of your execution}
 ```
@@ -527,7 +530,7 @@ After the SageMaker pipeline finishes retraining the model, you can retrieve the
 
 Setting up an end-to-end pipeline from data labeling to model training is complex, but after it's up and running you can take advantage of the time savings of an automated machine learning workflow. Branch out to include other types of data labeling for the bird images, such as image classification by season, or add some images of other animals to provide a more evenly trained model for your original use case. 
 
-<br/><img src="/images/webhook-blog/bird-labeled.png" alt="" class="gif-border" width="800px" height="628px" />
+<br/><img src="/images/webhook-blog/bird-labeled.png" alt="Screenshot of a finch perched on a fence with the beak, head, wing, and body labeled with different colored polygons." class="gif-border" width="800px" height="628px" />
 
 This is just one example of how you can use webhooks in Label Studio to simplify and automate part of your machine learning pipeline. You can also use webhooks to:
 - Monitor model performance against ground truth annotations
