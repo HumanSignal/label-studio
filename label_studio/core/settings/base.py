@@ -121,6 +121,23 @@ LOGGING = {
     }
 }
 
+if get_env('GOOGLE_LOGGING_ENABLED', False):
+    try:
+        import google.cloud.logging
+        from google.auth.exceptions import GoogleAuthError
+
+        client = google.cloud.logging.Client()
+        client.setup_logging()
+
+        LOGGING['handlers']['google_cloud_logging'] = {
+            'level': get_env('LOG_LEVEL', 'WARNING'),
+            'class': 'google.cloud.logging.handlers.CloudLoggingHandler',
+            'client': client
+        }
+        LOGGING['root']['handlers'].append('google_cloud_logging')
+    except GoogleAuthError as e:
+        logger.exception('Google Cloud Logging handler could not be setup.')
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
