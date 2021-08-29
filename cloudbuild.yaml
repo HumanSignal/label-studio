@@ -1,0 +1,21 @@
+steps:
+  - id: "build image"
+    name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "-t",
+        "gcr.io/${PROJECT_ID}/${_SERVICE_NAME}",
+        "${_SERVICE_FOLDER}",
+      ]
+
+  - id: "push image"
+    name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/${PROJECT_ID}/${_SERVICE_NAME}"]
+
+substitutions:
+  _SERVICE_FOLDER: .
+  _SERVICE_NAME: label-studio
+
+images:
+  - "gcr.io/${PROJECT_ID}/${_SERVICE_NAME}"
