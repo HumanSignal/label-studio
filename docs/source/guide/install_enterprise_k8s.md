@@ -102,8 +102,7 @@ If you have a more complex environment, you can customize your own YAML file of 
 
 {% codeblock lang:yaml %}
 
-
-# Default values for Label Studio Enterprise
+# Default values for Label Studio Enterprise.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -153,22 +152,17 @@ global:
 
 app:
   enabled: true
-  replicas: 1
 
   NameOverride: ""
   FullnameOverride: ""
 
-  deploymentStrategy:
-    type: Recreate
-
-  resources: { }
-  # resources:
-  #   requests:
-  #     memory: 256Mi
-  #     cpu: 250m
-  #   limits:
-  #     memory: 256Mi
-  #     cpu: 250m
+  resources:
+    requests:
+      memory: 384Mi
+      cpu: 250m
+    limits:
+      memory: 1024Mi
+      cpu: 750m
 
   logLevel: "INFO"
 
@@ -212,11 +206,11 @@ app:
   # Used to define custom readinessProbe settings
   readinessProbe:
     enabled: true
-    path: /health
+    path: /version
     # When a probe fails, Kubernetes will try failureThreshold times before giving up
     failureThreshold: 2
     # Number of seconds after the container has started before probe initiates
-    initialDelaySeconds: 15
+    initialDelaySeconds: 35
     # How often (in seconds) to perform the probe
     periodSeconds: 5
     # Minimum consecutive successes for the probe to be considered successful after having failed
@@ -225,7 +219,7 @@ app:
     timeoutSeconds: 3
   # Used to enable a livenessProbe for the pods
   livenessProbe:
-    enabled: false
+    enabled: true
     path: "/health"
     # When a probe fails, Kubernetes will try failureThreshold times before giving up
     failureThreshold: 2
@@ -242,7 +236,7 @@ app:
     enabled: true
     type: ClusterIP
     port: 80
-    targetPort: 8000
+    targetPort: 8085
     portName: service
 
   ingress:
@@ -287,14 +281,13 @@ rqworker:
     type: Recreate
 
   replicas: 1
-  resources: { }
-  # resources:
-  #   requests:
-  #     memory: 256Mi
-  #     cpu: 250m
-  #   limits:
-  #     memory: 256Mi
-  #     cpu: 250m
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 500m
 
   logLevel: "INFO"
 
@@ -338,11 +331,11 @@ rqworker:
   # Used to define custom readinessProbe settings
   readinessProbe:
     enabled: false
-    path: /health
+    path: /version
     # When a probe fails, Kubernetes will try failureThreshold times before giving up
     failureThreshold: 2
     # Number of seconds after the container has started before probe initiates
-    initialDelaySeconds: 5
+    initialDelaySeconds: 35
     # How often (in seconds) to perform the probe
     periodSeconds: 5
     # Minimum consecutive successes for the probe to be considered successful after having failed
