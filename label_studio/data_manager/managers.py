@@ -74,7 +74,6 @@ def get_fields_for_annotation(prepare_params):
     # we don't need to annotate regular model fields, so we skip them
     skipped_fields = [field.attname for field in Task._meta.fields]
     skipped_fields.append("id")
-    skipped_fields.append("file_upload")
     result = [f for f in result if f not in skipped_fields]
     result = [f for f in result if not f.startswith("data.")]
 
@@ -147,6 +146,10 @@ def apply_filters(queryset, filters):
 
         # django orm loop expression attached to column name
         field_name = preprocess_field_name(_filter.filter, only_undefined_field)
+
+        # use other name because of model names conflict
+        if field_name == 'file_upload':
+            field_name = 'file_upload_field'
 
         # annotate with cast to number if need
         if _filter.type == 'Number' and field_name.startswith('data__'):
@@ -310,6 +313,10 @@ def annotate_predictions_score(queryset):
     return queryset.annotate(predictions_score=Avg("predictions__score"))
 
 
+def file_upload(queryset):
+    return queryset.annotate(file_upload_field=F('file_upload__file'))
+
+
 def dummy(queryset):
     return queryset
 
@@ -320,6 +327,7 @@ settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     "predictions_results": annotate_predictions_results,
     "predictions_score": annotate_predictions_score,
     "annotators": annotate_annotators,
+    "file_upload": file_upload,
     "cancelled_annotations": dummy,
     "total_annotations": dummy,
     "total_predictions": dummy
