@@ -91,15 +91,15 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
         For example, to export JSON annotations for a project to a file called `annotations.json`,
         run the following from the command line:
         ```bash
-        curl -X GET {}/api/projects/{{id}}/export?exportType=JSON -H \'Authorization: Token abc123\' --output annotations.json'
+        curl -X GET {}/api/projects/{{id}}/export?exportType=JSON -H \'Authorization: Token abc123\' --output 'annotations.json'
         ```
         To export all tasks, including skipped tasks and others without annotations, run the following from the command line:
         ```bash
-        curl -X GET {}/api/projects/{{id}}/export?exportType=JSON&download_all_tasks=true -H \'Authorization: Token abc123\' --output annotations.json'
+        curl -X GET {}/api/projects/{{id}}/export?exportType=JSON&download_all_tasks=true -H \'Authorization: Token abc123\' --output 'annotations.json'
         ```
         To export specific tasks, run the following from the command line:
         ```bash
-        curl -X GET {}/api/projects/{{id}}/export?ids[]=123\&ids[]=345 -H \'Authorization: Token abc123\' --output annotations.json'
+        curl -X GET {}/api/projects/{{id}}/export?ids[]=123\&ids[]=345 -H \'Authorization: Token abc123\' --output 'annotations.json'
         ```
         """.format(settings.HOSTNAME or 'https://localhost:8080', settings.HOSTNAME or 'https://localhost:8080', settings.HOSTNAME or 'https://localhost:8080'),
     responses={200: openapi.Response(
