@@ -535,9 +535,7 @@ After you retrieve the execution ARN, you can run the following from the command
 aws sagemaker list-pipeline-execution-steps --pipeline-execution-arn {ARN of your execution}
 ```
 
-After the SageMaker pipeline finishes retraining the model, you can retrieve the output model from the `\output\` prefix of your Amazon S3 bucket. It takes about 15-20 minutes for retraining to complete. Each training run creates a different folder with the model output, identified by the prefix `pipelines-<pipeline-execution-ARN>`, for example `pipelines-ex1wl5v10ozo-ImageSegmentationTra-uQdocX42EE/`. 
-
-
+After the SageMaker pipeline finishes retraining the model, you can retrieve the output model from the `\output\` prefix of your Amazon S3 bucket. It takes about 15-20 minutes for retraining to complete. Each training run creates a different folder with the model output, identified by the prefix `pipelines-<pipeline-execution-ARN>`, for example `pipelines-ex1wl5v10ozo-ImageSegmentationTra-uQdocX42EE/`.
 
 ## Next Steps 
 
