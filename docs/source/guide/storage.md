@@ -47,7 +47,8 @@ In the Label Studio UI, do the following to set up Amazon S3 as a data source co
     - In the **Access Key ID** field, specify the access key ID for your AWS account.
     - In the **Secret Access Key** field, specify the secret key for your AWS account.
     - In the **Session Token** field, specify a session token for your AWS account. 
-    - Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file. 
+    - Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file.
+    - Enable **Recursive scan** to perform recursive scans over the bucket contents if you have nested folders in your S3 bucket.
     - Choose whether to disable **Use pre-signed URLs**. For example, if you host Label Studio in the same AWS network as your storage buckets, you can disable presigned URLs and have direct access to the storage using `s3://` links.
     - Adjust the counter for how many minutes the pre-signed URLs are valid.
 8. Click **Add Storage**.
@@ -150,7 +151,8 @@ In the Label Studio UI, do the following to set up the connection:
     - In the **S3 Endpoint** field, specify an S3 endpoint if you want to override the URL created by S3 to access your bucket.
     - In the **Role ARN** field, specify the Amazon Resource Name (ARN) of the IAM role that you created to grant access to Label Studio.
     - In the **External ID** field, specify the external ID that identifies Label Studio to your AWS account. You can find the external ID on your **Organization** page.
-    - Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file. 
+    - Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file.
+    - Enable **Recursive scan** to perform recursive scans over the bucket contents if you have nested folders in your S3 bucket.
     - Choose whether to disable **Use pre-signed URLs**. For example, if you host Label Studio in the same AWS network as your storage buckets, you can disable presigned URLs and have direct access to the storage using `s3://` links.
     - Adjust the counter for how many minutes the pre-signed URLs are valid.
 8. Click **Add Storage**.
