@@ -21,7 +21,7 @@ This example uses a pre-trained model, so it's faster to start training the mode
 
 This example covers the following steps:
 1. Adding public domain bird images to Amazon S3 storage.
-2. Creating an image segmentation model pipeline in Amazon SageMaker using ResNet50.
+2. Creating an image segmentation model pipeline in Amazon SageMaker using FCN ResNet-50 Image Segmentation.
 3. Writing an AWS Lambda function to trigger retraining the Amazon SageMaker model based on annotation progress in Label Studio.
 4. Configuring Amazon API Gateway to securely communicate between Label Studio and the AWS Lambda function.
 5. Setting up a labeling project in Label Studio and annotating images.
@@ -64,7 +64,7 @@ aws s3 cp --recursive bird-images/ s3://showcase-bucket/bird-images/
 
 The SageMaker pipeline also runs two scripts to manage the data for the model training process. A preprocessing script retrieves the bird images and annotations from the S3 bucket, drops any empty annotations, transforms the data into a format needed by the training process, and prompts the model to train on the newly-annotated images. The preprocessing script also creates additional prefixes in the S3 bucket to split the data into a training and validation set. A cleanup script runs after the model trains to remove the additional prefixes in the S3 bucket.
 
-1. Copy and save the data preprocessing script as `preprocessing.py`. This script is run by the SageMaker pipeline to process your image annotations into a format that ResNet50 can use for training. 
+1. Copy and save the data preprocessing script as `preprocessing.py`. This script is run by the SageMaker pipeline to process your image annotations into a format that FCN ResNet-50 Image Segmentation can use for training. 
 <br/>
 {% details <b>Click here to expand the preprocessing script</b> %}
 {% codeblock lang:python %}
@@ -199,7 +199,7 @@ After you prepare your datasets, deploy the model pipeline in Amazon SageMaker.
 
 ## Set up your model pipeline in Amazon SageMaker
 
-Create an image segmentation model pipeline in Amazon SageMaker using the ResNet50 pretrained model. Start by setting up the IAM policies needed to create and run the pipeline, then define and deploy the pipeline itself. 
+Create an image segmentation model pipeline in Amazon SageMaker using the FCN ResNet-50 Image Segmentation pretrained model. Start by setting up the IAM policies needed to create and run the pipeline, then define and deploy the pipeline itself. 
 
 ### Configure IAM permissions for SageMaker
 
@@ -235,7 +235,7 @@ Now you're ready to define the SageMaker pipeline.
 
 ### Create a SageMaker pipeline
 
-In Amazon SageMaker, create a model training pipeline with a pretrained ResNet50 semantic image segmentation model. using the source images and annotations created in Label Studio and stored in Amazon S3. The pipeline runs the preprocessing script to split the raw and annotation data from the S3 bucket into training and validation sets, retrains the ResNet50 model, and outputs the results to the S3 bucket prefixed with `output`. 
+In Amazon SageMaker, create a model training pipeline with a pretrained FCN ResNet-50 semantic image segmentation model. using the source images and annotations created in Label Studio and stored in Amazon S3. The pipeline runs the preprocessing script to split the raw and annotation data from the S3 bucket into training and validation sets, retrains the model, and outputs the results to the S3 bucket prefixed with `output`. 
 
 This example Amazon SageMaker pipeline definition has been updated to match the S3 bucket names that you created earlier, but you need to update it with the `RoleArn` of the role that you set up in previous steps. Replace `$SageMakerRoleArn` with the actual `RoleArn` value that you saved.
 
@@ -318,7 +318,7 @@ Now that you've set up a user role with the proper permissions, set up the Lambd
 
 This Python Lambda function counts the number of annotations created in Label Studio, based on the `ANNOTATION_CREATED` webhook event payload sent from Label Studio. After the number of completed annotations reaches a "ready to train" checkpoint of 16 annotations, the Lambda function invokes the Amazon SageMaker pipeline and starts the training process. 
 
-16 annotations is the minimum number of annotations for ResNet50 model training, but if your dataset is larger than the one used in this example, you might want to update the function to use a greater number of annotations, such as 50 or 100. In some cases, the number of annotations that you want to specify for initial training might be different than in this use case. Because this example is retraining a pre-trained model to focus on a specific use case of bird recognition, a smaller number of annotations is okay to start. 
+16 annotations is the minimum number of annotations for FCN ResNet-50 Image Segmentation model training, but if your dataset is larger than the one used in this example, you might want to update the function to use a greater number of annotations, such as 50 or 100. In some cases, the number of annotations that you want to specify for initial training might be different than in this use case. Because this example is retraining a pre-trained model to focus on a specific use case of bird recognition, a smaller number of annotations is okay to start. 
 
 1. Copy and save the following Python code as `LsCustomWebhook.py`: 
 ```python
@@ -522,7 +522,7 @@ As you start annotating data, Label Studio saves the annotations to your S3 buck
 
 <br/><img src="/images/webhook-blog/sagemaker-webhooks.png" alt="The same diagram as earlier showing data flow from bird images to an S3 bucket, flowing to Label Studio, which outputs annotations to the S3 bucket and sends a webhook to the Amazon API Gateway, which passes that information to the AWS Lambda function, which triggers the Amazon SageMaker training pipeline when the annotation count reaches at least 16, then outputs the resulting model to the S3 bucket." class="gif-border" width="800px" height="661px" />
 
-After you create at least 16 annotations, the Lambda function invokes the SageMaker pipeline that you created and starts processing the data using the preprocessing script and training the ResNet50 model in the SageMaker pipeline.
+After you create at least 16 annotations, the Lambda function invokes the SageMaker pipeline that you created and starts processing the data using the preprocessing script and training the FCN ResNet-50 Image Segmentation model in the SageMaker pipeline.
 
 You can check the status of the pipeline using the AWS Console and viewing the pipeline in Amazon SageMaker Studio. Search for the pipeline name and review the details of the pipeline execution. 
 
