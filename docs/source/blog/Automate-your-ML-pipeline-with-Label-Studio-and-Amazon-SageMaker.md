@@ -135,7 +135,7 @@ if __name__=='__main__':
         os.remove(p)
     print('Annotation files: ' + str(os.listdir(input_data_path)))
     for image in os.listdir(input_data_path):
-        target_set = 'train_1' if random.randint(0, 99) < split_ratio else 'validation'
+        target_set = 'train_1' if random.randint(0, 99) > split_ratio else 'validation'
         image_target_path = f'/opt/ml/processing/output/{target_set}'
         annotation_target_path = f'/opt/ml/processing/output/{target_set}_annotation'
         print(f"Moving file {os.path.join(data_path, image)} to {os.path.join(image_target_path, image)}")
