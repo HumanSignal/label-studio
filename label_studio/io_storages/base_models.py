@@ -170,8 +170,14 @@ class ExportStorage(Storage):
         raise NotImplementedError
 
     def save_all_annotations(self):
+        annotation_exported = 0
         for annotation in Annotation.objects.filter(task__project=self.project):
             self.save_annotation(annotation)
+            annotation_exported += 1
+
+        self.last_sync = timezone.now()
+        self.last_sync_count = annotation_exported
+        self.save()
 
     def sync(self):
         if redis_connected():
