@@ -22,6 +22,7 @@ export const StorageCard = ({
     setSyncing(true);
     setSynced(null);
 
+    
     const result = await api.callApi('syncStorage', {
       params: {
         target,
@@ -58,18 +59,16 @@ export const StorageCard = ({
     >
       <StorageSummary
         storage={storageData}
-        enableLastSync={target !== 'export'}
         className={rootClass.elem('summary')}
         storageTypes={storageTypes}
       />
 
-      {target !== 'export' && (
+      {(
         <div className={rootClass.elem('sync')}>
           <Space size="small">
             <Button waiting={syncing} onClick={startSync}>
               Sync Storage
             </Button>
-
             {synced !== null ? (
               <div className={rootClass.elem('sync-count')}>
                 Synced {synced} task(s)
