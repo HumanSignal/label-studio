@@ -74,6 +74,9 @@ AUTH_LDAP_BIND_DN=uid=user,ou=sysadmins,o=12abc345de12abc345de12ab,dc=zexample,d
 AUTH_LDAP_BIND_PASSWORD=zexamplepass
 AUTH_LDAP_USER_DN_TEMPLATE=uid=%(user)s,ou=Users,o=12abc345de12abc345de12ab,dc=example,dc=com
 
+# Query the authenticating user in the database, it can be [email|username]
+AUTH_LDAP_USER_QUERY_FIELD=email
+
 # Group parameters
 AUTH_LDAP_GROUP_SEARCH_BASE_DN=ou=Users,o=12abc345de12abc345de12ab,dc=example,dc=com
 AUTH_LDAP_GROUP_SEARCH_FILTER_STR=(objectClass=groupOfNames)
@@ -92,7 +95,7 @@ AUTH_LDAP_ORGANIZATION_ROLE_COLLABORATOR=cn=collabs,ou=users,o=12abc345de12abc34
 AUTH_LDAP_ORGANIZATION_ROLE_NOT_ACTIVATED=cn=not,ou=users,o=12abc345de12abc345de12ab,dc=example,dc=com
 AUTH_LDAP_ORGANIZATION_ROLE_DEACTIVATED=
 
-# Specify organization to assign on the platform 
+# Specify organization to assign it to all users on the platform 
 AUTH_LDAP_ORGANIZATION_OWNER_EMAIL=heartex@heartex.net
 ```
 
