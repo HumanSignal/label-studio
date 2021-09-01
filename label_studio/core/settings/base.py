@@ -123,7 +123,8 @@ LOGGING = {
     }
 }
 
-if get_env('GOOGLE_LOGGING_ENABLED', False):
+if get_bool_env('GOOGLE_LOGGING_ENABLED', False):
+    logging.info('Google Cloud Logging handler is enabled.')
     try:
         import google.cloud.logging
         from google.auth.exceptions import GoogleAuthError
