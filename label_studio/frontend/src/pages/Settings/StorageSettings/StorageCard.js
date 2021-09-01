@@ -62,21 +62,18 @@ export const StorageCard = ({
         className={rootClass.elem('summary')}
         storageTypes={storageTypes}
       />
-
-      {(
-        <div className={rootClass.elem('sync')}>
-          <Space size="small">
-            <Button waiting={syncing} onClick={startSync}>
+      <div className={rootClass.elem('sync')}>
+        <Space size="small">
+          <Button waiting={syncing} onClick={startSync}>
               Sync Storage
-            </Button>
-            {synced !== null ? (
-              <div className={rootClass.elem('sync-count')}>
+          </Button>
+          {synced !== null ? (
+            <div className={rootClass.elem('sync-count')}>
                 Synced {synced} task(s)
-              </div>
-            ) : null}
-          </Space>
-        </div>
-      )}
+            </div>
+          ) : null}
+        </Space>
+      </div>
     </Card>
   );
 };
