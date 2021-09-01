@@ -518,7 +518,12 @@ stages:
       json:
         annotation_pk: id
     status_code: 201
-
+- name: sync
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/export/s3/{storage_pk}/sync'
+  response:
+    status_code: 200
 ---
 test_name: test_export_gcs_storage
 strict: false
@@ -599,7 +604,12 @@ stages:
       json:
         annotation_pk: id
     status_code: 201
-
+- name: sync
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/export/gcs/{storage_pk}/sync'
+  response:
+    status_code: 200
 ---
 test_name: test_empty_storage_list
 strict: false

@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
 import { modal } from '../../components/Modal/Modal';
 import { Space } from '../../components/Space/Space';
+import { useAPI } from '../../providers/ApiProvider';
 import { useLibrary } from '../../providers/LibraryProvider';
 import { useProject } from '../../providers/ProjectProvider';
 import { useContextProps, useFixedLocation, useParams } from '../../providers/RoutesProvider';
@@ -51,6 +52,7 @@ export const DataManagerPage = ({...props}) => {
   const root = useRef();
   const params = useParams();
   const history = useHistory();
+  const api = useAPI();
   const LabelStudio = useLibrary('lsf');
   const DataManager = useLibrary('dm');
   const setContextProps = useContextProps();
@@ -83,6 +85,10 @@ export const DataManagerPage = ({...props}) => {
 
     dataManager.on("exportClicked", () => {
       history.push(buildLink("/data/export", {id: params.id}));
+    });
+
+    dataManager.on("error", response => {
+      api.handleError(response);
     });
 
     setContextProps({dmRef: dataManager});
