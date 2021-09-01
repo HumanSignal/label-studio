@@ -31,7 +31,7 @@
     "save": "^2.4.0"
   },
   "scripts": {
-    "server": "hexo serve",
+    "server": "hexo clean && touch db.json && hexo serve",
     "publish": "hexo clean && hexo generate && hexo deploy",
     "new": "hexo new"
   },

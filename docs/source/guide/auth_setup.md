@@ -74,9 +74,13 @@ AUTH_LDAP_BIND_DN=uid=user,ou=sysadmins,o=12abc345de12abc345de12ab,dc=zexample,d
 AUTH_LDAP_BIND_PASSWORD=zexamplepass
 AUTH_LDAP_USER_DN_TEMPLATE=uid=%(user)s,ou=Users,o=12abc345de12abc345de12ab,dc=example,dc=com
 
+# Query the authenticating user in the database, it can be [email|username]
+AUTH_LDAP_USER_QUERY_FIELD=email
+
 # Group parameters
 AUTH_LDAP_GROUP_SEARCH_BASE_DN=ou=Users,o=12abc345de12abc345de12ab,dc=example,dc=com
 AUTH_LDAP_GROUP_SEARCH_FILTER_STR=(objectClass=groupOfNames)
+AUTH_LDAP_GROUP_SEARCH_ATTR_LIST=group1;group2;
 AUTH_LDAP_GROUP_TYPE=ou
 
 # Populate the user from the LDAP directory, values below are set by default 
@@ -92,8 +96,15 @@ AUTH_LDAP_ORGANIZATION_ROLE_COLLABORATOR=cn=collabs,ou=users,o=12abc345de12abc34
 AUTH_LDAP_ORGANIZATION_ROLE_NOT_ACTIVATED=cn=not,ou=users,o=12abc345de12abc345de12ab,dc=example,dc=com
 AUTH_LDAP_ORGANIZATION_ROLE_DEACTIVATED=
 
-# Specify organization to assign on the platform 
+# Specify organization to assign it to all users on the platform 
 AUTH_LDAP_ORGANIZATION_OWNER_EMAIL=heartex@heartex.net
+```
+
+If you want to search in several groups with recursive scan then you have to do as following:
+
+```
+AUTH_LDAP_USER_DN_TEMPLATE="" 
+AUTH_LDAP_USER_SEARCH_BASES="ou=guests,dc=zflexsoftware,dc=com;ou=owners,dc=zflexsoftware,dc=com"
 ```
 
 After setting up LDAP authentication for your on-premises Label Studio Enterprise instance, you can use the credentials `guest1` and `guest1password` to log in and test the setup. 

@@ -36,7 +36,7 @@ favicon: images/favicon.ico
 new_post_name: :title.md # File name of new posts
 default_layout: post
 titlecase: false # Transform title into titlecase
-external_link: true # Open external links in new tab
+external_link.enable: true # Open external links in new tab
 filename_case: 0
 render_drafts: false
 post_asset_folder: true
@@ -45,10 +45,14 @@ future: true
 highlight:
   enable: true
   line_number: false
-  tab_replace:
+  tab_replace: "  "
   hljs: true
+  wrap: false
   # auto_detect: true
   # wrap: true
+
+prismjs:
+  enable: false
 
 # Markdown
 ## https://github.com/chjj/marked

@@ -1,0 +1,38 @@
+---
+test_name: regular_error
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/trigger500'
+  response:
+    json:
+      detail: test
+      exc_info: !re_search 'Exception: test'
+    status_code: 500
+
+---
+test_name: error_without_exc_info
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+  - debug_modal_exceptions_false
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/trigger500'
+  response:
+    json:
+      detail: test
+      exc_info: Tracebacks disabled in settings
+    status_code: 500
