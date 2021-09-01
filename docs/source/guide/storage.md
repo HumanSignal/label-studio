@@ -76,7 +76,7 @@ Set up an IAM role in Amazon AWS to use with Label Studio.
       "Effect": "Allow",
       "Principal": {
         "AWS": [
-          "arn:aws:sts::490065312183:assumed-role/eks-quickstart-ManagedNodeInstance/i-07057a656afd640b0"
+          "arn:aws:iam::490065312183:user/rw_bucket"
         ]
       },
       "Action": "sts:AssumeRole",
