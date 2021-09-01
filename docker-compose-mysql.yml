@@ -47,7 +47,7 @@ services:
           nocopy: true
 
   db:
-    image: mysql:5.7
+    image: mysql:8
     hostname: db
     restart: always
     environment:
