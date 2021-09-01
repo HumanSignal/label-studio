@@ -30,7 +30,7 @@ def next_task(project, queryset, **kwargs):
 actions = [
     {
         'entry_point': next_task,
-        'permissions': [all_permissions.projects_view],
+        'permission': all_permissions.projects_view,
         'title': 'Generate next task',
         'order': 0,
         'hidden': True
