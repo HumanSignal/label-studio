@@ -8,6 +8,13 @@ if [ -n "${POSTGRE_HOST:-}" ]; then
     sleep 1
   done
   echo >&3 "=> Postgres is up."
+elif [ -n "${MYSQL_HOST:-}" ]; then
+  echo >&3 "=> Waiting for MySQL..."
+  while ! mysqladmin ping -h"$MYSQL_HOST" -p"${MYSQL_PORT:-3306}" --silent; do
+      echo >&3 "==> MySQL is unavailable - sleeping..."
+      sleep 1
+  done
+  echo >&3 "=> MySQL is up."
 else
-  echo >&3 "=> Skipping wait for postgres."
+  echo >&3 "=> Skipping wait for database."
 fi
