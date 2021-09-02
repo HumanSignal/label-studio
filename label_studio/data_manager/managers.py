@@ -147,6 +147,10 @@ def apply_filters(queryset, filters):
         # django orm loop expression attached to column name
         field_name = preprocess_field_name(_filter.filter, only_undefined_field)
 
+        # annotation ids 
+        if field_name == 'annotations_ids':
+            field_name = 'annotations__id'
+
         # use other name because of model names conflict
         if field_name == 'file_upload':
             field_name = 'file_upload_field'
@@ -173,7 +177,7 @@ def apply_filters(queryset, filters):
         if queryset.exists():
             value_type = type(queryset.values_list(field_name, flat=True)[0]).__name__
 
-        if value_type == 'list' and 'equal' in _filter.operator:
+        if (value_type == 'list' or value_type == 'tuple') and 'equal' in _filter.operator:
             _filter.value = '{' + _filter.value + '}'
 
         # special case: for strings empty is "" or null=True
@@ -374,13 +378,13 @@ class PreparedTaskManager(models.Manager):
         annotations_map = get_annotations_map()
 
         if not fields_for_evaluation:
-            fields_for_evaluation = ['annotations_ids']
+            fields_for_evaluation = []
 
         # default annotations for calculating total values in pagination output
         queryset = queryset.annotate(
             total_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False)),
             cancelled_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True)),
-            total_predictions=Count("predictions", distinct=True),
+            total_predictions=Count("predictions"),
         )
 
         # db annotations applied only if we need them in ordering or filters
