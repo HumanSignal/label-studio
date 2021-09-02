@@ -30,6 +30,8 @@ operators = {
     "greater_or_equal": "__gte",
     "in": "",
     "not_in": "",
+    "in_list": "",
+    "not_in_list": "",
     "empty": "__isnull",
     "contains": "__icontains",
     "not_contains": "__icontains",
@@ -150,6 +152,15 @@ def apply_filters(queryset, filters):
         # annotation ids 
         if field_name == 'annotations_ids':
             field_name = 'annotations__id'
+            if 'contains' in _filter.operator:
+                # convert string like "1 2,3" => [1,2,3]
+                _filter.value = [int(value)
+                                 for value in re.split(',|;| ', _filter.value)
+                                 if value and value.isdigit()]
+                _filter.operator = 'in_list' if _filter.operator == 'contains' else 'not_in_list'
+            elif 'equal' in _filter.operator:
+                if not _filter.value.isdigit():
+                    _filter.value = 0
 
         # use other name because of model names conflict
         if field_name == 'file_upload':
@@ -238,6 +249,20 @@ def apply_filters(queryset, filters):
                         f"{field_name}__lte": _filter.value.max,
                     }
                 ),
+                conjunction,
+            )
+
+        # in list
+        elif _filter.operator == "in_list":
+            filter_expression.add(
+                Q(**{f"{field_name}__in": _filter.value}),
+                conjunction,
+            )
+
+        # not in list
+        elif _filter.operator == "not_in_list":
+            filter_expression.add(
+                ~Q(**{f"{field_name}__in": _filter.value}),
                 conjunction,
             )
 
