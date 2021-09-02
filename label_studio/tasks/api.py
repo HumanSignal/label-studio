@@ -14,7 +14,6 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
-from rest_framework.permissions import SAFE_METHODS
 
 from core.utils.common import get_object_with_check_and_log, DjangoFilterDescriptionInspector
 from core.permissions import all_permissions, ViewClassPermission
@@ -57,13 +56,10 @@ class TaskListAPI(generics.ListCreateAPIView):
         project_id = self.request.data.get('project')
         if project_id:
             context['project'] = generics.get_object_or_404(Project, pk=project_id)
-        elif self.request.method not in SAFE_METHODS:
-            raise ValueError('Field "project" is missed')
         return context
 
     def perform_create(self, serializer):
         project_id = self.request.data.get('project')
-
         generics.get_object_or_404(Project, pk=project_id)
         project = generics.get_object_or_404(Project, pk=project_id)
         instance = serializer.save(project=project)
