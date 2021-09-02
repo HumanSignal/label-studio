@@ -9,7 +9,7 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from django.db.models.functions import Coalesce
 from django.conf import settings
-from django.db.models.functions import Cast, Concat
+from django.db.models.functions import Cast
 from django.db.models import FloatField
 from datetime import datetime
 
@@ -171,7 +171,7 @@ def apply_filters(queryset, filters):
         # get type of annotated field
         value_type = 'str'
         if queryset.exists():
-            value_type = type(getattr(queryset.first(), field_name)).__name__
+            value_type = type(queryset.values_list(field_name, flat=True)[0]).__name__
 
         if value_type == 'list' and 'equal' in _filter.operator:
             _filter.value = '{' + _filter.value + '}'
