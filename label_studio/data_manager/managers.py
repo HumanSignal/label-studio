@@ -384,7 +384,7 @@ class PreparedTaskManager(models.Manager):
         queryset = queryset.annotate(
             total_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False)),
             cancelled_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True)),
-            total_predictions=Count("predictions"),
+            total_predictions=Count("predictions", distinct=True),
         )
 
         # db annotations applied only if we need them in ordering or filters
