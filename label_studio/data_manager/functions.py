@@ -134,6 +134,17 @@ def get_all_columns(project):
             }
         },
         {
+            'id': 'annotations_ids',
+            'title': "Annotation IDs",
+            'type': "String",
+            'target': 'tasks',
+            'help': 'Annotation IDs stacked over all annotations',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        },
+        {
             'id': 'predictions_score',
             'title': "Prediction score",
             'type': "Number",

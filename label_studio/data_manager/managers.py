@@ -9,7 +9,7 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from django.db.models.functions import Coalesce
 from django.conf import settings
-from django.db.models.functions import Cast
+from django.db.models.functions import Cast, Concat
 from django.db.models import FloatField
 from datetime import datetime
 
@@ -168,17 +168,35 @@ def apply_filters(queryset, filters):
             _filter.operator = 'equal' if cast_bool_from_str(_filter.value) else 'not_equal'
             _filter.value = 0
 
+        # get type of annotated field
+        value_type = 'str'
+        if queryset.exists():
+            value_type = type(getattr(queryset.first(), field_name)).__name__
+
+        if value_type == 'list' and 'equal' in _filter.operator:
+            _filter.value = '{' + _filter.value + '}'
+
         # special case: for strings empty is "" or null=True
         if _filter.type in ('String', 'Unknown') and _filter.operator == 'empty':
             value = cast_bool_from_str(_filter.value)
             if value:  # empty = true
                 q = Q(
-                    Q(**{field_name: ''}) | Q(**{field_name: None}) | Q(**{field_name+'__isnull': True})
+                    Q(**{field_name: None}) | Q(**{field_name+'__isnull': True})
                 )
+                if value_type == 'str':
+                    q |= Q(**{field_name: ''})
+                if value_type == 'list':
+                    q = Q(**{field_name: [None]})
+
             else:  # empty = false
                 q = Q(
-                    ~Q(**{field_name: ''}) & ~Q(**{field_name: None}) & ~Q(**{field_name+'__isnull': True})
+                    ~Q(**{field_name: None}) & ~Q(**{field_name+'__isnull': True})
                 )
+                if value_type == 'str':
+                    q &= ~Q(**{field_name: ''})
+                if value_type == 'list':
+                    q = ~Q(**{field_name: [None]})
+
             filter_expression.add(q, conjunction)
             continue
 
@@ -313,6 +331,13 @@ def annotate_predictions_score(queryset):
     return queryset.annotate(predictions_score=Avg("predictions__score"))
 
 
+def annotate_annotations_ids(queryset):
+    if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
+        return queryset.annotate(annotations_ids=GroupConcat('annotations__id'))
+    else:
+        return queryset.annotate(annotations_ids=ArrayAgg('annotations__id'))
+
+
 def file_upload(queryset):
     return queryset.annotate(file_upload_field=F('file_upload__file'))
 
@@ -327,6 +352,7 @@ settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     "predictions_results": annotate_predictions_results,
     "predictions_score": annotate_predictions_score,
     "annotators": annotate_annotators,
+    "annotations_ids": annotate_annotations_ids,
     "file_upload": file_upload,
     "cancelled_annotations": dummy,
     "total_annotations": dummy,
@@ -347,8 +373,8 @@ class PreparedTaskManager(models.Manager):
         queryset = TaskQuerySet(self.model)
         annotations_map = get_annotations_map()
 
-        if fields_for_evaluation is None:
-            fields_for_evaluation = []
+        if not fields_for_evaluation:
+            fields_for_evaluation = ['annotations_ids']
 
         # default annotations for calculating total values in pagination output
         queryset = queryset.annotate(

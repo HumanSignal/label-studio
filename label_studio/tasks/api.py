@@ -56,10 +56,13 @@ class TaskListAPI(generics.ListCreateAPIView):
         project_id = self.request.data.get('project')
         if project_id:
             context['project'] = generics.get_object_or_404(Project, pk=project_id)
+        else:
+            raise ValueError('Field "project" is missed')
         return context
 
     def perform_create(self, serializer):
         project_id = self.request.data.get('project')
+
         generics.get_object_or_404(Project, pk=project_id)
         project = generics.get_object_or_404(Project, pk=project_id)
         instance = serializer.save(project=project)

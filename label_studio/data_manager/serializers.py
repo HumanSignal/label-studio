@@ -162,6 +162,7 @@ class DataManagerTaskSerializer(TaskSerializer):
 
     cancelled_annotations = serializers.SerializerMethodField()
     completed_at = serializers.SerializerMethodField()
+    annotations_ids = serializers.StringRelatedField()
     annotations_results = serializers.SerializerMethodField()
     predictions_results = serializers.SerializerMethodField()
     predictions_score = serializers.SerializerMethodField()
@@ -185,6 +186,7 @@ class DataManagerTaskSerializer(TaskSerializer):
             "predictions_score",
             "total_annotations",
             "total_predictions",
+            "annotations_ids",
             "annotations",
             "predictions",
             "drafts",
