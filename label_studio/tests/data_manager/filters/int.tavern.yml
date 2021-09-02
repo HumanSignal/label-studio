@@ -265,3 +265,93 @@ stages:
       status_code: 200
 
 
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "columnsDisplayType": {
+            "tasks:data.int_field": "Number"
+          },
+          "filters": {
+            "conjunction": "and",
+            "items": [
+            {
+              "filter": "filter:tasks:annotations_ids",
+              "operator": "empty",
+              "type": "String",
+              "value": "true"
+            }
+            ]
+          },
+          "ordering": [
+            "tasks:annotations_ids"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/dm/views/{view.id}/tasks'
+    response:
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 1,
+        "total": 6
+      }
+      status_code: 200
+
+
+
+
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "columnsDisplayType": {
+            "tasks:data.int_field": "Number"
+          },
+          "filters": {
+            "conjunction": "and",
+            "items": [
+            {
+              "filter": "filter:tasks:annotations_ids",
+              "operator": "empty",
+              "type": "String",
+              "value": "false"
+            }
+            ]
+          },
+          "ordering": [
+            "tasks:annotations_ids"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/dm/views/{view.id}/tasks'
+    response:
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 0,
+        "total": 0
+      }
+      status_code: 200
