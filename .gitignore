@@ -20,6 +20,8 @@ venv/
 .venv
 .vscode
 .autoenv
+.env
+.envrc
 # web/static
 
 deploy/license.txt
@@ -44,6 +46,7 @@ archive
 *.idea/*
 .vscode/*
 pyrightconfig.json
+tags
 tags.temp
 mydatabase
 label_studio.sqlite3
