@@ -220,7 +220,7 @@ def get_prepare_params(request, project):
 
 def get_prepared_queryset(request, project):
     prepare_params = get_prepare_params(request, project)
-    queryset = Task.prepared.all(prepare_params=prepare_params, annotate_counts=False)
+    queryset = Task.prepared.all(prepare_params=prepare_params)
     return queryset
 
 
