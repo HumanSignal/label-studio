@@ -344,7 +344,7 @@ def update_annotation_map(obj):
 
 
 class PreparedTaskManager(models.Manager):
-    def get_queryset(self, fields_for_evaluation=None, annotate_counts=True):
+    def get_queryset(self, fields_for_evaluation=None):
         queryset = TaskQuerySet(self.model)
         annotations_map = get_annotations_map()
 
@@ -352,12 +352,11 @@ class PreparedTaskManager(models.Manager):
             fields_for_evaluation = []
 
         # default annotations for calculating total values in pagination output
-        if annotate_counts:
-            queryset = queryset.annotate(
-                total_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False)),
-                cancelled_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True)),
-                total_predictions=Count("predictions", distinct=True),
-            )
+        queryset = queryset.annotate(
+            total_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False)),
+            cancelled_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True)),
+            total_predictions=Count("predictions", distinct=True),
+        )
 
         # db annotations applied only if we need them in ordering or filters
         for field in fields_for_evaluation:
@@ -366,7 +365,7 @@ class PreparedTaskManager(models.Manager):
 
         return queryset
 
-    def all(self, prepare_params=None, annotate_counts=True):
+    def all(self, prepare_params=None):
         """ Make a task queryset with filtering, ordering, annotations
 
         :param prepare_params: prepare params with filters, orderings, etc
@@ -377,8 +376,7 @@ class PreparedTaskManager(models.Manager):
 
         fields_for_annotation = get_fields_for_annotation(prepare_params)
         return self.get_queryset(
-            fields_for_evaluation=fields_for_annotation,
-            annotate_counts=annotate_counts
+            fields_for_evaluation=fields_for_annotation
         ).prepared(prepare_params=prepare_params)
 
 
