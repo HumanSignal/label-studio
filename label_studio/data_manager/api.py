@@ -323,11 +323,6 @@ class ProjectActionsAPI(APIView):
 
         queryset = get_prepared_queryset(request, project)
 
-        # no selected items on tab
-        if not queryset.exists():
-            response = {'detail': 'No selected items for specified view'}
-            return Response(response, status=404)
-
         # wrong action id
         action_id = request.GET.get('id', None)
         if action_id is None:

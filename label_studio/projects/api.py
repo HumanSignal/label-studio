@@ -418,13 +418,10 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             if not assigned_flag:
                 not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
 
-            not_solved_tasks_count = not_solved_tasks.count()
+            # used only for debug logging, disabled for performance reasons
+            not_solved_tasks_count = 'unknown'
 
-            # return nothing if there are no tasks remain
-            if not_solved_tasks_count == 0:
-                raise NotFound(f'There are no tasks remaining to be annotated by the user={user}')
-            logger.debug(f'{not_solved_tasks_count} tasks that still need to be annotated for user={user}')
-
+            next_task = None
             # ordered by data manager
             if assigned_flag:
                 next_task = not_solved_tasks.first()
@@ -454,10 +451,12 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
             # if there any tasks in progress (with maximum number of annotations), randomly sampling from them
             logger.debug(f'User={request.user} tries depth first from {not_solved_tasks_count} tasks')
-            next_task = self._try_breadth_first(not_solved_tasks)
-            if next_task:
-                queue_info += (' & ' if queue_info else '') + 'Breadth first queue'
-                return self._make_response(next_task, request, queue=queue_info)
+
+            if project.maximum_annotations > 1:
+                next_task = self._try_breadth_first(not_solved_tasks)
+                if next_task:
+                    queue_info += (' & ' if queue_info else '') + 'Breadth first queue'
+                    return self._make_response(next_task, request, queue=queue_info)
 
             if project.sampling == project.UNCERTAINTY:
                 queue_info += (' & ' if queue_info else '') + 'Active learning or random queue'
