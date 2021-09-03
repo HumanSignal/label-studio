@@ -67,7 +67,7 @@ After you set up LDAP authentication, you can no longer use native authenticatio
 Set up LDAP authentication and assign LDAP users to your Label Studio Enterprise organization using environment variables in Docker. You can also map specific AD groups to specific organization roles in Label Studio Enterprise, making it easier to manage role-based access control (RBAC) in Label Studio Enterprise.
 
 You can refer to this example environment variable file for your own LDAP setup:
-```
+```bash
 AUTH_LDAP_ENABLED=1
 AUTH_LDAP_SERVER_URI=ldaps://ldap.example.com #Use ldaps to secure the LDAP connection
 AUTH_LDAP_BIND_DN=uid=user,ou=sysadmins,o=12abc345de12abc345de12ab,dc=zexample,dc=com
@@ -102,7 +102,7 @@ AUTH_LDAP_ORGANIZATION_OWNER_EMAIL=heartex@heartex.net
 
 If you want to search in several groups with recursive scan then you have to do as following:
 
-```
+```bash
 AUTH_LDAP_USER_DN_TEMPLATE="" 
 AUTH_LDAP_USER_SEARCH_BASES="ou=guests,dc=zflexsoftware,dc=com;ou=owners,dc=zflexsoftware,dc=com"
 ```
