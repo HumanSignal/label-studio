@@ -740,7 +740,11 @@ class ProjectSummary(models.Model):
         # Labels are stored in list
         labels = []
         for label in result_value:
-            labels.append(str(label))
+            if result_type == 'taxonomy' and isinstance(label, list):
+                for label_ in label:
+                    labels.append(str(label_))
+            else:
+                labels.append(str(label))
         return labels
 
     def update_created_annotations_and_labels(self, annotations):
