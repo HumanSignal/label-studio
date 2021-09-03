@@ -149,7 +149,7 @@ def apply_filters(queryset, filters):
         # django orm loop expression attached to column name
         field_name = preprocess_field_name(_filter.filter, only_undefined_field)
 
-        # annotation ids 
+        # annotation ids
         if field_name == 'annotations_ids':
             field_name = 'annotations__id'
             if 'contains' in _filter.operator:

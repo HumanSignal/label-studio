@@ -145,6 +145,18 @@ def get_all_columns(project):
             }
         },
         {
+            'id': 'annotators',
+            'title': 'Annotated by',
+            'type': 'List',
+            'target': 'tasks',
+            'help': 'All users who completed the task',
+            'schema': {'items': project.organization.members.values_list('user__id', flat=True)},
+            'visibility_defaults': {
+                'explore': True,
+                'labeling': False
+            }
+        },
+        {
             'id': 'predictions_score',
             'title': "Prediction score",
             'type': "Number",
@@ -167,17 +179,6 @@ def get_all_columns(project):
             }
         },
         {
-            'id': 'file_upload',
-            'title': "Source filename",
-            'type': "String",
-            'target': 'tasks',
-            'help': 'Source filename from import step',
-            'visibility_defaults': {
-                'explore': False,
-                'labeling': False
-            }
-        },
-        {
             'id': 'created_at',
             'title': 'Created at',
             'type': 'Datetime',
@@ -189,17 +190,16 @@ def get_all_columns(project):
             }
         },
         {
-            'id': 'annotators',
-            'title': 'Annotated by',
-            'type': 'List',
+            'id': 'file_upload',
+            'title': "Source filename",
+            'type': "String",
             'target': 'tasks',
-            'help': 'All users who completed the task',
-            'schema': { 'items': project.organization.members.values_list('user__id', flat=True) },
+            'help': 'Source filename from import step',
             'visibility_defaults': {
-                'explore': True,
+                'explore': False,
                 'labeling': False
             }
-        }
+        },
     ]
 
     result['columns'].append(data_root)
