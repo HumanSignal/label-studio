@@ -25,6 +25,7 @@ from tasks.models import Annotation
 logger = logging.getLogger(__name__)
 url_scheme = 'gs'
 
+clients_cache = {}
 
 class GCSStorageMixin(models.Model):
     bucket = models.TextField(
@@ -45,7 +46,11 @@ class GCSStorageMixin(models.Model):
 
     def get_client(self, raise_on_error=False):
         credentials = None
+        # gcs client initialization ~ 200 ms, for 30 tasks it's a 6 seconds, so we need to cache it
+        cache_key = f'{self.google_application_credentials}'
         if self.google_application_credentials:
+            if cache_key in clients_cache:
+                return clients_cache[cache_key]
             try:
                 service_account_info = json.loads(self.google_application_credentials)
                 credentials = service_account.Credentials.from_service_account_info(service_account_info)
@@ -54,7 +59,10 @@ class GCSStorageMixin(models.Model):
                     raise
                 logger.error(f"Can't create GCS credentials. Reason: {exc}", exc_info=True)
                 credentials = None
-        return google_storage.Client(credentials=credentials)
+        client = google_storage.Client(credentials=credentials)
+        if credentials is not None:
+            clients_cache[cache_key] = client
+        return client
 
     def get_bucket(self, client=None, bucket_name=None):
         if not client:
