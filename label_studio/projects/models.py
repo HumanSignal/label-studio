@@ -29,6 +29,10 @@ class ProjectManager(models.Manager):
     def with_counts(self):
         return self.annotate(
             task_number=Count('tasks', distinct=True),
+            finished_task_number=Count(
+                'tasks', distinct=True,
+                filter=Q(tasks__is_labeled=True)
+            ),
             total_predictions_number=Count('tasks__predictions', distinct=True),
             total_annotations_number=Count(
                 'tasks__annotations__id', distinct=True,
@@ -127,8 +131,8 @@ class Project(ProjectMixin, models.Model):
     )
 
     sampling = models.CharField(max_length=100, choices=SAMPLING_CHOICES, null=True, default=SEQUENCE)
-    show_ground_truth_first = models.BooleanField(_('show ground truth first'), default=True)
-    show_overlap_first = models.BooleanField(_('show overlap first'), default=True)
+    show_ground_truth_first = models.BooleanField(_('show ground truth first'), default=False)
+    show_overlap_first = models.BooleanField(_('show overlap first'), default=False)
     overlap_cohort_percentage = models.IntegerField(_('overlap_cohort_percentage'), default=100)
 
     task_data_login = models.CharField(
@@ -189,7 +193,8 @@ class Project(ProjectMixin, models.Model):
 
     @property
     def only_undefined_field(self):
-        return self.one_object_in_label_config and self.summary.common_data_columns and self.summary.common_data_columns[0] == settings.DATA_UNDEFINED_NAME
+        return self.one_object_in_label_config and self.summary.common_data_columns \
+               and self.summary.common_data_columns[0] == settings.DATA_UNDEFINED_NAME
 
     @property
     def get_labeled_count(self):
@@ -713,8 +718,8 @@ class ProjectSummary(models.Model):
         self.save()
 
     def _get_annotation_key(self, result):
-        result_type = result.get('type')
-        if result_type in ('relation', 'rating', 'pairwise'):
+        result_type = result.get('type', None)
+        if result_type in ('relation', 'pairwise', None):
             return None
         if 'from_name' not in result or 'to_name' not in result:
             logger.error(
@@ -728,21 +733,29 @@ class ProjectSummary(models.Model):
 
     def _get_labels(self, result):
         result_type = result.get('type')
+        result_value = result['value'].get(result_type)
+        if not result_value or not isinstance(result_value, list) or result_type == 'text':
+            # Non-list values are not labels. TextArea list values (texts) are not labels too.
+            return []
+        # Labels are stored in list
         labels = []
-        for label in result['value'].get(result_type, []):
-            if isinstance(label, list):
-                labels.extend(label)
+        for label in result_value:
+            if result_type == 'taxonomy' and isinstance(label, list):
+                for label_ in label:
+                    labels.append(str(label_))
             else:
-                labels.append(label)
-        return [str(l) for l in labels]
+                labels.append(str(label))
+        return labels
 
     def update_created_annotations_and_labels(self, annotations):
         created_annotations = dict(self.created_annotations)
         labels = dict(self.created_labels)
         for annotation in annotations:
             results = get_attr_or_item(annotation, 'result') or []
-            for result in results:
+            if not isinstance(results, list):
+                continue
 
+            for result in results:
                 # aggregate annotation types
                 key = self._get_annotation_key(result)
                 if not key:
@@ -768,8 +781,10 @@ class ProjectSummary(models.Model):
         labels = dict(self.created_labels)
         for annotation in annotations:
             results = get_attr_or_item(annotation, 'result') or []
-            for result in results:
+            if not isinstance(results, list):
+                continue
 
+            for result in results:
                 # reduce annotation counters
                 key = self._get_annotation_key(result)
                 if key in created_annotations:
@@ -778,7 +793,7 @@ class ProjectSummary(models.Model):
                         created_annotations.pop(key)
 
                 # reduce labels counters
-                from_name = result.get('from_name')
+                from_name = result.get('from_name', None)
                 if from_name not in labels:
                     continue
                 for label in self._get_labels(result):

@@ -61,6 +61,8 @@ urlpatterns = [
     re_path(r'^', include('tasks.urls')),
     re_path(r'^', include('io_storages.urls')),
     re_path(r'^', include('ml.urls')),
+    re_path(r'^', include('webhooks.urls')),
+
 
     re_path(r'data/local-files/', views.localfiles_data, name="localfiles_data"),
 
@@ -69,8 +71,10 @@ urlpatterns = [
 
     re_path(r'health/', views.health, name="health"),
     re_path(r'metrics/', views.metrics, name="metrics"),
+    re_path(r'trigger500/', views.TriggerAPIError.as_view(), name="metrics"),
 
     re_path(r'samples/time-series.csv', views.samples_time_series, name="static_time_series"),
+    re_path(r'samples/paragraphs.json', views.samples_paragraphs, name="samples_paragraphs"),
 
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

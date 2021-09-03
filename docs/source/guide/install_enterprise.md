@@ -9,7 +9,7 @@ meta_description: Install, back up, and upgrade Label Studio Enterprise with Doc
 
 > Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
 
-Install Label Studio Enterprise on-premises if you need to meet strong privacy regulations, legal requirements, or want to manage a custom installation on your own infrastructure using Docker or public cloud. To deploy Label Studio Enterprise on Amazon AWS in a Virtual Private Cloud (VPC), see [Install Label Studio Enterprise on AWS Private Cloud](install_enterprise_vpc.html). 
+Install Label Studio Enterprise on-premises if you need to meet strong privacy regulations, legal requirements, or want to manage a custom installation on your own infrastructure using Docker or public cloud. <!--To deploy Label Studio Enterprise on Amazon AWS in a Virtual Private Cloud (VPC), see [Install Label Studio Enterprise on AWS Private Cloud](install_enterprise_vpc.html).--> To deploy Label Studio Enterprise in the cloud, you can use Kubernetes and Helm. See [Deploy Label Studio Enterprise on Kubernetes](install_enterprise_k8s.html).
 
 You can run Label Studio Enterprise in an airgapped environment, and no data leaves your infrastructure. See [Secure Label Studio](security.html) for more details about security and hardening for Label Studio Enterprise.
 
@@ -119,6 +119,11 @@ REDIS_SSL_CERTS_REQS=required
 
 # Optional: Specify Redis SSL certificate
 REDIS_SSL_CA_CERTS=redis-ca-bundle.pem
+
+# Optional: Specify SSL termination certificate & key
+# Files should be placed in the directory "certs" at the same directory as docker-compose.yml file
+NGINX_SSL_CERT=/certs/cert.pem
+NGINX_SSL_CERT_KEY=/certs/cert.key
 ```
 
 2. After you set all the environment variables, create the following `docker-compose.yml`:
@@ -132,14 +137,18 @@ services:
     tty: true
     image: heartexlabs/label-studio-enterprise:latest
     ports:
-      - 80:8000
+      - 80:8085
+      - 443:8086
+    expose:
+      - "80"
+      - "443"
     env_file:
       - env.list
     volumes:
-      - ./license.txt:/label_studio_enterprise/license.txt
+      - ./license.txt:/label_studio_enterprise/license.txt:ro
       - ./mydata:/label-studio/data:rw
+      - ./certs:/certs:ro
     working_dir: /label-studio-enterprise
-    command: [ "uwsgi", "--ini", "deploy/uwsgi.ini"]
 
   rqworkers:
     image: heartexlabs/label-studio-enterprise:latest
@@ -150,7 +159,6 @@ services:
       - ./mydata:/label-studio/data:rw
     working_dir: /label-studio-enterprise
     command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "default" ]
-
 
 volumes:
   static: {} 

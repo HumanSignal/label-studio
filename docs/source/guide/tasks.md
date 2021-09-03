@@ -245,6 +245,8 @@ Use that script to do the following:
    The script collects the links to the files provided by that HTTP server and saves them to a `files.txt` file with one URL per line. 
 3. Import the file with URLs into Label Studio using the Label Studio UI. 
 
+> Note: You must keep the web server running while you perform your data labeling so that the URLs remain accessible to Label Studio.
+
 If your labeling configuration supports HyperText or multiple data types, use the Label Studio JSON format to specify the local file locations instead of a `txt` file. See [an example of this format](storage.html#Tasks-with-local-storage-file-references).
 
 If you serve your data from an HTTP server created like follows: `python -m http.server 8081 -d`, you might need to set up CORS for that server so that Label Studio can access the data files successfully. If needed, run the following from the command line:

@@ -23,6 +23,7 @@ logging.getLogger('botocore').setLevel(logging.CRITICAL)
 boto3.set_stream_logger(level=logging.INFO)
 url_scheme = 's3'
 
+clients_cache = {}
 
 class S3StorageMixin(models.Model):
     bucket = models.TextField(
@@ -54,9 +55,17 @@ class S3StorageMixin(models.Model):
         help_text='S3 Endpoint')
 
     def get_client_and_resource(self):
-        return get_client_and_resource(
+        # s3 client initialization ~ 100 ms, for 30 tasks it's a 3 seconds, so we need to cache it
+        cache_key = f'{self.aws_access_key_id}:{self.aws_secret_access_key}:{self.aws_session_token}:{self.region_name}:{self.s3_endpoint}'
+        if cache_key in clients_cache:
+            return clients_cache[cache_key]
+
+        result = get_client_and_resource(
             self.aws_access_key_id, self.aws_secret_access_key, self.aws_session_token, self.region_name,
             self.s3_endpoint)
+        clients_cache[cache_key] = result
+        return result
+
 
     def get_client(self):
         client, _ = self.get_client_and_resource()
@@ -100,13 +109,18 @@ class S3ImportStorage(S3StorageMixin, ImportStorage):
         help_text='Generate presigned URLs')
     presign_ttl = models.PositiveSmallIntegerField(
         _('presign_ttl'), default=1,
-        help_text='Presigned URLs TTL (in minutes)'
-    )
+        help_text='Presigned URLs TTL (in minutes)')
+    recursive_scan = models.BooleanField(
+        _('recursive scan'), default=False,
+        help_text=_('Perform recursive scan over the bucket content'))
 
     def iterkeys(self):
         client, bucket = self.get_client_and_bucket()
         if self.prefix:
-            bucket_iter = bucket.objects.filter(Prefix=self.prefix.rstrip('/') + '/', Delimiter='/').all()
+            list_kwargs = {'Prefix': self.prefix.rstrip('/') + '/'}
+            if not self.recursive_scan:
+                list_kwargs['Delimiter'] = '/'
+            bucket_iter = bucket.objects.filter(**list_kwargs).all()
         else:
             bucket_iter = bucket.objects.all()
         regex = re.compile(str(self.regex_filter)) if self.regex_filter else None
@@ -153,7 +167,7 @@ class S3ImportStorage(S3StorageMixin, ImportStorage):
             uri, storage = get_uri_via_regex(data, prefixes=(url_scheme,))
             if not storage:
                 return
-            resolved_uri = resolve_s3_url(uri, self.get_client(), self.presign)
+            resolved_uri = resolve_s3_url(uri, self.get_client(), self.presign, expires_in=self.presign_ttl * 60)
             return data.replace(uri, resolved_uri)
         except NoCredentialsError:
             logger.warning(f'No AWS credentials specified for {data}')
@@ -165,14 +179,16 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
         client, s3 = self.get_client_and_resource()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
-        with transaction.atomic():
-            # Create export storage link
-            link = S3ExportStorageLink.create(annotation, self)
-            key = str(self.prefix) + '/' + link.key if self.prefix else link.key
-            try:
-                s3.Object(self.bucket, key).put(Body=json.dumps(ser_annotation))
-            except Exception as exc:
-                logger.error(f"Can't export annotation {annotation} to S3 storage {self}. Reason: {exc}", exc_info=True)
+
+        # get key that identifies this object in storage
+        key = S3ExportStorageLink.get_key(annotation)
+        key = str(self.prefix) + '/' + key if self.prefix else key
+
+        # put object into storage
+        s3.Object(self.bucket, key).put(Body=json.dumps(ser_annotation))
+
+        # create link if everything ok
+        S3ExportStorageLink.create(annotation, self)
 
 
 @receiver(post_save, sender=Annotation)

@@ -72,6 +72,7 @@ The most common mistake while resource loading is <b>CORS</b> (Cross-Origin Reso
        }
   }
   ```
+
 - If you use Amazon S3 with Label Studio, see [Troubleshoot CORS and access problems](storage.html#Troubleshoot-CORS-and-access-problems).
 - If you use Google Cloud Storage with Label Studio, see [Troubleshoot CORS and access problems](storage.html#Troubleshoot-CORS-and-access-problems).
 - If you serve your data from an HTTP server created like follows: `python -m http.server 8081 -d`, run the following from the command line:

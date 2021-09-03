@@ -3,6 +3,7 @@
 import shutil
 import io
 import hashlib
+import logging
 import ujson as json
 import os
 from datetime import datetime
@@ -18,6 +19,9 @@ from tasks.models import Annotation
 # Create your models here.
 
 
+logger = logging.getLogger(__name__)
+
+
 class DataExport(object):
 
     @staticmethod
@@ -27,6 +31,11 @@ class DataExport(object):
         filename_results = os.path.join(settings.EXPORT_DIR, name + '.json')
         filename_info = os.path.join(settings.EXPORT_DIR, name + '-info.json')
         annotation_number = Annotation.objects.filter(task__project=project).count()
+        try:
+            platform_version = version.get_git_version()
+        except:
+            platform_version = 'none'
+            logger.error('Version is not detected in save_export_files()')
         info = {
             'project': {
                 'title': project.title,
@@ -37,7 +46,7 @@ class DataExport(object):
                 'annotation_number': annotation_number
             },
             'platform': {
-                'version': version.get_git_version()
+                'version': platform_version
             },
             'download': {
                 'GET': dict(get_args),
@@ -67,7 +76,7 @@ class DataExport(object):
         return sorted(formats, key=lambda f: f.get('disabled', False))
 
     @staticmethod
-    def generate_export_file(project, tasks, output_format, get_args):
+    def generate_export_file(project, tasks, output_format, download_resources, get_args):
         # prepare for saving
         now = datetime.now()
         data = json.dumps(tasks, ensure_ascii=False)
@@ -75,10 +84,13 @@ class DataExport(object):
         name = 'project-' + str(project.id) + '-at-' + now.strftime('%Y-%m-%d-%H-%M') + f'-{md5[0:8]}'
 
         input_json = DataExport.save_export_files(project, now, get_args, data, md5, name)
+
         converter = Converter(
             config=project.get_parsed_config(),
             project_dir=None,
-            upload_dir=os.path.join(settings.MEDIA_ROOT, settings.UPLOAD_DIR))
+            upload_dir=os.path.join(settings.MEDIA_ROOT, settings.UPLOAD_DIR),
+            download_resources=download_resources
+        )
         with get_temp_dir() as tmp_dir:
             converter.convert(input_json, tmp_dir, output_format, is_dir=False)
             files = get_all_files_from_dir(tmp_dir)

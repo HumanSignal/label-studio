@@ -48,7 +48,7 @@ class Task(TaskMixin, models.Model):
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last time a task was updated')
     is_labeled = models.BooleanField(_('is_labeled'), default=False,
                                      help_text='True if the number of annotations for this task is greater than or equal '
-                                               'to the number of maximum_completions for the project')
+                                               'to the number of maximum_completions for the project', db_index=True)
     overlap = models.IntegerField(_('overlap'), default=1, db_index=True,
                                   help_text='Number of distinct annotators that processed the current task')
     file_upload = models.ForeignKey(
@@ -89,7 +89,14 @@ class Task(TaskMixin, models.Model):
 
         num = num_locks + num_annotations
         if num > self.overlap:
-            logger.error(f"Num takes={num} > overlap={self.overlap} for task={self.id} - it's a bug")
+            logger.error(
+                f"Num takes={num} > overlap={self.overlap} for task={self.id} - it's a bug",
+                extra=dict(
+                    lock_ttl=self.get_lock_ttl(),
+                    num_locks=num_locks,
+                    num_annotations=num_annotations,
+                )
+            )
         return num >= self.overlap
 
     @property
@@ -99,8 +106,7 @@ class Task(TaskMixin, models.Model):
     def get_lock_ttl(self):
         if settings.TASK_LOCK_TTL is not None:
             return settings.TASK_LOCK_TTL
-        avg_lead_time = self.project.annotations_lead_time()
-        return 3 * int(avg_lead_time) if avg_lead_time is not None else settings.TASK_LOCK_DEFAULT_TTL
+        return settings.TASK_LOCK_MIN_TTL
 
     def has_permission(self, user):
         return self.project.has_permission(user)
@@ -112,9 +118,10 @@ class Task(TaskMixin, models.Model):
         """Lock current task by specified user. Lock lifetime is set by `expire_in_secs`"""
         num_locks = self.num_locks
         if num_locks < self.overlap:
-            expire_at = now() + datetime.timedelta(seconds=self.get_lock_ttl())
+            lock_ttl = self.get_lock_ttl()
+            expire_at = now() + datetime.timedelta(seconds=lock_ttl)
             TaskLock.objects.create(task=self, user=user, expire_at=expire_at)
-            logger.debug(f'User={user} acquires a lock for the task={self}')
+            logger.debug(f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
         else:
             logger.error(
                 f"Current number of locks for task {self.id} is {num_locks}, but overlap={self.overlap}: "

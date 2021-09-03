@@ -75,6 +75,7 @@ def get_git_commit_info(skip_os=True):
                 'branch': run('git rev-parse --abbrev-ref HEAD', stderr=STDOUT, shell=True).strip().decode('utf8')
             }
         except CalledProcessError:
+            os.chdir(cwd)
             return _read_py()
 
         # create package version

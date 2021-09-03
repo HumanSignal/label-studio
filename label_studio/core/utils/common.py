@@ -116,6 +116,8 @@ def custom_exception_handler(exc, context):
         exc_tb = tb.format_exc()
         logger.debug(exc_tb)
         response_data['detail'] = str(exc)
+        if not settings.DEBUG_MODAL_EXCEPTIONS:
+            exc_tb = 'Tracebacks disabled in settings'
         response_data['exc_info'] = exc_tb
         response = Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=response_data)
 
@@ -288,7 +290,7 @@ def start_browser(ls_url, no_browser):
 
     browser_url = ls_url
     threading.Timer(2.5, lambda: webbrowser.open(browser_url)).start()
-    print('Start browser at URL: ' + browser_url)
+    logger.info('Start browser at URL: ' + browser_url)
 
 
 @contextlib.contextmanager

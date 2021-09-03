@@ -1,12 +1,12 @@
 ---
 title: Text
 type: tags
-order: 306
+order: 307
 meta_title: Text Tags for Text Objects
 meta_description: Label Studio Text Tags customize Label Studio for Text for machine learning and data science projects.
 ---
 
-Text tag shows an Text markup that can be labeled.
+Text tag shows text markup that can be labeled.
 You can use `<Style>.htx-text{ white-space: pre-wrap; }</Style>` to preserve all the spaces.
 In any case every space counts for result offsets.
 
@@ -24,9 +24,33 @@ In any case every space counts for result offsets.
 | [showLabels] | <code>boolean</code> | <code>true</code> | show labels next to the region |
 | [encoding] | <code>string</code> | <code>&quot;none|base64|base64unicode&quot;</code> | decode value from encoded string |
 
+### Sample Results JSON
+
+| Name | Type | Description |
+| --- | --- | --- |
+| value | <code>Object</code> |  |
+| value.start | <code>string</code> | position of the start of the region in characters |
+| value.end | <code>string</code> | position of the end of the region in characters |
+| [value.text] | <code>string</code> | text content of the region, can be skipped |
+
+### Example JSON
+```json
+{
+  "value": {
+    "start": 2,
+    "end": 81,
+    "labels": ["Car"]
+  }
+}
+```
+
 ### Example
 ```html
 <View>
-  <Text name="text-1" value="$text" granularity="symbol" highlightColor="#ff0000" />
+  <Text name="text-1" value="$text" granularity="word" highlightColor="#ff0000" />
+  <Labels name="ner" toName="text-1">
+    <Label value="Person" />
+    <Label value="Location" />
+  </Labels>
 </View>
 ```

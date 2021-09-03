@@ -56,7 +56,7 @@ In the project settings, you can add instructions and choose whether to show the
 
 1. Within a project on the Label Studio UI, click **Settings**.
 2. Click **Instructions**, or in Label Studio Enterprise, click **Annotation Settings**. 
-3. Type instructions and choose whether to show the instructions to annotators before labeling. 
+3. Type instructions and choose whether to show the instructions to annotators before labeling. If you want to provide additional details or links for reference, instructions support HTML markup.
 4. Click **Save**. <br/>Click the project name to return to the data manager view. 
 
 Annotators can view instructions at any time when labeling by clicking the (i) button from the labeling interface.
@@ -124,18 +124,18 @@ In Label Studio Community Edition, you can set up task sampling from the command
    Your changes save automatically. 
 
 ### <i class='ent'></i> Define the matching function for annotation statistics
-Annotation statistics such as annotator consensus are calculated using a matching score. If you want the matching score to calculate matches by requiring exact matching choices, choose that option in the annotation settings.
+Annotation statistics such as annotator consensus are calculated using a matching score. If you want the matching score to calculate matches by requiring exact matching choices, choose that option in the annotation settings. For more about matching scores and functions in Label Studio Enterprise, see [Annotation statistics](stats.html).
 
 1. Within a project on the Label Studio UI, click **Settings**.
 2. Click **Annotation Settings**.
 3. Under **Matching Function**, select **Exact matching choices**.
-4. For some types of labeling, you can also select a specific matching function. For more about matching functions in Label Studio Enterprise, see [Annotation statistics](stats.html).
+4. For some types of labeling, you can also select a specific matching function. 
 
 Your changes save automatically. 
 
 ## <i class='ent'></i> Set up review settings for your project
 
-Set up review settings to guide reviewers when they review annotated tasks.
+Set up review settings to guide reviewers when they review annotated tasks. For more about reviewing annotations, see [Review annotations in Label Studio](quality.html)
 
 <div class="enterprise"><p>
 Review settings and the review stream are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
@@ -147,7 +147,7 @@ In the project settings, you can add instructions and choose whether to show the
 
 1. Within a project on the Label Studio UI, click **Settings**.
 2. Click **Review Settings**. 
-3. Type instructions and choose whether to show the instructions to reviewers before reviewing annotated tasks. 
+3. Type instructions and choose whether to show the instructions to reviewers before reviewing annotated tasks. If you want to provide additional details or links for reference, instructions support HTML markup.
 4. Click **Save**. <br/>Click **Data Manager** to return to the data manager view. 
 
 ### Set reviewing options

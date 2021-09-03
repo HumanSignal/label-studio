@@ -55,12 +55,16 @@ ImportStorage:
   # 2 columns grid
   - columnCount: 2
     columns:
-      - width: 371
+      - width: 345
         fields:
           - type: toggle
             name: use_blob_urls
             label: Treat every bucket object as a source file
             description: If unchecked, treat every bucket object as a JSON-formatted task. Optional
+          - type: toggle
+            name: recursive_scan
+            label: Recursive scan
+            description: Perform recursive scan over the bucket content
       - fields:
           - type: toggle
             name: presign
@@ -68,8 +72,9 @@ ImportStorage:
             value: true
           - type: counter
             name: presign_ttl
-            value: 1
+            label: Expiration minutes
             min: 1
+            value: 1
             dependency: presign
 
 ExportStorage:

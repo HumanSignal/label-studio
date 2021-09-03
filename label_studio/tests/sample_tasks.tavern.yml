@@ -36,3 +36,31 @@ stages:
         speaker: Alice
     status_code: 200
 
+---
+test_name: get_paragraphs_sample_task_value_type_url
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      label_config: "<View>\n  <ParagraphLabels name=\"actions\" toName=\"dialogue\"\
+        >\n      <Label value=\"Inform\"></Label>\n      <Label value=\"Request\"\
+        ></Label>\n      <Label value=\"Negate\"></Label>\n      <Label value=\"Affirm\"\
+        ></Label>\n  </ParagraphLabels>\n\n  <Paragraphs\n          audioUrl=\"$audio\"\
+        \n          name=\"dialogue\"\n          value=\"$dialogue\"\n          layout=\"\
+        dialogue\"\n          savetextresult=\"yes\"\n          nameKey=\"speaker\"\
+        \n          textKey=\"phrase\"\n valueType=\"url\"  />\n</View>\n"
+    headers:
+      content-type: application/x-www-form-urlencoded
+    method: POST
+    url: '{django_live_url}/projects/upload-example'
+  response:
+    json:
+      dialogue: /samples/paragraphs.json?nameKey=speaker&textKey=phrase
+    status_code: 200
+

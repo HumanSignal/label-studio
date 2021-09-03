@@ -1,7 +1,7 @@
 ---
 title: Relation
 type: tags
-order: 420
+order: 422
 meta_title: Relation Tags for a Single Relation
 meta_description: Label Studio Relation Tags customize Label Studio for a single relation for machine learning and data science projects.
 ---
@@ -12,8 +12,8 @@ Relation tag represents a single relation label
 
 | Param | Type | Description |
 | --- | --- | --- |
-| value | <code>string</code> | value of the relation |
-| [background] | <code>string</code> | background color of active label |
+| value | <code>string</code> | Value of the relation |
+| [background] | <code>string</code> | Background color of the active label |
 
 ### Example
 ```html

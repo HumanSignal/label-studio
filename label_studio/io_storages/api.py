@@ -35,6 +35,7 @@ class ImportStorageListAPI(generics.ListCreateAPIView):
 
 class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
+
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ImportStorageSerializer
     permission_required = all_permissions.projects_change
@@ -59,6 +60,7 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
 
 class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
+
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ExportStorageSerializer
     permission_required = all_permissions.projects_change
@@ -77,6 +79,25 @@ class ImportStorageSyncAPI(generics.GenericAPIView):
     def get_queryset(self):
         ImportStorageClass = self.serializer_class.Meta.model
         return ImportStorageClass.objects.all()
+
+    def post(self, request, *args, **kwargs):
+        storage = self.get_object()
+        # check connectivity & access, raise an exception if not satisfied
+        storage.validate_connection()
+        storage.sync()
+        storage.refresh_from_db()
+        return Response(self.serializer_class(storage).data)
+
+
+class ExportStorageSyncAPI(generics.GenericAPIView):
+
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
+    permission_required = all_permissions.projects_change
+    serializer_class = ExportStorageSerializer
+
+    def get_queryset(self):
+        ExportStorageClass = self.serializer_class.Meta.model
+        return ExportStorageClass.objects.all()
 
     def post(self, request, *args, **kwargs):
         storage = self.get_object()

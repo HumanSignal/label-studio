@@ -2,6 +2,7 @@
 """
 import logging
 
+from django.conf import settings
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.decorators import method_decorator
 from rest_framework import viewsets
@@ -14,7 +15,7 @@ from drf_yasg.utils import swagger_auto_schema
 from django.db.models import Sum
 from ordered_set import OrderedSet
 
-from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request
+from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, find_first_one_to_one_related_field_by_prefix
 from core.permissions import all_permissions, ViewClassPermission
 from core.decorators import permission_required
 from projects.models import Project
@@ -71,7 +72,6 @@ class TaskPagination(PageNumberPagination):
     tags=['Data Manager'], operation_summary="Delete view",
     operation_description="Delete a view for a specific project."))
 class ViewAPI(viewsets.ModelViewSet):
-    queryset = View.objects.all()
     serializer_class = ViewSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["project"]
@@ -103,6 +103,9 @@ class ViewAPI(viewsets.ModelViewSet):
     def get_task_queryset(self, request, view):
         return Task.prepared.all(prepare_params=view.get_prepare_tasks_params())
 
+    def get_queryset(self):
+        return View.objects.filter(project__organization=self.request.user.active_organization)
+
     @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
     @action(detail=True, methods=["get"])
     def tasks(self, request, pk=None):
@@ -114,8 +117,13 @@ class ViewAPI(viewsets.ModelViewSet):
         """
         view = self.get_object()
         queryset = self.get_task_queryset(request, view)
-        context = {'proxy': bool_from_request(request.GET, 'proxy', True), 'resolve_uri': True, 'request': request}
         project = view.project
+        storage = find_first_one_to_one_related_field_by_prefix(project, '.*io_storages_')
+        resolve_uri = True
+        if not storage:
+            resolve_uri = False
+
+        context = {'proxy': bool_from_request(request.GET, 'proxy', True), 'resolve_uri': resolve_uri, 'request': request}
 
         # paginated tasks
         self.pagination_class = TaskPagination
@@ -299,14 +307,7 @@ class ProjectActionsAPI(APIView):
         pk = int_from_request(request.GET, "project", 1)  # replace 1 to None, it's for debug only
         project = get_object_with_check_and_log(request, Project, pk=pk)
         self.check_object_permissions(request, project)
-
-        params = {
-            'can_delete_tasks': True,
-            'can_manage_annotations': True,
-            'experimental_feature': False
-        }
-
-        return Response(get_all_actions(params))
+        return Response(get_all_actions(request.user))
 
     @swagger_auto_schema(tags=["Data Manager"])
     def post(self, request):
@@ -322,11 +323,6 @@ class ProjectActionsAPI(APIView):
 
         queryset = get_prepared_queryset(request, project)
 
-        # no selected items on tab
-        if not queryset.exists():
-            response = {'detail': 'No selected items for specified view'}
-            return Response(response, status=404)
-
         # wrong action id
         action_id = request.GET.get('id', None)
         if action_id is None:
@@ -335,7 +331,7 @@ class ProjectActionsAPI(APIView):
 
         # perform action and return the result dict
         kwargs = {'request': request}  # pass advanced params to actions
-        result = perform_action(action_id, project, queryset, **kwargs)
+        result = perform_action(action_id, project, queryset, request.user, **kwargs)
         code = result.pop('response_code', 200)
 
         return Response(result, status=code)

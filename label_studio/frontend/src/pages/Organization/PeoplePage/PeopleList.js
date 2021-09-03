@@ -1,9 +1,9 @@
 import { formatDistance } from "date-fns";
 import { useCallback, useEffect, useState } from "react";
-import { Spinner, Userpic } from "../../components";
-import { useAPI } from "../../providers/ApiProvider";
-import { Block, Elem } from "../../utils/bem";
-import { isDefined } from "../../utils/helpers";
+import { Spinner, Userpic } from "../../../components";
+import { useAPI } from "../../../providers/ApiProvider";
+import { Block, Elem } from "../../../utils/bem";
+import { isDefined } from "../../../utils/helpers";
 import './PeopleList.styl';
 
 export const PeopleList = ({onSelect, selectedUser, defaultSelected}) => {

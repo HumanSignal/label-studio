@@ -1,7 +1,7 @@
 ---
 title: Pairwise
 type: tags
-order: 412
+order: 414
 meta_title: Pairwise Tags to Compare Objects
 meta_description: Label Studio Pairwise Tags customize Label Studio with pairwise to compare objects for machine learning and data science projects.
 ---
@@ -9,14 +9,12 @@ meta_description: Label Studio Pairwise Tags customize Label Studio with pairwis
 Pairwise element. Compare two different objects, works with any label studio object
 
 ### Parameters
-**Params**: <code>string</code> [leftClass=left]  - class name of the left object  
-**Params**: <code>string</code> [rightClass=left] - class name of the right object  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| name | <code>string</code> | name of the element |
-| toName | <code>string</code> | names of the elements you want to compare |
-| [selectionStyle] | <code>string</code> | style of the selection |
+| name | <code>string</code> | Name of the element |
+| toName | <code>string</code> | Names of the elements you want to compare, comma-separated |
+| [selectionStyle] | <code>string</code> | Style of the selection |
 
 ### Example
 ```html

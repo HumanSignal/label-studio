@@ -1,7 +1,7 @@
 ---
 title: Relations
 type: tags
-order: 421
+order: 423
 meta_title: Relations Tags for Multiple Relations
 meta_description: Label Studio Relations Tags customize Label Studio for Multiple Relations for machine learning and data science projects.
 ---
@@ -12,7 +12,7 @@ Relations tag, create relations labels
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| [choice] | <code>single</code> \| <code>multiple</code> | <code>single</code> | configure if you can select just one or multiple labels |
+| [choice] | <code>single</code> \| <code>multiple</code> | <code>single</code> | Configure whether you can select one or multiple labels |
 
 ### Example
 ```html

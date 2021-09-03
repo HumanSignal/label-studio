@@ -12,7 +12,6 @@ from data_manager.models import View
 from tasks.models import Task
 
 
-DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 TASKS = 'tasks:'
 logger = logging.getLogger(__name__)
 
@@ -197,7 +196,7 @@ def get_all_columns(project):
     return result
 
 
-def get_prepared_queryset(request, project):
+def get_prepare_params(request, project):
     # use filters and selected items from view
     view_id = int_from_request(request.GET, 'view_id', 0)
     if view_id > 0:
@@ -216,8 +215,12 @@ def get_prepared_queryset(request, project):
         ordering = request.data.get('ordering', [])
         prepare_params = PrepareParams(project=project.id, selectedItems=selected, data=request.data,
                                        filters=filters, ordering=ordering)
+    return prepare_params
 
-    queryset = Task.prepared.all(prepare_params=prepare_params)
+
+def get_prepared_queryset(request, project):
+    prepare_params = get_prepare_params(request, project)
+    queryset = Task.prepared.all(prepare_params=prepare_params, annotate_counts=False)
     return queryset
 
 
