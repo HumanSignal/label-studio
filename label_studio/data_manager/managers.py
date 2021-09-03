@@ -143,7 +143,7 @@ def apply_filters(queryset, filters):
 
     for _filter in filters.items:
         # we can also have annotations filters
-        if not _filter.filter.startswith("filter:tasks:") or not _filter.value:
+        if not _filter.filter.startswith("filter:tasks:") or _filter.value is None:
             continue
 
         # django orm loop expression attached to column name
