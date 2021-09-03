@@ -80,7 +80,7 @@ def get_fields_for_annotation(prepare_params):
     return result
 
 
-def apply_ordering(queryset, ordering):
+def apply_ordering(queryset, ordering, only_undefined_field=False):
     if ordering:
         field_name = ordering[0].replace("tasks:", "")
         ascending = False if field_name[0] == '-' else True  # detect direction
@@ -88,7 +88,6 @@ def apply_ordering(queryset, ordering):
 
         if "data." in field_name:
             field_name = field_name.replace(".", "__", 1)
-            only_undefined_field = queryset.exists() and queryset.first().project.only_undefined_field
             if only_undefined_field:
                 field_name = re.sub('data__\w+', f'data__{settings.DATA_UNDEFINED_NAME}', field_name)
 
@@ -126,7 +125,7 @@ def cast_value(_filter):
             _filter.value = cast_bool_from_str(_filter.value)
 
 
-def apply_filters(queryset, filters):
+def apply_filters(queryset, filters, only_undefined_field=False):
     if not filters:
         return queryset
 
@@ -136,8 +135,6 @@ def apply_filters(queryset, filters):
         conjunction = Q.OR
     else:
         conjunction = Q.AND
-
-    only_undefined_field = queryset.exists() and queryset.first().project.only_undefined_field
 
     for _filter in filters.items:
         # we can also have annotations filters
@@ -248,14 +245,18 @@ class TaskQuerySet(models.QuerySet):
         :param prepare_params: prepare params with project, filters, orderings, etc
         :return: ordered and filtered queryset
         """
+        from projects.models import Project
+
         queryset = self
 
         # project filter
         if prepare_params.project is not None:
             queryset = queryset.filter(project=prepare_params.project)
 
-        queryset = apply_filters(queryset, prepare_params.filters)
-        queryset = apply_ordering(queryset, prepare_params.ordering)
+        project = Project.objects.get(pk=prepare_params.project)
+
+        queryset = apply_filters(queryset, prepare_params.filters, only_undefined_field=project.only_undefined_field)
+        queryset = apply_ordering(queryset, prepare_params.ordering, only_undefined_field=project.only_undefined_field)
 
         if not prepare_params.selectedItems:
             return queryset
@@ -343,7 +344,7 @@ def update_annotation_map(obj):
 
 
 class PreparedTaskManager(models.Manager):
-    def get_queryset(self, fields_for_evaluation=None):
+    def get_queryset(self, fields_for_evaluation=None, annotate_counts=True):
         queryset = TaskQuerySet(self.model)
         annotations_map = get_annotations_map()
 
@@ -351,11 +352,12 @@ class PreparedTaskManager(models.Manager):
             fields_for_evaluation = []
 
         # default annotations for calculating total values in pagination output
-        queryset = queryset.annotate(
-            total_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False)),
-            cancelled_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True)),
-            total_predictions=Count("predictions", distinct=True),
-        )
+        if annotate_counts:
+            queryset = queryset.annotate(
+                total_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False)),
+                cancelled_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True)),
+                total_predictions=Count("predictions", distinct=True),
+            )
 
         # db annotations applied only if we need them in ordering or filters
         for field in fields_for_evaluation:
@@ -364,7 +366,7 @@ class PreparedTaskManager(models.Manager):
 
         return queryset
 
-    def all(self, prepare_params=None):
+    def all(self, prepare_params=None, annotate_counts=True):
         """ Make a task queryset with filtering, ordering, annotations
 
         :param prepare_params: prepare params with filters, orderings, etc
@@ -374,7 +376,10 @@ class PreparedTaskManager(models.Manager):
             return self.get_queryset()
 
         fields_for_annotation = get_fields_for_annotation(prepare_params)
-        return self.get_queryset(fields_for_annotation).prepared(prepare_params=prepare_params)
+        return self.get_queryset(
+            fields_for_evaluation=fields_for_annotation,
+            annotate_counts=annotate_counts
+        ).prepared(prepare_params=prepare_params)
 
 
 class TaskManager(models.Manager):
