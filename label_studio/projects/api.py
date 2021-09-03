@@ -30,7 +30,7 @@ from projects.serializers import (
     ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer
 )
 from tasks.models import Task, Annotation, Prediction, TaskLock
-from tasks.serializers import TaskSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer
+from tasks.serializers import TaskSerializer, TaskSimpleSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer
 from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
 from webhooks.models import WebhookAction
 
@@ -558,7 +558,6 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
         return super(ProjectSummaryAPI, self).get(*args, **kwargs)
 
 
-
 @method_decorator(name='delete', decorator=swagger_auto_schema(
         tags=['Projects'],
         operation_summary='Delete all tasks',
@@ -588,6 +587,12 @@ class TasksListAPI(generics.ListCreateAPIView,
     redirect_route = 'projects:project-settings'
     redirect_kwarg = 'pk'
 
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return TaskSimpleSerializer
+        else:
+            return TaskSerializer
+
     def filter_queryset(self, queryset):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
         tasks = Task.objects.filter(project=project)
@@ -616,7 +621,6 @@ class TasksListAPI(generics.ListCreateAPIView,
         project = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
         instance = serializer.save(project=project)
         emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])
-
 
 
 class TemplateListAPI(generics.ListAPIView):
