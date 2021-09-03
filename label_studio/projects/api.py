@@ -573,8 +573,8 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
             ```
         """.format(settings.HOSTNAME or 'https://localhost:8080')
     ))
-class TasksListAPI(generics.ListCreateAPIView,
-                   generics.DestroyAPIView):
+class ProjectTaskListAPI(generics.ListCreateAPIView,
+                         generics.DestroyAPIView):
 
     parser_classes = (JSONParser, FormParser)
     queryset = Task.objects.all()
@@ -606,14 +606,14 @@ class TasksListAPI(generics.ListCreateAPIView,
         return Response(data={'tasks': task_ids}, status=204)
 
     def get(self, *args, **kwargs):
-        return super(TasksListAPI, self).get(*args, **kwargs)
+        return super(ProjectTaskListAPI, self).get(*args, **kwargs)
 
     @swagger_auto_schema(auto_schema=None)
     def post(self, *args, **kwargs):
-        return super(TasksListAPI, self).post(*args, **kwargs)
+        return super(ProjectTaskListAPI, self).post(*args, **kwargs)
 
     def get_serializer_context(self):
-        context = super(TasksListAPI, self).get_serializer_context()
+        context = super(ProjectTaskListAPI, self).get_serializer_context()
         context['project'] = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
         return context
 
