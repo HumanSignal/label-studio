@@ -70,6 +70,9 @@ def get_fields_for_annotation(prepare_params):
             filter_field_name = _filter.filter.replace("filter:tasks:", "")
             result.append(filter_field_name)
 
+    if prepare_params.data:
+        pass
+
     # remove duplicates
     result = set(result)
 
