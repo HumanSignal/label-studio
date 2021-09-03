@@ -111,6 +111,15 @@ class TaskSimpleSerializer(ModelSerializer):
         self.fields['annotations'] = AnnotationSerializer(many=True, default=[], context=self.context, read_only=True)
         self.fields['predictions'] = PredictionSerializer(many=True, default=[], context=self.context, read_only=True)
 
+    def to_representation(self, instance):
+        project = instance.project
+        if project:
+            # resolve $undefined$ key in task data
+            data = instance.data
+            replace_task_data_undefined_with_config_field(data, project)
+
+        return super().to_representation(instance)
+
     class Meta:
         model = Task
         fields = '__all__'
