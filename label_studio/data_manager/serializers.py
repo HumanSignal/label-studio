@@ -158,17 +158,17 @@ class ViewSerializer(serializers.ModelSerializer):
 class DataManagerTaskSerializer(TaskSerializer):
     predictions = PredictionSerializer(many=True, default=[], read_only=True)
     annotations = AnnotationSerializer(many=True, default=[], read_only=True)
-    drafts = serializers.SerializerMethodField()
+    drafts = serializers.SerializerMethodField(required=False)
+    annotators = serializers.SerializerMethodField(required=False)
 
-    cancelled_annotations = serializers.SerializerMethodField()
-    completed_at = serializers.SerializerMethodField()
-    annotations_results = serializers.SerializerMethodField()
-    predictions_results = serializers.SerializerMethodField()
-    predictions_score = serializers.SerializerMethodField()
-    total_annotations = serializers.SerializerMethodField()
-    total_predictions = serializers.SerializerMethodField()
-    file_upload = serializers.ReadOnlyField(source='file_upload_name')
-    annotators = serializers.SerializerMethodField()
+    cancelled_annotations = serializers.IntegerField(required=False)
+    total_annotations = serializers.IntegerField(required=False)
+    total_predictions = serializers.IntegerField(required=False)
+    completed_at = serializers.DateTimeField(required=False)
+    annotations_results = serializers.CharField(required=False, max_length=1000)
+    predictions_results = serializers.CharField(required=False, max_length=1000)
+    predictions_score = serializers.FloatField(required=False)
+    file_upload = serializers.ReadOnlyField(source='file_upload_name', required=False)
 
     class Meta:
         model = Task
@@ -194,51 +194,8 @@ class DataManagerTaskSerializer(TaskSerializer):
         ]
 
     @staticmethod
-    def get_cancelled_annotations(obj):
-        return obj.annotations.filter(was_cancelled=True).count()
-
-    @staticmethod
-    def get_completed_at(obj):
-        annotations = obj.annotations.all()
-        if obj.is_labeled and annotations:
-            return max(c.created_at for c in annotations)
-        return None
-
-    @staticmethod
-    def get_annotations_results(obj):
-        annotations = obj.annotations.all()
-        if annotations:
-            return json.dumps([item.result for item in annotations])
-        else:
-            return ""
-
-    @staticmethod
-    def get_predictions_results(obj):
-        predictions = obj.predictions.all()
-        if predictions:
-            return json.dumps([item.result for item in predictions])
-        else:
-            return ""
-
-    @staticmethod
-    def get_predictions_score(obj):
-        predictions = obj.predictions.all()
-        if predictions:
-            values = [item.score for item in predictions if isinstance(item.score, (float, int))]
-            if values:
-                return sum(values) / float(len(values))
-        return None
-
-    @staticmethod
-    def get_total_predictions(obj):
-        return obj.predictions.count()
-
-    @staticmethod
-    def get_total_annotations(obj):
-        return obj.annotations.filter(was_cancelled=False).count()
-
-    @staticmethod
     def get_annotators(obj):
+        # return obj.annotators
         result = obj.annotations.values_list('completed_by', flat=True).distinct()
         result = [r for r in result if r is not None]
         return result

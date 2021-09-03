@@ -15,6 +15,7 @@ from datetime import datetime
 
 from data_manager.prepare_params import ConjunctionEnum
 from label_studio.core.utils.params import cast_bool_from_str
+from label_studio.core.utils.common import load_func
 
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
@@ -48,13 +49,15 @@ def preprocess_field_name(raw_field_name, only_undefined_field=False):
     return field_name
 
 
-def get_fields_for_annotation(prepare_params):
+def get_fields_for_evaluation(prepare_params, request):
     """ Collecting field names to annotate them
 
     :param prepare_params: structure with filters and ordering
+    :param request: django request
     :return: list of field names
     """
     from tasks.models import Task
+    from projects.models import Project
 
     result = []
     # collect fields from ordering
@@ -67,6 +70,19 @@ def get_fields_for_annotation(prepare_params):
         for _filter in prepare_params.filters.items:
             filter_field_name = _filter.filter.replace("filter:tasks:", "")
             result.append(filter_field_name)
+
+    # visible fields calculation
+    fields = prepare_params.data.get('hiddenColumns', None)
+    if fields:
+        from label_studio.data_manager.functions import TASKS
+        GET_ALL_COLUMNS = load_func(settings.DATA_MANAGER_GET_ALL_COLUMNS)
+        all_columns = GET_ALL_COLUMNS(request, Project.objects.get(id=prepare_params.project))
+        all_columns = set([TASKS + ('data.' if c.get('parent', None) == 'data' else '') + c['id']
+                           for c in all_columns['columns']])
+        hidden = set(fields['explore']) & set(fields['labeling'])
+        shown = all_columns - hidden
+        shown = {c[len(TASKS):] for c in shown} - {'data'}  # remove tasks:
+        result = set(result) | shown
 
     # remove duplicates
     result = set(result)
@@ -352,11 +368,18 @@ class PreparedTaskManager(models.Manager):
             fields_for_evaluation = []
 
         # default annotations for calculating total values in pagination output
-        queryset = queryset.annotate(
-            total_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False)),
-            cancelled_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True)),
-            total_predictions=Count("predictions", distinct=True),
-        )
+        if 'total_annotations' in fields_for_evaluation:
+            queryset = queryset.annotate(
+                total_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
+            )
+        if 'cancelled_annotations' in fields_for_evaluation:
+            queryset = queryset.annotate(
+                cancelled_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True))
+            )
+        if 'total_predictions' in fields_for_evaluation:
+            queryset = queryset.annotate(
+                total_predictions=Count("predictions", distinct=True)
+            )
 
         # db annotations applied only if we need them in ordering or filters
         for field in fields_for_evaluation:
@@ -365,16 +388,17 @@ class PreparedTaskManager(models.Manager):
 
         return queryset
 
-    def all(self, prepare_params=None):
+    def all(self, prepare_params=None, request=None):
         """ Make a task queryset with filtering, ordering, annotations
 
         :param prepare_params: prepare params with filters, orderings, etc
+        :param request: django request instance from API
         :return: TaskQuerySet with filtered, ordered, annotated tasks
         """
         if prepare_params is None:
             return self.get_queryset()
 
-        fields_for_annotation = get_fields_for_annotation(prepare_params)
+        fields_for_annotation = get_fields_for_evaluation(prepare_params, request)
         return self.get_queryset(
             fields_for_evaluation=fields_for_annotation
         ).prepared(prepare_params=prepare_params)

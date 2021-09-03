@@ -101,7 +101,7 @@ class ViewAPI(viewsets.ModelViewSet):
         return Response(status=204)
 
     def get_task_queryset(self, request, view):
-        return Task.prepared.all(prepare_params=view.get_prepare_tasks_params())
+        return Task.prepared.all(prepare_params=view.get_prepare_tasks_params(), request=request)
 
     def get_queryset(self):
         return View.objects.filter(project__organization=self.request.user.active_organization)
@@ -256,7 +256,7 @@ class ProjectColumnsAPI(APIView):
         pk = int_from_request(request.GET, "project", 1)
         project = get_object_with_check_and_log(request, Project, pk=pk)
         self.check_object_permissions(request, project)
-        data = get_all_columns(project)
+        data = get_all_columns(request, project)
         return Response(data)
 
 
