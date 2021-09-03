@@ -58,7 +58,8 @@ Use the following labeling configuration to reference the data fields:
 
 Then your labeling interface looks like the following:
 
-<br/><img src="/images/tag-header-example.png" alt="Screenshot of the labeling interface showing header of "This is a different header for each task" and text to be labeled of "This is the text that needs to be labeled" followed by a row of 3 checkboxes with Positive, Negative, and Neutral options." class="gif-border" width="748px" height="284px" />
+<br/>
+<img src="/images/tag-header-example.png" alt="Screenshot of the labeling interface showing header of "This is a different header for each task" and text to be labeled of "This is the text that needs to be labeled" followed by a row of 3 checkboxes with Positive, Negative, and Neutral options." class="gif-border" width="748px" height="284px" />
 
 
 ### Styles
