@@ -195,10 +195,7 @@ class DataManagerTaskSerializer(TaskSerializer):
 
     @staticmethod
     def get_annotators(obj):
-        # return obj.annotators
-        result = obj.annotations.values_list('completed_by', flat=True).distinct()
-        result = [r for r in result if r is not None]
-        return result
+        return obj.annotators if hasattr(obj, 'annotators') and obj.annotators else []
 
     def get_drafts(self, task):
         """Return drafts only for the current user"""
