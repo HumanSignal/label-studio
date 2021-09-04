@@ -36,7 +36,7 @@ _api_urlpatterns = [
     path('<int:pk>/summary/', api.ProjectSummaryAPI.as_view(), name='project-summary'),
 
     # Tasks list for the project: get and destroy
-    path('<int:pk>/tasks/', api.TasksListAPI.as_view(), name='project-tasks-list'),
+    path('<int:pk>/tasks/', api.ProjectTaskListAPI.as_view(), name='project-tasks-list'),
 
     # Generate sample task for this project
     path('<int:pk>/sample-task/', api.ProjectSampleTask.as_view(), name='project-sample-task'),

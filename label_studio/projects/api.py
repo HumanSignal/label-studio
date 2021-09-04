@@ -30,7 +30,7 @@ from projects.serializers import (
     ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer
 )
 from tasks.models import Task, Annotation, Prediction, TaskLock
-from tasks.serializers import TaskSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer
+from tasks.serializers import TaskSerializer, TaskSimpleSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer
 from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
 from webhooks.models import WebhookAction
 
@@ -418,13 +418,10 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             if not assigned_flag:
                 not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
 
-            not_solved_tasks_count = not_solved_tasks.count()
+            # used only for debug logging, disabled for performance reasons
+            not_solved_tasks_count = 'unknown'
 
-            # return nothing if there are no tasks remain
-            if not_solved_tasks_count == 0:
-                raise NotFound(f'There are no tasks remaining to be annotated by the user={user}')
-            logger.debug(f'{not_solved_tasks_count} tasks that still need to be annotated for user={user}')
-
+            next_task = None
             # ordered by data manager
             if assigned_flag:
                 next_task = not_solved_tasks.first()
@@ -454,10 +451,12 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
             # if there any tasks in progress (with maximum number of annotations), randomly sampling from them
             logger.debug(f'User={request.user} tries depth first from {not_solved_tasks_count} tasks')
-            next_task = self._try_breadth_first(not_solved_tasks)
-            if next_task:
-                queue_info += (' & ' if queue_info else '') + 'Breadth first queue'
-                return self._make_response(next_task, request, queue=queue_info)
+
+            if project.maximum_annotations > 1:
+                next_task = self._try_breadth_first(not_solved_tasks)
+                if next_task:
+                    queue_info += (' & ' if queue_info else '') + 'Breadth first queue'
+                    return self._make_response(next_task, request, queue=queue_info)
 
             if project.sampling == project.UNCERTAINTY:
                 queue_info += (' & ' if queue_info else '') + 'Active learning or random queue'
@@ -558,7 +557,6 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
         return super(ProjectSummaryAPI, self).get(*args, **kwargs)
 
 
-
 @method_decorator(name='delete', decorator=swagger_auto_schema(
         tags=['Projects'],
         operation_summary='Delete all tasks',
@@ -574,8 +572,8 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
             ```
         """.format(settings.HOSTNAME or 'https://localhost:8080')
     ))
-class TasksListAPI(generics.ListCreateAPIView,
-                   generics.DestroyAPIView):
+class ProjectTaskListAPI(generics.ListCreateAPIView,
+                         generics.DestroyAPIView):
 
     parser_classes = (JSONParser, FormParser)
     queryset = Task.objects.all()
@@ -587,6 +585,12 @@ class TasksListAPI(generics.ListCreateAPIView,
     serializer_class = TaskSerializer
     redirect_route = 'projects:project-settings'
     redirect_kwarg = 'pk'
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return TaskSimpleSerializer
+        else:
+            return TaskSerializer
 
     def filter_queryset(self, queryset):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
@@ -601,14 +605,14 @@ class TasksListAPI(generics.ListCreateAPIView,
         return Response(data={'tasks': task_ids}, status=204)
 
     def get(self, *args, **kwargs):
-        return super(TasksListAPI, self).get(*args, **kwargs)
+        return super(ProjectTaskListAPI, self).get(*args, **kwargs)
 
     @swagger_auto_schema(auto_schema=None)
     def post(self, *args, **kwargs):
-        return super(TasksListAPI, self).post(*args, **kwargs)
+        return super(ProjectTaskListAPI, self).post(*args, **kwargs)
 
     def get_serializer_context(self):
-        context = super(TasksListAPI, self).get_serializer_context()
+        context = super(ProjectTaskListAPI, self).get_serializer_context()
         context['project'] = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
         return context
 
@@ -616,7 +620,6 @@ class TasksListAPI(generics.ListCreateAPIView,
         project = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
         instance = serializer.save(project=project)
         emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])
-
 
 
 class TemplateListAPI(generics.ListAPIView):
