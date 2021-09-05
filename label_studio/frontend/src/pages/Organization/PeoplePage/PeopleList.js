@@ -5,8 +5,12 @@ import { useAPI } from "../../../providers/ApiProvider";
 import { Block, Elem } from "../../../utils/bem";
 import { isDefined } from "../../../utils/helpers";
 import './PeopleList.styl';
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
 
 export const PeopleList = ({onSelect, selectedUser, defaultSelected}) => {
+  const { t } = useTranslation();
+
   const api = useAPI();
   const [usersList, setUsersList] = useState();
 
@@ -43,9 +47,9 @@ export const PeopleList = ({onSelect, selectedUser, defaultSelected}) => {
         <Elem name="users">
           <Elem name="header">
             <Elem name="column" mix="avatar"/>
-            <Elem name="column" mix="email">Email</Elem>
-            <Elem name="column" mix="name">Name</Elem>
-            <Elem name="column" mix="last-activity">Last Activity</Elem>
+            <Elem name="column" mix="email">{t("email")}</Elem>
+            <Elem name="column" mix="name">{t("name")}</Elem>
+            <Elem name="column" mix="last-activity">{t("lastActivity")}</Elem>
           </Elem>
           <Elem name="body">
             {usersList.map(({user}) => {

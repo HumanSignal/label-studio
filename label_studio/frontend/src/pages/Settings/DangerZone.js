@@ -7,8 +7,13 @@ import { Space } from "../../components/Space/Space";
 import { Spinner } from "../../components/Spinner/Spinner";
 import { useAPI } from "../../providers/ApiProvider";
 import { useProject } from "../../providers/ProjectProvider";
+import { useTranslation } from "react-i18next";
+import "../../translations/i18n";
+import i18n from "i18next";
 
 export const DangerZone = () => {
+  const { t } = useTranslation();
+
   const {project} = useProject();
   const api = useAPI();
   const history = useHistory();
@@ -16,9 +21,9 @@ export const DangerZone = () => {
 
   const handleOnClick = (type) => () => {
     confirm({
-      title: "Action confirmation",
-      body: "You're about to delete all things. This action cannot be undone.",
-      okText: "Proceed",
+      title: t("actionConfirmation"),
+      body: t("youAreAbout"),
+      okText: t("proceed"),
       buttonLook: "destructive",
       onOk: async () => {
         setProcessing(type);
@@ -47,31 +52,36 @@ export const DangerZone = () => {
     });
   };
 
+  let deleteStr = t("delete");
+  let annotationsStr = t("annotations");
+  let tasksStr = t("tasks");
+  let predictionsStr = t("predictions");
+  let deleteProjectStr = t("deleteProject");
   const buttons = useMemo(() => [{
     type: 'annotations',
     disabled: true, //&& !project.total_annotations_number,
-    label: `Delete ${project.total_annotations_number} Annotations`,
+    label: deleteStr + ` ${project.total_annotations_number} ` + annotationsStr,
   }, {
     type: 'tasks',
     disabled: true, //&& !project.task_number,
-    label: `Delete ${project.task_number} Tasks`,
+    label: deleteStr + ` ${project.task_number} ` + tasksStr,
   }, {
     type: 'predictions',
     disabled: true, //&& !project.total_predictions_number,
-    label: `Delete ${project.total_predictions_number} Predictions`,
+    label: deleteStr + ` ${project.total_predictions_number} ` + predictionsStr,
   }, {
     type: 'tabs',
-    label: `Drop All Tabs`,
+    label: t("dropAllTabs"),
   }, {
     type: 'project',
-    label: 'Delete Project',
+    label: deleteProjectStr,
   }], [project]);
 
   return (
     <div style={{width: 480}}>
       <Label
-        text="Delete Annotations, Tasks, or Project"
-        description="Perform these actions at your own risk. Actions you take on this page can't be reverted. Make sure your data is backed up."
+        text={t("deleteAnnotationsTasksProject")}
+        description={t("performTheseActions")}
         style={{display: 'block', width: 415}}
       />
 
@@ -96,5 +106,5 @@ export const DangerZone = () => {
   );
 };
 
-DangerZone.title = "Danger Zone";
+DangerZone.title = i18n.t("dangerZone");
 DangerZone.path = "/danger-zone";

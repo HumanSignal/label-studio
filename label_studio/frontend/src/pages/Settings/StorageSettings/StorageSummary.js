@@ -2,8 +2,13 @@ import { format } from 'date-fns/esm';
 import React from 'react';
 import { DescriptionList } from '../../../components/DescriptionList/DescriptionList';
 import { Oneof } from '../../../components/Oneof/Oneof';
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
+
 
 export const StorageSummary = ({storage, className, storageTypes = []}) => {
+  const { t } = useTranslation();
+
   return (
     <div className={className}>
       <DescriptionList>
@@ -18,7 +23,7 @@ export const StorageSummary = ({storage, className, storageTypes = []}) => {
           <LocalStorage case="localfiles" storage={storage}/>
         </Oneof>
         <DescriptionList.Item term="Last Sync">
-          {storage.last_sync ? format(new Date(storage.last_sync), 'MMMM dd, yyyy ∙ HH:mm:ss') : "Never synced"}
+          {storage.last_sync ? format(new Date(storage.last_sync), 'MMMM dd, yyyy ∙ HH:mm:ss') : t("neverSynced")}
         </DescriptionList.Item>
       </DescriptionList>
     </div>

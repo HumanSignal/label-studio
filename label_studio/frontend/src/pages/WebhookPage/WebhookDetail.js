@@ -9,12 +9,13 @@ import { useAPI } from '../../providers/ApiProvider';
 import "./WebhookPage.styl";
 import { Space } from '../../components/Space/Space';
 import { useProject } from '../../providers/ProjectProvider';
-import { modal } from '../../components/Modal/Modal';
-import { useModalControls } from "../../components/Modal/ModalPopup";
 import { WebhookDeleteModal } from "./WebhookDeleteModal";
-import { format } from 'date-fns';
+import { useTranslation } from "react-i18next";
+import "../../translations/i18n";
+
 
 const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectActive }) => {
+  const { t } = useTranslation();
 
   // if webhook === null - create mod
   // else update
@@ -93,7 +94,7 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
         name='title-base'
         onClick={()=>{onSelectActive(null);}}
       >Webhooks
-      </Elem>  /  {webhook===null? 'New Webhook' : 'Edit Webhook'}</>
+      </Elem>  /  {webhook===null? t('newWebhook') : t('editWebhook')}</>
     </Elem>
     <Elem name='content'>
       <Block name={'webhook-detail'}>
@@ -123,14 +124,14 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
             style={{marginBottom: '40px'}}
             columnCount={1}
           >
-            <Label text='Payload URL' style={{marginLeft: '-16px'}} large></Label>
+            <Label text={t("payloadURL")} style={{marginLeft: '-16px'}} large></Label>
             <Space className={rootClass.elem('url-space')}>
               <Input 
                 name="url" 
                 className={rootClass.elem('url-input')} 
                 placeholder="URL" />
               <Space align='end' className={rootClass.elem('activator')}>
-                <span className={rootClass.elem('black-text')}>Is Active</span>
+                <span className={rootClass.elem('black-text')}>{t("isActive")}</span>
                 <Toggle 
                   skip
                   checked={isActive} 
@@ -178,7 +179,7 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
           </Form.Row>
           <Block name='webhook-payload' style={{marginBottom: '40px'}}>
             <Elem name='title'>
-              <Label text="Payload" large />
+              <Label text={t("payload")} large />
             </Elem>
             <Elem name='content'>
               <Elem name='content-row'>
@@ -186,14 +187,14 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
                   skip
                   checked={sendPayload}
                   onChange={(e) => { setSendPayload(e.target.checked); }}
-                  label="Send payload" />
+                  label={t("sendPayload")} />
 
               </Elem>
               <Elem name='content-row'>
                 <Toggle 
                   skip 
                   checked={sendForAllActions} 
-                  label="Send for all actions" 
+                  label={t("sendForAllActions")}
                   onChange={(e) => { setSendForAllActions(e.target.checked); }} />
               </Elem>
               <div >
@@ -257,7 +258,7 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
               primary
               className={rootClass.elem('save-button')}
             >
-              { webhook===null ? 'Add Webhook': 'Save' }
+              { webhook===null ? t("addWebhook") : t("save") }
             </Button>
           </Elem>
         </Form>
@@ -268,5 +269,3 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
 };
 
 export default WebhookDetail;
-
-

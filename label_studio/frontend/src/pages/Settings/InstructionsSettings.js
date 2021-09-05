@@ -3,8 +3,13 @@ import { Button } from '../../components';
 import { Form, Label, TextArea, Toggle } from '../../components/Form';
 import { MenubarContext } from '../../components/Menubar/Menubar';
 import { ProjectContext } from '../../providers/ProjectProvider';
+import { useTranslation } from "react-i18next";
+import "../../translations/i18n";
+import i18n from "i18next";
 
 export const InstructionsSettings = () => {
+  const { t } = useTranslation();
+
   const {project, fetchProject} = useContext(ProjectContext);
   const pageContext = useContext(MenubarContext);
   const formRef = useRef();
@@ -21,12 +26,12 @@ export const InstructionsSettings = () => {
     <div style={{width: 480}}>
       <Form ref={formRef} action="updateProject" formData={{...project}} params={{pk: project.id}} onSubmit={updateProject}>
         <Form.Row columnCount={1}>
-          <Label text="Labeling Instructions" large/>
+          <Label text={t("labelingInstructions")} large/>
           <div style={{paddingLeft: 16}}>
-            <Toggle label="Show before labeling" name="show_instruction"/>
+            <Toggle label={t("showBeforeLabeling")} name="show_instruction"/>
           </div>
           <div style={{color: "rgba(0,0,0,0.4)", paddingLeft: 16}}>
-            Write instructions to help users complete labeling tasks.
+            
           </div>
         </Form.Row>
 
@@ -36,14 +41,14 @@ export const InstructionsSettings = () => {
 
         <Form.Actions>
           <Form.Indicator>
-            <span case="success">Saved!</span>
+            <span case="success">{t("saved")}!</span>
           </Form.Indicator>
-          <Button type="submit" look="primary" style={{width: 120}}>Save</Button>
+          <Button type="submit" look="primary" style={{width: 120}}>{t("save")}</Button>
         </Form.Actions>
       </Form>
     </div>
   );
 };
 
-InstructionsSettings.title = "Instructions";
+InstructionsSettings.title = i18n.t("instructions");
 InstructionsSettings.path = "/instruction";

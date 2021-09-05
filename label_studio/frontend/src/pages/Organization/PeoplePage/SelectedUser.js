@@ -4,6 +4,9 @@ import { LsCross } from "../../../assets/icons";
 import { Button, Userpic } from "../../../components";
 import { Block, Elem } from "../../../utils/bem";
 import "./SelectedUser.styl";
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
+
 
 const UserProjectsLinks = ({projects}) => {
   return (
@@ -18,6 +21,8 @@ const UserProjectsLinks = ({projects}) => {
 };
 
 export const SelectedUser = ({ user, onClose }) => {
+  const { t } = useTranslation();
+
   const fullName = [user.first_name, user.last_name].filter(n => !!n).join(" ").trim();
 
   return (
@@ -45,7 +50,7 @@ export const SelectedUser = ({ user, onClose }) => {
 
       {!!user.created_projects.length && (
         <Elem name="section">
-          <Elem name="section-title">Created Projects</Elem>
+          <Elem name="section-title">{t("createdProjects")}</Elem>
 
           <UserProjectsLinks projects={user.created_projects}/>
         </Elem>
@@ -53,14 +58,14 @@ export const SelectedUser = ({ user, onClose }) => {
 
       {!!user.contributed_to_projects.length && (
         <Elem name="section">
-          <Elem name="section-title">Contributed to</Elem>
+          <Elem name="section-title">{t("contributedTo")}</Elem>
 
           <UserProjectsLinks projects={user.contributed_to_projects}/>
         </Elem>
       )}
 
       <Elem tag="p" name="last-active">
-        Last activity on: {format(new Date(user.last_activity), 'dd MMM yyyy, KK:mm a')}
+        {t("lastActivityOn")}: {format(new Date(user.last_activity), 'dd MMM yyyy, KK:mm a')}
       </Elem>
     </Block>
   );

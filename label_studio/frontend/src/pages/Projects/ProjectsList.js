@@ -1,36 +1,40 @@
 import chr from 'chroma-js';
 import { format } from 'date-fns';
 import React, { useMemo } from 'react';
-import { useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { LsBulb, LsCheck, LsEllipsis, LsMinus } from '../../assets/icons';
 import { Button, Dropdown, Menu, Userpic } from '../../components';
 import { Block, Elem } from '../../utils/bem';
 import { absoluteURL } from '../../utils/helpers';
+import { useTranslation } from "react-i18next";
+import "../../translations/i18n";
 
 export const ProjectsList = ({projects}) => {
-  const history = useHistory();
   return (
     <Elem name="list">
       {projects.map(project => (
-        <ProjectCard key={project.id} project={project} history={history}/>
+        <ProjectCard key={project.id} project={project}/>
       ))}
     </Elem>
   );
 };
 
 export const EmptyProjectsList = ({ openModal }) => {
+  const { t } = useTranslation();
+
   return (
     <Block name="empty-projects-page">
       <Elem name="heidi" tag="img" src={absoluteURL("/static/images/opossum_looking.png")} />
-      <Elem name="header" tag="h1">Heidi doesn’t see any projects here</Elem>
-      <p>Create one and start labeling your data</p>
-      <Elem name="action" tag={Button} onClick={openModal} look="primary">Create Project</Elem>
+      <Elem name="header" tag="h1">{t("noProjects")}</Elem>
+      <p>{t("createStartLabeling")}</p>
+      <Elem name="action" tag={Button} onClick={openModal} look="primary">{t("createProjectButton")}</Elem>
     </Block>
   );
 };
 
-const ProjectCard = ({project, history}) => {
+const ProjectCard = ({project}) => {
+  const { t } = useTranslation();
+
   const color = useMemo(() => {
     return project.color === '#FFFFFF' ? null : project.color;
   }, [project]);
@@ -48,7 +52,7 @@ const ProjectCard = ({project, history}) => {
         <Elem name="header">
           <Elem name="title">
             <Elem name="title-text">
-              {project.title ?? "New project"}
+              {project.title ?? t("newProject")}
             </Elem>
 
             <Elem name="menu" onClick={(e) => {
@@ -57,8 +61,8 @@ const ProjectCard = ({project, history}) => {
             }}>
               <Dropdown.Trigger content={(
                 <Menu>
-                  <Menu.Item href={`/projects/${project.id}/settings`}>Settings</Menu.Item>
-                  <Menu.Item href={`/projects/${project.id}/data?labeling=1`}>Label</Menu.Item>
+                  <Menu.Item href={`/projects/${project.id}/settings`}>{t("settings")}</Menu.Item>
+                  <Menu.Item href={`/projects/${project.id}/data?labeling=1`}>{t("label")}</Menu.Item>
                 </Menu>
               )}>
                 <Button size="small" type="text" icon={<LsEllipsis/>}/>

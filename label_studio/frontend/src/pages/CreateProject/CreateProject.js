@@ -10,30 +10,38 @@ import "./CreateProject.styl";
 import { ImportPage } from './Import/Import';
 import { useImportPage } from './Import/useImportPage';
 import { useDraftProject } from './utils/useDraftProject';
+import { useTranslation } from "react-i18next";
+import "../../translations/i18n";
 
 
-const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true }) => !show ? null :(
-  <form className={cn("project-name")} onSubmit={e => { e.preventDefault(); onSubmit(); }}>
-    <div className="field field--wide">
-      <label htmlFor="project_name">Project Name</label>
-      <input name="name" id="project_name" value={name} onChange={e => setName(e.target.value)} onBlur={onSaveName} />
-      {error && <span className="error">{error}</span>}
-    </div>
-    <div className="field field--wide">
-      <label htmlFor="project_description">Description</label>
-      <textarea
-        name="description"
-        id="project_description"
-        placeholder="Optional description of your project"
-        rows="4"
-        value={description}
-        onChange={e => setDescription(e.target.value)}
-      />
-    </div>
-  </form>
-);
+const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true }) => {
+  const { t } = useTranslation();
+
+  return !show ? null :(
+    <form className={cn("project-name")} onSubmit={e => { e.preventDefault(); onSubmit(); }}>
+      <div className="field field--wide">
+        <label htmlFor="project_name">{t("projectName")}</label>
+        <input name="name" id="project_name" value={name} onChange={e => setName(e.target.value)} onBlur={onSaveName} />
+        {error && <span className="error">{error}</span>}
+      </div>
+      <div className="field field--wide">
+        <label htmlFor="project_description">{t("description")}</label>
+        <textarea
+          name="description"
+          id="project_description"
+          placeholder={t("optionalDescription")}
+          rows="4"
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+        />
+      </div>
+    </form>
+  );
+};
 
 export const CreateProject = ({ onClose }) => {
+  const { t } = useTranslation();
+
   const [step, setStep] = React.useState("name"); // name | import | config
   const [waiting, setWaitingStatus] = React.useState(false);
 
@@ -53,9 +61,9 @@ export const CreateProject = ({ onClose }) => {
   const rootClass = cn("create-project");
   const tabClass = rootClass.elem("tab");
   const steps = {
-    name: <span className={tabClass.mod({ disabled: !!error })}>Project Name</span>,
-    import: <span className={tabClass.mod({ disabled: uploadDisabled })}>Data Import</span>,
-    config: "Labeling Setup",
+    name: <span className={tabClass.mod({ disabled: !!error })}>{t("projectName")}</span>,
+    import: <span className={tabClass.mod({ disabled: uploadDisabled })}>{t("dataImport")}</span>,
+    config: t("labelingSetup"),
   };
 
   // name intentionally skipped from deps:
@@ -117,12 +125,12 @@ export const CreateProject = ({ onClose }) => {
     <Modal onHide={onDelete} fullscreen visible bare closeOnClickOutside={false}>
       <div className={rootClass}>
         <Modal.Header>
-          <h1>Create Project</h1>
+          <h1>{t("createProject")}</h1>
           <ToggleItems items={steps} active={step} onSelect={setStep} />
 
           <Space>
-            <Button look="danger" size="compact" onClick={onDelete} waiting={waiting}>Delete</Button>
-            <Button look="primary" size="compact" onClick={onCreate} waiting={waiting || uploading} disabled={!project || uploadDisabled || error}>Save</Button>
+            <Button look="danger" size="compact" onClick={onDelete} waiting={waiting}>{t("delete")}</Button>
+            <Button look="primary" size="compact" onClick={onCreate} waiting={waiting || uploading} disabled={!project || uploadDisabled || error}>{t("save")}</Button>
           </Space>
         </Modal.Header>
         <ProjectName

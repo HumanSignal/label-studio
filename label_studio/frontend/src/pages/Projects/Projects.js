@@ -12,6 +12,8 @@ import { DataManagerPage } from '../DataManager/DataManager';
 import { SettingsPage } from '../Settings';
 import './Projects.styl';
 import { EmptyProjectsList, ProjectsList } from './ProjectsList';
+import i18n from "i18next";
+
 
 export const ProjectsPage = () => {
   const api = React.useContext(ApiContext);
@@ -59,7 +61,7 @@ export const ProjectsPage = () => {
   );
 };
 
-ProjectsPage.title = "Projects";
+ProjectsPage.title = i18n.t("projects");
 ProjectsPage.path = "/projects";
 ProjectsPage.exact = true;
 ProjectsPage.routes = ({store}) => [

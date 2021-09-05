@@ -7,7 +7,7 @@ import { InstructionsSettings } from './InstructionsSettings';
 import { LabelingSettings } from './LabelingSettings';
 import { MachineLearningSettings } from './MachineLearningSettings/MachineLearningSettings';
 import { StorageSettings } from './StorageSettings/StorageSettings';
-
+import i18n from "i18next";
 
 export const MenuLayout = ({children, ...routeProps}) => {
   return (
@@ -28,7 +28,7 @@ export const MenuLayout = ({children, ...routeProps}) => {
 };
 
 export const SettingsPage = {
-  title: "Settings",
+  title: i18n.t("settings"),
   path: "/settings",
   exact: true,
   layout: MenuLayout,

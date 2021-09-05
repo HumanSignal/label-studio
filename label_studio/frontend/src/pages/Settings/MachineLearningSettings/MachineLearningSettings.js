@@ -10,8 +10,13 @@ import { useAPI } from '../../../providers/ApiProvider';
 import { ProjectContext } from '../../../providers/ProjectProvider';
 import { MachineLearningList } from './MachineLearningList';
 import './MachineLearningSettings.styl';
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
+import i18n from "i18next";
 
 export const MachineLearningSettings = () => {
+  const { t } = useTranslation();
+
   const api = useAPI();
   const {project, fetchProject, updateProject} = useContext(ProjectContext);
   const [mlError, setMLError] = useState();
@@ -69,12 +74,12 @@ export const MachineLearningSettings = () => {
           <Input type="hidden" name="project" value={project.id}/>
 
           <Form.Row columnCount={2}>
-            <Input name="title" label="Title" placeholder="ML Model"/>
+            <Input name="title" label={t("title")} placeholder={t("MLModel")}/>
             <Input name="url" label="URL" required/>
           </Form.Row>
 
           <Form.Row columnCount={1}>
-            <TextArea name="description" label="Description" style={{minHeight: 120}}/>
+            <TextArea name="description" label={t("description")} style={{minHeight: 120}}/>
           </Form.Row>
 
           <Form.Actions>
@@ -114,15 +119,14 @@ export const MachineLearningSettings = () => {
   return (
     <>
       <Description style={{marginTop: 0, maxWidth: 680}}>
-        Add one or more machine learning models to predict labels for your data.
-        To import predictions without connecting a model,
+        {t("addOneOrMore")}
         {" "}
         <a href="https://labelstud.io/guide/predictions.html" target="_blank">
-          see the documentation
+          {t("seeTheDocumentation")}
         </a>.
       </Description>
       <Button onClick={() => showMLFormModal()}>
-        Add Model
+        {t("addModel")}
       </Button>
 
       <Divider height={32}/>
@@ -134,25 +138,25 @@ export const MachineLearningSettings = () => {
         autosubmit
       >
         <Form.Row columnCount={1}>
-          <Label text="ML-Assisted Labeling" large/>
+          <Label text={t("assistedLabeling")} large/>
 
           <div style={{paddingLeft: 16}}>
             <Toggle
-              label="Start model training after any annotations are submitted or updated"
+              label={t("startModel")}
               name="start_training_on_annotation_update"
             />
           </div>
 
           <div style={{paddingLeft: 16}}>
             <Toggle
-              label="Retrieve predictions when loading a task automatically"
+              label={t("retrievePredictions")}
               name="evaluate_predictions_automatically"
             />
           </div>
 
           <div style={{paddingLeft: 16}}>
             <Toggle
-              label="Show predictions to annotators in the Label Stream and Quick View"
+              label={t("showPredictions")}
               name="show_collab_predictions"
             />
           </div>
@@ -161,8 +165,8 @@ export const MachineLearningSettings = () => {
         {versions.length > 1 && (
           <Form.Row columnCount={1}>
             <Label
-              text="Model Version"
-              description="Model version allows you to specify which prediction will be shown to the annotators."
+              text={t("modelVersion")}
+              description={t("modelVersionAllows")}
               style={{marginTop: 16}}
               large
             />
@@ -175,7 +179,7 @@ export const MachineLearningSettings = () => {
                   options={[
                     ...versions,
                   ]}
-                  placeholder="No model version selected"
+                  placeholder={t("noModelVersion")}
                 />
               </div>
 
@@ -197,5 +201,5 @@ export const MachineLearningSettings = () => {
   );
 };
 
-MachineLearningSettings.title = "Machine Learning";
+MachineLearningSettings.title = i18n.t("machineLearning");
 MachineLearningSettings.path = "/ml";

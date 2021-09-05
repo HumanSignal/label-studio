@@ -5,6 +5,8 @@ import { Form, Input } from '../../../components/Form';
 import { Oneof } from '../../../components/Oneof/Oneof';
 import { ApiContext } from '../../../providers/ApiProvider';
 import { Block, Elem } from '../../../utils/bem';
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
 
 export const StorageForm = forwardRef(({
   onSubmit,
@@ -14,6 +16,8 @@ export const StorageForm = forwardRef(({
   storage,
   storageTypes,
 }, ref) => {
+  const { t } = useTranslation();
+
   /**@type {import('react').RefObject<Form>} */
   const api = useContext(ApiContext);
   const formRef = ref ?? useRef();
@@ -92,17 +96,17 @@ export const StorageForm = forwardRef(({
       <Form.Actions valid={connectionValid} extra={(connectionValid !== null) && (
         <Block name="form-indicator">
           <Oneof value={connectionValid}>
-            <Elem tag="span" mod={{type: "success"}} name="item" case={true}>Successfully connected!</Elem>
-            <Elem tag="span" mod={{type: "fail"}} name="item" case={false}>Connection failed</Elem>
+            <Elem tag="span" mod={{type: "success"}} name="item" case={true}>{t("successfullyConnected")}!</Elem>
+            <Elem tag="span" mod={{type: "fail"}} name="item" case={false}>{t("connectionFailed")}</Elem>
           </Oneof>
         </Block>
       )}>
         <Input type="hidden" name="project" value={project}/>
         <Button.Group className={rootClass.elem('buttons')}>
           <Button type="button" waiting={checking} onClick={validateStorageConnection}>
-            Check Connection
+            {t("checkConnection")}
           </Button>
-          <Button type="submit" look="primary">{storage ? "Save" : "Add Storage"}</Button>
+          <Button type="submit" look="primary">{storage ? t("save") : t("addStorage")}</Button>
         </Button.Group>
       </Form.Actions>
 

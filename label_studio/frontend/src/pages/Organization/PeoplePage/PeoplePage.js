@@ -13,8 +13,14 @@ import "./PeopleInvitation.styl";
 import { PeopleList } from "./PeopleList";
 import "./PeoplePage.styl";
 import { SelectedUser } from "./SelectedUser";
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
+import i18n from "i18next";
+
 
 const InvitationModal = ({link}) => {
+  const { t } = useTranslation();
+
   return (
     <Block name="invite">
       <Input
@@ -24,13 +30,15 @@ const InvitationModal = ({link}) => {
       />
 
       <Description style={{width: '70%', marginTop: 16}}>
-        Invite people to join your Label Studio instance. People that you invite have full access to all of your projects. <a href="https://labelstud.io/guide/signup.html">Learn more</a>.
+        {t("invitePeopleToJoin")} <a href="https://labelstud.io/guide/signup.html">{t("learnMore")}</a>.
       </Description>
     </Block>
   );
 };
 
 export const PeoplePage = () => {
+  const { t } = useTranslation();
+
   const api = useAPI();
   const inviteModal = useRef();
   const config = useConfig();
@@ -56,7 +64,7 @@ export const PeoplePage = () => {
   }, [setInviteLink]);
 
   const inviteModalProps = useCallback((link) => ({
-    title: "Invite people",
+    title: t("invitePeople"),
     style: { width: 640, height: 472 },
     body: () => (
       <InvitationModal link={link}/>
@@ -74,12 +82,12 @@ export const PeoplePage = () => {
         <Space spread>
           <Space>
             <Button style={{width: 170}} onClick={() => updateLink()}>
-              Reset Link
+              {t("resetLink")}
             </Button>
           </Space>
           <Space>
             <Button primary style={{width: 170}} onClick={copyLink}>
-              {copied ? "Copied!" : "Copy link"}
+              {copied ? t("copied") : t("copyLink")}
             </Button>
           </Space>
         </Space>
@@ -114,7 +122,7 @@ export const PeoplePage = () => {
 
           <Space>
             <Button icon={<LsPlus/>} primary onClick={showInvitationModal}>
-              Add People
+              {t("addPeople")}
             </Button>
           </Space>
         </Space>
@@ -137,5 +145,5 @@ export const PeoplePage = () => {
   );
 };
 
-PeoplePage.title = "People";
+PeoplePage.title = i18n.t("people");
 PeoplePage.path = "/";

@@ -11,6 +11,7 @@ import { Hamburger } from "../Hamburger/Hamburger";
 import { Menu } from '../Menu/Menu';
 import { Userpic } from '../Userpic/Userpic';
 import { VersionNotifier, VersionProvider } from '../VersionNotifier/VersionNotifier';
+import { LanguagePicker } from '../LanguagePicker/LanguagePicker';
 import './Menubar.styl';
 import './MenuContent.styl';
 import './MenuSidebar.styl';
@@ -213,6 +214,8 @@ export const Menubar = ({
                 />
 
                 <VersionNotifier showCurrentVersion/>
+
+                <LanguagePicker />
 
                 <Menu.Divider/>
 

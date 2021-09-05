@@ -13,6 +13,8 @@ import { Preview } from './Preview';
 import { DEFAULT_COLUMN, EMPTY_CONFIG, isEmptyConfig, Template } from './Template';
 import { TemplatesList } from './TemplatesList';
 import { useAPI } from '../../../providers/ApiProvider';
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
 
 // don't do this, kids
 const formatXML = (xml) => {
@@ -36,15 +38,19 @@ const formatXML = (xml) => {
 const wizardClass = cn("wizard");
 const configClass = cn("configure");
 
-const EmptyConfigPlaceholder = () => (
-  <div className={configClass.elem("empty-config")}>
-    <p>Your labeling configuration is empty. It is required to label your data.</p>
-    <p>
-      Start from one of our predefined templates or create your own config on the Code panel.
-      The labeling config is XML-based and you can <a href="https://labelstud.io/tags/" target="_blank">read about the available tags in our documentation</a>.
-    </p>
-  </div>
-);
+const EmptyConfigPlaceholder = () => {
+  const { t } = useTranslation();
+
+  return (
+    <div className={configClass.elem("empty-config")}>
+      <p>{t("labelingEmpty")}</p>
+      <p>
+        {t("startPredfinedTemplates")}
+        {t("labelingConfigXML")} <a href="https://labelstud.io/tags/" target="_blank">{t("readAbout")}</a>.
+      </p>
+    </div>
+  );
+};
 
 const Label = ({ label, template, color }) => {
   const value = label.getAttribute("value");

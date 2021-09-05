@@ -1,36 +1,35 @@
 import React from 'react';
 
 import { Button } from "../../components";
-import { Elem } from "../../components/Menu/MenuContext";
 import { modal } from "../../components/Modal/Modal";
 import { useModalControls } from "../../components/Modal/ModalPopup";
 import { Space } from "../../components/Space/Space";
-import { useAPI } from "../../providers/ApiProvider";
-import { Block, cn } from "../../utils/bem";
-
+import { cn } from "../../utils/bem";
+import { useTranslation } from "react-i18next";
+import "../../translations/i18n";
 
 
 export const WebhookDeleteModal = ({onDelete}) => {
+  const { t } = useTranslation();
+
   return modal({
-    title: "Delete",
-    body: ()=>{
-      const ctrl = useModalControls();
+    title: t("delete"),
+    body: () => {
       const rootClass = cn('webhook-delete-modal');
       return (<div className={rootClass}>
         <div className={rootClass.elem('modal-text')}>
-              Are you sure you want to delete the webhook? This action
-              cannot be undone.  
+          {t("areYouSureWant")}   
         </div>
 
       </div>);},
-    footer: ()=>{
+    footer: () => {
       const ctrl = useModalControls();
       const rootClass = cn('webhook-delete-modal');
       return <Space align="end">
         <Button 
           className={rootClass.elem('width-button')} 
           onClick={()=>{ctrl.hide();}}>
-                Cancel
+          {t("cancel")}
         </Button>
         <Button 
           look="destructive"
@@ -41,7 +40,7 @@ export const WebhookDeleteModal = ({onDelete}) => {
               ctrl.hide();
             }
           }
-        >Delete</Button>
+        >{t("delete")}</Button>
       </Space>;
     },
     style: { width: 512 },

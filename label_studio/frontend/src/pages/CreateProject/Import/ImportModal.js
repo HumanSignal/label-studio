@@ -10,8 +10,13 @@ import { Elem } from '../../../utils/bem';
 import { useRefresh } from '../../../utils/hooks';
 import { ImportPage } from './Import';
 import { useImportPage } from './useImportPage';
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
+
 
 export const Inner = () => {
+  const { t } = useTranslation();
+
   const history = useHistory();
   const location = useFixedLocation();
   const modal = useRef();
@@ -53,7 +58,7 @@ export const Inner = () => {
 
   return (
     <Modal
-      title="Import data"
+      title={t("importData")}
       ref={modal}
       onHide={() => backToDM()}
       closeOnClickOutside={false}
@@ -62,7 +67,7 @@ export const Inner = () => {
       bare
     >
       <Modal.Header divided>
-        <Elem block="modal" name="title">Import Data</Elem>
+        <Elem block="modal" name="title">{t("importData")}</Elem>
 
         <Space>
           <Button waiting={waiting} onClick={onCancel}>Cancel</Button>

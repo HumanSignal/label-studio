@@ -1,17 +1,18 @@
 import React, { useCallback } from 'react';
-import { LsCross, LsPencil, LsPlus } from '../../assets/icons';
+import { LsCross, LsPencil } from '../../assets/icons';
 import { Button } from '../../components';
-import { Form, Label, Input, Toggle } from '../../components/Form';
-import { modal } from '../../components/Modal/Modal';
+import { Toggle } from '../../components/Form';
 import { Elem, Block } from '../../utils/bem';
 import "./WebhookPage.styl";
 import { format } from 'date-fns';
 import { useAPI } from '../../providers/ApiProvider';
 import { WebhookDeleteModal } from './WebhookDeleteModal';
-import { useProject } from '../../providers/ProjectProvider';
+import { useTranslation } from "react-i18next";
+import "../../translations/i18n";
 
 
 const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) => {
+  const { t } = useTranslation();
 
   const api = useAPI();
 
@@ -33,7 +34,7 @@ const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) 
   return <Block name='webhook'>
     <Elem name='controls'>
       <Button onClick={onAddWebhook}>
-        Add Webhook
+        {t("addWebhook")}
       </Button>
     </Elem>
     <Elem>
@@ -61,7 +62,7 @@ const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) 
                   <Button
                     onClick={() => onSelectActive(obj.id)}
                     icon={<LsPencil />}
-                  >Edit</Button>
+                  >{t("edit")}</Button>
                   <Button
                     onClick={()=> WebhookDeleteModal({ 
                       onDelete: async ()=>{
@@ -71,7 +72,7 @@ const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) 
                     })}
                     look='danger'
                     icon={<LsCross />}
-                  >Delete</Button>
+                  >{t("delete")}</Button>
                 </Elem>
               </Elem>,
             )

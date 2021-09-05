@@ -7,23 +7,24 @@ import "./WebhookPage.styl";
 import WebhookList from './WebhookList';
 import WebhookDetail from './WebhookDetail';
 import { useProject } from '../../providers/ProjectProvider';
-import { Button, Spinner } from '../../components';
 import { Block, Elem } from '../../utils/bem';
 import { IconInfo } from '../../assets/icons';
 import { useHistory } from 'react-router';
+import { useTranslation } from "react-i18next";
+import "../../translations/i18n";
+import i18n from "i18next";
 
 const Webhook = () => {
+  const { t } = useTranslation();
+
   const [activeWebhook, setActiveWebhook] = useState(null);
   const [webhooks, setWebhooks] = useState(null);
   const [webhooksInfo, setWebhooksInfo] = useState(null);
-
 
   const history = useHistory();
 
   const api = useAPI();
   const { project } = useProject();
-  
-  
 
   const projectId = useMemo(()=>{
     if (history.location.pathname.startsWith('/projects')){
@@ -111,11 +112,10 @@ const Webhook = () => {
       </Elem>
       <Elem name='footer-text'>
         <p>
-        Webhooks allow external services to be notified when certain events happen. 
-        When the specified events occur, a POST request is sent to each of the URLs you provide. 
+          {t("webhooksAllowExternal")}
         </p>
         <p>
-          <a href="https://labelstud.io/guide/webhooks.html">Read more in the documentation</a>.
+          <a href="https://labelstud.io/guide/webhooks.html">{t("readMoreIn")}</a>.
         </p>
       </Elem>
     </Elem>
@@ -123,7 +123,7 @@ const Webhook = () => {
 };
 
 export const WebhookPage = {
-  title: "Webhooks",
+  title: i18n.t("webhooks"),
   path: "/webhooks",
   component: Webhook,
 };

@@ -9,6 +9,8 @@ import { useFixedLocation, useParams } from '../../providers/RoutesProvider';
 import { BemWithSpecifiContext } from '../../utils/bem';
 import { isDefined } from '../../utils/helpers';
 import "./ExportPage.styl";
+import { useTranslation } from "react-i18next";
+import "../../translations/i18n";
 
 // const formats = {
 //   json: 'JSON',
@@ -24,9 +26,9 @@ const downloadFile = (blob, filename) => {
 
 const {Block, Elem} = BemWithSpecifiContext();
 
-const wait = () => new Promise(resolve => setTimeout(resolve, 5000));
-
 export const ExportPage = () => {
+  const { t } = useTranslation();
+
   const history = useHistory();
   const location = useFixedLocation();
   const pageParams = useParams();
@@ -180,7 +182,7 @@ export const ExportPage = () => {
             <Elem name="actions">
               <Space>
                 {downloadingMessage && (
-                  "Files are being prepared. It might take some time."
+                  t("filesBeingPrepared")
                 )}
                 <Elem
                   tag={Button}
@@ -189,7 +191,7 @@ export const ExportPage = () => {
                   onClick={proceedExport}
                   waiting={downloading}
                 >
-                  Export
+                  {t("export")}
                 </Elem>
               </Space>
             </Elem>
@@ -201,6 +203,8 @@ export const ExportPage = () => {
 };
 
 const FormatInfo = ({availableFormats, selected, onClick}) => {
+  const { t } = useTranslation();
+
   return (
     <Block name="formats">
       <Elem name="info">You can export dataset in one of the following formats:</Elem>
@@ -230,9 +234,9 @@ const FormatInfo = ({availableFormats, selected, onClick}) => {
         ))}
       </Elem>
       <Elem name="feedback">
-        Can't find an export format?
+        {t("cantFindExport")}
         <br/>
-        Please let us know in <a className="no-go" href="http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=product-export">Slack</a> or submit an issue to the <a className="no-go" href="https://github.com/heartexlabs/label-studio-converter/issues">Repository</a>
+        {t("pleaseLetUsKnow")} <a className="no-go" href="http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=product-export">Slack</a> or submit an issue to the <a className="no-go" href="https://github.com/heartexlabs/label-studio-converter/issues">{t("repository")}</a>
       </Elem>
     </Block>
   );

@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { SidebarMenu } from '../../components/SidebarMenu/SidebarMenu';
 import { PeoplePage } from './PeoplePage/PeoplePage';
 import { WebhookPage } from '../WebhookPage/WebhookPage';
+import i18n from "i18next";
 
 const ALLOW_ORGANIZATION_WEBHOOKS = window.APP_SETTINGS.flags?.allow_organization_webhooks;
 
@@ -29,7 +29,7 @@ if (ALLOW_ORGANIZATION_WEBHOOKS){
 }
 
 export const OrganizationPage = {
-  title: "Organization",
+  title: i18n.t("organization"),
   path: "/organization",
   exact: true,
   layout: MenuLayout,

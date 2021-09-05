@@ -4,27 +4,31 @@ import { Description } from '../../../components/Description/Description';
 import { Block, cn } from '../../../utils/bem';
 import { StorageSet } from './StorageSet';
 import './StorageSettings.styl';
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
 
 export const StorageSettings = () => {
+  const { t } = useTranslation();
+
   const rootClass = cn("storage-settings");
 
   return (
     <Block name="storage-settings">
       <Description style={{marginTop: 0}}>
-        Use cloud or database storage as the source for your labeling tasks or the target of your completed annotations.
+        {t("useCloudDatabaseStorage")}  
       </Description>
 
       <Columns count={2} gap="40px" size="320px" className={rootClass}>
         <StorageSet
-          title="Source Cloud Storage"
-          buttonLabel="Add Source Storage"
+          title={t("sourceCloudStorage")}
+          buttonLabel={t("addSourceStorage")}
           rootClass={rootClass}
         />
 
         <StorageSet
-          title="Target Cloud Storage"
+          title={t("targetCloudStorage")}
           target="export"
-          buttonLabel="Add Target Storage"
+          buttonLabel={t("addTargetStorage")}
           rootClass={rootClass}
         />
       </Columns>
