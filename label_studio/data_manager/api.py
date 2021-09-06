@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from drf_yasg.utils import swagger_auto_schema
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from ordered_set import OrderedSet
 
 from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, find_first_one_to_one_related_field_by_prefix
@@ -36,10 +36,21 @@ class TaskPagination(PageNumberPagination):
     page_size_query_param = "page_size"
     total_annotations = 0
     total_predictions = 0
+    all_tasks = 0
+
+    def get_count(self, queryset):
+        return self.all_tasks
 
     def paginate_queryset(self, queryset, request, view=None):
-        self.total_annotations = queryset.aggregate(all_annotations=Sum("total_annotations"))["all_annotations"] or 0
-        self.total_predictions = queryset.aggregate(all_predictions=Sum("total_predictions"))["all_predictions"] or 0
+        aggregated = queryset.aggregate(
+            all_tasks=Count('pk'),
+            all_annotations=Sum("total_annotations"),
+            all_predictions=Sum("total_predictions")
+        )
+
+        self.all_tasks = aggregated['all_tasks']
+        self.total_annotations = aggregated["all_annotations"] or 0
+        self.total_predictions = aggregated["all_predictions"] or 0
         return super().paginate_queryset(queryset, request, view)
 
     def get_paginated_response(self, data):
