@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from django.db import models
 from django.db.models import fields
 from core.label_config import replace_task_data_undefined_with_config_field
 from django.conf import settings
@@ -46,5 +47,24 @@ class ExportDataSerializer(serializers.ModelSerializer):
 class ExportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Export
-        fields = ['id', 'created_at', 'file', 'completed_at']
-        read_only = ['id', 'project', 'created_at', 'file', 'completed_at']
+        read_only = [
+            'id',
+            'created_at',
+            'file',
+            'completed_at',
+            'md5'
+        ]
+        fields = read_only + [
+            'only_finished',
+            'task_ids',
+            'download_resources',
+        ]
+
+        def validate_task_ids(self, value):
+            if not value:
+                return []
+            if not isinstance(value, list):
+                raise serializers.ValidationError('Task_ids has to be list')
+            if not all((isinstance(id_, int) for id_ in value)):
+                raise serializers.ValidationError('Task_ids has to be list of numbers')
+            return value

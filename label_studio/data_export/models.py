@@ -8,13 +8,19 @@ import shutil
 from copy import deepcopy
 from datetime import datetime
 
+import django_rq
 import ujson as json
 from core import version
 from core.label_config import parse_config
+from core.redis import redis_connected
+from core.utils.common import batch
 from core.utils.io import get_all_files_from_dir, get_temp_dir, read_bytes_stream
 from django.conf import settings
-from django.db import models
+from django.core.cache.backends.base import default_key_func
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
+from django.core.files import File
+from django_rq import queues
 from label_studio_converter import Converter
 from tasks.models import Annotation
 
@@ -36,13 +42,88 @@ class Export(models.Model):
         upload_to=settings.UPLOAD_DIR,
         null=True,
     )
+    md5 = models.CharField(
+        _('md5 of file'),
+        max_length=128,
+        default='',
+    )
     completed_at = models.DateTimeField(
         _('completed at'),
         help_text='Completed time',
         null=True,
         default=None,
     )
-    
+    in_progress = models.BooleanField(
+        _('completed at'),
+        default=False,
+    )
+
+    only_finished = models.BooleanField(
+        _('Only finished'),
+        default=False,
+        help_text=_('If true - it exports only finished tasks'),
+    )
+    task_ids = models.JSONField(
+        _('Task ids list'),
+        default=[],
+        help_text=_('If list is empty - download all tasks'),
+    )
+    download_resources = models.BooleanField(
+        _('Download resources'),
+        default=False,
+    )
+
+    def get_export_data(self):
+        from .serializers import ExportDataSerializer
+
+        tasks = self.project.tasks.select_related('project').prefetch_related('annotations', 'predictions')
+        if self.task_ids:
+            tasks = tasks.filter(id__in=self.task_ids)
+        if self.only_finished:
+            tasks = tasks.filter(annotations__isnull=False).distinct()
+        task_ids = tasks.values_list('id', flat=True)
+
+        logger.debug('Serialize tasks for export')
+        result = []
+        for _task_ids in batch(task_ids, 1000):
+            result += ExportDataSerializer(tasks.filter(id__in=_task_ids), many=True).data
+        return result
+
+    def export_to_file(self):
+        if self.in_progress:
+            logger.warning('Try to export with in progress stage')
+            return
+        with transaction.atomic():
+            self.in_progress = True
+            self.save(update_fields=['in_progress'])
+
+            data = self.get_export_data()
+            now = datetime.now()
+            json_data = json.dumps(data, ensure_ascii=False)
+            md5 = hashlib.md5(json_data.encode('utf-8')).hexdigest()
+            name = f'project-{self.project.id}-at-{now.strftime("%Y-%m-%d-%H-%M")}-{md5[0:8]}.json'
+            file_ = File(io.StringIO(json_data), name=name)
+            self.file.save(name, file_)
+            self.md5 = md5
+            self.save(update_fields=['file', 'md5'])
+
+            self.in_progress = False
+            self.completed_at = datetime.now()
+            self.save(update_fields=['in_progress', 'completed_at'])
+
+    def run_file_exporting(self):
+        if redis_connected():
+            queue = django_rq.get_queue('default')
+            job = queue.enqueue(export_background, self.id)
+            logger.info(f'File exporting background job {job.id} for export {self} has been started')
+        else:
+            logger.info(f'Start file_exporting {self}')
+            self.export_to_file()
+
+
+def export_background(export_id):
+    Export.objects.get(id=export_id).export_to_file()
+
 
 class DataExport(object):
     @staticmethod

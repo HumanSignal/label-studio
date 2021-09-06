@@ -23,22 +23,25 @@ from .serializers import ExportDataSerializer, ExportSerializer
 logger = logging.getLogger(__name__)
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
-    tags=['Export'],
-    operation_summary='Get export formats',
-    operation_description='Retrieve the available export formats for the current project.',
-    responses={200: openapi.Response(
-        description='Export formats',
-        schema=openapi.Schema(
-            title='Format list',
-            description='List of available formats',
-            type=openapi.TYPE_ARRAY,
-            items=openapi.Schema(
-                title="Export format",
-                type=openapi.TYPE_STRING)
-        )
-    )}
-))
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
+        tags=['Export'],
+        operation_summary='Get export formats',
+        operation_description='Retrieve the available export formats for the current project.',
+        responses={
+            200: openapi.Response(
+                description='Export formats',
+                schema=openapi.Schema(
+                    title='Format list',
+                    description='List of available formats',
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(title="Export format", type=openapi.TYPE_STRING),
+                ),
+            )
+        },
+    ),
+)
 class ExportFormatsListAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_view
 
@@ -51,42 +54,45 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
         return Response(formats)
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
-    manual_parameters=[
-        openapi.Parameter(name='export_type',
-                          type=openapi.TYPE_STRING,
-                          in_=openapi.IN_QUERY,
-                          description='Selected export format (JSON by default)'),
-        openapi.Parameter(name='download_all_tasks',
-                          type=openapi.TYPE_STRING,
-                          in_=openapi.IN_QUERY,
-                          description="""
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                name='export_type',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_QUERY,
+                description='Selected export format (JSON by default)',
+            ),
+            openapi.Parameter(
+                name='download_all_tasks',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_QUERY,
+                description="""
                           If true, download all tasks regardless of status. If false, download only annotated tasks.
-                          """
-                          ),
-        openapi.Parameter(name='download_resources',
-                          type=openapi.TYPE_BOOLEAN,
-                          in_=openapi.IN_QUERY,
-                          description="""
+                          """,
+            ),
+            openapi.Parameter(
+                name='download_resources',
+                type=openapi.TYPE_BOOLEAN,
+                in_=openapi.IN_QUERY,
+                description="""
                           If true, the converter will download all resource files like images, audio, etc. 
-                          """
-                          ),
-        openapi.Parameter(name='ids',
-                          type=openapi.TYPE_ARRAY,
-                          items=openapi.Schema(
-                              title='Task ID',
-                              description='Individual task ID',
-                              type=openapi.TYPE_INTEGER
-                          ),
-                          in_=openapi.IN_QUERY,
-                          description="""
+                          """,
+            ),
+            openapi.Parameter(
+                name='ids',
+                type=openapi.TYPE_ARRAY,
+                items=openapi.Schema(title='Task ID', description='Individual task ID', type=openapi.TYPE_INTEGER),
+                in_=openapi.IN_QUERY,
+                description="""
                           To retrieve only subset of tasks, specify the list of target tasks IDs
-                          """
-                          )
-    ],
-    tags=['Export'],
-    operation_summary='Export tasks and annotations',
-    operation_description="""
+                          """,
+            ),
+        ],
+        tags=['Export'],
+        operation_summary='Export tasks and annotations',
+        operation_description="""
         Export annotated tasks as a file in a specific format.
         For example, to export JSON annotations for a project to a file called `annotations.json`,
         run the following from the command line:
@@ -101,16 +107,21 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
         ```bash
         curl -X GET {}/api/projects/{{id}}/export?ids[]=123\&ids[]=345 -H \'Authorization: Token abc123\' --output 'annotations.json'
         ```
-        """.format(settings.HOSTNAME or 'https://localhost:8080', settings.HOSTNAME or 'https://localhost:8080', settings.HOSTNAME or 'https://localhost:8080'),
-    responses={200: openapi.Response(
-        description='Exported data',
-        schema=openapi.Schema(
-            title='Export file',
-            description='Export file with results',
-            type=openapi.TYPE_FILE
-        )
-    )}
-))
+        """.format(
+            settings.HOSTNAME or 'https://localhost:8080',
+            settings.HOSTNAME or 'https://localhost:8080',
+            settings.HOSTNAME or 'https://localhost:8080',
+        ),
+        responses={
+            200: openapi.Response(
+                description='Exported data',
+                schema=openapi.Schema(
+                    title='Export file', description='Export file with results', type=openapi.TYPE_FILE
+                ),
+            )
+        },
+    ),
+)
 class ExportAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
 
@@ -119,9 +130,11 @@ class ExportAPI(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         project = self.get_object()
-        export_type = \
-            request.GET.get('exportType', 'JSON') if 'exportType' in request.GET \
+        export_type = (
+            request.GET.get('exportType', 'JSON')
+            if 'exportType' in request.GET
             else request.GET.get('export_type', 'JSON')
+        )
         only_finished = not bool_from_request(request.GET, 'download_all_tasks', False)
         tasks_ids = request.GET.getlist('ids[]')
         if 'download_resources' in request.GET:
@@ -156,13 +169,16 @@ class ExportAPI(generics.RetrieveAPIView):
         return response
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
-    tags=['Export'],
-    operation_summary='Export files',
-    operation_description="""
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
+        tags=['Export'],
+        operation_summary='Export files',
+        operation_description="""
         List of files exported from the Label Studio UI using the Export button on the Data Manager page.
         """,
-))
+    ),
+)
 class ProjectExportFiles(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
     swagger_schema = None  # hide export files endpoint from swagger
@@ -187,15 +203,14 @@ class ProjectExportFiles(generics.RetrieveAPIView):
 
 
 class ProjectExportFilesAuthCheck(APIView):
-    """ Check auth for nginx auth_request (/api/auth/export/)
-    """
+    """Check auth for nginx auth_request (/api/auth/export/)"""
+
     swagger_schema = None
     http_method_names = ['get']
     permission_required = all_permissions.projects_change
 
     def get(self, request, *args, **kwargs):
-        """ Get export files list
-        """
+        """Get export files list"""
         original_url = request.META['HTTP_X_ORIGINAL_URI']
         filename = original_url.replace('/export/', '')
         project_id = filename.split('-')[0]
@@ -212,9 +227,20 @@ class ExportListApi(generics.ListCreateAPIView):
     queryset = Export.objects.all()
     serializer_class = ExportSerializer
 
+    def _get_project(self):
+        project_pk = self.kwargs.get('pk')
+        project = Project.objects.get(
+            id=project_pk,
+            organization=self.request.user.active_organization,
+        )
+        return project
+
     def perform_create(self, serializer):
-        return super().perform_create(serializer)
+        project = self._get_project()
+        serializer.save(project=project)
+        instance = serializer.instance
+        instance.run_file_exporting()
 
     def get_queryset(self):
-        print(self.args)
-        return super().get_queryset().filter()
+        project = self._get_project()
+        return super().get_queryset().filter(project=project)
