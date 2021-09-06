@@ -53,6 +53,7 @@ export const DataManagerPage = ({...props}) => {
   const params = useParams();
   const history = useHistory();
   const api = useAPI();
+  const {project} = useProject();
   const LabelStudio = useLibrary('lsf');
   const DataManager = useLibrary('dm');
   const setContextProps = useContextProps();
@@ -63,15 +64,22 @@ export const DataManagerPage = ({...props}) => {
     if (!LabelStudio) return;
     if (!DataManager) return;
     if (!root.current) return;
+    if (!project?.id) return;
     if (dataManagerRef.current) return;
 
-    dataManagerRef.current = dataManagerRef.current ?? await initializeDataManager(
+    const mlBackends = await api.callApi("mlBackends", {
+      params: { project: project.id },
+    });
+
+    const interactiveBacked = (mlBackends ?? []).find(({is_interactive}) => is_interactive);
+
+    const dataManager = (dataManagerRef.current = dataManagerRef.current ?? await initializeDataManager(
       root.current,
       props,
       params,
-    );
+    ));
 
-    const {current: dataManager} = dataManagerRef;
+    Object.assign(window, { dataManager });
 
     dataManager.on("crash", () => setCrashed());
 
@@ -91,12 +99,26 @@ export const DataManagerPage = ({...props}) => {
       api.handleError(response);
     });
 
-    dataManager.on("lsf:regionFinishedDrawing", (reg) => {
-      console.log('reg');
-    });
+    if (interactiveBacked) {
+      dataManager.on("lsf:regionFinishedDrawing", async (reg) => {
+        console.log({
+          reg: reg.serialize(),
+          interactiveBacked,
+        });
+        const response = await api.callApi("mlInteractive", {
+          params: { pk: interactiveBacked.id },
+          body: {
+            task: dataManager.lsf.task.id,
+            context: [reg.serialize()],
+          },
+        });
+
+        console.log(response);
+      });
+    }
 
     setContextProps({dmRef: dataManager});
-  }, [LabelStudio, DataManager]);
+  }, [LabelStudio, DataManager, project]);
 
   const destroyDM = useCallback(() => {
     if (dataManagerRef.current) {
