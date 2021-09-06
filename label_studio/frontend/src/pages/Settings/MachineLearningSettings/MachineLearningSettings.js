@@ -5,6 +5,7 @@ import { Divider } from '../../../components/Divider/Divider';
 import { ErrorWrapper } from '../../../components/Error/Error';
 import { InlineError } from '../../../components/Error/InlineError';
 import { Form, Input, Label, Select, TextArea, Toggle } from '../../../components/Form';
+import { FormResponseContext } from '../../../components/Form/FormContext';
 import { modal } from '../../../components/Modal/Modal';
 import { useAPI } from '../../../providers/ApiProvider';
 import { ProjectContext } from '../../../providers/ProjectProvider';
@@ -50,6 +51,7 @@ export const MachineLearningSettings = () => {
 
   const showMLFormModal = useCallback((backend) => {
     const action = backend ? "updateMLBackend" : "addMLBackend";
+    console.log({backend});
     const modalProps = {
       title: `${backend ? 'Edit' : 'Add'} model`,
       style: { width: 760 },
@@ -75,6 +77,13 @@ export const MachineLearningSettings = () => {
 
           <Form.Row columnCount={1}>
             <TextArea name="description" label="Description" style={{minHeight: 120}}/>
+          </Form.Row>
+
+          <Form.Row columnCount={1}>
+            <Toggle
+              name="is_interactive"
+              label="Use for interactive preannotations"
+            />
           </Form.Row>
 
           <Form.Actions>

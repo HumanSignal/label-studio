@@ -91,6 +91,10 @@ export const DataManagerPage = ({...props}) => {
       api.handleError(response);
     });
 
+    dataManager.on("lsf:regionFinishedDrawing", (reg) => {
+      console.log('reg');
+    });
+
     setContextProps({dmRef: dataManager});
   }, [LabelStudio, DataManager]);
 
