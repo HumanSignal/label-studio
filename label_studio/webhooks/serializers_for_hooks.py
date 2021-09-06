@@ -13,6 +13,20 @@ class OnlyIDWebhookSerializer(serializers.Serializer):
 
 
 class ProjectWebhookSerializer(serializers.ModelSerializer):
+
+    task_number = serializers.IntegerField(read_only=True)
+    finished_task_number = serializers.IntegerField(read_only=True)
+    total_predictions_number = serializers.IntegerField(read_only=True)
+    total_annotations_number = serializers.IntegerField(read_only=True)
+    num_tasks_with_annotations = serializers.IntegerField(read_only=True)
+    useful_annotation_number = serializers.IntegerField(read_only=True)
+    ground_truth_number = serializers.IntegerField(read_only=True)
+    skipped_annotations_number = serializers.IntegerField(read_only=True)
+
+    def to_representation(self, instance):
+        instance = Project.objects.with_counts().filter(id=instance.id)[0]
+        return super().to_representation(instance)
+
     class Meta:
         model = Project
         fields = '__all__'

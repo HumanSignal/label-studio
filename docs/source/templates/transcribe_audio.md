@@ -7,16 +7,18 @@ meta_description: Label Studio Audio Transcription Template for machine learning
 
 ---
 
-Listen to an audio file and transcribe its content in natural language
+Listen to an audio file and transcribe its content in natural language, performing speech recognition.
 
 <img src="/images/screens/audio_transcription.png" class="img-template-example" title="Transcribe an Audio" />
 
 ## Run
 
 ```bash
-label-studio init --template=transcribe_audio transcribe_audio_project
+label-studio init transcribe_audio_project
 label-studio start transcribe_audio_project 
 ```
+
+After starting Label Studio, set up the labeling interface and browse to this template.
 
 ## Config 
 

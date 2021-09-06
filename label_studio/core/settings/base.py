@@ -49,6 +49,8 @@ SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_bool_env('DEBUG', True)
+DEBUG_MODAL_EXCEPTIONS = get_bool_env('DEBUG_MODAL_EXCEPTIONS', True)
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -120,6 +122,24 @@ LOGGING = {
         'level': get_env('LOG_LEVEL', 'WARNING'),
     }
 }
+
+if get_bool_env('GOOGLE_LOGGING_ENABLED', False):
+    logging.info('Google Cloud Logging handler is enabled.')
+    try:
+        import google.cloud.logging
+        from google.auth.exceptions import GoogleAuthError
+
+        client = google.cloud.logging.Client()
+        client.setup_logging()
+
+        LOGGING['handlers']['google_cloud_logging'] = {
+            'level': get_env('LOG_LEVEL', 'WARNING'),
+            'class': 'google.cloud.logging.handlers.CloudLoggingHandler',
+            'client': client
+        }
+        LOGGING['root']['handlers'].append('google_cloud_logging')
+    except GoogleAuthError as e:
+        logger.exception('Google Cloud Logging handler could not be setup.')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -315,6 +335,7 @@ CSRF_COOKIE_HTTPONLY = bool(int(get_env('CSRF_COOKIE_HTTPONLY', SESSION_COOKIE_S
 
 # user media files
 MEDIA_ROOT = os.path.join(BASE_DATA_DIR, 'media')
+os.makedirs(MEDIA_ROOT, exist_ok=True)
 MEDIA_URL = '/data/'
 UPLOAD_DIR = 'upload'
 AVATAR_PATH = 'avatars'
@@ -362,6 +383,8 @@ VERSION_EDITION = 'Community Edition'
 LATEST_VERSION_CHECK = True
 VERSIONS_CHECK_TIME = 0
 ALLOW_ORGANIZATION_WEBHOOKS = get_bool_env('ALLOW_ORGANIZATION_WEBHOOKS', False)
+CONVERTER_DOWNLOAD_RESOURCES = get_bool_env('CONVERTER_DOWNLOAD_RESOURCES', True)
+EXPERIMENTAL_FEATURES = get_bool_env('EXPERIMENTAL_FEATURES', False)
 
 CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and_log'
@@ -376,6 +399,8 @@ ANNOTATION_MIXIN = 'core.mixins.DummyModelMixin'
 ORGANIZATION_MIXIN = 'core.mixins.DummyModelMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
 GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
+
+STORAGE_ANNOTATION_SERIALIZER = 'io_storages.serializers.StorageAnnotationSerializer'
 
 
 def project_delete(project):

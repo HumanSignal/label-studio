@@ -76,7 +76,7 @@ class DataExport(object):
         return sorted(formats, key=lambda f: f.get('disabled', False))
 
     @staticmethod
-    def generate_export_file(project, tasks, output_format, get_args):
+    def generate_export_file(project, tasks, output_format, download_resources, get_args):
         # prepare for saving
         now = datetime.now()
         data = json.dumps(tasks, ensure_ascii=False)
@@ -84,10 +84,13 @@ class DataExport(object):
         name = 'project-' + str(project.id) + '-at-' + now.strftime('%Y-%m-%d-%H-%M') + f'-{md5[0:8]}'
 
         input_json = DataExport.save_export_files(project, now, get_args, data, md5, name)
+
         converter = Converter(
             config=project.get_parsed_config(),
             project_dir=None,
-            upload_dir=os.path.join(settings.MEDIA_ROOT, settings.UPLOAD_DIR))
+            upload_dir=os.path.join(settings.MEDIA_ROOT, settings.UPLOAD_DIR),
+            download_resources=download_resources
+        )
         with get_temp_dir() as tmp_dir:
             converter.convert(input_json, tmp_dir, output_format, is_dir=False)
             files = get_all_files_from_dir(tmp_dir)

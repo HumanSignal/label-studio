@@ -29,6 +29,10 @@ class ProjectManager(models.Manager):
     def with_counts(self):
         return self.annotate(
             task_number=Count('tasks', distinct=True),
+            finished_task_number=Count(
+                'tasks', distinct=True,
+                filter=Q(tasks__is_labeled=True)
+            ),
             total_predictions_number=Count('tasks__predictions', distinct=True),
             total_annotations_number=Count(
                 'tasks__annotations__id', distinct=True,
@@ -127,8 +131,8 @@ class Project(ProjectMixin, models.Model):
     )
 
     sampling = models.CharField(max_length=100, choices=SAMPLING_CHOICES, null=True, default=SEQUENCE)
-    show_ground_truth_first = models.BooleanField(_('show ground truth first'), default=True)
-    show_overlap_first = models.BooleanField(_('show overlap first'), default=True)
+    show_ground_truth_first = models.BooleanField(_('show ground truth first'), default=False)
+    show_overlap_first = models.BooleanField(_('show overlap first'), default=False)
     overlap_cohort_percentage = models.IntegerField(_('overlap_cohort_percentage'), default=100)
 
     task_data_login = models.CharField(
@@ -715,7 +719,7 @@ class ProjectSummary(models.Model):
 
     def _get_annotation_key(self, result):
         result_type = result.get('type', None)
-        if result_type in ('relation', 'rating', 'pairwise', None):
+        if result_type in ('relation', 'pairwise', None):
             return None
         if 'from_name' not in result or 'to_name' not in result:
             logger.error(
@@ -729,13 +733,19 @@ class ProjectSummary(models.Model):
 
     def _get_labels(self, result):
         result_type = result.get('type')
+        result_value = result['value'].get(result_type)
+        if not result_value or not isinstance(result_value, list) or result_type == 'text':
+            # Non-list values are not labels. TextArea list values (texts) are not labels too.
+            return []
+        # Labels are stored in list
         labels = []
-        for label in result['value'].get(result_type, []):
-            if isinstance(label, list):
-                labels.extend(label)
+        for label in result_value:
+            if result_type == 'taxonomy' and isinstance(label, list):
+                for label_ in label:
+                    labels.append(str(label_))
             else:
-                labels.append(label)
-        return [str(l) for l in labels]
+                labels.append(str(label))
+        return labels
 
     def update_created_annotations_and_labels(self, annotations):
         created_annotations = dict(self.created_annotations)

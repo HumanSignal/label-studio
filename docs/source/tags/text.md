@@ -1,7 +1,7 @@
 ---
 title: Text
 type: tags
-order: 306
+order: 307
 meta_title: Text Tags for Text Objects
 meta_description: Label Studio Text Tags customize Label Studio for Text for machine learning and data science projects.
 ---
@@ -23,6 +23,26 @@ In any case every space counts for result offsets.
 | [granularity] | <code>symbol</code> \| <code>word</code> | <code>symbol</code> | control per symbol or word selection |
 | [showLabels] | <code>boolean</code> | <code>true</code> | show labels next to the region |
 | [encoding] | <code>string</code> | <code>&quot;none|base64|base64unicode&quot;</code> | decode value from encoded string |
+
+### Sample Results JSON
+
+| Name | Type | Description |
+| --- | --- | --- |
+| value | <code>Object</code> |  |
+| value.start | <code>string</code> | position of the start of the region in characters |
+| value.end | <code>string</code> | position of the end of the region in characters |
+| [value.text] | <code>string</code> | text content of the region, can be skipped |
+
+### Example JSON
+```json
+{
+  "value": {
+    "start": 2,
+    "end": 81,
+    "labels": ["Car"]
+  }
+}
+```
 
 ### Example
 ```html

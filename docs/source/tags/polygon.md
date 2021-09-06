@@ -1,7 +1,7 @@
 ---
 title: Polygon
 type: tags
-order: 414
+order: 416
 meta_title: Polygon Tags for Adding Polygons to Images
 meta_description: Label Studio Polygon Tags customize Label Studio for adding polygons to images for machine learning and data science projects.
 ---

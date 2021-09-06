@@ -2,8 +2,6 @@
 title: AudioPlus
 type: tags
 order: 302
-meta_title:
-meta_description:
 ---
 
 AudioPlus tag plays audio and shows its waveform.

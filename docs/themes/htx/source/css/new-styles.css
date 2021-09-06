@@ -91,6 +91,38 @@ header .join__slack:hover {
   color: #5c1751cc;
   background: white;
 }
+.new-product-link {
+  height: 32px;
+  max-width: 400px;
+  min-width: 0;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  border-radius: 16px;
+  background-color: #313943;
+  color: #fff;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+}
+.new-product-link::before {
+  content: "New";
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 12px;
+  margin-right: 12px;
+  border-radius: 16px;
+  background-color: #fdb515;
+  color: #141e29;
+}
+.new-product-link::after {
+  content: "";
+  background: url(https://assets.website-files.com/6101e8714894db49dbef0f24/61027e702e82970a07ffe572_Vector.svg) no-repeat center/16px;
+  width: 16px;
+  height: 100%;
+  margin: 0 12px;
+}
 
 @media (max-width: 991px){
   header{

@@ -53,7 +53,7 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
     manual_parameters=[
-        openapi.Parameter(name='exportType',
+        openapi.Parameter(name='export_type',
                           type=openapi.TYPE_STRING,
                           in_=openapi.IN_QUERY,
                           description='Selected export format (JSON by default)'),
@@ -62,6 +62,13 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
                           in_=openapi.IN_QUERY,
                           description="""
                           If true, download all tasks regardless of status. If false, download only annotated tasks.
+                          """
+                          ),
+        openapi.Parameter(name='download_resources',
+                          type=openapi.TYPE_BOOLEAN,
+                          in_=openapi.IN_QUERY,
+                          description="""
+                          If true, the converter will download all resource files like images, audio, etc. 
                           """
                           ),
         openapi.Parameter(name='ids',
@@ -84,15 +91,15 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
         For example, to export JSON annotations for a project to a file called `annotations.json`,
         run the following from the command line:
         ```bash
-        curl -X GET {}/api/projects/{{id}}/export?exportType=JSON -H \'Authorization: Token abc123\' --output annotations.json'
+        curl -X GET {}/api/projects/{{id}}/export?exportType=JSON -H \'Authorization: Token abc123\' --output 'annotations.json'
         ```
         To export all tasks, including skipped tasks and others without annotations, run the following from the command line:
         ```bash
-        curl -X GET {}/api/projects/{{id}}/export?exportType=JSON&download_all_tasks=true -H \'Authorization: Token abc123\' --output annotations.json'
+        curl -X GET {}/api/projects/{{id}}/export?exportType=JSON&download_all_tasks=true -H \'Authorization: Token abc123\' --output 'annotations.json'
         ```
         To export specific tasks, run the following from the command line:
         ```bash
-        curl -X GET {}/api/projects/{{id}}/export?ids[]=123\&ids[]=345 -H \'Authorization: Token abc123\' --output annotations.json'
+        curl -X GET {}/api/projects/{{id}}/export?ids[]=123\&ids[]=345 -H \'Authorization: Token abc123\' --output 'annotations.json'
         ```
         """.format(settings.HOSTNAME or 'https://localhost:8080', settings.HOSTNAME or 'https://localhost:8080', settings.HOSTNAME or 'https://localhost:8080'),
     responses={200: openapi.Response(
@@ -112,9 +119,15 @@ class ExportAPI(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         project = self.get_object()
-        export_type = request.GET.get('exportType', 'JSON')
+        export_type = \
+            request.GET.get('exportType', 'JSON') if 'exportType' in request.GET \
+            else request.GET.get('export_type', 'JSON')
         only_finished = not bool_from_request(request.GET, 'download_all_tasks', False)
         tasks_ids = request.GET.getlist('ids[]')
+        if 'download_resources' in request.GET:
+            download_resources = bool_from_request(request.GET, 'download_resources', True)
+        else:
+            download_resources = settings.CONVERTER_DOWNLOAD_RESOURCES
 
         logger.debug('Get tasks')
         tasks = Task.objects.filter(project=project)
@@ -133,8 +146,9 @@ class ExportAPI(generics.RetrieveAPIView):
             tasks += ExportDataSerializer(query.filter(id__in=_task_ids), many=True).data
         logger.debug('Prepare export files')
 
-        export_stream, content_type, filename = DataExport.generate_export_file(project, tasks, export_type,
-                                                                                request.GET)
+        export_stream, content_type, filename = DataExport.generate_export_file(
+            project, tasks, export_type, download_resources, request.GET
+        )
 
         response = HttpResponse(File(export_stream), content_type=content_type)
         response['Content-Disposition'] = 'attachment; filename="%s"' % filename

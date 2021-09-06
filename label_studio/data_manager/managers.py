@@ -74,14 +74,13 @@ def get_fields_for_annotation(prepare_params):
     # we don't need to annotate regular model fields, so we skip them
     skipped_fields = [field.attname for field in Task._meta.fields]
     skipped_fields.append("id")
-    skipped_fields.append("file_upload")
     result = [f for f in result if f not in skipped_fields]
     result = [f for f in result if not f.startswith("data.")]
 
     return result
 
 
-def apply_ordering(queryset, ordering):
+def apply_ordering(queryset, ordering, only_undefined_field=False):
     if ordering:
         field_name = ordering[0].replace("tasks:", "")
         ascending = False if field_name[0] == '-' else True  # detect direction
@@ -89,7 +88,6 @@ def apply_ordering(queryset, ordering):
 
         if "data." in field_name:
             field_name = field_name.replace(".", "__", 1)
-            only_undefined_field = queryset.exists() and queryset.first().project.only_undefined_field
             if only_undefined_field:
                 field_name = re.sub('data__\w+', f'data__{settings.DATA_UNDEFINED_NAME}', field_name)
 
@@ -127,7 +125,7 @@ def cast_value(_filter):
             _filter.value = cast_bool_from_str(_filter.value)
 
 
-def apply_filters(queryset, filters):
+def apply_filters(queryset, filters, only_undefined_field=False):
     if not filters:
         return queryset
 
@@ -138,8 +136,6 @@ def apply_filters(queryset, filters):
     else:
         conjunction = Q.AND
 
-    only_undefined_field = queryset.exists() and queryset.first().project.only_undefined_field
-
     for _filter in filters.items:
         # we can also have annotations filters
         if not _filter.filter.startswith("filter:tasks:") or not _filter.value:
@@ -147,6 +143,10 @@ def apply_filters(queryset, filters):
 
         # django orm loop expression attached to column name
         field_name = preprocess_field_name(_filter.filter, only_undefined_field)
+
+        # use other name because of model names conflict
+        if field_name == 'file_upload':
+            field_name = 'file_upload_field'
 
         # annotate with cast to number if need
         if _filter.type == 'Number' and field_name.startswith('data__'):
@@ -245,14 +245,18 @@ class TaskQuerySet(models.QuerySet):
         :param prepare_params: prepare params with project, filters, orderings, etc
         :return: ordered and filtered queryset
         """
+        from projects.models import Project
+
         queryset = self
 
         # project filter
         if prepare_params.project is not None:
             queryset = queryset.filter(project=prepare_params.project)
 
-        queryset = apply_filters(queryset, prepare_params.filters)
-        queryset = apply_ordering(queryset, prepare_params.ordering)
+        project = Project.objects.get(pk=prepare_params.project)
+
+        queryset = apply_filters(queryset, prepare_params.filters, only_undefined_field=project.only_undefined_field)
+        queryset = apply_ordering(queryset, prepare_params.ordering, only_undefined_field=project.only_undefined_field)
 
         if not prepare_params.selectedItems:
             return queryset
@@ -310,6 +314,10 @@ def annotate_predictions_score(queryset):
     return queryset.annotate(predictions_score=Avg("predictions__score"))
 
 
+def file_upload(queryset):
+    return queryset.annotate(file_upload_field=F('file_upload__file'))
+
+
 def dummy(queryset):
     return queryset
 
@@ -320,6 +328,7 @@ settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     "predictions_results": annotate_predictions_results,
     "predictions_score": annotate_predictions_score,
     "annotators": annotate_annotators,
+    "file_upload": file_upload,
     "cancelled_annotations": dummy,
     "total_annotations": dummy,
     "total_predictions": dummy
@@ -366,7 +375,9 @@ class PreparedTaskManager(models.Manager):
             return self.get_queryset()
 
         fields_for_annotation = get_fields_for_annotation(prepare_params)
-        return self.get_queryset(fields_for_annotation).prepared(prepare_params=prepare_params)
+        return self.get_queryset(
+            fields_for_evaluation=fields_for_annotation
+        ).prepared(prepare_params=prepare_params)
 
 
 class TaskManager(models.Manager):

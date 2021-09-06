@@ -5,8 +5,11 @@ import logging
 from copy import copy, deepcopy
 from data_manager.functions import DataManagerException
 from core.utils.common import timestamp_now
+from core.permissions import AllPermissions
+
 
 logger = logging.getLogger(__name__)
+all_permissions = AllPermissions()
 
 
 def propagate_annotations(project, queryset, **kwargs):
@@ -79,6 +82,7 @@ def predictions_to_annotations(project, items, **kwargs):
 actions = [
     {
         'entry_point': propagate_annotations,
+        'permission': all_permissions.tasks_change,
         'title': 'Propagate annotations',
         'order': 1,
         'experimental': True,
@@ -101,6 +105,7 @@ actions = [
 
     {
         'entry_point': predictions_to_annotations,
+        'permission': all_permissions.tasks_change,
         'title': 'Predictions => annotations',
         'order': 1,
         'experimental': True,

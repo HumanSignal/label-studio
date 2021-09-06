@@ -1,7 +1,7 @@
 ---
 title: Relations
 type: tags
-order: 421
+order: 423
 meta_title: Relations Tags for Multiple Relations
 meta_description: Label Studio Relations Tags customize Label Studio for Multiple Relations for machine learning and data science projects.
 ---
