@@ -46,5 +46,5 @@ class ExportDataSerializer(serializers.ModelSerializer):
 class ExportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Export
-        fields = ['created_at', 'file', 'completed_at']
-        read_only = ['project', 'created_at', 'file', 'completed_at']
+        fields = ['id', 'created_at', 'file', 'completed_at']
+        read_only = ['id', 'project', 'created_at', 'file', 'completed_at']
