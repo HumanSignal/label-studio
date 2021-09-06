@@ -1,12 +1,13 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from django.db.models import fields
+from core.label_config import replace_task_data_undefined_with_config_field
 from django.conf import settings
 from rest_framework import serializers
-
-from tasks.models import Task, Annotation
+from tasks.models import Annotation, Task
 from tasks.serializers import PredictionSerializer
 from users.models import User
-from core.label_config import replace_task_data_undefined_with_config_field
+from .models import Export
 
 
 class CompletedBySerializer(serializers.ModelSerializer):
@@ -32,7 +33,7 @@ class ExportDataSerializer(serializers.ModelSerializer):
     def to_representation(self, task):
         project = task.project
         data = task.data
-        
+
         replace_task_data_undefined_with_config_field(data, project)
 
         return super().to_representation(task)
@@ -40,3 +41,10 @@ class ExportDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         exclude = ('overlap', 'is_labeled')
+
+
+class ExportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Export
+        fields = ['created_at', 'file', 'completed_at']
+        read_only = ['project', 'created_at', 'file', 'completed_at']

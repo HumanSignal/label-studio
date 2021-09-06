@@ -17,8 +17,8 @@ from core.permissions import all_permissions
 from core.utils.common import get_object_with_check_and_log, bool_from_request, batch
 from projects.models import Project
 from tasks.models import Task
-from .models import DataExport
-from .serializers import ExportDataSerializer
+from .models import DataExport, Export
+from .serializers import ExportDataSerializer, ExportSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -206,3 +206,15 @@ class ProjectExportFilesAuthCheck(APIView):
 
         generics.get_object_or_404(Project.objects.filter(organization=self.request.user.active_organization), pk=pk)
         return Response({'detail': 'auth ok'}, status=status.HTTP_200_OK)
+
+
+class ExportListApi(generics.ListCreateAPIView):
+    queryset = Export.objects.all()
+    serializer_class = ExportSerializer
+
+    def perform_create(self, serializer):
+        return super().perform_create(serializer)
+
+    def get_queryset(self):
+        print(self.args)
+        return super().get_queryset().filter()

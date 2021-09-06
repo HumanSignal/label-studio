@@ -1,33 +1,53 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import shutil
-import io
 import hashlib
+import io
 import logging
-import ujson as json
 import os
-from datetime import datetime
+import shutil
 from copy import deepcopy
+from datetime import datetime
 
+import ujson as json
+from core import version
+from core.label_config import parse_config
+from core.utils.io import get_all_files_from_dir, get_temp_dir, read_bytes_stream
 from django.conf import settings
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from label_studio_converter import Converter
-from core.utils.io import get_temp_dir, read_bytes_stream, get_all_files_from_dir
-from core.label_config import parse_config
-from core import version
 from tasks.models import Annotation
-# Create your models here.
-
 
 logger = logging.getLogger(__name__)
 
 
-class DataExport(object):
+class Export(models.Model):
+    project = models.ForeignKey(
+        'projects.Project',
+        related_name='exports',
+        on_delete=models.CASCADE,
+    )
+    created_at = models.DateTimeField(
+        _('created at'),
+        auto_now_add=True,
+        help_text='Creation time',
+    )
+    file = models.FileField(
+        upload_to=settings.UPLOAD_DIR,
+        null=True,
+    )
+    completed_at = models.DateTimeField(
+        _('completed at'),
+        help_text='Completed time',
+        null=True,
+        default=None,
+    )
+    
 
+class DataExport(object):
     @staticmethod
     def save_export_files(project, now, get_args, data, md5, name):
-        """ Generate two files: meta info and result file and store them locally for logging
-        """
+        """Generate two files: meta info and result file and store them locally for logging"""
         filename_results = os.path.join(settings.EXPORT_DIR, name + '.json')
         filename_info = os.path.join(settings.EXPORT_DIR, name + '-info.json')
         annotation_number = Annotation.objects.filter(task__project=project).count()
@@ -43,17 +63,15 @@ class DataExport(object):
                 'created_at': project.created_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
                 'created_by': project.created_by.email,
                 'task_number': project.tasks.count(),
-                'annotation_number': annotation_number
+                'annotation_number': annotation_number,
             },
-            'platform': {
-                'version': platform_version
-            },
+            'platform': {'version': platform_version},
             'download': {
                 'GET': dict(get_args),
                 'time': now.strftime('%Y-%m-%dT%H:%M:%SZ'),
                 'result_filename': filename_results,
-                'md5': md5
-            }
+                'md5': md5,
+            },
         }
 
         with open(filename_results, 'w', encoding='utf-8') as f:
@@ -89,7 +107,7 @@ class DataExport(object):
             config=project.get_parsed_config(),
             project_dir=None,
             upload_dir=os.path.join(settings.MEDIA_ROOT, settings.UPLOAD_DIR),
-            download_resources=download_resources
+            download_resources=download_resources,
         )
         with get_temp_dir() as tmp_dir:
             converter.convert(input_json, tmp_dir, output_format, is_dir=False)

@@ -176,6 +176,7 @@ INSTALLED_APPS = [
     'users',
     'organizations',
     'data_import',
+    'data_export',
 
     'projects',
     'tasks',
