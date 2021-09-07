@@ -230,9 +230,9 @@ class ExportListApi(generics.ListCreateAPIView):
 
     def _get_project(self):
         project_pk = self.kwargs.get('pk')
-        project = Project.objects.get(
-            id=project_pk,
-            organization=self.request.user.active_organization,
+        project = generics.get_object_or_404(
+            Project.objects.for_user(self.request.user),
+            pk=project_pk,
         )
         return project
 
@@ -255,13 +255,12 @@ class ExportDetailApi(generics.RetrieveDestroyAPIView):
 
     def _get_project(self):
         project_pk = self.kwargs.get('pk')
-        project = Project.objects.get(
-            id=project_pk,
-            organization=self.request.user.active_organization,
+        project = generics.get_object_or_404(
+            Project.objects.for_user(self.request.user),
+            pk=project_pk,
         )
         return project
 
     def get_queryset(self):
         project = self._get_project()
         return super().get_queryset().filter(project=project)
-
