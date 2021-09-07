@@ -54,10 +54,11 @@ stages:
       json:
         id: !anyint
         created_by: !anyint
-        counters: !anyobject
+        counters: !anydict
         file: !anystr
+        md5: !anystr
         created_at: !anystr
-        completed_at: !anystr
+        finished_at: !anystr
         status: !anystr
         task_ids: !anylist
         only_finished: !anybool
@@ -74,28 +75,30 @@ stages:
       json:
         - id: !anyint
           created_by: !anyint
-          counters: !anyobject
+          counters: !anydict
           file: !anystr
+          md5: !anystr
           created_at: !anystr
           status: !anystr
-          completed_at: !anystr
+          finished_at: !anystr
           task_ids: !anylist
           only_finished: !anybool
           download_resources: !anybool
   - name: get export retrieve
     request:
-      url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}/"
+      url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}"
       method: GET
     response:
       status_code: 200
       json:
         id: !anyint
         created_by: !anyint
-        counters: !anyobject
+        counters: !anydict
         file: !anystr
+        md5: !anystr
         created_at: !anystr
         status: !anystr
-        completed_at: !anystr
+        finished_at: !anystr
         task_ids: !anylist
         only_finished: !anybool
         download_resources: !anybool

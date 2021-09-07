@@ -226,6 +226,7 @@ class ProjectExportFilesAuthCheck(APIView):
 class ExportListApi(generics.ListCreateAPIView):
     queryset = Export.objects.all()
     serializer_class = ExportSerializer
+    permission_required = all_permissions.projects_change
 
     def _get_project(self):
         project_pk = self.kwargs.get('pk')
@@ -237,10 +238,30 @@ class ExportListApi(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         project = self._get_project()
-        serializer.save(project=project)
+        serializer.save(project=project, created_by=self.request.user)
         instance = serializer.instance
         instance.run_file_exporting()
 
     def get_queryset(self):
         project = self._get_project()
         return super().get_queryset().filter(project=project)
+
+
+class ExportDetailApi(generics.RetrieveDestroyAPIView):
+    queryset = Export.objects.all()
+    serializer_class = ExportSerializer
+    lookup_url_kwarg = 'export_pk'
+    permission_required = all_permissions.projects_change
+
+    def _get_project(self):
+        project_pk = self.kwargs.get('pk')
+        project = Project.objects.get(
+            id=project_pk,
+            organization=self.request.user.active_organization,
+        )
+        return project
+
+    def get_queryset(self):
+        project = self._get_project()
+        return super().get_queryset().filter(project=project)
+

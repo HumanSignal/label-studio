@@ -49,10 +49,13 @@ class ExportSerializer(serializers.ModelSerializer):
         model = Export
         read_only = [
             'id',
+            'created_by',
             'created_at',
             'file',
-            'completed_at',
-            'md5'
+            'finished_at',
+            'status',
+            'md5',
+            'counters',
         ]
         fields = read_only + [
             'only_finished',
