@@ -8,6 +8,7 @@ from django.db import transaction
 from data_manager.models import View, Filter, FilterGroup
 from tasks.models import Task
 from tasks.serializers import TaskSerializer, AnnotationSerializer, PredictionSerializer, AnnotationDraftSerializer
+from projects.models import Project
 
 
 class FilterSerializer(serializers.ModelSerializer):
@@ -276,3 +277,7 @@ class SelectedItemsSerializer(serializers.Serializer):
                 raise serializers.ValidationError("changing all value possible only with POST method")
 
         return data
+
+
+class ViewResetSerializer(serializers.Serializer):
+    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all())
