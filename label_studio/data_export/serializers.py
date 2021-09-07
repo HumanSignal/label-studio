@@ -51,7 +51,6 @@ class ExportSerializer(serializers.ModelSerializer):
             'id',
             'created_by',
             'created_at',
-            'file',
             'finished_at',
             'status',
             'md5',

@@ -17,6 +17,7 @@ _api_urlpatterns = [
     path('<int:pk>/export/files', api.ProjectExportFiles.as_view(), name='project-export-files'),
     path('<int:pk>/exports/', api.ExportListApi.as_view(), name='project-exports-list'),
     path('<int:pk>/exports/<int:export_pk>', api.ExportDetailApi.as_view(), name='project-exports-detail'),
+    path('<int:pk>/exports/<int:export_pk>/download', api.ExportDownloadApi.as_view(), name='project-exports-download'),
 ]
 
 urlpatterns = [

@@ -2,6 +2,7 @@
 """
 import os
 import logging
+import pathlib
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -264,3 +265,33 @@ class ExportDetailApi(generics.RetrieveDestroyAPIView):
     def get_queryset(self):
         project = self._get_project()
         return super().get_queryset().filter(project=project)
+
+
+class ExportDownloadApi(generics.RetrieveAPIView):
+    queryset = Export.objects.all()
+    serializer_class = ExportSerializer
+    lookup_url_kwarg = 'export_pk'
+    permission_required = all_permissions.projects_change
+
+    def _get_project(self):
+        project_pk = self.kwargs.get('pk')
+        project = generics.get_object_or_404(
+            Project.objects.for_user(self.request.user),
+            pk=project_pk,
+        )
+        return project
+
+    def get_queryset(self):
+        project = self._get_project()
+        return super().get_queryset().filter(project=project)
+
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        ext = instance.file.name.split('.')[-1]
+        if instance.status != Export.Status.COMPLETED:
+            return HttpResponse('Export is not completed', status=404)
+
+        response = HttpResponse(instance.file, content_type=f'application/{ext}')
+        response['Content-Disposition'] = f'attachment; filename="{instance.file.name}"'
+        response['filename'] = instance.file.name
+        return response
