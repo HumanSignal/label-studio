@@ -134,7 +134,12 @@ class ViewAPI(viewsets.ModelViewSet):
         if not storage:
             resolve_uri = False
 
-        context = {'proxy': bool_from_request(request.GET, 'proxy', True), 'resolve_uri': resolve_uri, 'request': request}
+        context = {
+            'proxy': bool_from_request(request.GET, 'proxy', True),
+            'resolve_uri': resolve_uri,
+            'request': request,
+            'project': project
+        }
 
         # paginated tasks
         self.pagination_class = TaskPagination

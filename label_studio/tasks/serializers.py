@@ -135,7 +135,7 @@ class TaskSerializer(ModelSerializer):
                 many=True, read_only=False, required=False, context=self.context
             )
 
-    def project(self):
+    def project(self, task=None):
         """ Take the project from context
         """
         if 'project' in self.context:
@@ -143,6 +143,8 @@ class TaskSerializer(ModelSerializer):
         elif 'view' in self.context and 'project_id' in self.context['view'].kwargs:
             kwargs = self.context['view'].kwargs
             project = get_object_with_check_and_log(Project, kwargs['project_id'])
+        elif task:
+            project = task.project
         else:
             project = None
         return project
@@ -153,7 +155,7 @@ class TaskSerializer(ModelSerializer):
         return validator.validate(task)
 
     def to_representation(self, instance):
-        project = instance.project
+        project = self.project()
         if project:
             # resolve uri for storage (s3/gcs/etc)
             if self.context.get('resolve_uri', False):
