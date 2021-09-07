@@ -458,9 +458,9 @@ class AnnotationDraftSerializer(ModelSerializer):
             return ""
 
         name = user.first_name
-        if len(user.last_name):
-            name = name + " " + user.last_name
-
+        last_name = user.last_name
+        if len(last_name):
+            name = name + " " + last_name
         name += (' ' if name else '') + f'{user.email}, {user.id}'
         return name
 

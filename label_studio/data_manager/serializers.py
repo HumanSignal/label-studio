@@ -156,10 +156,10 @@ class ViewSerializer(serializers.ModelSerializer):
 
 
 class DataManagerTaskSerializer(TaskSerializer):
-    predictions = PredictionSerializer(many=True, default=[], read_only=True)
-    annotations = AnnotationSerializer(many=True, default=[], read_only=True)
-    drafts = serializers.SerializerMethodField(required=False)
-    annotators = serializers.SerializerMethodField(required=False)
+    predictions = serializers.SerializerMethodField(required=False, read_only=True)
+    annotations = serializers.SerializerMethodField(required=False, read_only=True)
+    drafts = serializers.SerializerMethodField(required=False, read_only=True)
+    annotators = serializers.SerializerMethodField(required=False, read_only=True)
 
     cancelled_annotations = serializers.IntegerField(required=False)
     total_annotations = serializers.IntegerField(required=False)
@@ -193,6 +193,16 @@ class DataManagerTaskSerializer(TaskSerializer):
             "project"
         ]
 
+    def get_annotations(self, task):
+        if not self.context.get('annotations'):
+            return []
+        return AnnotationSerializer(task.annotations, many=True, default=[], read_only=True).data
+
+    def get_predictions(self, task):
+        if not self.context.get('predictions'):
+            return []
+        return PredictionSerializer(task.predictions, many=True, default=[], read_only=True).data
+
     @staticmethod
     def get_file_upload(task):
         if not hasattr(task, 'file_upload_field'):
@@ -206,8 +216,8 @@ class DataManagerTaskSerializer(TaskSerializer):
     def get_drafts(self, task):
         """Return drafts only for the current user"""
         # it's for swagger documentation
-        if not isinstance(task, Task):
-            return AnnotationDraftSerializer(many=True)
+        if not isinstance(task, Task) or not self.context.get('drafts'):
+            return []
 
         drafts = task.drafts
         if 'request' in self.context and hasattr(self.context['request'], 'user'):

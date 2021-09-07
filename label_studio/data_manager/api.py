@@ -246,6 +246,9 @@ class TaskAPI(APIView):
             'proxy': bool_from_request(request.GET, 'proxy', True),
             'resolve_uri': True,
             'completed_by': 'full',
+            'drafts': True,
+            'predictions': True,
+            'annotations': True,
             'request': request
         }
 
