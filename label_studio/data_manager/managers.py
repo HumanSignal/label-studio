@@ -361,30 +361,36 @@ def update_annotation_map(obj):
 
 class PreparedTaskManager(models.Manager):
     def get_queryset(self, fields_for_evaluation=None):
+        """
+        :param fields_for_evaluation: list of annotated fields in task or 'all' or None
+        :return: task queryset with annotated fields
+        """
         queryset = TaskQuerySet(self.model)
         annotations_map = get_annotations_map()
 
+        all_fields = fields_for_evaluation == 'all'
         if fields_for_evaluation is None:
             fields_for_evaluation = []
 
         # default annotations for calculating total values in pagination output
-        if 'total_annotations' in fields_for_evaluation or 'annotators' in fields_for_evaluation:
+        if 'total_annotations' in fields_for_evaluation or 'annotators' in fields_for_evaluation or all_fields:
             queryset = queryset.annotate(
                 total_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
             )
-        if 'cancelled_annotations' in fields_for_evaluation:
+        if 'cancelled_annotations' in fields_for_evaluation or all_fields:
             queryset = queryset.annotate(
                 cancelled_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True))
             )
-        if 'total_predictions' in fields_for_evaluation:
+        if 'total_predictions' in fields_for_evaluation or all_fields:
             queryset = queryset.annotate(
                 total_predictions=Count("predictions", distinct=True)
             )
 
         # db annotations applied only if we need them in ordering or filters
-        for field in fields_for_evaluation:
-            function = annotations_map[field]
-            queryset = function(queryset)
+        for field in annotations_map.keys():
+            if field in fields_for_evaluation or all_fields:
+                function = annotations_map[field]
+                queryset = function(queryset)
 
         return queryset
 

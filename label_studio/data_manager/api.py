@@ -236,7 +236,7 @@ class TaskAPI(APIView):
 
         Retrieve a specific task by ID.
         """
-        task = Task.prepared.get(id=pk)
+        task = Task.prepared.get_queryset(fields_for_evaluation='all').get(id=pk)
         context = {
             'proxy': bool_from_request(request.GET, 'proxy', True),
             'resolve_uri': True,
