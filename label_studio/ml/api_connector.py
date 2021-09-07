@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import json
 import logging
 import os
 import requests
@@ -176,6 +177,7 @@ class MLApi(BaseHTTPAPI):
                 'context': context,
             },
         }
+        print(json.dumps(request))
         return self._request('predict', request, verbose=False)
 
     def health(self):

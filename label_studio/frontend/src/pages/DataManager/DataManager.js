@@ -101,19 +101,21 @@ export const DataManagerPage = ({...props}) => {
 
     if (interactiveBacked) {
       dataManager.on("lsf:regionFinishedDrawing", async (reg) => {
-        console.log({
-          reg: reg.serialize(),
-          interactiveBacked,
-        });
+        const {task, currentAnnotation: annotation} = dataManager.lsf;
+
         const response = await api.callApi("mlInteractive", {
           params: { pk: interactiveBacked.id },
           body: {
-            task: dataManager.lsf.task.id,
-            context: [reg.serialize()],
+            task: task.id,
+            context: {
+              result: [reg.serialize()],
+            },
           },
         });
 
-        console.log(response);
+        if (response.data) {
+          annotation.setSuggestions(response.data.result);
+        }
       });
     }
 
