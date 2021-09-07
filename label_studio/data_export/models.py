@@ -53,7 +53,7 @@ class Export(models.Model):
         help_text='Creation time',
     )
     file = models.FileField(
-        upload_to=settings.UPLOAD_DIR,
+        upload_to=settings.EXPORT_DIR,
         null=True,
     )
     md5 = models.CharField(
