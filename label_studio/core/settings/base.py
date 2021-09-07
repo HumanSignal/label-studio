@@ -62,6 +62,7 @@ logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 
 # Databases
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
+DJANGO_DB_MYSQL = 'mysql'
 DJANGO_DB_SQLITE = 'sqlite'
 DJANGO_DB = 'default'
 DATABASE_NAME_DEFAULT = os.path.join(BASE_DATA_DIR, 'label_studio.sqlite3')
@@ -74,6 +75,14 @@ DATABASES_ALL = {
         'NAME': get_env('POSTGRE_NAME', 'postgres'),
         'HOST': get_env('POSTGRE_HOST', 'localhost'),
         'PORT': int(get_env('POSTGRE_PORT', '5432')),
+    },
+    DJANGO_DB_MYSQL: {
+        'ENGINE': 'django.db.backends.mysql',
+        'USER': get_env('MYSQL_USER', 'root'),
+        'PASSWORD': get_env('MYSQL_PASSWORD', ''),
+        'NAME': get_env('MYSQL_NAME', 'labelstudio'),
+        'HOST': get_env('MYSQL_HOST', 'localhost'),
+        'PORT': int(get_env('MYSQL_PORT', '3306')),
     },
     DJANGO_DB_SQLITE: {
         'ENGINE': 'django.db.backends.sqlite3',
