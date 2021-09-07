@@ -368,7 +368,7 @@ class PreparedTaskManager(models.Manager):
             fields_for_evaluation = []
 
         # default annotations for calculating total values in pagination output
-        if 'total_annotations' in fields_for_evaluation:
+        if 'total_annotations' in fields_for_evaluation or 'annotators' in fields_for_evaluation:
             queryset = queryset.annotate(
                 total_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
             )

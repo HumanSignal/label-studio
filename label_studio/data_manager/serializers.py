@@ -1,6 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import json
+import os
 
 from rest_framework import serializers
 from django.db import transaction
@@ -168,7 +168,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     annotations_results = serializers.CharField(required=False, max_length=1000)
     predictions_results = serializers.CharField(required=False, max_length=1000)
     predictions_score = serializers.FloatField(required=False)
-    file_upload = serializers.ReadOnlyField(source='file_upload_name', required=False)
+    file_upload = serializers.SerializerMethodField(required=False)
 
     class Meta:
         model = Task
@@ -192,6 +192,12 @@ class DataManagerTaskSerializer(TaskSerializer):
             "annotators",
             "project"
         ]
+
+    @staticmethod
+    def get_file_upload(task):
+        if not hasattr(task, 'file_upload_field'):
+            return None
+        return os.path.basename(task.file_upload_field)
 
     @staticmethod
     def get_annotators(obj):
