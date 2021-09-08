@@ -317,14 +317,14 @@ def annotate_predictions_results(queryset):
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
         return queryset.annotate(predictions_results=Coalesce(GroupConcat("predictions__result"), Value('')))
     else:
-        return queryset.annotate(predictions_results=ArrayAgg("predictions__result"))
+        return queryset.annotate(predictions_results=ArrayAgg("predictions__result", distinct=True))
 
 
 def annotate_annotators(queryset):
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
         return queryset.annotate(annotators=Coalesce(GroupConcat("annotations__completed_by"), Value(None)))
     else:
-        return queryset.annotate(annotators=ArrayAgg("annotations__completed_by"))
+        return queryset.annotate(annotators=ArrayAgg("annotations__completed_by", distinct=True))
 
 
 def annotate_predictions_score(queryset):

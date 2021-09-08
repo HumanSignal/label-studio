@@ -1,9 +1,11 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import os
+import ujson as json
 
 from rest_framework import serializers
 from django.db import transaction
+from django.conf import settings 
 
 from data_manager.models import View, Filter, FilterGroup
 from tasks.models import Task
@@ -165,10 +167,12 @@ class DataManagerTaskSerializer(TaskSerializer):
     total_annotations = serializers.IntegerField(required=False)
     total_predictions = serializers.IntegerField(required=False)
     completed_at = serializers.DateTimeField(required=False)
-    annotations_results = serializers.CharField(required=False, max_length=1000)
-    predictions_results = serializers.CharField(required=False, max_length=1000)
+    annotations_results = serializers.SerializerMethodField(required=False)
+    predictions_results = serializers.SerializerMethodField(required=False)
     predictions_score = serializers.FloatField(required=False)
     file_upload = serializers.SerializerMethodField(required=False)
+
+    CHAR_LIMITS = 1000
 
     class Meta:
         model = Task
@@ -192,6 +196,26 @@ class DataManagerTaskSerializer(TaskSerializer):
             "annotators",
             "project"
         ]
+
+    def get_annotations_results(self, task):
+        if hasattr(task, 'annotations_results'):
+            result = task.annotations_results
+            if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
+                if result:
+                    return result[:self.CHAR_LIMITS]
+            else:
+                if result and result[0]:
+                    return json.dumps(result[0])[:self.CHAR_LIMITS]
+
+    def get_predictions_results(self, task):
+        if hasattr(task, 'predictions_results'):
+            result = task.predictions_results
+            if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
+                if result:
+                    return result[:self.CHAR_LIMITS]
+            else:
+                if result and result[0]:
+                    return json.dumps(result[0])[:self.CHAR_LIMITS]
 
     def get_annotations(self, task):
         if not self.context.get('annotations'):
