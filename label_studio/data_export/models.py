@@ -123,7 +123,7 @@ class Export(models.Model):
             self.file.save(name, file_)
             self.md5 = md5
             self.counters = counters
-            self.save(update_fields=['file', 'md5'])
+            self.save(update_fields=['file', 'md5', 'counters'])
 
             self.status = self.Status.COMPLETED
             self.save(update_fields=['status'])
