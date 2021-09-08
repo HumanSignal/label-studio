@@ -207,7 +207,8 @@ class DataManagerTaskSerializer(TaskSerializer):
     def get_file_upload(task):
         if not hasattr(task, 'file_upload_field'):
             return None
-        return os.path.basename(task.file_upload_field)
+        file_upload = task.file_upload_field
+        return os.path.basename(task.file_upload_field) if file_upload else None
 
     @staticmethod
     def get_annotators(obj):

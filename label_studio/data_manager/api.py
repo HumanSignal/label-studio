@@ -2,7 +2,6 @@
 """
 import logging
 
-from django.conf import settings
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.decorators import method_decorator
 from rest_framework import viewsets
@@ -10,14 +9,12 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 from drf_yasg.utils import swagger_auto_schema
 from django.db.models import Sum, Count
 from ordered_set import OrderedSet
 
 from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, find_first_one_to_one_related_field_by_prefix
 from core.permissions import all_permissions, ViewClassPermission
-from core.decorators import permission_required
 from projects.models import Project
 from projects.serializers import ProjectSerializer
 from tasks.models import Task, Annotation
@@ -57,8 +54,8 @@ class TaskPagination(PageNumberPagination):
         )
 
         self.all_tasks = aggregated['all_tasks']
-        self.total_annotations = aggregated.get('all_annotations')
-        self.total_predictions = aggregated.get('all_predictions')
+        self.total_annotations = (aggregated.get('all_annotations') or 0) if 'all_annotations' in aggregated else None
+        self.total_predictions = (aggregated.get('all_predictions') or 0) if 'all_predictions' in aggregated else None
         return super().paginate_queryset(queryset, request, view)
 
     def get_paginated_response(self, data):
@@ -103,6 +100,25 @@ class ViewAPI(viewsets.ModelViewSet):
         DELETE=all_permissions.tasks_delete,
     )
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    @swagger_auto_schema(tags=['Data Manager'])
+    @action(detail=False, methods=['delete'])
+    def reset(self, _request):
+        """
+        delete:
+        Reset project views
+
+        Reset all views for a specific project.
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset.all().delete()
+        return Response(status=204)
+
+    def get_queryset(self):
+        return View.objects.filter(project__organization=self.request.user.active_organization)
+
     @staticmethod
     def get_task_serializer_context(request, project):
         storage = find_first_one_to_one_related_field_by_prefix(project, '.*io_storages_')
@@ -122,30 +138,12 @@ class ViewAPI(viewsets.ModelViewSet):
             'annotations': all_fields
         }
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    @swagger_auto_schema(tags=['Data Manager'])
-    @action(detail=False, methods=['delete'])
-    def reset(self, _request):
-        """
-        delete:
-        Reset project views
-
-        Reset all views for a specific project.
-        """
-        queryset = self.filter_queryset(self.get_queryset())
-        queryset.all().delete()
-        return Response(status=204)
-
     def get_task_queryset(self, request, view):
+        all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
         return Task.prepared.all(
-            fields_for_evaluation=request.GET.get('fields', None) == 'all',
+            fields_for_evaluation=all_fields,
             prepare_params=view.get_prepare_tasks_params(),
             request=request)
-
-    def get_queryset(self):
-        return View.objects.filter(project__organization=self.request.user.active_organization)
 
     @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
     @action(detail=True, methods=["get"])
