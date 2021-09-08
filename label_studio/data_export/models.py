@@ -4,6 +4,7 @@ import hashlib
 import io
 import logging
 import os
+import pathlib
 import shutil
 from copy import deepcopy
 from datetime import datetime
@@ -153,6 +154,31 @@ class Export(models.Model):
         else:
             logger.info(f'Start file_exporting {self}')
             self.export_to_file()
+
+    def convert_file(self, to):
+        with get_temp_dir() as tmp_dir:
+            converter = Converter(
+                config=self.project.get_parsed_config(),
+                project_dir=None,
+                upload_dir=tmp_dir,
+                # download_resources=download_resources,
+            )
+            input_name = pathlib.Path(self.file.name).name
+            input_file_path = pathlib.Path(tmp_dir) / input_name
+            with open(input_file_path, 'wb') as out_file:
+                out_file.write(self.file.open().read())
+
+            converter.convert(input_file_path, tmp_dir, to, is_dir=False)
+
+            files = get_all_files_from_dir(tmp_dir)
+            output_file = [file_name for file_name in files if pathlib.Path(file_name).name != input_name][0]
+
+            out = read_bytes_stream(output_file)
+            filename = pathlib.Path(input_name).stem + pathlib.Path(output_file).suffix
+            return File(
+                out,
+                name=filename,
+            )
 
 
 def export_background(export_id):

@@ -287,11 +287,18 @@ class ExportDownloadApi(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
-        ext = instance.file.name.split('.')[-1]
+        export_type = request.GET.get('exportType')
+
         if instance.status != Export.Status.COMPLETED:
             return HttpResponse('Export is not completed', status=404)
 
-        response = HttpResponse(instance.file, content_type=f'application/{ext}')
-        response['Content-Disposition'] = f'attachment; filename="{instance.file.name}"'
-        response['filename'] = instance.file.name
+        if export_type is None:
+            file_ = instance.file
+        else:
+            file_ = instance.convert_file(export_type)
+            
+        ext = file_.name.split('.')[-1]
+        response = HttpResponse(file_, content_type=f'application/{ext}')
+        response['Content-Disposition'] = f'attachment; filename="{file_.name}"'
+        response['filename'] = file_.name
         return response
