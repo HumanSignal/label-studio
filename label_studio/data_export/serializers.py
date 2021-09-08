@@ -59,7 +59,6 @@ class ExportSerializer(serializers.ModelSerializer):
         fields = read_only + [
             'only_finished',
             'task_ids',
-            'download_resources',
         ]
 
         def validate_task_ids(self, value):

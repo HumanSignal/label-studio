@@ -62,7 +62,6 @@ stages:
         status: !anystr
         task_ids: !anylist
         only_finished: !anybool
-        download_resources: !anybool
       save:
         json:
           export_id: id
@@ -83,7 +82,6 @@ stages:
           finished_at: !anystr
           task_ids: !anylist
           only_finished: !anybool
-          download_resources: !anybool
   - name: get export retrieve
     request:
       url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}"
@@ -101,4 +99,3 @@ stages:
         finished_at: !anystr
         task_ids: !anylist
         only_finished: !anybool
-        download_resources: !anybool

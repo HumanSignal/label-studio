@@ -87,10 +87,6 @@ class Export(models.Model):
         default=list,
         help_text=_('If list is empty - download all tasks'),
     )
-    download_resources = models.BooleanField(
-        _('Download resources'),
-        default=False,
-    )
 
     def has_permission(self, user):
         return self.project.has_permission(user)
