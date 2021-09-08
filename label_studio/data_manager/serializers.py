@@ -5,11 +5,11 @@ import ujson as json
 
 from rest_framework import serializers
 from django.db import transaction
-from django.conf import settings 
 
 from data_manager.models import View, Filter, FilterGroup
 from tasks.models import Task
 from tasks.serializers import TaskSerializer, AnnotationSerializer, PredictionSerializer, AnnotationDraftSerializer
+from label_studio.core.utils.common import round_floats
 
 
 class FilterSerializer(serializers.ModelSerializer):
@@ -172,7 +172,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     predictions_score = serializers.FloatField(required=False)
     file_upload = serializers.SerializerMethodField(required=False)
 
-    CHAR_LIMITS = 1000
+    CHAR_LIMITS = 500
 
     class Meta:
         model = Task
@@ -197,17 +197,25 @@ class DataManagerTaskSerializer(TaskSerializer):
             "project"
         ]
 
+    def _pretty_results(self, task, field):
+        if not hasattr(task, field):
+            return ''
+
+        result = getattr(task, field)
+        if isinstance(result, str):
+            output = result
+        else:
+            result = [r for r in result if r is not None]
+            result = round_floats(result)
+            output = json.dumps(result, ensure_ascii=False)[1:-1]  # remove brackets [ ]
+
+        return output[:self.CHAR_LIMITS].replace(',"', ', "').replace('],[', "] [").replace('"', '')
+
     def get_annotations_results(self, task):
-        if hasattr(task, 'annotations_results'):
-            result = task.annotations_results
-            if result:
-                return json.dumps(result)[:self.CHAR_LIMITS]
+        return self._pretty_results(task, 'annotations_results')
 
     def get_predictions_results(self, task):
-        if hasattr(task, 'predictions_results'):
-            result = task.predictions_results
-            if result:
-                return json.dumps(result)[:self.CHAR_LIMITS]
+        return self._pretty_results(task, 'predictions_results')
 
     def get_annotations(self, task):
         if not self.context.get('annotations'):
