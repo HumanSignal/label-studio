@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+set -e ${DEBUG:+-x}
 
 if [ -n "${POSTGRE_HOST:-}" ] || [ -n "${MYSQL_HOST:-}" ]; then
   echo >&3 "=> Do database migrations..."
