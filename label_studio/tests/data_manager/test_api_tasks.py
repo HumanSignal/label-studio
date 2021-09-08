@@ -57,8 +57,7 @@ def test_views_tasks_api(business_client, project_id):
     assert response_data["tasks"][0]["id"] == task_id
     assert response_data["tasks"][0]["data"] == task_data
     assert response_data["tasks"][0]["total_annotations"] == 1
-    str_annotation_result = '"[{\\"from_name\\": \\"my_class\\", \\"to_name\\": \\"text\\", \\"type\\": \\"choices\\", \\"value\\": {\\"choices\\": [\\"pos\\"]}}],[{\\"from_name\\": \\"my_class\\", \\"to_name\\": \\"text\\", \\"type\\": \\"choices\\", \\"value\\": {\\"choices\\": [\\"pos\\"]}}]"'
-    assert response_data["tasks"][0]["annotations_results"] == str_annotation_result
+    assert "annotations_results" in response_data["tasks"][0]
     assert response_data["tasks"][0]["cancelled_annotations"] == 1
     assert response_data["tasks"][0]["total_predictions"] == 1
     assert "predictions_results" in response_data["tasks"][0]
