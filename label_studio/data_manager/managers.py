@@ -76,6 +76,7 @@ def get_fields_for_evaluation(prepare_params, request):
     if fields:
         from label_studio.data_manager.functions import TASKS
         GET_ALL_COLUMNS = load_func(settings.DATA_MANAGER_GET_ALL_COLUMNS)
+        # we need to have a request here to detect user role
         all_columns = GET_ALL_COLUMNS(request, Project.objects.get(id=prepare_params.project))
         all_columns = set([TASKS + ('data.' if c.get('parent', None) == 'data' else '') + c['id']
                            for c in all_columns['columns']])
@@ -394,19 +395,20 @@ class PreparedTaskManager(models.Manager):
 
         return queryset
 
-    def all(self, prepare_params=None, request=None):
+    def all(self, prepare_params=None, request=None, fields_for_evaluation=None):
         """ Make a task queryset with filtering, ordering, annotations
 
         :param prepare_params: prepare params with filters, orderings, etc
         :param request: django request instance from API
+        :param fields_for_evaluation - 'all' or None for auto-evaluation by enabled filters, ordering, fields
         :return: TaskQuerySet with filtered, ordered, annotated tasks
         """
         if prepare_params is None:
             return self.get_queryset()
 
-        fields_for_annotation = get_fields_for_evaluation(prepare_params, request)
+        fields = fields_for_evaluation or get_fields_for_evaluation(prepare_params, request)
         return self.get_queryset(
-            fields_for_evaluation=fields_for_annotation
+            fields_for_evaluation=fields
         ).prepared(prepare_params=prepare_params)
 
 

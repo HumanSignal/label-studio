@@ -42,15 +42,23 @@ class TaskPagination(PageNumberPagination):
         return self.all_tasks
 
     def paginate_queryset(self, queryset, request, view=None):
+        ops = {
+            'all_tasks': Count('pk'),
+            'all_annotations': Sum("total_annotations"),
+            'all_predictions': Sum("total_predictions")
+        }
+        if 'total_predictions' not in queryset.query.annotations:
+            ops.pop('all_predictions')
+        if 'total_annotations' not in queryset.query.annotations:
+            ops.pop('all_annotations')
+
         aggregated = queryset.aggregate(
-            all_tasks=Count('pk'),
-            all_annotations=Sum("total_annotations"),
-            all_predictions=Sum("total_predictions")
+            **ops
         )
 
         self.all_tasks = aggregated['all_tasks']
-        self.total_annotations = aggregated["all_annotations"] or 0
-        self.total_predictions = aggregated["all_predictions"] or 0
+        self.total_annotations = aggregated.get('all_annotations')
+        self.total_predictions = aggregated.get('all_predictions')
         return super().paginate_queryset(queryset, request, view)
 
     def get_paginated_response(self, data):
@@ -102,11 +110,16 @@ class ViewAPI(viewsets.ModelViewSet):
         if not storage:
             resolve_uri = False
 
+        all_fields = request.GET.get('fields', None) == 'all'  # false by default
+
         return {
             'proxy': bool_from_request(request.GET, 'proxy', True),
             'resolve_uri': resolve_uri,
             'request': request,
-            'project': project
+            'project': project,
+            'drafts': all_fields,
+            'predictions': all_fields,
+            'annotations': all_fields
         }
 
     def perform_create(self, serializer):
@@ -126,7 +139,10 @@ class ViewAPI(viewsets.ModelViewSet):
         return Response(status=204)
 
     def get_task_queryset(self, request, view):
-        return Task.prepared.all(prepare_params=view.get_prepare_tasks_params(), request=request)
+        return Task.prepared.all(
+            fields_for_evaluation=request.GET.get('fields', None) == 'all',
+            prepare_params=view.get_prepare_tasks_params(),
+            request=request)
 
     def get_queryset(self):
         return View.objects.filter(project__organization=self.request.user.active_organization)
