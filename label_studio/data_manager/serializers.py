@@ -200,22 +200,14 @@ class DataManagerTaskSerializer(TaskSerializer):
     def get_annotations_results(self, task):
         if hasattr(task, 'annotations_results'):
             result = task.annotations_results
-            if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
-                if result:
-                    return result[:self.CHAR_LIMITS]
-            else:
-                if result and result[0]:
-                    return json.dumps(result[0])[:self.CHAR_LIMITS]
+            if result:
+                return json.dumps(result)[:self.CHAR_LIMITS]
 
     def get_predictions_results(self, task):
         if hasattr(task, 'predictions_results'):
             result = task.predictions_results
-            if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
-                if result:
-                    return result[:self.CHAR_LIMITS]
-            else:
-                if result and result[0]:
-                    return json.dumps(result[0])[:self.CHAR_LIMITS]
+            if result:
+                return json.dumps(result)[:self.CHAR_LIMITS]
 
     def get_annotations(self, task):
         if not self.context.get('annotations'):
@@ -236,7 +228,9 @@ class DataManagerTaskSerializer(TaskSerializer):
 
     @staticmethod
     def get_annotators(obj):
-        return obj.annotators if hasattr(obj, 'annotators') and obj.annotators else []
+        # result = obj.annotations.values_list('completed_by', flat=True).distinct()
+        # result = [r for r in result if r is not None]
+        return [obj.annotators] if hasattr(obj, 'annotators') and obj.annotators else []
 
     def get_drafts(self, task):
         """Return drafts only for the current user"""

@@ -295,7 +295,7 @@ class GroupConcat(Aggregate):
 
     def __init__(self, expression, distinct=False, **extra):
         super().__init__(
-            expression, distinct="DISTINCT " if distinct else "", output_field=models.CharField(), **extra
+            expression, distinct="DISTINCT " if distinct else "", output_field=models.JSONField(), **extra
         )
 
 
@@ -308,14 +308,16 @@ def annotate_completed_at(queryset):
 
 def annotate_annotations_results(queryset):
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
-        return queryset.annotate(annotations_results=Coalesce(GroupConcat("annotations__result"), Value('')))
+        return queryset.annotate(annotations_results=Coalesce(
+            GroupConcat("annotations__result"), Value('')))
     else:
-        return queryset.annotate(annotations_results=ArrayAgg("annotations__result"))
+        return queryset.annotate(annotations_results=ArrayAgg("annotations__result", distinct=True))
 
 
 def annotate_predictions_results(queryset):
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
-        return queryset.annotate(predictions_results=Coalesce(GroupConcat("predictions__result"), Value('')))
+        return queryset.annotate(predictions_results=Coalesce(
+            GroupConcat("predictions__result"), Value('')))
     else:
         return queryset.annotate(predictions_results=ArrayAgg("predictions__result", distinct=True))
 
