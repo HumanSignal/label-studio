@@ -100,27 +100,31 @@ export const DataManagerPage = ({...props}) => {
     });
 
     if (interactiveBacked) {
-      dataManager.on("lsf:regionFinishedDrawing", async (reg) => {
-        const {task, currentAnnotation: annotation} = dataManager.lsf;
+      dataManager.on("lsf:regionFinishedDrawing", (reg, group) => {
+        const { lsf, task, currentAnnotation: annotation } = dataManager.lsf;
+        const ids = group.map(r => r.id);
+        const result = annotation.serializeAnnotation().filter((res) => ids.includes(res.id));
 
-        const response = await api.callApi("mlInteractive", {
+        const suggestionsRequest = api.callApi("mlInteractive", {
           params: { pk: interactiveBacked.id },
           body: {
             task: task.id,
-            context: {
-              result: [reg.serialize()],
-            },
+            context: { result },
           },
         });
 
-        if (response.data) {
-          annotation.setSuggestions(response.data.result);
-        }
+        lsf.loadSuggestions(suggestionsRequest, (response) => {
+          if (response.data) {
+            return response.data.result;
+          }
+
+          return [];
+        });
       });
     }
 
     setContextProps({dmRef: dataManager});
-  }, [LabelStudio, DataManager, project]);
+  }, [LabelStudio, DataManager]);
 
   const destroyDM = useCallback(() => {
     if (dataManagerRef.current) {
