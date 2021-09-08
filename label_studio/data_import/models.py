@@ -2,6 +2,7 @@
 """
 import os
 import io
+import uuid
 import logging
 import pandas as pd
 import htmlmin
@@ -18,10 +19,16 @@ from rest_framework.exceptions import ValidationError
 logger = logging.getLogger(__name__)
 
 
+def upload_name_generator(instance, filename):
+    return os.path.join(
+        settings.UPLOAD_DIR, str(instance.project_id) + '-' + str(uuid.uuid4())[0:8] + '-' + filename
+    )
+
+
 class FileUpload(models.Model):
     user = models.ForeignKey('users.User', related_name='file_uploads', on_delete=models.CASCADE)
     project = models.ForeignKey('projects.Project', related_name='file_uploads', on_delete=models.CASCADE)
-    file = models.FileField(upload_to=settings.UPLOAD_DIR)
+    file = models.FileField(upload_to=upload_name_generator)
 
     @property
     def filepath(self):
