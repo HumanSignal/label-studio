@@ -95,6 +95,20 @@ class ViewAPI(viewsets.ModelViewSet):
         DELETE=all_permissions.tasks_delete,
     )
 
+    @staticmethod
+    def get_task_serializer_context(request, project):
+        storage = find_first_one_to_one_related_field_by_prefix(project, '.*io_storages_')
+        resolve_uri = True
+        if not storage:
+            resolve_uri = False
+
+        return {
+            'proxy': bool_from_request(request.GET, 'proxy', True),
+            'resolve_uri': resolve_uri,
+            'request': request,
+            'project': project
+        }
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
@@ -129,17 +143,7 @@ class ViewAPI(viewsets.ModelViewSet):
         view = self.get_object()
         queryset = self.get_task_queryset(request, view)
         project = view.project
-        storage = find_first_one_to_one_related_field_by_prefix(project, '.*io_storages_')
-        resolve_uri = True
-        if not storage:
-            resolve_uri = False
-
-        context = {
-            'proxy': bool_from_request(request.GET, 'proxy', True),
-            'resolve_uri': resolve_uri,
-            'request': request,
-            'project': project
-        }
+        context = self.get_task_serializer_context(self.request, project)
 
         # paginated tasks
         self.pagination_class = TaskPagination
@@ -233,6 +237,18 @@ class TaskAPI(APIView):
     def get_serializer_class(self):
         return DataManagerTaskSerializer
 
+    @staticmethod
+    def get_serializer_context(request):
+        return {
+            'proxy': bool_from_request(request.GET, 'proxy', True),
+            'resolve_uri': True,
+            'completed_by': 'full',
+            'drafts': True,
+            'predictions': True,
+            'annotations': True,
+            'request': request
+        }
+
     @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request, pk):
         """
@@ -242,15 +258,7 @@ class TaskAPI(APIView):
         Retrieve a specific task by ID.
         """
         task = Task.prepared.get_queryset(fields_for_evaluation='all').get(id=pk)
-        context = {
-            'proxy': bool_from_request(request.GET, 'proxy', True),
-            'resolve_uri': True,
-            'completed_by': 'full',
-            'drafts': True,
-            'predictions': True,
-            'annotations': True,
-            'request': request
-        }
+        context = self.get_serializer_context(request)
 
         # get prediction
         if task.project.evaluate_predictions_automatically and not task.predictions.exists():
@@ -291,9 +299,10 @@ class ProjectStateAPI(APIView):
         Retrieve the project state for data manager.
         """
         pk = int_from_request(request.GET, "project", 1)  # replace 1 to None, it's for debug only
-        project = get_object_with_check_and_log(request, Project.objects.with_counts(), pk=pk)
+        project = get_object_with_check_and_log(request, Project, pk=pk)
         self.check_object_permissions(request, project)
         data = ProjectSerializer(project).data
+        # Task.objects.filter(project=project).annotate(count=Count('pk'))
         data.update(
             {
                 "can_delete_tasks": True,
