@@ -31,13 +31,15 @@ def get_all_columns(project):
 
     data_types = OrderedDict()
     # add data types from config again
-    data_types.update(project.data_types.items())
+    project_data_types = project.data_types
+    data_types.update(project_data_types.items())
     # all data types from import data
-    if project.summary.all_data_columns:
-        data_types.update({key: 'Unknown' for key in project.summary.all_data_columns if key not in data_types})
+    all_data_columns = project.summary.all_data_columns
+    if all_data_columns:
+        data_types.update({key: 'Unknown' for key in all_data_columns if key not in data_types})
 
     # remove $undefined$ if there is one type at least in labeling config, because it will be resolved automatically
-    if len(project.data_types) > 0:
+    if len(project_data_types) > 0:
         data_types.pop(settings.DATA_UNDEFINED_NAME, None)
 
     for key, data_type in list(data_types.items()):  # make data types from labeling config first
@@ -49,7 +51,7 @@ def get_all_columns(project):
             'parent': 'data',
             'visibility_defaults': {
                 'explore': True,
-                'labeling': key in project.data_types or key == settings.DATA_UNDEFINED_NAME
+                'labeling': key in project_data_types or key == settings.DATA_UNDEFINED_NAME
             }
         }
         result['columns'].append(column)
@@ -123,6 +125,18 @@ def get_all_columns(project):
             }
         },
         {
+            'id': 'annotators',
+            'title': 'Annotated by',
+            'type': 'List',
+            'target': 'tasks',
+            'help': 'All users who completed the task',
+            'schema': {'items': project.organization.members.values_list('user__id', flat=True)},
+            'visibility_defaults': {
+                'explore': True,
+                'labeling': False
+            }
+        },
+        {
             'id': 'annotations_results',
             'title': "Annotation results",
             'type': "String",
@@ -134,22 +148,22 @@ def get_all_columns(project):
             }
         },
         {
-            'id': 'predictions_score',
-            'title': "Prediction score",
-            'type': "Number",
+            'id': 'predictions_results',
+            'title': "Prediction results",
+            'type': "String",
             'target': 'tasks',
-            'help': 'Average prediction score over all task predictions',
+            'help': 'Prediction results stacked over all predictions',
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
             }
         },
         {
-            'id': 'predictions_results',
-            'title': "Prediction results",
-            'type': "String",
+            'id': 'predictions_score',
+            'title': "Prediction score",
+            'type': "Number",
             'target': 'tasks',
-            'help': 'Prediction results stacked over all predictions',
+            'help': 'Average prediction score over all task predictions',
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
@@ -174,18 +188,6 @@ def get_all_columns(project):
             'help': 'Task creation time',
             'visibility_defaults': {
                 'explore': False,
-                'labeling': False
-            }
-        },
-        {
-            'id': 'annotators',
-            'title': 'Annotated by',
-            'type': 'List',
-            'target': 'tasks',
-            'help': 'All users who completed the task',
-            'schema': { 'items': project.organization.members.values_list('user__id', flat=True) },
-            'visibility_defaults': {
-                'explore': True,
                 'labeling': False
             }
         }
@@ -235,3 +237,7 @@ def evaluate_predictions(tasks):
     for ml_backend in project.ml_backends.all():
         # tasks = tasks.filter(~Q(predictions__model_version=ml_backend.model_version))
         ml_backend.predict_many_tasks(tasks)
+
+
+def filters_ordering_selected_items_exist(data):
+    return data.get('filters') or data.get('ordering') or data.get('selectedItems')
