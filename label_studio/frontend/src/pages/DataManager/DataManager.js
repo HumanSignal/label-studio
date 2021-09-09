@@ -10,6 +10,7 @@ import { useProject } from '../../providers/ProjectProvider';
 import { useContextProps, useFixedLocation, useParams } from '../../providers/RoutesProvider';
 import { addAction, addCrumb, deleteAction, deleteCrumb } from '../../services/breadrumbs';
 import { Block, Elem } from '../../utils/bem';
+import { isDefined } from '../../utils/helpers';
 import { ImportModal } from '../CreateProject/Import/ImportModal';
 import { ExportPage } from '../ExportPage/ExportPage';
 import { APIConfig } from './api-config';
@@ -36,6 +37,7 @@ const initializeDataManager = async (root, props, params) => {
       export: false,
       backButton: false,
       labelingHeader: false,
+      autoAnnotation: params.autoAnnotation,
     },
     ...props,
     ...settings,
@@ -76,7 +78,10 @@ export const DataManagerPage = ({...props}) => {
     const dataManager = (dataManagerRef.current = dataManagerRef.current ?? await initializeDataManager(
       root.current,
       props,
-      params,
+      {
+        ...params,
+        autoAnnotation: isDefined(interactiveBacked),
+      },
     ));
 
     Object.assign(window, { dataManager });
