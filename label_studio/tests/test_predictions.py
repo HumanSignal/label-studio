@@ -693,7 +693,7 @@ def test_predictions_with_partially_predicted_tasks(
 
 
 @pytest.mark.django_db
-def test_interactive_annotating(configured_project):
+def test_interactive_annotating(business_client, configured_project):
     # create project with predefined task set
     ml_backend = configured_project.ml_backends.first()
     ml_backend.is_interactive = True
@@ -703,8 +703,21 @@ def test_interactive_annotating(configured_project):
     # run prediction
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', f'{ml_backend.url}/predict', json={'results': [{'x': 'x'}]}, status_code=200)
-        result = ml_backend.interactive_annotating(task)
-    
-    assert 'data' in result
-    assert 'x' in result['data']
-    assert result['data']['x'] == 'x'
+
+        r = business_client.post(
+            f'/api/ml/{ml_backend.pk}/interactive-annotating',
+            data=json.dumps(
+                {
+                    'task': task.id,
+                    'context': {'y': 'y'},
+                }
+            ),
+            content_type="application/json",
+        )
+        r.status_code = 200
+
+        result = r.json()
+
+        assert 'data' in result
+        assert 'x' in result['data']
+        assert result['data']['x'] == 'x'
