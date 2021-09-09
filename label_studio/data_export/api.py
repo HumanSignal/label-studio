@@ -224,6 +224,26 @@ class ProjectExportFilesAuthCheck(APIView):
         return Response({'detail': 'auth ok'}, status=status.HTTP_200_OK)
 
 
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
+        tags=['Export'],
+        operation_summary='List your exports',
+        operation_description="""
+        Returns a list of exports.
+        """,
+    ),
+)
+@method_decorator(
+    name='post',
+    decorator=swagger_auto_schema(
+        tags=['Export'],
+        operation_summary='Create new export',
+        operation_description="""
+        Create an instance of export and start background task for file generating.
+        """,
+    ),
+)
 class ExportListApi(generics.ListCreateAPIView):
     queryset = Export.objects.all()
     serializer_class = ExportSerializer
@@ -248,6 +268,26 @@ class ExportListApi(generics.ListCreateAPIView):
         return super().get_queryset().filter(project=project)
 
 
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
+        tags=['Export'],
+        operation_summary='Get export by ID',
+        operation_description="""
+        Retrieve information about a export by project ID.
+        """,
+    ),
+)
+@method_decorator(
+    name='delete',
+    decorator=swagger_auto_schema(
+        tags=['Export'],
+        operation_summary='Delete export',
+        operation_description="""
+        Delete a export by specified export ID.
+        """,
+    ),
+)
 class ExportDetailApi(generics.RetrieveDestroyAPIView):
     queryset = Export.objects.all()
     serializer_class = ExportSerializer
@@ -267,6 +307,24 @@ class ExportDetailApi(generics.RetrieveDestroyAPIView):
         return super().get_queryset().filter(project=project)
 
 
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
+        tags=['Export'],
+        operation_summary='Download export file',
+        operation_description="""
+        Returns download file.
+        """,
+        manual_parameters=[
+            openapi.Parameter(
+                name='exportType',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_QUERY,
+                description='Selected export format',
+            ),
+        ],
+    ),
+)
 class ExportDownloadApi(generics.RetrieveAPIView):
     queryset = Export.objects.all()
     serializer_class = ExportSerializer
@@ -296,7 +354,7 @@ class ExportDownloadApi(generics.RetrieveAPIView):
             file_ = instance.file
         else:
             file_ = instance.convert_file(export_type)
-            
+
         ext = file_.name.split('.')[-1]
         response = HttpResponse(file_, content_type=f'application/{ext}')
         response['Content-Disposition'] = f'attachment; filename="{file_.name}"'
