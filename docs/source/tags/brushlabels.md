@@ -2,11 +2,13 @@
 title: BrushLabels
 type: tags
 order: 401
-meta_title: Brush Label Tags for Segmented Image Labeling
-meta_description: Label Studio Brush Label Tags customize Label Studio for segmented image labeling for machine learning and data science projects.
+meta_title: Brush Label Tag for Image Segmentation Labeling
+meta_description: Customize Label Studio with brush label tags for image segmentation labeling for machine learning and data science projects.
 ---
 
-Use the BrushLabels tag to create segmented labeling for images.
+Use the BrushLabels tag for image segmentation tasks where you want to apply a mask or use a brush to draw a region on the image.
+
+Use with the following data types: image
 
 ### Parameters
 
@@ -15,8 +17,8 @@ Use the BrushLabels tag to create segmented labeling for images.
 | name | <code>string</code> |  | Name of the element |
 | toName | <code>string</code> |  | Name of the image to label |
 | [choice] | <code>single</code> \| <code>multiple</code> | <code>single</code> | Configure whether the data labeler can select one or multiple labels |
-| [maxUsages] | <code>number</code> |  | The maximum available uses of a label |
-| [showInline] | <code>boolean</code> | <code>true</code> | Show items in the same visual line |
+| [maxUsages] | <code>number</code> |  | Maximum number of times a label can be used per task |
+| [showInline] | <code>boolean</code> | <code>true</code> | Show labels in the same visual line |
 
 ### Sample Results JSON
 
@@ -45,6 +47,7 @@ Use the BrushLabels tag to create segmented labeling for images.
 
 ### Example
 ```html
+<!--Basic image segmentation labeling configuration-->
 <View>
   <BrushLabels name="labels" toName="image">
     <Label value="Person" />
