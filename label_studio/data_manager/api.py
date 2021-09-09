@@ -120,7 +120,7 @@ class ViewAPI(viewsets.ModelViewSet):
         project = view.project
         storage = find_first_many_to_one_related_field_by_prefix(project, '.*io_storages.*')
         resolve_uri = True
-        if not storage:
+        if not storage and not project.task_data_login and not project.task_data_password:
             resolve_uri = False
 
         context = {'proxy': bool_from_request(request.GET, 'proxy', True), 'resolve_uri': resolve_uri, 'request': request}
