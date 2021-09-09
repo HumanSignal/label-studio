@@ -15,7 +15,7 @@ from drf_yasg.utils import swagger_auto_schema
 from django.db.models import Sum
 from ordered_set import OrderedSet
 
-from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, find_first_one_to_one_related_field_by_prefix
+from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, find_first_many_to_one_related_field_by_prefix
 from core.permissions import all_permissions, ViewClassPermission
 from core.decorators import permission_required
 from projects.models import Project
@@ -118,11 +118,10 @@ class ViewAPI(viewsets.ModelViewSet):
         view = self.get_object()
         queryset = self.get_task_queryset(request, view)
         project = view.project
-        storage = find_first_one_to_one_related_field_by_prefix(project, '.*io_storages_')
+        storage = find_first_many_to_one_related_field_by_prefix(project, '.*io_storages.*')
         resolve_uri = True
-        # TODO: fix storage existance check
-        # if not storage:
-        #     resolve_uri = False
+        if not storage:
+            resolve_uri = False
 
         context = {'proxy': bool_from_request(request.GET, 'proxy', True), 'resolve_uri': resolve_uri, 'request': request}
 
