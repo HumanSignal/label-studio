@@ -282,6 +282,18 @@ def find_first_one_to_one_related_field_by_prefix(instance, prefix):
                 return getattr(instance, attr_name)
 
 
+def find_first_many_to_one_related_field_by_prefix(instance, prefix):
+    '''Hard way to check if project has at least one storage'''
+
+    for field in instance._meta.get_fields():
+        if issubclass(type(field), models.fields.related.ManyToOneRel):
+            attr_name = field.get_accessor_name()
+            if re.match(prefix, attr_name) and hasattr(instance, attr_name):
+                related_instance = getattr(instance, attr_name).first()
+                if related_instance:
+                    return related_instance
+
+
 def start_browser(ls_url, no_browser):
     import threading
     import webbrowser
