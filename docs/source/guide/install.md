@@ -120,23 +120,24 @@ pip install label-studio
 
 ## Install on Google Cloud
 
-1. First login with `gcloud`
+1. From the command line, log in with `gcloud`
 ```bash
 gcloud auth application-default login
 ```
 
-2. You can use `direnv` to keep track of necessary env variables. Set up `.envrc` and don't forget to run `direnv allow`.
+> You can keep track of necessary env variables with `direnv`. Set up `.envrc` and don't forget to run `direnv allow`.
 ```bash
-export PROJECT_ID=maystra-poc
+export PROJECT_ID=<your-project>
 ```
 
-3. Build the docker image and push it to Google Build with:
+3. Build the Docker image.
+4. Push the Docker image you built to Google Build using the following command:
 ```bash
 // Needs to be from the same directory as cloudbuild.yaml
 gcloud builds submit
 ```
 
-4. Init terraform and apply changes
+4. Initiate terraform and apply changes. From the command line, run the following:
 ```bash
 cd deploy/gcp
 terraform init
