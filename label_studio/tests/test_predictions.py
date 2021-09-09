@@ -721,3 +721,50 @@ def test_interactive_annotating(business_client, configured_project):
         assert 'data' in result
         assert 'x' in result['data']
         assert result['data']['x'] == 'x'
+
+
+@pytest.mark.django_db
+def test_interactive_annotating_failing(business_client, configured_project):
+    # create project with predefined task set
+    ml_backend = configured_project.ml_backends.first()
+    ml_backend.is_interactive = True
+    ml_backend.save()
+
+    task = configured_project.tasks.first()
+    # run prediction
+
+    r = business_client.post(
+        f'/api/ml/{ml_backend.pk}/interactive-annotating',
+        data=json.dumps(
+            {
+                'task': task.id,
+                'context': {'y': 'y'},
+            }
+        ),
+        content_type="application/json",
+    )
+    r.status_code = 200
+
+    result = r.json()
+
+    assert 'errors' in result
+
+    # BAD ML RESPONCE
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', f'{ml_backend.url}/predict', json={'kebab': [[['eat']]]}, status_code=200)
+
+        r = business_client.post(
+            f'/api/ml/{ml_backend.pk}/interactive-annotating',
+            data=json.dumps(
+                {
+                    'task': task.id,
+                    'context': {'y': 'y'},
+                }
+            ),
+            content_type="application/json",
+        )
+        r.status_code = 200
+
+        result = r.json()
+
+    assert 'errors' in result
