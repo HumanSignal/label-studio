@@ -40,7 +40,7 @@ from core.utils.common import (
 from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
 from core.utils.io import find_dir, find_file, read_yaml
 
-from data_manager.functions import get_prepared_queryset
+from data_manager.functions import get_prepared_queryset, filters_ordering_selected_items_exist
 from data_manager.models import View
 
 logger = logging.getLogger(__name__)
@@ -458,7 +458,12 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                     queue_info += (' & ' if queue_info else '') + 'Breadth first queue'
                     return self._make_response(next_task, request, queue=queue_info)
 
-            if project.sampling == project.UNCERTAINTY:
+            if project.sampling == project.SEQUENCE or filters_ordering_selected_items_exist(request.data):
+                queue_info += (' & ' if queue_info else '') + 'Data manager queue'
+                logger.debug(f'User={request.user} tries sequence sampling from {not_solved_tasks_count} tasks')
+                next_task = self._get_first_unlocked(not_solved_tasks)
+
+            elif project.sampling == project.UNCERTAINTY:
                 queue_info += (' & ' if queue_info else '') + 'Active learning or random queue'
                 logger.debug(f'User={request.user} tries uncertainty sampling from {not_solved_tasks_count} tasks')
                 next_task = self._try_uncertainty_sampling(not_solved_tasks, project, user_solved_tasks_array)
@@ -467,11 +472,6 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 queue_info += (' & ' if queue_info else '') + 'Uniform random queue'
                 logger.debug(f'User={request.user} tries random sampling from {not_solved_tasks_count} tasks')
                 next_task = self._get_random_unlocked(not_solved_tasks)
-
-            elif project.sampling == project.SEQUENCE:
-                queue_info += (' & ' if queue_info else '') + 'Data manager queue'
-                logger.debug(f'User={request.user} tries sequence sampling from {not_solved_tasks_count} tasks')
-                next_task = self._get_first_unlocked(not_solved_tasks)
 
             if next_task:
                 return self._make_response(next_task, request, queue=queue_info)
