@@ -148,11 +148,11 @@ def get_all_columns(project):
             }
         },
         {
-            'id': 'predictions_results',
-            'title': "Prediction results",
+            'id': 'annotations_ids',
+            'title': "Annotation IDs",
             'type': "String",
             'target': 'tasks',
-            'help': 'Prediction results stacked over all predictions',
+            'help': 'Annotation IDs stacked over all annotations',
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
@@ -164,6 +164,17 @@ def get_all_columns(project):
             'type': "Number",
             'target': 'tasks',
             'help': 'Average prediction score over all task predictions',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        },
+        {
+            'id': 'predictions_results',
+            'title': "Prediction results",
+            'type': "String",
+            'target': 'tasks',
+            'help': 'Prediction results stacked over all predictions',
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
