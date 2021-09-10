@@ -55,6 +55,27 @@ stages:
     status_code: 200
 - name: stage
   request:
+    method: POST
+    url: '{django_live_url}/api/dm/views?project={project_pk}'
+    json:
+      project: '{project_pk}'
+  response:
+    status_code: 201
+    save:
+      json:
+        view_pk: id
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/dm/views/{view_pk}/tasks/'
+  response:
+    json:
+      tasks:
+        - data:
+            image_url: !re_match "https://pytest-s3-images.s3.amazonaws.com.+X-Amz-Security-Token=testing"
+    status_code: 200
+- name: stage
+  request:
     data:
       project: '{project_pk}'
     method: GET

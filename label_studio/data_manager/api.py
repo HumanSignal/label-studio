@@ -15,7 +15,7 @@ from drf_yasg.utils import swagger_auto_schema
 from django.db.models import Sum
 from ordered_set import OrderedSet
 
-from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request
+from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, find_first_many_to_one_related_field_by_prefix
 from core.permissions import all_permissions, ViewClassPermission
 from core.decorators import permission_required
 from projects.models import Project
@@ -117,8 +117,13 @@ class ViewAPI(viewsets.ModelViewSet):
         """
         view = self.get_object()
         queryset = self.get_task_queryset(request, view)
-        context = {'proxy': bool_from_request(request.GET, 'proxy', True), 'resolve_uri': True, 'request': request}
         project = view.project
+        storage = find_first_many_to_one_related_field_by_prefix(project, '.*io_storages.*')
+        resolve_uri = True
+        if not storage and not project.task_data_login and not project.task_data_password:
+            resolve_uri = False
+
+        context = {'proxy': bool_from_request(request.GET, 'proxy', True), 'resolve_uri': resolve_uri, 'request': request}
 
         # paginated tasks
         self.pagination_class = TaskPagination
@@ -317,11 +322,6 @@ class ProjectActionsAPI(APIView):
         self.check_object_permissions(request, project)
 
         queryset = get_prepared_queryset(request, project)
-
-        # no selected items on tab
-        if not queryset.exists():
-            response = {'detail': 'No selected items for specified view'}
-            return Response(response, status=404)
 
         # wrong action id
         action_id = request.GET.get('id', None)

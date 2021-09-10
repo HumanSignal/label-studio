@@ -1,13 +1,14 @@
 ---
 title: Ellipse
 type: tags
-order: 405
-meta_title: Ellipse Tags for Adding Elliptical Bounding Box to Images
-meta_description: Label Studio Ellipse Tags customize Label Studio to add elliptical bounding boxes to images for machine learning and data science projects.
+order: 404
+meta_title: Ellipse Tag for Adding Elliptical Bounding Box to Images
+meta_description: Customize Label Studio with ellipse tags to add elliptical bounding boxes to images for machine learning and data science projects.
 ---
 
-Ellipse
-Ellipse is used to add ellipse (elliptical Bounding Box) to an image
+Use the Ellipse tag to add an elliptical bounding box to an image. Use for bounding box image segmentation tasks with ellipses.
+
+Use with the following data types: image
 
 ### Parameters
 
@@ -16,13 +17,14 @@ Ellipse is used to add ellipse (elliptical Bounding Box) to an image
 | name | <code>string</code> |  | Name of the element |
 | toName | <code>string</code> |  | Name of the image to label |
 | [opacity] | <code>float</code> | <code>0.6</code> | Opacity of ellipse |
-| [fillColor] | <code>string</code> |  | Ellipse fill color |
+| [fillColor] | <code>string</code> |  | Ellipse fill color in hexadecimal |
 | [strokeColor] | <code>string</code> | <code>&quot;#f48a42&quot;</code> | Stroke color in hexadecimal |
 | [strokeWidth] | <code>number</code> | <code>1</code> | Width of the stroke |
 | [canRotate] | <code>boolean</code> | <code>true</code> | Show or hide rotation control |
 
 ### Example
 ```html
+<!--Basic image segmentation with ellipses labeling configuration-->
 <View>
   <Ellipse name="ellipse1-1" toName="img-1" />
   <Image name="img-1" value="$img" />
