@@ -162,7 +162,7 @@ class DataManagerTaskSerializer(TaskSerializer):
 
     cancelled_annotations = serializers.SerializerMethodField()
     completed_at = serializers.SerializerMethodField()
-    annotations_ids = serializers.StringRelatedField()
+    annotations_ids = serializers.SerializerMethodField()
     annotations_results = serializers.SerializerMethodField()
     predictions_results = serializers.SerializerMethodField()
     predictions_score = serializers.SerializerMethodField()
@@ -244,6 +244,11 @@ class DataManagerTaskSerializer(TaskSerializer):
         result = obj.annotations.values_list('completed_by', flat=True).distinct()
         result = [r for r in result if r is not None]
         return result
+
+    def get_annotations_ids(self, task):
+        out = str(task.annotations_ids)[1:-1]\
+            .replace('[', '').replace(']', '').replace('None,', '').replace('None', '')
+        return out
 
     def get_drafts(self, task):
         """Return drafts only for the current user"""
