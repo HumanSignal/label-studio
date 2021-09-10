@@ -391,6 +391,10 @@ class UploadedFileResponse(generics.RetrieveAPIView):
         file = settings.UPLOAD_DIR + ('/' if not settings.UPLOAD_DIR.endswith('/') else '') + filename
         logger.debug(f'Fetch uploaded file by user {request.user} => {file}')
         file_upload = FileUpload.objects.filter(file=file).last()
+
+        if not file_upload.has_permission(request.user):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
         if os.path.exists(file_upload.file.path):
             return RangedFileResponse(request, open(file_upload.file.path, mode='rb'))
         else:
