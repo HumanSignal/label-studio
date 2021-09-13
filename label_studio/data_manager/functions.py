@@ -20,7 +20,7 @@ class DataManagerException(Exception):
     pass
 
 
-def get_all_columns(project):
+def get_all_columns(request, project):
     """ Make columns info for the frontend data manager
     """
     result = {'columns': []}
@@ -233,7 +233,7 @@ def get_prepare_params(request, project):
 
 def get_prepared_queryset(request, project):
     prepare_params = get_prepare_params(request, project)
-    queryset = Task.prepared.all(prepare_params=prepare_params)
+    queryset = Task.prepared.all(prepare_params=prepare_params, request=request)
     return queryset
 
 

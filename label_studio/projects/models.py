@@ -45,7 +45,11 @@ class ProjectManager(models.Manager):
     ]
 
     def with_counts(self):
-        return self.annotate(
+        return self.with_counts_annotate(self)
+
+    @staticmethod
+    def with_counts_annotate(queryset):
+        return queryset.annotate(
             task_number=Count('tasks', distinct=True),
             finished_task_number=Count('tasks', distinct=True, filter=Q(tasks__is_labeled=True)),
             total_predictions_number=Count('tasks__predictions', distinct=True),

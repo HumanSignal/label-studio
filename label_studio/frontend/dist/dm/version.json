@@ -1,6 +1,6 @@
 {
-  "message": "Remove permissions field from Action model",
-  "commit": "e43c78af7d47d61912f98479ff9fc271b68d956e",
+  "message": "Reduce pageSize for speedup",
+  "commit": "70db7833c793061f461dbfa509ac8f3421b2899a",
   "branch": "master",
-  "date": "2021-08-27T12:22:53Z"
+  "date": "2021-09-08T02:26:07Z"
 }

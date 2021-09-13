@@ -85,7 +85,8 @@ class ContextLog(object):
     def _exclude_endpoint(self, request):
         if request.resolver_match and request.resolver_match.view_name in [
             'django.views.static.serve',
-            'data_import:data-upload'
+            'data_import:data-upload',
+            'version'
         ]:
             return True
         if request.GET.get('interaction', None) == 'timer':

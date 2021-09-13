@@ -24,7 +24,7 @@ from core.utils.common import conditional_atomic
 from core.utils.disable_signals import DisableSignals
 from core.label_config import config_essential_data_has_changed
 from projects.models import (
-    Project, ProjectSummary
+    Project, ProjectSummary, ProjectManager
 )
 from projects.serializers import (
     ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer
@@ -124,7 +124,8 @@ class ProjectListAPI(generics.ListCreateAPIView):
     ordering = ['-created_at']
 
     def get_queryset(self):
-        return Project.objects.with_counts().filter(organization=self.request.user.active_organization)
+        projects = Project.objects.filter(organization=self.request.user.active_organization)
+        return ProjectManager.with_counts_annotate(projects)
 
     def get_serializer_context(self):
         context = super(ProjectListAPI, self).get_serializer_context()

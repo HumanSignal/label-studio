@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import json
+import os
+import ujson as json
 
 from rest_framework import serializers
 from django.db import transaction
@@ -8,6 +9,7 @@ from django.db import transaction
 from data_manager.models import View, Filter, FilterGroup
 from tasks.models import Task
 from tasks.serializers import TaskSerializer, AnnotationSerializer, PredictionSerializer, AnnotationDraftSerializer
+from label_studio.core.utils.common import round_floats
 
 
 class FilterSerializer(serializers.ModelSerializer):
@@ -156,20 +158,22 @@ class ViewSerializer(serializers.ModelSerializer):
 
 
 class DataManagerTaskSerializer(TaskSerializer):
-    predictions = PredictionSerializer(many=True, default=[], read_only=True)
-    annotations = AnnotationSerializer(many=True, default=[], read_only=True)
-    drafts = serializers.SerializerMethodField()
+    predictions = serializers.SerializerMethodField(required=False, read_only=True)
+    annotations = serializers.SerializerMethodField(required=False, read_only=True)
+    drafts = serializers.SerializerMethodField(required=False, read_only=True)
+    annotators = serializers.SerializerMethodField(required=False, read_only=True)
 
-    cancelled_annotations = serializers.SerializerMethodField()
-    completed_at = serializers.SerializerMethodField()
-    annotations_ids = serializers.SerializerMethodField()
-    annotations_results = serializers.SerializerMethodField()
-    predictions_results = serializers.SerializerMethodField()
-    predictions_score = serializers.SerializerMethodField()
-    total_annotations = serializers.SerializerMethodField()
-    total_predictions = serializers.SerializerMethodField()
-    file_upload = serializers.ReadOnlyField(source='file_upload_name')
-    annotators = serializers.SerializerMethodField()
+    cancelled_annotations = serializers.IntegerField(required=False)
+    total_annotations = serializers.IntegerField(required=False)
+    total_predictions = serializers.IntegerField(required=False)
+    completed_at = serializers.DateTimeField(required=False)
+    annotations_results = serializers.SerializerMethodField(required=False)
+    predictions_results = serializers.SerializerMethodField(required=False)
+    predictions_score = serializers.FloatField(required=False)
+    file_upload = serializers.SerializerMethodField(required=False)
+    annotations_ids = serializers.SerializerMethodField(required=False)
+
+    CHAR_LIMITS = 500
 
     class Meta:
         model = Task
@@ -195,66 +199,72 @@ class DataManagerTaskSerializer(TaskSerializer):
             "project"
         ]
 
-    @staticmethod
-    def get_cancelled_annotations(obj):
-        return obj.annotations.filter(was_cancelled=True).count()
+    def _pretty_results(self, task, field, unique=False):
+        if not hasattr(task, field) or getattr(task, field) is None:
+            return ''
 
-    @staticmethod
-    def get_completed_at(obj):
-        annotations = obj.annotations.all()
-        if obj.is_labeled and annotations:
-            return max(c.created_at for c in annotations)
-        return None
+        result = getattr(task, field)
+        if isinstance(result, str):
+            output = result
+            if unique:
+                output = list(set(output.split(',')))
+                output = ','.join(output)
 
-    @staticmethod
-    def get_annotations_results(obj):
-        annotations = obj.annotations.all()
-        if annotations:
-            return json.dumps([item.result for item in annotations])
+        elif isinstance(result, int):
+            output = str(result)
         else:
-            return ""
+            result = [r for r in result if r is not None]
+            if unique:
+                result = list(set(result))
+            result = round_floats(result)
+            output = json.dumps(result, ensure_ascii=False)[1:-1]  # remove brackets [ ]
+
+        return output[:self.CHAR_LIMITS].replace(',"', ', "').replace('],[', "] [").replace('"', '')
+
+    def get_annotations_results(self, task):
+        return self._pretty_results(task, 'annotations_results')
+
+    def get_predictions_results(self, task):
+        return self._pretty_results(task, 'predictions_results')
+
+    def get_annotations(self, task):
+        if not self.context.get('annotations'):
+            return []
+        return AnnotationSerializer(task.annotations, many=True, default=[], read_only=True).data
+
+    def get_predictions(self, task):
+        if not self.context.get('predictions'):
+            return []
+        return PredictionSerializer(task.predictions, many=True, default=[], read_only=True).data
 
     @staticmethod
-    def get_predictions_results(obj):
-        predictions = obj.predictions.all()
-        if predictions:
-            return json.dumps([item.result for item in predictions])
-        else:
-            return ""
-
-    @staticmethod
-    def get_predictions_score(obj):
-        predictions = obj.predictions.all()
-        if predictions:
-            values = [item.score for item in predictions if isinstance(item.score, (float, int))]
-            if values:
-                return sum(values) / float(len(values))
-        return None
-
-    @staticmethod
-    def get_total_predictions(obj):
-        return obj.predictions.count()
-
-    @staticmethod
-    def get_total_annotations(obj):
-        return obj.annotations.filter(was_cancelled=False).count()
+    def get_file_upload(task):
+        if not hasattr(task, 'file_upload_field'):
+            return None
+        file_upload = task.file_upload_field
+        return os.path.basename(task.file_upload_field) if file_upload else None
 
     @staticmethod
     def get_annotators(obj):
-        result = obj.annotations.values_list('completed_by', flat=True).distinct()
-        result = [r for r in result if r is not None]
-        return result
+        if not hasattr(obj, 'annotators'):
+            return []
+
+        annotators = obj.annotators
+        if not annotators:
+            return []
+        if isinstance(annotators, str):
+            annotators = [int(v) for v in annotators.split(',')]
+
+        return annotators if hasattr(obj, 'annotators') and annotators else []
 
     def get_annotations_ids(self, task):
-        out = str(task.annotations_ids)[1:-1]\
-            .replace('[', '').replace(']', '').replace('None,', '').replace('None', '')
-        return out
+        return self._pretty_results(task, 'annotations_ids', unique=True)
 
     def get_drafts(self, task):
         """Return drafts only for the current user"""
         # it's for swagger documentation
-        if not isinstance(task, Task):
-            return AnnotationDraftSerializer(many=True)
+        if not isinstance(task, Task) or not self.context.get('drafts'):
+            return []
 
         drafts = task.drafts
         if 'request' in self.context and hasattr(self.context['request'], 'user'):
