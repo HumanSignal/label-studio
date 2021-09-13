@@ -17,7 +17,7 @@ Set up the following cloud and other storage systems with Label Studio:
 
 Each source and target storage setup is project-specific. You can connect multiple buckets, containers, databases, or directories as source or target storage for a project. If you upload new data to a connected cloud storage bucket, sync the storage connection to add the new labeling tasks to Label Studio without restarting. 
 
-After setting up target storage, the target storage is updated each time an annotation is created. Annotations are still stored in the Label Studio database, and the target storage receives a JSON export of each annotation. Annotations are sent to target storage as a one-way export.
+After setting up target storage and performing annotations, manually sync annotations using the **Sync** button for the configured target storage. Annotations are still stored in the Label Studio database, and the target storage receives a JSON export of each annotation. Annotations are sent to target storage as a one-way export. You can also export or sync using the API. 
 
 Secure access to cloud storage using workspaces and cloud storage credentials. For details, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
 
@@ -163,8 +163,8 @@ After adding the storage, click **Sync** to collect tasks from the bucket, or ma
 
 ### Add storage with the Label Studio API
 You can also create a storage connection using the Label Studio API. 
-- See [Create new import storage](/api#operation/api_storages_s3_create). 
-- See [Create export storage](/api#operation/api_storages_export_s3_create).
+- See [Create new import storage](/api#operation/api_storages_s3_create) then [sync the import storage](/api#operation/api_storages_s3_sync_create).
+- See [Create export storage](/api#operation/api_storages_export_s3_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_s3_sync_create).
 
 ## Google Cloud Storage
 
@@ -202,8 +202,8 @@ After adding the storage, click **Sync** to collect tasks from the bucket, or ma
 
 ### Add storage with the Label Studio API
 You can also create a storage connection using the Label Studio API. 
-- See [Create new import storage](/api#operation/api_storages_gcs_create). 
-- See [Create export storage](/api#operation/api_storages_export_gcs_create).
+- See [Create new import storage](/api#operation/api_storages_gcs_create) then [sync the import storage](/api#operation/api_storages_gcs_sync_create). 
+- See [Create export storage](/api#operation/api_storages_export_gcs_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_gcs_sync_create).
 
 ##  Microsoft Azure Blob storage
 
@@ -239,8 +239,8 @@ After adding the storage, click **Sync** to collect tasks from the container, or
 
 ### Add storage with the Label Studio API
 You can also create a storage connection using the Label Studio API. 
-- See [Create new import storage](/api#operation/api_storages_azure_create). 
-- See [Create export storage](/api#operation/api_storages_export_azure_create).
+- See [Create new import storage](/api#operation/api_storages_azure_create) then [sync the import storage](/api#operation/api_storages_azure_sync_create). 
+- See [Create export storage](/api#operation/api_storages_export_azure_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_azure_sync_create).
 
 ## Redis database
 
@@ -272,8 +272,8 @@ After adding the storage, click **Sync** to collect tasks from the database, or 
 
 ### Add storage with the Label Studio API
 You can also create a storage connection using the Label Studio API. 
-- See [Create new import storage](/api#operation/api_storages_redis_create). 
-- See [Create export storage](/api#operation/api_storages_export_redis_create).
+- See [Create new import storage](/api#operation/api_storages_redis_create) then [sync the import storage](/api#operation/api_storages_redis_sync_create). 
+- See [Create export storage](/api#operation/api_storages_export_redis_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_redis_sync_create).
 
 ## Local storage
 If you have local files that you want to add to Label Studio from a specific directory, you can set up a specific local directory on the machine where LS is running as source or target storage. Label Studio steps through the directory recursively to read tasks.
@@ -320,8 +320,8 @@ After adding the storage, click **Sync** to collect tasks from the bucket, or ma
 
 #### Add storage with the Label Studio API
 You can also create a storage connection using the Label Studio API. 
-- See [Create new import storage](/api#operation/api_storages_localfiles_create). 
-- See [Create export storage](/api#operation/api_storages_export_localfiles_create).
+- See [Create new import storage](/api#operation/api_storages_localfiles_create) then [sync the import storage](/api#operation/api_storages_localfiles_sync_create). 
+- See [Create export storage](/api#operation/api_storages_export_localfiles_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_localfiles_sync_create).
 
 ### Set up local storage with Docker
 If you're using Label Studio in Docker, you need to mount the local directory that you want to access as a volume when you start the Docker container. See [Run Label Studio on Docker and use local storage](start.html#Run-Label-Studio-on-Docker-and-use-local-storage).
@@ -352,7 +352,7 @@ Check your web browser console for errors.
     ```
 - For Amazon S3, make sure that the credentials that you used to set up the source or target storage connection are still valid. If you see 403 errors in the browser console and you set up the correct permissions for the bucket, you might need to update the Access Key ID, Secret Access Key, and Session ID.  
 
-### Tasks do not sync
+### Tasks or annotations do not sync
 
 If you're pressing the **Sync** button but tasks do not sync, or you can't see the new tasks in the Data Manager, check the following:
 
