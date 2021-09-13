@@ -33,7 +33,7 @@ stages:
       method: GET
       url: '{django_live_url}/api/dm/project?project={project_pk}'
     response:
-      json: {"id": 1, "title": "Test Draft 1", "description": "",
+      json: {"title": "Test Draft 1", "description": "",
              "label_config": "<View><Text name=\"text\" value=\"$text\"/><Choices name=\"label\" toName=\"text\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>",
              "expert_instruction": "", "show_instruction": false, "show_skip_button": false, "enable_empty_annotation": false,
              "show_annotation_history": false, "organization": 1, "color": "#FFFFFF", "maximum_annotations": 1,
