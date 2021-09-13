@@ -33,23 +33,24 @@ stages:
       method: GET
       url: '{django_live_url}/api/dm/project?project={project_pk}'
     response:
-      json: {'id': 1, 'title': 'Test Draft 1', 'description': '',
-             'label_config': '<View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>',
-             'expert_instruction': '', 'show_instruction': False, 'show_skip_button': False, 'enable_empty_annotation': False,
-             'show_annotation_history': False, 'organization': 1, 'color': '#FFFFFF', 'maximum_annotations': 1,
-             'is_published': False, 'model_version': 'model_version_A', 'is_draft': False,
-             'created_by': {'id': 1, 'first_name': '', 'last_name': '', 'email': 'test_suites_user@heartex.com', 'avatar': None},
-             'created_at': '2021-09-13T18:36:17.669027Z', 'min_annotations_to_start_training': 10,
-             'start_training_on_annotation_update': True, 'show_collab_predictions': True, 'num_tasks_with_annotations': None,
-             'task_number': None, 'useful_annotation_number': None, 'ground_truth_number': None, 'skipped_annotations_number': None,
-             'total_annotations_number': None, 'total_predictions_number': None, 'sampling': 'Sequential sampling',
-             'show_ground_truth_first': False, 'show_overlap_first': False, 'overlap_cohort_percentage': 100,
-             'task_data_login': None, 'task_data_password': None,
-             'control_weights': {'label': {'overall': 1.0, 'type': 'Choices', 'labels': {'pos': 1.0, 'neg': 1.0}}},
-             'parsed_label_config': {
-               'label': {'type': 'Choices', 'to_name': ['text'], 'inputs': [{'type': 'Text', 'value': 'text'}],
-                         'labels': ['pos', 'neg'], 'labels_attrs': {'pos': {'value': 'pos'}, 'neg': {'value': 'neg'}}}},
-             'evaluate_predictions_automatically': False, 'config_has_control_tags': True, 'can_delete_tasks': True,
-             'can_manage_annotations': True, 'can_manage_tasks': True, 'source_syncing': False, 'target_syncing': False,
-             'task_count': 6, 'annotation_count': 0}
+      json: {"id": 1, "title": "Test Draft 1", "description": "",
+             "label_config": "<View><Text name=\"text\" value=\"$text\"/><Choices name=\"label\" toName=\"text\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>",
+             "expert_instruction": "", "show_instruction": false, "show_skip_button": false, "enable_empty_annotation": false,
+             "show_annotation_history": false, "organization": 1, "color": "#FFFFFF", "maximum_annotations": 1,
+             "is_published": false, "model_version": "model_version_A", "is_draft": false,
+             "created_by": {"id": 1, "first_name": "", "last_name": "", "email": "test_suites_user@heartex.com", "avatar": null},
+            "min_annotations_to_start_training": 10,
+             "start_training_on_annotation_update": true, "show_collab_predictions": true, "num_tasks_with_annotations": null,
+             "task_number": null, "useful_annotation_number": null, "ground_truth_number": null, "skipped_annotations_number": null,
+             "total_annotations_number": null, "total_predictions_number": null, "sampling": "Sequential sampling",
+             "show_ground_truth_first": false, "show_overlap_first": false, "overlap_cohort_percentage": 100,
+             "task_data_login": null, "task_data_password": null,
+             "control_weights": {"label": {"overall": 1.0, "type": "Choices", "labels": {"pos": 1.0, "neg": 1.0}}},
+             "parsed_label_config": {
+               "label": {"type": "Choices", "to_name": ["text"], "inputs": [{"type": "Text", "value": "text"}],
+                         "labels": ["pos", "neg"], "labels_attrs": {"pos": {"value": "pos"}, "neg": {"value": "neg"}}}},
+             "evaluate_predictions_automatically": false, "config_has_control_tags": true, "can_delete_tasks": true,
+             "can_manage_annotations": true, "can_manage_tasks": true, "source_syncing": false, "target_syncing": false,
+             "task_count": 6, "annotation_count": 0}
+
       status_code: 200

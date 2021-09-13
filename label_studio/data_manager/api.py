@@ -329,6 +329,12 @@ class ProjectStateAPI(APIView):
                 'config_has_control_tags': len(project.get_control_tags_from_config()) > 0
             }
         )
+
+        print('\n\n\n\n\n\n\n')
+        import json
+        print(json.dumps(data))
+        print('\n\n\n\n\n')
+
         return Response(data)
 
 

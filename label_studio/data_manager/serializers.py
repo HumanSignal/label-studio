@@ -206,11 +206,16 @@ class DataManagerTaskSerializer(TaskSerializer):
         result = getattr(task, field)
         if isinstance(result, str):
             output = result
+            if unique:
+                output = list(set(output.split(',')))
+                output = ','.join(output)
+
         elif isinstance(result, int):
             output = str(result)
         else:
             result = [r for r in result if r is not None]
-            # if unique:
+            if unique:
+                result = list(set(result))
             result = round_floats(result)
             output = json.dumps(result, ensure_ascii=False)[1:-1]  # remove brackets [ ]
 
@@ -253,7 +258,7 @@ class DataManagerTaskSerializer(TaskSerializer):
         return annotators if hasattr(obj, 'annotators') and annotators else []
 
     def get_annotations_ids(self, task):
-        return self._pretty_results(task, 'annotations_ids')
+        return self._pretty_results(task, 'annotations_ids', unique=True)
 
     def get_drafts(self, task):
         """Return drafts only for the current user"""
