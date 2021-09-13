@@ -26,7 +26,7 @@ pre code
     &-winutils,
     &-flow,
     &-tex &-special
-      color: #2973b7
+      color: #e68438;
 
     &-symbol,
     &-symbol &-string,
@@ -55,7 +55,7 @@ pre code
     &-apache &-cbracket,
     &-tex &-command,
     &-prompt
-      color: $green
+      color: #8AAD00
 
     &-function &-keyword,
     &-constant
@@ -67,7 +67,7 @@ pre code
 
     &-number,
     &-literal
-      color: #a32eff
+      color: #97a4ff
 
     &-class &-title
       color: white
@@ -86,7 +86,7 @@ pre code
     &-shebang,
     &-apache &-sqbracket,
     &-tex &-formula
-      color: #707070
+      color: #888888
 
     &-coffeescript &-javascript,
     &-javascript &-xml,
@@ -107,19 +107,24 @@ pre code
         color: #ccc
         text-align: right
         font-size: .9em
-        padding: 5px 10px 0
+        padding: 5px 10px
         line-height: 15px
         height: 15px
         font-weight: 600
 
-    &.html::before
-      content: "HTML"
-    
-    &.js::before
-      content: "JS"
+.code-badge
+  font-family: $body-font
+  position: absolute
+  top: 0
+  right: 5px !important
+  text-align: right
+  font-size: .9em
+  margint-right: 10px !important
+  line-height: 15px
+  height: 15px !important
+  font-weight: lighter !important
+  text-transform capitalize
 
-    &.bash::before
-      content: "Shell"
+.code-badge-copy-icon
+  color: #ccc !important
 
-    &.css::before
-      content: "CSS"

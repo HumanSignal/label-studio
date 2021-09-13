@@ -8,7 +8,7 @@ app_name = 'ml'
 
 # ML backend CRUD
 _api_urlpatterns = [
-    # All storages
+    # All ml backends
     path('', api.MLBackendListAPI.as_view(), name='ml-list'),
     path('<int:pk>', api.MLBackendDetailAPI.as_view(), name='ml-detail'),
     path('<int:pk>/train', api.MLBackendTrainAPI.as_view(), name='ml-train'),

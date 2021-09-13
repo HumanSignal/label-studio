@@ -11,7 +11,7 @@ apt update
 apt -y install software-properties-common
 add-apt-repository ppa:deadsnakes/ppa
 apt update
-apt -y install python3.7 python3-pip
+apt -y install python3.7 python3-pip libpython3.7-dev libmysqlclient-dev
 
 echo "=> Environmental setup:"
 which python3

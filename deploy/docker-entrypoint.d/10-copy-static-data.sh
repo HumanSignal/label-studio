@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+set -e ${DEBUG:+-x}
 
 LABEL_STUDIO_STATIC_DATA_SOURCE="${LABEL_STUDIO_STATIC_DATA_SOURCE:=/label-studio/label_studio}"
 LABEL_STUDIO_STATIC_DATA_TARGET="${LABEL_STUDIO_STATIC_DATA_TARGET:=/label-studio/static_volume}"

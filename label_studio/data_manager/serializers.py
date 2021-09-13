@@ -171,6 +171,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     predictions_results = serializers.SerializerMethodField(required=False)
     predictions_score = serializers.FloatField(required=False)
     file_upload = serializers.SerializerMethodField(required=False)
+    annotations_ids = serializers.SerializerMethodField(required=False)
 
     CHAR_LIMITS = 500
 
@@ -189,6 +190,7 @@ class DataManagerTaskSerializer(TaskSerializer):
             "predictions_score",
             "total_annotations",
             "total_predictions",
+            "annotations_ids",
             "annotations",
             "predictions",
             "drafts",
@@ -197,15 +199,18 @@ class DataManagerTaskSerializer(TaskSerializer):
             "project"
         ]
 
-    def _pretty_results(self, task, field):
-        if not hasattr(task, field):
+    def _pretty_results(self, task, field, unique=False):
+        if not hasattr(task, field) or getattr(task, field) is None:
             return ''
 
         result = getattr(task, field)
         if isinstance(result, str):
             output = result
+        elif isinstance(result, int):
+            output = str(result)
         else:
             result = [r for r in result if r is not None]
+            # if unique:
             result = round_floats(result)
             output = json.dumps(result, ensure_ascii=False)[1:-1]  # remove brackets [ ]
 
@@ -238,7 +243,10 @@ class DataManagerTaskSerializer(TaskSerializer):
     def get_annotators(obj):
         # result = obj.annotations.values_list('completed_by', flat=True).distinct()
         # result = [r for r in result if r is not None]
-        return [obj.annotators] if hasattr(obj, 'annotators') and obj.annotators else []
+        return [int(v) for v in obj.annotators.split(',')] if hasattr(obj, 'annotators') and obj.annotators else []
+
+    def get_annotations_ids(self, task):
+        return self._pretty_results(task, 'annotations_ids')
 
     def get_drafts(self, task):
         """Return drafts only for the current user"""

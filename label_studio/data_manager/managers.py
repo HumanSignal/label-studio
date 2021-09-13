@@ -31,6 +31,8 @@ operators = {
     "greater_or_equal": "__gte",
     "in": "",
     "not_in": "",
+    "in_list": "",
+    "not_in_list": "",
     "empty": "__isnull",
     "contains": "__icontains",
     "not_contains": "__icontains",
@@ -155,11 +157,24 @@ def apply_filters(queryset, filters, only_undefined_field=False):
 
     for _filter in filters.items:
         # we can also have annotations filters
-        if not _filter.filter.startswith("filter:tasks:") or not _filter.value:
+        if not _filter.filter.startswith("filter:tasks:") or _filter.value is None:
             continue
 
         # django orm loop expression attached to column name
         field_name = preprocess_field_name(_filter.filter, only_undefined_field)
+
+        # annotation ids
+        if field_name == 'annotations_ids':
+            field_name = 'annotations__id'
+            if 'contains' in _filter.operator:
+                # convert string like "1 2,3" => [1,2,3]
+                _filter.value = [int(value)
+                                 for value in re.split(',|;| ', _filter.value)
+                                 if value and value.isdigit()]
+                _filter.operator = 'in_list' if _filter.operator == 'contains' else 'not_in_list'
+            elif 'equal' in _filter.operator:
+                if not _filter.value.isdigit():
+                    _filter.value = 0
 
         # use other name because of model names conflict
         if field_name == 'file_upload':
@@ -182,17 +197,35 @@ def apply_filters(queryset, filters, only_undefined_field=False):
             _filter.operator = 'equal' if cast_bool_from_str(_filter.value) else 'not_equal'
             _filter.value = 0
 
+        # get type of annotated field
+        value_type = 'str'
+        if queryset.exists():
+            value_type = type(queryset.values_list(field_name, flat=True)[0]).__name__
+
+        if (value_type == 'list' or value_type == 'tuple') and 'equal' in _filter.operator:
+            _filter.value = '{' + _filter.value + '}'
+
         # special case: for strings empty is "" or null=True
         if _filter.type in ('String', 'Unknown') and _filter.operator == 'empty':
             value = cast_bool_from_str(_filter.value)
             if value:  # empty = true
                 q = Q(
-                    Q(**{field_name: ''}) | Q(**{field_name: None}) | Q(**{field_name+'__isnull': True})
+                    Q(**{field_name: None}) | Q(**{field_name+'__isnull': True})
                 )
+                if value_type == 'str':
+                    q |= Q(**{field_name: ''})
+                if value_type == 'list':
+                    q = Q(**{field_name: [None]})
+
             else:  # empty = false
                 q = Q(
-                    ~Q(**{field_name: ''}) & ~Q(**{field_name: None}) & ~Q(**{field_name+'__isnull': True})
+                    ~Q(**{field_name: None}) & ~Q(**{field_name+'__isnull': True})
                 )
+                if value_type == 'str':
+                    q &= ~Q(**{field_name: ''})
+                if value_type == 'list':
+                    q = ~Q(**{field_name: [None]})
+
             filter_expression.add(q, conjunction)
             continue
 
@@ -230,6 +263,20 @@ def apply_filters(queryset, filters, only_undefined_field=False):
                         f"{field_name}__lte": _filter.value.max,
                     }
                 ),
+                conjunction,
+            )
+
+        # in list
+        elif _filter.operator == "in_list":
+            filter_expression.add(
+                Q(**{f"{field_name}__in": _filter.value}),
+                conjunction,
+            )
+
+        # not in list
+        elif _filter.operator == "not_in_list":
+            filter_expression.add(
+                ~Q(**{f"{field_name}__in": _filter.value}),
                 conjunction,
             )
 
@@ -293,9 +340,10 @@ class GroupConcat(Aggregate):
     function = "GROUP_CONCAT"
     template = "%(function)s(%(distinct)s%(expressions)s)"
 
-    def __init__(self, expression, distinct=False, **extra):
+    def __init__(self, expression, distinct=False, output_field=None, **extra):
+        output_field = models.JSONField() if output_field is None else output_field
         super().__init__(
-            expression, distinct="DISTINCT " if distinct else "", output_field=models.JSONField(), **extra
+            expression, distinct="DISTINCT " if distinct else "", output_field=output_field, **extra
         )
 
 
@@ -309,7 +357,7 @@ def annotate_completed_at(queryset):
 def annotate_annotations_results(queryset):
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
         return queryset.annotate(annotations_results=Coalesce(
-            GroupConcat("annotations__result"), Value('')))
+            GroupConcat("annotations__result"), Value(''), output_field=models.CharField()))
     else:
         return queryset.annotate(annotations_results=ArrayAgg("annotations__result", distinct=True))
 
@@ -317,20 +365,28 @@ def annotate_annotations_results(queryset):
 def annotate_predictions_results(queryset):
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
         return queryset.annotate(predictions_results=Coalesce(
-            GroupConcat("predictions__result"), Value('')))
+            GroupConcat("predictions__result"), Value(''), output_field=models.CharField()))
     else:
         return queryset.annotate(predictions_results=ArrayAgg("predictions__result", distinct=True))
 
 
 def annotate_annotators(queryset):
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
-        return queryset.annotate(annotators=Coalesce(GroupConcat("annotations__completed_by"), Value(None)))
+        return queryset.annotate(annotators=Coalesce(
+            GroupConcat("annotations__completed_by"), Value(''), output_field=models.CharField()))
     else:
         return queryset.annotate(annotators=ArrayAgg("annotations__completed_by", distinct=True))
 
 
 def annotate_predictions_score(queryset):
     return queryset.annotate(predictions_score=Avg("predictions__score"))
+
+
+def annotate_annotations_ids(queryset):
+    if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
+        return queryset.annotate(annotations_ids=GroupConcat('annotations__id', output_field=models.CharField()))
+    else:
+        return queryset.annotate(annotations_ids=ArrayAgg('annotations__id'))
 
 
 def file_upload(queryset):
@@ -347,6 +403,7 @@ settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     "predictions_results": annotate_predictions_results,
     "predictions_score": annotate_predictions_score,
     "annotators": annotate_annotators,
+    "annotations_ids": annotate_annotations_ids,
     "file_upload": file_upload,
     "cancelled_annotations": dummy,
     "total_annotations": dummy,

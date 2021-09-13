@@ -13,7 +13,7 @@ from drf_yasg.utils import swagger_auto_schema
 from django.db.models import Sum, Count
 from ordered_set import OrderedSet
 
-from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, find_first_one_to_one_related_field_by_prefix
+from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, find_first_many_to_one_related_field_by_prefix
 from core.permissions import all_permissions, ViewClassPermission
 from projects.models import Project
 from projects.serializers import ProjectSerializer
@@ -121,9 +121,9 @@ class ViewAPI(viewsets.ModelViewSet):
 
     @staticmethod
     def get_task_serializer_context(request, project):
-        storage = find_first_one_to_one_related_field_by_prefix(project, '.*io_storages_')
+        storage = find_first_many_to_one_related_field_by_prefix(project, '.*io_storages.*')
         resolve_uri = True
-        if not storage:
+        if not storage and not project.task_data_login and not project.task_data_password:
             resolve_uri = False
 
         all_fields = request.GET.get('fields', None) == 'all'  # false by default
