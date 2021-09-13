@@ -316,7 +316,7 @@ class ProjectStateAPI(APIView):
         project = get_object_with_check_and_log(request, Project, pk=pk)
         self.check_object_permissions(request, project)
         data = ProjectSerializer(project).data
-        # Task.objects.filter(project=project).annotate(count=Count('pk'))
+
         data.update(
             {
                 "can_delete_tasks": True,
