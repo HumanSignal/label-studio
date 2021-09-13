@@ -38,7 +38,6 @@ stages:
              "expert_instruction": "", "show_instruction": false, "show_skip_button": false, "enable_empty_annotation": false,
              "show_annotation_history": false, "organization": 1, "color": "#FFFFFF", "maximum_annotations": 1,
              "is_published": false, "model_version": "model_version_A", "is_draft": false,
-             "created_by": {"id": 1, "first_name": "", "last_name": "", "email": "test_suites_user@heartex.com", "avatar": null},
             "min_annotations_to_start_training": 10,
              "start_training_on_annotation_update": true, "show_collab_predictions": true, "num_tasks_with_annotations": null,
              "task_number": null, "useful_annotation_number": null, "ground_truth_number": null, "skipped_annotations_number": null,
