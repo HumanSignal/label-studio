@@ -1,37 +1,41 @@
 ---
 title: Ranker
 type: tags
-order: 418
-meta_title: Ranker Tags for Model Ranking
-meta_description: Label Studio Ranker Tags customize Label Studio for model ranking for machine learning and data science projects.
+order: 417
+meta_title: Ranker Tag for Model Ranking
+meta_description: Customize Label Studio with the Ranker tag to rank the predictions from different models to rank model quality in your machine learning and data science projects.
 ---
 
-Ranker tag, used for ranking models.
+Use the Ranker tag to rank the results from models. This tag uses the "prediction" field from a labeling task instead of the "data" field to display content for labeling on the interface. Carefully structure your labeling tasks to work with this tag. See [import pre-annotated data](../guide/predictions.html).
 
-Ranker has complex mechanics and uses only the "prediction" field from a labeling task. Please verify the information in the labeling task carefully.
+Use with the following data types: text
 
-It renders a given list of strings and allows you to drag and reorder them.
-To see this tag in action you have to import the example JSON below as a task on "Import" page. Save it as a file called example_ranker_tag.json, then upload it.
-Set up a project with the given configuration and the example JSON file.
+The Ranker tag renders a given list of strings and allows you to drag and reorder them.
+To see this tag in action:
+1. Save the example JSON below as a file called <code>example_ranker_tag.json</code>.
+2. Upload it as a task on the Label Studio UI.
+3. Set up a project with the given labeling configuration.
 
 ### Parameters
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | name | <code>string</code> |  | Name of group |
-| [axis] | <code>y</code> \| <code>x</code> | <code>y</code> | Axis direction |
+| [axis] | <code>y</code> \| <code>x</code> | <code>y</code> | Whether to use a vertical or horizantal axis direction for ranking |
 | lockAxis | <code>x</code> \| <code>y</code> |  | Lock axis |
-| sortedHighlightColor | <code>string</code> |  | Sorted color |
+| sortedHighlightColor | <code>string</code> |  | Sorted color in HTML color name |
 
 ### Example
 ```html
+<!--Labeling configuration for ranking predicted text output from a model -->
 <View>
   <Text name="txt-1" value="$text"></Text>
   <Ranker name="ranker-1" toName="txt-1" ranked="true" sortedHighlightColor="red"></Ranker>
 </View>
 ```
 ### Example
-```json
+```html
+<!--Example JSON task to use to see the Ranker tag in action -->
 [{
   "data": {
     "text": "Some text for the ranker tag"

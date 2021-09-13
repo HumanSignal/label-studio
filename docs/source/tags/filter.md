@@ -2,11 +2,11 @@
 title: Filter
 type: tags
 order: 501
-meta_title: Filter Tags for Filter Search
-meta_description: Label Studio Filter Tags customize Label Studio with filter search for machine learning and data science projects.
+meta_title: Filter Tag for Filter Search
+meta_description: Customize Label Studio with the Filter tag to filter labels to accelerate labeling for machine learning and data science projects.
 ---
 
-Add a filter search for a large number of labels.
+Use the Filter tag to add a filter search for a large number of labels or choices. Use with the Labels tag or Choices tag.
 
 ### Parameters
 
@@ -18,6 +18,9 @@ Add a filter search for a large number of labels.
 | [hotkey] | <code>string</code> |  | Hotkey to use to focus on the filter text area |
 
 ### Example
+
+Add a filter to labels for a named entity recognition task
+
 ```html
 <View>
   <Filter name="filter" toName="ner"
