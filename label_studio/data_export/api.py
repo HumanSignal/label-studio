@@ -244,7 +244,7 @@ class ProjectExportFilesAuthCheck(APIView):
         """,
     ),
 )
-class ExportListApi(generics.ListCreateAPIView):
+class ExportListAPI(generics.ListCreateAPIView):
     queryset = Export.objects.all()
     serializer_class = ExportSerializer
     permission_required = all_permissions.projects_change
@@ -288,7 +288,7 @@ class ExportListApi(generics.ListCreateAPIView):
         """,
     ),
 )
-class ExportDetailApi(generics.RetrieveDestroyAPIView):
+class ExportDetailAPI(generics.RetrieveDestroyAPIView):
     queryset = Export.objects.all()
     serializer_class = ExportSerializer
     lookup_url_kwarg = 'export_pk'
@@ -325,7 +325,7 @@ class ExportDetailApi(generics.RetrieveDestroyAPIView):
         ],
     ),
 )
-class ExportDownloadApi(generics.RetrieveAPIView):
+class ExportDownloadAPI(generics.RetrieveAPIView):
     queryset = Export.objects.all()
     serializer_class = ExportSerializer
     lookup_url_kwarg = 'export_pk'
