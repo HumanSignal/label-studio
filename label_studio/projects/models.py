@@ -12,7 +12,7 @@ from django.db import transaction, models
 from annoying.fields import AutoOneToOneField
 
 from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks
-from core.utils.common import create_hash, sample_query, get_attr_or_item, load_func
+from core.utils.common import create_hash, get_attr_or_item, load_func, top_query
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.label_config import (
     parse_config,
@@ -346,7 +346,11 @@ class Project(ProjectMixin, models.Model):
             )
 
     def _rearrange_overlap_cohort(self):
-        tasks_with_overlap = self.tasks.filter(overlap__gt=1)
+        """
+        Rearrange overlap depending on annotations count in tasks
+        """
+        tasks_with_overlap = self.tasks.annotate(anno=Count('annotations', filter=Q_finished_annotations)). \
+            filter(anno__gte=self.maximum_annotations)
         tasks_with_overlap_count = tasks_with_overlap.count()
         total_tasks = self.tasks.count()
 
@@ -354,15 +358,15 @@ class Project(ProjectMixin, models.Model):
         if tasks_with_overlap_count > new_tasks_with_overlap_count:
             # TODO: warn if we try to reduce current cohort that is already labeled with overlap
             reduce_by = tasks_with_overlap_count - new_tasks_with_overlap_count
-            reduce_tasks = sample_query(tasks_with_overlap, reduce_by)
+            reduce_tasks = top_query(tasks_with_overlap, reduce_by)
             reduce_tasks.update(overlap=1)
             reduced_tasks_ids = reduce_tasks.values_list('id', flat=True)
             tasks_with_overlap.exclude(id__in=reduced_tasks_ids).update(overlap=self.maximum_annotations)
 
         elif tasks_with_overlap_count < new_tasks_with_overlap_count:
             increase_by = new_tasks_with_overlap_count - tasks_with_overlap_count
-            tasks_without_overlap = self.tasks.filter(overlap=1)
-            increase_tasks = sample_query(tasks_without_overlap, increase_by)
+            tasks_without_overlap = self.tasks.exclude(id__in=tasks_with_overlap)
+            increase_tasks = top_query(tasks_without_overlap, increase_by, order_asc=True)
             increase_tasks.update(overlap=self.maximum_annotations)
             tasks_with_overlap.update(overlap=self.maximum_annotations)
 
@@ -900,3 +904,7 @@ class ProjectSummary(models.Model):
         self.created_annotations = created_annotations
         self.created_labels = labels
         self.save()
+
+Q_finished_annotations = Q(annotations__was_cancelled=False) & \
+                         Q(annotations__result__isnull=False) & \
+                         Q(annotations__ground_truth=False)
