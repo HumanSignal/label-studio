@@ -66,12 +66,12 @@ Needs to be updated to the following, with the rest of the task data remaining t
 
 ## Export data
 
-The export endpoint has changed, and so have the available options for that endpoint and the response parameters.
+The export endpoint has changed, and so have the available options for that endpoint and the response parameters. Rather than list all completions for a specific project, use the new export endpoint to see all the task and annotation details for a project.
 
 ### Updated export endpoint
 To export annotations from Label Studio Enterprise, you must call a new endpoint.
 
-Requests made to `/api/projects/<project_ID>/results` fail. Instead, call `/api/projects/<project_ID>/export?exportType=JSON`. See the [export API endpoint documentation](/api#operation/api_projects_export_read).
+Requests made to `/api/projects/<project_ID>/results/` or `/api/projects/<project_id>/completions/` fail. Instead, call `/api/projects/<project_ID>/export?exportType=JSON`. See the [export API endpoint documentation](/api#operation/api_projects_export_read).
 
 With this change, several arguments are no longer supported:
 
@@ -79,9 +79,9 @@ With this change, several arguments are no longer supported:
 | --- | --- |
 | `?aggregator_type=` | Cannot export aggregated annotations. |
 | `?finished=0` | No longer a default setting. Instead, use `download_all_tasks=true`. |
-| `?return_task=1` | Endpoint always returns all tasks. |
-| `?return_predictions=1` | Endpoint always returns predictions. |
-| `?return_ground_truths=1` | Endpoint always returns ground truth annotations. | 
+| `?return_task=1` | Tasks always returned. |
+| `?return_predictions=1` | Predictions always returned. |
+| `?return_ground_truths=1` | Ground truth annotations always returned. | 
 
 
 ### Changes to the endpoint response
@@ -92,7 +92,6 @@ The content of the response also has some changes:
 - `aggregated` is removed
 - `aggregated_completed_by` is removed
 - `aggregated_ids` is removed
-- `ground_truth` is removed
 - `result` is no longer a double list `"result": [[... ]]` and is now a single list `“result”: [...] `
 - `completed_by` IDs now refer to the actual user IDs (not "expert" IDs as before)
 
@@ -132,22 +131,39 @@ The content of the response also has some changes:
 
 
 ```json
-"annotations": [ 
- {
-   "result": [
-       {
-         "id": "7tHQ-n6xfo",
-         "type": "choices",
-         "value": {
-           "choices": [
-             "Neutral"
-           ]
-         },
-         "to_name": "text",
-         "from_name": "sentiment"
-       }
-   ]
- }
+"annotations":[
+   {
+      "id":362,
+      "completed_by":{
+         "id":1,
+         "email":"example@heartex.com",
+         "first_name":"",
+         "last_name":""
+      },
+      "result":[
+         {
+            "id":"7tHQ-n6xfo",
+            "type":"choices",
+            "value":{
+               "choices":[
+                  "Neutral"
+               ]
+            },
+            "to_name":"text",
+            "from_name":"sentiment"
+         }
+      ],
+      "was_cancelled":false,
+      "ground_truth":false,
+      "created_at":"2021-09-03T16:51:49.354140Z",
+      "updated_at":"2021-09-03T16:51:49.354261Z",
+      "lead_time":6.026,
+      "prediction":{
+         
+      },
+      "result_count":0,
+      "task":852
+   }
 ]
 ```
 
