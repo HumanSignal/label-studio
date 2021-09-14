@@ -3,6 +3,8 @@
 import logging
 import re
 
+from pydantic import BaseModel
+
 from django.db import models
 from django.db.models import Aggregate, Count, Exists, OuterRef, Subquery, Avg, Q, F, Value
 from django.contrib.postgres.aggregates import ArrayAgg
@@ -22,21 +24,39 @@ DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 logger = logging.getLogger(__name__)
 
+class _Operator(BaseModel):
+    EQUAL = "equal"
+    NOT_EQUAL = "not_equal"
+    LESS = "less"
+    GREATER = "greater"
+    LESS_OR_EQUAL = "less_or_equal"
+    GREATER_OR_EQUAL = "greater_or_equal"
+    IN = "in"
+    NOT_IN = "not_in"
+    IN_LIST = "in_list"
+    NOT_IN_LIST = "not_in_list"
+    EMPTY = "empty"
+    CONTAINS = "contains"
+    NOT_CONTAINS = "not_contains"
+    REGEX = "regex"
+
+Operator = _Operator()
+
 operators = {
-    "equal": "",
-    "not_equal": "",
-    "less": "__lt",
-    "greater": "__gt",
-    "less_or_equal": "__lte",
-    "greater_or_equal": "__gte",
-    "in": "",
-    "not_in": "",
-    "in_list": "",
-    "not_in_list": "",
-    "empty": "__isnull",
-    "contains": "__icontains",
-    "not_contains": "__icontains",
-    "regex": "__regex"
+    Operator.EQUAL: "",
+    Operator.NOT_EQUAL: "",
+    Operator.LESS: "__lt",
+    Operator.GREATER: "__gt",
+    Operator.LESS_OR_EQUAL: "__lte",
+    Operator.GREATER_OR_EQUAL: "__gte",
+    Operator.IN: "",
+    Operator.NOT_IN: "",
+    Operator.IN_LIST: "",
+    Operator.NOT_IN_LIST: "",
+    Operator.EMPTY: "__isnull",
+    Operator.CONTAINS: "__icontains",
+    Operator.NOT_CONTAINS: "__icontains",
+    Operator.REGEX: "__regex"
 }
 
 
@@ -148,6 +168,16 @@ def apply_filters(queryset, filters, only_undefined_field=False):
     if not filters:
         return queryset
 
+    generic_filters = []
+    for _filter in filters.items:
+        if _filter.filter == 'filter:tasks:annotations_results' and _filter.operator == Operator.CONTAINS:
+            queryset = queryset.filter(annotations__result__icontains=_filter.value)
+        elif _filter.filter == 'filter:tasks:annotations_results' and _filter.operator == Operator.NOT_CONTAINS:
+            queryset = queryset.exclude(annotations__result__icontains=_filter.value)
+        else:
+            generic_filters.append(_filter)
+
+
     # convert conjunction to orm statement
     filter_expression = Q()
     if filters.conjunction == ConjunctionEnum.OR:
@@ -155,7 +185,8 @@ def apply_filters(queryset, filters, only_undefined_field=False):
     else:
         conjunction = Q.AND
 
-    for _filter in filters.items:
+    for _filter in generic_filters:
+
         # we can also have annotations filters
         if not _filter.filter.startswith("filter:tasks:") or _filter.value is None:
             continue
