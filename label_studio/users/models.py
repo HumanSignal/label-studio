@@ -112,6 +112,13 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         db_table = 'htx_user'
         verbose_name = _('user')
         verbose_name_plural = _('users')
+        indexes = [
+            models.Index(fields=['username']),
+            models.Index(fields=['email']),
+            models.Index(fields=['first_name']),
+            models.Index(fields=['last_name']),
+            models.Index(fields=['date_joined']),
+        ]
 
     @property
     def avatar_url(self):

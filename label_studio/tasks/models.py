@@ -60,6 +60,16 @@ class Task(TaskMixin, models.Model):
     objects = TaskManager()  # task manager by default
     prepared = PreparedTaskManager()  # task manager with filters, ordering, etc for data_manager app
 
+    class Meta:
+        db_table = 'task'
+        ordering = ['-updated_at']
+        indexes = [
+            models.Index(fields=['project', 'is_labeled']),
+            models.Index(fields=['id', 'overlap']),
+            models.Index(fields=['overlap']),
+            models.Index(fields=['is_labeled'])
+        ]
+
     @property
     def file_upload_name(self):
         return os.path.basename(self.file_upload.file.name)
@@ -269,14 +279,6 @@ class Task(TaskMixin, models.Model):
     def ensure_unique_groundtruth(self, annotation_id):
         self.annotations.exclude(id=annotation_id).update(ground_truth=False)
 
-    class Meta:
-        db_table = 'task'
-        ordering = ['-updated_at']
-        indexes = [
-            models.Index(fields=['project', 'is_labeled']),
-            models.Index(fields=['id', 'overlap'])
-        ]
-
 
 pre_bulk_create = Signal(providing_args=["objs", "batch_size"])
 post_bulk_create = Signal(providing_args=["objs", "batch_size"])
@@ -329,7 +331,10 @@ class Annotation(AnnotationMixin, models.Model):
     class Meta:
         db_table = 'task_completion'
         indexes = [
-            models.Index(fields=['task', 'ground_truth'])
+            models.Index(fields=['task', 'ground_truth']),
+            models.Index(fields=['was_cancelled']),
+            models.Index(fields=['ground_truth']),
+            models.Index(fields=['created_at']),
         ]
 
     def created_ago(self):
