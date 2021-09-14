@@ -19,10 +19,10 @@ from data_manager.prepare_params import ConjunctionEnum
 from label_studio.core.utils.params import cast_bool_from_str
 from label_studio.core.utils.common import load_func
 
+logger = logging.getLogger(__name__)
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
-logger = logging.getLogger(__name__)
 
 class _Operator(BaseModel):
     EQUAL = "equal"
@@ -39,6 +39,7 @@ class _Operator(BaseModel):
     CONTAINS = "contains"
     NOT_CONTAINS = "not_contains"
     REGEX = "regex"
+
 
 Operator = _Operator()
 
@@ -168,24 +169,11 @@ def apply_filters(queryset, filters, only_undefined_field=False):
     if not filters:
         return queryset
 
-    generic_filters = []
-    for _filter in filters.items:
-        if _filter.filter == 'filter:tasks:annotations_results' and _filter.operator == Operator.CONTAINS:
-            queryset = queryset.filter(annotations__result__icontains=_filter.value)
-        elif _filter.filter == 'filter:tasks:annotations_results' and _filter.operator == Operator.NOT_CONTAINS:
-            queryset = queryset.exclude(annotations__result__icontains=_filter.value)
-        else:
-            generic_filters.append(_filter)
-
-
     # convert conjunction to orm statement
-    filter_expression = Q()
-    if filters.conjunction == ConjunctionEnum.OR:
-        conjunction = Q.OR
-    else:
-        conjunction = Q.AND
+    filter_expressions = Q()
+    conjunction = Q.OR if filters.conjunction == ConjunctionEnum.OR else Q.AND
 
-    for _filter in generic_filters:
+    for _filter in filters.items:
 
         # we can also have annotations filters
         if not _filter.filter.startswith("filter:tasks:") or _filter.value is None:
@@ -193,6 +181,32 @@ def apply_filters(queryset, filters, only_undefined_field=False):
 
         # django orm loop expression attached to column name
         field_name = preprocess_field_name(_filter.filter, only_undefined_field)
+
+        # custom expressions for enterprise
+        if settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS:
+            custom_filter_expressions = load_func(settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS)
+            if custom_filter_expressions(filter_expressions, field_name, _filter.operator, conjunction, _filter):
+                continue
+
+        # annotators
+        if field_name == 'annotators' and _filter.operator == Operator.CONTAINS:
+            filter_expressions.add(Q(annotations__completed_by=int(_filter.value)), conjunction)
+            continue
+        elif field_name == 'annotators' and _filter.operator == Operator.NOT_CONTAINS:
+            filter_expressions.add(~Q(annotations__completed_by=int(_filter.value)), conjunction)
+            continue
+        elif field_name == 'annotators' and _filter.operator == Operator.EMPTY:
+            value = cast_bool_from_str(_filter.value)
+            filter_expressions.add(Q(annotations__completed_by__isnull=value), conjunction)
+            continue
+
+        # annotations results
+        elif field_name == 'annotations_results' and _filter.operator == Operator.CONTAINS:
+            filter_expressions.add(Q(annotations__result__icontains=_filter.value), conjunction)
+            continue
+        elif field_name == 'annotations_results' and _filter.operator == Operator.NOT_CONTAINS:
+            filter_expressions.add(~Q(annotations__result__icontains=_filter.value), conjunction)
+            continue
 
         # annotation ids
         if field_name == 'annotations_ids':
@@ -234,7 +248,7 @@ def apply_filters(queryset, filters, only_undefined_field=False):
             value_type = type(queryset.values_list(field_name, flat=True)[0]).__name__
 
         if (value_type == 'list' or value_type == 'tuple') and 'equal' in _filter.operator:
-            _filter.value = '{' + _filter.value + '}'
+            _filter.value = '{' + str(_filter.value) + '}'
 
         # special case: for strings empty is "" or null=True
         if _filter.type in ('String', 'Unknown') and _filter.operator == 'empty':
@@ -257,7 +271,7 @@ def apply_filters(queryset, filters, only_undefined_field=False):
                 if value_type == 'list':
                     q = ~Q(**{field_name: [None]})
 
-            filter_expression.add(q, conjunction)
+            filter_expressions.add(q, conjunction)
             continue
 
         # regex pattern check
@@ -274,7 +288,7 @@ def apply_filters(queryset, filters, only_undefined_field=False):
         # in
         if _filter.operator == "in":
             cast_value(_filter)
-            filter_expression.add(
+            filter_expressions.add(
                 Q(
                     **{
                         f"{field_name}__gte": _filter.value.min,
@@ -287,7 +301,7 @@ def apply_filters(queryset, filters, only_undefined_field=False):
         # not in
         elif _filter.operator == "not_in":
             cast_value(_filter)
-            filter_expression.add(
+            filter_expressions.add(
                 ~Q(
                     **{
                         f"{field_name}__gte": _filter.value.min,
@@ -299,14 +313,14 @@ def apply_filters(queryset, filters, only_undefined_field=False):
 
         # in list
         elif _filter.operator == "in_list":
-            filter_expression.add(
+            filter_expressions.add(
                 Q(**{f"{field_name}__in": _filter.value}),
                 conjunction,
             )
 
         # not in list
         elif _filter.operator == "not_in_list":
-            filter_expression.add(
+            filter_expressions.add(
                 ~Q(**{f"{field_name}__in": _filter.value}),
                 conjunction,
             )
@@ -314,22 +328,22 @@ def apply_filters(queryset, filters, only_undefined_field=False):
         # empty
         elif _filter.operator == 'empty':
             if cast_bool_from_str(_filter.value):
-                filter_expression.add(Q(**{field_name: True}), conjunction)
+                filter_expressions.add(Q(**{field_name: True}), conjunction)
             else:
-                filter_expression.add(~Q(**{field_name: True}), conjunction)
+                filter_expressions.add(~Q(**{field_name: True}), conjunction)
 
         # starting from not_
         elif _filter.operator.startswith("not_"):
             cast_value(_filter)
-            filter_expression.add(~Q(**{field_name: _filter.value}), conjunction)
+            filter_expressions.add(~Q(**{field_name: _filter.value}), conjunction)
 
         # all others
         else:
             cast_value(_filter)
-            filter_expression.add(Q(**{field_name: _filter.value}), conjunction)
+            filter_expressions.add(Q(**{field_name: _filter.value}), conjunction)
     
-    logger.debug(f'Apply filter: {filter_expression}')
-    queryset = queryset.filter(filter_expression)
+    logger.debug(f'Apply filter: {filter_expressions}')
+    queryset = queryset.filter(filter_expressions)
     return queryset
 
 

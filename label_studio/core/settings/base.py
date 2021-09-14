@@ -407,6 +407,7 @@ USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
 DATA_MANAGER_GET_ALL_COLUMNS = 'data_manager.functions.get_all_columns'
 DATA_MANAGER_ANNOTATIONS_MAP = {}
 DATA_MANAGER_ACTIONS = {}
+DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS = ''
 USER_LOGIN_FORM = 'users.forms.LoginForm'
 PROJECT_MIXIN = 'core.mixins.DummyModelMixin'
 TASK_MIXIN = 'core.mixins.DummyModelMixin'
