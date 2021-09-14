@@ -273,9 +273,10 @@ class TaskAPI(APIView):
         """
         task = Task.prepared.get_queryset(fields_for_evaluation='all').get(id=pk)
         context = self.get_serializer_context(request)
+        context['project'] = project = task.project
 
         # get prediction
-        if task.project.evaluate_predictions_automatically and not task.predictions.exists():
+        if project.evaluate_predictions_automatically and not task.predictions.exists():
             evaluate_predictions([task])
 
         serializer = self.get_serializer_class()(task, many=False, context=context)

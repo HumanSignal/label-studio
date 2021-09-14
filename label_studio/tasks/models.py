@@ -329,7 +329,10 @@ class Annotation(AnnotationMixin, models.Model):
     class Meta:
         db_table = 'task_completion'
         indexes = [
-            models.Index(fields=['task', 'ground_truth'])
+            models.Index(fields=['task', 'ground_truth']),
+            models.Index(fields=['was_cancelled']),
+            models.Index(fields=['ground_truth']),
+            models.Index(fields=['created_at']),
         ]
 
     def created_ago(self):
