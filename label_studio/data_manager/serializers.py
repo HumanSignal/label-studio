@@ -256,6 +256,7 @@ class DataManagerTaskSerializer(TaskSerializer):
         if isinstance(annotators, str):
             annotators = [int(v) for v in annotators.split(',')]
 
+        annotators = list(set(annotators))
         return annotators if hasattr(obj, 'annotators') and annotators else []
 
     def get_annotations_ids(self, task):
