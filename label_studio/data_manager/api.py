@@ -4,7 +4,7 @@ import logging
 
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.decorators import method_decorator
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -21,7 +21,7 @@ from tasks.models import Task, Annotation
 
 from data_manager.functions import get_all_columns, get_prepared_queryset, evaluate_predictions
 from data_manager.models import View
-from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer
+from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer, ViewResetSerializer
 from data_manager.actions import get_all_actions, perform_action
 
 
@@ -105,14 +105,17 @@ class ViewAPI(viewsets.ModelViewSet):
 
     @swagger_auto_schema(tags=['Data Manager'])
     @action(detail=False, methods=['delete'])
-    def reset(self, _request):
+    def reset(self, request):
         """
         delete:
         Reset project views
 
         Reset all views for a specific project.
         """
-        queryset = self.filter_queryset(self.get_queryset())
+        serializer = ViewResetSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=serializer.validated_data['project'].id)
+        queryset = self.filter_queryset(self.get_queryset()).filter(project=project)
         queryset.all().delete()
         return Response(status=204)
 
