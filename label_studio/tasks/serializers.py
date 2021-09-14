@@ -155,7 +155,7 @@ class TaskSerializer(ModelSerializer):
         return validator.validate(task)
 
     def to_representation(self, instance):
-        project = self.project()
+        project = self.project(instance)
         if project:
             # resolve uri for storage (s3/gcs/etc)
             if self.context.get('resolve_uri', False):
