@@ -389,9 +389,11 @@ def config_essential_data_has_changed(new_config_str, old_config_str):
             return True
 
 
-def replace_task_data_undefined_with_config_field(data, project):
+def replace_task_data_undefined_with_config_field(data, project, first_key=None):
+    """ Use first key is passed (for speed up) or project.data.types.keys()[0]
+    """
     # assign undefined key name from data to the first key from config, e.g. for txt loading
-    if settings.DATA_UNDEFINED_NAME in data and project.data_types.keys():
-        key = list(project.data_types.keys())[0]
+    if settings.DATA_UNDEFINED_NAME in data and (first_key or project.data_types.keys()):
+        key = first_key or list(project.data_types.keys())[0]
         data[key] = data[settings.DATA_UNDEFINED_NAME]
         del data[settings.DATA_UNDEFINED_NAME]
