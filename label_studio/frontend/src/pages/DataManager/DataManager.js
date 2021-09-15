@@ -33,8 +33,8 @@ const initializeDataManager = async (root, props, params) => {
     showPreviews: false,
     apiEndpoints: APIConfig.endpoints,
     interfaces: {
-      import: false,
-      export: false,
+      import: true,
+      export: true,
       backButton: false,
       labelingHeader: false,
       autoAnnotation: params.autoAnnotation,
@@ -169,8 +169,6 @@ DataManagerPage.context = ({dmRef}) => {
 
   const links = {
     '/settings': 'Settings',
-    '/data/import': "Import",
-    '/data/export': 'Export',
   };
 
   const updateCrumbs = (currentMode) => {
