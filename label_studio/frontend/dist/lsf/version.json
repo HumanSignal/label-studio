@@ -1,6 +1,6 @@
 {
-  "message": "[fix] alphanumeric vars should work ($a2b)",
-  "commit": "4aec8995f152470a671c4e9d8bacae1189c0835c",
+  "message": "[fix] zoomed polygon points size",
+  "commit": "b2231b0cacccaf328368d0764baeab82f3b7a1de",
   "branch": "master",
-  "date": "2021-09-14T22:42:54Z"
+  "date": "2021-09-15T11:36:22Z"
 }
