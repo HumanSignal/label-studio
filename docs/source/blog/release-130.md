@@ -1,5 +1,5 @@
 ---
-title: Perform ML-Assisted Labeling with Label Studio 1.3.0
+title: Perform Interactive ML-Assisted Labeling with Label Studio 1.3.0
 type: blog
 image: /images/release-130/130-preannotations.gif
 order: 91
