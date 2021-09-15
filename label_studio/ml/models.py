@@ -269,7 +269,8 @@ class MLBackend(models.Model):
 
         if not (isinstance(ml_api_result.response, dict) and 'results' in ml_api_result.response):
             logger.warning(f'ML backend returns an incorrect response, it should be a dict: {ml_api_result.response}')
-            result['errors'] = ['incorrect response from ML service']
+            result['errors'] = ['Incorrect response from ML service: '
+                                'ML backend returns an incorrect response, it should be a dict.']
             return result
 
         ml_results = ml_api_result.response.get(
@@ -278,9 +279,10 @@ class MLBackend(models.Model):
                 None,
             ],
         )
-        if not isinstance(ml_results, list) or len(ml_results) != 1:
+        if not isinstance(ml_results, list) or len(ml_results) < 1:
             logger.warning(f'ML backend has to return list with 1 annotation but it returned: {ml_results}')
-            result['errors'] = ['incorrect response from ML service']
+            result['errors'] = ['Incorrect response from ML service: '
+                                'ML backend has to return list with more than 1 result.']
             return result
 
         result['data'] = ml_results[0]
