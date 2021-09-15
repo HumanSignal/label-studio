@@ -17,10 +17,11 @@ from core.utils.common import get_object_with_check_and_log, int_from_request, b
 from core.permissions import all_permissions, ViewClassPermission
 from projects.models import Project
 from projects.serializers import ProjectSerializer
-from tasks.models import Task, Annotation
+from tasks.models import Task, Annotation, Prediction
 
 from data_manager.functions import get_all_columns, get_prepared_queryset, evaluate_predictions
 from data_manager.models import View
+from data_manager.managers import get_fields_for_evaluation
 from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer, ViewResetSerializer
 from data_manager.actions import get_all_actions, perform_action
 
@@ -33,29 +34,10 @@ class TaskPagination(PageNumberPagination):
     page_size_query_param = "page_size"
     total_annotations = 0
     total_predictions = 0
-    all_tasks = 0
-
-    def get_count(self, queryset):
-        return self.all_tasks
 
     def paginate_queryset(self, queryset, request, view=None):
-        ops = {
-            'all_tasks': Count('pk'),
-            'all_annotations': Sum("total_annotations"),
-            'all_predictions': Sum("total_predictions")
-        }
-        if 'total_predictions' not in queryset.query.annotations:
-            ops.pop('all_predictions')
-        if 'total_annotations' not in queryset.query.annotations:
-            ops.pop('all_annotations')
-
-        aggregated = queryset.aggregate(
-            **ops
-        )
-
-        self.all_tasks = aggregated['all_tasks']
-        self.total_annotations = (aggregated.get('all_annotations') or 0) if 'all_annotations' in aggregated else None
-        self.total_predictions = (aggregated.get('all_predictions') or 0) if 'all_predictions' in aggregated else None
+        self.total_predictions = Prediction.objects.filter(task_id__in=queryset).count()
+        self.total_annotations = Annotation.objects.filter(task_id__in=queryset).count()
         return super().paginate_queryset(queryset, request, view)
 
     def get_paginated_response(self, data):
@@ -142,11 +124,7 @@ class ViewAPI(viewsets.ModelViewSet):
         }
 
     def get_task_queryset(self, request, view):
-        all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
-        return Task.prepared.all(
-            fields_for_evaluation=all_fields,
-            prepare_params=view.get_prepare_tasks_params(),
-            request=request)
+        return Task.prepared.only_filtered(prepare_params=view.get_prepare_tasks_params())
 
     @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
     @action(detail=True, methods=["get"])
@@ -166,9 +144,17 @@ class ViewAPI(viewsets.ModelViewSet):
         self.pagination_class = TaskPagination
         page = self.paginate_queryset(queryset)
         if page is not None:
+            ids = [task.id for task in page]  # page is a list already
+            all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
+            fields_for_evaluation = get_fields_for_evaluation(view.get_prepare_tasks_params(), request.user)
+            tasks = list(Task.prepared.annotate_queryset(Task.objects.filter(id__in=ids), fields_for_evaluation=fields_for_evaluation, all_fields=all_fields))
+            tasks_by_ids = {task.id: task for task in tasks}
+
+            # keep ids ordering
+            page = [tasks_by_ids[_id] for _id in ids]
+
             # retrieve ML predictions if tasks don't have them
             if project.evaluate_predictions_automatically:
-                ids = [task.id for task in page]  # page is a list already
                 tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
                 evaluate_predictions(tasks_for_predictions)
 
