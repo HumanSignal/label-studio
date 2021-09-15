@@ -6,7 +6,7 @@
     <Choice value="Important article"/>
     <Choice value="Yellow press"/>
   </Choices>
-  <HyperText name="pdf" value="$pdf"/>
+  <HyperText name="pdf" value="$pdf" inline="true"/>
 </View>
 
 
