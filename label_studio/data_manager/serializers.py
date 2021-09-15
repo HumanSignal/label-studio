@@ -9,6 +9,7 @@ from django.db import transaction
 from data_manager.models import View, Filter, FilterGroup
 from tasks.models import Task
 from tasks.serializers import TaskSerializer, AnnotationSerializer, PredictionSerializer, AnnotationDraftSerializer
+from projects.models import Project
 from label_studio.core.utils.common import round_floats
 
 
@@ -255,6 +256,7 @@ class DataManagerTaskSerializer(TaskSerializer):
         if isinstance(annotators, str):
             annotators = [int(v) for v in annotators.split(',')]
 
+        annotators = list(set(annotators))
         return annotators if hasattr(obj, 'annotators') and annotators else []
 
     def get_annotations_ids(self, task):
@@ -293,3 +295,7 @@ class SelectedItemsSerializer(serializers.Serializer):
                 raise serializers.ValidationError("changing all value possible only with POST method")
 
         return data
+
+
+class ViewResetSerializer(serializers.Serializer):
+    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all())
