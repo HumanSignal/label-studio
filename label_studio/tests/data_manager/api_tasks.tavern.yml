@@ -1,0 +1,341 @@
+---
+test_name: tasks-with-fields
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+
+  - id: signup
+    type: ref
+
+  - id: create_project
+    name: create_project
+    request:
+      data:
+        title: Test Draft 1
+        show_collab_predictions: true
+      method: POST
+      url: '{django_live_url}/api/projects'
+    response:
+      save:
+        json:
+          project_pk: id
+      status_code: 201
+
+  - name: create_filter_tasks
+    request:
+      files:
+        json_file: tests/data_manager/tasks_annotations_predictions.json
+      headers:
+        content-type: multipart/form-data
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/import'
+    response:
+      json:
+        annotation_count: 3
+        prediction_count: 3
+        task_count: 6
+      status_code: 201
+
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "filters": {
+            "conjunction": "or",
+            "items": [
+              {
+                "filter": "filter:tasks:data.text",
+                "operator": "equal",
+                "type": "String",
+                "value": "Test example phrase 1"
+              },
+              {
+                "filter": "filter:tasks:data.text",
+                "operator": "contains",
+                "type": "String",
+                "value": "x"
+              },
+              {
+                "filter": "filter:tasks:annotations_results",
+                "operator": "contains",
+                "type": "String",
+                "value": "TESTING"
+              },
+              {
+                "filter": "filter:tasks:predictions_results",
+                "operator": "contains",
+                "type": "String",
+                "value": "PREDICTIONS"
+              }
+            ]
+          },
+          "ordering": [
+            "tasks:data.text"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/dm/views/{view.id}/tasks?fields=all'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: label_studio.tests.utils:save_response
+      json:
+        {
+          "total_annotations": 3,
+          "total_predictions": 3,
+          "total": 4,
+          "tasks": [
+          {
+            "cancelled_annotations": 0,
+            "completed_at": null,
+
+            "annotations_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_A]}}]",
+            "data": {
+              "text": "Test example phrase 1",
+              "int_field": 1
+            },
+            "id": 1,
+            "predictions_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_A]}}]",
+            "predictions_score": null,
+            "total_annotations": 1,
+            "total_predictions": 1,
+            "annotations_ids": "1",
+            "annotations": [
+            {
+              "id": 1,
+              "created_username": " test_suites_user@heartex.com, 1",
+              "created_ago": "0\u00a0minutes",
+              "completed_by": 1,
+              "result": [
+              {
+                "from_name": "text_class",
+                "to_name": "text",
+                "type": "choices",
+                "value": {
+                  "choices": [
+                    "class_A"
+                  ]
+                }
+              }
+              ],
+              "was_cancelled": false,
+              "ground_truth": true,
+
+              "lead_time": null,
+              "task": 1
+            }
+            ],
+            "predictions": [
+            {
+              "id": 1,
+              "model_version": "model_version_A",
+              "created_ago": "0\u00a0minutes",
+              "result": [
+              {
+                "from_name": "text_class",
+                "to_name": "text",
+                "type": "choices",
+                "value": {
+                  "choices": [
+                    "class_A"
+                  ]
+                }
+              }
+              ],
+              "score": null,
+              "cluster": null,
+              "neighbors": null,
+              "mislabeling": 0.0,
+
+              "task": 1
+            }
+            ],
+            "drafts": [],
+
+            "annotators": [
+              1
+            ],
+            "project": 1
+          },
+          {
+            "cancelled_annotations": 0,
+            "completed_at": null,
+
+            "annotations_results": "",
+            "data": {
+              "int_field": 42,
+              "text": "opop"
+            },
+            "id": 6,
+            "predictions_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_PREDICTIONS_TESTING]}}]",
+            "predictions_score": null,
+            "total_annotations": 0,
+            "total_predictions": 1,
+            "annotations_ids": "",
+            "annotations": [],
+            "predictions": [
+            {
+              "id": 3,
+              "model_version": "undefined",
+              "created_ago": "0\u00a0minutes",
+              "result": [
+              {
+                "from_name": "text_class",
+                "to_name": "text",
+                "type": "choices",
+                "value": {
+                  "choices": [
+                    "class_PREDICTIONS_TESTING"
+                  ]
+                }
+              }
+              ],
+              "score": null,
+              "cluster": null,
+              "neighbors": null,
+              "mislabeling": 0.0,
+
+              "task": 6
+            }
+            ],
+            "drafts": [],
+
+            "annotators": [],
+            "project": 1
+          },
+          {
+            "cancelled_annotations": 0,
+            "completed_at": null,
+
+            "annotations_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_A]}}]",
+            "data": {
+              "int_field": 20,
+              "text": "x2"
+            },
+            "id": 2,
+            "predictions_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_A]}}]",
+            "predictions_score": null,
+            "total_annotations": 1,
+            "total_predictions": 1,
+            "annotations_ids": "2",
+            "annotations": [
+            {
+              "id": 2,
+              "created_username": " test_suites_user@heartex.com, 1",
+              "created_ago": "0\u00a0minutes",
+              "completed_by": 1,
+              "result": [
+              {
+                "from_name": "text_class",
+                "to_name": "text",
+                "type": "choices",
+                "value": {
+                  "choices": [
+                    "class_A"
+                  ]
+                }
+              }
+              ],
+              "was_cancelled": false,
+              "ground_truth": true,
+
+              "lead_time": null,
+              "task": 2
+            }
+            ],
+            "predictions": [
+            {
+              "id": 2,
+              "model_version": "model_version_A",
+              "created_ago": "0\u00a0minutes",
+              "result": [
+              {
+                "from_name": "text_class",
+                "to_name": "text",
+                "type": "choices",
+                "value": {
+                  "choices": [
+                    "class_A"
+                  ]
+                }
+              }
+              ],
+              "score": null,
+              "cluster": null,
+              "neighbors": null,
+              "mislabeling": 0.0,
+
+              "task": 2
+            }
+            ],
+            "drafts": [],
+
+            "annotators": [
+              1
+            ],
+            "project": 1
+          },
+          {
+            "cancelled_annotations": 0,
+            "completed_at": null,
+
+            "annotations_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_TESTING]}}]",
+            "data": {
+              "int_field": "99",
+              "text": "yoyo"
+            },
+            "id": 3,
+            "predictions_results": "",
+            "predictions_score": null,
+            "total_annotations": 1,
+            "total_predictions": 0,
+            "annotations_ids": "3",
+            "annotations": [
+            {
+              "id": 3,
+              "created_username": " test_suites_user@heartex.com, 1",
+              "created_ago": "0\u00a0minutes",
+              "completed_by": 1,
+              "result": [
+              {
+                "from_name": "text_class",
+                "to_name": "text",
+                "type": "choices",
+                "value": {
+                  "choices": [
+                    "class_TESTING"
+                  ]
+                }
+              }
+              ],
+              "was_cancelled": false,
+              "ground_truth": true,
+
+              "lead_time": null,
+              "task": 3
+            }
+            ],
+            "predictions": [],
+            "drafts": [],
+
+            "annotators": [
+              1
+            ],
+            "project": 1
+          }
+          ]
+        }
