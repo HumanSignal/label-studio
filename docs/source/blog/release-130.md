@@ -23,10 +23,8 @@ If you only want to selectively perform ML-assisted labeling, that's an option t
 For example, with this example labeling configuration, the Brush mask tool is visible for manual labeling and the KeyPoint labeling tool is visible only when in auto-annotation mode. 
 ```xml
 <View>
-  <View style="display:flex;align-items:start;gap:8px;flex-direction:column-reverse">
-    <Image name="img" value="$image_url" zoomControl="true" zoom="true" rotateControl="true"/>
-    <Brush name="brush" toName="img" smart="false" showInline="true"/>
-  </View>
+  <Image name="img" value="$image" zoomControl="true" zoom="true" rotateControl="true"/>
+  <Brush name="brush" toName="img" smart="false" showInline="true"/>
   <KeyPoint name="kp" toName="img" smartOnly="true"/>
   <Labels name="lb" toName="img">
     <Label value="Bird"/>
