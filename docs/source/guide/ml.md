@@ -134,7 +134,7 @@ ML-assisted labeling with interactive preannotations works with image segmentati
    4. Enter the **URL** for the running machine learning backend. For example, `http://example.com:9090`.
    5. Enable **Use for interactive preannotation**.
    6. Click **Validate and Save**. 
-2. For image labeling, update your labeling configuration to include `smart="true"` options for the type of labeling you're performing. This option is supported for Rectangle, Ellipse, Polygon, Keypoint, and Brush tags. See the [tag documentation](/tags). If you only want the smart option to appear and don't want to perform manual labeling at all, use `smartOnly="true"`. 
+2. For image labeling, you can update your labeling configuration to include `smart="true"` option for the type of labeling you're performing. Smart tools appear by default if auto-annotation is enabled. <br>This option is supported for Rectangle, Ellipse, Polygon, Keypoint, and Brush tags. See the [tag documentation](/tags). If you only want the smart option to appear and don't want to perform manual labeling at all, use `smartOnly="true"`. 
    1. For your project, open **Settings > Labeling Interface**.
    2. Click **Code** to view the XML labeling configuration.
    3. For the relevant tag type that you want to use to generate predictions with your ML backend, add the `smart="true"` parameter. For example: 
