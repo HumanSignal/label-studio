@@ -37,7 +37,7 @@ class TaskPagination(PageNumberPagination):
 
     def paginate_queryset(self, queryset, request, view=None):
         self.total_predictions = Prediction.objects.filter(task_id__in=queryset).count()
-        self.total_annotations = Annotation.objects.filter(task_id__in=queryset).count()
+        self.total_annotations = Annotation.objects.filter(task_id__in=queryset, was_cancelled=False).count()
         return super().paginate_queryset(queryset, request, view)
 
     def get_paginated_response(self, data):
@@ -143,11 +143,17 @@ class ViewAPI(viewsets.ModelViewSet):
         # paginated tasks
         self.pagination_class = TaskPagination
         page = self.paginate_queryset(queryset)
+        all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
+        fields_for_evaluation = get_fields_for_evaluation(view.get_prepare_tasks_params(), request.user)
         if page is not None:
             ids = [task.id for task in page]  # page is a list already
-            all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
-            fields_for_evaluation = get_fields_for_evaluation(view.get_prepare_tasks_params(), request.user)
-            tasks = list(Task.prepared.annotate_queryset(Task.objects.filter(id__in=ids), fields_for_evaluation=fields_for_evaluation, all_fields=all_fields))
+            tasks = list(
+                Task.prepared.annotate_queryset(
+                    Task.objects.filter(id__in=ids),
+                    fields_for_evaluation=fields_for_evaluation,
+                    all_fields=all_fields,
+                )
+            )
             tasks_by_ids = {task.id: task for task in tasks}
 
             # keep ids ordering
@@ -164,6 +170,7 @@ class ViewAPI(viewsets.ModelViewSet):
         # all tasks
         if project.evaluate_predictions_automatically:
             evaluate_predictions(queryset.filter(predictions__isnull=True))
+        queryset = Task.prepared.annotate_queryset(queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields)
         serializer = self.task_serializer_class(queryset, many=True, context=context)
         return Response(serializer.data)
 
@@ -260,7 +267,7 @@ class TaskAPI(APIView):
 
         Retrieve a specific task by ID.
         """
-        task = Task.prepared.get_queryset(fields_for_evaluation='all').get(id=pk)
+        task = Task.prepared.get_queryset(all_fields=True).get(id=pk)
         context = self.get_serializer_context(request)
         context['project'] = project = task.project
 
