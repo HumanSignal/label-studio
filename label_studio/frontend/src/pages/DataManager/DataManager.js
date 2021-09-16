@@ -33,8 +33,8 @@ const initializeDataManager = async (root, props, params) => {
     showPreviews: false,
     apiEndpoints: APIConfig.endpoints,
     interfaces: {
-      import: false,
-      export: false,
+      import: true,
+      export: true,
       backButton: false,
       labelingHeader: false,
       autoAnnotation: params.autoAnnotation,
@@ -61,6 +61,7 @@ export const DataManagerPage = ({...props}) => {
   const setContextProps = useContextProps();
   const [crashed, setCrashed] = useState(false);
   const dataManagerRef = useRef();
+  const projectId = project?.id;
 
   const init = useCallback(async () => {
     if (!LabelStudio) return;
@@ -129,7 +130,7 @@ export const DataManagerPage = ({...props}) => {
     }
 
     setContextProps({dmRef: dataManager});
-  }, [LabelStudio, DataManager]);
+  }, [LabelStudio, DataManager, projectId]);
 
   const destroyDM = useCallback(() => {
     if (dataManagerRef.current) {
@@ -169,8 +170,6 @@ DataManagerPage.context = ({dmRef}) => {
 
   const links = {
     '/settings': 'Settings',
-    '/data/import': "Import",
-    '/data/export': 'Export',
   };
 
   const updateCrumbs = (currentMode) => {

@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' of github.com:heartexlabs/dm2",
-  "commit": "ca6629602900ec102a440503f30f7fffd8c5c931",
+  "message": "Fix CI flow",
+  "commit": "6587b10eda3de2bbdd617caeeecb167293c161d2",
   "branch": "master",
-  "date": "2021-09-13T14:14:11Z"
+  "date": "2021-09-15T13:10:22Z"
 }
