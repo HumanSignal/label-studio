@@ -20,6 +20,7 @@ jobs:
       collect_analytics: false
       SENTRY_ENVIRONMENT: tests-ubuntu-sqlite
       SENTRY_RATE: 0
+      DJANGO_DB: sqlite
       # SENTRY_DSN:
 
     steps:
@@ -150,6 +151,7 @@ jobs:
       collect_analytics: false
       SENTRY_ENVIRONMENT: tests-windows-sqlite
       SENTRY_RATE: 0
+      DJANGO_DB: sqlite
       # SENTRY_DSN:
 
     steps:

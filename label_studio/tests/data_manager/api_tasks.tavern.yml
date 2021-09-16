@@ -2,9 +2,10 @@
 test_name: tasks-all-fields-postgre
 strict: false
 marks:
-  - skipif: "'default' not in '{tavern.env_vars.DJANGO_DB}'"
   - usefixtures:
       - django_live_url
+  - skipif: "'default' not in '{tavern.env_vars.DJANGO_DB}'"
+
 stages:
 
   - id: signup
