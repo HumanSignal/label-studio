@@ -460,8 +460,14 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                     queue_info += (' & ' if queue_info else '') + 'Breadth first queue'
                     return self._make_response(next_task, request, queue=queue_info)
 
-            if project.sampling == project.SEQUENCE or dm_queue:
+            # data manager queue
+            if dm_queue:
                 queue_info += (' & ' if queue_info else '') + 'Data manager queue'
+                logger.debug(f'User={request.user} tries sequence sampling from {not_solved_tasks_count} tasks')
+                next_task = not_solved_tasks.first()
+
+            elif project.sampling == project.SEQUENCE:
+                queue_info += (' & ' if queue_info else '') + 'Sequence queue'
                 logger.debug(f'User={request.user} tries sequence sampling from {not_solved_tasks_count} tasks')
                 next_task = self._get_first_unlocked(not_solved_tasks)
 
