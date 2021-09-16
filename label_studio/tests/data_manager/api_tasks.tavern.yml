@@ -161,7 +161,7 @@ stages:
           "annotations": [
           {
 
-            "created_username": " test_suites_user@heartex.com, 1",
+            "created_username": " test_suites_user@heartex.com, {created_by}",
             "created_ago": "0\u00a0minutes",
             "completed_by": !int "{created_by}",
             "result": [
@@ -225,7 +225,7 @@ stages:
           "annotations_ids": !anystr "",
           "annotations": [
           {
-            "created_username": " test_suites_user@heartex.com, 1",
+            "created_username": " test_suites_user@heartex.com, {created_by}",
             "created_ago": "0\u00a0minutes",
             "result": [
             {
