@@ -63,7 +63,7 @@ For example, you can label all instances of opossum in this excerpt from [Ecolog
 
 <br/><img src="/images/release-130/possum-text-annotation.gif" alt="" class="gif-border" width="" height="" />
 
-You can try this yourself by downloading this example [machine learning backend for substring matching](https://github.com/heartexlabs/label-studio-ml-backend/pull/32), or take it to the next level using a more sophisticated NLP model like a [transformer](https://github.com/heartexlabs/label-studio-transformers). See more about how to [create your own machine learning backend](/guide/ml_create.html)
+You can try this yourself by downloading this example [machine learning backend for substring matching](https://github.com/heartexlabs/label-studio-ml-backend/blob/master/label_studio_ml/examples/substring_matching/substring_matching.py), or take it to the next level using a more sophisticated NLP model like a [transformer](https://github.com/heartexlabs/label-studio-transformers). See more about how to [create your own machine learning backend](/guide/ml_create.html)
 
 Install or upgrade Label Studio and [start using ML-assisted labeling with interactive preannotations](/guide/ml.html#Get-interactive-pre-annotations) today!
 
