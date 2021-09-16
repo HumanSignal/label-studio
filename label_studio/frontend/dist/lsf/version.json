@@ -1,6 +1,6 @@
 {
-  "message": "Fix toolbar per-object issue (#285)\n\n* [fix] Toolbar Singleton\r\n\r\n* Fix typo\r\n\r\n* Remove excess code\r\n\r\n* Fix rotation control\r\n\r\n* Fix image labels assignment",
-  "commit": "5bac6d3f12f70664200f9e20057992626fa18e09",
+  "message": "[fix] Null when labels are empty on keypoints",
+  "commit": "389df15782faa749148b055a93aed67e9f75174e",
   "branch": "master",
-  "date": "2021-09-16T13:09:07Z"
+  "date": "2021-09-16T14:40:04Z"
 }
