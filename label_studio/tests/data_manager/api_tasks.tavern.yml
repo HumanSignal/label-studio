@@ -163,7 +163,7 @@ stages:
 
             "created_username": " test_suites_user@heartex.com, 1",
             "created_ago": "0\u00a0minutes",
-            "completed_by": 1,
+            "completed_by": !int "{created_by}",
             "result": [
             {
               "type": "choices",
@@ -290,7 +290,7 @@ stages:
           "annotations": [
           {
             "created_ago": "0\u00a0minutes",
-            "completed_by": 1,
+            "completed_by": !int "{created_by}",
             "result": [
             {
               "type": "choices",
