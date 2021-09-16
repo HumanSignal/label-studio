@@ -65,10 +65,13 @@ For example, you can label all instances of opossum in this excerpt from [Ecolog
 
 You can try this yourself by downloading this example [machine learning backend for substring matching](https://github.com/heartexlabs/label-studio-ml-backend/blob/master/label_studio_ml/examples/substring_matching/substring_matching.py), or take it to the next level using a more sophisticated NLP model like a [transformer](https://github.com/heartexlabs/label-studio-transformers). See more about how to [create your own machine learning backend](/guide/ml_create.html)
 
-Add your implementation for **predict** method
-Check task data in tasks parameter 
-Check context details in kwargs['context']
-Check this [code example](https://github.com/heartexlabs/label-studio-ml-backend/tree/master/label_studio_ml/examples/substring_matching) for more details 
+Check this [code example](https://github.com/heartexlabs/label-studio-ml-backend/tree/master/label_studio_ml/examples/substring_matching) for more details.
+Quick guide:
+- Add your implementation for **predict** method in ML backend 
+- Take task data in tasks parameter which contains details about the task that is being preannotated
+- Take context details in kwargs['context'] which contains details about your actions in Label Studio
+- Construct a prediction from the data you got from Label Studio
+- Return result in Label Studio format (check example for details)
 
 Install or upgrade Label Studio and [start using ML-assisted labeling with interactive preannotations](/guide/ml.html#Get-interactive-pre-annotations) today!
 
