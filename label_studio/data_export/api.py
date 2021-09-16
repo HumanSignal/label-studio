@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
     decorator=swagger_auto_schema(
         tags=['Export'],
         operation_summary='Get export formats',
-        operation_description='Retrieve the available export formats for the current project.',
+        operation_description='Retrieve the available export formats for the current project by ID.',
         responses={
             200: openapi.Response(
                 description='Export formats',
@@ -78,7 +78,7 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
                 type=openapi.TYPE_BOOLEAN,
                 in_=openapi.IN_QUERY,
                 description="""
-                          If true, the converter will download all resource files like images, audio, etc. 
+                          If true, download all resource files such as images, audio, and others relevant to the tasks. 
                           """,
             ),
             openapi.Parameter(
@@ -87,7 +87,7 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
                 items=openapi.Schema(title='Task ID', description='Individual task ID', type=openapi.TYPE_INTEGER),
                 in_=openapi.IN_QUERY,
                 description="""
-                          To retrieve only subset of tasks, specify the list of target tasks IDs
+                          Specify a list of task IDs to retrieve only the details for those tasks.
                           """,
             ),
         ],
@@ -174,9 +174,9 @@ class ExportAPI(generics.RetrieveAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Export'],
-        operation_summary='Export files',
+        operation_summary='Get exported files',
         operation_description="""
-        List of files exported from the Label Studio UI using the Export button on the Data Manager page.
+        Retrieve a list of files exported from the Label Studio UI using the Export button on the Data Manager page.
         """,
     ),
 )
@@ -228,9 +228,9 @@ class ProjectExportFilesAuthCheck(APIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Export'],
-        operation_summary='List your exports',
+        operation_summary='Get all export files',
         operation_description="""
-        Returns a list of exports.
+        Returns a list of exported files for a specific project by ID.
         """,
     ),
 )
@@ -240,7 +240,7 @@ class ProjectExportFilesAuthCheck(APIView):
         tags=['Export'],
         operation_summary='Create new export',
         operation_description="""
-        Create an instance of export and start background task for file generating.
+        Create a new export request to start a background task and generate an export file for a specific project by ID.
         """,
     ),
 )
@@ -274,7 +274,7 @@ class ExportListAPI(generics.ListCreateAPIView):
         tags=['Export'],
         operation_summary='Get export by ID',
         operation_description="""
-        Retrieve information about a export by project ID.
+        Retrieve information about an export file by export ID.
         """,
     ),
 )
@@ -284,7 +284,7 @@ class ExportListAPI(generics.ListCreateAPIView):
         tags=['Export'],
         operation_summary='Delete export',
         operation_description="""
-        Delete a export by specified export ID.
+        Delete an export file by specified export ID.
         """,
     ),
 )
@@ -313,7 +313,9 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
         tags=['Export'],
         operation_summary='Download export file',
         operation_description="""
-        Returns download file.
+        Download an export file in the specified format for a specific project. Specify the project ID with the `id` 
+        parameter in the path and the ID of the export file you want to download using the `export_pk` parameter 
+        in the path. 
         """,
         manual_parameters=[
             openapi.Parameter(
