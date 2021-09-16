@@ -38,7 +38,15 @@ logger = logging.getLogger(__name__)
         ),
     ),
 )
-@method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
+        tags=['Machine Learning'],
+        operation_summary='List ML backends',
+        operation_description="""
+        List all configured ML backends for a specific project by ID.
+        """
+    ))
 class MLBackendListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
@@ -81,7 +89,7 @@ class MLBackendListAPI(generics.ListCreateAPIView):
         tags=['Machine Learning'],
         operation_summary='Get ML Backend',
         operation_description="""
-    Get details about existing ML backend connections for a project ID. For example, make a GET request using the
+    Get details about a specific ML backend connection by ID. For example, make a GET request using the
     following cURL command:
     ```bash
     curl {host}/api/ml?project={{project_id}} -H 'Authorization: Token abc123'
@@ -169,17 +177,19 @@ class MLBackendTrainAPI(APIView):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Machine Learning'],
-        operation_summary='Intractive Annotating',
+        operation_summary='Request Interactive Annotation',
         operation_description="""
-
+        Send a request to the machine learning backend set up to be used for interactive preannotations to retrieve a
+        predicted region based on annotator input. 
+        See [set up machine learning](ml.html#Get-interactive-preannotations) for more.
         """,
         request_body=MLInteractiveAnnotatingRequest,
         responses={
-            200: openapi.Response(title='Annotating OK', description='Intractive Annotating has successfull.'),
+            200: openapi.Response(title='Annotating OK', description='Interactive annotation has succeeded.'),
         },
     ),
 )
-class MLBackendIntractiveAnnotating(APIView):
+class MLBackendInteractiveAnnotating(APIView):
     def post(self, request, *args, **kwargs):
         ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)

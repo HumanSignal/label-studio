@@ -40,8 +40,8 @@ class MLBackend(models.Model):
     is_interactive = models.BooleanField(
         _('is_interactive'),
         default=False,
-        help_text=("It's used for interactive annotating. "
-                   'If true, model has to return one-length list with results')
+        help_text=("Used to interactively annotate tasks. "
+                   'If true, model returns one list with results')
     )
     url = models.TextField(
         _('url'),
@@ -78,7 +78,7 @@ class MLBackend(models.Model):
         _('timeout'),
         blank=True,
         default=100.0,
-        help_text='Responce model timeout',
+        help_text='Response model timeout',
     )
     project = models.ForeignKey(
         Project,
@@ -176,7 +176,7 @@ class MLBackend(models.Model):
         elif len(responses) == 1:
             logger.warning(
                 f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
-                f"switched to one-by-one task retrieving"
+                f"switched to one-by-one task retrieval"
             )
             for task in tasks:
                 self.predict_one_task(task)
@@ -252,7 +252,7 @@ class MLBackend(models.Model):
     def interactive_annotating(self, task, context=None):
         result = {}
         if not self.is_interactive:
-            result['errors'] = ["You can't use not interactive model to interactive annotating"]
+            result['errors'] = ["Model is not set to be used for interactive preannotations"]
             return result
 
         tasks_ser = TaskSimpleSerializer([task], many=True).data
@@ -268,9 +268,9 @@ class MLBackend(models.Model):
             return result
 
         if not (isinstance(ml_api_result.response, dict) and 'results' in ml_api_result.response):
-            logger.warning(f'ML backend returns an incorrect response, it should be a dict: {ml_api_result.response}')
+            logger.warning(f'ML backend returns an incorrect response, it must be a dict: {ml_api_result.response}')
             result['errors'] = ['Incorrect response from ML service: '
-                                'ML backend returns an incorrect response, it should be a dict.']
+                                'ML backend returns an incorrect response, it must be a dict.']
             return result
 
         ml_results = ml_api_result.response.get(
@@ -294,7 +294,7 @@ class MLBackendPredictionJob(models.Model):
     job_id = models.CharField(max_length=128)
     ml_backend = models.ForeignKey(MLBackend, related_name='prediction_jobs', on_delete=models.CASCADE)
     model_version = models.TextField(
-        _('model version'), blank=True, null=True, help_text='Model version this job associated with'
+        _('model version'), blank=True, null=True, help_text='Model version this job is associated with'
     )
     batch_size = models.PositiveSmallIntegerField(
         _('batch size'), default=100, help_text='Number of tasks processed per batch'
