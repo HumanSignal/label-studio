@@ -101,17 +101,7 @@ def get_fields_for_evaluation(prepare_params, user):
     from projects.models import Project
 
     result = []
-    # result += get_fields_for_filter_ordering(prepare_params)
-    # # collect fields from ordering
-    # if prepare_params.ordering:
-    #     ordering_field_name = prepare_params.ordering[0].replace("tasks:", "").replace("-", "")
-    #     result.append(ordering_field_name)
-
-    # # collect fields from filters
-    # if prepare_params.filters:
-    #     for _filter in prepare_params.filters.items:
-    #         filter_field_name = _filter.filter.replace("filter:tasks:", "")
-    #         result.append(filter_field_name)
+    result += get_fields_for_filter_ordering(prepare_params)
 
     # visible fields calculation
     fields = prepare_params.data.get('hiddenColumns', None)
