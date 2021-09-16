@@ -140,7 +140,7 @@ ML-assisted labeling with interactive preannotations works with image segmentati
    3. For the relevant tag type that you want to use to generate predictions with your ML backend, add the `smart="true"` parameter. For example: 
       ```<Brush name="brush" toName="img" smart="true" showInline="true"/>```
    4. Save your changes.
-3. After you start labeling, enable **Auto-Annotation** to see and use the smart option to assign a label to a text span, draw a shape, mask, or assign a keypoint. 
+3. After you start labeling, enable **Auto-Annotation** to see and use the smart option to draw a shape, mask, or assign a keypoint. 
 4. For image labeling, after you enable auto-annotation you can choose whether to **Auto accept annotation suggestions**. If you automatically accept annotation suggestions, regions show up automatically and are immediately created. If you don't automatically accept suggestions, the regions appear but you can reject or approve them manually, either individually or all at once.
 
 <br/><img src="/images/release-130/predict-owl-region.gif" alt="" class="gif-border" width="800px" height="533px" />

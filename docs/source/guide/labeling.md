@@ -130,6 +130,13 @@ In Label Studio Enterprise, if you're an administrator or project manager, you c
 3. Select names of annotators and click the `>` arrow to assign them to the selected tasks.
 4. Click **Assign**. 
 
+## Perform ML-assisted labeling with interactive preannotations
+
+If you have a machine learning backend set up to [get interactive preannotations](ml.html#Get-interactive-preannotations), you can choose whether to use those predictions while you label. 
+
+1. After you start labeling, you can enable **Auto-Annotation** to see and use the smart option to assign a label to draw a shape, mask, or assign a keypoint. After using the smart option to draw on an image, or labeling a text or HTML span, the ML backend returns predictions.  
+2. For image labeling, you can choose whether to **Auto accept annotation suggestions** after you enable auto-annotation. If you automatically accept annotation suggestions, regions show up automatically and are immediately created. If you don't automatically accept suggestions, the regions appear but you can reject or approve them manually, either individually or all at once. Predicted text regions are automatically accepted.
+
 ## Use keyboard shortcuts to label regions faster
 Use keyboard shortcuts (hotkeys) to improve your labeling performance. When performing a labeling task, click the gear icon to see more details about hotkeys or to enable or disable hotkeys. 
 
