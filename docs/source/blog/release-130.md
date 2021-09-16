@@ -72,3 +72,4 @@ Install or upgrade Label Studio and [start using ML-assisted labeling with inter
 ML-assisted labeling is the most exciting part of this release, but it's not the only improvement we've made. We improved the functionality of the filtering options on the data manager, and also improved semantic segmentation workflows. We also added new capabilities for exporting the results of large labeling projects by introducing export files. Start by [creating an export file](/api#operation/api_projects_exports_create) and then [download the export file](/api#operation/api_projects_exports_download_read) with the results.
 
 Check out the full list of improvements and bug fixes in the [release notes on GitHub](https://github.com/heartexlabs/label-studio/releases/tag/v1.3.0).
+
