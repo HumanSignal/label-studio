@@ -1,9 +1,5 @@
 version: '3.3'
 
-# NOTE:
-# if you want to use mysql, don't forget to add this line into Dockerfile:
-# RUN apt install libmysqlclient-dev mysql-client
-
 services:
   app:
     environment:
