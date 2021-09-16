@@ -7,19 +7,33 @@ meta_title: Label Studio Release Notes 1.3.0
 meta_description: Release notes and information about Label Studio version 1.3.0, featuring ML-assisted labeling 
 ---
 
-At Label Studio, we're always looking for ways to help you accelerate your data annotation process. With the release of version 1.3.0, you can perform model-assisted labeling with any connected [ML backend](/guide/ml.html). 
+At Label Studio, we're always looking for ways to help you accelerate your data annotation process. With the release of version 1.3.0, you can perform [model-assisted labeling with any connected machine learning backend](/guide/ml.html#Get-interactive-preannotations). 
 
-By using a machine learning model to interactively predict annotations, expert human annotators can work alongside with pretrained machine learning models or rule-based heuristics to more efficiently complete labeling tasks. 
-
-ML-assisted labeling is applicable to many different data types. For example, it works with image segmentation and object detection tasks using rectangles, ellipses, polygons, brush masks, and keypoints, but automatically infer complex shapes on the screen like masks or polygons by interacting with simple primitives like rectangles or keypoints.
-You can also perform ML-assisted labeling for named entity recognition tasks for HTML and text, in case you want to automatically find repetitive or semantically similar substring patterns within long texts.
-
-
-### Example of interactive preannotations with Images
+By interactively predicting annotations, expert human annotators can work alongside pretrained machine learning models or rule-based heuristics to more efficiently complete labeling tasks, helping you get more value from your annotation process and make progress in your machine learning workflow sooner.
 
 <br/><img src="/images/release-130/predict-owl-region.gif" alt="" class="gif-border" width="800px" height="533px" />
 
-Upgrade to the latest version and select **Use for interactive preannotations** when you set up an ML backend, or edit an existing ML backend connection and toggle that option to get started today!
+You can perform ML-assisted labeling with many different types of data. Supplement your image segmentation and object detection tasks that use rectangles, ellipses, polygons, brush masks, and keypoints, even automatically inferring complex shapes like masks or polygons by interacting with simple primitives such as rectangles or keypoints.
+
+Beyond image labeling use cases, you can also use ML-assisted labeling for your named entity recognition tasks with HTML and text, in case you want to automatically find repetitive or semantically similar substring patterns within long text samples.
+
+[Upgrade to the latest version](/guide/install.html) and select **Use for interactive preannotations** when you set up an ML backend, or edit an existing ML backend connection and toggle that option to get started today!
+
+## Interactive preannotations with images
+
+Set up an object detection or image segmentation machine learning backend and you can perform interactive pre-annotation with images! For example, you can send a keypoint to the machine learning model and it can return a predicted mask region for your image.
+
+<br/><img src="/images/release-130/predict-bird-region.gif" alt="" class="gif-border" width="800px" height="533px" />
+
+Depending on whether speed or precision is more important in your labeling process, you can choose whether to automatically accept the predicted labels. If you deselect the option to auto accept annotation suggestions, you can manually accept predicted regions before submitting an annotation. 
+
+<br/><img src="/images/release-130/accept-predictions.gif" alt="" class="gif-border" width="800px" height="533px" />
+
+Of course, with the eraser tool (improved with new granularity in this release!) you can manually correct any incorrect automatically predicted regions.
+
+<br/><img src="/images/release-130/edit-predicted-mask.gif" alt="" class="gif-border" width="800px" height="533px" />
+
+## Selective preannotation with images 
 
 If you only want to selectively perform ML-assisted labeling, that's an option too! When you're labeling, you can toggle **Auto-Annotation** for specific tasks so that you can manually label more complicated tasks.
 
@@ -41,47 +55,18 @@ This lets you create traditional brush mask annotations for some tasks, or use t
 
 <br/><img src="/images/release-130/labeling-yes-auto.png" alt="" class="gif-border" width="800px" height="415px" />
 
-This also works for named entity recognition tasks. For example, if you have a long selection of text with multiple occurrences of an entity, you can set up a machine learning backend to identify identical or similar text spans based on a selection, 
+## Interactive pre-annotations for text
 
-```xml
- <View>
-  <Labels name="label" toName="text" smart="true">
-    <Label value="PER" background="red"/>
-    <Label value="ORG" background="darkorange"/>
-    <Label value="LOC" background="orange"/>
-    <Label value="MISC" background="green"/>
-  </Labels>
-  <Text name="text" value="$ner"/>
-</View>
-```
+You can also get interactive pre-annotations for text or HTML when performing named entity recognition (NER) tasks. For example, if you have a long sample of text with multiple occurrences of a word or phrase, you can set up a machine learning backend to identify identical or similar text spans based on a selection. Amplify your text labeling efficiency with this functionality!
 
-<br/><img src="/images/release-130/text-annotation.gif" alt="" class="gif-border" width="" height="" />
+For example, you can label all instances of opossum in this excerpt from [Ecology of the Opossum on a Natural Area in Northeastern Kansas by Henry S. Fitch et al.](https://www.gutenberg.org/ebooks/37199) using the [Text Named Entity Recognition Template](/templates/named_entity.html).
 
-Depending on whether speed or precision is more important in your labeling process, you can choose whether to automatically accept the predicted labels. If you deselect the option to auto accept annotation suggestions, you can manually accept predicted regions before submitting an annotation. 
+<br/><img src="/images/release-130/possum-text-annotation.gif" alt="" class="gif-border" width="" height="" />
 
-<br/><img src="/images/release-130/accept-predictions.gif" alt="" class="gif-border" width="800px" height="533px" />
-
-Of course, with the eraser tool (improved with new granularity in this release!) you can manually correct any incorred predicted regions.
-
-<br/><img src="/images/release-130/edit-predicted-mask.gif" alt="" class="gif-border" width="800px" height="533px" />
-
-
-### Example of interactive preannotations with texts
-
-Here is an example you can label all >400 occurences of the word "Lorem Ipsum" in the long text in one click:
-
-<GIF HERE>
-
-Try it yourself by downloading [Machine Learning backend for substring matching](https://github.com/heartexlabs/label-studio-ml-backend/pull/32)!
-Use this backend to take your text labeling efficiency to the next level. Or you can do much more, by replacing rule-based substring matching with more sophisticated NLP models like [Transformers](https://github.com/heartexlabs/label-studio-transformers)!
-Read [ML backend guide]() on how to easily create your own ML backend for interactive preannotations
-
-
+You can try this yourself by downloading this example [machine learning backend for substring matching](https://github.com/heartexlabs/label-studio-ml-backend/pull/32), or take it to the next level using a more sophisticated NLP model like a [transformer](https://github.com/heartexlabs/label-studio-transformers). See more about how to [create your own machine learning backend](/guide/ml_create.html)
 
 Install or upgrade Label Studio and [start using ML-assisted labeling with interactive preannotations](/guide/ml.html#Get-interactive-pre-annotations) today!
 
-
 ## Other improvements
 
-ML-assisted labeling is the most exciting part of this release, but it's not the only improvement we've made. We improved the functionality of the filtering options on the data manager, and also improved semantic segmentation workflows. Check out the full list of improvements and bug fixes in the [release notes on GitHub](https://github.com/heartexlabs/label-studio/releases/tag/v1.3.0). 
-
+ML-assisted labeling is the most exciting part of this release, but it's not the only improvement we've made. We improved the functionality of the filtering options on the data manager, and also improved semantic segmentation workflows. Check out the full list of improvements and bug fixes in the [release notes on GitHub](https://github.com/heartexlabs/label-studio/releases/tag/v1.3.0).
