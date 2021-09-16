@@ -9,9 +9,13 @@ meta_description: Release notes and information about Label Studio version 1.3.0
 
 At Label Studio, we're always looking for ways to help you accelerate your data annotation process. With the release of version 1.3.0, you can perform model-assisted labeling with any connected [ML backend](/guide/ml.html). 
 
-By using a machine learning model to interactively predict annotations, expert human annotators can work alongside an untrained, partially trained, or pretrained machine learning model to more efficiently complete labeling tasks. 
+By using a machine learning model to interactively predict annotations, expert human annotators can work alongside with pretrained machine learning models or rule-based heuristics to more efficiently complete labeling tasks. 
 
-ML-assisted labeling works with image segmentation and object detection tasks using rectangles, ellipses, polygons, brush masks, and keypoints. You can also perform ML-assisted labeling for named entity recognition tasks for HTML and text. 
+ML-assisted labeling is applicable to many different data types. For example, it works with image segmentation and object detection tasks using rectangles, ellipses, polygons, brush masks, and keypoints, but automatically infer complex shapes on the screen like masks or polygons by interacting with simple primitives like rectangles or keypoints.
+You can also perform ML-assisted labeling for named entity recognition tasks for HTML and text, in case you want to automatically find repetitive or semantically similar substring patterns within long texts.
+
+
+### Example of interactive preannotations with Images
 
 <br/><img src="/images/release-130/predict-owl-region.gif" alt="" class="gif-border" width="800px" height="533px" />
 
@@ -61,7 +65,20 @@ Of course, with the eraser tool (improved with new granularity in this release!)
 
 <br/><img src="/images/release-130/edit-predicted-mask.gif" alt="" class="gif-border" width="800px" height="533px" />
 
+
+### Example of interactive preannotations with texts
+
+Here is an example you can label all >400 occurences of the word "Lorem Ipsum" in the long text in one click:
+
+<GIF HERE>
+
+Try it yourself by downloading [Machine Learning backend for substring matching](https://github.com/heartexlabs/label-studio-ml-backend/pull/32)!
+
+You can do much more, by replacing rule-based substring matching with more sophisticated NLP models like [Transformers](https://github.com/heartexlabs/label-studio-transformers)!
+
+
 Install or upgrade Label Studio and [start using ML-assisted labeling with interactive preannotations](/guide/ml.html#Get-interactive-pre-annotations) today!
+
 
 ## Other improvements
 
