@@ -73,8 +73,9 @@ Here is an example you can label all >400 occurences of the word "Lorem Ipsum" i
 <GIF HERE>
 
 Try it yourself by downloading [Machine Learning backend for substring matching](https://github.com/heartexlabs/label-studio-ml-backend/pull/32)!
+Use this backend to take your text labeling efficiency to the next level. Or you can do much more, by replacing rule-based substring matching with more sophisticated NLP models like [Transformers](https://github.com/heartexlabs/label-studio-transformers)!
+Read [ML backend guide]() on how to easily create your own ML backend for interactive preannotations
 
-You can do much more, by replacing rule-based substring matching with more sophisticated NLP models like [Transformers](https://github.com/heartexlabs/label-studio-transformers)!
 
 
 Install or upgrade Label Studio and [start using ML-assisted labeling with interactive preannotations](/guide/ml.html#Get-interactive-pre-annotations) today!
