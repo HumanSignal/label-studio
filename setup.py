@@ -55,6 +55,6 @@ setuptools.setup(
         ],
     },
     extras_require={
-        'mysql': ['mysqlclient>=2.0.3']
+        'mysql': ['mysqlclient']
     }
 )
