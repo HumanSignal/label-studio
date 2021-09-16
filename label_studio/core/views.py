@@ -17,6 +17,7 @@ from django.views.static import serve
 from django.http import JsonResponse
 from wsgiref.util import FileWrapper
 from rest_framework.views import APIView
+from drf_yasg.utils import swagger_auto_schema
 
 from core import utils
 from core.utils.io import find_file
@@ -87,6 +88,7 @@ class TriggerAPIError(APIView):
     authentication_classes = ()
     permission_classes = ()
 
+    @swagger_auto_schema(auto_schema=None)
     def get(self, request):
         raise Exception('test')
 
