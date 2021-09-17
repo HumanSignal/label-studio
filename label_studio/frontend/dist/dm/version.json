@@ -1,6 +1,6 @@
 {
-  "message": "Fix CI flow",
-  "commit": "6587b10eda3de2bbdd617caeeecb167293c161d2",
+  "message": "Disable Label Stream mode",
+  "commit": "8360eac25f7c402f25538a6d4c41ba09286ab05b",
   "branch": "master",
-  "date": "2021-09-15T13:10:22Z"
+  "date": "2021-09-17T15:58:17Z"
 }
