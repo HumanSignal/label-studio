@@ -1,6 +1,6 @@
 {
-  "message": "Fix CI flow",
-  "commit": "6587b10eda3de2bbdd617caeeecb167293c161d2",
+  "message": "Merge pull request #13 from heartexlabs/feature/label-all\n\n[ext] Label All/Label as displayed dropdown",
+  "commit": "895ad5961889d06a51eb5e4f1b2da070e29a5f70",
   "branch": "master",
-  "date": "2021-09-15T13:10:22Z"
+  "date": "2021-09-17T13:24:27Z"
 }
