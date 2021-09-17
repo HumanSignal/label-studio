@@ -1,6 +1,6 @@
 {
-  "message": "Remove trace",
-  "commit": "d30cb3e3cdfcdf62c9fb80e96e1d99b0d9570c36",
+  "message": "Allow pan tool to move image instead of regions (#293)",
+  "commit": "5f88fe14e4c70d1c39ddea40964405d1f44deaee",
   "branch": "master",
-  "date": "2021-09-17T11:47:33Z"
+  "date": "2021-09-17T15:20:29Z"
 }
