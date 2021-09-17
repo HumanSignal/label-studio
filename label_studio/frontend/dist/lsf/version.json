@@ -1,6 +1,6 @@
 {
-  "message": "[fix] zoomed keypoints size",
-  "commit": "7ea44530be16d547a5d069f5abf3ee21d8034d8c",
+  "message": "[fix] Hotkeys on reset state",
+  "commit": "ceb1dc1bf8d2259da3dd8627647d8b1578f35a14",
   "branch": "master",
-  "date": "2021-09-16T17:42:25Z"
+  "date": "2021-09-17T09:19:33Z"
 }

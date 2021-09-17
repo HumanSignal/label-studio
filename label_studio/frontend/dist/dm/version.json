@@ -1,6 +1,6 @@
 {
-  "message": "[ext] Label All/Label as displayed dropdown",
-  "commit": "59e3398544fed98664469b0dfc12afea81f97ea3",
-  "branch": "feature/label-all",
-  "date": "2021-09-16T16:41:50Z"
+  "message": "Fix CI flow",
+  "commit": "6587b10eda3de2bbdd617caeeecb167293c161d2",
+  "branch": "master",
+  "date": "2021-09-15T13:10:22Z"
 }
