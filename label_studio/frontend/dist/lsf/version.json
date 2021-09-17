@@ -1,6 +1,6 @@
 {
-  "message": "[fix] Hotkeys on reset state",
-  "commit": "ceb1dc1bf8d2259da3dd8627647d8b1578f35a14",
+  "message": "[fix] implement stricter dragging of selected shapes (#283)\n\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
+  "commit": "cc7337c4e156756bc52ca6bac39480330a5e1cb0",
   "branch": "master",
-  "date": "2021-09-17T09:19:33Z"
+  "date": "2021-09-17T09:49:17Z"
 }
