@@ -164,6 +164,6 @@ class ContextLog(object):
         else:
             try:
                url = 'https://tele.labelstud.io'
-               requests.post(url=url, json=payload)
+               requests.post(url=url, json=payload, timeout=3.0)
             except:
                 pass
