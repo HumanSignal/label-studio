@@ -2,6 +2,7 @@
 test_name: str-empty
 strict: false
 marks:
+  - skip
   - usefixtures:
       - django_live_url
 stages:
