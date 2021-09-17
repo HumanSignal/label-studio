@@ -1,6 +1,6 @@
 {
-  "message": "Disable Label Stream mode",
-  "commit": "8360eac25f7c402f25538a6d4c41ba09286ab05b",
+  "message": "[fix] Selection logic",
+  "commit": "e1f6f01eea0bdbe35d370aa0894def5ebc0dcb2a",
   "branch": "master",
-  "date": "2021-09-17T15:58:17Z"
+  "date": "2021-09-17T17:05:28Z"
 }
