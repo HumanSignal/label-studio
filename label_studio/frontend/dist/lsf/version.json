@@ -1,6 +1,6 @@
 {
-  "message": "[fix] implement stricter dragging of selected shapes (#283)\n\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
-  "commit": "cc7337c4e156756bc52ca6bac39480330a5e1cb0",
+  "message": "Remove trace",
+  "commit": "d30cb3e3cdfcdf62c9fb80e96e1d99b0d9570c36",
   "branch": "master",
-  "date": "2021-09-17T09:49:17Z"
+  "date": "2021-09-17T11:47:33Z"
 }
