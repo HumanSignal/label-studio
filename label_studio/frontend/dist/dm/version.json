@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #13 from heartexlabs/feature/label-all\n\n[ext] Label All/Label as displayed dropdown",
-  "commit": "895ad5961889d06a51eb5e4f1b2da070e29a5f70",
+  "message": "Disable Label Stream mode",
+  "commit": "8360eac25f7c402f25538a6d4c41ba09286ab05b",
   "branch": "master",
-  "date": "2021-09-17T13:24:27Z"
+  "date": "2021-09-17T15:58:17Z"
 }
