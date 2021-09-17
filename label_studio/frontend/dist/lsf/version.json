@@ -1,6 +1,6 @@
 {
-  "message": "[fix] zoomed polygon points size",
-  "commit": "b2231b0cacccaf328368d0764baeab82f3b7a1de",
+  "message": "[fix] Hotkeys on reset state",
+  "commit": "ceb1dc1bf8d2259da3dd8627647d8b1578f35a14",
   "branch": "master",
-  "date": "2021-09-15T11:36:22Z"
+  "date": "2021-09-17T09:19:33Z"
 }
