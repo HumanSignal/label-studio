@@ -1,6 +1,6 @@
 {
-  "message": "Allow pan tool to move image instead of regions (#293)",
-  "commit": "5f88fe14e4c70d1c39ddea40964405d1f44deaee",
+  "message": "Merge branch 'master' of github.com:heartexlabs/label-studio-frontend",
+  "commit": "15f0b902ddccd81c9b369b7022d7b8dac9b01845",
   "branch": "master",
-  "date": "2021-09-17T15:20:29Z"
+  "date": "2021-09-18T11:32:52Z"
 }
