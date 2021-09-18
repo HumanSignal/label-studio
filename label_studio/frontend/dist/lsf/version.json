@@ -1,6 +1,6 @@
 {
-  "message": "Allow pan tool to move image instead of regions (#293)",
-  "commit": "5f88fe14e4c70d1c39ddea40964405d1f44deaee",
+  "message": "fix video-audio sync (typo)",
+  "commit": "c67f222ee29f19f2417ffdf32389718cc4568f68",
   "branch": "master",
-  "date": "2021-09-17T15:20:29Z"
+  "date": "2021-09-18T08:04:37Z"
 }
