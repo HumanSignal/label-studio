@@ -1,7 +1,6 @@
-version: '3.3'
+version: "3.3"
 
 services:
-
   nginx:
     image: nginx:latest
     ports:
@@ -55,6 +54,5 @@ services:
     volumes:
       - ${POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql/data
 
-
 volumes:
-  static: {} 
+  static: {}
