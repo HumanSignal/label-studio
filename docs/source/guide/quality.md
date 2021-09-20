@@ -111,14 +111,13 @@ Label Studio Enterprise compares annotations from annotators and model predictio
 
 ## Define ground truth annotations for a project
 
-You can define ground truth annotations from a project's Data Manager page:
-1. When viewing the data manager for a project, select the checkboxes next to annotated tasks.
-2. In the selected tasks dropdown menu, select **Assign ground truths**. If there are multiple annotations for a task, only the first, or earliest annotation is assigned as a ground truth. 
-3. Confirm that you want to set the selected task annotations as ground truths. 
+Set specific task annotations as ground truth annotations from the **Data Manager** page for a project.
 
-You can also assign ground truths when you annotate a task.
-1. When labeling a task, create an annotation or select an existing one.
-2. Click the star icon to label the annotation as a ground truth. 
+1. Locate the task that you want to set a ground truth annotation for.
+2. Click the task to preview all annotations for the task as tabs. If an annotation is already set as a ground truth, the annotation ID in the tab has a yellow star next to it.
+3. In the annotation sidebar for the task, click the star icon next to the annotation ID to set the annotation result as a ground truth.
+
+A task can only have one annotation set as the ground truth annotation for the task. If you set a new annotation for a task as a ground truth, the previous annotation for that task set as a ground truth is updated to no longer be a ground truth annotation. 
 
 ## Manage ground truth annotations for a project
 
@@ -126,7 +125,15 @@ Review and modify the ground truth annotations for a project.
 
 ### Review existing ground truth annotations
 
-You can filter the Data Manager to show only tasks with ground truth annotations so that you can review them. 
+You can adjust the Data Manager columns to show whether a task has any annotations set as ground truth annotations. 
+1. On the **Data Manager**, select the **Columns** drop-down menu.
+2. Select the checkbox for **Ground Truth**. A column appears with a star icon and true or false values listed for tasks, indicating whether a ground truth annotation has been set for a task. 
+3. Click **Columns** again to close the menu.
+
+You can also filter the Data Manager to show only tasks with ground truth annotations so that you can review them. 
+1. On the **Data Manager**, select the **Filters** drop-down menu.
+2. Click **+ Add Filter** and select where **Ground Truth** is **yes**. The Data Manager updates to show only tasks with ground truth annotations set.
+3. Click **Filters** again to close the menu.
 
 ### Remove ground truth annotations
 To remove ground truth annotations, 
@@ -135,4 +142,4 @@ To remove ground truth annotations,
 
 You can also remove ground truths when you annotate a task.
 1. When labeling a task, create an annotation or select an existing one.
-2. Click the star icon to label the annotation as a ground truth. 
+2. Click the star icon to unset the annotation result as a ground truth. 
