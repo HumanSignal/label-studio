@@ -142,8 +142,10 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Machine Learning'],
         operation_summary='Train',
         operation_description="""
-        After you activate an ML backend, call this API with the ML backend ID to start training with 
+        After you add an ML backend, call this API with the ML backend ID to start training with 
         already-labeled tasks. 
+        
+        Get the ML backend ID by [listing the ML backends for a project](https://labelstud.io/api/#operation/api_ml_list).
         """,
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
