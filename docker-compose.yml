@@ -1,7 +1,6 @@
-version: '3.3'
+version: "3.3"
 
 services:
-
   nginx:
     image: nginx:latest
     ports:
@@ -47,15 +46,13 @@ services:
           nocopy: true
 
   db:
-    image: postgres:latest
+    image: postgres:11.5
     hostname: db
     restart: always
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
-      # https://github.com/docker-library/postgres/issues/435#issuecomment-611613071
-      - ${POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql
-
+      - ${POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql/data
 
 volumes:
-  static: {} 
+  static: {}
