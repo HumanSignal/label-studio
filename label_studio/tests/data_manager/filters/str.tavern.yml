@@ -70,7 +70,7 @@ stages:
   - name: get_tasks
     request:
       method: GET
-      url: '{django_live_url}/api/dm/views/{view.id}/tasks'
+      url: '{django_live_url}/api/dm/views/{view.id}/tasks?fields=all'
     response:
       json: {
         "total_annotations": 0,
@@ -129,7 +129,7 @@ stages:
   - name: get_tasks_with_regex
     request:
       method: GET
-      url: '{django_live_url}/api/dm/views/{view.id}/tasks'
+      url: '{django_live_url}/api/dm/views/{view.id}/tasks?fields=all'
     response:
       json: {
         "total_annotations": 0,
@@ -178,7 +178,7 @@ stages:
   - name: get_tasks_with_wrong_regex
     request:
       method: GET
-      url: '{django_live_url}/api/dm/views/{view.id}/tasks'
+      url: '{django_live_url}/api/dm/views/{view.id}/tasks?fields=all'
     response:
       json: {
         "total_annotations": 0,

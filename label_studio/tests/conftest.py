@@ -38,6 +38,11 @@ def disable_sentry():
     settings.SENTRY_DSN = None
 
 
+@pytest.fixture()
+def debug_modal_exceptions_false(settings):
+    settings.DEBUG_MODAL_EXCEPTIONS = False
+
+
 @pytest.fixture(scope="function")
 def enable_sentry():
     settings.SENTRY_RATE = 0

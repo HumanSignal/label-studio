@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #9 from heartexlabs/feature/regex-filter\n\n[ext] Add regex filter support",
-  "commit": "e67fb3ab5bcabfb663a4e010503c83ecb3d2ed44",
+  "message": "[fix] Selection logic",
+  "commit": "e1f6f01eea0bdbe35d370aa0894def5ebc0dcb2a",
   "branch": "master",
-  "date": "2021-08-17T13:41:09Z"
+  "date": "2021-09-17T17:05:28Z"
 }

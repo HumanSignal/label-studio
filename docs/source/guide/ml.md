@@ -122,6 +122,28 @@ If you want to retrieve predictions manually for a list of tasks **using only an
   ]
 }
 ```
+
+### Get interactive preannotations
+
+ML-assisted labeling with interactive preannotations works with image segmentation and object detection tasks using rectangles, ellipses, polygons, brush masks, and keypoints, as well as with HTML and text named entity recognition tasks. Your ML backend must support the type of labeling that you're performing and recognize the input that you create and be able to respond with the relevant output for a prediction.
+
+1. Set up your machine learning backend for ML-assisted labeling.
+   1. For your project, open **Settings > Machine Learning**.
+   2. Click **Add Model** or select **Edit** for an existing machine learning backend.
+   3. Type a **Title** for the machine learning backend.
+   4. Enter the **URL** for the running machine learning backend. For example, `http://example.com:9090`.
+   5. Enable **Use for interactive preannotation**.
+   6. Click **Validate and Save**. 
+2. For image labeling, you can update your labeling configuration to include `smart="true"` option for the type of labeling you're performing. Smart tools appear by default if auto-annotation is enabled. <br>This option is supported for Rectangle, Ellipse, Polygon, Keypoint, and Brush tags. See the [tag documentation](/tags). If you only want the smart option to appear and don't want to perform manual labeling at all, use `smartOnly="true"`. 
+   1. For your project, open **Settings > Labeling Interface**.
+   2. Click **Code** to view the XML labeling configuration.
+   3. For the relevant tag type that you want to use to generate predictions with your ML backend, add the `smart="true"` parameter. For example: 
+      ```<Brush name="brush" toName="img" smart="true" showInline="true"/>```
+   4. Save your changes.
+3. After you start labeling, enable **Auto-Annotation** to see and use the smart option to draw a shape, mask, or assign a keypoint. 
+4. For image labeling, after you enable auto-annotation you can choose whether to **Auto accept annotation suggestions**. If you automatically accept annotation suggestions, regions show up automatically and are immediately created. If you don't automatically accept suggestions, the regions appear but you can reject or approve them manually, either individually or all at once.
+
+<br/><img src="/images/release-130/predict-owl-region.gif" alt="" class="gif-border" width="800px" height="533px" />
    
 ### Delete predictions 
 
@@ -179,8 +201,8 @@ The process of creating annotated training data for supervised machine learning 
 
 You can select a task ordering like `Predictions score` on Data manager and the sampling strategy will fit the active learning scenario. Label Studio will send a train signal to ML Backend automatically on each annotation submit/update. You can enable these train signals on the **machine learning** settings page for your project. 
 
-* If you need to retrieve and save predictions for all tasks, check recommendations from a [topic below](ml.html#Get-predictions-from-a-model).
-* If you want to delete all predictions after your model is retrained, check [this topic](ml.html#Delete-predictions). 
+* If you need to retrieve and save predictions for all tasks, check recommendations for [retrieving predictions from a model](ml.html#Get-predictions-from-a-model).
+* If you want to delete all predictions after your model is retrained, see how to [delete predictions](ml.html#Delete-predictions). 
   
 <br>
 <img src="/images/ml-backend-active-learning.png" style="border:1px #eee solid">

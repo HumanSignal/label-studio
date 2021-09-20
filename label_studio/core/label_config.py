@@ -292,9 +292,13 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
             # Paragraphs special case - replace nameKey/textKey if presented
             name_key = p.get('nameKey') or p.get('namekey') or 'author'
             text_key = p.get('textKey') or p.get('textkey') or 'text'
-            task[value] = []
-            for item in examples[p.tag]:
-                task[value].append({name_key: item['author'], text_key: item['text']})
+            if only_urls:
+                params = {'nameKey': name_key, 'textKey': text_key}
+                task[value] = examples['ParagraphsUrl'] + urlencode(params)
+            else:
+                task[value] = []
+                for item in examples[p.tag]:
+                    task[value].append({name_key: item['author'], text_key: item['text']})
 
         elif p.tag == 'TimeSeries':
             # TimeSeries special case - generate signals on-the-fly
@@ -318,7 +322,11 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
             else:
                 # data is JSON
                 task[value] = generate_time_series_json(time_column, value_columns, time_format)
-
+        elif p.tag == 'HyperText':
+            if only_urls:
+                task[value] = examples['HyperTextUrl']
+            else:
+                task[value] = examples['HyperText']
         else:
             # patch for valueType="url"
             examples['Text'] = examples['TextUrl'] if only_urls else examples['TextRaw']
@@ -381,9 +389,11 @@ def config_essential_data_has_changed(new_config_str, old_config_str):
             return True
 
 
-def replace_task_data_undefined_with_config_field(data, project):
+def replace_task_data_undefined_with_config_field(data, project, first_key=None):
+    """ Use first key is passed (for speed up) or project.data.types.keys()[0]
+    """
     # assign undefined key name from data to the first key from config, e.g. for txt loading
-    if settings.DATA_UNDEFINED_NAME in data and project.data_types.keys():
-        key = list(project.data_types.keys())[0]
+    if settings.DATA_UNDEFINED_NAME in data and (first_key or project.data_types.keys()):
+        key = first_key or list(project.data_types.keys())[0]
         data[key] = data[settings.DATA_UNDEFINED_NAME]
         del data[settings.DATA_UNDEFINED_NAME]

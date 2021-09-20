@@ -116,6 +116,8 @@ def custom_exception_handler(exc, context):
         exc_tb = tb.format_exc()
         logger.debug(exc_tb)
         response_data['detail'] = str(exc)
+        if not settings.DEBUG_MODAL_EXCEPTIONS:
+            exc_tb = 'Tracebacks disabled in settings'
         response_data['exc_info'] = exc_tb
         response = Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=response_data)
 
@@ -278,6 +280,18 @@ def find_first_one_to_one_related_field_by_prefix(instance, prefix):
             attr_name = field.get_accessor_name()
             if re.match(prefix, attr_name) and hasattr(instance, attr_name):
                 return getattr(instance, attr_name)
+
+
+def find_first_many_to_one_related_field_by_prefix(instance, prefix):
+    '''Hard way to check if project has at least one storage'''
+
+    for field in instance._meta.get_fields():
+        if issubclass(type(field), models.fields.related.ManyToOneRel):
+            attr_name = field.get_accessor_name()
+            if re.match(prefix, attr_name) and hasattr(instance, attr_name):
+                related_instance = getattr(instance, attr_name).first()
+                if related_instance:
+                    return related_instance
 
 
 def start_browser(ls_url, no_browser):
@@ -585,3 +599,13 @@ def batch(iterable, n=1):
     l = len(iterable)
     for ndx in range(0, l, n):
         yield iterable[ndx : min(ndx + n, l)]
+
+
+def round_floats(o):
+    if isinstance(o, float):
+        return round(o, 2)
+    if isinstance(o, dict):
+        return {k: round_floats(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)):
+        return [round_floats(x) for x in o]
+    return o

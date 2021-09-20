@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import json
 import logging
 import os
 import requests
@@ -57,7 +58,6 @@ class BaseHTTPAPI(object):
 
     def _prepare_kwargs(self, kwargs):
         kwargs['timeout'] = self._connection_timeout, self._timeout
-        # kwargs['timeout'] = kwargs.get('timeout', None)
 
     def request(self, method, *args, **kwargs):
         self._prepare_kwargs(kwargs)
@@ -165,7 +165,7 @@ class MLApi(BaseHTTPAPI):
         }
         return self._request('train', request, verbose=False)
 
-    def make_predictions(self, tasks, model_version, project):
+    def make_predictions(self, tasks, model_version, project, context=None):
         request = {
             'tasks': tasks,
             'model_version': model_version,
@@ -173,9 +173,11 @@ class MLApi(BaseHTTPAPI):
             'label_config': project.label_config,
             'params': {
                 'login': project.task_data_login,
-                'password': project.task_data_password
-            }
+                'password': project.task_data_password,
+                'context': context,
+            },
         }
+        print(json.dumps(request))
         return self._request('predict', request, verbose=False)
 
     def health(self):

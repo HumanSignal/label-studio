@@ -20,13 +20,19 @@ from django.http import JsonResponse
 from wsgiref.util import FileWrapper
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from drf_yasg.utils import swagger_auto_schema
 
 from core import utils
+from core.utils.io import find_file
 from core.utils.params import get_env
 from core.label_config import generate_time_series_json
 from core.utils.common import collect_versions
 
 logger = logging.getLogger(__name__)
+
+
+_PARAGRAPH_SAMPLE = None
 
 
 def main(request):
@@ -81,6 +87,16 @@ def metrics(request):
     return HttpResponse('')
 
 
+class TriggerAPIError(APIView):
+    """ 500 response for testing """
+    authentication_classes = ()
+    permission_classes = ()
+
+    @swagger_auto_schema(auto_schema=None)
+    def get(self, request):
+        raise Exception('test')
+
+
 def editor_files(request):
     """ Get last editor files
     """
@@ -128,6 +144,24 @@ def samples_time_series(request):
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     response['filename'] = filename
     return response
+
+
+def samples_paragraphs(request):
+    """ Generate paragraphs example for preview
+    """
+    global _PARAGRAPH_SAMPLE
+
+    if _PARAGRAPH_SAMPLE is None:
+        with open(find_file('paragraphs.json'), encoding='utf-8') as f:
+            _PARAGRAPH_SAMPLE = json.load(f)
+    name_key = request.GET.get('nameKey', 'author')
+    text_key = request.GET.get('textKey', 'text')
+
+    result = []
+    for line in _PARAGRAPH_SAMPLE:
+        result.append({name_key: line['author'], text_key: line['text']})
+
+    return HttpResponse(json.dumps(result), content_type='application/json')
 
 
 def localfiles_data(request):

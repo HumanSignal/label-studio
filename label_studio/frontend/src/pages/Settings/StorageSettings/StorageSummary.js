@@ -3,7 +3,7 @@ import React from 'react';
 import { DescriptionList } from '../../../components/DescriptionList/DescriptionList';
 import { Oneof } from '../../../components/Oneof/Oneof';
 
-export const StorageSummary = ({storage, className, enableLastSync = false, storageTypes = []}) => {
+export const StorageSummary = ({storage, className, storageTypes = []}) => {
   return (
     <div className={className}>
       <DescriptionList>
@@ -17,11 +17,9 @@ export const StorageSummary = ({storage, className, enableLastSync = false, stor
           <RedisStorage case="redis" storage={storage}/>
           <LocalStorage case="localfiles" storage={storage}/>
         </Oneof>
-        {enableLastSync && (
-          <DescriptionList.Item term="Last Sync">
-            {storage.last_sync ? format(new Date(storage.last_sync), 'MMMM dd, yyyy ∙ HH:mm:ss') : "Never synced"}
-          </DescriptionList.Item>
-        )}
+        <DescriptionList.Item term="Last Sync">
+          {storage.last_sync ? format(new Date(storage.last_sync), 'MMMM dd, yyyy ∙ HH:mm:ss') : "Never synced"}
+        </DescriptionList.Item>
       </DescriptionList>
     </div>
   );
