@@ -13,9 +13,6 @@ RUN chgrp -R 0 /var/log /var/cache /var/run /run /tmp /etc/uwsgi && \
 # Copy and install requirements.txt first for caching
 COPY deploy/requirements.txt /label-studio
 
-# Copy and install requirements.txt first for caching
-COPY deploy/requirements.txt /label-studio
-
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt && pip install uwsgi
 
