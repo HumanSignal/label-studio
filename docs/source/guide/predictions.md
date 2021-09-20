@@ -637,4 +637,62 @@ type": "choices",
 ### Check the labels in your configuration and your tasks
 Make sure that you have a labeling configuration set up for the labeling interface, and that the labels in your JSON file exactly match the labels in your configuration. If you're using a [tool to transform your model output](https://github.com/heartexlabs/label-studio-transformers), make sure that the labels aren't altered by the tool. 
 
+### Check the IDs and toName values
+If you're performing nested labeling, such as displaying a TextArea tag for specific Label or Choice values, the IDs for those results must match. 
 
+For example, if you want to transcribe text alongside a named entity resolution task, you might have the following labeling configuration:
+```xml
+  <View>
+    <Labels name="label" toName="text">
+      <Label value="PER" background="red"/>
+      <Label value="ORG" background="darkorange"/>
+      <Label value="LOC" background="orange"/>
+      <Label value="MISC" background="green"/>
+    </Labels>
+    <Text name="text" value="$text"/>
+    <TextArea name="entity" toName="text" perRegion="true"/>
+  </View>
+```
+
+If you wanted to add predicted text and suggested transcriptions for this labeling configuration, you might use the following example JSON. 
+```json
+{
+"data":{
+         "text":"The world that we live in is a broad expanse of nothingness, said the existential philosopher, before he rode away with his cat on his motorbike. "
+      },
+   "predictions":[
+      {
+            "result":[
+               {
+                  "value":{
+                     "start":135,
+                     "end":144,
+                     "text":"motorbike",
+                     "labels":[
+                        "ORG"
+                     ]
+                  },
+                  "id":"def",
+                  "from_name":"ner",
+                  "to_name":"text",
+                  "type":"labels"
+               },
+               {
+                  "value":{
+                     "start":135,
+                     "end":144,
+                     "text":[
+                        "yay"
+                     ]
+                  },
+                  "id":"def",
+                  "from_name":"entity",
+                  "to_name":"text",
+                  "type":"textarea"
+               }
+            ]
+      }
+   ]
+}
+```
+Because the TextArea tag applies to each labeled region, the IDs for the label results and the textarea results must match. 
