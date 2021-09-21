@@ -7,7 +7,7 @@
 
 ## What is Label Studio?
 
-<a href="https://labelstud.io/blog/release-100.html"><img src="https://github.com/heartexlabs/label-studio/raw/master/docs/themes/htx/source/images/release-100/LS-Hits-v1.0.png" align="right" /></a>
+<a href="https://labelstud.io/blog/release-130.html"><img src="https://github.com/heartexlabs/label-studio/raw/master/docs/themes/htx/source/images/release-130/LS-Hits-v1.3.png" align="right" /></a>
 
 Label Studio is an open source data labeling tool. It lets you label data types like audio, text, images, videos, and time series with a simple and straightforward UI and export to various model formats. It can be used to prepare raw data or improve existing training data to get more accurate ML models.
 
@@ -23,7 +23,7 @@ Have a custom dataset? You can customize Label Studio to fit your needs. Read an
 
 ## Try out Label Studio
 
-Try out Label Studio in a **[running app](https://app.labelstud.io)**, install it locally, or deploy it in a cloud instance. 
+Install Label Studio locally, or deploy it in a cloud instance. Also you can try [Label Studio Teams](https://app.heartex.com).
 
 - [Install locally with Docker](#install-locally-with-docker)
 - [Run with Docker Compose (Label Studio + Nginx + PostgreSQL)](#run-with-docker-compose)
@@ -33,9 +33,12 @@ Try out Label Studio in a **[running app](https://app.labelstud.io)**, install i
 - [Deploy in a cloud instance](#deploy-in-a-cloud-instance)
 
 ### Install locally with Docker
+Official Label Studio docker imageis is (here)[https://hub.docker.com/r/heartexlabs/label-studio] and it can be downloaded with `docker pull`. 
 Run Label Studio in a Docker container and access it at `http://localhost:8080`.
 
+
 ```bash
+docker pull heartexlabs/label-studio:latest
 docker run -it -p 8080:8080 -v `pwd`/mydata:/label-studio/data heartexlabs/label-studio:latest
 ```
 You can find all the generated assets, including SQLite3 database storage `label_studio.sqlite3` and uploaded files, in the `./mydata` directory.

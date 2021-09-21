@@ -20,6 +20,7 @@ jobs:
       collect_analytics: false
       SENTRY_ENVIRONMENT: tests-ubuntu-sqlite
       SENTRY_RATE: 0
+      DJANGO_DB: sqlite
       # SENTRY_DSN:
 
     steps:
@@ -49,7 +50,7 @@ jobs:
       - name: Run functional tests
         run: |
           cd label_studio/
-          pytest --junitxml report.xml --cov=.
+          pytest --junitxml report.xml --cov=. -vv
 
   run_pytest_postgresql:
     name: LS PostgreSQL
@@ -129,7 +130,7 @@ jobs:
       - name: Run functional tests
         run: |
           cd label_studio/
-          pytest --junitxml report.xml --cov=.
+          pytest --junitxml report.xml --cov=. -vv
 
       - name: "Upload coverage to Codecov"
         uses: codecov/codecov-action@v1
@@ -150,6 +151,7 @@ jobs:
       collect_analytics: false
       SENTRY_ENVIRONMENT: tests-windows-sqlite
       SENTRY_RATE: 0
+      DJANGO_DB: sqlite
       # SENTRY_DSN:
 
     steps:

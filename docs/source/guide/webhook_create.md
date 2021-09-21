@@ -15,7 +15,7 @@ To create a custom webhook event, add your own action to the `WebhookActions` mo
 
 For example:
 
-```
+```python
 class WebhookAction(models.Model):
     ...
     SOMETHING_HAPPENED = 'SOMETHING_HAPPENED'
@@ -33,7 +33,7 @@ class WebhookAction(models.Model):
 After declaring the action and the associated properties and payload details in the `WebhookAction` class, call the event action in the code where it occurs. For example:
 
 ```
-...
+...python
 result = do_something()
 emit_webhooks(organization, WebhookAction.SOMETHING_HAPPENED, {'something': [result]})
 ...

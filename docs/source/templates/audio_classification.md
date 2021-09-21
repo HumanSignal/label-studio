@@ -6,7 +6,7 @@ meta_title: Audio Classification Data Labeling Template
 meta_description: Label Studio Audio Classification Template for machine learning and data science data labeling projects.
 ---
 
-Listen to the audio file and classify
+Listen to the audio file and classify it. 
 
 <img src="/images/screens/audio_classification.png" class="img-template-example" title="Audio Classification" />
 

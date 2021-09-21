@@ -14,6 +14,11 @@ class RedisImportStorageSerializer(ImportStorageSerializer):
         model = RedisImportStorage
         fields = '__all__'
 
+    def to_representation(self, instance):
+        result = super().to_representation(instance)
+        result.pop('password')
+        return result
+
     def validate(self, data):
         data = super(RedisImportStorageSerializer, self).validate(data)
 
@@ -26,6 +31,11 @@ class RedisImportStorageSerializer(ImportStorageSerializer):
 
 class RedisExportStorageSerializer(ExportStorageSerializer):
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
+
+    def to_representation(self, instance):
+        result = super().to_representation(instance)
+        result.pop('password')
+        return result
 
     class Meta:
         model = RedisExportStorage

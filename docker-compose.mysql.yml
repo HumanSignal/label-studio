@@ -1,0 +1,22 @@
+version: '3.3'
+
+services:
+  app:
+    environment:
+      - DJANGO_DB=mysql
+      - MYSQL_NAME=labelstudio
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=password
+      - MYSQL_PORT=3306
+      - MYSQL_HOST=db
+      - POSTGRE_HOST=           # override POSTGRE vars to empty values
+
+  db:
+    image: mysql:8
+    hostname: db
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=labelstudio
+    volumes:
+      - ${MYSQL_DATA_DIR:-./mysql-data}:/var/lib/mysql

@@ -140,14 +140,16 @@ class AzureBlobExportStorage(ExportStorage, AzureBlobStorageMixin):
         container = self.get_container()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
-        with transaction.atomic():
-            # Create export storage link
-            link = AzureBlobExportStorageLink.create(annotation, self)
-            try:
-                blob = container.get_blob_client(link.key)
-                blob.upload_blob(json.dumps(ser_annotation), overwrite=True)
-            except Exception as exc:
-                logger.error(f"Can't export annotation {annotation} to Azure storage {self}. Reason: {exc}", exc_info=True)
+        # get key that identifies this object in storage
+        key = AzureBlobExportStorageLink.get_key(annotation)
+        key = str(self.prefix) + '/' + key if self.prefix else key
+
+        # put object into storage
+        blob = container.get_blob_client(key)
+        blob.upload_blob(json.dumps(ser_annotation), overwrite=True)
+
+        # create link if everything ok
+        AzureBlobExportStorageLink.create(annotation, self)
 
 
 @receiver(post_save, sender=Annotation)
@@ -165,11 +167,3 @@ class AzureBlobImportStorageLink(ImportStorageLink):
 
 class AzureBlobExportStorageLink(ExportStorageLink):
     storage = models.ForeignKey(AzureBlobExportStorage, on_delete=models.CASCADE, related_name='links')
-
-    @property
-    def key(self):
-        prefix = self.storage.prefix or ''
-        key = str(self.annotation.id)
-        if self.storage.prefix:
-            key = f'{self.storage.prefix}/{key}'
-        return key

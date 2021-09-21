@@ -5,24 +5,34 @@ import io
 import sys
 import json
 import logging
-
 import pandas as pd
+import posixpath
 
+from pathlib import Path
+from django.utils._os import safe_join
 from django.conf import settings
 from django.contrib.auth import logout
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden
 from django.shortcuts import redirect, reverse
 from django.template import loader
-from django.views.static import serve
+from ranged_fileresponse import RangedFileResponse
 from django.http import JsonResponse
 from wsgiref.util import FileWrapper
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from drf_yasg.utils import swagger_auto_schema
 
 from core import utils
+from core.utils.io import find_file
 from core.utils.params import get_env
 from core.label_config import generate_time_series_json
 from core.utils.common import collect_versions
 
 logger = logging.getLogger(__name__)
+
+
+_PARAGRAPH_SAMPLE = None
 
 
 def main(request):
@@ -77,6 +87,16 @@ def metrics(request):
     return HttpResponse('')
 
 
+class TriggerAPIError(APIView):
+    """ 500 response for testing """
+    authentication_classes = ()
+    permission_classes = ()
+
+    @swagger_auto_schema(auto_schema=None)
+    def get(self, request):
+        raise Exception('test')
+
+
 def editor_files(request):
     """ Get last editor files
     """
@@ -126,6 +146,24 @@ def samples_time_series(request):
     return response
 
 
+def samples_paragraphs(request):
+    """ Generate paragraphs example for preview
+    """
+    global _PARAGRAPH_SAMPLE
+
+    if _PARAGRAPH_SAMPLE is None:
+        with open(find_file('paragraphs.json'), encoding='utf-8') as f:
+            _PARAGRAPH_SAMPLE = json.load(f)
+    name_key = request.GET.get('nameKey', 'author')
+    text_key = request.GET.get('textKey', 'text')
+
+    result = []
+    for line in _PARAGRAPH_SAMPLE:
+        result.append({name_key: line['author'], text_key: line['text']})
+
+    return HttpResponse(json.dumps(result), content_type='application/json')
+
+
 def localfiles_data(request):
     """Serving files for LocalFilesImportStorage"""
     path = request.GET.get('d')
@@ -135,7 +173,12 @@ def localfiles_data(request):
 
     local_serving_document_root = get_env('LOCAL_FILES_DOCUMENT_ROOT', default='/')
     if path and request.user.is_authenticated:
-        return serve(request, path, document_root=local_serving_document_root)
+        path = posixpath.normpath(path).lstrip('/')
+        full_path = Path(safe_join(local_serving_document_root, path))
+        if os.path.exists(full_path):
+            return RangedFileResponse(request, open(full_path, mode='rb'))
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
     return HttpResponseForbidden()
 

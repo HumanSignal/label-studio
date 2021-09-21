@@ -89,15 +89,17 @@ class LocalFilesExportStorage(ExportStorage, LocalFilesMixin):
     def save_annotation(self, annotation):
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
-        with transaction.atomic():
-            # Create export storage link
-            link = LocalFilesExportStorageLink.create(annotation, self)
-            key = os.path.join(self.path, f"{link.key}.json")
-            try:
-                with open(key, mode='w') as f:
-                    json.dump(ser_annotation, f, indent=2)
-            except Exception as exc:
-                logger.error(f"Can't export annotation {annotation} to local storage {self}. Reason: {exc}", exc_info=True)
+
+        # get key that identifies this object in storage
+        key = LocalFilesExportStorageLink.get_key(annotation)
+        key = os.path.join(self.path, f"{key}.json")
+
+        # put object into storage
+        with open(key, mode='w') as f:
+            json.dump(ser_annotation, f, indent=2)
+
+        # Create export storage link
+        LocalFilesExportStorageLink.create(annotation, self)
 
 
 class LocalFilesImportStorageLink(ImportStorageLink):
@@ -115,4 +117,3 @@ def export_annotation_to_local_files(sender, instance, **kwargs):
         for storage in project.io_storages_localfilesexportstorages.all():
             logger.debug(f'Export {instance} to Local Storage {storage}')
             storage.save_annotation(instance)
-            

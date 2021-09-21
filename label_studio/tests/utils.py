@@ -107,7 +107,7 @@ def azure_client_mock():
             self.container_name = container_name
         def download_as_string(self):
             return f'test_blob_{self.key}'
-        def upload_from_string(self, string):
+        def upload_blob(self, string, overwrite):
             print(f'String {string} uploaded to bucket {self.container_name}')
         def generate_signed_url(self, **kwargs):
             return f'https://storage.googleapis.com/{self.container_name}/{self.key}'
@@ -117,7 +117,7 @@ def azure_client_mock():
             self.name = container_name
         def list_blobs(self, name_starts_with):
             return [File('abc'), File('def'), File('ghi')]
-        def blob(self, key):
+        def get_blob_client(self, key):
             return DummyAzureBlob(self.name, key)
 
     class DummyAzureClient():
@@ -239,3 +239,21 @@ def signin(client, email, password):
 
 def _client_is_annotator(client):
     return 'annotator' in client.user.email
+
+
+def save_response(response):
+    filename = 'tavern-output.json'
+    with open(filename, 'w') as f:
+        json.dump(response.json(), f)
+
+
+def check_response_with_json_file(response, json_file):
+    response = response.json()
+    filename = 'tavern-output.json'
+    with open(filename, 'w') as f:
+        json.dump(response, f, indent=4)
+
+    with open(json_file, 'r') as f:
+        true = json.load(f)
+        assert response == true
+

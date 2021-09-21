@@ -4,11 +4,13 @@ import { NavLink } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
 import { modal } from '../../components/Modal/Modal';
 import { Space } from '../../components/Space/Space';
+import { useAPI } from '../../providers/ApiProvider';
 import { useLibrary } from '../../providers/LibraryProvider';
 import { useProject } from '../../providers/ProjectProvider';
 import { useContextProps, useFixedLocation, useParams } from '../../providers/RoutesProvider';
 import { addAction, addCrumb, deleteAction, deleteCrumb } from '../../services/breadrumbs';
 import { Block, Elem } from '../../utils/bem';
+import { isDefined } from '../../utils/helpers';
 import { ImportModal } from '../CreateProject/Import/ImportModal';
 import { ExportPage } from '../ExportPage/ExportPage';
 import { APIConfig } from './api-config';
@@ -31,10 +33,11 @@ const initializeDataManager = async (root, props, params) => {
     showPreviews: false,
     apiEndpoints: APIConfig.endpoints,
     interfaces: {
-      import: false,
-      export: false,
+      import: true,
+      export: true,
       backButton: false,
       labelingHeader: false,
+      autoAnnotation: params.autoAnnotation,
     },
     ...props,
     ...settings,
@@ -51,25 +54,38 @@ export const DataManagerPage = ({...props}) => {
   const root = useRef();
   const params = useParams();
   const history = useHistory();
+  const api = useAPI();
+  const {project} = useProject();
   const LabelStudio = useLibrary('lsf');
   const DataManager = useLibrary('dm');
   const setContextProps = useContextProps();
   const [crashed, setCrashed] = useState(false);
   const dataManagerRef = useRef();
+  const projectId = project?.id;
 
   const init = useCallback(async () => {
     if (!LabelStudio) return;
     if (!DataManager) return;
     if (!root.current) return;
+    if (!project?.id) return;
     if (dataManagerRef.current) return;
 
-    dataManagerRef.current = dataManagerRef.current ?? await initializeDataManager(
+    const mlBackends = await api.callApi("mlBackends", {
+      params: { project: project.id },
+    });
+
+    const interactiveBacked = (mlBackends ?? []).find(({is_interactive}) => is_interactive);
+
+    const dataManager = (dataManagerRef.current = dataManagerRef.current ?? await initializeDataManager(
       root.current,
       props,
-      params,
-    );
+      {
+        ...params,
+        autoAnnotation: isDefined(interactiveBacked),
+      },
+    ));
 
-    const {current: dataManager} = dataManagerRef;
+    Object.assign(window, { dataManager });
 
     dataManager.on("crash", () => setCrashed());
 
@@ -85,8 +101,36 @@ export const DataManagerPage = ({...props}) => {
       history.push(buildLink("/data/export", {id: params.id}));
     });
 
+    dataManager.on("error", response => {
+      api.handleError(response);
+    });
+
+    if (interactiveBacked) {
+      dataManager.on("lsf:regionFinishedDrawing", (reg, group) => {
+        const { lsf, task, currentAnnotation: annotation } = dataManager.lsf;
+        const ids = group.map(r => r.id);
+        const result = annotation.serializeAnnotation().filter((res) => ids.includes(res.id));
+
+        const suggestionsRequest = api.callApi("mlInteractive", {
+          params: { pk: interactiveBacked.id },
+          body: {
+            task: task.id,
+            context: { result },
+          },
+        });
+
+        lsf.loadSuggestions(suggestionsRequest, (response) => {
+          if (response.data) {
+            return response.data.result;
+          }
+
+          return [];
+        });
+      });
+    }
+
     setContextProps({dmRef: dataManager});
-  }, [LabelStudio, DataManager]);
+  }, [LabelStudio, DataManager, projectId]);
 
   const destroyDM = useCallback(() => {
     if (dataManagerRef.current) {
@@ -126,8 +170,6 @@ DataManagerPage.context = ({dmRef}) => {
 
   const links = {
     '/settings': 'Settings',
-    '/data/import': "Import",
-    '/data/export': 'Export',
   };
 
   const updateCrumbs = (currentMode) => {

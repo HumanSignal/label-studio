@@ -50,6 +50,7 @@ export const API_CONFIG = {
     trainMLBackend: "POST:/ml/:pk/train",
     predictWithML: "POST:/ml/:pk/predict",
     modelVersions: "/projects/:pk/model-versions",
+    mlInteractive: "POST:/ml/:pk/interactive-annotating",
 
     // Export
     export: "/projects/:pk/export",
