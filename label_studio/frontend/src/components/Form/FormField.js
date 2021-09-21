@@ -10,6 +10,8 @@ export const FormField = forwardRef(({
   required,
   validate,
   skip,
+  allowEmpty,
+  skipAutofill,
   setValue,
   dependency,
   validators,
@@ -78,6 +80,7 @@ export const FormField = forwardRef(({
     }
 
     const evt = document.createEvent("HTMLEvents");
+
     evt.initEvent("change", false, true);
     input.dispatchEvent(evt);
   }, [field]);
@@ -88,6 +91,8 @@ export const FormField = forwardRef(({
       name,
       validation,
       skip,
+      allowEmpty,
+      skipAutofill,
       field: field.current,
       setValue: setValueCallback,
     });

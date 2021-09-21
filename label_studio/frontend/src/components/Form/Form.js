@@ -80,6 +80,7 @@ export default class Form extends React.Component {
 
   registerField(field) {
     const existingField = this.getFieldContext(field.name);
+
     if (!existingField) {
       this.fields.add(field);
       if (field.name && this.props.formData && field.name in this.props.formData) {
@@ -92,6 +93,7 @@ export default class Form extends React.Component {
 
   unregisterField(name) {
     const field = this.getFieldContext(name);
+
     if (field) this.fields.delete(field);
   }
 
@@ -162,8 +164,9 @@ export default class Form extends React.Component {
       fields = fields.filter(fieldsFilter);
     }
 
-    const requestBody = fields.reduce((res, { name, field, skip }) => {
-      const skipField = skip || (this.props.skipEmpty && !field.value);
+
+    const requestBody = fields.reduce((res, { name, field, skip, allowEmpty }) => {
+      const skipField = skip || ((this.props.skipEmpty || allowEmpty === false) && !field.value);
 
       if (full === true || !skipField) {
         const value = (() => {
@@ -190,12 +193,13 @@ export default class Form extends React.Component {
       return requestBody.reduce((res, [key, value]) => ({ ...res, [key]: value }), {});
     } else {
       const formData = new FormData();
+
       requestBody.forEach(([key, value]) => formData.append(key, value));
       return formData;
     }
   }
 
-  async submit({fieldsFilter} = {}) {
+  async submit({ fieldsFilter } = {}) {
     this.setState({ submitting: true, lastResponse: null });
 
     const rawAction = this.formElement.current.getAttribute("action");
@@ -245,6 +249,7 @@ export default class Form extends React.Component {
 
     try {
       const result = await response.json();
+
       this.setState({ lastResponse: result });
 
       if (result.validation_errors) {
@@ -305,6 +310,7 @@ export default class Form extends React.Component {
 
     validation.forEach((validator) => {
       const result = validator(field.label, value);
+
       if (result) messages.push(result);
     });
 
@@ -318,7 +324,7 @@ export default class Form extends React.Component {
     Object.entries(this.props.formData).forEach(([key, value]) => {
       const field = this.getFieldContext(key);
 
-      if (field && field.value !== value) {
+      if (field && field.value !== value && !field.skipAutofill) {
         field.setValue(value);
       }
     });
@@ -328,33 +334,35 @@ export default class Form extends React.Component {
 const ValidationRenderer = ({ validation }) => {
   const rootClass = cn('form-validation');
 
-  return <div className={rootClass}>
-    {Array.from(validation).map(([name, result]) => (
-      <div key={name} className={rootClass.elem('group')} onClick={() => result.field.focus()}>
-        <div className={rootClass.elem('field')}>{result.label}</div>
+  return (
+    <div className={rootClass}>
+      {Array.from(validation).map(([name, result]) => (
+        <div key={name} className={rootClass.elem('group')} onClick={() => result.field.focus()}>
+          <div className={rootClass.elem('field')}>{result.label}</div>
 
-        <div className={rootClass.elem('messages')}>
-          {result.messages.map((message, i) => (
-            <div key={`${name}-${i}`} className={rootClass.elem('message')}>
-              {message}
-            </div>
-          ))}
+          <div className={rootClass.elem('messages')}>
+            {result.messages.map((message, i) => (
+              <div key={`${name}-${i}`} className={rootClass.elem('message')}>
+                {message}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    ))}
-  </div>;
+      ))}
+    </div>
+  );
 };
 
 Form.Validator = Validators;
 
-Form.Row = ({columnCount, rowGap, children, style, spread = false}) => {
+Form.Row = ({ columnCount, rowGap, children, style, spread = false }) => {
   const styles = {};
 
   if (columnCount) styles['--column-count'] = columnCount;
   if (rowGap) styles['--row-gap'] = rowGap;
 
   return (
-    <div className={cn('form').elem('row').mod({spread})} style={{...(style ?? {}), ...styles}}>
+    <div className={cn('form').elem('row').mod({ spread })} style={{ ...(style ?? {}), ...styles }}>
       {children}
     </div>
   );
@@ -381,11 +389,15 @@ Form.Builder = React.forwardRef(({
 
       const currentValue = formData?.[field.name] ?? undefined;
       const triggerUpdate = props.autosubmit !== true && field.trigger_form_update === true;
+      const getValue = () => {
+        if (field.skipAutofill) {
+          return null;
+        }
 
-      const commonProps = {
-        key: field.name ?? index,
-        ...field,
+        return currentValue ?? field.value;
       };
+
+      const commonProps = {};
 
       if (triggerUpdate) {
         commonProps.onChange = async () => {
@@ -397,15 +409,28 @@ Form.Builder = React.forwardRef(({
         };
       }
 
-      if (field.type === 'select') {
-        return <Select {...commonProps} defaultValue={currentValue ?? field.value}/>;
-      } else if (field.type === 'counter') {
-        return <Counter {...commonProps} defaultValue={currentValue ?? field.value}/>;
-      } else if (field.type === 'toggle') {
-        return <Toggle {...commonProps} checked={currentValue ?? field.value}/>;
+      const InputComponent = (() => {
+        switch(field.type) {
+          case "select": return Select;
+          case "counter": return Counter;
+          case "toggle": return Toggle;
+          default: return Input;
+        }
+      })();
+
+      if (field.type === 'checkbox') {
+        commonProps.checked = getValue();
       } else {
-        return <Input {...commonProps} defaultValue={currentValue ?? field.value}/>;
+        commonProps.defaultValue = getValue();
       }
+
+      return (
+        <InputComponent
+          key={field.name ?? index}
+          {...field}
+          {...commonProps}
+        />
+      );
     });
   };
 
@@ -457,7 +482,7 @@ Form.Builder = React.forwardRef(({
 
   return (
     <Form {...props} onSubmit={handleOnSubmit} ref={formRef}>
-      {(fields ?? []).map(({columnCount, fields, columns}, index) => (
+      {(fields ?? []).map(({ columnCount, fields, columns }, index) => (
         <Form.Row key={index} columnCount={columnCount} style={formRowStyle} spread>
           {columns ? renderColumns(columns) : renderFields(fields)}
         </Form.Row>
@@ -468,7 +493,7 @@ Form.Builder = React.forwardRef(({
           <Button
             type="submit"
             look="primary"
-            style={{width: 120}}
+            style={{ width: 120 }}
           >
             Save
           </Button>
@@ -480,6 +505,7 @@ Form.Builder = React.forwardRef(({
 
 Form.Actions = ({ children, valid, extra, size }) => {
   const rootClass = cn('form');
+
   return (
     <div className={rootClass.elem('submit').mod({ size })}>
       <div className={rootClass.elem('info').mod({ valid })}>
@@ -495,6 +521,7 @@ Form.Actions = ({ children, valid, extra, size }) => {
 
 Form.Indicator = () => {
   const state = React.useContext(FormStateContext);
+
   return (
     <Block name="form-indicator">
       <Oneof value={state}>

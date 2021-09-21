@@ -53,6 +53,8 @@ ImportStorage:
         name: google_application_credentials
         label: Google Application Credentials
         placeholder: Copy and paste here the content of credentials.json
+        skipAutofill: true
+        allowEmpty: false
         validators:
           - json
 
