@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' of github.com:heartexlabs/label-studio-frontend",
-  "commit": "15f0b902ddccd81c9b369b7022d7b8dac9b01845",
+  "message": "Roll back to U instead of Alt+U",
+  "commit": "352c3e45c473a60dd13680a1ef30d9a60e42b15f",
   "branch": "master",
-  "date": "2021-09-18T11:32:52Z"
+  "date": "2021-09-21T07:47:50Z"
 }
