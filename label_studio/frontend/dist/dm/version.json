@@ -1,6 +1,6 @@
 {
-  "message": "[fix] Selection logic",
-  "commit": "e1f6f01eea0bdbe35d370aa0894def5ebc0dcb2a",
+  "message": "[fix] History ovrriding query option",
+  "commit": "8d8e0532f952d1eec873d8fd2320da1e913a7a4e",
   "branch": "master",
-  "date": "2021-09-17T17:05:28Z"
+  "date": "2021-09-21T08:34:07Z"
 }
