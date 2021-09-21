@@ -177,7 +177,6 @@ class MLApi(BaseHTTPAPI):
                 'context': context,
             },
         }
-        print(json.dumps(request))
         return self._request('predict', request, verbose=False)
 
     def health(self):
