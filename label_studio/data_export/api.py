@@ -104,7 +104,7 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
         ```bash
         curl -X GET {}/api/projects/{{id}}/export?exportType=JSON&download_all_tasks=true -H \'Authorization: Token abc123\' --output 'annotations.json'
         ```
-        To export specific tasks, run the following from the command line:
+        To export specific tasks with IDs of 123 and 345, run the following from the command line:
         ```bash
         curl -X GET {}/api/projects/{{id}}/export?ids[]=123\&ids[]=345 -H \'Authorization: Token abc123\' --output 'annotations.json'
         ```
