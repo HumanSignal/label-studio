@@ -64,6 +64,7 @@ logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 DJANGO_DB_MYSQL = 'mysql'
 DJANGO_DB_SQLITE = 'sqlite'
+DJANGO_DB_POSTGRE = 'default'
 DJANGO_DB = 'default'
 DATABASE_NAME_DEFAULT = os.path.join(BASE_DATA_DIR, 'label_studio.sqlite3')
 DATABASE_NAME = get_env('DATABASE_NAME', DATABASE_NAME_DEFAULT)

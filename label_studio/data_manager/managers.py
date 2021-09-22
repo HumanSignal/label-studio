@@ -400,27 +400,27 @@ def annotate_completed_at(queryset):
 
 
 def annotate_annotations_results(queryset):
-    if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
+    if settings.DJANGO_DB == settings.DJANGO_DB_POSTGRE:
+        return queryset.annotate(annotations_results=ArrayAgg("annotations__result", distinct=True))
+    else:
         return queryset.annotate(annotations_results=Coalesce(
             GroupConcat("annotations__result"), Value(''), output_field=models.CharField()))
-    else:
-        return queryset.annotate(annotations_results=ArrayAgg("annotations__result", distinct=True))
 
 
 def annotate_predictions_results(queryset):
-    if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
+    if settings.DJANGO_DB == settings.DJANGO_DB_POSTGRE:
+        return queryset.annotate(predictions_results=ArrayAgg("predictions__result", distinct=True))
+    else:
         return queryset.annotate(predictions_results=Coalesce(
             GroupConcat("predictions__result"), Value(''), output_field=models.CharField()))
-    else:
-        return queryset.annotate(predictions_results=ArrayAgg("predictions__result", distinct=True))
 
 
 def annotate_annotators(queryset):
-    if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
+    if settings.DJANGO_DB == settings.DJANGO_DB_POSTGRE:
+        return queryset.annotate(annotators=ArrayAgg("annotations__completed_by", distinct=True))
+    else:
         return queryset.annotate(annotators=Coalesce(
             GroupConcat("annotations__completed_by"), Value(''), output_field=models.CharField()))
-    else:
-        return queryset.annotate(annotators=ArrayAgg("annotations__completed_by", distinct=True))
 
 
 def annotate_predictions_score(queryset):
@@ -428,10 +428,10 @@ def annotate_predictions_score(queryset):
 
 
 def annotate_annotations_ids(queryset):
-    if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
-        return queryset.annotate(annotations_ids=GroupConcat('annotations__id', output_field=models.CharField()))
-    else:
+    if settings.DJANGO_DB == settings.DJANGO_DB_POSTGRE:
         return queryset.annotate(annotations_ids=ArrayAgg('annotations__id'))
+    else:
+        return queryset.annotate(annotations_ids=GroupConcat('annotations__id', output_field=models.CharField()))
 
 
 def file_upload(queryset):
