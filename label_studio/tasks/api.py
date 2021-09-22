@@ -216,7 +216,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         "ground_truth": true,
         "lead_time": 0,
         "task": 0
-        "completed_by": {"id": 1, "email": "heartex@example.com", "first_name": "", "last_name": ""}
+        "completed_by": 123
         } 
         ```
         """,
