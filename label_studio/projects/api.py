@@ -18,6 +18,7 @@ from rest_framework.exceptions import NotFound, ValidationError as RestValidatio
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import exception_handler
 
 from core.utils.common import conditional_atomic
@@ -87,6 +88,10 @@ _task_data_schema = openapi.Schema(
 )
 
 
+class ProjectListPagination(PageNumberPagination):
+    page_size = 30
+
+
 @method_decorator(name='get', decorator=swagger_auto_schema(
     tags=['Projects'],
     operation_summary='List your projects',
@@ -122,6 +127,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
         POST=all_permissions.projects_create,
     )
     ordering = ['-created_at']
+    pagination_class = ProjectListPagination
 
     def get_queryset(self):
         projects = Project.objects.filter(organization=self.request.user.active_organization)
