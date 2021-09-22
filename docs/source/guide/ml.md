@@ -155,7 +155,7 @@ curl -H 'Authorization: Token <user-token-from-account-page>' -X POST \
  "<host>/api/dm/actions?id=delete_tasks_predictions&project=<id>"
 ```
 
-### <i class='ent'></i> Choose which predictions to display to annotators
+### Choose which predictions to display to annotators
 
 You can choose which model predictions to display to annotators by default. 
 
