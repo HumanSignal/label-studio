@@ -31,7 +31,7 @@ You can make changes to the labeling interface and configuration in the project 
 
 ## Customize a template
 
-You can customize a [labeling config template](/templates) or use a custom configuration that you create from scratch. If you create a custom configuration that might be useful to other Label Studio users, consider [contributing the configuration as a template](https://github.com/heartexlabs/label-studio/tree/master/label_studio/examples).
+You can customize a [labeling config template](/templates) or use a custom configuration that you create from scratch. If you create a custom configuration that might be useful to other Label Studio users, consider [contributing the configuration as a template](https://github.com/heartexlabs/label-studio/tree/master/label_studio/annotation_templates).
 
 The labeling configuration for a project is an XML file that contains three types of tags specific to Label Studio.
 
