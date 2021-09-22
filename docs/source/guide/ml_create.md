@@ -24,7 +24,7 @@ from label_studio_ml.model import LabelStudioMLBase
 class MyModel(LabelStudioMLBase):
 ```
 
-Then, define loaders & initializers in the `__init__` method. 
+Then, define loaders and initializers in the `__init__` method. 
 
 ```python
 def __init__(self, **kwargs):
@@ -33,10 +33,10 @@ def __init__(self, **kwargs):
     self.model = self.load_my_model()
 ```
 
-There are special variables provided by the inherited class:
-- `self.parsed_label_config` is a Python dict that provides a Label Studio project config structure. See [ref for details](). Use might want to use this to align your model input/output with Label Studio labeling configuration;
-- `self.label_config` is a raw labeling config string;
-- `self.train_output` is a Python dict with the results of the previous model training runs (the output of the `fit()` method described bellow) Use this if you want to load the model for the next updates for active learning and model fine-tuning.
+The inherited class provides special variables that you can use:
+- `self.parsed_label_config` is a Python dict that provides a Label Studio project config structure. See the [Tags documentation](/tags) and [Template documentation](/templates) for some examples of labeling configurations. You might want to use this variable to align your model input or output with the Label Studio labeling configuration.
+- `self.label_config` is a raw labeling configuration string.
+- `self.train_output` is a Python dict that contains the results of the previous model training runs, which is the same as the output of the `fit()` method in your code, defined in the [training call section](ml_create.html#Training-call). Use this variable to load the model for active learning updates and fine-tuning.
 
 After you define the loaders, you can define two methods for your model: an inference call and a training call. 
 
@@ -86,7 +86,7 @@ def fit(self, completions, workdir=None, **kwargs):
     return {'checkpoints': 'my/model/checkpoints'}  # <-- you can retrieve this dict as self.train_output in the subsequent calls
 ```
 
-After you wrap your model code with the class, define the loaders, and define the methods, you're ready to run your model as an ML backend with Label Studio. See the [Quickstart](ml.html#Quickstart). 
+After you wrap your model code with the class, define the loaders, and define the methods, you're ready to run your model as an ML backend with Label Studio. See the [Quickstart](ml.html#Quickstart).
 
 ## Support interactive preannotations in your ML backend
 
