@@ -248,7 +248,6 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         user = self.request.user
 
         # updates history
-        update_id = self.request.user.id
         result = ser.validated_data.get('result')
         extra_args = {'task_id': self.kwargs['pk']}
 

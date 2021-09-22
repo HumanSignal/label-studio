@@ -46,13 +46,17 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
     """
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
-    completed_by = serializers.SerializerMethodField(default='Requesting user',
-                                                     help_text='ID of the user who completed the annotation.')
 
     @classmethod
     def many_init(cls, *args, **kwargs):
         kwargs['child'] = cls(*args, **kwargs)
         return ListAnnotationSerializer(*args, **kwargs)
+
+    def to_representation(self, instance):
+        annotation = super(AnnotationSerializer, self).to_representation(instance)
+        if self.context.get('completed_by', '') == 'full':
+            annotation['completed_by'] = UserSerializer(annotation.completed_by).data
+        return annotation
 
     def get_fields(self):
         fields = super(AnnotationSerializer, self).get_fields()
@@ -92,12 +96,6 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
 
         name += f' {user.email}, {user.id}'
         return name
-
-    def get_completed_by(self, annotation):
-        if self.context.get('completed_by', '') == 'full':
-            return UserSerializer(annotation.completed_by).data
-        else:
-            return annotation.completed_by.id if annotation.completed_by else None
 
     class Meta:
         model = Annotation
