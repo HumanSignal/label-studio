@@ -18,7 +18,7 @@ _DATA_TYPES = {
     'Header': [str, int, float],
     'HyperText': [str],
     'Image': [str, list],
-    'Paragraphs': [list],
+    'Paragraphs': [list, str],
     'Table': [dict],
     'TimeSeries': [dict, list, str],
     'TimeSeriesChannel': [dict, list, str]
