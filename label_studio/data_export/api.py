@@ -174,9 +174,10 @@ class ExportAPI(generics.RetrieveAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Export'],
-        operation_summary='Get exported files',
+        operation_summary='List exported files',
         operation_description="""
         Retrieve a list of files exported from the Label Studio UI using the Export button on the Data Manager page.
+        To retrieve the files themselves, see [Download export file](/api#operation/api_projects_exports_download_read).
         """,
     ),
 )
@@ -316,6 +317,9 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
         Download an export file in the specified format for a specific project. Specify the project ID with the `id` 
         parameter in the path and the ID of the export file you want to download using the `export_pk` parameter 
         in the path. 
+        
+        Get the `export_pk` from the response of the request to [Create new export](/api#operation/api_projects_exports_create)
+        or after [listing export files](/api#operation/api_projects_exports_list).
         """,
         manual_parameters=[
             openapi.Parameter(
