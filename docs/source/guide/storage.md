@@ -28,9 +28,11 @@ Connect your [Amazon S3]((https://aws.amazon.com/s3)) bucket to Label Studio to 
 For details about how Label Studio secures access to cloud storage, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
 
 ### Prerequisites
-- You must have programmatic access enabled. [See the Amazon Boto3 configuration documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html#configuration) for more on how to set up access to your S3 bucket.
-- You must get temporary security credentials to use to grant access to your S3 bucket. See the AWS Identity and Access Management documentation on [Requesting temporary security credentials](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html). 
-- (Optional) If you want to use a designated account for retrieving source tasks and storing annotations in S3, assign the following role policy to an account you set up for this purpose, replacing `<your_bucket_name>` with your bucket name:
+These prerequisites assume that you're using the same S3 bucket for both source and target storage with Label Studio. If you only use S3 for source storage, Label Studio does not need PUT access to the bucket. 
+
+1. Enable programmatic access to your bucket. [See the Amazon Boto3 configuration documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html#configuration) for more on how to set up access to your S3 bucket. 
+2. You must get temporary security credentials to use to grant access to your S3 bucket. See the AWS Identity and Access Management documentation on [Requesting temporary security credentials](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html). 
+3. If you want to use a designated account for retrieving source tasks and storing annotations in S3, assign the following role policy to an account you set up for this purpose, replacing `<your_bucket_name>` with your bucket name:
 ```json
 {
     "Version": "2012-10-17",
@@ -51,6 +53,7 @@ For details about how Label Studio secures access to cloud storage, see [Secure 
     ]
 }
 ```
+4. Set up cross-origin resource sharing (CORS) access to your bucket, using a policy that allows GET and PUT access from the same host name as your Label Studio deployment. See [Configuring cross-origin resource sharing (CORS)](https://docs.aws.amazon.com/AmazonS3/latest/userguide/enabling-cors-examples.html) and [CORS Configuration](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ManageCorsUsing.html) in the Amazon S3 User Guide. 
 
 ### Set up connection in the Label Studio UI
 In the Label Studio UI, do the following to set up Amazon S3 as a data source connection:
@@ -371,7 +374,7 @@ Check your web browser console for errors.
     [default]
     region=us-east-2  # change to the region of your bucket
     ```
-- For Amazon S3, make sure that the credentials that you used to set up the source or target storage connection are still valid. If you see 403 errors in the browser console and you set up the correct permissions for the bucket, you might need to update the Access Key ID, Secret Access Key, and Session ID.  
+- For Amazon S3, make sure that the credentials that you used to set up the source or target storage connection are still valid. If you see 403 errors in the browser console, and you set up the correct permissions for the bucket, you might need to update the Access Key ID, Secret Access Key, and Session ID. See the AWS Identity and Access Management documentation on [Requesting temporary security credentials](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html). 
 
 ### Tasks or annotations do not sync
 
