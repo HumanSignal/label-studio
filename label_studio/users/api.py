@@ -16,7 +16,7 @@ from rest_framework.decorators import action
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
-from core.permissions import all_permissions
+from core.permissions import all_permissions, ViewClassPermission
 from users.models import User
 from users.serializers import UserSerializer
 from users.functions import check_avatar
@@ -64,7 +64,13 @@ logger = logging.getLogger(__name__)
     ))
 class UserAPI(viewsets.ModelViewSet):
     serializer_class = UserSerializer
-    permission_required = all_permissions.organizations_view
+    permission_required = ViewClassPermission(
+        GET=all_permissions.organizations_view,
+        PUT=all_permissions.organizations_change,
+        POST=all_permissions.organizations_change,
+        PATCH=all_permissions.organizations_change,
+        DELETE=all_permissions.organizations_change,
+    )
 
     def get_queryset(self):
         return User.objects.filter(organizations=self.request.user.active_organization)
