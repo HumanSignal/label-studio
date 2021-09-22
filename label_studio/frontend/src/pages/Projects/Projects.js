@@ -25,9 +25,9 @@ export const ProjectsPage = () => {
 
   const fetchProjects = async () => {
     setNetworkState('loading');
-    const projects = await api.callApi("projects");
+    const data = await api.callApi("projects");
 
-    setProjectsList(projects ?? []);
+    setProjectsList(data.results ?? []);
     setNetworkState('loaded');
   };
 
