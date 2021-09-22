@@ -1,6 +1,6 @@
 {
-  "message": "[fix] parseValue with missed value",
-  "commit": "ed07a8f9dc36451687cdd80429dbf359ad7f8ed6",
-  "branch": "master",
-  "date": "2021-09-20T21:50:17Z"
+  "message": "Update Waveform.js",
+  "commit": "20c0f70ef0262f5f01d9f9207ee69a58cc464b28",
+  "branch": "fix/audio-center",
+  "date": "2021-09-18T22:44:47Z"
 }
