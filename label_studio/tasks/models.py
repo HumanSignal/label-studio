@@ -163,21 +163,27 @@ class Task(TaskMixin, models.Model):
             return protected_data
         else:
             # Try resolve URLs via storage associated with that task
-            storage = self._get_task_storage(task_data)
-            if storage:
-                return storage.resolve_task_data_uri(task_data)
+            storage = self.storage
+            for field in task_data:
+                storage = storage or self._get_storage_by_url(task_data[field])
+                if storage:
+                    resolved_uri = storage.resolve_uri(task_data[field])
+                    if resolved_uri:
+                        task_data[field] = resolved_uri
             return task_data
 
-    def _get_storage_by_task_data(self, task_data):
-        from io_storages.models import get_import_storage_by_url
+    def _get_storage_by_url(self, url):
+        """Find the first compatible storage and returns presigned URL"""
+        from io_storages.models import get_storage_classes
 
-        for url in task_data.values():
-            storage_class = get_import_storage_by_url(url)
-            if storage_class:
-                # Only first matched storage is returned - no way to specify {"url1": "s3://", "url2": "gs://"}
-                return storage_class.objects.filter(project=self.project).first()
+        for storage_class in get_storage_classes('import'):
+            storage_objects = storage_class.objects.filter(project=self.project)
+            for storage_object in storage_objects:
+                if storage_object.can_resolve_url(url):
+                    return storage_object
 
-    def _get_task_storage(self, task_data):
+    @property
+    def storage(self):
         # maybe task has storage link
         storage_link = self.get_storage_link()
         if storage_link:
@@ -189,10 +195,6 @@ class Task(TaskMixin, models.Model):
             # We may use more than one and non-default S3 storage (like GCS, Azure)
             from io_storages.s3.models import S3ImportStorage
             return S3ImportStorage()
-
-        storage = self._get_storage_by_task_data(task_data)
-        if storage:
-            return storage
 
     def update_is_labeled(self):
         """Set is_labeled field according to annotations*.count > overlap
