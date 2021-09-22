@@ -25,6 +25,7 @@ url_scheme = 's3'
 
 clients_cache = {}
 
+
 class S3StorageMixin(models.Model):
     bucket = models.TextField(
         _('bucket'), null=True, blank=True,
@@ -66,7 +67,6 @@ class S3StorageMixin(models.Model):
         clients_cache[cache_key] = result
         return result
 
-
     def get_client(self):
         client, _ = self.get_client_and_resource()
         return client
@@ -84,10 +84,14 @@ class S3StorageMixin(models.Model):
             logger.debug(f'Test connection to bucket {self.bucket} with prefix {self.prefix}')
             result = client.list_objects_v2(Bucket=self.bucket, Prefix=self.prefix, MaxKeys=1)
             if not result.get('KeyCount'):
-                raise KeyError(f's3://{self.bucket}/{self.prefix} not found.')
+                raise KeyError(f'{url_scheme}://{self.bucket}/{self.prefix} not found.')
         else:
             logger.debug(f'Test connection to bucket {self.bucket}')
             client.head_bucket(Bucket=self.bucket)
+
+    def can_resolve_url(self, url):
+        # TODO: later check to the full prefix like "url.startswith(self.path_full)"
+        return url.startswith(f'{url_scheme}://')
 
     @property
     def path_full(self):

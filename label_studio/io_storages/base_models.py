@@ -146,6 +146,9 @@ class ImportStorage(Storage):
             logger.info(f'Start syncing storage {self}')
             self.scan_and_create_links()
 
+    def can_resolve_url(self, url):
+        return False
+
     class Meta:
         abstract = True
 
