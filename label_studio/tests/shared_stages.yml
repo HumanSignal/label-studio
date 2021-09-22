@@ -72,3 +72,24 @@ stages:
         json:
           task_pk: id
       status_code: 201
+  - id: create_annotation
+    name: create_annotation
+    request:
+      headers:
+        content-type: application/json
+      json:
+        lead_time: 12.34
+        result:
+        - from_name: label
+          to_name: text
+          type: choices
+          value:
+            choices:
+            - pos
+      method: POST
+      url: '{django_live_url}/api/tasks/{task_pk}/annotations'
+    response:
+      save:
+        json:
+          annotation_pk: id
+      status_code: 201
