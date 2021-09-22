@@ -55,7 +55,7 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
     def to_representation(self, instance):
         annotation = super(AnnotationSerializer, self).to_representation(instance)
         if self.context.get('completed_by', '') == 'full':
-            annotation['completed_by'] = UserSerializer(annotation.completed_by).data
+            annotation['completed_by'] = UserSerializer(instance.completed_by).data
         return annotation
 
     def get_fields(self):
