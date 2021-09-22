@@ -108,7 +108,7 @@ def get_fields_for_evaluation(prepare_params, user):
     if fields:
         from label_studio.data_manager.functions import TASKS
         GET_ALL_COLUMNS = load_func(settings.DATA_MANAGER_GET_ALL_COLUMNS)
-        all_columns = GET_ALL_COLUMNS(user, Project.objects.get(id=prepare_params.project))
+        all_columns = GET_ALL_COLUMNS(Project.objects.get(id=prepare_params.project), user)
         all_columns = set([TASKS + ('data.' if c.get('parent', None) == 'data' else '') + c['id']
                            for c in all_columns['columns']])
         hidden = set(fields['explore']) & set(fields['labeling'])

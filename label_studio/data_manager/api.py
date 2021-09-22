@@ -11,9 +11,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
 from django.db.models import Sum, Count
+from django.conf import settings
 from ordered_set import OrderedSet
 
-from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, find_first_many_to_one_related_field_by_prefix
+from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, find_first_many_to_one_related_field_by_prefix, load_func
 from core.permissions import all_permissions, ViewClassPermission
 from projects.models import Project
 from projects.serializers import ProjectSerializer
@@ -294,7 +295,8 @@ class ProjectColumnsAPI(APIView):
         pk = int_from_request(request.GET, "project", 1)
         project = get_object_with_check_and_log(request, Project, pk=pk)
         self.check_object_permissions(request, project)
-        data = get_all_columns(request, project)
+        GET_ALL_COLUMNS = load_func(settings.DATA_MANAGER_GET_ALL_COLUMNS)
+        data = GET_ALL_COLUMNS(project, request.user)
         return Response(data)
 
 
