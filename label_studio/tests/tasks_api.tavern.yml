@@ -25,5 +25,3 @@ stages:
     url: '{django_live_url}/api/dm/tasks/{task_pk}?project={project_pk}'
   response:
     status_code: 200
-    json:
-      user: 123
