@@ -82,7 +82,7 @@ export const ApiProvider = forwardRef(({children}, ref) => {
 
       if (!errorFilter || shouldCatchError){
         setError(result);
-        const isShutdown = handleError(result, contextValue.showModal);
+        const isShutdown = await handleError(result, contextValue.showModal);
 
         apiLocked = apiLocked || isShutdown;
 

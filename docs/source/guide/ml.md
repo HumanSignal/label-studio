@@ -155,12 +155,14 @@ curl -H 'Authorization: Token <user-token-from-account-page>' -X POST \
  "<host>/api/dm/actions?id=delete_tasks_predictions&project=<id>"
 ```
 
-### <i class='ent'></i> Choose which predictions to display to annotators
+### Choose which predictions to display to annotators
 
-After setting up an ML backend with Label Studio Enterprise, you can choose which model predictions to display to annotators by default. You must have multiple ML backends configured with Label Studio in order to choose which predictions to display.
+You can choose which model predictions to display to annotators by default. 
 
 1. For a specific project, open the **Settings** and select **Machine Learning**.
 2. Under **Model Version**, select the version of the model that you want to use to display predictions to annotators by default. Your changes save automatically. 
+
+The model version can be specified in [imported pre-annotations](predictions.html), multiple versions of one connected ML backend, or multiple connected ML backends. 
 
 When annotators start labeling, they'll see the predictions from that model version for each task, which they can then modify as needed. If there are no predictions for a task from the model version selected, no predictions display to the annotator even if another model version has predictions for the task. 
    
