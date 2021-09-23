@@ -128,7 +128,6 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     def patch(self, request, *args, **kwargs):
         return super(TaskAPI, self).patch(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Tasks'])
     def delete(self, request, *args, **kwargs):
         return super(TaskAPI, self).delete(request, *args, **kwargs)
 
