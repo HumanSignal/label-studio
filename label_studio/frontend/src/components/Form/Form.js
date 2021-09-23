@@ -4,7 +4,7 @@ import { ApiProvider } from '../../providers/ApiProvider';
 import { MultiProvider } from '../../providers/MultiProvider';
 import { Block, cn, Elem } from '../../utils/bem';
 import { debounce } from '../../utils/debounce';
-import { objectClean } from '../../utils/helpers';
+import { isDefined, objectClean } from '../../utils/helpers';
 import { Button } from '../Button/Button';
 import { Oneof } from '../Oneof/Oneof';
 import { Space } from '../Space/Space';
@@ -12,6 +12,8 @@ import { Counter, Input, Select, Toggle } from './Elements';
 import './Form.styl';
 import { FormContext, FormResponseContext, FormStateContext, FormSubmissionContext, FormValidationContext } from './FormContext';
 import * as Validators from './Validation/Validators';
+
+const PASSWORD_PROTECTED_VALUE = 'got ya, suspicious hacker!';
 
 export default class Form extends React.Component {
   state = {
@@ -83,9 +85,8 @@ export default class Form extends React.Component {
 
     if (!existingField) {
       this.fields.add(field);
-      if (field.name && this.props.formData && field.name in this.props.formData) {
-        field.setValue(this.props.formData[field.name]);
-      }
+
+      this.fillWithFormData(field);
     } else {
       Object.assign(existingField, field);
     }
@@ -165,12 +166,16 @@ export default class Form extends React.Component {
     }
 
 
-    const requestBody = fields.reduce((res, { name, field, skip, allowEmpty }) => {
+    const requestBody = fields.reduce((res, { name, field, skip, allowEmpty, isProtected }) => {
       const skipField = skip || ((this.props.skipEmpty || allowEmpty === false) && !field.value);
 
       if (full === true || !skipField) {
         const value = (() => {
           const inputValue = field.value;
+
+          if (isProtected && inputValue === PASSWORD_PROTECTED_VALUE) {
+            return null;
+          }
 
           if (['checkbox', 'radio'].includes(field.type)) {
             if (inputValue !== null && inputValue !== 'on' && inputValue !== 'true') {
@@ -321,13 +326,19 @@ export default class Form extends React.Component {
     if (!this.props.formData) return;
     if (this.fields.size === 0) return;
 
-    Object.entries(this.props.formData).forEach(([key, value]) => {
-      const field = this.getFieldContext(key);
-
-      if (field && field.value !== value && !field.skipAutofill) {
-        field.setValue(value);
-      }
+    Object.entries(this.fields.values()).forEach((field) => {
+      this.fillWithFormData(field);
     });
+  }
+
+  fillWithFormData(field) {
+    const value = (this.props.formData ?? {})[field.name];
+
+    if (field.isProtected && this.props.formData) {
+      field.setValue(PASSWORD_PROTECTED_VALUE);
+    } else if (isDefined(value) && field.value !== value && !field.skipAutofill) {
+      field.setValue(value);
+    }
   }
 }
 
@@ -390,6 +401,12 @@ Form.Builder = React.forwardRef(({
       const currentValue = formData?.[field.name] ?? undefined;
       const triggerUpdate = props.autosubmit !== true && field.trigger_form_update === true;
       const getValue = () => {
+        const isProtected = field.skipAutofill && !field.allowEmpty && field.type === 'password';
+
+        if (isProtected) {
+          return PASSWORD_PROTECTED_VALUE;
+        }
+
         if (field.skipAutofill) {
           return null;
         }

@@ -86,6 +86,8 @@ export const FormField = forwardRef(({
   }, [field]);
 
   useEffect(() => {
+    const isProtected = skipAutofill && !allowEmpty && field.current.type === 'password';
+
     context?.registerField({
       label,
       name,
@@ -93,6 +95,7 @@ export const FormField = forwardRef(({
       skip,
       allowEmpty,
       skipAutofill,
+      isProtected,
       field: field.current,
       setValue: setValueCallback,
     });
