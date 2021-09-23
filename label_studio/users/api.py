@@ -15,6 +15,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import MethodNotAllowed
 
 from core.permissions import all_permissions, ViewClassPermission
 from users.models import User
@@ -90,7 +91,7 @@ class UserAPI(viewsets.ModelViewSet):
             return Response(status=204)
 
     def update(self, request, *args, **kwargs):
-        return super(UserAPI, self).update(request, *args, **kwargs)
+        raise MethodNotAllowed('PUT')
 
     def list(self, request, *args, **kwargs):
         return super(UserAPI, self).list(request, *args, **kwargs)
