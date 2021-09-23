@@ -1163,7 +1163,7 @@ stages:
         function: label_studio.tests.utils:save_response
       json: {
         "total_annotations": 3,
-        "total_predictions": null,
+        "total_predictions": 2,
         "total": 3,
         "tasks": [
         {
