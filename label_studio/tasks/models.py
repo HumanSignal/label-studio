@@ -167,7 +167,11 @@ class Task(TaskMixin, models.Model):
             for field in task_data:
                 storage = storage or self._get_storage_by_url(task_data[field])
                 if storage:
-                    resolved_uri = storage.resolve_uri(task_data[field])
+                    try:
+                        resolved_uri = storage.resolve_uri(task_data[field])
+                    except Exception as exc:
+                        logger.error(exc, exc_info=True)
+                        resolved_uri = None
                     if resolved_uri:
                         task_data[field] = resolved_uri
             return task_data
