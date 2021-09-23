@@ -167,15 +167,12 @@ export default class Form extends React.Component {
 
 
     const requestBody = fields.reduce((res, { name, field, skip, allowEmpty, isProtected }) => {
-      const skipField = skip || ((this.props.skipEmpty || allowEmpty === false) && !field.value);
+      const skipProtected = isProtected && field.value === PASSWORD_PROTECTED_VALUE;
+      const skipField = skip || skipProtected || ((this.props.skipEmpty || allowEmpty === false) && !field.value);
 
       if (full === true || !skipField) {
         const value = (() => {
           const inputValue = field.value;
-
-          if (isProtected && inputValue === PASSWORD_PROTECTED_VALUE) {
-            return null;
-          }
 
           if (['checkbox', 'radio'].includes(field.type)) {
             if (inputValue !== null && inputValue !== 'on' && inputValue !== 'true') {
@@ -312,6 +309,10 @@ export default class Form extends React.Component {
     const messages = [];
     const { validation, field: element } = field;
     const value = element.value?.trim() || null;
+
+    if (field.isProtected && value === PASSWORD_PROTECTED_VALUE) {
+      return messages;
+    }
 
     validation.forEach((validator) => {
       const result = validator(field.label, value);
