@@ -39,6 +39,7 @@ div.container__head{
   display: flex;
   align-items:center;
   justify-content:center;
+  line-height: 28px;
 }
 .head__main>.container__head>.head__menu--wrapper > *:last-child{
   margin-right:0px;
@@ -58,12 +59,14 @@ div.container__head{
 /***** webflow part *****/
 .head__main>.container__head>.head__menu--wrapper .w-dropdown {
   position: relative;
-  padding: 10px 0;
 }
 
 .head__main>.container__head>.head__menu--wrapper .w-dropdown-list {
   position: absolute;
   display: none;
+  padding: 8px 0;
+  margin-top: 6px;
+  border: 1px solid #ddd;
 }
 
 .head__main>.container__head>.head__menu--wrapper .w-dropdown:hover .w-dropdown-list {
@@ -71,14 +74,8 @@ div.container__head{
   top: 100%;
   right: 0;
   background: white;
-  padding: 8px;
   min-width: 100%;
-  border-style: solid;
-  border-width: 1px;
-  border-color: #ddd;
   border-radius: 4px;
-  background-color: #fff;
-  padding: 8px 0;
 }
 
 .head__main>.container__head>.head__menu--wrapper a.w-dropdown-link {
@@ -103,6 +100,33 @@ div.container__head{
 
 .head__main>.container__head>.head__menu--wrapper .w-dropdown-toggle svg {
   margin-left: 5px;
+}
+/* hide github stub button until widget is loaded */
+.head__main>.container__head>.github-button {
+  opacity: 0;
+}
+
+@media screen and (max-width: 991px) {
+  .head__main>.container__head>.head__menu--wrapper {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .head__main>.container__head>.head__menu--wrapper > * {
+    display: block;
+    font-size: 18px;
+  }
+  .head__main>.container__head>.head__menu--wrapper .w-dropdown-toggle svg {
+    display: none;
+  }
+  .head__main>.container__head>.head__menu--wrapper .w-dropdown-list {
+    position: static;
+    display: block;
+    margin-top: 0;
+    border: none;
+  }
+  .head__main>.container__head>span:last-child {
+    display: none; /* github widget */
+  }
 }
 
 .head__main .search__head{
