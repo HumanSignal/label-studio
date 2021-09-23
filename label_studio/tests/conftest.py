@@ -108,6 +108,14 @@ def s3_with_hypertext_s3_links(s3):
 
 
 @pytest.fixture(autouse=True)
+def s3_with_unexisted_links(s3):
+    bucket_name = 'pytest-s3-jsons-unexisted_links'
+    s3.create_bucket(Bucket=bucket_name)
+    s3.put_object(Bucket=bucket_name, Key='some-existed-image.jpg', Body='qwerty')
+    yield s3
+
+
+@pytest.fixture(autouse=True)
 def s3_export_bucket(s3):
     bucket_name = 'pytest-export-s3-bucket'
     s3.create_bucket(Bucket=bucket_name)
