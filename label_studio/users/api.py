@@ -72,6 +72,7 @@ class UserAPI(viewsets.ModelViewSet):
         PATCH=all_permissions.organizations_change,
         DELETE=all_permissions.organizations_change,
     )
+    http_method_names = ['get', 'post', 'head', 'patch', 'delete']
 
     def get_queryset(self):
         return User.objects.filter(organizations=self.request.user.active_organization)
@@ -91,7 +92,7 @@ class UserAPI(viewsets.ModelViewSet):
             return Response(status=204)
 
     def update(self, request, *args, **kwargs):
-        raise MethodNotAllowed('PUT')
+        return super(UserAPI, self).update(request, *args, **kwargs)
 
     def list(self, request, *args, **kwargs):
         return super(UserAPI, self).list(request, *args, **kwargs)
