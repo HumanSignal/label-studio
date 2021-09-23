@@ -1,4 +1,4 @@
-import React, { ComponentClass, FunctionComponent, ReactHTML, ReactSVG } from 'react';
+import React, { ComponentClass, FunctionComponent } from 'react';
 
 interface CNMod {
   [key: string]: unknown
@@ -25,7 +25,7 @@ interface CNOptions {
   mix?: CNMix | CNMix[] | undefined | undefined
 }
 
-type CNTagName = keyof ReactHTML | keyof ReactSVG | ComponentClass<unknown, unknown> | FunctionComponent<unknown> | string
+type CNTagName = ComponentClass<unknown, unknown> | FunctionComponent<unknown> | string
 
 type CNComponentProps = {
   name: string

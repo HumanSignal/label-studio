@@ -29,9 +29,13 @@ aws_params: &aws_params
     name: aws_secret_access_key
     label: Secret Access Key
     autoComplete: "new-password"
+    skipAutofill: true
+    allowEmpty: false
   - type: text
     name: aws_session_token
     label: Session Token
+    skipAutofill: true
+    allowEmpty: false
 
 
 
