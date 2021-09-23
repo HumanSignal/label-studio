@@ -175,7 +175,7 @@ export default class Form extends React.Component {
           const inputValue = field.value;
 
           if (['checkbox', 'radio'].includes(field.type)) {
-            if (inputValue !== null && inputValue !== 'on' && inputValue !== 'true') {
+            if (isDefined(inputValue) && !['', 'on', 'off', 'true', 'false'].includes(inputValue)) {
               return field.checked ? inputValue : null;
             }
 
