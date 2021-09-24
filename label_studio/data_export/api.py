@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
     decorator=swagger_auto_schema(
         tags=['Export'],
         operation_summary='Get export formats',
-        operation_description='Retrieve the available export formats for the current project.',
+        operation_description='Retrieve the available export formats for the current project by ID.',
         responses={
             200: openapi.Response(
                 description='Export formats',
@@ -71,24 +71,29 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
                 in_=openapi.IN_QUERY,
                 description="""
                           If true, download all tasks regardless of status. If false, download only annotated tasks.
-                          """
-                          ),
-        openapi.Parameter(name='ids',
-                          type=openapi.TYPE_ARRAY,
-                          items=openapi.Schema(
-                              title='Task ID',
-                              description='Individual task ID',
-                              type=openapi.TYPE_INTEGER
-                          ),
-                          in_=openapi.IN_QUERY,
-                          description="""
-                          Use to export a subset of tasks. Identify specific tasks by ID to export. 
-                          """
-                          )
-    ],
-    tags=['Export'],
-    operation_summary='Export tasks and annotations',
-    operation_description="""
+                          """,
+            ),
+            openapi.Parameter(
+                name='download_resources',
+                type=openapi.TYPE_BOOLEAN,
+                in_=openapi.IN_QUERY,
+                description="""
+                          If true, download all resource files such as images, audio, and others relevant to the tasks. 
+                          """,
+            ),
+            openapi.Parameter(
+                name='ids',
+                type=openapi.TYPE_ARRAY,
+                items=openapi.Schema(title='Task ID', description='Individual task ID', type=openapi.TYPE_INTEGER),
+                in_=openapi.IN_QUERY,
+                description="""
+                          Specify a list of task IDs to retrieve only the details for those tasks.
+                          """,
+            ),
+        ],
+        tags=['Export'],
+        operation_summary='Export tasks and annotations',
+        operation_description="""
         Export annotated tasks as a file in a specific format.
         For example, to export JSON annotations for a project to a file called `annotations.json`,
         run the following from the command line:
@@ -169,9 +174,10 @@ class ExportAPI(generics.RetrieveAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Export'],
-        operation_summary='Export files',
+        operation_summary='List exported files',
         operation_description="""
-        List of files exported from the Label Studio UI using the Export button on the Data Manager page.
+        Retrieve a list of files exported from the Label Studio UI using the Export button on the Data Manager page.
+        To retrieve the files themselves, see [Download export file](/api#operation/api_projects_exports_download_read).
         """,
     ),
 )
@@ -223,10 +229,18 @@ class ProjectExportFilesAuthCheck(APIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Export'],
-        operation_summary='List your exports',
+        operation_summary='List all export files',
         operation_description="""
-        Returns a list of exports.
+        Returns a list of exported files for a specific project by ID.
         """,
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                default=0,
+                description='Project ID')
+        ]
     ),
 )
 @method_decorator(
@@ -235,8 +249,16 @@ class ProjectExportFilesAuthCheck(APIView):
         tags=['Export'],
         operation_summary='Create new export',
         operation_description="""
-        Create an instance of export and start background task for file generating.
+        Create a new export request to start a background task and generate an export file for a specific project by ID.
         """,
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                default=0,
+                description='Project ID')
+        ]
     ),
 )
 class ExportListAPI(generics.ListCreateAPIView):
@@ -269,8 +291,22 @@ class ExportListAPI(generics.ListCreateAPIView):
         tags=['Export'],
         operation_summary='Get export by ID',
         operation_description="""
-        Retrieve information about a export by project ID.
+        Retrieve information about an export file by export ID.
         """,
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                default=0,
+                description='Project ID'),
+            openapi.Parameter(
+                name='export_pk',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                default=0,
+                description='Export primary key'),
+        ]
     ),
 )
 @method_decorator(
@@ -279,8 +315,22 @@ class ExportListAPI(generics.ListCreateAPIView):
         tags=['Export'],
         operation_summary='Delete export',
         operation_description="""
-        Delete a export by specified export ID.
+        Delete an export file by specified export ID.
         """,
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                default=0,
+                description='Project ID'),
+            openapi.Parameter(
+                name='export_pk',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                default=0,
+                description='Export primary key'),
+        ]
     ),
 )
 class ExportDetailAPI(generics.RetrieveDestroyAPIView):
@@ -308,7 +358,12 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
         tags=['Export'],
         operation_summary='Download export file',
         operation_description="""
-        Returns download file.
+        Download an export file in the specified format for a specific project. Specify the project ID with the `id` 
+        parameter in the path and the ID of the export file you want to download using the `export_pk` parameter 
+        in the path. 
+        
+        Get the `export_pk` from the response of the request to [Create new export](/api#operation/api_projects_exports_create)
+        or after [listing export files](/api#operation/api_projects_exports_list).
         """,
         manual_parameters=[
             openapi.Parameter(
@@ -317,6 +372,18 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
                 in_=openapi.IN_QUERY,
                 description='Selected export format',
             ),
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                default=0,
+                description='Project ID'),
+            openapi.Parameter(
+                name='export_pk',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                default=0,
+                description='Export primary key'),
         ],
     ),
 )

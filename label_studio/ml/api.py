@@ -29,7 +29,8 @@ logger = logging.getLogger(__name__)
         tags=['Machine Learning'],
         operation_summary='Add ML Backend',
         operation_description="""
-    Add an ML backend using the Label Studio UI or by sending a POST request using the following cURL command:
+    Add an ML backend to a project using the Label Studio UI or by sending a POST request using the following cURL 
+    command:
     ```bash
     curl -X POST -H 'Content-type: application/json' {host}/api/ml -H 'Authorization: Token abc123'\\
     --data '{{"url": "http://localhost:9090", "project": {{project_id}}}}' 
@@ -38,7 +39,20 @@ logger = logging.getLogger(__name__)
         ),
     ),
 )
-@method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
+        tags=['Machine Learning'],
+        operation_summary='List ML backends',
+        operation_description="""
+    List all configured ML backends for a specific project by ID.
+    Use the following cURL command:
+    ```bash
+    curl {host}/api/ml?project={{project_id}} -H 'Authorization: Token abc123'
+    """.format(
+            host=(settings.HOSTNAME or 'https://localhost:8080')
+        ),
+    ))
 class MLBackendListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
@@ -68,7 +82,7 @@ class MLBackendListAPI(generics.ListCreateAPIView):
         operation_description="""
     Update ML backend parameters using the Label Studio UI or by sending a PATCH request using the following cURL command:
     ```bash
-    curl -X PATCH -H 'Content-type: application/json' {host}/api/ml -H 'Authorization: Token abc123'\\
+    curl -X PATCH -H 'Content-type: application/json' {host}/api/ml/{{ml_backend_ID}} -H 'Authorization: Token abc123'\\
     --data '{{"url": "http://localhost:9091"}}' 
     """.format(
             host=(settings.HOSTNAME or 'https://localhost:8080')
@@ -81,10 +95,10 @@ class MLBackendListAPI(generics.ListCreateAPIView):
         tags=['Machine Learning'],
         operation_summary='Get ML Backend',
         operation_description="""
-    Get details about existing ML backend connections for a project ID. For example, make a GET request using the
+    Get details about a specific ML backend connection by ID. For example, make a GET request using the
     following cURL command:
     ```bash
-    curl {host}/api/ml?project={{project_id}} -H 'Authorization: Token abc123'
+    curl {host}/api/ml/{{ml_backend_ID}} -H 'Authorization: Token abc123'
     """.format(
             host=(settings.HOSTNAME or 'https://localhost:8080')
         ),
@@ -99,7 +113,7 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     Remove an existing ML backend connection by ID. For example, use the
     following cURL command:
     ```bash
-    curl -X DELETE {host}/api/ml?project={{project_id}}&id={{ml_backend_ID}} -H 'Authorization: Token abc123'
+    curl -X DELETE {host}/api/ml/{{ml_backend_ID}} -H 'Authorization: Token abc123'
     """.format(
             host=(settings.HOSTNAME or 'https://localhost:8080')
         ),
@@ -128,8 +142,10 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Machine Learning'],
         operation_summary='Train',
         operation_description="""
-        After you activate an ML backend, call this API with the ML backend ID to start training with 
+        After you add an ML backend, call this API with the ML backend ID to start training with 
         already-labeled tasks. 
+        
+        Get the ML backend ID by [listing the ML backends for a project](https://labelstud.io/api/#operation/api_ml_list).
         """,
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -169,17 +185,19 @@ class MLBackendTrainAPI(APIView):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Machine Learning'],
-        operation_summary='Intractive Annotating',
+        operation_summary='Request Interactive Annotation',
         operation_description="""
-
+        Send a request to the machine learning backend set up to be used for interactive preannotations to retrieve a
+        predicted region based on annotator input. 
+        See [set up machine learning](ml.html#Get-interactive-preannotations) for more.
         """,
         request_body=MLInteractiveAnnotatingRequest,
         responses={
-            200: openapi.Response(title='Annotating OK', description='Intractive Annotating has successfull.'),
+            200: openapi.Response(title='Annotating OK', description='Interactive annotation has succeeded.'),
         },
     ),
 )
-class MLBackendIntractiveAnnotating(APIView):
+class MLBackendInteractiveAnnotating(APIView):
     def post(self, request, *args, **kwargs):
         ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)

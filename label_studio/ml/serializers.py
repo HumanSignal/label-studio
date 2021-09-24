@@ -33,7 +33,7 @@ class MLBackendSerializer(serializers.ModelSerializer):
 
 class MLInteractiveAnnotatingRequest(serializers.Serializer):
     task = serializers.IntegerField(
-        help_text='Id of task to annotating',
+        help_text='ID of task to annotate',
         required=True,
     )
     context = serializers.JSONField(
