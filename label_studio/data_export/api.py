@@ -243,6 +243,9 @@ class ProjectExportFilesAuthCheck(APIView):
         operation_description="""
         Create a new export request to start a background task and generate an export file for a specific project by ID.
         """,
+        manual_parameters=[
+            openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, default=0,
+                              description='Project ID')]
     ),
 )
 class ExportListAPI(generics.ListCreateAPIView):
