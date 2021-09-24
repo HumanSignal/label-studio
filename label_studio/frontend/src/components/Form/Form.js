@@ -436,11 +436,13 @@ Form.Builder = React.forwardRef(({
         }
       })();
 
-      if (field.type === 'checkbox') {
+      if (['checkbox', 'radio', 'toggle'].includes(field.type)) {
         commonProps.checked = getValue();
       } else {
         commonProps.defaultValue = getValue();
       }
+
+      console.log({ field, commonProps });
 
       return (
         <InputComponent
