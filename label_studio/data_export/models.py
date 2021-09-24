@@ -70,7 +70,7 @@ class Export(models.Model):
     )
 
     status = models.CharField(
-        _('Exporting status'),
+        _('Export status'),
         max_length=64,
         choices=Status.choices,
         default=Status.CREATED,
@@ -80,12 +80,12 @@ class Export(models.Model):
     only_finished = models.BooleanField(
         _('Only finished'),
         default=False,
-        help_text=_('If true - it exports only finished tasks'),
+        help_text=_('If true, exports only finished tasks'),
     )
     task_ids = models.JSONField(
-        _('Task ids list'),
+        _('Task ID list'),
         default=list,
-        help_text=_('If list is empty - download all tasks'),
+        help_text=_('If list is empty, downloads all tasks'),
     )
 
     def has_permission(self, user):
