@@ -17,6 +17,8 @@ Use with the following data types: video
 | name | <code>string</code> |  | Name of the element |
 | value | <code>string</code> |  | URL of the video |
 | [frameRate] | <code>number</code> | <code>0.04</code> | frame rate in seconds; default 1/25s |
+| [sync] | <code>string</code> |  | object name to sync with |
+| [muted] | <code>boolean</code> | <code>false</code> | muted video |
 
 ### Example
 ```html
