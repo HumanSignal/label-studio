@@ -121,11 +121,22 @@ kubectl get pods
 ## Upgrade Label Studio using Helm
 To upgrade Label Studio Enterprise using Helm, do the following.
 
-Run `helm upgrade` with your values YAML file provided:
+Determine the latest tag version of Label Studio Enterprise and add the following to your `lse-values.yml` file: 
+```yaml
+global:
+images:
+tag: “20210914.154442-d2d1935”
+```
+After updating the values file, run the following from the command line:
 ```shell
 helm upgrade lse . -f lse-values.yaml
 ```
 
+As another option, you can run the following from the command line:
+```yaml
+helm upgrade lse . -f lse-values.yaml --set global.images.tag=20210914.154442-d2d1935
+```
+This command overrides the tag value stored in `lse-values.yaml`. You must update the tag value when you upgrade or redeploy your instance to avoid version downgrades.
 
 ## Uninstall Label Studio using Helm
 
