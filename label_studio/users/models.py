@@ -81,7 +81,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
 
     Username and password are required. Other fields are optional.
     """
-    username = models.CharField(_('username'), max_length=256, blank=True)
+    username = models.CharField(_('username'), max_length=256)
     email = models.EmailField(_('email address'), unique=True, blank=True)
 
     first_name = models.CharField(_('first name'), max_length=256, blank=True)

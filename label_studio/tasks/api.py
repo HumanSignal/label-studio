@@ -128,7 +128,6 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     def patch(self, request, *args, **kwargs):
         return super(TaskAPI, self).patch(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Tasks'])
     def delete(self, request, *args, **kwargs):
         return super(TaskAPI, self).delete(request, *args, **kwargs)
 
@@ -216,7 +215,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         "ground_truth": true,
         "lead_time": 0,
         "task": 0
-        "completed_by": {"id": 1, "email": "heartex@example.com", "first_name": "", "last_name": ""}
+        "completed_by": 123
         } 
         ```
         """,
@@ -248,7 +247,6 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         user = self.request.user
 
         # updates history
-        update_id = self.request.user.id
         result = ser.validated_data.get('result')
         extra_args = {'task_id': self.kwargs['pk']}
 

@@ -21,12 +21,13 @@ from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path, re_path
 from django.views.generic.base import RedirectView
-from django.views.static import serve
+
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework.permissions import AllowAny
 
 from core import views
+from core.utils.static_serve import serve
 
 handler500 = 'core.views.custom_500'
 
