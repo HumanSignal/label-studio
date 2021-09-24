@@ -25,14 +25,14 @@ Sort the data in your project by date to focus on labeling the newest data first
 
 1. In a project, update the **Order** of the data from the default to **Created at**.
 2. Update the order of the items to be in ascending order, so the newest items appear first. 
-3. Click **Label** to start labeling tasks from newest to oldest. 
+3. Select **Label Tasks As Displayed** to start labeling tasks from newest to oldest. 
 
 ### Example: Sort by prediction score
 You can sort the data in your project by prediction score if you upload [pre-annotated data](predictions.html) with prediction scores, or if your [machine learning backend](ml.html) produces prediction scores as part of the model output. 
 
 1. In a project, update the **Order** of the data from the default to use the **Prediction score** field.
 2. Update the order of the items in either ascending or descending order to label based on higher confidence or lower confidence predictions. 
-3. Click **Label** to start labeling tasks in prediction score order. 
+3. Select **Label Tasks As Displayed** to start labeling tasks in prediction score order. 
 You can also use [task sampling](start.html#Set_up_task_sampling_for_your_project) to use prediction score ordering.
 
 ### Example: Split a dataset using tabs and filters
@@ -49,7 +49,9 @@ For example, you might split a dataset with 300 images into 3 different tabs, an
 
 ## Start labeling
 
-From a project, click **Label** to start labeling. You can also label a specific task by clicking it when viewing the data in a project, but you won't automatically see the next task in the labeling queue after submitting your annotations. 
+From a project, click **Label All Tasks** to start labeling all tasks. To label the tasks as they are filtered and sorted in the data manager, select **Label Tasks As Displayed** instead. 
+
+You can also label a specific task in the **Quick View** or **Preview** by clicking it from the project data manager view, but you won't automatically see the next task in the labeling queue after submitting your annotations. 
 
 Some labeling tasks can be complicated to perform, for example, labeling that includes text, image, and audio data objects as part of one dataset and labeling task, or creating relations between annotations on a labeling task.
 
@@ -71,19 +73,31 @@ When you label with bounding boxes and other image segmentation tasks, or when y
 6. Continue hiding and labeling regions until you've completed annotating the task. If you want, select the eye icon next to **Regions** to hide and then show all regions labeled on the task to confirm the end result.
 7. Click **Submit** to submit the completed annotation and move on to the next task.
 
+### Select multiple regions
+
+You can select multiple regions while labeling to make changes to them together. 
+
+1. After creating multiple regions, press `ctrl` and click each region that you want to select. You can select regions on the object that you're labeling or in the **Regions** sidebar. Select a range of regions in the **Regions** sidebar by clicking the first region in the list that you want to select and holding `Shift` while you click the last region in the list that you want to select. 
+2. After selecting the regions you can apply a label to all selected regions or delete them. 
+3. Click a selected region to deselect it.
+
 ### Change the label
 You can change the label of an existing region. 
 
-1. Select the labeled region, for example a span, bounding box, image segment, audio region, or other region. 
+1. Select the labeled region, for example a span, bounding box, image segment, audio region, or other region, on the object or using the **Regions** sidebar.
 2. Select a new label. Your changes to the label save automatically. 
 3. Click **Submit** to submit the completed annotation and move on to the next task.
 
-### Delete an annotation
-After labeling a region, you can delete the annotation. 
-1. Select the labeled region.  
-2. Press the Backspace key, or go to the **Results** panel and remove the selected annotation. 
+### Delete a labeled region
+You can delete labeled regions, such as bounding boxes or text spans, if needed.  
 
-You can also delete all annotations on a task from the project page. See [Delete tasks or annotations](setup.html#Delete_tasks_or_annotations).
+1. Select the labeled region on the object or in the **Regions** sidebar. 
+2. Press the Backspace key, or go to the **Results** panel and remove the selected annotation.
+
+### Delete an annotation
+After labeling a task, you can delete the annotation by clicking the trash can button to delete an annotation on the task. If you haven't saved your annotation yet, click the `X` icon to reset the task and remove your labeling activity.
+
+You can also delete all annotations on a task from the project page. See [Delete tasks or annotations](setup_project.html#Delete_tasks_or_annotations).
 
 ### Add relations between annotations
 
@@ -138,18 +152,21 @@ If you have a machine learning backend set up to [get interactive preannotations
 2. For image labeling, you can choose whether to **Auto accept annotation suggestions** after you enable auto-annotation. If you automatically accept annotation suggestions, regions show up automatically and are immediately created. If you don't automatically accept suggestions, the regions appear but you can reject or approve them manually, either individually or all at once. Predicted text regions are automatically accepted.
 
 ## Use keyboard shortcuts to label regions faster
-Use keyboard shortcuts (hotkeys) to improve your labeling performance. When performing a labeling task, click the gear icon to see more details about hotkeys or to enable or disable hotkeys. 
+Use keyboard shortcuts, or hotkeys, to improve your labeling performance. When performing a labeling task, click the gear icon to see more details about hotkeys or to enable or disable hotkeys. 
 
-This table describes the hotkeys for a standard keyboard. For a Mac keyboard, use return and delete instead of enter and backspace.
+This table describes the hotkeys for a standard keyboard. For a Mac keyboard, use return instead of enter, delete instead of backspace, and option instead of alt.
 
 | Key | Description |
 | --- | --- | 
-| ctrl+enter | Submit a task |
-| ctrl+backspace | Delete all regions |
-| escape | Exit relation mode |
-| backspace | Delete selected region | 
-| alt+shift+$n | For $n region, select a region |
+| `ctrl` + `enter` | Submit a task |
+| `alt` + `enter` | Update a task | 
+| `ctrl` + `backspace` OR `cmd` + `backspace` | Delete all regions |
+| `escape` | Exit relation mode |
+| `backspace` | Delete selected region | 
+| `alt` + `r` | Create a relation between regions, when a region is selected | 
+| `alt` + `.` | Cycle through all regions in the order listed on the regions sidebar | 
 
+Other annotation types have labeling-specific shortcuts, such as numbers to select specific labels or to select the eraser or a brush tool when labeling images. You can also specify custom hotkeys for labeling using the [Shortcut tag](/tags/shortcut.html). 
 
 ## Customize the labeling interface 
 
@@ -217,7 +234,7 @@ When you're annotating images, you can create regions without applying labels.
 
 This can be helpful for two-step labeling, where you want one annotator to create regions and another annotator to label the regions. 
 
-By default, regions without labels appear gray. 
+By default, regions without labels appear gray.
 
 ### Erase brush mask labels
 
