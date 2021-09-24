@@ -36,7 +36,9 @@ export default class Form extends React.Component {
 
   componentDidMount() {
     if (this.props.formData) {
-      this.fillFormData();
+      setTimeout(() => {
+        this.fillFormData();
+      }, 50);
     }
   }
 
@@ -441,8 +443,6 @@ Form.Builder = React.forwardRef(({
       } else {
         commonProps.defaultValue = getValue();
       }
-
-      console.log({ field, commonProps });
 
       return (
         <InputComponent
