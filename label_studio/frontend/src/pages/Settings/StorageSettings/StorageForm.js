@@ -5,6 +5,7 @@ import { Form, Input } from '../../../components/Form';
 import { Oneof } from '../../../components/Oneof/Oneof';
 import { ApiContext } from '../../../providers/ApiProvider';
 import { Block, Elem } from '../../../utils/bem';
+import { isDefined } from '../../../utils/helpers';
 
 export const StorageForm = forwardRef(({
   onSubmit,
@@ -55,22 +56,27 @@ export const StorageForm = forwardRef(({
     if (form && form.validateFields()) {
       const body = form.assembleFormData({ asJSON: true });
       const type = form.getField('storage_type').value;
-
-      // we're using api provided by the form to be able to save
-      // current api context and render inline erorrs properly
-      const response = await form.api.callApi('validateStorage', {
+      const requestParams = {
         params: {
           target,
           type,
         },
         body,
-      });
+      };
+
+      if (isDefined(storage?.id)) {
+        requestParams.params.id = storage.id;
+      }
+
+      // we're using api provided by the form to be able to save
+      // current api context and render inline erorrs properly
+      const response = await form.api.callApi('validateStorage', requestParams);
 
       if (response !== null) setConnectionValid(true);
       else setConnectionValid(false);
     }
     setChecking(false);
-  }, [formRef, target, type]);
+  }, [formRef, target, type, storage]);
 
   const action = useMemo(() => {
     return storage ? "updateStorage" : "createStorage";
