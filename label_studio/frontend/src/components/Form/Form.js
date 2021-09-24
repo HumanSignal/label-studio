@@ -327,7 +327,7 @@ export default class Form extends React.Component {
     if (!this.props.formData) return;
     if (this.fields.size === 0) return;
 
-    Object.entries(this.fields.values()).forEach((field) => {
+    Array.from(this.fields).forEach((field) => {
       this.fillWithFormData(field);
     });
   }
