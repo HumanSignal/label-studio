@@ -5,17 +5,24 @@ import io
 import sys
 import json
 import logging
-
 import pandas as pd
+import posixpath
+import mimetypes
 
+from pathlib import Path
+from django.utils._os import safe_join
 from django.conf import settings
 from django.contrib.auth import logout
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden
 from django.shortcuts import redirect, reverse
 from django.template import loader
-from django.views.static import serve
+from ranged_fileresponse import RangedFileResponse
 from django.http import JsonResponse
 from wsgiref.util import FileWrapper
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from drf_yasg.utils import swagger_auto_schema
 
 from core import utils
 from core.utils.io import find_file
@@ -79,6 +86,16 @@ def health(request):
 def metrics(request):
     """ Empty page for metrics evaluation """
     return HttpResponse('')
+
+
+class TriggerAPIError(APIView):
+    """ 500 response for testing """
+    authentication_classes = ()
+    permission_classes = ()
+
+    @swagger_auto_schema(auto_schema=None)
+    def get(self, request):
+        raise Exception('test')
 
 
 def editor_files(request):
@@ -157,7 +174,14 @@ def localfiles_data(request):
 
     local_serving_document_root = get_env('LOCAL_FILES_DOCUMENT_ROOT', default='/')
     if path and request.user.is_authenticated:
-        return serve(request, path, document_root=local_serving_document_root)
+        path = posixpath.normpath(path).lstrip('/')
+        full_path = Path(safe_join(local_serving_document_root, path))
+        if os.path.exists(full_path):
+            content_type, encoding = mimetypes.guess_type(str(full_path))
+            content_type = content_type or 'application/octet-stream'
+            return RangedFileResponse(request, open(full_path, mode='rb'), content_type)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
     return HttpResponseForbidden()
 

@@ -28,7 +28,8 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                                                               'skipped_annotations_number and ground_truth_number.')
     total_predictions_number = serializers.IntegerField(default=None, read_only=True,
                                                     help_text='Total predictions number in project including '
-                                                              'skipped_annotations_number and ground_truth_numberuseful_annotation_number.')
+                                                              'skipped_annotations_number, ground_truth_number, and '
+                                                              'useful_annotation_number.')
     useful_annotation_number = serializers.IntegerField(default=None, read_only=True,
                                                      help_text='Useful annotation number in project not including '
                                                                'skipped_annotations_number and ground_truth_number. '

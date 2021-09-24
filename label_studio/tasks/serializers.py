@@ -46,13 +46,17 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
     """
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
-    completed_by = serializers.SerializerMethodField(default='Requesting user',
-                                                     help_text='ID of the user who completed the annotation.')
 
     @classmethod
     def many_init(cls, *args, **kwargs):
         kwargs['child'] = cls(*args, **kwargs)
         return ListAnnotationSerializer(*args, **kwargs)
+
+    def to_representation(self, instance):
+        annotation = super(AnnotationSerializer, self).to_representation(instance)
+        if self.context.get('completed_by', '') == 'full':
+            annotation['completed_by'] = UserSerializer(instance.completed_by).data
+        return annotation
 
     def get_fields(self):
         fields = super(AnnotationSerializer, self).get_fields()
@@ -93,12 +97,6 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
         name += f' {user.email}, {user.id}'
         return name
 
-    def get_completed_by(self, annotation):
-        if self.context.get('completed_by', '') == 'full':
-            return UserSerializer(annotation.completed_by).data
-        else:
-            return annotation.completed_by.id if annotation.completed_by else None
-
     class Meta:
         model = Annotation
         exclude = ['prediction', 'result_count']
@@ -110,6 +108,15 @@ class TaskSimpleSerializer(ModelSerializer):
         super().__init__(*args, **kwargs)
         self.fields['annotations'] = AnnotationSerializer(many=True, default=[], context=self.context, read_only=True)
         self.fields['predictions'] = PredictionSerializer(many=True, default=[], context=self.context, read_only=True)
+
+    def to_representation(self, instance):
+        project = instance.project
+        if project:
+            # resolve $undefined$ key in task data
+            data = instance.data
+            replace_task_data_undefined_with_config_field(data, project)
+
+        return super().to_representation(instance)
 
     class Meta:
         model = Task
@@ -126,7 +133,7 @@ class TaskSerializer(ModelSerializer):
                 many=True, read_only=False, required=False, context=self.context
             )
 
-    def project(self):
+    def project(self, task=None):
         """ Take the project from context
         """
         if 'project' in self.context:
@@ -134,6 +141,8 @@ class TaskSerializer(ModelSerializer):
         elif 'view' in self.context and 'project_id' in self.context['view'].kwargs:
             kwargs = self.context['view'].kwargs
             project = get_object_with_check_and_log(Project, kwargs['project_id'])
+        elif task:
+            project = task.project
         else:
             project = None
         return project
@@ -144,7 +153,7 @@ class TaskSerializer(ModelSerializer):
         return validator.validate(task)
 
     def to_representation(self, instance):
-        project = instance.project
+        project = self.project(instance)
         if project:
             # resolve uri for storage (s3/gcs/etc)
             if self.context.get('resolve_uri', False):
@@ -447,9 +456,9 @@ class AnnotationDraftSerializer(ModelSerializer):
             return ""
 
         name = user.first_name
-        if len(user.last_name):
-            name = name + " " + user.last_name
-
+        last_name = user.last_name
+        if len(last_name):
+            name = name + " " + last_name
         name += (' ' if name else '') + f'{user.email}, {user.id}'
         return name
 

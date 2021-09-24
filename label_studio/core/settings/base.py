@@ -49,6 +49,8 @@ SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_bool_env('DEBUG', True)
+DEBUG_MODAL_EXCEPTIONS = get_bool_env('DEBUG_MODAL_EXCEPTIONS', True)
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -60,6 +62,7 @@ logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 
 # Databases
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
+DJANGO_DB_MYSQL = 'mysql'
 DJANGO_DB_SQLITE = 'sqlite'
 DJANGO_DB = 'default'
 DATABASE_NAME_DEFAULT = os.path.join(BASE_DATA_DIR, 'label_studio.sqlite3')
@@ -72,6 +75,14 @@ DATABASES_ALL = {
         'NAME': get_env('POSTGRE_NAME', 'postgres'),
         'HOST': get_env('POSTGRE_HOST', 'localhost'),
         'PORT': int(get_env('POSTGRE_PORT', '5432')),
+    },
+    DJANGO_DB_MYSQL: {
+        'ENGINE': 'django.db.backends.mysql',
+        'USER': get_env('MYSQL_USER', 'root'),
+        'PASSWORD': get_env('MYSQL_PASSWORD', ''),
+        'NAME': get_env('MYSQL_NAME', 'labelstudio'),
+        'HOST': get_env('MYSQL_HOST', 'localhost'),
+        'PORT': int(get_env('MYSQL_PORT', '3306')),
     },
     DJANGO_DB_SQLITE: {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -121,7 +132,8 @@ LOGGING = {
     }
 }
 
-if get_env('GOOGLE_LOGGING_ENABLED', False):
+if get_bool_env('GOOGLE_LOGGING_ENABLED', False):
+    logging.info('Google Cloud Logging handler is enabled.')
     try:
         import google.cloud.logging
         from google.auth.exceptions import GoogleAuthError
@@ -164,6 +176,7 @@ INSTALLED_APPS = [
     'users',
     'organizations',
     'data_import',
+    'data_export',
 
     'projects',
     'tasks',
@@ -332,6 +345,7 @@ CSRF_COOKIE_HTTPONLY = bool(int(get_env('CSRF_COOKIE_HTTPONLY', SESSION_COOKIE_S
 
 # user media files
 MEDIA_ROOT = os.path.join(BASE_DATA_DIR, 'media')
+os.makedirs(MEDIA_ROOT, exist_ok=True)
 MEDIA_URL = '/data/'
 UPLOAD_DIR = 'upload'
 AVATAR_PATH = 'avatars'
@@ -339,7 +353,11 @@ AVATAR_PATH = 'avatars'
 # project exports
 EXPORT_DIR = os.path.join(BASE_DATA_DIR, 'export')
 EXPORT_URL_ROOT = '/export/'
+# old export dir
 os.makedirs(EXPORT_DIR, exist_ok=True)
+# dir for delayed export
+DELAYED_EXPORT_DIR = 'export'
+os.makedirs(os.path.join(BASE_DATA_DIR, MEDIA_ROOT, DELAYED_EXPORT_DIR), exist_ok=True)
 
 # file / task size limits
 DATA_UPLOAD_MAX_MEMORY_SIZE = int(get_env('DATA_UPLOAD_MAX_MEMORY_SIZE', 250 * 1024 * 1024))
@@ -386,8 +404,10 @@ CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and_log'
 SAVE_USER = 'users.functions.save_user'
 USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
+DATA_MANAGER_GET_ALL_COLUMNS = 'data_manager.functions.get_all_columns'
 DATA_MANAGER_ANNOTATIONS_MAP = {}
 DATA_MANAGER_ACTIONS = {}
+DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS = ''
 USER_LOGIN_FORM = 'users.forms.LoginForm'
 PROJECT_MIXIN = 'core.mixins.DummyModelMixin'
 TASK_MIXIN = 'core.mixins.DummyModelMixin'

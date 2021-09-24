@@ -64,7 +64,7 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True, help_text='Creation time', verbose_name='created at')),
                 ('updated_at', models.DateTimeField(auto_now=True, help_text='Last update time', verbose_name='updated at')),
                 ('completed_by', models.ForeignKey(help_text='User who made this completion', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='completions', to=settings.AUTH_USER_MODEL)),
-                ('task', models.ForeignKey(help_text='Corresponding task for this completion', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='completions', to='tasks.task')),
+                ('task', models.ForeignKey(help_text='Corresponding task for this completion', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='completions', to='tasks.task', db_index=settings.DJANGO_DB != settings.DJANGO_DB_MYSQL)),
                 ('prediction', models.JSONField(default=dict, help_text='Prediction viewed at the time of completion', null=True, verbose_name='prediction')),
                 ('prediction_equal_score', models.FloatField(default=0.0, help_text='Comparison result with prediction viewed at the time of completion', verbose_name='prediction_equal_score')),
                 ('updates_history', models.JSONField(default=list, help_text='Updates history by experts', null=True, verbose_name='update history')),

@@ -23,6 +23,8 @@ logging.getLogger('botocore').setLevel(logging.CRITICAL)
 boto3.set_stream_logger(level=logging.INFO)
 url_scheme = 's3'
 
+clients_cache = {}
+
 
 class S3StorageMixin(models.Model):
     bucket = models.TextField(
@@ -54,9 +56,16 @@ class S3StorageMixin(models.Model):
         help_text='S3 Endpoint')
 
     def get_client_and_resource(self):
-        return get_client_and_resource(
+        # s3 client initialization ~ 100 ms, for 30 tasks it's a 3 seconds, so we need to cache it
+        cache_key = f'{self.aws_access_key_id}:{self.aws_secret_access_key}:{self.aws_session_token}:{self.region_name}:{self.s3_endpoint}'
+        if cache_key in clients_cache:
+            return clients_cache[cache_key]
+
+        result = get_client_and_resource(
             self.aws_access_key_id, self.aws_secret_access_key, self.aws_session_token, self.region_name,
             self.s3_endpoint)
+        clients_cache[cache_key] = result
+        return result
 
     def get_client(self):
         client, _ = self.get_client_and_resource()
@@ -75,10 +84,14 @@ class S3StorageMixin(models.Model):
             logger.debug(f'Test connection to bucket {self.bucket} with prefix {self.prefix}')
             result = client.list_objects_v2(Bucket=self.bucket, Prefix=self.prefix, MaxKeys=1)
             if not result.get('KeyCount'):
-                raise KeyError(f's3://{self.bucket}/{self.prefix} not found.')
+                raise KeyError(f'{url_scheme}://{self.bucket}/{self.prefix} not found.')
         else:
             logger.debug(f'Test connection to bucket {self.bucket}')
             client.head_bucket(Bucket=self.bucket)
+
+    def can_resolve_url(self, url):
+        # TODO: later check to the full prefix like "url.startswith(self.path_full)"
+        return url.startswith(f'{url_scheme}://')
 
     @property
     def path_full(self):

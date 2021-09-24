@@ -24,13 +24,13 @@ from core.utils.common import conditional_atomic
 from core.utils.disable_signals import DisableSignals
 from core.label_config import config_essential_data_has_changed
 from projects.models import (
-    Project, ProjectSummary
+    Project, ProjectSummary, ProjectManager
 )
 from projects.serializers import (
     ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer
 )
 from tasks.models import Task, Annotation, Prediction, TaskLock
-from tasks.serializers import TaskSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer
+from tasks.serializers import TaskSerializer, TaskSimpleSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer
 from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
 from webhooks.models import WebhookAction
 
@@ -40,7 +40,7 @@ from core.utils.common import (
 from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
 from core.utils.io import find_dir, find_file, read_yaml
 
-from data_manager.functions import get_prepared_queryset
+from data_manager.functions import get_prepared_queryset, filters_ordering_selected_items_exist
 from data_manager.models import View
 
 logger = logging.getLogger(__name__)
@@ -124,7 +124,8 @@ class ProjectListAPI(generics.ListCreateAPIView):
     ordering = ['-created_at']
 
     def get_queryset(self):
-        return Project.objects.with_counts().filter(organization=self.request.user.active_organization)
+        projects = Project.objects.filter(organization=self.request.user.active_organization)
+        return ProjectManager.with_counts_annotate(projects)
 
     def get_serializer_context(self):
         context = super(ProjectListAPI, self).get_serializer_context()
@@ -395,6 +396,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         self.check_object_permissions(request, project)
         user = request.user
         self.current_user = user
+        dm_queue = filters_ordering_selected_items_exist(request.data)
 
         # support actions api call from actions/next_task.py
         if hasattr(self, 'prepared_tasks'):
@@ -418,15 +420,12 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             if not assigned_flag:
                 not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
 
-            not_solved_tasks_count = not_solved_tasks.count()
+            # used only for debug logging, disabled for performance reasons
+            not_solved_tasks_count = 'unknown'
 
-            # return nothing if there are no tasks remain
-            if not_solved_tasks_count == 0:
-                raise NotFound(f'There are no tasks remaining to be annotated by the user={user}')
-            logger.debug(f'{not_solved_tasks_count} tasks that still need to be annotated for user={user}')
-
+            next_task = None
             # ordered by data manager
-            if assigned_flag:
+            if assigned_flag and not dm_queue:
                 next_task = not_solved_tasks.first()
                 if not next_task:
                     raise NotFound('No more tasks found')
@@ -434,10 +433,10 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
             # If current user has already lock one task - return it (without setting the lock again)
             next_task = Task.get_locked_by(user, tasks=not_solved_tasks)
-            if next_task:
+            if next_task and not dm_queue:
                 return self._make_response(next_task, request, use_task_lock=False, queue='Task lock')
 
-            if project.show_ground_truth_first:
+            if project.show_ground_truth_first and not dm_queue:
                 logger.debug(f'User={request.user} tries ground truth from {not_solved_tasks_count} tasks')
                 next_task = self._try_ground_truth(not_solved_tasks, project)
                 if next_task:
@@ -446,7 +445,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             queue_info = ''
 
             # show tasks with overlap > 1 first
-            if project.show_overlap_first:
+            if project.show_overlap_first and not dm_queue:
                 # don't output anything - just filter tasks with overlap
                 logger.debug(f'User={request.user} tries overlap first from {not_solved_tasks_count} tasks')
                 _, not_solved_tasks = self._try_tasks_with_overlap(not_solved_tasks)
@@ -454,12 +453,25 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
             # if there any tasks in progress (with maximum number of annotations), randomly sampling from them
             logger.debug(f'User={request.user} tries depth first from {not_solved_tasks_count} tasks')
-            next_task = self._try_breadth_first(not_solved_tasks)
-            if next_task:
-                queue_info += (' & ' if queue_info else '') + 'Breadth first queue'
-                return self._make_response(next_task, request, queue=queue_info)
 
-            if project.sampling == project.UNCERTAINTY:
+            if project.maximum_annotations > 1 and not dm_queue:
+                next_task = self._try_breadth_first(not_solved_tasks)
+                if next_task:
+                    queue_info += (' & ' if queue_info else '') + 'Breadth first queue'
+                    return self._make_response(next_task, request, queue=queue_info)
+
+            # data manager queue
+            if dm_queue:
+                queue_info += (' & ' if queue_info else '') + 'Data manager queue'
+                logger.debug(f'User={request.user} tries sequence sampling from {not_solved_tasks_count} tasks')
+                next_task = not_solved_tasks.first()
+
+            elif project.sampling == project.SEQUENCE:
+                queue_info += (' & ' if queue_info else '') + 'Sequence queue'
+                logger.debug(f'User={request.user} tries sequence sampling from {not_solved_tasks_count} tasks')
+                next_task = self._get_first_unlocked(not_solved_tasks)
+
+            elif project.sampling == project.UNCERTAINTY:
                 queue_info += (' & ' if queue_info else '') + 'Active learning or random queue'
                 logger.debug(f'User={request.user} tries uncertainty sampling from {not_solved_tasks_count} tasks')
                 next_task = self._try_uncertainty_sampling(not_solved_tasks, project, user_solved_tasks_array)
@@ -468,11 +480,6 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 queue_info += (' & ' if queue_info else '') + 'Uniform random queue'
                 logger.debug(f'User={request.user} tries random sampling from {not_solved_tasks_count} tasks')
                 next_task = self._get_random_unlocked(not_solved_tasks)
-
-            elif project.sampling == project.SEQUENCE:
-                queue_info += (' & ' if queue_info else '') + 'Data manager queue'
-                logger.debug(f'User={request.user} tries sequence sampling from {not_solved_tasks_count} tasks')
-                next_task = self._get_first_unlocked(not_solved_tasks)
 
             if next_task:
                 return self._make_response(next_task, request, queue=queue_info)
@@ -558,7 +565,6 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
         return super(ProjectSummaryAPI, self).get(*args, **kwargs)
 
 
-
 @method_decorator(name='delete', decorator=swagger_auto_schema(
         tags=['Projects'],
         operation_summary='Delete all tasks',
@@ -574,8 +580,8 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
             ```
         """.format(settings.HOSTNAME or 'https://localhost:8080')
     ))
-class TasksListAPI(generics.ListCreateAPIView,
-                   generics.DestroyAPIView):
+class ProjectTaskListAPI(generics.ListCreateAPIView,
+                         generics.DestroyAPIView):
 
     parser_classes = (JSONParser, FormParser)
     queryset = Task.objects.all()
@@ -587,6 +593,12 @@ class TasksListAPI(generics.ListCreateAPIView,
     serializer_class = TaskSerializer
     redirect_route = 'projects:project-settings'
     redirect_kwarg = 'pk'
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return TaskSimpleSerializer
+        else:
+            return TaskSerializer
 
     def filter_queryset(self, queryset):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
@@ -601,14 +613,14 @@ class TasksListAPI(generics.ListCreateAPIView,
         return Response(data={'tasks': task_ids}, status=204)
 
     def get(self, *args, **kwargs):
-        return super(TasksListAPI, self).get(*args, **kwargs)
+        return super(ProjectTaskListAPI, self).get(*args, **kwargs)
 
     @swagger_auto_schema(auto_schema=None)
     def post(self, *args, **kwargs):
-        return super(TasksListAPI, self).post(*args, **kwargs)
+        return super(ProjectTaskListAPI, self).post(*args, **kwargs)
 
     def get_serializer_context(self):
-        context = super(TasksListAPI, self).get_serializer_context()
+        context = super(ProjectTaskListAPI, self).get_serializer_context()
         context['project'] = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
         return context
 
@@ -616,7 +628,6 @@ class TasksListAPI(generics.ListCreateAPIView,
         project = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
         instance = serializer.save(project=project)
         emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])
-
 
 
 class TemplateListAPI(generics.ListAPIView):

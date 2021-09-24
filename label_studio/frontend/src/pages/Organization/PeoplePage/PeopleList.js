@@ -12,7 +12,7 @@ export const PeopleList = ({onSelect, selectedUser, defaultSelected}) => {
 
   const fetchUsers = useCallback(async () => {
     const result = await api.callApi('memberships', {
-      params: {pk: 1},
+      params: { pk: 1, contributed_to_projects: 1 },
     });
 
     setUsersList(result);

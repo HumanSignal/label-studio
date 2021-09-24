@@ -2,35 +2,113 @@
 test_name: auth_export_error
 strict: false
 marks:
-- usefixtures:
-  - django_live_url
+  - usefixtures:
+      - django_live_url
 stages:
-- id: signup
-  type: ref
-- name: stage
-  request:
-    method: GET
-    headers:
-      X-Original-URI: test
-    url: '{django_live_url}/api/auth/export/'
-  response:
-    status_code: 422
+  - id: signup
+    type: ref
+  - name: stage
+    request:
+      method: GET
+      headers:
+        X-Original-URI: test
+      url: "{django_live_url}/api/auth/export/"
+    response:
+      status_code: 422
 ---
 test_name: auth_export
 strict: false
 marks:
-- usefixtures:
-  - django_live_url
+  - usefixtures:
+      - django_live_url
 stages:
-- id: signup
-  type: ref
-- id: create_project
-  type: ref
-- name: stage
-  request:
-    method: GET
-    headers:
-      X-Original-URI: '/export/{project_pk}-test'
-    url: '{django_live_url}/api/auth/export/'
-  response:
-    status_code: 200
+  - id: signup
+    type: ref
+  - id: create_project
+    type: ref
+  - name: stage
+    request:
+      method: GET
+      headers:
+        X-Original-URI: "/export/{project_pk}-test"
+      url: "{django_live_url}/api/auth/export/"
+    response:
+      status_code: 200
+---
+test_name: crud export
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+  - id: signup
+    type: ref
+  - id: create_project
+    type: ref
+  - id: create_task
+    type: ref
+  - name: create export
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/"
+      method: POST
+    response:
+      status_code: 201
+      json:
+        id: !anyint
+        created_by: !anyint
+        counters: !anydict
+        md5: !anystr
+        created_at: !anystr
+        finished_at: !anystr
+        status: !anystr
+        task_ids: !anylist
+        only_finished: !anybool
+      save:
+        json:
+          export_id: id
+  - name: get exports list
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        - id: !anyint
+          created_by: !anyint
+          counters: !anydict
+          md5: !anystr
+          created_at: !anystr
+          status: !anystr
+          finished_at: !anystr
+          task_ids: !anylist
+          only_finished: !anybool
+  - name: get export retrieve
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        id: !anyint
+        created_by: !anyint
+        counters: !anydict
+        md5: !anystr
+        created_at: !anystr
+        status: !anystr
+        finished_at: !anystr
+        task_ids: !anylist
+        only_finished: !anybool
+  - name: download export JSON
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}/download"
+      method: GET
+    response:
+      status_code: 200
+  - name: download export CSV
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}/download"
+      method: GET
+      params:
+        exportType: CSV
+    response:
+      status_code: 200

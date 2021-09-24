@@ -54,6 +54,7 @@ const loadAsyncPage = async (url) => {
           message={"Server not responding. Is it still running?"}
         />
       ),
+      simple: true,
       allowClose: false,
       style: { width: 680 },
     });

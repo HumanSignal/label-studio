@@ -53,5 +53,8 @@ setuptools.setup(
         'console_scripts': [
             'label-studio=label_studio.server:main',
         ],
+    },
+    extras_require={
+        'mysql': ['mysqlclient']
     }
 )

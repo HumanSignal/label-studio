@@ -20,13 +20,17 @@ venv/
 .venv
 .vscode
 .autoenv
+.env
+.envrc
 # web/static
 
 deploy/license.txt
 deploy/logs/
 deploy/redis-data/
 deploy/dockerfiles/postgres-data
+deploy/dockerfiles/mysql-data
 postgres-data
+mysql-data
 
 label_studio/core/media
 label_studio/core/downloads
@@ -44,6 +48,7 @@ archive
 *.idea/*
 .vscode/*
 pyrightconfig.json
+tags
 tags.temp
 mydatabase
 label_studio.sqlite3

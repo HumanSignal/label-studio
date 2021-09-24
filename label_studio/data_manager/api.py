@@ -2,29 +2,28 @@
 """
 import logging
 
-from django.conf import settings
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.decorators import method_decorator
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 from drf_yasg.utils import swagger_auto_schema
-from django.db.models import Sum
+from django.db.models import Sum, Count
+from django.conf import settings
 from ordered_set import OrderedSet
 
-from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request
+from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, find_first_many_to_one_related_field_by_prefix, load_func
 from core.permissions import all_permissions, ViewClassPermission
-from core.decorators import permission_required
 from projects.models import Project
 from projects.serializers import ProjectSerializer
-from tasks.models import Task, Annotation
+from tasks.models import Task, Annotation, Prediction
 
 from data_manager.functions import get_all_columns, get_prepared_queryset, evaluate_predictions
 from data_manager.models import View
-from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer
+from data_manager.managers import get_fields_for_evaluation
+from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer, ViewResetSerializer
 from data_manager.actions import get_all_actions, perform_action
 
 
@@ -38,8 +37,8 @@ class TaskPagination(PageNumberPagination):
     total_predictions = 0
 
     def paginate_queryset(self, queryset, request, view=None):
-        self.total_annotations = queryset.aggregate(all_annotations=Sum("total_annotations"))["all_annotations"] or 0
-        self.total_predictions = queryset.aggregate(all_predictions=Sum("total_predictions"))["all_predictions"] or 0
+        self.total_predictions = Prediction.objects.filter(task_id__in=queryset).count()
+        self.total_annotations = Annotation.objects.filter(task_id__in=queryset, was_cancelled=False).count()
         return super().paginate_queryset(queryset, request, view)
 
     def get_paginated_response(self, data):
@@ -89,22 +88,44 @@ class ViewAPI(viewsets.ModelViewSet):
 
     @swagger_auto_schema(tags=['Data Manager'])
     @action(detail=False, methods=['delete'])
-    def reset(self, _request):
+    def reset(self, request):
         """
         delete:
         Reset project views
 
         Reset all views for a specific project.
         """
-        queryset = self.filter_queryset(self.get_queryset())
+        serializer = ViewResetSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=serializer.validated_data['project'].id)
+        queryset = self.filter_queryset(self.get_queryset()).filter(project=project)
         queryset.all().delete()
         return Response(status=204)
 
-    def get_task_queryset(self, request, view):
-        return Task.prepared.all(prepare_params=view.get_prepare_tasks_params())
-
     def get_queryset(self):
         return View.objects.filter(project__organization=self.request.user.active_organization)
+
+    @staticmethod
+    def get_task_serializer_context(request, project):
+        storage = find_first_many_to_one_related_field_by_prefix(project, '.*io_storages.*')
+        resolve_uri = True
+        if not storage and not project.task_data_login and not project.task_data_password:
+            resolve_uri = False
+
+        all_fields = request.GET.get('fields', None) == 'all'  # false by default
+
+        return {
+            'proxy': bool_from_request(request.GET, 'proxy', True),
+            'resolve_uri': resolve_uri,
+            'request': request,
+            'project': project,
+            'drafts': all_fields,
+            'predictions': all_fields,
+            'annotations': all_fields
+        }
+
+    def get_task_queryset(self, request, view):
+        return Task.prepared.only_filtered(prepare_params=view.get_prepare_tasks_params())
 
     @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
     @action(detail=True, methods=["get"])
@@ -117,16 +138,30 @@ class ViewAPI(viewsets.ModelViewSet):
         """
         view = self.get_object()
         queryset = self.get_task_queryset(request, view)
-        context = {'proxy': bool_from_request(request.GET, 'proxy', True), 'resolve_uri': True, 'request': request}
         project = view.project
+        context = self.get_task_serializer_context(self.request, project)
 
         # paginated tasks
         self.pagination_class = TaskPagination
         page = self.paginate_queryset(queryset)
+        all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
+        fields_for_evaluation = get_fields_for_evaluation(view.get_prepare_tasks_params(), request.user)
         if page is not None:
+            ids = [task.id for task in page]  # page is a list already
+            tasks = list(
+                Task.prepared.annotate_queryset(
+                    Task.objects.filter(id__in=ids),
+                    fields_for_evaluation=fields_for_evaluation,
+                    all_fields=all_fields,
+                )
+            )
+            tasks_by_ids = {task.id: task for task in tasks}
+
+            # keep ids ordering
+            page = [tasks_by_ids[_id] for _id in ids]
+
             # retrieve ML predictions if tasks don't have them
             if project.evaluate_predictions_automatically:
-                ids = [task.id for task in page]  # page is a list already
                 tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
                 evaluate_predictions(tasks_for_predictions)
 
@@ -136,6 +171,7 @@ class ViewAPI(viewsets.ModelViewSet):
         # all tasks
         if project.evaluate_predictions_automatically:
             evaluate_predictions(queryset.filter(predictions__isnull=True))
+        queryset = Task.prepared.annotate_queryset(queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields)
         serializer = self.task_serializer_class(queryset, many=True, context=context)
         return Response(serializer.data)
 
@@ -212,6 +248,18 @@ class TaskAPI(APIView):
     def get_serializer_class(self):
         return DataManagerTaskSerializer
 
+    @staticmethod
+    def get_serializer_context(request):
+        return {
+            'proxy': bool_from_request(request.GET, 'proxy', True),
+            'resolve_uri': True,
+            'completed_by': 'full',
+            'drafts': True,
+            'predictions': True,
+            'annotations': True,
+            'request': request
+        }
+
     @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request, pk):
         """
@@ -220,16 +268,12 @@ class TaskAPI(APIView):
 
         Retrieve a specific task by ID.
         """
-        task = Task.prepared.get(id=pk)
-        context = {
-            'proxy': bool_from_request(request.GET, 'proxy', True),
-            'resolve_uri': True,
-            'completed_by': 'full',
-            'request': request
-        }
+        task = Task.prepared.get_queryset(all_fields=True).get(id=pk)
+        context = self.get_serializer_context(request)
+        context['project'] = project = task.project
 
         # get prediction
-        if task.project.evaluate_predictions_automatically and not task.predictions.exists():
+        if project.evaluate_predictions_automatically and not task.predictions.exists():
             evaluate_predictions([task])
 
         serializer = self.get_serializer_class()(task, many=False, context=context)
@@ -251,7 +295,8 @@ class ProjectColumnsAPI(APIView):
         pk = int_from_request(request.GET, "project", 1)
         project = get_object_with_check_and_log(request, Project, pk=pk)
         self.check_object_permissions(request, project)
-        data = get_all_columns(project)
+        GET_ALL_COLUMNS = load_func(settings.DATA_MANAGER_GET_ALL_COLUMNS)
+        data = GET_ALL_COLUMNS(project, request.user)
         return Response(data)
 
 
@@ -267,9 +312,10 @@ class ProjectStateAPI(APIView):
         Retrieve the project state for data manager.
         """
         pk = int_from_request(request.GET, "project", 1)  # replace 1 to None, it's for debug only
-        project = get_object_with_check_and_log(request, Project.objects.with_counts(), pk=pk)
+        project = get_object_with_check_and_log(request, Project, pk=pk)
         self.check_object_permissions(request, project)
         data = ProjectSerializer(project).data
+
         data.update(
             {
                 "can_delete_tasks": True,
@@ -317,11 +363,6 @@ class ProjectActionsAPI(APIView):
         self.check_object_permissions(request, project)
 
         queryset = get_prepared_queryset(request, project)
-
-        # no selected items on tab
-        if not queryset.exists():
-            response = {'detail': 'No selected items for specified view'}
-            return Response(response, status=404)
 
         # wrong action id
         action_id = request.GET.get('id', None)

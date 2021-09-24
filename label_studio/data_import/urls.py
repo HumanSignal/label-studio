@@ -25,5 +25,5 @@ urlpatterns = [
     path('api/projects/', include((_api_projects_urlpatterns, app_name), namespace='api-projects')),
 
     # special endpoints for serving imported files
-    path('data/upload/<str:filename>', api.UploadedFileResponse.as_view(), name='data-upload'),
+    path('data/upload/<path:filename>', api.UploadedFileResponse.as_view(), name='data-upload'),
 ]

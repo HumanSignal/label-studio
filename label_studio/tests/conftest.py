@@ -38,6 +38,11 @@ def disable_sentry():
     settings.SENTRY_DSN = None
 
 
+@pytest.fixture()
+def debug_modal_exceptions_false(settings):
+    settings.DEBUG_MODAL_EXCEPTIONS = False
+
+
 @pytest.fixture(scope="function")
 def enable_sentry():
     settings.SENTRY_RATE = 0
@@ -99,6 +104,14 @@ def s3_with_hypertext_s3_links(s3):
     s3.put_object(Bucket=bucket_name, Key='test.json', Body=json.dumps({
         'text': "<a href=\"s3://hypertext-bucket/file with /spaces and' / ' / quotes.jpg\"/>"
     }))
+    yield s3
+
+
+@pytest.fixture(autouse=True)
+def s3_with_unexisted_links(s3):
+    bucket_name = 'pytest-s3-jsons-unexisted_links'
+    s3.create_bucket(Bucket=bucket_name)
+    s3.put_object(Bucket=bucket_name, Key='some-existed-image.jpg', Body='qwerty')
     yield s3
 
 
