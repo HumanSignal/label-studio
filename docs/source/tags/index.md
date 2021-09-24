@@ -39,7 +39,7 @@ To use a variable, use it with the `value` parameter of a tag and specify it usi
 ```json
 { 
   "header": "This is a different header for each task", 
-  "value": "This is the text that needs to be labeled"
+  "textlabel": "This is the text that needs to be labeled"
 }
 ```
 
@@ -47,7 +47,7 @@ Use the following labeling configuration to reference the data fields:
 ```xml
 <View>
   <Header value="$header"></Header>
-  <Text name="text" value="$value"></Text>
+  <Text name="text" value="$textlabel"></Text>
   <Choices name="sentiment" toName="text" choice="single" showInLine="true">
    <Choice value="Positive"/>
    <Choice value="Negative"/>
