@@ -56,21 +56,20 @@ export const StorageForm = forwardRef(({
     if (form && form.validateFields()) {
       const body = form.assembleFormData({ asJSON: true });
       const type = form.getField('storage_type').value;
-      const requestParams = {
+
+      if (isDefined(storage?.id)) {
+        body.id = storage.id;
+      }
+
+      // we're using api provided by the form to be able to save
+      // current api context and render inline erorrs properly
+      const response = await form.api.callApi('validateStorage', {
         params: {
           target,
           type,
         },
         body,
-      };
-
-      if (isDefined(storage?.id)) {
-        requestParams.params.id = storage.id;
-      }
-
-      // we're using api provided by the form to be able to save
-      // current api context and render inline erorrs properly
-      const response = await form.api.callApi('validateStorage', requestParams);
+      });
 
       if (response !== null) setConnectionValid(true);
       else setConnectionValid(false);
