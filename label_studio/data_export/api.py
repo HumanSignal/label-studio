@@ -179,6 +179,7 @@ class ExportAPI(generics.RetrieveAPIView):
         Retrieve a list of files exported from the Label Studio UI using the Export button on the Data Manager page.
         To retrieve the files themselves, see [Download export file](/api#operation/api_projects_exports_download_read).
         """,
+
     ),
 )
 class ProjectExportFiles(generics.RetrieveAPIView):
@@ -229,10 +230,13 @@ class ProjectExportFilesAuthCheck(APIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Export'],
-        operation_summary='Get all export files',
+        operation_summary='List all export files',
         operation_description="""
         Returns a list of exported files for a specific project by ID.
         """,
+        manual_parameters=[
+            openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, default=0,
+                              description='Project ID')]
     ),
 )
 @method_decorator(
@@ -244,8 +248,13 @@ class ProjectExportFilesAuthCheck(APIView):
         Create a new export request to start a background task and generate an export file for a specific project by ID.
         """,
         manual_parameters=[
-            openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, default=0,
-                              description='Project ID')]
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                default=0,
+                description='Project ID')
+        ]
     ),
 )
 class ExportListAPI(generics.ListCreateAPIView):
@@ -280,6 +289,20 @@ class ExportListAPI(generics.ListCreateAPIView):
         operation_description="""
         Retrieve information about an export file by export ID.
         """,
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                default=0,
+                description='Project ID'),
+            openapi.Parameter(
+                name='export_pk',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                default=0,
+                description='Export primary key'),
+        ]
     ),
 )
 @method_decorator(
@@ -290,6 +313,20 @@ class ExportListAPI(generics.ListCreateAPIView):
         operation_description="""
         Delete an export file by specified export ID.
         """,
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                default=0,
+                description='Project ID'),
+            openapi.Parameter(
+                name='export_pk',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                default=0,
+                description='Export primary key'),
+        ]
     ),
 )
 class ExportDetailAPI(generics.RetrieveDestroyAPIView):
@@ -331,6 +368,18 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
                 in_=openapi.IN_QUERY,
                 description='Selected export format',
             ),
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                default=0,
+                description='Project ID'),
+            openapi.Parameter(
+                name='export_pk',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                default=0,
+                description='Export primary key'),
         ],
     ),
 )
