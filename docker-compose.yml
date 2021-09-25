@@ -51,9 +51,7 @@ services:
         type: volume
         volume:
           nocopy: true
-      - static:/label-studio/label_studio:rw
       - ./data:/label-studio/files:rw
-    command: [ "./deploy/wait-for-postgres.sh", "bash", "/label-studio/deploy/start_label_studio.sh" ]
 
   db:
     container_name: postgres
