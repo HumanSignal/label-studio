@@ -25,6 +25,8 @@ services:
     image: heartexlabs/label-studio:latest
     expose:
       - "8080"
+    ports:
+      - 8081:8081
     depends_on:
       - db
     environment:
@@ -36,7 +38,12 @@ services:
       - POSTGRE_HOST=db
       - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
       - LABEL_STUDIO_COPY_STATIC_DATA=true
+      - LABEL_STUDIO_BASE_DATA_DIR=/label-studio/root/appdata
+      - LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
+      - LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/label-studio/files
+      - LOCAL_FILES_DOCUMENT_ROOT=/label-studio/files
     volumes:
+      - ./:/label-studio/root:rw
       - ./mydata:/label-studio/data:rw
       # keep in sync with deploy/docker-entrypoint.d/30-copy-static-data.sh
       - source: static
@@ -44,8 +51,12 @@ services:
         type: volume
         volume:
           nocopy: true
+      - static:/label-studio/label_studio:rw
+      - ./data:/label-studio/files:rw
+    command: [ "./deploy/wait-for-postgres.sh", "bash", "/label-studio/deploy/start_label_studio.sh" ]
 
   db:
+    container_name: postgres
     image: postgres:11.5
     hostname: db
     restart: always
@@ -54,5 +65,18 @@ services:
     volumes:
       - ${POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql/data
 
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    depends_on:
+      - db
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+
+
 volumes:
-  static: {}
+  static: {} 

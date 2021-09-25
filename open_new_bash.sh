@@ -1,0 +1,1 @@
+docker exec -it $(docker ps -aqf "ancestor=heartexlabs/label-studio:latest") bash

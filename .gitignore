@@ -20,17 +20,12 @@ venv/
 .venv
 .vscode
 .autoenv
-.env
-.envrc
 # web/static
 
 deploy/license.txt
 deploy/logs/
 deploy/redis-data/
 deploy/dockerfiles/postgres-data
-deploy/dockerfiles/mysql-data
-postgres-data
-mysql-data
 
 label_studio/core/media
 label_studio/core/downloads
@@ -57,3 +52,6 @@ tmp
 .DS_Store
 *.sqlite3
 label_studio/core/settings/local.py
+
+appdata/
+.ssh/
