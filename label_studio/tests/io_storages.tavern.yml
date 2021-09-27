@@ -38,6 +38,14 @@ stages:
     status_code: 201
 - name: stage
   request:
+    data:
+      title: Testing S3 storage (bucket from conftest.py) changed
+    method: PATCH
+    url: '{django_live_url}/api/storages/s3/{storage_pk}'
+  response:
+    status_code: 200
+- name: stage
+  request:
     method: POST
     url: '{django_live_url}/api/storages/s3/{storage_pk}/sync'
   response:
@@ -90,6 +98,18 @@ stages:
       presign: false
     method: PATCH
     url: '{django_live_url}/api/storages/s3/{storage_pk}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    data:
+      id: !int "{storage_pk}"
+      bucket: pytest-s3-images
+      project: '{project_pk}'
+      title: Testing S3 storage (bucket from conftest.py)
+      use_blob_urls: true
+    method: POST
+    url: '{django_live_url}/api/storages/s3/validate'
   response:
     status_code: 200
 - name: stage
@@ -254,6 +274,14 @@ stages:
       json:
         storage_pk: id
     status_code: 201
+- name: stage
+  request:
+    data:
+      title: Test GCS storage import (mocked GCS client from conftest.py) changed
+    method: PATCH
+    url: '{django_live_url}/api/storages/gcs/{storage_pk}'
+  response:
+    status_code: 200
 - name: stage
   request:
     method: POST
@@ -591,6 +619,15 @@ stages:
     url: '{django_live_url}/api/storages/export/gcs/{storage_pk}'
   response:
     status_code: 200
+- name: stage
+  request:
+    data:
+      id: !int "{storage_pk}"
+      bucket: test-gs-bucket
+    method: POST
+    url: '{django_live_url}/api/storages/export/gcs/validate'
+  response:
+    status_code: 400
 - name: stage
   request:
     headers:

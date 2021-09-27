@@ -4,6 +4,7 @@ import os
 
 from rest_framework.exceptions import ValidationError
 from rest_framework import serializers
+from rest_framework.mixins import UpdateModelMixin
 from botocore.exceptions import ParamValidationError, ClientError
 from io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
 from io_storages.s3.models import S3ImportStorage, S3ExportStorage
@@ -27,8 +28,13 @@ class S3ImportStorageSerializer(ImportStorageSerializer):
         data = super(S3ImportStorageSerializer, self).validate(data)
         if not data.get('bucket', None):
             return data
-        
-        storage = S3ImportStorage(**data)
+
+        storage = self.instance
+        if storage:
+            for key, value in data.items():
+                setattr(storage, key, value)
+        else:
+            storage = S3ImportStorage(**data)
         try:
             storage.validate_connection()
         except ParamValidationError:

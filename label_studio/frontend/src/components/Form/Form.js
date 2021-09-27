@@ -4,7 +4,7 @@ import { ApiProvider } from '../../providers/ApiProvider';
 import { MultiProvider } from '../../providers/MultiProvider';
 import { Block, cn, Elem } from '../../utils/bem';
 import { debounce } from '../../utils/debounce';
-import { objectClean } from '../../utils/helpers';
+import { isDefined, objectClean } from '../../utils/helpers';
 import { Button } from '../Button/Button';
 import { Oneof } from '../Oneof/Oneof';
 import { Space } from '../Space/Space';
@@ -12,6 +12,8 @@ import { Counter, Input, Select, Toggle } from './Elements';
 import './Form.styl';
 import { FormContext, FormResponseContext, FormStateContext, FormSubmissionContext, FormValidationContext } from './FormContext';
 import * as Validators from './Validation/Validators';
+
+const PASSWORD_PROTECTED_VALUE = 'got ya, suspicious hacker!';
 
 export default class Form extends React.Component {
   state = {
@@ -34,7 +36,9 @@ export default class Form extends React.Component {
 
   componentDidMount() {
     if (this.props.formData) {
-      this.fillFormData();
+      setTimeout(() => {
+        this.fillFormData();
+      }, 50);
     }
   }
 
@@ -80,11 +84,11 @@ export default class Form extends React.Component {
 
   registerField(field) {
     const existingField = this.getFieldContext(field.name);
+
     if (!existingField) {
       this.fields.add(field);
-      if (field.name && this.props.formData && field.name in this.props.formData) {
-        field.setValue(this.props.formData[field.name]);
-      }
+
+      this.fillWithFormData(field);
     } else {
       Object.assign(existingField, field);
     }
@@ -92,6 +96,7 @@ export default class Form extends React.Component {
 
   unregisterField(name) {
     const field = this.getFieldContext(name);
+
     if (field) this.fields.delete(field);
   }
 
@@ -162,15 +167,17 @@ export default class Form extends React.Component {
       fields = fields.filter(fieldsFilter);
     }
 
-    const requestBody = fields.reduce((res, { name, field, skip }) => {
-      const skipField = skip || (this.props.skipEmpty && !field.value);
+
+    const requestBody = fields.reduce((res, { name, field, skip, allowEmpty, isProtected }) => {
+      const skipProtected = isProtected && field.value === PASSWORD_PROTECTED_VALUE;
+      const skipField = skip || skipProtected || ((this.props.skipEmpty || allowEmpty === false) && !field.value);
 
       if (full === true || !skipField) {
         const value = (() => {
           const inputValue = field.value;
 
           if (['checkbox', 'radio'].includes(field.type)) {
-            if (inputValue !== null && inputValue !== 'on' && inputValue !== 'true') {
+            if (isDefined(inputValue) && !['', 'on', 'off', 'true', 'false'].includes(inputValue)) {
               return field.checked ? inputValue : null;
             }
 
@@ -190,12 +197,13 @@ export default class Form extends React.Component {
       return requestBody.reduce((res, [key, value]) => ({ ...res, [key]: value }), {});
     } else {
       const formData = new FormData();
+
       requestBody.forEach(([key, value]) => formData.append(key, value));
       return formData;
     }
   }
 
-  async submit({fieldsFilter} = {}) {
+  async submit({ fieldsFilter } = {}) {
     this.setState({ submitting: true, lastResponse: null });
 
     const rawAction = this.formElement.current.getAttribute("action");
@@ -245,6 +253,7 @@ export default class Form extends React.Component {
 
     try {
       const result = await response.json();
+
       this.setState({ lastResponse: result });
 
       if (result.validation_errors) {
@@ -303,8 +312,13 @@ export default class Form extends React.Component {
     const { validation, field: element } = field;
     const value = element.value?.trim() || null;
 
+    if (field.isProtected && value === PASSWORD_PROTECTED_VALUE) {
+      return messages;
+    }
+
     validation.forEach((validator) => {
       const result = validator(field.label, value);
+
       if (result) messages.push(result);
     });
 
@@ -315,46 +329,54 @@ export default class Form extends React.Component {
     if (!this.props.formData) return;
     if (this.fields.size === 0) return;
 
-    Object.entries(this.props.formData).forEach(([key, value]) => {
-      const field = this.getFieldContext(key);
-
-      if (field && field.value !== value) {
-        field.setValue(value);
-      }
+    Array.from(this.fields).forEach((field) => {
+      this.fillWithFormData(field);
     });
+  }
+
+  fillWithFormData(field) {
+    const value = (this.props.formData ?? {})[field.name];
+
+    if (field.isProtected && this.props.formData) {
+      field.setValue(PASSWORD_PROTECTED_VALUE);
+    } else if (isDefined(value) && field.value !== value && !field.skipAutofill) {
+      field.setValue(value);
+    }
   }
 }
 
 const ValidationRenderer = ({ validation }) => {
   const rootClass = cn('form-validation');
 
-  return <div className={rootClass}>
-    {Array.from(validation).map(([name, result]) => (
-      <div key={name} className={rootClass.elem('group')} onClick={() => result.field.focus()}>
-        <div className={rootClass.elem('field')}>{result.label}</div>
+  return (
+    <div className={rootClass}>
+      {Array.from(validation).map(([name, result]) => (
+        <div key={name} className={rootClass.elem('group')} onClick={() => result.field.focus()}>
+          <div className={rootClass.elem('field')}>{result.label}</div>
 
-        <div className={rootClass.elem('messages')}>
-          {result.messages.map((message, i) => (
-            <div key={`${name}-${i}`} className={rootClass.elem('message')}>
-              {message}
-            </div>
-          ))}
+          <div className={rootClass.elem('messages')}>
+            {result.messages.map((message, i) => (
+              <div key={`${name}-${i}`} className={rootClass.elem('message')}>
+                {message}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    ))}
-  </div>;
+      ))}
+    </div>
+  );
 };
 
 Form.Validator = Validators;
 
-Form.Row = ({columnCount, rowGap, children, style, spread = false}) => {
+Form.Row = ({ columnCount, rowGap, children, style, spread = false }) => {
   const styles = {};
 
   if (columnCount) styles['--column-count'] = columnCount;
   if (rowGap) styles['--row-gap'] = rowGap;
 
   return (
-    <div className={cn('form').elem('row').mod({spread})} style={{...(style ?? {}), ...styles}}>
+    <div className={cn('form').elem('row').mod({ spread })} style={{ ...(style ?? {}), ...styles }}>
       {children}
     </div>
   );
@@ -381,11 +403,21 @@ Form.Builder = React.forwardRef(({
 
       const currentValue = formData?.[field.name] ?? undefined;
       const triggerUpdate = props.autosubmit !== true && field.trigger_form_update === true;
+      const getValue = () => {
+        const isProtected = field.skipAutofill && !field.allowEmpty && field.type === 'password';
 
-      const commonProps = {
-        key: field.name ?? index,
-        ...field,
+        if (isProtected) {
+          return PASSWORD_PROTECTED_VALUE;
+        }
+
+        if (field.skipAutofill) {
+          return null;
+        }
+
+        return currentValue ?? field.value;
       };
+
+      const commonProps = {};
 
       if (triggerUpdate) {
         commonProps.onChange = async () => {
@@ -397,15 +429,28 @@ Form.Builder = React.forwardRef(({
         };
       }
 
-      if (field.type === 'select') {
-        return <Select {...commonProps} defaultValue={currentValue ?? field.value}/>;
-      } else if (field.type === 'counter') {
-        return <Counter {...commonProps} defaultValue={currentValue ?? field.value}/>;
-      } else if (field.type === 'toggle') {
-        return <Toggle {...commonProps} checked={currentValue ?? field.value}/>;
+      const InputComponent = (() => {
+        switch(field.type) {
+          case "select": return Select;
+          case "counter": return Counter;
+          case "toggle": return Toggle;
+          default: return Input;
+        }
+      })();
+
+      if (['checkbox', 'radio', 'toggle'].includes(field.type)) {
+        commonProps.checked = getValue();
       } else {
-        return <Input {...commonProps} defaultValue={currentValue ?? field.value}/>;
+        commonProps.defaultValue = getValue();
       }
+
+      return (
+        <InputComponent
+          key={field.name ?? index}
+          {...field}
+          {...commonProps}
+        />
+      );
     });
   };
 
@@ -457,7 +502,7 @@ Form.Builder = React.forwardRef(({
 
   return (
     <Form {...props} onSubmit={handleOnSubmit} ref={formRef}>
-      {(fields ?? []).map(({columnCount, fields, columns}, index) => (
+      {(fields ?? []).map(({ columnCount, fields, columns }, index) => (
         <Form.Row key={index} columnCount={columnCount} style={formRowStyle} spread>
           {columns ? renderColumns(columns) : renderFields(fields)}
         </Form.Row>
@@ -468,7 +513,7 @@ Form.Builder = React.forwardRef(({
           <Button
             type="submit"
             look="primary"
-            style={{width: 120}}
+            style={{ width: 120 }}
           >
             Save
           </Button>
@@ -480,6 +525,7 @@ Form.Builder = React.forwardRef(({
 
 Form.Actions = ({ children, valid, extra, size }) => {
   const rootClass = cn('form');
+
   return (
     <div className={rootClass.elem('submit').mod({ size })}>
       <div className={rootClass.elem('info').mod({ valid })}>
@@ -495,6 +541,7 @@ Form.Actions = ({ children, valid, extra, size }) => {
 
 Form.Indicator = () => {
   const state = React.useContext(FormStateContext);
+
   return (
     <Block name="form-indicator">
       <Oneof value={state}>

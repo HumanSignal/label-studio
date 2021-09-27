@@ -7,7 +7,7 @@ import os
 from rest_framework import generics
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied
 from drf_yasg import openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
 
@@ -113,7 +113,13 @@ class StorageValidateAPI(generics.CreateAPIView):
     permission_required = all_permissions.projects_change
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        instance = None
+        storage_id = request.data.get('id')
+        if storage_id:
+            instance = generics.get_object_or_404(self.serializer_class.Meta.model.objects.all(), pk=storage_id)
+            if not instance.has_permission(request.user):
+                raise PermissionDenied()
+        serializer = self.get_serializer(instance=instance, data=request.data)
         serializer.is_valid(raise_exception=True)
         storage = self.serializer_class.Meta.model(**serializer.validated_data)
         storage.validate_connection()
