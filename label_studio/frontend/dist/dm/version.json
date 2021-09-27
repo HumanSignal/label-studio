@@ -1,6 +1,6 @@
 {
-  "message": "Remove permissions field from Action model",
-  "commit": "e43c78af7d47d61912f98479ff9fc271b68d956e",
+  "message": "[fix] History ovrriding query option",
+  "commit": "8d8e0532f952d1eec873d8fd2320da1e913a7a4e",
   "branch": "master",
-  "date": "2021-08-27T12:22:53Z"
+  "date": "2021-09-21T08:34:07Z"
 }

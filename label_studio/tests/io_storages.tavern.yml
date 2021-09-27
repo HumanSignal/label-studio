@@ -1000,6 +1000,64 @@ stages:
     status_code: 200
 
 ---
+# we don't fail when unexisted s3:// links occur in the list
+test_name: test_import_json_with_unexisted_s3_links
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      is_published: true
+      label_config: <View><Image name="image" value="$image"/><Choices name="label"
+        toName="image"><Choice value="0"/><Choice value="1"/></Choices></View>
+      title: test_s3_storage_with_json_and_unexisted_links
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: connect s3 import storage
+  request:
+    data:
+      bucket: pytest-s3-jsons-unexisted_links
+      project: '{project_pk}'
+      title: Testing S3 storage 4 (bucket from conftest.py)
+      use_blob_urls: false
+      presign: false
+    method: POST
+    url: '{django_live_url}/api/storages/s3'
+  response:
+    save:
+      json:
+        storage_pk: id
+    status_code: 201
+- name: import tasks with s3 links
+  request:
+    files:
+      file: tests/test_suites/samples/unexisted_s3_links.txt
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/import'
+
+- name: get next task
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    status_code: 200
+    json:
+      data:
+        image: 's3://pytest-s3-jsons-unexisted_links/some-unexisted-image.jpg'
+
+---
 test_name: test_connection_to_import_redis_storage
 strict: false
 marks:

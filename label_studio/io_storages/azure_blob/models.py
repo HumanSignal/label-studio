@@ -133,6 +133,10 @@ class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
                                       expiry=expiry)
         return 'https://' + self.get_account_name() + '.blob.core.windows.net/' + container + '/' + blob + '?' + sas_token
 
+    def can_resolve_url(self, url):
+        # TODO: later check to the full prefix like url.startswith(url_scheme + "//" + self.container)
+        return url.startswith(f'{url_scheme}://')
+
 
 class AzureBlobExportStorage(ExportStorage, AzureBlobStorageMixin):
 

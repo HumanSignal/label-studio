@@ -27,6 +27,7 @@ url_scheme = 'gs'
 
 clients_cache = {}
 
+
 class GCSStorageMixin(models.Model):
     bucket = models.TextField(
         _('bucket'), null=True, blank=True,
@@ -184,6 +185,10 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
         logger.debug("Found matching storage uri in task data value: {uri}".format(uri=uri))
         resolved_uri = self.resolve_gs(uri)
         return data.replace(uri, resolved_uri)
+
+    def can_resolve_url(self, url):
+        # TODO: later check to the full prefix like url.startswith(url_scheme + "//" + self.bucket)
+        return url.startswith(f'{url_scheme}://')
 
     def scan_and_create_links(self):
         return self._scan_and_create_links(GCSImportStorageLink)

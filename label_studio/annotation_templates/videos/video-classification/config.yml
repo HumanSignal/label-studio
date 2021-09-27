@@ -5,7 +5,7 @@ image: /static/templates/video-classification.png
 details: <h1>Classify video</h1>
 config: |
   <View>
-    <HyperText name="video" value="$video"/>
+    <Video name="video" value="$video"/>
     <Choices name="choice" toName="video" showInLine="true">
       <Choice value="Blurry" />
       <Choice value="Sharp" />
@@ -15,8 +15,7 @@ config: |
   <!-- {
 
   "data": {
-     "video": "<video src='static/samples/opossum_snow.mp4' width=100% controls>",
-     "videoSource": "/static/samples/opossum_snow.mp4"
+     "video": "/static/samples/opossum_snow.mp4"
   },
 
   "annotations": [{"result":

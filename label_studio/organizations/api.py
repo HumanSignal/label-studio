@@ -13,7 +13,7 @@ from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 
 from label_studio.core.permissions import all_permissions, ViewClassPermission
-from label_studio.core.utils.common import get_object_with_check_and_log
+from label_studio.core.utils.common import get_object_with_check_and_log, bool_from_request
 
 from organizations.models import Organization
 from organizations.serializers import (
@@ -75,12 +75,14 @@ class OrganizationMemberListAPI(generics.ListAPIView):
     )
     serializer_class = OrganizationMemberUserSerializer
 
+    def get_serializer_context(self):
+        return {
+            'contributed_to_projects': bool_from_request(self.request.GET, 'contributed_to_projects', False)
+        }
+
     def get_queryset(self):
         org = generics.get_object_or_404(self.request.user.organizations, pk=self.kwargs[self.lookup_field])
         return org.members.order_by('user__username')
-
-    def get(self, request, *args, **kwargs):
-        return super(OrganizationMemberListAPI, self).get(request, *args, **kwargs)
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(

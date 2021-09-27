@@ -9,6 +9,8 @@ meta_description: Import predicted labels, predictions, pre-annotations, or pre-
 
 If you have predictions generated for your dataset from a model, either as pre-annotated tasks or pre-labeled tasks, you can import the predictions with your dataset into Label Studio for review and correction. Label Studio automatically displays the pre-annotations that you import on the Labeling page for each task. 
 
+> To generate interactive pre-annotations with a machine learning model while labeling, see [Set up machine learning with Label Studio](ml.html).
+
 To import predicted labels into Label Studio, you must use the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format) and set up your tasks with the `predictions` JSON key. The Label Studio ML backend also outputs tasks in this format. 
 
 For image pre-annotations, Label Studio expects the x, y, width, and height of image annotations to be provided in percentages of overall image dimension. See [Units for image annotations](predictions.html#Units_for_image_annotations) on this page for more about how to convert formats.
@@ -280,6 +282,7 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
         "model_version": "one",
         "result": [
           {
+            "id": "abc",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
@@ -294,6 +297,7 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
             }
           },
           {
+            "id": "def",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
@@ -308,6 +312,7 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
             }
           },
           {
+            "id": "ghi",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
@@ -322,6 +327,7 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
             }
           },
           {
+            "id": "jkl",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
@@ -341,6 +347,7 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
         "model_version": "two",
         "result": [
           {
+            "id": "mno",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
@@ -355,6 +362,7 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
             }
           },
           {
+            "id": "pqr",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
@@ -369,6 +377,7 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
             }
           },
           {
+            "id": "stu",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
@@ -383,6 +392,7 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
             }
           },
           {
+            "id": "vwx",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
@@ -397,6 +407,7 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
             }
           },
           {
+            "id": "yz1",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
@@ -423,12 +434,13 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
         "model_version": "one",
         "result": [
           {
+            "id": "ab2",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
             "value": {
-              "start": 17,
-              "end": 31,
+              "start": 18,
+              "end": 32,
               "text": "several inches",
               "labels": [
                 "Product"
@@ -436,12 +448,13 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
             }
           },
           {
+            "id": "cd3",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
             "value": {
-              "start": 63,
-              "end": 66,
+              "start": 64,
+              "end": 67,
               "text": "one",
               "labels": [
                 "Percent"
@@ -449,12 +462,13 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
             }
           },
           {
+            "id": "ef4",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
             "value": {
-              "start": 95,
-              "end": 100,
+              "start": 96,
+              "end": 101,
               "text": "Sunny",
               "labels": [
                 "Person"
@@ -462,12 +476,13 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
             }
           },
           {
+            "id": "gh5",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
             "value": {
-              "start": 161,
-              "end": 169,
+              "start": 162,
+              "end": 170,
               "text": "hundreds",
               "labels": [
                 "Percent"
@@ -475,12 +490,13 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
             }
           },
           {
+            "id": "ij6",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
             "value": {
-              "start": 197,
-              "end": 203,
+              "start": 198,
+              "end": 204,
               "text": "Niyati",
               "labels": [
                 "Person"
@@ -493,12 +509,13 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
         "model_version": "two",
         "result": [
           {
+            "id": "kl7",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
             "value": {
-              "start": 17,
-              "end": 31,
+              "start": 18,
+              "end": 32,
               "text": "several inches",
               "labels": [
                 "Fact"
@@ -506,12 +523,13 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
             }
           },
           {
+            "id": "mn8",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
             "value": {
-              "start": 63,
-              "end": 66,
+              "start": 64,
+              "end": 67,
               "text": "one",
               "labels": [
                 "Percent"
@@ -519,12 +537,13 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
             }
           },
           {
+            "id": "op9",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
             "value": {
-              "start": 95,
-              "end": 100,
+              "start": 96,
+              "end": 101,
               "text": "Sunny",
               "labels": [
                 "Time"
@@ -532,12 +551,13 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
             }
           },
           {
+            "id": "qr10",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
             "value": {
-              "start": 115,
-              "end": 121,
+              "start": 116,
+              "end": 122,
               "text": "Easter",
               "labels": [
                 "Location"
@@ -545,12 +565,13 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
             }
           },
           {
+            "id": "st11",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
             "value": {
-              "start": 161,
-              "end": 169,
+              "start": 162,
+              "end": 170,
               "text": "hundreds",
               "labels": [
                 "Money"
@@ -558,12 +579,13 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
             }
           },
           {
+            "id": "uv12",
             "from_name": "label",
             "to_name": "text",
             "type": "labels",
             "value": {
-              "start": 197,
-              "end": 203,
+              "start": 198,
+              "end": 204,
               "text": "Niyati",
               "labels": [
                 "Person"
@@ -615,4 +637,62 @@ type": "choices",
 ### Check the labels in your configuration and your tasks
 Make sure that you have a labeling configuration set up for the labeling interface, and that the labels in your JSON file exactly match the labels in your configuration. If you're using a [tool to transform your model output](https://github.com/heartexlabs/label-studio-transformers), make sure that the labels aren't altered by the tool. 
 
+### Check the IDs and toName values
+If you're performing nested labeling, such as displaying a TextArea tag for specific Label or Choice values, the IDs for those results must match. 
 
+For example, if you want to transcribe text alongside a named entity resolution task, you might have the following labeling configuration:
+```xml
+  <View>
+    <Labels name="label" toName="text">
+      <Label value="PER" background="red"/>
+      <Label value="ORG" background="darkorange"/>
+      <Label value="LOC" background="orange"/>
+      <Label value="MISC" background="green"/>
+    </Labels>
+    <Text name="text" value="$text"/>
+    <TextArea name="entity" toName="text" perRegion="true"/>
+  </View>
+```
+
+If you wanted to add predicted text and suggested transcriptions for this labeling configuration, you might use the following example JSON. 
+```json
+{
+"data":{
+         "text":"The world that we live in is a broad expanse of nothingness, said the existential philosopher, before he rode away with his cat on his motorbike. "
+      },
+   "predictions":[
+      {
+            "result":[
+               {
+                  "value":{
+                     "start":135,
+                     "end":144,
+                     "text":"motorbike",
+                     "labels":[
+                        "ORG"
+                     ]
+                  },
+                  "id":"def",
+                  "from_name":"ner",
+                  "to_name":"text",
+                  "type":"labels"
+               },
+               {
+                  "value":{
+                     "start":135,
+                     "end":144,
+                     "text":[
+                        "yay"
+                     ]
+                  },
+                  "id":"def",
+                  "from_name":"entity",
+                  "to_name":"text",
+                  "type":"textarea"
+               }
+            ]
+      }
+   ]
+}
+```
+Because the TextArea tag applies to each labeled region, the IDs for the label results and the textarea results must match. 

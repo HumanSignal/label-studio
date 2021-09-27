@@ -604,6 +604,15 @@ def batch(iterable, n=1):
         yield iterable[ndx : min(ndx + n, l)]
 
 
+def round_floats(o):
+    if isinstance(o, float):
+        return round(o, 2)
+    if isinstance(o, dict):
+        return {k: round_floats(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)):
+        return [round_floats(x) for x in o]
+    return o
+
 def top_query(q, sample_size, count_by='annotations', order_asc=False):
     """
     Get top/bottom [sample_size] count objects in query

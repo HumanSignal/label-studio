@@ -24,7 +24,7 @@ from core.utils.common import conditional_atomic
 from core.utils.disable_signals import DisableSignals
 from core.label_config import config_essential_data_has_changed
 from projects.models import (
-    Project, ProjectSummary
+    Project, ProjectSummary, ProjectManager
 )
 from projects.serializers import (
     ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer
@@ -124,7 +124,8 @@ class ProjectListAPI(generics.ListCreateAPIView):
     ordering = ['-created_at']
 
     def get_queryset(self):
-        return Project.objects.with_counts().filter(organization=self.request.user.active_organization)
+        projects = Project.objects.filter(organization=self.request.user.active_organization)
+        return ProjectManager.with_counts_annotate(projects)
 
     def get_serializer_context(self):
         context = super(ProjectListAPI, self).get_serializer_context()
@@ -459,8 +460,14 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                     queue_info += (' & ' if queue_info else '') + 'Breadth first queue'
                     return self._make_response(next_task, request, queue=queue_info)
 
-            if project.sampling == project.SEQUENCE or dm_queue:
+            # data manager queue
+            if dm_queue:
                 queue_info += (' & ' if queue_info else '') + 'Data manager queue'
+                logger.debug(f'User={request.user} tries sequence sampling from {not_solved_tasks_count} tasks')
+                next_task = not_solved_tasks.first()
+
+            elif project.sampling == project.SEQUENCE:
+                queue_info += (' & ' if queue_info else '') + 'Sequence queue'
                 logger.debug(f'User={request.user} tries sequence sampling from {not_solved_tasks_count} tasks')
                 next_task = self._get_first_unlocked(not_solved_tasks)
 

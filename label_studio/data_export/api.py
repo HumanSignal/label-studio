@@ -71,29 +71,24 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
                 in_=openapi.IN_QUERY,
                 description="""
                           If true, download all tasks regardless of status. If false, download only annotated tasks.
-                          """,
-            ),
-            openapi.Parameter(
-                name='download_resources',
-                type=openapi.TYPE_BOOLEAN,
-                in_=openapi.IN_QUERY,
-                description="""
-                          If true, the converter will download all resource files like images, audio, etc. 
-                          """,
-            ),
-            openapi.Parameter(
-                name='ids',
-                type=openapi.TYPE_ARRAY,
-                items=openapi.Schema(title='Task ID', description='Individual task ID', type=openapi.TYPE_INTEGER),
-                in_=openapi.IN_QUERY,
-                description="""
-                          To retrieve only subset of tasks, specify the list of target tasks IDs
-                          """,
-            ),
-        ],
-        tags=['Export'],
-        operation_summary='Export tasks and annotations',
-        operation_description="""
+                          """
+                          ),
+        openapi.Parameter(name='ids',
+                          type=openapi.TYPE_ARRAY,
+                          items=openapi.Schema(
+                              title='Task ID',
+                              description='Individual task ID',
+                              type=openapi.TYPE_INTEGER
+                          ),
+                          in_=openapi.IN_QUERY,
+                          description="""
+                          Use to export a subset of tasks. Identify specific tasks by ID to export. 
+                          """
+                          )
+    ],
+    tags=['Export'],
+    operation_summary='Export tasks and annotations',
+    operation_description="""
         Export annotated tasks as a file in a specific format.
         For example, to export JSON annotations for a project to a file called `annotations.json`,
         run the following from the command line:
@@ -104,7 +99,7 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
         ```bash
         curl -X GET {}/api/projects/{{id}}/export?exportType=JSON&download_all_tasks=true -H \'Authorization: Token abc123\' --output 'annotations.json'
         ```
-        To export specific tasks, run the following from the command line:
+        To export specific tasks with IDs of 123 and 345, run the following from the command line:
         ```bash
         curl -X GET {}/api/projects/{{id}}/export?ids[]=123\&ids[]=345 -H \'Authorization: Token abc123\' --output 'annotations.json'
         ```
