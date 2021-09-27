@@ -5,12 +5,12 @@ import logging
 import json
 import boto3
 
-from botocore.exceptions import NoCredentialsError
+from botocore.exceptions import NoCredentialsError, ClientError
 from django.db import models, transaction
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.dispatch import receiver
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from io_storages.utils import get_uri_via_regex
@@ -194,6 +194,27 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
         # create link if everything ok
         S3ExportStorageLink.create(annotation, self)
 
+    def delete_annotation(self, annotation):
+        client, s3 = self.get_client_and_resource()
+        logger.debug(f'Deleting object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
+
+        # get key that identifies this object in storage
+        key = S3ExportStorageLink.get_key(annotation)
+        key = str(self.prefix) + '/' + key if self.prefix else key
+
+        # delete object from storage
+        try:
+            s3.Object(self.bucket, key).delete()
+        except ClientError as e:
+            # we ignore access denied errors
+            logger.exception(e)
+            if not 'Access Denied' in str(e):
+                raise
+
+
+        # delete link if everything ok
+        S3ExportStorageLink.objects.filter(storage=self, annotation=annotation).delete()
+
 
 @receiver(post_save, sender=Annotation)
 def export_annotation_to_s3_storages(sender, instance, **kwargs):
@@ -202,6 +223,16 @@ def export_annotation_to_s3_storages(sender, instance, **kwargs):
         for storage in project.io_storages_s3exportstorages.all():
             logger.debug(f'Export {instance} to S3 storage {storage}')
             storage.save_annotation(instance)
+
+
+@receiver(post_delete, sender=Annotation)
+def delete_annotation_from_s3_storages(sender, instance, **kwargs):
+    project = instance.task.project
+    if project.organization_id in settings.DELETION_FROM_S3_ENABLED_FOR_ORGS:
+        if hasattr(project, 'io_storages_s3exportstorages'):
+            for storage in project.io_storages_s3exportstorages.all():
+                logger.debug(f'Delete {instance} from S3 storage {storage}')
+                storage.delete_annotation(instance)
 
 
 class S3ImportStorageLink(ImportStorageLink):
