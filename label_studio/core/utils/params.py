@@ -90,3 +90,15 @@ def get_env(name, default=None, is_bool=False):
 
 def get_bool_env(key, default):
     return get_env(key, default, is_bool=True)
+
+
+def get_env_list_int(key, default=None):
+    """
+    "1,2,3" in env variable => [1, 2, 3] in python
+    """
+    value = get_env(key)
+    if not value:
+        if default is None:
+            return []
+        return default
+    return [int(el) for el in value.split(',')]
