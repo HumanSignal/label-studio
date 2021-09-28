@@ -29,7 +29,7 @@ class PredictionQuerySerializer(serializers.Serializer):
 
 
 class PredictionSerializer(ModelSerializer):
-    model_version = serializers.CharField(allow_blank=True)
+    model_version = serializers.CharField(allow_blank=True, required=False)
     created_ago = serializers.CharField(default='', read_only=True, help_text='Delta time from creation time')
 
     class Meta:
