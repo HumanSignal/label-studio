@@ -17,9 +17,23 @@ from rest_framework.response import Response
 from core.utils.contextlog import ContextLog
 
 
+def enforce_csrf_checks(func):
+    """ Enable csrf for specified view func
+    """
+    def wrapper(request, *args, **kwargs):
+        setattr(request, '_dont_enforce_csrf_checks', False)
+        return func(request, *args, **kwargs)
+
+    wrapper._dont_enforce_csrf_checks = False
+    return wrapper
+
+
 class DisableCSRF(MiddlewareMixin):
-    def process_request(self, request):
-        setattr(request, '_dont_enforce_csrf_checks', True)
+
+    # disable csrf for api requests
+    def process_view(self, request, callback, *args, **kwargs):
+        if not hasattr(callback, '_dont_enforce_csrf_checks'):
+            setattr(request, '_dont_enforce_csrf_checks', True)
 
 
 class HttpSmartRedirectResponse(HttpResponsePermanentRedirect):
