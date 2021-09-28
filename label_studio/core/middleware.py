@@ -35,6 +35,8 @@ class DisableCSRF(MiddlewareMixin):
     def process_view(self, request, callback, *args, **kwargs):
         if hasattr(callback, '_dont_enforce_csrf_checks'):
             setattr(request, '_dont_enforce_csrf_checks', callback._dont_enforce_csrf_checks)
+        elif request.GET.get('enforce_csrf_checks'):  # _dont_enforce_csrf_checks is for test
+            setattr(request, '_dont_enforce_csrf_checks', False)
         else:
             setattr(request, '_dont_enforce_csrf_checks', True)
 
