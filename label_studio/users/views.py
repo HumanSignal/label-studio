@@ -31,7 +31,7 @@ def logout(request):
     return redirect('/')
 
 
-@enforce_csrf_checks
+# @enforce_csrf_checks
 def user_signup(request):
     """ Sign up page
     """

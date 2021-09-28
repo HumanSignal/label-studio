@@ -10,28 +10,32 @@ from django.core.handlers.base import BaseHandler
 from django.core.exceptions import MiddlewareNotUsed
 from django.middleware.common import CommonMiddleware
 from django.conf import settings
-from django.utils import timezone
+
 from django.utils.http import escape_leading_slashes
 from rest_framework.permissions import SAFE_METHODS
-from rest_framework.response import Response
 from core.utils.contextlog import ContextLog
 
 
 def enforce_csrf_checks(func):
     """ Enable csrf for specified view func
     """
-    def wrapper(request, *args, **kwargs):
-        return func(request, *args, **kwargs)
+    # USE_ENFORCE_CSRF_CHECKS=False is for tests
+    if settings.USE_ENFORCE_CSRF_CHECKS:
+        def wrapper(request, *args, **kwargs):
+            return func(request, *args, **kwargs)
 
-    wrapper._dont_enforce_csrf_checks = False
-    return wrapper
+        wrapper._dont_enforce_csrf_checks = False
+        return wrapper
+    else:
+        return func
 
 
 class DisableCSRF(MiddlewareMixin):
-
     # disable csrf for api requests
     def process_view(self, request, callback, *args, **kwargs):
-        if not hasattr(request, '_dont_enforce_csrf_checks') and not hasattr(callback, '_dont_enforce_csrf_checks'):
+        if hasattr(callback, '_dont_enforce_csrf_checks'):
+            setattr(request, '_dont_enforce_csrf_checks', callback._dont_enforce_csrf_checks)
+        else:
             setattr(request, '_dont_enforce_csrf_checks', True)
 
 
