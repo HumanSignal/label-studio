@@ -21,7 +21,6 @@ def enforce_csrf_checks(func):
     """ Enable csrf for specified view func
     """
     def wrapper(request, *args, **kwargs):
-        setattr(request, '_dont_enforce_csrf_checks', False)
         return func(request, *args, **kwargs)
 
     wrapper._dont_enforce_csrf_checks = False
@@ -32,7 +31,7 @@ class DisableCSRF(MiddlewareMixin):
 
     # disable csrf for api requests
     def process_view(self, request, callback, *args, **kwargs):
-        if not hasattr(callback, '_dont_enforce_csrf_checks'):
+        if not hasattr(request, '_dont_enforce_csrf_checks') and not hasattr(callback, '_dont_enforce_csrf_checks'):
             setattr(request, '_dont_enforce_csrf_checks', True)
 
 
