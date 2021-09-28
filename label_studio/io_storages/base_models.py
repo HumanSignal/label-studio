@@ -160,6 +160,8 @@ def sync_background(storage_class, storage_id):
 
 
 class ExportStorage(Storage):
+    can_delete_objects = models.BooleanField(_('can_delete_objects'), null=True, blank=True, help_text='Deletion from storage enabled')
+
     def _get_serialized_data(self, annotation):
         if get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False):
             # export task with annotations

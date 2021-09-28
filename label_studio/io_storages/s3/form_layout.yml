@@ -89,3 +89,12 @@ ExportStorage:
     fields: *title_bucket_prefix
   - columnCount: 3
     fields: *aws_params
+  # 1 columns grid
+  - columnCount: 1
+    columns:
+      - width: 345
+        fields:
+          - type: toggle
+            name: can_delete_objects
+            label: Can delete objects from storage
+            description: If unchecked, annotations will not be deleted from storage

@@ -503,6 +503,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - enable_annotation_delete_from_s3
 stages:
 - id: signup
   type: ref
@@ -571,6 +572,12 @@ stages:
   request:
     method: POST
     url: '{django_live_url}/api/storages/export/s3/{storage_pk}/sync'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/dm/actions?id=delete_tasks_annotations&project={project_pk}'
   response:
     status_code: 200
 ---

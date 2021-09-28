@@ -392,3 +392,11 @@ def configured_project(business_client, annotator_client):
 @pytest.fixture(name="django_live_url")
 def get_server_url(live_server):
     yield live_server.url
+
+
+@pytest.fixture(autouse=False)
+def enable_annotation_delete_from_s3(settings):
+    class InAlwaysTrue(list):
+        def __contains__(self, *args, **kwargs):
+            return True
+    settings.DELETION_FROM_S3_ENABLED_FOR_ORGS = InAlwaysTrue()
