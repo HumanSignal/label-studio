@@ -1,4 +1,17 @@
-import React, { ComponentClass, DOMAttributes, FunctionComponent } from 'react';
+import {
+  ComponentClass,
+  Context,
+  createContext,
+  createElement,
+  CSSProperties,
+  DOMAttributes,
+  forwardRef,
+  FunctionComponent,
+  ReactHTML,
+  ReactSVG,
+  useContext
+} from 'react';
+import { isDefined, isEmptyString } from './helpers';
 
 interface CNMod {
   [key: string]: unknown
@@ -25,7 +38,7 @@ interface CNOptions {
   mix?: CNMix | CNMix[] | undefined | undefined
 }
 
-type CNTagName = ComponentClass<unknown, unknown> | FunctionComponent<unknown> | string
+type CNTagName = keyof ReactHTML | keyof ReactSVG | ComponentClass<unknown, unknown> | FunctionComponent<unknown> | string
 
 type CNComponentProps = {
   name: string
@@ -35,9 +48,10 @@ type CNComponentProps = {
   mix?: CNMix | CNMix[]
   className?: string
   component?: CNTagName
+  style?: CSSProperties
 } & DOMAttributes<HTMLElement>
 
-type BemComponent = FunctionComponent<CNComponentProps>
+export type BemComponent = FunctionComponent<CNComponentProps>
 
 const CSS_PREFIX = process.env.CSS_PREFIX ?? 'dm-';
 
@@ -70,7 +84,7 @@ const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?
     const mixes = Array.isArray(mix) ? mix : [mix];
     const mixMap = ([] as CNMix[])
       .concat(...mixes)
-      .filter(m => m !== undefined && m !== null && m !== "")
+      .filter(m => isDefined(m) && m !== "")
       .map(m => {
         if (typeof m === 'string') {
           return m;
@@ -88,10 +102,10 @@ const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?
     else return `${CSS_PREFIX}${cls}`;
   };
 
-  return finalClass.map(attachNamespace).join(" ");
+  return finalClass.filter(cls => !isEmptyString(cls)).map(attachNamespace).join(" ");
 };
 
-const BlockContext = React.createContext<CN | null>(null);
+const BlockContext = createContext<CN | null>(null);
 
 export const cn = (block: string, options: CNOptions = {}): CN => {
   const { elem, mix, mod } = options ?? {};
@@ -112,8 +126,8 @@ export const cn = (block: string, options: CNOptions = {}): CN => {
       return cn(block ?? blockName, { elem, mix, mod: stateOverride });
     },
 
-    mix(...mix) {
-      return cn(block, { elem, mix, mod });
+    mix(...mixes) {
+      return cn(block, { elem, mix: mixes, mod });
     },
 
     select(root = document) {
@@ -158,28 +172,29 @@ export const cn = (block: string, options: CNOptions = {}): CN => {
   return classNameBuilder;
 };
 
-export const BemWithSpecifiContext = (context: React.Context<CN | null>) => {
-  const Context = context ?? React.createContext<CN|null>(null);
+export const BemWithSpecifiContext = (context: Context<CN | null>) => {
+  const LocalContext = context ?? createContext<CN|null>(null);
 
-  const Block: BemComponent = React.forwardRef(({ tag = 'div', name, mod, mix, ...rest }, ref) => {
+  const Block: BemComponent = forwardRef(({ tag = 'div', name, mod, mix, ...rest }, ref) => {
     const rootClass = cn(name);
-    const finalMix = ([] as [ CNMix? ]).concat(mix).filter(cn => !!cn);
+    const finalMix = ([] as [ CNMix? ]).concat(mix).filter(cnm => !!cnm);
     const className = rootClass.mod(mod).mix(...(finalMix as CNMix[]), rest.className).toClassName();
     const finalProps = { ...rest, ref, className } as any;
 
     return (
-      <Context.Provider value={rootClass}>
-        {React.createElement(tag, finalProps)}
-      </Context.Provider>
+      <LocalContext.Provider value={rootClass}>
+        {createElement(tag, finalProps)}
+      </LocalContext.Provider>
     );
   });
 
   Block.displayName = 'Block';
 
-  const Elem: BemComponent = React.forwardRef(({ tag = 'div', component, block, name, mod, mix, ...rest }, ref) => {
-    const blockCtx = React.useContext(Context);
+  const Elem: BemComponent = forwardRef(({ component, block, name, mod, mix, ...rest }, ref) => {
+    const blockCtx = useContext(LocalContext);
 
-    const finalMix = ([] as [ CNMix? ]).concat(mix).filter(cn => !!cn);
+    const finalMix = ([] as [ CNMix? ]).concat(mix).filter(cnm => !!cnm);
+    const finalTag = rest.tag ?? 'div';
 
     const className = (block ? cn(block) : blockCtx)!
       .elem(name)
@@ -189,15 +204,14 @@ export const BemWithSpecifiContext = (context: React.Context<CN | null>) => {
 
     const finalProps: any = { ...rest, ref, className };
 
-    if (typeof tag !== 'string') finalProps.block = blockCtx;
-    if (component) finalProps.tag = tag;
+    if (typeof finalTag !== 'string') finalProps.block = blockCtx;
 
-    return React.createElement(component ?? tag, finalProps);
+    return createElement(component ?? finalTag, finalProps);
   });
 
   Elem.displayName = 'Elem';
 
-  return { Block, Elem, Context };
+  return { Block, Elem, Context: LocalContext };
 };
 
 export const { Block, Elem } = BemWithSpecifiContext(BlockContext);

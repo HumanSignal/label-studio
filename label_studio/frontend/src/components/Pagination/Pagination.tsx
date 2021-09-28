@@ -39,8 +39,8 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
   const [waiting, setWaiting] = useValueTracker(props.waiting);
 
   const totalPages = useMemo(() => {
-    return Math.ceil(props.totalItems / props.itemsPerPage);
-  }, [props.itemsPerPage, props.totalItems]);
+    return props.totalPages ?? Math.ceil(props.totalItems / props.itemsPerPage);
+  }, [props.itemsPerPage, props.totalItems, props.totalPages]);
 
   const visibleItems = useMemo(() => {
     const { itemsPerPage, totalItems } = props;
