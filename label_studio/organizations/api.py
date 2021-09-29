@@ -62,6 +62,7 @@ class OrganizationListAPI(generics.ListCreateAPIView):
 
 class OrganizationMemberPagination(PageNumberPagination):
     page_size = 20
+    page_size_query_param = 'page_size'
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
