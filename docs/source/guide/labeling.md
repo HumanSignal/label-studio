@@ -9,7 +9,7 @@ meta_description: Label and annotate data using the Label Studio UI to create bo
 Label and annotate your data with the open source data labeling tool, Label Studio. After you [set up your project](setup_project.html) and [labeling interface](setup.html) and [import your data](tasks.html), you can start labeling and annotating your data.
 
 1. Open a project in Label Studio and optionally [filter or sort the data](#Filter-or-sort-project-data).    
-2. Click **Label** to [start labeling](#Start-labeling).
+2. Click **Label All Tasks** to [start labeling](#Start-labeling).
 3. Use [keyboard shortcuts](#Use-keyboard-shortcuts-to-label-regions-faster) or your mouse to label the data and submit your annotations.
 4. Follow the project instructions for labeling and deciding whether to skip tasks. 
 5. Click the project name to return to the data manager.
@@ -49,11 +49,14 @@ For example, you might split a dataset with 300 images into 3 different tabs, an
 
 ## Start labeling
 
+Some labeling tasks can be complicated to perform, for example, labeling that includes text, image, and audio data objects as part of one dataset and labeling task, or creating relations between annotations on a labeling task. This section includes guidance on how to perform more complex labeling tasks, such as labeling with relations, overlapping regions, selected tasks, or changing labels. 
+
+### Choose which tasks to label
 From a project, click **Label All Tasks** to start labeling all tasks. To label the tasks as they are filtered and sorted in the data manager, select **Label Tasks As Displayed** instead. 
 
 You can also label a specific task in the **Quick View** or **Preview** by clicking it from the project data manager view, but you won't automatically see the next task in the labeling queue after submitting your annotations. 
 
-Some labeling tasks can be complicated to perform, for example, labeling that includes text, image, and audio data objects as part of one dataset and labeling task, or creating relations between annotations on a labeling task.
+You can also select the checkboxes next to specific tasks and then click **Label $n Tasks** to label the selected number of tasks. For example, select the checkboxes for 5 different tasks, then click **Label 5 Tasks** to label only those 5 tasks. 
 
 ### Label a region in the data
 Annotate a section of the data by adding a region. 
@@ -79,7 +82,14 @@ You can select multiple regions while labeling to make changes to them together.
 
 1. After creating multiple regions, press `ctrl` and click each region that you want to select. You can select regions on the object that you're labeling or in the **Regions** sidebar. Select a range of regions in the **Regions** sidebar by clicking the first region in the list that you want to select and holding `Shift` while you click the last region in the list that you want to select. 
 2. After selecting the regions you can apply a label to all selected regions or delete them. 
-3. Click a selected region to deselect it.
+3. Click a selected region or press `u` to deselect it.
+
+### Duplicate regions
+You can duplicate a region to create many identically-sized polygons, rectangles, or ellipses. 
+
+1. Select the region that you want to duplicate.
+2. Press `ctrl + d` to duplicate the region, or the sequence of `ctrl + c` and `ctrl + v` to copy and paste the region. Duplicated regions appear in the exact location as the region being duplicated. If you're using a Mac keyboard, use `cmd` instead of `ctrl`. 
+3. Click the arrow tool, then move and resize the newly-created region.
 
 ### Change the label
 You can change the label of an existing region. 
@@ -158,13 +168,19 @@ This table describes the hotkeys for a standard keyboard. For a Mac keyboard, us
 
 | Key | Description |
 | --- | --- | 
-| `ctrl` + `enter` | Submit a task |
-| `alt` + `enter` | Update a task | 
-| `ctrl` + `backspace` OR `cmd` + `backspace` | Delete all regions |
-| `escape` | Exit relation mode |
-| `backspace` | Delete selected region | 
-| `alt` + `r` | Create a relation between regions, when a region is selected | 
-| `alt` + `.` | Cycle through all regions in the order listed on the regions sidebar | 
+| `ctrl` + `enter` | Submit a task. |
+| `alt` + `enter` | Update a task. | 
+| `ctrl` + `backspace` OR `cmd` + `backspace` | Delete all regions. |
+| `escape` | Exit relation mode. |
+| `backspace` | Delete a selected region. | 
+| `alt` + `r` | Create a relation between regions, when a region is selected. | 
+| `alt` + `.` | Cycle through all regions in the order listed on the regions sidebar. |
+| `ctrl` + `d` OR `cmd` + `d` | Duplicate a selected region. |
+| `u` | Unselect a selected region. | 
+| `s` | On the data manager, change the row selection to the next row, 1 below the current row. |
+| `w` | On the data manager, change the row selection to the previous row, 1 above the current row. |
+| `d` | On the data manager, open the labeling quick view for the selected task row. | 
+| `a` | On the data manager, close the labeling quick view for the selected task row. |
 
 Other annotation types have labeling-specific shortcuts, such as numbers to select specific labels or to select the eraser or a brush tool when labeling images. You can also specify custom hotkeys for labeling using the [Shortcut tag](/tags/shortcut.html). 
 
@@ -215,7 +231,7 @@ Create a custom template for your labeling interface using the following example
 </View>
 ```
 
-This example makes rectangles, ellipses, polygons, keypoints, and brush masks available to the annotator, along with image classification choices of yes and no, and region labels of building and vehicle. 
+This example makes rectangles, ellipses, polygons, keypoints, and brush masks available to the annotator, along with image classification choices of yes and no, and region labels of building and vehicle.
 
 ### Faster image labeling
 
@@ -241,9 +257,6 @@ By default, regions without labels appear gray.
 If you make a mistake when labeling with the brush mask, you can erase it. You must select a brush region in the sidebar before you can erase any part of it. 
 
 If you want to completely remove a region and start over, delete the region instead of erasing it. Erasing a region does not delete it. 
-
-
-
 
 
 <!-- md annotation_ids.md -->

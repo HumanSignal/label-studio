@@ -9,13 +9,24 @@ meta_description: Label Studio documentation for exporting data labeling annotat
 
 ## Export data from Label Studio
 
-Export your completed annotations from Label Studio. Label Studio stores your annotations in a raw JSON format in the SQLite database backend or whichever cloud or database storage you specify as target storage. Cloud storage buckets contain one file per labeled task named as `task_id.json`. 
+Export your completed annotations from Label Studio. Label Studio stores your annotations in a raw JSON format in the SQLite database backend or whichever cloud or database storage you specify as target storage. Cloud storage buckets contain one file per labeled task named as `task_id.json`. See [Cloud storage setup](storage.html) for more details about syncing target storage. 
 
-You can convert the raw JSON completed annotations stored by Label Studio into a more common format and export that data in several different ways:
+### Export using the UI
 
-- Export from the Label Studio UI on the [/export](http://localhost:8080/export) page.
-- Call the API to export data. See the Label Studio [API documentation](api.html).
-- For versions of Label Studio earlier than 1.0.0, run the relevant [converter tool](https://github.com/heartexlabs/label-studio-converter) on the directory of completed annotations using the command line or Python. You can also run the relevant converter tool on exported JSON from version 1.0.0. 
+You can export data and annotations from the Label Studio UI using the [/export](http://localhost:8080/export) page. Click **Export** from the data manager to select an available export format and export your data. 
+
+### Export using the API
+You can call the Label Studio API to export annotations. 
+
+For a small labeling project, call the [export endpoint](/api#operation/api_projects_export_read) to export annotations.
+
+For a large labeling project with hundreds of thousands of tasks, do the following:
+1. Make a POST request to [create a new export file or snapshot](/api#operation/api_projects_exports_create). The response includes an `id` for the created file.
+2. [Check the status of the export file creation](/api#operation/api_projects_exports_read) using the `id` as the `export_pk`. 
+3. Using the `id` from the created snapshot as the export primary key, or `export_pk`, make a GET request to [download the export file](/api#operation/api_projects_exports_download_read).
+
+### Manually convert JSON annotations to another format
+You can run the relevant [converter tool](https://github.com/heartexlabs/label-studio-converter) on a directory or file of completed JSON annotations using the command line or Python to convert the completed annotations into another format. If you use versions of Label Studio earlier than 1.0.0, this is the only way to convert your Label Studio JSON format annotations into another labeling format. 
 
 ## Export formats supported by Label Studio
 
@@ -29,6 +40,7 @@ List of items in [raw JSON format](#Label-Studio-JSON-format-of-annotated-tasks)
 
 List of items where only `"from_name", "to_name"` values from the [raw JSON format](#Label-Studio-JSON-format-of-annotated-tasks) are exported. Use to export only the annotations and the data for a dataset, and no Label-Studio-specific fields. 
 
+For example: 
 ```json
 {
   "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg",
@@ -47,12 +59,12 @@ List of items where only `"from_name", "to_name"` values from the [raw JSON form
 
 ### CSV
 
-Results are stored as comma-separated values with the column names specified by the values of the `"from_name"` and `"to_name"` fields.
+Results are stored as comma-separated values with the column names specified by the values of the `"from_name"` and `"to_name"` fields in the labeling configuration.
 
 
 ### TSV
 
-Results are stored in tab-separated tabular file with column names specified by `"from_name"` `"to_name"` values
+Results are stored in tab-separated tabular file with column names specified by `"from_name"` and `"to_name"` values in the labeling configuration.
 
 
 ### CONLL2003
@@ -63,7 +75,6 @@ Popular format used for the [CoNLL-2003 named entity recognition challenge](http
 ### COCO
 
 Popular machine learning format used by the [COCO dataset](http://cocodataset.org/#home) for object detection and image segmentation tasks.
-
 
 ### Pascal VOC XML
 
@@ -203,7 +214,6 @@ Review the full list of JSON properties in the [API documentation](api.html).
 | result.value | Tag-specific value that includes details of the result of labeling the task. The value structure depends on the tag for the label. [Explore each tag](/tags) for more details. |
 | predictions | Array of machine learning predictions. Follows the same format as the completions array, with one additional parameter. |
 | predictions.score | The overall score of the result, based on the probabilistic output, confidence level, or other. | 
-
 
 <!-- md image_units.md -->
 
