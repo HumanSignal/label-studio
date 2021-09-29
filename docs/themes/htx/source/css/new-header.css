@@ -28,36 +28,107 @@ div.container__head{
   min-height:60px;
   font-family:"Inter",sans-serif;
 }
-.head__main>.container__head>.head__menu--wrapper ul{
+.head__main>.container__head>.head__menu--wrapper{
   display: flex;
   align-items:center;
   padding:0px;
   list-style-type: none;
 }
-.head__main>.container__head>.head__menu--wrapper ul li{
+.head__main>.container__head>.head__menu--wrapper > *{
   margin-right:30px;
   display: flex;
   align-items:center;
   justify-content:center;
+  line-height: 28px;
 }
-.head__main>.container__head>.head__menu--wrapper ul li:last-child{
+.head__main>.container__head>.head__menu--wrapper > *:last-child{
   margin-right:0px;
 }
-.head__main>.container__head>.head__menu--wrapper ul li a{
+.head__main>.container__head>.head__menu--wrapper a{
   text-decoration:none;
-  color:rgba(0,0,0,.5);
+  color:rgba(0,0,0,.6);
   transition:.4s ease all;
 }
-.head__main>.container__head>.head__menu--wrapper ul li a:hover{
+.head__main>.container__head>.head__menu--wrapper a:hover{
   color:#000;
 }
-.head__main>.container__head>.head__menu--wrapper ul li.current a{
-  padding: 3px 15px;
-  line-height: 28px;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.05);
+.head__main>.container__head>.head__menu--wrapper a.current{
   color: #000;
 }
+
+/***** webflow part *****/
+.head__main>.container__head>.head__menu--wrapper .w-dropdown {
+  position: relative;
+}
+
+.head__main>.container__head>.head__menu--wrapper .w-dropdown-list {
+  position: absolute;
+  display: none;
+  padding: 8px 0;
+  margin-top: 6px;
+  border: 1px solid #ddd;
+}
+
+.head__main>.container__head>.head__menu--wrapper .w-dropdown:hover .w-dropdown-list {
+  display: block;
+  top: 100%;
+  right: 0;
+  background: white;
+  min-width: 100%;
+  border-radius: 4px;
+}
+
+.head__main>.container__head>.head__menu--wrapper a.w-dropdown-link {
+  display: block;
+  padding: 0px 20px;
+  color: rgba(20, 30, 41, 0.6);
+  font-size: 16px;
+  line-height: 28px;
+  white-space: nowrap;
+}
+
+.head__main>.container__head>.head__menu--wrapper a.w-dropdown-link.current {
+  color: #0082f3;
+}
+.head__main>.container__head>.head__menu--wrapper a.w-dropdown-link:hover {
+  color: #141e29;
+}
+
+.head__main>.container__head>.head__menu--wrapper .w-dropdown-toggle {
+  display: flex;
+}
+
+.head__main>.container__head>.head__menu--wrapper .w-dropdown-toggle svg {
+  margin-left: 5px;
+}
+/* hide github stub button until widget is loaded */
+.head__main>.container__head>.github-button {
+  opacity: 0;
+}
+
+@media screen and (max-width: 991px) {
+  .head__main>.container__head>.head__menu--wrapper {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .head__main>.container__head>.head__menu--wrapper > * {
+    display: block;
+    font-size: 18px;
+  }
+  .head__main>.container__head>.head__menu--wrapper .w-dropdown-toggle svg {
+    display: none;
+  }
+  .head__main>.container__head>.head__menu--wrapper .w-dropdown-list {
+    position: static;
+    display: block;
+    margin-top: 0;
+    border: none;
+  }
+  .head__main>.container__head>span:last-child {
+    display: none; /* github widget */
+  }
+}
+
 .head__main .search__head{
   display: flex;
   align-items:center;
@@ -110,7 +181,7 @@ div.container__head{
   position: sticky;
   top: 0;
   z-index: 20;
-  background-color:#fff;
+  background-color: wheat;
   box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.08);
 }
 .head__main.active__head,
@@ -127,7 +198,6 @@ div.container__head{
 }
 @media (min-width: 992px){
   .head__main.main__page__header {
-    background-color:rgba(112, 169, 191, 0.13);
     box-shadow: none;
   }
 }
