@@ -121,15 +121,15 @@
       </header>
 
       <table>
-        <tr><td>Annotations completed by you</td><td>{{ user.active_organization_annotations.count }}</td></tr>
-        <tr><td>Projects contributed by you</td><td>{{ user.active_organization_contributed_project_number }}</td></tr>
-        <tr><td></td><td></td></tr>
-        <tr><td style="min-width: 75px">Organization ID</td><td>{{ user.active_organization.id }}</td></tr>
         {% with user.get_pretty_role as role %}
           {% if role %}
             <tr><td>Your role</td><td>{{ user.get_pretty_role }}</td></tr>
           {% endif %}
         {% endwith %}
+        <tr><td>Annotations completed by you</td><td>{{ user.active_organization_annotations.count }}</td></tr>
+        <tr><td>Projects contributed by you</td><td>{{ user.active_organization_contributed_project_number }}</td></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td style="min-width: 75px">Organization ID</td><td>{{ user.active_organization.id }}</td></tr>
         <tr><td>Organization owner</td><td>{{ user.active_organization.created_by }}</td></tr>
         <tr><td>Organization created at</td><td>{{ user.active_organization.created_at }}</td></tr>
       </table>
