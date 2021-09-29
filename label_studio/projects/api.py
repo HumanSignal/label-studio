@@ -90,6 +90,7 @@ _task_data_schema = openapi.Schema(
 
 class ProjectListPagination(PageNumberPagination):
     page_size = 30
+    page_size_query_param = 'page_size'
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
