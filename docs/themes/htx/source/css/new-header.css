@@ -39,7 +39,7 @@ div.container__head{
   display: flex;
   align-items:center;
   justify-content:center;
-  line-height: 28px;
+  line-height: 36px;
 }
 .head__main>.container__head>.head__menu--wrapper > *:last-child{
   margin-right:0px;
@@ -65,7 +65,6 @@ div.container__head{
   position: absolute;
   display: none;
   padding: 8px 0;
-  margin-top: 6px;
   border: 1px solid #ddd;
 }
 
@@ -191,6 +190,7 @@ div.container__head{
 .head__main .container__head{
   display: flex;
   justify-content: space-between;
+  align-items: center;
   width:100%;
 }
 .small__head{
