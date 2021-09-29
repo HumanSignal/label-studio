@@ -121,8 +121,8 @@
       </header>
 
       <table>
-        <tr><td>Annotations completed by you</td><td>{{ user.annotations.count }}</td></tr>
-        <tr><td>Projects contributed by you</td><td>{{ user.projects.count }}</td></tr>
+        <tr><td>Annotations completed by you</td><td>{{ user.active_organization_annotations.count }}</td></tr>
+        <tr><td>Projects contributed by you</td><td>{{ user.active_organization_contributed_project_number }}</td></tr>
         <tr><td></td><td></td></tr>
         <tr><td style="min-width: 75px">Organization ID</td><td>{{ user.active_organization.id }}</td></tr>
         {% with user.get_pretty_role as role %}

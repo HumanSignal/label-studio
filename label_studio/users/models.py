@@ -129,8 +129,12 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     def is_organization_admin(self, org_pk):
         return True
 
-    def projects(self):
-        return Project.objects.filter(tasks__annotations__in=self.annotations.all()).distinct()
+    def active_organization_annotations(self):
+        return self.annotations.filter(task__project__organization=self.active_organization)
+
+    def active_organization_contributed_project_number(self):
+        annotations = self.active_organization_annotations()
+        return annotations.values_list('task__project').distinct().count()
 
     @property
     def own_organization(self):
