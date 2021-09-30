@@ -5,7 +5,7 @@ import logging
 import os
 import datetime
 
-from urllib.parse import urljoin
+from urllib.parse import urljoin, quote
 
 from django.conf import settings
 from django.db import models, connection, transaction
@@ -157,7 +157,7 @@ class Task(TaskMixin, models.Model):
             protected_data = {}
             for key, value in task_data.items():
                 if isinstance(value, str) and string_is_url(value):
-                    path = reverse('projects-file-proxy', kwargs={'pk': self.project.pk}) + '?url=' + value
+                    path = reverse('projects-file-proxy', kwargs={'pk': self.project.pk}) + '?url=' + quote(value)
                     value = urljoin(settings.HOSTNAME, path)
                 protected_data[key] = value
             return protected_data
