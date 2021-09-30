@@ -368,8 +368,6 @@ TASK_LOCK_TTL = int(get_env('TASK_LOCK_TTL')) if get_env('TASK_LOCK_TTL') else N
 TASK_LOCK_DEFAULT_TTL = int(get_env('TASK_LOCK_DEFAULT_TTL', 3600))
 TASK_LOCK_MIN_TTL = int(get_env('TASK_LOCK_MIN_TTL', 120))
 
-DELETION_FROM_S3_ENABLED_FOR_ORGS = get_env_list_int('DELETION_FROM_S3_ENABLED_FOR_ORGS', [])
-
 # Email backend
 FROM_EMAIL = get_env('FROM_EMAIL', 'Label Studio <hello@labelstud.io>')
 EMAIL_BACKEND = get_env('EMAIL_BACKEND', 'django.core.mail.backends.dummy.EmailBackend')

@@ -78,6 +78,7 @@ class S3StorageMixin(models.Model):
         return client, s3.Bucket(self.bucket)
 
     def validate_connection(self, client=None):
+        print('validate_connection')
         if client is None:
             client = self.get_client()
         if self.prefix:
@@ -203,14 +204,7 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
         key = str(self.prefix) + '/' + key if self.prefix else key
 
         # delete object from storage
-        try:
-            s3.Object(self.bucket, key).delete()
-        except ClientError as e:
-            # we ignore access denied errors
-            logger.exception(e)
-            if not 'Access Denied' in str(e):
-                raise
-
+        s3.Object(self.bucket, key).delete()
 
         # delete link if everything ok
         S3ExportStorageLink.objects.filter(storage=self, annotation=annotation).delete()
@@ -228,9 +222,9 @@ def export_annotation_to_s3_storages(sender, instance, **kwargs):
 @receiver(post_delete, sender=Annotation)
 def delete_annotation_from_s3_storages(sender, instance, **kwargs):
     project = instance.task.project
-    if project.organization_id in settings.DELETION_FROM_S3_ENABLED_FOR_ORGS:
-        if hasattr(project, 'io_storages_s3exportstorages'):
-            for storage in project.io_storages_s3exportstorages.all():
+    if hasattr(project, 'io_storages_s3exportstorages'):
+        for storage in project.io_storages_s3exportstorages.all():
+            if storage.can_delete_objects:
                 logger.debug(f'Delete {instance} from S3 storage {storage}')
                 storage.delete_annotation(instance)
 
