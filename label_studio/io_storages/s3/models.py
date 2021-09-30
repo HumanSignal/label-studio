@@ -222,12 +222,11 @@ def export_annotation_to_s3_storages(sender, instance, **kwargs):
 @receiver(post_delete, sender=Annotation)
 def delete_annotation_from_s3_storages(sender, instance, **kwargs):
     project = instance.task.project
-    if project.organization_id in settings.DELETION_FROM_S3_ENABLED_FOR_ORGS:
-        if hasattr(project, 'io_storages_s3exportstorages'):
-            for storage in project.io_storages_s3exportstorages.all():
-                if storage.can_delete_objects:
-                    logger.debug(f'Delete {instance} from S3 storage {storage}')
-                    storage.delete_annotation(instance)
+    if hasattr(project, 'io_storages_s3exportstorages'):
+        for storage in project.io_storages_s3exportstorages.all():
+            if storage.can_delete_objects:
+                logger.debug(f'Delete {instance} from S3 storage {storage}')
+                storage.delete_annotation(instance)
 
 
 class S3ImportStorageLink(ImportStorageLink):
