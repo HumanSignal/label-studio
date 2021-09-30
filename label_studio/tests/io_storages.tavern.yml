@@ -503,7 +503,6 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
-  - enable_annotation_delete_from_s3
 stages:
 - id: signup
   type: ref
