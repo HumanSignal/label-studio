@@ -33,7 +33,7 @@ Install Label Studio locally, or deploy it in a cloud instance. Also you can try
 - [Deploy in a cloud instance](#deploy-in-a-cloud-instance)
 
 ### Install locally with Docker
-Official Label Studio docker imageis is (here)[https://hub.docker.com/r/heartexlabs/label-studio] and it can be downloaded with `docker pull`. 
+Official Label Studio docker imageis is [here](https://hub.docker.com/r/heartexlabs/label-studio) and it can be downloaded with `docker pull`. 
 Run Label Studio in a Docker container and access it at `http://localhost:8080`.
 
 
