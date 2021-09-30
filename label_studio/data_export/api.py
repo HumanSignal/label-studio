@@ -19,7 +19,7 @@ from core.utils.common import get_object_with_check_and_log, bool_from_request, 
 from projects.models import Project
 from tasks.models import Task
 from .models import DataExport, Export
-from .serializers import ExportDataSerializer, ExportSerializer
+from .serializers import ExportDataSerializer, ExportSerializer, ExportCreateSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -266,6 +266,13 @@ class ExportListAPI(generics.ListCreateAPIView):
     serializer_class = ExportSerializer
     permission_required = all_permissions.projects_change
 
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return ExportSerializer
+        if self.request.method == 'POST':
+            return ExportCreateSerializer
+        return super().get_serializer_class()
+
     def _get_project(self):
         project_pk = self.kwargs.get('pk')
         project = generics.get_object_or_404(
@@ -275,10 +282,19 @@ class ExportListAPI(generics.ListCreateAPIView):
         return project
 
     def perform_create(self, serializer):
+        task_filter_options = serializer.validated_data.pop('task_filter_options')
+        annotation_filter_options = serializer.validated_data.pop('annotation_filter_options')
+        serialization_options = serializer.validated_data.pop('serialization_options')
+
         project = self._get_project()
         serializer.save(project=project, created_by=self.request.user)
         instance = serializer.instance
-        instance.run_file_exporting()
+
+        instance.run_file_exporting(
+            task_filter_options=task_filter_options,
+            annotation_filter_options=annotation_filter_options,
+            serialization_options=serialization_options,
+        )
 
     def get_queryset(self):
         project = self._get_project()

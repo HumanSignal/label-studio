@@ -32,6 +32,11 @@ from .utils import (
 boto3.set_stream_logger('botocore.credentials', logging.DEBUG)
 
 
+@pytest.fixture(autouse=False)
+def enable_csrf():
+    settings.USE_ENFORCE_CSRF_CHECKS = True
+
+
 @pytest.fixture(autouse=True)
 def disable_sentry():
     settings.SENTRY_RATE = 0

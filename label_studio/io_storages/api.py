@@ -121,8 +121,6 @@ class StorageValidateAPI(generics.CreateAPIView):
                 raise PermissionDenied()
         serializer = self.get_serializer(instance=instance, data=request.data)
         serializer.is_valid(raise_exception=True)
-        storage = self.serializer_class.Meta.model(**serializer.validated_data)
-        storage.validate_connection()
         return Response()
 
 

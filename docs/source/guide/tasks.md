@@ -1,6 +1,6 @@
 ---
 title: Get data into Label Studio
-short: Get data
+short: Import data
 type: guide
 order: 300
 meta_title: Import Data into Label Studio
