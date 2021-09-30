@@ -85,6 +85,7 @@ body {
   gap: 20px;
 }
 #users table {
+  font-size: 20px;
   border: 1px solid rgba(0, 0, 0, 0.15);
   text-align: left;
 }
@@ -238,7 +239,7 @@ body {
   padding-left: 32px;
 }
 textarea.example_code {
-  font-size: 16px;
+  font-size: 12px;
   font-family: monospace;
   font-weight: 100;
   white-space: normal;
@@ -285,3 +286,8 @@ button.blinking-status.blink::after {
   min-width: 90px;
 }
 
+
+#organization table td {
+  font-size: 100%;
+  padding: 5px 0;
+}

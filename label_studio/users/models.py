@@ -15,6 +15,7 @@ from rest_framework.authtoken.models import Token
 from organizations.models import OrganizationMember, Organization
 from users.functions import hash_upload
 from core.utils.common import load_func
+from projects.models import Project
 
 YEAR_START = 1980
 YEAR_CHOICES = []
@@ -127,6 +128,13 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
 
     def is_organization_admin(self, org_pk):
         return True
+
+    def active_organization_annotations(self):
+        return self.annotations.filter(task__project__organization=self.active_organization)
+
+    def active_organization_contributed_project_number(self):
+        annotations = self.active_organization_annotations()
+        return annotations.values_list('task__project').distinct().count()
 
     @property
     def own_organization(self):
