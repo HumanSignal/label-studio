@@ -64,7 +64,7 @@ Test the configuration by logging in to Label Studio Enterprise with your SSO ac
 
 After you set up LDAP authentication, you can no longer use native authentication to log in to the Label Studio UI. Set up LDAP authentication and assign LDAP users to your Label Studio Enterprise organization using environment variables in Docker. 
 
-You can also map specific LDAP groups to specific organization roles in Label Studio Enterprise, making it easier to manage role-based access control (RBAC) in Label Studio Enterprise. Also you can do the similar mapping for Label Studio Workspaces. 
+You can also map specific LDAP groups to specific organization roles and workspaces in Label Studio Enterprise, making it easier to set up and manage role-based access control (RBAC) and project access in Label Studio Enterprise. 
 
 You can refer to this example environment variable file for your own LDAP setup:
 
@@ -77,29 +77,29 @@ AUTH_LDAP_SERVER_URI=ldaps://ldap.example.com
 AUTH_LDAP_BIND_DN=uid=user,ou=sysadmins,o=123abc,dc=zexample,dc=com
 AUTH_LDAP_BIND_PASSWORD=password123
 
-# Allow to use usernames (not only emails) for Label Studio login
+# Allow users to use usernames (not only emails) to log into Label Studio
 USE_USERNAME_FOR_LOGIN=1
 
 # Simple user search in LDAP groups
 AUTH_LDAP_USER_DN_TEMPLATE=uid=%(user)s,ou=Users,o=123abc,dc=example,dc=com
 
 # Specify organization to assign it to all users on the platform
-# Warning: the user with this email must be registered before any LDAP logins 
+# Warning: the user with this email must be registered before any LDAP users log in 
 AUTH_LDAP_ORGANIZATION_OWNER_EMAIL=heartex@heartex.net
 
 # Populate the user from the LDAP directory:
-# firstName, lastName, mail, sAMAccountName will be taken from your LDAP record 
+# firstName, lastName, mail, sAMAccountName are taken from your LDAP record 
 AUTH_LDAP_USER_ATTR_MAP_FIRST_NAME=firstName
 AUTH_LDAP_USER_ATTR_MAP_LAST_NAME=lastName
-# This field will be used for AUTH_LDAP_USER_QUERY_FIELD as 'email'
+# Specify the field to use for AUTH_LDAP_USER_QUERY_FIELD as 'email'
 AUTH_LDAP_USER_ATTR_MAP_EMAIL=mail
-# This field will be used for AUTH_LDAP_USER_QUERY_FIELD as 'username' 
+# Specify the field to use for AUTH_LDAP_USER_QUERY_FIELD as 'username' 
 AUTH_LDAP_USER_ATTR_MAP_USERNAME=sAMAccountName
 
 # Query the authenticating user in Label Studio, it can be [email|username]
 AUTH_LDAP_USER_QUERY_FIELD=email
 
-# Map LDAP groups to specific Label Studio Enterprise roles, use ';' to specify several groups
+# Map LDAP groups to specific Label Studio Enterprise roles, using ';' to specify several groups
 AUTH_LDAP_ORGANIZATION_ROLE_ADMINISTRATOR=cn=admins,ou=users,o=123abc,dc=example,dc=com 
 AUTH_LDAP_ORGANIZATION_ROLE_MANAGER=cn=managers,ou=users,o=123abc,dc=example,dc=com 
 AUTH_LDAP_ORGANIZATION_ROLE_REVIEWER=cn=reviewers,ou=users,o=123abc,dc=example,dc=com
@@ -107,24 +107,22 @@ AUTH_LDAP_ORGANIZATION_ROLE_ANNOTATOR=cn=annotators,ou=users,o=123abc,dc=example
 AUTH_LDAP_ORGANIZATION_ROLE_NOT_ACTIVATED=cn=not,ou=users,o=123abc,dc=example,dc=com 
 AUTH_LDAP_ORGANIZATION_ROLE_DEACTIVATED=cn=deactivated,ou=users,o=123abc,dc=example,dc=com
 
-# Map LDAP groups to specific Label Studio Workspaces, 
-# use JSON where keys are workspace titles and values are LDAP groups, split groups with ';' to specify several groups 
+# Map LDAP groups to specific Label Studio workspaces
+# Use a JSON format where keys are workspace titles and values are LDAP groups. Split groups with ';' to specify several groups.
 AUTH_LDAP_ORGANIZATION_WORKSPACES='{"Workspace 1":"cn=team1,ou=users,o=60cbc901ec2e8e387a3b2d3e,dc=jumpcloud,dc=com","Workspace 2":"cn=team2,ou=users,o=60cbc901ec2e8e387a3b2d3e,dc=jumpcloud,dc=com"}'
 ```
 
-If you want to search in several groups with recursive scan (instead of simple search with AUTH_LDAP_USER_DN_TEMPLATE) 
-then you have to do as following:
-
+If you want to use a recursive scan to search in several LDAP groups to grant access to Label Studio, instead of relying on the simple search used by `AUTH_LDAP_USER_ON_TEMPLATE`, update your environment variables file like the following:
 ```bash
-# Leave this param empty
+# Leave this parameter empty
 AUTH_LDAP_USER_DN_TEMPLATE=""
-# Write all groups you want to login, split them with ';' 
+# Specify the groups that you want to be able to log in, separated by ';' 
 AUTH_LDAP_USER_SEARCH_BASES="ou=guests,dc=domain,dc=com;ou=owners,dc=domain,dc=com"
 ```
 
-## Manual member management
+### Manage user access only with LDAP
 
-If you want to leave only LDAP role & workspace management, you can setup the following:
+If you want to manage Label Studio roles and workspaces entirely with LDAP, add the following to your environment variable file:
 
 ```
 MANUAL_PROJECT_MEMBER_MANAGEMENT=0
@@ -132,4 +130,4 @@ MANUAL_WORKSPACE_MANAGEMENT=0
 MANUAL_ROLE_MANAGEMENT=0
 ```
 
-These options will completely disable API and GUI interfaces for role and workspace member assignments. 
+Setting these options disables the Label Studio API and UI options to assign roles and workspaces for specific users within Label Studio and relies entirely on the settings in the environment variable file.
