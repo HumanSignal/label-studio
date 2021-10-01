@@ -1,6 +1,6 @@
 {
-  "message": "Roll back to U instead of Alt+U",
-  "commit": "352c3e45c473a60dd13680a1ef30d9a60e42b15f",
-  "branch": "master",
-  "date": "2021-09-21T07:47:50Z"
+  "message": "[fix] store code points instead of js length",
+  "commit": "bdce096b9e442f487775c646e56d2896b30a80a3",
+  "branch": "fix/emoji",
+  "date": "2021-09-23T07:58:55Z"
 }
