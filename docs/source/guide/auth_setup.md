@@ -124,10 +124,12 @@ AUTH_LDAP_USER_SEARCH_BASES="ou=guests,dc=domain,dc=com;ou=owners,dc=domain,dc=c
 
 ## Manual member management
 
-If you want to leave only LDAP roles & workspace management, you can setup the following:
+If you want to leave only LDAP role & workspace management, you can setup the following:
 
 ```
 MANUAL_PROJECT_MEMBER_MANAGEMENT=0
 MANUAL_WORKSPACE_MANAGEMENT=0
 MANUAL_ROLE_MANAGEMENT=0
 ```
+
+These options will completely disable API and GUI interfaces for role and workspace member assignments. 
