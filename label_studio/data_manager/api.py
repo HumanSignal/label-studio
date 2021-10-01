@@ -242,7 +242,7 @@ class ViewAPI(viewsets.ModelViewSet):
             return Response(view.selected_items, status=204)
 
 
-class TaskAPI(APIView):
+class TaskAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_view
 
     def get_serializer_class(self):
@@ -260,6 +260,9 @@ class TaskAPI(APIView):
             'request': request
         }
 
+    def get_queryset(self):
+        return Task.prepared.get_queryset(all_fields=True).filter(project__organization=self.request.user.active_organization)
+
     @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request, pk):
         """
@@ -268,7 +271,7 @@ class TaskAPI(APIView):
 
         Retrieve a specific task by ID.
         """
-        task = Task.prepared.get_queryset(all_fields=True).get(id=pk)
+        task = self.get_object()
         context = self.get_serializer_context(request)
         context['project'] = project = task.project
 
