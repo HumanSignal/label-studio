@@ -354,22 +354,3 @@ def _validate_ml_api_result(ml_api_result, tasks, curr_logger):
         return False
 
     return True
-
-
-def _get_model_version(project, ml_api, curr_logger):
-    logger.debug(f'Get model version for project {project}')
-    model_version = None
-    ml_api_result = ml_api.setup(project)
-    if ml_api_result.is_error:
-        curr_logger.warning(
-            (
-                f'Project {project}: can\'t fetch last model version from {ml_api_result.url}, '
-                f'reason: {ml_api_result.error_message}.'
-            )
-        )
-    else:
-        if 'model_version' in ml_api_result.response:
-            model_version = ml_api_result.response['model_version']
-        else:
-            curr_logger.error(f'Project {project}: "model_version" field is not specified in response.')
-    return model_version
