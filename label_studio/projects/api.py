@@ -20,8 +20,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
-from core.utils.common import conditional_atomic
-from core.utils.disable_signals import DisableSignals
+from core.utils.common import conditional_atomic, temporary_disconnect_all_signals
 from core.label_config import config_essential_data_has_changed
 from projects.models import (
     Project, ProjectSummary, ProjectManager
@@ -210,7 +209,7 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
 
     def perform_destroy(self, instance):
         # we don't need to relaculate counters if we delete whole project
-        with DisableSignals():
+        with temporary_disconnect_all_signals():
             instance.delete()
 
     @swagger_auto_schema(auto_schema=None)
