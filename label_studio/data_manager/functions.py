@@ -247,7 +247,7 @@ def evaluate_predictions(tasks):
 
     for ml_backend in project.ml_backends.all():
         # tasks = tasks.filter(~Q(predictions__model_version=ml_backend.model_version))
-        ml_backend.predict_many_tasks(tasks)
+        ml_backend.predict_tasks(tasks)
 
 
 def filters_ordering_selected_items_exist(data):
