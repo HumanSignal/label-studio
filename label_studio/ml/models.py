@@ -129,7 +129,10 @@ class MLBackend(models.Model):
                 self.error_message = setup_response.error_message
             else:
                 self.state = MLBackendState.CONNECTED
-                self.model_version = setup_response.response.get('model_version')
+                model_version = setup_response.response.get('model_version')
+                self.model_version = model_version
+                self.project.model_version = model_version
+                self.project.save()
                 self.error_message = None
         self.save()
 
@@ -145,7 +148,7 @@ class MLBackend(models.Model):
                 MLBackendTrainJob.objects.create(job_id=current_train_job, ml_backend=self)
         self.save()
 
-    def predict_many_tasks(self, tasks):
+    def predict_tasks(self, tasks):
         self.update_state()
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready')
@@ -179,7 +182,7 @@ class MLBackend(models.Model):
                 f"switched to one-by-one task retrieval"
             )
             for task in tasks:
-                self.predict_one_task(task)
+                self.__predict_one_task(task)
             return
 
         # wrong result number
@@ -208,7 +211,7 @@ class MLBackend(models.Model):
             prediction_ser.is_valid(raise_exception=True)
             prediction_ser.save()
 
-    def predict_one_task(self, task):
+    def __predict_one_task(self, task):
         self.update_state()
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready to predict {task}')
