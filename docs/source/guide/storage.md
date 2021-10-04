@@ -107,8 +107,6 @@ After adding the storage, click **Sync** to collect tasks from the bucket, or ma
 
 If you want to use a revocable method to grant Label Studio access to your Amazon S3 bucket, use an IAM role and its temporary security credentials instead of an access key ID and secret. This added layer of security is only available in Label Studio Enterprise. For more details about security in Label Studio and Label Studio Enterprise, see [Secure Label Studio](security.html).
 
-> Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
-
 #### Set up an IAM role in Amazon AWS
 Set up an IAM role in Amazon AWS to use with Label Studio.
 
