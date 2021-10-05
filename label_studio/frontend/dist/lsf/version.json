@@ -1,6 +1,6 @@
 {
-  "message": "[fix] expand subtrees with selected nodes",
-  "commit": "afed2128398c8a0d5b17ea9635d64c1885dcf6d2",
-  "branch": "master",
-  "date": "2021-09-29T18:24:40Z"
+  "message": "[fix] children -> value convertion for any tag\n\nfixes <Header>Test</Header> for example",
+  "commit": "20dd70036b7f746df6be958f6eaf78ef5c613a22",
+  "branch": "fix/tree-hypertext",
+  "date": "2021-10-05T17:18:04Z"
 }
