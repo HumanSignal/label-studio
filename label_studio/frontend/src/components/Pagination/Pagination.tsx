@@ -1,22 +1,28 @@
-import React, { FC, forwardRef, useCallback, useMemo, useState } from "react";
+import React, { FC, forwardRef, useCallback, useEffect, useMemo, useState } from "react";
 import { Block, Elem } from "../../utils/bem";
 import { clamp, isDefined } from "../../utils/helpers";
 import { useValueTracker } from "../Form/Utils";
+import { Select } from '../Form/Elements';
 import "./Pagination.styl";
+import { useFirstMountState, useUpdateEffect } from "../../utils/hooks";
 
 interface PaginationProps {
+  name?: string
   page: number,
   totalPages: number,
-  itemsPerPage: number,
+  pageSize: number,
   totalItems: number,
   label?: string,
   allowInput?: boolean,
   allowRewind?: boolean,
   disabled?: boolean,
   waiting?: boolean,
+  urlParamName?: string,
+  pageSizeOptions?: number[],
   size?: "small" | "medium" | "large"
-  onChange?: (pageNumber: number) => void
-  onPageLoad?: (pageNumber: number) => Promise<void>
+  onInit?: (pageNumber: number, pageSize: number) => void
+  onChange?: (pageNumber: number, pageSize: number) => void
+  onPageLoad?: (pageNumber: number, pageSize: number) => Promise<void>
 }
 
 const isSystemEvent = (e: React.KeyboardEvent<HTMLInputElement>): boolean => {
@@ -27,47 +33,86 @@ const isSystemEvent = (e: React.KeyboardEvent<HTMLInputElement>): boolean => {
   );
 };
 
+const getStoredPageSize = (name?: string): number | undefined => {
+  const value = localStorage.getItem(`pages:${name}`);
+
+  if (isDefined(value)) {
+    return parseInt(value);
+  }
+
+  return undefined;
+};
+
+const setStoredPageSize = (name: string, pageSize: number) => {
+  localStorage.setItem(`pages:${name}`, pageSize.toString());
+};
+
 export const Pagination: FC<PaginationProps> = forwardRef(({
   allowInput = true,
   allowRewind = true,
   disabled = false,
   size = "medium",
+  pageSizeOptions = [],
   ...props
 }, ref) => {
   const [inputMode, setInputMode] = useState(false);
   const [currentPage, setCurrentPage] = useValueTracker(props.page);
   const [waiting, setWaiting] = useValueTracker(props.waiting);
+  const [pageSize, setPageSize] = useValueTracker(props.pageSize, getStoredPageSize(props.name));
 
   const totalPages = useMemo(() => {
-    return props.totalPages ?? Math.ceil(props.totalItems / props.itemsPerPage);
-  }, [props.itemsPerPage, props.totalItems, props.totalPages]);
+    return props.totalPages ?? Math.ceil(props.totalItems / pageSize);
+  }, [pageSize, props.totalItems, props.totalPages]);
 
   const visibleItems = useMemo(() => {
-    const { itemsPerPage, totalItems } = props;
-    const start = (itemsPerPage * currentPage - itemsPerPage) + 1;
-    const end = start + itemsPerPage - 1;
+    const { totalItems } = props;
+    const start = (pageSize * currentPage - pageSize) + 1;
+    const end = start + pageSize - 1;
 
     return {
       start: clamp(start, 1, totalItems),
       end: clamp(end, 1, totalItems),
     };
-  }, [currentPage, totalPages, props.itemsPerPage, props.totalItems]);
+  }, [currentPage, totalPages, pageSize, props.totalItems]);
 
-  const setPageClamped = useCallback((value: number) => {
+  const handlePageLoad = useCallback(async (pageNumber: number, pageSize: number) => {
+    if (props.onPageLoad) {
+      setWaiting(true);
+      await props.onPageLoad(pageNumber, pageSize);
+      setWaiting(false);
+    }
+  }, [props.onPageLoad]);
+
+  const setPageClamped = useCallback((value: number, force = false) => {
     const pageNumber = clamp(value, 1, totalPages);
 
-    if (pageNumber !== currentPage) {
+    if (pageNumber !== currentPage || force === true) {
       setCurrentPage(pageNumber);
-      props.onChange?.(pageNumber);
-
-      if (props.onPageLoad) {
-        setWaiting(true);
-        props.onPageLoad(pageNumber).then(() => {
-          setWaiting(false);
-        });
-      }
+      updateURL(pageNumber);
     }
-  }, [totalPages, currentPage]);
+  }, [totalPages, currentPage, pageSize, handlePageLoad]);
+
+  const updateURL = useCallback((page: number, options: {
+    replace?: boolean
+  } = {}) => {
+    if (!props.urlParamName) return;
+
+    const urlParams = new URLSearchParams(location.search);
+
+    urlParams.set(props.urlParamName, page.toString());
+
+    const historyArgs: [any, string, string] = [
+      { page },
+      "",
+      `${location.pathname}?${urlParams.toString()}`,
+    ];
+
+    if (options.replace) {
+      history.replaceState(...historyArgs);
+    } else {
+      history.pushState(...historyArgs);
+    }
+  }, [props.urlParamName]);
 
   const applyPageNumberFromEvent = (e: React.KeyboardEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>) => {
     const result = parseInt((e.target as HTMLInputElement).value);
@@ -76,9 +121,47 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
     setInputMode(false);
   };
 
+  useEffect(() => {
+    props.onInit?.(currentPage, pageSize);
+    updateURL(currentPage, { replace: true });
+  }, []);
+
+  useUpdateEffect(() => {
+    if (currentPage > totalPages) {
+      setPageClamped(1, true);
+    } else {
+      props.onChange?.(currentPage, pageSize);
+
+      handlePageLoad(currentPage, pageSize);
+    }
+  }, [pageSize, totalPages]);
+
+  useUpdateEffect(() => {
+    props.onChange?.(currentPage, pageSize);
+
+    handlePageLoad(currentPage, pageSize);
+  }, [currentPage]);
+
+  useEffect(() => {
+    const popStateHandler = () => {
+      if (!props.urlParamName) return;
+
+      const urlParams = new URLSearchParams(location.search);
+      const pageNumberFromURL = parseInt(urlParams.get(props.urlParamName) ?? "");
+
+      if (!isNaN(pageNumberFromURL) && pageNumberFromURL !== currentPage) {
+        setCurrentPage(pageNumberFromURL);
+      }
+    };
+
+    window.addEventListener('popstate', popStateHandler);
+
+    return () => window.removeEventListener('popstate', popStateHandler);
+  }, [props.urlParamName]);
+
   return (
     <Block name="pagination" mod={{ disabled, size, waiting }}>
-      {(props.label && isDefined(props.itemsPerPage)) && (
+      {(props.label && isDefined(pageSize)) && (
         <Elem name="label">
           {props.label}: {visibleItems.start}-{visibleItems.end}
         </Elem>
@@ -148,6 +231,24 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
           </>
         )}
       </Elem>
+
+      {pageSizeOptions?.length > 0 && (
+        <Elem name="page-size">
+          <Select
+            value={pageSize}
+            options={pageSizeOptions.map(v => ({ label: `${v} per page`, value: v }))}
+            onChange={(e: any) => {
+              const newPageSize = parseInt(e.target.value);
+
+              setPageSize(newPageSize);
+
+              if (props.name) {
+                setStoredPageSize(props.name, newPageSize);
+              }
+            }}
+          />
+        </Elem>
+      )}
     </Block>
   );
 });

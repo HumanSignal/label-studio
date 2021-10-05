@@ -24,7 +24,7 @@ export const unique = <T>(list: T[] | undefined, expression: Uniqueness<T>): T[]
   }, []);
 };
 
-export const isDefined = <T>(value: T | undefined): value is T => {
+export const isDefined = <T>(value: T | null | undefined): value is T => {
   return value !== null && value !== undefined;
 };
 

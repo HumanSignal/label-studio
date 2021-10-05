@@ -17,11 +17,13 @@ export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage }
       </Elem>
       <Elem name="pages">
         <Pagination
+          name="projects-list"
           label="Projects"
           page={currentPage}
           totalItems={totalItems}
-          itemsPerPage={30}
-          onPageLoad={(page) => loadNextPage(page)}
+          urlParamName="page"
+          pageSizeOptions={[2, 30, 50, 100]}
+          onPageLoad={(page, pageSize) => loadNextPage(page, pageSize)}
         />
       </Elem>
     </>

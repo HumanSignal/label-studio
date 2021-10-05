@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams as useRouterParams } from 'react-router';
 import { Redirect } from 'react-router-dom';
 import { Button } from '../../components';
@@ -7,28 +7,36 @@ import { Spinner } from '../../components/Spinner/Spinner';
 import { ApiContext } from '../../providers/ApiProvider';
 import { useContextProps } from '../../providers/RoutesProvider';
 import { Block, Elem } from '../../utils/bem';
+import { isDefined } from '../../utils/helpers';
 import { CreateProject } from '../CreateProject/CreateProject';
 import { DataManagerPage } from '../DataManager/DataManager';
 import { SettingsPage } from '../Settings';
 import './Projects.styl';
 import { EmptyProjectsList, ProjectsList } from './ProjectsList';
 
+const getCurrentPage = () => {
+  const pageNumberFromURL = new URLSearchParams(location.search).get("page");
+
+  return pageNumberFromURL ? parseInt(pageNumberFromURL) : 1;
+};
+
 export const ProjectsPage = () => {
   const api = React.useContext(ApiContext);
   const [projectsList, setProjectsList] = React.useState([]);
   const [networkState, setNetworkState] = React.useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(getCurrentPage());
   const [totalItems, setTotalItems] = useState(1);
   const setContextProps = useContextProps();
+  const defaultPageSize = parseInt(localStorage.getItem('pages:projects-list') ?? 30);
 
   const [modal, setModal] = React.useState(false);
   const openModal = setModal.bind(null, true);
   const closeModal = setModal.bind(null, false);
 
-  const fetchProjects = async (page  = 1) => {
+  const fetchProjects = async (page  = currentPage, pageSize = defaultPageSize) => {
     setNetworkState('loading');
     const data = await api.callApi("projects", {
-      params: { page },
+      params: { page, page_size: pageSize },
     });
 
     setTotalItems(data?.count ?? 1);
@@ -36,9 +44,9 @@ export const ProjectsPage = () => {
     setNetworkState('loaded');
   };
 
-  const loadNextPage = async (page) => {
+  const loadNextPage = async (page, pageSize) => {
     setCurrentPage(page);
-    await fetchProjects(page);
+    await fetchProjects(page, pageSize);
   };
 
   React.useEffect(() => {
@@ -58,16 +66,16 @@ export const ProjectsPage = () => {
           <Spinner size={64}/>
         </Elem>
         <Elem name="content" case="loaded">
-          {projectsList.length
-            ? (
-              <ProjectsList
-                projects={projectsList}
-                currentPage={currentPage}
-                totalItems={totalItems}
-                loadNextPage={loadNextPage}
-              />
-            ) : <EmptyProjectsList openModal={openModal} />
-          }
+          {projectsList.length ? (
+            <ProjectsList
+              projects={projectsList}
+              currentPage={currentPage}
+              totalItems={totalItems}
+              loadNextPage={loadNextPage}
+            />
+          ) : (
+            <EmptyProjectsList openModal={openModal} />
+          )}
           {modal && <CreateProject onClose={closeModal} />}
         </Elem>
       </Oneof>
