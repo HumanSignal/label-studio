@@ -58,7 +58,10 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
   const [inputMode, setInputMode] = useState(false);
   const [currentPage, setCurrentPage] = useValueTracker(props.page);
   const [waiting, setWaiting] = useValueTracker(props.waiting);
-  const [pageSize, setPageSize] = useValueTracker(props.pageSize, getStoredPageSize(props.name));
+  const [pageSize, setPageSize] = useValueTracker(
+    props.pageSize,
+    getStoredPageSize(props.name) ?? pageSizeOptions?.[0] ?? 10,
+  );
 
   const totalPages = useMemo(() => {
     return props.totalPages ?? Math.ceil(props.totalItems / pageSize);

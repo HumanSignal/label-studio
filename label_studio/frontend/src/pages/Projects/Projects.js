@@ -72,6 +72,7 @@ export const ProjectsPage = () => {
               currentPage={currentPage}
               totalItems={totalItems}
               loadNextPage={loadNextPage}
+              pageSize={defaultPageSize}
             />
           ) : (
             <EmptyProjectsList openModal={openModal} />

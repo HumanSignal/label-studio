@@ -7,7 +7,7 @@ import { Button, Dropdown, Menu, Pagination, Userpic } from '../../components';
 import { Block, Elem } from '../../utils/bem';
 import { absoluteURL } from '../../utils/helpers';
 
-export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage }) => {
+export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, pageSize }) => {
   return (
     <>
       <Elem name="list">
@@ -22,7 +22,8 @@ export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage }
           page={currentPage}
           totalItems={totalItems}
           urlParamName="page"
-          pageSizeOptions={[2, 30, 50, 100]}
+          pageSize={pageSize}
+          pageSizeOptions={[10, 30, 50, 100]}
           onPageLoad={(page, pageSize) => loadNextPage(page, pageSize)}
         />
       </Elem>

@@ -5,7 +5,7 @@ export const useValueTracker = <T>(
   defaultValue?: T,
 ): [T, Dispatch<SetStateAction<T>>] => {
   const initialValue = useMemo(() => {
-    return (defaultValue ?? value ?? "") as T;
+    return (value ?? defaultValue ?? "") as T;
   }, [value, defaultValue]);
 
   const [finalValue, setValue] = useState<T>(initialValue);
