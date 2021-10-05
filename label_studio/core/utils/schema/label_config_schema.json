@@ -75,7 +75,7 @@
         "Label": {"$ref": "#/definitions/MaybeMultipleLabel"},
         "Choice": {"$ref": "#/definitions/MaybeMultipleChoice"},
         "Image": {"$ref": "#/definitions/tags_with_value_required_name"},
-        "Text": {"$ref": "#/definitions/tags_with_value_required_name"},
+        "Text": {"$ref": "#/definitions/tags_with_value_or_object"},
         "HyperText": {"$ref": "#/definitions/tags_with_value_or_object"},
         "View": {"$ref": "#/definitions/MaybeMultipleView"}
       }
@@ -170,7 +170,7 @@
         "Labels": {"$ref": "#/definitions/MaybeMultipleLabels"},
         "View": {"$ref": "#/definitions/MaybeMultipleView"},
         "Image": {"$ref": "#/definitions/tags_with_value_required_name"},
-        "Text": {"$ref": "#/definitions/tags_with_value_required_name"},
+        "Text": {"$ref": "#/definitions/tags_with_value_or_object"},
         "HyperText": {"$ref": "#/definitions/tags_with_value_or_object"}
       }
     }
