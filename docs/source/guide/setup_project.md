@@ -146,7 +146,7 @@ Review settings and the review stream are only available in Label Studio Enterpr
 In the project settings, you can add instructions and choose whether to show the instructions to reviewers before they start reviewing annotated tasks. 
 
 1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Review Settings**. 
+2. Click **Review**. 
 3. Type instructions and choose whether to show the instructions to reviewers before reviewing annotated tasks. If you want to provide additional details or links for reference, instructions support HTML markup.
 4. Click **Save**. <br/>Click **Data Manager** to return to the data manager view. 
 
@@ -155,7 +155,7 @@ In the project settings, you can add instructions and choose whether to show the
 Configure the reviewing settings for your project.
 
 1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Review Settings**. 
+2. Click **Review**. 
 3. Under **Reviewing Options**, choose whether to mark a task as reviewed if at least one annotation has been reviewed, or only after all annotations for a task have been processed.
 4. Under **Reviewing Options**, choose whether to anonymize annotators when reviewing tasks. 
 Your changes save automatically.
