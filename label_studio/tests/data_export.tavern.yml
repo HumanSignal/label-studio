@@ -34,7 +34,7 @@ stages:
       url: "{django_live_url}/api/auth/export/"
     response:
       status_code: 200
----
+# ---
 # test_name: crud export
 # strict: false
 # marks:
