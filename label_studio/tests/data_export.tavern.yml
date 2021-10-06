@@ -55,7 +55,8 @@ stages:
       status_code: 201
       json:
         id: !anyint
-        created_by: !anyint
+        title: !anystr
+        created_by: !anydict
         counters: !anydict
         md5: !anystr
         created_at: !anystr
@@ -72,7 +73,8 @@ stages:
       status_code: 200
       json:
         - id: !anyint
-          created_by: !anyint
+          title: !anystr
+          created_by: !anydict
           counters: !anydict
           md5: !anystr
           created_at: !anystr
@@ -86,7 +88,8 @@ stages:
       status_code: 200
       json:
         id: !anyint
-        created_by: !anyint
+        title: !anystr
+        created_by: !anydict
         counters: !anydict
         md5: !anystr
         created_at: !anystr
@@ -126,10 +129,13 @@ stages:
       json:
         task_filter_options:
           view: 1
-          skipped: 'only'
-          finished: 'exclude'
+          skipped: "only"
+          finished: "exclude"
+          annotated: "only"
         annotation_filter_options:
-          ground_truth: 'exclude'
+          ground_truth: true
+          usual: true
+          skipped: true
         serialization_options:
           drafts:
             only_id: true
@@ -141,7 +147,8 @@ stages:
       status_code: 201
       json:
         id: !anyint
-        created_by: !anyint
+        title: !anystr
+        created_by: !anydict
         counters: !anydict
         md5: !anystr
         created_at: !anystr
