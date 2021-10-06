@@ -48,6 +48,8 @@ class FileUpload(models.Model):
 
     @property
     def format(self):
+        print('======> ', self.file.name)
+        print('======> ', self.file.path)
         filepath = self.file.path
         try:
             file_format = os.path.splitext(filepath)[-1]
