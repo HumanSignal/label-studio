@@ -116,7 +116,10 @@ nginx:
 
 ## Run Label Studio on Docker with a host and sub-path
 
-To run Label Studio on Docker with a host and sub-path, you can refer to the example `deploy/dockerfiles/subpath.example.yml` Docker YAML file. To customize it for your environment, manually modify the `nginx/subpath.example.simple.conf` NGINX configuration file, the relevant Label Studio environment variables, and the PostgreSQL database settings for your environment. 
+To run Label Studio on Docker with a host and sub-path, you can refer to the example of nginx config `deploy/nginx/subpath.example.conf`. Just modify this NGINX configuration file and replace all entries of `/foo` to required sub-path. Also, it's necessary to pass new config file and `LABEL_STUDIO_HOST` env variable with sub-path to docker-compose:
+```
+NGINX_FILE=subpath.example.conf LABEL_STUDIO_HOST=http://localhost:8080/foo docker-compose up -d
+```
 
 ## Run Label Studio on Docker and use local storage
 To run Label Studio on Docker and reference persistent local storage directories, mount those directories as volumes when you start Label Studio and specify any environment variables you need.
