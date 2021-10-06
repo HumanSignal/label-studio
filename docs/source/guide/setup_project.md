@@ -79,7 +79,7 @@ Your changes save automatically.
 By default, each task only needs to be annotated by one annotator. If you want multiple annotators to be able to annotate tasks, set the Overlap of Annotations for a project in the project settings.
 
 1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Annotation Settings**.
+2. Click **Quality**.
 3. Under **Overlap of Annotations**, select the number of minimum annotations for a task. 
 4. Choose whether to enforce the overlap for the default of 100% of tasks, or a smaller percentage. 
 5. Choose whether to show tasks that require multiple annotations, **tasks with overlap**, before other tasks that need to be annotated. 
@@ -127,7 +127,7 @@ In Label Studio Community Edition, you can set up task sampling from the command
 Annotation statistics such as annotator consensus are calculated using a matching score. If you want the matching score to calculate matches by requiring exact matching choices, choose that option in the annotation settings. For more about matching scores and functions in Label Studio Enterprise, see [Annotation statistics](stats.html).
 
 1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Annotation Settings**.
+2. Click **Quality**.
 3. Under **Matching Function**, select **Exact matching choices**.
 4. For some types of labeling, you can also select a specific matching function. 
 
