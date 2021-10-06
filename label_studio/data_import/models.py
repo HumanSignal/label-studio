@@ -48,15 +48,14 @@ class FileUpload(models.Model):
 
     @property
     def format(self):
-        print('======> ', self.file.name)
-        print('======> ', self.file.path)
-        filepath = self.file.path
+        filepath = self.file.name
+        file_format = None
         try:
             file_format = os.path.splitext(filepath)[-1]
         except:
-            file_format = None
+            pass
         finally:
-            logger.debug('Get file format ' + file_format)
+            logger.debug('Get file format ' + str(file_format))
         return file_format
 
     @property
