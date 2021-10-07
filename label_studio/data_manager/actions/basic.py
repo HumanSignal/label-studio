@@ -143,7 +143,7 @@ actions = [
     {
         'entry_point': predictions_to_annotations,
         'permission': all_permissions.tasks_change,
-        'title': 'Convert Predictions to Annotations',
+        'title': 'Create Annotations From Predictions',
         'order': 90,
         'dialog': {
             'text': 'This action will create a new annotation from predictions with the current project model version '
