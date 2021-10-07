@@ -40,10 +40,14 @@ logger = logging.getLogger(__name__)
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'id': openapi.Schema(
+                'project': openapi.Schema(
                     type=openapi.TYPE_INTEGER,
                     description='Project ID'
-                )
+                ),
+                'url': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='ML backend URL'
+                ),
             },
         ),
     ),
@@ -61,6 +65,13 @@ logger = logging.getLogger(__name__)
     """.format(
             host=(settings.HOSTNAME or 'https://localhost:8080')
         ),
+        manual_parameters=[
+            openapi.Parameter(
+                name='project',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                description='Project ID'),
+        ],
     ))
 class MLBackendListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
@@ -164,7 +175,7 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='Machine Learning backend ID.'),
+                description='Machine Learning backend ID'),
         ],
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -208,8 +219,15 @@ class MLBackendTrainAPI(APIView):
         operation_description="""
         Send a request to the machine learning backend set up to be used for interactive preannotations to retrieve a
         predicted region based on annotator input. 
-        See [set up machine learning](ml.html#Get-interactive-preannotations) for more.
+        See [set up machine learning](labelstud.io/guide/ml.html#Get-interactive-preannotations) for more.
         """,
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='Machine Learning backend ID'),
+        ],
         request_body=MLInteractiveAnnotatingRequest,
         responses={
             200: openapi.Response(title='Annotating OK', description='Interactive annotation has succeeded.'),
