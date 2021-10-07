@@ -134,15 +134,13 @@ class ViewAPI(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    @swagger_auto_schema(tags=['Data Manager'])
+    @swagger_auto_schema(
+        tags=['Data Manager'],
+        operation_summary="Reset project views",
+        operation_description="Reset all views for a specific project.",
+    )
     @action(detail=False, methods=['delete'])
     def reset(self, request):
-        """
-        delete:
-        Reset project views
-
-        Reset all views for a specific project.
-        """
         serializer = ViewResetSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=serializer.validated_data['project'].id)
@@ -357,17 +355,15 @@ class TaskAPI(generics.RetrieveAPIView):
         return Response(data)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Data Manager'],
+    operation_summary='Get data manager columns',
+    operation_description='Retrieve the data manager columns available for the tasks in a specific project.',
+))
 class ProjectColumnsAPI(APIView):
     permission_required = all_permissions.projects_view
 
-    @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request):
-        """
-        get:
-        Get data manager columns
-
-        Retrieve the data manager columns available for the tasks in a specific project.
-        """
         pk = int_from_request(request.GET, "project", 1)
         project = get_object_with_check_and_log(request, Project, pk=pk)
         self.check_object_permissions(request, project)
@@ -376,17 +372,15 @@ class ProjectColumnsAPI(APIView):
         return Response(data)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Data Manager'],
+    operation_summary='Get project state',
+    operation_description='Retrieve the project state for the data manager.',
+))
 class ProjectStateAPI(APIView):
     permission_required = all_permissions.projects_view
 
-    @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request):
-        """
-        get:
-        Project state
-
-        Retrieve the project state for data manager.
-        """
         pk = int_from_request(request.GET, "project", 1)  # replace 1 to None, it's for debug only
         project = get_object_with_check_and_log(request, Project, pk=pk)
         self.check_object_permissions(request, project)
@@ -407,33 +401,29 @@ class ProjectStateAPI(APIView):
         return Response(data)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Data Manager'],
+    operation_summary='Get actions',
+    operation_description='Retrieve all the registered actions with descriptions that data manager can use.',
+))
+@method_decorator(name='post', decorator=swagger_auto_schema(
+    tags=['Data Manager'],
+    operation_summary='Post actions',
+    operation_description='Perform an action with the selected items from a specific view.',
+))
 class ProjectActionsAPI(APIView):
     permission_required = ViewClassPermission(
         GET=all_permissions.projects_view,
         POST=all_permissions.projects_view,
     )
 
-    @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request):
-        """
-        get:
-        Get actions
-
-        Retrieve all the registered actions with descriptions that data manager can use.
-        """
         pk = int_from_request(request.GET, "project", 1)  # replace 1 to None, it's for debug only
         project = get_object_with_check_and_log(request, Project, pk=pk)
         self.check_object_permissions(request, project)
         return Response(get_all_actions(request.user))
 
-    @swagger_auto_schema(tags=["Data Manager"])
     def post(self, request):
-        """
-        post:
-        Post actions
-
-        Perform an action with the selected items from a specific view.
-        """
         pk = int_from_request(request.GET, "project", None)
         project = get_object_with_check_and_log(request, Project, pk=pk)
         self.check_object_permissions(request, project)
