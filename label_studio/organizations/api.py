@@ -69,7 +69,7 @@ class OrganizationListAPI(generics.ListCreateAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='Organization ID.'),
+                description='A unique integer value identifying this organization.'),
         ],
     ))
 class OrganizationMemberListAPI(generics.ListAPIView):
