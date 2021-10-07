@@ -30,34 +30,12 @@ from data_manager.actions import get_all_actions, perform_action
 logger = logging.getLogger(__name__)
 
 
-class TaskPagination(PageNumberPagination):
-    page_size = 100
-    page_size_query_param = "page_size"
-    total_annotations = 0
-    total_predictions = 0
-
-    def paginate_queryset(self, queryset, request, view=None):
-        self.total_predictions = Prediction.objects.filter(task_id__in=queryset).count()
-        self.total_annotations = Annotation.objects.filter(task_id__in=queryset, was_cancelled=False).count()
-        return super().paginate_queryset(queryset, request, view)
-
-    def get_paginated_response(self, data):
-        return Response(
-            {
-                "total_annotations": self.total_annotations,
-                "total_predictions": self.total_predictions,
-                "total": self.page.paginator.count,
-                "tasks": data,
-            }
-        )
-
-
 @method_decorator(name='list', decorator=swagger_auto_schema(
     tags=['Data Manager'], operation_summary="List views",
     operation_description="List all views for a specific project."))
 @method_decorator(name='create', decorator=swagger_auto_schema(
     tags=['Data Manager'], operation_summary="Create view",
-    operation_description="Create a view for a speicfic project."))
+    operation_description="Create a view for a specific project."))
 @method_decorator(name='retrieve', decorator=swagger_auto_schema(
     tags=['Data Manager'], operation_summary="Get view",
     operation_description="Get all views for a specific project."))
@@ -74,14 +52,6 @@ class ViewAPI(viewsets.ModelViewSet):
     serializer_class = ViewSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["project"]
-    task_serializer_class = DataManagerTaskSerializer
-    permission_required = ViewClassPermission(
-        GET=all_permissions.tasks_view,
-        POST=all_permissions.tasks_change,
-        PATCH=all_permissions.tasks_change,
-        PUT=all_permissions.tasks_change,
-        DELETE=all_permissions.tasks_delete,
-    )
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -104,76 +74,6 @@ class ViewAPI(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return View.objects.filter(project__organization=self.request.user.active_organization)
-
-    @staticmethod
-    def get_task_serializer_context(request, project):
-        storage = find_first_many_to_one_related_field_by_prefix(project, '.*io_storages.*')
-        resolve_uri = True
-        if not storage and not project.task_data_login and not project.task_data_password:
-            resolve_uri = False
-
-        all_fields = request.GET.get('fields', None) == 'all'  # false by default
-
-        return {
-            'proxy': bool_from_request(request.GET, 'proxy', True),
-            'resolve_uri': resolve_uri,
-            'request': request,
-            'project': project,
-            'drafts': all_fields,
-            'predictions': all_fields,
-            'annotations': all_fields
-        }
-
-    def get_task_queryset(self, request, view):
-        return Task.prepared.only_filtered(prepare_params=view.get_prepare_tasks_params())
-
-    @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
-    @action(detail=True, methods=["get"])
-    def tasks(self, request, pk=None):
-        """
-        get:
-        Get task list for view
-
-        Retrieve a list of tasks with pagination for a specific view using filters and ordering.
-        """
-        view = self.get_object()
-        queryset = self.get_task_queryset(request, view)
-        project = view.project
-        context = self.get_task_serializer_context(self.request, project)
-
-        # paginated tasks
-        self.pagination_class = TaskPagination
-        page = self.paginate_queryset(queryset)
-        all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
-        fields_for_evaluation = get_fields_for_evaluation(view.get_prepare_tasks_params(), request.user)
-        if page is not None:
-            ids = [task.id for task in page]  # page is a list already
-            tasks = list(
-                Task.prepared.annotate_queryset(
-                    Task.objects.filter(id__in=ids),
-                    fields_for_evaluation=fields_for_evaluation,
-                    all_fields=all_fields,
-                )
-            )
-            tasks_by_ids = {task.id: task for task in tasks}
-
-            # keep ids ordering
-            page = [tasks_by_ids[_id] for _id in ids]
-
-            # retrieve ML predictions if tasks don't have them
-            if project.evaluate_predictions_automatically:
-                tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
-                evaluate_predictions(tasks_for_predictions)
-
-            serializer = self.task_serializer_class(page, many=True, context=context)
-            return self.get_paginated_response(serializer.data)
-
-        # all tasks
-        if project.evaluate_predictions_automatically:
-            evaluate_predictions(queryset.filter(predictions__isnull=True))
-        queryset = Task.prepared.annotate_queryset(queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields)
-        serializer = self.task_serializer_class(queryset, many=True, context=context)
-        return Response(serializer.data)
 
     @swagger_auto_schema(tags=['Data Manager'], methods=["get", "post", "delete", "patch"])
     @action(detail=True, url_path="selected-items", methods=["get", "post", "delete", "patch"])
@@ -240,6 +140,112 @@ class ViewAPI(viewsets.ModelViewSet):
             view.selected_items[key] = list(result)
             view.save(update_fields=["selected_items"])
             return Response(view.selected_items, status=204)
+
+
+class TaskPagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = "page_size"
+    total_annotations = 0
+    total_predictions = 0
+
+    def paginate_queryset(self, queryset, request, view=None):
+        self.total_predictions = Prediction.objects.filter(task_id__in=queryset).count()
+        self.total_annotations = Annotation.objects.filter(task_id__in=queryset, was_cancelled=False).count()
+        return super().paginate_queryset(queryset, request, view)
+
+    def get_paginated_response(self, data):
+        return Response(
+            {
+                "total_annotations": self.total_annotations,
+                "total_predictions": self.total_predictions,
+                "total": self.page.paginator.count,
+                "tasks": data,
+            }
+        )
+
+
+class TaskListAPI(generics.ListAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["project"]
+    task_serializer_class = DataManagerTaskSerializer
+    permission_required = ViewClassPermission(
+        GET=all_permissions.tasks_view,
+        POST=all_permissions.tasks_change,
+        PATCH=all_permissions.tasks_change,
+        PUT=all_permissions.tasks_change,
+        DELETE=all_permissions.tasks_delete,
+    )
+
+    @staticmethod
+    def get_task_serializer_context(request, project):
+        storage = find_first_many_to_one_related_field_by_prefix(project, '.*io_storages.*')
+        resolve_uri = True
+        if not storage and not project.task_data_login and not project.task_data_password:
+            resolve_uri = False
+
+        all_fields = request.GET.get('fields', None) == 'all'  # false by default
+
+        return {
+            'proxy': bool_from_request(request.GET, 'proxy', True),
+            'resolve_uri': resolve_uri,
+            'request': request,
+            'project': project,
+            'drafts': all_fields,
+            'predictions': all_fields,
+            'annotations': all_fields
+        }
+
+    def get_task_queryset(self, request, view):
+        return Task.prepared.only_filtered(prepare_params=view.get_prepare_tasks_params())
+
+    @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
+    def get(self, request, pk=None):
+        """
+        get:
+        Get task list for view
+
+        Retrieve a list of tasks with pagination for a specific view using filters and ordering.
+        """
+        view = self.get_object()
+        queryset = self.get_task_queryset(request, view)
+        project = view.project
+        context = self.get_task_serializer_context(self.request, project)
+
+        # paginated tasks
+        self.pagination_class = TaskPagination
+        page = self.paginate_queryset(queryset)
+        all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
+        fields_for_evaluation = get_fields_for_evaluation(view.get_prepare_tasks_params(), request.user)
+        if page is not None:
+            ids = [task.id for task in page]  # page is a list already
+            tasks = list(
+                Task.prepared.annotate_queryset(
+                    Task.objects.filter(id__in=ids),
+                    fields_for_evaluation=fields_for_evaluation,
+                    all_fields=all_fields,
+                )
+            )
+            tasks_by_ids = {task.id: task for task in tasks}
+
+            # keep ids ordering
+            page = [tasks_by_ids[_id] for _id in ids]
+
+            # retrieve ML predictions if tasks don't have them
+            if project.evaluate_predictions_automatically:
+                tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
+                evaluate_predictions(tasks_for_predictions)
+
+            serializer = self.task_serializer_class(page, many=True, context=context)
+            return self.get_paginated_response(serializer.data)
+
+        # all tasks
+        if project.evaluate_predictions_automatically:
+            evaluate_predictions(queryset.filter(predictions__isnull=True))
+        queryset = Task.prepared.annotate_queryset(
+            queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields
+        )
+        serializer = self.task_serializer_class(queryset, many=True, context=context)
+        return Response(serializer.data)
 
 
 class TaskAPI(generics.RetrieveAPIView):
