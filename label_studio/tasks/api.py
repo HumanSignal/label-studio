@@ -73,8 +73,12 @@ class TaskListAPI(generics.ListCreateAPIView):
         Get task data, metadata, annotations and other attributes for a specific labeling task by task ID.
         """,
         manual_parameters=[
-            openapi.Parameter(name='proxy', type=openapi.TYPE_BOOLEAN, in_=openapi.IN_QUERY,
-                          description='Use the proxy parameter inline for credential access to task data')
+            openapi.Parameter(
+                name='proxy',
+                type=openapi.TYPE_BOOLEAN,
+                in_=openapi.IN_QUERY,
+                description='Use the proxy parameter inline for credential access to task data'
+            ),
         ]))
 @method_decorator(name='patch', decorator=swagger_auto_schema(
         tags=['Tasks'],
@@ -204,7 +208,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='Task ID.'),
+                description='Task ID'),
         ],
         ))
 @method_decorator(name='post', decorator=swagger_auto_schema(
@@ -231,7 +235,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='Task ID.'),
+                description='Task ID'),
         ],
         request_body=AnnotationSerializer
         ))
@@ -358,7 +362,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
 @method_decorator(name='create', decorator=swagger_auto_schema(
     tags=['Predictions'],
     operation_summary="Create prediction",
-    operation_description="Create a prediction.",
+    operation_description="Create a prediction for a specific task.",
 ))
 @method_decorator(name='retrieve', decorator=swagger_auto_schema(
     tags=['Predictions'],
@@ -369,7 +373,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
             name='id',
             type=openapi.TYPE_INTEGER,
             in_=openapi.IN_PATH,
-            description='Prediction ID.'),
+            description='Prediction ID'),
     ],
 ))
 @method_decorator(name='update', decorator=swagger_auto_schema(
@@ -381,7 +385,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
             name='id',
             type=openapi.TYPE_INTEGER,
             in_=openapi.IN_PATH,
-            description='Prediction ID.'),
+            description='Prediction ID'),
     ],
 ))
 @method_decorator(name='partial_update', decorator=swagger_auto_schema(
@@ -393,7 +397,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
             name='id',
             type=openapi.TYPE_INTEGER,
             in_=openapi.IN_PATH,
-            description='Prediction ID.'),
+            description='Prediction ID'),
     ],
 ))
 @method_decorator(name='destroy', decorator=swagger_auto_schema(
@@ -405,7 +409,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
             name='id',
             type=openapi.TYPE_INTEGER,
             in_=openapi.IN_PATH,
-            description='Prediction ID.'),
+            description='Prediction ID'),
     ],
 ))
 class PredictionAPI(viewsets.ModelViewSet):
