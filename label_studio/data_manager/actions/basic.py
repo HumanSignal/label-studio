@@ -10,7 +10,7 @@ from data_manager.functions import evaluate_predictions
 from webhooks.utils import emit_webhooks_for_instance
 from webhooks.models import WebhookAction
 from core.permissions import AllPermissions
-
+from tasks.serializers import AnnotationSerializer
 
 all_permissions = AllPermissions()
 
@@ -93,6 +93,37 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
 
 
+def predictions_to_annotations(project, queryset, **kwargs):
+    count = 0
+    user = kwargs['request'].user
+
+    predictions = list(
+        queryset
+            .filter(predictions__isnull=False, predictions__model_version=project.model_version)
+            .values_list('predictions__result', 'predictions__model_version', 'id')
+    )
+
+    # prepare annotations
+    annotations = []
+    for prediction in predictions:
+        # copy only predictions with the current model_version
+        if prediction[1] != project.model_version:
+            continue
+
+        annotations.append({
+            'result': prediction[0],
+            'completed_by': user.pk,
+            'task': prediction[2]
+        })
+
+    count = len(annotations)
+    annotation_ser = AnnotationSerializer(data=annotations, many=True)
+    annotation_ser.is_valid(raise_exception=True)
+    annotation_ser.save()
+
+    return {'response_code': 200, 'detail': f'Created {count} annotations'}
+
+
 actions = [
     {
         'entry_point': retrieve_tasks_predictions,
@@ -108,6 +139,18 @@ actions = [
             'type': 'confirm'
         }
     },
+
+    {
+        'entry_point': predictions_to_annotations,
+        'permission': all_permissions.tasks_change,
+        'title': 'Predictions => annotations',
+        'order': 90,
+        'dialog': {
+            'text': 'This action will create a new annotation from the last task prediction for each selected task.',
+            'type': 'confirm'
+        }
+    },
+
     {
         'entry_point': delete_tasks,
         'title': 'Delete tasks', 'order': 100,
