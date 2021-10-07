@@ -10,6 +10,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from django.db.models import Sum, Count
 from django.conf import settings
 from ordered_set import OrderedSet
@@ -53,23 +54,70 @@ class TaskPagination(PageNumberPagination):
 
 
 @method_decorator(name='list', decorator=swagger_auto_schema(
-    tags=['Data Manager'], operation_summary="List views",
-    operation_description="List all views for a specific project."))
+    tags=['Data Manager'],
+    operation_summary="List views",
+    operation_description="List all views for a specific project.",
+    manual_parameters=[
+        openapi.Parameter(
+            name='id',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_QUERY,
+            description='Project ID.'),
+    ],
+))
 @method_decorator(name='create', decorator=swagger_auto_schema(
-    tags=['Data Manager'], operation_summary="Create view",
-    operation_description="Create a view for a speicfic project."))
+    tags=['Data Manager'],
+    operation_summary="Create view",
+    operation_description="Create a view for a specific project.",
+))
 @method_decorator(name='retrieve', decorator=swagger_auto_schema(
-    tags=['Data Manager'], operation_summary="Get view",
-    operation_description="Get all views for a specific project."))
+    tags=['Data Manager'],
+    operation_summary="Get view details",
+    operation_description="Get the details about a specific view in the data manager",
+    manual_parameters=[
+        openapi.Parameter(
+            name='id',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_PATH,
+            description='View ID.'),
+    ],
+))
 @method_decorator(name='update', decorator=swagger_auto_schema(
-    tags=['Data Manager'], operation_summary="Put view",
-    operation_description="Overwrite view data with updated filters and other information for a specific project."))
+    tags=['Data Manager'],
+    operation_summary="Put view",
+    operation_description="Overwrite view data with updated filters and other information for a specific project.",
+    manual_parameters=[
+        openapi.Parameter(
+            name='id',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_PATH,
+            description='View ID.'),
+    ],
+))
 @method_decorator(name='partial_update', decorator=swagger_auto_schema(
-    tags=['Data Manager'], operation_summary="Update view",
-    operation_description="Update view data with additional filters and other information for a specific project."))
+    tags=['Data Manager'],
+    operation_summary="Update view",
+    operation_description="Update view data with additional filters and other information for a specific project.",
+    manual_parameters=[
+        openapi.Parameter(
+            name='id',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_PATH,
+            description='View ID.'),
+    ],
+))
 @method_decorator(name='destroy', decorator=swagger_auto_schema(
-    tags=['Data Manager'], operation_summary="Delete view",
-    operation_description="Delete a view for a specific project."))
+    tags=['Data Manager'],
+    operation_summary="Delete view",
+    operation_description="Delete a view for a specific project.",
+    manual_parameters=[
+        openapi.Parameter(
+            name='id',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_PATH,
+            description='View ID.'),
+    ],
+))
 class ViewAPI(viewsets.ModelViewSet):
     serializer_class = ViewSerializer
     filter_backends = [DjangoFilterBackend]
@@ -127,15 +175,23 @@ class ViewAPI(viewsets.ModelViewSet):
     def get_task_queryset(self, request, view):
         return Task.prepared.only_filtered(prepare_params=view.get_prepare_tasks_params())
 
-    @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
+    @swagger_auto_schema(
+        tags=['Data Manager'],
+        operation_summary='Get task list for view',
+        operation_description="""
+        Retrieve a list of tasks with pagination for a specific view using filters and ordering.
+        """,
+        responses={200: task_serializer_class(many=True)},
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='View ID.'),
+        ],
+    )
     @action(detail=True, methods=["get"])
     def tasks(self, request, pk=None):
-        """
-        get:
-        Get task list for view
-
-        Retrieve a list of tasks with pagination for a specific view using filters and ordering.
-        """
         view = self.get_object()
         queryset = self.get_task_queryset(request, view)
         project = view.project
@@ -175,7 +231,17 @@ class ViewAPI(viewsets.ModelViewSet):
         serializer = self.task_serializer_class(queryset, many=True, context=context)
         return Response(serializer.data)
 
-    @swagger_auto_schema(tags=['Data Manager'], methods=["get", "post", "delete", "patch"])
+    @swagger_auto_schema(
+        tags=['Data Manager'],
+        methods=["get", "post", "delete", "patch"],
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='View ID.'),
+        ],
+    )
     @action(detail=True, url_path="selected-items", methods=["get", "post", "delete", "patch"])
     def selected_items(self, request, pk=None):
         """
@@ -242,6 +308,18 @@ class ViewAPI(viewsets.ModelViewSet):
             return Response(view.selected_items, status=204)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Data Manager'],
+    operation_summary='Task by ID',
+    operation_description='Retrieve a specific task by ID.',
+    manual_parameters=[
+        openapi.Parameter(
+            name='id',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_QUERY,
+            description='Task ID.'),
+    ],
+))
 class TaskAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_view
 
@@ -263,14 +341,8 @@ class TaskAPI(generics.RetrieveAPIView):
     def get_queryset(self):
         return Task.prepared.get_queryset(all_fields=True).filter(project__organization=self.request.user.active_organization)
 
-    @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request, pk):
-        """
-        get:
-        Task by ID
 
-        Retrieve a specific task by ID.
-        """
         task = self.get_object()
         context = self.get_serializer_context(request)
         context['project'] = project = task.project
