@@ -1,6 +1,6 @@
 from django.db import transaction
 
-from core.utils.disable_signals import DisableSignals
+from core.utils.common import temporary_disconnect_all_signals
 from organizations.models import Organization, OrganizationMember
 from projects.models import Project
 
@@ -13,6 +13,6 @@ def create_organization(title, created_by):
 
 
 def destroy_organization(org):
-    with DisableSignals():
+    with temporary_disconnect_all_signals():
         Project.objects.filter(organization=org).delete()
         org.delete()

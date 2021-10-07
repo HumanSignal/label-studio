@@ -12,7 +12,7 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from core.permissions import all_permissions
+from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import get_object_with_check_and_log
 from projects.models import Project, Task
 from ml.serializers import MLBackendSerializer, MLInteractiveAnnotatingRequest
@@ -55,7 +55,10 @@ logger = logging.getLogger(__name__)
     ))
 class MLBackendListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_required = all_permissions.projects_change
+    permission_required = ViewClassPermission(
+        GET=all_permissions.projects_view,
+        POST=all_permissions.projects_change,
+    )
     serializer_class = MLBackendSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["is_interactive"]
