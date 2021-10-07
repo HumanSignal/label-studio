@@ -325,7 +325,7 @@ class ExportListAPI(generics.ListCreateAPIView):
         manual_parameters=[
             openapi.Parameter(
                 name='id',
-                type=openapi.TYPE_STRING,
+                type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
                 default=0,
                 description='A unique integer value identifying this project.'),
@@ -349,7 +349,7 @@ class ExportListAPI(generics.ListCreateAPIView):
         manual_parameters=[
             openapi.Parameter(
                 name='id',
-                type=openapi.TYPE_STRING,
+                type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
                 default=0,
                 description='A unique integer value identifying this project.'),
@@ -403,7 +403,7 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
             ),
             openapi.Parameter(
                 name='id',
-                type=openapi.TYPE_STRING,
+                type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
                 default=0,
                 description='A unique integer value identifying this project.'),
