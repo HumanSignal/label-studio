@@ -1,5 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import logging
+
 from django.db.models import signals
 
 from tasks.models import Annotation, Prediction, update_is_labeled_after_removing_annotation
@@ -13,6 +15,8 @@ from core.permissions import AllPermissions
 from tasks.serializers import AnnotationSerializer
 
 all_permissions = AllPermissions()
+
+logger = logging.getLogger(__name__)
 
 
 def retrieve_tasks_predictions(project, queryset, **kwargs):
@@ -94,22 +98,16 @@ def delete_tasks_predictions(project, queryset, **kwargs):
 
 
 def predictions_to_annotations(project, queryset, **kwargs):
-    count = 0
     user = kwargs['request'].user
-
     predictions = list(
         queryset
-            .filter(predictions__isnull=False, predictions__model_version=project.model_version)
+            .filter(predictions__isnull=False)
             .values_list('predictions__result', 'predictions__model_version', 'id')
     )
 
     # prepare annotations
     annotations = []
     for prediction in predictions:
-        # copy only predictions with the current model_version
-        if prediction[1] != project.model_version:
-            continue
-
         annotations.append({
             'result': prediction[0],
             'completed_by': user.pk,
@@ -117,6 +115,7 @@ def predictions_to_annotations(project, queryset, **kwargs):
         })
 
     count = len(annotations)
+    logger.debug(f'{count} predictions will be converter to annotations')
     annotation_ser = AnnotationSerializer(data=annotations, many=True)
     annotation_ser.is_valid(raise_exception=True)
     annotation_ser.save()
@@ -143,7 +142,7 @@ actions = [
     {
         'entry_point': predictions_to_annotations,
         'permission': all_permissions.tasks_change,
-        'title': 'Predictions => annotations',
+        'title': 'Convert Predictions to Annotations',
         'order': 90,
         'dialog': {
             'text': 'This action will create a new annotation from predictions with the current project model version '
