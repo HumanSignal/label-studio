@@ -37,7 +37,7 @@ class FileUpload(models.Model):
 
     @property
     def filepath(self):
-        return self.file.path
+        return self.file.name
 
     @property
     def url(self):
