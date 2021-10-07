@@ -172,9 +172,10 @@ def get_all_columns(project, *_):
         {
             'id': 'predictions_model_versions',
             'title': "Prediction model versions",
-            'type': "String",
+            'type': 'List',
             'target': 'tasks',
             'help': 'Model versions aggregated over all predictions',
+            'schema': {'items': project.get_model_versions()},
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
