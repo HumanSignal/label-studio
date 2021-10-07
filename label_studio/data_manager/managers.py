@@ -229,6 +229,36 @@ def apply_filters(queryset, filters, only_undefined_field=False):
                 if not _filter.value.isdigit():
                     _filter.value = 0
 
+        # annotators
+        if field_name == 'annotators' and _filter.operator == Operator.CONTAINS:
+            filter_expressions.add(Q(annotations__completed_by=int(_filter.value)), conjunction)
+            continue
+        elif field_name == 'annotators' and _filter.operator == Operator.NOT_CONTAINS:
+            filter_expressions.add(~Q(annotations__completed_by=int(_filter.value)), conjunction)
+            continue
+        elif field_name == 'annotators' and _filter.operator == Operator.EMPTY:
+            value = cast_bool_from_str(_filter.value)
+            filter_expressions.add(Q(annotations__completed_by__isnull=value), conjunction)
+            continue
+
+        # predictions model versions
+        if field_name == 'predictions_model_versions' and _filter.operator == Operator.CONTAINS:
+            q = Q()
+            for value in _filter.value:
+                q |= Q(predictions__model_version__contains=value)
+            filter_expressions.add(q, conjunction)
+            continue
+        elif field_name == 'predictions_model_versions' and _filter.operator == Operator.NOT_CONTAINS:
+            q = Q()
+            for value in _filter.value:
+                q &= ~Q(predictions__model_version__contains=value)
+            filter_expressions.add(q, conjunction)
+            continue
+        elif field_name == 'predictions_model_versions' and _filter.operator == Operator.EMPTY:
+            value = cast_bool_from_str(_filter.value)
+            filter_expressions.add(Q(predictions__model_version__isnull=value), conjunction)
+            continue
+
         # use other name because of model names conflict
         if field_name == 'file_upload':
             field_name = 'file_upload_field'
