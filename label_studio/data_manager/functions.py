@@ -170,6 +170,17 @@ def get_all_columns(project, *_):
             }
         },
         {
+            'id': 'predictions_model_versions',
+            'title': "Prediction model versions",
+            'type': "String",
+            'target': 'tasks',
+            'help': 'Model versions aggregated over all predictions',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        },
+        {
             'id': 'predictions_results',
             'title': "Prediction results",
             'type': "String",

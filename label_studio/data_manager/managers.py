@@ -445,6 +445,14 @@ def annotate_annotations_ids(queryset):
         return queryset.annotate(annotations_ids=ArrayAgg('annotations__id'))
 
 
+def annotate_predictions_model_versions(queryset):
+    if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
+        return queryset.annotate(predictions_model_versions=GroupConcat('predictions__model_version',
+                                                                        output_field=models.CharField()))
+    else:
+        return queryset.annotate(predictions_model_versions=ArrayAgg('predictions__model_version'))
+
+
 def file_upload(queryset):
     return queryset.annotate(file_upload_field=F('file_upload__file'))
 
@@ -457,6 +465,7 @@ settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     "completed_at": annotate_completed_at,
     "annotations_results": annotate_annotations_results,
     "predictions_results": annotate_predictions_results,
+    "predictions_model_versions": annotate_predictions_model_versions,
     "predictions_score": annotate_predictions_score,
     "annotators": annotate_annotators,
     "annotations_ids": annotate_annotations_ids,
