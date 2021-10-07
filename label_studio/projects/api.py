@@ -521,13 +521,6 @@ class LabelConfigValidateAPI(generics.CreateAPIView):
         operation_description="""
         Determine whether the label configuration for a specific project is valid.
         """,
-        manual_parameters=[
-            openapi.Parameter(
-                name='label_config',
-                type=openapi.TYPE_STRING,
-                in_=openapi.IN_QUERY,
-                description='labeling config')
-        ]
 )) # This might be the same endpoint as the previous one for some reason?
 class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
     """ Validate label config
@@ -567,7 +560,14 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
 @method_decorator(name='delete', decorator=swagger_auto_schema(
         tags=['Projects'],
         operation_summary='Delete all tasks',
-        operation_description='Delete all tasks from a specific project.'
+        operation_description='Delete all tasks from a specific project.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='Project ID.'),
+        ],
 ))
 @method_decorator(name='get', decorator=swagger_auto_schema(
         **paginator_help('tasks', 'Projects'),
@@ -577,7 +577,14 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
             ```bash
             curl -X GET {}/api/projects/{{id}}/tasks/ -H 'Authorization: Token abc123'
             ```
-        """.format(settings.HOSTNAME or 'https://localhost:8080')
+        """.format(settings.HOSTNAME or 'https://localhost:8080'),
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='Project ID.'),
+        ],
     ))
 class ProjectTaskListAPI(generics.ListCreateAPIView,
                          generics.DestroyAPIView):
