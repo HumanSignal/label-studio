@@ -571,13 +571,6 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
 ))
 @method_decorator(name='get', decorator=swagger_auto_schema(
         **paginator_help('tasks', 'Projects'),
-        operation_summary='List project tasks',
-        operation_description="""
-            Retrieve a paginated list of tasks for a specific project. For example, use the following cURL command:
-            ```bash
-            curl -X GET {}/api/projects/{{id}}/tasks/ -H 'Authorization: Token abc123'
-            ```
-        """.format(settings.HOSTNAME or 'https://localhost:8080'),
         manual_parameters=[
             openapi.Parameter(
                 name='id',
@@ -585,6 +578,13 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
                 in_=openapi.IN_PATH,
                 description='Project ID.'),
         ],
+        operation_summary='List project tasks',
+        operation_description="""
+            Retrieve a paginated list of tasks for a specific project. For example, use the following cURL command:
+            ```bash
+            curl -X GET {}/api/projects/{{id}}/tasks/ -H 'Authorization: Token abc123'
+            ```
+        """.format(settings.HOSTNAME or 'https://localhost:8080'),
     ))
 class ProjectTaskListAPI(generics.ListCreateAPIView,
                          generics.DestroyAPIView):
