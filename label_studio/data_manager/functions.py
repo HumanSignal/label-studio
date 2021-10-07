@@ -1,7 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
-import ujson as json
 
 from collections import OrderedDict
 from django.conf import settings
@@ -11,7 +10,6 @@ from core.utils.common import int_from_request
 from data_manager.prepare_params import PrepareParams
 from data_manager.models import View
 from tasks.models import Task
-from urllib.parse import unquote
 
 
 TASKS = 'tasks:'
@@ -222,20 +220,13 @@ def get_prepare_params(request, project):
 
     # use filters and selected items from request if it's specified
     else:
-        # query arguments from url
-        if 'query' in request.GET:
-            data = json.loads(unquote(request.GET['query']))
-        # data payload from body
-        else:
-            data = request.data
-
-        selected = data.get('selectedItems', {"all": True, "excluded": []})
+        selected = request.data.get('selectedItems', {"all": True, "excluded": []})
         if not isinstance(selected, dict):
             raise DataManagerException('selectedItems must be dict: {"all": [true|false], '
                                        '"excluded | included": [...task_ids...]}')
-        filters = data.get('filters', None)
-        ordering = data.get('ordering', [])
-        prepare_params = PrepareParams(project=project.id, selectedItems=selected, data=data,
+        filters = request.data.get('filters', None)
+        ordering = request.data.get('ordering', [])
+        prepare_params = PrepareParams(project=project.id, selectedItems=selected, data=request.data,
                                        filters=filters, ordering=ordering)
     return prepare_params
 
