@@ -314,7 +314,7 @@ class ViewAPI(viewsets.ModelViewSet):
         openapi.Parameter(
             name='id',
             type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_QUERY,
+            in_=openapi.IN_PATH,
             description='Task ID.'),
     ],
 ))
