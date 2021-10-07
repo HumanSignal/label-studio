@@ -521,7 +521,14 @@ class LabelConfigValidateAPI(generics.CreateAPIView):
         operation_description="""
         Determine whether the label configuration for a specific project is valid.
         """,
-)) # This might be the same endpoint as the previous one for some reason?
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='Project ID'),
+        ],
+))
 class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
     """ Validate label config
     """
@@ -566,7 +573,7 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='Project ID.'),
+                description='Project ID'),
         ],
 ))
 @method_decorator(name='get', decorator=swagger_auto_schema(
@@ -583,7 +590,7 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='Project ID.'),
+                description='Project ID'),
         ],
     ))
 class ProjectTaskListAPI(generics.ListCreateAPIView,
