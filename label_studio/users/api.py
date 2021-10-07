@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
             name='id',
             type=openapi.TYPE_INTEGER,
             in_=openapi.IN_PATH,
-            description='User ID.'),
+            description='User ID'),
     ],
     request_body=UserSerializer
 ))
@@ -61,7 +61,7 @@ logger = logging.getLogger(__name__)
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='User ID.'),
+                description='User ID'),
                 ],
     ))
 @method_decorator(name='partial_update', decorator=swagger_auto_schema(
@@ -75,7 +75,7 @@ logger = logging.getLogger(__name__)
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='User ID.'),
+                description='User ID'),
         ],
         request_body=UserSerializer
     ))
@@ -88,7 +88,7 @@ logger = logging.getLogger(__name__)
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='User ID.'),
+                description='User ID'),
         ],
     ))
 class UserAPI(viewsets.ModelViewSet):
