@@ -79,16 +79,38 @@ class TaskListAPI(generics.ListCreateAPIView):
                 in_=openapi.IN_QUERY,
                 description='Use the proxy parameter inline for credential access to task data'
             ),
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                description='Task ID'
+            ),
         ]))
 @method_decorator(name='patch', decorator=swagger_auto_schema(
         tags=['Tasks'],
         operation_summary='Update task',
         operation_description='Update the attributes of an existing labeling task.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                description='Task ID'
+            ),
+        ],
         request_body=TaskSimpleSerializer))
 @method_decorator(name='delete', decorator=swagger_auto_schema(
         tags=['Tasks'],
         operation_summary='Delete task',
         operation_description='Delete a task in Label Studio. This action cannot be undone!',
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                description='Task ID'
+            ),
+        ],
         ))
 class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
