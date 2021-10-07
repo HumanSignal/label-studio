@@ -526,7 +526,7 @@ class LabelConfigValidateAPI(generics.CreateAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='Project ID'),
+                description='A unique integer value identifying this project.'),
         ],
 ))
 class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
@@ -573,7 +573,7 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='Project ID'),
+                description='A unique integer value identifying this project.'),
         ],
 ))
 @method_decorator(name='get', decorator=swagger_auto_schema(
@@ -590,7 +590,7 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='Project ID'),
+                description='A unique integer value identifying this project.'),
         ],
     ))
 class ProjectTaskListAPI(generics.ListCreateAPIView,
