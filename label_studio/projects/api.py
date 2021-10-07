@@ -374,7 +374,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             next_task.set_lock(request.user)
 
         # call machine learning api and format response
-        if project.show_collab_predictions and not next_task.predictions.exists():
+        if project.show_collab_predictions:
             for ml_backend in project.ml_backends.all():
                 ml_backend.predict_tasks([next_task])
 
