@@ -491,7 +491,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 @method_decorator(name='post', decorator=swagger_auto_schema(
         tags=['Projects'],
         operation_summary='Validate label config',
-        operation_description='Validate a labeling configuration for a project.',
+        operation_description='Validate an arbitrary labeling configuration.',
         responses={200: 'Validation success'}
     ))
 class LabelConfigValidateAPI(generics.CreateAPIView):
