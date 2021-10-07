@@ -146,7 +146,8 @@ actions = [
         'title': 'Predictions => annotations',
         'order': 90,
         'dialog': {
-            'text': 'This action will create a new annotation from the last task prediction for each selected task.',
+            'text': 'This action will create a new annotation from predictions with the current project model version '
+                    'for each selected task.',
             'type': 'confirm'
         }
     },
