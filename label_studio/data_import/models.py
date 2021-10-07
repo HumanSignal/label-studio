@@ -64,7 +64,7 @@ class FileUpload(models.Model):
         if hasattr(self, '_file_body'):
             body = getattr(self, '_file_body')
         else:
-            body = self.file.read()
+            body = self.file.read().decode('utf-8')
             setattr(self, '_file_body', body)
         return body
 
