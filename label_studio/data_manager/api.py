@@ -59,10 +59,10 @@ class TaskPagination(PageNumberPagination):
     operation_description="List all views for a specific project.",
     manual_parameters=[
         openapi.Parameter(
-            name='id',
+            name='project',
             type=openapi.TYPE_INTEGER,
             in_=openapi.IN_QUERY,
-            description='Project ID.'),
+            description='Project ID'),
     ],
 ))
 @method_decorator(name='create', decorator=swagger_auto_schema(
@@ -315,7 +315,7 @@ class ViewAPI(viewsets.ModelViewSet):
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
     tags=['Data Manager'],
-    operation_summary='Get Task by ID',
+    operation_summary='Get task by ID',
     operation_description='Retrieve a specific task by ID.',
     manual_parameters=[
         openapi.Parameter(
