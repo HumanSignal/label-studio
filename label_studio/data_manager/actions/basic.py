@@ -111,7 +111,8 @@ def predictions_to_annotations(project, queryset, **kwargs):
         annotations.append({
             'result': prediction[0],
             'completed_by': user.pk,
-            'task': prediction[2]
+            'task': prediction[2],
+            'ground_truth': True  # temp workaround to distinguish auto created annotations
         })
 
     count = len(annotations)
