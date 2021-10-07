@@ -1,5 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import logging
+
 from django.db.models import signals
 
 from tasks.models import Annotation, Prediction, update_is_labeled_after_removing_annotation
@@ -10,9 +12,11 @@ from data_manager.functions import evaluate_predictions
 from webhooks.utils import emit_webhooks_for_instance
 from webhooks.models import WebhookAction
 from core.permissions import AllPermissions
-
+from tasks.serializers import AnnotationSerializer
 
 all_permissions = AllPermissions()
+
+logger = logging.getLogger(__name__)
 
 
 def retrieve_tasks_predictions(project, queryset, **kwargs):
@@ -93,6 +97,33 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
 
 
+def predictions_to_annotations(project, queryset, **kwargs):
+    user = kwargs['request'].user
+    predictions = list(
+        queryset
+            .filter(predictions__isnull=False)
+            .values_list('predictions__result', 'predictions__model_version', 'id')
+    )
+
+    # prepare annotations
+    annotations = []
+    for prediction in predictions:
+        annotations.append({
+            'result': prediction[0],
+            'completed_by': user.pk,
+            'task': prediction[2],
+            'ground_truth': True  # temp workaround to distinguish auto created annotations
+        })
+
+    count = len(annotations)
+    logger.debug(f'{count} predictions will be converter to annotations')
+    annotation_ser = AnnotationSerializer(data=annotations, many=True)
+    annotation_ser.is_valid(raise_exception=True)
+    annotation_ser.save()
+
+    return {'response_code': 200, 'detail': f'Created {count} annotations'}
+
+
 actions = [
     {
         'entry_point': retrieve_tasks_predictions,
@@ -108,6 +139,19 @@ actions = [
             'type': 'confirm'
         }
     },
+
+    {
+        'entry_point': predictions_to_annotations,
+        'permission': all_permissions.tasks_change,
+        'title': 'Convert Predictions to Annotations',
+        'order': 90,
+        'dialog': {
+            'text': 'This action will create a new annotation from predictions with the current project model version '
+                    'for each selected task.',
+            'type': 'confirm'
+        }
+    },
+
     {
         'entry_point': delete_tasks,
         'title': 'Delete tasks', 'order': 100,
