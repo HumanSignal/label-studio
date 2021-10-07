@@ -681,5 +681,8 @@ class ProjectModelVersions(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         project = self.get_object()
-        model_versions = Prediction.objects.filter(task__project=project).values_list('model_version', flat=True).distinct()
-        return Response(data=model_versions)
+        model_versions = set(Prediction.objects.filter(task__project=project).values_list('model_version', flat=True).distinct())
+        model_versions.add(project.model_version)
+        logger.debug(model_versions)
+        filtered_model_versions = list(reversed(sorted(filter(None, model_versions))))
+        return Response(data=filtered_model_versions)
