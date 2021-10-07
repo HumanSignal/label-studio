@@ -77,7 +77,7 @@ class TaskPagination(PageNumberPagination):
     manual_parameters=[
         openapi.Parameter(
             name='id',
-            type=openapi.TYPE_INTEGER,
+            type=openapi.TYPE_STRING,
             in_=openapi.IN_PATH,
             description='View ID.'),
     ],
@@ -89,7 +89,7 @@ class TaskPagination(PageNumberPagination):
     manual_parameters=[
         openapi.Parameter(
             name='id',
-            type=openapi.TYPE_INTEGER,
+            type=openapi.TYPE_STRING,
             in_=openapi.IN_PATH,
             description='View ID.'),
     ],
@@ -101,7 +101,7 @@ class TaskPagination(PageNumberPagination):
     manual_parameters=[
         openapi.Parameter(
             name='id',
-            type=openapi.TYPE_INTEGER,
+            type=openapi.TYPE_STRING,
             in_=openapi.IN_PATH,
             description='View ID.'),
     ],
@@ -113,10 +113,15 @@ class TaskPagination(PageNumberPagination):
     manual_parameters=[
         openapi.Parameter(
             name='id',
-            type=openapi.TYPE_INTEGER,
+            type=openapi.TYPE_STRING,
             in_=openapi.IN_PATH,
             description='View ID.'),
     ],
+))
+@method_decorator(name='reset', decorator=swagger_auto_schema(
+    tags=['Data Manager'],
+    operation_summary="Reset project views",
+    operation_description="Reset all views for a specific project.",
 ))
 class ViewAPI(viewsets.ModelViewSet):
     serializer_class = ViewSerializer
@@ -134,12 +139,6 @@ class ViewAPI(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    @swagger_auto_schema(
-        tags=['Data Manager'],
-        operation_summary="Reset project views",
-        operation_description="Reset all views for a specific project.",
-    )
-    @action(detail=False, methods=['delete'])
     def reset(self, request):
         serializer = ViewResetSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
