@@ -274,7 +274,8 @@ class Export(models.Model):
             for task in tasks:
                 task._annotations = list(
                     self._get_filtered_annotations(
-                        task.annotations.all(), annotation_filter_options=annotation_filter_options
+                        task.annotations.all(),
+                        annotation_filter_options=annotation_filter_options,
                     )
                 )
 
