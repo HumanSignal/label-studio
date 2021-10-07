@@ -37,6 +37,15 @@ logger = logging.getLogger(__name__)
     """.format(
             host=(settings.HOSTNAME or 'https://localhost:8080')
         ),
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'id': openapi.Schema(
+                    type=openapi.TYPE_INTEGER,
+                    description='Project ID'
+                )
+            },
+        ),
     ),
 )
 @method_decorator(
@@ -150,6 +159,13 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
         
         Get the ML backend ID by [listing the ML backends for a project](https://labelstud.io/api/#operation/api_ml_list).
         """,
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='Machine Learning backend ID.'),
+        ],
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
