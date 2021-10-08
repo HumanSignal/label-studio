@@ -235,12 +235,9 @@ class ProjectExportFilesAuthCheck(APIView):
         """,
         manual_parameters=[
             openapi.Parameter(
-                name='id',
-                type=openapi.TYPE_STRING,
-                in_=openapi.IN_PATH,
-                default=0,
-                description='Project ID')
-        ]
+                name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, default=0, description='Project ID'
+            )
+        ],
     ),
 )
 @method_decorator(
@@ -253,16 +250,13 @@ class ProjectExportFilesAuthCheck(APIView):
         """,
         manual_parameters=[
             openapi.Parameter(
-                name='id',
-                type=openapi.TYPE_STRING,
-                in_=openapi.IN_PATH,
-                default=0,
-                description='Project ID')
-        ]
+                name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, default=0, description='Project ID'
+            )
+        ],
     ),
 )
 class ExportListAPI(generics.ListCreateAPIView):
-    queryset = Export.objects.all()
+    queryset = Export.objects.all().order_by('-created_at')
     serializer_class = ExportSerializer
     permission_required = all_permissions.projects_change
 
@@ -311,18 +305,16 @@ class ExportListAPI(generics.ListCreateAPIView):
         """,
         manual_parameters=[
             openapi.Parameter(
-                name='id',
-                type=openapi.TYPE_STRING,
-                in_=openapi.IN_PATH,
-                default=0,
-                description='Project ID'),
+                name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, default=0, description='Project ID'
+            ),
             openapi.Parameter(
                 name='export_pk',
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_PATH,
                 default=0,
-                description='Export primary key'),
-        ]
+                description='Export primary key',
+            ),
+        ],
     ),
 )
 @method_decorator(
@@ -335,18 +327,16 @@ class ExportListAPI(generics.ListCreateAPIView):
         """,
         manual_parameters=[
             openapi.Parameter(
-                name='id',
-                type=openapi.TYPE_STRING,
-                in_=openapi.IN_PATH,
-                default=0,
-                description='Project ID'),
+                name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, default=0, description='Project ID'
+            ),
             openapi.Parameter(
                 name='export_pk',
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_PATH,
                 default=0,
-                description='Export primary key'),
-        ]
+                description='Export primary key',
+            ),
+        ],
     ),
 )
 class ExportDetailAPI(generics.RetrieveDestroyAPIView):
@@ -389,17 +379,15 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
                 description='Selected export format',
             ),
             openapi.Parameter(
-                name='id',
-                type=openapi.TYPE_STRING,
-                in_=openapi.IN_PATH,
-                default=0,
-                description='Project ID'),
+                name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, default=0, description='Project ID'
+            ),
             openapi.Parameter(
                 name='export_pk',
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_PATH,
                 default=0,
-                description='Export primary key'),
+                description='Export primary key',
+            ),
         ],
     ),
 )
@@ -438,3 +426,4 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
         response['Content-Disposition'] = f'attachment; filename="{file_.name}"'
         response['filename'] = file_.name
         return response
+
