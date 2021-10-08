@@ -30,26 +30,51 @@ Before writing your custom matching function, do the following:
 Based on the type of labeling that you're performing, write a custom function. The [label-studio-evalme](https://github.com/heartexlabs/label-studio-evalme) repository includes boilerplate methods that you can use to construct your custom matching function.
 
 ```python
-def matching_function(payload):
-    '''your matching function for annotations'''
-    try:
-        x = payload[0]
-        y = payload[1]
-        return 1 if x==y else 0
-    except:
-        return -1
+def matching_function(annotation_1, annotation_2, per_label=False, **kwargs) -> float:
+    """
+    Gets two annotations in Label Studio JSON format https://labelstud.io/guide/export.html#Label-Studio-JSON-format-of-annotated-tasks and returns agreement score between them
+    :param annotation_1: First annotation
+    :param annotation_2: Second annotation
+    :param per_label: per labels calculation
+    :return real valued agreement score between 0 and 1
+    """
+    r1 = annotation_1["result"][0]["value"]["choices"][0]
+    r2 = annotation_1["result"][0]["value"]["choices"][0]
+    if r1 == r2:
+        if r1 == "Positive":
+            return 0.99
+        if r1 == "Negative":
+            return 0.7
+    else:
+        return 0
 ```
 
 ## Add your custom matching function to Label Studio Enterprise
 
-Set up a custom matching function for a specific project in Label Studio Enterprise. 
+Set up a custom matching function for a specific project in Label Studio Enterprise. You must configure the labeling interface before you can add your custom matching function. 
 
 1. Within a project on the Label Studio UI, click **Settings**.
 2. Click **Quality**.
-3. Under **Matching Function**, select **Custom**.
-4. Add a **Metric Name** for your custom matching function code.
-5. Write or paste code defining a custom matching function in the text box.
-6. Click **Deploy**.
+3. Under **Matching Function**, use the drop-down menu to select **Your custom AWS lambda function**.
+4. Write or paste code defining a custom matching function in the text box: 
+```python
+def matching_function(annotation_1, annotation_2, per_label=False, **kwargs) -> float:
+    """
+    Gets two annotations in Label Studio JSON format https://labelstud.io/guide/export.html#Label-Studio-JSON-format-of-annotated-tasks and returns agreement score between them
+    :param annotation_1: First annotation
+    :param annotation_2: Second annotation
+    :param per_label: per labels calculation
+    :return real valued agreement score between 0 and 1
+    """
+    # your code starts here...
+    if per_label:
+    # per label calculation returns dict with labels
+        return {'aws': 1}
+    else:
+    # overall calculation returns float[0..1]
+        return 1
+```
+5. Click **Deploy**.
 
 ## Troubleshoot your custom matching function
 
