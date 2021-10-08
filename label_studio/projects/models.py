@@ -664,6 +664,13 @@ class Project(ProjectMixin, models.Model):
                 result[field] = value
         return result
 
+    def get_model_versions(self):
+        predictions = Prediction.objects.filter(task__project=self)
+        model_versions = set(predictions.values_list('model_version', flat=True).distinct())
+        if self.model_version not in model_versions:
+            model_versions.add(self.model_version)
+        return list(reversed(sorted(model_versions)))
+
     def __str__(self):
         return f'{self.title} (id={self.id})' or _("Business number %d") % self.pk
 

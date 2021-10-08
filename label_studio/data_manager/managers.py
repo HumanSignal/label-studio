@@ -229,6 +229,36 @@ def apply_filters(queryset, filters, only_undefined_field=False):
                 if not _filter.value.isdigit():
                     _filter.value = 0
 
+        # annotators
+        if field_name == 'annotators' and _filter.operator == Operator.CONTAINS:
+            filter_expressions.add(Q(annotations__completed_by=int(_filter.value)), conjunction)
+            continue
+        elif field_name == 'annotators' and _filter.operator == Operator.NOT_CONTAINS:
+            filter_expressions.add(~Q(annotations__completed_by=int(_filter.value)), conjunction)
+            continue
+        elif field_name == 'annotators' and _filter.operator == Operator.EMPTY:
+            value = cast_bool_from_str(_filter.value)
+            filter_expressions.add(Q(annotations__completed_by__isnull=value), conjunction)
+            continue
+
+        # predictions model versions
+        if field_name == 'predictions_model_versions' and _filter.operator == Operator.CONTAINS:
+            q = Q()
+            for value in _filter.value:
+                q |= Q(predictions__model_version__contains=value)
+            filter_expressions.add(q, conjunction)
+            continue
+        elif field_name == 'predictions_model_versions' and _filter.operator == Operator.NOT_CONTAINS:
+            q = Q()
+            for value in _filter.value:
+                q &= ~Q(predictions__model_version__contains=value)
+            filter_expressions.add(q, conjunction)
+            continue
+        elif field_name == 'predictions_model_versions' and _filter.operator == Operator.EMPTY:
+            value = cast_bool_from_str(_filter.value)
+            filter_expressions.add(Q(predictions__model_version__isnull=value), conjunction)
+            continue
+
         # use other name because of model names conflict
         if field_name == 'file_upload':
             field_name = 'file_upload_field'
@@ -445,6 +475,14 @@ def annotate_annotations_ids(queryset):
         return queryset.annotate(annotations_ids=ArrayAgg('annotations__id'))
 
 
+def annotate_predictions_model_versions(queryset):
+    if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
+        return queryset.annotate(predictions_model_versions=GroupConcat('predictions__model_version',
+                                                                        output_field=models.CharField()))
+    else:
+        return queryset.annotate(predictions_model_versions=ArrayAgg('predictions__model_version'))
+
+
 def file_upload(queryset):
     return queryset.annotate(file_upload_field=F('file_upload__file'))
 
@@ -457,6 +495,7 @@ settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     "completed_at": annotate_completed_at,
     "annotations_results": annotate_annotations_results,
     "predictions_results": annotate_predictions_results,
+    "predictions_model_versions": annotate_predictions_model_versions,
     "predictions_score": annotate_predictions_score,
     "annotators": annotate_annotators,
     "annotations_ids": annotate_annotations_ids,

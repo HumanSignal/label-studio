@@ -2,7 +2,7 @@
 """
 from enum import Enum
 from typing import List, Optional, Union
-from pydantic import BaseModel, StrictInt, StrictFloat, StrictStr, StrictBool
+from pydantic import BaseModel, StrictInt, StrictFloat, StrictStr, StrictBool, ConstrainedList
 
 
 class FilterIn(BaseModel):
@@ -14,7 +14,7 @@ class Filter(BaseModel):
     filter: str
     operator: str
     type: str
-    value: Union[StrictInt, StrictFloat, StrictBool, StrictStr, FilterIn]
+    value: Union[StrictInt, StrictFloat, StrictBool, StrictStr, FilterIn, list]
 
 
 class ConjunctionEnum(Enum):
