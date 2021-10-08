@@ -110,7 +110,7 @@ stages:
     response:
       status_code: 200
 ---
-test_name: crud export with params
+test_name: crud export with params 1
 strict: false
 marks:
   - usefixtures:
@@ -151,7 +151,7 @@ stages:
         json:
           export_id: id
 ---
-test_name: crud export with other params
+test_name: crud export with params 2
 strict: false
 marks:
   - usefixtures:
@@ -168,22 +168,53 @@ stages:
       url: "{django_live_url}/api/projects/{project_pk}/exports/"
       method: POST
       json:
-        task_filter_options:
-          view: 1
-          skipped: "exclude"
-          finished: "only"
-          annotated: "only"
         annotation_filter_options:
           ground_truth: true
           usual: true
           skipped: true
         serialization_options:
           drafts:
-            only_id: true
+            only_id: false
           predictions:
-            only_id: true
+            only_id: false
           annotations__completed_by:
-            only_id: true
+            only_id: false
+    response:
+      status_code: 201
+      json:
+        id: !anyint
+        title: !anystr
+        created_by: !anydict
+        counters: !anydict
+        md5: !anystr
+        created_at: !anystr
+        finished_at: !anystr
+        status: !anystr
+      save:
+        json:
+          export_id: id
+---
+test_name: crud export with params 3
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+  - id: signup
+    type: ref
+  - id: create_project
+    type: ref
+  - id: create_task
+    type: ref
+  - name: create export
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/"
+      method: POST
+      json:
+        annotation_filter_options:
+          ground_truth: false
+          usual: false
+          skipped: false
     response:
       status_code: 201
       json:
