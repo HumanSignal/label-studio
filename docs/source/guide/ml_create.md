@@ -71,7 +71,6 @@ def predict(self, tasks, **kwargs):
     return predictions
 ```
 
-
 ## Training call
 Use the training call to update your model with new annotations. You don't need to use this call in your code, for example if you just want to pre-annotate tasks without retraining the model. If you do want to retrain the model based on annotations from Label Studio, use this method. 
 
@@ -85,6 +84,8 @@ def fit(self, completions, workdir=None, **kwargs):
     # ... do some heavy computations, get your model and store checkpoints and resources
     return {'checkpoints': 'my/model/checkpoints'}  # <-- you can retrieve this dict as self.train_output in the subsequent calls
 ```
+
+You can use the `self.model` variable in this function if you want to start training from the previous model checkpoint. 
 
 After you wrap your model code with the class, define the loaders, and define the methods, you're ready to run your model as an ML backend with Label Studio. See the [Quickstart](ml.html#Quickstart).
 
