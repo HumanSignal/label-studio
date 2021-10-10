@@ -101,7 +101,7 @@ def predictions_to_annotations(project, queryset, **kwargs):
     user = kwargs['request'].user
     predictions = list(
         queryset
-        .filter(predictions__isnull=False)
+        .filter(predictions__isnull=False, predictions__child_annotations__isnull=True)
         .values_list('predictions__result', 'predictions__model_version', 'id', 'predictions__id')
     )
 
