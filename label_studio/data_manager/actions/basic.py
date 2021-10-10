@@ -101,8 +101,8 @@ def predictions_to_annotations(project, queryset, **kwargs):
     user = kwargs['request'].user
     predictions = list(
         queryset
-            .filter(predictions__isnull=False)
-            .values_list('predictions__result', 'predictions__model_version', 'id')
+        .filter(predictions__isnull=False)
+        .values_list('predictions__result', 'predictions__model_version', 'id', 'predictions__id')
     )
 
     # prepare annotations
@@ -112,7 +112,7 @@ def predictions_to_annotations(project, queryset, **kwargs):
             'result': prediction[0],
             'completed_by': user.pk,
             'task': prediction[2],
-            'ground_truth': True  # temp workaround to distinguish auto created annotations
+            'parent_prediction': prediction[3]
         })
 
     count = len(annotations)
@@ -148,7 +148,13 @@ actions = [
         'dialog': {
             'text': 'This action will create a new annotation from predictions with the current project model version '
                     'for each selected task.',
-            'type': 'confirm'
+            'type': 'confirm',
+            'form': [{
+                'type': 'enum',
+                'name': 'model_version',
+                'label': 'Choice a model',
+                'values': ['version 1', 'version 2']
+            }]
         }
     },
 
