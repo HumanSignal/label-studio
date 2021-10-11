@@ -51,8 +51,9 @@ The matching score assesses the similarity of annotations for a specific task.
 
 The following table lists the matching functions available in Label Studio Enterprise. If you want to use a different matching function, you can [create a custom matching function](custom_metric.html).
 
+
 | Matching Function | Tag | Labeling Type | Description |
-| --- | --- | --- |
+| --- | --- | --- | --- | 
 | Exact matching choices | Choices | Categorical, Classification | Evaluates whether annotations exactly match. | 
 | Choices per span region | Choices[per_region=span] | Categorical, Classification | Evaluates whether specific choices applied to specific text spans match. | 
 | Choices per hypertext span region | Choices[per_region=hyperspan] | Categorical, Classification | Evaluates whether specific choices applied to specific hypertext spans match. |
