@@ -335,7 +335,11 @@ class Annotation(AnnotationMixin, models.Model):
                                        help_text='Results inside of annotation counter')
 
     parent_prediction = models.ForeignKey('tasks.Prediction', on_delete=models.SET_NULL, related_name='child_annotations',
-                                          null=True, help_text='Points to the prediction from which the annotation was created')
+                                          null=True, help_text='Points to the prediction from which this annotation was created')
+    parent_annotation = models.ForeignKey('tasks.Annotation', on_delete=models.SET_NULL,
+                                          related_name='child_annotations',
+                                          null=True,
+                                          help_text='Points to the parent annotation from which this annotation was created')
 
     class Meta:
         db_table = 'task_completion'

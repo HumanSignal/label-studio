@@ -1,6 +1,6 @@
 {
- "message": "[fix] Colors for agreement column",
- "commit": "78fd0487e684185e3139350a0390e2fdabc4003e",
+ "message": "[fix] List operators",
+ "commit": "f55d7cf9faced4ee938ff987354d32421a09b0c4",
  "branch": "HEAD",
- "date": "2021/10/07 01:40:54"
+ "date": "2021/10/07 17:11:19"
 }

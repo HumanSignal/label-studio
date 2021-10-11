@@ -1,6 +1,6 @@
 {
- "message": "[ext] Add link from prediction to annotation on entity panel",
- "commit": "b3e702e7d2aa377080810dac981e88bec0c706f6",
- "branch": "master",
- "date": "2021/10/10 19:03:40"
+ "message": "[ext] Parent annotations and preditions on Create Copy",
+ "commit": "df5024a6e5e65f700d50104a1daa30832ec55aff",
+ "branch": "feature/parent-anno",
+ "date": "2021/10/11 19:56:51"
 }
