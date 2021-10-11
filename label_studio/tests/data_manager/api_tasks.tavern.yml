@@ -1228,3 +1228,52 @@ stages:
         }
         ]
       }
+
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "filters": {
+            "conjunction": "and",
+            "items": [
+              {
+                "filter": "filter:tasks:predictions_results",
+                "operator": "equal",
+                "type": "String",
+                "value": "PREDICTIONS"
+              },
+              {
+                "filter": "filter:tasks:annotations_results",
+                "operator": "not_equal",
+                "type": "String",
+                "value": "PREDICTIONS"
+              }
+            ]
+          },
+          "ordering": [
+            "tasks:data.text"
+          ]
+        },
+        "project": !int "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/dm/views/{view.id}/tasks'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: label_studio.tests.utils:save_response
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 0,
+        "total": 0,
+        }
