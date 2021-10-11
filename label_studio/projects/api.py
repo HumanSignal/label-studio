@@ -374,7 +374,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             next_task.set_lock(request.user)
 
         # call machine learning api and format response
-        if project.show_collab_predictions and not next_task.predictions.exists():
+        if project.show_collab_predictions:
             for ml_backend in project.ml_backends.all():
                 ml_backend.predict_tasks([next_task])
 
@@ -681,5 +681,6 @@ class ProjectModelVersions(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         project = self.get_object()
-        model_versions = Prediction.objects.filter(task__project=project).values_list('model_version', flat=True).distinct()
-        return Response(data=model_versions)
+        model_versions = project.get_model_versions()
+        filtered_model_versions = filter(None, model_versions)
+        return Response(data=filtered_model_versions)
