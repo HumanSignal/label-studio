@@ -1,7 +1,9 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import logging
 import re
+import ujson as json
+import logging
+
 
 from pydantic import BaseModel
 
@@ -208,13 +210,24 @@ def apply_filters(queryset, filters, only_undefined_field=False):
             filter_expressions.add(Q(annotations__completed_by__isnull=value), conjunction)
             continue
 
-        # annotations results
-        elif field_name == 'annotations_results' and _filter.operator == Operator.CONTAINS:
-            filter_expressions.add(Q(annotations__result__icontains=_filter.value), conjunction)
-            continue
-        elif field_name == 'annotations_results' and _filter.operator == Operator.NOT_CONTAINS:
-            filter_expressions.add(~Q(annotations__result__icontains=_filter.value), conjunction)
-            continue
+        # annotations results & predictions results
+        if field_name in ['annotations_results', 'predictions_results']:
+            name = 'annotations__result' if field_name == 'annotations_results' else 'predictions__result'
+            if _filter.operator in [Operator.EQUAL, Operator.NOT_EQUAL]:
+                try:
+                    value = json.loads(_filter.value)
+                except:
+                    return queryset.none()
+
+                q = Q(**{name: value})
+                filter_expressions.add(q if _filter.operator == Operator.EQUAL else ~q, conjunction)
+                continue
+            elif _filter.operator == Operator.CONTAINS:
+                filter_expressions.add(Q(**{name + '__icontains': _filter.value}), conjunction)
+                continue
+            elif _filter.operator == Operator.NOT_CONTAINS:
+                filter_expressions.add(~Q(**{name + '__icontains': _filter.value}), conjunction)
+                continue
 
         # annotation ids
         if field_name == 'annotations_ids':
@@ -286,7 +299,7 @@ def apply_filters(queryset, filters, only_undefined_field=False):
             value_type = type(queryset.values_list(field_name, flat=True)[0]).__name__
 
         if (value_type == 'list' or value_type == 'tuple') and 'equal' in _filter.operator:
-            _filter.value = '{' + str(_filter.value) + '}'
+            raise Exception('Not supported filter type')
 
         # special case: for strings empty is "" or null=True
         if _filter.type in ('String', 'Unknown') and _filter.operator == 'empty':
