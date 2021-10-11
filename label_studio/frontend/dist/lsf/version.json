@@ -1,6 +1,6 @@
 {
- "message": "Update lockfiles",
- "commit": "031502e480b2b1ff2bf9bcebb320ac0028139337",
- "branch": "HEAD",
- "date": "2021/10/08 10:52:54"
+ "message": "[ext] Add link from prediction to annotation on entity panel",
+ "commit": "b3e702e7d2aa377080810dac981e88bec0c706f6",
+ "branch": "master",
+ "date": "2021/10/10 19:03:40"
 }
