@@ -125,14 +125,18 @@ class MLBackend(models.Model):
         else:
             setup_response = self.setup()
             if setup_response.is_error:
+                logger.warning(f'ML backend responds with error: {setup_response.error_message}')
                 self.state = MLBackendState.ERROR
                 self.error_message = setup_response.error_message
             else:
                 self.state = MLBackendState.CONNECTED
                 model_version = setup_response.response.get('model_version')
+                logger.info(f'ML backend responds with success: {setup_response.response}')
                 self.model_version = model_version
-                self.project.model_version = model_version
-                self.project.save()
+                if model_version != self.project.model_version:
+                    logger.debug(f'Changing project model version: {self.project.model_version} -> {model_version}')
+                    self.project.model_version = model_version
+                    self.project.save(update_fields=['model_version'])
                 self.error_message = None
         self.save()
 
@@ -160,7 +164,7 @@ class MLBackend(models.Model):
             tasks = Task.objects.filter(id__in=[task.id for task in tasks])
 
         tasks_ser = TaskSimpleSerializer(tasks, many=True).data
-        ml_api_result = self.api.make_predictions(tasks_ser, self.model_version, self.project)
+        ml_api_result = self.api.make_predictions(tasks_ser, self.project.model_version, self.project)
         if ml_api_result.is_error:
             logger.warning(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return
