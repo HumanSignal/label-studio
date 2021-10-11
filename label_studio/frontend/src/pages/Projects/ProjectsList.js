@@ -1,21 +1,33 @@
 import chr from 'chroma-js';
 import { format } from 'date-fns';
 import React, { useMemo } from 'react';
-import { useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { LsBulb, LsCheck, LsEllipsis, LsMinus } from '../../assets/icons';
-import { Button, Dropdown, Menu, Userpic } from '../../components';
+import { Button, Dropdown, Menu, Pagination, Userpic } from '../../components';
 import { Block, Elem } from '../../utils/bem';
 import { absoluteURL } from '../../utils/helpers';
 
-export const ProjectsList = ({projects}) => {
-  const history = useHistory();
+export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, pageSize }) => {
   return (
-    <Elem name="list">
-      {projects.map(project => (
-        <ProjectCard key={project.id} project={project} history={history}/>
-      ))}
-    </Elem>
+    <>
+      <Elem name="list">
+        {projects.map(project => (
+          <ProjectCard key={project.id} project={project}/>
+        ))}
+      </Elem>
+      <Elem name="pages">
+        <Pagination
+          name="projects-list"
+          label="Projects"
+          page={currentPage}
+          totalItems={totalItems}
+          urlParamName="page"
+          pageSize={pageSize}
+          pageSizeOptions={[10, 30, 50, 100]}
+          onPageLoad={(page, pageSize) => loadNextPage(page, pageSize)}
+        />
+      </Elem>
+    </>
   );
 };
 
@@ -30,7 +42,7 @@ export const EmptyProjectsList = ({ openModal }) => {
   );
 };
 
-const ProjectCard = ({project, history}) => {
+const ProjectCard = ({ project }) => {
   const color = useMemo(() => {
     return project.color === '#FFFFFF' ? null : project.color;
   }, [project]);
@@ -44,7 +56,7 @@ const ProjectCard = ({project, history}) => {
 
   return (
     <Elem tag={NavLink} name="link" to={`/projects/${project.id}/data`} data-external>
-      <Block name="project-card" mod={{colored: !!color}} style={projectColors}>
+      <Block name="project-card" mod={{ colored: !!color }} style={projectColors}>
         <Elem name="header">
           <Elem name="title">
             <Elem name="title-text">
@@ -71,15 +83,15 @@ const ProjectCard = ({project, history}) => {
                 {project.num_tasks_with_annotations} / {project.task_number}
               </Elem>
               <Elem name="detail">
-                <Elem name="detail-item" mod={{type: "completed"}}>
+                <Elem name="detail-item" mod={{ type: "completed" }}>
                   <Elem tag={LsCheck} name="icon"/>
                   {project.total_annotations_number}
                 </Elem>
-                <Elem name="detail-item" mod={{type: "rejected"}}>
+                <Elem name="detail-item" mod={{ type: "rejected" }}>
                   <Elem tag={LsMinus} name="icon"/>
                   {project.skipped_annotations_number}
                 </Elem>
-                <Elem name="detail-item" mod={{type: "predictions"}}>
+                <Elem name="detail-item" mod={{ type: "predictions" }}>
                   <Elem tag={LsBulb} name="icon"/>
                   {project.total_predictions_number}
                 </Elem>

@@ -25,20 +25,20 @@ You can make changes to the labeling interface and configuration in the project 
 1. In Label Studio UI, open the project you want to modify.
 2. Click **Settings**.
 3. Click **Labeling Interface**.
-4. Browse templates, update the available labels, 
+4. Browse templates, update the available labels, or use the `Code` option to further customize the interface using [tags](/tags).
 
-> **Note:** After you start to annotate tasks, you cannot remove labels or change the type of labeling being performed, for example by choosing a new template, unless you delete the completed annotations using those labels.
+> **Note:** After you start to annotate tasks, you cannot remove labels or change the type of labeling being performed unless you delete the annotations using those labels.
 
 ## Customize a template
 
-You can customize a [labeling config template](/templates) or use a custom configuration that you create from scratch. If you create a custom configuration that might be useful to other Label Studio users, consider [contributing the configuration as a template](https://github.com/heartexlabs/label-studio/tree/master/label_studio/annotation_templates).
+You can customize a [labeling config template](/templates) or use a custom configuration that you create from scratch using [tags](/tags). If you create a custom configuration that might be useful to other Label Studio users, consider [contributing the configuration as a template](https://github.com/heartexlabs/label-studio/tree/master/label_studio/examples).
 
 The labeling configuration for a project is an XML file that contains three types of tags specific to Label Studio.
 
 | Tag type | When to use |
 | --- | --- |
 | Object | Specify the data type and input data sources from your dataset. |
-| Control | Configure how the annotation results appear. |
+| Control | Configure what type of annotation to perform and how the results of annotation appear. |
 | Visual | Define how the user interface looks for labeling. | 
 
 You can combine these tags to create a custom label configuration for your dataset. 
@@ -47,7 +47,7 @@ You can combine these tags to create a custom label configuration for your datas
 
 ### Example labeling config
 
-For example, to classify images that are referenced in your data as URLs (`$image_url`) into one of two classes, Cat or Dog, use this example labeling config: 
+For example, to classify images that are referenced in your data as URLs (`$image_url`) into one of two classes, Cat or Dog, use this example labeling configuration: 
 ```xml
 <View>
   <Image name="image_object" value="$image_url"/>
@@ -58,7 +58,7 @@ For example, to classify images that are referenced in your data as URLs (`$imag
 </View>
 ```
 
-This labeling config references the image resource in the [Image](/tags/image.html) object tag, and specifies the available labels to select in the [Choices](/tags/choices.html) control tag.
+This labeling configuration references the image resource in the [Image](/tags/image.html) object tag, and specifies the available labels to select in the [Choices](/tags/choices.html) control tag.
 
 If you want to customize this example, such as to allow labelers to select both Cat and Dog labels for a single image, modify the parameters used with the [Choices](/tags/choices.html) control tag:
 

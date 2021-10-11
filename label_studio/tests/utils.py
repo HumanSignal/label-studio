@@ -150,8 +150,9 @@ def upload_data(client, project, tasks):
     return client.post(f'/api/projects/{project.id}/tasks/bulk', data=data, content_type='application/json')
 
 
-def make_project(config, user, use_ml_backend=True, team_id=None):
-    org = Organization.objects.filter(created_by=user).first()
+def make_project(config, user, use_ml_backend=True, team_id=None, org=None):
+    if org is None:
+        org = Organization.objects.filter(created_by=user).first()
     project = Project.objects.create(created_by=user, organization=org, **config)
     if use_ml_backend:
         MLBackend.objects.create(project=project, url='http://localhost:8999')

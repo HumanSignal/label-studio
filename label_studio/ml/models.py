@@ -40,8 +40,8 @@ class MLBackend(models.Model):
     is_interactive = models.BooleanField(
         _('is_interactive'),
         default=False,
-        help_text=("It's used for interactive annotating. "
-                   'If true, model has to return one-length list with results')
+        help_text=("Used to interactively annotate tasks. "
+                   'If true, model returns one list with results')
     )
     url = models.TextField(
         _('url'),
@@ -78,7 +78,7 @@ class MLBackend(models.Model):
         _('timeout'),
         blank=True,
         default=100.0,
-        help_text='Responce model timeout',
+        help_text='Response model timeout',
     )
     project = models.ForeignKey(
         Project,
@@ -125,11 +125,18 @@ class MLBackend(models.Model):
         else:
             setup_response = self.setup()
             if setup_response.is_error:
+                logger.warning(f'ML backend responds with error: {setup_response.error_message}')
                 self.state = MLBackendState.ERROR
                 self.error_message = setup_response.error_message
             else:
                 self.state = MLBackendState.CONNECTED
-                self.model_version = setup_response.response.get('model_version')
+                model_version = setup_response.response.get('model_version')
+                logger.info(f'ML backend responds with success: {setup_response.response}')
+                self.model_version = model_version
+                if model_version != self.project.model_version:
+                    logger.debug(f'Changing project model version: {self.project.model_version} -> {model_version}')
+                    self.project.model_version = model_version
+                    self.project.save(update_fields=['model_version'])
                 self.error_message = None
         self.save()
 
@@ -145,7 +152,7 @@ class MLBackend(models.Model):
                 MLBackendTrainJob.objects.create(job_id=current_train_job, ml_backend=self)
         self.save()
 
-    def predict_many_tasks(self, tasks):
+    def predict_tasks(self, tasks):
         self.update_state()
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready')
@@ -157,7 +164,7 @@ class MLBackend(models.Model):
             tasks = Task.objects.filter(id__in=[task.id for task in tasks])
 
         tasks_ser = TaskSimpleSerializer(tasks, many=True).data
-        ml_api_result = self.api.make_predictions(tasks_ser, self.model_version, self.project)
+        ml_api_result = self.api.make_predictions(tasks_ser, self.project.model_version, self.project)
         if ml_api_result.is_error:
             logger.warning(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return
@@ -176,10 +183,10 @@ class MLBackend(models.Model):
         elif len(responses) == 1:
             logger.warning(
                 f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
-                f"switched to one-by-one task retrieving"
+                f"switched to one-by-one task retrieval"
             )
             for task in tasks:
-                self.predict_one_task(task)
+                self.__predict_one_task(task)
             return
 
         # wrong result number
@@ -208,7 +215,7 @@ class MLBackend(models.Model):
             prediction_ser.is_valid(raise_exception=True)
             prediction_ser.save()
 
-    def predict_one_task(self, task):
+    def __predict_one_task(self, task):
         self.update_state()
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready to predict {task}')
@@ -252,7 +259,7 @@ class MLBackend(models.Model):
     def interactive_annotating(self, task, context=None):
         result = {}
         if not self.is_interactive:
-            result['errors'] = ["You can't use not interactive model to interactive annotating"]
+            result['errors'] = ["Model is not set to be used for interactive preannotations"]
             return result
 
         tasks_ser = TaskSimpleSerializer([task], many=True).data
@@ -268,9 +275,9 @@ class MLBackend(models.Model):
             return result
 
         if not (isinstance(ml_api_result.response, dict) and 'results' in ml_api_result.response):
-            logger.warning(f'ML backend returns an incorrect response, it should be a dict: {ml_api_result.response}')
+            logger.warning(f'ML backend returns an incorrect response, it must be a dict: {ml_api_result.response}')
             result['errors'] = ['Incorrect response from ML service: '
-                                'ML backend returns an incorrect response, it should be a dict.']
+                                'ML backend returns an incorrect response, it must be a dict.']
             return result
 
         ml_results = ml_api_result.response.get(
@@ -294,7 +301,7 @@ class MLBackendPredictionJob(models.Model):
     job_id = models.CharField(max_length=128)
     ml_backend = models.ForeignKey(MLBackend, related_name='prediction_jobs', on_delete=models.CASCADE)
     model_version = models.TextField(
-        _('model version'), blank=True, null=True, help_text='Model version this job associated with'
+        _('model version'), blank=True, null=True, help_text='Model version this job is associated with'
     )
     batch_size = models.PositiveSmallIntegerField(
         _('batch size'), default=100, help_text='Number of tasks processed per batch'
@@ -351,22 +358,3 @@ def _validate_ml_api_result(ml_api_result, tasks, curr_logger):
         return False
 
     return True
-
-
-def _get_model_version(project, ml_api, curr_logger):
-    logger.debug(f'Get model version for project {project}')
-    model_version = None
-    ml_api_result = ml_api.setup(project)
-    if ml_api_result.is_error:
-        curr_logger.warning(
-            (
-                f'Project {project}: can\'t fetch last model version from {ml_api_result.url}, '
-                f'reason: {ml_api_result.error_message}.'
-            )
-        )
-    else:
-        if 'model_version' in ml_api_result.response:
-            model_version = ml_api_result.response['model_version']
-        else:
-            curr_logger.error(f'Project {project}: "model_version" field is not specified in response.')
-    return model_version

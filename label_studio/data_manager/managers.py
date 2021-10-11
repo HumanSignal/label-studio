@@ -1,7 +1,9 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import logging
 import re
+import ujson as json
+import logging
+
 
 from pydantic import BaseModel
 
@@ -72,17 +74,11 @@ def preprocess_field_name(raw_field_name, only_undefined_field=False):
     return field_name
 
 
-def get_fields_for_evaluation(prepare_params, request):
-    """ Collecting field names to annotate them
-
-    :param prepare_params: structure with filters and ordering
-    :param request: django request
-    :return: list of field names
-    """
-    from tasks.models import Task
-    from projects.models import Project
-
+def get_fields_for_filter_ordering(prepare_params):
     result = []
+    if prepare_params is None:
+        return result
+
     # collect fields from ordering
     if prepare_params.ordering:
         ordering_field_name = prepare_params.ordering[0].replace("tasks:", "").replace("-", "")
@@ -93,14 +89,28 @@ def get_fields_for_evaluation(prepare_params, request):
         for _filter in prepare_params.filters.items:
             filter_field_name = _filter.filter.replace("filter:tasks:", "")
             result.append(filter_field_name)
+    return result
+
+
+def get_fields_for_evaluation(prepare_params, user):
+    """ Collecting field names to annotate them
+
+    :param prepare_params: structure with filters and ordering
+    :param user: user
+    :return: list of field names
+    """
+    from tasks.models import Task
+    from projects.models import Project
+
+    result = []
+    result += get_fields_for_filter_ordering(prepare_params)
 
     # visible fields calculation
     fields = prepare_params.data.get('hiddenColumns', None)
     if fields:
         from label_studio.data_manager.functions import TASKS
         GET_ALL_COLUMNS = load_func(settings.DATA_MANAGER_GET_ALL_COLUMNS)
-        # we need to have a request here to detect user role
-        all_columns = GET_ALL_COLUMNS(request, Project.objects.get(id=prepare_params.project))
+        all_columns = GET_ALL_COLUMNS(Project.objects.get(id=prepare_params.project), user)
         all_columns = set([TASKS + ('data.' if c.get('parent', None) == 'data' else '') + c['id']
                            for c in all_columns['columns']])
         hidden = set(fields['explore']) & set(fields['labeling'])
@@ -200,13 +210,24 @@ def apply_filters(queryset, filters, only_undefined_field=False):
             filter_expressions.add(Q(annotations__completed_by__isnull=value), conjunction)
             continue
 
-        # annotations results
-        elif field_name == 'annotations_results' and _filter.operator == Operator.CONTAINS:
-            filter_expressions.add(Q(annotations__result__icontains=_filter.value), conjunction)
-            continue
-        elif field_name == 'annotations_results' and _filter.operator == Operator.NOT_CONTAINS:
-            filter_expressions.add(~Q(annotations__result__icontains=_filter.value), conjunction)
-            continue
+        # annotations results & predictions results
+        if field_name in ['annotations_results', 'predictions_results']:
+            name = 'annotations__result' if field_name == 'annotations_results' else 'predictions__result'
+            if _filter.operator in [Operator.EQUAL, Operator.NOT_EQUAL]:
+                try:
+                    value = json.loads(_filter.value)
+                except:
+                    return queryset.none()
+
+                q = Q(**{name: value})
+                filter_expressions.add(q if _filter.operator == Operator.EQUAL else ~q, conjunction)
+                continue
+            elif _filter.operator == Operator.CONTAINS:
+                filter_expressions.add(Q(**{name + '__icontains': _filter.value}), conjunction)
+                continue
+            elif _filter.operator == Operator.NOT_CONTAINS:
+                filter_expressions.add(~Q(**{name + '__icontains': _filter.value}), conjunction)
+                continue
 
         # annotation ids
         if field_name == 'annotations_ids':
@@ -220,6 +241,36 @@ def apply_filters(queryset, filters, only_undefined_field=False):
             elif 'equal' in _filter.operator:
                 if not _filter.value.isdigit():
                     _filter.value = 0
+
+        # annotators
+        if field_name == 'annotators' and _filter.operator == Operator.CONTAINS:
+            filter_expressions.add(Q(annotations__completed_by=int(_filter.value)), conjunction)
+            continue
+        elif field_name == 'annotators' and _filter.operator == Operator.NOT_CONTAINS:
+            filter_expressions.add(~Q(annotations__completed_by=int(_filter.value)), conjunction)
+            continue
+        elif field_name == 'annotators' and _filter.operator == Operator.EMPTY:
+            value = cast_bool_from_str(_filter.value)
+            filter_expressions.add(Q(annotations__completed_by__isnull=value), conjunction)
+            continue
+
+        # predictions model versions
+        if field_name == 'predictions_model_versions' and _filter.operator == Operator.CONTAINS:
+            q = Q()
+            for value in _filter.value:
+                q |= Q(predictions__model_version__contains=value)
+            filter_expressions.add(q, conjunction)
+            continue
+        elif field_name == 'predictions_model_versions' and _filter.operator == Operator.NOT_CONTAINS:
+            q = Q()
+            for value in _filter.value:
+                q &= ~Q(predictions__model_version__contains=value)
+            filter_expressions.add(q, conjunction)
+            continue
+        elif field_name == 'predictions_model_versions' and _filter.operator == Operator.EMPTY:
+            value = cast_bool_from_str(_filter.value)
+            filter_expressions.add(Q(predictions__model_version__isnull=value), conjunction)
+            continue
 
         # use other name because of model names conflict
         if field_name == 'file_upload':
@@ -248,7 +299,7 @@ def apply_filters(queryset, filters, only_undefined_field=False):
             value_type = type(queryset.values_list(field_name, flat=True)[0]).__name__
 
         if (value_type == 'list' or value_type == 'tuple') and 'equal' in _filter.operator:
-            _filter.value = '{' + str(_filter.value) + '}'
+            raise Exception('Not supported filter type')
 
         # special case: for strings empty is "" or null=True
         if _filter.type in ('String', 'Unknown') and _filter.operator == 'empty':
@@ -358,6 +409,9 @@ class TaskQuerySet(models.QuerySet):
 
         queryset = self
 
+        if prepare_params is None:
+            return queryset
+
         # project filter
         if prepare_params.project is not None:
             queryset = queryset.filter(project=prepare_params.project)
@@ -434,6 +488,14 @@ def annotate_annotations_ids(queryset):
         return queryset.annotate(annotations_ids=ArrayAgg('annotations__id'))
 
 
+def annotate_predictions_model_versions(queryset):
+    if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
+        return queryset.annotate(predictions_model_versions=GroupConcat('predictions__model_version',
+                                                                        output_field=models.CharField()))
+    else:
+        return queryset.annotate(predictions_model_versions=ArrayAgg('predictions__model_version'))
+
+
 def file_upload(queryset):
     return queryset.annotate(file_upload_field=F('file_upload__file'))
 
@@ -446,6 +508,7 @@ settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     "completed_at": annotate_completed_at,
     "annotations_results": annotate_annotations_results,
     "predictions_results": annotate_predictions_results,
+    "predictions_model_versions": annotate_predictions_model_versions,
     "predictions_score": annotate_predictions_score,
     "annotators": annotate_annotators,
     "annotations_ids": annotate_annotations_ids,
@@ -465,15 +528,10 @@ def update_annotation_map(obj):
 
 
 class PreparedTaskManager(models.Manager):
-    def get_queryset(self, fields_for_evaluation=None):
-        """
-        :param fields_for_evaluation: list of annotated fields in task or 'all' or None
-        :return: task queryset with annotated fields
-        """
-        queryset = TaskQuerySet(self.model)
+    @staticmethod
+    def annotate_queryset(queryset, fields_for_evaluation=None, all_fields=False):
         annotations_map = get_annotations_map()
 
-        all_fields = fields_for_evaluation == 'all'
         if fields_for_evaluation is None:
             fields_for_evaluation = []
 
@@ -499,21 +557,21 @@ class PreparedTaskManager(models.Manager):
 
         return queryset
 
-    def all(self, prepare_params=None, request=None, fields_for_evaluation=None):
-        """ Make a task queryset with filtering, ordering, annotations
-
-        :param prepare_params: prepare params with filters, orderings, etc
-        :param request: django request instance from API
-        :param fields_for_evaluation - 'all' or None for auto-evaluation by enabled filters, ordering, fields
-        :return: TaskQuerySet with filtered, ordered, annotated tasks
+    def get_queryset(self, fields_for_evaluation=None, prepare_params=None, all_fields=False):
         """
-        if prepare_params is None:
-            return self.get_queryset()
+        :param fields_for_evaluation: list of annotated fields in task
+        :return: task queryset with annotated fields
+        """
+        queryset = self.only_filtered(prepare_params=prepare_params)
+        return self.annotate_queryset(queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields)
 
-        fields = fields_for_evaluation or get_fields_for_evaluation(prepare_params, request)
-        return self.get_queryset(
-            fields_for_evaluation=fields
-        ).prepared(prepare_params=prepare_params)
+    def only_filtered(self, prepare_params=None):
+        queryset = TaskQuerySet(self.model)
+
+        fields_for_filter_ordering = get_fields_for_filter_ordering(prepare_params)
+        queryset = self.annotate_queryset(queryset, fields_for_evaluation=fields_for_filter_ordering)
+
+        return queryset.prepared(prepare_params=prepare_params)
 
 
 class TaskManager(models.Manager):

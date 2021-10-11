@@ -20,7 +20,7 @@ class DataManagerException(Exception):
     pass
 
 
-def get_all_columns(request, project):
+def get_all_columns(project, *_):
     """ Make columns info for the frontend data manager
     """
     result = {'columns': []}
@@ -170,6 +170,18 @@ def get_all_columns(request, project):
             }
         },
         {
+            'id': 'predictions_model_versions',
+            'title': "Prediction model versions",
+            'type': 'List',
+            'target': 'tasks',
+            'help': 'Model versions aggregated over all predictions',
+            'schema': {'items': project.get_model_versions()},
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        },
+        {
             'id': 'predictions_results',
             'title': "Prediction results",
             'type': "String",
@@ -233,7 +245,7 @@ def get_prepare_params(request, project):
 
 def get_prepared_queryset(request, project):
     prepare_params = get_prepare_params(request, project)
-    queryset = Task.prepared.all(prepare_params=prepare_params, request=request)
+    queryset = Task.prepared.only_filtered(prepare_params=prepare_params)
     return queryset
 
 
@@ -247,7 +259,7 @@ def evaluate_predictions(tasks):
 
     for ml_backend in project.ml_backends.all():
         # tasks = tasks.filter(~Q(predictions__model_version=ml_backend.model_version))
-        ml_backend.predict_many_tasks(tasks)
+        ml_backend.predict_tasks(tasks)
 
 
 def filters_ordering_selected_items_exist(data):

@@ -22,7 +22,12 @@ class GCSImportStorageSerializer(ImportStorageSerializer):
 
     def validate(self, data):
         data = super(GCSImportStorageSerializer, self).validate(data)
-        storage = GCSImportStorage(**data)
+        storage = self.instance
+        if storage:
+            for key, value in data.items():
+                setattr(storage, key, value)
+        else:
+            storage = GCSImportStorage(**data)
         try:
             storage.validate_connection()
         except Exception as exc:

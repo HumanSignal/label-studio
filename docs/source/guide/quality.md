@@ -82,7 +82,7 @@ Review a table to see the following for each annotator:
 - The number of tasks that they skipped.
 - The outcome of reviews for the annotations they performed.
 - The total annotation progress across all tasks in the project. 
-- The mean time to annotate the tasks.
+- The mean time to annotate the tasks. Select this header to view the `median time` instead. Mean time and median time are calculated using the total time spent on each task by an annotator, including idle time. 
 - The agreement of their annotations with the ground truth annotations, if there are any.
 - The agreement of their annotations with predicted annotations, if there are any. 
 

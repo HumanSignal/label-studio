@@ -7,6 +7,7 @@ import json
 import logging
 import pandas as pd
 import posixpath
+import mimetypes
 
 from pathlib import Path
 from django.utils._os import safe_join
@@ -176,7 +177,9 @@ def localfiles_data(request):
         path = posixpath.normpath(path).lstrip('/')
         full_path = Path(safe_join(local_serving_document_root, path))
         if os.path.exists(full_path):
-            return RangedFileResponse(request, open(full_path, mode='rb'))
+            content_type, encoding = mimetypes.guess_type(str(full_path))
+            content_type = content_type or 'application/octet-stream'
+            return RangedFileResponse(request, open(full_path, mode='rb'), content_type)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
 

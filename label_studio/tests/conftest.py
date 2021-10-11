@@ -32,6 +32,11 @@ from .utils import (
 boto3.set_stream_logger('botocore.credentials', logging.DEBUG)
 
 
+@pytest.fixture(autouse=False)
+def enable_csrf():
+    settings.USE_ENFORCE_CSRF_CHECKS = True
+
+
 @pytest.fixture(autouse=True)
 def disable_sentry():
     settings.SENTRY_RATE = 0
@@ -104,6 +109,14 @@ def s3_with_hypertext_s3_links(s3):
     s3.put_object(Bucket=bucket_name, Key='test.json', Body=json.dumps({
         'text': "<a href=\"s3://hypertext-bucket/file with /spaces and' / ' / quotes.jpg\"/>"
     }))
+    yield s3
+
+
+@pytest.fixture(autouse=True)
+def s3_with_unexisted_links(s3):
+    bucket_name = 'pytest-s3-jsons-unexisted_links'
+    s3.create_bucket(Bucket=bucket_name)
+    s3.put_object(Bucket=bucket_name, Key='some-existed-image.jpg', Body='qwerty')
     yield s3
 
 

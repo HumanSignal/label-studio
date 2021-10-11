@@ -14,7 +14,7 @@ import './MachineLearningSettings.styl';
 
 export const MachineLearningSettings = () => {
   const api = useAPI();
-  const {project, fetchProject, updateProject} = useContext(ProjectContext);
+  const { project, fetchProject, updateProject } = useContext(ProjectContext);
   const [mlError, setMLError] = useState();
   const [backends, setBackends] = useState([]);
   const [versions, setVersions] = useState([]);
@@ -51,7 +51,8 @@ export const MachineLearningSettings = () => {
 
   const showMLFormModal = useCallback((backend) => {
     const action = backend ? "updateMLBackend" : "addMLBackend";
-    console.log({backend});
+
+    console.log({ backend });
     const modalProps = {
       title: `${backend ? 'Edit' : 'Add'} model`,
       style: { width: 760 },
@@ -76,7 +77,7 @@ export const MachineLearningSettings = () => {
           </Form.Row>
 
           <Form.Row columnCount={1}>
-            <TextArea name="description" label="Description" style={{minHeight: 120}}/>
+            <TextArea name="description" label="Description" style={{ minHeight: 120 }}/>
           </Form.Row>
 
           <Form.Row columnCount={1}>
@@ -122,7 +123,7 @@ export const MachineLearningSettings = () => {
 
   return (
     <>
-      <Description style={{marginTop: 0, maxWidth: 680}}>
+      <Description style={{ marginTop: 0, maxWidth: 680 }}>
         Add one or more machine learning models to predict labels for your data.
         To import predictions without connecting a model,
         {" "}
@@ -137,29 +138,29 @@ export const MachineLearningSettings = () => {
       <Divider height={32}/>
 
       <Form action="updateProject"
-        formData={{...project}}
-        params={{pk: project.id}}
+        formData={{ ...project }}
+        params={{ pk: project.id }}
         onSubmit={() => fetchProject()}
         autosubmit
       >
         <Form.Row columnCount={1}>
           <Label text="ML-Assisted Labeling" large/>
 
-          <div style={{paddingLeft: 16}}>
+          <div style={{ paddingLeft: 16 }}>
             <Toggle
               label="Start model training after any annotations are submitted or updated"
               name="start_training_on_annotation_update"
             />
           </div>
 
-          <div style={{paddingLeft: 16}}>
+          <div style={{ paddingLeft: 16 }}>
             <Toggle
               label="Retrieve predictions when loading a task automatically"
               name="evaluate_predictions_automatically"
             />
           </div>
 
-          <div style={{paddingLeft: 16}}>
+          <div style={{ paddingLeft: 16 }}>
             <Toggle
               label="Show predictions to annotators in the Label Stream and Quick View"
               name="show_collab_predictions"
@@ -172,12 +173,12 @@ export const MachineLearningSettings = () => {
             <Label
               text="Model Version"
               description="Model version allows you to specify which prediction will be shown to the annotators."
-              style={{marginTop: 16}}
+              style={{ marginTop: 16 }}
               large
             />
 
-            <div style={{display: 'flex', alignItems: 'center', width: 400, paddingLeft: 16}}>
-              <div style={{flex: 1, paddingRight: 16}}>
+            <div style={{ display: 'flex', alignItems: 'center', width: 400, paddingLeft: 16 }}>
+              <div style={{ flex: 1, paddingRight: 16 }}>
                 <Select
                   name="model_version"
                   defaultValue={null}

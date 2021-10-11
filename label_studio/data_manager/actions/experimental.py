@@ -49,36 +49,6 @@ def propagate_annotations(project, queryset, **kwargs):
     return {'response_code': 200}
 
 
-def predictions_to_annotations(project, items, **kwargs):
-    for i in items:
-        task = project.source_storage.get(i)
-        predictions = task.get('predictions', [])
-        if len(predictions) == 0:
-            continue
-
-        prediction = predictions[-1]
-
-        # load task with annotation from target storage
-        task_with_annotations = project.target_storage.get(i)
-        task = copy(task if task_with_annotations is None else task_with_annotations)
-
-        annotations = task.get('annotations', None) or [{'id': i * 9000}]
-        annotation = {
-            'id': max([c['id'] for c in annotations]) + 1,
-            'created_at': timestamp_now(),
-            'lead_time': 0,
-            'result': prediction.get('result', [])
-        }
-
-        if 'annotations' not in task:
-            task['annotations'] = []
-        task['annotations'].append(annotation)
-
-        project.target_storage.set(i, task)
-
-    return {'response_code': 200}
-
-
 actions = [
     {
         'entry_point': propagate_annotations,
@@ -99,18 +69,6 @@ actions = [
                     '! Warning: it is an experimental feature! It could work well with Choices, '
                     'but other annotation types (RectangleLabels, Text Labels, etc) '
                     'will have a lot of issues.',
-            'type': 'confirm'
-        }
-    },
-
-    {
-        'entry_point': predictions_to_annotations,
-        'permission': all_permissions.tasks_change,
-        'title': 'Predictions => annotations',
-        'order': 1,
-        'experimental': True,
-        'dialog': {
-            'text': 'This action will create a new annotation from the last task prediction for each selected task.',
             'type': 'confirm'
         }
     }
