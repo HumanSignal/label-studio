@@ -44,22 +44,17 @@ As you label tasks, Label Studio sends webhook events to your machine learning b
 2. Under **ML-Assisted Labeling**, enable the setting to **Show predictions to annotators in the Label Stream and Quick View**. 
 
 ## Configure webhooks to send a training event to the ML backend
-
-
-Note on this: ML backend doesn't require a payload to be sent along with the webhook event itself. But you can use it to retrieve project-related details (e.g. project ID) that might be useful in some cases:
-
-retrieve data from Label Studio / connected storage via API
-using project settings to define training hyperparameters
-check project state for experiment tracking
-(later we include links to all items' best practices)
+Notify your ML backend every time an annotation is created or updated so that it can start training in response.  
 
 1. In the Label Studio UI, open the project that you want to use for active learning.
 2. Click **Settings > Webhooks**.
 3. Click **Add Webhook**. 
 4. Add the following URL as your **Payload URL**: `http://localhost:9090/webhook`
-5. Leave the option to **Send payload** enabled.
+5. (Optional) Leave the option to **Send payload** enabled. The ML backend does not require a payload, but you can use it in your code to retrieve project-related details, such as the project ID that you can use to retrieve data, define training hyperparameters based on project settings, retrieve the project state, or other details.
 6. Disable the option to **Send for all actions** and enable **Annotation created** and **Annotation updated**.
 7. Click **Add Webhook**. 
+
+For more details on the webhook event payloads, see the full [payload details for the annotation webhook](webhook_reference.html#Annotation-Created). 
 
 ## Set up task sampling with prediction scores
 
