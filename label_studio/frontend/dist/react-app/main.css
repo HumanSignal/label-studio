@@ -3719,6 +3719,8 @@ body {
   width: 100%;
   min-width: 650px;
   font-size: 16px;
+}
+.ls-people-list__wrapper {
   border-radius: 4px;
   box-shadow: 0 0 0 1px rgba(0,0,0,0.15) inset;
 }

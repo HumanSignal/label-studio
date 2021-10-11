@@ -1,10 +1,10 @@
-import React, { FC, forwardRef, useCallback, useEffect, useMemo, useState } from "react";
+import { CSSProperties, FC, forwardRef, KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { Block, Elem } from "../../utils/bem";
 import { clamp, isDefined } from "../../utils/helpers";
 import { useValueTracker } from "../Form/Utils";
 import { Select } from '../Form/Elements';
 import "./Pagination.styl";
-import { useFirstMountState, useUpdateEffect } from "../../utils/hooks";
+import { useUpdateEffect } from "../../utils/hooks";
 
 interface PaginationProps {
   name?: string
@@ -20,12 +20,13 @@ interface PaginationProps {
   urlParamName?: string,
   pageSizeOptions?: number[],
   size?: "small" | "medium" | "large"
+  style?: CSSProperties,
   onInit?: (pageNumber: number, pageSize: number) => void
   onChange?: (pageNumber: number, pageSize: number) => void
   onPageLoad?: (pageNumber: number, pageSize: number) => Promise<void>
 }
 
-const isSystemEvent = (e: React.KeyboardEvent<HTMLInputElement>): boolean => {
+const isSystemEvent = (e: KeyboardEvent<HTMLInputElement>): boolean => {
   return (
     (e.code.match(/arrow/i) !== null) ||
     (e.shiftKey && e.code.match(/arrow/i) !== null) ||
@@ -162,8 +163,8 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
     return () => window.removeEventListener('popstate', popStateHandler);
   }, [props.urlParamName]);
 
-  return (
-    <Block name="pagination" mod={{ disabled, size, waiting }}>
+  return (totalPages > 1) ? (
+    <Block name="pagination" mod={{ disabled, size, waiting }} style={props.style}>
       {(props.label && isDefined(pageSize)) && (
         <Elem name="label">
           {props.label}: {visibleItems.start}-{visibleItems.end}
@@ -253,7 +254,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
         </Elem>
       )}
     </Block>
-  );
+  ) : null;
 });
 
 const NavigationButton: FC<{
@@ -268,4 +269,22 @@ const NavigationButton: FC<{
   return (
     <Elem name="btn" mod={mod} onClick={props.onClick}/>
   );
+};
+
+export const usePage = (paramName: string, initialValue = 1) => {
+  const params = new URLSearchParams(location.search);
+  const urlValue = params.get(paramName);
+
+  const [page, setPage] = useState(urlValue ? parseInt(urlValue) : initialValue);
+
+  return [page, setPage];
+};
+
+export const usePageSize = (paramName: string, initialValue = 1) => {
+  const params = new URLSearchParams(location.search);
+  const urlValue = params.get(paramName);
+
+  const [pageSize, setPageSize] = useState(urlValue ? parseInt(urlValue) : initialValue);
+
+  return [pageSize, setPageSize];
 };
