@@ -1,6 +1,6 @@
 {
- "message": "[fix] List operators",
- "commit": "f55d7cf9faced4ee938ff987354d32421a09b0c4",
- "branch": "HEAD",
- "date": "2021/10/07 17:11:19"
+ "message": "[ext] Add annotation and prediction parents to annotation submit",
+ "commit": "fa2da49b59401e51823e4526db0ddc6bbcd44ef5",
+ "branch": "master",
+ "date": "2021/10/11 23:36:59"
 }

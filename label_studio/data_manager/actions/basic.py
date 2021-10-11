@@ -101,8 +101,8 @@ def predictions_to_annotations(project, queryset, **kwargs):
     user = kwargs['request'].user
     predictions = list(
         queryset
-        .filter(predictions__isnull=False, predictions__child_annotations__isnull=True)
-        .values_list('predictions__result', 'predictions__model_version', 'id', 'predictions__id')
+            .filter(predictions__isnull=False, predictions__child_annotations__isnull=True)
+            .values_list('predictions__result', 'predictions__model_version', 'id', 'predictions__id')
     )
 
     # prepare annotations
@@ -150,11 +150,14 @@ actions = [
                     'for each selected task.',
             'type': 'confirm',
             'form': [{
-                'type': 'enum',
-                'name': 'model_version',
-                'label': 'Choice a model',
-                'values': ['version 1', 'version 2']
-            }]
+                'columnCount': 1,
+                'fields': [{
+                    'type': 'select',
+                    'name': 'model_version',
+                    'label': 'Choose a model',
+                    'options': ['version 1', 'version 2'],
+                }]
+            }],
         }
     },
 
