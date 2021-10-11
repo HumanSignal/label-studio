@@ -1,6 +1,6 @@
 {
- "message": "[ext] Parent annotations and preditions on Create Copy",
- "commit": "df5024a6e5e65f700d50104a1daa30832ec55aff",
+ "message": "Add parent annotations, fix styles",
+ "commit": "73555b417ab811033c8d0b3bd3c16130e9298f3b",
  "branch": "feature/parent-anno",
- "date": "2021/10/11 19:56:51"
+ "date": "2021/10/11 23:36:04"
 }
