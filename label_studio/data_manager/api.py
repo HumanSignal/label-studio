@@ -352,7 +352,7 @@ class ProjectActionsAPI(APIView):
         pk = int_from_request(request.GET, "project", 1)  # replace 1 to None, it's for debug only
         project = get_object_with_check_and_log(request, Project, pk=pk)
         self.check_object_permissions(request, project)
-        return Response(get_all_actions(request.user))
+        return Response(get_all_actions(request.user, project))
 
     @swagger_auto_schema(tags=["Data Manager"])
     def post(self, request):

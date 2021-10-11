@@ -6,6 +6,7 @@
     they are called by entry_points from settings.DATA_MANAGER_ACTIONS dict items.
 """
 import os
+import copy
 import logging
 import traceback as tb
 
@@ -29,13 +30,15 @@ def check_permissions(user, action):
     return user.has_perm(action['permission'])
 
 
-def get_all_actions(user):
+def get_all_actions(user, project):
     """ Return dict with registered actions
 
     :param user: list with user permissions
+    :param project: current project
     """
     # copy and sort by order key
     actions = list(settings.DATA_MANAGER_ACTIONS.values())
+    actions = copy.deepcopy(actions)
     actions = sorted(actions, key=lambda x: x['order'])
     actions = [
         {key: action[key] for key in action if key != 'entry_point'}
@@ -45,6 +48,13 @@ def get_all_actions(user):
     # remove experimental features if they are disabled
     if not settings.EXPERIMENTAL_FEATURES:
         actions = [action for action in actions if not action.get('experimental', False)]
+
+    # generate form if function is passed
+    for action in actions:
+        form_generator = action.get('dialog', {}).get('form')
+        if callable(form_generator):
+            action['dialog']['form'] = form_generator(user, project)
+
     return actions
 
 
