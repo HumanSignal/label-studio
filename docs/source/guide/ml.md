@@ -35,29 +35,18 @@ To get started, [use an example ML backend](#Get-started-with-an-example-ML-back
 
 ## Get started with an example ML backend
 
-Label Studio includes several example machine learning backends with popular machine learning models. See the [machine learning tutorials](ml_tutorials.html) or look at the code in the [`label-studio-ml/examples` section of the Label Studio ML backend repository](https://github.com/heartexlabs/label-studio-ml-backend/tree/master/label_studio_ml/examples).
+Label Studio includes several example machine learning backends with popular machine learning models. See the [machine learning tutorials](ml_tutorials.html).
 
 To start an example machine learning backend with Docker Compose, do the following:
-1. Make sure ports 9090 and 6379 are available.
+1. Make sure port 9090 is available.
 2. Clone the Label Studio Machine Learning Backend git repository. From the command line, run the following:
   ```bash
    git clone https://github.com/heartexlabs/label-studio-ml-backend  
    ```
-3. Set up the environment. From the command line, run the following:
+3. Change to the directory with the Docker Compose configuration file. From the command line, run the following:
    ```bash
-   cd label-studio-ml-backend
-   
-   # Install label-studio-ml and its dependencies
-   pip install -U -e .
-   
-   # Install the dependencies for the example ML backend
-   pip install -r label_studio_ml/examples/requirements.txt
+   cd label-studio-ml-backend/label_studio_ml/default_configs
    ```
-3. Initialize a specific example machine learning backend. This command uses the example simple text classifier model as an ML backend:
-    ```bash
-    label-studio-ml init my-ml-backend --script label_studio-ml/examples/simple_text_classifier.py
-    ```
-3. Change to the `my-ml-backend/` directory.
 4. Start Docker Compose. From the command line, run the following:
     ```bash
     docker-compose up
