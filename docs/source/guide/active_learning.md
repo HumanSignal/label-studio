@@ -75,9 +75,16 @@ As your model retrains and a new version is updated in Label Studio, the tasks s
 
 If you want to change the behavior of the active learning loop, you can make manual changes.
 
+- Customize the prediction score produced by the model by modifying the inference call. See [Make predictions with your ML backend](#Make-predictions-with-your-ML-backend) for details and example code. 
 - To change the version of the model used to show predictions to annotators, update it in the machine learning settings. See [Choose which predictions to show to annotators](ml.html#Choose-which-predictions-to-display-to-annotators).
 - If you want to delete all predictions after your model is retrained, see how to [delete predictions](ml.html#Delete-predictions).
-- If you need to retrieve and save predictions for all tasks, check recommendations for [retrieving predictions from a model](ml.html#Get-predictions-from-a-model).
+- If you need to retrieve and save predictions for all tasks, see the recommendations for [retrieving predictions from a model](ml.html#Get-predictions-from-a-model).
 
-### Set up manual active learning
-If you're using Label Studio community edition, data annotators can't experience a live active learning loop. You can mimic an active learning experience by manually [retrieving predictions from a model](ml.html#Get-predictions-from-a-model) and by [sorting the tasks in the data manager by prediction score](labeling.html#Example-Sort-by-prediction-score) and selecting **Label Tasks As Displayed** when labeling tasks. However, the tasks won't automatically update the order as the machine learning backend trains with each new annotation. Because of this, you could perform batched active learning, where you annotate and train in batches rather than on-the-fly in an automated loop. 
+### Set up manual active learning 
+
+If you're using Label Studio community edition, data annotators can't experience a live active learning loop. You can mimic an active learning experience by doing the following:
+1. Manually [retrieve predictions from a model](ml.html#Get-predictions-from-a-model).
+2. [Sort the tasks in the data manager by prediction score](labeling.html#Example-Sort-by-prediction-score).
+3. Select **Label Tasks As Displayed** when labeling tasks. 
+
+This manual active learning loop does not automatically update the order of tasks presented to annotators as the ML backend trains with each new annotation and produces new predictions. Therefore, instead of on-the-fly automated active learning, you can perform a form of batched active learning, where you perform annotation for a period, stop to train the model, then retrieve new predictions and start annotating tasks again.
