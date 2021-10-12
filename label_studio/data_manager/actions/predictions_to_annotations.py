@@ -45,7 +45,7 @@ def predictions_to_annotations(project, queryset, **kwargs):
 def predictions_to_annotations_form(user, project):
     versions = project.get_model_versions()
 
-    # put current model version on top of the list
+    # put the current model version on the top of the list
     first = project.model_version
     if first is not None:
         try:
