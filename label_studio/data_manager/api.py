@@ -199,7 +199,7 @@ class TaskListAPI(generics.ListAPIView):
         return Task.prepared.only_filtered(prepare_params=view.get_prepare_tasks_params())
 
     @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
-    def get(self, request, pk=None):
+    def get(self, request):
         """
         get:
         Get task list for view
@@ -207,8 +207,10 @@ class TaskListAPI(generics.ListAPIView):
         Retrieve a list of tasks with pagination for a specific view using filters and ordering.
         """
         view = self.get_object()
-        queryset = self.get_task_queryset(request, view)
+        # prepare_params = get_prepare_params(request,
+
         project = view.project
+        queryset = self.get_task_queryset(request, view)
         context = self.get_task_serializer_context(self.request, project)
 
         # paginated tasks

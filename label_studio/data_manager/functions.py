@@ -213,7 +213,7 @@ def get_all_columns(project, *_):
 
 def get_prepare_params(request, project):
     # use filters and selected items from view
-    view_id = int_from_request(request.GET, 'view_id', 0)
+    view_id = int_from_request(request.GET, 'view_id', 0) or int_from_request(request.data, 'view_id', 0)
     if view_id > 0:
         view = get_object_or_404(request, View, pk=view_id)
         if view.project.pk != project.pk:
