@@ -2,7 +2,6 @@
 import logging
 
 from django.db import migrations
-from django.contrib.postgres.operations import TrigramExtension
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +30,5 @@ class Migration(migrations.Migration):
     dependencies = [('tasks', '0008_auto_20210903_1332')]
 
     operations = [
-        TrigramExtension(),
         migrations.RunPython(forwards, backwards),
     ]

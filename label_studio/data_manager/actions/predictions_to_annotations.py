@@ -43,17 +43,17 @@ def predictions_to_annotations(project, queryset, **kwargs):
 
 
 def predictions_to_annotations_form(user, project):
-    return None
-
-    """first = project.model_version
     versions = project.get_model_versions()
-    versions = set(versions)
-    try:
-        versions.remove(first)
-    except KeyError:
-        pass
-    versions = sorted(list(versions))
-    versions = [first] + versions
+
+    # put current model version on top of the list
+    first = project.model_version
+    if first is not None:
+        try:
+            versions.remove(first)
+        except ValueError:
+            pass
+        versions = [first] + versions
+
     return [{
         'columnCount': 1,
         'fields': [{
@@ -62,7 +62,7 @@ def predictions_to_annotations_form(user, project):
             'label': 'Choose a model',
             'options': versions,
         }]
-    }]"""
+    }]
 
 
 actions = [
