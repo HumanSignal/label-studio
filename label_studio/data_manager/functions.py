@@ -212,10 +212,14 @@ def get_all_columns(project, *_):
 
 
 def get_prepare_params(request, project):
+    """ This function extract prepare_params from
+        * view_id if it's inside of request data
+        * selectedItems, filters, ordering if they are in request and there is no view_id
+    """
     # use filters and selected items from view
-    view_id = int_from_request(request.GET, 'view_id', 0) or int_from_request(request.data, 'view_id', 0)
+    view_id = int_from_request(request.GET, 'view', 0) or int_from_request(request.data, 'view', 0)
     if view_id > 0:
-        view = get_object_or_404(request, View, pk=view_id)
+        view = get_object_or_404(View, pk=view_id)
         if view.project.pk != project.pk:
             raise DataManagerException('Project and View mismatch')
         prepare_params = view.get_prepare_tasks_params(add_selected_items=True)

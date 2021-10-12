@@ -204,9 +204,15 @@ class TaskListAPI(generics.ListAPIView):
         Retrieve a list of tasks with pagination for a specific view using filters and ordering.
         """
         # get project
+        view_pk = int_from_request(request.GET, 'view', 0) or int_from_request(request.data, 'view', 0)
         project_pk = int_from_request(request.GET, 'project', 0) or int_from_request(request.data, 'project', 0)
-        project = get_object_with_check_and_log(request, Project, pk=project_pk)
-        self.check_object_permissions(request, project)
+        if project_pk:
+            project = get_object_with_check_and_log(request, Project, pk=project_pk)
+            self.check_object_permissions(request, project)
+        else:
+            view = get_object_with_check_and_log(request, View, pk=view_pk)
+            project = view.project
+            self.check_object_permissions(request, project)
 
         # get prepare params (from view or from payload directly)
         prepare_params = get_prepare_params(request, project)
