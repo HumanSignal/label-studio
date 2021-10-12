@@ -418,7 +418,7 @@ stages:
   - name: get_tasks
     request:
       method: GET
-      url: '{django_live_url}/api/dm/tasks?fields=all&views_id={view.id}'
+      url: '{django_live_url}/api/dm/tasks?fields=all&view={view.id}'
     response:
       json: {
         "total_annotations": 0,
