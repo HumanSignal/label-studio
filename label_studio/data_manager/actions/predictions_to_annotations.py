@@ -43,13 +43,22 @@ def predictions_to_annotations(project, queryset, **kwargs):
 
 
 def predictions_to_annotations_form(user, project):
+    first = project.model_version
+    versions = project.get_model_versions()
+    versions = set(versions)
+    try:
+        versions.remove(first)
+    except KeyError:
+        pass
+    versions = sorted(list(versions))
+    versions = [first] + versions
     return [{
         'columnCount': 1,
         'fields': [{
             'type': 'select',
             'name': 'model_version',
             'label': 'Choose a model',
-            'options': project.get_model_versions(),
+            'options': versions,
         }]
     }]
 
@@ -61,7 +70,7 @@ actions = [
         'title': 'Create Annotations From Predictions',
         'order': 91,
         'dialog': {
-            'text': 'This action will create a new annotation from predictions with the current project model version '
+            'text': 'This action will create new annotations from predictions with the selected model version '
                     'for each selected task.',
             'type': 'confirm',
             'form': predictions_to_annotations_form,
