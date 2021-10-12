@@ -25,12 +25,12 @@ def predictions_to_annotations(project, queryset, **kwargs):
 
     # prepare annotations
     annotations = []
-    for prediction in predictions:
+    for result, model_version, task_id, prediction_id in predictions:
         annotations.append({
-            'result': prediction[0],
+            'result': result,
             'completed_by': user.pk,
-            'task': prediction[2],
-            'parent_prediction': prediction[3]
+            'task': task_id,
+            'parent_prediction': prediction_id
         })
 
     count = len(annotations)
@@ -43,7 +43,9 @@ def predictions_to_annotations(project, queryset, **kwargs):
 
 
 def predictions_to_annotations_form(user, project):
-    first = project.model_version
+    return None
+
+    """first = project.model_version
     versions = project.get_model_versions()
     versions = set(versions)
     try:
@@ -60,7 +62,7 @@ def predictions_to_annotations_form(user, project):
             'label': 'Choose a model',
             'options': versions,
         }]
-    }]
+    }]"""
 
 
 actions = [
