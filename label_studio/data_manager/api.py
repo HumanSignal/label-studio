@@ -10,7 +10,6 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
-from django.db.models import Sum, Count
 from django.conf import settings
 from ordered_set import OrderedSet
 
@@ -20,7 +19,7 @@ from projects.models import Project
 from projects.serializers import ProjectSerializer
 from tasks.models import Task, Annotation, Prediction
 
-from data_manager.functions import get_all_columns, get_prepared_queryset, evaluate_predictions
+from data_manager.functions import get_prepared_queryset, evaluate_predictions, get_prepare_params
 from data_manager.models import View
 from data_manager.managers import get_fields_for_evaluation
 from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer, ViewResetSerializer
@@ -165,8 +164,6 @@ class TaskPagination(PageNumberPagination):
 
 
 class TaskListAPI(generics.ListAPIView):
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["project"]
     task_serializer_class = DataManagerTaskSerializer
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
@@ -195,8 +192,8 @@ class TaskListAPI(generics.ListAPIView):
             'annotations': all_fields
         }
 
-    def get_task_queryset(self, request, view):
-        return Task.prepared.only_filtered(prepare_params=view.get_prepare_tasks_params())
+    def get_task_queryset(self, request, prepare_params):
+        return Task.prepared.only_filtered(prepare_params=prepare_params)
 
     @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
     def get(self, request):
@@ -206,18 +203,21 @@ class TaskListAPI(generics.ListAPIView):
 
         Retrieve a list of tasks with pagination for a specific view using filters and ordering.
         """
-        view = self.get_object()
-        # prepare_params = get_prepare_params(request,
+        # get project
+        project_pk = int_from_request(request.GET, 'project', 0) or int_from_request(request.data, 'project', 0)
+        project = get_object_with_check_and_log(request, Project, pk=project_pk)
+        self.check_object_permissions(request, project)
 
-        project = view.project
-        queryset = self.get_task_queryset(request, view)
+        # get prepare params (from view or from payload directly)
+        prepare_params = get_prepare_params(request, project)
+        queryset = self.get_task_queryset(request, prepare_params)
         context = self.get_task_serializer_context(self.request, project)
 
         # paginated tasks
         self.pagination_class = TaskPagination
         page = self.paginate_queryset(queryset)
         all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
-        fields_for_evaluation = get_fields_for_evaluation(view.get_prepare_tasks_params(), request.user)
+        fields_for_evaluation = get_fields_for_evaluation(prepare_params, request.user)
         if page is not None:
             ids = [task.id for task in page]  # page is a list already
             tasks = list(
