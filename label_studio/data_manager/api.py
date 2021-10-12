@@ -51,6 +51,13 @@ class ViewAPI(viewsets.ModelViewSet):
     serializer_class = ViewSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["project"]
+    permission_required = ViewClassPermission(
+        GET=all_permissions.tasks_view,
+        POST=all_permissions.tasks_change,
+        PATCH=all_permissions.tasks_change,
+        PUT=all_permissions.tasks_change,
+        DELETE=all_permissions.tasks_delete,
+    )
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -164,6 +171,7 @@ class TaskPagination(PageNumberPagination):
 
 
 class TaskListAPI(generics.ListAPIView):
+    swagger_schema = None
     task_serializer_class = DataManagerTaskSerializer
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
