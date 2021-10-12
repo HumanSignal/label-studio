@@ -214,7 +214,7 @@ def get_all_columns(project, *_):
 def get_prepare_params(request, project):
     """ This function extract prepare_params from
         * view_id if it's inside of request data
-        * selectedItems, filters, ordering if they are in request and there is no view_id
+        * selectedItems, filters, ordering if they are in request and there is no view id
     """
     # use filters and selected items from view
     view_id = int_from_request(request.GET, 'view', 0) or int_from_request(request.data, 'view', 0)
