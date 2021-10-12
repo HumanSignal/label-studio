@@ -53,7 +53,7 @@ actions = [
     {
         'entry_point': propagate_annotations,
         'permission': all_permissions.tasks_change,
-        'title': 'Propagate annotations',
+        'title': 'Propagate Annotations',
         'order': 1,
         'experimental': True,
         'dialog': {

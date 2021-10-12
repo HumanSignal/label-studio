@@ -1,6 +1,6 @@
 {
- "message": "[fix] Colors for agreement column",
- "commit": "78fd0487e684185e3139350a0390e2fdabc4003e",
- "branch": "HEAD",
- "date": "2021/10/07 01:40:54"
+ "message": "[ext] Add annotation and prediction parents to annotation submit",
+ "commit": "fa2da49b59401e51823e4526db0ddc6bbcd44ef5",
+ "branch": "master",
+ "date": "2021/10/11 23:36:59"
 }
