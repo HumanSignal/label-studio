@@ -1,6 +1,6 @@
 {
- "message": "Add parent annotations, fix styles",
- "commit": "73555b417ab811033c8d0b3bd3c16130e9298f3b",
- "branch": "feature/parent-anno",
- "date": "2021/10/11 23:36:04"
+  "message": "[fix] brush+draft: save touches; pause on draw\n\n- save touches in drafts, it's much faster than full serialization\n- pause autosave during drawing process to reduce glithes",
+  "commit": "7a87fe943519be7d32c3bdcca2f9e1e387f90eec",
+  "branch": "fix/brush-draft-touches",
+  "date": "2021-10-13T20:50:04Z"
 }

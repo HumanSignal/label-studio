@@ -1,6 +1,6 @@
 {
- "message": "[ext] Add annotation and prediction parents to annotation submit",
- "commit": "fa2da49b59401e51823e4526db0ddc6bbcd44ef5",
- "branch": "master",
- "date": "2021/10/11 23:36:59"
+  "message": "Merge 'master' into fix/draft-serialization",
+  "commit": "b9c95162eb236d2eab6bbc2029017d921f6af3bd",
+  "branch": "fix/draft-serialization",
+  "date": "2021-10-13T20:55:05Z"
 }
