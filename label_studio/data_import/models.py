@@ -41,7 +41,7 @@ class FileUpload(models.Model):
 
     @property
     def url(self):
-        if settings.HOSTNAME:
+        if settings.HOSTNAME and settings.DEFAULT_FILE_STORAGE != 'storages.backends.s3boto3.S3Boto3Storage':
             return settings.HOSTNAME + self.file.url
         else:
             return self.file.url
