@@ -1,6 +1,6 @@
 {
-  "message": "[fix] History ovrriding query option",
-  "commit": "8d8e0532f952d1eec873d8fd2320da1e913a7a4e",
-  "branch": "master",
-  "date": "2021-09-21T08:34:07Z"
+  "message": "make virtual tabs works with new api",
+  "commit": "d4b18e77619a33cfc8d2280908030f93bc5665ba",
+  "branch": "",
+  "date": "2021-10-12T22:51:10Z"
 }
