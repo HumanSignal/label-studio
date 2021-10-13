@@ -1,6 +1,6 @@
 {
-  "message": "make virtual tabs works with new api",
-  "commit": "d4b18e77619a33cfc8d2280908030f93bc5665ba",
+  "message": "Add hiddenColumns to virtual tab query",
+  "commit": "35e173fd142bdd2e53dbacb63c5768677675751b",
   "branch": "",
-  "date": "2021-10-12T22:51:10Z"
+  "date": "2021-10-13T19:19:01Z"
 }
