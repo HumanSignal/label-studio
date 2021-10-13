@@ -11,13 +11,6 @@ object-assign
 */
 
 /*!
- * The buffer module from node.js, for the browser.
- *
- * @author   Feross Aboukhadijeh <https://feross.org>
- * @license  MIT
- */
-
-/*!
  * index-of <https://github.com/jonschlinkert/index-of>
  *
  * Copyright (c) 2014-2015 Jon Schlinkert.
@@ -121,10 +114,6 @@ and limitations under the License.
 /*! ./webaudio */
 
 /*! debounce */
-
-/*! http://mths.be/fromcodepoint v0.1.0 by @mathias */
-
-/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 
 /*! no static exports found */
 

@@ -9,6 +9,7 @@ from rest_framework import serializers
 from tasks.models import Annotation, Task
 from tasks.serializers import PredictionSerializer
 from users.models import User
+from users.serializers import UserSimpleSerializer
 
 from .models import Export
 
@@ -58,7 +59,9 @@ class ExportSerializer(serializers.ModelSerializer):
             'md5',
             'counters',
         ]
-        fields = read_only
+        fields = ['title'] + read_only
+
+    created_by = UserSimpleSerializer(required=False)
 
 
 ONLY_OR_EXCLUDE_CHOICE = [
@@ -72,16 +75,19 @@ class TaskFilterOptionsSerializer(serializers.Serializer):
     view = serializers.IntegerField(required=False)
     skipped = serializers.ChoiceField(choices=ONLY_OR_EXCLUDE_CHOICE, allow_null=True, required=False)
     finished = serializers.ChoiceField(choices=ONLY_OR_EXCLUDE_CHOICE, allow_null=True, required=False)
+    annotated = serializers.ChoiceField(choices=ONLY_OR_EXCLUDE_CHOICE, allow_null=True, required=False)
 
 
 class AnnotationFilterOptionsSerializer(serializers.Serializer):
-    ground_truth = serializers.ChoiceField(choices=ONLY_OR_EXCLUDE_CHOICE, allow_null=True, required=False)
+    usual = serializers.BooleanField(allow_null=True, required=False, default=True)
+    ground_truth = serializers.BooleanField(allow_null=True, required=False)
+    skipped = serializers.BooleanField(allow_null=True, required=False)
 
 
 class SerializationOptionsSerializer(serializers.Serializer):
     drafts = serializers.JSONField(required=False)
     predictions = serializers.JSONField(required=False)
-    completed_by = serializers.JSONField(required=False)
+    annotations__completed_by = serializers.JSONField(required=False)
 
 
 class ExportCreateSerializer(ExportSerializer):

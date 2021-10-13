@@ -149,7 +149,7 @@ def test_webhooks_for_tasks(configured_project, business_client, organization_we
             content_type="application/json",
         )
     assert response.status_code == 201
-    assert len(m.request_history) == 1
+    assert len(m.request_history) == 2  # 1st is a webhook.url, 2nd is a ML backend
     assert m.request_history[0].json()['action'] == WebhookAction.TASKS_CREATED
 
     # DELETE WITHOUT WEBHOOK

@@ -1,6 +1,6 @@
 {
-  "message": "Roll back to U instead of Alt+U",
-  "commit": "352c3e45c473a60dd13680a1ef30d9a60e42b15f",
+  "message": "Merge pull request #307 from heartexlabs/fix/trimming-in-symbol-granularity\n\nExclude trimming step from symbol granularity mode",
+  "commit": "f90a09a3859e290f71350f653eb34d9045f95698",
   "branch": "master",
-  "date": "2021-09-21T07:47:50Z"
+  "date": "2021-10-12T13:27:07Z"
 }

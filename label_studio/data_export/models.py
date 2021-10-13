@@ -8,6 +8,7 @@ import pathlib
 import shutil
 from copy import deepcopy
 from datetime import datetime
+from functools import reduce
 
 import django_rq
 import ujson as json
@@ -22,6 +23,11 @@ from django.conf import settings
 from django.core.cache.backends.base import default_key_func
 from django.core.files import File
 from django.db import models, transaction
+from django.db.models.query_utils import Q
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils import dateformat, timezone
+from django.utils.module_loading import module_has_submodule
 from django.utils.translation import gettext_lazy as _
 from django_rq import queues
 from label_studio_converter import Converter
@@ -42,6 +48,12 @@ class Export(models.Model):
         FAILED = 'failed', _('Failed')
         COMPLETED = 'completed', _('Completed')
 
+    title = models.CharField(
+        _('title'),
+        blank=True,
+        default='',
+        max_length=settings.PROJECT_TITLE_MAX_LEN,
+    )
     project = models.ForeignKey(
         'projects.Project',
         related_name='exports',
@@ -86,15 +98,16 @@ class Export(models.Model):
     def has_permission(self, user):
         return self.project.has_permission(user)
 
+    def get_default_title(self):
+        return f"{self.project.title.replace(' ', '-')}-at-{dateformat.format(timezone.now(), 'Y-m-d-H-i')}"
+
     def _get_filtered_tasks(self, tasks, task_filter_options=None):
         """
         task_filter_options: None or Dict({
             view: optional int id or View
-
             skipped: optional None or str:("include|exclude")
-
             finished: optional None or str:("include|exclude")
-                task.is_labled = true
+            annotated: optional None or str:("include|exclude")
         })
         """
         if not isinstance(task_filter_options, dict):
@@ -122,24 +135,41 @@ class Export(models.Model):
                 tasks = tasks.filter(is_labled=True)
             elif value == EXCLUDE:
                 tasks = tasks.exclude(is_labled=True)
+        if 'annotated' in task_filter_options:
+            value = task_filter_options['annotated']
+            # if any annotation exists and is not cancelled
+            if value == ONLY:
+                tasks = tasks.filter(annotations__was_cancelled=False)
+            elif value == EXCLUDE:
+                tasks = tasks.exclude(annotations__was_cancelled=False)
+
         return tasks
 
     def _get_filtered_annotations(self, annotations, annotation_filter_options=None):
         """
+        Filtering using disjunction of conditions
+
         annotation_filter_options: None or Dict({
-            ground_truth: optional None or str:("include|exclude")
-                annotations.ground_truth
+            usual: optional None or bool:("true|false")
+            ground_truth: optional None or bool:("true|false")
+            skipped: optional None or bool:("true|false")
         })
         """
         if not isinstance(annotation_filter_options, dict):
             return annotations
-        if 'ground_truth' in annotation_filter_options:
-            value = annotation_filter_options['ground_truth']
-            if value == ONLY:
-                annotations = annotations.filter(ground_truth=True)
-            elif value == EXCLUDE:
-                annotations = annotations.exclude(ground_truth=True)
-        return annotations
+
+        q_list = []
+        if annotation_filter_options.get('usual'):
+            q_list.append(Q(was_cancelled=False, ground_truth=False))
+        if annotation_filter_options.get('ground_truth'):
+            q_list.append(Q(ground_truth=True))
+        if annotation_filter_options.get('skipped'):
+            q_list.append(Q(was_cancelled=True))
+        if not q_list:
+            return annotations
+
+        q = reduce(lambda x, y: x | y, q_list)
+        return annotations.filter(q)
 
     def _get_export_serializer_option(self, serialization_options):
 
@@ -242,7 +272,12 @@ class Export(models.Model):
             tasks = self._get_filtered_tasks(tasks, task_filter_options=task_filter_options)
             tasks = list(tasks)
             for task in tasks:
-                task._annotations = self._get_filtered_annotations(task.annotations.all(), annotation_filter_options)
+                task._annotations = list(
+                    self._get_filtered_annotations(
+                        task.annotations.all(),
+                        annotation_filter_options=annotation_filter_options,
+                    )
+                )
 
             serializer_option_for_generator = self._get_export_serializer_option(serialization_options)
             serializer_option_for_generator['field_options'] = {
@@ -261,6 +296,12 @@ class Export(models.Model):
         annotation_filter_options=None,
         serialization_options=None,
     ):
+        logger.debug(
+            f'Run export for {self.id} with params:\n'
+            f'task_filter_options: {task_filter_options}\n'
+            f'annotation_filter_options: {annotation_filter_options}\n'
+            f'serialization_options: {serialization_options}\n'
+        )
         try:
             data, counters = self.get_export_data(
                 task_filter_options=task_filter_options,
@@ -350,7 +391,15 @@ def export_background(export_id, task_filter_options, annotation_filter_options,
     )
 
 
+@receiver(post_save, sender=Export)
+def set_export_default_name(sender, instance, created, **kwargs):
+    if created and not instance.title:
+        instance.title = instance.get_default_title()
+        instance.save()
+
+
 class DataExport(object):
+    # TODO: deprecated
     @staticmethod
     def save_export_files(project, now, get_args, data, md5, name):
         """Generate two files: meta info and result file and store them locally for logging"""
