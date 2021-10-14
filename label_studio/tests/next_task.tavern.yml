@@ -31,8 +31,8 @@ stages:
     url: '{django_live_url}/api/projects/{project_pk}/model-versions'
   response:
     json:
-      - model_version_A
       - model_version_B
+      - model_version_A
 
 - name: get_next_task
   request:
