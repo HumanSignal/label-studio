@@ -65,24 +65,26 @@ def agreement(annotation_1, annotation_2, per_label=False) -> float:
         return 0
 ```
 
-If you set `per_label=True`, you can define a separate method or agreement score for each label. If you do this, you must return a separate score for each label. For example, for a named entity recognition task, you could use the following function to assign a specific agreement score for each label used in an annotation:
+If you set `per_label=True`, you can define a separate method or agreement score for each label. If you do this, you must return a separate score for each label. For example, for a classification task, you could use the following function to assign a weight and return a specific agreement score for each label used in an annotation:
 
 ```python
-def agreement(annotation_1, annotation_2, per_label=True) -> float:
+def agreement(annotation_1, annotation_2, per_label=False) -> float:
 
-    # Retrieve two annotations in the Label Studio JSON format
-    r1 = annotation_1["result"][0]["value"]["labels"][0]
-    r2 = annotation_2["result"][0]["value"]["labels"][0]
+    label_1 = annotation_1["result"][0]["value"]["choices"][0]
+    label_2 = annotation_2["result"][0]["value"]["choices"][0]
+    weight = {"Positive": 0.99, "Negative": 0.01}
     
-    if per_label:
-    # per label calculation returns a JSON dictionary with labels
-        return {"PER": 0.123, "ORG": 0.456, "LOC": 0.789, "MISC": 0.147}
+    if label_1 == label_2:
+        if per_label:
+            return {label_1: weight[label_1]}
+        else:
+            return weight[label_1]
     else:
-        return 0
+        if per_label:
+            return {label_1: 0, label_2: 0}
+        else:
+            return 0
 ```
-
-
-
 
 ## Add your custom agreement metric to Label Studio Enterprise
 
