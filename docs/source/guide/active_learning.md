@@ -28,7 +28,7 @@ After a user creates an annotation in Label Studio, the configured webhook sends
 To set up this active learning, do the following: 
 1. [Set up an ML model as an ML backend for active learning](#Set-up-an-ML-model-as-an-ML-backend-for-active-learning).
 2. [Connect the ML backend for getting predictions to Label Studio](#Connect-the-ML-backend-to-Label-Studio-for-active-learning).
-3. [Configure webhooks to send a training event to the ML backend (optional)](#Configure-webhooks-to-send-a-training-event-to-the-ML-backend). 
+3. [Configure webhooks to send a training event to the ML backend (optional)](#Configure-webhooks-to-send-a-training-event-to-the-ML-backend-(optional)). 
 4. [Set up task sampling with prediction scores](#Set-up-task-sampling-with-prediction-scores).
 5. [Label the tasks](#Label-the-tasks). 
 
@@ -44,8 +44,10 @@ As you label tasks, Label Studio sends webhook events to your machine learning b
 2. Under **ML-Assisted Labeling**, enable the setting to **Show predictions to annotators in the Label Stream and Quick View**. 
 
 ## Configure webhooks to send a training event to the ML backend (optional)
-Machine Learning backend connection create a webhook that defines Label Studio event driven training logic. By default, it notifies your ML backend every time an annotation is created or updated so that it can start training in response. 
-If you want to customize the events and payloads, do the following:
+
+By default, Label Studio notifies your ML backend every time an annotation is created or updated so that it can start training in response. 
+
+If you want, you can set up your project to send a webhook event and use that event and payload to drive event-specific training logic in your ML backend. If you want to customize the events and payloads sent to your ML backend, do the following:
 
 1. In the Label Studio UI, open the project that you want to use for active learning.
 2. Click **Settings > Webhooks**.
