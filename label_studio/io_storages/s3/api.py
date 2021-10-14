@@ -22,7 +22,7 @@ from io_storages.api import (
 @method_decorator(
     name='get',
     decorator=swagger_auto_schema(
-        tags=['Storage - S3'],
+        tags=['Storage:S3'],
         operation_summary='Get import storage',
         operation_description='Get list of all S3 import storage connections.',
     ),
@@ -30,7 +30,7 @@ from io_storages.api import (
 @method_decorator(
     name='post',
     decorator=swagger_auto_schema(
-        tags=['Storage - S3'], operation_summary='Create new storage', operation_description='Get new S3 import storage'
+        tags=['Storage:S3'], operation_summary='Create new storage', operation_description='Get new S3 import storage'
     ),
 )
 class S3ImportStorageListAPI(ImportStorageListAPI):
@@ -41,7 +41,7 @@ class S3ImportStorageListAPI(ImportStorageListAPI):
 @method_decorator(
     name='get',
     decorator=swagger_auto_schema(
-        tags=['Storage - S3'],
+        tags=['Storage:S3'],
         operation_summary='Get import storage',
         operation_description='Get a specific S3 import storage connection.',
     ),
@@ -49,7 +49,7 @@ class S3ImportStorageListAPI(ImportStorageListAPI):
 @method_decorator(
     name='patch',
     decorator=swagger_auto_schema(
-        tags=['Storage - S3'],
+        tags=['Storage:S3'],
         operation_summary='Update import storage',
         operation_description='Update a specific S3 import storage connection.',
     ),
@@ -57,7 +57,7 @@ class S3ImportStorageListAPI(ImportStorageListAPI):
 @method_decorator(
     name='delete',
     decorator=swagger_auto_schema(
-        tags=['Storage - S3'],
+        tags=['Storage:S3'],
         operation_summary='Delete import storage',
         operation_description='Delete a specific S3 import storage connection.',
     ),
@@ -70,7 +70,7 @@ class S3ImportStorageDetailAPI(ImportStorageDetailAPI):
 @method_decorator(
     name='post',
     decorator=swagger_auto_schema(
-        tags=['Storage - S3'],
+        tags=['Storage:S3'],
         operation_summary='Sync import storage',
         operation_description='Sync tasks from an S3 import storage connection.',
     ),
@@ -82,7 +82,7 @@ class S3ImportStorageSyncAPI(ImportStorageSyncAPI):
 @method_decorator(
     name='post',
     decorator=swagger_auto_schema(
-        tags=['Storage - S3'],
+        tags=['Storage:S3'],
         operation_summary='Validate import storage',
         operation_description='Validate a specific S3 import storage connection.',
     ),
@@ -94,7 +94,7 @@ class S3ImportStorageValidateAPI(ImportStorageValidateAPI):
 @method_decorator(
     name='post',
     decorator=swagger_auto_schema(
-        tags=['Storage - S3'],
+        tags=['Storage:S3'],
         operation_summary='Validate export storage',
         operation_description='Validate a specific S3 export storage connection.',
     ),
@@ -106,7 +106,7 @@ class S3ExportStorageValidateAPI(ExportStorageValidateAPI):
 @method_decorator(
     name='get',
     decorator=swagger_auto_schema(
-        tags=['Storage - S3'],
+        tags=['Storage:S3'],
         operation_summary='Get all export storage',
         operation_description='Get a list of all S3 export storage connections.',
     ),
@@ -114,7 +114,7 @@ class S3ExportStorageValidateAPI(ExportStorageValidateAPI):
 @method_decorator(
     name='post',
     decorator=swagger_auto_schema(
-        tags=['Storage - S3'],
+        tags=['Storage:S3'],
         operation_summary='Create export storage',
         operation_description='Create a new S3 export storage connection to store annotations.',
     ),
@@ -127,7 +127,7 @@ class S3ExportStorageListAPI(ExportStorageListAPI):
 @method_decorator(
     name='get',
     decorator=swagger_auto_schema(
-        tags=['Storage - S3'],
+        tags=['Storage:S3'],
         operation_summary='Get export storage',
         operation_description='Get a specific S3 export storage connection.',
     ),
@@ -135,7 +135,7 @@ class S3ExportStorageListAPI(ExportStorageListAPI):
 @method_decorator(
     name='patch',
     decorator=swagger_auto_schema(
-        tags=['Storage - S3'],
+        tags=['Storage:S3'],
         operation_summary='Update export storage',
         operation_description='Update a specific S3 export storage connection.',
     ),
@@ -143,7 +143,7 @@ class S3ExportStorageListAPI(ExportStorageListAPI):
 @method_decorator(
     name='delete',
     decorator=swagger_auto_schema(
-        tags=['Storage - S3'],
+        tags=['Storage:S3'],
         operation_summary='Delete export storage',
         operation_description='Delete a specific S3 export storage connection.',
     ),
@@ -156,7 +156,7 @@ class S3ExportStorageDetailAPI(ExportStorageDetailAPI):
 @method_decorator(
     name='post',
     decorator=swagger_auto_schema(
-        tags=['Storage - S3'],
+        tags=['Storage:S3'],
         operation_summary='Sync export storage',
         operation_description='Sync tasks from an S3 export storage connection.',
     ),
