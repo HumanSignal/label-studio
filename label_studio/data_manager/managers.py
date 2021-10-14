@@ -224,13 +224,13 @@ def apply_filters(queryset, filters, only_undefined_field=False):
                     return queryset.none()
 
                 q = Q(**{name: value})
-                filter_expressions.append(q if _filter.operator == Operator.EQUAL else ~q, conjunction)
+                filter_expressions.append(q if _filter.operator == Operator.EQUAL else ~q)
                 continue
             elif _filter.operator == Operator.CONTAINS:
-                filter_expressions.append(Q(**{name + '__icontains': _filter.value}), conjunction)
+                filter_expressions.append(Q(**{name + '__icontains': _filter.value}))
                 continue
             elif _filter.operator == Operator.NOT_CONTAINS:
-                filter_expressions.append(~Q(**{name + '__icontains': _filter.value}), conjunction)
+                filter_expressions.append(~Q(**{name + '__icontains': _filter.value}))
                 continue
 
         # annotation ids
