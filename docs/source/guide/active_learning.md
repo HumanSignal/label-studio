@@ -21,7 +21,7 @@ Creating annotated training data for supervised machine learning models can be e
 
 Continuously train and review predictions from a connected machine learning model using Label Studio. 
 
-<br/><img src="/images/LS-active-learning.jpg" alt="Diagram of the active learning workflow described in surrounding text" class="gif-border" width="800px" height="244px" />
+<br/><img src="/images/LS-active-learning.jpg" alt="Diagram of the active learning workflow described in surrounding text" class="gif-border" width="800px" height="472px" />
 
 After a user creates an annotation in Label Studio, the configured webhook sends a message to the machine learning backend with the information about the created annotation. The fit() method of the ML backend runs to train the model. When the user moves on to the next labeling task, Label Studio retrieves the latest prediction for the task from the ML backend, which runs the predict() method on the task.
 
