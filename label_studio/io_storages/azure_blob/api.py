@@ -2,6 +2,7 @@
 """
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from io_storages.azure_blob.models import AzureBlobImportStorage, AzureBlobExportStorage
 from io_storages.azure_blob.serializers import AzureBlobImportStorageSerializer, AzureBlobExportStorageSerializer
 from io_storages.api import (
@@ -24,6 +25,16 @@ from io_storages.api import (
         tags=['Storage: Azure'],
         operation_summary='Get all import storage',
         operation_description='Get list of all Azure import storage connections.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='project',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                items=openapi.Schema(title='Project ID', description='Project ID for which to list storage',
+                                     type=openapi.TYPE_INTEGER),
+                description='Project ID',
+            ),
+        ],
     ),
 )
 @method_decorator(
@@ -122,6 +133,16 @@ class AzureBlobExportStorageValidateAPI(ExportStorageValidateAPI):
         tags=['Storage: Azure'],
         operation_summary='Get all export storage',
         operation_description='Get a list of all Azure export storage connections.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='project',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                items=openapi.Schema(title='Project ID', description='Project ID for which to list storage',
+                                     type=openapi.TYPE_INTEGER),
+                description='Project ID',
+            ),
+        ],
     ),
 )
 @method_decorator(

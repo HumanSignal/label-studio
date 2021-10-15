@@ -24,6 +24,16 @@ from io_storages.api import (
         tags=['Storage: Redis'],
         operation_summary='Get all import storage',
         operation_description='Get a list of all Redis import storage connections.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='project',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                items=openapi.Schema(title='Project ID', description='Project ID for which to list storage',
+                                     type=openapi.TYPE_INTEGER),
+                description='Project ID',
+            ),
+        ],
     ),
 )
 @method_decorator(
@@ -122,6 +132,16 @@ class RedisExportStorageValidateAPI(ExportStorageValidateAPI):
         tags=['Storage: Redis'],
         operation_summary='Get all export storage',
         operation_description='Get a list of all Redis export storage connections.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='project',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                items=openapi.Schema(title='Project ID', description='Project ID for which to list storage',
+                                     type=openapi.TYPE_INTEGER),
+                description='Project ID',
+            ),
+        ],
     ),
 )
 @method_decorator(

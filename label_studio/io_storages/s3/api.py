@@ -24,7 +24,17 @@ from io_storages.api import (
     decorator=swagger_auto_schema(
         tags=['Storage:S3'],
         operation_summary='Get import storage',
-        operation_description='Get list of all S3 import storage connections.',
+        operation_description='Get a list of all S3 import storage connections.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='project',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                items=openapi.Schema(title='Project ID', description='Project ID for which to list storage',
+                                     type=openapi.TYPE_INTEGER),
+                description='Project ID',
+            ),
+        ],
     ),
 )
 @method_decorator(
@@ -109,6 +119,16 @@ class S3ExportStorageValidateAPI(ExportStorageValidateAPI):
         tags=['Storage:S3'],
         operation_summary='Get all export storage',
         operation_description='Get a list of all S3 export storage connections.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='project',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                items=openapi.Schema(title='Project ID', description='Project ID for which to list storage',
+                                     type=openapi.TYPE_INTEGER),
+                description='Project ID',
+            ),
+        ],
     ),
 )
 @method_decorator(

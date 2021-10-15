@@ -24,6 +24,16 @@ from io_storages.api import (
         tags=['Storage: Local'],
         operation_summary='Get all import storage',
         operation_description='Get a list of all local file import storage connections.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='project',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                items=openapi.Schema(title='Project ID', description='Project ID for which to list storage',
+                                     type=openapi.TYPE_INTEGER),
+                description='Project ID',
+            ),
+        ],
     ),
 )
 @method_decorator(
@@ -122,6 +132,16 @@ class LocalFilesExportStorageValidateAPI(ExportStorageValidateAPI):
         tags=['Storage: Local'],
         operation_summary='Get all export storage',
         operation_description='Get a list of all Local export storage connections.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='project',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                items=openapi.Schema(title='Project ID', description='Project ID for which to list storage',
+                                     type=openapi.TYPE_INTEGER),
+                description='Project ID',
+            ),
+        ],
     ),
 )
 @method_decorator(
