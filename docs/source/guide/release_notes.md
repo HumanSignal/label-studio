@@ -28,15 +28,15 @@ This release also includes other important improvements.
 ### Data manager improvements
 - Create annotations from predictions by selecting tasks and using the drop-down menu options. 
 - Added the ability to remove reviewer and annotator assignments to tasks using the drop-down menu options for selected tasks. <!--HTX-2143-->
-- Improved filtering behavior. 
-- Added the ability to label tasks as displayed.
+- Enhanced filtering behavior to be robust and support filtering by reviewers, annotators, and fields in your task data. 
+- Added the ability to label tasks as displayed, allowing you to filter and sort your data and label tasks accordingly. See more in [Filter or sort project data](labeling.html#Filter-or-sort-project-data).
 - Improved performance by reducing the time it takes to load tasks.
 
 ### Labeling and tag improvements
 
 - Added the ability to manipulate regions when labeling images, such as selecting and moving multiple regions, duplicating regions, and more. See [Advanced image labeling](labeling.html#Advanced-image-labeling). 
 - Added [new hotkeys to accelerate labeling](labeling.html#Use-keyboard-shortcuts-to-label-regions-faster).
-- Added a dedicated [`<Video>` tag](/tags/video.html), a [`<Number>` tag](/tags/number.html), and a [`<DateTime>` tag](/tags/datetime.html). 
+- Added a dedicated [`<Video>` tag](/tags/video.html) and a [`<Number>` tag](/tags/number.html). 
 - Added a `hint` parameter for the [`<Label>` tag](/tags/label.html) so that you can provide additional guidance to annotators. <!--HTX-1933--> 
 
 ### Import and export improvements
