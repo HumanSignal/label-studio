@@ -1,6 +1,6 @@
 {
- "message": "[ext] Add annotation and prediction parents to annotation submit",
- "commit": "fa2da49b59401e51823e4526db0ddc6bbcd44ef5",
- "branch": "master",
- "date": "2021/10/11 23:36:59"
+ "message": "Form fields fix",
+ "commit": "6cc91af181fcc223a4af2ba28d58f1749cae6e3a",
+ "branch": "HEAD",
+ "date": "2021/10/12 13:17:15"
 }
