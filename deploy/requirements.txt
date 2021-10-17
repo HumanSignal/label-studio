@@ -14,7 +14,7 @@ django_annoying==0.10.6
 django_debug_toolbar==3.2.1
 django_filter==2.4.0
 django_model_utils==4.1.1
-django_rq==2.3.2
+django_rq==2.4.1
 django-cors-headers==3.6.0
 django-extensions==3.1.0
 django-rest-swagger==2.2.0
@@ -37,7 +37,7 @@ pydantic>=1.7.3,<=1.8.2
 python_dateutil==2.8.1
 pytz==2019.3
 requests>=2.22.0,<3
-rq==1.7.0
+rq==1.10.0
 rules==2.2
 ujson>=3.0.0
 xmljson==0.2.0

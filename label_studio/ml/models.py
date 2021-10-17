@@ -1,20 +1,19 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import django_rq
 import logging
-from django.db import models, transaction
+from django.db import models
 
 # Create your models here.
-from django.db.models import F, Count, Q
 from django.utils.translation import gettext_lazy as _
-from django_rq import job
-from rq import get_current_job
+from django.dispatch import receiver
+from django.db.models.signals import post_save, pre_delete
 
 from core.utils.common import safe_float, conditional_atomic
 from ml.api_connector import MLApi
 from projects.models import Project
-from tasks.models import Annotation, Prediction
-from tasks.serializers import TaskSerializer, TaskSimpleSerializer, PredictionSerializer
+from tasks.models import Prediction
+from tasks.serializers import TaskSimpleSerializer, PredictionSerializer
+from webhooks.serializers import WebhookSerializer, Webhook
 
 logger = logging.getLogger(__name__)
 
@@ -358,3 +357,24 @@ def _validate_ml_api_result(ml_api_result, tasks, curr_logger):
         return False
 
     return True
+
+
+@receiver(post_save, sender=MLBackend)
+def create_ml_webhook(sender, instance, created, **kwargs):
+    if not created:
+        return
+    ml_backend = instance
+    webhook_url = ml_backend.url.rstrip('/') + '/webhook'
+    project = ml_backend.project
+    if Webhook.objects.filter(project=project, url=webhook_url).exists():
+        logger.info(f'Webhook {webhook_url} already exists for project {project}: skip creating new one.')
+        return
+    logger.info(f'Create ML backend webhook {webhook_url}')
+    ser = WebhookSerializer(data=dict(
+        project=project.id,
+        url=webhook_url,
+        send_payload=True,
+        send_for_all_actions=True)
+    )
+    if ser.is_valid():
+        ser.save(organization=project.organization)
