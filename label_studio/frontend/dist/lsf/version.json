@@ -1,6 +1,6 @@
 {
- "message": "Add parent annotations, fix styles",
- "commit": "73555b417ab811033c8d0b3bd3c16130e9298f3b",
- "branch": "feature/parent-anno",
- "date": "2021/10/11 23:36:04"
+  "message": "Move hotkeys to a separate config file (#322)\n\n* Move hotkeys to a separate config file\r\n\r\n* Enable keymap override\r\n\r\n* Extend default keymap instead of overriding\r\n\r\n* Make sure that the default keymap object is never changed",
+  "commit": "929fc8d83d7bef8ce86d4e13d7bc14e5b028de26",
+  "branch": "master",
+  "date": "2021-10-17T16:03:40Z"
 }
