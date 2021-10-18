@@ -136,8 +136,6 @@ class AzureBlobExportStorageValidateAPI(ExportStorageValidateAPI):
                 name='project',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_QUERY,
-                items=openapi.Schema(title='Project ID', description='Project ID for which to list storage',
-                                     type=openapi.TYPE_INTEGER),
                 description='Project ID',
             ),
         ],
