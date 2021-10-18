@@ -2,6 +2,7 @@
 """
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi as openapi
 
 from io_storages.s3.models import S3ImportStorage, S3ExportStorage
 from io_storages.s3.serializers import S3ImportStorageSerializer, S3ExportStorageSerializer

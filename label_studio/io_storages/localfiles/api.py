@@ -2,6 +2,7 @@
 """
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi as openapi
 from io_storages.localfiles.models import LocalFilesImportStorage, LocalFilesExportStorage
 from io_storages.localfiles.serializers import LocalFilesImportStorageSerializer, LocalFilesExportStorageSerializer
 from io_storages.api import (

@@ -2,6 +2,7 @@
 """
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi as openapi
 from io_storages.redis.models import RedisImportStorage, RedisExportStorage
 from io_storages.redis.serializers import RedisImportStorageSerializer, RedisExportStorageSerializer
 from io_storages.api import (
