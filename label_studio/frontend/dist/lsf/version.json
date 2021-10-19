@@ -1,6 +1,6 @@
 {
-  "message": "Move hotkeys to a separate config file (#322)\n\n* Move hotkeys to a separate config file\r\n\r\n* Enable keymap override\r\n\r\n* Extend default keymap instead of overriding\r\n\r\n* Make sure that the default keymap object is never changed",
-  "commit": "929fc8d83d7bef8ce86d4e13d7bc14e5b028de26",
+  "message": "[fix] Hotkeys mapping",
+  "commit": "b8ca48475159834dbca026c1a831b6f823fe3c38",
   "branch": "master",
-  "date": "2021-10-17T16:03:40Z"
+  "date": "2021-10-19T09:17:06Z"
 }
