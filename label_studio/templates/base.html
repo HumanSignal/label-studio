@@ -100,6 +100,7 @@
     sentry_dsn: {% if settings.FRONTEND_SENTRY_DSN %}"{{ settings.FRONTEND_SENTRY_DSN }}"{% else %}null{% endif %},
     sentry_rate: "{{ settings.FRONTEND_SENTRY_RATE }}",
     sentry_environment: "{{ settings.FRONTEND_SENTRY_ENVIRONMENT }}",
+    editor_keymap: JSON.parse({{ settings.EDITOR_KEYMAP|safe }}),
 
     {% block app_more_settings %}
       flags: {

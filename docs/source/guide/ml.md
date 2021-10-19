@@ -7,101 +7,130 @@ meta_title: Set up machine learning with Label Studio
 meta_description: Connect Label Studio to machine learning frameworks using the Label Studio ML backend SDK to integrate your model development pipeline seamlessly with your data labeling workflow. 
 ---
 
-Set up machine learning with your labeling process by setting up a machine learning backend for Label Studio. 
+Set up machine learning with your labeling process by setting up a machine learning backend for Label Studio. If you need to load static pre-annotated data into Label Studio, running an ML backend might be more than you need. Instead, you can [import pre-annotated data](predictions.html).
 
 With Label Studio, you can set up your favorite machine learning models to do the following:
 - **Pre-labeling** by letting models predict labels and then perform further manual refinements. 
 - **Auto-labeling** by letting models create automatic annotations. 
 - **Online Learning** by simultaneously updating your model while new annotations are created, letting you retrain your model on-the-fly. 
-- **Active Learning** by selecting example tasks that the model is uncertain how to label for your annotators to label. 
+- [**Active Learning**](active_learning.html) by selecting example tasks that the model is uncertain how to label for your annotators to label. 
 
 With these capabilities, you can use Label Studio as part of a production-ready prediction service. 
 
-## How to set up machine learning with Label Studio?
+## How to set up machine learning with Label Studio
 
-Use the Label Studio ML backend to integrate Label Studio with machine learning models. The Label Studio ML backend is an SDK that you can use to wrap your machine learning code and turn it into a web server. You can then connect that server to a Label Studio instance to perform 2 tasks:
+Use the Label Studio ML backend to integrate Label Studio with machine learning models. The Label Studio ML backend is an SDK that you can use to wrap your machine learning model code and turn it into a web server. You can then connect that server to a Label Studio instance to perform 2 tasks:
 - Dynamically pre-annotate data based on model inference results
 - Retrain or fine-tune a model based on recently annotated data
-For example, for an image classification task, the model pre-selects an image class for data annotators to verify. For audio transcriptions, the model displays a transcription that data annotators can modify. If you need to load static pre-annotated data into Label Studio, running an ML backend might be more than you need. Instead, you can [import pre-annotated data](predictions.html).
-  
 
-To set up a Label Studio ML backend, perform the following steps:
-1. Get your model code, either by writing one from scratch or using an existing model.
-2. Wrap it with the [Label Studio SDK](ml_create.html).
-3. Create a running server script.
-4. Launch the script.
-5. Connect Label Studio to the ML backend on the UI.
-For an example, follow the [Quickstart](#Quickstart). For help with steps 1-3, see how to [create your own machine learning backend](ml_create.html).
+For example, for an image classification task, the model pre-selects an image class for data annotators to verify. For audio transcriptions, the model displays a transcription that data annotators can modify. 
 
-## Quickstart
+At a high level, do the following: 
+1. Set up an ML backend. You can [use an example ML backend](#Quickstart-with-an-example-ML-backend) or [create your own machine learning backend](ml_create.html).
+2. [Connect Label Studio to the ML backend](#Add-an-ML-backend-to-Label-Studio).
 
-Get started with a machine learning (ML) backend with Label Studio. You need to start both the machine learning backend and Label Studio to start labeling. You can review examples in the [`label-studio-ml/examples` section of the Label Studio ML backend repository](https://github.com/heartexlabs/label-studio-ml-backend/tree/master/label_studio_ml/examples) or in the [machine learning tutorials](ml_tutorials.html).
+## Quickstart with an example ML backend
 
-Follow these steps to set up an example text classifier ML backend with Label Studio:
+Label Studio includes several example machine learning backends with popular machine learning models. See the [machine learning tutorials](ml_tutorials.html).
 
-1. Clone the Label Studio Machine Learning Backend git repository.
+To start an example machine learning backend with Docker Compose, do the following:
+1. Make sure port 9090 is available.
+2. Clone the Label Studio Machine Learning Backend git repository. From the command line, run the following:
   ```bash
    git clone https://github.com/heartexlabs/label-studio-ml-backend  
    ```
-   
-2. Set up the environment.
-    
-   It is highly recommended to use `venv`, `virtualenv` or `conda` python environments. You can use the same environment as Label Studio. [Read more in the Python documentation](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments) about creating virtual environments via `venv`.
-   
+3. Change to the directory with the Docker Compose configuration file. From the command line, run the following:
+   ```bash
+   cd label-studio-ml-backend/label_studio_ml/default_configs
+   ```
+4. Start Docker Compose. From the command line, run the following:
+    ```bash
+    docker-compose up
+    ```
+The machine learning backend server starts becomes available at `http://localhost:9090`. You can now [add the machine learning backend to Label Studio](#Add-an-ML-backend-to-Label-Studio) and [set up your project](setup_project.html).
+
+## Start your custom ML backend with Label Studio
+
+After you [create your own machine learning backend](ml_create.html), you can start the ML backend by doing the following. 
+
+### Prerequisites
+Specify all requirements in a `my-ml-backend/requirements.txt` file. For example, to specify scikit-learn as a requirement for your model, do the following:
+```requirements.txt
+scikit-learn
+```
+
+Use a virtual environment with `venv`, `virtualenv` or `conda` Python environments to run your ML backend. You can use the same environment as Label Studio. See the [Python documentation about creating virtual environments](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments) for more.
+
+### Start your custom ML backend 
+If you don't want to [use Docker Compose](#Quickstart-with-an-example-ML-backend), follow these steps to set up and start your ML backend server. 
+
+1. Clone the Label Studio Machine Learning Backend git repository. From the command line, run the following:
+  ```bash
+   git clone https://github.com/heartexlabs/label-studio-ml-backend  
+   ```
+2. Set up the environment. From the command line, run the following:
    ```bash
    cd label-studio-ml-backend
    
    # Install label-studio-ml and its dependencies
    pip install -U -e .
    
-   # Install example dependencies
-   pip install -r label_studio_ml/examples/requirements.txt
+   # Install the dependencies for the example or your custom ML backend
+   pip install -r path/to/my_ml_backend/requirements.txt
    ```
-   
-3. Initialize an ML backend based on an example script:
+3. Initialize your custom ML backend. From the command line, run the following:
    ```bash
    label-studio-ml init my_ml_backend \
-     --script label_studio_ml/examples/simple_text_classifier.py
+     --script path/to/my_ml_backend.py
    ```
-   This ML backend is an example provided by Label Studio. See [how to create your own ML backend](ml_create.html).
-   
-3. Start the ML backend server.
+4. Start the ML backend server. From the command line, run the following:
    ```bash
    label-studio-ml start my_ml_backend
    ```
-   
-4. Start Label Studio. Run the following:
-```bash
-label-studio start 
-```
+   The ML backend server becomes available at `http://localhost:9090`
+5. Start Label Studio. From the command line, run the following:
+    ```bash
+    label-studio start 
+    ```
+    Label Studio starts at `http://localhost:8080`.
 
-5. Create a project and import text data. Set up the labeling interface to use the **Text Classification** template. 
+You can now [add the machine learning backend to Label Studio](#Add-an-ML-backend-to-Label-Studio) and [set up your project](setup_project.html).
 
-6. In the **Machine Learning** section of the project settings page, add the link `http://localhost:9090` to your machine learning model backend. 
+## Add an ML backend to Label Studio 
 
-<br>
-<center><img src="/images/ml-backend-card.png"></center>
+After you start a machine learning backend server, add it to your Label Studio project.
 
-If you run into any issues, see [Troubleshoot machine learning](ml_troubleshooting.html)
+### Add an ML backend using the Label Studio UI
 
+1. In the Label Studio UI, open the project that you want to use with your ML backend.
+2. Click **Settings > Machine Learning**.
+3. Click **Add Model**. 
+4. Type a **Title** for the model and provide the URL for the ML backend. For example, `http://localhost:9090`. 
+5. (Optional) Type a description.
+6. (Optional) Select **Use for interactive preannotation**. See [Get interactive pre-annotations](#Get-interactive-preannotations) for more. 
+7. Click **Validate and Save**. If you see any errors, see [Troubleshoot machine learning](ml_troubleshooting.html).
+
+### Add an ML backend using the API
+
+Using the project ID and the URL for the machine learning backend, you can also [add an ML backend using the API](/api/#operation/api_ml_create).
    
 ## Train a model
 
-After you connect a model to Label Studio as a machine learning backend, you can start training the model: 
-- Manually using the Label Studio UI, click the **Start Training** button on the **Machine Learning** settings for your project.
-- Automatically after any annotations are submitted or updated, enable the option `Start model training after annotations submit or update` on the **Machine Learning** settings for your project.
-- Manually using the API, cURL the API from the command line, specifying the ID of the machine learning backend: 
+After you [connect a model to Label Studio as a machine learning backend](#Add-an-ML-backend-to-Label-Studio) and annotate at least one task, you can start training the model. 
+
+You can prompt your model to train in several ways: 
+- Manually using the Label Studio UI. Click the **Start Training** button on the **Machine Learning** settings for your project.
+- Automatically after any annotations are submitted or updated. Enable the option `Start model training after annotations submit or update` on the **Machine Learning** settings for your project.
+- Manually using the API, cURL the API from the command line. Specify the ID of the machine learning backend and run the following command: 
    ```
    curl -X POST http://localhost:8080/api/ml/{id}/train
    ```
   See [the Train API documentation](/api/#operation/api_ml_train_create) for more.
 
-You must have at least one task annotated before you can start training. 
-
 In development mode, training logs appear in the web browser console. In production mode, you can find runtime logs in `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log` on the server running the ML backend, which might be different from the Label Studio server. To see more detailed logs, start the ML backend server with the `--debug` option. 
 
 ## Get predictions from a model
-After you connect a model to Label Studio as a machine learning backend, you can see model predictions in the labeling interface if the model is pre-trained, or right after it finishes training. 
+After you [connect a model to Label Studio as a machine learning backend](#Add-an-ML-backend-to-Label-Studio), you can see model predictions in the labeling interface if the model is pre-trained, or right after it finishes training. 
 
 If the model has not been trained yet, do the following to get predictions to appear:
 1. Start labeling data in Label Studio. 
@@ -111,7 +140,7 @@ If the model has not been trained yet, do the following to get predictions to ap
 
 You can also retrieve predictions automatically by loading tasks. To do this, enable `Retrieve predictions when loading a task automatically` on the **Machine Learning** settings for your project. When you scroll through tasks in the data manager for a project, the predictions for those tasks are automatically retrieved from the ML backend. Predictions also appear when labeling tasks in the Label stream workflow.
 
-> Note: For a large dataset, the HTTP request to retrieve predictions might be interrupted by a timeout. If you want to **get all predictions** for all tasks in a dataset from connected machine learning backends, make a [POST call to the predictions endpoint of the Label Studio API](/api/#operation/api_predictions_create) to prompt the machine learning backend to create predictions for the tasks. 
+> Note: For a large dataset, the HTTP request to retrieve predictions might be interrupted by a timeout. If you want to **get all predictions** for all tasks in a dataset from connected machine learning backends, make a [POST call to the predictions endpoint of the Label Studio API](/api/#operation/api_predictions_create) for each task to prompt the machine learning backend to create predictions for the tasks. 
 
 If you want to retrieve predictions manually for a list of tasks **using only an ML backend**, make a GET request to the `/predict` URL of your ML backend with a payload of the tasks that you want to see predictions for, formatted like the following example: 
 
@@ -165,46 +194,6 @@ You can choose which model predictions to display to annotators by default.
 The model version can be specified in [imported pre-annotations](predictions.html), multiple versions of one connected ML backend, or multiple connected ML backends. 
 
 When annotators start labeling, they'll see the predictions from that model version for each task, which they can then modify as needed. If there are no predictions for a task from the model version selected, no predictions display to the annotator even if another model version has predictions for the task. 
-   
-## Set up a machine learning backend with Docker Compose
-Label Studio includes everything you need to set up a production-ready ML backend server powered by Docker. 
 
+## About the Label Studio ML backend
 The Label Studio machine learning server uses [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/) and [supervisord](http://supervisord.org/) and handles background training jobs with [RQ](https://python-rq.org/).
-
-### Prerequisites
-Perform these prerequisites to make sure your server starts successfully. 
-1. Specify all requirements in a `my-ml-backend/requirements.txt` file. For example, to specify scikit-learn as a requirement for your model, do the following:
-    ```requirements.txt
-    scikit-learn
-    ```
-2. Make sure ports 9090 and 6379 are available and do not have services running on them. To use different ports, update the default ports in `my-ml-backend/docker-compose.yml`, created after you start the machine learning backend.
-
-### Start with Docker Compose
-
-1. Start the machine learning backend with an example model or your [custom machine learning backend](mlbackend.html).
-    ```bash
-    label-studio-ml init my-ml-backend --script label_studio-ml/examples/simple_text_classifier.py
-    ```
-    You see configurations in the `my-ml-backend/` directory that you need to build and run a Docker image using Docker Compose.
-
-2. From the `my-ml-backend/` directory, start Docker Compose.
-    ```bash
-    docker-compose up
-    ```
-    The machine learning backend server starts listening on port 9090.
-
-3. Connect the machine learning backend to Label Studio on the **Machine Learning** settings for your project in Label Studio UI.
-
-If you run into any issues, see [Troubleshoot machine learning](ml_troubleshooting.html)
-
-
-## Active Learning
-The process of creating annotated training data for supervised machine learning models is often expensive and time-consuming. Active Learning is a branch of machine learning that seeks to **minimize the total amount of data required for labeling by strategically sampling observations** that provide new insight into the problem. In particular, Active Learning algorithms aim to select diverse and informative data for annotation, rather than random observations, from a pool of unlabeled data using **prediction scores**. For more theory read [our article on Towards data science](https://towardsdatascience.com/learn-faster-with-smarter-data-labeling-15d0272614c4).
-
-You can select a task ordering like `Predictions score` on Data manager and the sampling strategy will fit the active learning scenario. Label Studio will send a train signal to ML Backend automatically on each annotation submit/update. You can enable these train signals on the **machine learning** settings page for your project. 
-
-* If you need to retrieve and save predictions for all tasks, check recommendations for [retrieving predictions from a model](ml.html#Get-predictions-from-a-model).
-* If you want to delete all predictions after your model is retrained, see how to [delete predictions](ml.html#Delete-predictions). 
-  
-<br>
-<img src="/images/ml-backend-active-learning.png" style="border:1px #eee solid">
