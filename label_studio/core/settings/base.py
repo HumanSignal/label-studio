@@ -26,7 +26,9 @@ logger = logging.getLogger(__name__)
 HOSTNAME = get_env('HOST', '')
 if HOSTNAME:
     if not HOSTNAME.startswith('http://') and not HOSTNAME.startswith('https://'):
-        logger.info("! HOST variable found in environment, but it must start with http:// or https://, ignore it: %s", HOSTNAME)
+        logger.info(
+            "! HOST variable found in environment, but it must start with http:// or https://, ignore it: %s", HOSTNAME
+        )
         HOSTNAME = ''
     else:
         logger.info("=> Hostname correctly is set to: %s", HOSTNAME)
@@ -89,8 +91,8 @@ DATABASES_ALL = {
         'NAME': DATABASE_NAME,
         'OPTIONS': {
             # 'timeout': 20,
-        }
-    }
+        },
+    },
 }
 DATABASES = {'default': DATABASES_ALL.get(get_env('DJANGO_DB', 'default'))}
 
@@ -117,19 +119,19 @@ LOGGING = {
         'console': {
             'level': get_env('LOG_LEVEL', 'WARNING'),
             'class': 'logging.StreamHandler',
-            'formatter': 'standard'
+            'formatter': 'standard',
         },
         'rq_console': {
             'level': 'WARNING',
             'class': 'rq.utils.ColorizingStreamHandler',
             'formatter': 'rq_console',
             'exclude': ['%(asctime)s'],
-        }
+        },
     },
     'root': {
         'handlers': ['console'],
         'level': get_env('LOG_LEVEL', 'WARNING'),
-    }
+    },
 }
 
 if get_bool_env('GOOGLE_LOGGING_ENABLED', False):
@@ -144,7 +146,7 @@ if get_bool_env('GOOGLE_LOGGING_ENABLED', False):
         LOGGING['handlers']['google_cloud_logging'] = {
             'level': get_env('LOG_LEVEL', 'WARNING'),
             'class': 'google.cloud.logging.handlers.CloudLoggingHandler',
-            'client': client
+            'client': client,
         }
         LOGGING['root']['handlers'].append('google_cloud_logging')
     except GoogleAuthError as e:
@@ -158,7 +160,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-
     'drf_yasg',
     'corsheaders',
     'django_extensions',
@@ -166,18 +167,15 @@ INSTALLED_APPS = [
     'django_filters',
     'rules',
     'annoying',
-
     'rest_framework',
     'rest_framework_swagger',
     'rest_framework.authtoken',
     'drf_generators',
-
     'core',
     'users',
     'organizations',
     'data_import',
     'data_export',
-
     'projects',
     'tasks',
     'data_manager',
@@ -213,13 +211,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'core.api_permissions.HasObjectPermission',
         'rest_framework.permissions.IsAuthenticated',
-
     ],
     'EXCEPTION_HANDLER': 'core.utils.common.custom_exception_handler',
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-    ),
-    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning'
+    'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
 }
 
 # CORS & Host settings
@@ -240,10 +235,7 @@ ALLOWED_HOSTS = ['*']
 
 # Auth modules
 AUTH_USER_MODEL = 'users.User'
-AUTHENTICATION_BACKENDS = [
-    'rules.permissions.ObjectPermissionBackend',
-    'django.contrib.auth.backends.ModelBackend'
-]
+AUTHENTICATION_BACKENDS = ['rules.permissions.ObjectPermissionBackend', 'django.contrib.auth.backends.ModelBackend',]
 USE_USERNAME_FOR_LOGIN = False
 
 DISABLE_SIGNUP_WITHOUT_LINK = get_bool_env('DISABLE_SIGNUP_WITHOUT_LINK', False)
@@ -270,7 +262,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'core.context_processors.settings'
+                'core.context_processors.settings',
             ],
             'builtins': ['django.templatetags.i18n'],
         },
@@ -283,8 +275,8 @@ RQ_QUEUES = {
         'HOST': 'localhost',
         'PORT': 6379,
         'DB': 0,
-        'DEFAULT_TIMEOUT': 180
-    }
+        'DEFAULT_TIMEOUT': 180,
+    },
 }
 
 # Swagger: automatic API documentation
@@ -294,13 +286,13 @@ SWAGGER_SETTINGS = {
             'type': 'token',
             'name': 'Token',
             'in': 'header',
-            'url': '/user/account'
-        }
+            'url': '/user/account',
+        },
     },
     'APIS_SORTER': 'alpha',
     'SUPPORTED_SUBMIT_METHODS': ['get', 'post', 'put', 'delete', 'patch'],
     # "DEFAULT_AUTO_SCHEMA_CLASS": "core.utils.CustomAutoSchema",
-    'OPERATIONS_SORTER': 'alpha'
+    'OPERATIONS_SORTER': 'alpha',
 }
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)
@@ -334,7 +326,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static_build')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder'
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 STATICFILES_STORAGE = 'core.storage.SkipMissedManifestStaticFilesStorage'
 
@@ -353,6 +345,7 @@ AVATAR_PATH = 'avatars'
 # project exports
 EXPORT_DIR = os.path.join(BASE_DATA_DIR, 'export')
 EXPORT_URL_ROOT = '/export/'
+EXPORT_MIXIN = 'data_export.mixins.ExportMixin'
 # old export dir
 os.makedirs(EXPORT_DIR, exist_ok=True)
 # dir for delayed export
@@ -442,5 +435,6 @@ WEBHOOK_TIMEOUT = float(get_env('WEBHOOK_TIMEOUT', 1.0))
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes
+
 mimetypes.add_type("application/javascript", ".js", True)
 mimetypes.add_type("image/png", ".png", True)

@@ -257,6 +257,7 @@ class ProjectExportFilesAuthCheck(APIView):
 )
 class ExportListAPI(generics.ListCreateAPIView):
     queryset = Export.objects.all().order_by('-created_at')
+    project_model = Project
     serializer_class = ExportSerializer
     permission_required = all_permissions.projects_change
 
@@ -270,7 +271,7 @@ class ExportListAPI(generics.ListCreateAPIView):
     def _get_project(self):
         project_pk = self.kwargs.get('pk')
         project = generics.get_object_or_404(
-            Project.objects.for_user(self.request.user),
+            self.project_model.objects.for_user(self.request.user),
             pk=project_pk,
         )
         return project
@@ -341,6 +342,7 @@ class ExportListAPI(generics.ListCreateAPIView):
 )
 class ExportDetailAPI(generics.RetrieveDestroyAPIView):
     queryset = Export.objects.all()
+    project_model = Project
     serializer_class = ExportSerializer
     lookup_url_kwarg = 'export_pk'
     permission_required = all_permissions.projects_change
@@ -348,7 +350,7 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
     def _get_project(self):
         project_pk = self.kwargs.get('pk')
         project = generics.get_object_or_404(
-            Project.objects.for_user(self.request.user),
+            self.project_model.objects.for_user(self.request.user),
             pk=project_pk,
         )
         return project
@@ -393,6 +395,7 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
 )
 class ExportDownloadAPI(generics.RetrieveAPIView):
     queryset = Export.objects.all()
+    project_model = Project
     serializer_class = ExportSerializer
     lookup_url_kwarg = 'export_pk'
     permission_required = all_permissions.projects_change
@@ -400,7 +403,7 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
     def _get_project(self):
         project_pk = self.kwargs.get('pk')
         project = generics.get_object_or_404(
-            Project.objects.for_user(self.request.user),
+            self.project_model.objects.for_user(self.request.user),
             pk=project_pk,
         )
         return project
@@ -420,10 +423,12 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
             file_ = instance.file
         else:
             file_ = instance.convert_file(export_type)
+        
+        if file_ is None:
+            return HttpResponse("Can't get file", status=404)
 
         ext = file_.name.split('.')[-1]
         response = HttpResponse(file_, content_type=f'application/{ext}')
         response['Content-Disposition'] = f'attachment; filename="{file_.name}"'
         response['filename'] = file_.name
         return response
-
