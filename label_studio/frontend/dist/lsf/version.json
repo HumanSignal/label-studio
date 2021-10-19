@@ -1,6 +1,6 @@
 {
-  "message": "Update hotkey tooltips",
-  "commit": "1b3d588e0956e0f8bbe97d2743b04b3fc9c2fe02",
+  "message": "[fix] brush+draft: save touches; pause on draw (#317)\n\n- save touches in drafts, it's much faster than full serialization\r\n- pause autosave during drawing process to reduce glithes",
+  "commit": "097cbd00bbf0f816a829222c5e49f7303860b4e8",
   "branch": "master",
-  "date": "2021-10-19T11:56:29Z"
+  "date": "2021-10-19T15:27:47Z"
 }

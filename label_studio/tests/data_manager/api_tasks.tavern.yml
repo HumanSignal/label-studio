@@ -91,7 +91,7 @@ stages:
   - name: get_tasks
     request:
       method: GET
-      url: '{django_live_url}/api/dm/views/{view.id}/tasks?fields=all'
+      url: '{django_live_url}/api/dm/tasks?fields=all&view={view.id}'
     response:
       status_code: 200
       verify_response_with:
@@ -413,7 +413,7 @@ stages:
   - name: get_tasks
     request:
       method: GET
-      url: '{django_live_url}/api/dm/views/{view.id}/tasks?fields=all'
+      url: '{django_live_url}/api/dm/tasks?fields=all&view={view.id}'
     response:
       status_code: 200
       # verify_response_with:
@@ -743,7 +743,7 @@ stages:
   - name: get_tasks
     request:
       method: GET
-      url: '{django_live_url}/api/dm/views/{view.id}/tasks?fields=all'
+      url: '{django_live_url}/api/dm/tasks?fields=all&view={view.id}'
     response:
       status_code: 200
       verify_response_with:
@@ -877,7 +877,7 @@ stages:
   - name: get_tasks
     request:
       method: GET
-      url: '{django_live_url}/api/dm/views/{view.id}/tasks?fields=all'
+      url: '{django_live_url}/api/dm/tasks?fields=all&view={view.id}'
     response:
       status_code: 200
       verify_response_with:
@@ -1156,7 +1156,7 @@ stages:
   - name: get_tasks
     request:
       method: GET
-      url: '{django_live_url}/api/dm/views/{view.id}/tasks'
+      url: '{django_live_url}/api/dm/tasks?view={view.id}'
     response:
       status_code: 200
       verify_response_with:
@@ -1267,7 +1267,7 @@ stages:
   - name: get_tasks
     request:
       method: GET
-      url: '{django_live_url}/api/dm/views/{view.id}/tasks'
+      url: '{django_live_url}/api/dm/tasks?view={view.id}'
     response:
       status_code: 200
       verify_response_with:

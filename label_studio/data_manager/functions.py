@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
+import ujson as json
 
 from collections import OrderedDict
 from django.conf import settings
@@ -10,6 +11,7 @@ from core.utils.common import int_from_request
 from data_manager.prepare_params import PrepareParams
 from data_manager.models import View
 from tasks.models import Task
+from urllib.parse import unquote
 
 
 TASKS = 'tasks:'
@@ -222,23 +224,34 @@ def get_all_columns(project, *_):
 
 
 def get_prepare_params(request, project):
+    """ This function extract prepare_params from
+        * view_id if it's inside of request data
+        * selectedItems, filters, ordering if they are in request and there is no view id
+    """
     # use filters and selected items from view
-    view_id = int_from_request(request.GET, 'view_id', 0)
+    view_id = int_from_request(request.GET, 'view', 0) or int_from_request(request.data, 'view', 0)
     if view_id > 0:
-        view = get_object_or_404(request, View, pk=view_id)
+        view = get_object_or_404(View, pk=view_id)
         if view.project.pk != project.pk:
             raise DataManagerException('Project and View mismatch')
         prepare_params = view.get_prepare_tasks_params(add_selected_items=True)
 
     # use filters and selected items from request if it's specified
     else:
-        selected = request.data.get('selectedItems', {"all": True, "excluded": []})
+        # query arguments from url
+        if 'query' in request.GET:
+            data = json.loads(unquote(request.GET['query']))
+        # data payload from body
+        else:
+            data = request.data
+
+        selected = data.get('selectedItems', {"all": True, "excluded": []})
         if not isinstance(selected, dict):
             raise DataManagerException('selectedItems must be dict: {"all": [true|false], '
                                        '"excluded | included": [...task_ids...]}')
-        filters = request.data.get('filters', None)
-        ordering = request.data.get('ordering', [])
-        prepare_params = PrepareParams(project=project.id, selectedItems=selected, data=request.data,
+        filters = data.get('filters', None)
+        ordering = data.get('ordering', [])
+        prepare_params = PrepareParams(project=project.id, selectedItems=selected, data=data,
                                        filters=filters, ordering=ordering)
     return prepare_params
 
