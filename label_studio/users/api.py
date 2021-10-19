@@ -69,7 +69,7 @@ class UserAPI(viewsets.ModelViewSet):
         GET=all_permissions.organizations_view,
         PUT=all_permissions.organizations_change,
         POST=all_permissions.organizations_change,
-        PATCH=all_permissions.organizations_change,
+        PATCH=all_permissions.organizations_view,
         DELETE=all_permissions.organizations_change,
     )
     http_method_names = ['get', 'post', 'head', 'patch', 'delete']
