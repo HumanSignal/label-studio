@@ -1,6 +1,6 @@
 {
- "message": "Add parent annotations, fix styles",
- "commit": "73555b417ab811033c8d0b3bd3c16130e9298f3b",
- "branch": "feature/parent-anno",
- "date": "2021/10/11 23:36:04"
+  "message": "Update hotkey tooltips",
+  "commit": "1b3d588e0956e0f8bbe97d2743b04b3fc9c2fe02",
+  "branch": "master",
+  "date": "2021-10-19T11:56:29Z"
 }

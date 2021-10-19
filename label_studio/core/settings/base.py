@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 import re
 import logging
+import json
 
 # for printing messages before main logging config applied
 if not logging.getLogger().hasHandlers():
@@ -432,6 +433,8 @@ USER_AUTH = user_auth
 COLLECT_VERSIONS = collect_versions_dummy
 
 WEBHOOK_TIMEOUT = float(get_env('WEBHOOK_TIMEOUT', 1.0))
+
+EDITOR_KEYMAP = json.dumps(get_env("EDITOR_KEYMAP"))
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes

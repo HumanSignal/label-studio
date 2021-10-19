@@ -79,6 +79,8 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
     def process_response(self, request, response):
         response = super(CommonMiddlewareAppendSlashWithoutRedirect, self).process_response(request, response)
 
+        request.editor_keymap = settings.EDITOR_KEYMAP
+
         if isinstance(response, HttpSmartRedirectResponse):
             if not request.path.endswith('/'):
                 # remove prefix SCRIPT_NAME
