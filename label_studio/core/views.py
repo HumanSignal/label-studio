@@ -13,14 +13,12 @@ from pathlib import Path
 from django.utils._os import safe_join
 from django.conf import settings
 from django.contrib.auth import logout
-from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotFound
 from django.shortcuts import redirect, reverse
 from django.template import loader
 from ranged_fileresponse import RangedFileResponse
 from django.http import JsonResponse
 from wsgiref.util import FileWrapper
-from rest_framework import status
-from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
 
@@ -29,6 +27,7 @@ from core.utils.io import find_file
 from core.utils.params import get_env
 from core.label_config import generate_time_series_json
 from core.utils.common import collect_versions
+from io_storages.localfiles.models import LocalFilesImportStorageLink
 
 logger = logging.getLogger(__name__)
 
@@ -176,12 +175,13 @@ def localfiles_data(request):
     if path and request.user.is_authenticated:
         path = posixpath.normpath(path).lstrip('/')
         full_path = Path(safe_join(local_serving_document_root, path))
-        if os.path.exists(full_path):
+        link = LocalFilesImportStorageLink.objects.filter(key=str(full_path)).first()
+        if link and link.has_permission(request.user) and os.path.exists(full_path):
             content_type, encoding = mimetypes.guess_type(str(full_path))
             content_type = content_type or 'application/octet-stream'
             return RangedFileResponse(request, open(full_path, mode='rb'), content_type)
         else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return HttpResponseNotFound()
 
     return HttpResponseForbidden()
 
