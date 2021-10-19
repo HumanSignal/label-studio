@@ -55,31 +55,31 @@ The following table lists the matching functions available in Label Studio Enter
 | Matching Function | Tag | Labeling Type | Description |
 | --- | --- | --- | --- | 
 | Exact matching choices | Choices | Categorical, Classification | Evaluates whether annotations exactly match. | 
-| Choices per span region | Choices[per_region=span] | Categorical, Classification | Evaluates whether specific choices applied to specific text spans match. | 
-| Choices per hypertext span region | Choices[per_region=hyperspan] | Categorical, Classification | Evaluates whether specific choices applied to specific hypertext spans match. |
-| Choices per bbox region | Choices[per_region=bbox] | Bounding Boxes, Categorical, Classification | Evaluates whether specific choices applied to specific bounding box regions match. |  
-| Precision on Choices per bbox region | Choices[per_region=bbox] | Bounding Boxes, Categorical, Classification | Evaluates the precision of specific choices applied to specific bounding box regions. |   
-| Recall on Choices per bbox region | Choices[per_region=bbox] | Bounding Boxes, Categorical, Classification | Evaluates the recall of specific choices applied to specific bounding box regions. |   
-| F1 on Choices per bbox region | Choices[per_region=bbox] | Bounding Boxes, Categorical, Classification | Evaluates the F1, or F-score, of specific choices applied to specific bounding box regions. |
-| Choices per polygon region | Choices[per_region=poly] | Polygons, Categorical, Classification | Evaluates whether specific choices applied to specific polygon regions match. |   
-| Precision on Choices per polygon region | Choices[per_region=poly] | Polygons, Categorical, Classification |  Evaluates the precision of specific choices applied to specific polygon regions. |   
-| Recall on Choices per polygon region | Choices[per_region=poly] | Polygons, Categorical, Classification | Evaluates the recall of specific choices applied to specific polygon regions. |   
-| F1 on Choices per polygon region | Choices[per_region=poly] | Polygons, Categorical, Classification | Evaluates the F1, or F-score, of specific choices applied to specific polygon regions. |
+| Choices per span region | Choices | Categorical, Classification | Evaluates whether specific choices applied to specific text spans match. | 
+| Choices per hypertext span region | Choices | Categorical, Classification | Evaluates whether specific choices applied to specific hypertext spans match. |
+| Choices per bbox region | Choices | Bounding Boxes, Categorical, Classification | Evaluates whether specific choices applied to specific bounding box regions match. |  
+| Precision on Choices per bbox region | Choices | Bounding Boxes, Categorical, Classification | Evaluates the precision of specific choices applied to specific bounding box regions. |   
+| Recall on Choices per bbox region | Choices | Bounding Boxes, Categorical, Classification | Evaluates the recall of specific choices applied to specific bounding box regions. |   
+| F1 on Choices per bbox region | Choices | Bounding Boxes, Categorical, Classification | Evaluates the F1, or F-score, of specific choices applied to specific bounding box regions. |
+| Choices per polygon region | Choices | Polygons, Categorical, Classification | Evaluates whether specific choices applied to specific polygon regions match. |   
+| Precision on Choices per polygon region | Choices | Polygons, Categorical, Classification |  Evaluates the precision of specific choices applied to specific polygon regions. |   
+| Recall on Choices per polygon region | Choices | Polygons, Categorical, Classification | Evaluates the recall of specific choices applied to specific polygon regions. |   
+| F1 on Choices per polygon region | Choices | Polygons, Categorical, Classification | Evaluates the F1, or F-score, of specific choices applied to specific polygon regions. |
 | Text edit distance | TextArea | Transcription | Uses the edit distance algorithm to calculate how dissimilar two text annotations are to one another. | 
-| Text edit distance per span region | TextArea[per_region=span] | Text | Uses the edit distance algorithm to calculate how dissimilar two text spans are to one another. |
-| Text edit distance per span region, with percentage of matched spans by IOU w.r.t threshold | TextArea[per_region=span] | Text | Uses the edit distance algorithm to calculate how dissimilar two text spans are to one another, then calculate the percentage of overlap compared to the union (IOU) of matching spans and compare the IOU to a threshold. |
-| Text edit distance per hypertext span region, with percentage of matched spans by IOU w.r.t threshold | TextArea[per_region=hyperspan] | Hypertext | Uses the edit distance algorithm to calculate how dissimilar two text spans are to one another, then calculate the intersection over union (IOU) for the percentage of matching spans and compare the IOU to a threshold. |
-| Text edit distance per bbox region | TextArea[per_region=bbox] | Optical character recognition (OCR) with bounding boxes | Uses the edit distance algorithm to calculate how dissimilar two text areas are to each other for each bounding box region they are associated with. | 
-| Text edit distance per polygon region | TextArea[per_region=poly] | OCR with polygons | Uses the edit distance algorithm to calculate how dissimilar two text areas are to each other for each polygonal region they are associated with. | 
+| Text edit distance per span region | TextArea | Text | Uses the edit distance algorithm to calculate how dissimilar two text spans are to one another. |
+| Text edit distance per span region, with percentage of matched spans by IOU w.r.t threshold | TextArea | Text | Uses the edit distance algorithm to calculate how dissimilar two text spans are to one another, then calculate the percentage of overlap compared to the union (IOU) of matching spans and compare the IOU to a threshold. |
+| Text edit distance per hypertext span region, with percentage of matched spans by IOU w.r.t threshold | TextArea | Hypertext | Uses the edit distance algorithm to calculate how dissimilar two text spans are to one another, then calculate the intersection over union (IOU) for the percentage of matching spans and compare the IOU to a threshold. |
+| Text edit distance per bbox region | TextArea | Optical character recognition (OCR) with bounding boxes | Uses the edit distance algorithm to calculate how dissimilar two text areas are to each other for each bounding box region they are associated with. | 
+| Text edit distance per polygon region | TextArea | OCR with polygons | Uses the edit distance algorithm to calculate how dissimilar two text areas are to each other for each polygonal region they are associated with. | 
 | Intersection over 1D regions | Labels | Semantic Segmentation, Named Entity Recognition | Evaluates whether two given one-dimensional labeled regions have points in common. | 
 | Percentage of matched spans by IOU w.r.t threshold | Labels | Semantic Segmentation, Named Entity Recognition | Evaluates the percentage by which two given labeled regions overlap compared to the union (IOU) of the regions, and compare the IOU to a threshold.
-| Intersection over 1D spans without labels | Region | Evaluates whether two given one-dimensional regions have points in common. |
-| Percentage of matched spans without labels by IOU w.r.t threshold | Region | Evaluates the percentage by which two given regions overlap compared to the union (IOU) of the regions, and compare the IOU to a threshold.|
-| Intersection over 1D timeseries spans | TimeSeriesLabels | Evaluates whether two given one-dimensional timeseries spans have points in common. |
-| Intersection over HTML spans | HyperTextLabels | Evaluates whether two given one-dimensional hypertext spans have points in common. |
-| Percentage of matched spans by IOU w.r.t threshold |  HyperTextLabels | Evaluates the percentage by which two given hypertext regions overlap compared to the union (IOU) of the regions, and compare the IOU to a threshold. |
-| Intersection over Paragraphs | ParagraphLabels | Evaluates whether two given one-dimensional paragraph-labeled spans have points in common. |
-| Percentage of matched spans by IOU w.r.t threshold | ParagraphLabels | Evaluates the percentage by which two given paragraph-labeled regions overlap compared to the union (IOU) of the regions, and compare the IOU to a threshold. |
+| Intersection over 1D spans without labels | Region | Image Segmentation, Computer Vision | Evaluates whether two given one-dimensional regions have points in common. |
+| Percentage of matched spans without labels by IOU w.r.t threshold | Region | Image Segmentation, Object Detection | Evaluates the percentage by which two given regions overlap compared to the union (IOU) of the regions, and compare the IOU to a threshold.|
+| Intersection over 1D timeseries spans | TimeSeriesLabels | Time Series | Evaluates whether two given one-dimensional time series spans have points in common. |
+| Intersection over HTML spans | HyperTextLabels | HTML | Evaluates whether two given hypertext spans have points in common. |
+| Percentage of matched spans by IOU w.r.t threshold |  HyperTextLabels | HTML | Evaluates the percentage by which two given hypertext regions overlap compared to the union (IOU) of the regions, and compare the IOU to a threshold. |
+| Intersection over Paragraphs | ParagraphLabels | Dialogue, Text | Evaluates whether two given one-dimensional paragraph-labeled spans have points in common. |
+| Percentage of matched spans by IOU w.r.t threshold | ParagraphLabels | Dialogue, Text | Evaluates the percentage by which two given paragraph-labeled regions overlap compared to the union (IOU) of the regions, and compare the IOU to a threshold. |
 | Average precision for ranking | Ranker | All | Calculates the precision for the ranking. |
 | IOU for bounding boxes | RectangleLabels | Object Detection, Semantic Segmentation | Evaluates the overlap compared to the union (IOU) of two bounding box regions. |
 | Precision at specific IOU threshold for bounding boxes | RectangleLabels | Object Detection, Semantic Segmentation | Evaluates the overlap compared to the union (IOU) of two bounding box regions, then computes the precision for the values above a threshold. |
