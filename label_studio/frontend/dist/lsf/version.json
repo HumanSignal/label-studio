@@ -1,6 +1,6 @@
 {
-  "message": "[fix] Hotkeys mapping",
-  "commit": "b8ca48475159834dbca026c1a831b6f823fe3c38",
+  "message": "Update hotkey tooltips",
+  "commit": "1b3d588e0956e0f8bbe97d2743b04b3fc9c2fe02",
   "branch": "master",
-  "date": "2021-10-19T09:17:06Z"
+  "date": "2021-10-19T11:56:29Z"
 }
