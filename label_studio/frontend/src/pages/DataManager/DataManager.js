@@ -39,7 +39,7 @@ const initializeDataManager = async (root, props, params) => {
       labelingHeader: false,
       autoAnnotation: params.autoAnnotation,
     },
-    labelStudioOptions: {
+    labelStudio: {
       keymap: window.APP_SETTINGS.editor_keymap,
     },
     ...props,
