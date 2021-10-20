@@ -7,6 +7,7 @@ import json
 INPUT = 'import.json' if len(sys.argv) <= 1 else sys.argv[1]
 OUTPUT = 'output' if len(sys.argv) <= 2 else sys.argv[2]
 CHUNKS = 2 if len(sys.argv) <= 3 else int(sys.argv[3])
+print('Usage: python ' + sys.argv[0] + ' import.json output 10')
 
 if __name__ == '__main__':
     with open(INPUT) as f:
