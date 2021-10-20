@@ -218,7 +218,7 @@ class ExportMixin:
             BATCH_SIZE = 1000
             for ids in batch(task_ids, BATCH_SIZE):
                 i += 1
-                tasks = Task.objects.filter(id__in=ids)
+                tasks = list(Task.objects.filter(id__in=ids))
                 logger.debug(f'Batch: {i*BATCH_SIZE}')
                 # TODO: move _get_filtered_annotations on Prefetch filtering
                 for task in tasks:
