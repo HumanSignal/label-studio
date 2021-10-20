@@ -1,5 +1,5 @@
 """ This script splits IMPORT json with array into CHUNKS.
-    This can be useful to avoid problems during the import step.
+    This can be useful to avoid problems with a large json file during the import step.
 """
 import sys
 import json
