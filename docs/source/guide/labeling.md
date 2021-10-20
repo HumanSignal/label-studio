@@ -183,8 +183,6 @@ This table describes the hotkeys for a standard keyboard. For a Mac keyboard, us
 | `d` | On the data manager, open the labeling quick view for the selected task row. | 
 | `a` | On the data manager, close the labeling quick view for the selected task row. |
 
-You can specify custom hotkeys for labeling using the [Shortcut tag](/tags/shortcut.html). If you want to customize the hotkeys used for specific actions, modify the [`keymap.json` file of the `label-studio-frontend`](https://github.com/heartexlabs/label-studio-frontend/blob/master/src/core/settings/keymap.json) component. 
-
 Other annotation types have labeling-specific shortcuts, such as numbers to select specific labels for named entity recognition tasks. 
 
 ### Image-specific hotkeys
@@ -237,6 +235,19 @@ When labeling video data with the `Video` tag, you can use specific hotkeys to t
 | `alt` + `spacebar` | Play or pause video. |
 | `alt` + `left arrow` | Rewind one frame. |
 | `alt` + `right arrow` | Fast forward one frame. | 
+
+### Customize hotkeys
+You can specify custom hotkeys for labeling using the [Shortcut tag](/tags/shortcut.html), or change the hotkeys used for specific actions using an environment variable. 
+
+If you want to change the hotkeys used for specific actions, set the `EDITOR_KEYMAP` environment variable with valid JSON in your `.env` file or when starting Label Studio. For example, to change the keyboard shortcut used to submit an annotation to `shift` + `s`, set the environment variable as follows:
+```
+EDITOR_KEYMAP='{"annotation:submit":{"key": "shift+s","description": "My Custom Submit Hotkey!"}}'
+```
+This overwrites the existing hotkey mapping with your custom mapping. See [more about how to set environment variables](start.html#Set-environment-variables). 
+
+Refer to the full list of customizable hotkeys in the [`keymap.json` file of the `label-studio-frontend`](https://github.com/heartexlabs/label-studio-frontend/blob/master/src/core/settings/keymap.json) repository to update a different hotkey combination. 
+
+You cannot use this environment variable to remove or add an existing keyboard shortcut. 
 
 ## Customize the labeling interface 
 
