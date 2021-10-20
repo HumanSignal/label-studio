@@ -10,8 +10,6 @@ meta_description: Manage billing for the plans for Label Studio Enterprise and T
 
 Manage the billing and usage settings for your Label Studio Teams or Label Studio Enterprise accounts. For details about Label Studio plan pricing, see [Label Studio Editions & Pricing](https://heartex.com/pricing) on the Heartex website. 
 
-> Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
-
 For more on the differences between Label Studio Teams and Label Studio Enterprise, see [Label Studio features](label_studio_compare.html). 
 
 You must be the organization Owner to manage billing and usage for your Label Studio plan.
