@@ -8,8 +8,6 @@ meta_title: Data Labeling Statistics
 meta_description: Label Studio Enterprise documentation about task agreement, annotator consensus, and other data annotation statistics for data labeling and machine learning projects.
 ---
 
-> Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
-
 <div class="enterprise"><p>
 Label Studio Enterprise Edition includes various annotation and labeling statistics. The open source Community Edition of Label Studio does not perform these statistical calculations. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
 </p></div>
@@ -28,7 +26,7 @@ For more about viewing agreement in Label Studio Enterprise, see [Verify model a
 
 ## Agreement method
 
-The agreement method defines how [agreement scores](stats.html#Matching-score) across all annotations for a task are combined to form a single inter-annotator agreement score. Label Studio uses the mean average of all inter-annotation agreement scores for each annotation pair as the final task agreement score. 
+The agreement method defines how [agreement scores](stats.html#Agreement-score) across all annotations for a task are combined to form a single inter-annotator agreement score. Label Studio uses the mean average of all inter-annotation agreement scores for each annotation pair as the final task agreement score. 
 
 Review the diagram for a full explanation:
 <div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, agreement scores are computed for each pair, the resulting scores are averaged for a task." width=800 height=365 src="/images/LSE/stats-no_grouping.png"/></div>
@@ -110,6 +108,7 @@ For data labeling tasks where annotators select a choice, such as image or text 
 - If `x` and `y` are different choices, the agreement score is `0`.
 
 ### Edit distance algorithm example 
+
 For data labeling tasks where annotators transcribe text in a text area, the resulting annotations contain a list of text. 
 
 You can select agreement metrics based on the intersection over one-dimensional text spans such as splitting the text area by words or characters, or using an [edit distance algorithm](https://en.wikipedia.org/wiki/Edit_distance). Decide what method to use to calculate the agreement score based on your use case and how important precision is for your data labels.
@@ -120,8 +119,6 @@ The agreement score for two given task annotations `x` and `y` is computed like 
 - For each unaligned pair, for example, when one list of text is longer than the other, the similarity is zero. 
 - The similarity scores are averaged across all pairs, and the result is the agreement score for the task. 
 
-### Intersection over union for result spans example 
-
 For data labeling tasks where annotators assign specific labels to regions or text spans, the agreement score is calculated by comparing the intersection of annotations over the result spans, normalized by the length of each span. 
 
-For two given task annotations `x` and `y`, the agreement score formula is `m(x, y) = spans(x) ∩ spans(y)`.
+For two given task annotations `x` and `y`, the agreement score formula is `m(x, y) = spans(x) ∩ spans(y)`

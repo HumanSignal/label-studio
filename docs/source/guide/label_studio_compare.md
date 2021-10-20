@@ -6,8 +6,6 @@ meta_title: Label Studio Community and Enterprise Features
 meta_description: Compare the features of Label Studio Community Edition with the paid Label Studio Enterprise Edition so that you can choose the best option for your data labeling and annotation projects. 
 ---
 
-> Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
-
 Label Studio is available as a Community Edition open source data labeling tool and as paid versions with extended functionality and support. Smaller organizations might want to consider the SaaS option, Label Studio Teams, and larger teams with robust data labeling needs can get the Enterprise Edition. [Contact us to get started with Label Studio Enterprise Edition](https://heartex.com/)! 
 
 

@@ -67,8 +67,6 @@ class AllImportStorageListAPI(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         list_responses = sum([
             self._get_response(s['import_list_api'], request, *args, **kwargs) for s in _common_storage_list], [])
-        if settings.ENABLE_LOCAL_FILES_STORAGE:
-            list_responses.extend(self._get_response(LocalFilesImportStorageListAPI, request, *args, **kwargs))
         return Response(list_responses)
 
 
