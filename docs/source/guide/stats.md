@@ -28,31 +28,30 @@ For more about viewing agreement in Label Studio Enterprise, see [Verify model a
 
 ## Agreement method
 
-The agreement method defines how [matching scores](stats.html#Matching-score) across all annotations for a task are combined to form a single inter-annotator agreement score. Label Studio uses the mean average of all inter-annotation matching scores for each annotation pair as the final task agreement score. 
+The agreement method defines how [agreement scores](stats.html#Matching-score) across all annotations for a task are combined to form a single inter-annotator agreement score. Label Studio uses the mean average of all inter-annotation agreement scores for each annotation pair as the final task agreement score. 
 
 Review the diagram for a full explanation:
-<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, matching scores are computed for each pair, the resulting scores are averaged for a task." width=800 height=365 src="/images/LSE/stats-no_grouping.png"/></div>
+<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, agreement scores are computed for each pair, the resulting scores are averaged for a task." width=800 height=365 src="/images/LSE/stats-no_grouping.png"/></div>
 
 ### Example
 One annotation that labels the text span "Excellent tool" as "positive", a second annotation that labels the span "tool" as "positive", and a third annotation that labels the text span "tool" as "negative".
 <br/><div style="text-align:center"><img alt="diagram showing example labeling scenario duplicated in surrounding text" width=800 height=100 src="/images/LSE/stats-agreement-example.jpg"/></div>
 
-The matching score for the first two annotations is 50%, based on the intersection of the text spans. The matching score comparing the second annotation with the third annotation is 0%, because the same text span was labeled differently. 
+The agreement score for the first two annotations is 50%, based on the intersection of the text spans. The agreement score comparing the second annotation with the third annotation is 0%, because the same text span was labeled differently. 
 
-The task agreement conditions use a threshold of 40% to group annotations based on the matching score, so the first and second annotations are matched with each other, and the third annotation is considered mismatched. In this case, task agreement exists for 2 of the 3 annotations, so the overall task agreement score is 67%.
+The task agreement conditions use a threshold of 40% to group annotations based on the agreement score, so the first and second annotations are matched with each other, and the third annotation is considered mismatched. In this case, task agreement exists for 2 of the 3 annotations, so the overall task agreement score is 67%.
 
-## Matching score
+## Agreement score
 
-Depending on the type of labeling that you perform, you can select a different type of matching function to use to calculate the matching score used in task agreement statistics. See how to [Define the matching function for annotation statistics](setup_project.html#Define-the-matching-function-for-annotation-statistics). 
+Depending on the type of labeling that you perform, you can select a different type of agreement metric to use to calculate the agreement score used in task agreement statistics. See how to [Define the agreement metric for annotation statistics](setup_project.html#Define-the-matching-function-for-annotation-statistics). 
 
-The matching score assesses the similarity of annotations for a specific task.
+The agreement score assesses the similarity of annotations for a specific task.
 
-### Available matching functions
+### Available agreement metrics
 
-The following table lists the matching functions available in Label Studio Enterprise. If you want to use a different matching function, you can [create a custom matching function](custom_metric.html).
+The following table lists the agreement metrics available in Label Studio Enterprise. If you want to use a different agreement metric, you can [create a custom agreement metric](custom_metric.html).
 
-
-| Matching Function | Tag | Labeling Type | Description |
+| agreement metric | Tag | Labeling Type | Description |
 | --- | --- | --- | --- | 
 | Exact matching choices | Choices | Categorical, Classification | Evaluates whether annotations exactly match. | 
 | Choices per span region | Choices | Categorical, Classification | Evaluates whether specific choices applied to specific text spans match. | 
@@ -94,67 +93,35 @@ The following table lists the matching functions available in Label Studio Enter
 | Exact matching rating | Rating | Evaluation, Rating | Evaluates the ratings assigned to tasks exactly match. |
 | Common subtree matches | Taxonomy | Categorization, Classification | Evaluates common subtree matches for a taxonomy of choices. |
 | Common labels matches | Taxonomy | Categorization, Classification, Named Entity Recognition | Evaluates common label matches for a taxonomy of labels assigned to regions. | 
-| Your custom AWS function | All tags | All types | Performs the evaluation function that you define. See [create a custom matching function](custom_metric.html). |
-| KeyPoint matching function | KeyPointLabels | Computer Vision | Evaluates whether key point annotations match. | 
+| Your custom AWS function | All tags | All types | Performs the evaluation function that you define. See [create a custom agreement metric](custom_metric.html). |
+| KeyPoint agreement metric | KeyPointLabels | Computer Vision | Evaluates whether key point annotations match. | 
 | OCR distance | Rectangle | Optical Character Recognition | Uses the edit distance algorithm to calculate how dissimilar two text areas are to each other for each rectangular region they are associated with. |
 
+### Naive agreement metric example 
 
-### Naive matching function example 
+For example, for two given annotations `x` and `y`, an agreement metric that performs a naive comparison of the results works like the following:
+- If both `x` and `y` are empty annotations, the agreement score is `1`.
+- If `x` and `y` share no similar points, the agreement score is `0`. 
+- If different labeling types are used in `x` and `y`, the partial agreement scores for each data labeling type are averaged.
 
-For example, for two given annotations `x` and `y`, a matching function that performs a naive comparison of the results works like the following:
-- If both `x` and `y` are empty annotations, the matching score is `1`.
-- If `x` and `y` share no similar points, the matching score is `0`. 
-- If different labeling types are used in `x` and `y`, the partial matching scores for each data labeling type are averaged.
+### Exact matching choices example
+For data labeling tasks where annotators select a choice, such as image or text classification, or data labeling tasks where annotators select a rating, you can select the `Exact matching choices` agreement metric. For this function, the agreement score for two given task annotations `x` and `y` is computed like follows:
+- If `x` and `y` are the same choice, the agreement score is `1`. 
+- If `x` and `y` are different choices, the agreement score is `0`.
 
-The following examples describe how the matching scores for various labeling configuration tags can be computed. 
-
-### Choices
-For data labeling tasks where annotators select a choice, such as image or text classification, multiple matching functions are available to select.
-
-If you select the `Exact matching choices` matching function, the matching score for two given task annotations `x` and `y` is computed like follows:
-- If `x` and `y` are the same choice, the matching score is `1`. 
-- If `x` and `y` are different choices, the matching score is `0`.
-
-### TextArea
+### Edit distance algorithm example 
 For data labeling tasks where annotators transcribe text in a text area, the resulting annotations contain a list of text. 
 
-You can select matching functions based on the intersection over one-dimensional text spans such as splitting the text area by words or characters, or using an [edit distance algorithm](https://en.wikipedia.org/wiki/Edit_distance). Decide what method to use to calculate the matching score based on your use case and how important precision is for your data labels.
+You can select agreement metrics based on the intersection over one-dimensional text spans such as splitting the text area by words or characters, or using an [edit distance algorithm](https://en.wikipedia.org/wiki/Edit_distance). Decide what method to use to calculate the agreement score based on your use case and how important precision is for your data labels.
 
-The matching score for two given task annotations `x` and `y` is computed like follows:
+The agreement score for two given task annotations `x` and `y` is computed like follows:
 - The list of text items in each annotation is indexed, such that `x = [x1, x2, ..., xn]` and similarly, `y = [y1, y2, ..., yn]`.  
 - For each aligned pair of text items across the two annotations `(x1, y1)` the similarity of the text is calculated.
 - For each unaligned pair, for example, when one list of text is longer than the other, the similarity is zero. 
-- The similarity scores are averaged across all pairs, and the result is the matching score for the task. 
+- The similarity scores are averaged across all pairs, and the result is the agreement score for the task. 
 
-### Labels
+### Intersection over union for result spans example 
 
-For data labeling tasks where annotators assign specific labels to regions or text spans, the matching score is calculated by comparing the intersection of annotations over the result spans, normalized by the length of each span. 
+For data labeling tasks where annotators assign specific labels to regions or text spans, the agreement score is calculated by comparing the intersection of annotations over the result spans, normalized by the length of each span. 
 
-For two given task annotations `x` and `y`, the matching score formula is `m(x, y) = spans(x) ∩ spans(y)`.
-
-### Rating
-
-For data labeling tasks where annotators select a rating, the matching score for two given task annotations `x` and `y` is computed like follows, using an exact matching function:
-
-- If `x` and `y` are the same rating, the matching score is `1`. 
-- If `x` and `y` are different ratings, the matching score is `0`.
-
-### Ranker
-
-For data labeling tasks where annotators perform ranking, the matching score is based on the mean average precision (mAP) of the annotation results.
-
-### RectangleLabels
-
-For data labeling tasks where annotators create bounding boxes of rectangles and label those rectangles, the matching score calculation depends on what you select as the **Metric name** on the **Annotation Settings** page. Select one of the following options: 
-- Intersection over Union (IoU), averaged over all bounding box pairs with the best match. This is the default matching function. 
-- Precision computed for some threshold imposed on IoU.
-- Recall computed for some threshold imposed on IoU.
-- F1 score, or F-score, computed for some threshold imposed on IoU.
-
-### PolygonLabels
-
-For data labeling tasks where annotators create polygons and label those polygonal regions, the matching score calculation depends on what you select as the **Metric name** on the **Annotation Settings** page. Select one of the following options:
-- Intersection over Union (IoU), averaged over all polygon pairs with the best match. This is the default matching function.  
-- Precision computed for some threshold imposed on IoU.
-- Recall computed for some threshold imposed on IoU.
-- F1 score, or F-score, computed for some threshold imposed on IoU.
+For two given task annotations `x` and `y`, the agreement score formula is `m(x, y) = spans(x) ∩ spans(y)`.
