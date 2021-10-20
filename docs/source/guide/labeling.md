@@ -171,10 +171,11 @@ This table describes the hotkeys for a standard keyboard. For a Mac keyboard, us
 | `ctrl` + `enter` | Submit a task. |
 | `alt` + `enter` | Update a task. | 
 | `ctrl` + `backspace` OR `cmd` + `backspace` | Delete all regions. |
-| `escape` | Exit relation mode. |
+| `escape` | Exit relation mode or unselect a selected region. |
 | `backspace` | Delete a selected region. | 
 | `alt` + `r` | Create a relation between regions, when a region is selected. | 
 | `alt` + `.` | Cycle through all regions in the order listed on the regions sidebar. |
+| `alt` + `h` | Hide a selected region. | 
 | `ctrl` + `d` OR `cmd` + `d` | Duplicate a selected region. |
 | `u` | Unselect a selected region. | 
 | `s` | On the data manager, change the row selection to the next row, 1 below the current row. |
@@ -182,7 +183,62 @@ This table describes the hotkeys for a standard keyboard. For a Mac keyboard, us
 | `d` | On the data manager, open the labeling quick view for the selected task row. | 
 | `a` | On the data manager, close the labeling quick view for the selected task row. |
 
-Other annotation types have labeling-specific shortcuts, such as numbers to select specific labels or to select the eraser or a brush tool when labeling images. You can also specify custom hotkeys for labeling using the [Shortcut tag](/tags/shortcut.html). 
+You can also specify custom hotkeys for labeling using the [Shortcut tag](/tags/shortcut.html). 
+
+If you want to customize the hotkeys used for specific actions, modify the [`keymap.json` file of the `label-studio-frontend`](https://github.com/heartexlabs/label-studio-frontend/blob/master/src/core/settings/keymap.json) component. 
+
+Other annotation types have labeling-specific shortcuts, such as numbers to select specific labels.
+
+### Image-specific hotkeys
+
+When labeling image data types with the `Rectangle`, `BrushLabels`, `Polygon`, or `KeyPoints` tags, you can use specific hotkeys to take image labeling-specific actions.
+
+| Key | Description |
+| --- | --- | 
+| `h` | Pan the image, after zooming in. |
+| `v` | Select the mouse arrow. |
+| `alt` + `left arrow` | Rotate the image to the left. |
+| `alt` + `right arrow` | Rotate the image to the right. |
+| `ctrl` + `+` | Zoom in to the image. |
+| `ctrl` + `-` | Zoom out of the image. | 
+| `k` | If performing key point labeling, select the key point option in the toolbar. |
+| `e` | Select the eraser option in the toolbar. | 
+| `b` | If performing brush mask labeling, select the brush option in the toolbar. 
+| `[` | When the brush or eraser option is selected, decrease the size of the brush or eraser. |
+| `]` | When the brush or eraser option is selected, increase the size of the brush or eraser. |
+
+### Audio-specific hotkeys
+
+When labeling audio data types with the `Audio` or `AudioPlus` tags, you can use specific hotkeys to take audio-specific actions.
+
+| Key | Description |
+| --- | --- | 
+| `ctrl` + `b` OR `cmd` + `b` | Rewind audio 1 second. |
+
+### Timeseries-specific hotkeys
+
+When labeling timeseries data with the `Timeseries` tag, you can use specific hotkeys to take actions on a selected region on the timeseries data.
+
+| Key | Description |
+| --- | --- | 
+| `left arrow` | Expand the region area to the left. |
+| `right arrow` | Expand the region area to the right. |
+| `alt` + `left arrow` | Decrease the region area on the left. |
+| `alt` + `right arrow` | Decrease the region area on the right. |
+| `shift` + `left arrow` | Expand the region area by a larger amount to the left. | 
+| `shift` + `right arrow` | Expand the region area by a larger amount to the right. |
+| `shift` + `alt` + `left arrow` | Decrease the region area by a larger amount on the left. |
+| `shift` + `alt` + `right arrow` | Decrease the region area by a larger amount on the right. |
+
+### Video-specific hotkeys
+
+When labeling video data with the `Video` tag, you can use specific hotkeys to take video-specific actions.
+
+| Key | Description |
+| --- | --- | 
+| `alt` + `spacebar` | Play or pause video. |
+| `alt` + `left arrow` | Rewind one frame. |
+| `alt` + `right arrow` | Fast forward one frame. | 
 
 ## Customize the labeling interface 
 
