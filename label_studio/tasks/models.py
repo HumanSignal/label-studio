@@ -5,7 +5,7 @@ import logging
 import os
 import datetime
 
-from urllib.parse import urljoin
+from urllib.parse import urljoin, quote
 
 from django.conf import settings
 from django.db import models, connection, transaction
@@ -157,7 +157,7 @@ class Task(TaskMixin, models.Model):
             protected_data = {}
             for key, value in task_data.items():
                 if isinstance(value, str) and string_is_url(value):
-                    path = reverse('projects-file-proxy', kwargs={'pk': self.project.pk}) + '?url=' + value
+                    path = reverse('projects-file-proxy', kwargs={'pk': self.project.pk}) + '?url=' + quote(value)
                     value = urljoin(settings.HOSTNAME, path)
                 protected_data[key] = value
             return protected_data
@@ -333,7 +333,14 @@ class Annotation(AnnotationMixin, models.Model):
         null=True, default=dict, help_text='Prediction viewed at the time of annotation')
     result_count = models.IntegerField(_('result count'), default=0,
                                        help_text='Results inside of annotation counter')
-    
+
+    parent_prediction = models.ForeignKey('tasks.Prediction', on_delete=models.SET_NULL, related_name='child_annotations',
+                                          null=True, help_text='Points to the prediction from which this annotation was created')
+    parent_annotation = models.ForeignKey('tasks.Annotation', on_delete=models.SET_NULL,
+                                          related_name='child_annotations',
+                                          null=True,
+                                          help_text='Points to the parent annotation from which this annotation was created')
+
     class Meta:
         db_table = 'task_completion'
         indexes = [

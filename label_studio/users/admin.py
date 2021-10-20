@@ -8,8 +8,8 @@ from django.contrib.auth.models import Group
 from users.models import User
 from projects.models import Project
 from ml.models import MLBackend, MLBackendTrainJob
-from tasks.models import Task, Annotation
-from organizations.models import Organization
+from tasks.models import Task, Annotation, Prediction
+from organizations.models import Organization, OrganizationMember
 
 
 class UserAdminShort(UserAdmin):
@@ -32,6 +32,9 @@ admin.site.register(MLBackend)
 admin.site.register(MLBackendTrainJob)
 admin.site.register(Task)
 admin.site.register(Annotation)
+admin.site.register(Prediction)
 admin.site.register(Organization)
+admin.site.register(OrganizationMember)
+
 # remove unused django groups
 admin.site.unregister(Group)

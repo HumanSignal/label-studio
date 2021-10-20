@@ -75,7 +75,7 @@ stages:
 - name: stage
   request:
     method: GET
-    url: '{django_live_url}/api/dm/views/{view_pk}/tasks/'
+    url: '{django_live_url}/api/dm/tasks?view={view_pk}'
   response:
     json:
       tasks:
@@ -571,6 +571,12 @@ stages:
   request:
     method: POST
     url: '{django_live_url}/api/storages/export/s3/{storage_pk}/sync'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/dm/actions?id=delete_tasks_annotations&project={project_pk}'
   response:
     status_code: 200
 ---

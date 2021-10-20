@@ -32,6 +32,7 @@ def test_create_annotation(caplog, any_client, configured_project_min_annotation
         assert invite_client_to_project(any_client, task.project).status_code == 200
     with requests_mock.Mocker() as m:
         m.post('http://localhost:8999/train')
+        m.post('http://localhost:8999/webhook')
         annotation = {'result': result, 'task': task.id, 'lead_time': 2.54}
         r = any_client.post(f'/api/tasks/{task.id}/annotations/', data=annotation)
         # check that submitted VALID data for task_annotation
@@ -61,9 +62,11 @@ def test_create_annotation(caplog, any_client, configured_project_min_annotation
 def test_create_annotation_with_ground_truth(caplog, any_client, configured_project_min_annotations_1):
 
     task = Task.objects.first()
-    if _client_is_annotator(any_client):
+    client_is_annotator = _client_is_annotator(any_client)
+    if client_is_annotator:
         assert invite_client_to_project(any_client, task.project).status_code == 200
 
+    webhook_called = not client_is_annotator
     ground_truth = {
         'task': task.id,
         'result': json.dumps([{'from_name': 'text_class', 'to_name': 'text', 'value': {'labels': ['class_A'], 'start': 0, 'end': 1}}]),
@@ -76,12 +79,13 @@ def test_create_annotation_with_ground_truth(caplog, any_client, configured_proj
     }
 
     with requests_mock.Mocker() as m:
+        m.post('http://localhost:8999/webhook')
         m.post('http://localhost:8999/train')
 
-        # ground_truth doesn't affect statistics & ML backend
+        # ground_truth doesn't affect statistics & ML backend, webhook is called for admin accounts
         r = any_client.post('/api/tasks/{}/annotations/'.format(task.id), data=ground_truth)
         assert r.status_code == 201
-        assert not m.called
+        assert m.called == webhook_called
 
         # real annotation triggers uploading to ML backend and recalculating accuracy
         r = any_client.post('/api/tasks/{}/annotations/'.format(task.id), data=annotation)

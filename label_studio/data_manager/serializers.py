@@ -173,6 +173,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     predictions_score = serializers.FloatField(required=False)
     file_upload = serializers.SerializerMethodField(required=False)
     annotations_ids = serializers.SerializerMethodField(required=False)
+    predictions_model_versions = serializers.SerializerMethodField(required=False)
 
     CHAR_LIMITS = 500
 
@@ -197,7 +198,8 @@ class DataManagerTaskSerializer(TaskSerializer):
             "drafts",
             "file_upload",
             "annotators",
-            "project"
+            "project",
+            'predictions_model_versions'
         ]
 
     def _pretty_results(self, task, field, unique=False):
@@ -262,6 +264,9 @@ class DataManagerTaskSerializer(TaskSerializer):
 
     def get_annotations_ids(self, task):
         return self._pretty_results(task, 'annotations_ids', unique=True)
+
+    def get_predictions_model_versions(self, task):
+        return self._pretty_results(task, 'predictions_model_versions', unique=True)
 
     def get_drafts(self, task):
         """Return drafts only for the current user"""

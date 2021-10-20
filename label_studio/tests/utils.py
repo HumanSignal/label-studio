@@ -39,6 +39,7 @@ def register_ml_backend_mock(m, url='http://localhost:9090', predictions=None, h
         m.get(f'{url}/health', text=json.dumps({'status': 'UP'}))
     m.post(f'{url}/train', text=json.dumps({'status': 'ok', 'job_id': train_job_id}))
     m.post(f'{url}/predict', text=json.dumps(predictions or {}))
+    m.post(f'{url}/webhook', text=json.dumps({}))
     return m
 
 
@@ -150,8 +151,9 @@ def upload_data(client, project, tasks):
     return client.post(f'/api/projects/{project.id}/tasks/bulk', data=data, content_type='application/json')
 
 
-def make_project(config, user, use_ml_backend=True, team_id=None):
-    org = Organization.objects.filter(created_by=user).first()
+def make_project(config, user, use_ml_backend=True, team_id=None, org=None):
+    if org is None:
+        org = Organization.objects.filter(created_by=user).first()
     project = Project.objects.create(created_by=user, organization=org, **config)
     if use_ml_backend:
         MLBackend.objects.create(project=project, url='http://localhost:8999')

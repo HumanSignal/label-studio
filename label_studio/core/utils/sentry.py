@@ -2,6 +2,8 @@ from django.conf import *
 
 
 def event_processor(event, hint):
+    if not 'exc_info' in hint:
+        return None
     # skip specified exceptions
     exceptions = event.get('exception', {}).get('values', [{}])
     last = exceptions[-1]
