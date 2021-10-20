@@ -79,7 +79,7 @@ Your changes save automatically.
 By default, each task only needs to be annotated by one annotator. If you want multiple annotators to be able to annotate tasks, set the Overlap of Annotations for a project in the project settings.
 
 1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Annotation Settings**.
+2. Click **Quality**.
 3. Under **Overlap of Annotations**, select the number of minimum annotations for a task. 
 4. Choose whether to enforce the overlap for the default of 100% of tasks, or a smaller percentage. 
 5. Choose whether to show tasks that require multiple annotations, **tasks with overlap**, before other tasks that need to be annotated. 
@@ -123,13 +123,13 @@ In Label Studio Community Edition, you can set up task sampling from the command
 4. You can also choose whether to show tasks with ground truth labels first. 
    Your changes save automatically. 
 
-### <i class='ent'></i> Define the matching function for annotation statistics
-Annotation statistics such as annotator consensus are calculated using a matching score. If you want the matching score to calculate matches by requiring exact matching choices, choose that option in the annotation settings. For more about matching scores and functions in Label Studio Enterprise, see [Annotation statistics](stats.html).
+### <i class='ent'></i> Define the agreement metrics for annotation statistics
+Annotation statistics such as annotator consensus are calculated using an agreement metric. If you want the agreement metric to calculate annotation or prediction agreement by requiring exact matching choices, choose that option in the annotation settings. For more about agreement metrics in Label Studio Enterprise, see [Annotation statistics](stats.html).
 
 1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Annotation Settings**.
-3. Under **Matching Function**, select **Exact matching choices**.
-4. For some types of labeling, you can also select a specific matching function. 
+2. Click **Quality**.
+3. Under **Annotation Agreement**, select **Exact matching choices**.
+4. For some types of labeling, you can also select a [specific matching function](stats.html) or add a [custom agreement metric](custom_metric.html). 
 
 Your changes save automatically. 
 
@@ -146,7 +146,7 @@ Review settings and the review stream are only available in Label Studio Enterpr
 In the project settings, you can add instructions and choose whether to show the instructions to reviewers before they start reviewing annotated tasks. 
 
 1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Review Settings**. 
+2. Click **Review**. 
 3. Type instructions and choose whether to show the instructions to reviewers before reviewing annotated tasks. If you want to provide additional details or links for reference, instructions support HTML markup.
 4. Click **Save**. <br/>Click **Data Manager** to return to the data manager view. 
 
@@ -155,7 +155,7 @@ In the project settings, you can add instructions and choose whether to show the
 Configure the reviewing settings for your project.
 
 1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Review Settings**. 
+2. Click **Review**. 
 3. Under **Reviewing Options**, choose whether to mark a task as reviewed if at least one annotation has been reviewed, or only after all annotations for a task have been processed.
 4. Under **Reviewing Options**, choose whether to anonymize annotators when reviewing tasks. 
 Your changes save automatically.
