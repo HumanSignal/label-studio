@@ -183,11 +183,9 @@ This table describes the hotkeys for a standard keyboard. For a Mac keyboard, us
 | `d` | On the data manager, open the labeling quick view for the selected task row. | 
 | `a` | On the data manager, close the labeling quick view for the selected task row. |
 
-You can also specify custom hotkeys for labeling using the [Shortcut tag](/tags/shortcut.html). 
+You can specify custom hotkeys for labeling using the [Shortcut tag](/tags/shortcut.html). If you want to customize the hotkeys used for specific actions, modify the [`keymap.json` file of the `label-studio-frontend`](https://github.com/heartexlabs/label-studio-frontend/blob/master/src/core/settings/keymap.json) component. 
 
-If you want to customize the hotkeys used for specific actions, modify the [`keymap.json` file of the `label-studio-frontend`](https://github.com/heartexlabs/label-studio-frontend/blob/master/src/core/settings/keymap.json) component. 
-
-Other annotation types have labeling-specific shortcuts, such as numbers to select specific labels.
+Other annotation types have labeling-specific shortcuts, such as numbers to select specific labels for named entity recognition tasks. 
 
 ### Image-specific hotkeys
 
@@ -215,9 +213,9 @@ When labeling audio data types with the `Audio` or `AudioPlus` tags, you can use
 | --- | --- | 
 | `ctrl` + `b` OR `cmd` + `b` | Rewind audio 1 second. |
 
-### Timeseries-specific hotkeys
+### Time series-specific hotkeys
 
-When labeling timeseries data with the `Timeseries` tag, you can use specific hotkeys to take actions on a selected region on the timeseries data.
+When labeling timeseries data with the `TimeSeries` tag, you can use specific hotkeys to take actions on a selected region on the time series data.
 
 | Key | Description |
 | --- | --- | 
