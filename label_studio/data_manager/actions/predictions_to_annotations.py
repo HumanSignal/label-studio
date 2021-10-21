@@ -4,6 +4,7 @@ import logging
 
 from core.permissions import AllPermissions
 from tasks.serializers import AnnotationSerializer
+from tasks.models import Prediction
 
 all_permissions = AllPermissions()
 logger = logging.getLogger(__name__)
@@ -13,19 +14,20 @@ def predictions_to_annotations(project, queryset, **kwargs):
     request = kwargs['request']
     user = request.user
     model_version = request.data.get('model_version')
-    queryset = queryset.filter(predictions__isnull=False, predictions__child_annotations__isnull=True)
+    queryset = queryset.filter(predictions__isnull=False)
+    predictions = Prediction.objects.filter(task__in=queryset, child_annotations__isnull=True)
 
     # model version filter
     if model_version is not None:
-        queryset = queryset.filter(predictions__model_version=model_version)
+        predictions = predictions.filter(model_version=model_version)
 
-    predictions = list(queryset.values_list(
-        'predictions__result', 'predictions__model_version', 'id', 'predictions__id'
+    predictions_values = list(predictions.values_list(
+        'result', 'model_version', 'task_id', 'id'
     ))
 
     # prepare annotations
     annotations = []
-    for result, model_version, task_id, prediction_id in predictions:
+    for result, model_version, task_id, prediction_id in predictions_values:
         annotations.append({
             'result': result,
             'completed_by': user.pk,
