@@ -494,7 +494,7 @@ def annotate_predictions_score(queryset):
         return queryset
 
     model_version = first_task.project.model_version
-    if not model_version:
+    if model_version is None:
         return queryset.annotate(predictions_score=Avg("predictions__score"))
 
     else:
