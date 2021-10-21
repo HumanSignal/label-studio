@@ -489,7 +489,19 @@ def annotate_annotators(queryset):
 
 
 def annotate_predictions_score(queryset):
-    return queryset.annotate(predictions_score=Avg("predictions__score"))
+    first_task = queryset.first()
+    if not first_task:
+        return queryset
+
+    model_version = first_task.project.model_version
+    if model_version is None:
+        return queryset.annotate(predictions_score=Avg("predictions__score"))
+
+    else:
+        return queryset.annotate(predictions_score=Avg(
+            "predictions__score", filter=Q(predictions__model_version=model_version)
+        ))
+
 
 
 def annotate_annotations_ids(queryset):
