@@ -7,7 +7,7 @@ meta_title: Data Labeling&#58; The Unsung Hero Combating Data Drift
 meta_description: This blog describes the various types of data drift and how data drift impacts model performance along with several examples, and addresses how data labeling can tackle data drift.
 ---
 
-*Authored by [Dr. Sundeep Teki](https://portal.draft.dev/writers/recD6UTOiuc13mU1n).* 
+*Authored by Dr. Sundeep Teki.* 
 
 Data drift is a common problem for production machine learning systems. It occurs when the statistical characteristics of the training (source) and test (target) data begin to differ significantly. As illustrated in the image below, the red curve depicting the original data distribution shifts to the blue curve, representing a change in statistical properties like the mean and variance.
 
