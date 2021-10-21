@@ -187,7 +187,7 @@ Other annotation types have labeling-specific shortcuts, such as numbers to sele
 
 ### Image-specific hotkeys
 
-When labeling image data types with the `Rectangle`, `BrushLabels`, `Polygon`, or `KeyPoints` tags, you can use specific hotkeys to take image labeling-specific actions.
+When labeling image data types with the `Rectangle`, `BrushLabels`, `Ellipse`, Polygon`, or `KeyPoints` tags, you can use specific hotkeys to take image labeling-specific actions.
 
 | Key | Description |
 | --- | --- | 
@@ -247,7 +247,7 @@ This overwrites the existing hotkey mapping with your custom mapping. See [more 
 
 Refer to the full list of customizable hotkeys in the [`keymap.json` file of the `label-studio-frontend`](https://github.com/heartexlabs/label-studio-frontend/blob/master/src/core/settings/keymap.json) repository to update a different hotkey combination. 
 
-You cannot use this environment variable to remove or add an existing keyboard shortcut. 
+You cannot use this environment variable to remove an existing or add a new keyboard shortcut. 
 
 ## Customize the labeling interface 
 
