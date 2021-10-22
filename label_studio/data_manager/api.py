@@ -131,6 +131,7 @@ class ViewAPI(viewsets.ModelViewSet):
         tags=['Data Manager'],
         operation_summary="Reset project views",
         operation_description="Reset all views for a specific project.",
+        request_body=ViewResetSerializer,
     )
     @action(detail=False, methods=["delete"])
     def reset(self, request):
