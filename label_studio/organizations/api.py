@@ -8,6 +8,7 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
@@ -59,6 +60,11 @@ class OrganizationListAPI(generics.ListCreateAPIView):
         return super(OrganizationListAPI, self).post(request, *args, **kwargs)
 
 
+class OrganizationMemberPagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+
+
 @method_decorator(name='get', decorator=swagger_auto_schema(
         tags=['Organizations'],
         operation_summary='Get organization members list',
@@ -74,6 +80,7 @@ class OrganizationMemberListAPI(generics.ListAPIView):
         DELETE=all_permissions.organizations_change,
     )
     serializer_class = OrganizationMemberUserSerializer
+    pagination_class = OrganizationMemberPagination
 
     def get_serializer_context(self):
         return {
