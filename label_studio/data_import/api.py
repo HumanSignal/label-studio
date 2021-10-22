@@ -22,7 +22,7 @@ from core.utils.common import bool_from_request, retry_database_locked
 from projects.models import Project
 from tasks.models import Task
 from .uploader import load_tasks
-from .serializers import ImportApiSerializer, FileUploadSerializer
+from .serializers import ImportApiSerializer, FileUploadSerializer, PredictionSerializer
 from .models import FileUpload
 
 from webhooks.utils import emit_webhooks_for_instance
@@ -178,6 +178,7 @@ class ImportAPI(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         start = time.time()
         commit_to_project = bool_from_request(request.query_params, 'commit_to_project', True)
+        return_task_ids = bool_from_request(request.query_params, 'return_task_ids', False)
 
         # check project permissions
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
@@ -212,7 +213,7 @@ class ImportAPI(generics.CreateAPIView):
 
         duration = time.time() - start
 
-        return Response({
+        response = {
             'task_count': task_count,
             'annotation_count': annotation_count,
             'prediction_count': prediction_count,
@@ -221,7 +222,29 @@ class ImportAPI(generics.CreateAPIView):
             'could_be_tasks_list': could_be_tasks_lists,
             'found_formats': found_formats,
             'data_columns': data_columns
-        }, status=status.HTTP_201_CREATED)
+        }
+        if return_task_ids:
+            response['task_ids'] = [task.id for task in tasks]
+
+        return Response(response, status=status.HTTP_201_CREATED)
+
+
+# Import
+class ImportPredictionsAPI(generics.CreateAPIView):
+    permission_required = all_permissions.projects_change
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    serializer_class = PredictionSerializer
+
+    def create(self, request, *args, **kwargs):
+        # check project permissions
+        generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+
+        # upload files from request, and parse all tasks
+        serializer = self.get_serializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({}, status=status.HTTP_201_CREATED)
 
 
 class TasksBulkCreateAPI(ImportAPI):
