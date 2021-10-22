@@ -7,7 +7,6 @@ import { Spinner } from '../../components/Spinner/Spinner';
 import { ApiContext } from '../../providers/ApiProvider';
 import { useContextProps } from '../../providers/RoutesProvider';
 import { Block, Elem } from '../../utils/bem';
-import { isDefined } from '../../utils/helpers';
 import { CreateProject } from '../CreateProject/CreateProject';
 import { DataManagerPage } from '../DataManager/DataManager';
 import { SettingsPage } from '../Settings';
