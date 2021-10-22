@@ -313,6 +313,7 @@ class ExportMixin:
                 config=self.project.get_parsed_config(),
                 project_dir=None,
                 upload_dir=out_dir,
+                download_resources=False,
             )
             input_name = pathlib.Path(self.file.name).name
             input_file_path = pathlib.Path(tmp_dir) / input_name
