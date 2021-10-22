@@ -31,7 +31,7 @@ actions = [
     {
         'entry_point': next_task,
         'permission': all_permissions.projects_view,
-        'title': 'Generate next task',
+        'title': 'Generate Next Task',
         'order': 0,
         'hidden': True
     }

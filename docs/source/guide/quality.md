@@ -8,8 +8,6 @@ meta_title: Review annotation quality in Label Studio
 meta_description: Review the annotations produced by annotators in your Label Studio data labeling projects and evaluate annotator performance against ground truth annotations, predictions, and other annotator's annotations to produce high-quality data for your machine learning models.
 ---
 
-> Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
-
 After multiple labelers have annotated tasks, review their output to validate the quality of the results. You can also perform this task after a model has predicted labels for tasks in your dataset. To configure the settings for reviewing annotations, see [Set up review settings for your project](setup_project.html#Set-up-review-settings-for-your-project).
 
 <div class="enterprise"><p>

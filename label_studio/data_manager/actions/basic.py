@@ -1,18 +1,18 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import logging
+
 from django.db.models import signals
 
-from tasks.models import Annotation, Prediction, update_is_labeled_after_removing_annotation
+from core.permissions import AllPermissions
 from core.utils.common import temporary_disconnect_signal, temporary_disconnect_all_signals
-
-from data_manager.functions import evaluate_predictions
-
+from tasks.models import Annotation, Prediction, update_is_labeled_after_removing_annotation
 from webhooks.utils import emit_webhooks_for_instance
 from webhooks.models import WebhookAction
-from core.permissions import AllPermissions
-
+from data_manager.functions import evaluate_predictions
 
 all_permissions = AllPermissions()
+logger = logging.getLogger(__name__)
 
 
 def retrieve_tasks_predictions(project, queryset, **kwargs):
@@ -96,9 +96,9 @@ def delete_tasks_predictions(project, queryset, **kwargs):
 actions = [
     {
         'entry_point': retrieve_tasks_predictions,
-        'title': 'Retrieve predictions',
-        'order': 90,
         'permission': all_permissions.predictions_any,
+        'title': 'Retrieve Predictions',
+        'order': 90,
         'dialog': {
             'text': 'Send the selected tasks to all ML backends connected to the project.'
                     'This operation might be abruptly interrupted due to a timeout. '
@@ -110,8 +110,9 @@ actions = [
     },
     {
         'entry_point': delete_tasks,
-        'title': 'Delete tasks', 'order': 100,
         'permission': all_permissions.tasks_delete,
+        'title': 'Delete Tasks',
+        'order': 100,
         'reload': True,
         'dialog': {
             'text': 'You are going to delete the selected tasks. Please confirm your action.',
@@ -121,7 +122,7 @@ actions = [
     {
         'entry_point': delete_tasks_annotations,
         'permission': all_permissions.tasks_delete,
-        'title': 'Delete annotations',
+        'title': 'Delete Annotations',
         'order': 101,
         'dialog': {
             'text': 'You are going to delete all annotations from the selected tasks. Please confirm your action.',
@@ -131,7 +132,7 @@ actions = [
     {
         'entry_point': delete_tasks_predictions,
         'permission': all_permissions.predictions_any,
-        'title': 'Delete predictions',
+        'title': 'Delete Predictions',
         'order': 102,
         'dialog': {
             'text': 'You are going to delete all predictions from the selected tasks. Please confirm your action.',

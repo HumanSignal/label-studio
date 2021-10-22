@@ -124,7 +124,10 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     @property
     def avatar_url(self):
         if self.avatar:
-            return settings.HOSTNAME + self.avatar.url
+            if settings.DEFAULT_FILE_STORAGE == 'storages.backends.s3boto3.S3Boto3Storage':
+                return self.avatar.url
+            else:
+                return settings.HOSTNAME + self.avatar.url
 
     def is_organization_admin(self, org_pk):
         return True

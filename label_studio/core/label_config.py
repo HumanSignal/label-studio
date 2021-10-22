@@ -10,6 +10,7 @@ import jsonschema
 import re
 
 from urllib.parse import urlencode
+from collections import OrderedDict
 from lxml import etree
 from collections import defaultdict
 from django.conf import settings
@@ -113,12 +114,28 @@ def parse_config(config_string):
     return outputs
 
 
+def _fix_choices(config):
+    '''
+    workaround for single choice
+    https://github.com/heartexlabs/label-studio/issues/1259
+    '''
+    if 'Choices' in config and 'Choice' in config['Choices'] and not isinstance(config['Choices']['Choice'], list):
+        config['Choices']['Choice'] = [config['Choices']['Choice']]
+    if 'View' in config:
+        if isinstance(config['View'], OrderedDict):
+            config['View'] = _fix_choices(config['View'])
+        else:
+            config['View'] = [_fix_choices(view) for view in config['View']]
+    return config
+
+
 def parse_config_to_json(config_string):
     parser = etree.XMLParser(recover=False)
     xml = etree.fromstring(config_string, parser)
     if xml is None:
         raise etree.XMLSchemaParseError('xml is empty or incorrect')
     config = xmljson.badgerfish.data(xml)
+    config = _fix_choices(config)
     return config
 
 

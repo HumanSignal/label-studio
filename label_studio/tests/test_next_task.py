@@ -435,7 +435,7 @@ def test_next_task_with_active_learning(mocker,
                                         status_code, prelabeling_result
                                         ):
 
-    project = make_project(project_config, business_client.user)
+    project = make_project(project_config, business_client.user, use_ml_backend=False)
     if _client_is_annotator(any_client):
         invite_client_to_project(any_client, project)
     if _client_is_annotator(annotator2_client):
