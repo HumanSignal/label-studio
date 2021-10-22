@@ -73,44 +73,18 @@ class TaskListAPI(generics.ListCreateAPIView):
         Get task data, metadata, annotations and other attributes for a specific labeling task by task ID.
         """,
         manual_parameters=[
-            openapi.Parameter(
-                name='proxy',
-                type=openapi.TYPE_BOOLEAN,
-                in_=openapi.IN_QUERY,
-                description='Use the proxy parameter inline for credential access to task data'
-            ),
-            openapi.Parameter(
-                name='id',
-                type=openapi.TYPE_STRING,
-                in_=openapi.IN_PATH,
-                description='Task ID'
-            ),
+            openapi.Parameter(name='proxy', type=openapi.TYPE_BOOLEAN, in_=openapi.IN_QUERY,
+                          description='Use the proxy parameter inline for credential access to task data')
         ]))
 @method_decorator(name='patch', decorator=swagger_auto_schema(
         tags=['Tasks'],
         operation_summary='Update task',
         operation_description='Update the attributes of an existing labeling task.',
-        manual_parameters=[
-            openapi.Parameter(
-                name='id',
-                type=openapi.TYPE_STRING,
-                in_=openapi.IN_PATH,
-                description='Task ID'
-            ),
-        ],
         request_body=TaskSimpleSerializer))
 @method_decorator(name='delete', decorator=swagger_auto_schema(
         tags=['Tasks'],
         operation_summary='Delete task',
         operation_description='Delete a task in Label Studio. This action cannot be undone!',
-        manual_parameters=[
-            openapi.Parameter(
-                name='id',
-                type=openapi.TYPE_STRING,
-                in_=openapi.IN_PATH,
-                description='Task ID'
-            ),
-        ],
         ))
 class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
@@ -225,13 +199,6 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Annotations'],
         operation_summary='Get all task annotations',
         operation_description='List all annotations for a task.',
-        manual_parameters=[
-            openapi.Parameter(
-                name='id',
-                type=openapi.TYPE_INTEGER,
-                in_=openapi.IN_PATH,
-                description='Task ID'),
-        ],
         ))
 @method_decorator(name='post', decorator=swagger_auto_schema(
         tags=['Annotations'],
@@ -252,13 +219,6 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         } 
         ```
         """,
-        manual_parameters=[
-            openapi.Parameter(
-                name='id',
-                type=openapi.TYPE_INTEGER,
-                in_=openapi.IN_PATH,
-                description='Task ID'),
-        ],
         request_body=AnnotationSerializer
         ))
 class AnnotationsListAPI(generics.ListCreateAPIView):
@@ -376,64 +336,29 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
 
 
 @method_decorator(name='list', decorator=swagger_auto_schema(
-    tags=['Predictions'],
-    operation_summary="List predictions",
+    tags=['Predictions'], operation_summary="List predictions", 
     filter_inspectors=[DjangoFilterDescriptionInspector],
-    operation_description="List all predictions and their IDs.",
-))
+    operation_description="List all predictions."))
 @method_decorator(name='create', decorator=swagger_auto_schema(
     tags=['Predictions'],
     operation_summary="Create prediction",
-    operation_description="Create a prediction for a specific task.",
-))
+    operation_description="Create a prediction."))
 @method_decorator(name='retrieve', decorator=swagger_auto_schema(
     tags=['Predictions'],
-    operation_summary="Get prediction details",
-    operation_description="Get details about a specific prediction by its ID.",
-    manual_parameters=[
-        openapi.Parameter(
-            name='id',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_PATH,
-            description='Prediction ID'),
-    ],
-))
+    operation_summary="Get prediction",
+    operation_description="Get all predictions in an organization, or for a specific task or project by ID."))
 @method_decorator(name='update', decorator=swagger_auto_schema(
     tags=['Predictions'],
     operation_summary="Put prediction",
-    operation_description="Overwrite prediction data by prediction ID.",
-    manual_parameters=[
-        openapi.Parameter(
-            name='id',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_PATH,
-            description='Prediction ID'),
-    ],
-))
+    operation_description="Overwrite prediction data by prediction ID."))
 @method_decorator(name='partial_update', decorator=swagger_auto_schema(
     tags=['Predictions'],
     operation_summary="Update prediction",
-    operation_description="Update prediction data by prediction ID.",
-    manual_parameters=[
-        openapi.Parameter(
-            name='id',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_PATH,
-            description='Prediction ID'),
-    ],
-))
+    operation_description="Update prediction data by prediction ID."))
 @method_decorator(name='destroy', decorator=swagger_auto_schema(
     tags=['Predictions'],
     operation_summary="Delete prediction",
-    operation_description="Delete a prediction by prediction ID.",
-    manual_parameters=[
-        openapi.Parameter(
-            name='id',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_PATH,
-            description='Prediction ID'),
-    ],
-))
+    operation_description="Delete a prediction by prediction ID."))
 class PredictionAPI(viewsets.ModelViewSet):
     serializer_class = PredictionSerializer
     permission_required = all_permissions.predictions_any

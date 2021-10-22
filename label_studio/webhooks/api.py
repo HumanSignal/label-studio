@@ -29,14 +29,6 @@ class WebhookFilterSet(django_filters.FilterSet):
         tags=['Webhooks'],
         operation_summary='List all webhooks',
         operation_description="List all webhooks set up for your organization.",
-        manual_parameters=[
-            openapi.Parameter(
-                name='project',
-                type=openapi.TYPE_STRING,
-                in_=openapi.IN_QUERY,
-                description='Project ID',
-            ),
-        ],
     ),
 )
 @method_decorator(
