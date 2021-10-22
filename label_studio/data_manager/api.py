@@ -57,13 +57,6 @@ class TaskPagination(PageNumberPagination):
     tags=['Data Manager'],
     operation_summary="List views",
     operation_description="List all views for a specific project.",
-    manual_parameters=[
-        openapi.Parameter(
-            name='project',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_QUERY,
-            description='Project ID'),
-    ],
 ))
 @method_decorator(name='create', decorator=swagger_auto_schema(
     tags=['Data Manager'],
@@ -138,13 +131,6 @@ class ViewAPI(viewsets.ModelViewSet):
         tags=['Data Manager'],
         operation_summary="Reset project views",
         operation_description="Reset all views for a specific project.",
-        manual_parameters=[
-            openapi.Parameter(
-                name='project',
-                type=openapi.TYPE_INTEGER,
-                in_=openapi.IN_QUERY,
-                description='Project ID'),
-        ],
     )
     @action(detail=False, methods=["delete"])
     def reset(self, request):
