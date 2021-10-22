@@ -10,6 +10,8 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from django.db.models import Sum, Count
 from django.conf import settings
 from ordered_set import OrderedSet
 
@@ -30,23 +32,70 @@ logger = logging.getLogger(__name__)
 
 
 @method_decorator(name='list', decorator=swagger_auto_schema(
-    tags=['Data Manager'], operation_summary="List views",
-    operation_description="List all views for a specific project."))
+    tags=['Data Manager'],
+    operation_summary="List views",
+    operation_description="List all views for a specific project.",
+    manual_parameters=[
+        openapi.Parameter(
+            name='project',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_QUERY,
+            description='Project ID'),
+    ],
+))
 @method_decorator(name='create', decorator=swagger_auto_schema(
-    tags=['Data Manager'], operation_summary="Create view",
-    operation_description="Create a view for a specific project."))
+    tags=['Data Manager'],
+    operation_summary="Create view",
+    operation_description="Create a view for a specific project.",
+))
 @method_decorator(name='retrieve', decorator=swagger_auto_schema(
-    tags=['Data Manager'], operation_summary="Get view",
-    operation_description="Get all views for a specific project."))
+    tags=['Data Manager'],
+    operation_summary="Get view details",
+    operation_description="Get the details about a specific view in the data manager",
+    manual_parameters=[
+        openapi.Parameter(
+            name='id',
+            type=openapi.TYPE_STRING,
+            in_=openapi.IN_PATH,
+            description='View ID'),
+    ],
+))
 @method_decorator(name='update', decorator=swagger_auto_schema(
-    tags=['Data Manager'], operation_summary="Put view",
-    operation_description="Overwrite view data with updated filters and other information for a specific project."))
+    tags=['Data Manager'],
+    operation_summary="Put view",
+    operation_description="Overwrite view data with updated filters and other information for a specific project.",
+    manual_parameters=[
+        openapi.Parameter(
+            name='id',
+            type=openapi.TYPE_STRING,
+            in_=openapi.IN_PATH,
+            description='View ID'),
+    ],
+))
 @method_decorator(name='partial_update', decorator=swagger_auto_schema(
-    tags=['Data Manager'], operation_summary="Update view",
-    operation_description="Update view data with additional filters and other information for a specific project."))
+    tags=['Data Manager'],
+    operation_summary="Update view",
+    operation_description="Update view data with additional filters and other information for a specific project.",
+    manual_parameters=[
+        openapi.Parameter(
+            name='id',
+            type=openapi.TYPE_STRING,
+            in_=openapi.IN_PATH,
+            description='View ID'),
+    ],
+))
 @method_decorator(name='destroy', decorator=swagger_auto_schema(
-    tags=['Data Manager'], operation_summary="Delete view",
-    operation_description="Delete a view for a specific project."))
+    tags=['Data Manager'],
+    operation_summary="Delete view",
+    operation_description="Delete a specific view by ID.",
+    manual_parameters=[
+        openapi.Parameter(
+            name='id',
+            type=openapi.TYPE_STRING,
+            in_=openapi.IN_PATH,
+            description='View ID'),
+    ],
+))
 class ViewAPI(viewsets.ModelViewSet):
     serializer_class = ViewSerializer
     filter_backends = [DjangoFilterBackend]
@@ -62,15 +111,14 @@ class ViewAPI(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    @swagger_auto_schema(tags=['Data Manager'])
-    @action(detail=False, methods=['delete'])
+    @swagger_auto_schema(
+        tags=['Data Manager'],
+        operation_summary="Reset project views",
+        operation_description="Reset all views for a specific project.",
+        request_body=ViewResetSerializer,
+    )
+    @action(detail=False, methods=["delete"])
     def reset(self, request):
-        """
-        delete:
-        Reset project views
-
-        Reset all views for a specific project.
-        """
         serializer = ViewResetSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=serializer.validated_data['project'].id)
@@ -81,7 +129,95 @@ class ViewAPI(viewsets.ModelViewSet):
     def get_queryset(self):
         return View.objects.filter(project__organization=self.request.user.active_organization)
 
-    @swagger_auto_schema(tags=['Data Manager'], methods=["get", "post", "delete", "patch"])
+    @staticmethod
+    def get_task_serializer_context(request, project):
+        storage = find_first_many_to_one_related_field_by_prefix(project, '.*io_storages.*')
+        resolve_uri = True
+        if not storage and not project.task_data_login and not project.task_data_password:
+            resolve_uri = False
+
+        all_fields = request.GET.get('fields', None) == 'all'  # false by default
+
+        return {
+            'proxy': bool_from_request(request.GET, 'proxy', True),
+            'resolve_uri': resolve_uri,
+            'request': request,
+            'project': project,
+            'drafts': all_fields,
+            'predictions': all_fields,
+            'annotations': all_fields
+        }
+
+    def get_task_queryset(self, request, view):
+        return Task.prepared.only_filtered(prepare_params=view.get_prepare_tasks_params())
+
+    @swagger_auto_schema(
+        tags=['Data Manager'],
+        operation_summary='Get task list for view',
+        operation_description="""
+        Retrieve a list of tasks with pagination for a specific view using filters and ordering.
+        """,
+        responses={200: task_serializer_class(many=True)},
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='View ID'),
+        ],
+    )
+    @action(detail=True, methods=["get"])
+    def tasks(self, request, pk=None):
+        view = self.get_object()
+        queryset = self.get_task_queryset(request, view)
+        project = view.project
+        context = self.get_task_serializer_context(self.request, project)
+
+        # paginated tasks
+        self.pagination_class = TaskPagination
+        page = self.paginate_queryset(queryset)
+        all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
+        fields_for_evaluation = get_fields_for_evaluation(view.get_prepare_tasks_params(), request.user)
+        if page is not None:
+            ids = [task.id for task in page]  # page is a list already
+            tasks = list(
+                Task.prepared.annotate_queryset(
+                    Task.objects.filter(id__in=ids),
+                    fields_for_evaluation=fields_for_evaluation,
+                    all_fields=all_fields,
+                )
+            )
+            tasks_by_ids = {task.id: task for task in tasks}
+
+            # keep ids ordering
+            page = [tasks_by_ids[_id] for _id in ids]
+
+            # retrieve ML predictions if tasks don't have them
+            if project.evaluate_predictions_automatically:
+                tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
+                evaluate_predictions(tasks_for_predictions)
+
+            serializer = self.task_serializer_class(page, many=True, context=context)
+            return self.get_paginated_response(serializer.data)
+
+        # all tasks
+        if project.evaluate_predictions_automatically:
+            evaluate_predictions(queryset.filter(predictions__isnull=True))
+        queryset = Task.prepared.annotate_queryset(queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields)
+        serializer = self.task_serializer_class(queryset, many=True, context=context)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        tags=['Data Manager'],
+        methods=["get", "post", "delete", "patch"],
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='View ID'),
+        ],
+    )
     @action(detail=True, url_path="selected-items", methods=["get", "post", "delete", "patch"])
     def selected_items(self, request, pk=None):
         """
@@ -266,6 +402,18 @@ class TaskListAPI(generics.ListAPIView):
         return Response(serializer.data)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Data Manager'],
+    operation_summary='Get task by ID',
+    operation_description='Retrieve a specific task by ID.',
+    manual_parameters=[
+        openapi.Parameter(
+            name='id',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_PATH,
+            description='Task ID'),
+    ],
+))
 class TaskAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_view
 
@@ -287,14 +435,8 @@ class TaskAPI(generics.RetrieveAPIView):
     def get_queryset(self):
         return Task.prepared.get_queryset(all_fields=True).filter(project__organization=self.request.user.active_organization)
 
-    @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request, pk):
-        """
-        get:
-        Task by ID
 
-        Retrieve a specific task by ID.
-        """
         task = self.get_object()
         context = self.get_serializer_context(request)
         context['project'] = project = task.project
@@ -309,17 +451,15 @@ class TaskAPI(generics.RetrieveAPIView):
         return Response(data)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Data Manager'],
+    operation_summary='Get data manager columns',
+    operation_description='Retrieve the data manager columns available for the tasks in a specific project.',
+))
 class ProjectColumnsAPI(APIView):
     permission_required = all_permissions.projects_view
 
-    @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request):
-        """
-        get:
-        Get data manager columns
-
-        Retrieve the data manager columns available for the tasks in a specific project.
-        """
         pk = int_from_request(request.GET, "project", 1)
         project = get_object_with_check_and_log(request, Project, pk=pk)
         self.check_object_permissions(request, project)
@@ -328,17 +468,15 @@ class ProjectColumnsAPI(APIView):
         return Response(data)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Data Manager'],
+    operation_summary='Get project state',
+    operation_description='Retrieve the project state for the data manager.',
+))
 class ProjectStateAPI(APIView):
     permission_required = all_permissions.projects_view
 
-    @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request):
-        """
-        get:
-        Project state
-
-        Retrieve the project state for data manager.
-        """
         pk = int_from_request(request.GET, "project", 1)  # replace 1 to None, it's for debug only
         project = get_object_with_check_and_log(request, Project, pk=pk)
         self.check_object_permissions(request, project)
@@ -359,33 +497,29 @@ class ProjectStateAPI(APIView):
         return Response(data)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Data Manager'],
+    operation_summary='Get actions',
+    operation_description='Retrieve all the registered actions with descriptions that data manager can use.',
+))
+@method_decorator(name='post', decorator=swagger_auto_schema(
+    tags=['Data Manager'],
+    operation_summary='Post actions',
+    operation_description='Perform an action with the selected items from a specific view.',
+))
 class ProjectActionsAPI(APIView):
     permission_required = ViewClassPermission(
         GET=all_permissions.projects_view,
         POST=all_permissions.projects_view,
     )
 
-    @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request):
-        """
-        get:
-        Get actions
-
-        Retrieve all the registered actions with descriptions that data manager can use.
-        """
         pk = int_from_request(request.GET, "project", 1)  # replace 1 to None, it's for debug only
         project = get_object_with_check_and_log(request, Project, pk=pk)
         self.check_object_permissions(request, project)
         return Response(get_all_actions(request.user, project))
 
-    @swagger_auto_schema(tags=["Data Manager"])
     def post(self, request):
-        """
-        post:
-        Post actions
-
-        Perform an action with the selected items from a specific view.
-        """
         pk = int_from_request(request.GET, "project", None)
         project = get_object_with_check_and_log(request, Project, pk=pk)
         self.check_object_permissions(request, project)

@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from django.utils.decorators import method_decorator
 
 from label_studio.core.permissions import all_permissions, ViewClassPermission
@@ -68,7 +69,14 @@ class OrganizationMemberPagination(PageNumberPagination):
 @method_decorator(name='get', decorator=swagger_auto_schema(
         tags=['Organizations'],
         operation_summary='Get organization members list',
-        operation_description='Retrieve a list of the organization members and their IDs.'
+        operation_description='Retrieve a list of the organization members and their IDs.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this organization.'),
+        ],
     ))
 class OrganizationMemberListAPI(generics.ListAPIView):
 
