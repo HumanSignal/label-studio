@@ -117,9 +117,8 @@ nginx:
 ## Run Label Studio on Docker with a host and sub-path
 
 To run Label Studio on Docker with a host and sub-path, just pass `LABEL_STUDIO_HOST` env variable with sub-path to docker/docker-compose:
-NOTE: trailing slash at the end of subdomain is mandatory.
 ```
-LABEL_STUDIO_HOST=http://localhost:8080/foo/ docker-compose up -d
+LABEL_STUDIO_HOST=http://localhost:8080/foo docker-compose up -d
 ```
 
 ## Run Label Studio on Docker and use local storage
