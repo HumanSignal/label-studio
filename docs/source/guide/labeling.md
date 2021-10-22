@@ -187,7 +187,7 @@ Other annotation types have labeling-specific shortcuts, such as numbers to sele
 
 ### Image-specific hotkeys
 
-When labeling image data types with the `Rectangle`, `BrushLabels`, `Ellipse`, Polygon`, or `KeyPoints` tags, you can use specific hotkeys to take image labeling-specific actions.
+When labeling image data types with the `Rectangle`, `BrushLabels`, `Ellipse`, `Polygon`, or `KeyPoints` tags, you can use specific hotkeys to take image labeling-specific actions.
 
 | Key | Description |
 | --- | --- | 
