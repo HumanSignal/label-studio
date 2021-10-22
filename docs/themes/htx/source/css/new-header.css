@@ -1,3 +1,59 @@
+/* docsearch */
+.ds-dropdown-menu > * {
+  line-height: normal;
+}
+
+.ds-suggestion:hover {
+  background: red !important;
+}
+
+.algolia-docsearch-suggestion--wrapper {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.algolia-docsearch-suggestion--category-header {
+  font-weight: 500 !important;
+}
+
+.algolia-docsearch-suggestion--subcategory-column {
+  display: none !important;
+}
+
+.algolia-docsearch-suggestion--content {
+  width: 100% !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+.algolia-docsearch-suggestion--content:before {
+  display: none !important;
+}
+.algolia-docsearch-suggestion--title {
+  font-weight: 400 !important;
+}
+
+.algolia-docsearch-suggestion--highlight {
+  color: #f58a48 !important;
+}
+
+.ds-dataset-1 {
+
+}
+
+.ds-suggestions {
+
+}
+
+.ds-suggestion {
+
+}
+
+.algolia-docsearch-footer {
+  display: none !important;
+}
+
+
 div.container__head{
   padding-left:40px;
   padding-right:40px;
@@ -32,6 +88,7 @@ div.container__head{
   display: flex;
   align-items:center;
   padding:0px;
+  margin: 0 10px;
   list-style-type: none;
 }
 .head__main>.container__head>.head__menu--wrapper > *{
@@ -134,11 +191,11 @@ div.container__head{
   justify-content:center;
   position: relative;
 }
-.head__main .search__head>input[type="text"]{
+#docsearch-input, .head__main .search__head>input[type="text"]{
   box-sizing: border-box;
   width: 180px;
   height:40px;
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(5, 0, 0, 0.05);
   border-radius: 6px;
   outline:none;
   border:0px;
@@ -147,6 +204,11 @@ div.container__head{
   font-size:18px;
   font-weight:500;
   color:#000;
+  transition: all 0.25s;
+}
+#docsearch-input:focus {
+  background-color: rgba(255, 255, 255, 0.9);
+  width: 300px;
 }
 .head__main .search__head>input[type="submit"]{
   position: absolute;
@@ -161,6 +223,12 @@ div.container__head{
   background-position:center;
   cursor:pointer;
   right: 12px;
+}
+@media (max-width: 991px) {
+  .head__main .search__head>input[type="submit"] {
+    display: none;
+  }
+
 }
 
 .head__main .search__head>input[type="text"]::-webkit-input-placeholder { /* Chrome/Opera/Safari */
@@ -202,6 +270,10 @@ div.container__head{
   }
 }
 @media (max-width: 991px){
+  div.container__head{
+    padding: 0;
+  }
+
   .small__head{
     display: flex;
     justify-content: space-between;
@@ -301,5 +373,9 @@ div.container__head{
   }
   .head__main{
     min-height:60px;
+  }
+
+  #docsearch-input {
+    display: none;
   }
 }

@@ -8,8 +8,6 @@ meta_title: Manage Role-Based Access Control in Label Studio
 meta_description: Manage access and set up permissions with user roles, organizations, and project workspaces for your data labeling, machine learning, and data science projects in Label Studio Enterprise.
 ---
 
-> Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
-
 Manage access to projects, organizations, and workspaces in Label Studio to restrict who can view data, annotations, and predictions in your data labeling projects. 
 
 <div class="enterprise"><p>

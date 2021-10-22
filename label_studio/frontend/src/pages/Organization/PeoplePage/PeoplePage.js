@@ -14,16 +14,16 @@ import { PeopleList } from "./PeopleList";
 import "./PeoplePage.styl";
 import { SelectedUser } from "./SelectedUser";
 
-const InvitationModal = ({link}) => {
+const InvitationModal = ({ link }) => {
   return (
     <Block name="invite">
       <Input
         value={link}
-        style={{width: '100%'}}
+        style={{ width: '100%' }}
         readOnly
       />
 
-      <Description style={{width: '70%', marginTop: 16}}>
+      <Description style={{ width: '70%', marginTop: 16 }}>
         Invite people to join your Label Studio instance. People that you invite have full access to all of your projects. <a href="https://labelstud.io/guide/signup.html">Learn more</a>.
       </Description>
     </Block>
@@ -46,11 +46,12 @@ export const PeoplePage = () => {
 
   const setInviteLink = useCallback((link) => {
     const hostname = config.hostname || location.origin;
+
     setLink(`${hostname}${link}`);
   }, [config, setLink]);
 
   const updateLink = useCallback(() => {
-    api.callApi('resetInviteLink').then(({invite_url}) => {
+    api.callApi('resetInviteLink').then(({ invite_url }) => {
       setInviteLink(invite_url);
     });
   }, [setInviteLink]);
@@ -73,12 +74,12 @@ export const PeoplePage = () => {
       return (
         <Space spread>
           <Space>
-            <Button style={{width: 170}} onClick={() => updateLink()}>
+            <Button style={{ width: 170 }} onClick={() => updateLink()}>
               Reset Link
             </Button>
           </Space>
           <Space>
-            <Button primary style={{width: 170}} onClick={copyLink}>
+            <Button primary style={{ width: 170 }} onClick={copyLink}>
               {copied ? "Copied!" : "Copy link"}
             </Button>
           </Space>
@@ -97,7 +98,7 @@ export const PeoplePage = () => {
   }, []);
 
   useEffect(() => {
-    api.callApi("inviteLink").then(({invite_url}) => {
+    api.callApi("inviteLink").then(({ invite_url }) => {
       setInviteLink(invite_url);
     });
   }, []);

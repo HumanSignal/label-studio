@@ -88,7 +88,9 @@ export default class Form extends React.Component {
     if (!existingField) {
       this.fields.add(field);
 
-      this.fillWithFormData(field);
+      setTimeout(() => {
+        this.fillWithFormData(field);
+      }, 0);
     } else {
       Object.assign(existingField, field);
     }

@@ -33,6 +33,8 @@ FRONTEND_SENTRY_DSN = get_env(
     'https://5f51920ff82a4675a495870244869c6b@o227124.ingest.sentry.io/5838868')
 FRONTEND_SENTRY_ENVIRONMENT = get_env('FRONTEND_SENTRY_ENVIRONMENT', 'opensource')
 
+EDITOR_KEYMAP = json.dumps(get_env("EDITOR_KEYMAP"))
+
 from label_studio import __version__
 from label_studio.core.utils import sentry
 sentry.init_sentry(release_name='label-studio', release_version=__version__)
