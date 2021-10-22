@@ -76,6 +76,7 @@ class TaskFilterOptionsSerializer(serializers.Serializer):
     skipped = serializers.ChoiceField(choices=ONLY_OR_EXCLUDE_CHOICE, allow_null=True, required=False)
     finished = serializers.ChoiceField(choices=ONLY_OR_EXCLUDE_CHOICE, allow_null=True, required=False)
     annotated = serializers.ChoiceField(choices=ONLY_OR_EXCLUDE_CHOICE, allow_null=True, required=False)
+    only_with_annotations = serializers.BooleanField(default=False, required=False)
 
 
 class AnnotationFilterOptionsSerializer(serializers.Serializer):

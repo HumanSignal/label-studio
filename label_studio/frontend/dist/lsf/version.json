@@ -1,6 +1,6 @@
 {
-  "message": "[fix] auto-height for small iframe content",
-  "commit": "5c362026f73a60bbca43fedc301b413726d560e5",
+  "message": "[fix] brush+draft: save touches; pause on draw (#317)\n\n- save touches in drafts, it's much faster than full serialization\r\n- pause autosave during drawing process to reduce glithes",
+  "commit": "097cbd00bbf0f816a829222c5e49f7303860b4e8",
   "branch": "master",
-  "date": "2021-10-07T08:28:15Z"
+  "date": "2021-10-19T15:27:47Z"
 }

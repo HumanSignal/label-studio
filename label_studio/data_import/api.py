@@ -5,6 +5,7 @@ import time
 import logging
 import drf_yasg.openapi as openapi
 import json
+import mimetypes
 
 from django.conf import settings
 from django.db import transaction
@@ -395,7 +396,10 @@ class UploadedFileResponse(generics.RetrieveAPIView):
         if not file_upload.has_permission(request.user):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        if os.path.exists(file_upload.file.path):
-            return RangedFileResponse(request, open(file_upload.file.path, mode='rb'))
+        file = file_upload.file
+        if file.storage.exists(file.name):
+            content_type, encoding = mimetypes.guess_type(str(file.name))
+            content_type = content_type or 'application/octet-stream'
+            return RangedFileResponse(request, file.open(mode='rb'), content_type=content_type)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
