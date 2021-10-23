@@ -1,6 +1,6 @@
 {
-  "message": "[fix] brush+draft: save touches; pause on draw (#317)\n\n- save touches in drafts, it's much faster than full serialization\r\n- pause autosave during drawing process to reduce glithes",
-  "commit": "097cbd00bbf0f816a829222c5e49f7303860b4e8",
+  "message": "[int] ESLint remove vars, prefer const",
+  "commit": "14084fe8c7349c67a7e8eed669cf7a941c364e25",
   "branch": "master",
-  "date": "2021-10-19T15:27:47Z"
+  "date": "2021-10-21T02:31:35Z"
 }
