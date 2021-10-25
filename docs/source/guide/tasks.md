@@ -24,11 +24,79 @@ You can import many different types of data, including text, timeseries, audio, 
 | Audio | .aiff, .au, .flac, .m4a, .mp3, .ogg, .wav |
 | HTML | .html, .htm, .xml |
 | Images | .bmp, .gif, .jpg, .png, .svg, .webp |
-| [Structured data](#Basic-Label-Studio-JSON-format) | .csv, .tsv, .json |
-| [Text](#Plain-text) | .txt |
-| [Time series](#Import-CSV-or-TSV-data) | .csv, .tsv |
+| [Text](#Plain-text) | .txt, .json |
+| [Time series](#Import-CSV-or-TSV-data) | .csv, .tsv, .json |
+| [Tasks with multiple object tags](#Basic-Label-Studio-JSON-format) | .csv, .tsv, .json |
 
 If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=docs-gdi). 
+
+### URL links and references to files
+The recommended import way is to store resources outside of LS and only to provide links in LS. 
+
+`<Audio>, <AudioPlus>, <Image> and <Video>` load data using URLs always.
+
+`<HyperText>, <Text>, <Paragraphs>, <TimeSeries>` support a special attribute `valueType` and can work in two ways: 
+* `valueType="url"` means data is loaded from URL link, 
+* <span title="<HyperText>, <Text>">`valueType="text"`</span> or <span title="<Paragraphs>, <TimeSeries>">`valueType="json"`</span> means data will be saved from the import file to the Label Studio Database and then data will be loaded from the Database directly. URLs can be provided in a JSON, CSV, TSV, or TXT files.
+
+<br/>
+{% details <b>Click to expand examples with different valueType</b> %}
+
+#### Example with valueType="text"
+<div style="margin-left: 1em;">
+
+Labeling config:
+
+{% codeblock lang:xml %}
+<View> 
+  <Text name="text1" value="text" valueType="text"> 
+</View>
+{% endcodeblock %}
+
+Import JSON file:
+{% codeblock lang:json %}
+{
+  "text": "My awesome opossum"
+}
+{% endcodeblock %}
+
+Import CSV file:
+{% codeblock lang:csv %}
+text
+My awesome opossum
+{% endcodeblock %}
+
+</div>
+
+#### Example with valueType="url"
+
+<div style="margin-left: 1em;">
+
+Labeling config:
+
+{% codeblock lang:xml %}
+<View> 
+  <Text name="text1" value="text" valueType="url"> 
+</View>
+{% endcodeblock %}
+
+Import JSON file:
+{% codeblock lang:json %}
+{
+  "text": "http://example.com/text.txt"
+}
+{% endcodeblock %}
+
+Import CSV file:
+{% codeblock lang:csv %}
+text
+http://example.com/text.txt
+{% endcodeblock %}
+
+</div>
+
+{% enddetails %}
+
 
 ## How to format your data to import it
 
@@ -38,7 +106,7 @@ If you want to import multiple types of data to label at the same time, for exam
 
 You can also use a CSV file or a JSON list of tasks to point to URLs with the data, rather than directly importing the data if you need to import thousands of files. You can import files containing up to 250,000 tasks or up to 50MB in size into Label Studio.
 
-If you're specifying data in a cloud storage bucket or container, and you don't want to [sync cloud storage](storage.html), create and specify [presigned URLs for Amazon S3 storage](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html), [signed URLs for Google Cloud Storage](https://cloud.google.com/storage/docs/access-control/signed-urls), or [shared access signatures for Microsoft Azure](https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview) in a JSON, CSV, or TXT file. 
+If you're specifying data in a cloud storage bucket or container, and you don't want to [sync cloud storage](storage.html), create and specify [presigned URLs for Amazon S3 storage](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html), [signed URLs for Google Cloud Storage](https://cloud.google.com/storage/docs/access-control/signed-urls), or [shared access signatures for Microsoft Azure](https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview) in a JSON, CSV, TSV or TXT file. 
 
 ### Basic Label Studio JSON format
 
