@@ -86,7 +86,7 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     def validate_label_config(self, value):
         if self.instance is None:
             # No project created yet
-            Project.validate_label_config(value)
+            ProjectSerializer.validate_label_config(value)
         else:
             # Existing project is updated
             self.instance.validate_config(value)
@@ -103,7 +103,7 @@ class ProjectLabelConfigSerializer(serializers.Serializer):
     label_config = serializers.CharField()
 
     def validate_label_config(self, config):
-        Project.validate_label_config(config)
+        ProjectSerializer.validate_label_config(config)
         return config
 
 
