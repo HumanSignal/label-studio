@@ -433,6 +433,11 @@ USER_AUTH = user_auth
 COLLECT_VERSIONS = collect_versions_dummy
 
 WEBHOOK_TIMEOUT = float(get_env('WEBHOOK_TIMEOUT', 1.0))
+WEBHOOK_SERIALIZERS = {
+    'project': 'webhooks.serializers_for_hooks.ProjectWebhookSerializer',
+    'task': 'webhooks.serializers_for_hooks.TaskWebhookSerializer',
+    'annotation': 'webhooks.serializers_for_hooks.AnnotationWebhookSerializer',
+}
 
 EDITOR_KEYMAP = json.dumps(get_env("EDITOR_KEYMAP"))
 
