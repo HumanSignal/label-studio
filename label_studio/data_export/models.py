@@ -37,7 +37,7 @@ class Export(ExportMixin, models.Model):
         _('title'),
         blank=True,
         default='',
-        max_length=settings.PROJECT_TITLE_MAX_LEN,
+        max_length=2048,
     )
     created_at = models.DateTimeField(
         _('created at'),
