@@ -308,7 +308,7 @@ class ExportMixin:
                 task_filter_options,
                 annotation_filter_options,
                 serialization_options,
-                on_failure=export_background_failure,
+                on_failure=set_export_background_failure,
                 job_timeout='3h',  # 3 hours
             )
         else:
@@ -369,7 +369,7 @@ def export_background(
     )
 
 
-def export_background_failure(job, connection, type, value, traceback):
+def set_export_background_failure(job, connection, type, value, traceback):
     from data_export.models import Export
 
     export_id = job.args[0]
