@@ -22,9 +22,10 @@ You can import many different types of data, including text, timeseries, audio, 
 | Data type | Supported file types |
 | --- | --- |
 | Audio | .aiff, .au, .flac, .m4a, .mp3, .ogg, .wav |
-| HTML | .html, .htm, .xml |
+| HyperText (HTML) | .html, .htm, .xml |
 | Images | .bmp, .gif, .jpg, .png, .svg, .webp |
 | [Text](#Plain-text) | .txt, .json |
+| Paragraphs | .json |
 | [Time series](#Import-CSV-or-TSV-data) | .csv, .tsv, .json |
 | [Tasks with multiple object tags](#Basic-Label-Studio-JSON-format) | .csv, .tsv, .json |
 
@@ -37,7 +38,9 @@ The recommended import way is to store resources outside of LS and only to provi
 
 `<HyperText>, <Text>, <Paragraphs>, <TimeSeries>` support a special attribute `valueType` and can work in two ways: 
 * `valueType="url"` means data is loaded from URL link, 
-* <span title="<HyperText>, <Text>">`valueType="text"`</span> or <span title="<Paragraphs>, <TimeSeries>">`valueType="json"`</span> means data will be saved from the import file to the Label Studio Database and then data will be loaded from the Database directly. URLs can be provided in a JSON, CSV, TSV, or TXT files.
+* <span title="<HyperText>, <Text>">`valueType="text"`</span> or <span title="<Paragraphs>, <TimeSeries>">`valueType="json"`</span> means data will be saved from the import file to the Label Studio Database and then data will be loaded from the Database directly.
+
+> URLs for any object tags can be provided in a JSON, CSV, TSV, or TXT files.
 
 <br/>
 {% details <b>Click to expand examples with different valueType</b> %}
