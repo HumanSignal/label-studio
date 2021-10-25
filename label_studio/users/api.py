@@ -32,6 +32,13 @@ logger = logging.getLogger(__name__)
     operation_description="""
     Save details for a specific user, such as their name or contact information, in Label Studio.
     """,
+    manual_parameters=[
+        openapi.Parameter(
+            name='id',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_PATH,
+            description='User ID'),
+    ],
     request_body=UserSerializer
 ))
 @method_decorator(name='list', decorator=swagger_auto_schema(
@@ -48,7 +55,14 @@ logger = logging.getLogger(__name__)
 @method_decorator(name='retrieve', decorator=swagger_auto_schema(
         tags=['Users'],
         operation_summary='Get user info',
-        operation_description='Get info about a specific Label Studio user, based on the user ID.'
+        operation_description='Get info about a specific Label Studio user, based on the user ID.',
+        manual_parameters = [
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='User ID'),
+                ],
     ))
 @method_decorator(name='partial_update', decorator=swagger_auto_schema(
         tags=['Users'],
@@ -56,12 +70,26 @@ logger = logging.getLogger(__name__)
         operation_description="""
         Update details for a specific user, such as their name or contact information, in Label Studio.
         """,
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='User ID'),
+        ],
         request_body=UserSerializer
     ))
 @method_decorator(name='destroy', decorator=swagger_auto_schema(
         tags=['Users'],
         operation_summary='Delete user',
         operation_description='Delete a specific Label Studio user.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='User ID'),
+        ],
     ))
 class UserAPI(viewsets.ModelViewSet):
     serializer_class = UserSerializer
@@ -169,7 +197,7 @@ class UserGetTokenAPI(APIView):
 @method_decorator(name='get', decorator=swagger_auto_schema(
         tags=['Users'],
         operation_summary='Retrieve my user',
-        operation_description='Retrieve details the account that you are using to access the API.'
+        operation_description='Retrieve details of the account that you are using to access the API.'
     ))
 class UserWhoAmIAPI(generics.RetrieveAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)

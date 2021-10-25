@@ -2,11 +2,14 @@ version: "3.3"
 
 services:
   nginx:
-    image: nginx:latest
+    image: nginx:1.21
     ports:
       - "8080:80"
     depends_on:
       - app
+    environment:
+      - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
+      - NGINX_FILE=${NGINX_FILE:-default.conf}
     volumes:
       # keep in sync with deploy/docker-entrypoint.d/30-copy-static-data.sh
       - source: static
@@ -15,7 +18,8 @@ services:
         volume:
           nocopy: true
       - ./mydata:/label-studio/data:rw
-      - ./deploy/nginx/${NGINX_FILE:-default.conf}:/etc/nginx/conf.d/default.conf:ro
+      - ./deploy/nginx/${NGINX_FILE:-default.conf}:/etc/nginx/templates/${NGINX_FILE:-default.conf}.template
+      - ./deploy/nginx/scripts:/docker-entrypoint.d/label-studio
     command: nginx -g "daemon off;"
 
   app:
