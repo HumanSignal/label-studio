@@ -514,3 +514,10 @@ class TaskIDWithAnnotationsAndPredictionsSerializer(ModelSerializer):
     class Meta:
         model = Task
         fields = ['id', 'annotations', 'predictions']
+
+
+class TaskIDOnlySerializer(ModelSerializer):
+
+    class Meta:
+        model = Task
+        fields = ['id']
