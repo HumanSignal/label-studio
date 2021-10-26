@@ -89,7 +89,7 @@ def test_exception_catch(organization_webhook):
     assert result is None
 
 
-# PROJECT
+# PROJECT CREATE/UPDATE/DELETE API
 @pytest.mark.django_db
 def test_webhooks_for_projects(configured_project, business_client, organization_webhook):
     webhook = organization_webhook
@@ -101,8 +101,10 @@ def test_webhooks_for_projects(configured_project, business_client, organization
         response = business_client.post(reverse('projects:api:project-list'))
 
     assert response.status_code == 201
-    assert len(m.request_history) == 1
-    assert m.request_history[0].json()['action'] == WebhookAction.PROJECT_CREATED
+    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
+
+    r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
+    assert r.json()['action'] == WebhookAction.PROJECT_CREATED
 
     project_id = response.json()['id']
     # PROJECT_UPDATED
@@ -115,9 +117,11 @@ def test_webhooks_for_projects(configured_project, business_client, organization
         )
 
     assert response.status_code == 200
-    assert len(m.request_history) == 1
-    assert m.request_history[0].json()['action'] == WebhookAction.PROJECT_UPDATED
-    assert m.request_history[0].json()['project']['title'] == 'Test title'
+    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
+
+    r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
+    assert r.json()['action'] == WebhookAction.PROJECT_UPDATED
+    assert r.json()['project']['title'] == 'Test title'
 
     # PROJECT_DELETED
     with requests_mock.Mocker(real_http=True) as m:
@@ -126,15 +130,18 @@ def test_webhooks_for_projects(configured_project, business_client, organization
             reverse('projects:api:project-detail', kwargs={'pk': project_id}),
         )
     assert response.status_code == 204
-    assert len(m.request_history) == 1
-    assert m.request_history[0].json()['action'] == WebhookAction.PROJECT_DELETED
-    assert m.request_history[0].json()['project']['id'] == project_id
+    assert len(list(filter(lambda x: x.url == organization_webhook.url, m.request_history))) == 1
+
+    r = list(filter(lambda x: x.url == organization_webhook.url, m.request_history))[0]
+    assert r.json()['action'] == WebhookAction.PROJECT_DELETED
+    assert r.json()['project']['id'] == project_id
 
 
+# TASK CREATE/DELETE API
+# WE DON'T SUPPORT UPDATE FOR TASK
 @pytest.mark.django_db
 def test_webhooks_for_tasks(configured_project, business_client, organization_webhook):
     webhook = organization_webhook
-    # create/update/delete
     # CREATE
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', webhook.url)
@@ -149,19 +156,32 @@ def test_webhooks_for_tasks(configured_project, business_client, organization_we
             content_type="application/json",
         )
     assert response.status_code == 201
-    assert len(m.request_history) == 2  # 1st is a webhook.url, 2nd is a ML backend
-    assert m.request_history[0].json()['action'] == WebhookAction.TASKS_CREATED
+    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
 
-    # DELETE WITHOUT WEBHOOK
+    r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
+    assert r.json()['action'] == WebhookAction.TASKS_CREATED
+    assert 'tasks' in r.json()
+    assert 'project' in r.json()
+
+    # DELETE
     task_id = response.json()['id']
     url = webhook.url
-    webhook.delete()
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', url)
         response = business_client.delete(reverse('tasks:api:task-detail', kwargs={'pk': task_id}))
 
     assert response.status_code == 204
-    assert len(m.request_history) == 0
+    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
+
+    r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
+    assert r.json()['action'] == WebhookAction.TASKS_DELETED
+    assert 'tasks' in r.json()
+    assert 'project' in r.json()
+
+# TASK CREATE on IMPORT
+@pytest.mark.django_db
+def test_webhooks_for_tasks_import(configured_project, business_client, organization_webhook):
+    pass
 
 
 # TODO
