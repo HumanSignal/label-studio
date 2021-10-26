@@ -40,9 +40,9 @@ If you're importing audio, image, or video data, you must use URLs to refer to t
 
 If you're importing HTML, text, dialogue, or timeseries data using the `<HyperText>`, `<Text>`, `<Paragraphs>`, or `<TimeSeries>` tags in your labeling configuration, you can either load data directly, or load data from a URL. 
 - To load data from a URL, specify `valueType="url"` in your labeling configuration. 
-- To load data directly into Label Studio, specify `valueType="text"` for HyperText or Text data, or `valueType="json"` for Paragraph or TimeSeries data.
+- To load data directly into the Label Studio database, specify `valueType="text"` for HyperText or Text data, or `valueType="json"` for Paragraph or TimeSeries data.
 
-> Note: If you load data from a URL, the data is not saved in Label Studio. If you want an annotated task export to include the data that you annotated, you must load the data into Label Studio directly or combine the data with the annotations after exporting.
+> Note: If you load data from a URL, the data is not saved in Label Studio. If you want an annotated task export to include the data that you annotated, you must import the data into the Label Studio database without using URL references, or combine the data with the annotations after exporting.
 
 <br/>
 {% details <b>Click to expand example configurations with each valueType</b> %}
