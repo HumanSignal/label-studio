@@ -10,12 +10,13 @@ import shutil
 from core.utils.io import get_all_files_from_dir, get_temp_dir, read_bytes_stream
 from data_manager.models import View
 from django.core.files import File
+from django.db.models import Prefetch
 from django.db import transaction
 from django.db.models.query_utils import Q
 from django.utils import dateformat, timezone
 from label_studio_converter import Converter
 from projects.models import Project
-from tasks.models import Task
+from tasks.models import Task, Annotation
 from core.utils.common import batch
 
 from core.redis import redis_connected
@@ -78,7 +79,7 @@ class ExportMixin:
 
         return tasks
 
-    def _get_filtered_annotations(self, annotations, annotation_filter_options=None):
+    def _get_filtered_annotations_queryset(self, annotation_filter_options=None):
         """
         Filtering using disjunction of conditions
 
@@ -88,8 +89,9 @@ class ExportMixin:
             skipped: optional None or bool:("true|false")
         })
         """
+        queryset = Annotation.objects.all()
         if not isinstance(annotation_filter_options, dict):
-            return annotations
+            return queryset
 
         q_list = []
         if annotation_filter_options.get('usual'):
@@ -99,10 +101,10 @@ class ExportMixin:
         if annotation_filter_options.get('skipped'):
             q_list.append(Q(was_cancelled=True))
         if not q_list:
-            return annotations
+            return queryset
 
         q = reduce(lambda x, y: x | y, q_list)
-        return annotations.filter(q)
+        return queryset.filter(q)
 
     def _get_export_serializer_option(self, serialization_options):
         options = {'expand': []}
@@ -128,11 +130,10 @@ class ExportMixin:
 
     def get_serializer_class(self):
         from .serializers import ExportDataSerializer
+
         return ExportDataSerializer
 
-    def get_export_data(
-        self, task_filter_options=None, annotation_filter_options=None, serialization_options=None
-    ):
+    def get_export_data(self, task_filter_options=None, annotation_filter_options=None, serialization_options=None):
         """
         serialization_options: None or Dict({
             drafts: optional
@@ -172,23 +173,24 @@ class ExportMixin:
             base_export_serializer_option = self._get_export_serializer_option(serialization_options)
             i = 0
             BATCH_SIZE = 1000
+            serializer_class = self.get_serializer_class()
+            annotations_qs = self._get_filtered_annotations_queryset(
+                annotation_filter_options=annotation_filter_options
+            )
             for ids in batch(task_ids, BATCH_SIZE):
                 i += 1
-                tasks = list(Task.objects.filter(id__in=ids))
-                logger.debug(f'Batch: {i*BATCH_SIZE}')
-                # TODO: move _get_filtered_annotations on Prefetch filtering
-                for task in tasks:
-                    task.annotations.set(
-                        list(
-                            self._get_filtered_annotations(
-                                task.annotations.all(), annotation_filter_options=annotation_filter_options
-                            ).distinct()
+                tasks = list(
+                    Task.objects.filter(id__in=ids).prefetch_related(
+                        Prefetch(
+                            "annotations",
+                            queryset=annotations_qs,
                         )
                     )
+                )
+                logger.debug(f'Batch: {i*BATCH_SIZE}')
                 if isinstance(task_filter_options, dict) and task_filter_options.get('only_with_annotations'):
-                    tasks = [task for task in tasks if task.annotations]
+                    tasks = [task for task in tasks if task.annotations.all()]
 
-                serializer_class = self.get_serializer_class()
                 serializer = serializer_class(tasks, many=True, **base_export_serializer_option)
                 result += serializer.data
 
