@@ -18,6 +18,9 @@ from projects.models import Project
 from tasks.models import Task
 from core.utils.common import batch
 
+from core.redis import redis_connected
+import django_rq
+
 ONLY = 'only'
 EXCLUDE = 'exclude'
 
@@ -236,13 +239,25 @@ class ExportMixin:
 
         self.status = self.Status.IN_PROGRESS
         self.save(update_fields=['status'])
-
         logger.info(f'Start file_exporting {self}')
-        self.export_to_file(
-            task_filter_options=task_filter_options,
-            annotation_filter_options=annotation_filter_options,
-            serialization_options=serialization_options,
-        )
+
+        if redis_connected():
+            queue = django_rq.get_queue('default')
+            job = queue.enqueue(
+                export_background,
+                self.id,
+                task_filter_options,
+                annotation_filter_options,
+                serialization_options,
+                on_failure=set_export_background_failure,
+                job_timeout='3h',  # 3 hours
+            )
+        else:
+            self.export_to_file(
+                task_filter_options=task_filter_options,
+                annotation_filter_options=annotation_filter_options,
+                serialization_options=serialization_options,
+            )
 
     def convert_file(self, to_format):
         with get_temp_dir() as tmp_dir:
@@ -277,4 +292,26 @@ class ExportMixin:
                 filename = pathlib.Path(input_name).stem + '.zip'
 
             out = read_bytes_stream(output_file)
-            return File(out, name=filename)
+            return File(
+                out,
+                name=filename,
+            )
+
+
+def export_background(
+    export_id, task_filter_options, annotation_filter_options, serialization_options, *args, **kwargs
+):
+    from data_export.models import Export
+
+    Export.objects.get(id=export_id).export_to_file(
+        task_filter_options,
+        annotation_filter_options,
+        serialization_options,
+    )
+
+
+def set_export_background_failure(job, connection, type, value, traceback):
+    from data_export.models import Export
+
+    export_id = job.args[0]
+    Export.objects.filter(id=export_id).update(status=Export.Status.FAILED)

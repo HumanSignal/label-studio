@@ -2,6 +2,7 @@ import logging
 from functools import wraps
 
 import requests
+from core.utils.common import load_func
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
@@ -63,7 +64,7 @@ def emit_webhooks(organization, project, action, payload):
     """Run all active webhooks for the action."""
     webhooks = get_active_webhooks(organization, project, action)
     if project and payload and webhooks.filter(send_payload=True).exists():
-        payload['project'] = ProjectWebhookSerializer(instance=project).data
+        payload['project'] = load_func(settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data
     for wh in webhooks:
         run_webhook(wh, action, payload)
 
@@ -85,7 +86,12 @@ def emit_webhooks_for_instance(organization, project, action, instance=None):
         if serializer_class:
             payload[action_meta['key']] = serializer_class(instance=instance, many=action_meta['many']).data
         if project and payload:
-            payload['project'] = ProjectWebhookSerializer(instance=project).data
+            payload['project'] = load_func(settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data
+        if payload and 'nested-fields' in action_meta:
+            for key, value in action_meta['nested-fields'].items():
+                payload[key] = value['serializer'](
+                    instance=get_nested_field(instance, value['field']), many=value['many']
+                ).data
     for wh in webhooks:
         run_webhook(wh, action, payload)
 
