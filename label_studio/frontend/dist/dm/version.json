@@ -1,6 +1,6 @@
 {
-  "message": "[ext] Add support of virtual tabs",
-  "commit": "6589a7131df83aa196218d121671a14822596d8e",
+  "message": "[fix] Prevent loading all the audios",
+  "commit": "f398398ace9e55e6ee22e2803223ab7fd45b5381",
   "branch": "master",
-  "date": "2021-10-19T17:37:40Z"
+  "date": "2021-10-26T19:44:40Z"
 }
