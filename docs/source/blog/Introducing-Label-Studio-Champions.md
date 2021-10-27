@@ -2,7 +2,7 @@
 title: Introducing Label Studio Champions!
 type: blog
 order: 93
-image: /images/opossum/other/3.svg
+image: /images/champions-blog/leaderboard.JPG
 meta_title: Introducing Label Studio Champions!
 meta_description: Introducing the community reward program for the Label Studio open source data labeling tool!  
 ---
