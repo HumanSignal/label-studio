@@ -2,7 +2,7 @@
 title: Introducing Label Studio Champions!
 type: blog
 order: 93
-image: /images/champions-blog/leaderboard.JPG
+image: /images/champions-blog/leaderboard.png
 meta_title: Introducing Label Studio Champions!
 meta_description: Introducing the community reward program for the Label Studio open source data labeling tool!  
 ---
@@ -10,6 +10,8 @@ meta_description: Introducing the community reward program for the Label Studio 
 *Authored by Michael Ludden, Community @ Heartex*
 
 At Heartex, we’re putting community at the heart of everything we do, because we’re building the world’s leading open source data labeling tool, and that deserves the most vibrant community possible. 
+<br/>
+<img src="/images/champions-blog/leaderboard.png" alt="Screenshot of top 3 community champions on the leaderboard as of October 27 2021, daniel bishop, tom o'hara, and twsl." class="gif-border" height="474px" width="800px" />
 
 As part of our ongoing efforts to provide value to our users and foster a healthy growing community, and to celebrate our approach to 3000 Label Studio Slack Community users, today we’re launching [Label Studio Champions](/community/champions), where you can get rewarded for doing things you may already be inclined to do, and that are helpful to Label Studio and the community!
 
