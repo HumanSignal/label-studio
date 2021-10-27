@@ -1,13 +1,11 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from core.label_config import replace_task_data_undefined_with_config_field
-from data_manager.models import View
-from django.conf import settings
-from django.db import models
-from django.db.models import fields
 from rest_framework import serializers
+
+from core.label_config import replace_task_data_undefined_with_config_field
+from rest_flex_fields import FlexFieldsModelSerializer
 from tasks.models import Annotation, Task
-from tasks.serializers import PredictionSerializer
+from tasks.serializers import PredictionSerializer, AnnotationDraftSerializer
 from users.models import User
 from users.serializers import UserSimpleSerializer
 
@@ -20,18 +18,23 @@ class CompletedBySerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'first_name', 'last_name']
 
 
-class AnnotationSerializer(serializers.ModelSerializer):
-    completed_by = CompletedBySerializer(read_only=True)
+class AnnotationSerializer(FlexFieldsModelSerializer):
+    completed_by = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Annotation
         fields = '__all__'
+        expandable_fields = {
+          'completed_by': (CompletedBySerializer, )
+        }
 
 
-class ExportDataSerializer(serializers.ModelSerializer):
+class ExportDataSerializer(FlexFieldsModelSerializer):
     annotations = AnnotationSerializer(many=True, read_only=True)
     predictions = PredictionSerializer(many=True, read_only=True)
     file_upload = serializers.ReadOnlyField(source='file_upload_name')
+    drafts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    predictions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     # resolve $undefined$ key in task data, if any
     def to_representation(self, task):
@@ -45,6 +48,10 @@ class ExportDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         exclude = ('overlap', 'is_labeled')
+        expandable_fields = {
+          'drafts': (AnnotationDraftSerializer, {'many': True}),
+          'predictions': (PredictionSerializer, {'many': True}),
+        }
 
 
 class ExportSerializer(serializers.ModelSerializer):

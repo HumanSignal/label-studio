@@ -170,7 +170,7 @@ class ExportAPI(generics.RetrieveAPIView):
         logger.debug('Serialize tasks for export')
         tasks = []
         for _task_ids in batch(task_ids, 1000):
-            tasks += ExportDataSerializer(query.filter(id__in=_task_ids), many=True).data
+            tasks += ExportDataSerializer(query.filter(id__in=_task_ids), many=True, expand=['drafts']).data
         logger.debug('Prepare export files')
 
         export_stream, content_type, filename = DataExport.generate_export_file(

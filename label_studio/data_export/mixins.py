@@ -2,23 +2,21 @@ import hashlib
 import io
 import json
 import logging
-from os import name
 import pathlib
 from datetime import datetime
 from functools import reduce
 import shutil
-import copy
 
-from core.serializers import SerializerOption, generate_serializer
 from core.utils.io import get_all_files_from_dir, get_temp_dir, read_bytes_stream
 from data_manager.models import View
 from django.core.files import File
+from django.db.models import Prefetch
 from django.db import transaction
 from django.db.models.query_utils import Q
 from django.utils import dateformat, timezone
 from label_studio_converter import Converter
 from projects.models import Project
-from tasks.models import Annotation, Prediction, Task
+from tasks.models import Task, Annotation
 from core.utils.common import batch
 
 from core.redis import redis_connected
@@ -52,10 +50,9 @@ class ExportMixin:
         if 'view' in task_filter_options:
             try:
                 value = int(task_filter_options['view'])
-                prepare_params = View.objects.get(
-                    project=self.project,
-                    id=value,
-                ).get_prepare_tasks_params(add_selected_items=True)
+                prepare_params = View.objects.get(project=self.project, id=value).get_prepare_tasks_params(
+                    add_selected_items=True
+                )
                 tab_tasks = Task.prepared.only_filtered(prepare_params=prepare_params).values_list('id', flat=True)
                 tasks = tasks.filter(id__in=tab_tasks)
             except (ValueError, View.DoesNotExist) as exc:
@@ -82,7 +79,7 @@ class ExportMixin:
 
         return tasks
 
-    def _get_filtered_annotations(self, annotations, annotation_filter_options=None):
+    def _get_filtered_annotations_queryset(self, annotation_filter_options=None):
         """
         Filtering using disjunction of conditions
 
@@ -92,8 +89,9 @@ class ExportMixin:
             skipped: optional None or bool:("true|false")
         })
         """
+        queryset = Annotation.objects.all()
         if not isinstance(annotation_filter_options, dict):
-            return annotations
+            return queryset
 
         q_list = []
         if annotation_filter_options.get('usual'):
@@ -103,81 +101,39 @@ class ExportMixin:
         if annotation_filter_options.get('skipped'):
             q_list.append(Q(was_cancelled=True))
         if not q_list:
-            return annotations
+            return queryset
 
         q = reduce(lambda x, y: x | y, q_list)
-        return annotations.filter(q)
+        return queryset.filter(q)
 
     def _get_export_serializer_option(self, serialization_options):
+        options = {'expand': []}
+        if isinstance(serialization_options, dict):
+            if (
+                'drafts' in serialization_options
+                and isinstance(serialization_options['drafts'], dict)
+                and not serialization_options['drafts'].get('only_id')
+            ):
+                options['expand'].append('drafts')
+            if (
+                'predictions' in serialization_options
+                and isinstance(serialization_options['predictions'], dict)
+                and not serialization_options['predictions'].get('only_id')
+            ):
+                options['expand'].append('predictions')
+            if 'annotations__completed_by' in serialization_options and not serialization_options[
+                'annotations__completed_by'
+            ].get('only_id'):
+                options['expand'].append('annotations.completed_by')
 
-        from organizations.serializers import UserSerializer
-        from rest_framework import serializers
-        from tasks.serializers import AnnotationDraftSerializer
+        return options
 
+    def get_serializer_class(self):
         from .serializers import ExportDataSerializer
 
-        drafts = None
-        predictions = None
-        completed_by = {'serializer_class': UserSerializer}
-        if isinstance(serialization_options, dict):
-            if 'drafts' in serialization_options and isinstance(serialization_options['drafts'], dict):
-                if serialization_options['drafts'].get('only_id'):
-                    drafts = {
-                        "serializer_class": serializers.PrimaryKeyRelatedField,
-                        "field_options": {'many': True, 'read_only': True},
-                    }
-                else:
-                    drafts = {
-                        "serializer_class": AnnotationDraftSerializer,
-                        "field_options": {'many': True, 'read_only': True},
-                    }
-            if 'predictions' in serialization_options and isinstance(serialization_options['predictions'], dict):
-                if serialization_options['drafts'].get('only_id'):
-                    predictions = {
-                        "serializer_class": serializers.PrimaryKeyRelatedField,
-                        "field_options": {'many': True, 'read_only': True},
-                    }
-                else:
-                    predictions = {
-                        "model_class": Prediction,
-                        "field_options": {'many': True, 'read_only': True},
-                        "nested_fields": {'created_ago': {'serializer_class': serializers.CharField}},
-                    }
-            if 'annotations__completed_by' in serialization_options:
-                if serialization_options['annotations__completed_by'].get('only_id'):
-                    completed_by = {
-                        'serializer_class': serializers.IntegerField,
-                        'field_options': {'source': 'completed_by_id'},
-                    }
+        return ExportDataSerializer
 
-        result = {
-            "model_class": Task,
-            "base_serializer": ExportDataSerializer,  # to inherit to_representation
-            "exclude": ('overlap', 'is_labeled'),
-            "nested_fields": {
-                "annotations": {
-                    'model_class': Annotation,
-                    'field_options': {
-                        'many': True,
-                        'read_only': True,
-                        'source': '_annotations',  # filtered annotations by _get_filtered_annotations
-                    },
-                    'nested_fields': {'completed_by': completed_by},
-                },
-            },
-        }
-        if drafts is not None:
-            result['nested_fields']['drafts'] = drafts
-        if predictions is not None:
-            result['nested_fields']['predictions'] = predictions
-        return result
-
-    def get_export_data(
-        self,
-        task_filter_options=None,
-        annotation_filter_options=None,
-        serialization_options=None,
-    ):
+    def get_export_data(self, task_filter_options=None, annotation_filter_options=None, serialization_options=None):
         """
         serialization_options: None or Dict({
             drafts: optional
@@ -200,8 +156,6 @@ class ExportMixin:
                 })
         })
         """
-        from .serializers import ExportDataSerializer
-
         with transaction.atomic():
             # TODO: make counters from queryset
             # counters = Project.objects.with_counts().filter(id=self.project.id)[0].get_counters()
@@ -219,39 +173,31 @@ class ExportMixin:
             base_export_serializer_option = self._get_export_serializer_option(serialization_options)
             i = 0
             BATCH_SIZE = 1000
+            serializer_class = self.get_serializer_class()
+            annotations_qs = self._get_filtered_annotations_queryset(
+                annotation_filter_options=annotation_filter_options
+            )
             for ids in batch(task_ids, BATCH_SIZE):
                 i += 1
-                tasks = list(Task.objects.filter(id__in=ids))
-                logger.debug(f'Batch: {i*BATCH_SIZE}')
-                # TODO: move _get_filtered_annotations on Prefetch filtering
-                for task in tasks:
-                    task._annotations = list(
-                        self._get_filtered_annotations(
-                            task.annotations.all(),
-                            annotation_filter_options=annotation_filter_options,
-                        ).distinct()
+                tasks = list(
+                    Task.objects.filter(id__in=ids).prefetch_related(
+                        Prefetch(
+                            "annotations",
+                            queryset=annotations_qs,
+                        )
                     )
+                )
+                logger.debug(f'Batch: {i*BATCH_SIZE}')
                 if isinstance(task_filter_options, dict) and task_filter_options.get('only_with_annotations'):
-                    tasks = [task for task in tasks if task._annotations]
+                    tasks = [task for task in tasks if task.annotations.all()]
 
-                serializer_option_for_generator = copy.deepcopy(base_export_serializer_option)
-                serializer_option_for_generator['field_options'] = {
-                    'many': True,
-                    'instance': tasks,
-                    'read_only': True,
-                }
-
-                result += generate_serializer(SerializerOption(serializer_option_for_generator)).data
+                serializer = serializer_class(tasks, many=True, **base_export_serializer_option)
+                result += serializer.data
 
         counters['task_number'] = len(result)
         return result, counters
 
-    def export_to_file(
-        self,
-        task_filter_options=None,
-        annotation_filter_options=None,
-        serialization_options=None,
-    ):
+    def export_to_file(self, task_filter_options=None, annotation_filter_options=None, serialization_options=None):
         logger.debug(
             f'Run export for {self.id} with params:\n'
             f'task_filter_options: {task_filter_options}\n'
@@ -269,7 +215,9 @@ class ExportMixin:
             json_data = json.dumps(data, ensure_ascii=False).encode('utf-8')
             md5 = hashlib.md5(json_data).hexdigest()
             file_name = f'project-{self.project.id}-at-{now.strftime("%Y-%m-%d-%H-%M")}-{md5[0:8]}.json'
-            file_path = f'{self.project.id}/{file_name}'  # finlay file will be in settings.DELAYED_EXPORT_DIR/self.project.id/file_name
+            file_path = (
+                f'{self.project.id}/{file_name}'
+            )  # finlay file will be in settings.DELAYED_EXPORT_DIR/self.project.id/file_name
             file_ = File(io.BytesIO(json_data), name=file_path)
             self.file.save(file_path, file_)
             self.md5 = md5
@@ -286,12 +234,7 @@ class ExportMixin:
             self.finished_at = datetime.now()
             self.save(update_fields=['finished_at'])
 
-    def run_file_exporting(
-        self,
-        task_filter_options=None,
-        annotation_filter_options=None,
-        serialization_options=None,
-    ):
+    def run_file_exporting(self, task_filter_options=None, annotation_filter_options=None, serialization_options=None):
         if self.status == self.Status.IN_PROGRESS:
             logger.warning('Try to export with in progress stage')
             return

@@ -22,6 +22,7 @@ django-user-agents==0.4.0
 django-ranged-fileresponse>=0.1.2
 django-redis-cache==3.0.0
 drf_dynamic_fields==0.3.0
+drf-flex-fields==0.9.5
 drf_yasg==1.20.0
 drf-generators==0.3.0
 htmlmin==0.1.12
