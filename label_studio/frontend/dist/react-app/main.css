@@ -2355,6 +2355,9 @@ span.CodeMirror-selectedtext { background: none; }
 .ls-configure__container > header .ls-toggle-items {
   margin-left: auto;
 }
+.ls-wizard .ls-configure__code {
+  overflow: hidden;
+}
 .ls-wizard .ls-configure__code textarea,
 .ls-wizard .ls-configure__code .react-codemirror2 {
   flex: 1;
