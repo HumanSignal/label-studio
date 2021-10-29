@@ -211,6 +211,106 @@ def test_webhooks_for_tasks_import(configured_project, business_client, organiza
     assert len(r.json()['tasks']) == response.json()['task_count'] == 3
 
 
-# CRUD for annotations
+# ANNOTATION CREATE/UPDATE/DELETE
+@pytest.mark.django_db
+def test_webhooks_for_annotation(configured_project, business_client, organization_webhook):
+    from django.core.files.uploadedfile import SimpleUploadedFile
+
+    webhook = organization_webhook
+    task = configured_project.tasks.all().first()
+    # CREATE
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url)
+        response = business_client.post(
+            f'/api/tasks/{task.id}/annotations?project={configured_project.id}',
+            data=json.dumps(
+                {
+                    "result": [
+                        {
+                            "value": {"choices": ["class_A"]},
+                            "id": "nJS76J03pi",
+                            "from_name": "text_class",
+                            "to_name": "text",
+                            "type": "choices",
+                            "origin": "manual",
+                        }
+                    ],
+                    "draft_id": 0,
+                    "parent_prediction": None,
+                    "parent_annotation": None,
+                    "project": configured_project.id,
+                }
+            ),
+            content_type="application/json",
+        )
+
+    assert response.status_code == 201
+    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
+
+    r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
+    assert r.json()['action'] == WebhookAction.ANNOTATION_CREATED
+    annotation_id = response.json()['id']
+
+    # UPDATE POST
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url)
+        response = business_client.put(
+            f'/api/annotations/{annotation_id}?project={configured_project.id}&taskId={task.id}',
+            data=json.dumps(
+                {
+                    "result": [],
+                }
+            ),
+            content_type="application/json",
+        )
+        assert response.status_code == 200
+
+        response = business_client.patch(
+            f'/api/annotations/{annotation_id}?project={configured_project.id}&taskId={task.id}',
+            data=json.dumps(
+                {
+                    "result": [
+                        {
+                            "value": {"choices": ["class_B"]},
+                            "id": "nJS76J03pi",
+                            "from_name": "text_class",
+                            "to_name": "text",
+                            "type": "choices",
+                            "origin": "manual",
+                        }
+                    ],
+                }
+            ),
+            content_type="application/json",
+        )
+        assert response.status_code == 200
+
+    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 2
+
+    for r in list(filter(lambda x: x.url == webhook.url, m.request_history)):
+        assert r.json()['action'] == WebhookAction.ANNOTATION_UPDATED
+
+        assert 'task' in r.json()
+        assert 'annotation' in r.json()
+        assert 'project' in r.json()
+
+    # DELETE
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url)
+        response = business_client.delete(
+            f'/api/annotations/{annotation_id}',
+            content_type="application/json",
+        )
+    assert response.status_code == 204
+    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
+
+    r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
+    assert r.json()['action'] == WebhookAction.ANNOTATIONS_DELETED
+    assert 'annotations' in r.json()
+    assert annotation_id == r.json()['annotations'][0]['id']
+
+
+# delete through actions TASKS/ANNOTATIONS
+
+
 # create through import
-# delete through actions
