@@ -214,7 +214,6 @@ def test_webhooks_for_tasks_import(configured_project, business_client, organiza
 # ANNOTATION CREATE/UPDATE/DELETE
 @pytest.mark.django_db
 def test_webhooks_for_annotation(configured_project, business_client, organization_webhook):
-    from django.core.files.uploadedfile import SimpleUploadedFile
 
     webhook = organization_webhook
     task = configured_project.tasks.all().first()
@@ -310,7 +309,57 @@ def test_webhooks_for_annotation(configured_project, business_client, organizati
     assert annotation_id == r.json()['annotations'][0]['id']
 
 
-# delete through actions TASKS/ANNOTATIONS
+# ACTION: DELETE ANNOTATIONS
+@pytest.mark.django_db
+def test_webhooks_for_action_delete_tasks_annotations(configured_project, business_client, organization_webhook):
+    webhook = organization_webhook
+
+    # create annotations for tasks
+    for task in configured_project.tasks.all():
+        response = business_client.post(
+            f'/api/tasks/{task.id}/annotations?project={configured_project.id}',
+            data=json.dumps({"result": [{"value": {"choices": ["class_B"]}}]}),
+            content_type="application/json",
+        )
+        assert response.status_code == 201
+
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url)
+        response = business_client.post(
+            f'/api/dm/actions?id=delete_tasks_annotations&project={configured_project.id}',
+            data=json.dumps(
+                {
+                    "project": str(configured_project.id),
+                    "selectedItems": {"all": True},
+                }
+            ),
+            content_type="application/json",
+        )
+
+    assert response.status_code == 200
+    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
+
+    r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
+    assert r.json()['action'] == WebhookAction.ANNOTATIONS_DELETED
 
 
-# create through import
+# ACTION: DELETE TASKS
+def test_webhooks_for_action_delete_tasks_annotations(configured_project, business_client, organization_webhook):
+    webhook = organization_webhook
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url)
+        response = business_client.post(
+            f'/api/dm/actions?id=delete_tasks&project={configured_project.id}',
+            data=json.dumps(
+                {
+                    "project": str(configured_project.id),
+                    "selectedItems": {"all": True},
+                }
+            ),
+            content_type="application/json",
+        )
+    assert response.status_code == 200
+    assert len(list(filter(lambda x: x.url == webhook.url, m.request_history))) == 1
+
+    r = list(filter(lambda x: x.url == webhook.url, m.request_history))[0]
+    assert r.json()['action'] == WebhookAction.TASKS_DELETED
