@@ -228,3 +228,7 @@ For `x` and `y` annotations in this case, the F1-score =
 ```
 
 ### Common matches example
+
+This metric applies for classification and taxonomy tasks. It looks at which items are selected, and if matching items are selected, counts the number of common items and compares them to the total number of selected items across both annotations.
+
+For annotations `x` and `y`, if `x` has 3 selections in common with `y` out of a possible 4 selections, the agreement score is `0.75` because 3 of 4 possible selections match. This can happen for example if the first three options in a boolean classification task with three layers of nested options, but the fourth subtree option is different.
