@@ -126,82 +126,41 @@ The Intersection over Union (IoU) metric compares the area of overlapping region
 For example, for two annotations `x` and `y` containing either bounding boxes or polygons, the following calculation occurs:
 - LSE identifies whether any regions overlap across the two annotations.  
 - For each pair of overlapping regions across the annotations, the area of the overlap, or intersection `aI` is compared to the combined area `aU` of both regions, referred to as the union of the regions: `aI` ÷ `aU`
-- The average of `aI` ÷ `aU` for each pair of regions is used as the IoU calculation for a pair of annotations.
+- The average of `aI` ÷ `aU` for each pair of regions is used as the IoU calculation for a pair of annotations, or each IoU calculation for eadch label or region is used. 
 For example, if there are two bounding boxes for each `x` and `y` annotations, the agreement of `x` and `y` = ((`aI` ÷ `aU`) + (`aI` ÷ `aU`)) ÷2 .
 
 INSERT IMAGES
-
-#### Intersection over union with threshold
-
-You can use IoU with a threshold to calculate agreement. With a threshold you can consider only the regions that are most similar to each other. 
-
-In this case, the same metric IoU metric of `aI` ÷ `aU` is calculated, but only the percentage of those above a threshold, say .75, are considered for the final agreement score. For example:
-
-IoU for regions x1 and y1: `aI` ÷ `aU` = .99
-IoU for regions x2 and y2: `aI` ÷ `aU` = .70
-IoU for regions x3 and y3: `aI` ÷ `aU` = .82
-
-Number of region pairs with IoU above the threshold of .75 = 2 of 3 
-
-Agreement of `x` and `y` = .66
-
-OR If it's an average of the IoU scores above the threshold, then it'd be .91 instead but that seems too high? 
-
-#### Intersection over union with other metrics 
-The IoU metric can be combined with other metrics. Several metrics in Label Studio Enterprise use IoU to establish initial agreement across annotations, then computes the precision, recall, or F1-score for the IoU values above a specific threshold. Text IoU can also include the edit distance algorithm. 
-
-
-
-
-Precision at specific IOU threshold for polygons	PolygonLabels	Object Detection, Semantic Segmentation	Evaluates the overlap compared to the union (IOU) of two polygonal regions, then computes the precision for the values above a threshold.
-Recall at specific IOU threshold for polygons	PolygonLabels	Object Detection, Semantic Segmentation	Evaluates the overlap compared to the union (IOU) of two polygonal regions, then computes the recall for the values above a threshold.
-F1 score at specific IOU threshold for polygons	PolygonLabels	Object Detection, Semantic Segmentation	Evaluates the overlap compared to the union (IOU) of two polygonal regions, then computes the F1-score for the values above a threshold.
-Precision at specific IOU threshold for bounding boxes	RectangleLabels	Object Detection, Semantic Segmentation	Evaluates the overlap compared to the union (IOU) of two bounding box regions, then computes the precision for the values above a threshold.
-Recall at specific IOU threshold for bounding boxes	RectangleLabels	Object Detection, Semantic Segmentation	Evaluates the overlap compared to the union (IOU) of two bounding box regions, then computes the recall for the values above a threshold.
-F1 score at specific IOU threshold for bounding boxes	RectangleLabels	Object Detection, Semantic Segmentation	Evaluates the overlap compared to the union (IOU) of two bounding box regions, then computes the F1-score for the values above a threshold.
-
-
-Text edit distance per span region, with percentage of matched spans by IOU w.r.t threshold	TextArea	Text	Uses the edit distance algorithm to calculate how dissimilar two text spans are to one another, then calculate the percentage of overlap compared to the union (IOU) of matching spans and compare the IOU to a threshold.
-Text edit distance per hypertext span region, with percentage of matched spans by IOU w.r.t threshold	TextArea	Hypertext	Uses the edit distance algorithm to calculate how dissimilar two text spans are to one another, then calculate the intersection over union (IOU) for the percentage of matching spans and compare the IOU to a threshold.
-
-
-
-
-
-Percentage of matched spans by IOU w.r.t threshold	HyperTextLabels	HTML	Evaluates the percentage by which two given hypertext regions overlap compared to the union (IOU) of the regions, and compare the IOU to a threshold.
-Percentage of matched spans by IOU w.r.t threshold	ParagraphLabels	Dialogue, Text	Evaluates the percentage by which two given paragraph-labeled regions overlap compared to the union (IOU) of the regions, and compare the IOU to a threshold.
-
-
-
-
-
-
-IoU wrt threshold
-
-IoU matched spans
 
 For data labeling tasks where annotators assign specific labels to regions or text spans, the agreement score is calculated by comparing the intersection of annotations over the result spans, normalized by the length of each span. 
 
 For two given task annotations `x` and `y`, the agreement score formula is `m(x, y) = spans(x) ∩ spans(y)`
 
+#### Intersection over union with threshold
 
+You can use IoU with a threshold to calculate agreement. With a threshold you can consider only the regions that are most similar to each other. 
 
+In this case, the same metric IoU metric of `aI` ÷ `aU` is calculated, but only the percentage of those above a threshold, say 0.5, are considered for the final agreement score. For example:
 
+IoU for regions x1 and y1: `aI` ÷ `aU` = 0.99
+IoU for regions x2 and y2: `aI` ÷ `aU` = 0.34
+IoU for regions x3 and y3: `aI` ÷ `aU` = 0.82
 
+Number of region pairs with IoU above the threshold of 0.5 = 2 of 3 
 
+Agreement of `x` and `y` = 0.66
 
+#### Intersection over union with other metrics 
+The IoU metric can be combined with other metrics. Several metrics in Label Studio Enterprise use IoU to establish initial agreement across annotations, then computes the [precision](#precision-example), [recall](#recall-example), or [F1-score](#f1-score-example) for the IoU values above a specific threshold. Text IoU can also include the [edit distance algorithm](#edit-distance-algorithm-example).
 
 ### Intersection over one dimension example
 
-Intersection over Paragraphs	ParagraphLabels	Dialogue, Text	Evaluates whether two given one-dimensional paragraph-labeled spans have points in common.
+The intersection over one dimension metric is similar to the exact matching choices. This metric evaluates whether two given spans or regions have points in common. 
 
-Intersection over HTML spans	HyperTextLabels	HTML	Evaluates whether two given hypertext spans have points in common.
-
-Intersection over 1D spans without labels	Region	Image Segmentation, Computer Vision	Evaluates whether two given one-dimensional regions have points in common.
-
-Intersection over 1D regions	Labels	Semantic Segmentation, Named Entity Recognition	Evaluates whether two given one-dimensional labeled regions have points in common.
-
-Intersection over 1D timeseries spans	TimeSeriesLabels	Time Series	Evaluates whether two given one-dimensional time series spans have points in common.
+For example, for given one dimensional annotations `x` and `y`, identify whether any points are common between the annotations:
+- Identify the list of points for annotation `x` and the list of points for annotation `y`.
+- Compare the two lists. 
+- Compare the total number of points in common against the total number of points, for example, 8 common points and 10 total points across the annotations.
+- The resulting comparison is the agreement score for the annotations. For example, `0.80`. 
 
 ### Precision example
 
