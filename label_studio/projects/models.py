@@ -649,7 +649,7 @@ class Project(ProjectMixin, models.Model):
         return settings.TASKS_MAX_FILE_SIZE
 
     def get_control_tags_from_config(self):
-        return parse_config(self.label_config)
+        return self.get_parsed_config()
 
     def get_parsed_config(self):
         return parse_config(self.label_config)

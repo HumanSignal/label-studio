@@ -18,7 +18,8 @@ from rest_framework.permissions import IsAuthenticated
 from ranged_fileresponse import RangedFileResponse
 
 from core.permissions import all_permissions, ViewClassPermission
-from core.utils.common import bool_from_request, retry_database_locked
+from core.utils.common import retry_database_locked
+from core.utils.params import list_of_strings_from_request, bool_from_request
 from projects.models import Project
 from tasks.models import Task
 from .uploader import load_tasks
@@ -175,16 +176,31 @@ class ImportAPI(generics.CreateAPIView):
         emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, task_instances)
         return task_instances, serializer
 
+    def _reformat_predictions(self, tasks, preannotated_from_fields):
+        new_tasks = []
+        for task in tasks:
+            predictions = [{'result': task.pop(field) for field in preannotated_from_fields}]
+            new_tasks.append({
+                'data': task,
+                'predictions': predictions
+            })
+        return new_tasks
+
     def create(self, request, *args, **kwargs):
         start = time.time()
         commit_to_project = bool_from_request(request.query_params, 'commit_to_project', True)
         return_task_ids = bool_from_request(request.query_params, 'return_task_ids', False)
+        preannotated_from_fields = list_of_strings_from_request(request.query_params, 'preannotated_from_fields', None)
 
         # check project permissions
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
 
         # upload files from request, and parse all tasks
         parsed_data, file_upload_ids, could_be_tasks_lists, found_formats, data_columns = load_tasks(request, project)
+
+        if preannotated_from_fields:
+            # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]  # noqa
+            parsed_data = self._reformat_predictions(parsed_data, preannotated_from_fields)
 
         if commit_to_project:
             # Immediately create project tasks and update project states and counters

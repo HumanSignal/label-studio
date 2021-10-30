@@ -2,6 +2,7 @@
 """
 import logging
 import ujson as json
+import numbers
 
 from django.db import transaction
 from drf_dynamic_fields import DynamicFieldsMixin
@@ -17,7 +18,7 @@ from projects.models import Project
 from tasks.models import Task, Annotation, AnnotationDraft, Prediction
 from tasks.validation import TaskValidator
 from core.utils.common import get_object_with_check_and_log, retry_database_locked
-from core.label_config import replace_task_data_undefined_with_config_field
+from core.label_config import replace_task_data_undefined_with_config_field, SINGLE_VALUED_TAGS
 from users.serializers import UserSerializer
 
 logger = logging.getLogger(__name__)
@@ -31,6 +32,49 @@ class PredictionQuerySerializer(serializers.Serializer):
 class PredictionSerializer(ModelSerializer):
     model_version = serializers.CharField(allow_blank=True, required=False)
     created_ago = serializers.CharField(default='', read_only=True, help_text='Delta time from creation time')
+
+    @property
+    def project(self):
+        return Task.objects.get(id=self['task']).project
+
+    def validate_result(self, result):
+        if isinstance(result, list):
+            # full representation of result
+            for item in result:
+                if not isinstance(item, dict):
+                    raise ValidationError(f'Each item in prediction result should be dict')
+            # TODO: check consistency with project.label_config
+            return result
+
+        elif isinstance(result, dict):
+            # "value" from result
+            # TODO: validate value fields according to project.label_config
+            for tag, tag_info in self.project.get_control_tags_from_config():
+                tag_type = tag_info['type'].lower()
+                if tag_type in result:
+                    return [{
+                        'from_name': tag,
+                        'to_name': ','.join(tag_info['to_name']),
+                        'type': tag_type,
+                        'value': result
+                    }]
+
+        elif isinstance(result, (str, numbers.Integral)):
+            # If result is of integral type, it could be a representation of data from single-valued control tags (e.g. Choices, Rating, etc.)  # noqa
+            for tag, tag_info in self.project.get_control_tags_from_config():
+                tag_type = tag_info['type'].lower()
+                if tag_type in SINGLE_VALUED_TAGS and isinstance(result, SINGLE_VALUED_TAGS[tag_info['type']]):
+                    return [{
+                        'from_name': tag,
+                        'to_name': ','.join(tag_info['to_name']),
+                        'type': tag_type,
+                        'value': {
+                            tag_type: [result]
+                        }
+                    }]
+        else:
+            raise ValidationError(f'Incorrect format {type(result)} for prediction result {result}')
+
 
     class Meta:
         model = Prediction
