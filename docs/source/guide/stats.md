@@ -164,14 +164,67 @@ For example, for given one dimensional annotations `x` and `y`, identify whether
 
 ### Precision example
 
-For a given set of annotations, this agreement metric
+For a given set of annotations, this agreement metric compares the number of true positives with the total number of positive results from the annotations. 
+
+Precision is calculated for IoU with a threshold like the following example using an annotation `x` and an annotation `y`:
+
+- Calculate the IoU for all relevant pairs of regions: 
+IoU for regions x1 and y1: `aI` ÷ `aU` = 0.99, both labeled `Car`
+IoU for regions x2 and y2: `aI` ÷ `aU` = 0.34, both labeled `Car`
+IoU for regions x3 and y3: `aI` ÷ `aU` = 0.82, x3 labeled `Car`, y3 labeled `Airplane`
+IoU for regions x4 and y4: `aI` ÷ `aU` = 0.44, x3 labeled `Car`, y3 labeled `Airplane`
+IoU for regions x5 and y5: `aI` ÷ `aU` = 0.67, x5 labeled `Car`, y5 labeled `Airplane`
+- Determine which labels are assigned to each region.
+- For each pair of regions, determine whether the labels match and whether the IoU is above a threshold of 0.5.
+  - True positive (TP) annotated regions are those with IoU values above the threshold and with matching labels. TP = 1, because x1 and y1 match and have an IoU above the threshold.
+  - False positive (FP) regions are those where the labels do not match but the IoU values are above the threshold. FP = 2, because x3 and y3 do not match but the IoU value is above the threshold, and the same is true for x5 and y5. 
+- Precision is calculated as TP ÷ (TP + FP), in this case, 1/3, or `0.33`. 
+
 
 ### Recall example
 
-For a given set of annotations, this agreement metric
+For a given set of annotations, this agreement metric compares the number of true positives with the total number of true positives and false negatives in the annotation results. 
+
+Recall is calculated for IoU with a threshold like the following example using an annotation `x` and an annotation `y`:
+
+- Calculate the IoU for all relevant pairs of regions: 
+IoU for regions x1 and y1: `aI` ÷ `aU` = 0.99, both labeled `Car`
+IoU for regions x2 and y2: `aI` ÷ `aU` = 0.34, both labeled `Car`
+IoU for regions x3 and y3: `aI` ÷ `aU` = 0.82, x3 labeled `Car`, y3 labeled `Airplane`
+IoU for regions x4 and y4: `aI` ÷ `aU` = 0.44, x4 labeled `Car`, y4 labeled `Airplane`
+IoU for regions x5 and y5: `aI` ÷ `aU` = 0.67, x5 labeled `Car`, y5 labeled `Airplane`
+- Determine which labels are assigned to each region.
+- For each pair of regions, determine whether the labels match and whether the IoU is above a threshold of 0.5.
+  - True positive (TP) annotated regions are those with IoU values above the threshold and with matching labels. TP = 1, because x1 and y1 match and have an IoU above the threshold.
+  - False negative (FN) annotated regions are those with IoU values below the threshold, but the labels still match. FN = 1, because x2 and y2 match, but the IoU is below the threshold.
+- Recall is calculated as TP ÷ (TP + FN), in this case, 1/2, or `0.5`.
 
 ### F1 score example
 
-For a given set of annotations, this agreement metric
+For a given set of annotations, this agreement metric compares the precision and recall for two annotations using the following formula:
+
+F1 = 2 * (precision * recall) ÷ (precision + recall)
+
+The F1-score is calculated for IoU with a threshold like the following example using an annotation `x` and an annotation `y`:
+
+- Calculate the IoU for all relevant pairs of regions: 
+IoU for regions x1 and y1: `aI` ÷ `aU` = 0.99, both labeled `Car`
+IoU for regions x2 and y2: `aI` ÷ `aU` = 0.34, both labeled `Car`
+IoU for regions x3 and y3: `aI` ÷ `aU` = 0.82, x3 labeled `Car`, y3 labeled `Airplane`
+IoU for regions x4 and y4: `aI` ÷ `aU` = 0.44, x4 labeled `Car`, y5 labeled `Airplane`
+IoU for regions x5 and y5: `aI` ÷ `aU` = 0.67, x5 labeled `Car`, y5 labeled `Airplane`
+- Determine which labels are assigned to each region.
+- For each pair of regions, determine whether the labels match and whether the IoU is above a threshold of 0.5.
+  - True positive (TP) annotated regions are those with IoU values above the threshold and with matching labels. TP = 1, because x1 and y1 match and have an IoU above the threshold. 
+  - False positive (FP) regions are those where the labels do not match but the IoU values are above the threshold. FP = 2, because x3 and y3 do not match but the IoU value is above the threshold, and the same is true for x5 and y5. 
+  - False negative (FN) annotated regions are those with IoU values below the threshold, but the labels still match. FN = 1, because x2 and y2 match, but the IoU is below the threshold.
+- Precision is calculated as TP ÷ (TP + FP), in this case, 1/3, or `0.33`. 
+- Recall is calculated as TP ÷ (TP + FN), in this case, 1/2, or `0.5`.
+
+
+For `x` and `y` annotations in this case, the F1-score =
+```
+2 * ((0.33 * 0.5) ÷ (0.33 + 0.5)) = 0.40
+```
 
 ### Common matches example
