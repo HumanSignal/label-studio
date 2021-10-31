@@ -12,7 +12,7 @@ meta_description: Label Studio Enterprise documentation about task agreement, an
 Label Studio Enterprise Edition includes various annotation and labeling statistics. The open source Community Edition of Label Studio does not perform these statistical calculations. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
 </p></div>
 
-Annotation statistics help you determine the quality of your dataset, its readiness to be used to train models, and assess the performance of your annotators. 
+Annotation statistics help you determine the quality of your dataset, its readiness to be used to train models, and assess the performance of your annotators and reviewers.
 
 ## Task agreement
 
@@ -51,7 +51,7 @@ The following table lists the agreement metrics available in Label Studio Enterp
 
 | Agreement Metric | Tag | Labeling Type | Description |
 | --- | --- | --- | --- | 
-| [Naive comparison of result](#Naive-agreement-metric-example) | All tags | All types | Evaluates whether annotation results match, ignoring any label weights. |
+| [Naive comparison of result](#Naive-agreement-metric-example) | All tags | All types | Evaluates whether annotation results exactly match, ignoring any label weights. |
 | [Custom agreement metric](custom_metric.html) | All tags | All types | Performs the evaluation function that you define. See [create a custom agreement metric](custom_metric.html). |
 | [Exact matching choices](#Exact-matching-choices-example) | Choices | Categorical, Classification | Evaluates whether annotations exactly match, considering label weights. | 
 | [Choices per span region](#Exact-matching-choices-example) | Choices | Categorical, Classification | Evaluates whether specific choices applied to specific text spans match. | 
@@ -107,6 +107,9 @@ For data labeling tasks where annotators select a choice, such as image or text 
 - If `x` and `y` are the same choice, the agreement score is `1`. 
 - If `x` and `y` are different choices, the agreement score is `0`.
 
+When calculating agreement between choices selection conditioned on region selection (i.e. when `perRegion="true"` attribute is specified for `<Choices>` tag), corresponding choice agreement is multiplied with region agreements. 
+For example, [calculating intersection over union](#Intersection-over-Union-example) with two bounding boxes results to 0.9, and they have mismatched conditional choices annotations (i.e agreement score is 0), the resulted score is 0.
+
 ### Edit distance algorithm example 
 
 For data labeling tasks where annotators transcribe text in a text area, the resulting annotations contain a list of text. 
@@ -119,17 +122,25 @@ The agreement score for two given task annotations `x` and `y` is computed as fo
 - For each unaligned pair, for example, when one list of text is longer than the other, the similarity is zero. 
 - The similarity scores are averaged across all pairs, and the result is the agreement score for the task.
 
+The following **text edit distance** algorithms are available:
+- Levenshtein
+- Damerau-Levenshtein
+- Hamming
+- MLIPNS
+- Jaro-Winkler
+- Strcmp95
+- Needleman-Wunsch
+- Smith-Waterman
+
 ### Intersection over Union example
 
-The Intersection over Union (IoU) metric compares the area of overlapping regions, such as bounding boxes or polygons, with the overall area, or union, of the regions.
+The Intersection over Union (IoU) metric compares the area of overlapping regions, such as bounding boxes, polygons or textual / time series one-dimensional spans with the overall area, or union, of the regions.
 
 For example, for two annotations `x` and `y` containing either bounding boxes or polygons, the following calculation occurs:
-- LSE identifies whether any regions overlap across the two annotations.  
+- LSE identifies whether any regions overlap across the two annotations. Overlapping can be only considered with matched labels.
 - For each pair of overlapping regions across the annotations, the area of the overlap, or intersection `aI` is compared to the combined area `aU` of both regions, referred to as the union of the regions: `aI` ÷ `aU`
 - The average of `aI` ÷ `aU` for each pair of regions is used as the IoU calculation for a pair of annotations, or each IoU calculation for eadch label or region is used. 
 For example, if there are two bounding boxes for each `x` and `y` annotations, the agreement of `x` and `y` = ((`aI` ÷ `aU`) + (`aI` ÷ `aU`)) ÷2 .
-
-INSERT IMAGES
 
 For data labeling tasks where annotators assign specific labels to regions or text spans, the agreement score is calculated by comparing the intersection of annotations over the result spans, normalized by the length of each span. 
 
