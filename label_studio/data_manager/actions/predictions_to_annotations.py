@@ -3,7 +3,6 @@
 import logging
 
 from core.permissions import AllPermissions
-from annotation_history.functions import bulk_annotation_history
 from tasks.models import Prediction, Annotation
 
 all_permissions = AllPermissions()
