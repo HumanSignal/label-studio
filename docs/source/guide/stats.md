@@ -107,14 +107,18 @@ For data labeling tasks where annotators select a choice, such as image or text 
 - If `x` and `y` are the same choice, the agreement score is `1`. 
 - If `x` and `y` are different choices, the agreement score is `0`.
 
-When calculating agreement between choices selection conditioned on region selection (i.e. when `perRegion="true"` attribute is specified for `<Choices>` tag), corresponding choice agreement is multiplied with region agreements. 
-For example, [calculating intersection over union](#Intersection-over-Union-example) with two bounding boxes results to 0.9, and they have mismatched conditional choices annotations (i.e agreement score is 0), the resulted score is 0.
+When calculating agreement between selected choices conditional on a specific region, such as when `perRegion="true"` attribute is specified for the `<Choices>` tag, corresponding choice agreement is multiplied with region agreements. 
+
+For example, [calculating intersection over union](#Intersection-over-Union-example) with two bounding boxes and corresponding choice selections:
+* The IoU for the bounding box annotations results in an agreement score of 0.9.
+* The conditional choices selected do not match, so that agreement score is 0. 
+* As a result, the final agreement score for these two annotations is 0 (0.9 * 0 = 0).
 
 ### Edit distance algorithm example 
 
 For data labeling tasks where annotators transcribe text in a text area, the resulting annotations contain a list of text. 
 
-You can select agreement metrics based on the intersection over one-dimensional text spans such as splitting the text area by words or characters, or using an [edit distance algorithm](https://en.wikipedia.org/wiki/Edit_distance). Decide what method to use to calculate the agreement score based on your use case and how important precision is for your data labels.
+You can select agreement metrics based on the [intersection over one-dimensional text spans](#Intersection-over-one-dimension-example) such as splitting the text area by words or characters, or using an [edit distance algorithm](https://en.wikipedia.org/wiki/Edit_distance). Decide what method to use to calculate the agreement score based on your use case and how important precision is for your data labels.
 
 The agreement score for two given task annotations `x` and `y` is computed as follows:
 - The list of text items in each annotation is indexed, such that `x = [x1, x2, ..., xn]` and similarly, `y = [y1, y2, ..., yn]`.  
@@ -153,7 +157,7 @@ The IoU metric can be combined with other metrics. Several metrics in Label Stud
 
 You can use IoU with a threshold to calculate agreement. With a threshold you can consider only the regions that are most similar to each other. 
 
-In this case, the same metric IoU metric of `aI` ÷ `aU` is calculated, but only the percentage of those above a threshold, say 0.5, are considered for the final agreement score. For example:
+In this case, the [same IoU metric](#Intersection-over-Union-example) of `aI` ÷ `aU` is calculated, but only the percentage of those above a threshold, say 0.5, are considered for the final agreement score. For example:
 
 IoU for regions x1 and y1: `aI` ÷ `aU` = 0.99
 IoU for regions x2 and y2: `aI` ÷ `aU` = 0.34
