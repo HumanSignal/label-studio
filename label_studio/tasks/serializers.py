@@ -19,8 +19,10 @@ from tasks.validation import TaskValidator
 from core.utils.common import get_object_with_check_and_log, retry_database_locked
 from core.label_config import replace_task_data_undefined_with_config_field
 from users.serializers import UserSerializer
+from core.utils.common import load_func
 
 logger = logging.getLogger(__name__)
+task_bulk_post_create = load_func(settings.TASK_BULK_SERIALIZER_POST_CREATE)
 
 
 class PredictionQuerySerializer(serializers.Serializer):
@@ -371,6 +373,7 @@ class TaskSerializerBulk(serializers.ListSerializer):
                 project.model_version = last_model_version
                 project.save()
 
+        task_bulk_post_create(self)
         return db_tasks
 
     class Meta:
