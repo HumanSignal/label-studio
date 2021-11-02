@@ -578,6 +578,8 @@ class PreparedTaskManager(models.Manager):
     def get_queryset(self, fields_for_evaluation=None, prepare_params=None, all_fields=False):
         """
         :param fields_for_evaluation: list of annotated fields in task
+        :param prepare_params: filters, ordering, selected items
+        :param all_fields: evaluate all fields for task
         :return: task queryset with annotated fields
         """
         queryset = self.only_filtered(prepare_params=prepare_params)
