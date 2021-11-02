@@ -610,6 +610,3 @@ def round_floats(o):
         return [round_floats(x) for x in o]
     return o
 
-
-def dummy_func(*args, **kwargs):
-    pass
