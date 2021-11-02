@@ -4,6 +4,7 @@ import logging
 
 from core.permissions import AllPermissions
 from tasks.models import Prediction, Annotation
+from tasks.serializers import TaskSerializerBulk
 
 all_permissions = AllPermissions()
 logger = logging.getLogger(__name__)
@@ -39,7 +40,8 @@ def predictions_to_annotations(project, queryset, **kwargs):
     db_annotations = [Annotation(**annotation) for annotation in annotations]
     db_annotations = Annotation.objects.bulk_create(db_annotations)
 
-    return {'response_code': 200, 'detail': f'Created {count} annotations', 'db_annotations': db_annotations}
+    TaskSerializerBulk.post_process_annotations(db_annotations)
+    return {'response_code': 200, 'detail': f'Created {count} annotations'}
 
 
 def predictions_to_annotations_form(user, project):

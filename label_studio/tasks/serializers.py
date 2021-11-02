@@ -22,7 +22,6 @@ from users.serializers import UserSerializer
 from core.utils.common import load_func
 
 logger = logging.getLogger(__name__)
-task_bulk_post_create = load_func(settings.TASK_BULK_SERIALIZER_POST_CREATE)
 
 
 class PredictionQuerySerializer(serializers.Serializer):
@@ -373,8 +372,12 @@ class TaskSerializerBulk(serializers.ListSerializer):
                 project.model_version = last_model_version
                 project.save()
 
-        task_bulk_post_create(self)
+        self.post_process_annotations(self.db_annotations)
         return db_tasks
+
+    @staticmethod
+    def post_process_annotations(db_annotations):
+        pass
 
     class Meta:
         model = Task
