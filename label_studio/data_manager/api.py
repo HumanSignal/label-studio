@@ -22,7 +22,7 @@ from projects.serializers import ProjectSerializer
 from tasks.models import Task, Annotation, Prediction
 
 from data_manager.functions import get_prepared_queryset, evaluate_predictions, get_prepare_params
-from data_manager.models import View
+from data_manager.models import View, PrepareParams
 from data_manager.managers import get_fields_for_evaluation
 from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer, ViewResetSerializer
 from data_manager.actions import get_all_actions, perform_action
@@ -289,13 +289,19 @@ class TaskAPI(generics.RetrieveAPIView):
         }
 
     def get_queryset(self):
-        return Task.prepared.get_queryset(all_fields=True).filter(project__organization=self.request.user.active_organization)
+        return Task.objects.filter(
+            project__organization=self.request.user.active_organization
+        )
 
     def get(self, request, pk):
-
         task = self.get_object()
         context = self.get_serializer_context(request)
         context['project'] = project = task.project
+
+        # we need to annotate task because before it was retrieved only for permission checks and project retrieving
+        task = Task.prepared.get_queryset(
+            all_fields=True, prepare_params=PrepareParams(project=project.id)
+        ).filter(id=task.id).first()
 
         # get prediction
         if (project.evaluate_predictions_automatically or project.show_collab_predictions) \
