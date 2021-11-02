@@ -146,9 +146,14 @@ For example, for two annotations `x` and `y` containing either bounding boxes or
 - The average of `aI` ÷ `aU` for each pair of regions is used as the IoU calculation for a pair of annotations, or each IoU calculation for eadch label or region is used. 
 For example, if there are two bounding boxes for each `x` and `y` annotations, the agreement of `x` and `y` = ((`aI` ÷ `aU`) + (`aI` ÷ `aU`)) ÷2 .
 
-For data labeling tasks where annotators assign specific labels to regions or text spans, the agreement score is calculated by comparing the intersection of annotations over the result spans, normalized by the length of each span. 
+#### Intersection over union with text
+
+For data labeling tasks where annotators assign specific labels to text spans in **text**, **hypertext**, or **paragraphs of dialogue**, the agreement score is calculated by comparing the intersection of annotations over the result spans, normalized by the length of each span.
 
 For two given task annotations `x` and `y`, the agreement score formula is `m(x, y) = spans(x) ∩ spans(y)`
+- For text annotations, the span is defined by the `start` and `end` keys.
+- For hypertext annotations, the span is defined by the `startOffset` and `endOffset` keys. 
+- For paragraphs of dialogue annotations, the span is defined by the `startOffset` and `endOffset` keys. 
 
 #### Intersection over union with other metrics 
 The IoU metric can be combined with other metrics. Several metrics in Label Studio Enterprise use IoU to establish initial agreement across annotations, then computes the [precision](#precision-example), [recall](#recall-example), or [F1-score](#f1-score-example) for the IoU values above a specific threshold. Text IoU can also include the [edit distance algorithm](#edit-distance-algorithm-example).
@@ -175,7 +180,7 @@ For example, for given one dimensional annotations `x` and `y`, identify whether
 - Identify the list of points for annotation `x` and the list of points for annotation `y`.
 - Compare the two lists. 
 - Compare the total number of points in common against the total number of points, for example, 8 common points and 10 total points across the annotations.
-- The resulting comparison is the agreement score for the annotations. For example, `0.80`. 
+- The resulting comparison is the agreement score for the annotations. For example, `0.80`.
 
 ### Precision example
 
