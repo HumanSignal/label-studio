@@ -94,8 +94,10 @@ class Task(TaskMixin, models.Model):
     def has_lock(self, user=None):
         """Check whether current task has been locked by some user"""
         num_locks = self.num_locks
-        num_annotations = self.annotations.filter(ground_truth=False)\
-            .exclude(Q(was_cancelled=True) & ~Q(completed_by=user)).count()
+        if self.project.skip_queue == self.project.SkipQueue.REQUEUE_FOR_ME:
+            num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) | ~Q(completed_by=user)).count()
+        else:
+            num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) & ~Q(completed_by=user)).count()
 
         num = num_locks + num_annotations
         if num > self.overlap:
@@ -107,7 +109,9 @@ class Task(TaskMixin, models.Model):
                     num_annotations=num_annotations,
                 )
             )
-        return num >= self.overlap
+        result = bool(num >= self.overlap)
+        logger.debug(f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations}')
+        return result
 
     @property
     def num_locks(self):
@@ -203,8 +207,11 @@ class Task(TaskMixin, models.Model):
     def update_is_labeled(self):
         """Set is_labeled field according to annotations*.count > overlap
         """
-        n = self.annotations.filter(Q_finished_annotations & Q(ground_truth=False)).count()
-        # self.is_labeled = n >= self.project.maximum_annotations
+        if self.project.skip_queue == self.project.SkipQueue.IGNORE_SKIPPED:
+            n = self.annotations.filter(Q(ground_truth=False)).count()
+        else:
+            n = self.annotations.filter(Q_finished_annotations & Q(ground_truth=False)).count()
+
         self.is_labeled = n >= self.overlap
 
     def reset_updates(self):

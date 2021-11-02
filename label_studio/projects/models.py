@@ -84,6 +84,13 @@ ProjectMixin = load_func(settings.PROJECT_MIXIN)
 
 
 class Project(ProjectMixin, models.Model):
+    class SkipQueue(models.TextChoices):
+        # requeue to the end of the same annotator’s queue => annotator gets this task at the end of the queue
+        REQUEUE_FOR_ME = 'REQUEUE_FOR_ME', 'Requeue for me'
+        # requeue skipped tasks back to the common queue, excluding skipping annotator [current default] => another annotator gets this task
+        REQUEUE_FOR_OTHERS = 'REQUEUE_FOR_OTHERS', 'Requeue for others'
+        # ignore skipped tasks => skip is a valid annotation, task is completed (finished=True)
+        IGNORE_SKIPPED = 'IGNORE_SKIPPED', 'Ignore skipped'
 
     objects = ProjectManager()
     __original_label_config = None
@@ -193,6 +200,7 @@ class Project(ProjectMixin, models.Model):
     )
 
     sampling = models.CharField(max_length=100, choices=SAMPLING_CHOICES, null=True, default=SEQUENCE)
+    skip_queue = models.CharField(max_length=100, choices=SkipQueue.choices, null=True, default=SkipQueue.REQUEUE_FOR_OTHERS)
     show_ground_truth_first = models.BooleanField(_('show ground truth first'), default=False)
     show_overlap_first = models.BooleanField(_('show overlap first'), default=False)
     overlap_cohort_percentage = models.IntegerField(_('overlap_cohort_percentage'), default=100)
