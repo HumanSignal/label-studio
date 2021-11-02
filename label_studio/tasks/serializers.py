@@ -1,6 +1,8 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
+from abc import ABC
+
 import ujson as json
 
 from django.db import transaction
@@ -171,7 +173,7 @@ class TaskSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class TaskSerializerBulk(serializers.ListSerializer):
+class BaseTaskSerializerBulk(serializers.ListSerializer):
     """ Serialize task with annotation from source json data
     """
     annotations = AnnotationSerializer(many=True, default=[], read_only=True)
@@ -382,7 +384,7 @@ class TaskSerializerBulk(serializers.ListSerializer):
     class Meta:
         model = Task
         fields = "__all__"
-    
+
         
 class TaskWithAnnotationsSerializer(TaskSerializer):
     """
@@ -393,7 +395,8 @@ class TaskWithAnnotationsSerializer(TaskSerializer):
 
     class Meta:
         model = Task
-        list_serializer_class = TaskSerializerBulk
+        list_serializer_class = load_func(settings.TASK_SERIALIZER_BULK)
+        
         exclude = ()
 
 
@@ -520,3 +523,8 @@ class TaskIDWithAnnotationsAndPredictionsSerializer(ModelSerializer):
     class Meta:
         model = Task
         fields = ['id', 'annotations', 'predictions']
+
+
+# LSE inherits this serializer
+TaskSerializerBulk = load_func(settings.TASK_SERIALIZER_BULK)
+
