@@ -33,7 +33,6 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
 
 class BaseExportDataSerializer(FlexFieldsModelSerializer):
     annotations = AnnotationSerializer(many=True, read_only=True)
-    predictions = PredictionSerializer(many=True, read_only=True)
     file_upload = serializers.ReadOnlyField(source='file_upload_name')
     drafts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     predictions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)

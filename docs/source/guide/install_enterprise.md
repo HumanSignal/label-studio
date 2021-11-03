@@ -97,6 +97,16 @@ POSTGRE_SSL_MODE=require
 # Optional: Specify Postgre SSL certificate
 POSTGRE_SSLROOTCERT=postgre-ca-bundle.pem
 
+# Minio configuration. Copy as-is:
+MINIO_STORAGE_ENDPOINT=http://minio:9000
+MINIO_STORAGE_ACCESS_KEY=very_secret_access_key
+MINIO_STORAGE_SECRET_KEY=very_secret_secret_key
+MINIO_ROOT_USER=very_secret_access_key
+MINIO_ROOT_PASSWORD=very_secret_secret_key
+MINIO_STORAGE_BUCKET_NAME=media
+MINIO_STORAGE_MEDIA_USE_PRESIGNED=false
+MINIO_BROWSER=off
+
 # Redis location e.g. redis://[:password]@localhost:6379/1
 REDIS_LOCATION=localhost:6379
 
@@ -131,8 +141,6 @@ version: '3.3'
 
 services:
   app:
-    stdin_open: true
-    tty: true
     image: heartexlabs/label-studio-enterprise:latest
     ports:
       - 80:8085
@@ -140,26 +148,39 @@ services:
     expose:
       - "80"
       - "443"
+    depends_on:
+      - minio
     env_file:
       - env.list
     volumes:
       - ./license.txt:/label_studio_enterprise/license.txt:ro
-      - ./mydata:/label-studio/data:rw
       - ./certs:/certs:ro
     working_dir: /label-studio-enterprise
 
   rqworkers:
     image: heartexlabs/label-studio-enterprise:latest
+    depends_on:
+      - minio
     env_file:
       - env.list
     volumes:
       - ./license.txt:/label_studio_enterprise/license.txt
-      - ./mydata:/label-studio/data:rw
     working_dir: /label-studio-enterprise
     command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "default" ]
 
-volumes:
-  static: {} 
+  minio:
+    image: heartexlabs/label-studio-enterprise:latest
+    command:
+      - /bin/bash
+      - -c
+      - |
+        mkdir -p /data/media
+        minio server /data
+    env_file:
+      - .env.list
+    volumes:
+      - ./mydata:/data:rw
+
 ```
 
 3. Run Docker Compose:
@@ -169,12 +190,6 @@ docker-compose up
 ```
 
 > Note: If you expose port 80, you must start Docker with `sudo`.
-
-4. If you're starting Docker for the first time, you must run the database migrations to make sure that the `postgres` database already exists:
-
-```bash
-docker-compose run app python3 label_studio_enterprise/manage.py migrate
-```
 
 ### Get the Docker image version
 
