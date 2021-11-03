@@ -1,11 +1,13 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from django.conf import settings
+from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
 
 from core.label_config import replace_task_data_undefined_with_config_field
-from rest_flex_fields import FlexFieldsModelSerializer
+from core.utils.common import load_func
 from tasks.models import Annotation, Task
-from tasks.serializers import PredictionSerializer, AnnotationDraftSerializer
+from tasks.serializers import AnnotationDraftSerializer, PredictionSerializer
 from users.models import User
 from users.serializers import UserSimpleSerializer
 
@@ -29,7 +31,7 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         }
 
 
-class ExportDataSerializer(FlexFieldsModelSerializer):
+class BaseExportDataSerializer(FlexFieldsModelSerializer):
     annotations = AnnotationSerializer(many=True, read_only=True)
     file_upload = serializers.ReadOnlyField(source='file_upload_name')
     drafts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
@@ -108,3 +110,6 @@ class ExportCreateSerializer(ExportSerializer):
     task_filter_options = TaskFilterOptionsSerializer(required=False, default=None)
     annotation_filter_options = AnnotationFilterOptionsSerializer(required=False, default=None)
     serialization_options = SerializationOptionsSerializer(required=False, default=None)
+
+
+ExportDataSerializer = load_func(settings.EXPORT_DATA_SERIALIZER)
