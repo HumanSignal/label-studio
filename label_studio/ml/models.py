@@ -133,7 +133,7 @@ class MLBackend(models.Model):
                 model_version = setup_response.response.get('model_version')
                 logger.info(f'ML backend responds with success: {setup_response.response}')
                 self.model_version = model_version
-                if model_version != self.project.model_version:
+                if (model_version != self.project.model_version) and (self.project.model_version == ""):
                     logger.debug(f'Changing project model version: {self.project.model_version} -> {model_version}')
                     self.project.model_version = model_version
                     self.project.save(update_fields=['model_version'])
