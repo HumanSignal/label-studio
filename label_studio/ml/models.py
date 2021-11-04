@@ -262,7 +262,7 @@ class MLBackend(models.Model):
             result['errors'] = ["Model is not set to be used for interactive preannotations"]
             return result
 
-        tasks_ser = ExportDataSerializer([task], many=True).data
+        tasks_ser = ExportDataSerializer([task], many=True, expand=['drafts', 'predictions', 'annotations']).data
         ml_api_result = self.api.make_predictions(
             tasks=tasks_ser,
             model_version=self.model_version,
