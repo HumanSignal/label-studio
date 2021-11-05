@@ -2,14 +2,16 @@ from django.conf import *
 
 
 def event_processor(event, hint):
-    if not 'exc_info' in hint:
+    # skip all transactions without errors
+    if 'exc_info' not in hint:
         return None
+
     # skip specified exceptions
     exceptions = event.get('exception', {}).get('values', [{}])
     last = exceptions[-1]
     if last.get('type') in [
-        # 'Http404', 'NotAuthenticated', 'AuthenticationFailed', 'NotFound', 'XMLSyntaxError',
-        # 'FileUpload.DoesNotExist',
+        'Http404', 'NotAuthenticated', 'AuthenticationFailed', 'NotFound', 'XMLSyntaxError',
+        'FileUpload.DoesNotExist',
         'Forbidden', 'KeyboardInterrupt'
     ]:
         return None

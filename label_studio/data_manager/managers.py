@@ -423,10 +423,6 @@ class TaskQuerySet(models.QuerySet):
         if prepare_params is None:
             return queryset
 
-        # project filter
-        if prepare_params.project is not None:
-            queryset = queryset.filter(project=prepare_params.project)
-
         project = Project.objects.get(pk=prepare_params.project)
 
         queryset = apply_filters(queryset, prepare_params.filters, only_undefined_field=project.only_undefined_field)
@@ -501,7 +497,6 @@ def annotate_predictions_score(queryset):
         return queryset.annotate(predictions_score=Avg(
             "predictions__score", filter=Q(predictions__model_version=model_version)
         ))
-
 
 
 def annotate_annotations_ids(queryset):
@@ -583,13 +578,15 @@ class PreparedTaskManager(models.Manager):
     def get_queryset(self, fields_for_evaluation=None, prepare_params=None, all_fields=False):
         """
         :param fields_for_evaluation: list of annotated fields in task
+        :param prepare_params: filters, ordering, selected items
+        :param all_fields: evaluate all fields for task
         :return: task queryset with annotated fields
         """
         queryset = self.only_filtered(prepare_params=prepare_params)
         return self.annotate_queryset(queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields)
 
     def only_filtered(self, prepare_params=None):
-        queryset = TaskQuerySet(self.model)
+        queryset = TaskQuerySet(self.model).filter(project=prepare_params.project)
 
         fields_for_filter_ordering = get_fields_for_filter_ordering(prepare_params)
         queryset = self.annotate_queryset(queryset, fields_for_evaluation=fields_for_filter_ordering)

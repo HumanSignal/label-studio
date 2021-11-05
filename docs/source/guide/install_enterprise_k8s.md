@@ -78,14 +78,23 @@ global:
   redisConfig:
     # Redis connection string
     host: redis://host:port/db
+
+  # extraEnvironmentVars is a list of extra environment variables to set in the deployment, empty by default
+  extraEnvironmentVars: {}
+  # extraEnvironmentSecrets is a list of extra environment variables to set in the deplyoment, empty by default
+  extraEnvironmentSecrets: {}
   
 # Ingress config for Label Studio
 app:
   ingress:
     host: studio.yourdomain.com
-# if you have a tls cert, uncomment the next section
+    # You may need to set path to '/*' in order to use this with ALB ingress controllers.
+    path: /
+    # Annotations required for your ingress controller, empty by default 
+    annotations: {}
+# if you have cert-manager, uncomment the next section
 #    tls:
-#      - secretName: ssl-cert
+#      - secretName: ssl-cert-studio.yourdomain.com
 #        hosts:
 #          - studio.yourdomain.com
 
@@ -122,8 +131,8 @@ To upgrade Label Studio Enterprise using Helm, do the following.
 Determine the latest tag version of Label Studio Enterprise and add the following to your `lse-values.yml` file: 
 ```yaml
 global:
-images:
-tag: “20210914.154442-d2d1935”
+  image:
+    tag: “20210914.154442-d2d1935”
 ```
 After updating the values file, run the following from the command line:
 ```shell

@@ -9,6 +9,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_delete
 
 from core.utils.common import safe_float, conditional_atomic
+from data_export.serializers import ExportDataSerializer
 from ml.api_connector import MLApi
 from projects.models import Project
 from tasks.models import Prediction
@@ -261,7 +262,7 @@ class MLBackend(models.Model):
             result['errors'] = ["Model is not set to be used for interactive preannotations"]
             return result
 
-        tasks_ser = TaskSimpleSerializer([task], many=True).data
+        tasks_ser = ExportDataSerializer([task], many=True).data
         ml_api_result = self.api.make_predictions(
             tasks=tasks_ser,
             model_version=self.model_version,

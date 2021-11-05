@@ -1,26 +1,27 @@
+from datetime import datetime
+from functools import reduce
 import hashlib
 import io
 import json
 import logging
 import pathlib
-from datetime import datetime
-from functools import reduce
 import shutil
 
-from core.utils.io import get_all_files_from_dir, get_temp_dir, read_bytes_stream
-from data_manager.models import View
 from django.core.files import File
-from django.db.models import Prefetch
 from django.db import transaction
+from django.db.models import Prefetch
 from django.db.models.query_utils import Q
 from django.utils import dateformat, timezone
+import django_rq
 from label_studio_converter import Converter
-from projects.models import Project
-from tasks.models import Task, Annotation
-from core.utils.common import batch
 
 from core.redis import redis_connected
-import django_rq
+from core.utils.common import batch
+from core.utils.io import get_all_files_from_dir, get_temp_dir, read_bytes_stream
+from data_manager.models import View
+from projects.models import Project
+from tasks.models import Annotation, Task
+
 
 ONLY = 'only'
 EXCLUDE = 'exclude'
@@ -128,10 +129,16 @@ class ExportMixin:
 
         return options
 
-    def get_serializer_class(self):
-        from .serializers import ExportDataSerializer
-
-        return ExportDataSerializer
+    def get_task_queryset(self, ids, annotation_filter_options):
+        annotations_qs = self._get_filtered_annotations_queryset(
+            annotation_filter_options=annotation_filter_options
+        )
+        return Task.objects.filter(id__in=ids).prefetch_related(
+            Prefetch(
+                "annotations",
+                queryset=annotations_qs,
+            )
+        )
 
     def get_export_data(self, task_filter_options=None, annotation_filter_options=None, serialization_options=None):
         """
@@ -156,6 +163,8 @@ class ExportMixin:
                 })
         })
         """
+        from .serializers import ExportDataSerializer
+
         with transaction.atomic():
             # TODO: make counters from queryset
             # counters = Project.objects.with_counts().filter(id=self.project.id)[0].get_counters()
@@ -173,25 +182,14 @@ class ExportMixin:
             base_export_serializer_option = self._get_export_serializer_option(serialization_options)
             i = 0
             BATCH_SIZE = 1000
-            serializer_class = self.get_serializer_class()
-            annotations_qs = self._get_filtered_annotations_queryset(
-                annotation_filter_options=annotation_filter_options
-            )
             for ids in batch(task_ids, BATCH_SIZE):
                 i += 1
-                tasks = list(
-                    Task.objects.filter(id__in=ids).prefetch_related(
-                        Prefetch(
-                            "annotations",
-                            queryset=annotations_qs,
-                        )
-                    )
-                )
+                tasks = list(self.get_task_queryset(ids, annotation_filter_options))
                 logger.debug(f'Batch: {i*BATCH_SIZE}')
                 if isinstance(task_filter_options, dict) and task_filter_options.get('only_with_annotations'):
                     tasks = [task for task in tasks if task.annotations.all()]
 
-                serializer = serializer_class(tasks, many=True, **base_export_serializer_option)
+                serializer = ExportDataSerializer(tasks, many=True, **base_export_serializer_option)
                 result += serializer.data
 
         counters['task_number'] = len(result)

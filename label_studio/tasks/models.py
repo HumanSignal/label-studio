@@ -570,6 +570,7 @@ def update_ml_backend(sender, instance, **kwargs):
             for ml_backend in project.ml_backends.all():
                 ml_backend.train()
 
+
 def update_task_stats(task, stats=('is_labeled',), save=True):
     """Update single task statistics:
         accuracy

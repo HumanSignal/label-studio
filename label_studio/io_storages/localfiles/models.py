@@ -44,7 +44,8 @@ class LocalFilesMixin(models.Model):
             raise ValidationError(f'Path {self.path} does not exist')
         if settings.LOCAL_FILES_SERVING_ENABLED is False:
             raise ValidationError("Serving local files can be dangerous, so it's disabled by default. "
-                                  'You can enable it with LOCAL_FILES_SERVING_ENABLED environment variable')
+                                  'You can enable it with LOCAL_FILES_SERVING_ENABLED environment variable, '
+                                  'please check docs: https://labelstud.io/guide/storage.html#Local-storage')
 
 
 class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):

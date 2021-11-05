@@ -24,7 +24,7 @@ RQ_QUEUES = {}
 
 SENTRY_DSN = get_env(
     'SENTRY_DSN',
-    'https://044f6ac4baa8491f8955a7e6bd5f7f7b@o227124.ingest.sentry.io/5820521'
+    'https://68b045ab408a4d32a910d339be8591a4@o227124.ingest.sentry.io/5820521'
 )
 SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'opensource')
 
