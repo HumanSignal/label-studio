@@ -35,49 +35,6 @@ class PredictionSerializer(ModelSerializer):
     model_version = serializers.CharField(allow_blank=True, required=False)
     created_ago = serializers.CharField(default='', read_only=True, help_text='Delta time from creation time')
 
-    @property
-    def project(self):
-        return Task.objects.get(id=self['task']).project
-
-    def validate_result(self, result):
-        if isinstance(result, list):
-            # full representation of result
-            for item in result:
-                if not isinstance(item, dict):
-                    raise ValidationError(f'Each item in prediction result should be dict')
-            # TODO: check consistency with project.label_config
-            return result
-
-        elif isinstance(result, dict):
-            # "value" from result
-            # TODO: validate value fields according to project.label_config
-            for tag, tag_info in self.project.get_control_tags_from_config():
-                tag_type = tag_info['type'].lower()
-                if tag_type in result:
-                    return [{
-                        'from_name': tag,
-                        'to_name': ','.join(tag_info['to_name']),
-                        'type': tag_type,
-                        'value': result
-                    }]
-
-        elif isinstance(result, (str, numbers.Integral)):
-            # If result is of integral type, it could be a representation of data from single-valued control tags (e.g. Choices, Rating, etc.)  # noqa
-            for tag, tag_info in self.project.get_control_tags_from_config():
-                tag_type = tag_info['type'].lower()
-                if tag_type in SINGLE_VALUED_TAGS and isinstance(result, SINGLE_VALUED_TAGS[tag_info['type']]):
-                    return [{
-                        'from_name': tag,
-                        'to_name': ','.join(tag_info['to_name']),
-                        'type': tag_type,
-                        'value': {
-                            tag_type: [result]
-                        }
-                    }]
-        else:
-            raise ValidationError(f'Incorrect format {type(result)} for prediction result {result}')
-
-
     class Meta:
         model = Prediction
         fields = '__all__'
@@ -222,6 +179,10 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
     annotations = AnnotationSerializer(many=True, default=[], read_only=True)
     predictions = PredictionSerializer(many=True, default=[], read_only=True)
 
+    @property
+    def project(self):
+        return self.context.get('project')
+
     @staticmethod
     def format_error(i, detail, item):
         if len(detail) == 1:
@@ -302,6 +263,44 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                     f"Import data contains completed_by={completed_by} which is not a valid annotator's email or ID")
             annotation.pop('completed_by', None)
 
+    def _prepare_prediction_result(self, result):
+        if isinstance(result, list):
+            # full representation of result
+            for item in result:
+                if not isinstance(item, dict):
+                    raise ValidationError(f'Each item in prediction result should be dict')
+            # TODO: check consistency with project.label_config
+            return result
+
+        elif isinstance(result, dict):
+            # "value" from result
+            # TODO: validate value fields according to project.label_config
+            for tag, tag_info in self.project.get_control_tags_from_config().items():
+                tag_type = tag_info['type'].lower()
+                if tag_type in result:
+                    return [{
+                        'from_name': tag,
+                        'to_name': ','.join(tag_info['to_name']),
+                        'type': tag_type,
+                        'value': result
+                    }]
+
+        elif isinstance(result, (str, numbers.Integral)):
+            # If result is of integral type, it could be a representation of data from single-valued control tags (e.g. Choices, Rating, etc.)  # noqa
+            for tag, tag_info in self.project.get_control_tags_from_config().items():
+                tag_type = tag_info['type'].lower()
+                if tag_type in SINGLE_VALUED_TAGS and isinstance(result, SINGLE_VALUED_TAGS[tag_type]):
+                    return [{
+                        'from_name': tag,
+                        'to_name': ','.join(tag_info['to_name']),
+                        'type': tag_type,
+                        'value': {
+                            tag_type: [result]
+                        }
+                    }]
+        else:
+            raise ValidationError(f'Incorrect format {type(result)} for prediction result {result}')
+
     @retry_database_locked()
     def create(self, validated_data):
         """ Create Tasks and Annotations in bulk
@@ -309,10 +308,9 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         db_tasks, db_annotations, db_predictions, validated_tasks = [], [], [], validated_data
         logging.info(f'Try to serialize tasks with annotations, data len = {len(validated_data)}')
         user = self.context.get('user', None)
-        project = self.context.get('project')
 
         organization = user.active_organization \
-            if not project.created_by.active_organization else project.created_by.active_organization
+            if not self.project.created_by.active_organization else self.project.created_by.active_organization
         members_email_to_id = dict(organization.members.values_list('user__email', 'user__id'))
         members_ids = set(members_email_to_id.values())
         logger.debug(f"{len(members_email_to_id)} members found in organization {organization}")
@@ -326,15 +324,15 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 annotations = task.pop('annotations', [])
                 # insert a valid "completed_by_id" by existing member
                 self._insert_valid_completed_by_id_or_raise(
-                    annotations, members_email_to_id, members_ids, user or project.created_by)
+                    annotations, members_email_to_id, members_ids, user or self.project.created_by)
                 predictions = task.pop('predictions', [])
                 task_annotations.append(annotations)
                 task_predictions.append(predictions)
 
             # add tasks first
             for task in validated_tasks:
-                t = Task(project=project, data=task['data'], meta=task.get('meta', {}),
-                         overlap=project.maximum_annotations,
+                t = Task(project=self.project, data=task['data'], meta=task.get('meta', {}),
+                         overlap=self.project.maximum_annotations,
                          file_upload_id=task.get('file_upload_id'))
                 db_tasks.append(t)
 
@@ -375,6 +373,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             last_model_version = None
             for i, predictions in enumerate(task_predictions):
                 for prediction in predictions:
+                    result = self._prepare_prediction_result(prediction['result'])
                     prediction_score = prediction.get('score')
                     if prediction_score is not None:
                         try:
@@ -387,7 +386,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
                     last_model_version = prediction.get('model_version', 'undefined')
                     db_predictions.append(Prediction(task=self.db_tasks[i],
-                                                     result=prediction['result'],
+                                                     result=result,
                                                      score=prediction_score,
                                                      model_version=last_model_version))
 
@@ -413,9 +412,9 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             logging.info(f'Predictions serialization success, len = {len(self.db_predictions)}')
 
             # renew project model version if it's empty
-            if not project.model_version and last_model_version is not None:
-                project.model_version = last_model_version
-                project.save()
+            if not self.project.model_version and last_model_version is not None:
+                self.project.model_version = last_model_version
+                self.project.save()
 
         self.post_process_annotations(self.db_annotations)
         return db_tasks

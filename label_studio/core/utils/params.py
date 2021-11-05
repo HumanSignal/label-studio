@@ -86,14 +86,15 @@ def list_of_strings_from_request(params, key, default):
     :return: float
     """
     value = params.get(key, default)
+    if value is None:
+        return
     splitters = (',', ';', '|')
     # str
     if isinstance(value, str):
         for splitter in splitters:
             if splitter in value:
                 return value.split(splitter)
-        raise ValueError(f'Incorrect value type in key "{key}" = "{value}". '
-                         f'It should be string with any of the following separators: {splitters}')
+        return [value]
     else:
         raise ValueError(f'Incorrect value type in key "{key}" = "{value}". It should be digit string or float.')
 

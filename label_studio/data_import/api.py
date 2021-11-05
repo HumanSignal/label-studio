@@ -179,6 +179,8 @@ class ImportAPI(generics.CreateAPIView):
     def _reformat_predictions(self, tasks, preannotated_from_fields):
         new_tasks = []
         for task in tasks:
+            if 'data' in task:
+                task = task['data']
             predictions = [{'result': task.pop(field) for field in preannotated_from_fields}]
             new_tasks.append({
                 'data': task,
