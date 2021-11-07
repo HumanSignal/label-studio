@@ -17,7 +17,6 @@ from rest_framework.settings import api_settings
 from projects.models import Project
 from tasks.models import Task, Annotation, AnnotationDraft, Prediction
 from tasks.validation import TaskValidator
-from core.label_config import SINGLE_VALUED_TAGS
 from core.utils.common import get_object_with_check_and_log, retry_database_locked
 from core.label_config import replace_task_data_undefined_with_config_field
 from users.serializers import UserSerializer
@@ -263,44 +262,6 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                     f"Import data contains completed_by={completed_by} which is not a valid annotator's email or ID")
             annotation.pop('completed_by', None)
 
-    def _prepare_prediction_result(self, result):
-        if isinstance(result, list):
-            # full representation of result
-            for item in result:
-                if not isinstance(item, dict):
-                    raise ValidationError(f'Each item in prediction result should be dict')
-            # TODO: check consistency with project.label_config
-            return result
-
-        elif isinstance(result, dict):
-            # "value" from result
-            # TODO: validate value fields according to project.label_config
-            for tag, tag_info in self.project.get_control_tags_from_config().items():
-                tag_type = tag_info['type'].lower()
-                if tag_type in result:
-                    return [{
-                        'from_name': tag,
-                        'to_name': ','.join(tag_info['to_name']),
-                        'type': tag_type,
-                        'value': result
-                    }]
-
-        elif isinstance(result, (str, numbers.Integral)):
-            # If result is of integral type, it could be a representation of data from single-valued control tags (e.g. Choices, Rating, etc.)  # noqa
-            for tag, tag_info in self.project.get_control_tags_from_config().items():
-                tag_type = tag_info['type'].lower()
-                if tag_type in SINGLE_VALUED_TAGS and isinstance(result, SINGLE_VALUED_TAGS[tag_type]):
-                    return [{
-                        'from_name': tag,
-                        'to_name': ','.join(tag_info['to_name']),
-                        'type': tag_type,
-                        'value': {
-                            tag_type: [result]
-                        }
-                    }]
-        else:
-            raise ValidationError(f'Incorrect format {type(result)} for prediction result {result}')
-
     @retry_database_locked()
     def create(self, validated_data):
         """ Create Tasks and Annotations in bulk
@@ -373,7 +334,8 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             last_model_version = None
             for i, predictions in enumerate(task_predictions):
                 for prediction in predictions:
-                    result = self._prepare_prediction_result(prediction['result'])
+                    # we need to call result normalizer here since "bulk_create" doesn't call save() method
+                    result = Prediction.prepare_prediction_result(prediction['result'], self.project)
                     prediction_score = prediction.get('score')
                     if prediction_score is not None:
                         try:
