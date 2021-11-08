@@ -135,6 +135,7 @@ def apply_ordering(queryset, ordering, only_undefined_field=False):
         field_name = ordering[0].replace("tasks:", "")
         ascending = False if field_name[0] == '-' else True  # detect direction
         field_name = field_name[1:] if field_name[0] == '-' else field_name  # remove direction
+        field_name = field_name.replace('agreement', '_agreement')
 
         if "data." in field_name:
             field_name = field_name.replace(".", "__", 1)
@@ -190,6 +191,7 @@ def apply_filters(queryset, filters, only_undefined_field=False):
 
         # django orm loop expression attached to column name
         field_name = preprocess_field_name(_filter.filter, only_undefined_field)
+        field_name = field_name.replace('agreement', '_agreement')
 
         # filter preprocessing, value type conversion, etc..
         preprocess_filter = load_func(settings.DATA_MANAGER_PREPROCESS_FILTER)
