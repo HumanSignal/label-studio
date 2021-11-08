@@ -57,3 +57,5 @@ tmp
 .DS_Store
 *.sqlite3
 label_studio/core/settings/local.py
+deploy/nginx/certs/*
+!deploy/nginx/certs/.placeholder
