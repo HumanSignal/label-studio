@@ -24,11 +24,11 @@ See the [full SDK reference documentation for all available modules](/sdk/index.
    `pip install label-studio-sdk`
 2. In your Python script, do the following:
    1. Import the SDK.
-   2. Define your API key and Label Studio URL.
+   2. Define your API key and Label Studio URL (API key is available at _Account_ page).
    3. Connect to the API.
 ```python
 # Define the URL where Label Studio is accessible and the API key for your user account
-LABEL_STUDIO_URL = 'http://localhost:8000'
+LABEL_STUDIO_URL = 'http://localhost:8080'
 API_KEY = 'd6f8a2622d39e9d89ff0dfef1a80ad877f4ee9e3'
 
 # Import the SDK and the client module
@@ -45,8 +45,6 @@ Create a project in Label Studio using the SDK. Specify the project title and th
 
 For example, create an audio transcription project in your Python code:
 ```python
-from label_studio_sdk import project
-
 project = ls.start_project(
     title='Audio Transcription Project',
     label_config='''
@@ -70,14 +68,11 @@ You can import tasks from your script using the Label Studio Python SDK.
 For a specific project, you can import tasks in [Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format) or [connect to cloud storage providers](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/Import%20data%20from%20Cloud%20Storage.ipynb) and import image, audio, or video files directly. 
 
 ```python
-from label_studio_sdk import project
-
 project.import_tasks(
-    [{
-        'data': {'image': 'https://data.heartex.net/open-images/train_0/mini/0045dd96bf73936c.jpg'},
-    }, {
-        'data': {'image': 'https://data.heartex.net/open-images/train_0/mini/0083d02f6ad18b38.jpg'},
-    }]
+    [
+        {'image': 'https://data.heartex.net/open-images/train_0/mini/0045dd96bf73936c.jpg'},
+        {'image': 'https://data.heartex.net/open-images/train_0/mini/0083d02f6ad18b38.jpg'}
+    ]
 )
 ```
 
@@ -91,8 +86,6 @@ You can add predictions to existing tasks in Label Studio in your Python script.
 
 For an existing simple image classification project, you can do the following to add predictions of "Dog" for image tasks that you retrieve:
 ```python
-from label_studio_sdk import project
-
 task_ids = project.get_tasks_ids()
 project.create_prediction(task_ids[0], result='Dog')
 ```
@@ -107,8 +100,6 @@ One way is to import tasks in a simple JSON format, where one key in the JSON id
 
 In this example, import predictions for an image classification task:
 ```python
-from label_studio_sdk import project
-
 project.import_tasks(
     [{'image': f'https://data.heartex.net/open-images/train_0/mini/0045dd96bf73936c.jpg', 'pet': 'Dog'},
     {'image': f'https://data.heartex.net/open-images/train_0/mini/0083d02f6ad18b38.jpg', 'pet': 'Cat'}],
