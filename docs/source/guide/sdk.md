@@ -155,7 +155,7 @@ Filters.create(Filters.AND, [
 
 For example, to create a filter that displays only tasks with an ID greater than 42 or that were annotated between November 1, 2021, and now, do the following:
 ```python
-from label_studio_sdk import data_manager
+from label_studio_sdkюdata_manager import Filters
 
 Filters.create(Filters.OR, [
     Filters.item(
