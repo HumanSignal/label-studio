@@ -10,25 +10,22 @@ meta_description: Tutorial documentation for the Label Studio Python SDK that co
 You can use the Label Studio Python SDK to make annotating data a more integrated part of your data science and machine learning pipelines. This software development kit (SDK) lets you call the Label Studio API directly from scripts using predefined classes and methods. 
 
 With the Label Studio Python SDK, you can perform the following tasks in a Python script:
-- Authenticate to the Label Studio API
-- Create a Label Studio project, including setting up a labeling configuration. 
-- Import tasks, including pre-annotated tasks.
-- Connect to a cloud storage provider, such as Amazon S3, Microsoft Azure, or Google Cloud Services (GCS), to retrieve unlabeled tasks and store annotated tasks.
-- Modify project settings, such as task sampling or the model version used to display predictions. 
-- Create annotations from predictions or pre-annotated tasks. 
-- Retrieve task annotations, including specific subsets of tasks.  (???)
+- [Authenticate to the Label Studio API](#Start-using-the-Label-Studio-Python-SDK)
+- [Create a Label Studio project](#Create-a-project-with-the-Label-Studio-Python-SDK), including setting up a labeling configuration. 
+- [Import tasks](#Import-tasks-with-the-Label-Studio-Python-SDK), including pre-annotated tasks.
+- [Connect to a cloud storage provider](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/Import%20data%20from%20Cloud%20Storage.ipynb), such as Amazon S3, Microsoft Azure, or Google Cloud Services (GCS), to retrieve unlabeled tasks and store annotated tasks.
+- [Modify project settings](/sdk/project.html#label_studio_sdk.project.Project.set_params), such as task sampling or the model version used to display predictions. 
 
 See the [full SDK reference documentation for all available modules](/sdk/index.html), or review the available [API endpoints](/api) for any tasks that the SDK does not cover. 
 
 ## Start using the Label Studio Python SDK
 
-1. Clone the [Label Studio SDK](https://github.com/heartexlabs/label-studio-sdk) GitHub repository.
+1. Install the SDK:
+   `pip install label-studio-sdk`
 2. In your Python script, do the following:
    1. Import the SDK.
    2. Define your API key and Label Studio URL.
    3. Connect to the API.
-
-For example: 
 ```python
 # Define the URL where Label Studio is accessible and the API key for your user account
 LABEL_STUDIO_URL = 'http://localhost:8000'
@@ -44,12 +41,9 @@ ls.check_connection()
 
 ## Create a project with the Label Studio Python SDK
 
-Create a project in Label Studio using the SDK. Specify the project title and the labeling configuration. 
+Create a project in Label Studio using the SDK. Specify the project title and the labeling configuration. Choose your labeling configuration based on the type of labeling that you wish to perform. See the available [templates for Label Studio projects](/templates), or set a blank configuration with `<View></View>`. 
 
-see project reference
-see more about labeling configs
-
-
+For example, create an audio transcription project in your Python code:
 ```python
 from label_studio_sdk import project
 
@@ -66,6 +60,8 @@ project = ls.start_project(
     '''
 )
 ```
+
+For more about what you can do with the project module of the SDK, see the [project module SDK reference](/sdk/project.html). 
 
 ## Import tasks with the Label Studio Python SDK
 
@@ -85,10 +81,15 @@ project.import_tasks(
 )
 ```
 
-## Add predictions to existing tasks with the Label Studio Python SDK
+You can also import predictions:
+- [Add predictions to an existing task](#Add-predictions-to-existing-tasks-with-the-Label-Studio-Python-SDK)
+- [Import pre-annotated tasks](#Import-pre-annotated-tasks-into-Label-Studio)
 
-You can add predictions to existing tasks in Label Studio
+### Add predictions to existing tasks with the Label Studio Python SDK
 
+You can add predictions to existing tasks in Label Studio in your Python script. 
+
+For an existing simple image classification project, you can do the following to add predictions of "Dog" for image tasks that you retrieve:
 ```python
 from label_studio_sdk import project
 
@@ -96,10 +97,13 @@ task_ids = project.get_tasks_ids()
 project.create_prediction(task_ids[0], result='Dog')
 ```
 
-For more examples, see the [Jupyter notebook example of importing pre-annotated data](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/Import%20preannotations.ipynb).
+For another example, see the [Jupyter notebook example of importing pre-annotated data](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/Import%20preannotations.ipynb).
 
-## Import pre-annotated tasks into Label Studio
-You can import pre-annotated tasks into Label Studio in a number of ways. One way is to import tasks in a simple JSON format, where one key in the JSON identifies the data object being labeled, and the other is the key containing the prediction. 
+### Import pre-annotated tasks into Label Studio
+
+You can also import predictions together with tasks as pre-annotated tasks. The SDK offers several ways that you can import pre-annotations into Label Studio.
+
+One way is to import tasks in a simple JSON format, where one key in the JSON identifies the data object being labeled, and the other is the key containing the prediction. 
 
 In this example, import predictions for an image classification task:
 ```python
@@ -115,35 +119,13 @@ The image is specified in the `image` key using a public URL, and the prediction
 
 For more examples, see the [Jupyter notebook example of importing pre-annotated data](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/Import%20preannotations.ipynb).
 
-## Prepare and manage unlabeled data and annotations with filters
+## Prepare and manage data with filters
 
-You can also use the SDK to control how tasks appear in the data manager to annotators. You can create custom filters and ordering for the tasks based on parameters that you specify with the SDK. This lets you have more granular control over which tasks in your dataset get labeled, and in which order.
+You can also use the SDK to control how tasks appear in the data manager to annotators or reviewers. You can create custom filters and ordering for the tasks based on parameters that you specify with the SDK. This lets you have more granular control over which tasks in your dataset get labeled or reviewed, and in which order.
 
-For example, to create a filter that displays only tasks with an ID greater than 42 or that were annotated between November 1, 2021, and now, do the following:
-```python
-from label_studio_sdk import data_manager
+### Prepare unlabeled data with filters
 
-Filters.create(Filters.OR, [
-    Filters.item(
-        Column.id,
-        Operator.GREATER,
-        Type.Number,
-        Filters.value(42)
-    ),
-    Filters.item(
-        Column.completed_at,
-        Operator.IN,
-        Type.Datetime,
-        Filters.value(
-            datetime(2021, 11, 1),
-            datetime.now()
-        )
-    )
-])
-```
-That filter can be helpful for preparing completed tasks for review in Label Studio Enterprise.
-
-Alternately, you can create a filter to prepare tasks to be annotated. For example, if you want annotators to focus on tasks in the first 1000 tasks in a dataset that contain the word "possum" in the field "text" in the task data, do the following: 
+For example, you can create a filter to prepare tasks to be annotated. For example, if you want annotators to focus on tasks in the first 1000 tasks in a dataset that contain the word "possum" in the field "text" in the task data, do the following: 
 ```python
 from label_studio_sdk import data_manager
 
@@ -168,3 +150,29 @@ Filters.create(Filters.AND, [
     )
 ])
 ```
+
+### Manage annotations with filters and the Label Studio SDK
+
+For example, to create a filter that displays only tasks with an ID greater than 42 or that were annotated between November 1, 2021, and now, do the following:
+```python
+from label_studio_sdk import data_manager
+
+Filters.create(Filters.OR, [
+    Filters.item(
+        Column.id,
+        Operator.GREATER,
+        Type.Number,
+        Filters.value(42)
+    ),
+    Filters.item(
+        Column.completed_at,
+        Operator.IN,
+        Type.Datetime,
+        Filters.value(
+            datetime(2021, 11, 1),
+            datetime.now()
+        )
+    )
+])
+```
+You can use this example filter to prepare completed tasks for review in Label Studio Enterprise.
