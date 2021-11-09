@@ -17,7 +17,6 @@ For cases when you want to minimize the amount of data that you're labeling, you
 
 You can programmatically create noisy labels, assess their validity, and take action in a **weak supervision** scenario. Save the more correct noisy labels directly as annotations for training your model, and import the high-importance and high-uncertainty task predictions into Label Studio to be reviewed and corrected. Check out the full [weak supervision example on GitHub](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/Weak%20Supervision.ipynb).
 
-If you want to be able to do more **granular data preparation** than you already do, the SDK makes that straightforward too. Create filters to simplify splitting your data into training and testing sets, or to parallelize the reviewers for a ground truth dataset in Label Studio Enterprise. Check out the [tutorial](/guide/sdk.html) or the [README](https://github.com/heartexlabs/label-studio-sdk#readme) and get started today!
+If you want to be able to do more **granular data preparation** than you already do, the SDK makes that straightforward too. [Create filters to simplify splitting your data](/guide/sdk.html#Prepare-and-manage-data-with-filters) into training and testing sets, or to parallelize the reviewers for a ground truth dataset in Label Studio Enterprise. Check out the [tutorial](/guide/sdk.html) or the [README](https://github.com/heartexlabs/label-studio-sdk#readme) and get started today!
 
-This release of Label Studio also includes a variety of labeling improvements and bug fixes. To see the full list of updates and contributors to this release, check out the [changelog on GitHub](https://github.com/heartexlabs/label-studio/releases). 
-
+This release of Label Studio also includes a variety of labeling improvements and bug fixes. To see the full list of updates and contributors to this release, check out the [changelog on GitHub](https://github.com/heartexlabs/label-studio/releases).
