@@ -88,7 +88,12 @@ You can add predictions to existing tasks in Label Studio in your Python script.
 For an existing simple image classification project, you can do the following to add predictions of "Dog" for image tasks that you retrieve:
 ```python
 task_ids = project.get_tasks_ids()
-project.create_prediction(task_ids[0], result='Dog')
+project.create_prediction(task_ids[0], result='Dog', score=0.9)
+```
+
+For complex cases (like Bounding box based object detection), you can specify structured results:
+```python
+project.create_prediction(task_ids[1], result={"x": 10, "y": 20, "width": 30, "height": 40, "label": ["Dog"]}, score=0.9)
 ```
 
 For another example, see the [Jupyter notebook example of importing pre-annotated data](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/Import%20preannotations.ipynb).
