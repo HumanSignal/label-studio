@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.3
+# syntax=docker/dockerfile:experimental
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
