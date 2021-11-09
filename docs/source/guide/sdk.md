@@ -91,7 +91,7 @@ task_ids = project.get_tasks_ids()
 project.create_prediction(task_ids[0], result='Dog', score=0.9)
 ```
 
-For complex cases (like Bounding box based object detection), you can specify structured results:
+For complex cases, such as object detection with bounding boxes, you can specify structured results:
 ```python
 project.create_prediction(task_ids[1], result={"x": 10, "y": 20, "width": 30, "height": 40, "label": ["Dog"]}, score=0.9)
 ```
