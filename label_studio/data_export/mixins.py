@@ -165,6 +165,8 @@ class ExportMixin:
         """
         from .serializers import ExportDataSerializer
 
+        logger.debug('Run get_task_queryset')
+
         with transaction.atomic():
             # TODO: make counters from queryset
             # counters = Project.objects.with_counts().filter(id=self.project.id)[0].get_counters()
@@ -239,7 +241,6 @@ class ExportMixin:
 
         self.status = self.Status.IN_PROGRESS
         self.save(update_fields=['status'])
-        logger.info(f'Start file_exporting {self}')
 
         if redis_connected():
             queue = django_rq.get_queue('default')
