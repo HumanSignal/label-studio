@@ -154,6 +154,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     def patch(self, request, *args, **kwargs):
         return super(TaskAPI, self).patch(request, *args, **kwargs)
 
+    @api_webhook_for_delete(WebhookAction.TASKS_DELETED)
     def delete(self, request, *args, **kwargs):
         return super(TaskAPI, self).delete(request, *args, **kwargs)
 

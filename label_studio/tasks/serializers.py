@@ -16,9 +16,10 @@ from rest_framework.settings import api_settings
 from projects.models import Project
 from tasks.models import Task, Annotation, AnnotationDraft, Prediction
 from tasks.validation import TaskValidator
-from core.utils.common import get_object_with_check_and_log, retry_database_locked
+from core.utils.common import get_object_with_check_and_log, retry_database_locked, load_func
 from core.label_config import replace_task_data_undefined_with_config_field
 from users.serializers import UserSerializer
+from core.utils.common import load_func
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +124,7 @@ class TaskSimpleSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class TaskSerializer(ModelSerializer):
+class BaseTaskSerializer(ModelSerializer):
     """ Task Serializer with project scheme configs validation
     """
     def __init__(self, *args, **kwargs):
@@ -170,7 +171,7 @@ class TaskSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class TaskSerializerBulk(serializers.ListSerializer):
+class BaseTaskSerializerBulk(serializers.ListSerializer):
     """ Serialize task with annotation from source json data
     """
     annotations = AnnotationSerializer(many=True, default=[], read_only=True)
@@ -371,13 +372,21 @@ class TaskSerializerBulk(serializers.ListSerializer):
                 project.model_version = last_model_version
                 project.save()
 
+        self.post_process_annotations(self.db_annotations)
         return db_tasks
+
+    @staticmethod
+    def post_process_annotations(db_annotations):
+        pass
 
     class Meta:
         model = Task
         fields = "__all__"
     
+
+TaskSerializer = load_func(settings.TASK_SERIALIZER)
         
+
 class TaskWithAnnotationsSerializer(TaskSerializer):
     """
     """
@@ -387,7 +396,8 @@ class TaskWithAnnotationsSerializer(TaskSerializer):
 
     class Meta:
         model = Task
-        list_serializer_class = TaskSerializerBulk
+        list_serializer_class = load_func(settings.TASK_SERIALIZER_BULK)
+        
         exclude = ()
 
 
@@ -535,3 +545,8 @@ class TaskIDWithAnnotationsAndPredictionsSerializer(ModelSerializer):
     class Meta:
         model = Task
         fields = ['id', 'annotations', 'predictions']
+
+
+# LSE inherits this serializer
+TaskSerializerBulk = load_func(settings.TASK_SERIALIZER_BULK)
+
