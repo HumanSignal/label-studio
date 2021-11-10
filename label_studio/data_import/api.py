@@ -1,6 +1,5 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import os
 import time
 import logging
 import drf_yasg.openapi as openapi
@@ -20,6 +19,7 @@ from ranged_fileresponse import RangedFileResponse
 from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import retry_database_locked
 from core.utils.params import list_of_strings_from_request, bool_from_request
+from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from projects.models import Project
 from tasks.models import Task, Prediction
 from .uploader import load_tasks
@@ -258,9 +258,14 @@ class ImportPredictionsAPI(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         # check project permissions
         project = self.get_object()
-
+        tasks_ids = set(Task.objects.filter(project=project).values_list('id', flat=True))
+        logger.debug(f'Importing {len(self.request.data)} predictions to project {project} with {len(tasks_ids)} tasks')
         predictions = []
         for item in self.request.data:
+            if item.get('task') not in tasks_ids:
+                raise LabelStudioValidationErrorSentryIgnored(
+                    f'{item} contains invalid "task" field: corresponding task ID couldn\'t be retrieved '
+                    f'from project {project} tasks')
             predictions.append(Prediction(
                 task_id=item['task'],
                 result=Prediction.prepare_prediction_result(item.get('result'), project),
