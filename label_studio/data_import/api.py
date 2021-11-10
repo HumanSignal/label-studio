@@ -21,7 +21,7 @@ from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import retry_database_locked
 from core.utils.params import list_of_strings_from_request, bool_from_request
 from projects.models import Project
-from tasks.models import Task
+from tasks.models import Task, Prediction
 from .uploader import load_tasks
 from .serializers import ImportApiSerializer, FileUploadSerializer, PredictionSerializer
 from .models import FileUpload
@@ -252,17 +252,24 @@ class ImportPredictionsAPI(generics.CreateAPIView):
     permission_required = all_permissions.projects_change
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = PredictionSerializer
+    queryset = Project.objects.all()
+    swagger_schema = None  # TODO: create API schema
 
     def create(self, request, *args, **kwargs):
         # check project permissions
-        generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        project = self.get_object()
 
-        # upload files from request, and parse all tasks
-        serializer = self.get_serializer(data=request.data, many=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        predictions = []
+        for item in self.request.data:
+            predictions.append(Prediction(
+                task_id=item['task'],
+                result=Prediction.prepare_prediction_result(item.get('result'), project),
+                score=item.get('score'),
+                model_version=item.get('model_version', 'undefined')
+            ))
+        predictions_obj = Prediction.objects.bulk_create(predictions, batch_size=settings.BATCH_SIZE)
 
-        return Response({}, status=status.HTTP_201_CREATED)
+        return Response({'created': len(predictions_obj)}, status=status.HTTP_201_CREATED)
 
 
 class TasksBulkCreateAPI(ImportAPI):
