@@ -140,9 +140,10 @@ def _try_uncertainty_sampling(tasks, project, user_solved_tasks_array, user, pre
     return next_task
 
 
-def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag):
+def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_info):
     if project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
         user_solved_tasks_array = user.annotations.filter(ground_truth=False, was_cancelled=False)
+        queue_info += ' Requeued for me from cancelled tasks '
     else:
         user_solved_tasks_array = user.annotations.filter(ground_truth=False)
     user_solved_tasks_array = (
@@ -159,16 +160,16 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag):
         # don't output anything - just filter tasks with overlap
         logger.debug(f'User={user} tries overlap first from prepared tasks')
         _, not_solved_tasks = _try_tasks_with_overlap(not_solved_tasks)
-        # queue_info += 'Show overlap first'
+        queue_info += 'Show overlap first'
 
     if project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
-        # https://code.djangoproject.com/ticket/19726
+        # Ordering works different for sqlite and postgresql, details: https://code.djangoproject.com/ticket/19726
         if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
             not_solved_tasks = not_solved_tasks.order_by('annotations__was_cancelled', 'id')
         else:
             not_solved_tasks = not_solved_tasks.order_by('-annotations__was_cancelled', 'id')
 
-    return not_solved_tasks, user_solved_tasks_array
+    return not_solved_tasks, user_solved_tasks_array, queue_info
 
 
 def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_flag):
@@ -211,13 +212,13 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
     logger.debug(f'get_next_task called. user: {user}, project: {project}, dm_queue: {dm_queue}')
 
     with conditional_atomic():
-        not_solved_tasks, user_solved_tasks_array = get_not_solved_tasks_qs(
-            user, project, prepared_tasks, assigned_flag
-        )
-
         next_task = None
         use_task_lock = True
         queue_info = ''
+
+        not_solved_tasks, user_solved_tasks_array, queue_info = get_not_solved_tasks_qs(
+            user, project, prepared_tasks, assigned_flag, queue_info
+        )
 
         if not dm_queue:
             next_task, use_task_lock, queue_info = get_next_task_without_dm_queue(
