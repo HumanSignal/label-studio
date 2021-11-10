@@ -612,7 +612,7 @@ You can sort the prediction scores for each labeled region using the **Regions**
 
 You can import pre-annotations for BrushLabels segmentation. Label Studio Converter package has some helper functions for this. 
 
-- You can convert a 2D mask (np.array with shape=[width, height] and dtype=np.uint8) to RLE by the following: 
+- You can convert masks (np.array with shape=[width, height, 4] and dtype=np.uint8, the channel number must be 4 always and all these 4 values must be the same) to RLE by the following: 
     ```
     rle_1d_array = encode_rle(mask.ravel().astype(np.uint8))
     ```
