@@ -607,6 +607,26 @@ In the Label Studio UI, the imported prediction for the first task looks like th
 
 You can sort the prediction scores for each labeled region using the **Regions** pane options. 
 
+
+## Import brush segmentation pre-annotations in RLE format
+
+You can import pre-annotations for BrushLabels segmentation. Label Studio Converter package has some helper functions for this. 
+
+- You can convert a 2D mask (np.array with shape=[width, height] and dtype=np.uint8) to RLE by the following: 
+    ```
+    rle_1d_array = encode_rle(mask.ravel().astype(np.uint8))
+    ```
+  
+- To convert OpenCV contours use [mask2rle](https://github.com/heartexlabs/label-studio-converter/commit/19316e876c01e066b8584b72b0b072497f3afcfb#diff-b82fa6eac244e4e2cbee0b3ba3e9582bd74edab647fb9570b1c9ef0f23b7ea4cR310)
+
+- To convert image from path use [image2rle](https://github.com/heartexlabs/label-studio-converter/commit/19316e876c01e066b8584b72b0b072497f3afcfb#diff-b82fa6eac244e4e2cbee0b3ba3e9582bd74edab647fb9570b1c9ef0f23b7ea4cR329)
+
+- To prepare annotation use [image2annotation](https://github.com/heartexlabs/label-studio-converter/commit/19316e876c01e066b8584b72b0b072497f3afcfb#diff-b82fa6eac244e4e2cbee0b3ba3e9582bd74edab647fb9570b1c9ef0f23b7ea4cR345)
+
+
+Also you can check [this example](https://github.com/heartexlabs/label-studio-converter/blob/master/tests/test_brush.py#L11) showing how to build the Label Studio Task with Pre-annotations.
+
+
 ## Troubleshoot pre-annotations
 If you encounter unexpected behavior after you import pre-annotations into Label Studio, review this guidance to resolve the issues.
 
