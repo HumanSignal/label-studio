@@ -669,7 +669,7 @@ class Project(ProjectMixin, models.Model):
         # model_versions = set(predictions.values_list('model_version', flat=True).distinct())
         model_versions = predictions.values('model_version').annotate(count=Count('model_version'))
         output = {r['model_version']: r['count'] for r in model_versions}
-        if self.model_version is not None and self.model_version not in model_versions:
+        if self.model_version is not None and self.model_version not in output:
             output[self.model_version] = 0
         if with_counters:
             return output
