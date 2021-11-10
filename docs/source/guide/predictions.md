@@ -618,22 +618,25 @@ pip install -U label-studio-converter
 ```
 
 Import brush tools:
-```
+```python
 from label_studio_converter import brush
 ```
 
 - Convert masks to RLE. This expects an `np.array` with `shape=[width, height, 4]` and `dtype=np.uint8`. The channel number must always be 4 and all of these 4 values must match. Add the following to your python code to perform the conversion:
-    ```
-    mask = (np.random.random([10, 20]) * 255)  # just random 2D mask
-    mask = (mask > 128).astype(np.uint8)  # better to threshold, it reduces output annotation size
+    ```python
+    mask = (np.random.random([10, 20]) * 255).astype(np.uint8)  # just a random 2D mask
+    mask = (mask > 128).astype(np.uint8) * 255  # better to threshold, it reduces output annotation size
     rle = brush.mask2rle(mask)  # mask image in RLE format 
     ```
   
-- To convert OpenCV contours, use [mask2rle](https://github.com/heartexlabs/label-studio-converter/commit/19316e876c01e066b8584b72b0b072497f3afcfb#diff-b82fa6eac244e4e2cbee0b3ba3e9582bd74edab647fb9570b1c9ef0f23b7ea4cR310).
+- To convert OpenCV contours, use 
+[`brush.contour2rle(contours, contour_id, img_width, img_height)`](https://github.com/heartexlabs/label-studio-converter/blob/master/label_studio_converter/brush.py#L310).
 
-- To convert an image from path, use [image2rle](https://github.com/heartexlabs/label-studio-converter/commit/19316e876c01e066b8584b72b0b072497f3afcfb#diff-b82fa6eac244e4e2cbee0b3ba3e9582bd74edab647fb9570b1c9ef0f23b7ea4cR329).
+- To convert an image from path (jpg, png. bmp), use 
+[`brush.image2rle(path)`](https://github.com/heartexlabs/label-studio-converter/blob/master/label_studio_converter/brush.py#L343).
 
-- To prepare the pre-annotation, use [image2annotation](https://github.com/heartexlabs/label-studio-converter/commit/19316e876c01e066b8584b72b0b072497f3afcfb#diff-b82fa6eac244e4e2cbee0b3ba3e9582bd74edab647fb9570b1c9ef0f23b7ea4cR345)
+- To prepare the pre-annotation, use 
+[`brush.image2annotation(path, label_name, from_name, to_name, ground_truth=False, model_version=None, score=None)`](https://github.com/heartexlabs/label-studio-converter/blob/master/label_studio_converter/brush.py#L361)
 
 For more assistance, review this [example code creating a Label Studio task with pre-annotations](https://github.com/heartexlabs/label-studio-converter/blob/master/tests/test_brush.py#L11) for brush labels.
 
