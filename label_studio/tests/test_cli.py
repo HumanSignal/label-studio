@@ -10,6 +10,7 @@ from tests.utils import make_project, make_task, make_annotation
 @pytest.mark.django_db
 def test_create_user():
     input_args = parse_input_args(['init', 'test', '--username', 'default@localhost', '--password', '12345678'])
+    print(input_args)
     config = {}
     user = _create_user(input_args, config)
     assert user.active_organization is not None
