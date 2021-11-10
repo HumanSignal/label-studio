@@ -44,6 +44,15 @@ Before installing Label Studio Enterprise, prepare the Kubernetes cluster with [
    ```shell
    kubectl create secret generic lse-license --from-literal=license=https://lic.heartex.ai/db/<CUSTOMER_LICENSE_ID>
    ```
+3. Add helm chart repository. From the command line, replace `<USERNAME>` and `<PASSWORD>` with the provided from the Sales Team:
+   ```shell
+   helm repo add heartex https://charts.heartex.com/ --username <USERNAME> --password <PASSWORD>
+   helm repo update heartex
+   ```
+   Check for available versions:
+   ```shell
+   helm search repo heartex/label-studio-enterprise
+   ```
 
 ## Configure the Helm chart for Label Studio Enterprise
 
@@ -57,6 +66,10 @@ global:
   imagePullSecrets:
     # Defined with earlier kubectl command
     - name: heartex-pull-key
+
+# Optional: override docker image
+#  image:
+#    tag: ""
   
   # [Enterprise Only] This value refers to a Kubernetes secret that you 
   # created that contains your enterprise license.
@@ -84,8 +97,10 @@ global:
   # extraEnvironmentSecrets is a list of extra environment variables to set in the deplyoment, empty by default
   extraEnvironmentSecrets: {}
   
-# Ingress config for Label Studio
 app:
+  # HA mode: adjust according to your resources
+  replicas: 1
+  # Ingress config for Label Studio
   ingress:
     host: studio.yourdomain.com
     # You may need to set path to '/*' in order to use this with ALB ingress controllers.
@@ -106,6 +121,19 @@ app:
     limits:
       memory: 6144Mi
       cpu: 4000m
+
+rqworker:
+   # HA mode: adjust according to your resources
+   replicas: 2
+
+# HA mode: persist the uploaded data
+# storageClass should be configured in your cluster 
+#minio:
+#   mode: "distributed"
+#   persistence:
+#      enabled: "true"
+#      size: "10Gi"      # Here you have to adjust according to your business needs
+#      storageClass: ""  # This line is optional. If you have no default storageClass you should configure it here. Your cluster admin could help you to get the right value(hint: if you're running in a public cloud eg AWS, Gcloud, Azure it's already configured)
 ```
 
 Adjust the included defaults to reflect your environment and copy these into a new file and save it as `lse-values.yaml`. 
@@ -113,11 +141,11 @@ Adjust the included defaults to reflect your environment and copy these into a n
 
 ## Install Label Studio Enterprise using Helm on a Kubernetes cluster
 
-Use Helm to install Label Studio Enterprise on your Kubernetes cluster. Provide your custom reource definitions YAML file. Specify any environment variables that you need to set for your Label Studio Enterprise installation using the `--set` argument with the `helm install` command.
+Use Helm to install Label Studio Enterprise on your Kubernetes cluster. Provide your custom resource definitions YAML file. Specify any environment variables that you need to set for your Label Studio Enterprise installation using the `--set` argument with the `helm install` command.
 
 From the command line, run the following:
 ```shell
-helm install lse . -f lse-values.yaml
+helm install lse heartex/label-studio-enterprise -f lse-values.yaml
 ```
 
 After installing, check the status of the Kubernetes pod creation:
@@ -128,22 +156,25 @@ kubectl get pods
 ## Upgrade Label Studio using Helm
 To upgrade Label Studio Enterprise using Helm, do the following.
 
-Determine the latest tag version of Label Studio Enterprise and add the following to your `lse-values.yml` file: 
-```yaml
-global:
-  image:
-    tag: “20210914.154442-d2d1935”
-```
-After updating the values file, run the following from the command line:
-```shell
-helm upgrade lse . -f lse-values.yaml
-```
-
-As another option, you can run the following from the command line:
-```yaml
-helm upgrade lse . -f lse-values.yaml --set global.images.tag=20210914.154442-d2d1935
-```
-This command overrides the tag value stored in `lse-values.yaml`. You must update the tag value when you upgrade or redeploy your instance to avoid version downgrades.
+1. Determine the latest tag version of Label Studio Enterprise and add/replace the following in your `lse-values.yml` file: 
+   ```yaml
+   global:
+     image:
+       tag: "20210914.154442-d2d1935"
+   ```
+2. After updating the values file, it's necessary to receive the latest updates for Helm chart:
+   ```shell
+   helm repo update heartex
+   ```
+3. Run the following from the command line to upgrade your deployment:
+   ```shell
+   helm upgrade lse heartex/label-studio-enterprise -f lse-values.yaml
+   ```
+   As an option, you can pass a new version from the command line:
+   ```shell
+   helm upgrade lse heartex/label-studio-enterprise -f lse-values.yaml --set global.image.tag=20210914.154442-d2d1935
+   ```
+   This command overrides the tag value stored in `lse-values.yaml`. You must update the tag value when you upgrade or redeploy your instance to avoid version downgrades.
 
 ## Uninstall Label Studio using Helm
 
