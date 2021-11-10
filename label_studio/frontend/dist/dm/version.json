@@ -1,6 +1,6 @@
 {
-  "message": "[ext] Add support of virtual tabs",
-  "commit": "6589a7131df83aa196218d121671a14822596d8e",
+  "message": "[fix] Skip undefined users in filters",
+  "commit": "3998e9a058abeffad1d029c928f238794df24284",
   "branch": "master",
-  "date": "2021-10-19T17:37:40Z"
+  "date": "2021-10-27T14:31:38Z"
 }

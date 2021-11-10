@@ -3,8 +3,8 @@
 import logging
 
 from core.permissions import AllPermissions
-from tasks.serializers import AnnotationSerializer
-from tasks.models import Prediction
+from tasks.models import Prediction, Annotation
+from tasks.serializers import TaskSerializerBulk
 
 all_permissions = AllPermissions()
 logger = logging.getLogger(__name__)
@@ -30,17 +30,17 @@ def predictions_to_annotations(project, queryset, **kwargs):
     for result, model_version, task_id, prediction_id in predictions_values:
         annotations.append({
             'result': result,
-            'completed_by': user.pk,
-            'task': task_id,
-            'parent_prediction': prediction_id
+            'completed_by_id': user.pk,
+            'task_id': task_id,
+            'parent_prediction_id': prediction_id
         })
 
     count = len(annotations)
     logger.debug(f'{count} predictions will be converter to annotations')
-    annotation_ser = AnnotationSerializer(data=annotations, many=True)
-    annotation_ser.is_valid(raise_exception=True)
-    annotation_ser.save()
+    db_annotations = [Annotation(**annotation) for annotation in annotations]
+    db_annotations = Annotation.objects.bulk_create(db_annotations)
 
+    TaskSerializerBulk.post_process_annotations(db_annotations)
     return {'response_code': 200, 'detail': f'Created {count} annotations'}
 
 

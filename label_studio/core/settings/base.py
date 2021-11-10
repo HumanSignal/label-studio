@@ -400,6 +400,8 @@ CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and_log'
 SAVE_USER = 'users.functions.save_user'
 USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
+TASK_SERIALIZER = 'tasks.serializers.BaseTaskSerializer'
+EXPORT_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializer'
 DATA_MANAGER_GET_ALL_COLUMNS = 'data_manager.functions.get_all_columns'
 DATA_MANAGER_ANNOTATIONS_MAP = {}
 DATA_MANAGER_ACTIONS = {}
@@ -412,8 +414,8 @@ ANNOTATION_MIXIN = 'core.mixins.DummyModelMixin'
 ORGANIZATION_MIXIN = 'core.mixins.DummyModelMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
 GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
-
 STORAGE_ANNOTATION_SERIALIZER = 'io_storages.serializers.StorageAnnotationSerializer'
+TASK_SERIALIZER_BULK = 'tasks.serializers.BaseTaskSerializerBulk'
 
 
 def project_delete(project):
@@ -433,6 +435,11 @@ USER_AUTH = user_auth
 COLLECT_VERSIONS = collect_versions_dummy
 
 WEBHOOK_TIMEOUT = float(get_env('WEBHOOK_TIMEOUT', 1.0))
+WEBHOOK_SERIALIZERS = {
+    'project': 'webhooks.serializers_for_hooks.ProjectWebhookSerializer',
+    'task': 'webhooks.serializers_for_hooks.TaskWebhookSerializer',
+    'annotation': 'webhooks.serializers_for_hooks.AnnotationWebhookSerializer',
+}
 
 EDITOR_KEYMAP = json.dumps(get_env("EDITOR_KEYMAP"))
 
