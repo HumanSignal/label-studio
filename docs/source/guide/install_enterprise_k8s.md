@@ -44,7 +44,7 @@ Before installing Label Studio Enterprise, prepare the Kubernetes cluster with [
    ```shell
    kubectl create secret generic lse-license --from-literal=license=https://lic.heartex.ai/db/<CUSTOMER_LICENSE_ID>
    ```
-3. Add helm chart repository. From the command line, replace `<USERNAME>` and `<PASSWORD>` with the provided from the Sales Team:
+3. Add helm chart repository. From the command line, replace `<USERNAME>` and `<PASSWORD>` with the credentials provided by your account manager:
    ```shell
    helm repo add heartex https://charts.heartex.com/ --username <USERNAME> --password <PASSWORD>
    helm repo update heartex
@@ -98,7 +98,7 @@ global:
   extraEnvironmentSecrets: {}
   
 app:
-  # HA mode: adjust according to your resources
+  # High Availability (HA) mode: adjust according to your resources
   replicas: 1
   # Ingress config for Label Studio
   ingress:
@@ -132,8 +132,8 @@ rqworker:
 #   mode: "distributed"
 #   persistence:
 #      enabled: "true"
-#      size: "10Gi"      # Here you have to adjust according to your business needs
-#      storageClass: ""  # This line is optional. If you have no default storageClass you should configure it here. Your cluster admin could help you to get the right value(hint: if you're running in a public cloud eg AWS, Gcloud, Azure it's already configured)
+#      size: "10Gi"      # Adjust this according to your business needs
+#      storageClass: ""  # This line is optional. If you have no default storageClass, configure it here. If you're running in a public cloud such as AWS, Google Cloud, or Microsoft Azure, this value is already configured. If you're running in a different environment, your cluster admin can help you to get the right value. 
 ```
 
 Adjust the included defaults to reflect your environment and copy these into a new file and save it as `lse-values.yaml`. 
@@ -162,7 +162,7 @@ To upgrade Label Studio Enterprise using Helm, do the following.
      image:
        tag: "20210914.154442-d2d1935"
    ```
-2. After updating the values file, it's necessary to receive the latest updates for Helm chart:
+2. After updating the values file, retrieve the latest updates for the Helm chart:
    ```shell
    helm repo update heartex
    ```
@@ -170,7 +170,7 @@ To upgrade Label Studio Enterprise using Helm, do the following.
    ```shell
    helm upgrade lse heartex/label-studio-enterprise -f lse-values.yaml
    ```
-   As an option, you can pass a new version from the command line:
+   If you want, you can specify a version from the command line:
    ```shell
    helm upgrade lse heartex/label-studio-enterprise -f lse-values.yaml --set global.image.tag=20210914.154442-d2d1935
    ```
