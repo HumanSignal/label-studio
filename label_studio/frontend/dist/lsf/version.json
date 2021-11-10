@@ -1,6 +1,6 @@
 {
-  "message": "[fix] better iframe height calculation (#339)",
-  "commit": "2e31e7d9589488ab44cdf7f69fdfa9f6af6157c4",
+  "message": "Disable GT button in annotations list",
+  "commit": "6b32ed68743f492384535c6fe8ecc1e3805c34be",
   "branch": "master",
-  "date": "2021-11-08T17:15:31Z"
+  "date": "2021-11-10T14:22:06Z"
 }

@@ -1,6 +1,6 @@
 {
-  "message": "[fix] preserve annotation after update in stream",
-  "commit": "095e0835b2c9215a4d14fb845461fc91ccce57ec",
+  "message": "fix: currentView?.virtual",
+  "commit": "cd8c3467b654732051ef05b0267d160788643838",
   "branch": "master",
-  "date": "2021-11-05T11:48:50Z"
+  "date": "2021-11-10T08:25:35Z"
 }
