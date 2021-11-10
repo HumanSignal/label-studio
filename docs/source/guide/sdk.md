@@ -124,7 +124,7 @@ You can also use the SDK to control how tasks appear in the data manager to anno
 
 For example, you can create a filter to prepare tasks to be annotated. For example, if you want annotators to focus on tasks in the first 1000 tasks in a dataset that contain the word "possum" in the field "text" in the task data, do the following: 
 ```python
-from label_studio_sdk.data_manager import Filters
+from label_studio_sdk.data_manager import Filters, Column, Type, Operator
 
 Filters.create(Filters.AND, [
     Filters.item(
@@ -152,7 +152,7 @@ Filters.create(Filters.AND, [
 
 For example, to create a filter that displays only tasks with an ID greater than 42 or that were annotated between November 1, 2021, and now, do the following:
 ```python
-from label_studio_sdk.data_manager import Filters
+from label_studio_sdk.data_manager import Filters, Column, Type, Operator
 
 Filters.create(Filters.OR, [
     Filters.item(
