@@ -181,7 +181,7 @@ class ImportAPI(generics.CreateAPIView):
         for task in tasks:
             if 'data' in task:
                 task = task['data']
-            predictions = [{'result': task.pop(field) for field in preannotated_from_fields}]
+            predictions = [{'result': task.pop(field)} for field in preannotated_from_fields]
             new_tasks.append({
                 'data': task,
                 'predictions': predictions
