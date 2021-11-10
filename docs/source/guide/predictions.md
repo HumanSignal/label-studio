@@ -610,14 +610,26 @@ You can sort the prediction scores for each labeled region using the **Regions**
 
 ## Import brush segmentation pre-annotations in RLE format
 
-You can import pre-annotations for BrushLabels segmentation. Label Studio Converter package has some helper functions for this. 
+You can import pre-annotations for BrushLabels segmentation. Label Studio Converter package has some helper functions for this.
+
+Install Label Studio Converter:
+```
+pip install -U label-studio-converter
+```
+
+Import brush tools:
+```
+from label_studio_converter import brush
+```
 
 - You can convert masks (np.array with shape=[width, height, 4] and dtype=np.uint8, the channel number must be 4 always and all these 4 values must be the same) to RLE by the following: 
-    ```
-    rle_1d_array = encode_rle(mask.ravel().astype(np.uint8))
-    ```
+  ```
+  mask = (np.random.random([10, 20]) * 255)  # just random 2D mask
+  mask = (mask > 128).astype(np.uint8)  # better to threshold, it reduces output annotation size
+  rle = brush.mask2rle(mask)  # mask image in RLE format 
+  ```
   
-- To convert OpenCV contours use [mask2rle](https://github.com/heartexlabs/label-studio-converter/commit/19316e876c01e066b8584b72b0b072497f3afcfb#diff-b82fa6eac244e4e2cbee0b3ba3e9582bd74edab647fb9570b1c9ef0f23b7ea4cR310)
+- To convert OpenCV contours use [contour2rle](https://github.com/heartexlabs/label-studio-converter/blob/887eadf4ac1822f71f3ede2f84b1651683c4e9c9/label_studio_converter/brush.py#L310)
 
 - To convert image from path use [image2rle](https://github.com/heartexlabs/label-studio-converter/commit/19316e876c01e066b8584b72b0b072497f3afcfb#diff-b82fa6eac244e4e2cbee0b3ba3e9582bd74edab647fb9570b1c9ef0f23b7ea4cR329)
 
