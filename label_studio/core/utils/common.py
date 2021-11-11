@@ -612,22 +612,3 @@ def round_floats(o):
     if isinstance(o, (list, tuple)):
         return [round_floats(x) for x in o]
     return o
-
-
-def top_query(q, sample_size, count_by='annotations', order_asc=False):
-    """
-    Get top/bottom [sample_size] count objects in query
-    @param q: query to objects
-    @param sample_size: amount of objects to pop from query
-    @param count_by: order by count objects in filter, default annotations
-    @param order_asc: query in desc\asc order
-    """
-    n = q.count()
-    if n == 0:
-        raise ValueError('Can\'t sample from empty query')
-    if n < sample_size:
-        raise ValueError(f'Can\'t sample {sample_size} from query with {n} samples')
-    order_asc = '-' if order_asc else ''
-    ids = q.annotate(anno=Count(count_by)).order_by(f'{order_asc}anno').values_list('id', flat=True)
-    top_ids = list(ids).pop(sample_size)
-    return q.filter(id__in=top_ids)
