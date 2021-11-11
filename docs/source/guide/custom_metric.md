@@ -8,7 +8,7 @@ meta_title: Add a Custom Agreement Metric for Labeling
 meta_description: Label Studio Enterprise documentation about how to add a custom agreement metric to use for assessing annotator agreement or the quality of your annotation and prediction results for data labeling and machine learning projects.
 ---
 
-Write a custom agreement metric to assess the quality of the predictions and annotations in your Label Studio Enterprise project. Label Studio Enterprise contains a variety of [agreement metrics for your project](stats.html) but if you want to evaluate annotations using a custom metric or a standard metric not available in Label Studio, you can write your own. This functionality is only available for Label Studio Enterprise Cloud customers. 
+Write a custom agreement metric to assess the quality of the predictions and annotations in your Label Studio Enterprise project. Label Studio Enterprise contains a variety of [agreement metrics for your project](stats.html) but if you want to evaluate annotations using a custom metric or a standard metric not available in Label Studio, you can write your own. This functionality is only available for Label Studio Enterprise Cloud customers, or for customers running Label Studio Enterprise in a private cloud with [AWS EC2](https://aws.amazon.com/ec2/) or [AWS EKS](https://aws.amazon.com/eks/).
 
 <div class="enterprise"><p>
 Label Studio Enterprise Edition includes various annotation and labeling statistics and the ability to add your own. The open source Community Edition of Label Studio does not contain these calculations. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
@@ -19,6 +19,8 @@ Label Studio Enterprise Edition includes various annotation and labeling statist
 3. [Add your custom agreement metric to Label Studio Enterprise](#Add-your-custom-agreement-metric-to-Label-Studio-Enterprise).
 
 ## Prerequisites
+
+If you're adding your custom agreement metric to Label Studio Enterprise hosted in a private (self-managed) AWS EC2 or AWS EKS instance, [set up permissions]().
 
 Before writing your custom agreement metric, do the following:
 1. Determine the type of labeling that you're performing based on your labeling configuration.
@@ -106,3 +108,41 @@ After adding your code to Label Studio Enterprise, the following could happen:
 - Your code might fail to run properly based on the format of your JSON annotations. Export an example annotation from your project in Label Studio JSON format and make sure your function handles the annotation as expected outside of Label Studio. 
 
 If you change the labeling configuration for your project, you might need to update the custom agreement metric code to handle the new format of annotations produced.
+
+## Set up permissions for a private cloud custom agreement metric
+
+If you have Label Studio Enterprise deployed in a private cloud (self-managed) AWS EC2 cluster or AWS EKS, you must grant additional permissions for the `label-studio` service account to be able to set up and run custom agreement metrics. 
+
+The best way to do this is to:
+1. Create an AWS IAM role to be used by the custom metric lambdas to store logs in Cloudwatch 
+2. Define an IAM policy.
+3. Attach the IAM policy to the `label-studio` service account. How you do this depends on your deployment scenario:
+- this
+- or this
+- or this
+
+You must know your AWS account ID to perform these steps. 
+
+### Create an AWS IAM role
+
+Using your preferred method, create an AWS IAM role. 
+
+1. Create an AWS IAM role named `LSE_CustomMetricsExecuteRole`. For guidance, see the [AWS Identity and Access Management doc for Creating IAM roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create.html)
+2. 
+
+
+### Define an IAM policy
+
+### Do the things for xyz
+### Do the things for abc
+### Do the things for def
+
+### Set up your custom agreement metric
+
+After you set up these permissions in your environment, you're ready to write your custom agreement metric and add it to Label Studio Enterprise:
+1. [Write your custom agreement metric](#How-to-write-your-custom-agreement-metric).
+2. [Add your custom agreement metric to Label Studio Enterprise](#Add-your-custom-agreement-metric-to-Label-Studio-Enterprise).
+
+
+
+
