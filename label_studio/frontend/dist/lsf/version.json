@@ -1,6 +1,6 @@
 {
-  "message": "[fix] Linter issues",
-  "commit": "d0261d7362eaee235f6ab1f2d7f64ac17e7226c6",
+  "message": "Disable GT button in annotations list",
+  "commit": "6b32ed68743f492384535c6fe8ecc1e3805c34be",
   "branch": "master",
-  "date": "2021-10-26T12:28:02Z"
+  "date": "2021-11-10T14:22:06Z"
 }
