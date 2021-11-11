@@ -1,0 +1,9 @@
+[{
+  "image": "https://pytest.heartex.com/image1.jpg",
+  "bbox": {"x": 10, "y": 20, "width": 30, "height": 40, "rectanglelabels": ["Cat", "Dog"]}
+},
+{
+  "image": "https://pytest.heartex.com/image1.jpg",
+  "bbox": {"x": 10, "y": 20, "width": 30, "height": 40, "rectanglelabels": ["Dog"]}
+}
+]

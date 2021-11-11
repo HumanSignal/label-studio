@@ -695,6 +695,4 @@ class ProjectModelVersions(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         project = self.get_object()
-        model_versions = project.get_model_versions()
-        filtered_model_versions = filter(None, model_versions)
-        return Response(data=filtered_model_versions)
+        return Response(data=project.get_model_versions(with_counters=True))

@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import datetime
+import numbers
 
 from urllib.parse import urljoin, quote
 
@@ -18,11 +19,13 @@ from django.urls import reverse
 from django.utils.timesince import timesince
 from django.utils.timezone import now
 from django.dispatch import receiver, Signal
+from rest_framework.exceptions import ValidationError
 
 from model_utils import FieldTracker
 
 from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func
 from core.utils.params import get_env
+from core.label_config import SINGLE_VALUED_TAGS
 from data_manager.managers import PreparedTaskManager, TaskManager
 from core.bulk_update_utils import bulk_update
 
@@ -436,6 +439,56 @@ class Prediction(models.Model):
 
     def has_permission(self, user):
         return self.task.project.has_permission(user)
+
+    @classmethod
+    def prepare_prediction_result(cls, result, project):
+        """
+        This function does the following logic of transforming "result" object:
+        result is list -> use raw result as is
+        result is dict -> put result under single "value" section
+        result is string -> find first occurrence of single-valued tag (Choices, TextArea, etc.) and put string under corresponding single field (e.g. "choices": ["my_label"])  # noqa
+        """
+        if isinstance(result, list):
+            # full representation of result
+            for item in result:
+                if not isinstance(item, dict):
+                    raise ValidationError(f'Each item in prediction result should be dict')
+            # TODO: check consistency with project.label_config
+            return result
+
+        elif isinstance(result, dict):
+            # "value" from result
+            # TODO: validate value fields according to project.label_config
+            for tag, tag_info in project.get_control_tags_from_config().items():
+                tag_type = tag_info['type'].lower()
+                if tag_type in result:
+                    return [{
+                        'from_name': tag,
+                        'to_name': ','.join(tag_info['to_name']),
+                        'type': tag_type,
+                        'value': result
+                    }]
+
+        elif isinstance(result, (str, numbers.Integral)):
+            # If result is of integral type, it could be a representation of data from single-valued control tags (e.g. Choices, Rating, etc.)  # noqa
+            for tag, tag_info in project.get_control_tags_from_config().items():
+                tag_type = tag_info['type'].lower()
+                if tag_type in SINGLE_VALUED_TAGS and isinstance(result, SINGLE_VALUED_TAGS[tag_type]):
+                    return [{
+                        'from_name': tag,
+                        'to_name': ','.join(tag_info['to_name']),
+                        'type': tag_type,
+                        'value': {
+                            tag_type: [result]
+                        }
+                    }]
+        else:
+            raise ValidationError(f'Incorrect format {type(result)} for prediction result {result}')
+
+    def save(self, *args, **kwargs):
+        # "result" data can come in different forms - normalize them to JSON
+        self.result = self.prepare_prediction_result(self.result, self.task.project)
+        return super(Prediction, self).save(*args, **kwargs)
 
     class Meta:
         db_table = 'prediction'
