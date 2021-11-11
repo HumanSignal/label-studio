@@ -607,6 +607,40 @@ In the Label Studio UI, the imported prediction for the first task looks like th
 
 You can sort the prediction scores for each labeled region using the **Regions** pane options. 
 
+
+## Import brush segmentation pre-annotations in RLE format
+
+If you want to import pre-annotations for brush mask image segmentation using the BrushLabels tag, you must convert the masks to RLE format first. The [Label Studio Converter](https://github.com/heartexlabs/label-studio-converter) package has some helper functions for this. See the following for common conversion cases and guidance.
+
+Install Label Studio Converter:
+```
+pip install -U label-studio-converter
+```
+
+Import brush tools:
+```python
+from label_studio_converter import brush
+```
+
+- Convert masks to RLE. This expects an `np.array` with `shape=[width, height, 4]` and `dtype=np.uint8`. The channel number must always be 4 and all of these 4 values must match. Add the following to your python code to perform the conversion:
+    ```python
+    mask = (np.random.random([10, 20]) * 255).astype(np.uint8)  # just a random 2D mask
+    mask = (mask > 128).astype(np.uint8) * 255  # better to threshold, it reduces output annotation size
+    rle = brush.mask2rle(mask)  # mask image in RLE format 
+    ```
+  
+- To convert OpenCV contours, use 
+[`brush.contour2rle(contours, contour_id, img_width, img_height)`](https://github.com/heartexlabs/label-studio-converter/blob/master/label_studio_converter/brush.py#L310).
+
+- To convert an image from path (jpg, png. bmp), use 
+[`brush.image2rle(path)`](https://github.com/heartexlabs/label-studio-converter/blob/master/label_studio_converter/brush.py#L343).
+
+- To prepare the pre-annotation, use 
+[`brush.image2annotation(path, label_name, from_name, to_name, ground_truth=False, model_version=None, score=None)`](https://github.com/heartexlabs/label-studio-converter/blob/master/label_studio_converter/brush.py#L361)
+
+For more assistance, review this [example code creating a Label Studio task with pre-annotations](https://github.com/heartexlabs/label-studio-converter/blob/master/tests/test_brush.py#L11) for brush labels.
+
+
 ## Troubleshoot pre-annotations
 If you encounter unexpected behavior after you import pre-annotations into Label Studio, review this guidance to resolve the issues.
 
