@@ -1,6 +1,6 @@
 {
-  "message": "Disable GT button in annotations list",
-  "commit": "6b32ed68743f492384535c6fe8ecc1e3805c34be",
+  "message": "Disable submit in view all",
+  "commit": "025e37d63c04e86f3116b79f86a019dc75319b7c",
   "branch": "master",
-  "date": "2021-11-10T14:22:06Z"
+  "date": "2021-11-11T11:53:34Z"
 }
