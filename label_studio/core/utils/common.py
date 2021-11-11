@@ -18,9 +18,6 @@ import ujson as json
 import traceback as tb
 import drf_yasg.openapi as openapi
 import contextlib
-
-from django.db.models import Count
-
 import label_studio
 import re
 

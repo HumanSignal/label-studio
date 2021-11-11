@@ -338,11 +338,11 @@ class Project(ProjectMixin, models.Model):
 
         # if cohort slider is tweaked
         elif overlap_cohort_percentage_changed and self.maximum_annotations > 1:
-            self.recalculate_overlap_after_changes()
+            self._rearrange_overlap_cohort()
 
         # if adding/deleting tasks and cohort settings are applied
         elif tasks_number_changed and self.overlap_cohort_percentage < 100 and self.maximum_annotations > 1:
-            self.recalculate_overlap_after_changes()
+            self._rearrange_overlap_cohort()
 
         if maximum_annotations_changed or overlap_cohort_percentage_changed:
             bulk_update_stats_project_tasks(
@@ -353,28 +353,6 @@ class Project(ProjectMixin, models.Model):
         """
         Rearrange overlap depending on annotations count in tasks
         """
-        tasks_with_overlap = self.tasks.annotate(anno=Count('annotations', filter=Q_finished_annotations)). \
-            filter(anno__gte=self.maximum_annotations)
-        tasks_with_overlap_count = tasks_with_overlap.count()
-        total_tasks = self.tasks.count()
-
-        new_tasks_with_overlap_count = int(self.overlap_cohort_percentage / 100 * total_tasks + 0.5)
-        if tasks_with_overlap_count > new_tasks_with_overlap_count:
-            # TODO: warn if we try to reduce current cohort that is already labeled with overlap
-            reduce_by = tasks_with_overlap_count - new_tasks_with_overlap_count
-            reduce_tasks = sample_query(tasks_with_overlap, reduce_by)
-            reduce_tasks.update(overlap=1)
-            reduced_tasks_ids = reduce_tasks.values_list('id', flat=True)
-            tasks_with_overlap.exclude(id__in=reduced_tasks_ids).update(overlap=self.maximum_annotations)
-
-        elif tasks_with_overlap_count < new_tasks_with_overlap_count:
-            increase_by = new_tasks_with_overlap_count - tasks_with_overlap_count
-            tasks_without_overlap = self.tasks.filter(overlap=1)
-            increase_tasks = sample_query(tasks_without_overlap, increase_by, order_asc=True)
-            increase_tasks.update(overlap=self.maximum_annotations)
-            tasks_with_overlap.update(overlap=self.maximum_annotations)
-
-    def recalculate_overlap_after_changes(self):
         all_project_tasks = Task.objects.filter(project=self)
         max_annotations = self.maximum_annotations
         must_tasks = int(self.tasks.count() * self.overlap_cohort_percentage / 100 + 0.5)
