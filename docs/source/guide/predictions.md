@@ -622,7 +622,7 @@ Import brush tools:
 from label_studio_converter import brush
 ```
 
-- Convert masks to RLE. This expects an `np.array` with `shape=[width, height, 4]` and `dtype=np.uint8`. The channel number must always be 4 and all of these 4 values must match. Add the following to your python code to perform the conversion:
+- Convert masks to RLE. This expects an `np.array` with `shape=[image_width, image_height]` and `dtype=np.uint8`. Add the following to your python code to perform the conversion:
     ```python
     mask = (np.random.random([10, 20]) * 255).astype(np.uint8)  # just a random 2D mask
     mask = (mask > 128).astype(np.uint8) * 255  # better to threshold, it reduces output annotation size
