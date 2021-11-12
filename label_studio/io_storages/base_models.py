@@ -109,7 +109,10 @@ class ImportStorage(Storage):
                 data = data['data']
 
             with transaction.atomic():
-                task = Task.objects.create(data=data, project=self.project, overlap=maximum_annotations)
+                task = Task.objects.create(
+                    data=data, project=self.project, overlap=maximum_annotations,
+                    is_labeled=len(annotations) >= maximum_annotations
+                )
                 link_class.create(task, key, self)
                 logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
                 tasks_created += 1
