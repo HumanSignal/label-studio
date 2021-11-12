@@ -2,19 +2,20 @@
 title: Data Labeling&#58; The Unsung Hero Combating Data Drift
 type: blog
 order: 92
-image: https://imgur.com/ZW4Y22i.png
+image: https://imgur.com/ySpC1xI.png
 meta_title: Data Labeling&#58; The Unsung Hero Combating Data Drift
 meta_description: This blog describes the various types of data drift and how data drift impacts model performance along with several examples, and addresses how data labeling can tackle data drift.
 ---
 
 *Authored by Dr. Sundeep Teki.* 
 
-Data drift is a common problem for production machine learning systems. It occurs when the statistical characteristics of the training (source) and test (target) data begin to differ significantly. As illustrated in the image below, the red curve depicting the original data distribution shifts to the blue curve, representing a change in statistical properties like the mean and variance.
+Data drift is a common problem for production machine learning systems. It occurs when the statistical characteristics of the training (source) and test (target) data begin to differ significantly. As illustrated in the image below, the orange curve depicting the original data distribution shifts to the purple curve, representing a change in statistical properties like the mean and variance.
 
-Consequently, a machine learning model that initially performed well on the original data (the red curve) now fails to match its earlier predictive accuracy on the new data distribution (the blue curve). 
+Consequently, a machine learning model that initially performed well on the original data (the orange curve) now fails to match its earlier predictive accuracy on the new data distribution (the purple curve). 
 
-![Data drift diagram showing a red bell curve overlaid by a blue bell curve that is slightly flatter and further to the right than the red one.](https://imgur.com/ZW4Y22i.png)
-*Data drift is caused by changes in the distribution of data.*
+<img src="/images/drift-blog/data-drift.jpg" alt="Data drift diagram showing an orange bell curve overlaid by a purple bell curve that is slightly flatter and further to the right than the orange one." class="gif-border" />
+
+*Data drift is caused by changes in the distribution of data. Graphic based on an image from the [Evidently AI blog post on Why You Should Care About Data and Concept Drift](https://evidentlyai.com/blog/machine-learning-monitoring-data-and-concept-drift).*
 
 Understanding data drift is fundamental to maintaining the predictive power of your production machine learning systems. For instance, a data science team may have started working on a machine learning use case in 2019, using training data from 2018, but by the time the model is ready to go into production, it’s 2020. There could be a huge change in the distribution between the source data from 2018 and the live data coming from 2020.
 

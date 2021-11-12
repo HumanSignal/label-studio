@@ -68,6 +68,8 @@ class ImportStorage(Storage):
 
     def _scan_and_create_links(self, link_class):
         tasks_created = 0
+        maximum_annotations = self.project.maximum_annotations
+        
         for key in self.iterkeys():
             logger.debug(f'Scanning key {key}')
 
@@ -107,7 +109,7 @@ class ImportStorage(Storage):
                 data = data['data']
 
             with transaction.atomic():
-                task = Task.objects.create(data=data, project=self.project)
+                task = Task.objects.create(data=data, project=self.project, overlap=maximum_annotations)
                 link_class.create(task, key, self)
                 logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
                 tasks_created += 1

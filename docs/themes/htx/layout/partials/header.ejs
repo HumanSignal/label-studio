@@ -59,29 +59,10 @@
 
     </div>
 
-    <!-- <div class="head__menu--wrapper">
-      <ul>
-        <li class="<%- page.type === "guide" ? "current": "" %>"><a href="<%- url_for("/guide/") %>">Guide</a></li>
-        <li class="<%- page.type === "tags" ? "current": "" %>"><a href="<%- url_for("/tags/") %>">Tags</a></li>
-        <li class="<%- page.type === "templates" ? "current": "" %>"><a href="<%- url_for("/templates/") %>">Templates</a></li>
-        <li class="<%- page.type === "api" ? "current": "" %>"><a href="<%- url_for("/api/") %>">API</a></li>
-        <li class="<%- page.type === "playground" ? "current": "" %>"><a href="<%- url_for("/playground/") %>">Playground</a></li>
-        <li class="<%- page.type === "blog" ? "current": "" %>"><a href="<%- url_for("/blog/") %>">Blog</a></li>
-      </ul>
-    </div> -->
-
     <!-- Place this tag where you want the button to render. -->
     <a class="github-button" href="https://github.com/heartexlabs/label-studio" data-size="large" data-show-count="true" aria-label="Star heartexlabs/label-studio on GitHub">GitHub</a>
   </div>
-
-  <div id="local-search-result-wrapper"></div>
   <script>
-  var search_path = "<%= config.search.path %>";
-  if (search_path.length === 0) {
-    search_path = "search.xml";
-  }
-  var path = "<%= config.root %>" + search_path;
-  searchFunc(path, 'local-search-input', 'local-search-result-wrapper');
 
   document.querySelector(".menu__icon>a").addEventListener("click", function(e){
     e.preventDefault();
@@ -95,8 +76,7 @@
       document.querySelector("body , html").style.overflow = "hidden";
     }
   });
-  </script>
-  <script>
+
   document.addEventListener("DOMContentLoaded", function(event) {
       function doSomething(scroll_pos) {
           if (window.scrollY > 70) {
@@ -110,7 +90,18 @@
         doSomething();
       });
     });
-   </script>
+
+    $(document).bind('keydown',function(e){
+      console.log(e)
+      if (document.activeElement.localName === 'body'
+          && e.code !== "Space"
+          && !e.altKey && !e.shiftKey && !e.ctrlKey
+      ) {
+        $('#docsearch-input').focus();
+        $(document).unbind('keydown');
+      }
+    });
+  </script>
 </div>
 
 
