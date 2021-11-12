@@ -176,6 +176,32 @@ To upgrade Label Studio Enterprise using Helm, do the following.
    ```
    This command overrides the tag value stored in `lse-values.yaml`. You must update the tag value when you upgrade or redeploy your instance to avoid version downgrades.
 
+
+## Blocked internet access
+In some cases outgoing connections are not allowed according to security rules of organizations.
+
+1. In the case when your organization has an internal https proxy(socks proxy is not supported by Helm 3): 
+   - Please ask your Security team to whitelist `https://charts.heartex.com/`
+   - Export your https proxy address before calling any helm commands:
+   ```shell
+   export HTTPS_PROXY=<your_proxy>
+   ```
+2. In all other cases it's allowed to download the latest helm chart in tar.gz format:
+   - From the command line, replace `<USERNAME>` and `<PASSWORD>` with the credentials provided by your account manager:
+   ```shell
+   helm repo add heartex https://charts.heartex.com/ --username <USERNAME> --password <PASSWORD>
+   helm repo update heartex
+   helm pull heartex/label-studio-enterprise
+   ```
+   - Transfer the downloaded tar.gz archive to the host with installed `kubectl` and `helm`. Unarchive it.
+   - In all `helm` commands with the definition of repository `heartex/label-studio-enterprise` should be replaced with the relative path to the extracted folder, eg:
+   ```shell
+   # before
+   helm install lse heartex/label-studio-enterprise -f lse-values.yaml
+   # after
+   helm install lse ./label-studio-enterprise -f lse-values.yaml
+   ```
+
 ## Uninstall Label Studio using Helm
 
 To uninstall Label Studio Enterprise using Helm, delete the configuration.
