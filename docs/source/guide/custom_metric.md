@@ -20,7 +20,7 @@ Label Studio Enterprise Edition includes various annotation and labeling statist
 
 ## Prerequisites
 
-If you're adding your custom agreement metric to Label Studio Enterprise hosted in a private (self-managed) AWS EC2 or AWS EKS instance, [set up permissions]().
+If you're adding your custom agreement metric to Label Studio Enterprise hosted in a private (self-managed) AWS EC2 or AWS EKS instance, [set up permissions](#Set-up-permissions-for-a-private-cloud-custom-agreement-metric).
 
 Before writing your custom agreement metric, do the following:
 1. Determine the type of labeling that you're performing based on your labeling configuration.
