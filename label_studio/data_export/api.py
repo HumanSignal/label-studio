@@ -159,6 +159,11 @@ class ExportAPI(generics.RetrieveAPIView):
         else:
             download_resources = settings.CONVERTER_DOWNLOAD_RESOURCES
 
+        if 'interpolcate_key_frames' in request.GET:
+            interpolcate_key_frames = bool_from_request(request.GET, 'interpolcate_key_frames', False)
+        else:
+            interpolcate_key_frames = settings.INTERPOLATE_KEY_FRAMES
+
         logger.debug('Get tasks')
         tasks = Task.objects.filter(project=project)
         if tasks_ids and len(tasks_ids) > 0:
@@ -174,7 +179,8 @@ class ExportAPI(generics.RetrieveAPIView):
         tasks = []
         for _task_ids in batch(task_ids, 1000):
             tasks += ExportDataSerializer(
-                self.get_task_queryset(query.filter(id__in=_task_ids)), many=True, expand=['drafts']
+                self.get_task_queryset(query.filter(id__in=_task_ids)), many=True, expand=['drafts'],
+                context={'interpolcate_key_frames': interpolcate_key_frames}
             ).data
         logger.debug('Prepare export files')
 

@@ -47,3 +47,4 @@ boxing>=0.1.4
 redis>=3.5.0
 sentry-sdk>=1.1.0
 label-studio-converter==0.0.33rc5
+https://github.com/heartexlabs/label-studio-tools/archive/fceddc6cf789ce7d0c3f38150a3ded297de40245.zip

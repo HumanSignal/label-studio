@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from django.conf import settings
+from postprocessing.video import extract_key_frames
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
 
@@ -22,6 +23,7 @@ class CompletedBySerializer(serializers.ModelSerializer):
 
 class AnnotationSerializer(FlexFieldsModelSerializer):
     completed_by = serializers.PrimaryKeyRelatedField(read_only=True)
+    result = serializers.SerializerMethodField()
 
     class Meta:
         model = Annotation
@@ -29,6 +31,17 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         expandable_fields = {
           'completed_by': (CompletedBySerializer, )
         }
+
+    def get_result(self, obj):
+        if self.context.get('interpolcate_key_frames', False) and obj.result and any(item['type'] == 'videorectangle' for item in list(obj.result)):
+            final_results = []
+            for res in obj.result:
+                if res['type'].lower() in ["videorectangle"]:
+                    final_results.extend(extract_key_frames([res]))
+                else:
+                    final_results.append(res)
+            return final_results
+        return obj.result
 
 
 class BaseExportDataSerializer(FlexFieldsModelSerializer):
@@ -41,7 +54,7 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
     def to_representation(self, task):
         project = task.project
         data = task.data
-
+        self.annotations.context['interpolcate_key_frames'] = self.context.get('interpolcate_key_frames', False)
         replace_task_data_undefined_with_config_field(data, project)
 
         return super().to_representation(task)
