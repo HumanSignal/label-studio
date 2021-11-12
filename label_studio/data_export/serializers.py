@@ -33,7 +33,8 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         }
 
     def get_result(self, obj):
-        if self.context.get('interpolcate_key_frames', False) and obj.result and any(item['type'] == 'videorectangle' for item in list(obj.result)):
+        # run frames extraction on param, result and result type
+        if self.context.get('interpolate_key_frames', False) and obj.result and any(item['type'] == 'videorectangle' for item in list(obj.result)):
             final_results = []
             for res in obj.result:
                 if res['type'].lower() in ["videorectangle"]:
@@ -54,7 +55,8 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
     def to_representation(self, task):
         project = task.project
         data = task.data
-        self.annotations.context['interpolcate_key_frames'] = self.context.get('interpolcate_key_frames', False)
+        # add interpolate_key_frames param to annotations serializer
+        self.annotations.context['interpolate_key_frames'] = self.context.get('interpolate_key_frames', False)
         replace_task_data_undefined_with_config_field(data, project)
 
         return super().to_representation(task)
