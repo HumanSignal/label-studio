@@ -177,30 +177,42 @@ To upgrade Label Studio Enterprise using Helm, do the following.
    This command overrides the tag value stored in `lse-values.yaml`. You must update the tag value when you upgrade or redeploy your instance to avoid version downgrades.
 
 
-## Blocked internet access
-In some cases outgoing connections are not allowed according to security rules of organizations.
+## Install Label Studio Enterprise without public internet access
 
-1. In the case when your organization has an internal https proxy(socks proxy is not supported by Helm 3): 
-   - Please ask your Security team to whitelist `https://charts.heartex.com/`
-   - Export your https proxy address before calling any helm commands:
-   ```shell
-   export HTTPS_PROXY=<your_proxy>
-   ```
-2. In all other cases it's allowed to download the latest helm chart in tar.gz format:
-   - From the command line, replace `<USERNAME>` and `<PASSWORD>` with the credentials provided by your account manager:
+If you need to install Label Studio Enterprise on a server that blocks access to the internet using a proxy, or an airgapped server that does not allow outgoing connections to the internet, follow these steps:
+
+- If you access the internet from your server using an HTTPS proxy, see [Install behind an HTTPS proxy](#Install-behind-an-HTTPS-proxy).
+- If you do not have access to the internet from your server, or use a different proxy, see [Install without internet access or HTTPS proxy](#Install-without-internet-access-or-HTTPS-proxy).
+
+### Install behind an HTTPS proxy
+If your organization uses an HTTPS proxy to manage access to the internet, do the following.
+> If you're using a SOCKS proxy, Helm 3 does not support SOCKS proxies. See [Install without internet access or HTTPS proxy](#Install-without-internet-access-or-HTTPS-proxy).
+
+1. Work with your network security team to whitelist `https://charts.heartex.com` so that you can access the Helm charts for deploymnet.
+2. On the Label Studio Enterprise server, set an environment variable with the HTTPS proxy address:
+```shell
+export HTTPS_PROXY=<your_proxy>
+```
+3. [Install Label Studio Enterprise using Helm on a Kubernetes cluster](#Install-Label-Studio-Enterprise-using-Helm-on-a-Kubernetes-cluster).
+
+### Install without internet access or HTTPS proxy
+
+If you can't access the internet using a proxy supported by Helm or at all, follow these steps to download the Helm charts necessary to deploy Label Studio Enterprise on an airgapped Kubernetes cluster. 
+
+> You need the Label Studio Enterprise credentials provided to you by your account manager to download the Helm charts.
+
+1. Download the latest version of Label Studio Enterprise. From the command line, run the following, replacing `<USERNAME>` and `<PASSWORD>` with the credentials provided to you by your account manager:
    ```shell
    helm repo add heartex https://charts.heartex.com/ --username <USERNAME> --password <PASSWORD>
    helm repo update heartex
    helm pull heartex/label-studio-enterprise
    ```
-   - Transfer the downloaded tar.gz archive to the host with installed `kubectl` and `helm`. Unarchive it.
-   - In all `helm` commands with the definition of repository `heartex/label-studio-enterprise` should be replaced with the relative path to the extracted folder, eg:
-   ```shell
-   # before
-   helm install lse heartex/label-studio-enterprise -f lse-values.yaml
-   # after
-   helm install lse ./label-studio-enterprise -f lse-values.yaml
-   ```
+2. Transfer the downloaded `tar.gz` archive to the host that has `kubectl` and `helm` installed.
+3. Expand the `tar.gz` archive.
+4. [Install Label Studio Enterprise](#Install-Label-Studio-Enterprise-using-Helm-on-a-Kubernetes-cluster), updating the path in the `helm` commands to reference the relative path of the folder where you expanded Label Studio Enterprise. For example, if you expanded the archive file in the current directory, run the following:
+```shell
+helm install lse ./label-studio-enterprise -f lse-values.yaml
+```
 
 ## Uninstall Label Studio using Helm
 
