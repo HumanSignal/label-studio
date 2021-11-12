@@ -14,7 +14,7 @@ With the Label Studio Python SDK, you can perform the following tasks in a Pytho
 - [Create a Label Studio project](#Create-a-project-with-the-Label-Studio-Python-SDK), including setting up a labeling configuration. 
 - [Import tasks](#Import-tasks-with-the-Label-Studio-Python-SDK).
 - [Manage pre-annotated tasks and model predictions](#Add-predictions-to-existing-tasks-with-the-Label-Studio-Python-SDK).
-- [Connect to a cloud storage provider](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/Import%20data%20from%20Cloud%20Storage.ipynb), such as Amazon S3, Microsoft Azure, or Google Cloud Services (GCS), to retrieve unlabeled tasks and store annotated tasks.
+- [Connect to a cloud storage provider](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/annotate_data_from_gcs/annotate_data_from_gcs.ipynb), such as Amazon S3, Microsoft Azure, or Google Cloud Services (GCS), to retrieve unlabeled tasks and store annotated tasks.
 - [Modify project settings](/sdk/project.html#label_studio_sdk.project.Project.set_params), such as task sampling or the model version used to display predictions. 
 
 See the [full SDK reference documentation for all available modules](/sdk/index.html), or review the available [API endpoints](/api) for any tasks that the SDK does not cover. 
@@ -66,7 +66,7 @@ For more about what you can do with the project module of the SDK, see the [proj
 
 You can import tasks from your script using the Label Studio Python SDK. 
 
-For a specific project, you can import tasks in [Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format) or [connect to cloud storage providers](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/Import%20data%20from%20Cloud%20Storage.ipynb) and import image, audio, or video files directly. 
+For a specific project, you can import tasks in [Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format) or [connect to cloud storage providers](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/annotate_data_from_gcs/annotate_data_from_gcs.ipynb) and import image, audio, or video files directly. 
 
 ```python
 project.import_tasks(
@@ -96,7 +96,7 @@ For complex cases, such as object detection with bounding boxes, you can specify
 project.create_prediction(task_ids[1], result={"x": 10, "y": 20, "width": 30, "height": 40, "label": ["Dog"]}, score=0.9)
 ```
 
-For another example, see the [Jupyter notebook example of importing pre-annotated data](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/Import%20preannotations.ipynb).
+For another example, see the [Jupyter notebook example of importing pre-annotated data](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/import_preannotations/import_preannotations.ipynb).
 
 ### Import pre-annotated tasks into Label Studio
 
@@ -114,7 +114,7 @@ project.import_tasks(
 ```
 The image is specified in the `image` key using a public URL, and the prediction is referenced in an arbitrary `pet` key, which is then specified in the `preannotated_from_fields()` method.  
 
-For more examples, see the [Jupyter notebook example of importing pre-annotated data](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/Import%20preannotations.ipynb).
+For more examples, see the [Jupyter notebook example of importing pre-annotated data](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/import_preannotations/import_preannotations.ipynb).
 
 ## Prepare and manage data with filters
 
