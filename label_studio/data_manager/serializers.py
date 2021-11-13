@@ -240,12 +240,10 @@ class DataManagerTaskSerializer(TaskSerializer):
     def get_predictions_results(self, task):
         return self._pretty_results(task, 'predictions_results')
 
-    @staticmethod
-    def get_annotations(task):
+    def get_annotations(self, task):
         return AnnotationSerializer(task.annotations, many=True, default=[], read_only=True).data
 
-    @staticmethod
-    def get_predictions(task):
+    def get_predictions(self, task):
         return PredictionSerializer(task.predictions, many=True, default=[], read_only=True).data
 
     @staticmethod
