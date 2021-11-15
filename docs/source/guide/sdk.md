@@ -148,7 +148,7 @@ Filters.create(Filters.AND, [
 ])
 ```
 
-### Manage annotations with filters and the Label Studio SDK
+### Manage annotations with filters 
 
 For example, to create a filter that displays only tasks with an ID greater than 42 or that were annotated between November 1, 2021, and now, do the following:
 ```python
