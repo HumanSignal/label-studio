@@ -57,3 +57,6 @@ tmp
 .DS_Store
 *.sqlite3
 label_studio/core/settings/local.py
+mydata/
+deploy/pgsql/certs/*
+!deploy/pgsql/certs/.placeholder
