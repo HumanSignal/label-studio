@@ -59,3 +59,6 @@ tmp
 label_studio/core/settings/local.py
 deploy/nginx/certs/*
 !deploy/nginx/certs/.placeholder
+mydata/
+deploy/pgsql/certs/*
+!deploy/pgsql/certs/.placeholder

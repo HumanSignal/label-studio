@@ -59,10 +59,18 @@ services:
     image: postgres:11.5
     hostname: db
     restart: always
+    # Optional: Enable TLS on PostgreSQL
+    # Just drop your server.crt and server.key into folder 'deploy/pgsql/certs'
+    # NOTE: Both files must have permissions u=rw (0600) or less
+#    command: >
+#      -c ssl=on
+#      -c ssl_cert_file=/var/lib/postgresql/certs/server.crt
+#      -c ssl_key_file=/var/lib/postgresql/certs/server.key
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
       - ${POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql/data
+      - ./deploy/pgsql/certs:/var/lib/postgresql/certs:ro
 
 volumes:
   static: {}
