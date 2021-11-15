@@ -2,10 +2,12 @@
 **
 
 # Except:
-!deploy
+!deploy/docker-entrypoint.d
+!deploy/docker-entrypoint.sh
+!deploy/prebuild_wo_frontend.sh
+!deploy/requirements.txt
 !label_studio
 !setup.py
-!requirements.txt
 !README.md
 
 # but ignore:

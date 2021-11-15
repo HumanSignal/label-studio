@@ -5,11 +5,16 @@ services:
     image: nginx:1.21
     ports:
       - "8080:80"
+      - "8081:443"
     depends_on:
       - app
     environment:
       - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
       - NGINX_FILE=${NGINX_FILE:-default.conf}
+#   Optional: Specify SSL termination certificate & key
+#   Just drop your cert.pem and cert.key into folder 'deploy/nginx/certs'
+#      - NGINX_SSL_CERT=/certs/cert.pem
+#      - NGINX_SSL_CERT_KEY=/certs/cert.key
     volumes:
       # keep in sync with deploy/docker-entrypoint.d/30-copy-static-data.sh
       - source: static
@@ -20,6 +25,7 @@ services:
       - ./mydata:/label-studio/data:rw
       - ./deploy/nginx/${NGINX_FILE:-default.conf}:/etc/nginx/templates/${NGINX_FILE:-default.conf}.template
       - ./deploy/nginx/scripts:/docker-entrypoint.d/label-studio
+      - ./deploy/nginx/certs:/certs:ro
     command: nginx -g "daemon off;"
 
   app:
