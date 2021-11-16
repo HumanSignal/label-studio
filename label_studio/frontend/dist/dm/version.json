@@ -1,6 +1,6 @@
 {
-  "message": "[fix] Skip undefined users in filters",
-  "commit": "3998e9a058abeffad1d029c928f238794df24284",
-  "branch": "master",
-  "date": "2021-10-27T14:31:38Z"
+  "message": "Merge branch 'master' into fix/DEV-428/draft-created-date",
+  "commit": "10f6fccb7984d5065e9d3413c472b8fcb33f7730",
+  "branch": "fix/DEV-428/draft-created-date",
+  "date": "2021-11-16T13:10:35Z"
 }
