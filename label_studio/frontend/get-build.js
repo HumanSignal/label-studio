@@ -41,7 +41,7 @@ async function get(projectName, ref = 'master') {
     fs.mkdirSync(dir);
   }
 
-  if (ref.length < 30) {
+  if (ref.length < 30 || ref.indexOf("/") > -1) {
     const commitUrl = `https://api.github.com/repos/${REPO}/git/ref/heads/${ref}`;
     console.info(`Fetching ${commitUrl}`);
     res = await fetch(commitUrl, { headers: { Authorization: `token ${TOKEN}` }});
