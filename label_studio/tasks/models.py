@@ -203,31 +203,6 @@ class Task(TaskMixin, models.Model):
             from io_storages.s3.models import S3ImportStorage
             return S3ImportStorage()
 
-
-    @staticmethod
-    def bulk_update_is_labeled(project):
-        """ Fast way to update only is_labeled.
-            Prefer to use Django 2.2 bulk_update(), see bulk_update_field('is_labeled')
-            get all project.tasks as subquery
-            Subquery(
-                w coalesce get the first non-null value (count(annotations), or 0)
-                make condition
-                add temp field pre_is_labeled as condtion values
-            )
-            update all tasks with Subquery
-        """
-        tasks = project.tasks.filter(pk=OuterRef('pk'))
-        count = Coalesce(Count(
-            'annotations', filter=Q(annotations__was_cancelled=False) & Q(annotations__ground_truth=False)), Value(0))
-        condition = Case(
-            When(overlap__lte=count, then=Value(True)),
-            default=Value(False),
-            output_field=models.BooleanField(null=False)
-        )
-        results = tasks.annotate(pre_is_labeled=condition).values('pre_is_labeled')
-        project.tasks.update(is_labeled=Subquery(results))
-
-
     @property
     def completed_annotations(self):
         """Annotations that we take into account when set completed status to the task"""
