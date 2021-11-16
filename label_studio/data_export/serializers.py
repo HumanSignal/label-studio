@@ -56,7 +56,7 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
         project = task.project
         data = task.data
         # add interpolate_key_frames param to annotations serializer
-        self.annotations.context['interpolate_key_frames'] = self.context.get('interpolate_key_frames', False)
+        self.fields['annotations'].context['interpolate_key_frames'] = self.context.get('interpolate_key_frames', False)
         replace_task_data_undefined_with_config_field(data, project)
 
         return super().to_representation(task)
