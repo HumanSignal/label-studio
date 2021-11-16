@@ -25,7 +25,7 @@ with open('README.md', 'r', encoding='utf-8') as f:
 requirements, dependency_links = [], []
 with open('deploy/requirements.txt') as f:
     for line in f.read().splitlines():
-        if line.startswith('-e git+'):
+        if line.startswith('-e git+') or line.startswith('http'):
             dependency_links.append(line.replace('-e ', ''))
         else:
             requirements.append(line)
