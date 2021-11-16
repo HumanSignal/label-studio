@@ -1177,8 +1177,6 @@ stages:
           "predictions_results": "",
           "total_annotations": 1,
           "annotations_ids": !anystr "",
-          "annotations": [],
-          "predictions": [],
           "drafts": [],
           "file_upload": null,
           "annotators": [
@@ -1197,8 +1195,6 @@ stages:
           "predictions_results": "",
           "total_annotations": 1,
           "annotations_ids": !anystr "",
-          "annotations": [],
-          "predictions": [],
           "drafts": [],
           "file_upload": null,
           "annotators": [
@@ -1217,8 +1213,6 @@ stages:
           "predictions_results": "",
           "total_annotations": 1,
           "annotations_ids": !anystr "",
-          "annotations": [],
-          "predictions": [],
           "drafts": [],
           "file_upload": null,
           "annotators": [
