@@ -1,6 +1,6 @@
 {
-  "message": "[fix] Skip undefined users in filters",
-  "commit": "3998e9a058abeffad1d029c928f238794df24284",
+  "message": "fix: (!self.SDK.settings?.onlyVirtualTabs) (#20)",
+  "commit": "14b3543e0129774520d9d2439081259ceb429854",
   "branch": "master",
-  "date": "2021-10-27T14:31:38Z"
+  "date": "2021-11-12T18:33:54Z"
 }
