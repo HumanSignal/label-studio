@@ -29,7 +29,7 @@ If you haven't opened a pull request before, check out the [GitHub documentation
 
 ## Contributor Guidelines
 
-We value input from each member of the community, and we ask that you follow our [code of conduct](https://github.com/heartexlabs/label-studio/blob/master/CODE_OF_CONDUCT.md). We are a small team, but we try to respond to issues and pull requests within 2 business days. 
+We value input from each member of the community, and we ask that you follow our [code of conduct](https://github.com/heartexlabs/label-studio/blob/master/CODE_OF_CONDUCT.md). We are [a small team](https://github.com/orgs/heartexlabs/teams), but we try to respond to issues and pull requests within 2 business days. 
 
 ### Before you start
 For changes that you contribute to any of the Label Studio repositories, please do the following:
