@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #355 from heartexlabs/fix/dev-1154/rotation-fixes\n\nDEV-1154: Fix scaling on rotation",
-  "commit": "0d18df9534cb2924e77a31852e06ae2519033b6d",
-  "branch": "master",
-  "date": "2021-11-18T13:24:01Z"
+  "message": "Fix tests",
+  "commit": "a33234433a9f5a023eaa8adf807e4d85f595b71f",
+  "branch": "fix/DEV-819/incorrect-image-resizing",
+  "date": "2021-11-16T14:59:06Z"
 }
