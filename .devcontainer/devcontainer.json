@@ -12,20 +12,73 @@
 	// The 'service' property is the name of the service for the container that VS Code should
 	// use. Update this value and .devcontainer/docker-compose.yml to the real service name.
 	"service": "app",
-	"runServices": [
-		"db",
-		"app",
-	],
 	// The optional 'workspaceFolder' property is the path VS Code should open by default when
 	// connected. This is typically a file mount in .devcontainer/docker-compose.yml
 	"workspaceFolder": "/workspace",
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
-		"terminal.integrated.defaultProfile.linux": "bash",
-		"python.defaultInterpreterPath": "/usr/bin/python3",
-		"python.pythonPath": "/usr/bin/python3",
-		"files.eol": "\n",
+		"editor.tabSize": 4,
+		"editor.renderWhitespace": "all",
+		"editor.formatOnPaste": true,
 		"editor.formatOnSave": true,
+		"editor.rulers": [
+			120
+		],
+		"files.eol": "\n",
+		"terminal.integrated.defaultProfile.linux": "bash",
+		"python.pythonPath": "/usr/bin/python3",
+		"python.defaultInterpreterPath": "/usr/bin/python3",
+		"python.languageServer": "Pylance",
+		"python.autoComplete.addBrackets": true,
+		"python.analysis.autoImportCompletions": true,
+		"python.analysis.completeFunctionParens": true,
+		"python.analysis.autoSearchPaths": true,
+		"python.analysis.useImportHeuristic": true,
+		"python.analysis.extraPaths": [
+			"label_studio",
+		],
+		"python.analysis.typeCheckingMode": "off",
+		"python.sortImports": true,
+		"python.sortImports.args": [
+			"--src=${workspaceFolder}",
+			"--profile",
+			"black",
+			"--atomic",
+			"--py",
+			"37",
+			"--line-length",
+			"120"
+		],
+		"python.formatting.blackPath": "/usr/local/bin/black",
+		"python.formatting.provider": "black",
+		"python.formatting.blackArgs": [
+			"--line-length=120",
+			"--skip-string-normalization"
+		],
+		"python.linting.flake8Path": "/usr/local/bin/flake8",
+		"python.linting.enabled": true,
+		"python.linting.pylintEnabled": false,
+		"python.linting.flake8Enabled": true,
+		"python.linting.flake8Args": [
+			"--ignore=E24,W504,F401,E203,W503",
+			"--max-line-length=120",
+			"--verbose"
+		],
+		"python.testing.autoTestDiscoverOnSaveEnabled": false,
+		"python.testing.pytestEnabled": true,
+		"python.testing.cwd": "./label_studio/tests",
+		"python.testing.pytestArgs": [
+			"-v",
+		],
+		"[python]": {
+			"editor.codeActionsOnSave": {
+				"source.organizeImports": true
+			}
+		},
+		"testExplorer.codeLens": true,
+		"testExplorer.gutterDecoration": true,
+		"autoDocstring.docstringFormat": "numpy",
+		"autoDocstring.startOnNewLine": true,
 	},
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
@@ -40,15 +93,21 @@
 		"medo64.render-crlf",
 		"ms-azuretools.vscode-docker",
 		"ms-vscode-remote.vscode-remote-extensionpack",
+		"njqdev.vscode-python-typehint",
+		"njpwerner.autodocstring",
+		"nhoizey.gremlins",
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 	// Uncomment the next line if you want start specific services in your Docker Compose config.
-	// "runServices": [],
+	"runServices": [
+		"db",
+		"app",
+	],
 	// Uncomment the next line if you want to keep your containers running after VS Code shuts down.
 	// "shutdownAction": "none",
 	// Uncomment the next line to run commands after the container is created - for example installing curl.
-	//"postCreateCommand": "",
+	"postCreateCommand": "pip3 install -r /workspace/deploy/requirements-dev.txt && pre-commit install",
 	// Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
 	// "remoteUser": "vscode"
 }
