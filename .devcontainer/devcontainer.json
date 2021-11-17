@@ -53,15 +53,17 @@
 		"python.formatting.provider": "black",
 		"python.formatting.blackArgs": [
 			"--line-length=120",
-			"--skip-string-normalization"
+			"--skip-string-normalization",
+			"--exclude='^.*\b(migrations)\b.*$'"
 		],
 		"python.linting.flake8Path": "/usr/local/bin/flake8",
 		"python.linting.enabled": true,
 		"python.linting.pylintEnabled": false,
 		"python.linting.flake8Enabled": true,
 		"python.linting.flake8Args": [
-			"--ignore=E24,W504,F401,E203,W503",
+			"--ignore=E24,W504,F401,E203,W503,E402",
 			"--max-line-length=120",
+			"--exclude=*/migrations/*",
 			"--verbose"
 		],
 		"python.testing.autoTestDiscoverOnSaveEnabled": false,
