@@ -46,4 +46,4 @@ colorama>=0.4.4
 boxing>=0.1.4
 redis>=3.5.0
 sentry-sdk>=1.1.0
-https://github.com/heartexlabs/label-studio-converter/archive/534cc8381ca52520d4bc5d536aacedb4048e783f.zip
+https://github.com/heartexlabs/label-studio-converter/archive/1648e0801427a60e52d8ab7466d9665bb584bb8b.zip

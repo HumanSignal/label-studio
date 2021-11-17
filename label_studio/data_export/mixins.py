@@ -7,6 +7,7 @@ import logging
 import pathlib
 import shutil
 
+from django.conf import settings
 from django.core.files import File
 from django.db import transaction
 from django.db.models import Prefetch
@@ -271,6 +272,7 @@ class ExportMixin:
                 project_dir=None,
                 upload_dir=out_dir,
                 download_resources=False,
+                enterprise=not settings.VERSION_EDITION == 'Community Edition',
             )
             input_name = pathlib.Path(self.file.name).name
             input_file_path = pathlib.Path(tmp_dir) / input_name

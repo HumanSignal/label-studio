@@ -130,7 +130,9 @@ class DataExport(object):
 
     @staticmethod
     def get_export_formats(project):
-        converter = Converter(config=project.get_parsed_config(), project_dir=None)
+        converter = Converter(config=project.get_parsed_config(),
+                              project_dir=None,
+                              enterprise=not settings.VERSION_EDITION == 'Community Edition',)
         formats = []
         supported_formats = set(converter.supported_formats)
         for format, format_info in converter.all_formats().items():
@@ -156,6 +158,7 @@ class DataExport(object):
             project_dir=None,
             upload_dir=os.path.join(settings.MEDIA_ROOT, settings.UPLOAD_DIR),
             download_resources=download_resources,
+            enterprise=not settings.VERSION_EDITION == 'Community Edition',
         )
         with get_temp_dir() as tmp_dir:
             converter.convert(input_json, tmp_dir, output_format, is_dir=False)
