@@ -1,6 +1,6 @@
 {
-  "message": "Disable submit in view all",
-  "commit": "025e37d63c04e86f3116b79f86a019dc75319b7c",
-  "branch": "master",
-  "date": "2021-11-11T11:53:34Z"
+  "message": "Merge branch 'master' into fix/dev-1121-ctrl-z-hotkeys",
+  "commit": "97e38ba41dd6b52a8ac62d73c6dee142ae7e20d3",
+  "branch": "fix/dev-1121-ctrl-z-hotkeys",
+  "date": "2021-11-17T12:20:11Z"
 }
