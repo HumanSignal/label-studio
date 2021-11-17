@@ -47,7 +47,10 @@
 			"--py",
 			"37",
 			"--line-length",
-			"120"
+			"120",
+			"--skip-glob",
+			"'*/migrations/*'",
+			"--filter-files"
 		],
 		"python.formatting.blackPath": "/usr/local/bin/black",
 		"python.formatting.provider": "black",
