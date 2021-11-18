@@ -1,5 +1,4 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""  # noqa: E501
 import logging
 import re
 
@@ -9,20 +8,19 @@ logger = logging.getLogger(__name__)
 uri_regex = r"([\"'])(?P<uri>(?P<storage>{})://[^\1=]*)\1"
 
 
-def get_uri_via_regex(data, prefixes=('s3', 'gs')):
+def get_uri_via_regex(data, prefixes=("s3", "gs")):
     data = str(data).strip()
     for prefix in prefixes:
         if data.startswith(prefix):
             return data, prefix
     try:
-        uri_regex_prepared = uri_regex.format('|'.join(prefixes))
+        uri_regex_prepared = uri_regex.format("|".join(prefixes))
         r_match = re.search(uri_regex_prepared, data)
     except Exception as exc:
-        logger.error(f'{data} can\'t be processed. Reason: {exc}', exc_info=True)
+        logger.error(f"{data} can't be processed. Reason: {exc}", exc_info=True)
         return None, None
     else:
         if r_match is None:
-            logger.warning(
-                "{data} does not match uri regex {uri_regex}".format(data=data, uri_regex=uri_regex))
+            logger.warning(f"{data} does not match uri regex {uri_regex}")
             return None, None
     return r_match.group("uri"), r_match.group("storage")

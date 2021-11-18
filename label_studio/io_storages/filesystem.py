@@ -1,23 +1,22 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
-import ujson as json
-import os
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""  # noqa: E501
 import logging
-
+import os
 from copy import deepcopy
-from core.utils.io import json_load, delete_dir_content, iter_files, remove_file_or_dir
-from .base import BaseStorage, BaseForm, CloudStorage
 
+import ujson as json
+from core.utils.io import delete_dir_content, iter_files, json_load, remove_file_or_dir
+
+from .base import BaseForm, BaseStorage, CloudStorage
 
 logger = logging.getLogger(__name__)
 
 
 class JSONStorage(BaseStorage):
 
-    description = 'JSON task file'
+    description = "JSON task file"
 
     def __init__(self, **kwargs):
-        super(JSONStorage, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         tasks = {}
         if os.path.exists(self.path):
             tasks = json_load(self.path, int_keys=True)
@@ -26,11 +25,11 @@ class JSONStorage(BaseStorage):
         elif isinstance(tasks, dict):
             self.data = tasks
         elif isinstance(self.data, list):
-            self.data = {int(task['id']): task for task in tasks}
+            self.data = {int(task["id"]): task for task in tasks}
         self._save()
 
     def _save(self):
-        with open(self.path, mode='w', encoding='utf8') as fout:
+        with open(self.path, mode="w", encoding="utf8") as fout:
             json.dump(self.data, fout, ensure_ascii=False)
 
     @property
@@ -80,16 +79,15 @@ class JSONStorage(BaseStorage):
 
 
 def already_exists_error(what, path):
-    raise RuntimeError('{path} {what} already exists. Use "--force" option to recreate it.'.format(
-        path=path, what=what))
+    raise RuntimeError(f'{path} {what} already exists. Use "--force" option to recreate it.')
 
 
 class DirJSONsStorage(BaseStorage):
 
-    description = 'Directory with JSON task files'
+    description = "Directory with JSON task files"
 
     def __init__(self, **kwargs):
-        super(DirJSONsStorage, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         os.makedirs(self.path, exist_ok=True)
         self.cache = {}
 
@@ -101,7 +99,7 @@ class DirJSONsStorage(BaseStorage):
         if id in self.cache:
             return self.cache[id]
         else:
-            filename = os.path.join(self.path, str(id) + '.json')
+            filename = os.path.join(self.path, str(id) + ".json")
             if os.path.exists(filename):
                 data = json_load(filename)
                 self.cache[id] = data
@@ -111,8 +109,8 @@ class DirJSONsStorage(BaseStorage):
         return id in set(self.ids())
 
     def set(self, id, value):
-        filename = os.path.join(self.path, str(id) + '.json')
-        with open(filename, 'w', encoding='utf8') as fout:
+        filename = os.path.join(self.path, str(id) + ".json")
+        with open(filename, "w", encoding="utf8") as fout:
             json.dump(value, fout, indent=2, sort_keys=True)
         self.cache[id] = value
 
@@ -121,7 +119,7 @@ class DirJSONsStorage(BaseStorage):
         raise NotImplementedError
 
     def ids(self):
-        for f in iter_files(self.path, '.json'):
+        for f in iter_files(self.path, ".json"):
             yield int(os.path.splitext(os.path.basename(f))[0])
 
     def max_id(self):
@@ -132,11 +130,11 @@ class DirJSONsStorage(BaseStorage):
 
     def items(self):
         for id in self.ids():
-            filename = os.path.join(self.path, str(id) + '.json')
+            filename = os.path.join(self.path, str(id) + ".json")
             yield id, self.cache[id] if id in self.cache else json_load(filename)
 
     def remove(self, id):
-        filename = os.path.join(self.path, str(id) + '.json')
+        filename = os.path.join(self.path, str(id) + ".json")
         if os.path.exists(filename):
             os.remove(filename)
             self.cache.pop(id, None)
@@ -148,11 +146,11 @@ class DirJSONsStorage(BaseStorage):
         else:
             for i in ids:
                 self.cache.pop(i, None)
-                path = os.path.join(self.path, str(i) + '.json')
+                path = os.path.join(self.path, str(i) + ".json")
                 try:
                     remove_file_or_dir(path)
                 except OSError:
-                    logger.warning('Storage file already removed: ' + path)
+                    logger.warning("Storage file already removed: " + path)
 
     def empty(self):
         return next(self.ids(), None) is None
@@ -164,9 +162,7 @@ class TasksJSONStorage(JSONStorage):
     description = 'Local [loading tasks from "tasks.json" file]'
 
     def __init__(self, path, project_path, **kwargs):
-        super(TasksJSONStorage, self).__init__(
-            project_path=project_path,
-            path=os.path.join(project_path, 'tasks.json'))
+        super().__init__(project_path=project_path, path=os.path.join(project_path, "tasks.json"))
 
 
 class ExternalTasksJSONStorage(CloudStorage):
@@ -174,23 +170,23 @@ class ExternalTasksJSONStorage(CloudStorage):
     form = BaseForm
     description = 'Local [loading tasks from "tasks.json" file]'
 
-    def __init__(self, name, path, project_path, prefix=None, create_local_copy=False, regex='.*', **kwargs):
-        super(ExternalTasksJSONStorage, self).__init__(
+    def __init__(self, name, path, project_path, prefix=None, create_local_copy=False, regex=".*", **kwargs):
+        super().__init__(
             name=name,
             project_path=project_path,
-            path=os.path.join(project_path, 'tasks.json'),
+            path=os.path.join(project_path, "tasks.json"),
             use_blob_urls=False,
             prefix=None,
             regex=None,
             create_local_copy=False,
             sync_in_thread=False,
-            **kwargs
+            **kwargs,
         )
         # data is used as a local cache for tasks.json file
         self.data = {}
 
     def _save(self):
-        with open(self.path, mode='w', encoding='utf8') as fout:
+        with open(self.path, mode="w", encoding="utf8") as fout:
             json.dump(self.data, fout, ensure_ascii=False)
 
     def _get_client(self):
@@ -201,7 +197,7 @@ class ExternalTasksJSONStorage(CloudStorage):
 
     @property
     def url_prefix(self):
-        return ''
+        return ""
 
     @property
     def readable_path(self):
@@ -215,13 +211,13 @@ class ExternalTasksJSONStorage(CloudStorage):
 
     def set(self, id, value):
         with self.thread_lock:
-            super(ExternalTasksJSONStorage, self).set(id, value)
+            super().set(id, value)
             self._save()
 
     def set_many(self, ids, values):
         with self.thread_lock:
             for id, value in zip(ids, values):
-                super(ExternalTasksJSONStorage, self)._pre_set(id, value)
+                super()._pre_set(id, value)
             self._save_ids()
             self._save()
 
@@ -237,8 +233,8 @@ class ExternalTasksJSONStorage(CloudStorage):
 
     def _remove_id_from_keys_map(self, id):
         full_key = self.key_prefix + str(id)
-        assert id in self._ids_keys_map, 'No such task id: ' + str(id)
-        assert self._ids_keys_map[id]['key'] == full_key, (self._ids_keys_map[id]['key'], full_key)
+        assert id in self._ids_keys_map, "No such task id: " + str(id)
+        assert self._ids_keys_map[id]["key"] == full_key, (self._ids_keys_map[id]["key"], full_key)
         self._selected_ids.remove(id)
         self._ids_keys_map.pop(id)
         self._keys_ids_map.pop(full_key)
@@ -247,11 +243,11 @@ class ExternalTasksJSONStorage(CloudStorage):
         with self.thread_lock:
             id = int(id)
 
-            logger.debug('Remove id=' + str(id) + ' from ids.json')
+            logger.debug("Remove id=" + str(id) + " from ids.json")
             self._remove_id_from_keys_map(id)
             self._save_ids()
 
-            logger.debug('Remove id=' + str(id) + ' from tasks.json')
+            logger.debug("Remove id=" + str(id) + " from tasks.json")
             self.data.pop(id, None)
             self._save()
 
@@ -259,12 +255,12 @@ class ExternalTasksJSONStorage(CloudStorage):
         with self.thread_lock:
             remove_ids = self.data if ids is None else ids
 
-            logger.debug('Remove ' + str(len(remove_ids)) + ' records from ids.json')
+            logger.debug("Remove " + str(len(remove_ids)) + " records from ids.json")
             for id in remove_ids:
                 self._remove_id_from_keys_map(id)
             self._save_ids()
 
-            logger.debug('Remove all data from tasks.json')
+            logger.debug("Remove all data from tasks.json")
             # remove record from tasks.json
             if ids is None:
                 self.data = {}
@@ -280,7 +276,4 @@ class AnnotationsDirStorage(DirJSONsStorage):
     description = 'Local [annotations are in "annotations" directory]'
 
     def __init__(self, name, path, project_path, **kwargs):
-        super(AnnotationsDirStorage, self).__init__(
-            name=name,
-            project_path=project_path,
-            path=os.path.join(project_path, 'annotations'))
+        super().__init__(name=name, project_path=project_path, path=os.path.join(project_path, "annotations"))

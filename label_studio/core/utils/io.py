@@ -1,20 +1,17 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
-import os
-import pkg_resources
-import shutil
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""  # noqa: E501
 import glob
 import io
+import os
+import shutil
+from contextlib import contextmanager
+from tempfile import mkdtemp, mkstemp
+
+import pkg_resources
 import ujson as json
 import yaml
+from appdirs import user_cache_dir, user_config_dir, user_data_dir
 
-from contextlib import contextmanager
-from tempfile import mkstemp, mkdtemp
-
-from appdirs import user_config_dir, user_data_dir, user_cache_dir
-
-
-_DIR_APP_NAME = 'label-studio'
+_DIR_APP_NAME = "label-studio"
 
 
 def good_path(path):
@@ -22,15 +19,15 @@ def good_path(path):
 
 
 def find_node(package_name, node_path, node_type):
-    assert node_type in ('dir', 'file', 'any')
-    basedir = pkg_resources.resource_filename(package_name, '')
-    node_path = os.path.join(*node_path.split('/'))  # linux to windows compatibility
-    search_by_path = '/' in node_path or '\\' in node_path
+    assert node_type in ("dir", "file", "any")
+    basedir = pkg_resources.resource_filename(package_name, "")
+    node_path = os.path.join(*node_path.split("/"))  # linux to windows compatibility
+    search_by_path = "/" in node_path or "\\" in node_path
 
     for path, dirs, filenames in os.walk(basedir):
-        if node_type == 'file':
+        if node_type == "file":
             nodes = filenames
-        elif node_type == 'dir':
+        elif node_type == "dir":
             nodes = dirs
         else:
             nodes = filenames + dirs
@@ -42,17 +39,15 @@ def find_node(package_name, node_path, node_type):
         elif node_path in nodes:
             return os.path.join(path, node_path)
     else:
-        raise IOError(
-            'Could not find "%s" at package "%s"' % (node_path, basedir)
-        )
+        raise OSError(f'Could not find "{node_path}" at package "{basedir}"')
 
 
 def find_file(file):
-    return find_node('label_studio', file, 'file')
+    return find_node("label_studio", file, "file")
 
 
 def find_dir(directory):
-    return find_node('label_studio', directory, 'dir')
+    return find_node("label_studio", directory, "dir")
 
 
 @contextmanager
@@ -88,7 +83,7 @@ def get_cache_dir():
 
 
 def delete_dir_content(dirpath):
-    for f in glob.glob(dirpath + '/*'):
+    for f in glob.glob(dirpath + "/*"):
         remove_file_or_dir(f)
 
 
@@ -116,7 +111,7 @@ def iter_files(root_dir, ext):
 
 
 def json_load(file, int_keys=False):
-    with io.open(file, encoding='utf8') as f:
+    with open(file, encoding="utf8") as f:
         data = json.load(f)
         if int_keys:
             return {int(k): v for k, v in data.items()}
@@ -127,11 +122,11 @@ def json_load(file, int_keys=False):
 def read_yaml(filepath):
     if not os.path.exists(filepath):
         filepath = find_file(filepath)
-    with io.open(filepath, encoding='utf-8') as f:
+    with open(filepath, encoding="utf-8") as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
     return data
 
 
 def read_bytes_stream(filepath):
-    with open(filepath, mode='rb') as f:
+    with open(filepath, mode="rb") as f:
         return io.BytesIO(f.read())

@@ -1,13 +1,13 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
-import pytest
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""  # noqa: E501
 import json
+
+import pytest
 
 from ..utils import project_id
 
 
 @pytest.mark.django_db
-def test_views_api(business_client, project_id):
+def test_views_api(business_client, project_id):  # noqa: F811
     # create
     payload = dict(project=project_id, data={"test": 1})
     response = business_client.post(
@@ -46,7 +46,7 @@ def test_views_api(business_client, project_id):
 
     # reset
     response = business_client.delete(
-        f"/api/dm/views/reset", data=json.dumps(dict(project=project_id)), content_type='application/json'
+        "/api/dm/views/reset", data=json.dumps(dict(project=project_id)), content_type="application/json"
     )
 
     assert response.status_code == 204, response.content
@@ -81,7 +81,7 @@ def test_views_api_filter_project(business_client):
 
     # filtered reset
     response = business_client.delete(
-        f"/api/dm/views/reset/", data=json.dumps(dict(project=project1_id)), content_type="application/json"
+        "/api/dm/views/reset/", data=json.dumps(dict(project=project1_id)), content_type="application/json"
     )
     assert response.status_code == 204, response.content
 
@@ -92,7 +92,7 @@ def test_views_api_filter_project(business_client):
 
 
 @pytest.mark.django_db
-def test_views_api_filters(business_client, project_id):
+def test_views_api_filters(business_client, project_id):  # noqa: F811
     # create
     payload = dict(
         project=project_id,

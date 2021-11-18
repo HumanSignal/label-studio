@@ -1,14 +1,14 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
-import pytest
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""  # noqa: E501
 import json
 
-from ..utils import make_task, make_annotation, make_prediction, project_id, make_annotator
-from projects.models import Project
+import pytest
 from data_import.models import FileUpload
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.utils.timezone import now
+from projects.models import Project
+
+from ..utils import make_annotation, make_annotator, make_prediction, make_task, project_id
 
 
 @pytest.mark.parametrize(
@@ -39,7 +39,7 @@ from django.utils.timezone import now
     ],
 )
 @pytest.mark.django_db
-def test_views_ordering(ordering, element_index, undefined, business_client, project_id):
+def test_views_ordering(ordering, element_index, undefined, business_client, project_id):  # noqa: F811
 
     payload = dict(
         project=project_id,
@@ -59,16 +59,20 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
     if undefined:
         task_field_name = settings.DATA_UNDEFINED_NAME
     else:
-        task_field_name = 'text'
+        task_field_name = "text"
 
-    file_upload1 = FileUpload.objects.create(user=project.created_by, project=project, file=ContentFile('', name='file_upload1'))
+    file_upload1 = FileUpload.objects.create(
+        user=project.created_by, project=project, file=ContentFile("", name="file_upload1")
+    )
 
-    task_id_1 = make_task({"data": {task_field_name: 1}, 'file_upload': file_upload1}, project).id
+    task_id_1 = make_task({"data": {task_field_name: 1}, "file_upload": file_upload1}, project).id
     make_annotation({"result": [{"1": True}]}, task_id_1)
     make_prediction({"result": [{"1": True}], "score": 1}, task_id_1)
 
-    file_upload2 = FileUpload.objects.create(user=project.created_by, project=project, file=ContentFile('', name='file_upload2'))
-    task_id_2 = make_task({"data": {task_field_name: 2}, 'file_upload': file_upload2}, project).id
+    file_upload2 = FileUpload.objects.create(
+        user=project.created_by, project=project, file=ContentFile("", name="file_upload2")
+    )
+    task_id_2 = make_task({"data": {task_field_name: 2}, "file_upload": file_upload2}, project).id
     for _ in range(0, 2):
         make_annotation({"result": [{"2": True}], "was_cancelled": True}, task_id_2)
     for _ in range(0, 2):
@@ -178,7 +182,7 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                         "filter": "filter:tasks:completed_at",
                         "operator": "less",
                         "type": "Datetime",
-                        "value": now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+                        "value": now().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
                     }
                 ],
             },
@@ -192,7 +196,7 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                         "filter": "filter:tasks:completed_at",
                         "operator": "greater",
                         "type": "Datetime",
-                        "value": now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+                        "value": now().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
                     }
                 ],
             },
@@ -238,7 +242,9 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                     }
                 ],
             },
-            [1, ],
+            [
+                1,
+            ],
         ],
         [
             {
@@ -252,7 +258,9 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                     }
                 ],
             },
-            [1, ],
+            [
+                1,
+            ],
         ],
         [
             {
@@ -267,7 +275,9 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                     {"filter": "filter:tasks:id", "operator": "equal", "value": 1, "type": "Number"},
                 ],
             },
-            [1, ],
+            [
+                1,
+            ],
         ],
         [
             {
@@ -296,19 +306,19 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
     ],
 )
 @pytest.mark.django_db
-def test_views_filters(filters, ids, business_client, project_id):
+def test_views_filters(filters, ids, business_client, project_id):  # noqa: F811
     project = Project.objects.get(pk=project_id)
-    ann1 = make_annotator({'email': 'ann1@testheartex.com'}, project)
-    ann2 = make_annotator({'email': 'ann2@testheartex.com'}, project)
+    ann1 = make_annotator({"email": "ann1@testheartex.com"}, project)
+    ann2 = make_annotator({"email": "ann2@testheartex.com"}, project)
 
     ann_ids = {
-        '$ANN1_ID': ann1.id,
-        '$ANN2_ID': ann2.id,
+        "$ANN1_ID": ann1.id,
+        "$ANN2_ID": ann2.id,
     }
-    for item in filters['items']:
+    for item in filters["items"]:
         for ann_id_key, ann_id_value in ann_ids.items():
-            if isinstance(item['value'], str) and ann_id_key in item['value']:
-                item['value'] = ann_id_value
+            if isinstance(item["value"], str) and ann_id_key in item["value"]:
+                item["value"] = ann_id_value
 
     payload = dict(
         project=project_id,
@@ -331,7 +341,14 @@ def test_views_filters(filters, ids, business_client, project_id):
 
     task_id_2 = make_task({"data": {task_data_field_name: "some text2"}}, project).id
     for ann in (ann1, ann2):
-        make_annotation({"result": [{"from_name": "2_second", "to_name": "", "value": {}}], "was_cancelled": True, "completed_by": ann}, task_id_2)
+        make_annotation(
+            {
+                "result": [{"from_name": "2_second", "to_name": "", "value": {}}],
+                "was_cancelled": True,
+                "completed_by": ann,
+            },
+            task_id_2,
+        )
     for _ in range(0, 2):
         make_prediction({"result": [{"from_name": "2_second", "to_name": "", "value": {}}], "score": 2}, task_id_2)
 
@@ -341,15 +358,16 @@ def test_views_filters(filters, ids, business_client, project_id):
         task_id = make_task({"data": {task_data_field_name: "some text_"}}, project).id
         task_ids.append(task_id)
 
-    for item in filters['items']:
-        if item['type'] == 'Number':
-            if isinstance(item['value'], dict):
-                item['value']['min'] = task_ids[int(item['value']['min'])]
-                item['value']['max'] = task_ids[int(item['value']['max'])]
+    for item in filters["items"]:
+        if item["type"] == "Number":
+            if isinstance(item["value"], dict):
+                item["value"]["min"] = task_ids[int(item["value"]["min"])]
+                item["value"]["max"] = task_ids[int(item["value"]["max"])]
             else:
-                item['value'] = task_ids[int(item['value'])]
+                item["value"] = task_ids[int(item["value"])]
 
-    updated_payload = dict(
+    # TODO: Unused
+    updated_payload = dict(  # noqa: F841
         data={"filters": filters},
     )
     response = business_client.patch(
@@ -361,7 +379,7 @@ def test_views_filters(filters, ids, business_client, project_id):
     response = business_client.get(f"/api/dm/tasks/?view={view_id}")
     response_data = response.json()
 
-    assert 'tasks' in response_data, response_data
+    assert "tasks" in response_data, response_data
 
     response_ids = [task["id"] for task in response_data["tasks"]]
     correct_ids = [task_ids[i] for i in ids]

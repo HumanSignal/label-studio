@@ -1,12 +1,11 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""  # noqa: E501
 import os
-from rest_framework import serializers
 
-from io_storages.base_models import ImportStorage, ExportStorage
-from users.models import User
-from tasks.serializers import AnnotationSerializer, TaskSerializer
+from io_storages.base_models import ExportStorage, ImportStorage
+from rest_framework import serializers
 from tasks.models import Task
+from tasks.serializers import AnnotationSerializer, TaskSerializer
+from users.models import User
 
 
 class ImportStorageSerializer(serializers.ModelSerializer):
@@ -14,7 +13,7 @@ class ImportStorageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ImportStorage
-        fields = '__all__'
+        fields = "__all__"
 
 
 class ExportStorageSerializer(serializers.ModelSerializer):
@@ -22,27 +21,24 @@ class ExportStorageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ExportStorage
-        fields = '__all__'
+        fields = "__all__"
 
 
 class StorageTaskSerializer(TaskSerializer):
     def __init__(self, *args, **kwargs):
         # task is nested into the annotation, we don't need annotations in the task again
-        kwargs['context'] = {
-            'include_annotations': False,
-            'resolve_uri': False
-        }
+        kwargs["context"] = {"include_annotations": False, "resolve_uri": False}
         super().__init__(*args, **kwargs)
 
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = "__all__"
 
 
 class StorageCompletedBySerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'email')
+        fields = ("id", "first_name", "last_name", "email")
 
 
 class StorageAnnotationSerializer(AnnotationSerializer):

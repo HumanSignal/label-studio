@@ -1,5 +1,4 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""  # noqa: E501
 import hashlib
 import logging
 import os
@@ -19,7 +18,6 @@ from django.utils.translation import gettext_lazy as _
 from label_studio_converter import Converter
 from tasks.models import Annotation
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -28,59 +26,59 @@ ExportMixin = load_func(settings.EXPORT_MIXIN)
 
 class Export(ExportMixin, models.Model):
     class Status(models.TextChoices):
-        CREATED = 'created', _('Created')
-        IN_PROGRESS = 'in_progress', _('In progress')
-        FAILED = 'failed', _('Failed')
-        COMPLETED = 'completed', _('Completed')
+        CREATED = "created", _("Created")
+        IN_PROGRESS = "in_progress", _("In progress")
+        FAILED = "failed", _("Failed")
+        COMPLETED = "completed", _("Completed")
 
     title = models.CharField(
-        _('title'),
+        _("title"),
         blank=True,
-        default='',
+        default="",
         max_length=2048,
     )
     created_at = models.DateTimeField(
-        _('created at'),
+        _("created at"),
         auto_now_add=True,
-        help_text='Creation time',
+        help_text="Creation time",
     )
     file = models.FileField(
         upload_to=settings.DELAYED_EXPORT_DIR,
         null=True,
     )
     md5 = models.CharField(
-        _('md5 of file'),
+        _("md5 of file"),
         max_length=128,
-        default='',
+        default="",
     )
     finished_at = models.DateTimeField(
-        _('finished at'),
-        help_text='Complete or fail time',
+        _("finished at"),
+        help_text="Complete or fail time",
         null=True,
         default=None,
     )
 
     status = models.CharField(
-        _('Export status'),
+        _("Export status"),
         max_length=64,
         choices=Status.choices,
         default=Status.CREATED,
     )
     counters = models.JSONField(
-        _('Exporting meta data'),
+        _("Exporting meta data"),
         default=dict,
     )
     project = models.ForeignKey(
-        'projects.Project',
-        related_name='exports',
+        "projects.Project",
+        related_name="exports",
         on_delete=models.CASCADE,
     )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        related_name='+',
+        related_name="+",
         on_delete=models.SET_NULL,
         null=True,
-        verbose_name=_('created by'),
+        verbose_name=_("created by"),
     )
 
 
@@ -91,40 +89,40 @@ def set_export_default_name(sender, instance, created, **kwargs):
         instance.save()
 
 
-class DataExport(object):
+class DataExport:
     # TODO: deprecated
     @staticmethod
     def save_export_files(project, now, get_args, data, md5, name):
         """Generate two files: meta info and result file and store them locally for logging"""
-        filename_results = os.path.join(settings.EXPORT_DIR, name + '.json')
-        filename_info = os.path.join(settings.EXPORT_DIR, name + '-info.json')
+        filename_results = os.path.join(settings.EXPORT_DIR, name + ".json")
+        filename_info = os.path.join(settings.EXPORT_DIR, name + "-info.json")
         annotation_number = Annotation.objects.filter(task__project=project).count()
         try:
             platform_version = version.get_git_version()
-        except:
-            platform_version = 'none'
-            logger.error('Version is not detected in save_export_files()')
+        except Exception:
+            platform_version = "none"
+            logger.error("Version is not detected in save_export_files()")
         info = {
-            'project': {
-                'title': project.title,
-                'id': project.id,
-                'created_at': project.created_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
-                'created_by': project.created_by.email,
-                'task_number': project.tasks.count(),
-                'annotation_number': annotation_number,
+            "project": {
+                "title": project.title,
+                "id": project.id,
+                "created_at": project.created_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "created_by": project.created_by.email,
+                "task_number": project.tasks.count(),
+                "annotation_number": annotation_number,
             },
-            'platform': {'version': platform_version},
-            'download': {
-                'GET': dict(get_args),
-                'time': now.strftime('%Y-%m-%dT%H:%M:%SZ'),
-                'result_filename': filename_results,
-                'md5': md5,
+            "platform": {"version": platform_version},
+            "download": {
+                "GET": dict(get_args),
+                "time": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "result_filename": filename_results,
+                "md5": md5,
             },
         }
 
-        with open(filename_results, 'w', encoding='utf-8') as f:
+        with open(filename_results, "w", encoding="utf-8") as f:
             f.write(data)
-        with open(filename_info, 'w', encoding='utf-8') as f:
+        with open(filename_info, "w", encoding="utf-8") as f:
             json.dump(info, f, ensure_ascii=False)
         return filename_results
 
@@ -135,19 +133,19 @@ class DataExport(object):
         supported_formats = set(converter.supported_formats)
         for format, format_info in converter.all_formats().items():
             format_info = deepcopy(format_info)
-            format_info['name'] = format.name
+            format_info["name"] = format.name
             if format.name not in supported_formats:
-                format_info['disabled'] = True
+                format_info["disabled"] = True
             formats.append(format_info)
-        return sorted(formats, key=lambda f: f.get('disabled', False))
+        return sorted(formats, key=lambda f: f.get("disabled", False))
 
     @staticmethod
     def generate_export_file(project, tasks, output_format, download_resources, get_args):
         # prepare for saving
         now = datetime.now()
         data = json.dumps(tasks, ensure_ascii=False)
-        md5 = hashlib.md5(json.dumps(data).encode('utf-8')).hexdigest()
-        name = 'project-' + str(project.id) + '-at-' + now.strftime('%Y-%m-%d-%H-%M') + f'-{md5[0:8]}'
+        md5 = hashlib.md5(json.dumps(data).encode("utf-8")).hexdigest()
+        name = "project-" + str(project.id) + "-at-" + now.strftime("%Y-%m-%d-%H-%M") + f"-{md5[0:8]}"
 
         input_json = DataExport.save_export_files(project, now, get_args, data, md5, name)
 
@@ -164,14 +162,14 @@ class DataExport(object):
             if len(os.listdir(tmp_dir)) == 1:
                 output_file = files[0]
                 ext = os.path.splitext(output_file)[-1]
-                content_type = f'application/{ext}'
+                content_type = f"application/{ext}"
                 out = read_bytes_stream(output_file)
                 filename = name + os.path.splitext(output_file)[-1]
                 return out, content_type, filename
 
             # otherwise pack output directory into archive
-            shutil.make_archive(tmp_dir, 'zip', tmp_dir)
-            out = read_bytes_stream(os.path.abspath(tmp_dir + '.zip'))
-            content_type = 'application/zip'
-            filename = name + '.zip'
+            shutil.make_archive(tmp_dir, "zip", tmp_dir)
+            out = read_bytes_stream(os.path.abspath(tmp_dir + ".zip"))
+            content_type = "application/zip"
+            filename = name + ".zip"
             return out, content_type, filename

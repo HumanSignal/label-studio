@@ -1,26 +1,24 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
-import ujson as json
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""  # noqa: E501
 import time
-
 from uuid import uuid4
-from django.http import HttpResponsePermanentRedirect
-from django.utils.deprecation import MiddlewareMixin
-from django.core.handlers.base import BaseHandler
-from django.core.exceptions import MiddlewareNotUsed
-from django.middleware.common import CommonMiddleware
-from django.conf import settings
 
+import ujson as json
+from core.utils.contextlog import ContextLog
+from django.conf import settings
+from django.core.exceptions import MiddlewareNotUsed
+from django.core.handlers.base import BaseHandler
+from django.http import HttpResponsePermanentRedirect
+from django.middleware.common import CommonMiddleware
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import escape_leading_slashes
 from rest_framework.permissions import SAFE_METHODS
-from core.utils.contextlog import ContextLog
 
 
 def enforce_csrf_checks(func):
-    """ Enable csrf for specified view func
-    """
+    """Enable csrf for specified view func"""
     # USE_ENFORCE_CSRF_CHECKS=False is for tests
     if settings.USE_ENFORCE_CSRF_CHECKS:
+
         def wrapper(request, *args, **kwargs):
             return func(request, *args, **kwargs)
 
@@ -33,12 +31,12 @@ def enforce_csrf_checks(func):
 class DisableCSRF(MiddlewareMixin):
     # disable csrf for api requests
     def process_view(self, request, callback, *args, **kwargs):
-        if hasattr(callback, '_dont_enforce_csrf_checks'):
-            setattr(request, '_dont_enforce_csrf_checks', callback._dont_enforce_csrf_checks)
-        elif request.GET.get('enforce_csrf_checks'):  # _dont_enforce_csrf_checks is for test
-            setattr(request, '_dont_enforce_csrf_checks', False)
+        if hasattr(callback, "_dont_enforce_csrf_checks"):
+            setattr(request, "_dont_enforce_csrf_checks", callback._dont_enforce_csrf_checks)
+        elif request.GET.get("enforce_csrf_checks"):  # _dont_enforce_csrf_checks is for test
+            setattr(request, "_dont_enforce_csrf_checks", False)
         else:
-            setattr(request, '_dont_enforce_csrf_checks', True)
+            setattr(request, "_dont_enforce_csrf_checks", True)
 
 
 class HttpSmartRedirectResponse(HttpResponsePermanentRedirect):
@@ -46,11 +44,12 @@ class HttpSmartRedirectResponse(HttpResponsePermanentRedirect):
 
 
 class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
-    """ This class converts HttpSmartRedirectResponse to the common response
-        of Django view, without redirect. This is necessary to match status_codes
-        for urls like /url?q=1 and /url/?q=1. If you don't use it, you will have 302
-        code always on pages without slash.
+    """This class converts HttpSmartRedirectResponse to the common response
+    of Django view, without redirect. This is necessary to match status_codes
+    for urls like /url?q=1 and /url/?q=1. If you don't use it, you will have 302
+    code always on pages without slash.
     """
+
     response_redirect_class = HttpSmartRedirectResponse
 
     def __init__(self, *args, **kwargs):
@@ -59,17 +58,17 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
 
         # prevent recursive includes
         old = settings.MIDDLEWARE
-        name = self.__module__ + '.' + self.__class__.__name__
+        name = self.__module__ + "." + self.__class__.__name__
         settings.MIDDLEWARE = [i for i in settings.MIDDLEWARE if i != name]
 
         self.handler.load_middleware()
 
         settings.MIDDLEWARE = old
-        super(CommonMiddlewareAppendSlashWithoutRedirect, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_full_path_with_slash(self, request):
-        """ Return the full path of the request with a trailing slash appended
-            without Exception in Debug mode
+        """Return the full path of the request with a trailing slash appended
+        without Exception in Debug mode
         """
         new_path = request.get_full_path(force_append_slash=True)
         # Prevent construction of scheme relative urls.
@@ -77,16 +76,15 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
         return new_path
 
     def process_response(self, request, response):
-        response = super(CommonMiddlewareAppendSlashWithoutRedirect, self).process_response(request, response)
+        response = super().process_response(request, response)
 
         request.editor_keymap = settings.EDITOR_KEYMAP
 
         if isinstance(response, HttpSmartRedirectResponse):
-            if not request.path.endswith('/'):
+            if not request.path.endswith("/"):
                 # remove prefix SCRIPT_NAME
-                path = request.path[len(settings.FORCE_SCRIPT_NAME):] if settings.FORCE_SCRIPT_NAME \
-                    else request.path
-                request.path = path + '/'
+                path = request.path[len(settings.FORCE_SCRIPT_NAME) :] if settings.FORCE_SCRIPT_NAME else request.path
+                request.path = path + "/"
             # we don't need query string in path_info because it's in request.GET already
             request.path_info = request.path
             response = self.handler.get_response(request)
@@ -95,14 +93,12 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
 
 
 class SetSessionUIDMiddleware(CommonMiddleware):
-
     def process_request(self, request):
-        if 'uid' not in request.session:
-            request.session['uid'] = str(uuid4())
+        if "uid" not in request.session:
+            request.session["uid"] = str(uuid4())
 
 
 class ContextLogMiddleware(CommonMiddleware):
-
     def __init__(self, get_response):
         self.get_response = get_response
         self.log = ContextLog()
@@ -110,7 +106,7 @@ class ContextLogMiddleware(CommonMiddleware):
     def __call__(self, request):
         try:
             body = json.loads(request.body)
-        except:
+        except Exception:
             body = {}
         response = self.get_response(request)
         self.log.send(request=request, response=response, body=body)
@@ -133,8 +129,8 @@ class DatabaseIsLockedRetryMiddleware(CommonMiddleware):
         backoff = 1.5
         while (
             response.status_code == 500
-            and hasattr(response, 'content')
-            and b'database-is-locked-error' in response.content
+            and hasattr(response, "content")
+            and b"database-is-locked-error" in response.content
             and retries_number < 15
         ):
             time.sleep(sleep_time)
@@ -146,6 +142,6 @@ class DatabaseIsLockedRetryMiddleware(CommonMiddleware):
 
 class UpdateLastActivityMiddleware(CommonMiddleware):
     def process_view(self, request, view_func, view_args, view_kwargs):
-        if hasattr(request, 'user') and request.method not in SAFE_METHODS:
+        if hasattr(request, "user") and request.method not in SAFE_METHODS:
             if request.user.is_authenticated:
                 request.user.update_last_activity()

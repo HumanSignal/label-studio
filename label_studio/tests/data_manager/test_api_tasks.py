@@ -1,14 +1,14 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
-import pytest
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""  # noqa: E501
 import json
 
-from ..utils import make_task, make_annotation, make_prediction, project_id
+import pytest
 from projects.models import Project
+
+from ..utils import make_annotation, make_prediction, make_task, project_id
 
 
 @pytest.mark.django_db
-def test_views_tasks_api(business_client, project_id):
+def test_views_tasks_api(business_client, project_id):  # noqa: F811
     # create
     payload = dict(project=project_id, data={"test": 1})
     response = business_client.post(
@@ -73,7 +73,9 @@ def test_views_tasks_api(business_client, project_id):
     ],
 )
 @pytest.mark.django_db
-def test_views_total_counters(tasks_count, annotations_count, predictions_count, business_client, project_id):
+def test_views_total_counters(
+    tasks_count, annotations_count, predictions_count, business_client, project_id  # noqa: F811
+):
     # create
     payload = dict(project=project_id, data={"test": 1})
     response = business_client.post(
@@ -88,7 +90,7 @@ def test_views_total_counters(tasks_count, annotations_count, predictions_count,
     project = Project.objects.get(pk=project_id)
     for _ in range(0, tasks_count):
         task_id = make_task({"data": {}}, project).id
-        print('TASK_ID: %s' % task_id)
+        print("TASK_ID: %s" % task_id)
         for _ in range(0, annotations_count):
             make_annotation({"result": []}, task_id)
 

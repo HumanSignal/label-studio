@@ -1,21 +1,19 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
-import logging
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""  # noqa: E501
 import inspect
+import logging
 import os
-
-from rest_framework import generics
-from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
-from rest_framework.response import Response
-from rest_framework.exceptions import NotFound, PermissionDenied
-from drf_yasg import openapi as openapi
-from drf_yasg.utils import swagger_auto_schema
 
 from core.permissions import all_permissions
 from core.utils.common import get_object_with_check_and_log
 from core.utils.io import read_yaml
-from io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
+from drf_yasg import openapi as openapi
+from drf_yasg.utils import swagger_auto_schema
+from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
 from projects.models import Project
+from rest_framework import generics
+from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from rest_framework.response import Response
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +24,7 @@ class ImportStorageListAPI(generics.ListCreateAPIView):
     serializer_class = ImportStorageSerializer
 
     def get_queryset(self):
-        project_pk = self.request.query_params.get('project')
+        project_pk = self.request.query_params.get("project")
         project = get_object_with_check_and_log(self.request, Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
         ImportStorageClass = self.serializer_class.Meta.model
@@ -42,7 +40,7 @@ class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
 
     @swagger_auto_schema(auto_schema=None)
     def put(self, request, *args, **kwargs):
-        return super(ImportStorageDetailAPI, self).put(request, *args, **kwargs)
+        return super().put(request, *args, **kwargs)
 
 
 class ExportStorageListAPI(generics.ListCreateAPIView):
@@ -51,7 +49,7 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
     serializer_class = ExportStorageSerializer
 
     def get_queryset(self):
-        project_pk = self.request.query_params.get('project')
+        project_pk = self.request.query_params.get("project")
         project = get_object_with_check_and_log(self.request, Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
         ImportStorageClass = self.serializer_class.Meta.model
@@ -67,7 +65,7 @@ class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
 
     @swagger_auto_schema(auto_schema=None)
     def put(self, request, *args, **kwargs):
-        return super(ExportStorageDetailAPI, self).put(request, *args, **kwargs)
+        return super().put(request, *args, **kwargs)
 
 
 class ImportStorageSyncAPI(generics.GenericAPIView):
@@ -114,7 +112,7 @@ class StorageValidateAPI(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         instance = None
-        storage_id = request.data.get('id')
+        storage_id = request.data.get("id")
         if storage_id:
             instance = generics.get_object_or_404(self.serializer_class.Meta.model.objects.all(), pk=storage_id)
             if not instance.has_permission(request.user):
@@ -133,7 +131,7 @@ class StorageFormLayoutAPI(generics.RetrieveAPIView):
 
     @swagger_auto_schema(auto_schema=None)
     def get(self, request, *args, **kwargs):
-        form_layout_file = os.path.join(os.path.dirname(inspect.getfile(self.__class__)), 'form_layout.yml')
+        form_layout_file = os.path.join(os.path.dirname(inspect.getfile(self.__class__)), "form_layout.yml")
         if not os.path.exists(form_layout_file):
             raise NotFound(f'"form_layout.yml" is not found for {self.__class__.__name__}')
 
@@ -154,8 +152,8 @@ class ExportStorageValidateAPI(StorageValidateAPI):
 
 
 class ImportStorageFormLayoutAPI(StorageFormLayoutAPI):
-    storage_type = 'ImportStorage'
+    storage_type = "ImportStorage"
 
 
 class ExportStorageFormLayoutAPI(StorageFormLayoutAPI):
-    storage_type = 'ExportStorage'
+    storage_type = "ExportStorage"

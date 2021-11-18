@@ -1,84 +1,77 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""  # noqa: E501
 import json
 import logging
 import os
-from pathlib import Path
 import re
+from pathlib import Path
 
+from core.utils.params import get_env
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
-from rest_framework.exceptions import ValidationError
-
-from core.utils.params import get_env
-from io_storages.base_models import (
-      ExportStorage,
-      ExportStorageLink,
-      ImportStorage,
-      ImportStorageLink,
-)
+from io_storages.base_models import ExportStorage, ExportStorageLink, ImportStorage, ImportStorageLink
 from io_storages.serializers import StorageAnnotationSerializer
+from rest_framework.exceptions import ValidationError
 from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
-url_scheme = 'https'
+url_scheme = "https"
 
 
 class LocalFilesMixin(models.Model):
-    path = models.TextField(
-        _('path'), null=True, blank=True,
-        help_text='Local path')
-    regex_filter = models.TextField(
-        _('regex_filter'), null=True, blank=True,
-        help_text='Regex for filtering objects')
+    path = models.TextField(_("path"), null=True, blank=True, help_text="Local path")
+    regex_filter = models.TextField(_("regex_filter"), null=True, blank=True, help_text="Regex for filtering objects")
     use_blob_urls = models.BooleanField(
-        _('use_blob_urls'), default=False,
-        help_text='Interpret objects as BLOBs and generate URLs')
+        _("use_blob_urls"), default=False, help_text="Interpret objects as BLOBs and generate URLs"
+    )
 
     def validate_connection(self):
         path = Path(self.path)
         if not path.exists():
-            raise ValidationError(f'Path {self.path} does not exist')
+            raise ValidationError(f"Path {self.path} does not exist")
         if settings.LOCAL_FILES_SERVING_ENABLED is False:
-            raise ValidationError("Serving local files can be dangerous, so it's disabled by default. "
-                                  'You can enable it with LOCAL_FILES_SERVING_ENABLED environment variable, '
-                                  'please check docs: https://labelstud.io/guide/storage.html#Local-storage')
+            raise ValidationError(
+                "Serving local files can be dangerous, so it's disabled by default. "
+                "You can enable it with LOCAL_FILES_SERVING_ENABLED environment variable, "
+                "please check docs: https://labelstud.io/guide/storage.html#Local-storage"
+            )
 
 
 class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):
-
     def iterkeys(self):
         path = Path(self.path)
         regex = re.compile(str(self.regex_filter)) if self.regex_filter else None
-        for file in path.rglob('*'):
+        for file in path.rglob("*"):
             if file.is_file():
                 key = file.name
                 if regex and not regex.match(key):
-                    logger.debug(key + ' is skipped by regex filter')
+                    logger.debug(key + " is skipped by regex filter")
                     continue
                 yield str(file)
 
     def get_data(self, key):
         path = Path(key)
         if self.use_blob_urls:
-            # include self-hosted links pointed to local resources via {settings.HOSTNAME}/data/local-files?d=<path/to/local/dir>
-            document_root = Path(get_env('LOCAL_FILES_DOCUMENT_ROOT', default='/'))
+            # include self-hosted links pointed to local resources via {settings.HOSTNAME}/data/local-files?d=<path/to/local/dir> # noqa: E501
+            document_root = Path(get_env("LOCAL_FILES_DOCUMENT_ROOT", default="/"))
             relative_path = str(path.relative_to(document_root))
-            return {settings.DATA_UNDEFINED_NAME: f'{settings.HOSTNAME}/data/local-files/?d={relative_path}'}
+            return {settings.DATA_UNDEFINED_NAME: f"{settings.HOSTNAME}/data/local-files/?d={relative_path}"}
 
         try:
-            with open(path, encoding='utf8') as f:
+            with open(path, encoding="utf8") as f:
                 value = json.load(f)
         except (UnicodeDecodeError, json.decoder.JSONDecodeError):
             raise ValueError(
-                f"Can\'t import JSON-formatted tasks from {key}. If you're trying to import binary objects, "
-                f"perhaps you've forgot to enable \"Treat every bucket object as a source file\" option?")
+                f"Can't import JSON-formatted tasks from {key}. If you're trying to import binary objects, "
+                f'perhaps you\'ve forgot to enable "Treat every bucket object as a source file" option?'
+            )
 
         if not isinstance(value, dict):
-            raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
+            raise ValueError(
+                f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task."
+            )  # noqa
         return value
 
     def scan_and_create_links(self):
@@ -86,9 +79,8 @@ class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):
 
 
 class LocalFilesExportStorage(ExportStorage, LocalFilesMixin):
-
     def save_annotation(self, annotation):
-        logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
+        logger.debug(f"Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}")
         ser_annotation = self._get_serialized_data(annotation)
 
         # get key that identifies this object in storage
@@ -96,7 +88,7 @@ class LocalFilesExportStorage(ExportStorage, LocalFilesMixin):
         key = os.path.join(self.path, f"{key}.json")
 
         # put object into storage
-        with open(key, mode='w') as f:
+        with open(key, mode="w") as f:
             json.dump(ser_annotation, f, indent=2)
 
         # Create export storage link
@@ -104,17 +96,17 @@ class LocalFilesExportStorage(ExportStorage, LocalFilesMixin):
 
 
 class LocalFilesImportStorageLink(ImportStorageLink):
-    storage = models.ForeignKey(LocalFilesImportStorage, on_delete=models.CASCADE, related_name='links')
+    storage = models.ForeignKey(LocalFilesImportStorage, on_delete=models.CASCADE, related_name="links")
 
 
 class LocalFilesExportStorageLink(ExportStorageLink):
-    storage = models.ForeignKey(LocalFilesExportStorage, on_delete=models.CASCADE, related_name='links')
+    storage = models.ForeignKey(LocalFilesExportStorage, on_delete=models.CASCADE, related_name="links")
 
 
 @receiver(post_save, sender=Annotation)
 def export_annotation_to_local_files(sender, instance, **kwargs):
     project = instance.task.project
-    if hasattr(project, 'io_storages_localfilesexportstorages'):
+    if hasattr(project, "io_storages_localfilesexportstorages"):
         for storage in project.io_storages_localfilesexportstorages.all():
-            logger.debug(f'Export {instance} to Local Storage {storage}')
+            logger.debug(f"Export {instance} to Local Storage {storage}")
             storage.save_annotation(instance)

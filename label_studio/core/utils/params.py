@@ -2,7 +2,7 @@ import os
 
 
 def bool_from_request(params, key, default):
-    """ Get boolean value from request GET, POST, etc
+    """Get boolean value from request GET, POST, etc
 
     :param params: dict POST, GET, etc
     :param key: key to find
@@ -19,18 +19,17 @@ def bool_from_request(params, key, default):
 
 def cast_bool_from_str(value):
     if isinstance(value, str):
-        if value.lower() in ['true', 'yes', 'on', '1']:
+        if value.lower() in ["true", "yes", "on", "1"]:
             value = True
-        elif value.lower() in ['false', 'no', 'not', 'off', '0']:
+        elif value.lower() in ["false", "no", "not", "off", "0"]:
             value = False
         else:
-            raise ValueError(f'Incorrect bool value "{value}". '
-                             f'It should be one of [1, 0, true, false, yes, no]')
+            raise ValueError(f'Incorrect bool value "{value}". ' f"It should be one of [1, 0, true, false, yes, no]")
     return value
 
 
 def int_from_request(params, key, default):
-    """ Get integer from request GET, POST, etc
+    """Get integer from request GET, POST, etc
 
     :param params: dict POST, GET, etc
     :param key: key to find
@@ -54,7 +53,7 @@ def int_from_request(params, key, default):
 
 
 def float_from_request(params, key, default):
-    """ Get float from request GET, POST, etc
+    """Get float from request GET, POST, etc
 
     :param params: dict POST, GET, etc
     :param key: key to find
@@ -78,7 +77,7 @@ def float_from_request(params, key, default):
 
 
 def list_of_strings_from_request(params, key, default):
-    """ Get list of strings from request GET, POST, etc
+    """Get list of strings from request GET, POST, etc
 
     :param params: dict POST, GET, etc
     :param key: key to find
@@ -88,7 +87,7 @@ def list_of_strings_from_request(params, key, default):
     value = params.get(key, default)
     if value is None:
         return
-    splitters = (',', ';', '|')
+    splitters = (",", ";", "|")
     # str
     if isinstance(value, str):
         for splitter in splitters:
@@ -100,7 +99,7 @@ def list_of_strings_from_request(params, key, default):
 
 
 def get_env(name, default=None, is_bool=False):
-    for env_key in ['LABEL_STUDIO_' + name, 'HEARTEX_' + name, name]:
+    for env_key in ["LABEL_STUDIO_" + name, "HEARTEX_" + name, name]:
         value = os.environ.get(env_key)
         if value is not None:
             if is_bool:
@@ -123,4 +122,4 @@ def get_env_list_int(key, default=None):
         if default is None:
             return []
         return default
-    return [int(el) for el in value.split(',')]
+    return [int(el) for el in value.split(",")]

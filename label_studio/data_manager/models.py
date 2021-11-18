@@ -1,10 +1,8 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
-from django.db import models
-from django.conf import settings
-from django.utils.translation import gettext_lazy as _
-
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""  # noqa: E501
 from data_manager.prepare_params import PrepareParams
+from django.conf import settings
+from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class View(models.Model):
@@ -54,15 +52,14 @@ class View(models.Model):
         if add_selected_items and self.selected_items:
             selected_items = self.selected_items
 
-        return PrepareParams(project=self.project_id, ordering=ordering, filters=filters,
-                             data=self.data, selectedItems=selected_items)
+        return PrepareParams(
+            project=self.project_id, ordering=ordering, filters=filters, data=self.data, selectedItems=selected_items
+        )
 
 
 class FilterGroup(models.Model):
     conjunction = models.CharField(_("conjunction"), max_length=1024, help_text="Type of conjunction")
-    filters = models.ManyToManyField(
-        "data_manager.Filter", related_name="filter_groups", help_text="Connected filters"
-    )
+    filters = models.ManyToManyField("data_manager.Filter", related_name="filter_groups", help_text="Connected filters")
 
 
 class Filter(models.Model):

@@ -1,10 +1,10 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""  # noqa: E501
 import os
+
+from io_storages.gcs.models import GCSExportStorage, GCSImportStorage
+from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
-from io_storages.gcs.models import GCSImportStorage, GCSExportStorage
 
 
 class GCSImportStorageSerializer(ImportStorageSerializer):
@@ -13,15 +13,15 @@ class GCSImportStorageSerializer(ImportStorageSerializer):
 
     class Meta:
         model = GCSImportStorage
-        fields = '__all__'
+        fields = "__all__"
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
-        result.pop('google_application_credentials')
+        result.pop("google_application_credentials")
         return result
 
     def validate(self, data):
-        data = super(GCSImportStorageSerializer, self).validate(data)
+        data = super().validate(data)
         storage = self.instance
         if storage:
             for key, value in data.items():
@@ -40,9 +40,9 @@ class GCSExportStorageSerializer(ExportStorageSerializer):
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
-        result.pop('google_application_credentials')
+        result.pop("google_application_credentials")
         return result
 
     class Meta:
         model = GCSExportStorage
-        fields = '__all__'
+        fields = "__all__"

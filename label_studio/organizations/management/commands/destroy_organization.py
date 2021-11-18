@@ -8,18 +8,19 @@ log = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    help = 'Destroy organization'
+    help = "Destroy organization"
 
     def add_arguments(self, parser):
-        parser.add_argument('organization_id', type=int)
+        parser.add_argument("organization_id", type=int)
 
     def handle(self, *args, **options):
-        org = Organization.objects.filter(pk=options['organization_id']).first()
+        org = Organization.objects.filter(pk=options["organization_id"]).first()
         if org is None:
             print(f'Organization with id: {options["organization_id"]} not found')
             return
         yes = input(
-            f'You are trying to remove organization with id: {org.id} and title: "{org.title}". This is not reversible!! Are you sure? yes/no: '
+            f'You are trying to remove organization with id: {org.id} and title: "{org.title}".'
+            " This is not reversible!! Are you sure? yes/no: "
         )
-        if yes == 'yes':
+        if yes == "yes":
             destroy_organization(org)

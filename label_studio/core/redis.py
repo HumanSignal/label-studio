@@ -1,8 +1,7 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
-import redis
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""  # noqa: E501
 import logging
 
+import redis
 from django_rq import get_connection
 
 logger = logging.getLogger(__name__)
@@ -10,8 +9,8 @@ logger = logging.getLogger(__name__)
 try:
     _redis = get_connection()
     _redis.ping()
-except:
-    logger.debug('Redis is not connected.')
+except Exception:
+    logger.debug("Redis is not connected.")
     _redis = None
 
 
@@ -21,16 +20,16 @@ def redis_healthcheck():
     try:
         _redis.ping()
     except redis.exceptions.ConnectionError as exc:
-        logger.error(f'Redis healthcheck failed with ConnectionError: {exc}', exc_info=True)
+        logger.error(f"Redis healthcheck failed with ConnectionError: {exc}", exc_info=True)
         return False
     except redis.exceptions.TimeoutError as exc:
-        logger.error(f'Redis healthcheck failed with TimeoutError: {exc}', exc_info=True)
+        logger.error(f"Redis healthcheck failed with TimeoutError: {exc}", exc_info=True)
         return False
     except redis.exceptions.RedisError as exc:
-        logger.error(f'Redis healthcheck failed: {exc}', exc_info=True)
+        logger.error(f"Redis healthcheck failed: {exc}", exc_info=True)
         return False
     else:
-        logger.debug('Redis client is alive!')
+        logger.debug("Redis client is alive!")
         return True
 
 

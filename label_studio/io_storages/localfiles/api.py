@@ -1,46 +1,45 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""  # noqa: E501
 from django.utils.decorators import method_decorator
-from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi as openapi
-from io_storages.localfiles.models import LocalFilesImportStorage, LocalFilesExportStorage
-from io_storages.localfiles.serializers import LocalFilesImportStorageSerializer, LocalFilesExportStorageSerializer
+from drf_yasg.utils import swagger_auto_schema
 from io_storages.api import (
-    ImportStorageListAPI,
-    ImportStorageDetailAPI,
-    ImportStorageSyncAPI,
-    ExportStorageListAPI,
     ExportStorageDetailAPI,
-    ExportStorageSyncAPI,
-    ImportStorageValidateAPI,
-    ExportStorageValidateAPI,
-    ImportStorageFormLayoutAPI,
     ExportStorageFormLayoutAPI,
+    ExportStorageListAPI,
+    ExportStorageSyncAPI,
+    ExportStorageValidateAPI,
+    ImportStorageDetailAPI,
+    ImportStorageFormLayoutAPI,
+    ImportStorageListAPI,
+    ImportStorageSyncAPI,
+    ImportStorageValidateAPI,
 )
+from io_storages.localfiles.models import LocalFilesExportStorage, LocalFilesImportStorage
+from io_storages.localfiles.serializers import LocalFilesExportStorageSerializer, LocalFilesImportStorageSerializer
 
 
 @method_decorator(
-    name='get',
+    name="get",
     decorator=swagger_auto_schema(
-        tags=['Storage: Local'],
-        operation_summary='Get all import storage',
-        operation_description='Get a list of all local file import storage connections.',
+        tags=["Storage: Local"],
+        operation_summary="Get all import storage",
+        operation_description="Get a list of all local file import storage connections.",
         manual_parameters=[
             openapi.Parameter(
-                name='project',
+                name="project",
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_QUERY,
-                description='Project ID',
+                description="Project ID",
             ),
         ],
     ),
 )
 @method_decorator(
-    name='post',
+    name="post",
     decorator=swagger_auto_schema(
-        tags=['Storage: Local'],
-        operation_summary='Create import storage',
-        operation_description='Create a new local file import storage connection.',
+        tags=["Storage: Local"],
+        operation_summary="Create import storage",
+        operation_description="Create a new local file import storage connection.",
     ),
 )
 class LocalFilesImportStorageListAPI(ImportStorageListAPI):
@@ -49,27 +48,27 @@ class LocalFilesImportStorageListAPI(ImportStorageListAPI):
 
 
 @method_decorator(
-    name='get',
+    name="get",
     decorator=swagger_auto_schema(
-        tags=['Storage: Local'],
-        operation_summary='Get import storage',
-        operation_description='Get a specific local file import storage connection.',
+        tags=["Storage: Local"],
+        operation_summary="Get import storage",
+        operation_description="Get a specific local file import storage connection.",
     ),
 )
 @method_decorator(
-    name='patch',
+    name="patch",
     decorator=swagger_auto_schema(
-        tags=['Storage: Local'],
-        operation_summary='Update import storage',
-        operation_description='Update a specific local file import storage connection.',
+        tags=["Storage: Local"],
+        operation_summary="Update import storage",
+        operation_description="Update a specific local file import storage connection.",
     ),
 )
 @method_decorator(
-    name='delete',
+    name="delete",
     decorator=swagger_auto_schema(
-        tags=['Storage: Local'],
-        operation_summary='Delete import storage',
-        operation_description='Delete a specific local import storage connection.',
+        tags=["Storage: Local"],
+        operation_summary="Delete import storage",
+        operation_description="Delete a specific local import storage connection.",
     ),
 )
 class LocalFilesImportStorageDetailAPI(ImportStorageDetailAPI):
@@ -78,11 +77,11 @@ class LocalFilesImportStorageDetailAPI(ImportStorageDetailAPI):
 
 
 @method_decorator(
-    name='post',
+    name="post",
     decorator=swagger_auto_schema(
-        tags=['Storage: Local'],
-        operation_summary='Sync import storage',
-        operation_description='Sync tasks from a local file import storage connection.',
+        tags=["Storage: Local"],
+        operation_summary="Sync import storage",
+        operation_description="Sync tasks from a local file import storage connection.",
     ),
 )
 class LocalFilesImportStorageSyncAPI(ImportStorageSyncAPI):
@@ -90,11 +89,11 @@ class LocalFilesImportStorageSyncAPI(ImportStorageSyncAPI):
 
 
 @method_decorator(
-    name='post',
+    name="post",
     decorator=swagger_auto_schema(
-        tags=['Storage: Local'],
-        operation_summary='Sync export storage',
-        operation_description='Sync tasks from a local file export storage connection.',
+        tags=["Storage: Local"],
+        operation_summary="Sync export storage",
+        operation_description="Sync tasks from a local file export storage connection.",
     ),
 )
 class LocalFilesExportStorageSyncAPI(ExportStorageSyncAPI):
@@ -102,11 +101,11 @@ class LocalFilesExportStorageSyncAPI(ExportStorageSyncAPI):
 
 
 @method_decorator(
-    name='post',
+    name="post",
     decorator=swagger_auto_schema(
-        tags=['Storage: Local'],
-        operation_summary='Validate import storage',
-        operation_description='Validate a specific local file import storage connection.',
+        tags=["Storage: Local"],
+        operation_summary="Validate import storage",
+        operation_description="Validate a specific local file import storage connection.",
     ),
 )
 class LocalFilesImportStorageValidateAPI(ImportStorageValidateAPI):
@@ -114,11 +113,11 @@ class LocalFilesImportStorageValidateAPI(ImportStorageValidateAPI):
 
 
 @method_decorator(
-    name='post',
+    name="post",
     decorator=swagger_auto_schema(
-        tags=['Storage: Local'],
-        operation_summary='Validate export storage',
-        operation_description='Validate a specific local file export storage connection.',
+        tags=["Storage: Local"],
+        operation_summary="Validate export storage",
+        operation_description="Validate a specific local file export storage connection.",
     ),
 )
 class LocalFilesExportStorageValidateAPI(ExportStorageValidateAPI):
@@ -126,27 +125,27 @@ class LocalFilesExportStorageValidateAPI(ExportStorageValidateAPI):
 
 
 @method_decorator(
-    name='get',
+    name="get",
     decorator=swagger_auto_schema(
-        tags=['Storage: Local'],
-        operation_summary='Get all export storage',
-        operation_description='Get a list of all Local export storage connections.',
+        tags=["Storage: Local"],
+        operation_summary="Get all export storage",
+        operation_description="Get a list of all Local export storage connections.",
         manual_parameters=[
             openapi.Parameter(
-                name='project',
+                name="project",
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_QUERY,
-                description='Project ID',
+                description="Project ID",
             ),
         ],
     ),
 )
 @method_decorator(
-    name='post',
+    name="post",
     decorator=swagger_auto_schema(
-        tags=['Storage: Local'],
-        operation_summary='Create export storage',
-        operation_description='Create a new local file export storage connection to store annotations.',
+        tags=["Storage: Local"],
+        operation_summary="Create export storage",
+        operation_description="Create a new local file export storage connection to store annotations.",
     ),
 )
 class LocalFilesExportStorageListAPI(ExportStorageListAPI):
@@ -155,27 +154,27 @@ class LocalFilesExportStorageListAPI(ExportStorageListAPI):
 
 
 @method_decorator(
-    name='get',
+    name="get",
     decorator=swagger_auto_schema(
-        tags=['Storage: Local'],
-        operation_summary='Get export storage',
-        operation_description='Get a specific local file export storage connection.',
+        tags=["Storage: Local"],
+        operation_summary="Get export storage",
+        operation_description="Get a specific local file export storage connection.",
     ),
 )
 @method_decorator(
-    name='patch',
+    name="patch",
     decorator=swagger_auto_schema(
-        tags=['Storage: Local'],
-        operation_summary='Update export storage',
-        operation_description='Update a specific local file export storage connection.',
+        tags=["Storage: Local"],
+        operation_summary="Update export storage",
+        operation_description="Update a specific local file export storage connection.",
     ),
 )
 @method_decorator(
-    name='delete',
+    name="delete",
     decorator=swagger_auto_schema(
-        tags=['Storage: Local'],
-        operation_summary='Delete export storage',
-        operation_description='Delete a specific local file export storage connection.',
+        tags=["Storage: Local"],
+        operation_summary="Delete export storage",
+        operation_description="Delete a specific local file export storage connection.",
     ),
 )
 class LocalFilesExportStorageDetailAPI(ExportStorageDetailAPI):

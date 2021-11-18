@@ -1,15 +1,14 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""  # noqa: E501
 import os
+
 import ujson as json
-
-from rest_framework import serializers
+from data_manager.models import Filter, FilterGroup, View
 from django.db import transaction
-
-from data_manager.models import View, Filter, FilterGroup
-from tasks.models import Task
-from tasks.serializers import TaskSerializer, AnnotationSerializer, PredictionSerializer, AnnotationDraftSerializer
 from projects.models import Project
+from rest_framework import serializers
+from tasks.models import Task
+from tasks.serializers import AnnotationDraftSerializer, AnnotationSerializer, PredictionSerializer, TaskSerializer
+
 from label_studio.core.utils.common import round_floats
 
 
@@ -179,7 +178,7 @@ class DataManagerTaskSerializer(TaskSerializer):
 
     class Meta:
         model = Task
-        ref_name = 'data_manager_task_serializer'
+        ref_name = "data_manager_task_serializer"
 
         fields = [
             "cancelled_annotations",
@@ -199,19 +198,19 @@ class DataManagerTaskSerializer(TaskSerializer):
             "file_upload",
             "annotators",
             "project",
-            'predictions_model_versions'
+            "predictions_model_versions",
         ]
 
     def _pretty_results(self, task, field, unique=False):
         if not hasattr(task, field) or getattr(task, field) is None:
-            return ''
+            return ""
 
         result = getattr(task, field)
         if isinstance(result, str):
             output = result
             if unique:
-                output = list(set(output.split(',')))
-                output = ','.join(output)
+                output = list(set(output.split(",")))
+                output = ",".join(output)
 
         elif isinstance(result, int):
             output = str(result)
@@ -222,61 +221,61 @@ class DataManagerTaskSerializer(TaskSerializer):
             result = round_floats(result)
             output = json.dumps(result, ensure_ascii=False)[1:-1]  # remove brackets [ ]
 
-        return output[:self.CHAR_LIMITS].replace(',"', ', "').replace('],[', "] [").replace('"', '')
+        return output[: self.CHAR_LIMITS].replace(',"', ', "').replace("],[", "] [").replace('"', "")
 
     def get_annotations_results(self, task):
-        return self._pretty_results(task, 'annotations_results')
+        return self._pretty_results(task, "annotations_results")
 
     def get_predictions_results(self, task):
-        return self._pretty_results(task, 'predictions_results')
+        return self._pretty_results(task, "predictions_results")
 
     def get_annotations(self, task):
-        if not self.context.get('annotations'):
+        if not self.context.get("annotations"):
             return []
         return AnnotationSerializer(task.annotations, many=True, default=[], read_only=True).data
 
     def get_predictions(self, task):
-        if not self.context.get('predictions'):
+        if not self.context.get("predictions"):
             return []
         return PredictionSerializer(task.predictions, many=True, default=[], read_only=True).data
 
     @staticmethod
     def get_file_upload(task):
-        if not hasattr(task, 'file_upload_field'):
+        if not hasattr(task, "file_upload_field"):
             return None
         file_upload = task.file_upload_field
         return os.path.basename(task.file_upload_field) if file_upload else None
 
     @staticmethod
     def get_annotators(obj):
-        if not hasattr(obj, 'annotators'):
+        if not hasattr(obj, "annotators"):
             return []
 
         annotators = obj.annotators
         if not annotators:
             return []
         if isinstance(annotators, str):
-            annotators = [int(v) for v in annotators.split(',')]
+            annotators = [int(v) for v in annotators.split(",")]
 
         annotators = list(set(annotators))
         annotators = [a for a in annotators if a is not None]
-        return annotators if hasattr(obj, 'annotators') and annotators else []
+        return annotators if hasattr(obj, "annotators") and annotators else []
 
     def get_annotations_ids(self, task):
-        return self._pretty_results(task, 'annotations_ids', unique=True)
+        return self._pretty_results(task, "annotations_ids", unique=True)
 
     def get_predictions_model_versions(self, task):
-        return self._pretty_results(task, 'predictions_model_versions', unique=True)
+        return self._pretty_results(task, "predictions_model_versions", unique=True)
 
     def get_drafts(self, task):
         """Return drafts only for the current user"""
         # it's for swagger documentation
-        if not isinstance(task, Task) or not self.context.get('drafts'):
+        if not isinstance(task, Task) or not self.context.get("drafts"):
             return []
 
         drafts = task.drafts
-        if 'request' in self.context and hasattr(self.context['request'], 'user'):
-            user = self.context['request'].user
+        if "request" in self.context and hasattr(self.context["request"], "user"):
+            user = self.context["request"].user
             drafts = drafts.filter(user=user)
 
         return AnnotationDraftSerializer(drafts, many=True, read_only=True, default=True, context=self.context).data
