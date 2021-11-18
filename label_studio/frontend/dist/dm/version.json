@@ -1,6 +1,6 @@
 {
-  "message": "DM for annotators (#23)\n\nlabelStudioInterfacesModifier\r\n\r\nCo-authored-by: 4iGAN <4iGAN.yO@gmail.com>",
-  "commit": "01e0f150f91a9886e68dbba7d990644ab2fd1ff8",
-  "branch": "master",
-  "date": "2021-11-17T09:14:53Z"
+  "message": "Merge branch 'feature/dev-609/source-from-server' of github.com:heartexlabs/dm2 into feature/dev-609/source-from-server",
+  "commit": "e52959c02510bf31bfae8e7c3e336135097570e0",
+  "branch": "feature/dev-609/source-from-server",
+  "date": "2021-11-16T16:51:40Z"
 }
