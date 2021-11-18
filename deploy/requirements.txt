@@ -47,4 +47,4 @@ boxing>=0.1.4
 redis>=3.5.0
 sentry-sdk>=1.1.0
 label-studio-converter==0.0.33rc5
-https://github.com/heartexlabs/label-studio-tools/archive/455e9c1d73d5737c1b31b8ca2fc1d2e018ac7665.zip
+https://robot-ci-ls-tools-ro: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@github.com/heartexlabs/label-studio-tools/archive/455e9c1d73d5737c1b31b8ca2fc1d2e018ac7665.zip
