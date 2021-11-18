@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into fix/dev-1154/rotation-fixes",
-  "commit": "434c46a40f029b0605e6fc03df99a838ec776454",
-  "branch": "fix/dev-1154/rotation-fixes",
-  "date": "2021-11-18T09:18:46Z"
+  "message": "Merge pull request #355 from heartexlabs/fix/dev-1154/rotation-fixes\n\nDEV-1154: Fix scaling on rotation",
+  "commit": "0d18df9534cb2924e77a31852e06ae2519033b6d",
+  "branch": "master",
+  "date": "2021-11-18T13:24:01Z"
 }
