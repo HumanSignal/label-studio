@@ -1,6 +1,6 @@
 {
-  "message": "Fix tests",
-  "commit": "a33234433a9f5a023eaa8adf807e4d85f595b71f",
+  "message": "Merge branch 'master' into fix/DEV-819/incorrect-image-resizing",
+  "commit": "f4eb6ca16439a52eed943f86d58ccdeb503144fc",
   "branch": "fix/DEV-819/incorrect-image-resizing",
-  "date": "2021-11-16T14:59:06Z"
+  "date": "2021-11-18T13:30:13Z"
 }

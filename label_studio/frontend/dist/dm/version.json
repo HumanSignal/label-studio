@@ -1,6 +1,6 @@
 {
-  "message": "fix: (!self.SDK.settings?.onlyVirtualTabs) (#20)",
-  "commit": "14b3543e0129774520d9d2439081259ceb429854",
+  "message": "DM for annotators (#23)\n\nlabelStudioInterfacesModifier\r\n\r\nCo-authored-by: 4iGAN <4iGAN.yO@gmail.com>",
+  "commit": "01e0f150f91a9886e68dbba7d990644ab2fd1ff8",
   "branch": "master",
-  "date": "2021-11-12T18:33:54Z"
+  "date": "2021-11-17T09:14:53Z"
 }
