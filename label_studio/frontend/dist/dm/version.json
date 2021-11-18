@@ -1,6 +1,6 @@
 {
-  "message": "[fix] Skip undefined users in filters",
-  "commit": "3998e9a058abeffad1d029c928f238794df24284",
+  "message": "DM for annotators (#23)\n\nlabelStudioInterfacesModifier\r\n\r\nCo-authored-by: 4iGAN <4iGAN.yO@gmail.com>",
+  "commit": "01e0f150f91a9886e68dbba7d990644ab2fd1ff8",
   "branch": "master",
-  "date": "2021-10-27T14:31:38Z"
+  "date": "2021-11-17T09:14:53Z"
 }

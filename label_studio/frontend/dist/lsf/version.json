@@ -1,6 +1,6 @@
 {
-  "message": "[fix] Linter issues",
-  "commit": "d0261d7362eaee235f6ab1f2d7f64ac17e7226c6",
-  "branch": "master",
-  "date": "2021-10-26T12:28:02Z"
+  "message": "Refactor and add comments",
+  "commit": "9d87e388b8381986d8649f0efd0df59e5d658385",
+  "branch": "fix/DEV-839/undo-problems",
+  "date": "2021-11-17T22:37:59Z"
 }
