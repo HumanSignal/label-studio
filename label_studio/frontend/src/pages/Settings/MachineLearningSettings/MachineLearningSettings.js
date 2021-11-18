@@ -40,11 +40,20 @@ export const MachineLearningSettings = () => {
   }, [api, project, setBackends]);
 
   const fetchMLVersions = useCallback(async () => {
-    const versions = await api.callApi("modelVersions", {
+    const modelVersions = await api.callApi("modelVersions", {
       params: {
         pk: project.id,
       },
     });
+
+    var versions = [];
+
+    for (const [key, value] of Object.entries(modelVersions)) {
+      versions.push({
+        value: key,
+        label: key + " (" + value + " predictions)",
+      });
+    }
 
     setVersions(versions);
   }, [api, project.id]);

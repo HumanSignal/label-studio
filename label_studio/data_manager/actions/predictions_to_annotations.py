@@ -19,7 +19,10 @@ def predictions_to_annotations(project, queryset, **kwargs):
 
     # model version filter
     if model_version is not None:
-        predictions = predictions.filter(model_version=model_version)
+        if isinstance(model_version, list):
+            predictions = predictions.filter(model_version__in=model_version).distinct()
+        else:
+            predictions = predictions.filter(model_version=model_version)
 
     predictions_values = list(predictions.values_list(
         'result', 'model_version', 'task_id', 'id'
