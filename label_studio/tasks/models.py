@@ -203,77 +203,13 @@ class Task(TaskMixin, models.Model):
             from io_storages.s3.models import S3ImportStorage
             return S3ImportStorage()
 
+    @property
+    def completed_annotations(self):
+        """Annotations that we take into account when set completed status to the task"""
+        return self.annotations.filter(Q_finished_annotations & Q(ground_truth=False))
+
     def update_is_labeled(self):
-        """Set is_labeled field according to annotations*.count > overlap
-        """
-        n = self.annotations.filter(Q_finished_annotations & Q(ground_truth=False)).count()
-        # self.is_labeled = n >= self.project.maximum_annotations
-        self.is_labeled = n >= self.overlap
-
-    def reset_updates(self):
-        """ Reset updates to default from model for one task.
-            We need it in duplicate project or total deletion of annotations
-        """
-        for field in Task._meta.fields:
-            if field.name in Task.updates:
-                setattr(self, field.name, field.default)
-
-    @staticmethod
-    def bulk_reset_updates(project):
-        """ Bulk reset updates to default, it's a fast way to reset all tasks in project
-        """
-        for field in Task._meta.fields:
-            if field.name in Task.updates:
-                project.tasks.update(**{field.name: field.default})
-
-    @staticmethod
-    def bulk_update_is_labeled(project):
-        """ Fast way to update only is_labeled.
-            Prefer to use Django 2.2 bulk_update(), see bulk_update_field('is_labeled')
-
-            get all project.tasks as subquery
-            Subquery(
-                w coalesce get the first non-null value (count(annotations), or 0)
-                make condition
-                add temp field pre_is_labeled as condtion values
-            )
-            update all tasks with Subquery
-        """
-        tasks = project.tasks.filter(pk=OuterRef('pk'))
-        count = Coalesce(Count(
-            'annotations', filter=Q(annotations__was_cancelled=False) & Q(annotations__ground_truth=False)), Value(0))
-        condition = Case(
-            When(overlap__lte=count, then=Value(True)),
-            default=Value(False),
-            output_field=models.BooleanField(null=False)
-        )
-        results = tasks.annotate(pre_is_labeled=condition).values('pre_is_labeled')
-        project.tasks.update(is_labeled=Subquery(results))
-
-    def delete_url(self):
-        return reverse('tasks:task-delete', kwargs={'pk': self.pk})
-
-    def completion_for_ground_truth(self):
-        """ 1 Get ground_truth completion if task has it, else
-            2 Get first completion created by owner of project,
-            3 Or the first of somebody if no owner's items.
-            It's used for ground_truth selection right on data manager page
-        """
-        if not self.annotations.exists():
-            return None
-
-        # ground_truth already exist
-        ground_truth_annotations = self.annotations.filter(ground_truth=True)
-        if ground_truth_annotations.exists():
-            return ground_truth_annotations.first()
-
-        # owner annotation
-        owner_annotations = self.annotations.filter(completed_by=self.project.created_by)
-        if owner_annotations.count() > 0:
-            return owner_annotations.first()
-
-        # annotator annotation
-        return self.annotations.first()
+        self.is_labeled = self._get_is_labeled_value()
 
     def increase_project_summary_counters(self):
         if hasattr(self.project, 'summary'):
@@ -638,6 +574,7 @@ def update_task_stats(task, stats=('is_labeled',), save=True):
         task.update_is_labeled()
     if save:
         task.save()
+
 
 def bulk_update_stats_project_tasks(tasks):
     """bulk Task update accuracy
