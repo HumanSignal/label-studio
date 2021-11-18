@@ -24,6 +24,8 @@ Use with the following data types: video
 <View>
   <Video name="video" value="$video" />
 </View>
+
+<!-- {"video": "https://app.heartex.com/static/samples/opossum_snow.mp4" } -->
 ```
 ### Example
 
@@ -37,6 +39,8 @@ Video classification
     <Choice value="Negative" />
   </Choices>
 </View>
+
+<!-- {"video": "https://app.heartex.com/static/samples/opossum_snow.mp4" } -->
 ```
 ### Example
 
@@ -47,4 +51,6 @@ Video transcription
   <Video name="video" value="$video" />
   <TextArea name="ta" toName="video" />
 </View>
+
+<!-- {"video": "https://app.heartex.com/static/samples/opossum_snow.mp4" } -->
 ```
