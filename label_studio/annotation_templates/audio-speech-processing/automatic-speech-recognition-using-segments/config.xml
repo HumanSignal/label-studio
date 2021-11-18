@@ -12,7 +12,7 @@
 </View>
 
 <!-- { "data":
-{"audio": "https://app.heartex.ai/static/samples/game.wav"},
+{"audio": "/static/samples/game.wav"},
 "annotations": [{
 "result": [
     {
