@@ -4,6 +4,7 @@ on:
     branches: ['*', '*/*', master]
     paths:
       - 'label_studio/**'
+      - '.github/workflows/tests.yml'
 
 jobs:
   run_pytest_sqlite:
@@ -183,8 +184,14 @@ jobs:
     - name: Test with pytest
       env:
         collect_analytics: 0
-        # PYTHONPATH: ../..
       run: |
         cd label_studio/
         coverage run -m pytest
+
+    - name: Collect coverage results
+      if: always()
+      env:
+        collect_analytics: 0
+      run: |
+        cd label_studio/
         coverage report -m --fail-under=40
