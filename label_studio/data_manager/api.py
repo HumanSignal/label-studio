@@ -178,11 +178,6 @@ class TaskListAPI(generics.ListAPIView):
         DELETE=all_permissions.tasks_delete,
     )
 
-    def get_serializer_class(self):
-        if bool_from_request(self.request.query_params, 'only_ids', False):
-            return TaskIDOnlySerializer
-        return self.task_serializer_class
-
     @staticmethod
     def get_task_serializer_context(request, project):
         storage = find_first_many_to_one_related_field_by_prefix(project, '.*io_storages.*')
@@ -254,7 +249,7 @@ class TaskListAPI(generics.ListAPIView):
                 tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
                 evaluate_predictions(tasks_for_predictions)
 
-            serializer = self.get_serializer_class()(page, many=True, context=context)
+            serializer = self.task_serializer_class(page, many=True, context=context)
             return self.get_paginated_response(serializer.data)
 
         # all tasks
@@ -263,7 +258,7 @@ class TaskListAPI(generics.ListAPIView):
         queryset = Task.prepared.annotate_queryset(
             queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields
         )
-        serializer = self.get_serializer_class()(queryset, many=True, context=context)
+        serializer = self.task_serializer_class(queryset, many=True, context=context)
         return Response(serializer.data)
 
 
