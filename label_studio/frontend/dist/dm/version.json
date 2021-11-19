@@ -1,6 +1,6 @@
 {
-  "message": "[fix] Skip undefined users in filters",
-  "commit": "3998e9a058abeffad1d029c928f238794df24284",
-  "branch": "master",
-  "date": "2021-10-27T14:31:38Z"
+  "message": "Merge branch 'feature/dev-609/source-from-server' of github.com:heartexlabs/dm2 into feature/dev-609/source-from-server",
+  "commit": "e52959c02510bf31bfae8e7c3e336135097570e0",
+  "branch": "feature/dev-609/source-from-server",
+  "date": "2021-11-16T16:51:40Z"
 }
