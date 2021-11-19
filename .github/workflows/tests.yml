@@ -55,7 +55,7 @@ jobs:
         with:
           node-version: 14
 
-      - name: Get x` cache directory
+      - name: Get npm cache directory
         id: npm-cache-dir
         run: echo "::set-output name=dir::$(npm config get cache)"
 
@@ -137,6 +137,11 @@ jobs:
         with:
           python-version: '3.7'
 
+      - name: Install OS dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev
+
       - uses: actions/cache@v2
         id: pip-cache
         with:
@@ -145,11 +150,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Install dependencies
+      - name: Install pip dependencies
         run: |
-          sudo apt-get clean
-          sudo apt-get update
-          sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev
           pip install -U pip==20.2
           pip install -r deploy/requirements.txt -r deploy/requirements-test.txt
           pip install -e .
