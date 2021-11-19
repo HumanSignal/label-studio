@@ -1,20 +1,20 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import django_rq
 import logging
-from django.db import models, transaction
+from django.db import models
 
 # Create your models here.
-from django.db.models import F, Count, Q
 from django.utils.translation import gettext_lazy as _
-from django_rq import job
-from rq import get_current_job
+from django.dispatch import receiver
+from django.db.models.signals import post_save, pre_delete
 
 from core.utils.common import safe_float, conditional_atomic
+from data_export.serializers import ExportDataSerializer
 from ml.api_connector import MLApi
 from projects.models import Project
-from tasks.models import Annotation, Prediction
-from tasks.serializers import TaskSerializer, TaskSimpleSerializer, PredictionSerializer
+from tasks.models import Prediction
+from tasks.serializers import TaskSimpleSerializer, PredictionSerializer
+from webhooks.serializers import WebhookSerializer, Webhook
 
 logger = logging.getLogger(__name__)
 
@@ -125,11 +125,18 @@ class MLBackend(models.Model):
         else:
             setup_response = self.setup()
             if setup_response.is_error:
+                logger.warning(f'ML backend responds with error: {setup_response.error_message}')
                 self.state = MLBackendState.ERROR
                 self.error_message = setup_response.error_message
             else:
                 self.state = MLBackendState.CONNECTED
-                self.model_version = setup_response.response.get('model_version')
+                model_version = setup_response.response.get('model_version')
+                logger.info(f'ML backend responds with success: {setup_response.response}')
+                self.model_version = model_version
+                if (model_version != self.project.model_version) and (self.project.model_version == ""):
+                    logger.debug(f'Changing project model version: {self.project.model_version} -> {model_version}')
+                    self.project.model_version = model_version
+                    self.project.save(update_fields=['model_version'])
                 self.error_message = None
         self.save()
 
@@ -145,7 +152,7 @@ class MLBackend(models.Model):
                 MLBackendTrainJob.objects.create(job_id=current_train_job, ml_backend=self)
         self.save()
 
-    def predict_many_tasks(self, tasks):
+    def predict_tasks(self, tasks):
         self.update_state()
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready')
@@ -157,7 +164,7 @@ class MLBackend(models.Model):
             tasks = Task.objects.filter(id__in=[task.id for task in tasks])
 
         tasks_ser = TaskSimpleSerializer(tasks, many=True).data
-        ml_api_result = self.api.make_predictions(tasks_ser, self.model_version, self.project)
+        ml_api_result = self.api.make_predictions(tasks_ser, self.project.model_version, self.project)
         if ml_api_result.is_error:
             logger.warning(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return
@@ -173,13 +180,13 @@ class MLBackend(models.Model):
             return
 
         # ML Backend doesn't support batch of tasks, do it one by one
-        elif len(responses) == 1:
+        elif len(responses) == 1 and len(tasks) != 1:
             logger.warning(
                 f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
                 f"switched to one-by-one task retrieval"
             )
             for task in tasks:
-                self.predict_one_task(task)
+                self.__predict_one_task(task)
             return
 
         # wrong result number
@@ -208,7 +215,7 @@ class MLBackend(models.Model):
             prediction_ser.is_valid(raise_exception=True)
             prediction_ser.save()
 
-    def predict_one_task(self, task):
+    def __predict_one_task(self, task):
         self.update_state()
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready to predict {task}')
@@ -255,7 +262,7 @@ class MLBackend(models.Model):
             result['errors'] = ["Model is not set to be used for interactive preannotations"]
             return result
 
-        tasks_ser = TaskSimpleSerializer([task], many=True).data
+        tasks_ser = ExportDataSerializer([task], many=True, expand=['drafts', 'predictions', 'annotations']).data
         ml_api_result = self.api.make_predictions(
             tasks=tasks_ser,
             model_version=self.model_version,
@@ -353,20 +360,22 @@ def _validate_ml_api_result(ml_api_result, tasks, curr_logger):
     return True
 
 
-def _get_model_version(project, ml_api, curr_logger):
-    logger.debug(f'Get model version for project {project}')
-    model_version = None
-    ml_api_result = ml_api.setup(project)
-    if ml_api_result.is_error:
-        curr_logger.warning(
-            (
-                f'Project {project}: can\'t fetch last model version from {ml_api_result.url}, '
-                f'reason: {ml_api_result.error_message}.'
-            )
-        )
-    else:
-        if 'model_version' in ml_api_result.response:
-            model_version = ml_api_result.response['model_version']
-        else:
-            curr_logger.error(f'Project {project}: "model_version" field is not specified in response.')
-    return model_version
+@receiver(post_save, sender=MLBackend)
+def create_ml_webhook(sender, instance, created, **kwargs):
+    if not created:
+        return
+    ml_backend = instance
+    webhook_url = ml_backend.url.rstrip('/') + '/webhook'
+    project = ml_backend.project
+    if Webhook.objects.filter(project=project, url=webhook_url).exists():
+        logger.info(f'Webhook {webhook_url} already exists for project {project}: skip creating new one.')
+        return
+    logger.info(f'Create ML backend webhook {webhook_url}')
+    ser = WebhookSerializer(data=dict(
+        project=project.id,
+        url=webhook_url,
+        send_payload=True,
+        send_for_all_actions=True)
+    )
+    if ser.is_valid():
+        ser.save(organization=project.organization)

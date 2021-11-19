@@ -1,6 +1,6 @@
 {
-  "message": "[fix] History ovrriding query option",
-  "commit": "8d8e0532f952d1eec873d8fd2320da1e913a7a4e",
-  "branch": "master",
-  "date": "2021-09-21T08:34:07Z"
+  "message": "Merge branch 'feature/dev-609/source-from-server' of github.com:heartexlabs/dm2 into feature/dev-609/source-from-server",
+  "commit": "e52959c02510bf31bfae8e7c3e336135097570e0",
+  "branch": "feature/dev-609/source-from-server",
+  "date": "2021-11-16T16:51:40Z"
 }

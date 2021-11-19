@@ -19,7 +19,7 @@ from core.utils.common import get_object_with_check_and_log, bool_from_request, 
 from projects.models import Project
 from tasks.models import Task
 from .models import DataExport, Export
-from .serializers import ExportDataSerializer, ExportSerializer
+from .serializers import ExportDataSerializer, ExportSerializer, ExportCreateSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +30,13 @@ logger = logging.getLogger(__name__)
         tags=['Export'],
         operation_summary='Get export formats',
         operation_description='Retrieve the available export formats for the current project by ID.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project.'),
+        ],
         responses={
             200: openapi.Response(
                 description='Export formats',
@@ -90,6 +97,12 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
                           Specify a list of task IDs to retrieve only the details for those tasks.
                           """,
             ),
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project.'
+            ),
         ],
         tags=['Export'],
         operation_summary='Export tasks and annotations',
@@ -129,6 +142,9 @@ class ExportAPI(generics.RetrieveAPIView):
     def get_queryset(self):
         return Project.objects.filter(organization=self.request.user.active_organization)
 
+    def get_task_queryset(self, queryset):
+        return queryset
+
     def get(self, request, *args, **kwargs):
         project = self.get_object()
         export_type = (
@@ -157,7 +173,9 @@ class ExportAPI(generics.RetrieveAPIView):
         logger.debug('Serialize tasks for export')
         tasks = []
         for _task_ids in batch(task_ids, 1000):
-            tasks += ExportDataSerializer(query.filter(id__in=_task_ids), many=True).data
+            tasks += ExportDataSerializer(
+                self.get_task_queryset(query.filter(id__in=_task_ids)), many=True, expand=['drafts']
+            ).data
         logger.debug('Prepare export files')
 
         export_stream, content_type, filename = DataExport.generate_export_file(
@@ -236,10 +254,10 @@ class ProjectExportFilesAuthCheck(APIView):
         manual_parameters=[
             openapi.Parameter(
                 name='id',
-                type=openapi.TYPE_STRING,
+                type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
                 default=0,
-                description='Project ID')
+                description='A unique integer value identifying this project.')
         ]
     ),
 )
@@ -254,31 +272,48 @@ class ProjectExportFilesAuthCheck(APIView):
         manual_parameters=[
             openapi.Parameter(
                 name='id',
-                type=openapi.TYPE_STRING,
+                type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
                 default=0,
-                description='Project ID')
+                description='A unique integer value identifying this project.')
         ]
     ),
 )
 class ExportListAPI(generics.ListCreateAPIView):
-    queryset = Export.objects.all()
+    queryset = Export.objects.all().order_by('-created_at')
+    project_model = Project
     serializer_class = ExportSerializer
     permission_required = all_permissions.projects_change
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return ExportSerializer
+        if self.request.method == 'POST':
+            return ExportCreateSerializer
+        return super().get_serializer_class()
 
     def _get_project(self):
         project_pk = self.kwargs.get('pk')
         project = generics.get_object_or_404(
-            Project.objects.for_user(self.request.user),
+            self.project_model.objects.for_user(self.request.user),
             pk=project_pk,
         )
         return project
 
     def perform_create(self, serializer):
+        task_filter_options = serializer.validated_data.pop('task_filter_options')
+        annotation_filter_options = serializer.validated_data.pop('annotation_filter_options')
+        serialization_options = serializer.validated_data.pop('serialization_options')
+
         project = self._get_project()
         serializer.save(project=project, created_by=self.request.user)
         instance = serializer.instance
-        instance.run_file_exporting()
+
+        instance.run_file_exporting(
+            task_filter_options=task_filter_options,
+            annotation_filter_options=annotation_filter_options,
+            serialization_options=serialization_options,
+        )
 
     def get_queryset(self):
         project = self._get_project()
@@ -291,21 +326,21 @@ class ExportListAPI(generics.ListCreateAPIView):
         tags=['Export'],
         operation_summary='Get export by ID',
         operation_description="""
-        Retrieve information about an export file by export ID.
+        Retrieve information about an export file by export ID for a specific project.
         """,
         manual_parameters=[
             openapi.Parameter(
                 name='id',
-                type=openapi.TYPE_STRING,
+                type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
                 default=0,
-                description='Project ID'),
+                description='A unique integer value identifying this project.'),
             openapi.Parameter(
                 name='export_pk',
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_PATH,
                 default=0,
-                description='Export primary key'),
+                description='Primary key identifying the export file.'),
         ]
     ),
 )
@@ -320,21 +355,22 @@ class ExportListAPI(generics.ListCreateAPIView):
         manual_parameters=[
             openapi.Parameter(
                 name='id',
-                type=openapi.TYPE_STRING,
+                type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
                 default=0,
-                description='Project ID'),
+                description='A unique integer value identifying this project.'),
             openapi.Parameter(
                 name='export_pk',
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_PATH,
                 default=0,
-                description='Export primary key'),
+                description='Primary key identifying the export file.'),
         ]
     ),
 )
 class ExportDetailAPI(generics.RetrieveDestroyAPIView):
     queryset = Export.objects.all()
+    project_model = Project
     serializer_class = ExportSerializer
     lookup_url_kwarg = 'export_pk'
     permission_required = all_permissions.projects_change
@@ -342,7 +378,7 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
     def _get_project(self):
         project_pk = self.kwargs.get('pk')
         project = generics.get_object_or_404(
-            Project.objects.for_user(self.request.user),
+            self.project_model.objects.for_user(self.request.user),
             pk=project_pk,
         )
         return project
@@ -374,21 +410,22 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
             ),
             openapi.Parameter(
                 name='id',
-                type=openapi.TYPE_STRING,
+                type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
                 default=0,
-                description='Project ID'),
+                description='A unique integer value identifying this project.'),
             openapi.Parameter(
                 name='export_pk',
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_PATH,
                 default=0,
-                description='Export primary key'),
+                description='Primary key identifying the export file.'),
         ],
     ),
 )
 class ExportDownloadAPI(generics.RetrieveAPIView):
     queryset = Export.objects.all()
+    project_model = Project
     serializer_class = ExportSerializer
     lookup_url_kwarg = 'export_pk'
     permission_required = all_permissions.projects_change
@@ -396,7 +433,7 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
     def _get_project(self):
         project_pk = self.kwargs.get('pk')
         project = generics.get_object_or_404(
-            Project.objects.for_user(self.request.user),
+            self.project_model.objects.for_user(self.request.user),
             pk=project_pk,
         )
         return project
@@ -416,6 +453,9 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
             file_ = instance.file
         else:
             file_ = instance.convert_file(export_type)
+        
+        if file_ is None:
+            return HttpResponse("Can't get file", status=404)
 
         ext = file_.name.split('.')[-1]
         response = HttpResponse(file_, content_type=f'application/{ext}')

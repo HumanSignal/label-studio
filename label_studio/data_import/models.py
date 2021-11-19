@@ -37,34 +37,40 @@ class FileUpload(models.Model):
 
     @property
     def filepath(self):
-        return self.file.path
+        return self.file.name
 
     @property
     def url(self):
-        if settings.HOSTNAME:
+        if settings.HOSTNAME and settings.DEFAULT_FILE_STORAGE != 'storages.backends.s3boto3.S3Boto3Storage':
             return settings.HOSTNAME + self.file.url
         else:
             return self.file.url
 
     @property
     def format(self):
-        filepath = self.file.path
+        filepath = self.file.name
+        file_format = None
         try:
             file_format = os.path.splitext(filepath)[-1]
         except:
-            file_format = None
+            pass
         finally:
-            logger.debug('Get file format ' + file_format)
+            logger.debug('Get file format ' + str(file_format))
         return file_format
 
     @property
     def content(self):
-        with io.open(self.filepath, encoding='utf-8') as f:
-            return f.read()
+        # cache file body
+        if hasattr(self, '_file_body'):
+            body = getattr(self, '_file_body')
+        else:
+            body = self.file.read().decode('utf-8')
+            setattr(self, '_file_body', body)
+        return body
 
     def read_tasks_list_from_csv(self, sep=','):
-        logger.debug('Read tasks list from CSV file {}'.format(self.filepath))
-        tasks = pd.read_csv(self.filepath, sep=sep).fillna('').to_dict('records')
+        logger.debug('Read tasks list from CSV file {}'.format(self.file.name))
+        tasks = pd.read_csv(self.file.open(), sep=sep).fillna('').to_dict('records')
         tasks = [{'data': task} for task in tasks]
         return tasks
 
@@ -72,14 +78,14 @@ class FileUpload(models.Model):
         return self.read_tasks_list_from_csv('\t')
 
     def read_tasks_list_from_txt(self):
-        logger.debug('Read tasks list from text file {}'.format(self.filepath))
+        logger.debug('Read tasks list from text file {}'.format(self.file.name))
         lines = self.content.splitlines()
         tasks = [{'data': {settings.DATA_UNDEFINED_NAME: line}} for line in lines]
         return tasks
 
     def read_tasks_list_from_json(self):
-        logger.debug('Read tasks list from JSON file {}'.format(self.filepath))
-        fileprefix = os.path.basename(self.filepath)
+        logger.debug('Read tasks list from JSON file {}'.format(self.file.name))
+
         raw_data = self.content
         # Python 3.5 compatibility fix https://docs.python.org/3/whatsnew/3.6.html#json
         try:
@@ -98,14 +104,14 @@ class FileUpload(models.Model):
         return tasks_formatted
 
     def read_task_from_hypertext_body(self):
-        logger.debug('Read 1 task from hypertext file {}'.format(self.filepath))
+        logger.debug('Read 1 task from hypertext file {}'.format(self.file.name))
         data = self.content
         body = htmlmin.minify(data, remove_all_empty_space=True)
         tasks = [{'data': {settings.DATA_UNDEFINED_NAME: body}}]
         return tasks
 
     def read_task_from_uploaded_file(self):
-        logger.debug('Read 1 task from uploaded file {}'.format(self.filepath))
+        logger.debug('Read 1 task from uploaded file {}'.format(self.file.name))
         tasks = [{'data': {settings.DATA_UNDEFINED_NAME: self.url}}]
         return tasks
 
@@ -139,7 +145,7 @@ class FileUpload(models.Model):
                 tasks = self.read_task_from_uploaded_file()
 
         except Exception as exc:
-            raise ValidationError('Failed to parse input file ' + self.filepath + ': ' + str(exc))
+            raise ValidationError('Failed to parse input file ' + self.file.name + ': ' + str(exc))
         return tasks
 
     @classmethod
@@ -166,7 +172,7 @@ class FileUpload(models.Model):
             elif not common_data_fields.intersection(new_data_fields):
                 raise ValidationError(
                     _old_vs_new_data_keys_inconsistency_message(
-                        new_data_fields, common_data_fields, file_upload.filepath))
+                        new_data_fields, common_data_fields, file_upload.file.name))
             else:
                 common_data_fields &= new_data_fields
 

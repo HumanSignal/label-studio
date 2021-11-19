@@ -18,10 +18,10 @@ from rest_framework.exceptions import NotFound, ValidationError as RestValidatio
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import exception_handler
 
-from core.utils.common import conditional_atomic
-from core.utils.disable_signals import DisableSignals
+from core.utils.common import conditional_atomic, temporary_disconnect_all_signals
 from core.label_config import config_essential_data_has_changed
 from projects.models import (
     Project, ProjectSummary, ProjectManager
@@ -82,9 +82,14 @@ _task_data_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     example={
         'id': 1,
-        'my_image_url': 'https://app.heartex.ai/static/samples/kittens.jpg'
+        'my_image_url': '/static/samples/kittens.jpg'
     }
 )
+
+
+class ProjectListPagination(PageNumberPagination):
+    page_size = 30
+    page_size_query_param = 'page_size'
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
@@ -122,6 +127,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
         POST=all_permissions.projects_create,
     )
     ordering = ['-created_at']
+    pagination_class = ProjectListPagination
 
     def get_queryset(self):
         projects = Project.objects.filter(organization=self.request.user.active_organization)
@@ -210,7 +216,7 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
 
     def perform_destroy(self, instance):
         # we don't need to relaculate counters if we delete whole project
-        with DisableSignals():
+        with temporary_disconnect_all_signals():
             instance.delete()
 
     @swagger_auto_schema(auto_schema=None)
@@ -368,9 +374,9 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             next_task.set_lock(request.user)
 
         # call machine learning api and format response
-        if project.show_collab_predictions and not next_task.predictions.exists():
+        if project.show_collab_predictions:
             for ml_backend in project.ml_backends.all():
-                ml_backend.predict_one_task(next_task)
+                ml_backend.predict_tasks([next_task])
 
         # serialize task
         context = {'request': request, 'project': project, 'resolve_uri': True,
@@ -492,7 +498,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 @method_decorator(name='post', decorator=swagger_auto_schema(
         tags=['Projects'],
         operation_summary='Validate label config',
-        operation_description='Validate a labeling configuration for a project.',
+        operation_description='Validate an arbitrary labeling configuration.',
         responses={200: 'Validation success'}
     ))
 class LabelConfigValidateAPI(generics.CreateAPIView):
@@ -524,12 +530,12 @@ class LabelConfigValidateAPI(generics.CreateAPIView):
         """,
         manual_parameters=[
             openapi.Parameter(
-                name='label_config',
-                type=openapi.TYPE_STRING,
-                in_=openapi.IN_QUERY,
-                description='labeling config')
-        ]
-)) # This might be the same endpoint as the previous one for some reason?
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project.'),
+        ],
+))
 class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
     """ Validate label config
     """
@@ -568,17 +574,31 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
 @method_decorator(name='delete', decorator=swagger_auto_schema(
         tags=['Projects'],
         operation_summary='Delete all tasks',
-        operation_description='Delete all tasks from a specific project.'
+        operation_description='Delete all tasks from a specific project.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project.'),
+        ],
 ))
 @method_decorator(name='get', decorator=swagger_auto_schema(
-        **paginator_help('tasks', 'Projects'),
+        tags=['Projects'],
         operation_summary='List project tasks',
         operation_description="""
             Retrieve a paginated list of tasks for a specific project. For example, use the following cURL command:
             ```bash
             curl -X GET {}/api/projects/{{id}}/tasks/ -H 'Authorization: Token abc123'
             ```
-        """.format(settings.HOSTNAME or 'https://localhost:8080')
+        """.format(settings.HOSTNAME or 'https://localhost:8080'),
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project.'),
+        ],
     ))
 class ProjectTaskListAPI(generics.ListCreateAPIView,
                          generics.DestroyAPIView):
@@ -675,5 +695,4 @@ class ProjectModelVersions(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         project = self.get_object()
-        model_versions = Prediction.objects.filter(task__project=project).values_list('model_version', flat=True).distinct()
-        return Response(data=model_versions)
+        return Response(data=project.get_model_versions(with_counters=True))

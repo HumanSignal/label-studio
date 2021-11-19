@@ -1,0 +1,30 @@
+---
+test_name: csrf check
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+  - enable_csrf
+stages:
+- id: login_csrf
+  name: Sign up without csrf
+  request:
+    url: "{django_live_url}/user/signup?enforce_csrf_checks=1"
+    data:
+      email: test_suites_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 403
+
+- id: login_csrf
+  name: Login without csrf
+  request:
+    url: "{django_live_url}/user/login?enforce_csrf_checks=1"
+    data:
+      email: test_suites_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 403
+    

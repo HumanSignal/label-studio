@@ -8,8 +8,6 @@ meta_title: Review annotation quality in Label Studio
 meta_description: Review the annotations produced by annotators in your Label Studio data labeling projects and evaluate annotator performance against ground truth annotations, predictions, and other annotator's annotations to produce high-quality data for your machine learning models.
 ---
 
-> Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
-
 After multiple labelers have annotated tasks, review their output to validate the quality of the results. You can also perform this task after a model has predicted labels for tasks in your dataset. To configure the settings for reviewing annotations, see [Set up review settings for your project](setup_project.html#Set-up-review-settings-for-your-project).
 
 <div class="enterprise"><p>
@@ -82,7 +80,7 @@ Review a table to see the following for each annotator:
 - The number of tasks that they skipped.
 - The outcome of reviews for the annotations they performed.
 - The total annotation progress across all tasks in the project. 
-- The mean time to annotate the tasks.
+- The mean time to annotate the tasks. Select this header to view the `median time` instead. Mean time and median time are calculated using the total time spent on each task by an annotator, including idle time. 
 - The agreement of their annotations with the ground truth annotations, if there are any.
 - The agreement of their annotations with predicted annotations, if there are any. 
 

@@ -1,7 +1,9 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import logging
 import re
+import ujson as json
+import logging
+
 
 from pydantic import BaseModel
 
@@ -133,6 +135,7 @@ def apply_ordering(queryset, ordering, only_undefined_field=False):
         field_name = ordering[0].replace("tasks:", "")
         ascending = False if field_name[0] == '-' else True  # detect direction
         field_name = field_name[1:] if field_name[0] == '-' else field_name  # remove direction
+        field_name = field_name.replace('agreement', '_agreement')
 
         if "data." in field_name:
             field_name = field_name.replace(".", "__", 1)
@@ -178,8 +181,7 @@ def apply_filters(queryset, filters, only_undefined_field=False):
         return queryset
 
     # convert conjunction to orm statement
-    filter_expressions = Q()
-    conjunction = Q.OR if filters.conjunction == ConjunctionEnum.OR else Q.AND
+    filter_expressions = []
 
     for _filter in filters.items:
 
@@ -189,32 +191,49 @@ def apply_filters(queryset, filters, only_undefined_field=False):
 
         # django orm loop expression attached to column name
         field_name = preprocess_field_name(_filter.filter, only_undefined_field)
+        field_name = field_name.replace('agreement', '_agreement')
+
+        # filter preprocessing, value type conversion, etc..
+        preprocess_filter = load_func(settings.DATA_MANAGER_PREPROCESS_FILTER)
+        _filter = preprocess_filter(_filter, field_name)
 
         # custom expressions for enterprise
-        if settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS:
-            custom_filter_expressions = load_func(settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS)
-            if custom_filter_expressions(filter_expressions, field_name, _filter.operator, conjunction, _filter):
-                continue
+        custom_filter_expressions = load_func(settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS)
+        filter_expression = custom_filter_expressions(_filter, field_name)
+        if filter_expression:
+            filter_expressions.append(filter_expression)
+            continue
 
         # annotators
         if field_name == 'annotators' and _filter.operator == Operator.CONTAINS:
-            filter_expressions.add(Q(annotations__completed_by=int(_filter.value)), conjunction)
+            filter_expressions.append(Q(annotations__completed_by=int(_filter.value)))
             continue
         elif field_name == 'annotators' and _filter.operator == Operator.NOT_CONTAINS:
-            filter_expressions.add(~Q(annotations__completed_by=int(_filter.value)), conjunction)
+            filter_expressions.append(~Q(annotations__completed_by=int(_filter.value)))
             continue
         elif field_name == 'annotators' and _filter.operator == Operator.EMPTY:
             value = cast_bool_from_str(_filter.value)
-            filter_expressions.add(Q(annotations__completed_by__isnull=value), conjunction)
+            filter_expressions.append(Q(annotations__completed_by__isnull=value))
             continue
 
-        # annotations results
-        elif field_name == 'annotations_results' and _filter.operator == Operator.CONTAINS:
-            filter_expressions.add(Q(annotations__result__icontains=_filter.value), conjunction)
-            continue
-        elif field_name == 'annotations_results' and _filter.operator == Operator.NOT_CONTAINS:
-            filter_expressions.add(~Q(annotations__result__icontains=_filter.value), conjunction)
-            continue
+        # annotations results & predictions results
+        if field_name in ['annotations_results', 'predictions_results']:
+            name = 'annotations__result' if field_name == 'annotations_results' else 'predictions__result'
+            if _filter.operator in [Operator.EQUAL, Operator.NOT_EQUAL]:
+                try:
+                    value = json.loads(_filter.value)
+                except:
+                    return queryset.none()
+
+                q = Q(**{name: value})
+                filter_expressions.append(q if _filter.operator == Operator.EQUAL else ~q)
+                continue
+            elif _filter.operator == Operator.CONTAINS:
+                filter_expressions.append(Q(**{name + '__icontains': _filter.value}))
+                continue
+            elif _filter.operator == Operator.NOT_CONTAINS:
+                filter_expressions.append(~Q(**{name + '__icontains': _filter.value}))
+                continue
 
         # annotation ids
         if field_name == 'annotations_ids':
@@ -228,6 +247,36 @@ def apply_filters(queryset, filters, only_undefined_field=False):
             elif 'equal' in _filter.operator:
                 if not _filter.value.isdigit():
                     _filter.value = 0
+
+        # annotators
+        if field_name == 'annotators' and _filter.operator == Operator.CONTAINS:
+            filter_expressions.append(Q(annotations__completed_by=int(_filter.value)))
+            continue
+        elif field_name == 'annotators' and _filter.operator == Operator.NOT_CONTAINS:
+            filter_expressions.append(~Q(annotations__completed_by=int(_filter.value)))
+            continue
+        elif field_name == 'annotators' and _filter.operator == Operator.EMPTY:
+            value = cast_bool_from_str(_filter.value)
+            filter_expressions.append(Q(annotations__completed_by__isnull=value))
+            continue
+
+        # predictions model versions
+        if field_name == 'predictions_model_versions' and _filter.operator == Operator.CONTAINS:
+            q = Q()
+            for value in _filter.value:
+                q |= Q(predictions__model_version__contains=value)
+            filter_expressions.append(q)
+            continue
+        elif field_name == 'predictions_model_versions' and _filter.operator == Operator.NOT_CONTAINS:
+            q = Q()
+            for value in _filter.value:
+                q &= ~Q(predictions__model_version__contains=value)
+            filter_expressions.append(q)
+            continue
+        elif field_name == 'predictions_model_versions' and _filter.operator == Operator.EMPTY:
+            value = cast_bool_from_str(_filter.value)
+            filter_expressions.append(Q(predictions__model_version__isnull=value))
+            continue
 
         # use other name because of model names conflict
         if field_name == 'file_upload':
@@ -256,7 +305,7 @@ def apply_filters(queryset, filters, only_undefined_field=False):
             value_type = type(queryset.values_list(field_name, flat=True)[0]).__name__
 
         if (value_type == 'list' or value_type == 'tuple') and 'equal' in _filter.operator:
-            _filter.value = '{' + str(_filter.value) + '}'
+            raise Exception('Not supported filter type')
 
         # special case: for strings empty is "" or null=True
         if _filter.type in ('String', 'Unknown') and _filter.operator == 'empty':
@@ -279,7 +328,7 @@ def apply_filters(queryset, filters, only_undefined_field=False):
                 if value_type == 'list':
                     q = ~Q(**{field_name: [None]})
 
-            filter_expressions.add(q, conjunction)
+            filter_expressions.append(q)
             continue
 
         # regex pattern check
@@ -296,62 +345,69 @@ def apply_filters(queryset, filters, only_undefined_field=False):
         # in
         if _filter.operator == "in":
             cast_value(_filter)
-            filter_expressions.add(
+            filter_expressions.append(
                 Q(
                     **{
                         f"{field_name}__gte": _filter.value.min,
                         f"{field_name}__lte": _filter.value.max,
                     }
                 ),
-                conjunction,
+
             )
 
         # not in
         elif _filter.operator == "not_in":
             cast_value(_filter)
-            filter_expressions.add(
+            filter_expressions.append(
                 ~Q(
                     **{
                         f"{field_name}__gte": _filter.value.min,
                         f"{field_name}__lte": _filter.value.max,
                     }
                 ),
-                conjunction,
+
             )
 
         # in list
         elif _filter.operator == "in_list":
-            filter_expressions.add(
+            filter_expressions.append(
                 Q(**{f"{field_name}__in": _filter.value}),
-                conjunction,
+
             )
 
         # not in list
         elif _filter.operator == "not_in_list":
-            filter_expressions.add(
+            filter_expressions.append(
                 ~Q(**{f"{field_name}__in": _filter.value}),
-                conjunction,
+
             )
 
         # empty
         elif _filter.operator == 'empty':
             if cast_bool_from_str(_filter.value):
-                filter_expressions.add(Q(**{field_name: True}), conjunction)
+                filter_expressions.append(Q(**{field_name: True}))
             else:
-                filter_expressions.add(~Q(**{field_name: True}), conjunction)
+                filter_expressions.append(~Q(**{field_name: True}))
 
         # starting from not_
         elif _filter.operator.startswith("not_"):
             cast_value(_filter)
-            filter_expressions.add(~Q(**{field_name: _filter.value}), conjunction)
+            filter_expressions.append(~Q(**{field_name: _filter.value}))
 
         # all others
         else:
             cast_value(_filter)
-            filter_expressions.add(Q(**{field_name: _filter.value}), conjunction)
+            filter_expressions.append(Q(**{field_name: _filter.value}))
     
     logger.debug(f'Apply filter: {filter_expressions}')
-    queryset = queryset.filter(filter_expressions)
+    if filters.conjunction == ConjunctionEnum.OR:
+        result_filter = Q()
+        for filter_expression in filter_expressions:
+            result_filter.add(filter_expression, Q.OR)
+        queryset = queryset.filter(result_filter)
+    else:
+        for filter_expression in filter_expressions:
+            queryset = queryset.filter(filter_expression)
     return queryset
 
 
@@ -368,10 +424,6 @@ class TaskQuerySet(models.QuerySet):
 
         if prepare_params is None:
             return queryset
-
-        # project filter
-        if prepare_params.project is not None:
-            queryset = queryset.filter(project=prepare_params.project)
 
         project = Project.objects.get(pk=prepare_params.project)
 
@@ -435,7 +487,18 @@ def annotate_annotators(queryset):
 
 
 def annotate_predictions_score(queryset):
-    return queryset.annotate(predictions_score=Avg("predictions__score"))
+    first_task = queryset.first()
+    if not first_task:
+        return queryset
+
+    model_version = first_task.project.model_version
+    if model_version is None:
+        return queryset.annotate(predictions_score=Avg("predictions__score"))
+
+    else:
+        return queryset.annotate(predictions_score=Avg(
+            "predictions__score", filter=Q(predictions__model_version=model_version)
+        ))
 
 
 def annotate_annotations_ids(queryset):
@@ -443,6 +506,14 @@ def annotate_annotations_ids(queryset):
         return queryset.annotate(annotations_ids=GroupConcat('annotations__id', output_field=models.CharField()))
     else:
         return queryset.annotate(annotations_ids=ArrayAgg('annotations__id'))
+
+
+def annotate_predictions_model_versions(queryset):
+    if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
+        return queryset.annotate(predictions_model_versions=GroupConcat('predictions__model_version',
+                                                                        output_field=models.CharField()))
+    else:
+        return queryset.annotate(predictions_model_versions=ArrayAgg('predictions__model_version'))
 
 
 def file_upload(queryset):
@@ -457,6 +528,7 @@ settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     "completed_at": annotate_completed_at,
     "annotations_results": annotate_annotations_results,
     "predictions_results": annotate_predictions_results,
+    "predictions_model_versions": annotate_predictions_model_versions,
     "predictions_score": annotate_predictions_score,
     "annotators": annotate_annotators,
     "annotations_ids": annotate_annotations_ids,
@@ -508,13 +580,15 @@ class PreparedTaskManager(models.Manager):
     def get_queryset(self, fields_for_evaluation=None, prepare_params=None, all_fields=False):
         """
         :param fields_for_evaluation: list of annotated fields in task
+        :param prepare_params: filters, ordering, selected items
+        :param all_fields: evaluate all fields for task
         :return: task queryset with annotated fields
         """
         queryset = self.only_filtered(prepare_params=prepare_params)
         return self.annotate_queryset(queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields)
 
     def only_filtered(self, prepare_params=None):
-        queryset = TaskQuerySet(self.model)
+        queryset = TaskQuerySet(self.model).filter(project=prepare_params.project)
 
         fields_for_filter_ordering = get_fields_for_filter_ordering(prepare_params)
         queryset = self.annotate_queryset(queryset, fields_for_evaluation=fields_for_filter_ordering)

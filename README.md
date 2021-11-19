@@ -33,7 +33,7 @@ Install Label Studio locally, or deploy it in a cloud instance. Also you can try
 - [Deploy in a cloud instance](#deploy-in-a-cloud-instance)
 
 ### Install locally with Docker
-Official Label Studio docker imageis is (here)[https://hub.docker.com/r/heartexlabs/label-studio] and it can be downloaded with `docker pull`. 
+Official Label Studio docker image is [here](https://hub.docker.com/r/heartexlabs/label-studio) and it can be downloaded with `docker pull`. 
 Run Label Studio in a Docker container and access it at `http://localhost:8080`.
 
 
@@ -103,7 +103,6 @@ python label_studio/manage.py runserver
 You can deploy Label Studio with one click in Heroku, Microsoft Azure, or Google Cloud Platform: 
 
 [<img src="https://www.herokucdn.com/deploy/button.svg" height="30px">](https://heroku.com/deploy?template=https://github.com/heartexlabs/label-studio/tree/master)
-[<img src="https://aka.ms/deploytoazurebutton" height="30px">](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fheartexlabs%2Flabel-studio%2Fmaster%2Fazuredeploy.json)
 [<img src="https://deploy.cloud.run/button.svg" height="30px">](https://deploy.cloud.run)
 
 

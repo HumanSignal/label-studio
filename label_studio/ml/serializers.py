@@ -10,7 +10,7 @@ class MLBackendSerializer(serializers.ModelSerializer):
         url = attrs['url']
         if MLBackend.healthcheck_(url).is_error:
             raise serializers.ValidationError(
-                "Can't connect to ML backend {url}, health check failed. "
+                f"Can't connect to ML backend {url}, health check failed. "
                 f'Make sure it is up and your firewall is properly configured. '
                 f'<a href="https://labelstud.io/guide/ml.html>Learn more</a>'
                 f' about how to set up an ML backend.'

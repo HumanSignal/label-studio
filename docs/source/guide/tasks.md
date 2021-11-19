@@ -1,6 +1,6 @@
 ---
 title: Get data into Label Studio
-short: Get data
+short: Import data
 type: guide
 order: 300
 meta_title: Import Data into Label Studio
@@ -267,7 +267,7 @@ To import data from the Label Studio UI, do the following:
 
 Data that you import is project-specific. 
 
-### Import data using the API
+## Import data using the API
 
 Import your data using the Label Studio API. See the [API documentation for importing tasks](/api#operation/projects_import_create).
 

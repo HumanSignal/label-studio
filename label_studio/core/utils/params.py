@@ -77,6 +77,28 @@ def float_from_request(params, key, default):
         raise ValueError(f'Incorrect value type in key "{key}" = "{value}". It should be digit string or float.')
 
 
+def list_of_strings_from_request(params, key, default):
+    """ Get list of strings from request GET, POST, etc
+
+    :param params: dict POST, GET, etc
+    :param key: key to find
+    :param default: default value
+    :return: float
+    """
+    value = params.get(key, default)
+    if value is None:
+        return
+    splitters = (',', ';', '|')
+    # str
+    if isinstance(value, str):
+        for splitter in splitters:
+            if splitter in value:
+                return value.split(splitter)
+        return [value]
+    else:
+        raise ValueError(f'Incorrect value type in key "{key}" = "{value}". It should be digit string or float.')
+
+
 def get_env(name, default=None, is_bool=False):
     for env_key in ['LABEL_STUDIO_' + name, 'HEARTEX_' + name, name]:
         value = os.environ.get(env_key)
@@ -90,3 +112,15 @@ def get_env(name, default=None, is_bool=False):
 
 def get_bool_env(key, default):
     return get_env(key, default, is_bool=True)
+
+
+def get_env_list_int(key, default=None):
+    """
+    "1,2,3" in env variable => [1, 2, 3] in python
+    """
+    value = get_env(key)
+    if not value:
+        if default is None:
+            return []
+        return default
+    return [int(el) for el in value.split(',')]

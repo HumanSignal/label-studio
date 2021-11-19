@@ -6,15 +6,16 @@ export const useDraftProject = () => {
   const [project, setProject] = React.useState();
 
   const fetchDraftProject = React.useCallback(async () => {
-    const projects = await api.callApi('projects');
+    const response = await api.callApi('projects');
 
     // always create the new one
-    const lastIndex = (projects ?? []).length;
+    const projects = response?.results ?? [];
+    const lastIndex = projects.length;
     let projectNumber = lastIndex + 1;
     let projectName = `New Project #${projectNumber}`;
 
     // dirty hack to get proper non-duplicate name
-    while(projects.find(({title}) => title === projectName)) {
+    while(projects.find(({ title }) => title === projectName)) {
       projectNumber++;
       projectName = `New Project #${projectNumber}`;
     }
