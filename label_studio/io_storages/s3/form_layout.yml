@@ -98,3 +98,13 @@ ExportStorage:
             name: can_delete_objects
             label: Can delete objects from storage
             description: If unchecked, annotations will not be deleted from storage
+  - columnCount: 1
+    columns:
+      - width: 345
+        fields:
+          - type: select
+            name: export_type
+            label: Export type
+            options:
+              - task
+              - annotation

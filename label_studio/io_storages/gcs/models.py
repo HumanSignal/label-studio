@@ -202,7 +202,7 @@ class GCSExportStorage(GCSStorageMixin, ExportStorage):
         ser_annotation = self._get_serialized_data(annotation)
 
         # get key that identifies this object in storage
-        key = GCSExportStorageLink.get_key(annotation)
+        key = GCSExportStorageLink.get_key(annotation, self)
         key = str(self.prefix) + '/' + key if self.prefix else key
 
         # put object into storage

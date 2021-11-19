@@ -392,3 +392,8 @@ def configured_project(business_client, annotator_client):
 @pytest.fixture(name="django_live_url")
 def get_server_url(live_server):
     yield live_server.url
+
+
+@pytest.fixture(name="export_test_dir")
+def export_test_dir():
+    os.makedirs('/tmp/export_test', exist_ok=True)

@@ -1152,3 +1152,65 @@ stages:
     json:
       last_sync_count: 0
     status_code: 200
+---
+test_name: test_export_type
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+  - export_test_dir
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+- id: create_task
+  type: ref
+- id: create_annotation
+  type: ref
+- name: create_export_storage
+  request:
+    json:
+      export_type: annotation
+      path: "/tmp/export_test"
+      project: "{project_pk}"
+      title: test export type
+    method: POST
+    url: '{django_live_url}/api/storages/export/localfiles'
+  response:
+    save:
+      json:
+        storage_pk: id
+    status_code: 201
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/export/localfiles/{storage_pk}/sync'
+  response:
+    json:
+      last_sync_count: 1
+    status_code: 200
+    verify_response_with:
+      function: tests.functions:check_export_storage_type_annotation
+      extra_kwargs:
+        annotation_pk: !int "{annotation_pk}"
+- name: change_export_storage_export_type
+  request:
+    json:
+      export_type: task
+    method: PATCH
+    url: '{django_live_url}/api/storages/export/localfiles/{storage_pk}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/export/localfiles/{storage_pk}/sync'
+  response:
+    json:
+      last_sync_count: 1
+    status_code: 200
+    verify_response_with:
+      function: tests.functions:check_export_storage_type_task
+      extra_kwargs:
+        task_pk: !int "{task_pk}"

@@ -145,7 +145,7 @@ class AzureBlobExportStorage(ExportStorage, AzureBlobStorageMixin):
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
         # get key that identifies this object in storage
-        key = AzureBlobExportStorageLink.get_key(annotation)
+        key = AzureBlobExportStorageLink.get_key(annotation, self)
         key = str(self.prefix) + '/' + key if self.prefix else key
 
         # put object into storage

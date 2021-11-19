@@ -108,7 +108,7 @@ class RedisExportStorage(ExportStorage, RedisStorageMixin):
         ser_annotation = self._get_serialized_data(annotation)
 
         # get key that identifies this object in storage
-        key = RedisExportStorageLink.get_key(annotation)
+        key = RedisExportStorageLink.get_key(annotation, self)
 
         # put object into storage
         client.set(key, json.dumps(ser_annotation))

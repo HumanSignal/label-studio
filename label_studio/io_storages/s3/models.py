@@ -186,7 +186,7 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
         ser_annotation = self._get_serialized_data(annotation)
 
         # get key that identifies this object in storage
-        key = S3ExportStorageLink.get_key(annotation)
+        key = S3ExportStorageLink.get_key(annotation, self)
         key = str(self.prefix) + '/' + key if self.prefix else key
 
         # put object into storage
@@ -200,7 +200,7 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
         logger.debug(f'Deleting object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
 
         # get key that identifies this object in storage
-        key = S3ExportStorageLink.get_key(annotation)
+        key = S3ExportStorageLink.get_key(annotation, self)
         key = str(self.prefix) + '/' + key if self.prefix else key
 
         # delete object from storage

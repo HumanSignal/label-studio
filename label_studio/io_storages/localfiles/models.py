@@ -92,7 +92,7 @@ class LocalFilesExportStorage(ExportStorage, LocalFilesMixin):
         ser_annotation = self._get_serialized_data(annotation)
 
         # get key that identifies this object in storage
-        key = LocalFilesExportStorageLink.get_key(annotation)
+        key = LocalFilesExportStorageLink.get_key(annotation, self)
         key = os.path.join(self.path, f"{key}.json")
 
         # put object into storage

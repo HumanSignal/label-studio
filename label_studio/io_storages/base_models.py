@@ -69,7 +69,7 @@ class ImportStorage(Storage):
     def _scan_and_create_links(self, link_class):
         tasks_created = 0
         maximum_annotations = self.project.maximum_annotations
-        
+
         for key in self.iterkeys():
             logger.debug(f'Scanning key {key}')
 
@@ -162,10 +162,23 @@ def sync_background(storage_class, storage_id):
 
 
 class ExportStorage(Storage):
-    can_delete_objects = models.BooleanField(_('can_delete_objects'), null=True, blank=True, help_text='Deletion from storage enabled')
+    class ExportType(models.TextChoices):
+        TASK = 'task', _('Task')
+        ANNOTATION = 'annotation', _('Annotation')
+
+    can_delete_objects = models.BooleanField(
+        _('can_delete_objects'), null=True, blank=True, help_text='Deletion from storage enabled'
+    )
+    export_type = models.CharField(
+        _('export type'),
+        choices=ExportType.choices,
+        max_length=128,
+        default=ExportType.TASK,
+        help_text=_('Export task or annotation'),
+    )
 
     def _get_serialized_data(self, annotation):
-        if get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False):
+        if self.export_type == self.ExportType.TASK or get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False):
             # export task with annotations
             return ExportDataSerializer(annotation.task).data
         else:
@@ -243,14 +256,10 @@ class ExportStorageLink(models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
 
     @staticmethod
-    def get_key(annotation):
-        if get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False):
+    def get_key(annotation, storage):
+        if storage.export_type == storage.ExportType.TASK or get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False):
             return str(annotation.task.id)
         return str(annotation.id)
-
-    @property
-    def key(self):
-        return self.get_key(self.annotation)
 
     @classmethod
     def exists(cls, annotation, storage):
