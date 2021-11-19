@@ -1,6 +1,6 @@
 {
-  "message": "[fix] Linter issues",
-  "commit": "d0261d7362eaee235f6ab1f2d7f64ac17e7226c6",
-  "branch": "master",
-  "date": "2021-10-26T12:28:02Z"
+  "message": "[fix] Fix required condition on same type tags (DEV-1180)",
+  "commit": "d4b4c9b0a69065362860df1dbb86d448d75d1a0f",
+  "branch": "fix/DEV-1180/required-checks",
+  "date": "2021-11-19T12:48:33Z"
 }
