@@ -67,11 +67,12 @@ logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 DJANGO_DB_MYSQL = 'mysql'
 DJANGO_DB_SQLITE = 'sqlite'
+DJANGO_DB_POSTGRESQL = 'postgresql'
 DJANGO_DB = 'default'
 DATABASE_NAME_DEFAULT = os.path.join(BASE_DATA_DIR, 'label_studio.sqlite3')
 DATABASE_NAME = get_env('DATABASE_NAME', DATABASE_NAME_DEFAULT)
 DATABASES_ALL = {
-    'default': {
+    DJANGO_DB_POSTGRESQL: {
         'ENGINE': 'django.db.backends.postgresql',
         'USER': get_env('POSTGRE_USER', 'postgres'),
         'PASSWORD': get_env('POSTGRE_PASSWORD', 'postgres'),
@@ -95,6 +96,7 @@ DATABASES_ALL = {
         },
     },
 }
+DATABASES_ALL['default'] = DATABASES_ALL[DJANGO_DB_POSTGRESQL]
 DATABASES = {'default': DATABASES_ALL.get(get_env('DJANGO_DB', 'default'))}
 
 LOGGING = {
@@ -448,3 +450,7 @@ import mimetypes
 
 mimetypes.add_type("application/javascript", ".js", True)
 mimetypes.add_type("image/png", ".png", True)
+
+
+# fields name was used in DM api before
+REST_FLEX_FIELDS = {"FIELDS_PARAM": "include"}
