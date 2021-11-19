@@ -82,7 +82,7 @@ _task_data_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     example={
         'id': 1,
-        'my_image_url': 'https://app.heartex.ai/static/samples/kittens.jpg'
+        'my_image_url': '/static/samples/kittens.jpg'
     }
 )
 

@@ -180,7 +180,7 @@ class MLBackend(models.Model):
             return
 
         # ML Backend doesn't support batch of tasks, do it one by one
-        elif len(responses) == 1:
+        elif len(responses) == 1 and len(tasks) != 1:
             logger.warning(
                 f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
                 f"switched to one-by-one task retrieval"
