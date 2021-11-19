@@ -20,9 +20,10 @@ from core.permissions import all_permissions, ViewClassPermission
 from projects.models import Project
 from projects.serializers import ProjectSerializer
 from tasks.models import Task, Annotation, Prediction
+from tasks.serializers import TaskIDOnlySerializer
 
 from data_manager.functions import get_prepared_queryset, evaluate_predictions, get_prepare_params
-from data_manager.models import View
+from data_manager.models import View, PrepareParams
 from data_manager.managers import get_fields_for_evaluation
 from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer, ViewResetSerializer
 from data_manager.actions import get_all_actions, perform_action
@@ -149,21 +150,25 @@ class TaskPagination(PageNumberPagination):
 
 @swagger_auto_schema(
     tags=['Data Manager'],
-    operation_summary='Get task list for view',
+    operation_summary='Get tasks list',
     operation_description="""
-    Retrieve a list of tasks with pagination for a specific view using filters and ordering.
+    Retrieve a list of tasks with pagination for a specific view or project, by using filters and ordering.
     """,
-    responses={200: DataManagerTaskSerializer(many=True)},
+    # responses={200: DataManagerTaskSerializer(many=True)},
     manual_parameters=[
         openapi.Parameter(
-            name='id',
+            name='view',
             type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_PATH,
+            in_=openapi.IN_QUERY,
             description='View ID'),
+        openapi.Parameter(
+            name='project',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_QUERY,
+            description='Project ID'),
     ],
 )
 class TaskListAPI(generics.ListAPIView):
-    swagger_schema = None
     task_serializer_class = DataManagerTaskSerializer
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
@@ -195,7 +200,6 @@ class TaskListAPI(generics.ListAPIView):
     def get_task_queryset(self, request, prepare_params):
         return Task.prepared.only_filtered(prepare_params=prepare_params)
 
-    @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
     def get(self, request):
         """
         get:
@@ -289,13 +293,19 @@ class TaskAPI(generics.RetrieveAPIView):
         }
 
     def get_queryset(self):
-        return Task.prepared.get_queryset(all_fields=True).filter(project__organization=self.request.user.active_organization)
+        return Task.objects.filter(
+            project__organization=self.request.user.active_organization
+        )
 
     def get(self, request, pk):
-
         task = self.get_object()
         context = self.get_serializer_context(request)
         context['project'] = project = task.project
+
+        # we need to annotate task because before it was retrieved only for permission checks and project retrieving
+        task = Task.prepared.get_queryset(
+            all_fields=True, prepare_params=PrepareParams(project=project.id)
+        ).filter(id=task.id).first()
 
         # get prediction
         if (project.evaluate_predictions_automatically or project.show_collab_predictions) \

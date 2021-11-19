@@ -235,6 +235,9 @@ class MLBackendTrainAPI(APIView):
     ),
 )
 class MLBackendInteractiveAnnotating(APIView):
+
+    permission_required = all_permissions.tasks_view
+
     def post(self, request, *args, **kwargs):
         ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)

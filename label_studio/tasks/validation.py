@@ -147,10 +147,6 @@ class TaskValidator:
                 if not ok:
                     raise ValidationError('Prediction must have "result" fields')
 
-                # check result is list
-                if not isinstance(prediction.get('result', []), list):
-                    raise ValidationError('"result" field in prediction must be list')
-
             # task[meta]
             self.raise_if_wrong_class(task, 'meta', (dict, list))
 
