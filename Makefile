@@ -28,4 +28,4 @@ frontend-build:
 
 # Run tests
 test:
-	cd label_studio && pytest -v -m "not integration_tests"
+	cd label_studio && DJANGO_DB=sqlite pytest -v -m "not integration_tests"

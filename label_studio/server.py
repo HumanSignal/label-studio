@@ -26,6 +26,7 @@ from django.db import connections, DEFAULT_DB_ALIAS
 from label_studio.core.argparser import parse_input_args
 from label_studio.core.utils.params import get_env
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -64,7 +65,7 @@ def _get_config(config_path):
     return config
 
 
-def _create_project(title, user, label_config=None, sampling=None, description=None):
+def _create_project(title, user, label_config=None, sampling=None, description=None, ml_backends=None):
     from projects.models import Project
     from organizations.models import Organization
 
@@ -86,6 +87,14 @@ def _create_project(title, user, label_config=None, sampling=None, description=N
 
     if description is not None:
         project.description = description
+
+    if ml_backends is not None:
+        from ml.models import MLBackend
+
+        # e.g.: localhost:8080,localhost:8081;localhost:8082
+        for url in ml_backends:
+            logger.info('Adding new ML backend %s', url)
+            MLBackend.objects.create(project=project, url=url)
 
     project.save()
     return project
@@ -132,7 +141,7 @@ def _create_user(input_args, config):
         if not username:
             username = DEFAULT_USERNAME
     if not password:
-        password = getpass.getpass(f'Default user password {DEFAULT_USERNAME}: ')
+        password = getpass.getpass(f'User password for {username}: ')
 
     try:
         user = User.objects.create_user(email=username, password=password)
@@ -173,7 +182,8 @@ def _init(input_args, config):
             user=user,
             label_config=input_args.label_config,
             description=input_args.project_desc,
-            sampling=sampling_map.get(input_args.sampling, 'sequential')
+            sampling=sampling_map.get(input_args.sampling, 'sequential'),
+            ml_backends=input_args.ml_backends
         )
     else:
         print('Project "{0}" already exists'.format(input_args.project_name))

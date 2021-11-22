@@ -106,7 +106,7 @@ class UserAPI(viewsets.ModelViewSet):
         return User.objects.filter(organizations=self.request.user.active_organization)
 
     @swagger_auto_schema(auto_schema=None, methods=['delete', 'post'])
-    @action(detail=True, methods=['delete', 'post'])
+    @action(detail=True, methods=['delete', 'post'], permission_required=all_permissions.organizations_view)
     def avatar(self, request, pk):
         if request.method == 'POST':
             avatar = check_avatar(request.FILES)
