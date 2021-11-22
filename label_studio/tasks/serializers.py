@@ -2,6 +2,7 @@
 """
 import logging
 import ujson as json
+import numbers
 
 from django.db import transaction
 from drf_dynamic_fields import DynamicFieldsMixin
@@ -12,11 +13,12 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField
 from rest_framework.settings import api_settings
+from rest_flex_fields import FlexFieldsModelSerializer
 
 from projects.models import Project
 from tasks.models import Task, Annotation, AnnotationDraft, Prediction
 from tasks.validation import TaskValidator
-from core.utils.common import get_object_with_check_and_log, retry_database_locked, load_func
+from core.utils.common import get_object_with_check_and_log, retry_database_locked
 from core.label_config import replace_task_data_undefined_with_config_field
 from users.serializers import UserSerializer
 from core.utils.common import load_func
@@ -124,7 +126,7 @@ class TaskSimpleSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class BaseTaskSerializer(ModelSerializer):
+class BaseTaskSerializer(FlexFieldsModelSerializer):
     """ Task Serializer with project scheme configs validation
     """
     def __init__(self, *args, **kwargs):
@@ -176,6 +178,10 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
     """
     annotations = AnnotationSerializer(many=True, default=[], read_only=True)
     predictions = PredictionSerializer(many=True, default=[], read_only=True)
+
+    @property
+    def project(self):
+        return self.context.get('project')
 
     @staticmethod
     def format_error(i, detail, item):
@@ -264,10 +270,9 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         db_tasks, db_annotations, db_predictions, validated_tasks = [], [], [], validated_data
         logging.info(f'Try to serialize tasks with annotations, data len = {len(validated_data)}')
         user = self.context.get('user', None)
-        project = self.context.get('project')
 
         organization = user.active_organization \
-            if not project.created_by.active_organization else project.created_by.active_organization
+            if not self.project.created_by.active_organization else self.project.created_by.active_organization
         members_email_to_id = dict(organization.members.values_list('user__email', 'user__id'))
         members_ids = set(members_email_to_id.values())
         logger.debug(f"{len(members_email_to_id)} members found in organization {organization}")
@@ -281,15 +286,15 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 annotations = task.pop('annotations', [])
                 # insert a valid "completed_by_id" by existing member
                 self._insert_valid_completed_by_id_or_raise(
-                    annotations, members_email_to_id, members_ids, user or project.created_by)
+                    annotations, members_email_to_id, members_ids, user or self.project.created_by)
                 predictions = task.pop('predictions', [])
                 task_annotations.append(annotations)
                 task_predictions.append(predictions)
 
             # add tasks first
             for task in validated_tasks:
-                t = Task(project=project, data=task['data'], meta=task.get('meta', {}),
-                         overlap=project.maximum_annotations,
+                t = Task(project=self.project, data=task['data'], meta=task.get('meta', {}),
+                         overlap=self.project.maximum_annotations,
                          file_upload_id=task.get('file_upload_id'))
                 db_tasks.append(t)
 
@@ -330,6 +335,8 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             last_model_version = None
             for i, predictions in enumerate(task_predictions):
                 for prediction in predictions:
+                    # we need to call result normalizer here since "bulk_create" doesn't call save() method
+                    result = Prediction.prepare_prediction_result(prediction['result'], self.project)
                     prediction_score = prediction.get('score')
                     if prediction_score is not None:
                         try:
@@ -342,7 +349,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
                     last_model_version = prediction.get('model_version', 'undefined')
                     db_predictions.append(Prediction(task=self.db_tasks[i],
-                                                     result=prediction['result'],
+                                                     result=result,
                                                      score=prediction_score,
                                                      model_version=last_model_version))
 
@@ -368,9 +375,9 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             logging.info(f'Predictions serialization success, len = {len(self.db_predictions)}')
 
             # renew project model version if it's empty
-            if not project.model_version and last_model_version is not None:
-                project.model_version = last_model_version
-                project.save()
+            if not self.project.model_version and last_model_version is not None:
+                self.project.model_version = last_model_version
+                self.project.save()
 
         self.post_process_annotations(self.db_annotations)
         return db_tasks
@@ -526,6 +533,12 @@ class TaskIDWithAnnotationsAndPredictionsSerializer(ModelSerializer):
         fields = ['id', 'annotations', 'predictions']
 
 
+class TaskIDOnlySerializer(ModelSerializer):
+
+    class Meta:
+        model = Task
+        fields = ['id']
+
+
 # LSE inherits this serializer
 TaskSerializerBulk = load_func(settings.TASK_SERIALIZER_BULK)
-

@@ -649,7 +649,7 @@ class Project(ProjectMixin, models.Model):
         return settings.TASKS_MAX_FILE_SIZE
 
     def get_control_tags_from_config(self):
-        return parse_config(self.label_config)
+        return self.get_parsed_config()
 
     def get_parsed_config(self):
         return parse_config(self.label_config)
@@ -664,12 +664,17 @@ class Project(ProjectMixin, models.Model):
                 result[field] = value
         return result
 
-    def get_model_versions(self):
+    def get_model_versions(self, with_counters=False):
         predictions = Prediction.objects.filter(task__project=self)
-        model_versions = set(predictions.values_list('model_version', flat=True).distinct())
-        if self.model_version is not None and self.model_version not in model_versions:
-            model_versions.add(self.model_version)
-        return list(reversed(sorted(model_versions)))
+        # model_versions = set(predictions.values_list('model_version', flat=True).distinct())
+        model_versions = predictions.values('model_version').annotate(count=Count('model_version'))
+        output = {r['model_version']: r['count'] for r in model_versions}
+        if self.model_version is not None and self.model_version not in output:
+            output[self.model_version] = 0
+        if with_counters:
+            return output
+        else:
+            return list(output)
 
     def __str__(self):
         return f'{self.title} (id={self.id})' or _("Business number %d") % self.pk

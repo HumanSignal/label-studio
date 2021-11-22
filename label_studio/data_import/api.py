@@ -1,6 +1,5 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import os
 import time
 import logging
 import drf_yasg.openapi as openapi
@@ -18,11 +17,13 @@ from rest_framework.permissions import IsAuthenticated
 from ranged_fileresponse import RangedFileResponse
 
 from core.permissions import all_permissions, ViewClassPermission
-from core.utils.common import bool_from_request, retry_database_locked
+from core.utils.common import retry_database_locked
+from core.utils.params import list_of_strings_from_request, bool_from_request
+from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from projects.models import Project
-from tasks.models import Task
+from tasks.models import Task, Prediction
 from .uploader import load_tasks
-from .serializers import ImportApiSerializer, FileUploadSerializer
+from .serializers import ImportApiSerializer, FileUploadSerializer, PredictionSerializer
 from .models import FileUpload
 
 from webhooks.utils import emit_webhooks_for_instance
@@ -175,15 +176,33 @@ class ImportAPI(generics.CreateAPIView):
         emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, task_instances)
         return task_instances, serializer
 
+    def _reformat_predictions(self, tasks, preannotated_from_fields):
+        new_tasks = []
+        for task in tasks:
+            if 'data' in task:
+                task = task['data']
+            predictions = [{'result': task.pop(field)} for field in preannotated_from_fields]
+            new_tasks.append({
+                'data': task,
+                'predictions': predictions
+            })
+        return new_tasks
+
     def create(self, request, *args, **kwargs):
         start = time.time()
         commit_to_project = bool_from_request(request.query_params, 'commit_to_project', True)
+        return_task_ids = bool_from_request(request.query_params, 'return_task_ids', False)
+        preannotated_from_fields = list_of_strings_from_request(request.query_params, 'preannotated_from_fields', None)
 
         # check project permissions
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
 
         # upload files from request, and parse all tasks
         parsed_data, file_upload_ids, could_be_tasks_lists, found_formats, data_columns = load_tasks(request, project)
+
+        if preannotated_from_fields:
+            # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]  # noqa
+            parsed_data = self._reformat_predictions(parsed_data, preannotated_from_fields)
 
         if commit_to_project:
             # Immediately create project tasks and update project states and counters
@@ -212,7 +231,7 @@ class ImportAPI(generics.CreateAPIView):
 
         duration = time.time() - start
 
-        return Response({
+        response = {
             'task_count': task_count,
             'annotation_count': annotation_count,
             'prediction_count': prediction_count,
@@ -221,7 +240,41 @@ class ImportAPI(generics.CreateAPIView):
             'could_be_tasks_list': could_be_tasks_lists,
             'found_formats': found_formats,
             'data_columns': data_columns
-        }, status=status.HTTP_201_CREATED)
+        }
+        if return_task_ids:
+            response['task_ids'] = [task.id for task in tasks]
+
+        return Response(response, status=status.HTTP_201_CREATED)
+
+
+# Import
+class ImportPredictionsAPI(generics.CreateAPIView):
+    permission_required = all_permissions.projects_change
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    serializer_class = PredictionSerializer
+    queryset = Project.objects.all()
+    swagger_schema = None  # TODO: create API schema
+
+    def create(self, request, *args, **kwargs):
+        # check project permissions
+        project = self.get_object()
+        tasks_ids = set(Task.objects.filter(project=project).values_list('id', flat=True))
+        logger.debug(f'Importing {len(self.request.data)} predictions to project {project} with {len(tasks_ids)} tasks')
+        predictions = []
+        for item in self.request.data:
+            if item.get('task') not in tasks_ids:
+                raise LabelStudioValidationErrorSentryIgnored(
+                    f'{item} contains invalid "task" field: corresponding task ID couldn\'t be retrieved '
+                    f'from project {project} tasks')
+            predictions.append(Prediction(
+                task_id=item['task'],
+                result=Prediction.prepare_prediction_result(item.get('result'), project),
+                score=item.get('score'),
+                model_version=item.get('model_version', 'undefined')
+            ))
+        predictions_obj = Prediction.objects.bulk_create(predictions, batch_size=settings.BATCH_SIZE)
+
+        return Response({'created': len(predictions_obj)}, status=status.HTTP_201_CREATED)
 
 
 class TasksBulkCreateAPI(ImportAPI):

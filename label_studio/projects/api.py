@@ -82,7 +82,7 @@ _task_data_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     example={
         'id': 1,
-        'my_image_url': 'https://app.heartex.ai/static/samples/kittens.jpg'
+        'my_image_url': '/static/samples/kittens.jpg'
     }
 )
 
@@ -695,6 +695,4 @@ class ProjectModelVersions(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         project = self.get_object()
-        model_versions = project.get_model_versions()
-        filtered_model_versions = filter(None, model_versions)
-        return Response(data=filtered_model_versions)
+        return Response(data=project.get_model_versions(with_counters=True))

@@ -20,6 +20,7 @@ from core.permissions import all_permissions, ViewClassPermission
 from projects.models import Project
 from projects.serializers import ProjectSerializer
 from tasks.models import Task, Annotation, Prediction
+from tasks.serializers import TaskIDOnlySerializer
 
 from data_manager.functions import get_prepared_queryset, evaluate_predictions, get_prepare_params
 from data_manager.models import View, PrepareParams
@@ -149,21 +150,25 @@ class TaskPagination(PageNumberPagination):
 
 @swagger_auto_schema(
     tags=['Data Manager'],
-    operation_summary='Get task list for view',
+    operation_summary='Get tasks list',
     operation_description="""
-    Retrieve a list of tasks with pagination for a specific view using filters and ordering.
+    Retrieve a list of tasks with pagination for a specific view or project, by using filters and ordering.
     """,
-    responses={200: DataManagerTaskSerializer(many=True)},
+    # responses={200: DataManagerTaskSerializer(many=True)},
     manual_parameters=[
         openapi.Parameter(
-            name='id',
+            name='view',
             type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_PATH,
+            in_=openapi.IN_QUERY,
             description='View ID'),
+        openapi.Parameter(
+            name='project',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_QUERY,
+            description='Project ID'),
     ],
 )
 class TaskListAPI(generics.ListAPIView):
-    swagger_schema = None
     task_serializer_class = DataManagerTaskSerializer
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
@@ -195,7 +200,6 @@ class TaskListAPI(generics.ListAPIView):
     def get_task_queryset(self, request, prepare_params):
         return Task.prepared.only_filtered(prepare_params=prepare_params)
 
-    @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
     def get(self, request):
         """
         get:
