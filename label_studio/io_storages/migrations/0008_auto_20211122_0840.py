@@ -13,26 +13,26 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='azureblobexportstorage',
             name='export_type',
-            field=models.CharField(choices=[('task', 'Task'), ('annotation', 'Annotation')], default='task', help_text='Export task or annotation', max_length=128, verbose_name='export type'),
+            field=models.CharField(choices=[('task', 'Task'), ('annotation', 'Annotation')], default='annotation', help_text='Export task or annotation', max_length=128, verbose_name='export type'),
         ),
         migrations.AddField(
             model_name='gcsexportstorage',
             name='export_type',
-            field=models.CharField(choices=[('task', 'Task'), ('annotation', 'Annotation')], default='task', help_text='Export task or annotation', max_length=128, verbose_name='export type'),
+            field=models.CharField(choices=[('task', 'Task'), ('annotation', 'Annotation')], default='annotation', help_text='Export task or annotation', max_length=128, verbose_name='export type'),
         ),
         migrations.AddField(
             model_name='localfilesexportstorage',
             name='export_type',
-            field=models.CharField(choices=[('task', 'Task'), ('annotation', 'Annotation')], default='task', help_text='Export task or annotation', max_length=128, verbose_name='export type'),
+            field=models.CharField(choices=[('task', 'Task'), ('annotation', 'Annotation')], default='annotation', help_text='Export task or annotation', max_length=128, verbose_name='export type'),
         ),
         migrations.AddField(
             model_name='redisexportstorage',
             name='export_type',
-            field=models.CharField(choices=[('task', 'Task'), ('annotation', 'Annotation')], default='task', help_text='Export task or annotation', max_length=128, verbose_name='export type'),
+            field=models.CharField(choices=[('task', 'Task'), ('annotation', 'Annotation')], default='annotation', help_text='Export task or annotation', max_length=128, verbose_name='export type'),
         ),
         migrations.AddField(
             model_name='s3exportstorage',
             name='export_type',
-            field=models.CharField(choices=[('task', 'Task'), ('annotation', 'Annotation')], default='task', help_text='Export task or annotation', max_length=128, verbose_name='export type'),
+            field=models.CharField(choices=[('task', 'Task'), ('annotation', 'Annotation')], default='annotation', help_text='Export task or annotation', max_length=128, verbose_name='export type'),
         ),
     ]
