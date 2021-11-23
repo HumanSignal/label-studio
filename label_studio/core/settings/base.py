@@ -285,15 +285,17 @@ RQ_QUEUES = {
 # Swagger: automatic API documentation
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
-        'token': {
-            'name': 'token',
-            'type': 'string',
+        'Token': {
+            'type': 'apiKey',
+            'name': 'Authorization',
             'in': 'header',
-            'tokenUrl': '/user/account',
-            'description': 'The token must be passed as a request header. '
-                           'You can find your user token on the User Account page in Label Studio.',
-            "required": True
-        },
+            'description':
+                'The token (or API key) must be passed as a request header. '
+                'You can find your user token on the User Account page in Label Studio. Example: '
+                '<br><pre><code class="language-bash">'
+                'curl https://label-studio-host/api/projects -H "Authorization: Token [your-token]"'
+                '</code></pre>'
+        }
     },
     'APIS_SORTER': 'alpha',
     'SUPPORTED_SUBMIT_METHODS': ['get', 'post', 'put', 'delete', 'patch'],
