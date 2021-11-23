@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 @method_decorator(name='list', decorator=swagger_auto_schema(
     tags=['Data Manager'], operation_summary="List views",
-    operation_description="List all views (tabs) for a specific project.",
+    operation_description="List all views for a specific project.",
     manual_parameters=[
         openapi.Parameter(
             name='project',
@@ -110,7 +110,7 @@ class ViewAPI(viewsets.ModelViewSet):
     @swagger_auto_schema(
         tags=['Data Manager'],
         operation_summary="Reset project views",
-        operation_description="Reset all views (tabs) for a specific project.",
+        operation_description="Reset all views for a specific project.",
         request_body=ViewResetSerializer,
     )
     @action(detail=False, methods=["delete"])
@@ -200,7 +200,7 @@ class TaskListAPI(generics.ListAPIView):
     def get_task_queryset(self, request, prepare_params):
         return Task.prepared.only_filtered(prepare_params=prepare_params)
 
-    def get(self, request, **kwargs):
+    def get(self, request):
         # get project
         view_pk = int_from_request(request.GET, 'view', 0) or int_from_request(request.data, 'view', 0)
         project_pk = int_from_request(request.GET, 'project', 0) or int_from_request(request.data, 'project', 0)
@@ -291,7 +291,7 @@ class TaskAPI(generics.RetrieveAPIView):
             project__organization=self.request.user.active_organization
         )
 
-    def get(self, request, pk, **kwargs):
+    def get(self, request, pk):
         task = self.get_object()
         context = self.get_serializer_context(request)
         context['project'] = project = task.project
