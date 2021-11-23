@@ -286,16 +286,19 @@ RQ_QUEUES = {
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
         'token': {
-            'type': 'token',
-            'name': 'Token',
+            'name': 'token',
+            'type': 'string',
             'in': 'header',
-            'url': '/user/account',
+            'tokenUrl': '/user/account',
+            'description': 'The token must be passed as a request header. '
+                           'You can find your user token on the User Account page in Label Studio.',
+            "required": True
         },
     },
     'APIS_SORTER': 'alpha',
     'SUPPORTED_SUBMIT_METHODS': ['get', 'post', 'put', 'delete', 'patch'],
-    # "DEFAULT_AUTO_SCHEMA_CLASS": "core.utils.CustomAutoSchema",
     'OPERATIONS_SORTER': 'alpha',
+
 }
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)
