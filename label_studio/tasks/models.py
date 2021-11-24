@@ -317,6 +317,12 @@ class Annotation(AnnotationMixin, models.Model):
             summary = self.task.project.summary
             summary.remove_created_annotations_and_labels([self])
 
+    def save(self, *args, **kwargs):
+        result = super().save(*args, **kwargs)
+        # set updated_at field of task to now()
+        self.task.save(update_fields=['updated_at'])
+        return result
+
 
 class TaskLock(models.Model):
     task = models.ForeignKey(
