@@ -13,6 +13,7 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField
 from rest_framework.settings import api_settings
+from rest_flex_fields import FlexFieldsModelSerializer
 
 from projects.models import Project
 from tasks.models import Task, Annotation, AnnotationDraft, Prediction
@@ -125,7 +126,7 @@ class TaskSimpleSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class BaseTaskSerializer(ModelSerializer):
+class BaseTaskSerializer(FlexFieldsModelSerializer):
     """ Task Serializer with project scheme configs validation
     """
     def __init__(self, *args, **kwargs):

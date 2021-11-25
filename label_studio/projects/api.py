@@ -80,7 +80,7 @@ _task_data_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     example={
         'id': 1,
-        'my_image_url': 'https://app.heartex.ai/static/samples/kittens.jpg'
+        'my_image_url': '/static/samples/kittens.jpg'
     }
 )
 
@@ -266,7 +266,8 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         tags=['Projects'],
         operation_summary='Validate label config',
         operation_description='Validate an arbitrary labeling configuration.',
-        responses={200: 'Validation success'}
+        responses={200: 'Validation success'},
+        request_body=ProjectLabelConfigSerializer,
     ))
 class LabelConfigValidateAPI(generics.CreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
@@ -302,6 +303,7 @@ class LabelConfigValidateAPI(generics.CreateAPIView):
                 in_=openapi.IN_PATH,
                 description='A unique integer value identifying this project.'),
         ],
+        request_body=ProjectLabelConfigSerializer,
 ))
 class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
     """ Validate label config

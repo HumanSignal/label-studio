@@ -118,9 +118,9 @@ AUTH_LDAP_USER_DN_TEMPLATE=""
 AUTH_LDAP_USER_SEARCH_BASES="ou=guests,dc=domain,dc=com;ou=owners,dc=domain,dc=com"
 ```
 
-### Manage user access only with LDAP
+## Manage user access only with LDAP or SSO 
 
-If you want to manage Label Studio roles and workspaces entirely with LDAP, add the following to your environment variable file:
+If you want to manage Label Studio roles and workspaces entirely with LDAP or single sign-on (SSO), add the following to your environment variable file:
 
 ```
 MANUAL_PROJECT_MEMBER_MANAGEMENT=0
