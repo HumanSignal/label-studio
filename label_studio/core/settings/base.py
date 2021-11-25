@@ -285,17 +285,22 @@ RQ_QUEUES = {
 # Swagger: automatic API documentation
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
-        'token': {
-            'type': 'token',
-            'name': 'Token',
+        'Token': {
+            'type': 'apiKey',
+            'name': 'Authorization',
             'in': 'header',
-            'url': '/user/account',
-        },
+            'description':
+                'The token (or API key) must be passed as a request header. '
+                'You can find your user token on the User Account page in Label Studio. Example: '
+                '<br><pre><code class="language-bash">'
+                'curl https://label-studio-host/api/projects -H "Authorization: Token [your-token]"'
+                '</code></pre>'
+        }
     },
     'APIS_SORTER': 'alpha',
     'SUPPORTED_SUBMIT_METHODS': ['get', 'post', 'put', 'delete', 'patch'],
-    # "DEFAULT_AUTO_SCHEMA_CLASS": "core.utils.CustomAutoSchema",
     'OPERATIONS_SORTER': 'alpha',
+
 }
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)
