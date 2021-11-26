@@ -17,5 +17,5 @@ config: '
             perRegion="true" required="true" />
 </View>
 
-<!-- { "data": {"audio": "https://app.heartex.ai/static/samples/game.wav"} } -->
+<!-- { "data": {"audio": "/static/samples/game.wav"} } -->
 '

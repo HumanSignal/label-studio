@@ -148,7 +148,7 @@ class TaskPagination(PageNumberPagination):
         )
 
 
-@swagger_auto_schema(
+@method_decorator(name='get', decorator=swagger_auto_schema(
     tags=['Data Manager'],
     operation_summary='Get tasks list',
     operation_description="""
@@ -167,7 +167,7 @@ class TaskPagination(PageNumberPagination):
             in_=openapi.IN_QUERY,
             description='Project ID'),
     ],
-)
+))
 class TaskListAPI(generics.ListAPIView):
     task_serializer_class = DataManagerTaskSerializer
     permission_required = ViewClassPermission(
@@ -177,11 +177,6 @@ class TaskListAPI(generics.ListAPIView):
         PUT=all_permissions.tasks_change,
         DELETE=all_permissions.tasks_delete,
     )
-
-    def get_serializer_class(self):
-        if bool_from_request(self.request.query_params, 'only_ids', False):
-            return TaskIDOnlySerializer
-        return self.task_serializer_class
 
     @staticmethod
     def get_task_serializer_context(request, project):
@@ -206,12 +201,6 @@ class TaskListAPI(generics.ListAPIView):
         return Task.prepared.only_filtered(prepare_params=prepare_params)
 
     def get(self, request):
-        """
-        get:
-        Get task list for view
-
-        Retrieve a list of tasks with pagination for a specific view using filters and ordering.
-        """
         # get project
         view_pk = int_from_request(request.GET, 'view', 0) or int_from_request(request.data, 'view', 0)
         project_pk = int_from_request(request.GET, 'project', 0) or int_from_request(request.data, 'project', 0)
@@ -254,7 +243,7 @@ class TaskListAPI(generics.ListAPIView):
                 tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
                 evaluate_predictions(tasks_for_predictions)
 
-            serializer = self.get_serializer_class()(page, many=True, context=context)
+            serializer = self.task_serializer_class(page, many=True, context=context)
             return self.get_paginated_response(serializer.data)
 
         # all tasks
@@ -263,7 +252,7 @@ class TaskListAPI(generics.ListAPIView):
         queryset = Task.prepared.annotate_queryset(
             queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields
         )
-        serializer = self.get_serializer_class()(queryset, many=True, context=context)
+        serializer = self.task_serializer_class(queryset, many=True, context=context)
         return Response(serializer.data)
 
 

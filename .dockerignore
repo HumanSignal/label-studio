@@ -6,6 +6,7 @@
 !deploy/docker-entrypoint.sh
 !deploy/prebuild_wo_frontend.sh
 !deploy/requirements.txt
+!deploy/heroku_run.sh
 !label_studio
 !setup.py
 !README.md
