@@ -41,7 +41,7 @@ To start an example machine learning backend with Docker Compose, do the followi
    ```
 3. Change to the directory with the Docker Compose configuration file. From the command line, run the following:
    ```bash
-   cd label-studio-ml-backend/label_studio_ml/default_configs
+   cd label-studio-ml-backend/label_studio_ml/examples/simple_text_classifier
    ```
 4. Start Docker Compose. From the command line, run the following:
     ```bash

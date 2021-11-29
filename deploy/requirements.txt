@@ -22,6 +22,7 @@ django-user-agents==0.4.0
 django-ranged-fileresponse>=0.1.2
 django-redis-cache==3.0.0
 drf_dynamic_fields==0.3.0
+drf-flex-fields==0.9.5
 drf_yasg==1.20.0
 drf-generators==0.3.0
 htmlmin==0.1.12
@@ -45,4 +46,4 @@ colorama>=0.4.4
 boxing>=0.1.4
 redis>=3.5.0
 sentry-sdk>=1.1.0
-label-studio-converter==0.0.33rc5
+label-studio-converter==0.0.36
