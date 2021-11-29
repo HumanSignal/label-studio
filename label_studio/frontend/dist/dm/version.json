@@ -1,6 +1,6 @@
 {
-  "message": "DM for annotators (#23)\n\nlabelStudioInterfacesModifier\r\n\r\nCo-authored-by: 4iGAN <4iGAN.yO@gmail.com>",
-  "commit": "01e0f150f91a9886e68dbba7d990644ab2fd1ff8",
+  "message": "DEV-609: Load task data from server (#22)\n\n* Load task data from server\r\n\r\n* Load task data from server\r\n\r\n* Run actions on branch\r\n\r\nCo-authored-by: Sergey <Gondragos@gmail.com>",
+  "commit": "feb9f1db923039b098fd0122f3d6a87bdc224a79",
   "branch": "master",
-  "date": "2021-11-17T09:14:53Z"
+  "date": "2021-11-18T20:01:55Z"
 }

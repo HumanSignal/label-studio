@@ -197,19 +197,7 @@ app:
     annotations: 
       eks.amazonaws.com/role-arn: arn:aws:iam::YOUR_AWS_ACCOUNT:role/LSE_ServiceAccountApp
 ```
-4. Restart your Helm release by doing the following from the command line:
-   1. Identify the `<RELEASE_NAME>` of the latest Label Studio Enterprise release:
-   ```shell
-   helm list
-   ```
-   2. Restart the rqworker for Label Studio Enterprise:
-   ```shell
-   kubectl rollout restart deployment/<RELEASE_NAME>-lse-rqworker
-   ```
-   3. Restart the Label Studio Enterprise app:
-   ```shell
-   kubectl rollout restart deployment/<RELEASE_NAME>-lse-app
-   ```
+4. [Restart your Helm release](install_enterprise_k8s.html#Restart-Label-Studio-Enterprise-using-Helm).
    
 After you set up these permissions in your environment, you're ready to write your custom agreement metric and add it to Label Studio Enterprise:
 1. [Write your custom agreement metric](#How-to-write-your-custom-agreement-metric).
@@ -222,19 +210,7 @@ If you deployed Label Studio Enterprise in Amazon Elastic Kubernetes Service (EK
 2. Select the name of **YOUR_NODE_GROUP** with Label Studio Enterprise deployed.
 3. On the **Details** page, locate and select the option for **Node IAM Role ARN**.
 4. Create the AWS IAM policy [`LSE_AllowInteractLambda`](#Create-an-IAM-policy-to-grant-AWS-Lambda-permissions).
-5. Restart your Helm release by doing the following from the command line:
-   1. Identify the `<RELEASE_NAME>` of the latest Label Studio Enterprise release:
-   ```shell
-   helm list
-   ```
-   2. Restart the rqworker for Label Studio Enterprise:
-   ```shell
-   kubectl rollout restart deployment/<RELEASE_NAME>-lse-rqworker
-   ```
-   3. Restart the Label Studio Enterprise app:
-   ```shell
-   kubectl rollout restart deployment/<RELEASE_NAME>-lse-app
-   ```
+5. [Restart your Helm release](install_enterprise_k8s.html#Restart-Label-Studio-Enterprise-using-Helm).
    
 After you set up these permissions in your environment, you're ready to write your custom agreement metric and add it to Label Studio Enterprise:
 1. [Write your custom agreement metric](#How-to-write-your-custom-agreement-metric).

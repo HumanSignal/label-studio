@@ -39,6 +39,7 @@ class AllPermissions(BaseModel):
     annotations_delete = 'annotations.delete'
     actions_perform = 'actions.perform'
     predictions_any = 'predictions.any'
+    avatar_any = 'avatar.any'
 
 
 all_permissions = AllPermissions()
