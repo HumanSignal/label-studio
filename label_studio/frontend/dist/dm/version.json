@@ -1,6 +1,6 @@
 {
-  "message": "[fix] Skip undefined users in filters",
-  "commit": "3998e9a058abeffad1d029c928f238794df24284",
+  "message": "DEV-609: Load task data from server (#22)\n\n* Load task data from server\r\n\r\n* Load task data from server\r\n\r\n* Run actions on branch\r\n\r\nCo-authored-by: Sergey <Gondragos@gmail.com>",
+  "commit": "feb9f1db923039b098fd0122f3d6a87bdc224a79",
   "branch": "master",
-  "date": "2021-10-27T14:31:38Z"
+  "date": "2021-11-18T20:01:55Z"
 }
