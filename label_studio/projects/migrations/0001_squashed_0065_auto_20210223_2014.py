@@ -252,7 +252,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='project',
             name='label_config',
-            field=models.TextField(blank=True, help_text='Label config in XML format. More about it in <a href="https://app.heartex.ai/static/docs/#/Business?id=label-config">documentation</a>', null=True, verbose_name='label config'),
+            field=models.TextField(blank=True, help_text='Label config in XML format. More about it in <a href="https://labelstud.io/guide/setup.html">documentation</a>', null=True, verbose_name='label config'),
         ),
         migrations.AlterField(
             model_name='project',
