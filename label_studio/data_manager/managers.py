@@ -135,6 +135,7 @@ def apply_ordering(queryset, ordering, only_undefined_field=False):
         field_name = ordering[0].replace("tasks:", "")
         ascending = False if field_name[0] == '-' else True  # detect direction
         field_name = field_name[1:] if field_name[0] == '-' else field_name  # remove direction
+        field_name = field_name.replace('agreement', '_agreement')
 
         if "data." in field_name:
             field_name = field_name.replace(".", "__", 1)
@@ -190,6 +191,7 @@ def apply_filters(queryset, filters, only_undefined_field=False):
 
         # django orm loop expression attached to column name
         field_name = preprocess_field_name(_filter.filter, only_undefined_field)
+        field_name = field_name.replace('agreement', '_agreement')
 
         # filter preprocessing, value type conversion, etc..
         preprocess_filter = load_func(settings.DATA_MANAGER_PREPROCESS_FILTER)
@@ -423,10 +425,6 @@ class TaskQuerySet(models.QuerySet):
         if prepare_params is None:
             return queryset
 
-        # project filter
-        if prepare_params.project is not None:
-            queryset = queryset.filter(project=prepare_params.project)
-
         project = Project.objects.get(pk=prepare_params.project)
 
         queryset = apply_filters(queryset, prepare_params.filters, only_undefined_field=project.only_undefined_field)
@@ -501,7 +499,6 @@ def annotate_predictions_score(queryset):
         return queryset.annotate(predictions_score=Avg(
             "predictions__score", filter=Q(predictions__model_version=model_version)
         ))
-
 
 
 def annotate_annotations_ids(queryset):
@@ -583,13 +580,15 @@ class PreparedTaskManager(models.Manager):
     def get_queryset(self, fields_for_evaluation=None, prepare_params=None, all_fields=False):
         """
         :param fields_for_evaluation: list of annotated fields in task
+        :param prepare_params: filters, ordering, selected items
+        :param all_fields: evaluate all fields for task
         :return: task queryset with annotated fields
         """
         queryset = self.only_filtered(prepare_params=prepare_params)
         return self.annotate_queryset(queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields)
 
     def only_filtered(self, prepare_params=None):
-        queryset = TaskQuerySet(self.model)
+        queryset = TaskQuerySet(self.model).filter(project=prepare_params.project)
 
         fields_for_filter_ordering = get_fields_for_filter_ordering(prepare_params)
         queryset = self.annotate_queryset(queryset, fields_for_evaluation=fields_for_filter_ordering)

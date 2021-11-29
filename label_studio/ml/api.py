@@ -175,7 +175,7 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='Machine Learning backend ID'),
+                description='A unique integer value identifying this ML backend.'),
         ],
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -226,7 +226,7 @@ class MLBackendTrainAPI(APIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='Machine Learning backend ID'),
+                description='A unique integer value identifying this ML backend.'),
         ],
         request_body=MLInteractiveAnnotatingRequest,
         responses={
@@ -235,6 +235,9 @@ class MLBackendTrainAPI(APIView):
     ),
 )
 class MLBackendInteractiveAnnotating(APIView):
+
+    permission_required = all_permissions.tasks_view
+
     def post(self, request, *args, **kwargs):
         ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)

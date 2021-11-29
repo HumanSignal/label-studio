@@ -1,21 +1,25 @@
-# Building the main container
+# syntax=docker/dockerfile:1.3
 FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PIP_CACHE_DIR=/.cache
 
 WORKDIR /label-studio
 
-ENV TZ=Europe/Berlin
-RUN chmod 1777 /tmp
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-RUN apt-get update && apt-get install -y build-essential postgresql-client libmysqlclient-dev mysql-client python3.8 python3-pip python3.8-dev uwsgi  git libxml2-dev libxslt-dev zlib1g-dev uwsgi
+# install packages
+RUN set -eux; \
+    apt-get update && apt-get install --no-install-recommends --no-install-suggests -y \
+    build-essential postgresql-client libmysqlclient-dev mysql-client python3.8 python3-pip python3.8-dev \
+    uwsgi git libxml2-dev libxslt-dev zlib1g-dev
 
-RUN chgrp -R 0 /var/log /var/cache /var/run /run /tmp /etc/uwsgi && \
-    chmod -R g+rwX /var/log /var/cache /var/run /run /tmp /etc/uwsgi
+RUN --mount=type=cache,target=$PIP_CACHE_DIR \
+    pip3 install --upgrade pip setuptools && pip3 install uwsgi
 
 # Copy and install requirements.txt first for caching
 COPY deploy/requirements.txt /label-studio
 
-RUN pip3 install --upgrade pip
-RUN pip3 install -r requirements.txt && pip install uwsgi
+RUN --mount=type=cache,target=$PIP_CACHE_DIR \
+    pip3 install -r requirements.txt
 
 ENV DJANGO_SETTINGS_MODULE=core.settings.label_studio
 ENV LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data

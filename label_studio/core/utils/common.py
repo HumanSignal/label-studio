@@ -423,6 +423,7 @@ def collect_versions(force=False):
 
     # main pypi package
     result = {
+        'release': label_studio.__version__,
         'label-studio-os-package': {
             'version': label_studio.__version__,
             'short_version': '.'.join(label_studio.__version__.split('.')[:2]),
@@ -431,8 +432,7 @@ def collect_versions(force=False):
             'current_version_is_outdated': label_studio.__current_version_is_outdated__
         },
         # backend full git info
-        'label-studio-os-backend': version.get_git_commit_info(),
-        'release': label_studio.__version__
+        'label-studio-os-backend': version.get_git_commit_info()
     }
 
     # label studio frontend
@@ -609,3 +609,4 @@ def round_floats(o):
     if isinstance(o, (list, tuple)):
         return [round_floats(x) for x in o]
     return o
+

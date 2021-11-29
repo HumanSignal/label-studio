@@ -24,6 +24,12 @@ logger = logging.getLogger(__name__)
 
 _DATA_EXAMPLES = None
 _LABEL_TAGS = {'Label', 'Choice'}
+SINGLE_VALUED_TAGS = {
+    'choices': str,
+    'rating': int,
+    'number': float,
+    'textarea': str
+}
 _NOT_CONTROL_TAGS = {'Filter',}
 # TODO: move configs in right place
 _LABEL_CONFIG_SCHEMA = find_file('label_config_schema.json')

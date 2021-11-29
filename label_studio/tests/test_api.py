@@ -182,7 +182,7 @@ def test_delete_annotations(business_client, configured_project):
 @pytest.mark.django_db
 def test_get_task(client_and_token, configured_project, response, status_code):
     client, token = client_and_token
-    task = configured_project.tasks.all()[0]
+    task = configured_project.tasks.order_by('-id').all()[0]
     response['project'] = configured_project.id
     response['created_at'] = task.created_at.isoformat().replace('+00:00', 'Z')
     response['updated_at'] = task.updated_at.isoformat().replace('+00:00', 'Z')
