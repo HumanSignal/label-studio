@@ -25,7 +25,8 @@ logger = logging.getLogger(__name__)
 class Storage(models.Model):
     title = models.CharField(_('title'), null=True, blank=True, max_length=256, help_text='Cloud storage title')
     description = models.TextField(_('description'), null=True, blank=True, help_text='Cloud storage description')
-    project = models.ForeignKey('projects.Project', related_name='%(app_label)s_%(class)ss', on_delete=models.CASCADE)
+    project = models.ForeignKey('projects.Project', related_name='%(app_label)s_%(class)ss', on_delete=models.CASCADE,
+                                help_text='A unique integer value identifying this project.')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     last_sync = models.DateTimeField(_('last sync'), null=True, blank=True, help_text='Last sync finished time')
     last_sync_count = models.PositiveIntegerField(
