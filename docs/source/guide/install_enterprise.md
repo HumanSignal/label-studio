@@ -70,6 +70,9 @@ To run Label Studio Enterprise in production, start it using [Docker compose](ht
 # Alternatively, it can be a URL like LICENSE=https://lic.heartex.ai/db/20210203-1234-ab123456.lic
 LICENSE=/label-studio-enterprise/license.txt
 
+# Specify the FQDN name with port if differs from 80
+LABEL_STUDIO_HOST=http://localhost/
+
 # Database engine (PostgreSQL by default)
 DJANGO_DB=default
 
@@ -92,10 +95,10 @@ POSTGRE_HOST=db
 POSTGRE_PORT=5432
 
 # Optional: PostgreSQL SSL mode
-POSTGRE_SSL_MODE=require
+# POSTGRE_SSL_MODE=require
 
 # Optional: Specify Postgre SSL certificate
-POSTGRE_SSLROOTCERT=postgre-ca-bundle.pem
+# POSTGRE_SSLROOTCERT=postgre-ca-bundle.pem
 
 # Minio configuration. Copy as-is:
 MINIO_STORAGE_ENDPOINT=http://minio:9000
@@ -108,30 +111,30 @@ MINIO_STORAGE_MEDIA_USE_PRESIGNED=false
 MINIO_BROWSER=off
 
 # Redis location e.g. redis://[:password]@localhost:6379/1
-REDIS_LOCATION=localhost:6379
+REDIS_LOCATION=redis:6379
 
 # Optional: Redis database
-REDIS_DB=1
+# REDIS_DB=1
 
 # Optional: Redis password
-REDIS_PASSWORD=12345
+# REDIS_PASSWORD=12345
 
 # Optional: Redis socket timeout
-REDIS_SOCKET_TIMEOUT=3600
+# REDIS_SOCKET_TIMEOUT=3600
 
 # Optional: Use Redis SSL connection
-REDIS_SSL=1
+# REDIS_SSL=1
 
 # Optional: Require certificate
-REDIS_SSL_CERTS_REQS=required
+# REDIS_SSL_CERTS_REQS=required
 
 # Optional: Specify Redis SSL certificate
-REDIS_SSL_CA_CERTS=redis-ca-bundle.pem
+# REDIS_SSL_CA_CERTS=redis-ca-bundle.pem
 
 # Optional: Specify SSL termination certificate & key
 # Files should be placed in the directory "certs" at the same directory as docker-compose.yml file
-NGINX_SSL_CERT=/certs/cert.pem
-NGINX_SSL_CERT_KEY=/certs/cert.key
+# NGINX_SSL_CERT=/certs/cert.pem
+# NGINX_SSL_CERT_KEY=/certs/cert.key
 ```
 
 2. After you set all the environment variables, create the following `docker-compose.yml`:
@@ -141,10 +144,10 @@ version: '3.3'
 
 services:
   app:
-    image: heartexlabs/label-studio-enterprise:latest
+    image: heartexlabs/label-studio-enterprise:VERSION
     ports:
-      - 80:8085
-      - 443:8086
+      - "80:8085"
+      - "443:8086"
     expose:
       - "80"
       - "443"
@@ -153,23 +156,23 @@ services:
     env_file:
       - env.list
     volumes:
-      - ./license.txt:/label_studio_enterprise/license.txt:ro
+      - ./license.txt:/label-studio-enterprise/license.txt:ro
       - ./certs:/certs:ro
     working_dir: /label-studio-enterprise
 
   rqworkers:
-    image: heartexlabs/label-studio-enterprise:latest
+    image: heartexlabs/label-studio-enterprise:VERSION
     depends_on:
       - minio
     env_file:
       - env.list
     volumes:
-      - ./license.txt:/label_studio_enterprise/license.txt
+      - ./license.txt:/label-studio-enterprise/license.txt:ro
     working_dir: /label-studio-enterprise
     command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "default" ]
 
   minio:
-    image: heartexlabs/label-studio-enterprise:latest
+    image: heartexlabs/label-studio-enterprise:VERSION
     command:
       - /bin/bash
       - -c
@@ -177,7 +180,7 @@ services:
         mkdir -p /data/media
         minio server /data
     env_file:
-      - .env.list
+      - env.list
     volumes:
       - ./mydata:/data:rw
 

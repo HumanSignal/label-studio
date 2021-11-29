@@ -100,7 +100,7 @@ class ProjectOnboardingSerializer(serializers.ModelSerializer):
 
 
 class ProjectLabelConfigSerializer(serializers.Serializer):
-    label_config = serializers.CharField()
+    label_config = serializers.CharField(help_text=Project.label_config.field.help_text)
 
     def validate_label_config(self, config):
         Project.validate_label_config(config)

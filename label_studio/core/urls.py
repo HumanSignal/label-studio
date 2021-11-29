@@ -28,13 +28,15 @@ from rest_framework.permissions import AllowAny
 
 from core import views
 from core.utils.static_serve import serve
+from core.utils.common import collect_versions
 
 handler500 = 'core.views.custom_500'
 
+versions = collect_versions()
 schema_view = get_schema_view(
     openapi.Info(
         title="Label Studio API",
-        default_version='v2',
+        default_version='v' + versions['release'],
         contact=openapi.Contact(url="https://labelstud.io"),
         x_logo={"url": "../../static/icons/logo-black.svg"}
     ),
