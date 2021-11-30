@@ -11,7 +11,8 @@ from django.core.validators import MinLengthValidator, MaxLengthValidator
 from django.db import transaction, models
 from annoying.fields import AutoOneToOneField
 
-from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks
+from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks, \
+    Q_finished_annotations
 from core.utils.common import create_hash, sample_query, get_attr_or_item, load_func
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.label_config import (
@@ -357,7 +358,7 @@ class Project(ProjectMixin, models.Model):
         max_annotations = self.maximum_annotations
         must_tasks = int(self.tasks.count() * self.overlap_cohort_percentage / 100 + 0.5)
         tasks_with_max_annotations = all_project_tasks.annotate(
-            anno=Count('annotations', filter=Q_finished_annotations)).filter(anno__gte=max_annotations)
+            anno=Count('annotations', filter=Q_finished_annotations & Q(ground_truth=False))).filter(anno__gte=max_annotations)
         tasks_with_min_annotations = all_project_tasks.exclude(id__in=tasks_with_max_annotations)
         left_must_tasks = max(must_tasks - tasks_with_max_annotations.count(), 0)
         if left_must_tasks > 0:
@@ -924,8 +925,3 @@ class ProjectSummary(models.Model):
         self.created_annotations = created_annotations
         self.created_labels = labels
         self.save()
-
-
-Q_finished_annotations = Q(annotations__was_cancelled=False) & \
-                                 Q(annotations__result__isnull=False) & \
-                                 Q(annotations__ground_truth=False)
