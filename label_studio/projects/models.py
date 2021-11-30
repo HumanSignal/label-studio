@@ -358,7 +358,7 @@ class Project(ProjectMixin, models.Model):
         max_annotations = self.maximum_annotations
         must_tasks = int(self.tasks.count() * self.overlap_cohort_percentage / 100 + 0.5)
         tasks_with_max_annotations = all_project_tasks.annotate(
-            anno=Count('annotations', filter=Q_finished_annotations & Q(ground_truth=False))).filter(anno__gte=max_annotations)
+            anno=Count('annotations', filter=Q_finished_annotations & Q(annotations__ground_truth=False))).filter(anno__gte=max_annotations)
         tasks_with_min_annotations = all_project_tasks.exclude(id__in=tasks_with_max_annotations)
         left_must_tasks = max(must_tasks - tasks_with_max_annotations.count(), 0)
         if left_must_tasks > 0:
