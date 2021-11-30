@@ -19,5 +19,5 @@ config: |
   </View>
 
   <!--{
-   "video_url": "/static/samples/opossum_snow.mp4"
+   "video": "/static/samples/opossum_snow.mp4"
   }-->
