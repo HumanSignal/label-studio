@@ -130,6 +130,9 @@ class Project(ProjectMixin, models.Model):
         _('enable empty annotation'), default=True, help_text='Allow annotators to submit empty annotations'
     )
 
+    reveal_preannotations_interactively = models.BooleanField(
+        _('reveal_preannotations_interactively'), default=False, help_text='Reveal pre-annotations interactively'
+    )
     show_annotation_history = models.BooleanField(
         _('show annotation history'), default=False, help_text='Show annotation history to annotator'
     )
