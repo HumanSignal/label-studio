@@ -2356,7 +2356,7 @@ span.CodeMirror-selectedtext { background: none; }
   margin-left: auto;
 }
 .ls-wizard .ls-configure__code {
-  overflow: hidden;
+  overflow-x: hidden;
 }
 .ls-wizard .ls-configure__code textarea,
 .ls-wizard .ls-configure__code .react-codemirror2 {
