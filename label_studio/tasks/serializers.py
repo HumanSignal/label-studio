@@ -23,6 +23,8 @@ from core.label_config import replace_task_data_undefined_with_config_field
 from users.serializers import UserSerializer
 from core.utils.common import load_func
 
+from io_storages.s3.utils import get_client_and_resource, resolve_s3_url
+
 logger = logging.getLogger(__name__)
 
 
@@ -161,6 +163,13 @@ class BaseTaskSerializer(FlexFieldsModelSerializer):
             # resolve uri for storage (s3/gcs/etc)
             if self.context.get('resolve_uri', False):
                 instance.data = instance.resolve_uri(instance.data, proxy=self.context.get('proxy', False))
+
+            # resolve S3 URLs
+            if instance.data["image"][:2] == "s3":
+                s3_url = instance.data["image"]
+                s3_client, _ = get_client_and_resource()
+                resolved_url = resolve_s3_url(s3_url, s3_client)
+                instance.data["image"] = resolved_url
 
             # resolve $undefined$ key in task data
             data = instance.data
