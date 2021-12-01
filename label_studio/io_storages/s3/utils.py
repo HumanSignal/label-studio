@@ -13,7 +13,7 @@ from functools import lru_cache
 logger = logging.getLogger(__name__)
 
 
-@lru_cache
+@lru_cache()
 def get_client_and_resource(
     aws_access_key_id=None,
     aws_secret_access_key=None,
