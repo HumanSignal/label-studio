@@ -46,6 +46,7 @@ class TaskValidator:
 
         # iterate over data types from project
         for data_key, data_type in project.data_types.items():
+            data_key = data_key.split('[')[0]  # get array name in case of Repeater tag
             if data_key not in data:
                 raise ValidationError('"{data_key}" key is expected in task data'.format(data_key=data_key))
 
