@@ -63,6 +63,10 @@ def resolve_s3_url(url, client, presign=True, expires_in=3600):
             Params={'Bucket': bucket_name, 'Key': key},
             ExpiresIn=expires_in)
     except ClientError as exc:
+        if exc.response['Error']['Code'] == 'ExpiredToken':
+            # If credentials expired, invalidate the cache
+            # Ensures that a new client object is created with new credentials next time
+            get_client_and_resource.cache_clear()
         logger.warning(f'Can\'t generate presigned URL for {url}. Reason: {exc}')
         return url
     else:
