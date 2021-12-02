@@ -1,7 +1,7 @@
 name: pytest:ubnt
 on:
   push:
-    branches: ['*', '*/*', master]
+    branches: ['*', '*/*', '*/**', master]
     paths:
       - 'label_studio/**'
       - '.github/workflows/tests.yml'
