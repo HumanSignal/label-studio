@@ -182,7 +182,7 @@ def localfiles_data(request):
             # Try to find Local File Storage connection based prefix
             localfiles_storage = LocalFilesImportStorage.objects.filter(path=path)
             if localfiles_storage.exists():
-                user_has_permissions = localfiles_storage.project.has_permission(request.user)
+                user_has_permissions = localfiles_storage.first().project.has_permission(request.user)
         else:
             user_has_permissions = link.has_permission(request.user)
 
