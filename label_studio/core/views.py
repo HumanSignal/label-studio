@@ -21,6 +21,7 @@ from django.http import JsonResponse
 from wsgiref.util import FileWrapper
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
+from django.db.models import Value, F, CharField
 
 from core import utils
 from core.utils.io import find_file
@@ -180,8 +181,12 @@ def localfiles_data(request):
         link = LocalFilesImportStorageLink.objects.filter(key=str(full_path)).first()
         user_has_permissions = False
         if not link:
-            # Try to find Local File Storage connection based prefix
-            localfiles_storage = LocalFilesImportStorage.objects.filter(path=os.path.dirname(full_path))
+            # Try to find Local File Storage connection based prefix:
+            # storage.path=/home/user, full_path=/home/user/a/b/c/1.jpg =>
+            # full_path.startswith(path) => True
+            localfiles_storage = LocalFilesImportStorage.objects \
+                .annotate(_full_path=Value(os.path.dirname(full_path), output_field=CharField())) \
+                .filter(_full_path__startswith=F('path'))
             if localfiles_storage.exists():
                 user_has_permissions = any(storage.project.has_permission(user) for storage in localfiles_storage)
         else:
