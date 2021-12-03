@@ -42,5 +42,3 @@ sentry.init_sentry(release_name='label-studio', release_version=__version__)
 # we should do it after sentry init
 from label_studio.core.utils.common import collect_versions
 versions = collect_versions()
-
-INTERPOLATE_KEY_FRAMES = get_env('INTERPOLATE_KEY_FRAMES', False)

@@ -459,3 +459,5 @@ mimetypes.add_type("image/png", ".png", True)
 
 # fields name was used in DM api before
 REST_FLEX_FIELDS = {"FIELDS_PARAM": "include"}
+
+INTERPOLATE_KEY_FRAMES = get_env('INTERPOLATE_KEY_FRAMES', False)
