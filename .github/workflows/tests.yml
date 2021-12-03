@@ -1,7 +1,7 @@
 name: pytest:ubnt
 on:
   push:
-    branches: ['*', '*/*', master]
+    branches: ['*', '*/*', '*/**', master]
     paths:
       - 'label_studio/**'
       - '.github/workflows/tests.yml'
@@ -31,7 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2.3.0
+        uses: actions/setup-python@v2.3.1
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -52,7 +52,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v2.4.1
+        uses: actions/setup-node@v2.5.0
         with:
           node-version: "${{ env.NODE }}"
 
@@ -134,7 +134,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Python
-        uses: actions/setup-python@v2.3.0
+        uses: actions/setup-python@v2.3.1
         with:
           python-version: '3.7'
 
@@ -158,7 +158,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v2.4.1
+        uses: actions/setup-node@v2.5.0
         with:
           node-version: 14
 
@@ -213,7 +213,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2.4.0
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2.3.0
+      uses: actions/setup-python@v2.3.1
       with:
         python-version: ${{ matrix.python-version }}
 
