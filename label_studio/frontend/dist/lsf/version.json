@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into fix/DEV-839/undo-problems",
-  "commit": "1b8f43ce5afb5d566dab62c33107f4a405301957",
+  "message": "Fix branches merge",
+  "commit": "1b8dea0e3f1b55a0e216bde5d7f489df23a828c0",
   "branch": "fix/DEV-839/undo-problems",
-  "date": "2021-11-29T08:17:43Z"
+  "date": "2021-12-03T17:28:20Z"
 }
