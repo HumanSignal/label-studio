@@ -46,10 +46,19 @@ class TaskValidator:
 
         # iterate over data types from project
         for data_key, data_type in project.data_types.items():
+
+            # get array name in case of Repeater tag
+            is_array = '[' in data_key
+            data_key = data_key.split('[')[0]
+
             if data_key not in data:
                 raise ValidationError('"{data_key}" key is expected in task data'.format(data_key=data_key))
 
-            expected_types = _DATA_TYPES.get(data_type, (str, ))
+            if is_array:
+                expected_types = (list, )
+            else:
+                expected_types = _DATA_TYPES.get(data_type, (str,))
+
             if not isinstance(data[data_key], tuple(expected_types)):
                 raise ValidationError('data[\'{data_key}\']={data_value} is of type \'{type}\', '
                                       "but the object tag {data_type} expects the following types: {expected_types}"
