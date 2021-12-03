@@ -27,14 +27,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/stale@v4
+      - uses: actions/stale@v4.0.0
         with:
-          stale-issue-message: "This issue is stale because it has been open 30 days with no activity. Remove stale label or comment or this will be closed in 5 days."
-          close-issue-message: "This issue was closed because it has been stalled for 5 days with no activity."
-          days-before-issue-stale: 30
-          days-before-issue-close: -1 # never closed automatically
-          stale-issue-label: "no-issue-activity"
-          exempt-issue-labels: "awaiting-approval,work-in-progress"
           stale-pr-message: "This PR is stale because it has been open 172 days with no activity. Remove stale label or comment or this will be closed in 10 days."
           close-pr-message: "This PR was closed because it has been stalled for 10 days with no activity."
           days-before-pr-stale: 172
