@@ -178,19 +178,16 @@ def localfiles_data(request):
     if path and request.user.is_authenticated:
         path = posixpath.normpath(path).lstrip('/')
         full_path = Path(safe_join(local_serving_document_root, path))
-        link = LocalFilesImportStorageLink.objects.filter(key=str(full_path)).first()
         user_has_permissions = False
-        if not link:
-            # Try to find Local File Storage connection based prefix:
-            # storage.path=/home/user, full_path=/home/user/a/b/c/1.jpg =>
-            # full_path.startswith(path) => True
-            localfiles_storage = LocalFilesImportStorage.objects \
-                .annotate(_full_path=Value(os.path.dirname(full_path), output_field=CharField())) \
-                .filter(_full_path__startswith=F('path'))
-            if localfiles_storage.exists():
-                user_has_permissions = any(storage.project.has_permission(user) for storage in localfiles_storage)
-        else:
-            user_has_permissions = link.has_permission(user)
+
+        # Try to find Local File Storage connection based prefix:
+        # storage.path=/home/user, full_path=/home/user/a/b/c/1.jpg =>
+        # full_path.startswith(path) => True
+        localfiles_storage = LocalFilesImportStorage.objects \
+            .annotate(_full_path=Value(os.path.dirname(full_path), output_field=CharField())) \
+            .filter(_full_path__startswith=F('path'))
+        if localfiles_storage.exists():
+            user_has_permissions = any(storage.project.has_permission(user) for storage in localfiles_storage)
 
         if user_has_permissions and os.path.exists(full_path):
             content_type, encoding = mimetypes.guess_type(str(full_path))
