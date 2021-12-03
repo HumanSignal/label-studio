@@ -256,7 +256,6 @@ class ProjectExportFilesAuthCheck(APIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                default=0,
                 description='A unique integer value identifying this project.')
         ]
     ),
@@ -274,7 +273,6 @@ class ProjectExportFilesAuthCheck(APIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                default=0,
                 description='A unique integer value identifying this project.')
         ]
     ),
@@ -333,13 +331,11 @@ class ExportListAPI(generics.ListCreateAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                default=0,
                 description='A unique integer value identifying this project.'),
             openapi.Parameter(
                 name='export_pk',
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_PATH,
-                default=0,
                 description='Primary key identifying the export file.'),
         ]
     ),
@@ -357,13 +353,11 @@ class ExportListAPI(generics.ListCreateAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                default=0,
                 description='A unique integer value identifying this project.'),
             openapi.Parameter(
                 name='export_pk',
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_PATH,
-                default=0,
                 description='Primary key identifying the export file.'),
         ]
     ),
@@ -412,13 +406,11 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                default=0,
                 description='A unique integer value identifying this project.'),
             openapi.Parameter(
                 name='export_pk',
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_PATH,
-                default=0,
                 description='Primary key identifying the export file.'),
         ],
     ),

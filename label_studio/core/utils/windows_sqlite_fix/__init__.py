@@ -2,7 +2,7 @@ import os
 import sys
 import colorama
 import logging
-import urllib.request
+import requests
 
 
 logger = logging.getLogger('main')
@@ -22,11 +22,11 @@ def start_fix():
 
     src = os.path.join(work_dir, 'sqlite.zip')
     try:
-        with urllib.request.urlopen(url) as f:
-            with open(src, 'wb') as f_out:
-                f_out.write(f.read())
-    except:
-        print(colorama.Fore.LIGHTRED_EX + "\nCan't download sqlite.zip. Please, download it manually:\n" + url)
+        with open(src, 'wb') as f_out:
+            resp = requests.get(url, verify=False)
+            f_out.write(resp.content)
+    except Exception as e:
+        print(colorama.Fore.LIGHTRED_EX + f"\nCan't download sqlite.zip: {e}\nPlease, download it manually and extract in the current directory:\n" + url)
         print(colorama.Fore.WHITE)
         exit()
 

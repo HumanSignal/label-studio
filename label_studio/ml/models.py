@@ -133,7 +133,7 @@ class MLBackend(models.Model):
                 model_version = setup_response.response.get('model_version')
                 logger.info(f'ML backend responds with success: {setup_response.response}')
                 self.model_version = model_version
-                if model_version != self.project.model_version:
+                if (model_version != self.project.model_version) and (self.project.model_version == ""):
                     logger.debug(f'Changing project model version: {self.project.model_version} -> {model_version}')
                     self.project.model_version = model_version
                     self.project.save(update_fields=['model_version'])
@@ -180,7 +180,7 @@ class MLBackend(models.Model):
             return
 
         # ML Backend doesn't support batch of tasks, do it one by one
-        elif len(responses) == 1:
+        elif len(responses) == 1 and len(tasks) != 1:
             logger.warning(
                 f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
                 f"switched to one-by-one task retrieval"

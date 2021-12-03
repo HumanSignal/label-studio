@@ -40,7 +40,7 @@ The following command line arguments are optional and must be specified with `la
 | `-d` `--debug` | N/A | `False` | Enable debug mode for troubleshooting Label Studio. |
 | `-c` `--config` | `CONFIG_PATH` | `default_config.json` | Deprecated, do not use. Specify the path to the server configuration for Label Studio. |
 | `-l` `--label-config` | `LABEL_STUDIO_LABEL_CONFIG` | `None` | Path to the label configuration file for a specific Label Studio project. See [Set up your labeling project](setup.html). |
-| `--ml-backends` | `LABEL_STUDIO_ML_BACKENDS` | `None` | Command line argument is deprecated. Specify the URLs for one or more machine learning backends. See [Set up machine learning with your labeling process](ml.html). |
+| `--ml-backends` | N/A | `None` | Command line argument is deprecated. Specify the URLs for one or more machine learning backends. See [Set up machine learning with your labeling process](ml.html). |
 | `--sampling` | N/A | `sequential` | Specify one of sequential or uniform to define the order for labeling tasks. See [Set up task sampling for your project](start.html#Set_up_task_sampling_for_your_project) on this page. |
 | `--log-level` | N/A | `ERROR` | One of DEBUG, INFO, WARNING, or ERROR. Use to specify the logging level for the Label Studio server. |
 | `-p` `--port` | `LABEL_STUDIO_PORT` | `8080` | Specify the web server port for Label Studio. Defaults to 8080. See [Run Label Studio on localhost with a different port](start.html#Run-Label-Studio-on-localhost-with-a-different-port) on this page. |
