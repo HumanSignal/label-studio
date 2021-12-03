@@ -1,6 +1,6 @@
 {
-  "message": "[fix] keep label selected; order after ctrl+z (#358)\n\n- keep label selected if such setting selected even after region removal\r\n- restore correct order when you:\r\n  a. create region, press ctrl+z\r\n  b. delete region, press ctrl+shift+z\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>\r\nCo-authored-by: niklub <lubimov.nicolas@gmail.com>\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "6494ffaf3cdaf5c2564371a66d809aa50ea3bda0",
-  "branch": "master",
-  "date": "2021-11-26T16:39:40Z"
+  "message": "Fix resize observer crash when Image URL is not provided",
+  "commit": "23580b27a85248d6fc616b58dd9daecd267c9a3b",
+  "branch": "fix/dev-1247/resize-observer-crash",
+  "date": "2021-12-02T17:07:52Z"
 }
