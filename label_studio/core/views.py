@@ -166,6 +166,7 @@ def samples_paragraphs(request):
 
 def localfiles_data(request):
     """Serving files for LocalFilesImportStorage"""
+    user = request.user
     path = request.GET.get('d')
     if settings.LOCAL_FILES_SERVING_ENABLED is False:
         return HttpResponseForbidden("Serving local files can be dangerous, so it's disabled by default. "
@@ -182,9 +183,9 @@ def localfiles_data(request):
             # Try to find Local File Storage connection based prefix
             localfiles_storage = LocalFilesImportStorage.objects.filter(path=os.path.dirname(full_path))
             if localfiles_storage.exists():
-                user_has_permissions = localfiles_storage.first().project.has_permission(request.user)
+                user_has_permissions = any(storage.project.has_permission(user) for storage in localfiles_storage)
         else:
-            user_has_permissions = link.has_permission(request.user)
+            user_has_permissions = link.has_permission(user)
 
         if user_has_permissions and os.path.exists(full_path):
             content_type, encoding = mimetypes.guess_type(str(full_path))
