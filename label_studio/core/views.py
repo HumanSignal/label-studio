@@ -27,7 +27,7 @@ from core.utils.io import find_file
 from core.utils.params import get_env
 from core.label_config import generate_time_series_json
 from core.utils.common import collect_versions
-from io_storages.localfiles.models import LocalFilesImportStorageLink
+from io_storages.localfiles.models import LocalFilesImportStorageLink, LocalFilesImportStorage
 
 logger = logging.getLogger(__name__)
 
@@ -177,7 +177,16 @@ def localfiles_data(request):
         path = posixpath.normpath(path).lstrip('/')
         full_path = Path(safe_join(local_serving_document_root, path))
         link = LocalFilesImportStorageLink.objects.filter(key=str(full_path)).first()
-        if link and link.has_permission(request.user) and os.path.exists(full_path):
+        user_has_permissions = False
+        if not link:
+            # Try to find Local File Storage connection based prefix
+            localfiles_storage = LocalFilesImportStorage.objects.filter(path=path)
+            if localfiles_storage.exists():
+                user_has_permissions = localfiles_storage.project.has_permission(request.user)
+        else:
+            user_has_permissions = link.has_permission(request.user)
+
+        if user_has_permissions and os.path.exists(full_path):
             content_type, encoding = mimetypes.guess_type(str(full_path))
             content_type = content_type or 'application/octet-stream'
             return RangedFileResponse(request, open(full_path, mode='rb'), content_type)
