@@ -64,10 +64,11 @@ class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):
     def get_data(self, key):
         path = Path(key)
         if self.use_blob_urls:
-            # include self-hosted links pointed to local resources via {settings.HOSTNAME}/data/local-files?d=<path/to/local/dir>
+            # include self-hosted links pointed to local resources via
+            # {settings.HOSTNAME}/data/local-files?d=<path/to/local/dir>
             document_root = Path(get_env('LOCAL_FILES_DOCUMENT_ROOT', default='/'))
             relative_path = str(path.relative_to(document_root))
-            return {settings.DATA_UNDEFINED_NAME: f'{settings.HOSTNAME}/data/local-files/?d={relative_path}'}
+            return {settings.DATA_UNDEFINED_NAME: f'{settings.HOSTNAME}/data/local-files/?d={str(relative_path)}'}
 
         try:
             with open(path, encoding='utf8') as f:
