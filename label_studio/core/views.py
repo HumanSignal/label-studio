@@ -174,7 +174,7 @@ def localfiles_data(request):
                                      'You can enable it with LOCAL_FILES_SERVING_ENABLED environment variable, '
                                      'please check docs: https://labelstud.io/guide/storage.html#Local-storage')
 
-    local_serving_document_root = get_env('LOCAL_FILES_DOCUMENT_ROOT', default='/')
+    local_serving_document_root = settings.LOCAL_FILES_DOCUMENT_ROOT
     if path and request.user.is_authenticated:
         path = posixpath.normpath(path).lstrip('/')
         full_path = Path(safe_join(local_serving_document_root, path))
