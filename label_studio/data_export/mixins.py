@@ -127,9 +127,9 @@ class ExportMixin:
                 'annotations__completed_by'
             ].get('only_id'):
                 options['expand'].append('annotations.completed_by')
-            options['interpolate_key_frames'] = settings.INTERPOLATE_KEY_FRAMES
+            options['context'] = {'interpolate_key_frames': settings.INTERPOLATE_KEY_FRAMES}
             if 'interpolate_key_frames' in serialization_options:
-                options['interpolate_key_frames'] = serialization_options['serialization_options']
+                options['context']['interpolate_key_frames'] = serialization_options['serialization_options']
         return options
 
     def get_task_queryset(self, ids, annotation_filter_options):
