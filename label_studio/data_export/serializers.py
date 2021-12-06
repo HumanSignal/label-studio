@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from django.conf import settings
+from label_studio_tools.core.label_config import is_video_object_tracking
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
 
@@ -34,14 +35,9 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
 
     def get_result(self, obj):
         # run frames extraction on param, result and result type
-        if self.context.get('interpolate_key_frames', False) and obj.result and any(item['type'] == 'videorectangle' for item in list(obj.result)):
-            final_results = []
-            for res in obj.result:
-                if res['type'].lower() in ["videorectangle"]:
-                    final_results.extend(extract_key_frames([res]))
-                else:
-                    final_results.append(res)
-            return final_results
+        if obj.result and self.context.get('interpolate_key_frames', False) and \
+                is_video_object_tracking(obj.task.project.label_config):
+            return extract_key_frames(obj.result)
         return obj.result
 
 
@@ -126,5 +122,16 @@ class ExportCreateSerializer(ExportSerializer):
     annotation_filter_options = AnnotationFilterOptionsSerializer(required=False, default=None)
     serialization_options = SerializationOptionsSerializer(required=False, default=None)
 
+
+class ExportParamSerializer(serializers.Serializer):
+    interpolate_key_frames = serializers.BooleanField(default=settings.INTERPOLATE_KEY_FRAMES,
+                                                      help_text='Interpolate video key frames.')
+    download_resources = serializers.BooleanField(default=settings.CONVERTER_DOWNLOAD_RESOURCES,
+                                                  help_text='Download resources in converter.')
+    export_type = serializers.StringRelatedField(default='JSON',
+                                                 help_text='Export file format.')
+    download_all_tasks = serializers.BooleanField(default=False,
+                                                  help_text='Download all tasks or only finished.')
+    ids = serializers.ListField(help_text='IDs of tasks to export')
 
 ExportDataSerializer = load_func(settings.EXPORT_DATA_SERIALIZER)
