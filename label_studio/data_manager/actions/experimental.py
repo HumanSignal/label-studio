@@ -90,7 +90,7 @@ actions = [
         'experimental': True,
         'dialog': {
             'text': 'Confirm that you want to copy the source annotation to all selected tasks. '
-                    'Note: this could be applied only for similar source objects: '
+                    'Note: this action can be applied only for similar source objects: '
                     'images with the same width and height, '
                     'texts with the same length, '
                     'audios with the same durations.',
