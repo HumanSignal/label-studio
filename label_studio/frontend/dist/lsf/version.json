@@ -1,6 +1,6 @@
 {
-  "message": "Fix resize observer crash when Image URL is not provided",
-  "commit": "23580b27a85248d6fc616b58dd9daecd267c9a3b",
-  "branch": "fix/dev-1247/resize-observer-crash",
-  "date": "2021-12-02T17:07:52Z"
+  "message": "[ext] Add wavesurfer vertical zoom control in editor",
+  "commit": "8deeed9151a44746714e909712c95c8a8df7da93",
+  "branch": "feature/DEV-1236/audio-zoom-y",
+  "date": "2021-12-06T16:21:32Z"
 }
