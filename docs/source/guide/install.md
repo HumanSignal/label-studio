@@ -12,7 +12,6 @@ Install Label Studio on premises or in the cloud. Choose the installation method
 - [Install on Ubuntu](#Install-on-Ubuntu)
 - [Install from source](#Install-from-source)
 - [Install with Anaconda](#Install-with-Anaconda)
-- [Install for local development](#Install-for-local-development)
 - [Upgrade Label Studio](#Upgrade-Label-Studio)
 
 <!-- md deploy.md -->
@@ -75,7 +74,7 @@ docker build -t heartexlabs/label-studio:latest .
 ```
 
 ### Run with Docker Compose
-Use Docker Compose to serve Label Studio at `http://localhost:8080`.
+Use Docker Compose to serve Label Studio at `http://localhost:8080`. You must use Docker Compose version 1.25.0 or higher.
 
 Start Label Studio:
 ```bash

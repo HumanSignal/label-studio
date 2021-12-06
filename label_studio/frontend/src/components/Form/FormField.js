@@ -1,4 +1,5 @@
 import { forwardRef, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { isDefined } from '../../utils/helpers';
 import { FormContext } from "./FormContext";
 import * as Validators from './Validation/Validators';
 
@@ -9,8 +10,11 @@ export const FormField = forwardRef(({
   required,
   validate,
   skip,
+  allowEmpty,
+  skipAutofill,
   setValue,
   dependency,
+  validators,
   ...props
 }, ref) => {
   /**@type {Form} */
@@ -22,6 +26,19 @@ export const FormField = forwardRef(({
   const validation = [
     ...(validate ?? []),
   ];
+
+  validators?.forEach?.(validator => {
+    const [name, value] = validator.split(/:(.+)/).slice(0, 2);
+    const validatorFunc = Validators[name];
+
+    if (isDefined(validatorFunc)) {
+      if (isDefined(value)) {
+        validation.push(validatorFunc(value));
+      } else {
+        validation.push(validatorFunc);
+      }
+    }
+  });
 
   if (required) validation.push(Validators.required);
 
@@ -56,21 +73,29 @@ export const FormField = forwardRef(({
       setValue(value);
     } else if (input.type === 'checkbox' || input.type === 'radio') {
       input.checked = value ?? input.checked;
+    } else if (value === null) {
+      input.value = "";
     } else {
       input.value = value;
     }
 
     const evt = document.createEvent("HTMLEvents");
+
     evt.initEvent("change", false, true);
     input.dispatchEvent(evt);
   }, [field]);
 
   useEffect(() => {
+    const isProtected = skipAutofill && !allowEmpty && field.current.type === 'password';
+
     context?.registerField({
       label,
       name,
       validation,
       skip,
+      allowEmpty,
+      skipAutofill,
+      isProtected,
       field: field.current,
       setValue: setValueCallback,
     });

@@ -11,33 +11,36 @@ from django.db import IntegrityError
 from django.db.models.fields import DecimalField
 from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
+from django.utils.decorators import method_decorator
 from django.db.models import Q, When, Count, Case, OuterRef, Max, Exists, Value, BooleanField
 from rest_framework import generics, status, filters
 from rest_framework.exceptions import NotFound, ValidationError as RestValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import exception_handler
 
-from core.utils.common import conditional_atomic
+from core.utils.common import conditional_atomic, temporary_disconnect_all_signals
 from core.label_config import config_essential_data_has_changed
 from projects.models import (
-    Project, ProjectSummary
+    Project, ProjectSummary, ProjectManager
 )
 from projects.serializers import (
     ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer
 )
 from tasks.models import Task, Annotation, Prediction, TaskLock
-from tasks.serializers import TaskSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer
+from tasks.serializers import TaskSerializer, TaskSimpleSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer
+from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
+from webhooks.models import WebhookAction
 
-from core.mixins import APIViewVirtualRedirectMixin, APIViewVirtualMethodMixin
 from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import (
     get_object_with_check_and_log, bool_from_request, paginator, paginator_help)
 from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
 from core.utils.io import find_dir, find_file, read_yaml
 
-from data_manager.functions import get_prepared_queryset
+from data_manager.functions import get_prepared_queryset, filters_ordering_selected_items_exist
 from data_manager.models import View
 
 logger = logging.getLogger(__name__)
@@ -79,23 +82,43 @@ _task_data_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     example={
         'id': 1,
-        'my_image_url': 'https://app.heartex.ai/static/samples/kittens.jpg'
+        'my_image_url': '/static/samples/kittens.jpg'
     }
 )
 
 
-class ProjectListAPI(generics.ListCreateAPIView):
-    """
-    get:
-    List your projects
+class ProjectListPagination(PageNumberPagination):
+    page_size = 30
+    page_size_query_param = 'page_size'
 
+
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Projects'],
+    operation_summary='List your projects',
+    operation_description="""
     Return a list of the projects that you've created.
 
-    post:
-    Create new project
-
-    Create a labeling project.
-    """
+    To perform most tasks with the Label Studio API, you must specify the project ID, sometimes referred to as the `pk`.
+    To retrieve a list of your Label Studio projects, update the following command to match your own environment.
+    Replace the domain name, port, and authorization token, then run the following from the command line:
+    ```bash
+    curl -X GET {}/api/projects/ -H 'Authorization: Token abc123'
+    ```
+    """.format(settings.HOSTNAME or 'https://localhost:8080')
+))
+@method_decorator(name='post', decorator=swagger_auto_schema(
+    tags=['Projects'],
+    operation_summary='Create new project',
+    operation_description="""
+    Create a project and set up the labeling interface in Label Studio using the API.
+    
+    ```bash
+    curl -H Content-Type:application/json -H 'Authorization: Token abc123' -X POST '{}/api/projects' \
+    --data "{{\"label_config\": \"<View>[...]</View>\"}}"
+    ```
+    """.format(settings.HOSTNAME or 'https://localhost:8080')
+))
+class ProjectListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ProjectSerializer
     filter_backends = [filters.OrderingFilter]
@@ -104,9 +127,11 @@ class ProjectListAPI(generics.ListCreateAPIView):
         POST=all_permissions.projects_create,
     )
     ordering = ['-created_at']
+    pagination_class = ProjectListPagination
 
     def get_queryset(self):
-        return Project.objects.with_counts().filter(organization=self.request.user.active_organization)
+        projects = Project.objects.filter(organization=self.request.user.active_organization)
+        return ProjectManager.with_counts_annotate(projects)
 
     def get_serializer_context(self):
         context = super(ProjectListAPI, self).get_serializer_context()
@@ -122,34 +147,32 @@ class ProjectListAPI(generics.ListCreateAPIView):
                                             format(ser.validated_data.get('title', '')))
             raise LabelStudioDatabaseException('Database error during project creation. Try again.')
 
-    @swagger_auto_schema(tags=['Projects'])
     def get(self, request, *args, **kwargs):
         return super(ProjectListAPI, self).get(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Projects'], request_body=ProjectSerializer)
+    @api_webhook(WebhookAction.PROJECT_CREATED)
     def post(self, request, *args, **kwargs):
         return super(ProjectListAPI, self).post(request, *args, **kwargs)
 
 
-class ProjectAPI(APIViewVirtualRedirectMixin,
-                 APIViewVirtualMethodMixin,
-                 generics.RetrieveUpdateDestroyAPIView):
-    """
-    get:
-    Get project by ID
+@method_decorator(name='get', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Get project by ID',
+        operation_description='Retrieve information about a project by project ID.'
+    ))
+@method_decorator(name='delete', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Delete project',
+        operation_description='Delete a project by specified project ID.'
+    ))
+@method_decorator(name='patch', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Update project',
+        operation_description='Update the project settings for a specific project.',
+        request_body=ProjectSerializer
+    ))
+class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
 
-    Retrieve information about a project by ID.
-
-    patch:
-    Update project
-
-    Update project settings for a specific project.
-
-    delete:
-    Delete project
-
-    Delete a project by specified project ID.
-    """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = Project.objects.with_counts()
     permission_required = ViewClassPermission(
@@ -167,15 +190,14 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
     def get_queryset(self):
         return Project.objects.with_counts().filter(organization=self.request.user.active_organization)
 
-    @swagger_auto_schema(tags=['Projects'])
     def get(self, request, *args, **kwargs):
         return super(ProjectAPI, self).get(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Projects'])
+    @api_webhook_for_delete(WebhookAction.PROJECT_DELETED)
     def delete(self, request, *args, **kwargs):
         return super(ProjectAPI, self).delete(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Projects'], request_body=ProjectSerializer)
+    @api_webhook(WebhookAction.PROJECT_UPDATED)
     def patch(self, request, *args, **kwargs):
         project = self.get_object()
         label_config = self.request.data.get('label_config')
@@ -193,43 +215,32 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
         return super(ProjectAPI, self).patch(request, *args, **kwargs)
 
     def perform_destroy(self, instance):
-        """Performance optimization for whole project deletion
-        if we catch constraint error fallback to regular .delete() method"""
-        try:
-            task_annotation_qs = Annotation.objects.filter(task__project_id=instance.id)
-            task_annotation_qs._raw_delete(task_annotation_qs.db)
-            task_prediction_qs = Prediction.objects.filter(task__project_id=instance.id)
-            task_prediction_qs._raw_delete(task_prediction_qs.db)
-            task_locks_qs = TaskLock.objects.filter(task__project_id=instance.id)
-            task_locks_qs._raw_delete(task_locks_qs.db)
-            task_qs = Task.objects.filter(project_id=instance.id)
-            task_qs._raw_delete(task_qs.db)
-            instance.delete()
-        except IntegrityError as e:
-            logger.error('Fallback to cascade deleting after integrity_error: {}'.format(str(e)))
+        # we don't need to relaculate counters if we delete whole project
+        with temporary_disconnect_all_signals():
             instance.delete()
 
     @swagger_auto_schema(auto_schema=None)
-    def post(self, request, *args, **kwargs):
-        return super(ProjectAPI, self).post(request, *args, **kwargs)
-
-    @swagger_auto_schema(auto_schema=None)
+    @api_webhook(WebhookAction.PROJECT_UPDATED)
     def put(self, request, *args, **kwargs):
         return super(ProjectAPI, self).put(request, *args, **kwargs)
 
 
-class ProjectNextTaskAPI(generics.RetrieveAPIView):
-    """get:
-    Get next task to label
-
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Projects'],
+    operation_summary='Get next task to label',
+    operation_description="""
     Get the next task for labeling. If you enable Machine Learning in
     your project, the response might include a "predictions"
     field. It contains a machine learning prediction result for
     this task.
+    """,
+    responses={200: TaskWithAnnotationsAndPredictionsAndDraftsSerializer()}
+    ))  # leaving this method decorator info in case we put it back in swagger API docs
+class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
-    """
     permission_required = all_permissions.tasks_view
     serializer_class = TaskWithAnnotationsAndPredictionsAndDraftsSerializer  # using it for swagger API docs
+    swagger_schema = None # this endpoint doesn't need to be in swagger API docs
 
     def _get_random_unlocked(self, task_query, upper_limit=None):
         # get random task from task query, ignoring locked tasks
@@ -250,7 +261,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 else:
                     try:
                         task = Task.objects.select_for_update(skip_locked=True).get(pk=task.id)
-                        if not task.has_lock():
+                        if not task.has_lock(self.current_user):
                             return task
                     except Task.DoesNotExist:
                         logger.debug('Task with id {} locked'.format(task.id))
@@ -260,7 +271,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         for task_id in tasks_query.values_list('id', flat=True):
             try:
                 task = Task.objects.select_for_update(skip_locked=True).get(pk=task_id)
-                if not task.has_lock():
+                if not task.has_lock(self.current_user):
                     return task
             except Task.DoesNotExist:
                 logger.debug('Task with id {} locked'.format(task_id))
@@ -329,7 +340,8 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             # order each task by the count of how many tasks solved in it's cluster
             cluster_num_solved_map = [When(predictions__cluster=k, then=v) for k, v in user_solved_clusters.items()]
 
-            num_tasks_with_current_predictions = task_with_current_predictions.count()  # WARNING! this call doesn't work after consequent annotate
+            # WARNING! this call doesn't work after consequent annotate
+            num_tasks_with_current_predictions = task_with_current_predictions.count()
             if cluster_num_solved_map:
                 task_with_current_predictions = task_with_current_predictions.annotate(
                     cluster_num_solved=Case(*cluster_num_solved_map, default=0, output_field=DecimalField()))
@@ -352,7 +364,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             next_task = self._get_random_unlocked(tasks)
         return next_task
 
-    def _make_response(self, next_task, request, use_task_lock=True):
+    def _make_response(self, next_task, request, use_task_lock=True, queue=''):
         """Once next task has chosen, this function triggers inference and prepare the API response"""
         user = request.user
         project = next_task.project
@@ -362,9 +374,9 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             next_task.set_lock(request.user)
 
         # call machine learning api and format response
-        if project.show_collab_predictions and not next_task.predictions.exists():
+        if project.show_collab_predictions:
             for ml_backend in project.ml_backends.all():
-                ml_backend.predict_one_task(next_task)
+                ml_backend.predict_tasks([next_task])
 
         # serialize task
         context = {'request': request, 'project': project, 'resolve_uri': True,
@@ -382,15 +394,15 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         if not project.show_collab_predictions:
             response['predictions'] = []
 
+        response['queue'] = queue
         return Response(response)
 
-    @swagger_auto_schema(
-        tags=['Projects'], responses={200: TaskWithAnnotationsAndPredictionsAndDraftsSerializer()}
-    )
     def get(self, request, *args, **kwargs):
         project = get_object_with_check_and_log(request, Project, pk=self.kwargs['pk'])
         self.check_object_permissions(request, project)
         user = request.user
+        self.current_user = user
+        dm_queue = filters_ordering_selected_items_exist(request.data)
 
         # support actions api call from actions/next_task.py
         if hasattr(self, 'prepared_tasks'):
@@ -400,87 +412,101 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             project.prepared_tasks = get_prepared_queryset(self.request, project)
 
         # detect solved and not solved tasks
-        user_solved_tasks_array = user.annotations.filter(ground_truth=False).filter(
-            Q(task__isnull=False)).values_list('task__pk', flat=True)
+        assigned_flag = hasattr(self, 'assignee_flag') and self.assignee_flag
+        user_solved_tasks_array = user.annotations.filter(ground_truth=False)
+        user_solved_tasks_array = user_solved_tasks_array.filter(task__isnull=False)\
+            .distinct().values_list('task__pk', flat=True)
 
         with conditional_atomic():
             not_solved_tasks = project.prepared_tasks.\
                 exclude(pk__in=user_solved_tasks_array)
 
             # if annotator is assigned for tasks, he must to solve it regardless of is_labeled=True
-            assigned_flag = hasattr(self, 'assignee_flag') and self.assignee_flag
+
             if not assigned_flag:
-                not_solved_tasks = not_solved_tasks.annotate(
-                    annotation_number=Count('annotations')).filter(annotation_number__lte=project.maximum_annotations)
+                not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
 
-            not_solved_tasks_count = not_solved_tasks.count()
+            # used only for debug logging, disabled for performance reasons
+            not_solved_tasks_count = 'unknown'
 
-            # return nothing if there are no tasks remain
-            if not_solved_tasks_count == 0:
-                raise NotFound(f'There are no tasks remaining to be annotated by the user={user}')
-            logger.debug(f'{not_solved_tasks_count} tasks that still need to be annotated for user={user}')
-
+            next_task = None
             # ordered by data manager
-            if assigned_flag:
+            if assigned_flag and not dm_queue:
                 next_task = not_solved_tasks.first()
                 if not next_task:
                     raise NotFound('No more tasks found')
-                return self._make_response(next_task, request, use_task_lock=False)
+                return self._make_response(next_task, request, use_task_lock=False, queue='Manually assigned queue')
 
             # If current user has already lock one task - return it (without setting the lock again)
             next_task = Task.get_locked_by(user, tasks=not_solved_tasks)
-            if next_task:
-                return self._make_response(next_task, request, use_task_lock=False)
+            if next_task and not dm_queue:
+                return self._make_response(next_task, request, use_task_lock=False, queue='Task lock')
 
-            if project.show_ground_truth_first:
+            if project.show_ground_truth_first and not dm_queue:
                 logger.debug(f'User={request.user} tries ground truth from {not_solved_tasks_count} tasks')
                 next_task = self._try_ground_truth(not_solved_tasks, project)
                 if next_task:
-                    return self._make_response(next_task, request)
+                    return self._make_response(next_task, request, queue='Ground truth queue')
 
-            if project.show_overlap_first:
+            queue_info = ''
+
+            # show tasks with overlap > 1 first
+            if project.show_overlap_first and not dm_queue:
                 # don't output anything - just filter tasks with overlap
                 logger.debug(f'User={request.user} tries overlap first from {not_solved_tasks_count} tasks')
                 _, not_solved_tasks = self._try_tasks_with_overlap(not_solved_tasks)
+                queue_info += 'Show overlap first'
 
-            # don't use this mode for data manager sorting, because the sorting becomes not obvious
-            if project.sampling != project.SEQUENCE:
-                # if there any tasks in progress (with maximum number of annotations), randomly sampling from them
-                logger.debug(f'User={request.user} tries depth first from {not_solved_tasks_count} tasks')
+            # if there any tasks in progress (with maximum number of annotations), randomly sampling from them
+            logger.debug(f'User={request.user} tries depth first from {not_solved_tasks_count} tasks')
+
+            if project.maximum_annotations > 1 and not dm_queue:
                 next_task = self._try_breadth_first(not_solved_tasks)
                 if next_task:
-                    return self._make_response(next_task, request)
+                    queue_info += (' & ' if queue_info else '') + 'Breadth first queue'
+                    return self._make_response(next_task, request, queue=queue_info)
 
-            if project.sampling == project.UNCERTAINTY:
+            # data manager queue
+            if dm_queue:
+                queue_info += (' & ' if queue_info else '') + 'Data manager queue'
+                logger.debug(f'User={request.user} tries sequence sampling from {not_solved_tasks_count} tasks')
+                next_task = not_solved_tasks.first()
+
+            elif project.sampling == project.SEQUENCE:
+                queue_info += (' & ' if queue_info else '') + 'Sequence queue'
+                logger.debug(f'User={request.user} tries sequence sampling from {not_solved_tasks_count} tasks')
+                next_task = self._get_first_unlocked(not_solved_tasks)
+
+            elif project.sampling == project.UNCERTAINTY:
+                queue_info += (' & ' if queue_info else '') + 'Active learning or random queue'
                 logger.debug(f'User={request.user} tries uncertainty sampling from {not_solved_tasks_count} tasks')
                 next_task = self._try_uncertainty_sampling(not_solved_tasks, project, user_solved_tasks_array)
 
             elif project.sampling == project.UNIFORM:
+                queue_info += (' & ' if queue_info else '') + 'Uniform random queue'
                 logger.debug(f'User={request.user} tries random sampling from {not_solved_tasks_count} tasks')
                 next_task = self._get_random_unlocked(not_solved_tasks)
 
-            elif project.sampling == project.SEQUENCE:
-                logger.debug(f'User={request.user} tries sequence sampling from {not_solved_tasks_count} tasks')
-                next_task = self._get_first_unlocked(not_solved_tasks)
-
             if next_task:
-                return self._make_response(next_task, request)
+                return self._make_response(next_task, request, queue=queue_info)
             else:
                 raise NotFound(
-                    f'There are still some tasks to complete for the user={user}, but they seem to be locked by another user.')
+                    f'There are still some tasks to complete for the user={user}, '
+                    f'but they seem to be locked by another user.')
 
 
+@method_decorator(name='post', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Validate label config',
+        operation_description='Validate an arbitrary labeling configuration.',
+        responses={200: 'Validation success'},
+        request_body=ProjectLabelConfigSerializer,
+    ))
 class LabelConfigValidateAPI(generics.CreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_classes = (AllowAny,)
     serializer_class = ProjectLabelConfigSerializer
 
-    @swagger_auto_schema(
-        tags=['Projects'],
-        operation_summary='Validate label config',
-        operation_description='Validate a labeling configuration for a project.',
-        responses={200: 'Validation success'}
-    )
     def post(self, request, *args, **kwargs):
         return super(LabelConfigValidateAPI, self).post(request, *args, **kwargs)
 
@@ -497,6 +523,21 @@ class LabelConfigValidateAPI(generics.CreateAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@method_decorator(name='post', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Validate project label config',
+        operation_description="""
+        Determine whether the label configuration for a specific project is valid.
+        """,
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project.'),
+        ],
+        request_body=ProjectLabelConfigSerializer,
+))
 class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
     """ Validate label config
     """
@@ -505,16 +546,6 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
     queryset = Project.objects.all()
 
-    @swagger_auto_schema(
-        tags=['Projects'],
-        operation_summary='Validate a label config',
-        manual_parameters=[
-            openapi.Parameter(
-                name='label_config',
-                type=openapi.TYPE_STRING,
-                in_=openapi.IN_QUERY,
-                description='labeling config')
-        ])
     def post(self, request, *args, **kwargs):
         project = self.get_object()
         label_config = self.request.data.get('label_config')
@@ -537,27 +568,45 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_view
     queryset = ProjectSummary.objects.all()
 
-    @swagger_auto_schema(tags=['Projects'], operation_summary='Project summary')
+    @swagger_auto_schema(auto_schema=None)
     def get(self, *args, **kwargs):
         return super(ProjectSummaryAPI, self).get(*args, **kwargs)
 
 
-class TasksListAPI(generics.ListCreateAPIView,
-                   generics.DestroyAPIView,
-                   APIViewVirtualMethodMixin,
-                   APIViewVirtualRedirectMixin):
-    """
-    get:
-    List project tasks
+@method_decorator(name='delete', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Delete all tasks',
+        operation_description='Delete all tasks from a specific project.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project.'),
+        ],
+))
+@method_decorator(name='get', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='List project tasks',
+        operation_description="""
+            Retrieve a paginated list of tasks for a specific project. For example, use the following cURL command:
+            ```bash
+            curl -X GET {}/api/projects/{{id}}/tasks/ -H 'Authorization: Token abc123'
+            ```
+        """.format(settings.HOSTNAME or 'https://localhost:8080'),
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project.'),
+        ],
+    ))
+class ProjectTaskListAPI(generics.ListCreateAPIView,
+                         generics.DestroyAPIView):
 
-    Paginated list of tasks for a specific project.
-
-    delete:
-    Delete all tasks
-
-    Delete all tasks from a specific project.
-    """
     parser_classes = (JSONParser, FormParser)
+    queryset = Task.objects.all()
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
         POST=all_permissions.tasks_change,
@@ -567,33 +616,40 @@ class TasksListAPI(generics.ListCreateAPIView,
     redirect_route = 'projects:project-settings'
     redirect_kwarg = 'pk'
 
-    def get_queryset(self):
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return TaskSimpleSerializer
+        else:
+            return TaskSerializer
+
+    def filter_queryset(self, queryset):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
         tasks = Task.objects.filter(project=project)
         return paginator(tasks, self.request)
 
-    @swagger_auto_schema(tags=['Projects'])
     def delete(self, request, *args, **kwargs):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        task_ids = list(Task.objects.filter(project=project).values('id'))
         Task.objects.filter(project=project).delete()
-        return Response(status=204)
+        emit_webhooks_for_instance(request.user.active_organization, None, WebhookAction.TASKS_DELETED, task_ids)
+        return Response(data={'tasks': task_ids}, status=204)
 
-    @swagger_auto_schema(**paginator_help('tasks', 'Projects'))
     def get(self, *args, **kwargs):
-        return super(TasksListAPI, self).get(*args, **kwargs)
+        return super(ProjectTaskListAPI, self).get(*args, **kwargs)
 
-    @swagger_auto_schema(auto_schema=None, tags=['Projects'])
+    @swagger_auto_schema(auto_schema=None)
     def post(self, *args, **kwargs):
-        return super(TasksListAPI, self).post(*args, **kwargs)
+        return super(ProjectTaskListAPI, self).post(*args, **kwargs)
 
     def get_serializer_context(self):
-        context = super(TasksListAPI, self).get_serializer_context()
+        context = super(ProjectTaskListAPI, self).get_serializer_context()
         context['project'] = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
         return context
 
     def perform_create(self, serializer):
         project = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
-        serializer.save(project=project)
+        instance = serializer.save(project=project)
+        emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])
 
 
 class TemplateListAPI(generics.ListAPIView):
@@ -631,3 +687,14 @@ class ProjectSampleTask(generics.RetrieveAPIView):
 
         project = self.get_object()
         return Response({'sample_task': project.get_sample_task(label_config)}, status=200)
+
+
+class ProjectModelVersions(generics.RetrieveAPIView):
+    parser_classes = (JSONParser,)
+    swagger_schema = None
+    permission_required = all_permissions.projects_view
+    queryset = Project.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        project = self.get_object()
+        return Response(data=project.get_model_versions(with_counters=True))

@@ -32,14 +32,46 @@ When you import pre-annotations into Label Studio, the `completions` field is no
 ### Changes to the endpoint response
 The endpoint response returns an `annotation_count` field instead of a `completion_count` field. If your script expects a response with this field, update it to expect a response with the new field. 
 
+### If migrated tasks don't display as expected
+Label Studio Enterprise version 2 allows you to upload data before or after you set up the labeling configuration. Because of that, when your data is migrated from version 1 to version 2, some tasks might not display properly. This happens because the data fields for some tasks change from having a reference to the data type of the labeling configuration, such as `image`, to `$undefined$`. 
+
+If this happens to you, update the affected tasks to use `$undefined$` as a key in the task instead of `image`, `text`, and so on.
+
+For example:
+```json
+{'id': 1, 
+  'data': 
+    {'image': "s3://example.png"}, 
+  'meta': {}, 
+  'created_at': '2021-08-09T16:00:03.123456Z', 
+  'updated_at': '2021-08-09T16:00:03.123456Z', 
+  'is_labeled': False, 
+  'overlap': 1, 
+  'project': 2, 
+  'file_upload': None, 
+  'annotations': [], 
+  'predictions': []
+}
+```
+
+Needs to be updated to the following, with the rest of the task data remaining the same:
+```json
+{'id': 1, 
+  'data': 
+    {'$undefined$': "s3://example.png"}, 
+  'meta': {}, 
+...
+}
+```
+
 ## Export data
 
-The export endpoint has changed, and so have the available options for that endpoint and the response parameters.
+The export endpoint has changed, and so have the available options for that endpoint and the response parameters. Rather than list all completions for a specific project, use the new export endpoint to see all the task and annotation details for a project.
 
 ### Updated export endpoint
 To export annotations from Label Studio Enterprise, you must call a new endpoint.
 
-Requests made to `/api/projects/<project_ID>/results` fail. Instead, call `/api/projects/<project_ID>/export?exportType=JSON`. See the [export API endpoint documentation](/api#operation/api_projects_export_read).
+Requests made to `/api/projects/<project_ID>/results/` or `/api/projects/<project_id>/completions/` fail. Instead, call `/api/projects/<project_ID>/export?exportType=JSON`. See the [export API endpoint documentation](/api#operation/api_projects_export_read).
 
 With this change, several arguments are no longer supported:
 
@@ -47,9 +79,9 @@ With this change, several arguments are no longer supported:
 | --- | --- |
 | `?aggregator_type=` | Cannot export aggregated annotations. |
 | `?finished=0` | No longer a default setting. Instead, use `download_all_tasks=true`. |
-| `?return_task=1` | Endpoint always returns all tasks. |
-| `?return_predictions=1` | Endpoint always returns predictions. |
-| `?return_ground_truths=1` | Endpoint always returns ground truth annotations. | 
+| `?return_task=1` | Tasks always returned. |
+| `?return_predictions=1` | Predictions always returned. |
+| `?return_ground_truths=1` | Ground truth annotations always returned. | 
 
 
 ### Changes to the endpoint response
@@ -60,7 +92,6 @@ The content of the response also has some changes:
 - `aggregated` is removed
 - `aggregated_completed_by` is removed
 - `aggregated_ids` is removed
-- `ground_truth` is removed
 - `result` is no longer a double list `"result": [[... ]]` and is now a single list `“result”: [...] `
 - `completed_by` IDs now refer to the actual user IDs (not "expert" IDs as before)
 
@@ -100,22 +131,39 @@ The content of the response also has some changes:
 
 
 ```json
-"annotations": [ 
- {
-   "result": [
-       {
-         "id": "7tHQ-n6xfo",
-         "type": "choices",
-         "value": {
-           "choices": [
-             "Neutral"
-           ]
-         },
-         "to_name": "text",
-         "from_name": "sentiment"
-       }
-   ]
- }
+"annotations":[
+   {
+      "id":362,
+      "completed_by":{
+         "id":1,
+         "email":"example@heartex.com",
+         "first_name":"",
+         "last_name":""
+      },
+      "result":[
+         {
+            "id":"7tHQ-n6xfo",
+            "type":"choices",
+            "value":{
+               "choices":[
+                  "Neutral"
+               ]
+            },
+            "to_name":"text",
+            "from_name":"sentiment"
+         }
+      ],
+      "was_cancelled":false,
+      "ground_truth":false,
+      "created_at":"2021-09-03T16:51:49.354140Z",
+      "updated_at":"2021-09-03T16:51:49.354261Z",
+      "lead_time":6.026,
+      "prediction":{
+         
+      },
+      "result_count":0,
+      "task":852
+   }
 ]
 ```
 
@@ -179,8 +227,62 @@ Some parameters have changed as listed in the following table:
 With the change from teams to workspaces, the `team_id` parameter is no longer supported in the POST payload to create a project using the API. 
 
 Instead, do the following:
-1. [Create a project](/api#operation/api_projects_create).
-2. [Add the project to a workspace](/api_workspaces_projects_create).
-3. [Add the project to a workspace](/api#operation/api_workspaces_post).
-
+1. [Create a workspace](/api#operation/api_workspaces_create)
+   - POST a request to `<host>/api/workspaces/` with the following request body:
+    ```json
+    {
+    "title": "string",
+    "description": "string",
+    "color": "string",
+    "is_personal": true
+    }
+   ```
+   - Or retrieve the details of an existing workspace by making a GET request to `<host>/api/workspaces/`.
+2. [Create a project and add it to a workspace](/api#operation/api_projects_create).
+    - POST a request to `<host>/api/projects/` with the following request body. All fields are optional:
+    ```json
+    {
+    "title": "string",
+    "description": "string",
+    "label_config": "string",
+    "expert_instruction": "string",
+    "show_instruction": true,
+    "show_skip_button": true,
+    "enable_empty_annotation": true,
+    "show_annotation_history": true,
+    "organization": 0,
+    "color": "string",
+    "maximum_annotations": -2147483648,
+    "is_published": true,
+    "model_version": "string",
+    "is_draft": true,
+    "created_by": {
+        "id": 1,
+        "first_name": "",
+        "last_name": "",
+        "email": "heartex@heartex.net"
+    },
+    "min_annotations_to_start_training": -2147483648,
+    "show_collab_predictions": true,
+    "sampling": "Sequential sampling",
+    "show_ground_truth_first": true,
+    "show_overlap_first": true,
+    "overlap_cohort_percentage": -2147483648,
+    "task_data_login": "string",
+    "task_data_password": "string",
+    "control_weights": {},
+    "evaluate_predictions_automatically": true,
+    "workspace": 0
+    }
+    ```
+3. [Add a user to a workspace](/api#operation/api_workspaces_post).
+    - POST a request to `<host>/api/workspaces/{id}/memberships/` with the workspace ID in the path, with the following request body:
+    ```json
+    {
+    "user": 0,
+    "workspace": 0
+    }
+    ```
+    - To retrieve a list of users in your organization, make a GET request to `<host>/api/users/`. 
+    
  

@@ -5,6 +5,7 @@ import { Form, Input } from '../../../components/Form';
 import { Oneof } from '../../../components/Oneof/Oneof';
 import { ApiContext } from '../../../providers/ApiProvider';
 import { Block, Elem } from '../../../utils/bem';
+import { isDefined } from '../../../utils/helpers';
 
 export const StorageForm = forwardRef(({
   onSubmit,
@@ -12,26 +13,15 @@ export const StorageForm = forwardRef(({
   project,
   rootClass,
   storage,
+  storageTypes,
 }, ref) => {
   /**@type {import('react').RefObject<Form>} */
   const api = useContext(ApiContext);
   const formRef = ref ?? useRef();
-  const [type, setType] = useState(storage?.type ?? 's3');
+  const [type, setType] = useState(storage?.type ?? storageTypes?.[0]?.name ?? 's3');
   const [checking, setChecking] = useState(false);
   const [connectionValid, setConnectionValid] = useState(null);
-  const [storageTypes, setStorageTypes] = useState([]);
-  const [form, setForm] = useState([]);
-
-  useEffect(() => {
-    api.callApi('storageTypes', {
-      params: {
-        target,
-      },
-    }).then(types => {
-      setStorageTypes(types);
-      if (!storage?.type) setType(types[0].name);
-    });
-  }, []);
+  const [formFields, setFormFields] = useState([]);
 
   useEffect(() => {
     api.callApi('storageForms', {
@@ -39,23 +29,23 @@ export const StorageForm = forwardRef(({
         target,
         type,
       },
-    }).then(formFields => setForm(formFields));
+    }).then(formFields => setFormFields(formFields ?? []));
   }, [type]);
 
-  const storageTypeSelect = {columnCount: 1, fields: [{
+  const storageTypeSelect = { columnCount: 1, fields: [{
     skip: true,
     type: "select",
     name: "storage_type",
     label: "Storage Type",
     disabled: !!storage,
-    options: storageTypes.map(({name, title}) => ({
+    options: storageTypes.map(({ name, title }) => ({
       value: name, label: title,
     })),
     value: storage?.type ?? type,
     onChange: (e) => {
       setType(e.target.value);
     },
-  }]};
+  }] };
 
   const validateStorageConnection = useCallback(async () => {
     setChecking(true);
@@ -64,8 +54,12 @@ export const StorageForm = forwardRef(({
     const form = formRef.current;
 
     if (form && form.validateFields()) {
-      const body = form.assembleFormData({asJSON: true});
+      const body = form.assembleFormData({ asJSON: true });
       const type = form.getField('storage_type').value;
+
+      if (isDefined(storage?.id)) {
+        body.id = storage.id;
+      }
 
       // we're using api provided by the form to be able to save
       // current api context and render inline erorrs properly
@@ -81,7 +75,7 @@ export const StorageForm = forwardRef(({
       else setConnectionValid(false);
     }
     setChecking(false);
-  }, [formRef, target, type]);
+  }, [formRef, target, type, storage]);
 
   const action = useMemo(() => {
     return storage ? "updateStorage" : "createStorage";
@@ -92,9 +86,9 @@ export const StorageForm = forwardRef(({
       ref={formRef}
       action={action}
       params={{ target, type, project, pk: storage?.id }}
-      fields={[storageTypeSelect, ...form]}
-      formData={{...(storage ?? {})}}
-      skipEmpty={true}
+      fields={[storageTypeSelect, ...(formFields ?? [])]}
+      formData={{ ...(storage ?? {}) }}
+      skipEmpty={false}
       onSubmit={onSubmit}
       autoFill="off"
       autoComplete="off"
@@ -103,8 +97,8 @@ export const StorageForm = forwardRef(({
       <Form.Actions valid={connectionValid} extra={(connectionValid !== null) && (
         <Block name="form-indicator">
           <Oneof value={connectionValid}>
-            <Elem tag="span" mod={{type: "success"}} name="item" case={true}>Successfully connected!</Elem>
-            <Elem tag="span" mod={{type: "fail"}} name="item" case={false}>Connection failed</Elem>
+            <Elem tag="span" mod={{ type: "success" }} name="item" case={true}>Successfully connected!</Elem>
+            <Elem tag="span" mod={{ type: "fail" }} name="item" case={false}>Connection failed</Elem>
           </Oneof>
         </Block>
       )}>

@@ -13,7 +13,7 @@ config: '
   </RectangleLabels>
 </View>
 
-<!--{"completions": [{"result":
+<!--{"annotations": [{"result":
 [
     {
         "original_width": 600,

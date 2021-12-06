@@ -1,0 +1,45 @@
+[
+  {
+    "data": {
+      "text": "Test example phrase 1",
+      "int_field": 1
+    },
+    "predictions": [
+      {
+        "result": [
+          {
+            "from_name": "text_class",
+            "to_name": "text",
+            "type": "choices",
+            "value": {
+              "choices": [
+                "class_A"
+              ]
+            }
+          }
+        ],
+        "model_version": "model_version_A"
+      }
+    ]
+  },
+  {
+    "int_field": 20,
+    "text": "x2"
+  },
+  {
+    "int_field": 30,
+    "text": "x3"
+  },
+  {
+    "int_field": 4,
+    "text": "x4"
+  },
+  {
+    "int_field": "50",
+    "text": "x5"
+  },
+
+  {
+   "text": "x6"
+  }
+]

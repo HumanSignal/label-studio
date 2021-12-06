@@ -2,19 +2,19 @@
 """
 from enum import Enum
 from typing import List, Optional, Union
-from pydantic import BaseModel
+from pydantic import BaseModel, StrictInt, StrictFloat, StrictStr, StrictBool, ConstrainedList
 
 
 class FilterIn(BaseModel):
-    min: Union[int, float, str]
-    max: Union[int, float, str]
+    min: Union[StrictInt, StrictFloat, StrictStr]
+    max: Union[StrictInt, StrictFloat, StrictStr]
 
 
 class Filter(BaseModel):
     filter: str
     operator: str
     type: str
-    value: Union[str, int, float, bool, FilterIn]
+    value: Union[StrictInt, StrictFloat, StrictBool, StrictStr, FilterIn, list]
 
 
 class ConjunctionEnum(Enum):
@@ -34,7 +34,7 @@ class SelectedItems(BaseModel):
 
 
 class PrepareParams(BaseModel):
-    project: Optional[int] = None
+    project: int
     ordering: List[str] = []
     selectedItems: Optional[SelectedItems] = None
     filters: Optional[Filters] = None

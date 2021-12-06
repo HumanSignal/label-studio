@@ -4,27 +4,30 @@ import json
 import logging
 import os
 import datetime
+import numbers
 
-from urllib.parse import urljoin
+from urllib.parse import urljoin, quote
 
 from django.conf import settings
-from django.db import models, connection
+from django.db import models, connection, transaction
 from django.db.models import Q, F, When, Count, Case, Subquery, OuterRef, Value
 from django.db.models.functions import Coalesce
 from django.db.models.signals import post_delete, pre_save, post_save, pre_delete
-from django.db.utils import ProgrammingError, OperationalError, DatabaseError
 from django.utils.translation import gettext_lazy as _
 from django.db.models import JSONField
 from django.urls import reverse
 from django.utils.timesince import timesince
 from django.utils.timezone import now
 from django.dispatch import receiver, Signal
+from rest_framework.exceptions import ValidationError
 
 from model_utils import FieldTracker
 
 from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func
 from core.utils.params import get_env
+from core.label_config import SINGLE_VALUED_TAGS
 from data_manager.managers import PreparedTaskManager, TaskManager
+from core.bulk_update_utils import bulk_update
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +51,7 @@ class Task(TaskMixin, models.Model):
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last time a task was updated')
     is_labeled = models.BooleanField(_('is_labeled'), default=False,
                                      help_text='True if the number of annotations for this task is greater than or equal '
-                                               'to the number of maximum_completions for the project')
+                                               'to the number of maximum_completions for the project', db_index=True)
     overlap = models.IntegerField(_('overlap'), default=1, db_index=True,
                                   help_text='Number of distinct annotators that processed the current task')
     file_upload = models.ForeignKey(
@@ -59,6 +62,16 @@ class Task(TaskMixin, models.Model):
 
     objects = TaskManager()  # task manager by default
     prepared = PreparedTaskManager()  # task manager with filters, ordering, etc for data_manager app
+
+    class Meta:
+        db_table = 'task'
+        ordering = ['-updated_at']
+        indexes = [
+            models.Index(fields=['project', 'is_labeled']),
+            models.Index(fields=['id', 'overlap']),
+            models.Index(fields=['overlap']),
+            models.Index(fields=['is_labeled'])
+        ]
 
     @property
     def file_upload_name(self):
@@ -81,13 +94,22 @@ class Task(TaskMixin, models.Model):
         if lock:
             return lock.task
 
-    def has_lock(self):
+    def has_lock(self, user=None):
         """Check whether current task has been locked by some user"""
         num_locks = self.num_locks
-        num_annotations = self.annotations.filter(ground_truth=False).count()
+        num_annotations = self.annotations.filter(ground_truth=False)\
+            .exclude(Q(was_cancelled=True) & ~Q(completed_by=user)).count()
+
         num = num_locks + num_annotations
         if num > self.overlap:
-            logger.error(f"Num takes={num} > overlap={self.overlap} for task={self.id} - it's a bug")
+            logger.error(
+                f"Num takes={num} > overlap={self.overlap} for task={self.id} - it's a bug",
+                extra=dict(
+                    lock_ttl=self.get_lock_ttl(),
+                    num_locks=num_locks,
+                    num_annotations=num_annotations,
+                )
+            )
         return num >= self.overlap
 
     @property
@@ -97,8 +119,7 @@ class Task(TaskMixin, models.Model):
     def get_lock_ttl(self):
         if settings.TASK_LOCK_TTL is not None:
             return settings.TASK_LOCK_TTL
-        avg_lead_time = self.project.annotations_lead_time()
-        return 3 * int(avg_lead_time) if avg_lead_time is not None else settings.TASK_LOCK_DEFAULT_TTL
+        return settings.TASK_LOCK_MIN_TTL
 
     def has_permission(self, user):
         return self.project.has_permission(user)
@@ -110,9 +131,10 @@ class Task(TaskMixin, models.Model):
         """Lock current task by specified user. Lock lifetime is set by `expire_in_secs`"""
         num_locks = self.num_locks
         if num_locks < self.overlap:
-            expire_at = now() + datetime.timedelta(seconds=self.get_lock_ttl())
+            lock_ttl = self.get_lock_ttl()
+            expire_at = now() + datetime.timedelta(seconds=lock_ttl)
             TaskLock.objects.create(task=self, user=user, expire_at=expire_at)
-            logger.debug(f'User={user} acquires a lock for the task={self}')
+            logger.debug(f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
         else:
             logger.error(
                 f"Current number of locks for task {self.id} is {num_locks}, but overlap={self.overlap}: "
@@ -131,25 +153,44 @@ class Task(TaskMixin, models.Model):
 
     def get_storage_link(self):
         # TODO: how to get neatly any storage class here?
-        return find_first_one_to_one_related_field_by_prefix(self, 'io_storages_')
+        return find_first_one_to_one_related_field_by_prefix(self, '.*io_storages_')
 
     def resolve_uri(self, task_data, proxy=True):
         if proxy and self.project.task_data_login and self.project.task_data_password:
             protected_data = {}
             for key, value in task_data.items():
                 if isinstance(value, str) and string_is_url(value):
-                    path = reverse('projects-file-proxy', kwargs={'pk': self.project.pk}) + '?url=' + value
+                    path = reverse('projects-file-proxy', kwargs={'pk': self.project.pk}) + '?url=' + quote(value)
                     value = urljoin(settings.HOSTNAME, path)
                 protected_data[key] = value
             return protected_data
         else:
             # Try resolve URLs via storage associated with that task
-            storage = self._get_task_storage()
-            if storage:
-                return storage.resolve_task_data_uri(task_data)
+            storage = self.storage
+            for field in task_data:
+                storage = storage or self._get_storage_by_url(task_data[field])
+                if storage:
+                    try:
+                        resolved_uri = storage.resolve_uri(task_data[field])
+                    except Exception as exc:
+                        logger.error(exc, exc_info=True)
+                        resolved_uri = None
+                    if resolved_uri:
+                        task_data[field] = resolved_uri
             return task_data
 
-    def _get_task_storage(self):
+    def _get_storage_by_url(self, url):
+        """Find the first compatible storage and returns presigned URL"""
+        from io_storages.models import get_storage_classes
+
+        for storage_class in get_storage_classes('import'):
+            storage_objects = storage_class.objects.filter(project=self.project)
+            for storage_object in storage_objects:
+                if storage_object.can_resolve_url(url):
+                    return storage_object
+
+    @property
+    def storage(self):
         # maybe task has storage link
         storage_link = self.get_storage_link()
         if storage_link:
@@ -162,77 +203,13 @@ class Task(TaskMixin, models.Model):
             from io_storages.s3.models import S3ImportStorage
             return S3ImportStorage()
 
+    @property
+    def completed_annotations(self):
+        """Annotations that we take into account when set completed status to the task"""
+        return self.annotations.filter(Q_finished_annotations & Q(ground_truth=False))
+
     def update_is_labeled(self):
-        """Set is_labeled field according to annotations*.count > overlap
-        """
-        n = self.annotations.filter(Q_finished_annotations & Q(ground_truth=False)).count()
-        # self.is_labeled = n >= self.project.maximum_annotations
-        self.is_labeled = n >= self.overlap
-
-    def reset_updates(self):
-        """ Reset updates to default from model for one task.
-            We need it in duplicate project or total deletion of annotations
-        """
-        for field in Task._meta.fields:
-            if field.name in Task.updates:
-                setattr(self, field.name, field.default)
-
-    @staticmethod
-    def bulk_reset_updates(project):
-        """ Bulk reset updates to default, it's a fast way to reset all tasks in project
-        """
-        for field in Task._meta.fields:
-            if field.name in Task.updates:
-                project.tasks.update(**{field.name: field.default})
-
-    @staticmethod
-    def bulk_update_is_labeled(project):
-        """ Fast way to update only is_labeled.
-            Prefer to use Django 2.2 bulk_update(), see bulk_update_field('is_labeled')
-
-            get all project.tasks as subquery
-            Subquery(
-                w coalesce get the first non-null value (count(annotations), or 0)
-                make condition
-                add temp field pre_is_labeled as condtion values
-            )
-            update all tasks with Subquery
-        """
-        tasks = project.tasks.filter(pk=OuterRef('pk'))
-        count = Coalesce(Count(
-            'annotations', filter=Q(annotations__was_cancelled=False) & Q(annotations__ground_truth=False)), Value(0))
-        condition = Case(
-            When(overlap__lte=count, then=Value(True)),
-            default=Value(False),
-            output_field=models.BooleanField(null=False)
-        )
-        results = tasks.annotate(pre_is_labeled=condition).values('pre_is_labeled')
-        project.tasks.update(is_labeled=Subquery(results))
-
-    def delete_url(self):
-        return reverse('tasks:task-delete', kwargs={'pk': self.pk})
-
-    def completion_for_ground_truth(self):
-        """ 1 Get ground_truth completion if task has it, else
-            2 Get first completion created by owner of project,
-            3 Or the first of somebody if no owner's items.
-            It's used for ground_truth selection right on data manager page
-        """
-        if not self.annotations.exists():
-            return None
-
-        # ground_truth already exist
-        ground_truth_annotations = self.annotations.filter(ground_truth=True)
-        if ground_truth_annotations.exists():
-            return ground_truth_annotations.first()
-
-        # owner annotation
-        owner_annotations = self.annotations.filter(completed_by=self.project.created_by)
-        if owner_annotations.count() > 0:
-            return owner_annotations.first()
-
-        # annotator annotation
-        return self.annotations.first()
+        self.is_labeled = self._get_is_labeled_value()
 
     def increase_project_summary_counters(self):
         if hasattr(self.project, 'summary'):
@@ -244,13 +221,8 @@ class Task(TaskMixin, models.Model):
             summary = self.project.summary
             summary.remove_data_columns([self])
 
-    class Meta:
-        db_table = 'task'
-        ordering = ['-updated_at']
-        indexes = [
-            models.Index(fields=['project', 'is_labeled']),
-            models.Index(fields=['id', 'overlap'])
-        ]
+    def ensure_unique_groundtruth(self, annotation_id):
+        self.annotations.exclude(id=annotation_id).update(ground_truth=False)
 
 
 pre_bulk_create = Signal(providing_args=["objs", "batch_size"])
@@ -290,8 +262,8 @@ class Annotation(AnnotationMixin, models.Model):
                              help_text='Corresponding task for this annotation')
     completed_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="annotations", on_delete=models.SET_NULL,
                                      null=True, help_text='User ID of the person who created this annotation')
-    was_cancelled = models.BooleanField(_('was cancelled'), default=False, help_text='User skipped the task')
-    ground_truth = models.BooleanField(_('ground_truth'), default=False, help_text='This annotation is a Ground Truth (ground_truth)')
+    was_cancelled = models.BooleanField(_('was cancelled'), default=False, help_text='User skipped the task', db_index=True)
+    ground_truth = models.BooleanField(_('ground_truth'), default=False, help_text='This annotation is a Ground Truth (ground_truth)', db_index=True)
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last updated time')
     lead_time = models.FloatField(_('lead time'), null=True, default=None, help_text='How much time it took to annotate the task')
@@ -300,11 +272,21 @@ class Annotation(AnnotationMixin, models.Model):
         null=True, default=dict, help_text='Prediction viewed at the time of annotation')
     result_count = models.IntegerField(_('result count'), default=0,
                                        help_text='Results inside of annotation counter')
-    
+
+    parent_prediction = models.ForeignKey('tasks.Prediction', on_delete=models.SET_NULL, related_name='child_annotations',
+                                          null=True, help_text='Points to the prediction from which this annotation was created')
+    parent_annotation = models.ForeignKey('tasks.Annotation', on_delete=models.SET_NULL,
+                                          related_name='child_annotations',
+                                          null=True,
+                                          help_text='Points to the parent annotation from which this annotation was created')
+
     class Meta:
         db_table = 'task_completion'
         indexes = [
-            models.Index(fields=['task', 'ground_truth'])
+            models.Index(fields=['task', 'ground_truth']),
+            models.Index(fields=['was_cancelled']),
+            models.Index(fields=['ground_truth']),
+            models.Index(fields=['created_at']),
         ]
 
     def created_ago(self):
@@ -391,6 +373,59 @@ class Prediction(models.Model):
         """ Humanize date """
         return timesince(self.created_at)
 
+    def has_permission(self, user):
+        return self.task.project.has_permission(user)
+
+    @classmethod
+    def prepare_prediction_result(cls, result, project):
+        """
+        This function does the following logic of transforming "result" object:
+        result is list -> use raw result as is
+        result is dict -> put result under single "value" section
+        result is string -> find first occurrence of single-valued tag (Choices, TextArea, etc.) and put string under corresponding single field (e.g. "choices": ["my_label"])  # noqa
+        """
+        if isinstance(result, list):
+            # full representation of result
+            for item in result:
+                if not isinstance(item, dict):
+                    raise ValidationError(f'Each item in prediction result should be dict')
+            # TODO: check consistency with project.label_config
+            return result
+
+        elif isinstance(result, dict):
+            # "value" from result
+            # TODO: validate value fields according to project.label_config
+            for tag, tag_info in project.get_control_tags_from_config().items():
+                tag_type = tag_info['type'].lower()
+                if tag_type in result:
+                    return [{
+                        'from_name': tag,
+                        'to_name': ','.join(tag_info['to_name']),
+                        'type': tag_type,
+                        'value': result
+                    }]
+
+        elif isinstance(result, (str, numbers.Integral)):
+            # If result is of integral type, it could be a representation of data from single-valued control tags (e.g. Choices, Rating, etc.)  # noqa
+            for tag, tag_info in project.get_control_tags_from_config().items():
+                tag_type = tag_info['type'].lower()
+                if tag_type in SINGLE_VALUED_TAGS and isinstance(result, SINGLE_VALUED_TAGS[tag_type]):
+                    return [{
+                        'from_name': tag,
+                        'to_name': ','.join(tag_info['to_name']),
+                        'type': tag_type,
+                        'value': {
+                            tag_type: [result]
+                        }
+                    }]
+        else:
+            raise ValidationError(f'Incorrect format {type(result)} for prediction result {result}')
+
+    def save(self, *args, **kwargs):
+        # "result" data can come in different forms - normalize them to JSON
+        self.result = self.prepare_prediction_result(self.result, self.task.project)
+        return super(Prediction, self).save(*args, **kwargs)
+
     class Meta:
         db_table = 'prediction'
 
@@ -410,11 +445,6 @@ def update_all_task_states_after_deleting_task(sender, instance, **kwargs):
     except Exception as exc:
         logger.error('Error in update_all_task_states_after_deleting_task: ' + str(exc))
 
-
-@receiver(pre_delete, sender=Task)
-def release_task_lock_before_delete(sender, instance, **kwargs):
-    if instance is not None:
-        instance.release_lock()
 
 # =========== PROJECT SUMMARY UPDATES ===========
 
@@ -529,6 +559,40 @@ def update_ml_backend(sender, instance, **kwargs):
             for ml_backend in project.ml_backends.all():
                 ml_backend.train()
 
+
+def update_task_stats(task, stats=('is_labeled',), save=True):
+    """Update single task statistics:
+        accuracy
+        is_labeled
+    :param task_id:
+    :param stats: to update separate stats
+    :param save: to skip saving in some cases
+    :return:
+    """
+    logger.debug(f'Update stats {stats} for task {task}')
+    if 'is_labeled' in stats:
+        task.update_is_labeled()
+    if save:
+        task.save()
+
+
+def bulk_update_stats_project_tasks(tasks):
+    """bulk Task update accuracy
+       ex: after change settings
+       apply several update queries size of batch
+       on updated Task objects
+       in single transaction as execute sql
+    :param tasks:
+    :param batch_size:
+    :return:
+    """
+    # recalc accuracy
+    with transaction.atomic():
+        # update objects without saving
+        for task in tasks:
+            update_task_stats(task, save=False)
+        # start update query batches
+        bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \

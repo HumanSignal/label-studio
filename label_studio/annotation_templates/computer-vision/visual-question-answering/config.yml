@@ -52,7 +52,7 @@ and is to the left of the big sphere?",
 metal cube; is it made of the same material as the small red sphere?",
 "q4": "How many objects are either small cylinders or metal things?"
 },
-"completions": [{"result":
+"annotations": [{"result":
 [
     {
         "value": {

@@ -1,0 +1,250 @@
+---
+test_name: change_model_version_and_get_next_task
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+
+- name: create_task_with_2_predictions
+  request:
+    files:
+      json_file: tests/test_suites/samples/text_with_2_predictions.json
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/import'
+  response:
+    json:
+      annotation_count: 0
+      prediction_count: 2
+      task_count: 1
+    status_code: 201
+
+- name: get_available_model_versions
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/model-versions'
+  response:
+    json:
+      model_version_B: 1
+      model_version_A: 1
+
+- name: get_next_task
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      data:
+        text: Test example phrase
+      predictions:  # last taken model version is activated
+        - result:
+          - from_name: text_class
+            to_name: text
+            type: choices
+            value:
+              choices:
+                - class_B
+          model_version: model_version_B
+
+- name: change_project_model_version
+  request:
+    method: PATCH
+    url: '{django_live_url}/api/projects/{project_pk}'
+    headers:
+      content-type: application/json
+    json:
+      model_version: model_version_A
+
+- name: get_next_task
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      data:
+        text: Test example phrase
+      is_labeled: false
+      predictions:
+        - result:
+          - from_name: text_class
+            to_name: text
+            type: choices
+            value:
+              choices:
+                - class_A
+          model_version: model_version_A
+
+- name: change_project_model_version
+  request:
+    method: PATCH
+    url: '{django_live_url}/api/projects/{project_pk}'
+    headers:
+      content-type: application/json
+    json:
+      model_version: model_version_UNEXISTED
+
+- name: get_next_task
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      data:
+        text: Test example phrase
+      is_labeled: false
+
+- name: change_project_model_version
+  request:
+    method: PATCH
+    url: '{django_live_url}/api/projects/{project_pk}'
+    headers:
+      content-type: application/json
+    json:
+      model_version: null
+
+- name: get_next_task
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      data:
+        text: Test example phrase
+      predictions:
+        - result:
+            - from_name: text_class
+              to_name: text
+              type: choices
+              value:
+                choices:
+                  - class_A
+          model_version: model_version_A
+        - result:
+            - from_name: text_class
+              to_name: text
+              type: choices
+              value:
+                choices:
+                  - class_B
+          model_version: model_version_B
+
+
+
+
+
+
+
+
+
+
+---
+test_name: check_task_lock_with_data_manager_queue
+# task lock shouldn't affect the sequence any way
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+
+- name: create_2_tasks
+  request:
+    files:
+      json_file: tests/test_suites/samples/text_with_2_tasks.json
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/import'
+  response:
+    json:
+      annotation_count: 0
+      prediction_count: 0
+      task_count: 2
+    status_code: 201
+
+# 1st next task api with filter/ordering payload works as data manager queue mode
+- name: get_next_task
+  request:
+    method: POST
+    url: '{django_live_url}/api/dm/actions?project={project_pk}&id=next_task'
+    json:
+      ordering:
+        - -tasks:id
+      selectedItems:
+        all: true
+        excluded: []
+      filters:
+        conjunction: and
+        items: []
+  response:
+    json:
+      data:
+        text: Example 2
+
+# 2nd api call must return the same task in data manager queue mode
+- name: get_next_task
+  request:
+    method: POST
+    url: '{django_live_url}/api/dm/actions?project={project_pk}&id=next_task'
+    json:
+      ordering:
+        - -tasks:id
+      selectedItems:
+        all: true
+        excluded: []
+      filters:
+        conjunction: and
+        items: []
+  response:
+    json:
+      data:
+        text: Example 2
+
+# 3rd - user direct ordering
+- name: get_next_task
+  request:
+    method: POST
+    url: '{django_live_url}/api/dm/actions?project={project_pk}&id=next_task'
+    json:
+      ordering:
+        - tasks:id
+      selectedItems:
+        all: true
+        excluded: []
+      filters:
+        conjunction: and
+        items: []
+  response:
+    json:
+      data:
+        text: Example 1
+
+# 4th - disable data manager queue, use label stream as is
+- name: get_next_task
+  request:
+    method: POST
+    url: '{django_live_url}/api/dm/actions?project={project_pk}&id=next_task'
+  response:
+    status_code: 200
+    save:
+      json:
+        task_id: id
+
+# 5th - label stream again must return previously locked task
+- name: get_next_task
+  request:
+    method: POST
+    url: '{django_live_url}/api/dm/actions?project={project_pk}&id=next_task'
+  response:
+    status_code: 200
+    json:
+      id: !int "{task_id}"

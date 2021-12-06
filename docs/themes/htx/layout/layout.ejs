@@ -17,7 +17,7 @@
       <% if (page.meta_title) { %>
       <title><%- titlePrefix + ' — ' + page.meta_title %></title>
       <% } else { %>
-      <title><%- page.title ? page.title + ' — ' : titlePrefix %>Label Studio — Data Labeling</title>
+      <title><%- page.title ? page.title : titlePrefix %> — Data Labeling</title>
       <% } %>
       <meta charset="utf-8">
       <meta name="description" content="<%- page.meta_description ? page.meta_description : theme.site_description %>">
@@ -47,8 +47,8 @@
         <meta name="twitter:image" content="https://<%- theme.root_domain %>/images/opossum/heartex_icon_opossum_green@2x.png"/>
         <meta name="thumbnail" content="https://<%- theme.root_domain %>/images/opossum/heartex_icon_opossum_green@2x.png"/>
         <meta property="og:image" content="https://repository-images.githubusercontent.com/192640529/6b34d180-dd95-11e9-8016-fddd7751cb2c" />
-      <% } %>      
-      
+      <% } %>
+
       <meta name="msapplication-TileColor" content="#4fc08d">
       <meta name="theme-color" content="#4fc08d">
 
@@ -67,7 +67,7 @@
       <script src="<%- url_for("js/jquery.min.js") %>"></script>
       <script async defer src="https://buttons.github.io/buttons.js"></script>
       <script src="<%- url_for("js/search.js") %>"></script>
-
+      <script src="<%- url_for("js/highlightjs-badge.min.js") %>"></script>
       <script src="<%- url_for("/js/smooth-scroll.min.js") %>"></script>
 
       <%- css('css/new-styles') %>
@@ -90,6 +90,8 @@
 
     <%- partial('partials/google_analytics') %>
 
+    <!-- docsearch -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
   </head>
   <body >
     <div id="mobile-bar" <%- isBlog ? 'style="display: none"' : '' %>>
@@ -110,5 +112,40 @@
     <% } else { %>
         <%- partial('partials/index') %>
     <% } %>
+
+  <script>
+    // add HighlightJS-badge (options are optional)
+    var options = {  // optional
+
+       // CSS class(es) used to render the copy icon.
+       copyIconClass: "fa fa-copy",
+       // CSS class(es) used to render the done icon.
+       checkIconClass: "fa fa-check"
+    };
+    window.highlightJsBadge(options);
+
+    $(function() {
+      $('.code-badge-language').each(function (o, v) {
+        console.log(o)
+        if ($(v).html() === 'undefined')
+          $(v).html('')
+        if ($(v).html() === 'bash')
+          $(v).html('shell')
+        if ($(v).html() === 'html')
+          $(v).html('xml')
+      })
+    });
+  </script>
+
+  <!-- docsearch -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+  <script type="text/javascript"> docsearch({
+    apiKey: 'e5286d9454e04e9d10c9e927b4a4a205',
+    indexName: 'labelstud',
+    inputSelector: '#docsearch-input',
+    debug: false // Set debug to true if you want to inspect the dropdown
+    });
+  </script>
+
   </body>
 </html>

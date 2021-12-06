@@ -18,7 +18,7 @@ _DATA_TYPES = {
     'Header': [str, int, float],
     'HyperText': [str],
     'Image': [str, list],
-    'Paragraphs': [list],
+    'Paragraphs': [list, str],
     'Table': [dict],
     'TimeSeries': [dict, list, str],
     'TimeSeriesChannel': [dict, list, str]
@@ -46,16 +46,25 @@ class TaskValidator:
 
         # iterate over data types from project
         for data_key, data_type in project.data_types.items():
+
+            # get array name in case of Repeater tag
+            is_array = '[' in data_key
+            data_key = data_key.split('[')[0]
+
             if data_key not in data:
                 raise ValidationError('"{data_key}" key is expected in task data'.format(data_key=data_key))
 
-            expected_types = _DATA_TYPES.get(data_type, (str, ))
+            if is_array:
+                expected_types = (list, )
+            else:
+                expected_types = _DATA_TYPES.get(data_type, (str,))
+
             if not isinstance(data[data_key], tuple(expected_types)):
-                raise ValidationError('data["{data_key}"]={data_value} '
-                                      'is of type "{type}", '
-                                      'but types "{expected_types}" are expected'
+                raise ValidationError('data[\'{data_key}\']={data_value} is of type \'{type}\', '
+                                      "but the object tag {data_type} expects the following types: {expected_types}"
                                       .format(data_key=data_key, data_value=data[data_key],
-                                              type=type(data[data_key]), expected_types=expected_types))
+                                              type=type(data[data_key]).__name__, data_type=data_type,
+                                              expected_types=[e.__name__ for e in expected_types]))
 
             if data_type == 'List':
                 for item in data[data_key]:
@@ -146,10 +155,6 @@ class TaskValidator:
                 ok = 'result' in prediction
                 if not ok:
                     raise ValidationError('Prediction must have "result" fields')
-
-                # check result is list
-                if not isinstance(prediction.get('result', []), list):
-                    raise ValidationError('"result" field in prediction must be list')
 
             # task[meta]
             self.raise_if_wrong_class(task, 'meta', (dict, list))

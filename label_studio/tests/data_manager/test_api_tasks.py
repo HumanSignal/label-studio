@@ -21,7 +21,7 @@ def test_views_tasks_api(business_client, project_id):
     view_id = response.json()["id"]
 
     # no tasks
-    response = business_client.get(f"/api/dm/views/{view_id}/tasks/")
+    response = business_client.get(f"/api/dm/tasks?fields=all&view={view_id}")
 
     assert response.status_code == 200, response.content
     assert response.json()["total"] == 0
@@ -48,7 +48,7 @@ def test_views_tasks_api(business_client, project_id):
         task_id,
     )
 
-    response = business_client.get(f"/api/dm/views/{view_id}/tasks/")
+    response = business_client.get(f"/api/dm/tasks?fields=all&view={view_id}")
 
     assert response.status_code == 200, response.content
     response_data = response.json()
@@ -57,10 +57,10 @@ def test_views_tasks_api(business_client, project_id):
     assert response_data["tasks"][0]["id"] == task_id
     assert response_data["tasks"][0]["data"] == task_data
     assert response_data["tasks"][0]["total_annotations"] == 1
-    assert json.loads(response_data["tasks"][0]["annotations_results"]) == [[annotation_result], [annotation_result]]
+    assert "annotations_results" in response_data["tasks"][0]
     assert response_data["tasks"][0]["cancelled_annotations"] == 1
     assert response_data["tasks"][0]["total_predictions"] == 1
-    assert json.loads(response_data["tasks"][0]["predictions_results"]) == [[prediction_result]]
+    assert "predictions_results" in response_data["tasks"][0]
 
 
 @pytest.mark.parametrize(
@@ -90,13 +90,12 @@ def test_views_total_counters(tasks_count, annotations_count, predictions_count,
         task_id = make_task({"data": {}}, project).id
         print('TASK_ID: %s' % task_id)
         for _ in range(0, annotations_count):
-            print('COMPLETION')
             make_annotation({"result": []}, task_id)
 
         for _ in range(0, predictions_count):
             make_prediction({"result": []}, task_id)
 
-    response = business_client.get(f"/api/dm/views/{view_id}/tasks/")
+    response = business_client.get(f"/api/dm/tasks?fields=all&view={view_id}")
 
     response_data = response.json()
 

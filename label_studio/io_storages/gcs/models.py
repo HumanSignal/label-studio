@@ -3,13 +3,13 @@
 import logging
 import json
 import socket
-import re
 import google.auth
 import re
 
 from google.auth import compute_engine
 from google.cloud import storage as google_storage
 from google.auth.transport import requests
+from google.oauth2 import service_account
 from urllib.parse import urlparse
 from datetime import datetime, timedelta
 from django.db import models, transaction
@@ -20,11 +20,12 @@ from django.db.models.signals import post_save
 
 from io_storages.utils import get_uri_via_regex
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
-from io_storages.serializers import StorageAnnotationSerializer
 from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
 url_scheme = 'gs'
+
+clients_cache = {}
 
 
 class GCSStorageMixin(models.Model):
@@ -40,17 +41,43 @@ class GCSStorageMixin(models.Model):
     use_blob_urls = models.BooleanField(
         _('use_blob_urls'), default=False,
         help_text='Interpret objects as BLOBs and generate URLs')
+    google_application_credentials = models.TextField(
+        _('google_application_credentials'), null=True, blank=True,
+        help_text='The content of GOOGLE_APPLICATION_CREDENTIALS json file')
 
-    def get_client(self):
-        return google_storage.Client()
+    def get_client(self, raise_on_error=False):
+        credentials = None
+        # gcs client initialization ~ 200 ms, for 30 tasks it's a 6 seconds, so we need to cache it
+        cache_key = f'{self.google_application_credentials}'
+        if self.google_application_credentials:
+            if cache_key in clients_cache:
+                return clients_cache[cache_key]
+            try:
+                service_account_info = json.loads(self.google_application_credentials)
+                credentials = service_account.Credentials.from_service_account_info(service_account_info)
+            except Exception as exc:
+                if raise_on_error:
+                    raise
+                logger.error(f"Can't create GCS credentials. Reason: {exc}", exc_info=True)
+                credentials = None
+        client = google_storage.Client(credentials=credentials)
+        if credentials is not None:
+            clients_cache[cache_key] = client
+        return client
 
     def get_bucket(self, client=None, bucket_name=None):
         if not client:
             client = self.get_client()
         return client.get_bucket(bucket_name or self.bucket)
 
+    def validate_connection(self):
+        logger.debug('Validating GCS connection')
+        client = self.get_client(raise_on_error=True)
+        logger.debug('Validating GCS bucket')
+        self.get_bucket(client=client)
 
-class GCSImportStorage(ImportStorage, GCSStorageMixin):
+
+class GCSImportStorage(GCSStorageMixin, ImportStorage):
     presign = models.BooleanField(
         _('presign'), default=True,
         help_text='Generate presigned URLs')
@@ -159,25 +186,31 @@ class GCSImportStorage(ImportStorage, GCSStorageMixin):
         resolved_uri = self.resolve_gs(uri)
         return data.replace(uri, resolved_uri)
 
+    def can_resolve_url(self, url):
+        # TODO: later check to the full prefix like url.startswith(url_scheme + "//" + self.bucket)
+        return url.startswith(f'{url_scheme}://')
+
     def scan_and_create_links(self):
         return self._scan_and_create_links(GCSImportStorageLink)
 
 
-class GCSExportStorage(ExportStorage, GCSStorageMixin):
+class GCSExportStorage(GCSStorageMixin, ExportStorage):
 
     def save_annotation(self, annotation):
         bucket = self.get_bucket()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
-        with transaction.atomic():
-            # Create export storage link
-            link = GCSExportStorageLink.create(annotation, self)
-            key = str(self.prefix) + '/' + link.key if self.prefix else link.key
-            try:
-                blob = bucket.blob(key)
-                blob.upload_from_string(json.dumps(ser_annotation))
-            except Exception as exc:
-                logger.error(f"Can't export annotation {annotation} to GCS storage {self}. Reason: {exc}", exc_info=True)
+
+        # get key that identifies this object in storage
+        key = GCSExportStorageLink.get_key(annotation)
+        key = str(self.prefix) + '/' + key if self.prefix else key
+
+        # put object into storage
+        blob = bucket.blob(key)
+        blob.upload_from_string(json.dumps(ser_annotation))
+
+        # create link if everything ok
+        GCSExportStorageLink.create(annotation, self)
 
 
 @receiver(post_save, sender=Annotation)

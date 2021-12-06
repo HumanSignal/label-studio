@@ -15,6 +15,22 @@ You can also integrate Label Studio with machine learning models to supply predi
 
 Label Studio is also available in Enterprise and Cloud editions with additional features. See [Label Studio features](label_studio_compare.html) for more.
 
+## Labeling workflow with Label Studio
+
+Start and finish a labeling project with Label Studio by following these steps:
+
+1. [Install Label Studio](install.html).
+2. [Start Label Studio](start.html).
+2. [Create accounts for Label Studio](signup.html). Create an account to manage and set up labeling projects.
+3. <i class='ent'></i> [Restrict access to the project](manage_users.html). Set up role-based access control. Only available in Label Studio Enterprise Edition.
+4. [Set up the labeling project](setup_project.html). Define the type of labeling to perform on the dataset and configure project settings.
+5. [Set up the labeling interface](setup.html). Add the labels that you want annotators to apply and customize the labeling interface. 
+6. [Import data as labeling tasks](tasks.html).
+7. [Label and annotate the data](labeling.html). 
+8. <i class='ent'></i> [Review the annotated tasks](quality.html). Only available in Label Studio Enterprise Edition.
+9. [Export the labeled data or the annotations](export.html).
+
+
 ## Quick start
 
 1. Install Label Studio:
@@ -34,22 +50,6 @@ label-studio start
 9. Click **Save** to save your project. 
 
 You're ready to start [labeling and annotating your data](labeling.html)!
-
-## Labeling workflow with Label Studio
-
-All the steps required to start and finish a labeling project with Label Studio:
-
-1. [Install Label Studio](install.html).
-2. [Start Label Studio](start.html).
-2. [Create accounts for Label Studio](signup.html). Create an account to manage and set up labeling projects.
-3. <i class='ent'></i> [Restrict access to the project](manage_users.html). Set up role-based access control. Only available in Label Studio Enterprise Edition.
-4. [Set up the labeling project](setup_project.html). Define the type of labeling to perform on the dataset and configure project settings.
-5. [Set up the labeling interface](setup.html). Add the labels that you want annotators to apply and customize the labeling interface. 
-6. [Import data as labeling tasks](tasks.html).
-7. [Label and annotate the data](labeling.html). 
-8. <i class='ent'></i> [Review the annotated tasks](quality.html). Only available in Label Studio Enterprise Edition.
-9. [Export the labeled data or the annotations](export.html).
-
 
 ## Label Studio terminology
 

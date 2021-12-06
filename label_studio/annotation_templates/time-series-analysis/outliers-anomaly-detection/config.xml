@@ -26,7 +26,7 @@
 </View>
 
 <!-- { "data": { "timeseriesUrl": "/samples/time-series.csv?time=time&values=velocity%2Cacceleration&sep=%2C&tf=%25Y-%25m-%25d+%25H%3A%25M%3A%25S.%25f" },
- "completions": [{
+ "annotations": [{
  "result": [
     {
         "value": {

@@ -10,7 +10,7 @@ MIDDLEWARE.append('core.middleware.UpdateLastActivityMiddleware')
 
 ADD_DEFAULT_ML_BACKENDS = False
 
-LOGGING['root']['level'] = get_env('LOG_LEVEL', 'DEBUG')
+LOGGING['root']['level'] = get_env('LOG_LEVEL', 'WARNING')
 
 DEBUG = get_bool_env('DEBUG', False)
 
@@ -21,3 +21,24 @@ SESSION_COOKIE_SECURE = False
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
 RQ_QUEUES = {}
+
+SENTRY_DSN = get_env(
+    'SENTRY_DSN',
+    'https://68b045ab408a4d32a910d339be8591a4@o227124.ingest.sentry.io/5820521'
+)
+SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'opensource')
+
+FRONTEND_SENTRY_DSN = get_env(
+    'FRONTEND_SENTRY_DSN',
+    'https://5f51920ff82a4675a495870244869c6b@o227124.ingest.sentry.io/5838868')
+FRONTEND_SENTRY_ENVIRONMENT = get_env('FRONTEND_SENTRY_ENVIRONMENT', 'opensource')
+
+EDITOR_KEYMAP = json.dumps(get_env("EDITOR_KEYMAP"))
+
+from label_studio import __version__
+from label_studio.core.utils import sentry
+sentry.init_sentry(release_name='label-studio', release_version=__version__)
+
+# we should do it after sentry init
+from label_studio.core.utils.common import collect_versions
+versions = collect_versions()

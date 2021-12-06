@@ -9,11 +9,14 @@ from django.db.models import Count, CharField, F
 from django.db.models.functions import Cast
 from django.db.models.fields.json import KeyTextTransform
 
-
-from data_manager.functions import DataManagerException
 from tasks.models import Annotation
+from data_manager.functions import DataManagerException
+from core.utils.common import timestamp_now
+from core.permissions import AllPermissions
+
 
 logger = logging.getLogger(__name__)
+all_permissions = AllPermissions()
 
 
 def propagate_annotations(project, queryset, **kwargs):
@@ -111,10 +114,11 @@ actions = [
     # },
 
     {
-        'entry_point': predictions_to_annotations,
-        'title': 'Predictions => annotations',
+        'entry_point': propagate_annotations,
+        'permission': all_permissions.tasks_change,
+        'title': 'Propagate Annotations',
         'order': 1,
-        'experimental': False,
+        'experimental': True,
         'dialog': {
             'text': 'This action will create a new annotation from the last task prediction for each selected task.',
             'type': 'confirm'

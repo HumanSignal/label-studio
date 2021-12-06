@@ -123,6 +123,7 @@ export class Modal extends React.Component {
   }
 
   onClickOutside = (e) => {
+    if (!this.modalRef.current) return;
     const {closeOnClickOutside} = this.props;
     const allowClose = this.props.allowClose !== false;
     const isInModal = this.modalRef.current.contains(e.target);

@@ -3,8 +3,11 @@
 import logging
 
 from projects.api import ProjectNextTaskAPI
+from core.permissions import AllPermissions
+
 
 logger = logging.getLogger(__name__)
+all_permissions = AllPermissions()
 
 
 def next_task(project, queryset, **kwargs):
@@ -27,7 +30,8 @@ def next_task(project, queryset, **kwargs):
 actions = [
     {
         'entry_point': next_task,
-        'title': 'Generate next task',
+        'permission': all_permissions.projects_view,
+        'title': 'Generate Next Task',
         'order': 0,
         'hidden': True
     }

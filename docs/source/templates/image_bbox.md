@@ -6,16 +6,18 @@ meta_title: Image Object Detection Data Labeling Template
 meta_description: Label Studio Image Object Detection Template for machine learning and data science data labeling projects.
 ---
 
-Image bounding box labeling
+Perform image bounding box labeling.
 
 <img src="/images/screens/image_bbox.png" class="img-template-example" title="Images Bbounding box" />
 
 ## Run
 
 ```bash
-label-studio init --template=image_bbox image_bbox_project
+label-studio init image_bbox_project
 label-studio start image_bbox_project 
 ```
+
+After starting Label Studio, set up the labeling interface and browse to this template.
 
 ## Config 
 

@@ -3,9 +3,8 @@
 import pytest
 import json
 
-from ..utils import make_task, make_annotation, make_prediction, project_id
+from ..utils import make_task, make_annotation, make_prediction, project_id, make_annotator
 from projects.models import Project
-from data_manager.models import View
 from data_import.models import FileUpload
 from django.conf import settings
 from django.core.files.base import ContentFile
@@ -18,7 +17,7 @@ from django.utils.timezone import now
         [["tasks:id"], 0, False],  # ordered by id ascending, first element api == first created
         [["tasks:-id"], -1, False],  # ordered by id descending, first element api == last created
         [["tasks:completed_at"], 0, False],
-        [["tasks:-completed_at"], -1, False],
+        [["tasks:-completed_at"], 0, False],  # only one task is labeled
         [["tasks:total_annotations"], -1, False],
         [["tasks:-total_annotations"], 0, False],
         [["tasks:total_predictions"], 0, False],
@@ -77,7 +76,7 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
 
     task_ids = [task_id_1, task_id_2]
 
-    response = business_client.get(f"/api/dm/views/{view_id}/tasks/")
+    response = business_client.get(f"/api/dm/tasks?view={view_id}")
     response_data = response.json()
 
     assert response_data["tasks"][0]["id"] == task_ids[element_index]
@@ -179,7 +178,7 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                         "filter": "filter:tasks:completed_at",
                         "operator": "less",
                         "type": "Datetime",
-                        "value": now().isoformat(),
+                        "value": now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
                     }
                 ],
             },
@@ -193,11 +192,11 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                         "filter": "filter:tasks:completed_at",
                         "operator": "greater",
                         "type": "Datetime",
-                        "value": now().isoformat(),
+                        "value": now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
                     }
                 ],
             },
-            [1, 2],
+            [1],  # only first task is labeled, second one is skipped
         ],
         [
             {
@@ -211,7 +210,7 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                     }
                 ],
             },
-            [3, 4],
+            [2, 3, 4],
         ],
         [
             {
@@ -225,7 +224,7 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                     }
                 ],
             },
-            [1, 2],
+            [1],
         ],
         [
             {
@@ -284,10 +283,33 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
             },
             [2, 3, 4],
         ],
+        [
+            {
+                "conjunction": "and",
+                "items": [
+                    {"filter": "filter:tasks:annotators", "operator": "contains", "value": "$ANN1_ID", "type": "List"},
+                    {"filter": "filter:tasks:annotators", "operator": "contains", "value": "$ANN2_ID", "type": "List"},
+                ],
+            },
+            [2],
+        ],
     ],
 )
 @pytest.mark.django_db
 def test_views_filters(filters, ids, business_client, project_id):
+    project = Project.objects.get(pk=project_id)
+    ann1 = make_annotator({'email': 'ann1@testheartex.com'}, project)
+    ann2 = make_annotator({'email': 'ann2@testheartex.com'}, project)
+
+    ann_ids = {
+        '$ANN1_ID': ann1.id,
+        '$ANN2_ID': ann2.id,
+    }
+    for item in filters['items']:
+        for ann_id_key, ann_id_value in ann_ids.items():
+            if isinstance(item['value'], str) and ann_id_key in item['value']:
+                item['value'] = ann_id_value
+
     payload = dict(
         project=project_id,
         data={"test": 1, "filters": filters},
@@ -301,17 +323,15 @@ def test_views_filters(filters, ids, business_client, project_id):
     assert response.status_code == 201, response.content
     view_id = response.json()["id"]
 
-    project = Project.objects.get(pk=project_id)
-
     task_data_field_name = settings.DATA_UNDEFINED_NAME
 
     task_id_1 = make_task({"data": {task_data_field_name: "some text1"}}, project).id
-    make_annotation({"result": [{"from_name": "1_first", "to_name": "", "value": {}}]}, task_id_1)
+    make_annotation({"result": [{"from_name": "1_first", "to_name": "", "value": {}}], "completed_by": ann1}, task_id_1)
     make_prediction({"result": [{"from_name": "1_first", "to_name": "", "value": {}}], "score": 1}, task_id_1)
 
     task_id_2 = make_task({"data": {task_data_field_name: "some text2"}}, project).id
-    for _ in range(0, 2):
-        make_annotation({"result": [{"from_name": "2_second", "to_name": "", "value": {}}], "was_cancelled": True}, task_id_2)
+    for ann in (ann1, ann2):
+        make_annotation({"result": [{"from_name": "2_second", "to_name": "", "value": {}}], "was_cancelled": True, "completed_by": ann}, task_id_2)
     for _ in range(0, 2):
         make_prediction({"result": [{"from_name": "2_second", "to_name": "", "value": {}}], "score": 2}, task_id_2)
 
@@ -338,10 +358,11 @@ def test_views_filters(filters, ids, business_client, project_id):
         content_type="application/json",
     )
 
-    response = business_client.get(f"/api/dm/views/{view_id}/tasks/")
+    response = business_client.get(f"/api/dm/tasks/?view={view_id}")
     response_data = response.json()
 
     assert 'tasks' in response_data, response_data
+
     response_ids = [task["id"] for task in response_data["tasks"]]
     correct_ids = [task_ids[i] for i in ids]
     assert response_ids == correct_ids, (response_ids, correct_ids, filters)

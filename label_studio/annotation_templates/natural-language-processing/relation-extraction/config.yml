@@ -22,7 +22,7 @@ config: '
 <!-- {"data": {
 "text": "Microsoft was founded by Bill Gates and Paul Allen on April 4, 1975, to develop and sell BASIC interpreters for the Altair 8800."
 },
-"completions": [{"result":
+"annotations": [{"result":
 [
     {
         "value": {

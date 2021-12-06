@@ -6,13 +6,13 @@
     <Choice value="Important article"/>
     <Choice value="Yellow press"/>
   </Choices>
-  <HyperText name="pdf" value="$pdf"/>
+  <HyperText name="pdf" value="$pdf" inline="true"/>
 </View>
 
 
 <!-- {
 "data": {"text": "<embed src='static/samples/sample.pdf' width='100%' height='600px'/>"},
-"completions": [{
+"annotations": [{
 "result": [
     {
         "value": {

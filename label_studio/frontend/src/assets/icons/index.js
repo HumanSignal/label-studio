@@ -9,6 +9,7 @@ export { default as LsCross } from './cross.svg';
 export { default as LsDoor } from './door.svg';
 export { default as LsEllipsis } from './ellipsis.svg';
 export { default as IconEmptyFolder } from './folder-empty.svg';
+export { default as IconError } from './error.svg';
 export { default as IconFolder } from './folder.svg';
 export { default as IconGear } from './gear.svg';
 export { default as LsGitHub } from './github.svg';
@@ -23,4 +24,4 @@ export { default as IconTerminal } from './terminal.svg';
 export { default as LsThumbsDown } from './thumbs-down.svg';
 export { default as LsThumbsUp } from './thumbs-up.svg';
 export { default as IconUpload } from './upload.svg';
-
+export { default as LsPencil } from './pencil.svg';

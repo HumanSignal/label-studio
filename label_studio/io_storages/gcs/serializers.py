@@ -15,9 +15,19 @@ class GCSImportStorageSerializer(ImportStorageSerializer):
         model = GCSImportStorage
         fields = '__all__'
 
+    def to_representation(self, instance):
+        result = super().to_representation(instance)
+        result.pop('google_application_credentials')
+        return result
+
     def validate(self, data):
         data = super(GCSImportStorageSerializer, self).validate(data)
-        storage = GCSImportStorage(**data)
+        storage = self.instance
+        if storage:
+            for key, value in data.items():
+                setattr(storage, key, value)
+        else:
+            storage = GCSImportStorage(**data)
         try:
             storage.validate_connection()
         except Exception as exc:
@@ -27,6 +37,11 @@ class GCSImportStorageSerializer(ImportStorageSerializer):
 
 class GCSExportStorageSerializer(ExportStorageSerializer):
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
+
+    def to_representation(self, instance):
+        result = super().to_representation(instance)
+        result.pop('google_application_credentials')
+        return result
 
     class Meta:
         model = GCSExportStorage

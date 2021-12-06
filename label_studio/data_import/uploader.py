@@ -11,8 +11,6 @@ try:
     import ujson as json
 except:
     import json
-import pandas as pd
-import numpy as np
 
 from dateutil import parser
 from rest_framework.exceptions import ValidationError

@@ -77,7 +77,7 @@
         </div> -->
       </div>
       <footer>
-        <p class="secondary">Registered {{ user.date_joined|date:"M j, Y" }}</p>
+        <p class="secondary">Registered {{ user.date_joined|date:"M j, Y" }}, user ID {{ user.id }}</p>
         <button class="ls-button ls-button_look_primary" onclick="smart_submit()">Save</button>
       </footer>
     </form>
@@ -96,7 +96,8 @@
       <!-- Example -->
       <div class="field field--wide">
         <label for="example_fetch">Example fetch projects data:</label>
-        <textarea id="example_fetch" class="example_code ls-textarea" type="text" readonly style="height: 92px">
+        <textarea id="example_fetch" class="example_code ls-textarea" type="text" readonly
+                  style="height: 92px; font-size: 14px">
           {% if settings.HOSTNAME %}
             curl -X GET {{ settings.HOSTNAME }}/api/projects/ -H 'Authorization: Token {{token}}'
           {% else %}
@@ -109,6 +110,32 @@
         </p>
       </div>
     </form>
+
+
+   <!-- Organization -->
+    <form action="" class="organization" id="organization">
+      <header>
+        {{ user.active_organization.title }}
+        <br>
+        <sub style="font-size: 16px; margin-top: 0; color: rgba(0,0,0,0.2); ">Your active organization</sub>
+      </header>
+
+      <table>
+        {% with user.get_pretty_role as role %}
+          {% if role %}
+            <tr><td>Your role</td><td>{{ user.get_pretty_role }}</td></tr>
+          {% endif %}
+        {% endwith %}
+        <tr><td>Annotations completed by you</td><td>{{ user.active_organization_annotations.count }}</td></tr>
+        <tr><td>Projects contributed by you</td><td>{{ user.active_organization_contributed_project_number }}</td></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td style="min-width: 75px">Organization ID</td><td>{{ user.active_organization.id }}</td></tr>
+        <tr><td>Organization owner</td><td>{{ user.active_organization.created_by }}</td></tr>
+        <tr><td>Organization created at</td><td>{{ user.active_organization.created_at }}</td></tr>
+      </table>
+
+    </form>
+
   </div>
 
   <script>

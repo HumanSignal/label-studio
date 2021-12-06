@@ -21,17 +21,24 @@ aws_params: &aws_params
     name: s3_endpoint
     label: S3 Endpoint
   - null
-  - type: text
+  - type: password
     name: aws_access_key_id
     label: Access Key ID
     autoComplete: "off"
+    skipAutofill: true
+    allowEmpty: false
   - type: password
     name: aws_secret_access_key
     label: Secret Access Key
     autoComplete: "new-password"
-  - type: text
+    skipAutofill: true
+    allowEmpty: false
+  - type: password
     name: aws_session_token
+    autoComplete: "new-password"
     label: Session Token
+    skipAutofill: true
+    allowEmpty: false
 
 
 
@@ -46,6 +53,8 @@ ImportStorage:
         name: regex_filter
         label: File Filter Regex
         placeholder: '.*csv or .*(jpe?g|png|tiff) or .\w+-\d+.text'
+        validators:
+          - regexp
   # AWS specific params
   - columnCount: 3
     fields: *aws_params
@@ -53,12 +62,16 @@ ImportStorage:
   # 2 columns grid
   - columnCount: 2
     columns:
-      - width: 371
+      - width: 345
         fields:
           - type: toggle
             name: use_blob_urls
             label: Treat every bucket object as a source file
             description: If unchecked, treat every bucket object as a JSON-formatted task. Optional
+          - type: toggle
+            name: recursive_scan
+            label: Recursive scan
+            description: Perform recursive scan over the bucket content
       - fields:
           - type: toggle
             name: presign
@@ -66,8 +79,9 @@ ImportStorage:
             value: true
           - type: counter
             name: presign_ttl
-            value: 1
+            label: Expiration minutes
             min: 1
+            value: 1
             dependency: presign
 
 ExportStorage:
@@ -75,3 +89,12 @@ ExportStorage:
     fields: *title_bucket_prefix
   - columnCount: 3
     fields: *aws_params
+  # 1 columns grid
+  - columnCount: 1
+    columns:
+      - width: 345
+        fields:
+          - type: toggle
+            name: can_delete_objects
+            label: Can delete objects from storage
+            description: If unchecked, annotations will not be deleted from storage

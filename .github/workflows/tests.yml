@@ -1,39 +1,72 @@
 name: pytest:ubnt
 on:
   push:
-    branches: ['*', '*/*', master]
+    branches: ['*', '*/*', '*/**', master]
     paths:
       - 'label_studio/**'
+      - '.github/workflows/tests.yml'
+
+env:
+  NODE: '14'
 
 jobs:
   run_pytest_sqlite:
     name: LS SQLite Ubuntu
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: [3.6, 3.7, 3.8]
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
       COVERAGE_PROCESS_START: 1
       LOG_DIR: pytest_logs
       collect_analytics: false
+      SENTRY_ENVIRONMENT: tests-ubuntu-sqlite
+      SENTRY_RATE: 0
+      DJANGO_DB: sqlite
+      # SENTRY_DSN:
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.4.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v2.3.1
         with:
           python-version: ${{ matrix.python-version }}
+
+      - uses: actions/cache@v2.1.6
+        id: pip-cache
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools
           pip install --upgrade cython
-          sh ./deploy/install_npm.sh
           pip install -U pip==20.2
           pip install -r deploy/requirements.txt -r deploy/requirements-test.txt
           pip install -e .
+
+      - name: Setup node
+        uses: actions/setup-node@v2.5.0
+        with:
+          node-version: "${{ env.NODE }}"
+
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: echo "::set-output name=dir::$(npm config get cache)"
+
+      - uses: actions/cache@v2.1.6
+        id: npm-cache
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ env.NODE }}-${{ hashFiles('label_studio/frontend/package.json') }}-${{ hashFiles('label_studio/frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Install LSF & set version.py
         run: ./deploy/prebuild.sh
@@ -46,7 +79,7 @@ jobs:
       - name: Run functional tests
         run: |
           cd label_studio/
-          pytest --junitxml report.xml --cov=. -m "not integration_tests"
+          pytest --junitxml report.xml --cov=. -vv
 
   run_pytest_postgresql:
     name: LS PostgreSQL
@@ -59,6 +92,9 @@ jobs:
       LOG_LEVEL: ERROR
       LOG_DIR: pytest_logs
       collect_analytics: false
+      SENTRY_ENVIRONMENT: tests-ubuntu-postgresql
+      SENTRY_RATE: 0
+      # SENTRY_DSN:
 
     # Service containers to run with `container-job`
     services:
@@ -96,21 +132,47 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.4.0
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v2.3.1
         with:
           python-version: '3.7'
 
-      - name: Install dependencies
+      - name: Install OS dependencies
         run: |
-          sudo apt-get clean
           sudo apt-get update
           sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev
-          sh ./deploy/install_npm.sh
+
+      - uses: actions/cache@v2.1.6
+        id: pip-cache
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install pip dependencies
+        run: |
           pip install -U pip==20.2
           pip install -r deploy/requirements.txt -r deploy/requirements-test.txt
           pip install -e .
+
+      - name: Setup node
+        uses: actions/setup-node@v2.5.0
+        with:
+          node-version: 14
+
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: echo "::set-output name=dir::$(npm config get cache)"
+
+      - uses: actions/cache@v2.1.6
+        id: npm-cache
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ env.NODE }}-${{ hashFiles('label_studio/frontend/package.json') }}-${{ hashFiles('label_studio/frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Install LSF & set version.py
         run: ./deploy/prebuild.sh
@@ -123,10 +185,10 @@ jobs:
       - name: Run functional tests
         run: |
           cd label_studio/
-          pytest --junitxml report.xml --cov=. -m "not integration_tests"
+          pytest --junitxml report.xml --cov=. -vv
 
       - name: "Upload coverage to Codecov"
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2.1.0
         with:
           fail_ci_if_error: true
 
@@ -134,6 +196,7 @@ jobs:
     name: LS SQLite Windows
     runs-on: windows-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: [3.6, 3.7, 3.8]
 
@@ -142,13 +205,24 @@ jobs:
       COVERAGE_PROCESS_START: 1
       LOG_DIR: pytest_logs
       collect_analytics: false
+      SENTRY_ENVIRONMENT: tests-windows-sqlite
+      SENTRY_RATE: 0
+      DJANGO_DB: sqlite
+      # SENTRY_DSN:
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v2.4.0
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v2.3.1
       with:
         python-version: ${{ matrix.python-version }}
+
+    - uses: actions/cache@v2.1.6
+      with:
+        path: ~\AppData\Local\pip\Cache
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
 
     - name: Install dependencies
       run: |
@@ -164,7 +238,7 @@ jobs:
       run: |
         set PYTHONIOENCODING=utf-8
         set PYTHONLEGACYWINDOWSSTDIO=utf-8
-        label-studio init my_project --agree-fix-sqlite
+        label-studio init my_project --agree-fix-sqlite --force-fix-sqlite
         label-studio init my_project --username test@test.com --password testpwd
         cp sqlite3.dll %pythonLocation%/DLLs/sqlite3.dll
       shell: cmd
@@ -172,8 +246,14 @@ jobs:
     - name: Test with pytest
       env:
         collect_analytics: 0
-        # PYTHONPATH: ../..
       run: |
         cd label_studio/
         coverage run -m pytest
+
+    - name: Collect coverage results
+      if: always()
+      env:
+        collect_analytics: 0
+      run: |
+        cd label_studio/
         coverage report -m --fail-under=40

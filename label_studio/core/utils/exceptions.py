@@ -1,7 +1,8 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, ValidationError
 from rest_framework import status
+from lxml.etree import XMLSyntaxError
 
 
 class LabelStudioError(Exception):
@@ -25,3 +26,19 @@ class LabelStudioDatabaseLockedException(LabelStudioAPIException):
 class ProjectExistException(LabelStudioAPIException):
     status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
     default_detail = 'Project with the same title already exists'
+
+
+class LabelStudioErrorSentryIgnored(Exception):
+    pass
+
+
+class LabelStudioAPIExceptionSentryIgnored(LabelStudioAPIException):
+    pass
+
+
+class LabelStudioValidationErrorSentryIgnored(ValidationError):
+    pass
+
+
+class LabelStudioXMLSyntaxErrorSentryIgnored(Exception):
+    pass

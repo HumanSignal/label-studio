@@ -48,7 +48,7 @@ export const ErrorWrapper = ({title, message, errorId, stacktrace, validation, v
       )}
 
 
-      {validation?.length && (
+      {(validation?.length > 0) && (
         <Elem tag="ul" name="validation">
           {validation.map(([field, errors]) => (
             <Fragment key={field}>

@@ -2,22 +2,46 @@
 title: Audio
 type: tags
 order: 301
-meta_title: Audio Tags for Labeling Audio
-meta_description: Label Studio Audio Tags customize Label Studio for labeling audio for machine learning and data science projects.
+meta_title: Audio Tag for Labeling Audio
+meta_description: Customize Label Studio to label audio data for machine learning and data science projects.
 ---
 
-Audio tag plays a simple audio file
+The Audio tag plays a simple audio file. Use this tag for basic audio annotation tasks such as classification or transcription.
+
+Use with the following data types: audio
 
 ### Parameters
 
 | Param | Type | Description |
 | --- | --- | --- |
-| name | <code>string</code> | of the element |
-| value | <code>string</code> | of the element |
-| hotkey | <code>string</code> | hotkey used to play/pause audio |
+| name | <code>string</code> | Name of the element |
+| value | <code>string</code> | Data field containing path or a URL to the audio |
+| hotkey | <code>string</code> | Hotkey used to play or pause audio |
+
+### Sample Results JSON
+
+| Name | Type | Description |
+| --- | --- | --- |
+| original_length | <code>number</code> | length of the original audio (seconds) |
+| value | <code>Object</code> |  |
+| value.start | <code>number</code> | start time of the fragment (seconds) |
+| value.end | <code>number</code> | end time of the fragment (seconds) |
+
+### Example JSON
+```json
+{
+  "original_length": 18,
+  "value": {
+    "start": 3.1,
+    "end": 8.2,
+    "labels": ["Voice"]
+  }
+}
+```
 
 ### Example
 ```html
+<!--Play audio on the labeling interface-->
 <View>
   <Audio name="audio" value="$audio" />
 </View>

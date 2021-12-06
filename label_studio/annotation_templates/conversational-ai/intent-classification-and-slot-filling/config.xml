@@ -22,7 +22,7 @@
 {"author": "Human", "text": "Order me a pizza from Golden Boy on Green Street "},
 {"author": "Robot", "text": "Done. When do you want to get the order?"},
 {"author": "Human", "text": "At 3am in the morning, please"}]},
-"completions": [{"result":
+"annotations": [{"result":
 [
     {
         "value": {

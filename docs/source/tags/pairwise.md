@@ -1,25 +1,26 @@
 ---
 title: Pairwise
 type: tags
-order: 412
-meta_title: Pairwise Tags to Compare Objects
-meta_description: Label Studio Pairwise Tags customize Label Studio with pairwise to compare objects for machine learning and data science projects.
+order: 413
+meta_title: Pairwise Tag to Compare Objects
+meta_description: Customize Label Studio with the Pairwise tag for object comparison tasks for machine learning and data science projects.
 ---
 
-Pairwise element. Compare two different objects, works with any label studio object
+Use the Pairwise tag to compare two different objects.
+
+Use with the following data types: audio, image, HTML, paragraphs, text, time series, video
 
 ### Parameters
-**Params**: <code>string</code> [leftClass=left]  - class name of the left object  
-**Params**: <code>string</code> [rightClass=left] - class name of the right object  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| name | <code>string</code> | name of the element |
-| toName | <code>string</code> | names of the elements you want to compare |
-| [selectionStyle] | <code>string</code> | style of the selection |
+| name | <code>string</code> | Name of the element |
+| toName | <code>string</code> | Comma-separated names of the elements you want to compare |
+| [selectionStyle] | <code>string</code> | Style for the selection |
 
 ### Example
 ```html
+<!--Basic labeling configuration to compare two passages of text -->
 <View>
   <Pairwise name="pairwise" leftClass="text1" rightClass="text2" toName="txt-1,txt-2"></Pairwise>
   <Text name="txt-1" value="Text 1" />
@@ -28,7 +29,7 @@ Pairwise element. Compare two different objects, works with any label studio obj
 ```
 ### Example
 
-You can also style the appearence using the View tag:
+You can also style the appearance using the View tag:
 
 ```html
 <View>

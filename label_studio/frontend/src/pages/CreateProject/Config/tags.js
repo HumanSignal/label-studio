@@ -6,7 +6,7 @@ const OBJECTS = {
         title: 'Width of region borders',
         type: Number,
         param: ($obj, value) => $obj.$controls.forEach($control => $control.setAttribute('strokeWidth', value)),
-        value: $obj => $obj.$controls[0]?.getAttribute('strokeWidth') ?? 3,
+        value: $obj => $obj.$controls[0]?.getAttribute('strokeWidth') ?? 1,
       },
       zoom: {
         title: 'Allow image zoom (ctrl+wheel)',

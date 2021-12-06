@@ -1,10 +1,11 @@
 import { useCallback, useRef, useState } from 'react';
-import { useHistory, useLocation } from 'react-router';
+import { useHistory } from 'react-router';
 import { Button } from '../../../components';
 import { Modal } from '../../../components/Modal/Modal';
 import { Space } from '../../../components/Space/Space';
 import { useAPI } from '../../../providers/ApiProvider';
 import { ProjectProvider, useProject } from '../../../providers/ProjectProvider';
+import { useFixedLocation } from '../../../providers/RoutesProvider';
 import { Elem } from '../../../utils/bem';
 import { useRefresh } from '../../../utils/hooks';
 import { ImportPage } from './Import';
@@ -12,7 +13,7 @@ import { useImportPage } from './useImportPage';
 
 export const Inner = () => {
   const history = useHistory();
-  const location = useLocation();
+  const location = useFixedLocation();
   const modal = useRef();
   const refresh = useRefresh();
   const {project} = useProject();

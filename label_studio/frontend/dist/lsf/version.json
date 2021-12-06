@@ -1,6 +1,6 @@
 {
-  "message": "Fix Image regions dimension corruption issue",
-  "commit": "4d267dceb621cd2efe5456edb48ece2fba0903a5",
-  "branch": "master",
-  "date": "2021-06-09T21:42:33Z"
+  "message": "Fix resize observer crash when Image URL is not provided",
+  "commit": "23580b27a85248d6fc616b58dd9daecd267c9a3b",
+  "branch": "fix/dev-1247/resize-observer-crash",
+  "date": "2021-12-02T17:07:52Z"
 }

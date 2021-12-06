@@ -11,9 +11,11 @@ Pairwise comparison of different objects
 ## Run
 
 ```bash
-label-studio init --template=pairwise pairwise_project
+label-studio init pairwise_project
 label-studio start pairwise_project
 ```
+
+After starting Label Studio, set up the labeling interface and browse to this template.
 
 ## Config
 

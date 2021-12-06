@@ -32,6 +32,11 @@
     DM_CSS = "{{settings.HOSTNAME}}/dm/css/main.css?v={{ versions.dm2.commit }}";
   </script>
 
+  <script
+   src="https://browser.sentry-cdn.com/5.17.0/bundle.min.js"
+   integrity="sha384-lowBFC6YTkvMIWPORr7+TERnCkZdo5ab00oH5NkFLeQUAmBTLGwJpFjF6djuxJ/5"
+   crossorigin="anonymous"></script>
+
   <script>
     window.exports = () => {};
   </script>
@@ -91,6 +96,18 @@
     },
     debug: {{settings.DEBUG|yesno:"true,false"}},
     hostname: "{{settings.HOSTNAME}}",
+    version: {{ versions|json_dumps_ensure_ascii|safe }},
+    sentry_dsn: {% if settings.FRONTEND_SENTRY_DSN %}"{{ settings.FRONTEND_SENTRY_DSN }}"{% else %}null{% endif %},
+    sentry_rate: "{{ settings.FRONTEND_SENTRY_RATE }}",
+    sentry_environment: "{{ settings.FRONTEND_SENTRY_ENVIRONMENT }}",
+    editor_keymap: JSON.parse({{ settings.EDITOR_KEYMAP|safe }}),
+
+    {% block app_more_settings %}
+      flags: {
+        allow_organization_webhooks: {{settings.ALLOW_ORGANIZATION_WEBHOOKS|yesno:"true,false"}}
+      }
+    {% endblock %}
+
   }, {% block frontend_settings %}{}{% endblock %});
 </script>
 
@@ -107,6 +124,8 @@
 
   {% block bottomjs %}
   {% endblock %}
+
+  {% try_include 'checks.html' %}
 
 </div>
 

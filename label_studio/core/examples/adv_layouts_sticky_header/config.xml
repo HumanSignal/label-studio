@@ -1,6 +1,6 @@
 <!-- {"title": "Sticky header", "category": "layouts", "complexity": "advanced"} -->
 <View>
-  <View style="padding: 0 1em; margin: 1em 0; background: #f1f1f1; position: sticky; top: 0; border-radius: 3px">
+  <View style="padding: 0 1em; margin: 1em 0; background: #f1f1f1; z-index: 10000; position: sticky; top: 0; border-radius: 3px">
     <Labels name="label" toName="text" showInline="true">
       <Label value="Person" />
       <Label value="Organization" />

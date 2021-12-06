@@ -1,32 +1,33 @@
+require('dotenv').config();
+
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { EnvironmentPlugin } = require('webpack');
 const TerserPlugin = require("terser-webpack-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const SentryWebpackPlugin = require('@sentry/webpack-plugin');
+
+const RELEASE = require('./release').getReleaseName();
 
 const LOCAL_ENV = {
   NODE_ENV: "development",
   CSS_PREFIX: "ls-",
+  RELEASE_NAME: RELEASE,
 };
 
-const babelOptimizeOptions = () => {
-  return process.env.NODE_ENV === 'production'
-    ? {
-      compact: true,
-      cacheCompression: true,
-    } : {};
-};
-
-const babelLoader = {
-  loader: 'babel-loader',
-  options: babelOptimizeOptions(),
-};
+const SENTRY = {
+  AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
+  ORG: process.env.SENTRY_ORG,
+  PROJECT: process.env.SENTRY_PROJECT,
+  RELEASE,
+}
 
 const devtool = process.env.NODE_ENV === 'production' ? "source-map" : "cheap-module-source-map";
 
 const output = {
   path: path.resolve(__dirname, "dist", "react-app"),
   filename: 'index.js',
+  hashFunction: "sha256"
 };
 
 const plugins = [
@@ -45,6 +46,20 @@ if (process.env.NODE_ENV === 'production') {
       default: false,
     },
   };
+}
+
+if (process.env.BUILD_SENTRY && SENTRY.AUTH_TOKEN && SENTRY.RELEASE) {
+  plugins.push(new SentryWebpackPlugin({
+    authToken: SENTRY.AUTH_TOKEN,
+    org: SENTRY.ORG,
+    project: SENTRY.PROJECT,
+    release: SENTRY.RELEASE,
+    include: "./dist",
+    ignore: ["node_modules", "webpack.config.js"],
+    deploy: {
+      env: process.env.NODE_ENV,
+    }
+  }))
 }
 
 module.exports = {

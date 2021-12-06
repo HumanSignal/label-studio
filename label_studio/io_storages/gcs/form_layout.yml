@@ -11,6 +11,17 @@ title_bucket_prefix: &title_bucket_prefix
     name: prefix
     label: Bucket Prefix
 
+gcs_credentials: &gcs_credentials
+  - type: password
+    name: google_application_credentials
+    label: Google Application Credentials
+    placeholder: Copy and paste here the content of credentials.json
+    autoComplete: "new-password"
+    skipAutofill: true
+    allowEmpty: false
+    validators:
+      - json
+
 ImportStorage:
   # Title, Bucket, Prefix
   - columnCount: 3
@@ -22,11 +33,13 @@ ImportStorage:
         name: regex_filter
         label: File Filter Regex
         placeholder: '.*csv or .*(jpe?g|png|tiff) or .\w+-\d+.text'
+        validators:
+          - regexp
 
   # 2 columns grid
   - columnCount: 2
     columns:
-      - width: 371
+      - width: 345
         fields:
           - type: toggle
             name: use_blob_urls
@@ -39,10 +52,17 @@ ImportStorage:
             value: true
           - type: counter
             name: presign_ttl
-            value: 1
+            label: Expiration minutes
             min: 1
+            value: 1
             dependency: presign
+
+  # GCS credentials
+  - columnCount: 1
+    fields: *gcs_credentials
 
 ExportStorage:
   - columnCount: 3
     fields: *title_bucket_prefix
+  - columnCount: 1
+    fields: *gcs_credentials
