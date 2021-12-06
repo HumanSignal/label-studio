@@ -125,13 +125,17 @@ class ExportCreateSerializer(ExportSerializer):
 
 class ExportParamSerializer(serializers.Serializer):
     interpolate_key_frames = serializers.BooleanField(default=settings.INTERPOLATE_KEY_FRAMES,
-                                                      help_text='Interpolate video key frames.')
+                                                      help_text='Interpolate video key frames.',
+                                                      required=False)
     download_resources = serializers.BooleanField(default=settings.CONVERTER_DOWNLOAD_RESOURCES,
-                                                  help_text='Download resources in converter.')
+                                                  help_text='Download resources in converter.',
+                                                  required=False)
     export_type = serializers.StringRelatedField(default='JSON',
-                                                 help_text='Export file format.')
+                                                 help_text='Export file format.',
+                                                 required=False)
     download_all_tasks = serializers.BooleanField(default=False,
-                                                  help_text='Download all tasks or only finished.')
-    ids = serializers.ListField(help_text='IDs of tasks to export')
+                                                  help_text='Download all tasks or only finished.',
+                                                  required=False)
+
 
 ExportDataSerializer = load_func(settings.EXPORT_DATA_SERIALIZER)

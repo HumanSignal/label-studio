@@ -149,11 +149,13 @@ class ExportAPI(generics.RetrieveAPIView):
         project = self.get_object()
         query_serializer = ExportParamSerializer(data=request.GET)
         query_serializer.is_valid(raise_exception=True)
+
         export_type = query_serializer.validated_data['export_type']
         only_finished = not query_serializer.validated_data['download_all_tasks']
-        tasks_ids = query_serializer.validated_data['ids']
         download_resources = query_serializer.validated_data['download_resources']
         interpolate_key_frames = query_serializer.validated_data['interpolate_key_frames']
+
+        tasks_ids = request.GET.getlist('ids[]')
 
         logger.debug('Get tasks')
         tasks = Task.objects.filter(project=project)
