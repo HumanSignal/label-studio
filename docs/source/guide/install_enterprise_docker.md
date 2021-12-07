@@ -1,4 +1,4 @@
-                                             ---
+---
 title: Install Label Studio Enterprise on-premises using Docker
 badge: <i class='ent'/></i>
 type: guide
