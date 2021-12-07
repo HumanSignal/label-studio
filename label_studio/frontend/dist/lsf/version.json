@@ -1,6 +1,6 @@
 {
-  "message": "[fix] keep label selected; order after ctrl+z (#358)\n\n- keep label selected if such setting selected even after region removal\r\n- restore correct order when you:\r\n  a. create region, press ctrl+z\r\n  b. delete region, press ctrl+shift+z\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>\r\nCo-authored-by: niklub <lubimov.nicolas@gmail.com>\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "6494ffaf3cdaf5c2564371a66d809aa50ea3bda0",
+  "message": "[ext] Add wavesurfer vertical zoom control in editor (#382)",
+  "commit": "ae7db71d83188d19d9b748940dc5b8be0d3aa870",
   "branch": "master",
-  "date": "2021-11-26T16:39:40Z"
+  "date": "2021-12-07T09:41:41Z"
 }
