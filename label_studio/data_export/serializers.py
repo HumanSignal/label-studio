@@ -1,7 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from django.conf import settings
-from label_studio_tools.core.label_config import is_video_object_tracking
+from label_studio_tools.core.label_config import is_video_object_tracking, parse_config
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
 
@@ -36,7 +36,7 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
     def get_result(self, obj):
         # run frames extraction on param, result and result type
         if obj.result and self.context.get('interpolate_key_frames', False) and \
-                is_video_object_tracking(obj.task.project.label_config):
+                is_video_object_tracking(parsed_config=parse_config(obj.task.project.label_config)):
             return extract_key_frames(obj.result)
         return obj.result
 
@@ -130,7 +130,7 @@ class ExportParamSerializer(serializers.Serializer):
     download_resources = serializers.BooleanField(default=settings.CONVERTER_DOWNLOAD_RESOURCES,
                                                   help_text='Download resources in converter.',
                                                   required=False)
-    # deprecated param to delete 
+    # deprecated param to delete
     export_type = serializers.CharField(default='JSON',
                                         help_text='Export file format.',
                                         required=False)
