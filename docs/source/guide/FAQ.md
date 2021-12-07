@@ -93,5 +93,18 @@ If you find that after annotating audio data, the visible audio wave doesn't mat
 ffmpeg -y -i audio.mp3 -ar 8k -ac 1 audio.wav
 ```
 
+## HTML label offsets are in the wrong places
 
+When you upload HTML files to Label Studio for labeling, the HTML is minified to remove whitespace. When you annotate those tasks, the offsets for the labels apply to the minified version of the HTML. 
 
+You can use a different import method to prevent the HTML files from being minified. See [Import HTML data](tasks.html#Import-HTML-data) for more.
+
+If you want to correct existing annotations, you can minify your own HTML files in the same way that Label Studio does. The minification is performed with the following script:
+```python
+import htmlmin
+
+with open("sample.html", "r") as f:
+html_doc = f.read()
+
+minified_html_doc = htmlmin.minify(html_doc, remove_all_empty_space=True)
+```

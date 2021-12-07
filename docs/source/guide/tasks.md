@@ -22,7 +22,7 @@ You can import many types of data, including text, timeseries, audio, and image 
 | Data type | Supported file types |
 | --- | --- |
 | Audio | .aiff, .au, .flac, .m4a, .mp3, .ogg, .wav |
-| HyperText (HTML) | .html, .htm, .xml |
+| [HyperText (HTML)](#Import-HTML-data) | .html, .htm, .xml |
 | Images | .bmp, .gif, .jpg, .png, .svg, .webp |
 | Paragraphs (Dialogue) | .json |
 | Structured data | .csv, .tsv | 
@@ -300,6 +300,14 @@ this is a second task
 ```
 
 If you want to import entire plain text files without each line becoming a new labeling task, customize the labeling configuration to specify `valueType="url"` in the Text tag. See the [Text tag documentation](/tags/text.html). See more about [how to use the valueType field](#How-to-import-your-data).
+
+### Import HTML data
+
+You can import HyperText data in HTML-formatted files and annotate them in Label Studio. When you directly import HTML files, the content is minified the content is minified by compressing the text, removing whitespace and other nonfunctional data in the HTML code. Annotations that you create are applied to the minified version of the HTML. 
+
+If you want to label HTML files without minifying the data, you can do one of the following:
+- Import the HTML files as BLOB storage from [external cloud storage such as Amazon S3 or Google Cloud Storage](storage.html).
+- Update the HyperText tag in your labeling configuration to specify `valueType="url"` as described in [How to import your data](#How-to-import-your-data) on this page.
 
 ## Import data from a local directory
 
