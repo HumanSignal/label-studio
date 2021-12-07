@@ -130,9 +130,9 @@ class ExportParamSerializer(serializers.Serializer):
     download_resources = serializers.BooleanField(default=settings.CONVERTER_DOWNLOAD_RESOURCES,
                                                   help_text='Download resources in converter.',
                                                   required=False)
-    export_type = serializers.StringRelatedField(default='JSON',
-                                                 help_text='Export file format.',
-                                                 required=False)
+    export_type = serializers.CharField(default='JSON',
+                                        help_text='Export file format.',
+                                        required=False)
     download_all_tasks = serializers.BooleanField(default=False,
                                                   help_text='Download all tasks or only finished.',
                                                   required=False)
