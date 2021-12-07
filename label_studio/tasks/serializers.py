@@ -321,6 +321,9 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             # add annotations
             for i, annotations in enumerate(task_annotations):
                 for annotation in annotations:
+                    if not isinstance(annotation, dict):
+                        continue
+                        
                     # support both "ground_truth" and "ground_truth"
                     ground_truth = annotation.pop('ground_truth', True)
                     was_cancelled = annotation.pop('was_cancelled', False)
@@ -335,6 +338,9 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             last_model_version = None
             for i, predictions in enumerate(task_predictions):
                 for prediction in predictions:
+                    if not isinstance(prediction, dict):
+                        continue
+
                     # we need to call result normalizer here since "bulk_create" doesn't call save() method
                     result = Prediction.prepare_prediction_result(prediction['result'], self.project)
                     prediction_score = prediction.get('score')
