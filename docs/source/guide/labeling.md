@@ -107,7 +107,7 @@ You can delete labeled regions, such as bounding boxes or text spans, if needed.
 ### Delete an annotation
 After labeling a task, you can delete the annotation by clicking the trash can button to delete an annotation on the task. If you haven't saved your annotation yet, click the `X` icon to reset the task and remove your labeling activity.
 
-You can also delete all annotations on a task from the project page. See [Delete tasks or annotations](setup_project.html#Delete_tasks_or_annotations).
+You can also delete all annotations on a task from the project page. See [Delete tasks or annotations](manage_data.html#Delete_tasks_or_annotations).
 
 ### Add relations between annotations
 
