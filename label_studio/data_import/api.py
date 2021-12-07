@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import os
 import time
 import logging
 import drf_yasg.openapi as openapi
@@ -446,13 +447,40 @@ class UploadedFileResponse(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticated, )
 
     @swagger_auto_schema(auto_schema=None)
+    def skip_checks_get(self, *args, **kwargs):
+        request = self.request
+        filename = kwargs['filename']
+        path = os.path.join(settings.MEDIA_ROOT, settings.UPLOAD_DIR, filename)
+
+        if os.path.exists(path):
+            content_type, encoding = mimetypes.guess_type(str(path))
+            content_type = content_type or 'application/octet-stream'
+            return RangedFileResponse(request, open(path, mode='rb'), content_type=content_type)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    @swagger_auto_schema(auto_schema=None)
     def get(self, *args, **kwargs):
+        # skip permission checks and return file from disk directly
+        if settings.UPLOAD_FILES_SKIP_CHECKS:
+            return self.skip_checks_get(*args, **kwargs)
+
         request = self.request
         filename = kwargs['filename']
         file = settings.UPLOAD_DIR + ('/' if not settings.UPLOAD_DIR.endswith('/') else '') + filename
-        logger.debug(f'Fetch uploaded file by user {request.user} => {file}')
-        file_upload = FileUpload.objects.filter(file=file).last()
 
+        logger.debug(f'Fetch uploaded file by user {request.user} => {file}')
+        file_upload = FileUpload.objects.filter(file=file)
+
+        if not file_upload.exists():
+            return Response(
+                data={'detail': 'File not found in FileUpload database table. '
+                                'If you want to grant access to all files from /data/upload then set '
+                                'UPLOAD_FILES_SKIP_CHECKS=1'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        file_upload = file_upload.last()
         if not file_upload.has_permission(request.user):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
