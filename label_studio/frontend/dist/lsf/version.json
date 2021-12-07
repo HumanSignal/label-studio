@@ -1,6 +1,6 @@
 {
-  "message": "[ext] Add wavesurfer vertical zoom control in editor",
-  "commit": "8deeed9151a44746714e909712c95c8a8df7da93",
-  "branch": "feature/DEV-1236/audio-zoom-y",
-  "date": "2021-12-06T16:21:32Z"
+  "message": "DEV-839: Fix undo working unexpectedly (#356)\n\n* [fix] drawing regions created more than one history step\r\n\r\n* fix test\r\n\r\n* add test for one-step drawing undoing\r\n\r\n* Merge branch 'feature/keep-selection-on-undo-redo' into fix/DEV-839/undo-problems\r\n\r\n# Conflicts:\r\n# src/components/TopBar/Actions.js\r\n\r\n* fix tests\r\n\r\n* Refactor and add comments\r\n\r\n* Fix branches merge\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>\r\nCo-authored-by: Nick <nr@fenelon.ru>",
+  "commit": "2d32878409b8009842ca4b68c8af9d32a8af1c1e",
+  "branch": "master",
+  "date": "2021-12-06T09:38:59Z"
 }
