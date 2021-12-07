@@ -31,17 +31,6 @@ You can also create a project from a template by clicking **Use Template**. See 
 
 After you save a project, any other collaborator with access to the Label Studio instance can view your project, perform labeling, and make changes. To use role-based access control, you need to use Label Studio Enterprise Edition.
 
-## Delete tasks or annotations
-If you have duplicate tasks, or want to remove annotations, you can delete tasks and annotations from Label Studio.
-
-1. In Label Studio UI, open the project you want to update.
-2. Filter the Data Manager page to show only the data you want to delete. For example, specific annotations, or tasks annotated by a specific annotator. 
-3. Select the checkboxes for the tasks or annotations that you want to delete.
-4. Select the dropdown with the number of tasks, and choose **Delete tasks** or **Delete annotations**. 
-5. Click **Ok** to confirm your action.
-
-If you want to make changes to the labeling interface or perform a different type of data labeling, first select all the annotations for your dataset and delete the annotations.
-
 ## Set up annotation settings for your project
 
 Set up annotation settings to configure how you want annotators to perform labeling for your project.
