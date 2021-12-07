@@ -135,6 +135,12 @@ class ImportStorage(Storage):
         self.last_sync_count = tasks_created
         self.save()
 
+        self.project.update_tasks_states(
+                maximum_annotations_changed=False,
+                overlap_cohort_percentage_changed=False,
+                tasks_number_changed=True
+            )
+
     def scan_and_create_links(self):
         """This is proto method - you can override it, or just replace ImportStorageLink by your own model"""
         self._scan_and_create_links(ImportStorageLink)
