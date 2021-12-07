@@ -30,7 +30,7 @@ Copy this labeling config to your project.
     <Label value="Run"/>
     <Label value="Walk"/>
   </TimeSeriesLabels>
-  <HyperText name="video" value="$video"/>
+  <HyperText name="video" value="$video" inline="true"/>
   <TimeSeries name="ts" value="$csv" valueType="url" timeColumn="time_column">
     <Channel column="first_column"/>
   </TimeSeries>
