@@ -9,6 +9,8 @@ meta_description: Manage, filter, and sort project data for your machine learnin
 
 After you [set up your project](setup_project.html) and [labeling interface](setup.html) and [import your data](tasks.html), you can filter, sort, and manage your data to prepare it for [labeling](labeling.html).
 
+With filters and tabs, you can split data into different sections to be labeled by different annotators, or set up data in a particular order to perform labeling according to prediction score, or another value in your data.
+
 ## Filter or sort project data
 
 When you filter or sort the data before you label it, you modify which tasks and the order of the tasks you see when labeling. While [task sampling](start.html#Set_up_task_sampling_for_your_project) affects the task order for an entire project and can't be changed, filtering and sorting tasks can be changed at any time. 
@@ -40,6 +42,13 @@ For example, you might split a dataset with 300 images into 3 different tabs, an
 6. On the new tab, create a filter where the **ID** field **is between** the values "201" and "300". Click away from the filter to review the filtered items on the tab.
 7. Any annotator can log in and navigate to the relevant tab for their work and click the **Label** button to start labeling the subset of tasks on their tab.
 
+## Save filters as tabs
+
+You can create tabs on the data manager to [split your dataset](#Example-Split-a-dataset-using-tabs-and-filters) for labeling, to separate tasks by status (annotated, predicted, unlabeled), or other reasons. 
+
+Tabs that you create depend on your [labeling configuration setup](setup.html), because the labeling configuration defines the data fields available for filtering and sorting. 
+
+> If you make changes to the labeling configuration, any tabs in your data manager are removed. Finish project setup before setting up complex tabs in the Data Manager.
 
 ## Delete tasks or annotations
 If you have duplicate tasks, or want to remove annotations, you can delete tasks and annotations from Label Studio.
