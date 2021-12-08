@@ -50,6 +50,15 @@ Tabs that you create depend on your [labeling configuration setup](setup.html), 
 
 > If you make changes to the labeling configuration, any tabs in your data manager are removed. Finish project setup before setting up complex tabs in the Data Manager.
 
+## <i class='ent'></i> Assign annotators to tasks
+
+In Label Studio Enterprise, if you're an administrator or project manager, you can assign annotators to tasks in a specific project. After you [add the annotator to the project or workspace](setup_project.html#Add-members-to-a-project), assign the annotator to specific tasks. You must assign annotators to tasks if you're using [manual task distribution](setup_project.html#Set-up-task-distribution-for-labeling).
+
+1. For a specific project, select tasks on the Data Manager.
+2. Select the dropdown and choose **Assign Annotators**.
+3. Select names of annotators and click the `>` arrow to assign them to the selected tasks.
+4. Click **Assign**. 
+
 ## Delete tasks or annotations
 If you have duplicate tasks, or want to remove annotations, you can delete tasks and annotations from Label Studio.
 

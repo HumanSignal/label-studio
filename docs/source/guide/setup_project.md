@@ -51,7 +51,7 @@ In the project settings, you can add instructions and choose whether to show the
 Annotators can view instructions at any time when labeling by clicking the (i) button from the labeling interface.
 
 ### <i class='ent'></i> Set up task distribution for labeling
-Select how you want to distribute tasks to annotators for labeling. Different from task sampling, use this setting to choose whether you need to assign annotators before they can start labeling.
+Select how you want to distribute tasks to annotators for labeling. Different from task sampling, use this setting to choose whether you need to [assign annotators](manage_data.html##Assign-annotators-to-tasks) before they can start labeling.
 
 1. Within a project on the Label Studio UI, click **Settings**.
 2. Click **Annotation Settings**.

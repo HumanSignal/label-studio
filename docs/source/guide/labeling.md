@@ -114,15 +114,6 @@ To label tasks multiple times while the minimum annotations required is set to o
 4. Click **Submit** to save your annotation.
 5. Click the next task in the data manager to open the quick labeling view for that task and repeat steps 2-4.
 
-### <i class='ent'></i> Assign annotators to tasks
-
-In Label Studio Enterprise, if you're an administrator or project manager, you can assign annotators to tasks in a specific project. After you [add the annotator to the project or workspace](setup_project.html#Add-members-to-a-project), assign the annotator to specific tasks.
-
-1. For a specific project, select tasks on the Data Manager.
-2. Select the dropdown and choose **Assign Annotators**.
-3. Select names of annotators and click the `>` arrow to assign them to the selected tasks.
-4. Click **Assign**. 
-
 ## Perform ML-assisted labeling with interactive preannotations
 
 If you have a machine learning backend set up to [get interactive preannotations](ml.html#Get-interactive-preannotations), you can choose whether to use those predictions while you label. 
