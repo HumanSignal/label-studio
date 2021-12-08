@@ -159,7 +159,7 @@ To add members to a specific project, do the following:
 3. Select the checkbox next to the user's name and click the `>` arrow so that they appear in the list of users that **Belong to the Workspace**.
 4. Click **Save**.
 
-After adding a member to a project, you can [assign them as a reviewer](quality.html#Assign-reviewers-to-tasks) or [assign them as an annotator](labeling.html#Assign-annotators-to-tasks) to tasks in the project. 
+After adding a member to a project, you can [assign them as a reviewer](quality.html#Assign-reviewers-to-tasks) or [assign them as an annotator](manage_data.html#Assign-annotators-to-tasks) to tasks in the project. 
    
 ## <i class='ent'></i> Publish project to annotators
 
