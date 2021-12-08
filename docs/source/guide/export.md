@@ -126,7 +126,7 @@ Export object detection annotations in the YOLOv3 and YOLOv4 format. Supports ob
 
 ### spaCy 
 
-Label Studio doesn't support exporting directly to spaCy binary format, but you can convert annotations exported from Label Studio to a format compatible with spaCy.
+Label Studio doesn't support exporting directly to spaCy binary format, but you can convert annotations exported from Label Studio to a format compatible with spaCy. You must have the spacy python package installed to perform this conversion. 
 
 To transform Label Studio annotations into spaCy binary format, do the following:
 1. Export your annotations to CONLL2003 format.
@@ -134,10 +134,11 @@ To transform Label Studio annotations into spaCy binary format, do the following
 ```
 -DOCSTART- -X- O O
 ```
-3. From the command line, run spacy convert to convert the CONLL-formatted annotations to spaCy binary format:
+3. From the command line, run spacy convert to convert the CONLL-formatted annotations to spaCy binary format, replacing `/path/to/<filename>` with the path and file name of your annotations:
 ```shell
-spacy convert input.conll -c conll . 
+spacy convert /path/to/<filename>.conll -c conll . 
 ```
+
 See the spaCy documentation on [Converting existing corpora and annotations](https://spacy.io/usage/training#data-convert) for more details on running spacy convert.
 
 ## Label Studio JSON format of annotated tasks 
