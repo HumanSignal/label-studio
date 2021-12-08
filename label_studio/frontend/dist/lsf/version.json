@@ -1,6 +1,6 @@
 {
-  "message": "Fix resize observer crash when Image URL is not provided",
-  "commit": "23580b27a85248d6fc616b58dd9daecd267c9a3b",
-  "branch": "fix/dev-1247/resize-observer-crash",
-  "date": "2021-12-02T17:07:52Z"
+  "message": "[fix] Fix image transformer for the case with one transformed region (#384)",
+  "commit": "533e4153624fa7780c2de674e494eb0c43b8cc8e",
+  "branch": "master",
+  "date": "2021-12-07T15:55:28Z"
 }

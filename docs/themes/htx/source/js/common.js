@@ -7,7 +7,7 @@
     initSubHeaders();
   }
 
-  initLocationHashFuzzyMatching();
+  window.addEventListener('DOMContentLoaded', initLocationHashFuzzyMatching);
   initPreviewButtons();
 
   function parseRawHash(hash) {

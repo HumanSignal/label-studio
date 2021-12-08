@@ -16,7 +16,7 @@ or another clouds. If you want to host data from your hard drive, please use
 
 As the result of this step you will have two URLs: one for CSV and one for video, e.g.:
 ```
-http://app.heartex.com/samples/time-series.csv?time=time_column&values=first_column
+http://localhost:8080/samples/time-series.csv?time=time_column&values=first_column
 http://localhost:8080/static/samples/opossum_snow.mp4
 ```
 
@@ -30,15 +30,15 @@ Copy this labeling config to your project.
     <Label value="Run"/>
     <Label value="Walk"/>
   </TimeSeriesLabels>
-  <HyperText name="video" value="$video"/>
+  <HyperText name="video" value="$video" inline="true"/>
   <TimeSeries name="ts" value="$csv" valueType="url" timeColumn="time_column">
     <Channel column="first_column"/>
   </TimeSeries>
 </View>
 
 <!-- {
-    "csv": "http://app.heartex.com/samples/time-series.csv?time=time_column&values=first_column",
-    "video": "<video src='http://app.heartex.com/static/samples/opossum_snow.mp4' width='100%' controls onloadeddata=\"setTimeout(function(){ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.time_column;v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>
+    "csv": "/samples/time-series.csv?time=time_column&values=first_column",
+    "video": "<video src='/static/samples/opossum_snow.mp4' width='100%' controls onloadeddata=\"setTimeout(function(){ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.time_column;v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>
 ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=v.duration*(r()[0]-t[0])/(t.slice(-1)[0]-t[0]-(r()[1]-r()[0]))),300); console.log('video is loaded, starting to sync with time series')}, 3000); \" />"
   } -->
 ```
@@ -50,8 +50,8 @@ ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_
 Save this code to `import.json` and then import this file to LS.   
 ```
 {
-    "csv": "http://app.heartex.com/samples/time-series.csv?time=time_column&values=first_column",
-    "video": "<video src='http://app.heartex.com/static/samples/opossum_snow.mp4' width='100%' controls onloadeddata=\"setTimeout(function(){ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.time_column;v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>
+    "csv": "/samples/time-series.csv?time=time_column&values=first_column",
+    "video": "<video src='/static/samples/opossum_snow.mp4' width='100%' controls onloadeddata=\"setTimeout(function(){ts=Htx.annotationStore.selected.names.get('ts');t=ts.data.time_column;v=document.getElementsByTagName('video')[0];w=parseInt(t.length*(5/v.duration));l=t.length-w;ts.updateTR([t[0], t[w]], 1.001);r=$=>
 ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_[i])&&(_=r())&&(v.currentTime=v.duration*(r()[0]-t[0])/(t.slice(-1)[0]-t[0]-(r()[1]-r()[0]))),300); console.log('video is loaded, starting to sync with time series')}, 3000); \" />"
 }
 ```
