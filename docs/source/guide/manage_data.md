@@ -7,11 +7,13 @@ meta_title: Manage data for your labeling project
 meta_description: Manage, filter, and sort project data for your machine learning data science labeling project.
 ---
 
-After you [set up your project](setup_project.html) and [labeling interface](setup.html) and [import your data](tasks.html), you can filter, sort, and manage your data to prepare it for [labeling](labeling.html).
+After you [set up your project](setup_project.html) and [labeling interface](setup.html) and [import your data](tasks.html), you can filter and sort your data to prepare it for [labeling](labeling.html).
 
-With filters and tabs, you can split data into different sections to be labeled by different annotators, or set up data in a particular order to perform labeling according to prediction score, or another value in your data.
+You can also take steps to manage your data, such as assigning annotators to tasks in Label Studio Enterprise, or deleting tasks and annotations if needed. 
 
 ## Filter or sort project data
+
+With filters and tabs, you can split data into different sections to be labeled by different annotators, or set up data in a particular order to perform labeling according to prediction score, or another value in your data.
 
 When you filter or sort the data before you label it, you modify which tasks and the order of the tasks you see when labeling. While [task sampling](start.html#Set_up_task_sampling_for_your_project) affects the task order for an entire project and can't be changed, filtering and sorting tasks can be changed at any time. 
 
@@ -58,6 +60,8 @@ In Label Studio Enterprise, if you're an administrator or project manager, you c
 2. Select the dropdown and choose **Assign Annotators**.
 3. Select names of annotators and click the `>` arrow to assign them to the selected tasks.
 4. Click **Assign**. 
+
+If you want to bulk assign tasks, you can use filters to identify exactly the tasks that you want to assign, then select the top checkbox on the data manager to select all tasks shown and assign them to an annotator.
 
 ## Delete tasks or annotations
 If you have duplicate tasks, or want to remove annotations, you can delete tasks and annotations from Label Studio.
