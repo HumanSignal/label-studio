@@ -108,6 +108,9 @@ class SerializationOptionsSerializer(serializers.Serializer):
     drafts = serializers.JSONField(required=False)
     predictions = serializers.JSONField(required=False)
     annotations__completed_by = serializers.JSONField(required=False)
+    interpolate_key_frames = serializers.BooleanField(default=settings.INTERPOLATE_KEY_FRAMES,
+                                                      help_text='Interpolate video key frames.',
+                                                      required=False)
 
 
 class ExportCreateSerializer(ExportSerializer):
