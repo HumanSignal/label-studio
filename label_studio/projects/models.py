@@ -410,7 +410,7 @@ class Project(ProjectMixin, models.Model):
     def validate_label_config(cls, config_string):
         validate_label_config(config_string)
 
-    def validate_config(self, config_string):
+    def validate_config(self, config_string, strict=False):
         self.validate_label_config(config_string)
         if not hasattr(self, 'summary'):
             return
@@ -471,11 +471,12 @@ class Project(ProjectMixin, models.Model):
                     f'There are {sum(labels_from_data.values(), 0)} annotation(s) created with tag '
                     f'"{control_tag_from_data}", you can\'t remove it'
                 )
-            labels_from_config_by_tag = set(labels_from_config[control_tag_from_data])
-            if not set(labels_from_data).issubset(set(labels_from_config_by_tag)):
-                different_labels = list(set(labels_from_data).difference(labels_from_config_by_tag))
-                diff_str = '\n'.join(f'{l} ({labels_from_data[l]} annotations)' for l in different_labels)
-                raise LabelStudioValidationErrorSentryIgnored(f'These labels still exist in annotations:\n{diff_str}')
+            if strict is True:
+                labels_from_config_by_tag = set(labels_from_config[control_tag_from_data])
+                if not set(labels_from_data).issubset(set(labels_from_config_by_tag)):
+                    different_labels = list(set(labels_from_data).difference(labels_from_config_by_tag))
+                    diff_str = '\n'.join(f'{l} ({labels_from_data[l]} annotations)' for l in different_labels)
+                    raise LabelStudioValidationErrorSentryIgnored(f'These labels still exist in annotations:\n{diff_str}')
 
     def _label_config_has_changed(self):
         return self.label_config != self.__original_label_config
