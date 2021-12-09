@@ -7,6 +7,7 @@ import requests_mock
 import re
 import boto3
 import logging
+import shutil
 
 from moto import mock_s3
 from copy import deepcopy
@@ -392,3 +393,18 @@ def configured_project(business_client, annotator_client):
 @pytest.fixture(name="django_live_url")
 def get_server_url(live_server):
     yield live_server.url
+
+
+@pytest.fixture(name="local_files_storage")
+def local_files_storage(settings):
+    settings.LOCAL_FILES_SERVING_ENABLED = True
+    os.makedirs('/tmp/files/subdir', exist_ok=True)
+    os.makedirs('/tmp/files11', exist_ok=True)
+    shutil.copyfile('tests/test_suites/samples/test_image.png', '/tmp/files/test_image1.png')
+    shutil.copyfile('tests/test_suites/samples/test_image.png', '/tmp/files/subdir/test_image2.png')
+    shutil.copyfile('tests/test_suites/samples/test_image.png', '/tmp/files11/test_image3.png')
+
+
+@pytest.fixture(name="local_files_document_root")
+def local_files_document_root(settings):
+    settings.LOCAL_FILES_DOCUMENT_ROOT = '/tmp/files'
