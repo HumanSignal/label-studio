@@ -425,6 +425,7 @@ class Project(ProjectMixin, models.Model):
         if not fields_from_config:
             logger.debug(f'Data fields not found in labeling config')
             return
+        fields_from_config = {field.split('[')[0] for field in fields_from_config}  # Repeater tag support
         fields_from_data = set(self.summary.common_data_columns)
         fields_from_data.discard(settings.DATA_UNDEFINED_NAME)
         if fields_from_data and not fields_from_config.issubset(fields_from_data):
