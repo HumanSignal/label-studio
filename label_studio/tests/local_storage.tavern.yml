@@ -41,7 +41,7 @@ stages:
   response:
     json:
       data:
-        image_url: '/data/local-files/?d=tmp/files/subdir/test_image2.png'
+        image_url: !re_match \/data\/local-files\/\?d=tmp[\/\\]files[\/\\]subdir[\/\\]test_image2.png
     status_code: 200
 - name: stage
   request:
@@ -68,7 +68,7 @@ stages:
     json:
       tasks:
         - data:
-            image_url: '/data/local-files/?d=tmp/files/subdir/test_image2.png'
+            image_url: !re_match \/data\/local-files\/\?d=tmp[\/\\]files[\/\\]subdir[\/\\]test_image2.png
     status_code: 200
 ---
 test_name: test_local_files_not_enabled
@@ -78,11 +78,24 @@ marks:
   - django_live_url
 stages:
 - id: signup
-  type: ref
+  name: Sign up
+  request:
+    url: "{django_live_url}/user/signup"
+    data:
+      email: test_suites_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+    save:
+      $ext:
+        function: tests.utils:os_independent_path
+        extra_kwargs:
+          path: 'tmp/files/subdir/test_image2.png'
 - name: stage
   request:
     method: GET
-    url: '{django_live_url}/data/local-files/?d=tmp/files/subdir/test_image2.png'
+    url: '{django_live_url}/data/local-files/?d={os_independent_path}'
   response:
     status_code: 403
 ---
@@ -94,11 +107,24 @@ marks:
   - local_files_storage
 stages:
 - id: signup
-  type: ref
+  name: Sign up
+  request:
+    url: "{django_live_url}/user/signup"
+    data:
+      email: test_suites_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+    save:
+      $ext:
+        function: tests.utils:os_independent_path
+        extra_kwargs:
+          path: 'tmp/files/subdir/test_image2.png'
 - name: stage
   request:
     method: GET
-    url: '{django_live_url}/data/local-files/?d=tmp/files/subdir/test_image2.png'
+    url: '{django_live_url}/data/local-files/?d={os_independent_path}'
   response:
     status_code: 404
 ---
@@ -110,14 +136,27 @@ marks:
   - local_files_storage
 stages:
 - id: signup
-  type: ref
+  name: Sign up
+  request:
+    url: "{django_live_url}/user/signup"
+    data:
+      email: test_suites_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+    save:
+      $ext:
+        function: tests.utils:os_independent_path
+        extra_kwargs:
+          path: 'tmp/files/subdir/test_image2.png'
 - id: create_project_image
   type: ref
 - *create_storage
 - name: stage
   request:
     method: GET
-    url: '{django_live_url}/data/local-files/?d=tmp/files/subdir/test_image2.png'
+    url: '{django_live_url}/data/local-files/?d={os_independent_path}'
   response:
     status_code: 200
 ---
@@ -130,14 +169,27 @@ marks:
   - local_files_document_root
 stages:
 - id: signup
-  type: ref
+  name: Sign up
+  request:
+    url: "{django_live_url}/user/signup"
+    data:
+      email: test_suites_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+    save:
+      $ext:
+        function: tests.utils:os_independent_path
+        extra_kwargs:
+          path: 'subdir/test_image2.png'
 - id: create_project_image
   type: ref
 - *create_storage
 - name: stage
   request:
     method: GET
-    url: '{django_live_url}/data/local-files/?d=subdir/test_image2.png'
+    url: '{django_live_url}/data/local-files/?d={os_independent_path}'
   response:
     status_code: 200
 ---
@@ -150,7 +202,20 @@ marks:
   - local_files_document_root
 stages:
 - id: signup
-  type: ref
+  name: Sign up
+  request:
+    url: "{django_live_url}/user/signup"
+    data:
+      email: test_suites_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+    save:
+      $ext:
+        function: tests.utils:os_independent_path
+        extra_kwargs:
+          path: 'subdir/test_image2.png'
 - id: create_project_image
   type: ref
 - *create_storage
@@ -169,12 +234,12 @@ stages:
   response:
     json:
       data:
-        image_url: '/data/local-files/?d=subdir/test_image2.png'
+        image_url: !re_match \/data\/local-files\/\?d=subdir[\/\\]test_image2.png
     status_code: 200
 - name: stage
   request:
     method: GET
-    url: '{django_live_url}/data/local-files/?d=subdir/test_image2.png'
+    url: '{django_live_url}/data/local-files/?d={os_independent_path}'
   response:
     status_code: 200
 - name: stage
@@ -196,5 +261,5 @@ stages:
     json:
       tasks:
         - data:
-            image_url: '/data/local-files/?d=subdir/test_image2.png'
+            image_url: !re_match \/data\/local-files\/\?d=subdir[\/\\]test_image2.png
     status_code: 200

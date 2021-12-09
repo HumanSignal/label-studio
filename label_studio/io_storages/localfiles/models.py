@@ -40,9 +40,10 @@ class LocalFilesMixin(models.Model):
 
     def validate_connection(self):
         path = Path(self.path)
+        document_root = Path(settings.LOCAL_FILES_DOCUMENT_ROOT)
         if not path.exists():
             raise ValidationError(f'Path {self.path} does not exist')
-        if not str(path).startswith(settings.LOCAL_FILES_DOCUMENT_ROOT):
+        if not document_root in path.parents:
             raise ValidationError(f'Path {self.path} must start with '
                                   f'LOCAL_FILES_DOCUMENT_ROOT = {settings.LOCAL_FILES_DOCUMENT_ROOT}')
         if settings.LOCAL_FILES_SERVING_ENABLED is False:

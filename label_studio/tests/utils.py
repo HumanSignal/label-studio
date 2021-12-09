@@ -10,6 +10,8 @@ import requests
 from contextlib import contextmanager
 from unittest import mock
 from types import SimpleNamespace
+from box import Box
+from pathlib import PurePath
 
 from django.test import Client
 from django.apps import apps
@@ -259,3 +261,6 @@ def check_response_with_json_file(response, json_file):
         true = json.load(f)
         assert response == true
 
+
+def os_independent_path(_, path):
+    return Box({'os_independent_path': str(PurePath(*path.split('/')))})
