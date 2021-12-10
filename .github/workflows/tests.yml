@@ -16,7 +16,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version:
+          - 3.6
+          - 3.7
+          - 3.8
+          - 3.9
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
@@ -39,7 +43,7 @@ jobs:
         id: pip-cache
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
@@ -151,7 +155,7 @@ jobs:
         id: pip-cache
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
@@ -202,7 +206,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version:
+          - 3.6
+          - 3.7
+          - 3.8
+          - 3.9
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
@@ -224,7 +232,7 @@ jobs:
     - uses: actions/cache@v2.1.6
       with:
         path: ~\AppData\Local\pip\Cache
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
 
