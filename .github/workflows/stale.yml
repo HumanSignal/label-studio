@@ -27,8 +27,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/stale@v4.0.0
+      - uses: actions/stale@54197c7137c7221265ea1097805e48ab88497b94
         with:
+          days-before-issue-stale: -1
+          days-before-issue-close: -1 # never closed automatically
           stale-pr-message: "This PR is stale because it has been open 172 days with no activity. Remove stale label or comment or this will be closed in 10 days."
           close-pr-message: "This PR was closed because it has been stalled for 10 days with no activity."
           days-before-pr-stale: 172
