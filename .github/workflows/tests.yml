@@ -16,7 +16,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version:
+          - 3.6
+          - 3.7
+          - 3.8
+          - 3.9
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
@@ -39,7 +43,7 @@ jobs:
         id: pip-cache
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
@@ -82,8 +86,12 @@ jobs:
           pytest --junitxml report.xml --cov=. -vv
 
   run_pytest_postgresql:
-    name: LS PostgreSQL
+    name: LS PostgreSQL Ubuntu
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.8]
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
       DJANGO_DB: default
@@ -136,7 +144,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2.3.1
         with:
-          python-version: '3.7'
+          python-version: ${{ matrix.python-version }}
 
       - name: Install OS dependencies
         run: |
@@ -147,7 +155,7 @@ jobs:
         id: pip-cache
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
@@ -198,7 +206,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version:
+          - 3.6
+          - 3.7
+          - 3.8
+          - 3.9
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
@@ -220,7 +232,7 @@ jobs:
     - uses: actions/cache@v2.1.6
       with:
         path: ~\AppData\Local\pip\Cache
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
 
@@ -234,13 +246,20 @@ jobs:
         {pip install -r deploy/requirements-test.txt}
         pip install -e .
 
-    - name: Init project
+    - name: Fix sqlite.dll for python < 3.9
+      if: ${{ matrix.python-version < '3.9' }}
       run: |
         set PYTHONIOENCODING=utf-8
         set PYTHONLEGACYWINDOWSSTDIO=utf-8
         label-studio init my_project --agree-fix-sqlite --force-fix-sqlite
-        label-studio init my_project --username test@test.com --password testpwd
         cp sqlite3.dll %pythonLocation%/DLLs/sqlite3.dll
+      shell: cmd
+
+    - name: Init project
+      run: |
+        set PYTHONIOENCODING=utf-8
+        set PYTHONLEGACYWINDOWSSTDIO=utf-8
+        label-studio init my_project --username test@test.com --password testpwd
       shell: cmd
 
     - name: Test with pytest
