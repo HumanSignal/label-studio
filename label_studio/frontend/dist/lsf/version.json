@@ -1,6 +1,6 @@
 {
-  "message": "[fix] Fix image transformer for the case with one transformed region (#384)",
-  "commit": "533e4153624fa7780c2de674e494eb0c43b8cc8e",
-  "branch": "master",
-  "date": "2021-12-07T15:55:28Z"
+  "message": "Fix region tree restoration",
+  "commit": "8fd1164674fab0e3611f6912a85a94338ec21fc2",
+  "branch": "fix/tree-relations",
+  "date": "2021-12-09T14:51:11Z"
 }
