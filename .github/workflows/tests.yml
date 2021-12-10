@@ -246,13 +246,20 @@ jobs:
         {pip install -r deploy/requirements-test.txt}
         pip install -e .
 
-    - name: Init project
+    - name: Fix sqlite.dll for python < 3.9
+      if: ${{ matrix.python-version < '3.9' }}
       run: |
         set PYTHONIOENCODING=utf-8
         set PYTHONLEGACYWINDOWSSTDIO=utf-8
         label-studio init my_project --agree-fix-sqlite --force-fix-sqlite
-        label-studio init my_project --username test@test.com --password testpwd
         cp sqlite3.dll %pythonLocation%/DLLs/sqlite3.dll
+      shell: cmd
+
+    - name: Init project
+      run: |
+        set PYTHONIOENCODING=utf-8
+        set PYTHONLEGACYWINDOWSSTDIO=utf-8
+        label-studio init my_project --username test@test.com --password testpwd
       shell: cmd
 
     - name: Test with pytest
