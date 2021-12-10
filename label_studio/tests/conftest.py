@@ -8,9 +8,12 @@ import re
 import boto3
 import logging
 import shutil
+import tempfile
 
 from moto import mock_s3
 from copy import deepcopy
+from pathlib import Path
+
 from django.conf import settings
 from projects.models import Project
 from tasks.models import Task
@@ -398,13 +401,21 @@ def get_server_url(live_server):
 @pytest.fixture(name="local_files_storage")
 def local_files_storage(settings):
     settings.LOCAL_FILES_SERVING_ENABLED = True
-    os.makedirs('/tmp/files/subdir', exist_ok=True)
-    os.makedirs('/tmp/files11', exist_ok=True)
-    shutil.copyfile('tests/test_suites/samples/test_image.png', '/tmp/files/test_image1.png')
-    shutil.copyfile('tests/test_suites/samples/test_image.png', '/tmp/files/subdir/test_image2.png')
-    shutil.copyfile('tests/test_suites/samples/test_image.png', '/tmp/files11/test_image3.png')
+    tempdir = Path(tempfile.gettempdir()) / Path('files')
+    subdir = tempdir / Path('subdir')
+    os.makedirs(str(subdir), exist_ok=True)
+    test_image = Path(*'tests/test_suites/samples/test_image.png'.split('/'))
+    shutil.copyfile(str(test_image), str(tempdir / Path('test_image1.png')))
+    shutil.copyfile(str(test_image), str(subdir / Path('test_image2.png')))
 
 
-@pytest.fixture(name="local_files_document_root")
-def local_files_document_root(settings):
-    settings.LOCAL_FILES_DOCUMENT_ROOT = '/tmp/files'
+@pytest.fixture(name="local_files_document_root_tempdir")
+def local_files_document_root_tempdir(settings):
+    tempdir = Path(tempfile.gettempdir())
+    settings.LOCAL_FILES_DOCUMENT_ROOT = tempdir.root
+
+
+@pytest.fixture(name="local_files_document_root_subdir")
+def local_files_document_root_subdir(settings):
+    tempdir = Path(tempfile.gettempdir()) / Path('files')
+    settings.LOCAL_FILES_DOCUMENT_ROOT = str(tempdir)

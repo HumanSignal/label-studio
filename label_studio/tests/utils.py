@@ -6,12 +6,13 @@ import json
 import pytest
 import requests_mock
 import requests
+import tempfile
 
 from contextlib import contextmanager
 from unittest import mock
 from types import SimpleNamespace
 from box import Box
-from pathlib import PurePath
+from pathlib import Path
 
 from django.test import Client
 from django.apps import apps
@@ -262,5 +263,16 @@ def check_response_with_json_file(response, json_file):
         assert response == true
 
 
-def os_independent_path(_, path):
-    return Box({'os_independent_path': str(PurePath(*path.split('/')))})
+def os_independent_path(_, path, add_tempdir=False):
+    os_independent_path = Path(path)
+    if add_tempdir:
+        tempdir = Path(tempfile.gettempdir())
+        os_independent_path = tempdir / os_independent_path
+
+    os_independent_path_parent = os_independent_path.parent
+    return Box(
+        {
+            'os_independent_path': str(os_independent_path),
+            'os_independent_path_parent': str(os_independent_path_parent),
+        }
+    )
