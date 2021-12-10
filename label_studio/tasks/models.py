@@ -19,6 +19,7 @@ from django.urls import reverse
 from django.utils.timesince import timesince
 from django.utils.timezone import now
 from django.dispatch import receiver, Signal
+from django.core.files.storage import default_storage
 from rest_framework.exceptions import ValidationError
 
 from model_utils import FieldTracker
@@ -155,6 +156,12 @@ class Task(TaskMixin, models.Model):
         # TODO: how to get neatly any storage class here?
         return find_first_one_to_one_related_field_by_prefix(self, '.*io_storages_')
 
+    @staticmethod
+    def is_upload_file(filename):
+        if not isinstance(filename, str):
+            return False
+        return filename.startswith(settings.UPLOAD_DIR + '/')
+
     def resolve_uri(self, task_data, proxy=True):
         if proxy and self.project.task_data_login and self.project.task_data_password:
             protected_data = {}
@@ -168,8 +175,14 @@ class Task(TaskMixin, models.Model):
             # Try resolve URLs via storage associated with that task
             storage = self.storage
             for field in task_data:
+                # file saved in django file storage
+                if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(task_data[field]):
+                    task_data[field] = default_storage.url(name=task_data[field])
+                    continue
+
+                # project storage
                 storage = storage or self._get_storage_by_url(task_data[field])
-                if storage:
+                if storage or self._get_storage_by_url(task_data[field]):
                     try:
                         resolved_uri = storage.resolve_uri(task_data[field])
                     except Exception as exc:

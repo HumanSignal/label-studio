@@ -181,11 +181,12 @@ class TaskListAPI(generics.ListAPIView):
     @staticmethod
     def get_task_serializer_context(request, project):
         storage = find_first_many_to_one_related_field_by_prefix(project, '.*io_storages.*')
-        resolve_uri = True
-        if not storage and not project.task_data_login and not project.task_data_password:
-            resolve_uri = False
-
         all_fields = request.GET.get('fields', None) == 'all'  # false by default
+
+        resolve_uri = \
+            storage or \
+            (project.task_data_login and project.task_data_password) or \
+            settings.CLOUD_FILE_STORAGE_ENABLED
 
         return {
             'proxy': bool_from_request(request.GET, 'proxy', True),
