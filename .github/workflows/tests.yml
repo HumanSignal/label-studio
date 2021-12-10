@@ -40,12 +40,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - uses: actions/cache@v2.1.6
+        name: Configure pip cache
         id: pip-cache
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
       - name: Install dependencies
         run: |
@@ -65,6 +66,7 @@ jobs:
         run: echo "::set-output name=dir::$(npm config get cache)"
 
       - uses: actions/cache@v2.1.6
+        name: Configure npm cache
         id: npm-cache
         with:
           path: ${{ steps.npm-cache-dir.outputs.dir }}
@@ -141,7 +143,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2.4.0
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2.3.1
         with:
           python-version: ${{ matrix.python-version }}
@@ -152,12 +154,13 @@ jobs:
           sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev
 
       - uses: actions/cache@v2.1.6
+        name: Configure pip cache
         id: pip-cache
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
       - name: Install pip dependencies
         run: |
@@ -175,6 +178,7 @@ jobs:
         run: echo "::set-output name=dir::$(npm config get cache)"
 
       - uses: actions/cache@v2.1.6
+        name: Configure npm cache
         id: npm-cache
         with:
           path: ${{ steps.npm-cache-dir.outputs.dir }}
@@ -230,11 +234,12 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - uses: actions/cache@v2.1.6
+      name: Configure pip cache
       with:
         path: ~\AppData\Local\pip\Cache
         key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
         restore-keys: |
-          ${{ runner.os }}-pip-
+          ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
     - name: Install dependencies
       run: |
