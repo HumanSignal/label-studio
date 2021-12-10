@@ -172,12 +172,18 @@ class Task(TaskMixin, models.Model):
                 protected_data[key] = value
             return protected_data
         else:
-            # Try resolve URLs via storage associated with that task
+            # try resolve URLs via storage associated with that task
             storage = self.storage
             for field in task_data:
                 # file saved in django file storage
                 if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(task_data[field]):
-                    task_data[field] = default_storage.url(name=task_data[field])
+                    # permission check: resolve uploaded files to the project only
+                    if self.file_upload.file.name == task_data[field]:
+                        task_data[field] = default_storage.url(name=task_data[field])
+                    # it's very rare case, e.g. user tried to reimport exported file from another project
+                    # or user wrote his django storage path manually
+                    else:
+                        task_data[field] = task_data[field] + '?not_uploaded_project_file'
                     continue
 
                 # project storage
