@@ -2,6 +2,7 @@
 test_name: test_import_from_localstorage
 strict: false
 marks:
+- skipif: '"Windows" in platform.system()'
 - usefixtures:
   - django_live_url
   - local_files_storage
@@ -90,6 +91,7 @@ stages:
 test_name: test_local_files_not_enabled
 strict: false
 marks:
+- skipif: '"Windows" in platform.system()'
 - usefixtures:
   - django_live_url
 stages:
@@ -118,6 +120,7 @@ stages:
 test_name: test_local_files_without_storage_not_available
 strict: false
 marks:
+- skipif: '"Windows" in platform.system()'
 - usefixtures:
   - django_live_url
   - local_files_storage
@@ -148,6 +151,7 @@ stages:
 test_name: test_local_files_without_import
 strict: false
 marks:
+- skipif: '"Windows" in platform.system()'
 - usefixtures:
   - django_live_url
   - local_files_storage
@@ -182,6 +186,7 @@ stages:
 test_name: test_local_files_without_import_document_root
 strict: false
 marks:
+- skipif: '"Windows" in platform.system()'
 - usefixtures:
   - django_live_url
   - local_files_storage
@@ -227,6 +232,7 @@ stages:
 test_name: test_import_from_localstorage_document_root
 strict: false
 marks:
+- skipif: '"Windows" in platform.system()'
 - usefixtures:
   - django_live_url
   - local_files_storage
