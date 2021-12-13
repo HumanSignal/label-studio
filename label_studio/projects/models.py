@@ -10,8 +10,6 @@ from django.db.models import JSONField
 from django.core.validators import MinLengthValidator, MaxLengthValidator
 from django.db import transaction, models
 from annoying.fields import AutoOneToOneField
-from django.dispatch import receiver
-from django.db.models.signals import pre_save
 
 from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks
 from core.utils.common import create_hash, sample_query, get_attr_or_item, load_func
@@ -520,6 +518,7 @@ class Project(ProjectMixin, models.Model):
         project_with_config_just_created = not exists and self.pk and self.label_config
         if self._label_config_has_changed() or project_with_config_just_created:
             self.data_types = extract_data_types(self.label_config)
+            self.parsed_label_config = parse_config(self.label_config)
 
         if self._label_config_has_changed():
             self.__original_label_config = self.label_config
@@ -931,14 +930,3 @@ class ProjectSummary(models.Model):
         self.created_annotations = created_annotations
         self.created_labels = labels
         self.save()
-
-
-@receiver(pre_save, sender=Project)
-def save_project(sender, instance, **kwargs):
-    try:
-        old_instance = Project.objects.get(id=instance.id)
-    except Project.DoesNotExist:
-        return 
-    if instance.label_config != old_instance.label_config:
-        instance.parsed_label_config = parse_config(instance.label_config)
-        logger.debug(f'Label config has changed for {instance}')
