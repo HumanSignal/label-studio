@@ -1,6 +1,6 @@
 {
-  "message": "[ext] Add wavesurfer vertical zoom control in editor (#382)",
-  "commit": "ae7db71d83188d19d9b748940dc5b8be0d3aa870",
+  "message": "[fix] Fix image transformer for the case with one transformed region (#384)",
+  "commit": "533e4153624fa7780c2de674e494eb0c43b8cc8e",
   "branch": "master",
-  "date": "2021-12-07T09:41:41Z"
+  "date": "2021-12-07T15:55:28Z"
 }
