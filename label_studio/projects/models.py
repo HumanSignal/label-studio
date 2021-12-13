@@ -935,7 +935,10 @@ class ProjectSummary(models.Model):
 
 @receiver(pre_save, sender=Project)
 def save_project(sender, instance, **kwargs):
-    old_instance = Project.objects.get(id=instance.id)
+    try:
+        old_instance = Project.objects.get(id=instance.id)
+    except Project.DoesNotExist:
+        return 
     if instance.label_config != old_instance.label_config:
         instance.parsed_label_config = parse_config(instance.label_config)
         logger.debug(f'Label config has changed for {instance}')
