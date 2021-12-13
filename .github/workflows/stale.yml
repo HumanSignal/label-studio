@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/stale@54197c7137c7221265ea1097805e48ab88497b94
+      - uses: actions/stale@7fb802b3079a276cf3c7e6ba9aa003c665b3f838
         with:
           days-before-issue-stale: -1
           days-before-issue-close: -1 # never closed automatically
