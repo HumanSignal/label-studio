@@ -29,7 +29,7 @@ This release also includes other important improvements.
 - Create annotations from predictions by selecting tasks and using the drop-down menu options. 
 - Added the ability to remove reviewer and annotator assignments to tasks using the drop-down menu options for selected tasks. <!--HTX-2143-->
 - Enhanced filtering behavior to be robust and support filtering by reviewers, annotators, and fields in your task data. 
-- Added the ability to label tasks as displayed, allowing you to filter and sort your data and label tasks accordingly. See more in [Filter or sort project data](labeling.html#Filter-or-sort-project-data).
+- Added the ability to label tasks as displayed, allowing you to filter and sort your data and label tasks accordingly. See more in [Filter or sort project data](manage_data.html#Filter-or-sort-project-data).
 - Improved performance by reducing the time it takes to load tasks.
 
 ### Labeling and tag improvements
