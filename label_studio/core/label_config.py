@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 _DATA_EXAMPLES = None
-_LABEL_TAGS = {'Label', 'Choice'}
+_LABEL_TAGS = {'Label', 'Choice', 'Relation'}
 SINGLE_VALUED_TAGS = {
     'choices': str,
     'rating': int,

@@ -17,7 +17,7 @@ from label_studio_converter import Converter
 
 from core.redis import redis_connected
 from core.utils.common import batch
-from core.utils.io import get_all_files_from_dir, get_temp_dir, read_bytes_stream
+from core.utils.io import get_all_files_from_dir, get_temp_dir, read_bytes_stream, get_all_dirs_from_dir
 from data_manager.models import View
 from projects.models import Project
 from tasks.models import Annotation, Task
@@ -281,10 +281,11 @@ class ExportMixin:
             converter.convert(input_file_path, out_dir, to_format, is_dir=False)
 
             files = get_all_files_from_dir(out_dir)
+            dirs = get_all_dirs_from_dir(out_dir)
 
-            if len(files) == 0:
+            if len(files) == 0 and len(dirs) == 0:
                 return None
-            elif len(files) == 1:
+            elif len(files) == 1 and len(dirs) == 0:
                 output_file = files[0]
                 filename = pathlib.Path(input_name).stem + pathlib.Path(output_file).suffix
             else:
