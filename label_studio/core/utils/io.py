@@ -135,3 +135,12 @@ def read_yaml(filepath):
 def read_bytes_stream(filepath):
     with open(filepath, mode='rb') as f:
         return io.BytesIO(f.read())
+
+
+def get_all_dirs_from_dir(d):
+    out = []
+    for name in os.listdir(d):
+        filepath = os.path.join(d, name)
+        if os.path.isdir(filepath):
+            out.append(filepath)
+    return out
