@@ -29,6 +29,8 @@ from core.utils.params import get_env
 from core.label_config import SINGLE_VALUED_TAGS
 from data_manager.managers import PreparedTaskManager, TaskManager
 from core.bulk_update_utils import bulk_update
+from data_import.models import FileUpload
+
 
 logger = logging.getLogger(__name__)
 
@@ -178,7 +180,8 @@ class Task(TaskMixin, models.Model):
                 # file saved in django file storage
                 if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(task_data[field]):
                     # permission check: resolve uploaded files to the project only
-                    if self.file_upload.file.name == task_data[field]:
+                    file_upload = FileUpload.objects.filter(project=self.project, file=task_data[field])
+                    if file_upload.exists():
                         task_data[field] = default_storage.url(name=task_data[field])
                     # it's very rare case, e.g. user tried to reimport exported file from another project
                     # or user wrote his django storage path manually
