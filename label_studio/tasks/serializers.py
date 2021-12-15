@@ -44,7 +44,7 @@ class ListAnnotationSerializer(serializers.ListSerializer):
     pass
 
 
-class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
+class AnnotationSerializer(ModelSerializer):
     """
     """
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
@@ -298,9 +298,9 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                          file_upload_id=task.get('file_upload_id'))
                 db_tasks.append(t)
 
-            # deprecated meta warning
-            if 'meta' in task:
-                logger.warning('You task data has field "meta" which is deprecated and it will be removed in future')
+                # deprecated meta warning
+                if 'meta' in task:
+                    logger.warning('You task data has field "meta" which is deprecated and it will be removed in future')
 
             if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
                 self.db_tasks = []
@@ -321,6 +321,9 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             # add annotations
             for i, annotations in enumerate(task_annotations):
                 for annotation in annotations:
+                    if not isinstance(annotation, dict):
+                        continue
+                        
                     # support both "ground_truth" and "ground_truth"
                     ground_truth = annotation.pop('ground_truth', True)
                     was_cancelled = annotation.pop('was_cancelled', False)
@@ -335,6 +338,9 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             last_model_version = None
             for i, predictions in enumerate(task_predictions):
                 for prediction in predictions:
+                    if not isinstance(prediction, dict):
+                        continue
+
                     # we need to call result normalizer here since "bulk_create" doesn't call save() method
                     result = Prediction.prepare_prediction_result(prediction['result'], self.project)
                     prediction_score = prediction.get('score')
