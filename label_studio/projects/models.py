@@ -12,7 +12,7 @@ from django.db import transaction, models
 from annoying.fields import AutoOneToOneField
 
 from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks
-from core.utils.common import create_hash, sample_query, get_attr_or_item, load_func
+from core.utils.common import create_hash, get_attr_or_item, load_func
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.label_config import (
     parse_config,
@@ -25,6 +25,7 @@ from core.label_config import (
     get_all_control_tag_tuples,
     get_annotation_tuple,
 )
+from core.bulk_update_utils import bulk_update
 
 logger = logging.getLogger(__name__)
 
@@ -356,7 +357,7 @@ class Project(ProjectMixin, models.Model):
         """
         Rearrange overlap depending on annotations count in tasks
         """
-        all_project_tasks = Task.objects.select_for_update().filter(project=self)
+        all_project_tasks = Task.objects.filter(project=self)
         max_annotations = self.maximum_annotations
         must_tasks = int(self.tasks.count() * self.overlap_cohort_percentage / 100 + 0.5)
         tasks_with_max_annotations = all_project_tasks.annotate(
@@ -379,7 +380,7 @@ class Project(ProjectMixin, models.Model):
                 item.overlap = 1
                 objs.append(item)
             with transaction.atomic():
-                Task.objects.bulk_update(objs, ['overlap'], batch_size=1000)
+                bulk_update(objs, update_fields=['overlap'], batch_size=settings.BATCH_SIZE)
         else:
             tasks_with_max_annotations.update(overlap=max_annotations)
             tasks_with_min_annotations.update(overlap=1)
