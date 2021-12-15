@@ -356,7 +356,7 @@ class Project(ProjectMixin, models.Model):
         """
         Rearrange overlap depending on annotations count in tasks
         """
-        all_project_tasks = Task.objects.filter(project=self)
+        all_project_tasks = Task.objects.select_for_update().filter(project=self)
         max_annotations = self.maximum_annotations
         must_tasks = int(self.tasks.count() * self.overlap_cohort_percentage / 100 + 0.5)
         tasks_with_max_annotations = all_project_tasks.annotate(
@@ -378,7 +378,8 @@ class Project(ProjectMixin, models.Model):
             for item in tasks_with_min_annotations[left_must_tasks:]:
                 item.overlap = 1
                 objs.append(item)
-            Task.objects.bulk_update(objs, ['overlap'], batch_size=1000)
+            with transaction.atomic():
+                Task.objects.bulk_update(objs, ['overlap'], batch_size=1000)
         else:
             tasks_with_max_annotations.update(overlap=max_annotations)
             tasks_with_min_annotations.update(overlap=1)
