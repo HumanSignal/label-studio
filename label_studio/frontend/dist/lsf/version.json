@@ -1,6 +1,6 @@
 {
-  "message": "[fix] Fix image transformer for the case with one transformed region (#384)",
-  "commit": "533e4153624fa7780c2de674e494eb0c43b8cc8e",
+  "message": "DEV-1312: Fix relations restoration (#389)\n\n* Fix regions tree assembly\r\n\r\n* Fix region tree restoration\r\n\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
+  "commit": "d886b810bae4ee0bff3bac884838cae2c1b6f8aa",
   "branch": "master",
-  "date": "2021-12-07T15:55:28Z"
+  "date": "2021-12-13T15:40:57Z"
 }
