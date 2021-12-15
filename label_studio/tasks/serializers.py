@@ -44,7 +44,7 @@ class ListAnnotationSerializer(serializers.ListSerializer):
     pass
 
 
-class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
+class AnnotationSerializer(ModelSerializer):
     """
     """
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
