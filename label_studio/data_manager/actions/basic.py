@@ -90,9 +90,11 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     :param queryset: filtered tasks db queryset
     """
     task_ids = queryset.values_list('id', flat=True)
+    tasks_with_predictions_ids = list(Task.objects.filter(id__in=task_ids, predictions__isnull=False).values_list('id', flat=True))
     predictions = Prediction.objects.filter(task__id__in=task_ids)
     count = predictions.count()
     predictions.delete()
+    Task.objects.filter(id__in=tasks_with_predictions_ids).update(updated_at=now())
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
 
 
