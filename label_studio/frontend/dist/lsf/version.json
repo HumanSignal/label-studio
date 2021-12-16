@@ -1,6 +1,6 @@
 {
-  "message": "DEV-1312: Fix relations restoration (#389)\n\n* Fix regions tree assembly\r\n\r\n* Fix region tree restoration\r\n\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "d886b810bae4ee0bff3bac884838cae2c1b6f8aa",
-  "branch": "master",
-  "date": "2021-12-13T15:40:57Z"
+  "message": "Fix tests",
+  "commit": "3b3eac9ba5b66509456297c8b6122af72b5a7530",
+  "branch": "fix/DEV-1155/rotation-behavior",
+  "date": "2021-12-16T01:45:51Z"
 }
