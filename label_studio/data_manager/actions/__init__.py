@@ -13,6 +13,7 @@ import traceback as tb
 from importlib import import_module
 
 from django.conf import settings
+from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 
 from data_manager.functions import DataManagerException
@@ -100,12 +101,17 @@ def perform_action(action_id, project, queryset, user, **kwargs):
     if not check_permissions(user, action):
         raise DRFPermissionDenied(f'Action is not allowed for the current user: {action["id"]}')
 
+
     try:
         result = action['entry_point'](project, queryset, **kwargs)
     except Exception as e:
         text = 'Error while perform action: ' + action_id + '\n' + tb.format_exc()
         logger.error(text, extra={'sentry_skip': True})
         raise e
+    else:
+        set_updated_at = action.get('set_updated_at', True)
+        if set_updated_at:
+            queryset.update(updated_at=timezone.now())
 
     return result
 

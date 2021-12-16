@@ -3,7 +3,6 @@
 import logging
 
 from django.db.models import signals
-from django.utils.timezone import now
 
 from core.permissions import AllPermissions
 from core.utils.common import temporary_disconnect_signal, temporary_disconnect_all_signals
@@ -72,12 +71,10 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     :param queryset: filtered tasks db queryset
     """
     task_ids = queryset.values_list('id', flat=True)
-    tasks_with_annotations_ids = list(Task.objects.filter(id__in=task_ids, annotations__isnull=False).values_list('id', flat=True))
     annotations = Annotation.objects.filter(task__id__in=task_ids)
     count = annotations.count()
     annotations_ids = list(annotations.values('id'))
     annotations.delete()
-    Task.objects.filter(id__in=tasks_with_annotations_ids).update(updated_at=now())
     emit_webhooks_for_instance(project.organization, project, WebhookAction.ANNOTATIONS_DELETED, annotations_ids)
     return {'processed_items': count,
             'detail': 'Deleted ' + str(count) + ' annotations'}
@@ -90,11 +87,9 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     :param queryset: filtered tasks db queryset
     """
     task_ids = queryset.values_list('id', flat=True)
-    tasks_with_predictions_ids = list(Task.objects.filter(id__in=task_ids, predictions__isnull=False).values_list('id', flat=True))
     predictions = Prediction.objects.filter(task__id__in=task_ids)
     count = predictions.count()
     predictions.delete()
-    Task.objects.filter(id__in=tasks_with_predictions_ids).update(updated_at=now())
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
 
 
