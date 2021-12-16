@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import datetime
+import numbers
 
 from urllib.parse import urljoin, quote
 
@@ -18,13 +19,18 @@ from django.urls import reverse
 from django.utils.timesince import timesince
 from django.utils.timezone import now
 from django.dispatch import receiver, Signal
+from django.core.files.storage import default_storage
+from rest_framework.exceptions import ValidationError
 
 from model_utils import FieldTracker
 
 from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func
 from core.utils.params import get_env
+from core.label_config import SINGLE_VALUED_TAGS
 from data_manager.managers import PreparedTaskManager, TaskManager
 from core.bulk_update_utils import bulk_update
+from data_import.models import FileUpload
+
 
 logger = logging.getLogger(__name__)
 
@@ -152,6 +158,12 @@ class Task(TaskMixin, models.Model):
         # TODO: how to get neatly any storage class here?
         return find_first_one_to_one_related_field_by_prefix(self, '.*io_storages_')
 
+    @staticmethod
+    def is_upload_file(filename):
+        if not isinstance(filename, str):
+            return False
+        return filename.startswith(settings.UPLOAD_DIR + '/')
+
     def resolve_uri(self, task_data, proxy=True):
         if proxy and self.project.task_data_login and self.project.task_data_password:
             protected_data = {}
@@ -162,11 +174,24 @@ class Task(TaskMixin, models.Model):
                 protected_data[key] = value
             return protected_data
         else:
-            # Try resolve URLs via storage associated with that task
+            # try resolve URLs via storage associated with that task
             storage = self.storage
             for field in task_data:
+                # file saved in django file storage
+                if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(task_data[field]):
+                    # permission check: resolve uploaded files to the project only
+                    file_upload = FileUpload.objects.filter(project=self.project, file=task_data[field])
+                    if file_upload.exists():
+                        task_data[field] = default_storage.url(name=task_data[field])
+                    # it's very rare case, e.g. user tried to reimport exported file from another project
+                    # or user wrote his django storage path manually
+                    else:
+                        task_data[field] = task_data[field] + '?not_uploaded_project_file'
+                    continue
+
+                # project storage
                 storage = storage or self._get_storage_by_url(task_data[field])
-                if storage:
+                if storage or self._get_storage_by_url(task_data[field]):
                     try:
                         resolved_uri = storage.resolve_uri(task_data[field])
                     except Exception as exc:
@@ -200,77 +225,13 @@ class Task(TaskMixin, models.Model):
             from io_storages.s3.models import S3ImportStorage
             return S3ImportStorage()
 
+    @property
+    def completed_annotations(self):
+        """Annotations that we take into account when set completed status to the task"""
+        return self.annotations.filter(Q_finished_annotations & Q(ground_truth=False))
+
     def update_is_labeled(self):
-        """Set is_labeled field according to annotations*.count > overlap
-        """
-        n = self.annotations.filter(Q_finished_annotations & Q(ground_truth=False)).count()
-        # self.is_labeled = n >= self.project.maximum_annotations
-        self.is_labeled = n >= self.overlap
-
-    def reset_updates(self):
-        """ Reset updates to default from model for one task.
-            We need it in duplicate project or total deletion of annotations
-        """
-        for field in Task._meta.fields:
-            if field.name in Task.updates:
-                setattr(self, field.name, field.default)
-
-    @staticmethod
-    def bulk_reset_updates(project):
-        """ Bulk reset updates to default, it's a fast way to reset all tasks in project
-        """
-        for field in Task._meta.fields:
-            if field.name in Task.updates:
-                project.tasks.update(**{field.name: field.default})
-
-    @staticmethod
-    def bulk_update_is_labeled(project):
-        """ Fast way to update only is_labeled.
-            Prefer to use Django 2.2 bulk_update(), see bulk_update_field('is_labeled')
-
-            get all project.tasks as subquery
-            Subquery(
-                w coalesce get the first non-null value (count(annotations), or 0)
-                make condition
-                add temp field pre_is_labeled as condtion values
-            )
-            update all tasks with Subquery
-        """
-        tasks = project.tasks.filter(pk=OuterRef('pk'))
-        count = Coalesce(Count(
-            'annotations', filter=Q(annotations__was_cancelled=False) & Q(annotations__ground_truth=False)), Value(0))
-        condition = Case(
-            When(overlap__lte=count, then=Value(True)),
-            default=Value(False),
-            output_field=models.BooleanField(null=False)
-        )
-        results = tasks.annotate(pre_is_labeled=condition).values('pre_is_labeled')
-        project.tasks.update(is_labeled=Subquery(results))
-
-    def delete_url(self):
-        return reverse('tasks:task-delete', kwargs={'pk': self.pk})
-
-    def completion_for_ground_truth(self):
-        """ 1 Get ground_truth completion if task has it, else
-            2 Get first completion created by owner of project,
-            3 Or the first of somebody if no owner's items.
-            It's used for ground_truth selection right on data manager page
-        """
-        if not self.annotations.exists():
-            return None
-
-        # ground_truth already exist
-        ground_truth_annotations = self.annotations.filter(ground_truth=True)
-        if ground_truth_annotations.exists():
-            return ground_truth_annotations.first()
-
-        # owner annotation
-        owner_annotations = self.annotations.filter(completed_by=self.project.created_by)
-        if owner_annotations.count() > 0:
-            return owner_annotations.first()
-
-        # annotator annotation
-        return self.annotations.first()
+        self.is_labeled = self._get_is_labeled_value()
 
     def increase_project_summary_counters(self):
         if hasattr(self.project, 'summary'):
@@ -437,6 +398,56 @@ class Prediction(models.Model):
     def has_permission(self, user):
         return self.task.project.has_permission(user)
 
+    @classmethod
+    def prepare_prediction_result(cls, result, project):
+        """
+        This function does the following logic of transforming "result" object:
+        result is list -> use raw result as is
+        result is dict -> put result under single "value" section
+        result is string -> find first occurrence of single-valued tag (Choices, TextArea, etc.) and put string under corresponding single field (e.g. "choices": ["my_label"])  # noqa
+        """
+        if isinstance(result, list):
+            # full representation of result
+            for item in result:
+                if not isinstance(item, dict):
+                    raise ValidationError(f'Each item in prediction result should be dict')
+            # TODO: check consistency with project.label_config
+            return result
+
+        elif isinstance(result, dict):
+            # "value" from result
+            # TODO: validate value fields according to project.label_config
+            for tag, tag_info in project.get_control_tags_from_config().items():
+                tag_type = tag_info['type'].lower()
+                if tag_type in result:
+                    return [{
+                        'from_name': tag,
+                        'to_name': ','.join(tag_info['to_name']),
+                        'type': tag_type,
+                        'value': result
+                    }]
+
+        elif isinstance(result, (str, numbers.Integral)):
+            # If result is of integral type, it could be a representation of data from single-valued control tags (e.g. Choices, Rating, etc.)  # noqa
+            for tag, tag_info in project.get_control_tags_from_config().items():
+                tag_type = tag_info['type'].lower()
+                if tag_type in SINGLE_VALUED_TAGS and isinstance(result, SINGLE_VALUED_TAGS[tag_type]):
+                    return [{
+                        'from_name': tag,
+                        'to_name': ','.join(tag_info['to_name']),
+                        'type': tag_type,
+                        'value': {
+                            tag_type: [result]
+                        }
+                    }]
+        else:
+            raise ValidationError(f'Incorrect format {type(result)} for prediction result {result}')
+
+    def save(self, *args, **kwargs):
+        # "result" data can come in different forms - normalize them to JSON
+        self.result = self.prepare_prediction_result(self.result, self.task.project)
+        return super(Prediction, self).save(*args, **kwargs)
+
     class Meta:
         db_table = 'prediction'
 
@@ -570,6 +581,7 @@ def update_ml_backend(sender, instance, **kwargs):
             for ml_backend in project.ml_backends.all():
                 ml_backend.train()
 
+
 def update_task_stats(task, stats=('is_labeled',), save=True):
     """Update single task statistics:
         accuracy
@@ -584,6 +596,7 @@ def update_task_stats(task, stats=('is_labeled',), save=True):
         task.update_is_labeled()
     if save:
         task.save()
+
 
 def bulk_update_stats_project_tasks(tasks):
     """bulk Task update accuracy

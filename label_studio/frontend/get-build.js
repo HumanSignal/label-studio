@@ -41,7 +41,7 @@ async function get(projectName, ref = 'master') {
     fs.mkdirSync(dir);
   }
 
-  if (ref.length < 30) {
+  if (ref.length < 30 || ref.indexOf("/") > -1) {
     const commitUrl = `https://api.github.com/repos/${REPO}/git/ref/heads/${ref}`;
     console.info(`Fetching ${commitUrl}`);
     res = await fetch(commitUrl, { headers: { Authorization: `token ${TOKEN}` }});
@@ -63,7 +63,7 @@ async function get(projectName, ref = 'master') {
   const artifactsUrl = `https://api.github.com/repos/${REPO}/actions/artifacts`;
   res = await fetch(artifactsUrl, { headers: { Authorization: `token ${TOKEN}` }});
   json = await res.json();
-  const artifact = json.artifacts.find(art => art.name === `build ${sha}`);
+  const artifact = json.artifacts.find(art => art.name.match(sha) !== null);
   if (!artifact) throw new Error(`Artifact for commit ${sha} was not found. Build failed?`);
   const buildUrl = artifact.archive_download_url;
   console.info('Found an artifact:', buildUrl);

@@ -67,11 +67,12 @@ logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 DJANGO_DB_MYSQL = 'mysql'
 DJANGO_DB_SQLITE = 'sqlite'
+DJANGO_DB_POSTGRESQL = 'postgresql'
 DJANGO_DB = 'default'
 DATABASE_NAME_DEFAULT = os.path.join(BASE_DATA_DIR, 'label_studio.sqlite3')
 DATABASE_NAME = get_env('DATABASE_NAME', DATABASE_NAME_DEFAULT)
 DATABASES_ALL = {
-    'default': {
+    DJANGO_DB_POSTGRESQL: {
         'ENGINE': 'django.db.backends.postgresql',
         'USER': get_env('POSTGRE_USER', 'postgres'),
         'PASSWORD': get_env('POSTGRE_PASSWORD', 'postgres'),
@@ -95,6 +96,7 @@ DATABASES_ALL = {
         },
     },
 }
+DATABASES_ALL['default'] = DATABASES_ALL[DJANGO_DB_POSTGRESQL]
 DATABASES = {'default': DATABASES_ALL.get(get_env('DJANGO_DB', 'default'))}
 
 LOGGING = {
@@ -283,17 +285,22 @@ RQ_QUEUES = {
 # Swagger: automatic API documentation
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
-        'token': {
-            'type': 'token',
-            'name': 'Token',
+        'Token': {
+            'type': 'apiKey',
+            'name': 'Authorization',
             'in': 'header',
-            'url': '/user/account',
-        },
+            'description':
+                'The token (or API key) must be passed as a request header. '
+                'You can find your user token on the User Account page in Label Studio. Example: '
+                '<br><pre><code class="language-bash">'
+                'curl https://label-studio-host/api/projects -H "Authorization: Token [your-token]"'
+                '</code></pre>'
+        }
     },
     'APIS_SORTER': 'alpha',
     'SUPPORTED_SUBMIT_METHODS': ['get', 'post', 'put', 'delete', 'patch'],
-    # "DEFAULT_AUTO_SCHEMA_CLASS": "core.utils.CustomAutoSchema",
     'OPERATIONS_SORTER': 'alpha',
+
 }
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)
@@ -394,12 +401,14 @@ ALLOW_ORGANIZATION_WEBHOOKS = get_bool_env('ALLOW_ORGANIZATION_WEBHOOKS', False)
 CONVERTER_DOWNLOAD_RESOURCES = get_bool_env('CONVERTER_DOWNLOAD_RESOURCES', True)
 EXPERIMENTAL_FEATURES = get_bool_env('EXPERIMENTAL_FEATURES', False)
 USE_ENFORCE_CSRF_CHECKS = get_bool_env('USE_ENFORCE_CSRF_CHECKS', True)  # False is for tests
-
+CLOUD_FILE_STORAGE_ENABLED = False
 
 CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and_log'
 SAVE_USER = 'users.functions.save_user'
 USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
+TASK_SERIALIZER = 'tasks.serializers.BaseTaskSerializer'
+EXPORT_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializer'
 DATA_MANAGER_GET_ALL_COLUMNS = 'data_manager.functions.get_all_columns'
 DATA_MANAGER_ANNOTATIONS_MAP = {}
 DATA_MANAGER_ACTIONS = {}
@@ -407,13 +416,13 @@ DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS = 'data_manager.functions.custom_filter_e
 DATA_MANAGER_PREPROCESS_FILTER = 'data_manager.functions.preprocess_filter'
 USER_LOGIN_FORM = 'users.forms.LoginForm'
 PROJECT_MIXIN = 'core.mixins.DummyModelMixin'
-TASK_MIXIN = 'core.mixins.DummyModelMixin'
+TASK_MIXIN = 'tasks.mixins.TaskMixin'
 ANNOTATION_MIXIN = 'core.mixins.DummyModelMixin'
 ORGANIZATION_MIXIN = 'core.mixins.DummyModelMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
 GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
-
 STORAGE_ANNOTATION_SERIALIZER = 'io_storages.serializers.StorageAnnotationSerializer'
+TASK_SERIALIZER_BULK = 'tasks.serializers.BaseTaskSerializerBulk'
 
 
 def project_delete(project):
@@ -433,6 +442,11 @@ USER_AUTH = user_auth
 COLLECT_VERSIONS = collect_versions_dummy
 
 WEBHOOK_TIMEOUT = float(get_env('WEBHOOK_TIMEOUT', 1.0))
+WEBHOOK_SERIALIZERS = {
+    'project': 'webhooks.serializers_for_hooks.ProjectWebhookSerializer',
+    'task': 'webhooks.serializers_for_hooks.TaskWebhookSerializer',
+    'annotation': 'webhooks.serializers_for_hooks.AnnotationWebhookSerializer',
+}
 
 EDITOR_KEYMAP = json.dumps(get_env("EDITOR_KEYMAP"))
 
@@ -441,3 +455,7 @@ import mimetypes
 
 mimetypes.add_type("application/javascript", ".js", True)
 mimetypes.add_type("image/png", ".png", True)
+
+
+# fields name was used in DM api before
+REST_FLEX_FIELDS = {"FIELDS_PARAM": "include"}

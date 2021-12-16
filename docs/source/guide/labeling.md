@@ -8,44 +8,13 @@ meta_description: Label and annotate data using the Label Studio UI to create bo
 
 Label and annotate your data with the open source data labeling tool, Label Studio. After you [set up your project](setup_project.html) and [labeling interface](setup.html) and [import your data](tasks.html), you can start labeling and annotating your data.
 
-1. Open a project in Label Studio and optionally [filter or sort the data](#Filter-or-sort-project-data).    
+1. Open a project in Label Studio and optionally [filter or sort the data](manage_data.html#Filter-or-sort-project-data).    
 2. Click **Label All Tasks** to [start labeling](#Start-labeling).
 3. Use [keyboard shortcuts](#Use-keyboard-shortcuts-to-label-regions-faster) or your mouse to label the data and submit your annotations.
 4. Follow the project instructions for labeling and deciding whether to skip tasks. 
 5. Click the project name to return to the data manager.
 
 You can also [collaborate with other annotators](#Label-with-collaborators) to improve the quality of your labeled data. 
-
-## Filter or sort project data
-
-When you filter or sort the data before you label it, you modify which tasks and the order of the tasks you see when labeling. While [task sampling](start.html#Set_up_task_sampling_for_your_project) affects the task order for an entire project and can't be changed, filtering and sorting tasks can be changed at any time. 
-
-### Example: Label new data first
-Sort the data in your project by date to focus on labeling the newest data first.
-
-1. In a project, update the **Order** of the data from the default to **Created at**.
-2. Update the order of the items to be in ascending order, so the newest items appear first. 
-3. Select **Label Tasks As Displayed** to start labeling tasks from newest to oldest. 
-
-### Example: Sort by prediction score
-You can sort the data in your project by prediction score if you upload [pre-annotated data](predictions.html) with prediction scores, or if your [machine learning backend](ml.html) produces prediction scores as part of the model output. 
-
-1. In a project, update the **Order** of the data from the default to use the **Prediction score** field.
-2. Update the order of the items in either ascending or descending order to label based on higher confidence or lower confidence predictions. 
-3. Select **Label Tasks As Displayed** to start labeling tasks in prediction score order. 
-You can also use [task sampling](start.html#Set_up_task_sampling_for_your_project) to use prediction score ordering.
-
-### Example: Split a dataset using tabs and filters
-If you want to label a large dataset, you might want to use tabs and filters to split it up into smaller sections, and assign different annotators to different tabs. You can't assign annotators to specific tasks in Label Studio Community Edition, but you can rename the tabs after specific annotators as a way to basically assign tasks using tabs.  
-
-For example, you might split a dataset with 300 images into 3 different tabs, and have different annotators focus on each tab:
-1. In a project, create a filter where the **ID** field **is between** the values "1" and "100". Click away from the filter to review filtered items the tab.
-2. Click the vertical ellipsis for the tab and select **Rename**. Name it after a specific annotator that you want to focus on the items in that tab.
-3. Click the **+** icon to create a new tab. Click the vertical ellipsis for the new tab and select **Rename** to name it after a second annotator.
-4. On the new tab, create a filter where the **ID** field **is between** the values "101" and "200". Click away from the filter to review the filtered items on the tab.
-5. Click the **+** icon to create a new tab. Click the vertical ellipsis for the new tab and select **Rename** to name it after a third annotator.
-6. On the new tab, create a filter where the **ID** field **is between** the values "201" and "300". Click away from the filter to review the filtered items on the tab.
-7. Any annotator can log in and navigate to the relevant tab for their work and click the **Label** button to start labeling the subset of tasks on their tab.
 
 ## Start labeling
 
@@ -107,7 +76,7 @@ You can delete labeled regions, such as bounding boxes or text spans, if needed.
 ### Delete an annotation
 After labeling a task, you can delete the annotation by clicking the trash can button to delete an annotation on the task. If you haven't saved your annotation yet, click the `X` icon to reset the task and remove your labeling activity.
 
-You can also delete all annotations on a task from the project page. See [Delete tasks or annotations](setup_project.html#Delete_tasks_or_annotations).
+You can also delete all annotations on a task from the project page. See [Delete tasks or annotations](manage_data.html#Delete_tasks_or_annotations).
 
 ### Add relations between annotations
 
@@ -145,15 +114,6 @@ To label tasks multiple times while the minimum annotations required is set to o
 4. Click **Submit** to save your annotation.
 5. Click the next task in the data manager to open the quick labeling view for that task and repeat steps 2-4.
 
-### <i class='ent'></i> Assign annotators to tasks
-
-In Label Studio Enterprise, if you're an administrator or project manager, you can assign annotators to tasks in a specific project. After you [add the annotator to the project or workspace](setup_project.html#Add-members-to-a-project), assign the annotator to specific tasks.
-
-1. For a specific project, select tasks on the Data Manager.
-2. Select the dropdown and choose **Assign Annotators**.
-3. Select names of annotators and click the `>` arrow to assign them to the selected tasks.
-4. Click **Assign**. 
-
 ## Perform ML-assisted labeling with interactive preannotations
 
 If you have a machine learning backend set up to [get interactive preannotations](ml.html#Get-interactive-preannotations), you can choose whether to use those predictions while you label. 
@@ -171,10 +131,11 @@ This table describes the hotkeys for a standard keyboard. For a Mac keyboard, us
 | `ctrl` + `enter` | Submit a task. |
 | `alt` + `enter` | Update a task. | 
 | `ctrl` + `backspace` OR `cmd` + `backspace` | Delete all regions. |
-| `escape` | Exit relation mode. |
+| `escape` | Exit relation mode or unselect a selected region. |
 | `backspace` | Delete a selected region. | 
 | `alt` + `r` | Create a relation between regions, when a region is selected. | 
 | `alt` + `.` | Cycle through all regions in the order listed on the regions sidebar. |
+| `alt` + `h` | Hide a selected region. | 
 | `ctrl` + `d` OR `cmd` + `d` | Duplicate a selected region. |
 | `u` | Unselect a selected region. | 
 | `s` | On the data manager, change the row selection to the next row, 1 below the current row. |
@@ -182,7 +143,71 @@ This table describes the hotkeys for a standard keyboard. For a Mac keyboard, us
 | `d` | On the data manager, open the labeling quick view for the selected task row. | 
 | `a` | On the data manager, close the labeling quick view for the selected task row. |
 
-Other annotation types have labeling-specific shortcuts, such as numbers to select specific labels or to select the eraser or a brush tool when labeling images. You can also specify custom hotkeys for labeling using the [Shortcut tag](/tags/shortcut.html). 
+Other annotation types have labeling-specific shortcuts, such as numbers to select specific labels for named entity recognition tasks. 
+
+### Image-specific hotkeys
+
+When labeling image data types with the `Rectangle`, `BrushLabels`, `Ellipse`, `Polygon`, or `KeyPoints` tags, you can use specific hotkeys to take image labeling-specific actions.
+
+| Key | Description |
+| --- | --- | 
+| `h` | Pan the image, after zooming in. |
+| `v` | Select the mouse arrow. |
+| `alt` + `left arrow` | Rotate the image to the left. |
+| `alt` + `right arrow` | Rotate the image to the right. |
+| `ctrl` + `+` | Zoom in to the image. |
+| `ctrl` + `-` | Zoom out of the image. | 
+| `k` | If performing key point labeling, select the key point option in the toolbar. |
+| `e` | Select the eraser option in the toolbar. | 
+| `b` | If performing brush mask labeling, select the brush option in the toolbar. 
+| `[` | When the brush or eraser option is selected, decrease the size of the brush or eraser. |
+| `]` | When the brush or eraser option is selected, increase the size of the brush or eraser. |
+
+### Audio-specific hotkeys
+
+When labeling audio data types with the `Audio` or `AudioPlus` tags, you can use specific hotkeys to take audio-specific actions.
+
+| Key | Description |
+| --- | --- | 
+| `ctrl` + `b` OR `cmd` + `b` | Rewind audio 1 second. |
+
+### Time series-specific hotkeys
+
+When labeling timeseries data with the `TimeSeries` tag, you can use specific hotkeys to take actions on a selected region on the time series data.
+
+| Key | Description |
+| --- | --- | 
+| `left arrow` | Expand the region area to the left. |
+| `right arrow` | Expand the region area to the right. |
+| `alt` + `left arrow` | Decrease the region area on the left. |
+| `alt` + `right arrow` | Decrease the region area on the right. |
+| `shift` + `left arrow` | Expand the region area by a larger amount to the left. | 
+| `shift` + `right arrow` | Expand the region area by a larger amount to the right. |
+| `shift` + `alt` + `left arrow` | Decrease the region area by a larger amount on the left. |
+| `shift` + `alt` + `right arrow` | Decrease the region area by a larger amount on the right. |
+
+### Video-specific hotkeys
+
+When labeling video data with the `Video` tag, you can use specific hotkeys to take video-specific actions.
+
+| Key | Description |
+| --- | --- | 
+| `alt` + `spacebar` | Play or pause video. |
+| `alt` + `left arrow` | Rewind one frame. |
+| `alt` + `right arrow` | Fast forward one frame. | 
+
+### Customize hotkeys
+You can specify custom hotkeys for labeling using the [Shortcut tag](/tags/shortcut.html), or change the hotkeys used for specific actions using an environment variable. 
+
+If you want to change the hotkeys used for specific actions, set the `EDITOR_KEYMAP` environment variable with valid JSON in your `.env` file or when starting Label Studio. For example, to change the keyboard shortcut used to submit an annotation to `shift` + `s`, set the environment variable as follows:
+```
+EDITOR_KEYMAP='{"annotation:submit":{"key": "shift+s","description": "My Custom Submit Hotkey!"}}'
+```
+This overwrites the existing hotkey mapping with your custom mapping. See [more about how to set environment variables](start.html#Set-environment-variables). 
+
+Refer to the full list of customizable hotkeys in the [`keymap.json` file of the `label-studio-frontend`](https://github.com/heartexlabs/label-studio-frontend/blob/master/src/core/settings/keymap.json) repository to update a different hotkey combination. 
+
+You cannot use this environment variable to remove an existing or add a new keyboard shortcut. 
 
 ## Customize the labeling interface 
 

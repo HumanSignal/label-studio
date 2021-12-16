@@ -30,6 +30,13 @@ logger = logging.getLogger(__name__)
         tags=['Export'],
         operation_summary='Get export formats',
         operation_description='Retrieve the available export formats for the current project by ID.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project.'),
+        ],
         responses={
             200: openapi.Response(
                 description='Export formats',
@@ -90,6 +97,12 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
                           Specify a list of task IDs to retrieve only the details for those tasks.
                           """,
             ),
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project.'
+            ),
         ],
         tags=['Export'],
         operation_summary='Export tasks and annotations',
@@ -129,6 +142,9 @@ class ExportAPI(generics.RetrieveAPIView):
     def get_queryset(self):
         return Project.objects.filter(organization=self.request.user.active_organization)
 
+    def get_task_queryset(self, queryset):
+        return queryset
+
     def get(self, request, *args, **kwargs):
         project = self.get_object()
         export_type = (
@@ -157,7 +173,9 @@ class ExportAPI(generics.RetrieveAPIView):
         logger.debug('Serialize tasks for export')
         tasks = []
         for _task_ids in batch(task_ids, 1000):
-            tasks += ExportDataSerializer(query.filter(id__in=_task_ids), many=True).data
+            tasks += ExportDataSerializer(
+                self.get_task_queryset(query.filter(id__in=_task_ids)), many=True, expand=['drafts']
+            ).data
         logger.debug('Prepare export files')
 
         export_stream, content_type, filename = DataExport.generate_export_file(
@@ -235,9 +253,11 @@ class ProjectExportFilesAuthCheck(APIView):
         """,
         manual_parameters=[
             openapi.Parameter(
-                name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, default=0, description='Project ID'
-            )
-        ],
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project.')
+        ]
     ),
 )
 @method_decorator(
@@ -250,9 +270,11 @@ class ProjectExportFilesAuthCheck(APIView):
         """,
         manual_parameters=[
             openapi.Parameter(
-                name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, default=0, description='Project ID'
-            )
-        ],
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project.')
+        ]
     ),
 )
 class ExportListAPI(generics.ListCreateAPIView):
@@ -302,20 +324,20 @@ class ExportListAPI(generics.ListCreateAPIView):
         tags=['Export'],
         operation_summary='Get export by ID',
         operation_description="""
-        Retrieve information about an export file by export ID.
+        Retrieve information about an export file by export ID for a specific project.
         """,
         manual_parameters=[
             openapi.Parameter(
-                name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, default=0, description='Project ID'
-            ),
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project.'),
             openapi.Parameter(
                 name='export_pk',
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_PATH,
-                default=0,
-                description='Export primary key',
-            ),
-        ],
+                description='Primary key identifying the export file.'),
+        ]
     ),
 )
 @method_decorator(
@@ -328,16 +350,16 @@ class ExportListAPI(generics.ListCreateAPIView):
         """,
         manual_parameters=[
             openapi.Parameter(
-                name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, default=0, description='Project ID'
-            ),
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project.'),
             openapi.Parameter(
                 name='export_pk',
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_PATH,
-                default=0,
-                description='Export primary key',
-            ),
-        ],
+                description='Primary key identifying the export file.'),
+        ]
     ),
 )
 class ExportDetailAPI(generics.RetrieveDestroyAPIView):
@@ -381,15 +403,15 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
                 description='Selected export format',
             ),
             openapi.Parameter(
-                name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, default=0, description='Project ID'
-            ),
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project.'),
             openapi.Parameter(
                 name='export_pk',
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_PATH,
-                default=0,
-                description='Export primary key',
-            ),
+                description='Primary key identifying the export file.'),
         ],
     ),
 )

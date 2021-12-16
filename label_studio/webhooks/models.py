@@ -1,18 +1,17 @@
-import requests
-from core.validators import JSONSchemaValidator
-from django.db import models
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
-from django.conf import settings
 import logging
 
+import requests
+from core.utils.common import load_func
+from core.validators import JSONSchemaValidator
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.utils.translation import gettext_lazy as _
 from projects.models import Project
-from tasks.models import Task, Annotation
+from tasks.models import Annotation, Task
+
 from .serializers_for_hooks import (
     OnlyIDWebhookSerializer,
-    ProjectWebhookSerializer,
-    TaskWebhookSerializer,
-    AnnotationWebhookSerializer,
 )
 
 HEADERS_SCHEMA = {
@@ -111,7 +110,7 @@ class WebhookAction(models.Model):
             'key': 'project',
             'many': False,
             'model': Project,
-            'serializer': ProjectWebhookSerializer,
+            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['project']),
             'organization-only': True,
         },
         PROJECT_UPDATED: {
@@ -120,7 +119,7 @@ class WebhookAction(models.Model):
             'key': 'project',
             'many': False,
             'model': Project,
-            'serializer': ProjectWebhookSerializer,
+            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['project']),
             'project-field': '__self__',
         },
         PROJECT_DELETED: {
@@ -138,7 +137,7 @@ class WebhookAction(models.Model):
             'key': 'tasks',
             'many': True,
             'model': Task,
-            'serializer': TaskWebhookSerializer,
+            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),
             'project-field': 'project',
         },
         TASKS_DELETED: {
@@ -156,8 +155,15 @@ class WebhookAction(models.Model):
             'key': 'annotation',
             'many': False,
             'model': Annotation,
-            'serializer': AnnotationWebhookSerializer,
+            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['annotation']),
             'project-field': 'task__project',
+            'nested-fields': {
+                'task': {
+                    'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),
+                    'many': False,
+                    'field': 'task',
+                },
+            },
         },
         ANNOTATION_UPDATED: {
             'name': _('Annotation updated'),
@@ -165,8 +171,15 @@ class WebhookAction(models.Model):
             'key': 'annotation',
             'many': False,
             'model': Annotation,
-            'serializer': AnnotationWebhookSerializer,
+            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['annotation']),
             'project-field': 'task__project',
+            'nested-fields': {
+                'task': {
+                    'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),
+                    'many': False,
+                    'field': 'task',
+                },
+            },
         },
         ANNOTATIONS_DELETED: {
             'name': _('Annotation deleted'),
@@ -186,7 +199,7 @@ class WebhookAction(models.Model):
         choices=[[key, value['name']] for key, value in ACTIONS.items()],
         max_length=128,
         db_index=True,
-        help_text=_('Action value')
+        help_text=_('Action value'),
     )
 
     class Meta:

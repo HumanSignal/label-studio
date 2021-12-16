@@ -25,7 +25,8 @@ logger = logging.getLogger(__name__)
 class Storage(models.Model):
     title = models.CharField(_('title'), null=True, blank=True, max_length=256, help_text='Cloud storage title')
     description = models.TextField(_('description'), null=True, blank=True, help_text='Cloud storage description')
-    project = models.ForeignKey('projects.Project', related_name='%(app_label)s_%(class)ss', on_delete=models.CASCADE)
+    project = models.ForeignKey('projects.Project', related_name='%(app_label)s_%(class)ss', on_delete=models.CASCADE,
+                                help_text='A unique integer value identifying this project.')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     last_sync = models.DateTimeField(_('last sync'), null=True, blank=True, help_text='Last sync finished time')
     last_sync_count = models.PositiveIntegerField(
@@ -68,6 +69,8 @@ class ImportStorage(Storage):
 
     def _scan_and_create_links(self, link_class):
         tasks_created = 0
+        maximum_annotations = self.project.maximum_annotations
+        
         for key in self.iterkeys():
             logger.debug(f'Scanning key {key}')
 
@@ -107,7 +110,7 @@ class ImportStorage(Storage):
                 data = data['data']
 
             with transaction.atomic():
-                task = Task.objects.create(data=data, project=self.project)
+                task = Task.objects.create(data=data, project=self.project, overlap=maximum_annotations)
                 link_class.create(task, key, self)
                 logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
                 tasks_created += 1
