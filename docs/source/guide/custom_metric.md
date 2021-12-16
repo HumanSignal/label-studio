@@ -53,8 +53,8 @@ For example, the following agreement metric compares two annotations for a class
 def agreement(annotation_1, annotation_2, per_label=False) -> float:
 
     # Retrieve two annotations in the Label Studio JSON format
-    r1 = annotation_1["result"][0]["value"]["choices"][0]
-    r2 = annotation_2["result"][0]["value"]["choices"][0]
+    r1 = annotation_1["result"][0]["value"]["choices"][0][0]
+    r2 = annotation_2["result"][0]["value"]["choices"][0][0]
     
     # Determine annotation agreement based on specific choice values
     if r1 == r2:
@@ -74,8 +74,8 @@ If you set `per_label=True`, you can define a separate method or agreement score
 ```python
 def agreement(annotation_1, annotation_2, per_label=False) -> float:
 
-    label_1 = annotation_1["result"][0]["value"]["choices"][0]
-    label_2 = annotation_2["result"][0]["value"]["choices"][0]
+    label_1 = annotation_1["result"][0]["value"]["choices"][0][0]
+    label_2 = annotation_2["result"][0]["value"]["choices"][0][0]
     weight = {"Positive": 0.99, "Negative": 0.01}
     
     if label_1 == label_2:

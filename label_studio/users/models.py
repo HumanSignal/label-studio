@@ -124,7 +124,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     @property
     def avatar_url(self):
         if self.avatar:
-            if settings.DEFAULT_FILE_STORAGE == 'storages.backends.s3boto3.S3Boto3Storage':
+            if settings.CLOUD_FILE_STORAGE_ENABLED:
                 return self.avatar.url
             else:
                 return settings.HOSTNAME + self.avatar.url

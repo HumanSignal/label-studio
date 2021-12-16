@@ -21,7 +21,8 @@ _DATA_TYPES = {
     'Paragraphs': [list, str],
     'Table': [dict],
     'TimeSeries': [dict, list, str],
-    'TimeSeriesChannel': [dict, list, str]
+    'TimeSeriesChannel': [dict, list, str],
+    'List': [list]
 }
 logger = logging.getLogger(__name__)
 
@@ -70,7 +71,7 @@ class TaskValidator:
                 for item in data[data_key]:
                     key = 'text'  # FIXME: read key from config (elementValue from List)
                     if key not in item:
-                        raise ValidationError('Each item from List must have key ' + key)
+                        raise ValidationError('Each item from List must have key "' + key + '"')
 
         return data
 
