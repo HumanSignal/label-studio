@@ -1,6 +1,6 @@
 {
-  "message": "DEV-1312: Fix relations restoration (#389)\n\n* Fix regions tree assembly\r\n\r\n* Fix region tree restoration\r\n\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "d886b810bae4ee0bff3bac884838cae2c1b6f8aa",
-  "branch": "master",
-  "date": "2021-12-13T15:40:57Z"
+  "message": "Limit events from resize observer",
+  "commit": "9f0a6860393d9eaa18093cd3e55b5f63bdf77935",
+  "branch": "fix/DEV-1373/brush-relations",
+  "date": "2021-12-16T21:26:24Z"
 }
