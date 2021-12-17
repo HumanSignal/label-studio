@@ -41,7 +41,7 @@ class FileUpload(models.Model):
 
     @property
     def url(self):
-        if settings.HOSTNAME and settings.DEFAULT_FILE_STORAGE != 'storages.backends.s3boto3.S3Boto3Storage':
+        if settings.HOSTNAME and settings.CLOUD_FILE_STORAGE_ENABLED:
             return settings.HOSTNAME + self.file.url
         else:
             return self.file.url
@@ -112,7 +112,10 @@ class FileUpload(models.Model):
 
     def read_task_from_uploaded_file(self):
         logger.debug('Read 1 task from uploaded file {}'.format(self.file.name))
-        tasks = [{'data': {settings.DATA_UNDEFINED_NAME: self.url}}]
+        if settings.CLOUD_FILE_STORAGE_ENABLED:
+            tasks = [{'data': {settings.DATA_UNDEFINED_NAME: self.file.name}}]
+        else:
+            tasks = [{'data': {settings.DATA_UNDEFINED_NAME: self.url}}]
         return tasks
 
     @property
@@ -172,7 +175,9 @@ class FileUpload(models.Model):
             elif not common_data_fields.intersection(new_data_fields):
                 raise ValidationError(
                     _old_vs_new_data_keys_inconsistency_message(
-                        new_data_fields, common_data_fields, file_upload.file.name))
+                        new_data_fields, common_data_fields, file_upload.file.name
+                    )
+                )
             else:
                 common_data_fields &= new_data_fields
 
