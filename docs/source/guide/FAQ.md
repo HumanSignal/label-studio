@@ -95,11 +95,11 @@ ffmpeg -y -i audio.mp3 -ar 8k -ac 1 audio.wav
 
 ## HTML label offsets are in the wrong places
 
-When you upload HTML files to Label Studio for labeling, the HTML is minified to remove whitespace. When you annotate those tasks, the offsets for the labels apply to the minified version of the HTML. 
+If the offsets for exported HTML labels don't match your expected output, such as with HTML named entity recognition (NER) tasks, the most common reason why is due to HTML minification. When you upload HTML files to Label Studio for labeling, the HTML is minified to remove whitespace. When you annotate those tasks, the offsets for the labels apply to the minified version of the HTML, rather than the original unmodified HTML files. 
 
-You can use a different import method to prevent the HTML files from being minified. See [Import HTML data](tasks.html#Import-HTML-data) for more.
+To prevent the HTML files from being minified, you can use a different import method. See [Import HTML data](tasks.html#Import-HTML-data) for more.
 
-If you want to correct existing annotations, you can minify your own HTML files in the same way that Label Studio does. The minification is performed with the following script:
+If you want to correct existing annotations, you can minify your source HTML files in the same way that Label Studio does. The minification is performed with the following script:
 ```python
 import htmlmin
 
@@ -108,3 +108,5 @@ html_doc = f.read()
 
 minified_html_doc = htmlmin.minify(html_doc, remove_all_empty_space=True)
 ```
+
+If minification does not seem to be affecting the offset placements, complex CSS or other reasons could be the cause. 
