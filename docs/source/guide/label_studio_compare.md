@@ -28,7 +28,7 @@ Label Studio is available as a Community Edition open source data labeling tool 
   <tr>
     <td><a href="manage_users.html">Role-based access control for each user account.</a></td>
     <td style="text-align:center">❌</td>
-    <td style="text-align:center">✔️</td>
+    <td style="text-align:center">❌️</td>
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>

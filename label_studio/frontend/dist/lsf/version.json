@@ -1,6 +1,6 @@
 {
-  "message": "[fix] Add observing of image size for special cases (#340)\n\n* [fix] Add observing of image size for special cases\r\n\r\n* Add ResizeObserver fallback\r\n\r\n* Run actions on sub-branches\r\n\r\n(cherry picked from commit c1f1744ecf68c32db8adcbae0ae1ca62fba92780)\r\n(cherry picked from commit 862e7d58476ad169457b68224b09301d04e067d1)\r\n\r\n* Fix tests\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>\r\nCo-authored-by: Nick <nr@fenelon.ru>\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>\r\nCo-authored-by: niklub <lubimov.nicolas@gmail.com>",
-  "commit": "cb2fd37cda67dd456700f95e64947b00319dc8b8",
+  "message": "DEV-1312: Fix relations restoration (#389)\n\n* Fix regions tree assembly\r\n\r\n* Fix region tree restoration\r\n\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
+  "commit": "d886b810bae4ee0bff3bac884838cae2c1b6f8aa",
   "branch": "master",
-  "date": "2021-11-18T15:41:46Z"
+  "date": "2021-12-13T15:40:57Z"
 }
