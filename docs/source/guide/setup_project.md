@@ -31,17 +31,6 @@ You can also create a project from a template by clicking **Use Template**. See 
 
 After you save a project, any other collaborator with access to the Label Studio instance can view your project, perform labeling, and make changes. To use role-based access control, you need to use Label Studio Enterprise Edition.
 
-## Delete tasks or annotations
-If you have duplicate tasks, or want to remove annotations, you can delete tasks and annotations from Label Studio.
-
-1. In Label Studio UI, open the project you want to update.
-2. Filter the Data Manager page to show only the data you want to delete. For example, specific annotations, or tasks annotated by a specific annotator. 
-3. Select the checkboxes for the tasks or annotations that you want to delete.
-4. Select the dropdown with the number of tasks, and choose **Delete tasks** or **Delete annotations**. 
-5. Click **Ok** to confirm your action.
-
-If you want to make changes to the labeling interface or perform a different type of data labeling, first select all the annotations for your dataset and delete the annotations.
-
 ## Set up annotation settings for your project
 
 Set up annotation settings to configure how you want annotators to perform labeling for your project.
@@ -62,7 +51,7 @@ In the project settings, you can add instructions and choose whether to show the
 Annotators can view instructions at any time when labeling by clicking the (i) button from the labeling interface.
 
 ### <i class='ent'></i> Set up task distribution for labeling
-Select how you want to distribute tasks to annotators for labeling. Different from task sampling, use this setting to choose whether you need to assign annotators before they can start labeling.
+Select how you want to distribute tasks to annotators for labeling. Different from task sampling, use this setting to choose whether you need to [assign annotators](manage_data.html##Assign-annotators-to-tasks) before they can start labeling.
 
 1. Within a project on the Label Studio UI, click **Settings**.
 2. Click **Annotation Settings**.
@@ -170,7 +159,7 @@ To add members to a specific project, do the following:
 3. Select the checkbox next to the user's name and click the `>` arrow so that they appear in the list of users that **Belong to the Workspace**.
 4. Click **Save**.
 
-After adding a member to a project, you can [assign them as a reviewer](quality.html#Assign-reviewers-to-tasks) or [assign them as an annotator](labeling.html#Assign-annotators-to-tasks) to tasks in the project. 
+After adding a member to a project, you can [assign them as a reviewer](quality.html#Assign-reviewers-to-tasks) or [assign them as an annotator](manage_data.html#Assign-annotators-to-tasks) to tasks in the project. 
    
 ## <i class='ent'></i> Publish project to annotators
 
