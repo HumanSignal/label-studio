@@ -43,9 +43,10 @@ class LocalFilesMixin(models.Model):
         document_root = Path(settings.LOCAL_FILES_DOCUMENT_ROOT)
         if not path.exists():
             raise ValidationError(f'Path {self.path} does not exist')
-        if not document_root in path.parents:
+        if document_root not in path.parents:
             raise ValidationError(f'Path {self.path} must start with '
-                                  f'LOCAL_FILES_DOCUMENT_ROOT = {settings.LOCAL_FILES_DOCUMENT_ROOT}')
+                                  f'LOCAL_FILES_DOCUMENT_ROOT={settings.LOCAL_FILES_DOCUMENT_ROOT} '
+                                  f'and must be a child, e.g.: {Path(settings.LOCAL_FILES_DOCUMENT_ROOT) / "abc"}')
         if settings.LOCAL_FILES_SERVING_ENABLED is False:
             raise ValidationError("Serving local files can be dangerous, so it's disabled by default. "
                                   'You can enable it with LOCAL_FILES_SERVING_ENABLED environment variable, '
