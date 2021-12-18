@@ -21,7 +21,7 @@ from users.models import User
 from organizations.models import Organization
 from types import SimpleNamespace
 
-# if we haven't this package, pytest.ini::env doesn't work
+# if we haven't this package, pytest.ini::env doesn't work 
 try:
     import pytest_env.plugin
 except ImportError:
