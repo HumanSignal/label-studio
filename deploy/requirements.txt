@@ -18,7 +18,6 @@ google-cloud-storage==1.29.0
 google-resumable-media==0.5.1
 googleapis-common-protos==1.52.0
 grpc-google-iam-v1==0.12.3
-grpcio==1.29.0
 
 Django==3.1.13
 django_annoying==0.10.6
