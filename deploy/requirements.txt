@@ -19,7 +19,7 @@ google-resumable-media==0.5.1
 googleapis-common-protos==1.52.0
 grpc-google-iam-v1==0.12.3
 
-Django==3.1.13
+Django==3.1.14
 django_annoying==0.10.6
 django_debug_toolbar==3.2.1
 django_filter==2.4.0
@@ -57,3 +57,4 @@ boxing>=0.1.4
 redis>=3.5.0
 sentry-sdk>=1.1.0
 label-studio-converter==0.0.36
+
