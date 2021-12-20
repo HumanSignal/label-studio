@@ -21,13 +21,14 @@ from django.http import JsonResponse
 from wsgiref.util import FileWrapper
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
+from django.db.models import Value, F, CharField
 
 from core import utils
 from core.utils.io import find_file
 from core.utils.params import get_env
 from core.label_config import generate_time_series_json
 from core.utils.common import collect_versions
-from io_storages.localfiles.models import LocalFilesImportStorageLink
+from io_storages.localfiles.models import LocalFilesImportStorageLink, LocalFilesImportStorage
 
 logger = logging.getLogger(__name__)
 
@@ -166,18 +167,29 @@ def samples_paragraphs(request):
 
 def localfiles_data(request):
     """Serving files for LocalFilesImportStorage"""
+    user = request.user
     path = request.GET.get('d')
     if settings.LOCAL_FILES_SERVING_ENABLED is False:
         return HttpResponseForbidden("Serving local files can be dangerous, so it's disabled by default. "
                                      'You can enable it with LOCAL_FILES_SERVING_ENABLED environment variable, '
                                      'please check docs: https://labelstud.io/guide/storage.html#Local-storage')
 
-    local_serving_document_root = get_env('LOCAL_FILES_DOCUMENT_ROOT', default='/')
+    local_serving_document_root = settings.LOCAL_FILES_DOCUMENT_ROOT
     if path and request.user.is_authenticated:
         path = posixpath.normpath(path).lstrip('/')
         full_path = Path(safe_join(local_serving_document_root, path))
-        link = LocalFilesImportStorageLink.objects.filter(key=str(full_path)).first()
-        if link and link.has_permission(request.user) and os.path.exists(full_path):
+        user_has_permissions = False
+
+        # Try to find Local File Storage connection based prefix:
+        # storage.path=/home/user, full_path=/home/user/a/b/c/1.jpg =>
+        # full_path.startswith(path) => True
+        localfiles_storage = LocalFilesImportStorage.objects \
+            .annotate(_full_path=Value(os.path.dirname(full_path), output_field=CharField())) \
+            .filter(_full_path__startswith=F('path'))
+        if localfiles_storage.exists():
+            user_has_permissions = any(storage.project.has_permission(user) for storage in localfiles_storage)
+
+        if user_has_permissions and os.path.exists(full_path):
             content_type, encoding = mimetypes.guess_type(str(full_path))
             content_type = content_type or 'application/octet-stream'
             return RangedFileResponse(request, open(full_path, mode='rb'), content_type)
