@@ -11,7 +11,7 @@ Install Label Studio Enterprise on-premises if you need to meet strong privacy r
 
 Before you install, you can review this high-level architecture diagram that outlines the main components of Label Studio Enterprise in an on-premises deployment.
 
-<Insert a diagram and informative text about the diagram>
+<img src="/images/LSE_k8s_scheme.png"/>
 
 Label Studio runs on Python and uses rqworkers to perform additional tasks. Metadata and annotations are stored in a bundled version of PostgreSQL that functions as persistent storage. 
 
