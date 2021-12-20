@@ -642,7 +642,14 @@ For more assistance, review this [example code creating a Label Studio task with
 
 
 ## Troubleshoot pre-annotations
-If you encounter unexpected behavior after you import pre-annotations into Label Studio, review this guidance to resolve the issues.
+
+If annotators can't see predictions or if you encounter unexpected behavior after you import pre-annotations into Label Studio, review this guidance to resolve the issues.
+
+### Make sure the predictions are visible to annotators
+In the **Settings > Machine Learning** section for your project, make sure that the following settings are configured:
+- Enable **Show predictions to annotators in the Label Stream and Quick View**
+- Select the relevant **Model Version** in the drop-down. If there is no drop-down menu visible, there might not be a model version listed for the pre-annotations, or there might be another issue happening. 
+- <i class='ent'></i> Disable the option to **Reveal pre-annotations interactively**, which requires manual action from annotators to display pre-annotated regions. (Label Studio Enterprise only)  
 
 ### Check the configuration values of your labeling configuration and tasks
 The `from_name` of the pre-annotation task JSON must match the value of the name in the `<Labels name="label" toName="text">` portion of the labeling configuration. The `to_name` must match the `toName` value. 
