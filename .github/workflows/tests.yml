@@ -5,6 +5,9 @@ on:
     paths:
       - 'label_studio/**'
       - '.github/workflows/tests.yml'
+      - 'deploy/requirements.txt'
+      - 'deploy/requirements-test.txt'
+      - 'deploy/prebuild.sh'
 
 env:
   NODE: '14'
