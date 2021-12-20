@@ -208,7 +208,9 @@ class Task(TaskMixin, models.Model):
         for storage_class in get_storage_classes('import'):
             storage_objects = storage_class.objects.filter(project=self.project)
             for storage_object in storage_objects:
-                if storage_object.can_resolve_url(url):
+                # check url is string because task can have int, float, dict, list
+                # and 'can_resolve_url' will fail
+                if isinstance(url, str) and storage_object.can_resolve_url(url):
                     return storage_object
 
     @property
