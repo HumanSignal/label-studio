@@ -479,7 +479,7 @@ class Project(ProjectMixin, models.Model):
                 if strict is True:
                     raise LabelStudioValidationErrorSentryIgnored(f'These labels still exist in annotations:\n{diff_str}')
                 else:
-                    logger.error(f'project_id={self.id} inconsistent labels in config and annotations: {diff_str}')
+                    logger.warning(f'project_id={self.id} inconsistent labels in config and annotations: {diff_str}')
 
     def _label_config_has_changed(self):
         return self.label_config != self.__original_label_config
