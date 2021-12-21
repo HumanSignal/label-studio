@@ -2,7 +2,10 @@
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
-    PIP_CACHE_DIR=/.cache
+    PIP_CACHE_DIR=/.cache \
+    DJANGO_SETTINGS_MODULE=core.settings.label_studio \
+    LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data \
+    SETUPTOOLS_USE_DISTUTILS=stdlib
 
 WORKDIR /label-studio
 
@@ -21,11 +24,6 @@ RUN --mount=type=cache,target=$PIP_CACHE_DIR \
 COPY deploy/requirements.txt /label-studio
 RUN --mount=type=cache,target=$PIP_CACHE_DIR \
     pip3 install -r requirements.txt
-
-ENV DJANGO_SETTINGS_MODULE=core.settings.label_studio
-ENV LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data
-# otherwise setuptools (since 60.0.0) incorrectly installs the LS package and Django cannot be found
-ENV SETUPTOOLS_USE_DISTUTILS=stdlib
 
 COPY . /label-studio
 RUN --mount=type=cache,target=$PIP_CACHE_DIR \
