@@ -5,6 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PIP_CACHE_DIR=/.cache
 
 WORKDIR /label-studio
+RUN chmod 777 -R /tmp && chmod o+t -R /tmp
 
 # install packages
 RUN set -eux; \
@@ -13,7 +14,7 @@ RUN set -eux; \
     uwsgi git libxml2-dev libxslt-dev zlib1g-dev
 
 RUN --mount=type=cache,target=$PIP_CACHE_DIR \
-    pip3 install --upgrade pip setuptools && pip3 install uwsgi
+    pip3 install --upgrade pip==21.3.1 setuptools==60.0.3 && pip3 install uwsgi==2.0.20
 
 # Copy and install requirements.txt first for caching
 COPY deploy/requirements.txt /label-studio
@@ -23,6 +24,8 @@ RUN --mount=type=cache,target=$PIP_CACHE_DIR \
 
 ENV DJANGO_SETTINGS_MODULE=core.settings.label_studio
 ENV LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data
+# otherwise setuptools (since 60.0.0) incorrectly installs the LS package and Django cannot be found
+ENV SETUPTOOLS_USE_DISTUTILS=stdlib
 
 COPY . /label-studio
 RUN python3.8 setup.py develop
