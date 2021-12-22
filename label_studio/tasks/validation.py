@@ -21,7 +21,8 @@ _DATA_TYPES = {
     'Paragraphs': [list, str],
     'Table': [dict],
     'TimeSeries': [dict, list, str],
-    'TimeSeriesChannel': [dict, list, str]
+    'TimeSeriesChannel': [dict, list, str],
+    'List': [list]
 }
 logger = logging.getLogger(__name__)
 
@@ -46,10 +47,19 @@ class TaskValidator:
 
         # iterate over data types from project
         for data_key, data_type in project.data_types.items():
+
+            # get array name in case of Repeater tag
+            is_array = '[' in data_key
+            data_key = data_key.split('[')[0]
+
             if data_key not in data:
                 raise ValidationError('"{data_key}" key is expected in task data'.format(data_key=data_key))
 
-            expected_types = _DATA_TYPES.get(data_type, (str, ))
+            if is_array:
+                expected_types = (list, )
+            else:
+                expected_types = _DATA_TYPES.get(data_type, (str,))
+
             if not isinstance(data[data_key], tuple(expected_types)):
                 raise ValidationError('data[\'{data_key}\']={data_value} is of type \'{type}\', '
                                       "but the object tag {data_type} expects the following types: {expected_types}"
@@ -61,7 +71,7 @@ class TaskValidator:
                 for item in data[data_key]:
                     key = 'text'  # FIXME: read key from config (elementValue from List)
                     if key not in item:
-                        raise ValidationError('Each item from List must have key ' + key)
+                        raise ValidationError('Each item from List must have key "' + key + '"')
 
         return data
 
@@ -132,6 +142,10 @@ class TaskValidator:
             # because it's much different with validation we need here
             self.raise_if_wrong_class(task, 'annotations', list)
             for annotation in task.get('annotations', []):
+                if not isinstance(annotation, dict):
+                    logger.warning('Annotation must be dict, but "%s" found', str(annotation))
+                    continue
+
                 ok = 'result' in annotation
                 if not ok:
                     raise ValidationError('Annotation must have "result" fields')
@@ -143,6 +157,10 @@ class TaskValidator:
             # task[predictions]
             self.raise_if_wrong_class(task, 'predictions', list)
             for prediction in task.get('predictions', []):
+                if not isinstance(prediction, dict):
+                    logger.warning('Prediction must be dict, but "%s" found', str(prediction))
+                    continue
+
                 ok = 'result' in prediction
                 if not ok:
                     raise ValidationError('Prediction must have "result" fields')

@@ -32,9 +32,16 @@ def get_all_columns(project, *_):
     i = 0
 
     data_types = OrderedDict()
+
     # add data types from config again
-    project_data_types = project.data_types
+    project_data_types = {}
+    for key, value in project.data_types.items():
+        # skip keys from Repeater tag, because we already have its base data,
+        # e.g.: skip 'image[{{idx}}]' because we have 'image' list already
+        if '[' not in key:
+            project_data_types[key] = value
     data_types.update(project_data_types.items())
+
     # all data types from import data
     all_data_columns = project.summary.all_data_columns
     if all_data_columns:

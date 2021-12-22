@@ -8,6 +8,7 @@ import re
 
 from google.auth import compute_engine
 from google.cloud import storage as google_storage
+from google.cloud.storage.client import _marker
 from google.auth.transport import requests
 from google.oauth2 import service_account
 from urllib.parse import urlparse
@@ -47,6 +48,8 @@ class GCSStorageMixin(models.Model):
 
     def get_client(self, raise_on_error=False):
         credentials = None
+        project_id = _marker
+
         # gcs client initialization ~ 200 ms, for 30 tasks it's a 6 seconds, so we need to cache it
         cache_key = f'{self.google_application_credentials}'
         if self.google_application_credentials:
@@ -54,13 +57,16 @@ class GCSStorageMixin(models.Model):
                 return clients_cache[cache_key]
             try:
                 service_account_info = json.loads(self.google_application_credentials)
+                project_id = service_account_info.get('project_id', _marker)
                 credentials = service_account.Credentials.from_service_account_info(service_account_info)
             except Exception as exc:
                 if raise_on_error:
                     raise
                 logger.error(f"Can't create GCS credentials. Reason: {exc}", exc_info=True)
                 credentials = None
-        client = google_storage.Client(credentials=credentials)
+                project_id = _marker
+
+        client = google_storage.Client(project=project_id, credentials=credentials)
         if credentials is not None:
             clients_cache[cache_key] = client
         return client

@@ -1,10 +1,14 @@
 name: pytest:ubnt
 on:
   push:
-    branches: ['*', '*/*', master]
+    branches: ['*', '*/*', '*/**', master]
     paths:
       - 'label_studio/**'
       - '.github/workflows/tests.yml'
+      - 'deploy/requirements.txt'
+      - 'deploy/requirements-mw.txt'
+      - 'deploy/requirements-test.txt'
+      - 'deploy/prebuild_wo_frontend.sh'
 
 env:
   NODE: '14'
@@ -16,7 +20,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version:
+          - 3.6
+          - 3.7
+          - 3.8
+          - 3.9
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
@@ -31,17 +39,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2.3.0
+        uses: actions/setup-python@v2.3.1
         with:
           python-version: ${{ matrix.python-version }}
 
       - uses: actions/cache@v2.1.6
+        name: Configure pip cache
         id: pip-cache
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
       - name: Install dependencies
         run: |
@@ -52,7 +61,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v2.4.1
+        uses: actions/setup-node@v2.5.0
         with:
           node-version: "${{ env.NODE }}"
 
@@ -61,6 +70,7 @@ jobs:
         run: echo "::set-output name=dir::$(npm config get cache)"
 
       - uses: actions/cache@v2.1.6
+        name: Configure npm cache
         id: npm-cache
         with:
           path: ${{ steps.npm-cache-dir.outputs.dir }}
@@ -82,8 +92,12 @@ jobs:
           pytest --junitxml report.xml --cov=. -vv
 
   run_pytest_postgresql:
-    name: LS PostgreSQL
+    name: LS PostgreSQL Ubuntu
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.8]
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
       DJANGO_DB: default
@@ -133,10 +147,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2.4.0
-      - name: Set up Python
-        uses: actions/setup-python@v2.3.0
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2.3.1
         with:
-          python-version: '3.7'
+          python-version: ${{ matrix.python-version }}
 
       - name: Install OS dependencies
         run: |
@@ -144,12 +158,13 @@ jobs:
           sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev
 
       - uses: actions/cache@v2.1.6
+        name: Configure pip cache
         id: pip-cache
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
       - name: Install pip dependencies
         run: |
@@ -158,7 +173,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v2.4.1
+        uses: actions/setup-node@v2.5.0
         with:
           node-version: 14
 
@@ -167,6 +182,7 @@ jobs:
         run: echo "::set-output name=dir::$(npm config get cache)"
 
       - uses: actions/cache@v2.1.6
+        name: Configure npm cache
         id: npm-cache
         with:
           path: ${{ steps.npm-cache-dir.outputs.dir }}
@@ -198,7 +214,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version:
+          - 3.6
+          - 3.7
+          - 3.8
+          - 3.9
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
@@ -213,16 +233,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2.4.0
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2.3.0
+      uses: actions/setup-python@v2.3.1
       with:
         python-version: ${{ matrix.python-version }}
 
     - uses: actions/cache@v2.1.6
+      name: Configure pip cache
       with:
         path: ~\AppData\Local\pip\Cache
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
         restore-keys: |
-          ${{ runner.os }}-pip-
+          ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
     - name: Install dependencies
       run: |
@@ -234,13 +255,20 @@ jobs:
         {pip install -r deploy/requirements-test.txt}
         pip install -e .
 
-    - name: Init project
+    - name: Fix sqlite.dll for python < 3.9
+      if: ${{ matrix.python-version < '3.9' }}
       run: |
         set PYTHONIOENCODING=utf-8
         set PYTHONLEGACYWINDOWSSTDIO=utf-8
         label-studio init my_project --agree-fix-sqlite --force-fix-sqlite
-        label-studio init my_project --username test@test.com --password testpwd
         cp sqlite3.dll %pythonLocation%/DLLs/sqlite3.dll
+      shell: cmd
+
+    - name: Init project
+      run: |
+        set PYTHONIOENCODING=utf-8
+        set PYTHONLEGACYWINDOWSSTDIO=utf-8
+        label-studio init my_project --username test@test.com --password testpwd
       shell: cmd
 
     - name: Test with pytest

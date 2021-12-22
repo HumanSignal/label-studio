@@ -285,17 +285,22 @@ RQ_QUEUES = {
 # Swagger: automatic API documentation
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
-        'token': {
-            'type': 'token',
-            'name': 'Token',
+        'Token': {
+            'type': 'apiKey',
+            'name': 'Authorization',
             'in': 'header',
-            'url': '/user/account',
-        },
+            'description':
+                'The token (or API key) must be passed as a request header. '
+                'You can find your user token on the User Account page in Label Studio. Example: '
+                '<br><pre><code class="language-bash">'
+                'curl https://label-studio-host/api/projects -H "Authorization: Token [your-token]"'
+                '</code></pre>'
+        }
     },
     'APIS_SORTER': 'alpha',
     'SUPPORTED_SUBMIT_METHODS': ['get', 'post', 'put', 'delete', 'patch'],
-    # "DEFAULT_AUTO_SCHEMA_CLASS": "core.utils.CustomAutoSchema",
     'OPERATIONS_SORTER': 'alpha',
+
 }
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)
@@ -370,6 +375,7 @@ EMAIL_BACKEND = get_env('EMAIL_BACKEND', 'django.core.mail.backends.dummy.EmailB
 
 ENABLE_LOCAL_FILES_STORAGE = get_bool_env('ENABLE_LOCAL_FILES_STORAGE', default=True)
 LOCAL_FILES_SERVING_ENABLED = get_bool_env('LOCAL_FILES_SERVING_ENABLED', default=False)
+LOCAL_FILES_DOCUMENT_ROOT = get_env('LOCAL_FILES_DOCUMENT_ROOT', default=os.path.abspath(os.sep))
 
 """ React Libraries: do not forget to change this dir in /etc/nginx/nginx.conf """
 # EDITOR = label-studio-frontend repository
@@ -396,7 +402,7 @@ ALLOW_ORGANIZATION_WEBHOOKS = get_bool_env('ALLOW_ORGANIZATION_WEBHOOKS', False)
 CONVERTER_DOWNLOAD_RESOURCES = get_bool_env('CONVERTER_DOWNLOAD_RESOURCES', True)
 EXPERIMENTAL_FEATURES = get_bool_env('EXPERIMENTAL_FEATURES', False)
 USE_ENFORCE_CSRF_CHECKS = get_bool_env('USE_ENFORCE_CSRF_CHECKS', True)  # False is for tests
-
+CLOUD_FILE_STORAGE_ENABLED = False
 
 CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and_log'

@@ -124,6 +124,23 @@ Export audio transcription labels for automatic speech recognition as the JSON m
 
 Export object detection annotations in the YOLOv3 and YOLOv4 format. Supports object detection labeling projects that use the `RectangleLabels` tag. 
 
+### spaCy 
+
+Label Studio doesn't support exporting directly to spaCy binary format, but you can convert annotations exported from Label Studio to a format compatible with spaCy. You must have the spacy python package installed to perform this conversion. 
+
+To transform Label Studio annotations into spaCy binary format, do the following:
+1. Export your annotations to CONLL2003 format.
+2. Open the downloaded file and update the first line of the exported file to add a O on the first line:
+```
+-DOCSTART- -X- O O
+```
+3. From the command line, run spacy convert to convert the CONLL-formatted annotations to spaCy binary format, replacing `/path/to/<filename>` with the path and file name of your annotations:
+```shell
+spacy convert /path/to/<filename>.conll -c conll . 
+```
+
+See the spaCy documentation on [Converting existing corpora and annotations](https://spacy.io/usage/training#data-convert) for more details on running spacy convert.
+
 ## Label Studio JSON format of annotated tasks 
 
 When you annotate data, Label Studio stores the output in JSON format. The raw JSON structure of each completed task follows this example: 
