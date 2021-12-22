@@ -1,6 +1,6 @@
 {
-  "message": "DEV-1312: Fix relations restoration (#389)\n\n* Fix regions tree assembly\r\n\r\n* Fix region tree restoration\r\n\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "d886b810bae4ee0bff3bac884838cae2c1b6f8aa",
-  "branch": "master",
-  "date": "2021-12-13T15:40:57Z"
+  "message": "Clear console logs",
+  "commit": "467b2e0f7d2796f6ff0b563c597325270c259815",
+  "branch": "fix/view-all",
+  "date": "2021-12-22T11:50:16Z"
 }
