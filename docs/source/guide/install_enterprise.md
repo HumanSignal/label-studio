@@ -9,31 +9,27 @@ meta_description: Install, back up, and upgrade Label Studio Enterprise to creat
 
 Install Label Studio Enterprise on-premises if you need to meet strong privacy regulations, legal requirements, or want to manage a custom installation on your own infrastructure. You can run Label Studio Enterprise in an airgapped environment, and no data leaves your infrastructure.
 
-Before you install, you can review this high-level architecture diagram that outlines the main components of Label Studio Enterprise in an on-premises deployment.
+## Before you install 
+
+Review this high-level architecture diagram that outlines the main components of Label Studio Enterprise in an on-premises deployment.
 
 <img src="/images/LSE_k8s_scheme.png"/>
 
-Label Studio runs on Python and uses rqworkers to perform additional tasks. Metadata and annotations are stored in a bundled version of PostgreSQL that functions as persistent storage. 
+Label Studio runs on Python and uses rqworkers to perform additional tasks. Metadata and annotations are stored in a bundled version of PostgreSQL that functions as persistent storage. If you host Label Studio in the cloud, use persistent storage in the cloud instead of MinIO. 
 
 
 ## Install Label Studio Enterprise
-You can install Label Studio Enterprise using Docker Compose or using Kubernetes and Helm. 
 
-* [Install using Docker Compose](install_enterprise_docker.html) for small-scale production data labeling activities with dozens or hundreds of annotators. 
-* [Install using Kubernetes and Helm charts](install_enterprise_k8s.html) for large-scale production-grade data labeling activities with tens of thousands of annotators.
-* [Install Label Studio Enterprise without public internet access](install_enterprise_airgapped.html) if you use a proxy to access the internet from your Kubernetes cluster, or it is airgapped from the internet.
+| How | Who |
+| --- | --- |
+| [Install using Docker Compose](install_enterprise_docker.html) | small-scale production data labeling activities with dozens or hundreds of annotators |
+| [Install using Kubernetes and Helm charts](install_enterprise_k8s.html) | large-scale production-grade data labeling activities with tens of thousands of annotators |
+| [Install Label Studio Enterprise without public internet access](install_enterprise_airgapped.html) | if you use a proxy to access the internet from your Kubernetes cluster, or it is airgapped from the internet |
 
+## About installing Label Studio Enterprise
 
-
-
-
-
-
-
-
-See [Secure Label Studio](security.html) for more details about security and hardening for Label Studio Enterprise.
-
-You can also use [Label Studio Teams as a SaaS solution or Label Studio Enterprise as a cloud offering](https://heartex.com/product). 
+- See [Secure Label Studio](security.html) for more details about security and hardening for Label Studio Enterprise. 
+- Use [Label Studio Teams as a SaaS solution or Label Studio Enterprise as a cloud offering](https://heartex.com/product). 
 
 <div class="enterprise"><p>
 To install Label Studio Community Edition, see <a href="install.html">Install and Upgrade Label Studio</a>. This page is specific to the Enterprise version of Label Studio.
