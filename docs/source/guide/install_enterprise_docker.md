@@ -64,7 +64,7 @@ cd label-studio-enterprise
 
 To run Label Studio Enterprise in production, start it using [Docker compose](https://docs.docker.com/compose/). This configuration lets you connect Label Studio to external databases and services.
 
-1. Create a file, `label-studio-enterprise/env.list` with the required environmental variables:
+1. Create a file, `label-studio-enterprise/env.list` with the required environment variables:
 ```
 # Specify the path to the license file. 
 # Alternatively, it can be a URL like LICENSE=https://lic.heartex.ai/db/20210203-1234-ab123456.lic
