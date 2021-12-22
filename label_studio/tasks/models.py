@@ -230,7 +230,7 @@ class Task(TaskMixin, models.Model):
     @property
     def completed_annotations(self):
         """Annotations that we take into account when set completed status to the task"""
-        return self.annotations.filter(Q_finished_annotations & Q(ground_truth=False))
+        return self.annotations.filter(Q_finished_annotations)
 
     def update_is_labeled(self):
         self.is_labeled = self._get_is_labeled_value()
