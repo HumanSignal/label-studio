@@ -2,7 +2,10 @@
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
-    PIP_CACHE_DIR=/.cache
+    PIP_CACHE_DIR=/.cache \
+    DJANGO_SETTINGS_MODULE=core.settings.label_studio \
+    LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data \
+    SETUPTOOLS_USE_DISTUTILS=stdlib
 
 WORKDIR /label-studio
 
@@ -12,20 +15,19 @@ RUN set -eux; \
     build-essential postgresql-client libmysqlclient-dev mysql-client python3.8 python3-pip python3.8-dev \
     uwsgi git libxml2-dev libxslt-dev zlib1g-dev
 
+# Copy and install middleware dependencies
+COPY deploy/requirements-mw.txt /label-studio
 RUN --mount=type=cache,target=$PIP_CACHE_DIR \
-    pip3 install --upgrade pip setuptools && pip3 install uwsgi
+    pip3 install -r requirements-mw.txt
 
 # Copy and install requirements.txt first for caching
 COPY deploy/requirements.txt /label-studio
-
 RUN --mount=type=cache,target=$PIP_CACHE_DIR \
     pip3 install -r requirements.txt
 
-ENV DJANGO_SETTINGS_MODULE=core.settings.label_studio
-ENV LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data
-
 COPY . /label-studio
-RUN python3.8 setup.py develop
+RUN --mount=type=cache,target=$PIP_CACHE_DIR \
+    pip3 install -e .
 
 EXPOSE 8080
 RUN ./deploy/prebuild_wo_frontend.sh
