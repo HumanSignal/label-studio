@@ -70,7 +70,7 @@ _project_for_text_choices_onto_A_B_classes = dict(
             {'data': {'meta_info': 'meta info B', 'text': 'text B'},
              'annotations': [{'result': [{'r': 2}], 'ground_truth': False}]},
         ],
-        200, {'id': 'uncompleted_task_ids'}
+        404, {'id': 'uncompleted_task_ids'}
     ),
         (
         dict(
