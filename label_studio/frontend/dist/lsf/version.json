@@ -1,6 +1,6 @@
 {
-  "message": "DEV-1312: Fix relations restoration (#389)\n\n* Fix regions tree assembly\r\n\r\n* Fix region tree restoration\r\n\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "d886b810bae4ee0bff3bac884838cae2c1b6f8aa",
-  "branch": "master",
-  "date": "2021-12-13T15:40:57Z"
+  "message": "[fix] draft right after HyperText loaded",
+  "commit": "be9285a5df6a8a6ac255d6b0e57f888d92e547fc",
+  "branch": "fix/drafts-audio-html",
+  "date": "2021-12-22T11:15:51Z"
 }
