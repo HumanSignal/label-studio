@@ -53,42 +53,61 @@ rm -rf mydata/.minio.sys
 ## Kubernetes deployed on AWS EKS or a Linux server
 
 
-For AWS EKS, follow the instructions to [deploy the Amazon EFS CSI Driver to your Amazon EKS cluster](https://docs.aws.amazon.com/eks/latest/userguide/efs-csi.html) in the Amazon EKS User Guide. 
-
-
-
-
-
+For AWS EKS, follow the instructions to [deploy the Amazon EFS CSI Driver to your Amazon EKS cluster](https://docs.aws.amazon.com/eks/latest/userguide/efs-csi.html) in the Amazon EKS User Guide.
 
 Redeploy using the latest version of the helm chart and the latest image release with the following additional variables added to lse-values.yaml file:
+```yaml
 global:
   persistence:
     enabled: true
+```
 
-
-Run shell in your app pod:
-# obtain release name from `helm list`
+From the command line of your application pod in the Kubernetes cluster, run the following to obtain the release name:
+```shell
+helm list
+```
+Then, deploy the updated release:
+```shell
 kubectl exec -ti deploy/<YOUR_RELEASE_NAME>-lse-app -c lse-app -- bash
-Copy data from a bucket to persistent volume:
+```
+Copy your existing data from minio to the persistent volume:
+```shell
 minio-mc cp --recursive local/$MINIO_STORAGE_BUCKET_NAME /label-studio/data/
-Redeploy the app with the following values:
+```
+
+Update the `values.yaml` file with the following set:
+```yaml
 minio:
   enabled: false
+```
 
 ## Amazon S3-compatible storage 
 
-Follow the instructions to configure the S3 bucket from
+Follow the instructions to configure the S3 bucket. 
 
-
-Redeploy using the latest version of the helm chart and the latest image release with the following additional variables added to lse-values.yaml file:
+Add the following values to the `lse-values.yaml` file:
+```yaml
 global:
   persistence:
     enabled: true
-Run shell in your app pod:
-# obtain release name from `helm list`
+```
+
+From the command line of your application pod of your Kubernetes cluster, run the following to obtain the release name:
+```shell
+helm list
+```
+Then use the release name to 
+```shell
 kubectl exec -ti deploy/<YOUR_RELEASE_NAME>-lse-app -c lse-app -- bash
+```
 Copy data from a bucket to persistent volume:
+```shell
 JSON_LOG=0 python3 $LSE_DIR/label_studio_enterprise/manage.py minio-migrate
-Redeploy the app with the following values:
+```
+
+Then update the `lse-values.yaml` file with the following:
+```yaml
 minio:
   enabled: false
+```
+Then redeploy Label Studio Enterprise.
