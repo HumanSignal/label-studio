@@ -8,12 +8,11 @@
 !deploy/requirements-mw.txt
 !deploy/requirements.txt
 !deploy/heroku_run.sh
-!label_studio
+!label_studio/**
 !setup.py
 !README.md
 
 # but ignore:
-.DS_Store
 label_studio/frontend
 
 # except
