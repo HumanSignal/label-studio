@@ -1,6 +1,6 @@
 {
-  "message": "DEV-1312: Fix relations restoration (#389)\n\n* Fix regions tree assembly\r\n\r\n* Fix region tree restoration\r\n\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "d886b810bae4ee0bff3bac884838cae2c1b6f8aa",
-  "branch": "master",
-  "date": "2021-12-13T15:40:57Z"
+  "message": "Merge branch 'master' into feature/dev-1171-value-resolver",
+  "commit": "d6aeabf2178a9977b18aeac30004fa4064ca79ef",
+  "branch": "feature/dev-1171-value-resolver",
+  "date": "2021-12-22T14:28:10Z"
 }
