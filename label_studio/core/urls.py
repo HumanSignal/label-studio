@@ -87,6 +87,7 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
     path('django-rq/', include('django_rq.urls')),
+    path('feature-flags-example/', views.feature_flags_example, name='feature_flags_example'),
     re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
 

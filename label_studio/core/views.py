@@ -219,3 +219,15 @@ def static_file_with_host_resolver(path_on_disk, content_type):
             return response
 
     return serve_file
+
+
+def feature_flags_example(request):
+    from label_studio.core.feature_flags import flag_set, all_flags
+    user = request.user
+    result = None
+    if flag_set('ff-dev-123-some-fixed-issue-231221-short', user):
+        result = 'Flag is set!'
+    return HttpResponse(json.dumps({
+        'result': result,
+        'flags': all_flags(user)
+    }), status=200)
