@@ -5,6 +5,10 @@ on:
     paths:
       - 'label_studio/**'
       - '.github/workflows/tests.yml'
+      - 'deploy/requirements.txt'
+      - 'deploy/requirements-mw.txt'
+      - 'deploy/requirements-test.txt'
+      - 'deploy/prebuild_wo_frontend.sh'
 
 env:
   NODE: '14'

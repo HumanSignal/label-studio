@@ -19,6 +19,7 @@ from django.urls import reverse
 from django.utils.timesince import timesince
 from django.utils.timezone import now
 from django.dispatch import receiver, Signal
+from django.core.files.storage import default_storage
 from rest_framework.exceptions import ValidationError
 
 from model_utils import FieldTracker
@@ -28,6 +29,8 @@ from core.utils.params import get_env
 from core.label_config import SINGLE_VALUED_TAGS
 from data_manager.managers import PreparedTaskManager, TaskManager
 from core.bulk_update_utils import bulk_update
+from data_import.models import FileUpload
+
 
 logger = logging.getLogger(__name__)
 
@@ -155,6 +158,12 @@ class Task(TaskMixin, models.Model):
         # TODO: how to get neatly any storage class here?
         return find_first_one_to_one_related_field_by_prefix(self, '.*io_storages_')
 
+    @staticmethod
+    def is_upload_file(filename):
+        if not isinstance(filename, str):
+            return False
+        return filename.startswith(settings.UPLOAD_DIR + '/')
+
     def resolve_uri(self, task_data, proxy=True):
         if proxy and self.project.task_data_login and self.project.task_data_password:
             protected_data = {}
@@ -165,11 +174,24 @@ class Task(TaskMixin, models.Model):
                 protected_data[key] = value
             return protected_data
         else:
-            # Try resolve URLs via storage associated with that task
+            # try resolve URLs via storage associated with that task
             storage = self.storage
             for field in task_data:
+                # file saved in django file storage
+                if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(task_data[field]):
+                    # permission check: resolve uploaded files to the project only
+                    file_upload = FileUpload.objects.filter(project=self.project, file=task_data[field])
+                    if file_upload.exists():
+                        task_data[field] = default_storage.url(name=task_data[field])
+                    # it's very rare case, e.g. user tried to reimport exported file from another project
+                    # or user wrote his django storage path manually
+                    else:
+                        task_data[field] = task_data[field] + '?not_uploaded_project_file'
+                    continue
+
+                # project storage
                 storage = storage or self._get_storage_by_url(task_data[field])
-                if storage:
+                if storage or self._get_storage_by_url(task_data[field]):
                     try:
                         resolved_uri = storage.resolve_uri(task_data[field])
                     except Exception as exc:
@@ -186,7 +208,9 @@ class Task(TaskMixin, models.Model):
         for storage_class in get_storage_classes('import'):
             storage_objects = storage_class.objects.filter(project=self.project)
             for storage_object in storage_objects:
-                if storage_object.can_resolve_url(url):
+                # check url is string because task can have int, float, dict, list
+                # and 'can_resolve_url' will fail
+                if isinstance(url, str) and storage_object.can_resolve_url(url):
                     return storage_object
 
     @property
@@ -206,7 +230,7 @@ class Task(TaskMixin, models.Model):
     @property
     def completed_annotations(self):
         """Annotations that we take into account when set completed status to the task"""
-        return self.annotations.filter(Q_finished_annotations & Q(ground_truth=False))
+        return self.annotations.filter(Q_finished_annotations)
 
     def update_is_labeled(self):
         self.is_labeled = self._get_is_labeled_value()
