@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into feature/dev-1171-value-resolver",
-  "commit": "d6aeabf2178a9977b18aeac30004fa4064ca79ef",
-  "branch": "feature/dev-1171-value-resolver",
-  "date": "2021-12-22T14:28:10Z"
+  "message": "Add `resolver` param to retrieve data from remote (#396)\n\n* Add `resolver` param to retrieve data from remote\r\n\r\nCurrently only csv for Text/HyperText are supported\r\n\r\n* Use papaparse for csv; much better now\r\n\r\n* Update lock files\r\n\r\nCo-authored-by: niklub <lubimov.nicolas@gmail.com>",
+  "commit": "8cf800d730d6b086986db662855b37c5f0d749b2",
+  "branch": "master",
+  "date": "2021-12-24T14:45:42Z"
 }
