@@ -1,6 +1,6 @@
 {
-  "message": "DEV-1312: Fix relations restoration (#389)\n\n* Fix regions tree assembly\r\n\r\n* Fix region tree restoration\r\n\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "d886b810bae4ee0bff3bac884838cae2c1b6f8aa",
+  "message": "Add `resolver` param to retrieve data from remote (#396)\n\n* Add `resolver` param to retrieve data from remote\r\n\r\nCurrently only csv for Text/HyperText are supported\r\n\r\n* Use papaparse for csv; much better now\r\n\r\n* Update lock files\r\n\r\nCo-authored-by: niklub <lubimov.nicolas@gmail.com>",
+  "commit": "8cf800d730d6b086986db662855b37c5f0d749b2",
   "branch": "master",
-  "date": "2021-12-13T15:40:57Z"
+  "date": "2021-12-24T14:45:42Z"
 }
