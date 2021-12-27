@@ -1,6 +1,6 @@
 {
-  "message": "DEV-1312: Fix relations restoration (#389)\n\n* Fix regions tree assembly\r\n\r\n* Fix region tree restoration\r\n\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "d886b810bae4ee0bff3bac884838cae2c1b6f8aa",
-  "branch": "master",
-  "date": "2021-12-13T15:40:57Z"
+  "message": "Ignore not meaningful error",
+  "commit": "763b45527277e9381dcd4744cb27675a38ea00e7",
+  "branch": "fix/DEV-1367/image-width",
+  "date": "2021-12-27T17:14:04Z"
 }
