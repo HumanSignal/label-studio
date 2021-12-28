@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into feature/DEV-428/show-created-date",
-  "commit": "278ee62c9d6daacb98bbd0c1b04f127980a12915",
-  "branch": "feature/DEV-428/show-created-date",
-  "date": "2021-12-03T16:08:19Z"
+  "message": "Add `resolver` param to retrieve data from remote (#396)\n\n* Add `resolver` param to retrieve data from remote\r\n\r\nCurrently only csv for Text/HyperText are supported\r\n\r\n* Use papaparse for csv; much better now\r\n\r\n* Update lock files\r\n\r\nCo-authored-by: niklub <lubimov.nicolas@gmail.com>",
+  "commit": "8cf800d730d6b086986db662855b37c5f0d749b2",
+  "branch": "master",
+  "date": "2021-12-24T14:45:42Z"
 }
