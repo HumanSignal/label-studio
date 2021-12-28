@@ -21,7 +21,8 @@ _DATA_TYPES = {
     'Paragraphs': [list, str],
     'Table': [dict],
     'TimeSeries': [dict, list, str],
-    'TimeSeriesChannel': [dict, list, str]
+    'TimeSeriesChannel': [dict, list, str],
+    'List': [list]
 }
 logger = logging.getLogger(__name__)
 
@@ -70,7 +71,7 @@ class TaskValidator:
                 for item in data[data_key]:
                     key = 'text'  # FIXME: read key from config (elementValue from List)
                     if key not in item:
-                        raise ValidationError('Each item from List must have key ' + key)
+                        raise ValidationError('Each item from List must have key "' + key + '"')
 
         return data
 
@@ -141,6 +142,10 @@ class TaskValidator:
             # because it's much different with validation we need here
             self.raise_if_wrong_class(task, 'annotations', list)
             for annotation in task.get('annotations', []):
+                if not isinstance(annotation, dict):
+                    logger.warning('Annotation must be dict, but "%s" found', str(annotation))
+                    continue
+
                 ok = 'result' in annotation
                 if not ok:
                     raise ValidationError('Annotation must have "result" fields')
@@ -152,6 +157,10 @@ class TaskValidator:
             # task[predictions]
             self.raise_if_wrong_class(task, 'predictions', list)
             for prediction in task.get('predictions', []):
+                if not isinstance(prediction, dict):
+                    logger.warning('Prediction must be dict, but "%s" found', str(prediction))
+                    continue
+
                 ok = 'result' in prediction
                 if not ok:
                     raise ValidationError('Prediction must have "result" fields')

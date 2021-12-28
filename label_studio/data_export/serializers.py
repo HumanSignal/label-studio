@@ -26,9 +26,7 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = Annotation
         fields = '__all__'
-        expandable_fields = {
-          'completed_by': (CompletedBySerializer, )
-        }
+        expandable_fields = {'completed_by': (CompletedBySerializer,)}
 
 
 class BaseExportDataSerializer(FlexFieldsModelSerializer):
@@ -50,8 +48,8 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
         model = Task
         exclude = ('overlap', 'is_labeled')
         expandable_fields = {
-          'drafts': (AnnotationDraftSerializer, {'many': True}),
-          'predictions': (PredictionSerializer, {'many': True}),
+            'drafts': (AnnotationDraftSerializer, {'many': True}),
+            'predictions': (PredictionSerializer, {'many': True}),
         }
 
 
@@ -94,9 +92,12 @@ class AnnotationFilterOptionsSerializer(serializers.Serializer):
 
 
 class SerializationOptionsSerializer(serializers.Serializer):
-    drafts = serializers.JSONField(required=False)
-    predictions = serializers.JSONField(required=False)
-    annotations__completed_by = serializers.JSONField(required=False)
+    class SerializationOption(serializers.Serializer):
+        only_id = serializers.BooleanField(default=False, required=False)
+
+    drafts = SerializationOption(required=False)
+    predictions = SerializationOption(required=False)
+    annotations__completed_by = SerializationOption(required=False)
 
 
 class ExportCreateSerializer(ExportSerializer):
