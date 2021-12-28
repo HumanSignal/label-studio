@@ -1,6 +1,6 @@
 {
-  "message": "Add `resolver` param to retrieve data from remote (#396)\n\n* Add `resolver` param to retrieve data from remote\r\n\r\nCurrently only csv for Text/HyperText are supported\r\n\r\n* Use papaparse for csv; much better now\r\n\r\n* Update lock files\r\n\r\nCo-authored-by: niklub <lubimov.nicolas@gmail.com>",
-  "commit": "8cf800d730d6b086986db662855b37c5f0d749b2",
-  "branch": "master",
-  "date": "2021-12-24T14:45:42Z"
+  "message": "Fix tests",
+  "commit": "07db74d928e3e6678315f287e562bc85f08b955b",
+  "branch": "fix/DEV-812/selecting-text",
+  "date": "2021-12-28T01:54:37Z"
 }
