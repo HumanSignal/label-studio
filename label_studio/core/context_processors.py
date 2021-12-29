@@ -2,6 +2,7 @@
 """
 from django.conf import settings as django_settings
 from core.utils.common import collect_versions
+from core.feature_flags import all_flags
 
 
 def sentry_fe(request):
@@ -31,5 +32,6 @@ def settings(request):
 
     return {
         'settings': django_settings,
-        'versions': versions
+        'versions': versions,
+        'feature_flags': all_flags(request.user)
     }

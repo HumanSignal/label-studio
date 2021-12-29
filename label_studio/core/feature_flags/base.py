@@ -5,7 +5,7 @@ from ldclient.config import Config, HTTPConfig
 from ldclient.integrations import Files
 
 from django.conf import settings
-from label_studio.core.utils.params import get_bool_env
+from label_studio.core.utils.params import get_bool_env, get_all_env_with_prefix
 from label_studio.core.utils.io import find_file
 
 logger = logging.getLogger(__name__)
@@ -66,6 +66,10 @@ def all_flags(user):
     """
     user_dict = _get_user_repr(user)
     state = client.all_flags_state(user_dict)
-    state_json = state.to_json_dict()
-    # TODO: extend state_json with default flags from env
-    return state_json
+    flags = state.to_json_dict()
+    env_ff = get_all_env_with_prefix('ff_')
+    for env_flag_name, env_flag_on in env_ff.items():
+        if env_flag_name not in flags and env_flag_on:
+            flags[env_flag_name] = True
+    logger.debug(f'Requested all active feature flags: {flags}')
+    return flags

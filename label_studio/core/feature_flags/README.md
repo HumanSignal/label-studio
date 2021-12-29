@@ -34,13 +34,13 @@
 
 ### Production mode
 
-1. Set `FEATURE_FLAGS_OFFLINE=false`
+1. Set `FEATURE_FLAGS_OFFLINE=false` (by default)
 
 
 
 ## Feature flags namings
 
-`ff-<issue-id>-short-description-<date>-<short|long>`
+`ff-<back|front|all>-<issue-id>-short-description-<date>-<short|long>`
 
 - *short* - short-term flags
 - *long* - permanent flags or killswitchers
