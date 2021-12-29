@@ -20,14 +20,14 @@ if settings.FEATURE_FLAGS_FROM_FILE:
     logger.info(f'Read flags from file {feature_flags_file}')
     data_source = Files.new_data_source(paths=[feature_flags_file])
     config = Config(
-        sdk_key=settings.FEATURE_FLAGS_API_KEY,
+        sdk_key=settings.FEATURE_FLAGS_API_KEY or 'whatever',
         update_processor_class=data_source,
         send_events=False)
     ldclient.set_config(config)
     client = ldclient.get()
 elif settings.FEATURE_FLAGS_OFFLINE:
     # On-prem usage, without feature flags file
-    ldclient.set_config(Config(settings.FEATURE_FLAGS_API_KEY, offline=True))
+    ldclient.set_config(Config(settings.FEATURE_FLAGS_API_KEY or 'whatever', offline=True))
     client = ldclient.get()
 else:
     # Production usage

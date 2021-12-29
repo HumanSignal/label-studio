@@ -226,4 +226,4 @@ def feature_flags(request):
     user = request.user
     if not user.is_authenticated:
         return HttpResponseForbidden()
-    return HttpResponse(json.dumps(all_flags(request.user)), status=200)
+    return HttpResponse(json.dumps(all_flags(request.user), indent=4), status=200)
