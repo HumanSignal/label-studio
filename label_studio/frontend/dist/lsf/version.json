@@ -1,6 +1,6 @@
 {
-  "message": "Fix resize observer crash when Image URL is not provided",
-  "commit": "23580b27a85248d6fc616b58dd9daecd267c9a3b",
-  "branch": "fix/dev-1247/resize-observer-crash",
-  "date": "2021-12-02T17:07:52Z"
+  "message": "Merge branch 'master' into feature/DEV-428/show-created-date",
+  "commit": "93198a9641dd97196b64120862ce8728d0e1c639",
+  "branch": "",
+  "date": "2021-12-28T16:28:16Z"
 }
