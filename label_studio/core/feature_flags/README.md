@@ -46,3 +46,14 @@
 - *long* - permanent flags or killswitchers
 
 (check best practices from [here](https://launchdarkly.com/blog/best-practices-short-term-permanent-flags/))
+
+
+## Frontend feature flags
+
+Feature flags JSON object is available on frontend via
+
+```
+window.APP_SETTINGS.feature_flags
+```
+
+To make use flags with LD client, [populate it with bootstap values](https://docs.launchdarkly.com/sdk/features/bootstrapping#javascript)
