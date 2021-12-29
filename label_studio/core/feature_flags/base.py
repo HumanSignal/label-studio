@@ -38,6 +38,8 @@ else:
 def _get_user_repr(user):
     """Turn user object into dict with required properties"""
     from users.serializers import UserSerializer
+    if user.is_anonymous:
+        return {'key': str(user)}
     user_data = UserSerializer(user).data
     user_data['key'] = user_data['email']
     logger.debug(f'Read user properties: {user_data}')

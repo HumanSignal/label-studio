@@ -30,8 +30,12 @@ def settings(request):
     if 'dm2' in versions:
         versions['dm2']['commit'] = versions['dm2'].get('commit', 'none')[0:6]
 
+    feature_flags = {}
+    if hasattr(request, 'user'):
+        feature_flags = all_flags(request.user)
+
     return {
         'settings': django_settings,
         'versions': versions,
-        'feature_flags': all_flags(request.user)
+        'feature_flags': feature_flags
     }
