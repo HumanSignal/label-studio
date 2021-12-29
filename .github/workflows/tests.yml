@@ -284,4 +284,4 @@ jobs:
         collect_analytics: 0
       run: |
         cd label_studio/
-        coverage report -m --fail-under=40
+        coverage report -i -m --fail-under=40

@@ -424,6 +424,7 @@ USER_MIXIN = 'users.mixins.UserMixin'
 GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
 STORAGE_ANNOTATION_SERIALIZER = 'io_storages.serializers.StorageAnnotationSerializer'
 TASK_SERIALIZER_BULK = 'tasks.serializers.BaseTaskSerializerBulk'
+PREPROCESS_FIELD_NAME = 'data_manager.functions.preprocess_field_name'
 
 
 def project_delete(project):
