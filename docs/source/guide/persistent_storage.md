@@ -16,22 +16,17 @@ Follow the steps relevant for your deployment:
 
 ## Set up Amazon S3
 
-Set up Amazon S3 as the storage 
+Set up Amazon S3 as the persistent storage for uploaded Label Studio Enterprise assets. 
 
-1. Create an S3 bucket
-2. (Optional) Set up bucket encryption
-3. Set up IAM permissions
+> If you want to secure the data stored in the S3 bucket at rest, you can [set up default server-side encryption for Amazon S3 buckets](https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-encryption.html) following the steps in the Amazon Simple Storage Service User Guide. 
 
-### Create an S3 bucket
+Start by [creating an S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/create-bucket-overview.html) following the Amazon Simple Storage Service User Guide steps.
 
-   Clone Create bucket: https://docs.pachyderm.com/latest/deploy-manage/deploy/aws-deploy-pachyderm/#3-create-an-s3-bucket
+After you set up an S3 bucket, set up the necessary IAM permissions to grant Label Studio Enterprise access to your bucket. There are two ways that you can manage access to your S3 bucket:
+- Set up an **IAM role** (recommended)
+- Or use **Access keys** 
 
-### (Optional) Set up bucket encryption
-
-### Set up IAM permissions
-
-You can either set up an **IAM role** or use **Access keys** to secure the connection to your S3 bucket.
-
+Select the relevant tab and follow the steps for your desired option: 
 
 <div class="code-tabs">
   <div data-name="IAM role">
