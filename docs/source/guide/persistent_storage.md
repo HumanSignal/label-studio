@@ -12,7 +12,7 @@ If you host Label Studio Enterprise in the cloud, you want to set up persistent 
 Follow the steps relevant for your deployment:
 * [Set up Amazon S3](#Set-up-Amazon-S3) for Label Studio Enterprise deployments in Amazon Web Services (AWS).
 * [Set up Google Cloud Storage (GCS)](#Set-up-Google-Cloud-Storage) for Label Studio Enterprise deployments in Google Cloud Platform.
-* [Set up Microsoft Azure](#Set-up-Microsoft-Azure) for Label Studio Enterprise deployments in Microsoft Azure. 
+* [Set up Microsoft Azure Storage](#Set-up-Microsoft-Azure-Storage) for Label Studio Enterprise deployments in Microsoft Azure. 
 
 ## Set up Amazon S3
 
@@ -24,16 +24,44 @@ Start by [creating an S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/use
 
 After you create an S3 bucket, set up the necessary IAM permissions to grant Label Studio Enterprise access to your bucket. There are two ways that you can manage access to your S3 bucket:
 - Set up an **IAM role** (recommended)
-- Using temporary **Access keys** 
+- Using temporary **access keys** 
 
 Select the relevant tab and follow the steps for your desired option: 
 
 <div class="code-tabs">
   <div data-name="IAM role">
 
+To set up an IAM role, you must have a configured and provisioned OIDC provider for your cluster. See [Create an IAM OIDC provider for your cluster](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html) in the Amazon EKS User Guide. If you don't have an OIDC provider set up for your IAM role, locate and select the option for **Node IAM Role ARN** for your EKS Cluster Node Group, then create the policy specified below.
 
-IAM role [configured and provisioned OIDC provider is required](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html)
-Pass your newly created IAM role to our app and workers pods as annotation in your lse-values.yaml file:
+Follow the steps to [create an IAM role and policy for your service account](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html) in the Amazon EKS User Guide. 
+
+Use the following IAM Policy, replacing `<YOUR_S3_BUCKET>` with the name of your bucket:
+```json
+{
+      "Version": "2012-10-17",
+      "Statement": [
+            {
+      "Effect": "Allow",
+            "Action": [
+                  "s3:ListBucket"
+            ],
+            "Resource": [
+                  "arn:aws:s3:::<YOUR_S3_BUCKET>"
+            ]},{
+      "Effect": "Allow",
+            "Action": [
+                  "s3:PutObject",
+                  "s3:GetObject",
+                  "s3:DeleteObject"
+            ],
+            "Resource": [
+                  "arn:aws:s3:::<YOUR_S3_BUCKET>/*"
+            ]}
+      ]
+}
+```
+
+After you create an IAM role, add it as an annotation in your `lse-values.yaml` file:
 ```yaml
 global:
   persistence:
@@ -58,11 +86,36 @@ rqworker:
 
   <div data-name="Access keys">
 
-Follow the AWS documentation steps for [Creating an IAM user in your AWS account](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) to create an IAM user with programmatic access. This type of user is granted an access key to access AWS services.
-While creating the IAM user, for the Set permissions option, choose to Attach existing policies directly.
-Select Create policy and attach the policy from the Storage for LSE
-When you finish creating the user, save the username and access key somewhere secure.
-Pass your newly created AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY role to our app and workers in your lse-values.yaml file:
+1. Create an IAM user with programmatic access. See [Creating an IAM user in your AWS account](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) in the AWS Identity and Access Management User Guide. 
+2. When creating the user, for the **Set permissions** option, choose to **Attach existing policies directly**.
+3. Select **Create policy** and attach the following policy, replacing `<YOUR_S3_BUCKET>` with the name of your bucket:
+```json
+{
+      "Version": "2012-10-17",
+      "Statement": [
+            {
+      "Effect": "Allow",
+            "Action": [
+                  "s3:ListBucket"
+            ],
+            "Resource": [
+                  "arn:aws:s3:::<YOUR_S3_BUCKET>"
+            ]},{
+      "Effect": "Allow",
+            "Action": [
+                  "s3:PutObject",
+                  "s3:GetObject",
+                  "s3:DeleteObject"
+            ],
+            "Resource": [
+                  "arn:aws:s3:::<YOUR_S3_BUCKET>/*"
+            ]}
+      ]
+}
+```
+4. After you create the user, save the username and access key somewhere secure.
+5. Create [temporary security credentials](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html) for the user to obtain an access key ID and a secret key. 
+6. Update your `lse-values.yaml` file with your newly-created access key ID and secret key as `<YOUR_ACCESS_KEY_ID>` and `<YOUR_SECRET_ACCESS_KEY>`:
 ```yaml
 global:
   persistence:
@@ -70,24 +123,14 @@ global:
     type: s3
     config:
       s3:
-        accessKey: "AKZXNXASDLHG3165FRCE3"
-        secretKey: "eKESFDgjkdsfkgbdsjKelRhEe5GSd0lZ5A/Ya"
+        accessKey: "<YOUR_ACCESS_KEY_ID>"
+        secretKey: "<YOUR_SECRET_ACCESS_KEY>"
         bucket: "my-awesome-bucket"
         region: "us-east-2"
 ```
 
-
   </div>
 </div>
-
-
-
-If you don't have an OIDC provider set up for your IAM role
-Similar steps as in https://github.com/heartexlabs/label-studio/blob/master/docs/source/guide/custom_metric.md#deployed-in-eks-without-an-oidc-provider but different policy (https://docs.pachyderm.com/latest/deploy-manage/deploy/aws-deploy-pachyderm/#add-an-iam-role-and-policy-to-your-service-account)
-
-
-
-
 
 ## Set up Google Cloud Storage
 
@@ -181,10 +224,9 @@ global:
 </div>
 
 
-## Set up Microsoft Azure 
+## Set up Microsoft Azure Storage
 
-Create a Microsoft Azure Storage container to use as persistent storage with Label Studio Enterprise. 
-
+Create a Microsoft Azure Storage container to use as persistent storage with Label Studio Enterprise.
 
 1. Create a storage account: https://docs.microsoft.com/en-us/azure/storage/common/storage-account-overview
 2. After creating the storage account, get the key. 
