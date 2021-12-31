@@ -7,24 +7,24 @@ meta_title: Set up persistent storage with Label Studio Enterprise
 meta_description: Configure persistent storage with Label Studio Enterprise hosted in the cloud to store uploaded data such as task data, user images, and more. 
 ---
 
-If you host Label Studio Enterprise in the cloud, set up persistent storage for uploaded task data, user images, and more in the cloud.
+If you host Label Studio Enterprise in the cloud, you want to set up persistent storage for uploaded task data, user images, and more in the same cloud service as your deployment.
 
 Follow the steps relevant for your deployment:
 * [Set up Amazon S3](#Set-up-Amazon-S3) for Label Studio Enterprise deployments in Amazon Web Services (AWS).
-* [Set up Google Cloud Storage (GCS)](#Set-up-Google-Cloud-Storage) for Label Studio Enterprise deployments in GCS.
+* [Set up Google Cloud Storage (GCS)](#Set-up-Google-Cloud-Storage) for Label Studio Enterprise deployments in Google Cloud Platform.
 * [Set up Microsoft Azure](#Set-up-Microsoft-Azure) for Label Studio Enterprise deployments in Microsoft Azure. 
 
 ## Set up Amazon S3
 
-Set up Amazon S3 as the persistent storage for uploaded Label Studio Enterprise assets. 
+Set up Amazon S3 as the persistent storage for Label Studio Enterprise hosted in AWS. 
 
 > If you want to secure the data stored in the S3 bucket at rest, you can [set up default server-side encryption for Amazon S3 buckets](https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-encryption.html) following the steps in the Amazon Simple Storage Service User Guide. 
 
 Start by [creating an S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/create-bucket-overview.html) following the Amazon Simple Storage Service User Guide steps.
 
-After you set up an S3 bucket, set up the necessary IAM permissions to grant Label Studio Enterprise access to your bucket. There are two ways that you can manage access to your S3 bucket:
+After you create an S3 bucket, set up the necessary IAM permissions to grant Label Studio Enterprise access to your bucket. There are two ways that you can manage access to your S3 bucket:
 - Set up an **IAM role** (recommended)
-- Or use **Access keys** 
+- Using temporary **Access keys** 
 
 Select the relevant tab and follow the steps for your desired option: 
 
@@ -91,41 +91,46 @@ Similar steps as in https://github.com/heartexlabs/label-studio/blob/master/docs
 
 ## Set up Google Cloud Storage
 
+Set up Google Cloud Storage (GCS) as the persistent storage for Label Studio Enterprise hosted in Google Cloud Platform (GCP).
 
-Create bucket
-Create a test bucket in GCS with uniform access control for that. 
+### Create a GCS bucket 
 
-Create IAM Service Account in the menu “Iam & Admin -> Service Accounts”
-To enable this account to create, access and delete objects in the bucket with uniform access control, we set the permissions of this account to the pre-defined role Storage Object Admin. With this role we exactly gain the desired permissions. Click “Add condition” right to the role in the permissions dialogue. There you can enter a condition name and the condition itself. In our case we will restirct the Storage Object Admin role to objects that belong to our test bucket heartex-example-bucket-123456.
+1. Start by creating a bucket. See [Creating storage buckets](https://cloud.google.com/storage/docs/creating-buckets) in the Google Cloud Storage guide. For example, a bucket called `heartex-example-bucket-123456`.
+2. When choosing the [access control method for the bucket](https://cloud.google.com/storage/docs/access-control), choose **uniform** access. 
 
-Condition type	
-Name
-Operator
-Starts with
-Value
-projects/_/buckets/heartex-example-bucket-123456
+### Set up IAM permissions 
+After you create a GCS bucket, set up the necessary IAM permissions to grant Label Studio Enterprise access to your bucket.
 
+1. Create an IAM Service Account. See [Creating and managing service accounts](https://cloud.google.com/iam/docs/creating-managing-service-accounts) in the Google Cloud Storage guide. 
+2. Select the predefined **Storage Object Admin** IAM role to add to the service account so that the account can create, access, and delete objects in the bucket.
+3. Add a condition to the role that restricts the role to access only objects that belong to the bucket you created. You can add a condition in one of two ways:
+   - Select **Add Condition** when setting up the service account IAM role, then use the **Condition Builder** to specify the following values: 
+     | Condition type | Operator | Value |
+     | --- | --- | --- | 
+     | Name | Starts with | `projects/_/buckets/heartex-example-bucket-123456` |
+   - Use a Common Expression Language (CEL) to specify an IAM condition. For example, set the following: `resource.name.startsWith('projects/_/buckets/heartex-example-bucket-123456')`. See [CEL for Conditions in Overview of IAM Conditions](https://cloud.google.com/iam/docs/conditions-overview#cel) in the Google Cloud Storage guide. 
 
-Alternatively you can enter a so-called CEL expression to set the condition. For this also refer to the overview of IAM conditions in the official docs. The CEL for our condition would be: resource.name.startsWith('projects/_/buckets/heartex-example-bucket-123456')
+### Connect Label Studio Enterprise to your GCS bucket
 
+You can connect Label Studio Enterprise to your GCS bucket using Workload Identity or Access keys
 
-There are 2 ways how to connect to your bucket: WorkLoad Identity or Access keys
-Workload Identity is the recommended way to access Google Cloud services from applications running within GKE. Ensure that your GKE cluster has enabled WorkloadIdentity:https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
-
-
+After you create a bucket and set up IAM permissions, connect Label Studio Enterprise to your GCS bucket. There are two ways that you can connect to your bucket:
+- Use Workload Identity to allow workloads in GKE to access your GCS bucket by impersonating the service account you created (recommended).
+- Create a service account key to use the service account outside Google Cloud.  
 
 <div class="code-tabs">
-  <div data-name="Workload Identity">
+<div data-name="Workload Identity">
 
-Create and Bind a Kubernetes Service Account
-Create the following set of variables:
+> Make sure that Workload Identity is enabled on your GKE cluster and that you meet the necessary prerequisites. See [Using Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) in the Google Kubernetes Engine guide.
+
+1. Set up the following environment variables, specifying the service account you created as the `GCP_SA` variable, and replacing the other references in `<>` as needed:
 ```
-GCP_SA=<SERVICE_ACCOUNT_NAME_FROM_THE_PREVIOUS_STEP>
-APP_SA="serviceAccount:${GCP_PROJECT_ID}.svc.id.goog[${K8S_NAMESPACE}/${HELM_RELEASE_NAME}-lse-app]"
-WORKER_SA="serviceAccount:${GCP_PROJECT_ID}.svc.id.goog[${K8S_NAMESPACE}/${HELM_RELEASE_NAME}-lse-rqworker]"
+GCP_SA=<Service-Account-You-Created>
+APP_SA="serviceAccount:<GCP_PROJECT_ID>.svc.id.goog[<K8S_NAMESPACE>/<HELM_RELEASE_NAME>-lse-app]"
+WORKER_SA="serviceAccount:<GCP_PROJECT_ID>.svc.id.goog[<K8S_NAMESPACE>/<HELM_RELEASE_NAME>-lse-rqworker]"
 ```
-Bind roles:
-```
+2. Create an IAM policy binding between the Kubernetes service account on your cluster and the GCS service account you created, allowing the K8s service account for the Label Studio Enterprise app and the related rqworkers to impersonate the other service account. From the command line, run the following:
+```shell
 gcloud iam service-accounts add-iam-policy-binding ${GCP_SA} \
     --role roles/iam.workloadIdentityUser \
     --member "${APP_SA}"
@@ -133,49 +138,72 @@ gcloud iam service-accounts add-iam-policy-binding ${GCP_SA} \
     --role roles/iam.workloadIdentityUser \
     --member "${WORKER_SA}"
 ```
-Pass your service account and other configuration in your lse-values.yaml:
-```
+3. After binding the service accounts, update your `lse-values.yaml` file to include the values for the service account and other configurations. Update the `projectID`, `bucket`, and replace the`<GCP_SERVICE_ACCOUNT>` with the relevant values for your deployment:
+```yaml
 global:
   persistence:
     enabled: true
     type: gcs
     config:
       gcs:
-        projectID: "123123project"
-        bucket: "heartex-example-bucket-123456"
+        projectID: "<YOUR_PROJECT_ID>"
+        bucket: "<YOUR_BUCKET_NAME>"
 app:
   serviceAccount:
     annotations:
-      iam.gke.io/gcp-service-account: "<SERVICE_ACCOUNT>"
+      iam.gke.io/gcp-service-account: "<GCP_SERVICE_ACCOUNT>"
 
 rqworker:
   serviceAccount:
     annotations:
-      iam.gke.io/gcp-service-account: "<SERVICE_ACCOUNT>"
+      iam.gke.io/gcp-service-account: "<GCP_SERVICE_ACCOUNT>"
 ```
 
+</div>
+<div data-name="Service Account Key">
 
-  </div>
+Create a service account key from the UI and download the JSON. Follow the steps for [Creating and managing service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) in the Google Cloud Identity and Access Management guide. 
 
-  <div data-name="Service Account Keys">
-   Create a service account key from the UI and download the JSON.
-
-
-Put your json, projectID and bucket in your lse-values.yaml:
-```
+After downloading the JSON for the service account key, update or create references to the JSON, your projectID, and your bucket in your `lse-values.yaml` file:
+```yaml
 global:
   persistence:
     enabled: true
     type: gcs
     config:
       gcs:
-        projectID: "123123project"
-        applicationCredentialsJSON: "YOUR_JSON"
-        bucket: "heartex-example-bucket-123456"
+        projectID: "<YOUR_PROJECT_ID>"
+        applicationCredentialsJSON: "<YOUR_JSON>"
+        bucket: "<YOUR_BUCKET_NAME>"
 ```
+
   </div>
 </div>
 
 
-
 ## Set up Microsoft Azure 
+
+Create a Microsoft Azure Storage container to use as persistent storage with Label Studio Enterprise. 
+
+
+1. Create a storage account: https://docs.microsoft.com/en-us/azure/storage/common/storage-account-overview
+2. After creating the storage account, get the key. 
+3. Create a new storage container within your storage account:
+```shell
+az storage container create --name <YOUR_CONTAINER_NAME> \
+          --account-name <YOUR_STORAGE_ACCOUNT> \
+          --account-key "<YOUR_STORAGE_KEY>"
+```
+4. Update your `lse-values.yaml` file with the `YOUR_CONTAINER_NAME`, `YOUR_STORAGE_ACCOUNT`, and `YOUR_STORAGE_KEY` that you created:
+```yaml
+global:
+  persistence:
+    enabled: true
+    type: azure
+    config:
+      azure:
+        storageAccountName: "<YOUR_STORAGE_ACCOUNT>"
+        storageAccountKey: "<YOUR_STORAGE_KEY>"
+        containerName: "<YOUR_CONTAINER_NAME>"
+
+```
