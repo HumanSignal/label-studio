@@ -208,7 +208,9 @@ class Task(TaskMixin, models.Model):
         for storage_class in get_storage_classes('import'):
             storage_objects = storage_class.objects.filter(project=self.project)
             for storage_object in storage_objects:
-                if storage_object.can_resolve_url(url):
+                # check url is string because task can have int, float, dict, list
+                # and 'can_resolve_url' will fail
+                if isinstance(url, str) and storage_object.can_resolve_url(url):
                     return storage_object
 
     @property
@@ -228,7 +230,7 @@ class Task(TaskMixin, models.Model):
     @property
     def completed_annotations(self):
         """Annotations that we take into account when set completed status to the task"""
-        return self.annotations.filter(Q_finished_annotations & Q(ground_truth=False))
+        return self.annotations.filter(Q_finished_annotations)
 
     def update_is_labeled(self):
         self.is_labeled = self._get_is_labeled_value()
