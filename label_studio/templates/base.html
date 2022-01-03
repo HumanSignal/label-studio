@@ -101,6 +101,7 @@
     sentry_rate: "{{ settings.FRONTEND_SENTRY_RATE }}",
     sentry_environment: "{{ settings.FRONTEND_SENTRY_ENVIRONMENT }}",
     editor_keymap: JSON.parse({{ settings.EDITOR_KEYMAP|safe }}),
+    feature_flags: {{ feature_flags|json_dumps_ensure_ascii|safe }},
 
     {% block app_more_settings %}
       flags: {
