@@ -1,7 +1,7 @@
 ---
 title: Image
 type: tags
-order: 303
+order: 304
 meta_title: Image Tags for Images
 meta_description: Customize Label Studio with the Image tag to annotate images for computer vision machine learning and data science projects.
 ---
