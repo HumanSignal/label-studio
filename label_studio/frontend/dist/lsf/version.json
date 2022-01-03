@@ -1,6 +1,6 @@
 {
-  "message": "[fix] Fix image transformer for the case with one transformed region (#384)",
-  "commit": "533e4153624fa7780c2de674e494eb0c43b8cc8e",
-  "branch": "master",
-  "date": "2021-12-07T15:55:28Z"
+  "message": "Merge branch 'master' into feature/DEV-428/show-created-date",
+  "commit": "93198a9641dd97196b64120862ce8728d0e1c639",
+  "branch": "",
+  "date": "2021-12-28T16:28:16Z"
 }

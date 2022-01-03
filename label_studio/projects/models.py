@@ -410,7 +410,7 @@ class Project(ProjectMixin, models.Model):
     def validate_label_config(cls, config_string):
         validate_label_config(config_string)
 
-    def validate_config(self, config_string):
+    def validate_config(self, config_string, strict=False):
         self.validate_label_config(config_string)
         if not hasattr(self, 'summary'):
             return
@@ -425,6 +425,7 @@ class Project(ProjectMixin, models.Model):
         if not fields_from_config:
             logger.debug(f'Data fields not found in labeling config')
             return
+        fields_from_config = {field.split('[')[0] for field in fields_from_config}  # Repeater tag support
         fields_from_data = set(self.summary.common_data_columns)
         fields_from_data.discard(settings.DATA_UNDEFINED_NAME)
         if fields_from_data and not fields_from_config.issubset(fields_from_data):
@@ -475,7 +476,10 @@ class Project(ProjectMixin, models.Model):
             if not set(labels_from_data).issubset(set(labels_from_config_by_tag)):
                 different_labels = list(set(labels_from_data).difference(labels_from_config_by_tag))
                 diff_str = '\n'.join(f'{l} ({labels_from_data[l]} annotations)' for l in different_labels)
-                raise LabelStudioValidationErrorSentryIgnored(f'These labels still exist in annotations:\n{diff_str}')
+                if strict is True:
+                    raise LabelStudioValidationErrorSentryIgnored(f'These labels still exist in annotations:\n{diff_str}')
+                else:
+                    logger.warning(f'project_id={self.id} inconsistent labels in config and annotations: {diff_str}')
 
     def _label_config_has_changed(self):
         return self.label_config != self.__original_label_config

@@ -44,7 +44,7 @@ class ListAnnotationSerializer(serializers.ListSerializer):
     pass
 
 
-class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
+class AnnotationSerializer(ModelSerializer):
     """
     """
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
@@ -298,9 +298,9 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                          file_upload_id=task.get('file_upload_id'))
                 db_tasks.append(t)
 
-            # deprecated meta warning
-            if 'meta' in task:
-                logger.warning('You task data has field "meta" which is deprecated and it will be removed in future')
+                # deprecated meta warning
+                if 'meta' in task:
+                    logger.warning('You task data has field "meta" which is deprecated and it will be removed in future')
 
             if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
                 self.db_tasks = []
@@ -327,12 +327,14 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                     # support both "ground_truth" and "ground_truth"
                     ground_truth = annotation.pop('ground_truth', True)
                     was_cancelled = annotation.pop('was_cancelled', False)
+                    lead_time = annotation.pop('lead_time', None)
 
                     db_annotations.append(Annotation(task=self.db_tasks[i],
                                                      ground_truth=ground_truth,
                                                      was_cancelled=was_cancelled,
                                                      completed_by_id=annotation['completed_by_id'],
-                                                     result=annotation['result']))
+                                                     result=annotation['result'],
+                                                     lead_time=lead_time))
 
             # add predictions
             last_model_version = None
