@@ -131,9 +131,10 @@ You can add other, optional keys to the JSON file.
 
 | JSON key | Description |
 | --- | --- | 
-| id | Optional. Integer to use as the task ID. |
 | annotations | Optional. List of annotations exported from Label Studio. [Label Studio's annotation format](export.html#Raw-JSON-format-of-completed-tasks) allows you to import annotation results in order to use them in subsequent labeling tasks. |
 | predictions | Optional. List of model prediction results, where each result is saved using [Label Studio's prediction format](export.html#Raw-JSON-format-of-completed-tasks). Import predictions for automatic task pre-labeling and active learning. See [Import predicted labels into Label Studio](predictions.html) |
+
+See [Relevant JSON property descriptions](export.html#Relevant-JSON-property-descriptions) in the export documentation for more details about the JSON format of exported tasks.
 
 ### Example JSON format
 
