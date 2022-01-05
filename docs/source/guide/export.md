@@ -257,7 +257,8 @@ Review the full list of JSON properties in the [API documentation](api.html).
 | result.to_name | Name of the object tag that provided the region to be labeled. See [object tags](/tags). |
 | result.type | Type of tag used to annotate the task. |
 | result.value | Tag-specific value that includes details of the result of labeling the task. The value structure depends on the tag for the label. [Explore each tag](/tags) for more details. |
-| predictions | Array of machine learning predictions. Follows the same format as the completions array, with one additional parameter. |
+| drafts | Array of draft annotations. Follows the similar format as the annotations array. Included only for tasks exported as a snapshot [from the UI](#Export-snapshots-using-the-UI) or [using the API](#Export-snapshots-using-the-API).
+| predictions | Array of machine learning predictions. Follows the same format as the annotations array, with one additional parameter. |
 | predictions.score | The overall score of the result, based on the probabilistic output, confidence level, or other. | 
 
 <!-- md image_units.md -->
