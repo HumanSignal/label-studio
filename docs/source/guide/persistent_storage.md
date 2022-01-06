@@ -24,18 +24,18 @@ Start by [creating an S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/use
 
 > If you want to secure the data stored in the S3 bucket at rest, you can [set up default server-side encryption for Amazon S3 buckets](https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-encryption.html) following the steps in the Amazon Simple Storage Service User Guide. 
 
-### Configure to use S3 bucket
+### Configure the S3 bucket
 After you create an S3 bucket, set up the necessary IAM permissions to grant Label Studio Enterprise access to your bucket. There are three ways that you can manage access to your S3 bucket:
 - Set up an **IAM role** with an OIDC provider (**recommended**)
-- Using temporary **access keys**
-- Using **IAM role** without an OIDC provider
+- Use **access keys**
+- Set up an **IAM role** without an OIDC provider
 
 Select the relevant tab and follow the steps for your desired option: 
 
 <div class="code-tabs">
-  <div data-name="IAM role(OIDC)">
+  <div data-name="IAM role (OIDC)">
 
-> To set up an IAM role, you must have a configured and provisioned OIDC provider for your cluster. See [Create an IAM OIDC provider for your cluster](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html) in the Amazon EKS User Guide.
+> To set up an IAM role using this method, you must have a configured and provisioned OIDC provider for your cluster. See [Create an IAM OIDC provider for your cluster](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html) in the Amazon EKS User Guide.
 
 1. Follow the steps to [create an IAM role and policy for your service account](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html) in the Amazon EKS User Guide.
 2. Use the following IAM Policy, replacing `<YOUR_S3_BUCKET>` with the name of your bucket:
@@ -67,11 +67,11 @@ Select the relevant tab and follow the steps for your desired option:
 }
 ```
 3. Create an **IAM role as a Web Identity** using the cluster OIDC provider as the identity provider:
-    - Create a new **Role** from your IAM Console.
-    - Select the **Web identity** Tab.
-    - In the **Identity Provider** drop down, select the OpenID Connect provider URL of your EKS and `sts.amazonaws.com` as the Audience.
-    - Attach the newly created permission to the Role and name it.
-    - Retrieve the Role arn for the next step.
+   1. Create a new **Role** from your IAM Console.
+   2. Select the **Web identity** Tab.
+   3. In the **Identity Provider** drop-down, select the OpenID Connect provider URL of your EKS and `sts.amazonaws.com` as the Audience.
+   4. Attach the newly created permission to the Role and name it.
+   5. Retrieve the Role arn for the next step.
 4. After you create an IAM role, add it as an annotation in your `lse-values.yaml` file:
 ```yaml
 global:
@@ -144,11 +144,13 @@ global:
 
   </div>
 
-  <div data-name="EKS node IAM role">
+  <div data-name="IAM role (EKS node)">
+
+To create an IAM role without using OIDC in EKS, follow these steps.
 
 1. In the AWS console UI, go to **EKS > Clusters > `YOUR_CLUSTER_NAME` > Node Group**.
 2. Select the name of `YOUR_NODE_GROUP` with Label Studio Enterprise deployed.
-3. On the Details page, locate and select the option for Node IAM Role ARN and choose to **Attach existing policies directly**.
+3. On the **Details** page, locate and select the option for Node IAM Role ARN and choose to **Attach existing policies directly**.
 3. Select **Create policy** and attach the following policy, replacing `<YOUR_S3_BUCKET>` with the name of your bucket:
 ```json
 {
@@ -177,7 +179,7 @@ global:
   ]
 }
 ```
-4. After you added an IAM policy, configure your `lse-values.yaml` file:
+4. After you add an IAM policy, configure your `lse-values.yaml` file:
 ```yaml
 global:
   persistence:
@@ -203,14 +205,11 @@ Set up Google Cloud Storage (GCS) as the persistent storage for Label Studio Ent
 3. Create an IAM Service Account. See [Creating and managing service accounts](https://cloud.google.com/iam/docs/creating-managing-service-accounts) in the Google Cloud Storage guide. 
 4. Select the predefined **Storage Object Admin** IAM role to add to the service account so that the account can create, access, and delete objects in the bucket.
 5. Add a condition to the role that restricts the role to access only objects that belong to the bucket you created. You can add a condition in one of two ways:
-
-    Select **Add Condition** when setting up the service account IAM role, then use the **Condition Builder** to specify the following values:
-
-| Condition type | Operator    | Value                                              |
-|----------------|-------------|----------------------------------------------------|
-| Name           | Starts with | `projects/_/buckets/heartex-example-bucket-123456` |
-
-> Alternatively **Use a Common Expression Language** (CEL) to specify an IAM condition. For example, set the following: `resource.name.startsWith('projects/_/buckets/heartex-example-bucket-123456')`. See [CEL for Conditions in Overview of IAM Conditions](https://cloud.google.com/iam/docs/conditions-overview#cel) in the Google Cloud Storage guide. 
+    - Select **Add Condition** when setting up the service account IAM role, then use the **Condition Builder** to specify the following values:
+      - Condition type: `Name`
+      - Operator: `Starts with`
+      - Value: `projects/_/buckets/heartex-example-bucket-123456`
+    - Or, **use a Common Expression Language** (CEL) to specify an IAM condition. For example, set the following: `resource.name.startsWith('projects/_/buckets/heartex-example-bucket-123456')`. See [CEL for Conditions in Overview of IAM Conditions](https://cloud.google.com/iam/docs/conditions-overview#cel) in the Google Cloud Storage guide. 
 
 ### Configure to use GCS bucket
 
