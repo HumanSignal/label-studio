@@ -347,8 +347,9 @@ CSRF_COOKIE_HTTPONLY = bool(int(get_env('CSRF_COOKIE_HTTPONLY', SESSION_COOKIE_S
 MEDIA_ROOT = os.path.join(BASE_DATA_DIR, 'media')
 os.makedirs(MEDIA_ROOT, exist_ok=True)
 MEDIA_URL = '/data/'
-UPLOAD_DIR = 'upload'
-AVATAR_PATH = 'avatars'
+PERSISTENT_DATA_ROOT_DIR = get_env('PERSISTENT_DATA_ROOT_DIR', default='')
+UPLOAD_DIR = os.path.join(PERSISTENT_DATA_ROOT_DIR, 'upload')
+AVATAR_PATH = os.path.join(PERSISTENT_DATA_ROOT_DIR, 'avatars')
 
 # project exports
 EXPORT_DIR = os.path.join(BASE_DATA_DIR, 'export')
@@ -357,7 +358,7 @@ EXPORT_MIXIN = 'data_export.mixins.ExportMixin'
 # old export dir
 os.makedirs(EXPORT_DIR, exist_ok=True)
 # dir for delayed export
-DELAYED_EXPORT_DIR = 'export'
+DELAYED_EXPORT_DIR = os.path.join(PERSISTENT_DATA_ROOT_DIR, 'export')
 os.makedirs(os.path.join(BASE_DATA_DIR, MEDIA_ROOT, DELAYED_EXPORT_DIR), exist_ok=True)
 
 # file / task size limits
