@@ -25,10 +25,11 @@ from django.db.models import Value, F, CharField
 
 from core import utils
 from core.utils.io import find_file
-from core.utils.params import get_env
 from core.label_config import generate_time_series_json
 from core.utils.common import collect_versions
-from io_storages.localfiles.models import LocalFilesImportStorageLink, LocalFilesImportStorage
+from io_storages.localfiles.models import LocalFilesImportStorage
+from label_studio.core.feature_flags import all_flags
+
 
 logger = logging.getLogger(__name__)
 
@@ -219,3 +220,10 @@ def static_file_with_host_resolver(path_on_disk, content_type):
             return response
 
     return serve_file
+
+
+def feature_flags(request):
+    user = request.user
+    if not user.is_authenticated:
+        return HttpResponseForbidden()
+    return HttpResponse(json.dumps(all_flags(request.user), indent=4), status=200)

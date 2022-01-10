@@ -6,8 +6,9 @@ on:
       - 'label_studio/**'
       - '.github/workflows/tests.yml'
       - 'deploy/requirements.txt'
+      - 'deploy/requirements-mw.txt'
       - 'deploy/requirements-test.txt'
-      - 'deploy/prebuild.sh'
+      - 'deploy/prebuild_wo_frontend.sh'
 
 env:
   NODE: '14'
@@ -60,7 +61,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v2.5.0
+        uses: actions/setup-node@v2.5.1
         with:
           node-version: "${{ env.NODE }}"
 
@@ -172,7 +173,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v2.5.0
+        uses: actions/setup-node@v2.5.1
         with:
           node-version: 14
 
@@ -283,4 +284,4 @@ jobs:
         collect_analytics: 0
       run: |
         cd label_studio/
-        coverage report -m --fail-under=40
+        coverage report -i -m --fail-under=40
