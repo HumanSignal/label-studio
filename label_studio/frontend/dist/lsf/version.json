@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into feature/DEV-428/show-created-date",
-  "commit": "93198a9641dd97196b64120862ce8728d0e1c639",
-  "branch": "",
-  "date": "2021-12-28T16:28:16Z"
+  "message": "fix: DEV-1471: Table tag breaks View All (#419)\n\nit's actually an object tag, so should behave and inherit appropriately",
+  "commit": "a47177e84d28056789e32434de39e0d5ca125ae4",
+  "branch": "master",
+  "date": "2022-01-11T15:02:28Z"
 }
