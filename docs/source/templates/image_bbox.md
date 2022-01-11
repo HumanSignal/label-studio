@@ -1,7 +1,8 @@
 ---
-title: Image Object Detection
+title: Object Detection with Bounding Boxes
 type: templates
-order: 102
+category: Computer Vision
+order: 103
 meta_title: Image Object Detection Data Labeling Template
 meta_description: Label Studio Image Object Detection Template for machine learning and data science data labeling projects.
 ---

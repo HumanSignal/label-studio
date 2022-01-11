@@ -1,7 +1,7 @@
 ---
 title: Image Classification
 type: templates
-order: 101
+order: 106
 meta_title: Image Classification Data Labeling Template
 meta_description: Label Studio Image Classification Template for machine learning and data science data labeling projects.
 ---
