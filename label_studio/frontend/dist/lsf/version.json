@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into feature/DEV-428/show-created-date",
-  "commit": "93198a9641dd97196b64120862ce8728d0e1c639",
-  "branch": "",
-  "date": "2021-12-28T16:28:16Z"
+  "message": "Add duration to the serialized result",
+  "commit": "ad5dcbb159c1389ec04f014c362e7a2e40ebdd4c",
+  "branch": "feat/dev-1411/video-duration",
+  "date": "2022-01-11T22:08:02Z"
 }
