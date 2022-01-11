@@ -74,7 +74,8 @@ Select the relevant tab and follow the steps for your desired option:
    3. In the **Identity Provider** drop-down, select the OpenID Connect provider URL of your EKS and `sts.amazonaws.com` as the Audience.
    4. Attach the newly created permission to the Role and name it.
    5. Retrieve the Role arn for the next step.
-4. After you create an IAM role, add it as an annotation in your `lse-values.yaml` file:
+4. After you create an IAM role, add it as an annotation in your `lse-values.yaml` file.
+   Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 
 ```yaml
 global:
@@ -85,6 +86,7 @@ global:
       s3:
         bucket: "<YOUR_BUCKET_NAME>"
         region: "<YOUR_BUCKET_REGION>"
+        folder: ""
 app:
   serviceAccount:
     annotations:
@@ -133,7 +135,8 @@ rqworker:
 ```
 
 4. After you create the user, save the username and access key somewhere secure.
-5. Update your `lse-values.yaml` file with your newly-created access key ID and secret key as `<YOUR_ACCESS_KEY_ID>` and `<YOUR_SECRET_ACCESS_KEY>`:
+5. Update your `lse-values.yaml` file with your newly-created access key ID and secret key as `<YOUR_ACCESS_KEY_ID>` and `<YOUR_SECRET_ACCESS_KEY>`.
+   Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 
 ```yaml
 global:
@@ -144,6 +147,28 @@ global:
       s3:
         accessKey: "<YOUR_ACCESS_KEY_ID>"
         secretKey: "<YOUR_SECRET_ACCESS_KEY>"
+        bucket: "<YOUR_BUCKET_NAME>"
+        region: "<YOUR_BUCKET_REGION>"
+        folder: ""
+```
+
+> Optionally, you can use already existing Kubernetes secret and a key
+1. Create a kubernetes secret with your AWS access keys:
+```shell
+kubectl create secret generic <YOUR_SECRET_NAME> --from-literal=accesskey=<YOUR_ACCESS_KEY_ID> --from-literal=secretkey=<YOUR_SECRET_ACCESS_KEY>
+```
+2. Update your `lse-values.yaml` file with your newly-created kubernetes secret:
+```yaml
+global:
+  persistence:
+    enabled: true
+    type: s3
+    config:
+      s3:
+        accessKeyExistingSecret: "<YOUR_SECRET_NAME>"
+        accessKeyExistingSecretKey: "accesskey"
+        secretKeyExistingSecret: "<YOUR_SECRET_NAME>"
+        secretKeyExistingSecretKey: "secretkey"
         bucket: "<YOUR_BUCKET_NAME>"
         region: "<YOUR_BUCKET_REGION>"
 ```
@@ -187,7 +212,8 @@ To create an IAM role without using OIDC in EKS, follow these steps.
 }
 ```
 
-4. After you add an IAM policy, configure your `lse-values.yaml` file:
+4. After you add an IAM policy, configure your `lse-values.yaml` file.
+   Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 
 ```yaml
 global:
@@ -198,6 +224,7 @@ global:
       s3:
         bucket: "<YOUR_BUCKET_NAME>"
         region: "<YOUR_BUCKET_REGION>"
+        folder: ""
 ```
 
   </div>
@@ -252,7 +279,8 @@ gcloud iam service-accounts add-iam-policy-binding ${GCP_SA} \
     --member "${WORKER_SA}"
 ```
 
-3. After binding the service accounts, update your `lse-values.yaml` file to include the values for the service account and other configurations. Update the `projectID`, `bucket`, and replace the`<GCP_SERVICE_ACCOUNT>` with the relevant values for your deployment:
+3. After binding the service accounts, update your `lse-values.yaml` file to include the values for the service account and other configurations. Update the `projectID`, `bucket`, and replace the`<GCP_SERVICE_ACCOUNT>` with the relevant values for your deployment.
+   Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 
 ```yaml
 global:
@@ -263,6 +291,7 @@ global:
       gcs:
         projectID: "<YOUR_PROJECT_ID>"
         bucket: "<YOUR_BUCKET_NAME>"
+        folder: ""
 app:
   serviceAccount:
     annotations:
@@ -278,7 +307,8 @@ rqworker:
 <div data-name="Service Account Key">
 
 1. Create a service account key from the UI and download the JSON. Follow the steps for [Creating and managing service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) in the Google Cloud Identity and Access Management guide.
-2. After downloading the JSON for the service account key, update or create references to the JSON, your projectID, and your bucket in your `lse-values.yaml` file:
+2. After downloading the JSON for the service account key, update or create references to the JSON, your projectID, and your bucket in your `lse-values.yaml` file.
+   Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 
 ```yaml
 global:
@@ -290,6 +320,7 @@ global:
         projectID: "<YOUR_PROJECT_ID>"
         applicationCredentialsJSON: "<YOUR_JSON>"
         bucket: "<YOUR_BUCKET_NAME>"
+        folder: ""
 ```
 
   </div>
@@ -318,7 +349,8 @@ az storage container create --name <YOUR_CONTAINER_NAME> \
 ```
 
 ### Configure to use Azure container
-Update your `lse-values.yaml` file with the `YOUR_CONTAINER_NAME`, `YOUR_STORAGE_ACCOUNT`, and `YOUR_STORAGE_KEY` that you created:
+Update your `lse-values.yaml` file with the `YOUR_CONTAINER_NAME`, `YOUR_STORAGE_ACCOUNT`, and `YOUR_STORAGE_KEY` that you created.
+Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 
 ```yaml
 global:
@@ -330,4 +362,5 @@ global:
         storageAccountName: "<YOUR_STORAGE_ACCOUNT>"
         storageAccountKey: "<YOUR_STORAGE_KEY>"
         containerName: "<YOUR_CONTAINER_NAME>"
+        folder: ""
 ```
