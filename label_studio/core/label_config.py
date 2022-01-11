@@ -4,7 +4,6 @@ import logging
 import json
 import pandas as pd
 import numpy as np
-import os
 import xmljson
 import jsonschema
 import re
@@ -459,7 +458,6 @@ def check_control_in_config_by_regex(config_string, control_type):
         expression = control
         for key in item:
             expression = expression.replace(key, item[key])
-        import re
         pattern = re.compile(expression)
         full_match = pattern.fullmatch(control_type)
         if full_match:
@@ -483,7 +481,6 @@ def check_toname_in_config_by_regex(config_string, to_name, control_type=None):
             expression = to_name_item
             for key in item:
                 expression = expression.replace(key, item[key])
-            import re
             pattern = re.compile(expression)
             full_match = pattern.fullmatch(to_name)
             if full_match:
@@ -501,9 +498,19 @@ def get_original_fromname_by_regex(config_string, fromname):
         expression = control
         for key in item:
             expression = expression.replace(key, item[key])
-        import re
         pattern = re.compile(expression)
         full_match = pattern.fullmatch(fromname)
         if full_match:
             return control
     return fromname
+
+
+def get_all_types(label_config):
+    """
+    Get all types from label_config
+    """
+    outputs = parse_config(label_config)
+    out = []
+    for control_name, info in outputs.items():
+        out.append(info['type'].lower())
+    return out

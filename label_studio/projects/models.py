@@ -24,7 +24,7 @@ from core.label_config import (
     get_all_labels,
     get_all_control_tag_tuples,
     get_annotation_tuple, check_control_in_config_by_regex, check_toname_in_config_by_regex,
-    get_original_fromname_by_regex,
+    get_original_fromname_by_regex, get_all_types,
 )
 
 logger = logging.getLogger(__name__)
@@ -455,7 +455,8 @@ class Project(ProjectMixin, models.Model):
             for ann_tuple in different_annotations:
                 from_name, to_name, t = ann_tuple.split('|')
                 if not check_control_in_config_by_regex(config_string, from_name) or \
-                not check_toname_in_config_by_regex(config_string, to_name):
+                not check_toname_in_config_by_regex(config_string, to_name) or \
+                t not in get_all_types(config_string):
                     diff_str.append(
                         f'{self.summary.created_annotations[ann_tuple]} '
                         f'with from_name={from_name}, to_name={to_name}, type={t}'
