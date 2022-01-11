@@ -76,11 +76,22 @@ def parse_config(config_string):
         xml_tree = etree.fromstring(config_string)
     except etree.XMLSyntaxError as e:
         raise LabelStudioXMLSyntaxErrorSentryIgnored(str(e))
-
     inputs, outputs, labels = {}, {}, defaultdict(dict)
+    # Add variables to config (e.g. {{idx}} for index in Repeater
+    variables = []
     for tag in xml_tree.iter():
+        if tag.attrib and 'indexFlag' in tag.attrib:
+            variables.append(tag.attrib['indexFlag'])
         if _is_output_tag(tag):
             tag_info = {'type': tag.tag, 'to_name': tag.attrib['toName'].split(',')}
+            if variables:
+                # Find variables in tag_name and regex if find it
+                for v in variables:
+                    for tag_name in tag_info['to_name']:
+                        if v in tag_name:
+                            if 'regex' not in tag_info:
+                                tag_info['regex'] = {}
+                            tag_info['regex'][v] = ".*"
             # Grab conditionals if any
             conditionals = {}
             if tag.attrib.get('perRegion') == 'true':
@@ -436,3 +447,63 @@ def replace_task_data_undefined_with_config_field(data, project, first_key=None)
         key = first_key or list(project.data_types.keys())[0]
         data[key] = data[settings.DATA_UNDEFINED_NAME]
         del data[settings.DATA_UNDEFINED_NAME]
+
+
+def check_control_in_config_by_regex(config_string, control_type):
+    """
+    Check if control type is in config including regex filter
+    """
+    c = parse_config(config_string)
+    for control in c:
+        item = c[control]['regex']
+        expression = control
+        for key in item:
+            expression = expression.replace(key, item[key])
+        import re
+        pattern = re.compile(expression)
+        full_match = pattern.fullmatch(control_type)
+        if full_match:
+            return True
+    return False
+
+
+def check_toname_in_config_by_regex(config_string, to_name, control_type=None):
+    """
+    Check if to_name is in config including regex filter
+    :return: True if to_name is fullmatch to some pattern ion config
+    """
+    c = parse_config(config_string)
+    if control_type:
+        check_list = [control_type]
+    else:
+        check_list = list(c.keys())
+    for control in check_list:
+        item = c[control]['regex']
+        for to_name_item in c[control]['to_name']:
+            expression = to_name_item
+            for key in item:
+                expression = expression.replace(key, item[key])
+            import re
+            pattern = re.compile(expression)
+            full_match = pattern.fullmatch(to_name)
+            if full_match:
+                return True
+    return False
+
+
+def get_original_fromname_by_regex(config_string, fromname):
+    """
+    Get from_name from config on from_name key from data after applying regex search or original fromname
+    """
+    c = parse_config(config_string)
+    for control in c:
+        item = c[control].get('regex', {})
+        expression = control
+        for key in item:
+            expression = expression.replace(key, item[key])
+        import re
+        pattern = re.compile(expression)
+        full_match = pattern.fullmatch(fromname)
+        if full_match:
+            return control
+    return fromname

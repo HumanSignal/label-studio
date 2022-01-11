@@ -23,7 +23,8 @@ from core.label_config import (
     get_sample_task,
     get_all_labels,
     get_all_control_tag_tuples,
-    get_annotation_tuple,
+    get_annotation_tuple, check_control_in_config_by_regex, check_toname_in_config_by_regex,
+    get_original_fromname_by_regex,
 )
 
 logger = logging.getLogger(__name__)
@@ -453,26 +454,29 @@ class Project(ProjectMixin, models.Model):
             diff_str = []
             for ann_tuple in different_annotations:
                 from_name, to_name, t = ann_tuple.split('|')
-                diff_str.append(
-                    f'{self.summary.created_annotations[ann_tuple]} '
-                    f'with from_name={from_name}, to_name={to_name}, type={t}'
+                if not check_control_in_config_by_regex(config_string, from_name) or \
+                not check_toname_in_config_by_regex(config_string, to_name):
+                    diff_str.append(
+                        f'{self.summary.created_annotations[ann_tuple]} '
+                        f'with from_name={from_name}, to_name={to_name}, type={t}'
+                    )
+            if len(diff_str) > 0:
+                diff_str = '\n'.join(diff_str)
+                raise LabelStudioValidationErrorSentryIgnored(
+                    f'Created annotations are incompatible with provided labeling schema, we found:\n{diff_str}'
                 )
-            diff_str = '\n'.join(diff_str)
-            raise LabelStudioValidationErrorSentryIgnored(
-                f'Created annotations are incompatible with provided labeling schema, we found:\n{diff_str}'
-            )
 
         # validate labels consistency
         labels_from_config = get_all_labels(config_string)
         created_labels = self.summary.created_labels
         for control_tag_from_data, labels_from_data in created_labels.items():
             # Check if labels created in annotations, and their control tag has been removed
-            if labels_from_data and control_tag_from_data not in labels_from_config:
+            if labels_from_data and not check_control_in_config_by_regex(config_string, control_tag_from_data):
                 raise LabelStudioValidationErrorSentryIgnored(
                     f'There are {sum(labels_from_data.values(), 0)} annotation(s) created with tag '
                     f'"{control_tag_from_data}", you can\'t remove it'
                 )
-            labels_from_config_by_tag = set(labels_from_config[control_tag_from_data])
+            labels_from_config_by_tag = set(labels_from_config[get_original_fromname_by_regex(config_string, control_tag_from_data)])
             if not set(labels_from_data).issubset(set(labels_from_config_by_tag)):
                 different_labels = list(set(labels_from_data).difference(labels_from_config_by_tag))
                 diff_str = '\n'.join(f'{l} ({labels_from_data[l]} annotations)' for l in different_labels)
