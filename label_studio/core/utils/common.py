@@ -35,6 +35,7 @@ from rest_framework.exceptions import ErrorDetail
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
 from collections import defaultdict
+from functools import lru_cache
 
 from base64 import b64encode
 from lockfile import LockFile
@@ -274,6 +275,7 @@ def timestamp_now():
     return datetime_to_timestamp(datetime.utcnow())
 
 
+@lru_cache(maxsize=None)
 def find_first_one_to_one_related_field_by_prefix(instance, prefix):
     for field in instance._meta.get_fields():
         if issubclass(type(field), models.fields.related.OneToOneRel):
@@ -282,8 +284,9 @@ def find_first_one_to_one_related_field_by_prefix(instance, prefix):
                 return getattr(instance, attr_name)
 
 
+@lru_cache(maxsize=None)
 def find_first_many_to_one_related_field_by_prefix(instance, prefix):
-    '''Hard way to check if project has at least one storage'''
+    """ Hard way to check if project has at least one storage """
 
     for field in instance._meta.get_fields():
         if issubclass(type(field), models.fields.related.ManyToOneRel):

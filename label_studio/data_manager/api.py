@@ -189,7 +189,6 @@ class TaskListAPI(generics.ListAPIView):
             settings.CLOUD_FILE_STORAGE_ENABLED
 
         return {
-            'proxy': bool_from_request(request.GET, 'proxy', True),
             'resolve_uri': resolve_uri,
             'request': request,
             'project': project,
@@ -278,7 +277,6 @@ class TaskAPI(generics.RetrieveAPIView):
     @staticmethod
     def get_serializer_context(request):
         return {
-            'proxy': bool_from_request(request.GET, 'proxy', True),
             'resolve_uri': True,
             'completed_by': 'full',
             'drafts': True,
