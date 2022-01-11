@@ -455,7 +455,7 @@ def check_control_in_config_by_regex(config_string, control_type):
     """
     c = parse_config(config_string)
     for control in c:
-        item = c[control]['regex']
+        item = c[control].get('regex', {})
         expression = control
         for key in item:
             expression = expression.replace(key, item[key])
@@ -478,7 +478,7 @@ def check_toname_in_config_by_regex(config_string, to_name, control_type=None):
     else:
         check_list = list(c.keys())
     for control in check_list:
-        item = c[control]['regex']
+        item = c[control].get('regex', {})
         for to_name_item in c[control]['to_name']:
             expression = to_name_item
             for key in item:
