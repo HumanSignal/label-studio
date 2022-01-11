@@ -1,8 +1,8 @@
 pytest==6.2.2
 pytest-cov==2.9.0
 pytest-django==4.1.0
-pytest-mock==3.6.1
-requests-mock==1.9.3
+pytest-mock==1.10.3
+requests-mock==1.5.2
 pyyaml>=5.3.1
 moto==2.3.1
 tavern==1.14.0
