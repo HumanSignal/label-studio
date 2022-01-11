@@ -141,14 +141,13 @@ def _try_uncertainty_sampling(tasks, project, user_solved_tasks_array, user, pre
 
 
 def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_info):
+    user_solved_tasks_array = user.annotations.filter(task__project=project, task__isnull=False)
+
     if project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
-        user_solved_tasks_array = user.annotations.filter(ground_truth=False, was_cancelled=False)
+        user_solved_tasks_array = user_solved_tasks_array.filter(was_cancelled=False)
         queue_info += ' Requeued for me from cancelled tasks '
-    else:
-        user_solved_tasks_array = user.annotations.filter(ground_truth=False)
-    user_solved_tasks_array = (
-        user_solved_tasks_array.filter(task__isnull=False).distinct().values_list('task__pk', flat=True)
-    )
+
+    user_solved_tasks_array = user_solved_tasks_array.distinct().values_list('task__pk', flat=True)
     not_solved_tasks = prepared_tasks.exclude(pk__in=user_solved_tasks_array)
 
     # if annotator is assigned for tasks, he must to solve it regardless of is_labeled=True

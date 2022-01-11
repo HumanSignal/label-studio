@@ -32,9 +32,16 @@ def get_all_columns(project, *_):
     i = 0
 
     data_types = OrderedDict()
+
     # add data types from config again
-    project_data_types = project.data_types
+    project_data_types = {}
+    for key, value in project.data_types.items():
+        # skip keys from Repeater tag, because we already have its base data,
+        # e.g.: skip 'image[{{idx}}]' because we have 'image' list already
+        if '[' not in key:
+            project_data_types[key] = value
     data_types.update(project_data_types.items())
+
     # all data types from import data
     all_data_columns = project.summary.all_data_columns
     if all_data_columns:
@@ -285,3 +292,16 @@ def custom_filter_expressions(*args, **kwargs):
 
 def preprocess_filter(_filter, *_):
     return _filter
+
+
+def preprocess_field_name(raw_field_name, only_undefined_field=False):
+    field_name = raw_field_name.replace("filter:", "")
+    field_name = field_name.replace("tasks:", "")
+    ascending = False if field_name[0] == '-' else True  # detect direction
+    field_name = field_name[1:] if field_name[0] == '-' else field_name  # remove direction
+    if field_name.startswith("data."):
+        if only_undefined_field:
+            field_name = f'data__{settings.DATA_UNDEFINED_NAME}'
+        else:
+            field_name = field_name.replace("data.", "data__")
+    return field_name, ascending

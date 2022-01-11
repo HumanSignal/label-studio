@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 _DATA_EXAMPLES = None
-_LABEL_TAGS = {'Label', 'Choice'}
+_LABEL_TAGS = {'Label', 'Choice', 'Relation'}
 SINGLE_VALUED_TAGS = {
     'choices': str,
     'rating': int,
@@ -305,7 +305,7 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
 
         example_from_field_name = examples.get('$' + value)
         if example_from_field_name:
-            # try get example by variable name
+            # try to get example by variable name
             task[value] = example_from_field_name
 
         elif value == 'video' and p.tag == 'HyperText':
@@ -355,6 +355,22 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
             examples['Text'] = examples['TextUrl'] if only_urls else examples['TextRaw']
             # not found by name, try get example by type
             task[value] = examples.get(p.tag, 'Something')
+
+        # support for Repeater tag
+        if '[' in value:
+            base = value.split('[')[0]
+            child = value.split(']')[1]
+
+            # images[{{idx}}].url => { "images": [ {"url": "test.jpg"} ] }
+            if child.startswith('.'):
+                child_name = child[1:]
+                task[base] = [{child_name: task[value]}, {child_name: task[value]}]
+            # images[{{idx}}].url => { "images": [ "test.jpg", "test.jpg" ] }
+            else:
+                task[base] = [task[value], task[value]]
+
+            # remove unused "images[{{idx}}].url"
+            task.pop(value, None)
 
     return task
 

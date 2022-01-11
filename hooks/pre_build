@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 cat /etc/os-release
 lsb_release -a
@@ -11,7 +12,7 @@ apt update
 apt -y install software-properties-common
 add-apt-repository ppa:deadsnakes/ppa
 apt update
-apt -y install python3.7 python3-pip libpython3.7-dev libmysqlclient-dev
+apt -y install python3.7 python3-pip libpython3.7-dev libmysqlclient-dev unzip
 
 echo "=> Environmental setup:"
 which python3
@@ -26,18 +27,16 @@ python3 --version
 
 echo "=> Upgrade pip"
 pip3 --version
-pip3 install --upgrade pip
+pip3 install -r deploy/requirements-mw.txt
 pip3 --version
 
 echo "=> Install prerequisites..."
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.39.1/install.sh | bash
 source ~/.bashrc
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 nvm install 14
 nvm use 14
-apt install unzip
-
 
 echo "npm version:"
 npm -v

@@ -7,9 +7,13 @@ import requests_mock
 import re
 import boto3
 import logging
+import shutil
+import tempfile
 
 from moto import mock_s3
 from copy import deepcopy
+from pathlib import Path
+
 from django.conf import settings
 from projects.models import Project
 from tasks.models import Task
@@ -17,7 +21,7 @@ from users.models import User
 from organizations.models import Organization
 from types import SimpleNamespace
 
-# if we haven't this package, pytest.ini::env doesn't work
+# if we haven't this package, pytest.ini::env doesn't work 
 try:
     import pytest_env.plugin
 except ImportError:
@@ -392,3 +396,26 @@ def configured_project(business_client, annotator_client):
 @pytest.fixture(name="django_live_url")
 def get_server_url(live_server):
     yield live_server.url
+
+
+@pytest.fixture(name="local_files_storage")
+def local_files_storage(settings):
+    settings.LOCAL_FILES_SERVING_ENABLED = True
+    tempdir = Path(tempfile.gettempdir()) / Path('files')
+    subdir = tempdir / Path('subdir')
+    os.makedirs(str(subdir), exist_ok=True)
+    test_image = Path(*'tests/test_suites/samples/test_image.png'.split('/'))
+    shutil.copyfile(str(test_image), str(tempdir / Path('test_image1.png')))
+    shutil.copyfile(str(test_image), str(subdir / Path('test_image2.png')))
+
+
+@pytest.fixture(name="local_files_document_root_tempdir")
+def local_files_document_root_tempdir(settings):
+    tempdir = Path(tempfile.gettempdir())
+    settings.LOCAL_FILES_DOCUMENT_ROOT = tempdir.root
+
+
+@pytest.fixture(name="local_files_document_root_subdir")
+def local_files_document_root_subdir(settings):
+    tempdir = Path(tempfile.gettempdir()) / Path('files')
+    settings.LOCAL_FILES_DOCUMENT_ROOT = str(tempdir)
