@@ -1,7 +1,8 @@
 ---
-title: Audio Classification
+title: Intent Classification
 type: templates
-order: 401
+category: Audio/Speech Processing
+order: 306
 meta_title: Audio Classification Data Labeling Template
 meta_description: Label Studio Audio Classification Template for machine learning and data science data labeling projects.
 ---
