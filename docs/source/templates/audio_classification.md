@@ -1,8 +1,9 @@
 ---
-title: Intent Classification
+title: Audio Classification
 type: templates
 category: Audio/Speech Processing
-order: 306
+cat: audio-speech-processing
+order: 307
 meta_title: Audio Classification Data Labeling Template
 meta_description: Label Studio Audio Classification Template for machine learning and data science data labeling projects.
 ---
@@ -11,13 +12,8 @@ Listen to the audio file and classify it.
 
 <img src="/images/screens/audio_classification.png" class="img-template-example" title="Audio Classification" />
 
-## Run
 
-```bash
-python server.py -c config.json -l ../examples/audio_classification/config.xml -i ../examples/audio_classification/tasks.json -o output_audio_classes
-```
-
-## Config 
+## Labeling Configuration
 
 ```html
 <View>

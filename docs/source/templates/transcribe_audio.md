@@ -1,6 +1,8 @@
 ---
 title: Audio Transcription 
 type: templates
+category: Audio/Speech Processing
+cat: audio-speech-processing
 order: 303
 meta_title: Audio Transcription Data Labeling Template
 meta_description: Label Studio Audio Transcription Template for machine learning and data science data labeling projects.
@@ -30,3 +32,4 @@ After starting Label Studio, set up the labeling interface and browse to this te
   <TextArea name="answer"></TextArea>
 </View>
 ```
+
