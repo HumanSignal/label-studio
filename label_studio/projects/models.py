@@ -10,6 +10,7 @@ from django.db.models import JSONField
 from django.core.validators import MinLengthValidator, MaxLengthValidator
 from django.db import transaction, models
 from annoying.fields import AutoOneToOneField
+from functools import lru_cache
 
 from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks
 from core.utils.common import create_hash, sample_query, get_attr_or_item, load_func
@@ -682,6 +683,19 @@ class Project(ProjectMixin, models.Model):
             return output
         else:
             return list(output)
+
+    def get_all_storage_objects(self, type_='import'):
+        from io_storages.models import get_storage_classes
+
+        if hasattr(self, '_storage_objects'):
+            return self._storage_objects
+
+        storage_objects = []
+        for storage_class in get_storage_classes(type_):
+            storage_objects += list(storage_class.objects.filter(project=self))
+
+        self._storage_objects = storage_objects
+        return storage_objects
 
     def __str__(self):
         return f'{self.title} (id={self.id})' or _("Business number %d") % self.pk
