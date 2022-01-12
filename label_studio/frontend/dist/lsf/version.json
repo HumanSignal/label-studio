@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into feature/DEV-428/show-created-date",
-  "commit": "93198a9641dd97196b64120862ce8728d0e1c639",
-  "branch": "",
-  "date": "2021-12-28T16:28:16Z"
+  "message": "Fix issues with short videos rendering",
+  "commit": "4ca8ac1cb179140163742971ce386c923367cb1d",
+  "branch": "fix/dev-1290/short-video",
+  "date": "2022-01-12T08:58:57Z"
 }
