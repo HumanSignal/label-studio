@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into feature/DEV-428/show-created-date",
-  "commit": "93198a9641dd97196b64120862ce8728d0e1c639",
-  "branch": "",
-  "date": "2021-12-28T16:28:16Z"
+  "message": "Fix adding keypoints before the existing ones",
+  "commit": "cad712ec6eb624ec937f63f098f842e4cb2df6ef",
+  "branch": "fix/dev-1394/keypoints-before-seq",
+  "date": "2022-01-12T12:09:23Z"
 }
