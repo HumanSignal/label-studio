@@ -2,6 +2,7 @@
 title: Video Classification
 type: templates
 category: Videos
+cat: videos
 order: 801
 meta_title: Video Classification Data Labeling Template
 meta_description: Label Studio Video Classification Template for machine learning and data science data labeling projects.
@@ -45,3 +46,14 @@ Or you can even use embeds from Youtube:
 ```
 
 Note: preview for this config uses another sample input data, so it won't display the proper task with the video.  
+
+## Labeling Configuration
+```html
+<View>
+  <Video name="video" value="$video"/>
+  <Choices name="choice" toName="video" showInLine="true">
+    <Choice value="Blurry" />
+    <Choice value="Sharp" />
+  </Choices>
+</View>
+```
