@@ -35,7 +35,6 @@ from rest_framework.exceptions import ErrorDetail
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
 from collections import defaultdict
-from functools import lru_cache
 
 from base64 import b64encode
 from lockfile import LockFile
@@ -275,26 +274,20 @@ def timestamp_now():
     return datetime_to_timestamp(datetime.utcnow())
 
 
-@lru_cache(maxsize=None)
 def find_first_one_to_one_related_field_by_prefix(instance, prefix):
+    if hasattr(instance, '_find_first_one_to_one_related_field_by_prefix_cache'):
+        return getattr(instance, '_find_first_one_to_one_related_field_by_prefix_cache')
+
+    result = None
     for field in instance._meta.get_fields():
         if issubclass(type(field), models.fields.related.OneToOneRel):
             attr_name = field.get_accessor_name()
             if re.match(prefix, attr_name) and hasattr(instance, attr_name):
-                return getattr(instance, attr_name)
+                result = getattr(instance, attr_name)
+                break
 
-
-@lru_cache(maxsize=None)
-def find_first_many_to_one_related_field_by_prefix(instance, prefix):
-    """ Hard way to check if project has at least one storage """
-
-    for field in instance._meta.get_fields():
-        if issubclass(type(field), models.fields.related.ManyToOneRel):
-            attr_name = field.get_accessor_name()
-            if re.match(prefix, attr_name) and hasattr(instance, attr_name):
-                related_instance = getattr(instance, attr_name).first()
-                if related_instance:
-                    return related_instance
+    instance._find_first_one_to_one_related_field_by_prefix_cache = result
+    return result
 
 
 def start_browser(ls_url, no_browser):
