@@ -55,12 +55,39 @@
       <% } %>
 
       <% if (type==="templates") { %>
-         <% if (fileName === '') { %>
-           <li><h4>Audio</h4></li>
-           <li><h4>Images</h4></li>
-           <li><h4>Text</h4></li>
-           <li><h4>Mix</h4></li>
-         <% } %>
+
+        <% if (fileName === 'image_polygons') { %>
+          <li><h4>Computer Vision</h4></li>
+        <% } %>
+
+        <% if (fileName === 'question_answering') { %>
+          <li><h4>Natural Language Processing</h4></li>
+        <% } %>
+
+        <% if (fileName === 'automatic_speech_recognition') { %>
+          <li><h4>Audio/Speech Processing</h4></li>
+        <% } %>
+
+        <% if (fileName === 'response_generation') { %>
+          <li><h4>Conversational AI</h4></li>
+        <% } %>
+
+        <% if (fileName === 'freeform_metadata') { %>
+          <li><h4>Structured Data Parsing</h4></li>
+        <% } %>
+
+        <% if (fileName === 'pairwise_regression') { %>
+          <li><h4>Ranking and Scoring</h4></li>
+        <% } %>
+
+        <% if (fileName === 'time_series_forecasting') { %>
+          <li><h4>Time Series Analysis</h4></li>
+        <% } %>
+
+        <% if (fileName === 'video_classification') { %>
+          <li><h4>Videos</h4></li>
+        <% } %>
+
       <% } %>
     <li>
       <a href="<%- url_for(p.path) %>" class="sidebar-link<%- page.title === p.title ? ' current' : '' %><%- p.is_new ? ' new' : '' %>">
