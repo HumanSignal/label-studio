@@ -2,7 +2,23 @@
 title: Pairwise Regression
 type: templates
 category: Ranking and Scoring
-order: 601
+cat: ranking-and-scoring
+order: 501
 meta_title: 
 meta_description: 
 ---
+
+## Labeling Configuration
+
+```html
+<View>
+  <Header>Set how likely these images represent the same thing:</Header>
+    <View style="display: grid; column-gap: 8px; grid-template: auto/1fr 1fr">
+  	<Image name="image1" value="$image1" />
+    <Image name="image2" value="$image2" />
+  </View>
+  <View style="margin-left: auto; margin-right: auto; width: 16em">
+    <Rating name="rating" toName="image1,image2"/>
+    </View>
+</View>
+```
