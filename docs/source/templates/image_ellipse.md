@@ -1,7 +1,9 @@
 ---
 title: Image Ellipse
 type: templates
-order: 104
+category: Computer Vision
+cat: computer-vision
+order: 110
 meta_title: Image Ellipse Data Labeling Template
 meta_description: Label Studio Image Ellipse Template for machine learning and data science data labeling projects.
 ---

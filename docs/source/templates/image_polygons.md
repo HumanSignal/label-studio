@@ -2,6 +2,7 @@
 title: Semantic Segmentation with Polygons
 type: templates
 category: Computer Vision
+cat: computer-vision
 order: 101
 meta_title: Image Polygons Data Labeling Template
 meta_description: Label Studio Image Polygons Template for machine learning and data science data labeling projects.
@@ -36,5 +37,20 @@ After starting Label Studio, set up the labeling interface and browse to this te
   <View>
     <Image name="img" value="$image" showMousePos="true" zoom="true" />
   </View>
+</View>
+```
+
+## Labeling Configuration
+
+```html
+<View>
+  <Header value="Select label and click the image to start"/>
+  <Image name="image" value="$image" zoom="true"/>
+  <PolygonLabels name="label" toName="image"
+                 strokeWidth="3" pointSize="small"
+                 opacity="0.9">
+    <Label value="Airplane" background="red"/>
+    <Label value="Car" background="blue"/>
+  </PolygonLabels>
 </View>
 ```
