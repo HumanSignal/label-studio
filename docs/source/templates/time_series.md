@@ -3,7 +3,7 @@ title: Time Series Labeling
 type: templates
 category: Time Series Analysis
 cat: time-series-analysis
-order: 700
+order: 750
 meta_title: Time Series Data Labeling Template
 meta_description: Label Studio Time Series Data Template for machine learning and data science data labeling projects.
 ---
