@@ -1,7 +1,9 @@
 ---
-title: HTML Documents NER
+title: HTML Entity Recognition
 type: templates
-order: 302
+category: Structured Data Parsing
+cat: structured-data-parsing
+order: 504
 meta_title: HTML Document Data Labeling Template
 meta_description: Label Studio HTML Document Template for named entity recognition in machine learning and data science data labeling projects.
 ---
