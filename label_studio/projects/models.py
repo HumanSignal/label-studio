@@ -684,14 +684,17 @@ class Project(ProjectMixin, models.Model):
         else:
             return list(output)
 
-    @lru_cache(maxsize=None)
     def get_all_storage_objects(self, type_='import'):
         from io_storages.models import get_storage_classes
+
+        if hasattr(self, '_storage_objects'):
+            return self._storage_objects
 
         storage_objects = []
         for storage_class in get_storage_classes(type_):
             storage_objects += list(storage_class.objects.filter(project=self))
 
+        self._storage_objects = storage_objects
         return storage_objects
 
     def __str__(self):
