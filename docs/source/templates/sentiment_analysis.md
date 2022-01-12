@@ -1,6 +1,8 @@
 ---
-title: Text Sentiment Analysis
+title: Sentiment Analysis
 type: templates
+category: Natural Language Processing
+cat: natural-language-processing
 order: 202
 meta_title: Sentiment Analysis Data Labeling Template
 meta_description: Label Studio Sentiment Analysis Template for machine learning and data science data labeling projects.
@@ -9,15 +11,6 @@ meta_description: Label Studio Sentiment Analysis Template for machine learning 
 Classify the sentiment of reviews, for example for musical instruments found on an online retailer.
 
 <img src="/images/screens/text_classification.png" class="img-template-example" title="Sentiment Analysis" />
-
-## Run
-
-```bash
-label-studio init sentiment_analysis_project
-label-studio start sentiment_analysis_project 
-```
-
-After starting Label Studio, set up the labeling interface and browse to this template.
 
 ## Config 
 
