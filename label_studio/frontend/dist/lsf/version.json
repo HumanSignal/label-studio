@@ -1,6 +1,6 @@
 {
-  "message": "Add duration to the serialized result",
-  "commit": "ad5dcbb159c1389ec04f014c362e7a2e40ebdd4c",
-  "branch": "feat/dev-1411/video-duration",
-  "date": "2022-01-11T22:08:02Z"
+  "message": "Add duration to the serialized result (#421)\n\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
+  "commit": "95a19a81c68baa2bb2e8161e7a625db5e5387bb0",
+  "branch": "master",
+  "date": "2022-01-13T20:32:53Z"
 }
