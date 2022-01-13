@@ -154,10 +154,12 @@ global:
 
 > Optionally, you can use already existing Kubernetes secret and a key
 1. Create a kubernetes secret with your AWS access keys:
+
 ```shell
 kubectl create secret generic <YOUR_SECRET_NAME> --from-literal=accesskey=<YOUR_ACCESS_KEY_ID> --from-literal=secretkey=<YOUR_SECRET_ACCESS_KEY>
 ```
 2. Update your `lse-values.yaml` file with your newly-created kubernetes secret:
+
 ```yaml
 global:
   persistence:
@@ -225,6 +227,55 @@ global:
         bucket: "<YOUR_BUCKET_NAME>"
         region: "<YOUR_BUCKET_REGION>"
         folder: ""
+```
+
+  </div>
+
+  <div data-name="Docker compose">
+
+1. Create an IAM user with **Programmatic access**. See [Creating an IAM user in your AWS account](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) in the AWS Identity and Access Management User Guide.
+2. When creating the user, for the **Set permissions** option, choose to **Attach existing policies directly**.
+3. Select **Create policy** and attach the following policy, replacing `<YOUR_S3_BUCKET>` with the name of your bucket:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::<YOUR_S3_BUCKET>"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::<YOUR_S3_BUCKET>/*"
+      ]
+    }
+  ]
+}
+```
+
+4. After you create the user, save the username and access key somewhere secure.
+5. Update your `env.list` file with your newly-created access key ID and secret key as `<YOUR_ACCESS_KEY_ID>` and `<YOUR_SECRET_ACCESS_KEY>`.
+   Optionally, you can choose a folder by specifying `STORAGE_AWS_FOLDER` (default is `""` or omit this argument):
+
+```shell
+STORAGE_TYPE=s3
+STORAGE_AWS_ACCESS_KEY_ID="<YOUR_ACCESS_KEY_ID>"
+STORAGE_AWS_SECRET_ACCESS_KEY="<YOUR_SECRET_ACCESS_KEY>"
+STORAGE_AWS_BUCKET_NAME="<YOUR_BUCKET_NAME>"
+STORAGE_AWS_REGION_NAME="<YOUR_BUCKET_REGION>"
+STORAGE_AWS_FOLDER=""
 ```
 
   </div>
@@ -324,6 +375,28 @@ global:
 ```
 
   </div>
+
+  <div data-name="Docker compose">
+
+1. Create a service account key from the UI and download the JSON. Follow the steps for [Creating and managing service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) in the Google Cloud Identity and Access Management guide.
+2. After downloading the JSON for the service account key, update or create references to the JSON, your projectID, and your bucket in your `env.list` file.
+   Optionally, you can choose a folder by specifying `STORAGE_GCS_FOLDER` (default is `""` or omit this argument):
+
+```shell
+STORAGE_TYPE=gcs
+STORAGE_GCS_BUCKET_NAME="<YOUR_BUCKET_NAME>"
+STORAGE_GCS_PROJECT_ID="<YOUR_PROJECT_ID>"
+STORAGE_GCS_FOLDER=""
+GOOGLE_APPLICATION_CREDENTIALS="/opt/heartex/secrets/key.json"
+```
+
+3. Place the downloaded json file from the step 1 to the same directory as `env.list` file.
+4. Append the following entry in `docker-compose.yml` file by the path `app.volumes`:
+
+```yaml
+- ./service-account-file.json:/opt/heartex/secrets/key.json:ro
+```
+  </div>
 </div>
 
 
@@ -349,6 +422,10 @@ az storage container create --name <YOUR_CONTAINER_NAME> \
 ```
 
 ### Configure to use Azure container
+
+<div class="code-tabs">
+  <div data-name="k8s">
+
 Update your `lse-values.yaml` file with the `YOUR_CONTAINER_NAME`, `YOUR_STORAGE_ACCOUNT`, and `YOUR_STORAGE_KEY` that you created.
 Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 
@@ -364,3 +441,21 @@ global:
         containerName: "<YOUR_CONTAINER_NAME>"
         folder: ""
 ```
+
+  </div>
+
+  <div data-name="Docker compose">
+
+Update your `env.list` file with the `YOUR_CONTAINER_NAME`, `YOUR_STORAGE_ACCOUNT`, and `YOUR_STORAGE_KEY` that you created.
+Optionally, you can choose a folder by specifying `STORAGE_AZURE_FOLDER` (default is `""` or omit this argument):
+
+```shell
+STORAGE_TYPE=azure
+STORAGE_AZURE_ACCOUNT_NAME="<YOUR_STORAGE_ACCOUNT>"
+STORAGE_AZURE_ACCOUNT_KEY="<YOUR_STORAGE_KEY>"
+STORAGE_AZURE_CONTAINER_NAME="<YOUR_CONTAINER_NAME>"
+STORAGE_AZURE_FOLDER=""
+```
+
+  </div>
+</div>
