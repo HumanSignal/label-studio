@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into feature/DEV-428/show-created-date",
-  "commit": "93198a9641dd97196b64120862ce8728d0e1c639",
-  "branch": "",
-  "date": "2021-12-28T16:28:16Z"
+  "message": "Merge branch 'master' into fix/DEV-1235/view-all",
+  "commit": "ff81deedc0612446151a623e828c109cdf410b51",
+  "branch": "fix/DEV-1235/view-all",
+  "date": "2022-01-13T04:42:26Z"
 }
