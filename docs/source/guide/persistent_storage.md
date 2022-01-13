@@ -487,9 +487,9 @@ global:
       config:
          azure:
             storageAccountNameExistingSecret: "<YOUR_SECRET_NAME>"
-            storageAccountNameExistingSecretKey: "<YOUR_STORAGE_ACCOUNT_NAME>"
+            storageAccountNameExistingSecretKey: "storageaccountname"
             storageAccountKeyExistingSecret: "<YOUR_SECRET_NAME>"
-            storageAccountKeyExistingSecretKey: "<YOUR_STORAGE_ACCOUNT_KEY>"
+            storageAccountKeyExistingSecretKey: "storageaccountkey"
             containerName: "<YOUR_CONTAINER_NAME>"
 ```
 
