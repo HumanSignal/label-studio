@@ -374,6 +374,27 @@ global:
         folder: ""
 ```
 
+> Optionally, you can use already existing Kubernetes secret and a key
+1. Create a kubernetes secret with your GCS service account json, replacing `<PATH_TO_JSON>` with the path to service account json file:
+
+```shell
+kubectl create secret generic <YOUR_SECRET_NAME> --from-file=key_json=<PATH_TO_JSON>
+```
+2. Update your `lse-values.yaml` file with your newly-created kubernetes secret:
+
+```yaml
+global:
+   persistence:
+      enabled: true
+      type: gcs
+      config:
+         gcs:
+            projectID: "<YOUR_PROJECT_ID>"
+            applicationCredentialsJSONExistingSecret: "<YOUR_SECRET_NAME>"
+            applicationCredentialsJSONExistingSecretKey: "key_json"
+            bucket: "<YOUR_BUCKET_NAME>"
+```
+
   </div>
 
   <div data-name="Docker compose">
@@ -440,6 +461,28 @@ global:
         storageAccountKey: "<YOUR_STORAGE_KEY>"
         containerName: "<YOUR_CONTAINER_NAME>"
         folder: ""
+```
+
+> Optionally, you can use already existing Kubernetes secret and a key
+1. Create a kubernetes secret with your Azure access keys:
+
+```shell
+kubectl create secret generic <YOUR_SECRET_NAME> --from-literal=storageaccountname=<YOUR_STORAGE_ACCOUNT> --from-literal=storageaccountkey=<YOUR_STORAGE_KEY>
+```
+2. Update your `lse-values.yaml` file with your newly-created kubernetes secret:
+
+```yaml
+global:
+   persistence:
+      enabled: true
+      type: azure
+      config:
+         azure:
+            storageAccountNameExistingSecret: "<YOUR_SECRET_NAME>"
+            storageAccountNameExistingSecretKey: "storageaccountname"
+            storageAccountKeyExistingSecret: "<YOUR_SECRET_NAME>"
+            storageAccountKeyExistingSecretKey: "storageaccountkey"
+            containerName: "<YOUR_CONTAINER_NAME>"
 ```
 
   </div>
