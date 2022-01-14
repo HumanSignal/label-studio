@@ -22,3 +22,8 @@ meta_description:
   <HyperText name="pdf" value="$pdf" inline="true"/>
 </View>
 ```
+
+## Related tags
+- [Rating](/tags/rating.html)
+- [Choices](/tags/choices.html)
+- [HyperText](/tags/hypertext.html)

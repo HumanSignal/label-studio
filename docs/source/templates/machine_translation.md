@@ -8,6 +8,8 @@ meta_title:
 meta_description: 
 ---
 
+If you want to improve existing machine translation capabilities, you want to provide a dataset with robust and accurate translation examples. Use this template to read a text in one language and store a translation in another language.
+
 ## Labeling Configuration
 
 ```html
@@ -24,3 +26,10 @@ meta_description:
   </View>
 </View>
 ```
+
+## Related tags
+
+- [Header](/tags/header.html)
+- [Text](/tags/text.html)
+- [TextArea](/tags/textarea.html)
+

@@ -8,6 +8,8 @@ meta_title:
 meta_description: 
 ---
 
+Perform classification tasks within the context of a defined taxonomy or hierarchy of choices. 
+
 ## Labeling Configuration
 
 ```html
@@ -24,3 +26,9 @@ meta_description:
   </Taxonomy>
 </View>
 ```
+
+## Related tags
+
+- [Text](/tags/text.html)
+- [Taxonomy](/tags/taxonomy.html)
+- [Choice](/tags/choice.html)

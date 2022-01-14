@@ -20,3 +20,8 @@ meta_description:
     </Choices>
 </View>
 ```
+
+## Related tags
+
+- [Table](/tags/table.html)
+- [Choices](/tags/choices.html)

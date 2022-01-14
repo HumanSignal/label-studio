@@ -8,6 +8,8 @@ meta_title:
 meta_description: 
 ---
 
+
+
 ## Labeling Configuration
 
 ```html
@@ -33,3 +35,9 @@ meta_description:
     </TimeSeries>
 </View>
 ```
+
+## Related tags
+
+- [TimeSeriesLabels](/tags/timeserieslabels.html)
+- [TimeSeries](/tags/timeseries.html)
+- [Channel](/tags/timeseries.html)

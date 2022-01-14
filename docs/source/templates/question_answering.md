@@ -23,3 +23,8 @@ meta_description:
 
 </View>
 ```
+
+## Related tags
+
+- [Text](/tags/text.html)
+- [Labels](/tags/labels.html)

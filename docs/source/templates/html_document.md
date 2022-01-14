@@ -12,16 +12,7 @@ Perform named entity recognition for HTML documents.
 
 <img src="/images/screens/html_document.png" class="img-template-example" title="HTML Documents" />
 
-## Run
-
-```bash
-label-studio init html_document_project
-label-studio start html_document_project 
-```
-
-After starting Label Studio, set up the labeling interface and browse to this template.
-
-## Config 
+## Labeling Configuration 
 
 ```html
 <View>
@@ -32,3 +23,7 @@ After starting Label Studio, set up the labeling interface and browse to this te
   <HyperText name="text" value="$text"></HyperText>
 </View>
 ```
+## Related tags
+
+- [Labels](/tags/labels.html)
+- [HyperText](/tags/hypertext.html)

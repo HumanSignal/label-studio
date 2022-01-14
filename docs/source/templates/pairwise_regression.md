@@ -8,6 +8,8 @@ meta_title:
 meta_description: 
 ---
 
+
+
 ## Labeling Configuration
 
 ```html
@@ -22,3 +24,9 @@ meta_description:
     </View>
 </View>
 ```
+
+## Related tags
+
+- [Header](/tags/header.html)
+- [Image](/tags/image.html)
+- [Rating](/tags/rating.html)

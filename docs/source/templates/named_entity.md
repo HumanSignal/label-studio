@@ -61,8 +61,6 @@ Named entity recognition for a piece of text. It supports overlapping spans and 
 ## Labeling Configuration
 
 ```html
-
-   
 <View>
   <Labels name="label" toName="text">
     <Label value="PER" background="red"/>
@@ -74,3 +72,8 @@ Named entity recognition for a piece of text. It supports overlapping spans and 
   <Text name="text" value="$text"/>
 </View>
 ```
+
+## Related tags
+
+- [Labels](/tags/labels.html)
+- [Text](/tags/text.html)

@@ -8,6 +8,8 @@ meta_title:
 meta_description: 
 ---
 
+If you want to start training document retrieval or recommender models, you might want to develop a dataset with that identifies similar documents. Use this template to identify and choose documents that are related to a specific query or an existing document.
+
 ## Labeling Configuration
 
 ```html
@@ -30,3 +32,8 @@ meta_description:
   </View>
 </View>
 ```
+
+## Related tags
+
+- [Text](/tags/text.html)
+- [Choices](/tags/choices.html)

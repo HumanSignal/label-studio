@@ -8,7 +8,7 @@ meta_title: Pairwise Comparison Data Labeling Template
 meta_description: Label Studio Pairwise Comparison Template for machine learning and data science data labeling projects.
 ---
 
-Pairwise comparison of different objects
+Pairwise comparison of different objects.
 
 ## Config
 
@@ -30,3 +30,9 @@ Pairwise comparison of different objects
   <Text name="text2" value="$text2" />
 </View>
 ```
+
+## Related tags
+- [Header](/tags/header.html)
+- [Pairwise](/tags/pairwise.html)
+- [Text](tags/text.html)
+
