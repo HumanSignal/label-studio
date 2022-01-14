@@ -1,7 +1,7 @@
 ---
 title: KeyPoint
 type: tags
-order: 407
+order: 408
 meta_title: Keypoint Tag for Adding Keypoints to Images
 meta_description: Customize Label Studio with the KeyPoint tag to add key points to images for computer vision machine learning and data science projects.
 ---
@@ -20,6 +20,8 @@ Use with the following data types: image
 | [fillColor] | <code>string</code> | <code>&quot;#8bad00&quot;</code> | Keypoint fill color in hexadecimal |
 | [strokeWidth] | <code>number</code> | <code>1</code> | Width of the stroke |
 | [strokeColor] | <code>string</code> | <code>&quot;#8bad00&quot;</code> | Keypoint stroke color in hexadecimal |
+| [smart] | <code>boolean</code> |  | Show smart tool for interactive pre-annotations |
+| [smartOnly] | <code>boolean</code> |  | Only show smart tool for interactive pre-annotations |
 
 ### Example
 ```html

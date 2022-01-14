@@ -112,7 +112,7 @@ python label_studio/manage.py runserver
 ## Install with Anaconda
 
 ```bash
-conda create --name label-studio python=3.8
+conda create --name label-studio
 conda activate label-studio
 pip install label-studio
 ```

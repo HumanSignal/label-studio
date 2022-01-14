@@ -1,7 +1,7 @@
 ---
 title: Ellipse
 type: tags
-order: 404
+order: 405
 meta_title: Ellipse Tag for Adding Elliptical Bounding Box to Images
 meta_description: Customize Label Studio with ellipse tags to add elliptical bounding boxes to images for machine learning and data science projects.
 ---
@@ -21,6 +21,8 @@ Use with the following data types: image
 | [strokeColor] | <code>string</code> | <code>&quot;#f48a42&quot;</code> | Stroke color in hexadecimal |
 | [strokeWidth] | <code>number</code> | <code>1</code> | Width of the stroke |
 | [canRotate] | <code>boolean</code> | <code>true</code> | Show or hide rotation control |
+| [smart] | <code>boolean</code> |  | Show smart tool for interactive pre-annotations |
+| [smartOnly] | <code>boolean</code> |  | Only show smart tool for interactive pre-annotations |
 
 ### Example
 ```html
