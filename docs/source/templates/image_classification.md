@@ -8,19 +8,7 @@ meta_title: Image Classification Data Labeling Template
 meta_description: Label Studio Image Classification Template for machine learning and data science data labeling projects.
 ---
 
-Image classification with checkboxes.
-
-## Config 
-
-```html
-<View>
-  <Image name="img" value="$image"></Image>
-  <Choices name="tag" toName="img" choice="single-radio">
-    <Choice value="Airbus"></Choice>
-    <Choice value="Boeing" background="blue"></Choice>
-  </Choices>
-</View>
-```
+If you want to train a model to identify the type of content in images, for example for a content moderation use case, use this template to perform image classification with checkboxes.
 
 ## Labeling Configuration
 
@@ -34,3 +22,8 @@ Image classification with checkboxes.
   </Choices>
 </View>
 ```
+
+## Related tags
+
+- [Image](/tags/image.html)
+- [Choices](/tags/choices.html)

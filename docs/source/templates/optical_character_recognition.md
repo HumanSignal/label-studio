@@ -8,6 +8,7 @@ meta_title:
 meta_description: 
 ---
 
+Perform optical character recognition (OCR) tasks using a variety of shapes on an image. Use this template to identify regions using shapes and transcribe the associated text for specific regions of the image.
 
 ## Labeling Configuration
 
@@ -31,3 +32,10 @@ meta_description:
             />
 </View>
 ```
+
+## Related tags
+- [Image](/tags/image.html)
+- [Labels](/tags/labels.html)
+- [Rectangle](/tags/rectangle.html)
+- [Polygon](/tags/polygon.html)
+- [TextArea](/tags/textarea.html)

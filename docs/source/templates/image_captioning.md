@@ -8,6 +8,8 @@ meta_title:
 meta_description:
 ---
 
+If you want to train a machine learning model to caption or add alt text to images, use this template to collect captions about images. 
+
 ## Labeling Configuration
 
 ```html
@@ -17,3 +19,8 @@ meta_description:
   <TextArea name="caption" toName="image" placeholder="Enter description here..." rows="5" maxSubmissions="1"/>
 </View>
 ```
+
+## Related tags
+
+- [Image](/tags/image.html)
+- [TextArea](/tags/textarea.html)

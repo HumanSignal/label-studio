@@ -8,18 +8,9 @@ meta_title: Image Ellipse Data Labeling Template
 meta_description: Label Studio Image Ellipse Template for machine learning and data science data labeling projects.
 ---
 
-Put ellipses on the image
+Put ellipses on an image for object detection and segmentation use cases. 
 
 <img src="/images/screens/image_ellipse.png" class="img-template-example" title="Images Ellipse" />
-
-## Run
-
-```bash
-label-studio init image_ellipse_project
-label-studio start image_ellipse_project 
-```
-
-After starting Label Studio, set up the labeling interface and browse to this template.
 
 ## Config 
 
@@ -32,3 +23,8 @@ After starting Label Studio, set up the labeling interface and browse to this te
   <Image name="img" value="$image" />
 </View>
 ```
+
+## Related tags
+
+- [EllipseLabels](/tags/ellipselabels.html)
+- [Image](/tags/image.html)
