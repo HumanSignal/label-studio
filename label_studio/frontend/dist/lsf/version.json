@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into feature/DEV-428/show-created-date",
-  "commit": "93198a9641dd97196b64120862ce8728d0e1c639",
-  "branch": "",
-  "date": "2021-12-28T16:28:16Z"
+  "message": "Merge branch 'master' into fix/dev-1264/timeline-sync",
+  "commit": "764e39a22e9bdb7ce61eea0103d5a66612807a73",
+  "branch": "fix/dev-1264/timeline-sync",
+  "date": "2022-01-14T09:57:10Z"
 }
