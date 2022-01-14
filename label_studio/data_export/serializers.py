@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from django.conf import settings
+from label_studio_tools.core.label_config import is_video_object_tracking
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
 
@@ -10,6 +11,7 @@ from tasks.models import Annotation, Task
 from tasks.serializers import AnnotationDraftSerializer, PredictionSerializer
 from users.models import User
 from users.serializers import UserSimpleSerializer
+from label_studio_tools.postprocessing.video import extract_key_frames
 
 from .models import Export
 
@@ -22,11 +24,19 @@ class CompletedBySerializer(serializers.ModelSerializer):
 
 class AnnotationSerializer(FlexFieldsModelSerializer):
     completed_by = serializers.PrimaryKeyRelatedField(read_only=True)
+    result = serializers.SerializerMethodField()
 
     class Meta:
         model = Annotation
         fields = '__all__'
         expandable_fields = {'completed_by': (CompletedBySerializer,)}
+
+    def get_result(self, obj):
+        # run frames extraction on param, result and result type
+        if obj.result and self.context.get('interpolate_key_frames', False) and \
+                is_video_object_tracking(parsed_config=obj.task.project.get_parsed_config()):
+            return extract_key_frames(obj.result)
+        return obj.result
 
 
 class BaseExportDataSerializer(FlexFieldsModelSerializer):
@@ -39,7 +49,8 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
     def to_representation(self, task):
         project = task.project
         data = task.data
-
+        # add interpolate_key_frames param to annotations serializer
+        self.fields['annotations'].context['interpolate_key_frames'] = self.context.get('interpolate_key_frames', False)
         replace_task_data_undefined_with_config_field(data, project)
 
         return super().to_representation(task)
@@ -98,6 +109,9 @@ class SerializationOptionsSerializer(serializers.Serializer):
     drafts = SerializationOption(required=False)
     predictions = SerializationOption(required=False)
     annotations__completed_by = SerializationOption(required=False)
+    interpolate_key_frames = serializers.BooleanField(default=settings.INTERPOLATE_KEY_FRAMES,
+                                                      help_text='Interpolate video key frames.',
+                                                      required=False)
 
 
 class ExportCreateSerializer(ExportSerializer):
@@ -111,6 +125,24 @@ class ExportCreateSerializer(ExportSerializer):
     task_filter_options = TaskFilterOptionsSerializer(required=False, default=None)
     annotation_filter_options = AnnotationFilterOptionsSerializer(required=False, default=None)
     serialization_options = SerializationOptionsSerializer(required=False, default=None)
+
+
+class ExportParamSerializer(serializers.Serializer):
+    interpolate_key_frames = serializers.BooleanField(default=settings.INTERPOLATE_KEY_FRAMES,
+                                                      help_text='Interpolate video key frames.',
+                                                      required=False)
+    download_resources = serializers.BooleanField(default=settings.CONVERTER_DOWNLOAD_RESOURCES,
+                                                  help_text='Download resources in converter.',
+                                                  required=False)
+    # deprecated param to delete
+    export_type = serializers.CharField(default='JSON',
+                                        help_text='Export file format.',
+                                        required=False)
+    exportType = serializers.CharField(help_text='Export file format.',
+                                        required=False)
+    download_all_tasks = serializers.BooleanField(default=False,
+                                                  help_text='Download all tasks or only finished.',
+                                                  required=False)
 
 
 ExportDataSerializer = load_func(settings.EXPORT_DATA_SERIALIZER)
