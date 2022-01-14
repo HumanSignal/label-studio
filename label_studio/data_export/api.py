@@ -19,7 +19,9 @@ from core.utils.common import get_object_with_check_and_log, bool_from_request, 
 from projects.models import Project
 from tasks.models import Task
 from .models import DataExport, Export
+
 from .serializers import ExportDataSerializer, ExportSerializer, ExportCreateSerializer, ExportParamSerializer
+from ranged_fileresponse import RangedFileResponse
 
 logger = logging.getLogger(__name__)
 
@@ -449,7 +451,8 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
             return HttpResponse("Can't get file", status=404)
 
         ext = file_.name.split('.')[-1]
-        response = HttpResponse(file_, content_type=f'application/{ext}')
+
+        response = RangedFileResponse(request, file_, content_type=f'application/{ext}')
         response['Content-Disposition'] = f'attachment; filename="{file_.name}"'
         response['filename'] = file_.name
         return response
