@@ -16,11 +16,15 @@ Use with the following data types: HTML
 | --- | --- | --- | --- |
 | name | <code>string</code> |  | Name of the element |
 | value | <code>string</code> |  | Value of the element |
-| [valueType] | <code>url</code> \| <code>text</code> |  | Whether the text is stored directly in uploaded data or needs to be loaded from a URL |
+| [valueType] | <code>url</code> \| <code>text</code> | <code>text</code> | Whether the text is stored directly in uploaded data or needs to be loaded from a URL |
+| [inline] | <code>boolean</code> | <code>false</code> | Whether to embed HTML directly in Label Studio or use an iframe |
 | [saveTextResult] | <code>yes</code> \| <code>no</code> |  | Whether to store labeled text along with the results. By default, doesn't store text for `valueType=url` |
-| [showLabels] | <code>boolean</code> | <code>false</code> | Whether to show labels next to the region |
 | [encoding] | <code>none</code> \| <code>base64</code> \| <code>base64unicode</code> |  | How to decode values from encoded strings |
+| [selectionEnabled] | <code>boolean</code> | <code>true</code> | Enable or disable selection |
 | [clickableLinks] | <code>boolean</code> | <code>false</code> | Whether to allow opening resources from links in the hypertext markup. |
+| [highlightColor] | <code>string</code> |  | Hex string with highlight color, if not provided uses the labels color |
+| [showLabels] | <code>boolean</code> |  | Whether or not to show labels next to the region; unset (by default) — use editor settings; true/false — override settings |
+| [granularity] | <code>symbol</code> \| <code>word</code> \| <code>sentence</code> \| <code>paragraph</code> |  | Control region selection granularity |
 
 ### Sample Results JSON
 
@@ -57,4 +61,8 @@ Use with the following data types: HTML
     <Label value="Author" />
   </Labels>
 </View>
+```
+### Example
+```html
+<HyperText name="p1" value="<p>Some explanations <em>with style</em></p>" />
 ```
