@@ -91,7 +91,7 @@
       initials: "{{user.get_initials}}",
       email: "{{user.email}}",
       {% if user.avatar %}
-      avatar: "{{user.avatar_url}}",
+      avatar: "{{user.avatar_url|safe}}",
       {% endif %}
     },
     debug: {{settings.DEBUG|yesno:"true,false"}},
