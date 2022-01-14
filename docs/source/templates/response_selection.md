@@ -8,6 +8,10 @@ meta_title:
 meta_description: 
 ---
 
+If you want to refine the best response for a conversational AI use case, you can provide already-generated responses to annotators and have them choose the best one. 
+
+Use this template to provide a section of dialogue and three text responses to the dialogue. Annotators then select the choice that corresponds with the best-fitting text response. 
+
 ## Labeling Configuration
 
 ```html
@@ -30,3 +34,9 @@ meta_description:
   </View>
 </View>
 ```
+
+## Related Tags
+
+- [Paragraphs](/tags/paragraphs.html)
+- [Text](/tags/text.html)
+- [Choices](/tags/choices.html)

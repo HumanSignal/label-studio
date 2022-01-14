@@ -8,6 +8,10 @@ meta_title:
 meta_description: 
 ---
 
+If you want to train a machine learning model to be capable of natural language understanding in the context of conversational AI, you will want to perform coreference resolution on a dataset.
+
+Use this template to assign coreferences using relations to specific entities identified in a passage of text. You can add relations to any identified region spans in Label Studio.
+
 ## Labeling Configuration
 
 ```html
@@ -20,3 +24,9 @@ meta_description:
   <Text name="text" value="$text"/>
 </View>
 ```
+
+## Related tags
+
+- [Labels](/tags/labels.html)
+- [Text](/tags/text.html)
+- [Relations](/tags/relations.html)

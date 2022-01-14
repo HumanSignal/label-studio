@@ -8,6 +8,10 @@ meta_title:
 meta_description: 
 ---
 
+For natural language understanding cases when you need to detect the intent of a speaker in dialogue, perform intent classification and slot filling to identify the entities related to the intent of the dialogue, and classify those entities. 
+
+Use this template to provide a section of dialogue, assign labels to spans of text in the dialogue, and classify the intent of the dialogue. 
+
 ## Labeling Configuration
 
 ```html
@@ -28,3 +32,10 @@ meta_description:
     </Choices>
 </View>
 ```
+
+## Related tags
+
+- [ParagraphLabels](/tags/paragraphlabels.html)
+- [Label](tags/label.html)
+- [Paragraphs](/tags/paragraphs.html)
+- [Choices](/tags/choices.html)
