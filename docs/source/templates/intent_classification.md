@@ -8,7 +8,7 @@ meta_title:
 meta_description: 
 ---
 
-
+If you want to identify the intent of an audio recording, such as an interview or customer service call, use this template to classify intent by selecting choices and listening to an audio clip.
 
 ## Labeling Configuration
 
@@ -29,3 +29,9 @@ meta_description:
   </Choices>
 </View>
 ```
+
+## Related tags
+
+- [Labels](/tags/labels.html)
+- [AudioPlus](/tags/audioplus.html)
+- [Choices](/tags/choices.html)

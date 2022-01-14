@@ -1,9 +1,9 @@
 ---
-title: Audio Transcription 
+title: Automatic Speech Recognition
 type: templates
 category: Audio/Speech Processing
 cat: audio-speech-processing
-order: 303
+order: 301
 meta_title: Audio Transcription Data Labeling Template
 meta_description: Label Studio Audio Transcription Template for machine learning and data science data labeling projects.
 
@@ -13,23 +13,36 @@ Listen to an audio file and transcribe its content in natural language, performi
 
 <img src="/images/screens/audio_transcription.png" class="img-template-example" title="Transcribe an Audio" />
 
-## Run
-
-```bash
-label-studio init transcribe_audio_project
-label-studio start transcribe_audio_project 
-```
-
-After starting Label Studio, set up the labeling interface and browse to this template.
-
-## Config 
+## Labeling Configuration
 
 ```html
 <View>
-  <Header value="Listen to the audio:"></Header>
-  <Audio name="audio" value="$url"></Audio>
-  <Header value="Write the transcription:"></Header>
-  <TextArea name="answer"></TextArea>
+  <Audio name="audio" value="$audio" zoom="true" hotkey="ctrl+enter" />
+  <Header value="Provide Transcription" />
+  <TextArea name="transcription" toName="audio" rows="4" editable="true" maxSubmissions="1" />
 </View>
 ```
 
+## Labeling Configuration with Segments
+
+```html
+<View>
+  <Labels name="labels" toName="audio">
+    <Label value="Speech" />
+    <Label value="Noise" />
+  </Labels>
+
+  <AudioPlus name="audio" value="$audio"/>
+
+  <TextArea name="transcription" toName="audio"
+            rows="2" editable="true"
+            perRegion="true" required="true" />
+</View>
+```
+
+## Related tags
+
+- [AudioPlus](/tags/audioplus.html)
+- [Audio](/tags/audio.html)
+- [Labels](/tags/labels.html)
+- [TextArea](/tags/textarea.html)

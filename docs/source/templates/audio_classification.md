@@ -28,3 +28,8 @@ Listen to the audio file and classify it.
   </Choices>
 </View>
 ```
+
+## Related tags
+
+- [Audio](/tags/audio.html)
+- [Choices](/tags/choices.html)

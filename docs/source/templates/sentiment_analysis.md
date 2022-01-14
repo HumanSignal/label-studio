@@ -12,7 +12,7 @@ Classify the sentiment of reviews, for example for musical instruments found on 
 
 <img src="/images/screens/text_classification.png" class="img-template-example" title="Sentiment Analysis" />
 
-## Config 
+## Labeling Configuration 
 
 ```html
 <View>
@@ -25,3 +25,7 @@ Classify the sentiment of reviews, for example for musical instruments found on 
   </Choices>
 </View>
 ```
+
+## Related tags
+- [Text](/tags/text.html)
+- [Choices](/tags/choices.html)

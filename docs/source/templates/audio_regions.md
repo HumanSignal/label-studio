@@ -14,7 +14,7 @@ Listen to the audio file and classify it.
 
 <p class="tip">For audio regions to work when you have remote URLs, you need to configure CORS to be wide open.</p>
 
-## Config 
+## Labeling Configuration 
 
 ```html
 <View>
@@ -29,3 +29,8 @@ Listen to the audio file and classify it.
   <AudioPlus name="audio" value="$url"></AudioPlus>
 </View>
 ```
+
+## Related tags
+
+- [AudioPlus](/tags/audioplus.html)
+- [Choices](/tags/choices.html)

@@ -8,6 +8,8 @@ meta_title:
 meta_description: 
 ---
 
+Label which event audio is associated with in an audio clip. 
+
 ## Labeling Configuration
 
 ```html
@@ -19,3 +21,8 @@ meta_description:
   <AudioPlus name="audio" value="$audio"/>
 </View>
 ```
+
+## Related tags
+
+- [Labels](/tags/labels.html)
+- [AudioPlus](/tags/audioplus.html)
