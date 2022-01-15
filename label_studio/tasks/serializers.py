@@ -160,7 +160,7 @@ class BaseTaskSerializer(FlexFieldsModelSerializer):
         if project:
             # resolve uri for storage (s3/gcs/etc)
             if self.context.get('resolve_uri', False):
-                instance.data = instance.resolve_uri(instance.data)
+                instance.data = instance.resolve_uri(instance.data, project)
 
             # resolve $undefined$ key in task data
             data = instance.data
