@@ -1,5 +1,5 @@
 ---
-title: Sentiment Analysis
+title: Sentiment Analysis Text Classification
 type: templates
 category: Natural Language Processing
 cat: natural-language-processing
