@@ -228,6 +228,7 @@ class Project(ProjectMixin, models.Model):
         self.__original_label_config = self.label_config
         self.__maximum_annotations = self.maximum_annotations
         self.__overlap_cohort_percentage = self.overlap_cohort_percentage
+        self.__skip_queue = self.skip_queue
 
         # TODO: once bugfix with incorrect data types in List
         # logging.warning('! Please, remove code below after patching of all projects (extract_data_types)')
@@ -549,6 +550,11 @@ class Project(ProjectMixin, models.Model):
             )
             self.__maximum_annotations = self.maximum_annotations
             self.__overlap_cohort_percentage = self.overlap_cohort_percentage
+
+        if self.__skip_queue != self.skip_queue:
+            bulk_update_stats_project_tasks(
+                self.tasks.filter(Q(annotations__isnull=False) & Q(annotations__ground_truth=False))
+            )
 
         if hasattr(self, 'summary'):
             # Ensure project.summary is consistent with current tasks / annotations
