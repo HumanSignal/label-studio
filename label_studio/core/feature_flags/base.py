@@ -31,7 +31,7 @@ elif settings.FEATURE_FLAGS_OFFLINE:
     client = ldclient.get()
 else:
     # Production usage
-    ldclient.set_config(Config(settings.FEATURE_FLAGS_API_KEY, http=HTTPConfig(connect_timeout=5)))
+    ldclient.set_config(Config(settings.FEATURE_FLAGS_API_KEY))
     client = ldclient.get()
 
 
