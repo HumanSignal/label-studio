@@ -31,7 +31,9 @@ elif settings.FEATURE_FLAGS_OFFLINE:
     client = ldclient.get()
 else:
     # Production usage
+    logger.debug('Set LaunchDarkly config...')
     ldclient.set_config(Config(settings.FEATURE_FLAGS_API_KEY))
+    logger.debug('Get LaunchDarkly client...')
     client = ldclient.get()
 
 
