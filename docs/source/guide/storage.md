@@ -16,11 +16,19 @@ Set up the following cloud and other storage systems with Label Studio:
 - [Redis database](#Redis-database)
 - [Local storage](#Local-storage)
 
-Each source and target storage setup is project-specific. You can connect multiple buckets, containers, databases, or directories as source or target storage for a project. If you upload new data to a connected cloud storage bucket, sync the storage connection to add the new labeling tasks to Label Studio without restarting. 
+## How external storage connections work
 
-After setting up target storage and performing annotations, manually sync annotations using the **Sync** button for the configured target storage. Annotations are still stored in the Label Studio database, and the target storage receives a JSON export of each annotation. Annotations are sent to target storage as a one-way export. You can also export or sync using the API. 
+Add source storage connections to sync data from an external source to a Label Studio project. Add target storage connections to sync annotations from Label Studio to external storage. Each source and target storage setup is project-specific. You can connect multiple buckets, containers, databases, or directories as source or target storage for a project. 
 
-Secure access to cloud storage using workspaces and cloud storage credentials. For details, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
+Data is not synced automatically from source storage to Label Studio. If you upload new data to a connected cloud storage bucket, sync the storage connection to add the new labeling tasks to Label Studio without restarting. 
+
+After setting up target storage and performing annotations, manually sync annotations using the **Sync** button for the configured target storage. Annotations are still stored in the Label Studio database, and the target storage receives a JSON export of each annotation. 
+
+If you're using Label Studio Enterprise with Amazon S3, you can also delete annotations in external storage if they are deleted in Label Studio. 
+
+You can also use the API to set up or sync storage connections. See [Label Studio API](/api) and locate the relevant storage connection type. 
+
+Data synced from cloud storage is not stored in Label Studio. Instead, the data is accessed using a URL. You can also secure access to cloud storage using workspaces and cloud storage credentials. For details, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
 
 ## Amazon S3
 
@@ -44,7 +52,8 @@ Before you set up your S3 bucket or buckets with Label Studio, configure access 
             "Action": [
                 "s3:ListBucket",
                 "s3:GetObject",
-                "s3:PutObject"
+                "s3:PutObject",
+                "s3:DeleteObject"
             ],
             "Resource": [
                 "arn:aws:s3:::<your_bucket_name>",
@@ -54,6 +63,7 @@ Before you set up your S3 bucket or buckets with Label Studio, configure access 
     ]
 }
 ```
+> `"s3:PutObject"` is only needed for target storage connections, and `"s3:DeleteObject` is only needed for target storage connections in Label Studio Enterprise where you want to allow deleted annotations in Label Studio to also be deleted in the target S3 bucket.  
 4. Set up cross-origin resource sharing (CORS) access to your bucket, using a policy that allows GET access from the same host name as your Label Studio deployment. See [Configuring cross-origin resource sharing (CORS)](https://docs.aws.amazon.com/AmazonS3/latest/userguide/enabling-cors-examples.html) in the Amazon S3 User Guide. Use or modify the following example:
 ```json
 [
@@ -99,9 +109,29 @@ After you [configure access to your S3 bucket](#Configure-access-to-your-S3-buck
     - Choose whether to disable **Use pre-signed URLs**. For example, if you host Label Studio in the same AWS network as your storage buckets, you can disable presigned URLs and have direct access to the storage using `s3://` links.
     - Adjust the counter for how many minutes the pre-signed URLs are valid.
 8. Click **Add Storage**.
-9. Repeat these steps for **Target Storage** to sync completed data annotations to a bucket.
 
 After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync import storage](/api#operation/api_storages_s3_sync_create).
+
+### Set up target storage connection in the Label Studio UI
+After you [configure access to your S3 bucket](#Configure-access-to-your-S3-bucket), do the following to set up Amazon S3 as a target storage connection:
+
+1. Open Label Studio in your web browser.
+2. For a specific project, open **Settings > Cloud Storage**.
+3. Click **Add Target Storage**.  
+4. In the dialog box that appears, select **Amazon S3** as the storage type.
+5. In the **Storage Title** field, type a name for the storage to appear in the Label Studio UI.
+6. Specify the name of the S3 bucket, and if relevant, the bucket prefix to specify an internal folder or container.
+7. Adjust the remaining parameters:
+    - In the **Region Name** field, specify the AWS region name. For example `us-east-1`.
+    - (Optional) In the **S3 Endpoint** field, specify an S3 endpoint if you want to override the URL created by S3 to access your bucket.
+    - In the **Access Key ID** field, specify the access key ID of the temporary security credentials for an AWS account with access to your S3 bucket.
+    - In the **Secret Access Key** field, specify the secret key of the temporary security credentials for an AWS account with access to your S3 bucket.
+    - In the **Session Token** field, specify a session token of the temporary security credentials for an AWS account with access to your S3 bucket.
+    - <i class='ent'></i> (Optional) Enable **Can delete objects from storage** if you want to delete annotations stored in the S3 bucket when they are deleted in Label Studio. The storage credentials associated with the bucket must include the ability to delete bucket objects. Leave disabled to not take any action on annotations if they are deleted in Label Studio. 
+8. Click **Add Storage**.
+
+After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync export storage](/api#operation/api_storages_export_s3_sync_create).
+
 
 ### <i class='ent'></i> Set up an S3 connection with IAM role access
 
@@ -147,7 +177,7 @@ Set up an IAM role in Amazon AWS to use with Label Studio.
             "Effect": "Allow",
             "Action": [
                 "s3:ListBucket",
-                "s3:GetObject"
+                "s3:GetObject",
             ],
             "Resource": [
                 "arn:aws:s3:::<your_bucket_name>",
@@ -168,7 +198,8 @@ Use the following role policy for S3 target storage:
             "Action": [
                 "s3:ListBucket",
                 "s3:PutObject",
-                "s3:GetObject"
+                "s3:GetObject",
+                "s3:DeleteObject"
             ],
             "Resource": [
                 "arn:aws:s3:::<your_bucket_name>",
@@ -178,6 +209,8 @@ Use the following role policy for S3 target storage:
     ]
 }
 ```
+> `"s3:DeleteObject` is only needed for target storage connections where you want deleted annotations in Label Studio to also be deleted in the target S3 bucket.  
+
 
 For more details about using an IAM role with an external ID to provide access to a third party (Label Studio), see the Amazon AWS documentation [How to use an external ID when granting access to your AWS resources to a third party](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html).
 
@@ -201,10 +234,27 @@ In the Label Studio UI, do the following to set up the connection:
     - Choose whether to disable **Use pre-signed URLs**. For example, if you host Label Studio in the same AWS network as your storage buckets, you can disable presigned URLs and have direct access to the storage using `s3://` links.
     - Adjust the counter for how many minutes the pre-signed URLs are valid.
 8. Click **Add Storage**.
-9. Repeat these steps for **Target Storage** to sync completed data annotations to a bucket.
 
+After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync import storage](https://app.heartex.com/docs/api#operation/api_storages_s3s_sync_create).
 
-After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync import storage](/api#operation/api_storages_s3_sync_create).
+#### Create a target storage connection to S3 in the Label Studio UI
+In the Label Studio UI, do the following to set up a target storage connection to save annotations in an S3 bucket with IAM role access set up:
+
+1. Open Label Studio in your web browser.
+2. For a specific project, open **Settings > Cloud Storage**.
+3. Click **Add Target Storage**.  
+4. In the dialog box that appears, select **Amazon S3 (IAM role access)** as the storage type.
+5. In the **Storage Title** field, type a name for the storage to appear in the Label Studio UI.
+6. Specify the name of the S3 bucket, and if relevant, the bucket prefix to specify an internal folder or container.
+7. Adjust the remaining parameters:
+    - In the **Region Name** field, specify the AWS region name. For example `us-east-1`.
+    - In the **S3 Endpoint** field, specify an S3 endpoint if you want to override the URL created by S3 to access your bucket.
+    - In the **Role ARN** field, specify the Amazon Resource Name (ARN) of the IAM role that you created to grant access to Label Studio.
+    - In the **External ID** field, specify the external ID that identifies Label Studio to your AWS account. You can find the external ID on your **Organization** page.
+    - (Optional) Enable **Can delete objects from storage** if you want to delete annotations stored in the S3 bucket when they are deleted in Label Studio. The storage credentials associated with the bucket must include the ability to delete bucket objects. Leave disabled to not take any action on annotations if they are deleted in Label Studio.
+8. Click **Add Storage**.
+
+After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync export storage](https://app.heartex.com/docs/api#operation/api_storages_export_s3s_sync_create).
 
 ### Add storage with the Label Studio API
 You can also create a storage connection using the Label Studio API. 

@@ -379,8 +379,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 ml_backend.predict_tasks([next_task])
 
         # serialize task
-        context = {'request': request, 'project': project, 'resolve_uri': True,
-                   'proxy': bool_from_request(request.GET, 'proxy', True)}
+        context = {'request': request, 'project': project, 'resolve_uri': True}
         serializer = TaskWithAnnotationsAndPredictionsAndDraftsSerializer(next_task, context=context)
         response = serializer.data
 
@@ -413,8 +412,8 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
         # detect solved and not solved tasks
         assigned_flag = hasattr(self, 'assignee_flag') and self.assignee_flag
-        user_solved_tasks_array = user.annotations.filter(ground_truth=False)
-        user_solved_tasks_array = user_solved_tasks_array.filter(task__isnull=False)\
+        user_solved_tasks_array = user.annotations\
+            .filter(task__project=project, task__isnull=False)\
             .distinct().values_list('task__pk', flat=True)
 
         with conditional_atomic():
@@ -554,7 +553,7 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
 
         # check new config includes meaningful changes
         has_changed = config_essential_data_has_changed(label_config, project.label_config)
-        project.validate_config(label_config)
+        project.validate_config(label_config, strict=True)
         return Response({'config_essential_data_has_changed': has_changed}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(auto_schema=None)

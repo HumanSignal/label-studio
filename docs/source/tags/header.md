@@ -1,7 +1,7 @@
 ---
 title: Header
 type: tags
-order: 502
+order: 503
 meta_title: Header Tag to Show Headers
 meta_description: Customize Label Studio with the Header tag to display a header for a labeling task for machine learning and data science projects.
 ---
