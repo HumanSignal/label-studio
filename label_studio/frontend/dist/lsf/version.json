@@ -1,6 +1,6 @@
 {
-  "message": "Small refactoring, changes according to the review",
-  "commit": "fdd93899bd76e93d90169274f21309fccd4b6275",
+  "message": "Merge branch 'fix/dev-1264/timeline-sync' of github.com:heartexlabs/label-studio-frontend into fix/dev-1264/timeline-sync",
+  "commit": "af6c1b61a80c6a9f0dbef5d0bd6f6473cb66a710",
   "branch": "fix/dev-1264/timeline-sync",
-  "date": "2022-01-17T14:00:05Z"
+  "date": "2022-01-17T14:40:07Z"
 }
