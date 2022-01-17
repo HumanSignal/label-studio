@@ -1,6 +1,6 @@
 {
-  "message": "Fix issues with short videos rendering",
-  "commit": "4ca8ac1cb179140163742971ce386c923367cb1d",
+  "message": "Merge branch 'fix/dev-1290/short-video' of github.com:heartexlabs/label-studio-frontend into fix/dev-1290/short-video",
+  "commit": "e2e9a336d190944156ab8945817fed2b7312bb78",
   "branch": "fix/dev-1290/short-video",
-  "date": "2022-01-12T08:58:57Z"
+  "date": "2022-01-17T14:07:38Z"
 }
