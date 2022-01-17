@@ -462,6 +462,7 @@ mimetypes.add_type("image/png", ".png", True)
 # fields name was used in DM api before
 REST_FLEX_FIELDS = {"FIELDS_PARAM": "include"}
 
+INTERPOLATE_KEY_FRAMES = get_env('INTERPOLATE_KEY_FRAMES', False)
 
 # Feature Flags
 FEATURE_FLAGS_API_KEY = get_env('FEATURE_FLAGS_API_KEY', default='any key')
@@ -471,3 +472,4 @@ FEATURE_FLAGS_FROM_FILE = get_bool_env('FEATURE_FLAGS_FROM_FILE', False)
 FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE')
 # or if file is not set, default is using offline mode
 FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)
+

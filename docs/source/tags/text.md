@@ -17,14 +17,14 @@ Use with the following data types: text
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | name | <code>string</code> |  | Name of the element |
-| value | <code>string</code> |  | Data field containing text or a URL |
-| [valueType] | <code>url</code> \| <code>text</code> |  | Whether the text is stored directly in task or needs to be loaded by url |
+| value | <code>string</code> |  | Data field containing text or a UR |
+| [valueType] | <code>url</code> \| <code>text</code> | <code>text</code> | Whether the text is stored directly in uploaded data or needs to be loaded from a URL |
 | [saveTextResult] | <code>yes</code> \| <code>no</code> |  | Whether to store labeled text along with the results. By default, doesn't store text for `valueType=url` |
-| [selectionEnabled] | <code>boolean</code> | <code>true</code> | Whether to enable or disable text selection |
-| [highlightColor] | <code>string</code> |  | Hex color string to highlight text. If not provided, label color is used |
-| [granularity] | <code>symbol</code> \| <code>word</code> | <code>symbol</code> | Whether to select text per symbol or word |
-| [showLabels] | <code>boolean</code> | <code>true</code> | Whether to show labels next to the region |
-| [encoding] | <code>string</code> | <code>&quot;none|base64|base64unicode&quot;</code> | How to decode values from encoded strings |
+| [encoding] | <code>none</code> \| <code>base64</code> \| <code>base64unicode</code> |  | How to decode values from encoded strings |
+| [selectionEnabled] | <code>boolean</code> | <code>true</code> | Enable or disable selection |
+| [highlightColor] | <code>string</code> |  | Hex string with highlight color, if not provided uses the labels color |
+| [showLabels] | <code>boolean</code> |  | Whether or not to show labels next to the region; unset (by default) — use editor settings; true/false — override settings |
+| [granularity] | <code>symbol</code> \| <code>word</code> \| <code>sentence</code> \| <code>paragraph</code> |  | Control region selection granularity |
 
 ### Sample Results JSON
 
@@ -56,4 +56,8 @@ Use with the following data types: text
     <Label value="Location" />
   </Labels>
 </View>
+```
+### Example
+```html
+<Text name="p1">Some simple text with explanations</Text>
 ```
