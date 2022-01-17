@@ -1,7 +1,7 @@
 ---
 title: Rectangle
 type: tags
-order: 419
+order: 420
 meta_title: Rectangle Tag for Adding Rectangle Bounding Box to Images
 meta_description: Customize Label Studio with the Rectangle tag to add rectangle bounding boxes to images for machine learning and data science projects.
 ---
@@ -21,6 +21,8 @@ Use with the following data types: image
 | [strokeColor] | <code>string</code> | <code>&quot;#f48a42&quot;</code> | Stroke color in hexadecimal |
 | [strokeWidth] | <code>number</code> | <code>1</code> | Width of the stroke |
 | [canRotate] | <code>boolean</code> | <code>true</code> | Whether to show or hide rotation control |
+| [smart] | <code>boolean</code> |  | Show smart tool for interactive pre-annotations |
+| [smartOnly] | <code>boolean</code> |  | Only show smart tool for interactive pre-annotations |
 
 ### Example
 ```html

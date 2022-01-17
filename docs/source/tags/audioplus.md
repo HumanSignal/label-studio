@@ -20,6 +20,7 @@ Use with the following data types: audio
 | [speed] | <code>boolean</code> | <code>false</code> | Whether to show a speed slider (from 0.5 to 3) |
 | [zoom] | <code>boolean</code> | <code>true</code> | Whether to show the zoom slider |
 | [hotkey] | <code>string</code> |  | Hotkey used to play or pause audio |
+| [sync] | <code>string</code> |  | object name to sync with |
 
 ### Example
 ```html
