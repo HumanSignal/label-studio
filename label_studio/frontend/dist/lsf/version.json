@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into feature/DEV-428/show-created-date",
-  "commit": "93198a9641dd97196b64120862ce8728d0e1c639",
-  "branch": "",
-  "date": "2021-12-28T16:28:16Z"
+  "message": "test: DEV-1155: Fix drawing of polygon in multiple region transforming test",
+  "commit": "a2834f94f8e26539685caa13f40faa9207c808c9",
+  "branch": "fix/DEV-1155/rotation-behavior",
+  "date": "2022-01-17T12:02:13Z"
 }
