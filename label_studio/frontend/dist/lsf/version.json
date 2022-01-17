@@ -1,6 +1,6 @@
 {
-  "message": "Fix tests",
-  "commit": "3b3eac9ba5b66509456297c8b6122af72b5a7530",
+  "message": "test: DEV-1155: Fix drawing of polygon in multiple region transforming test",
+  "commit": "a2834f94f8e26539685caa13f40faa9207c808c9",
   "branch": "fix/DEV-1155/rotation-behavior",
-  "date": "2021-12-16T01:45:51Z"
+  "date": "2022-01-17T12:02:13Z"
 }
