@@ -1,6 +1,6 @@
 {
-  "message": "DEV-609: Load task data from server (#22)\n\n* Load task data from server\r\n\r\n* Load task data from server\r\n\r\n* Run actions on branch\r\n\r\nCo-authored-by: Sergey <Gondragos@gmail.com>",
-  "commit": "feb9f1db923039b098fd0122f3d6a87bdc224a79",
+  "message": "[fix] Fix missed created date in drafts (#21)\n\n* [fix] Fix created date in drafts\r\n\r\n* Run actions on sub-branches\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
+  "commit": "8f94eee9b4742377d9937cc6c5bc21bcf058c352",
   "branch": "master",
-  "date": "2021-11-18T20:01:55Z"
+  "date": "2021-12-28T17:02:24Z"
 }
