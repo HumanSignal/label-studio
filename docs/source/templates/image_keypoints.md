@@ -10,8 +10,6 @@ meta_description: Label Studio Image Keypoints Template for machine learning and
 
 Key Point labeling for images when you want to identify specific key points for facial recognition and other use cases.
 
-<img src="/images/screens/image_keypoints.png" class="img-template-example" title="Images Key Points" />
-
 ## Labeling Configuration
 
 ```html
