@@ -6,7 +6,8 @@ from django.db.models import signals
 
 from core.permissions import AllPermissions
 from core.utils.common import temporary_disconnect_signal, temporary_disconnect_all_signals
-from tasks.models import Annotation, Prediction, update_is_labeled_after_removing_annotation
+from tasks.models import Annotation, Prediction, update_is_labeled_after_removing_annotation, \
+    bulk_update_stats_project_tasks
 from webhooks.utils import emit_webhooks_for_instance
 from webhooks.models import WebhookAction
 from data_manager.functions import evaluate_predictions
@@ -76,6 +77,7 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     annotations_ids = list(annotations.values('id'))
     annotations.delete()
     emit_webhooks_for_instance(project.organization, project, WebhookAction.ANNOTATIONS_DELETED, annotations_ids)
+    bulk_update_stats_project_tasks(queryset)
     return {'processed_items': count,
             'detail': 'Deleted ' + str(count) + ' annotations'}
 

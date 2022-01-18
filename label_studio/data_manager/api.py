@@ -15,7 +15,7 @@ from django.db.models import Sum, Count
 from django.conf import settings
 from ordered_set import OrderedSet
 
-from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, find_first_many_to_one_related_field_by_prefix, load_func
+from core.utils.common import get_object_with_check_and_log, int_from_request, load_func
 from core.permissions import all_permissions, ViewClassPermission
 from projects.models import Project
 from projects.serializers import ProjectSerializer
@@ -180,17 +180,10 @@ class TaskListAPI(generics.ListAPIView):
 
     @staticmethod
     def get_task_serializer_context(request, project):
-        storage = find_first_many_to_one_related_field_by_prefix(project, '.*io_storages.*')
         all_fields = request.GET.get('fields', None) == 'all'  # false by default
 
-        resolve_uri = \
-            storage or \
-            (project.task_data_login and project.task_data_password) or \
-            settings.CLOUD_FILE_STORAGE_ENABLED
-
         return {
-            'proxy': bool_from_request(request.GET, 'proxy', True),
-            'resolve_uri': resolve_uri,
+            'resolve_uri': True,
             'request': request,
             'project': project,
             'drafts': all_fields,
@@ -278,7 +271,6 @@ class TaskAPI(generics.RetrieveAPIView):
     @staticmethod
     def get_serializer_context(request):
         return {
-            'proxy': bool_from_request(request.GET, 'proxy', True),
             'resolve_uri': True,
             'completed_by': 'full',
             'drafts': True,

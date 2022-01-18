@@ -379,8 +379,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 ml_backend.predict_tasks([next_task])
 
         # serialize task
-        context = {'request': request, 'project': project, 'resolve_uri': True,
-                   'proxy': bool_from_request(request.GET, 'proxy', True)}
+        context = {'request': request, 'project': project, 'resolve_uri': True}
         serializer = TaskWithAnnotationsAndPredictionsAndDraftsSerializer(next_task, context=context)
         response = serializer.data
 

@@ -1,6 +1,6 @@
 {
-  "message": "Ignore not meaningful error",
-  "commit": "763b45527277e9381dcd4744cb27675a38ea00e7",
-  "branch": "fix/DEV-1367/image-width",
-  "date": "2021-12-27T17:14:04Z"
+  "message": "Merge branch 'master' into feature/DEV-428/show-created-date",
+  "commit": "93198a9641dd97196b64120862ce8728d0e1c639",
+  "branch": "",
+  "date": "2021-12-28T16:28:16Z"
 }

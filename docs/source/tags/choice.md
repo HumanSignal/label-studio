@@ -1,7 +1,7 @@
 ---
 title: Choice
 type: tags
-order: 402
+order: 403
 meta_title: Choice Tag for Single Choice Labels
 meta_description: Customize Label Studio with choice tags for simple classification tasks in machine learning and data science projects.
 ---
