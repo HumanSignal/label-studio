@@ -181,15 +181,14 @@ class TaskListAPI(generics.ListAPIView):
     @staticmethod
     def get_task_serializer_context(request, project):
         all_fields = request.GET.get('fields', None) == 'all'  # false by default
-        review = bool_from_request(request.GET, 'review', False)
 
         return {
             'resolve_uri': True,
             'request': request,
             'project': project,
-            'drafts': all_fields and not review,
-            'predictions': all_fields and not review,
-            'annotations': all_fields and not review
+            'drafts': all_fields,
+            'predictions': all_fields,
+            'annotations': all_fields
         }
 
     def get_task_queryset(self, request, prepare_params):
@@ -277,12 +276,17 @@ class TaskAPI(generics.RetrieveAPIView):
 
     def get_serializer_context(self, request):
         review = bool_from_request(self.request.GET, 'review', False)
+        if review:
+            fields = ['drafts', 'annotations']
+        else:
+            fields = ['completed_by_full', 'drafts', 'predictions', 'annotations']
+
         return {
             'resolve_uri': True,
-            'completed_by': 'full' if not review else None,
-            'drafts': True,
-            'predictions': not review,
-            'annotations': True,
+            'completed_by': 'full' if 'completed_by_full' in fields else None,
+            'predictions': 'predictions' in fields,
+            'annotations': 'annotations' in fields,
+            'drafts': 'drafts' in fields,
             'request': request
         }
 
@@ -295,8 +299,8 @@ class TaskAPI(generics.RetrieveAPIView):
         task = self.get_object()
         context = self.get_serializer_context(request)
         context['project'] = project = task.project
-        review = bool_from_request(self.request.GET, 'review', False)
 
+        review = bool_from_request(self.request.GET, 'review', False)
         if review:
             kwargs = {
                 'fields_for_evaluation': ['annotators', 'reviewed']
