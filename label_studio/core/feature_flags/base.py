@@ -31,7 +31,9 @@ elif settings.FEATURE_FLAGS_OFFLINE:
     client = ldclient.get()
 else:
     # Production usage
+    logger.debug('Set LaunchDarkly config...')
     ldclient.set_config(Config(settings.FEATURE_FLAGS_API_KEY, http=HTTPConfig(connect_timeout=5)))
+    logger.debug('Get LaunchDarkly client...')
     client = ldclient.get()
 
 
@@ -66,10 +68,15 @@ def all_flags(user):
     """Return the output of this method in API response, to bootstrap client-side flags.
     More on https://docs.launchdarkly.com/sdk/features/bootstrapping#javascript
     """
+    logger.debug(f'Get all_flags request for {user}')
     user_dict = _get_user_repr(user)
+    logger.debug(f'Resolve all flags state {user_dict}')
     state = client.all_flags_state(user_dict)
+    logger.debug(f'State received: {state}')
     flags = state.to_json_dict()
+    logger.debug(f'Flags received: {flags}')
     env_ff = get_all_env_with_prefix('ff_')
+    logger.debug(f'Read flags from env: {env_ff}')
     for env_flag_name, env_flag_on in env_ff.items():
         if env_flag_name not in flags and env_flag_on:
             flags[env_flag_name] = True
