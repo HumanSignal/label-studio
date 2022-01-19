@@ -310,10 +310,9 @@ class TaskAPI(generics.RetrieveAPIView):
         ).filter(id=task.id).first()
 
         # get prediction
-        if not review:
-            if (project.evaluate_predictions_automatically or project.show_collab_predictions) \
-                    and not task.predictions.exists():
-                evaluate_predictions([task])
+        if (project.evaluate_predictions_automatically or project.show_collab_predictions) \
+                and not task.predictions.exists():
+            evaluate_predictions([task])
 
         serializer = self.get_serializer_class()(task, many=False, context=context)
         data = serializer.data
