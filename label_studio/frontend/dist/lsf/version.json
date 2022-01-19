@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into feature/DEV-428/show-created-date",
-  "commit": "93198a9641dd97196b64120862ce8728d0e1c639",
-  "branch": "",
-  "date": "2021-12-28T16:28:16Z"
+  "message": "test: Allow to run tests over local start\n\nSolved by preventing preserving selected tool",
+  "commit": "c16853f1396eb8be2678d754cfd20b02bdf0940c",
+  "branch": "fix/DEV-1367/image-width",
+  "date": "2022-01-19T00:25:04Z"
 }
