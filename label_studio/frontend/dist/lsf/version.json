@@ -1,6 +1,6 @@
 {
-  "message": "test: DEV-1155: Fix drawing of polygon in multiple region transforming test",
-  "commit": "a2834f94f8e26539685caa13f40faa9207c808c9",
+  "message": "Merge branch 'fix/DEV-1155/rotation-behavior' of github.com:heartexlabs/label-studio-frontend into fix/DEV-1155/rotation-behavior",
+  "commit": "b991f71deb09c4addb204a4a0ab411a0140bea90",
   "branch": "fix/DEV-1155/rotation-behavior",
-  "date": "2022-01-17T12:02:13Z"
+  "date": "2022-01-19T10:40:25Z"
 }
