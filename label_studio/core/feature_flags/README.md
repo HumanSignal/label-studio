@@ -6,11 +6,11 @@
 
     ```yml
     flagValues:
-      ff_dev_123_some_fixed_issue_231221_short: true
-      ff_dev_456_my_super_feature_010122_long: true
+      ff_back_dev_123_some_fixed_issue_231221_short: true
+      ff_front_dev_456_my_super_feature_010122_long: true
     ```
    
-    Naming convention is presented [here](#feature_flags_namings)
+    Naming convention is presented [here](#feature-flags-namings)
     
     [Read more](https://docs.launchdarkly.com/sdk/features/flags_from_files#creating_a_flag_data_file) about extended format
     
@@ -24,11 +24,11 @@
 
 ### Feature flags from environment
 
-1. Prepare env variables using [proper namings](#feature_flags_namings), e.g.
+1. Prepare env variables using [proper namings](#feature-flags-namings), e.g.
 
     ```
-    ff_dev_123_some_fixed_issue_231221_short=true
-    ff_dev_456_my_super_feature_010122_long=true
+    ff_back_dev_123_some_fixed_issue_231221_short=true
+    ff_front_dev_456_my_super_feature_010122_long=true
     ```
 
 
@@ -45,7 +45,7 @@
 - *short*: short_term flags
 - *long*: permanent flags or killswitchers
 
-(check best practices from [here](https://launchdarkly.com/blog/best_practices_short_term_permanent_flags/))
+(check best practices from [here](https://launchdarkly.com/blog/best-practices-short-term-permanent-flags/))
 
 
 ## Frontend feature flags
