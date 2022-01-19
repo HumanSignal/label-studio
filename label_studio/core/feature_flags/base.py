@@ -32,7 +32,7 @@ elif settings.FEATURE_FLAGS_OFFLINE:
 else:
     # Production usage
     logger.debug('Set LaunchDarkly config...')
-    ldclient.set_config(Config(settings.FEATURE_FLAGS_API_KEY))
+    ldclient.set_config(Config(settings.FEATURE_FLAGS_API_KEY, http=HTTPConfig(connect_timeout=5)))
     logger.debug('Get LaunchDarkly client...')
     client = ldclient.get()
 
