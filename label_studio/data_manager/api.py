@@ -15,7 +15,7 @@ from django.db.models import Sum, Count
 from django.conf import settings
 from ordered_set import OrderedSet
 
-from core.utils.common import get_object_with_check_and_log, int_from_request, load_func
+from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, load_func
 from core.permissions import all_permissions, ViewClassPermission
 from projects.models import Project
 from projects.serializers import ProjectSerializer
@@ -181,14 +181,15 @@ class TaskListAPI(generics.ListAPIView):
     @staticmethod
     def get_task_serializer_context(request, project):
         all_fields = request.GET.get('fields', None) == 'all'  # false by default
+        review = bool_from_request(request.GET, 'review', False)
 
         return {
             'resolve_uri': True,
             'request': request,
             'project': project,
-            'drafts': all_fields,
-            'predictions': all_fields,
-            'annotations': all_fields
+            'drafts': all_fields and not review,
+            'predictions': all_fields and not review,
+            'annotations': all_fields and not review
         }
 
     def get_task_queryset(self, request, prepare_params):
@@ -218,6 +219,12 @@ class TaskListAPI(generics.ListAPIView):
         page = self.paginate_queryset(queryset)
         all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
         fields_for_evaluation = get_fields_for_evaluation(prepare_params, request.user)
+
+        review = bool_from_request(self.request.GET, 'review', False)
+        if review:
+            fields_for_evaluation = ['annotators', 'reviewed']
+            all_fields = None
+
         if page is not None:
             ids = [task.id for task in page]  # page is a list already
             tasks = list(
@@ -233,7 +240,7 @@ class TaskListAPI(generics.ListAPIView):
             page = [tasks_by_ids[_id] for _id in ids]
 
             # retrieve ML predictions if tasks don't have them
-            if project.evaluate_predictions_automatically:
+            if not review and project.evaluate_predictions_automatically:
                 tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
                 evaluate_predictions(tasks_for_predictions)
 
@@ -268,13 +275,13 @@ class TaskAPI(generics.RetrieveAPIView):
     def get_serializer_class(self):
         return DataManagerTaskSerializer
 
-    @staticmethod
-    def get_serializer_context(request):
+    def get_serializer_context(self, request):
+        review = bool_from_request(self.request.GET, 'review', False)
         return {
             'resolve_uri': True,
-            'completed_by': 'full',
+            'completed_by': 'full' if not review else None,
             'drafts': True,
-            'predictions': True,
+            'predictions': not review,
             'annotations': True,
             'request': request
         }
@@ -288,16 +295,25 @@ class TaskAPI(generics.RetrieveAPIView):
         task = self.get_object()
         context = self.get_serializer_context(request)
         context['project'] = project = task.project
+        review = bool_from_request(self.request.GET, 'review', False)
+
+        if review:
+            kwargs = {
+                'fields_for_evaluation': ['annotators', 'reviewed']
+            }
+        else:
+            kwargs = {'all_fields': True}
 
         # we need to annotate task because before it was retrieved only for permission checks and project retrieving
         task = Task.prepared.get_queryset(
-            all_fields=True, prepare_params=PrepareParams(project=project.id)
+            prepare_params=PrepareParams(project=project.id), **kwargs
         ).filter(id=task.id).first()
 
         # get prediction
-        if (project.evaluate_predictions_automatically or project.show_collab_predictions) \
-                and not task.predictions.exists():
-            evaluate_predictions([task])
+        if not review:
+            if (project.evaluate_predictions_automatically or project.show_collab_predictions) \
+                    and not task.predictions.exists():
+                evaluate_predictions([task])
 
         serializer = self.get_serializer_class()(task, many=False, context=context)
         data = serializer.data
