@@ -222,8 +222,8 @@ def static_file_with_host_resolver(path_on_disk, content_type):
     return serve_file
 
 
-# def feature_flags(request):
-#     user = request.user
-#     if not user.is_authenticated:
-#         return HttpResponseForbidden()
-#     return HttpResponse(json.dumps(all_flags(request.user), indent=4), status=200)
+def feature_flags(request):
+    user = request.user
+    if not user.is_authenticated:
+        return HttpResponseForbidden()
+    return HttpResponse(json.dumps(all_flags(request.user), indent=4), status=200)
