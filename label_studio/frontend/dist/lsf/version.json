@@ -1,6 +1,6 @@
 {
-  "message": "test: Allow to run tests over local start\n\nSolved by preventing preserving selected tool",
-  "commit": "c16853f1396eb8be2678d754cfd20b02bdf0940c",
+  "message": "Merge branch 'master' into fix/DEV-1367/image-width\n\n# Conflicts:\n#\tsrc/components/ImageView/ImageView.js",
+  "commit": "81fee152e46cd9a258ef9620c5eb39de4a6c690b",
   "branch": "fix/DEV-1367/image-width",
-  "date": "2022-01-19T00:25:04Z"
+  "date": "2022-01-19T10:24:41Z"
 }
