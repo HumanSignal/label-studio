@@ -2,7 +2,10 @@
 """
 import pytest
 import json
+import os
+import glob
 
+from core.label_config import parse_config, validate_label_config, parse_config_to_json
 from label_studio.tests.utils import make_task, make_annotation, make_prediction, project_id
 from projects.models import Project
 
@@ -96,3 +99,14 @@ def test_change_label_config_repeater(tasks_count, annotations_count, prediction
     assert response.status_code == 400
 
 
+@pytest.mark.django_db
+def test_parse_all_configs():
+    folder_wildcard = "./label_studio/annotation_templates"
+    result = [y for x in os.walk(folder_wildcard) for y in glob.glob(os.path.join(x[0], '*.xml'))]
+    for file in result:
+        print(f"Parsing config: {file}")
+        with open(file, mode='r') as f:
+            config = f.read()
+            assert parse_config(config)
+            assert parse_config_to_json(config)
+            validate_label_config(config)
