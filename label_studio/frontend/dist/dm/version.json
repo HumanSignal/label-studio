@@ -1,6 +1,6 @@
 {
-  "message": "[fix] Fix missed created date in drafts (#21)\n\n* [fix] Fix created date in drafts\r\n\r\n* Run actions on sub-branches\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "8f94eee9b4742377d9937cc6c5bc21bcf058c352",
-  "branch": "master",
-  "date": "2021-12-28T17:02:24Z"
+  "message": "fix: DEV-1481: shrink tabs if they're crowding",
+  "commit": "9c1957bfb1c0811cc67e57469715af9f4b03b980",
+  "branch": "fix/dev-1481-tabs",
+  "date": "2022-01-19T21:31:58Z"
 }
