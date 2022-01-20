@@ -364,22 +364,29 @@ class Project(ProjectMixin, models.Model):
 
     def _rearrange_overlap_cohort(self):
         """
-        Rearrange overlap depending on annotations count in tasks
+        Rearrange overlap depending on annotation count in tasks
         """
         all_project_tasks = Task.objects.filter(project=self)
         max_annotations = self.maximum_annotations
         must_tasks = int(self.tasks.count() * self.overlap_cohort_percentage / 100 + 0.5)
+
         tasks_with_max_annotations = all_project_tasks.annotate(
-            anno=Count('annotations', filter=Q_task_finished_annotations & Q(annotations__ground_truth=False))).filter(anno__gte=max_annotations)
-        tasks_with_min_annotations = all_project_tasks.exclude(id__in=tasks_with_max_annotations)
+            anno=Count('annotations', filter=Q_task_finished_annotations & Q(annotations__ground_truth=False))
+        ).filter(anno__gte=max_annotations)
+
+        tasks_with_min_annotations = all_project_tasks.exclude(
+            id__in=tasks_with_max_annotations
+        )
+
         # check how many tasks left to finish
         left_must_tasks = max(must_tasks - tasks_with_max_annotations.count(), 0)
         if left_must_tasks > 0:
             # if there are unfinished tasks update tasks with count(annotations) >= overlap
             tasks_with_max_annotations.update(overlap=max_annotations)
             # order other tasks by count(annotations)
-            tasks_with_min_annotations = tasks_with_min_annotations.annotate(anno=Count('annotations')).order_by(
-                '-anno')
+            tasks_with_min_annotations = tasks_with_min_annotations.annotate(
+                anno=Count('annotations')
+            ).order_by('-anno')
             objs = []
             # assign overlap depending on annotation count
             for item in tasks_with_min_annotations[:left_must_tasks]:
