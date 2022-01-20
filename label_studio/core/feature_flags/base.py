@@ -30,6 +30,7 @@ def initialize_feature_flags_offline():
     global ff_client
 
     # On-prem usage, without feature flags file
+    logger.info('Use feature flags offline mode...')
     ldclient.set_config(Config('whatever', offline=True))
     ff_client = ldclient.get()
 
@@ -37,7 +38,7 @@ def initialize_feature_flags_offline():
 def initialize_feature_flags_with_redis_store(api_key, redis_location):
     global ff_client
     # Production usage
-    logger.debug('Set LaunchDarkly config...')
+    logger.info(f'Connect to LaunchDarkly, use Redis feature store with {redis_location}...')
     store = Redis.new_feature_store(
         url=redis_location,
         prefix='feature-flags',
@@ -47,7 +48,6 @@ def initialize_feature_flags_with_redis_store(api_key, redis_location):
         http=HTTPConfig(connect_timeout=5),
         feature_store=store
     ))
-    logger.debug('Get LaunchDarkly client...')
     ff_client = ldclient.get()
 
 
