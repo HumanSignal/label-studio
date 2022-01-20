@@ -13,36 +13,54 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
-from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 
 from core.utils.common import get_object_with_check_and_log, DjangoFilterDescriptionInspector
 from core.permissions import all_permissions, ViewClassPermission
 
 from tasks.models import Task, Annotation, Prediction, AnnotationDraft
-from core.utils.common import bool_from_request, int_from_request
+from core.utils.common import bool_from_request
 from tasks.serializers import (
     TaskSerializer, AnnotationSerializer, TaskSimpleSerializer, PredictionSerializer,
-    TaskWithAnnotationsAndPredictionsAndDraftsSerializer, AnnotationDraftSerializer, PredictionQuerySerializer)
+    TaskWithAnnotationsAndPredictionsAndDraftsSerializer, AnnotationDraftSerializer)
 from projects.models import Project
 from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
 from webhooks.models import WebhookAction
+from data_manager.api import TaskListAPI as DMTaskListAPI
 
 logger = logging.getLogger(__name__)
 
 
+# TODO: fix after switch to api/tasks from api/dm/tasks
 @method_decorator(name='post', decorator=swagger_auto_schema(
         tags=['Tasks'],
         operation_summary='Create task',
         operation_description='Create a new labeling task in Label Studio.',
         request_body=TaskSerializer))
-class TaskListAPI(generics.ListCreateAPIView):
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
-    queryset = Task.objects.all()
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Tasks'],
+    operation_summary='Get tasks list',
+    operation_description="""
+    Retrieve a list of tasks with pagination for a specific view or project, by using filters and ordering.
+    """,
+    manual_parameters=[
+        openapi.Parameter(
+            name='view',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_QUERY,
+            description='View ID'),
+        openapi.Parameter(
+            name='project',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_QUERY,
+            description='Project ID'),
+    ],
+))
+class TaskListAPI(DMTaskListAPI):
+    serializer_class = TaskSerializer
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
         POST=all_permissions.tasks_create,
     )
-    serializer_class = TaskSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['project',]
 

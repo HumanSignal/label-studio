@@ -148,27 +148,9 @@ class TaskPagination(PageNumberPagination):
         )
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
-    tags=['Data Manager'],
-    operation_summary='Get tasks list',
-    operation_description="""
-    Retrieve a list of tasks with pagination for a specific view or project, by using filters and ordering.
-    """,
-    # responses={200: DataManagerTaskSerializer(many=True)},
-    manual_parameters=[
-        openapi.Parameter(
-            name='view',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_QUERY,
-            description='View ID'),
-        openapi.Parameter(
-            name='project',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_QUERY,
-            description='Project ID'),
-    ],
-))
-class TaskListAPI(generics.ListAPIView):
+@method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
+@method_decorator(name='post', decorator=swagger_auto_schema(auto_schema=None))
+class TaskListAPI(generics.ListCreateAPIView):
     task_serializer_class = DataManagerTaskSerializer
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
