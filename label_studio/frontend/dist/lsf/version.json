@@ -1,6 +1,6 @@
 {
-  "message": "Fix tests",
-  "commit": "07db74d928e3e6678315f287e562bc85f08b955b",
+  "message": "Merge branch 'master' into fix/DEV-812/selecting-text\n\n# Conflicts:\n#\te2e/fragments/ErrorsCollector.js",
+  "commit": "976a90af5b5d81d486e5b463208711da2047929a",
   "branch": "fix/DEV-812/selecting-text",
-  "date": "2021-12-28T01:54:37Z"
+  "date": "2022-01-20T09:56:28Z"
 }

@@ -14,6 +14,7 @@ from django.db.models.query_utils import Q
 from django.utils import dateformat, timezone
 import django_rq
 from label_studio_converter import Converter
+from django.conf import settings
 
 from core.redis import redis_connected
 from core.utils.common import batch
@@ -126,7 +127,9 @@ class ExportMixin:
                 'annotations__completed_by'
             ].get('only_id'):
                 options['expand'].append('annotations.completed_by')
-
+            options['context'] = {'interpolate_key_frames': settings.INTERPOLATE_KEY_FRAMES}
+            if 'interpolate_key_frames' in serialization_options:
+                options['context']['interpolate_key_frames'] = serialization_options['interpolate_key_frames']
         return options
 
     def get_task_queryset(self, ids, annotation_filter_options):
