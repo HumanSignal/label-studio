@@ -2,7 +2,8 @@ import ldclient
 import logging
 
 from ldclient.config import Config, HTTPConfig
-from ldclient.integrations import Files
+from ldclient.integrations import Files, Redis
+from ldclient.feature_store import CacheConfig
 
 from django.conf import settings
 from label_studio.core.utils.params import get_bool_env, get_all_env_with_prefix
@@ -32,7 +33,15 @@ elif settings.FEATURE_FLAGS_OFFLINE:
 else:
     # Production usage
     logger.debug('Set LaunchDarkly config...')
-    ldclient.set_config(Config(settings.FEATURE_FLAGS_API_KEY, http=HTTPConfig(connect_timeout=5)))
+    store = Redis.new_feature_store(
+        url='redis://redis:6379',
+        prefix='feature-flags',
+        caching=CacheConfig(expiration=30))
+    ldclient.set_config(Config(
+        settings.FEATURE_FLAGS_API_KEY,
+        http=HTTPConfig(connect_timeout=5),
+        feature_store=store
+    ))
     logger.debug('Get LaunchDarkly client...')
     client = ldclient.get()
 
