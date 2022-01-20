@@ -614,7 +614,7 @@ def test_breadth_first_simple(business_client):
         label_config='''
             <View>
               <Text name="text" value="$text"></Text>
-              <Choices name="text_class" choice="single">
+              <Choices name="text_class" choice="single" toName="text">
                 <Choice value="class_A"></Choice>
                 <Choice value="class_B"></Choice>
               </Choices>
@@ -672,7 +672,7 @@ def test_breadth_first_overlap_3(business_client):
         label_config='''
             <View>
               <Text name="text" value="$text"></Text>
-              <Choices name="text_class" choice="single">
+              <Choices name="text_class" choice="single" toName="text">
                 <Choice value="class_A"></Choice>
                 <Choice value="class_B"></Choice>
               </Choices>
@@ -1069,7 +1069,7 @@ def test_fetch_final_taken_task(business_client):
         label_config='''
             <View>
               <Text name="text" value="$text"></Text>
-              <Choices name="text_class" choice="single">
+              <Choices name="text_class" choice="single" toName="text">
                 <Choice value="class_A"></Choice>
                 <Choice value="class_B"></Choice>
               </Choices>

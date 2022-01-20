@@ -10,12 +10,12 @@ from django.db.models import JSONField
 from django.core.validators import MinLengthValidator, MaxLengthValidator
 from django.db import transaction, models
 from annoying.fields import AutoOneToOneField
+from functools import lru_cache
 
 from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks
 from core.utils.common import create_hash, get_attr_or_item, load_func
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.label_config import (
-    parse_config,
     validate_label_config,
     extract_data_types,
     get_all_object_tag_names,
@@ -26,6 +26,8 @@ from core.label_config import (
     get_annotation_tuple,
 )
 from core.bulk_update_utils import bulk_update
+from label_studio_tools.core.label_config import parse_config
+
 
 logger = logging.getLogger(__name__)
 
@@ -114,6 +116,13 @@ class Project(ProjectMixin, models.Model):
         null=True,
         default='<View></View>',
         help_text='Label config in XML format. See more about it in documentation',
+    )
+    parsed_label_config = models.TextField(
+        _('parsed label config'),
+        blank=True,
+        null=True,
+        default='',
+        help_text='Parsed label config in JSON format. See more about it in documentation',
     )
     expert_instruction = models.TextField(
         _('expert instruction'), blank=True, null=True, default='', help_text='Labeling instructions in HTML format'
@@ -503,7 +512,7 @@ class Project(ProjectMixin, models.Model):
         return {'deleted_predictions': count}
 
     def get_updated_weights(self):
-        outputs = parse_config(self.label_config)
+        outputs = self.get_parsed_config()
         control_weights = {}
         exclude_control_types = ('Filter',)
         for control_name in outputs:
@@ -526,6 +535,7 @@ class Project(ProjectMixin, models.Model):
         project_with_config_just_created = not exists and self.pk and self.label_config
         if self._label_config_has_changed() or project_with_config_just_created:
             self.data_types = extract_data_types(self.label_config)
+            self.parsed_label_config = parse_config(self.label_config)
 
         if self._label_config_has_changed():
             self.__original_label_config = self.label_config
@@ -671,6 +681,8 @@ class Project(ProjectMixin, models.Model):
         return self.get_parsed_config()
 
     def get_parsed_config(self):
+        if self.parsed_label_config:
+            return self.parsed_label_config
         return parse_config(self.label_config)
 
     def get_counters(self):
@@ -694,6 +706,19 @@ class Project(ProjectMixin, models.Model):
             return output
         else:
             return list(output)
+
+    def get_all_storage_objects(self, type_='import'):
+        from io_storages.models import get_storage_classes
+
+        if hasattr(self, '_storage_objects'):
+            return self._storage_objects
+
+        storage_objects = []
+        for storage_class in get_storage_classes(type_):
+            storage_objects += list(storage_class.objects.filter(project=self))
+
+        self._storage_objects = storage_objects
+        return storage_objects
 
     def __str__(self):
         return f'{self.title} (id={self.id})' or _("Business number %d") % self.pk

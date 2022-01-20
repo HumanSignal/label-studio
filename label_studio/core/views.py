@@ -28,7 +28,7 @@ from core.utils.io import find_file
 from core.label_config import generate_time_series_json
 from core.utils.common import collect_versions
 from io_storages.localfiles.models import LocalFilesImportStorage
-from label_studio.core.feature_flags import all_flags
+from core.feature_flags import all_flags
 
 
 logger = logging.getLogger(__name__)
