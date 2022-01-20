@@ -42,3 +42,14 @@ sentry.init_sentry(release_name='label-studio', release_version=__version__)
 # we should do it after sentry init
 from label_studio.core.utils.common import collect_versions
 versions = collect_versions()
+
+
+if FEATURE_FLAGS_FROM_FILE:
+    from core.feature_flags.base import initialize_feature_flags_from_file
+    initialize_feature_flags_from_file(FEATURE_FLAGS_FILE)
+elif FEATURE_FLAGS_OFFLINE:
+    from core.feature_flags.base import initialize_feature_flags_offline
+    initialize_feature_flags_offline()
+else:
+    raise ValueError(f'Current feature flag mode is not supported in Label Studio Community:\n'
+                     f'enable FEATURE_FLAGS_FROM_FILE=true or FEATURE_FLAGS_OFFLINE=true')
