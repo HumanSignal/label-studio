@@ -10,11 +10,11 @@ from label_studio.core.utils.io import find_file
 
 logger = logging.getLogger(__name__)
 
-ff_client = None
+_client = None
 
 
 def initialize_feature_flags_from_file(file_path):
-    global ff_client
+    global _client
     feature_flags_file = find_file(file_path)
     logger.info(f'Read flags from file {feature_flags_file}')
     data_source = Files.new_data_source(paths=[feature_flags_file])
@@ -23,20 +23,20 @@ def initialize_feature_flags_from_file(file_path):
         update_processor_class=data_source,
         send_events=False)
     ldclient.set_config(config)
-    ff_client = ldclient.get()
+    _client = ldclient.get()
 
 
 def initialize_feature_flags_offline():
-    global ff_client
+    global _client
 
     # On-prem usage, without feature flags file
     logger.info('Use feature flags offline mode...')
     ldclient.set_config(Config('whatever', offline=True))
-    ff_client = ldclient.get()
+    _client = ldclient.get()
 
 
 def initialize_feature_flags_with_redis_store(api_key, redis_location):
-    global ff_client
+    global _client
     # Production usage
     logger.info(f'Connect to LaunchDarkly, use Redis feature store with {redis_location}...')
     store = Redis.new_feature_store(
@@ -48,11 +48,13 @@ def initialize_feature_flags_with_redis_store(api_key, redis_location):
         http=HTTPConfig(connect_timeout=5),
         feature_store=store
     ))
-    ff_client = ldclient.get()
+    _client = ldclient.get()
 
 
 def _check_client():
-    if ff_client is None:
+    global _client
+
+    if _client is None:
         raise ValueError(
             'Feature Flag client is not initialized: you have to initialize it by calling \n'
             'initialize_feature_flags_from_file(), '
@@ -86,7 +88,7 @@ def flag_set(feature_flag, user):
     _check_client()
     user_dict = _get_user_repr(user)
     default_value = get_bool_env(feature_flag, False)
-    is_on = ff_client.variation(feature_flag, user_dict, default_value)
+    is_on = _client.variation(feature_flag, user_dict, default_value)
     return is_on
 
 
@@ -98,7 +100,7 @@ def all_flags(user):
     logger.debug(f'Get all_flags request for {user}')
     user_dict = _get_user_repr(user)
     logger.debug(f'Resolve all flags state {user_dict}')
-    state = ff_client.all_flags_state(user_dict)
+    state = _client.all_flags_state(user_dict)
     logger.debug(f'State received: {state}')
     flags = state.to_json_dict()
     logger.debug(f'Flags received: {flags}')
