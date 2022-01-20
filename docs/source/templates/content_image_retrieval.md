@@ -8,6 +8,7 @@ meta_title:
 meta_description: 
 ---
 
+If you want to train a machine learning model on content-based image retrieval computer vision tasks, use this template. This labeling configuration displays an image and prompts annotators to select a choice corresponding to one or more similar images.  
 
 
 ## Labeling Configuration

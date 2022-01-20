@@ -8,6 +8,8 @@ meta_title:
 meta_description: 
 ---
 
+Create a dataset with answered questions about images using this visual question answering template. In response to an image, annotators can provide free-text answers to a question and also label components of a question with relevant aspects. 
+
 ## Labeling Configuration
 
 ```html
@@ -47,3 +49,10 @@ meta_description:
     </View>
 </View>
 ```
+
+## Related tags
+
+- [Image](/tags/image.html)
+- [Labels](/tags/labels.html)
+- [Header](/tags/header.html)
+- [TextArea](/tags/textarea.html)

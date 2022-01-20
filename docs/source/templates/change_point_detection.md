@@ -8,7 +8,7 @@ meta_title:
 meta_description: 
 ---
 
-
+If you need to find sudden changes in time series data, use this template to perform change point detection. Label the change on relevant time series channels. 
 
 ## Labeling Configuration
 

@@ -8,7 +8,7 @@ meta_title:
 meta_description: 
 ---
 
-
+If you want to train a machine learning model to detect outliers and anomalies in time series data, use this template to label suspicious regions and classify those regions of the time series channels as outliers or anomalies.
 
 ## Labeling Configuration
 
@@ -40,3 +40,8 @@ meta_description:
   </Choices>
 </View>
 ```
+
+## Related tags
+- [TimeSeries](/tags/timeseries.html)
+- [TimeSeriesLabels](/tags/timeserieslabels.html)
+- [Choices](/tags/choices.html)

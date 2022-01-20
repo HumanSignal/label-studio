@@ -8,6 +8,8 @@ meta_title:
 meta_description: 
 ---
 
+If you want to train a question answering machine learning model, use this template to develop a dataset. This template prompts annotators to read a passage of text, then highlight the span of text that answers a specific question. 
+
 ## Labeling Configuration
 
 ```html

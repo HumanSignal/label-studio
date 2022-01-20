@@ -8,6 +8,8 @@ meta_title:
 meta_description: 
 ---
 
+If you want to perform PDF classification, use this template. This template prompts an annotator to rate a PDF on a 10-star scale, then categorize it.
+
 ## Labeling Configuration
 
 ```html
@@ -22,6 +24,10 @@ meta_description:
   <HyperText name="pdf" value="$pdf" inline="true"/>
 </View>
 ```
+
+### Input data
+
+Label Studio does not support labeling PDF-formatted files directly. Instead, convert your PDF to HTML or an image file. See [importing tasks](/guide/tasks.html) for more.  
 
 ## Related tags
 - [Rating](/tags/rating.html)

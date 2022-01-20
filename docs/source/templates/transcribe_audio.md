@@ -11,8 +11,6 @@ meta_description: Label Studio Audio Transcription Template for machine learning
 
 Listen to an audio file and transcribe its content in natural language, performing speech recognition.
 
-<img src="/images/screens/audio_transcription.png" class="img-template-example" title="Transcribe an Audio" />
-
 ## Labeling Configuration
 
 ```html

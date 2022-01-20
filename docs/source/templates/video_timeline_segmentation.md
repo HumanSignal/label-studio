@@ -8,6 +8,9 @@ meta_title:
 meta_description: 
 ---
 
+To more easily identify video timelines, label segments alongside the audio channel of the video using video timeline segmentation. Use this template if you want to label the audio segment of a video on a timeline. 
+
+
 ## Labeling Configuration
 
 ```html
@@ -22,3 +25,10 @@ meta_description:
   <AudioPlus name="audio" value="$video_url" sync="video" speed="false"/>
 </View>
 ```
+
+## Related tags
+
+- [Header](/tags/header.html)
+- [Video](/tags/video.html)
+- [Labels](/tags/labels.html)
+- [AudioPlus](/tags/audioplus.html)

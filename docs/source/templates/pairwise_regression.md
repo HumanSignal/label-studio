@@ -8,6 +8,7 @@ meta_title:
 meta_description: 
 ---
 
+If you need a dataset to train a pairwise regression model, use this template to rate pairs of images based on how similar they are. You can also customize this template to rate different properties of different types of data, such as rating whether the sentiment of two text excerpts of movie reviews is similar. 
 
 
 ## Labeling Configuration

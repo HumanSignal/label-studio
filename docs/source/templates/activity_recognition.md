@@ -8,9 +8,7 @@ meta_title:
 meta_description: 
 ---
 
-
-
-
+If you want to perform time series classification for human activity recognition, use this template to classify different activities across several time series channels.
 
 ## Labeling Configuration
 
@@ -47,3 +45,8 @@ meta_description:
     </TimeSeries>
 </View>
 ```
+
+## Related tags
+
+- [TimeSeriesLabels](/tags/timeserieslabels.html)
+- [TimeSeries](/tags/timeseries.html)

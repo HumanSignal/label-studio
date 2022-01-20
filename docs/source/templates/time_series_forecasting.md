@@ -8,6 +8,8 @@ meta_title:
 meta_description: 
 ---
 
+To train a machine learning model to perform forecasting on time series data, create a dataset using this template. This template prompts annotators to highlight predictable region spans in the time series channels and label them as "Regions", then identify the trend forecast for a specific region. 
+
 ## Labeling Configuration
 
 ```html
@@ -39,3 +41,10 @@ meta_description:
     </Choices>
 </View>
 ```
+
+## Related tags
+
+- [Header](/tags/header.html)
+- [TimeSeriesLabels](/tags/timeserieslabels.html)
+- [TimeSeries](/tags/timeseries.html)
+- [Choices](/tags/choices.html)

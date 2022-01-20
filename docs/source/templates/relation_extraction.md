@@ -8,6 +8,9 @@ meta_title:
 meta_description: 
 ---
 
+If you need to train a natural language processing model to perform relationship extraction tasks, use this template to create a dataset. This template prompts an annotator to label text spans and identify relationships between the spans. For example, identifying people and organizations, and adding relation arrows and labels to identify who founded an organization. 
+
+
 ## Labeling Configuration
 
 ```html
@@ -26,3 +29,8 @@ meta_description:
 </View>
 ```
 
+## Related tags
+
+- [Relations](/tags/relations.html)
+- [Labels](/tags/labels.html)
+- [Text](/tags/text.html)
