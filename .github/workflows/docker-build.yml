@@ -4,12 +4,7 @@ on:
   push:
     branches:
       - master
-      - new-build
     tags: [ '*' ]
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.pull_request.head.ref || github.ref }}
-  cancel-in-progress: true
 
 env:
   # increment it in case if you need to reset cache
@@ -17,7 +12,7 @@ env:
   NODE: '14'
   DOCKER_CLI_EXPERIMENTAL: enabled
   IMAGE_NAME: heartexlabs/label-studio
-  DOCKER_TAG: 'test'
+  DOCKER_TAG: 'latest'
 
 jobs:
   docker_build_and_push:
@@ -76,7 +71,6 @@ jobs:
           key: ${{ runner.os }}-pip-django-${{ hashFiles('deploy/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-django-
-
 
       - name: Install MW & LS
         run: |
