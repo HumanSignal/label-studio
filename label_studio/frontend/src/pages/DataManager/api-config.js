@@ -26,10 +26,10 @@ export const APIConfig = {
     annotations: "/views/:tabID/annotations",
 
     /** Single task (sample) */
-    task: "/tasks/:taskID",
+    task: "/../tasks/:taskID",
 
     /** List of tasks (samples) in the dataset */
-    tasks: "/tasks",
+    tasks: "/../tasks",
 
     /** Next task (labelstream, default sequential) */
     nextTask: "/tasks/next",
@@ -43,6 +43,7 @@ export const APIConfig = {
       path: (params) => {
         const pathBase = "/../tasks/:taskID/annotations";
         const isNewAnnotation = !isDefined(params.annotationID);
+
         return isNewAnnotation ? pathBase : `${pathBase}/:annotationID`;
       },
     },
