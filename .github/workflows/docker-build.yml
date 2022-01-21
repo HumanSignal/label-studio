@@ -80,9 +80,6 @@ jobs:
 
       - name: Install MW & LS
         run: |
-#          sudo apt-get update && sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev
-#          set -xeuo pipefail
-#          pip install -U pip==20.2
           pip3 install -r deploy/requirements-mw.txt
           pip3 install -e .
 
