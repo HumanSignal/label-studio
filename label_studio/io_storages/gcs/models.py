@@ -173,8 +173,9 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
         # Note: as described in that page, you need to run your function with a service account
         # with the permission roles/iam.serviceAccountTokenCreator
         auth_request = requests.Request()
-        credentials, project = google.auth.default()
-        storage_client = google_storage.Client(project, credentials)
+        # credentials, project = google.auth.default()
+        # storage_client = google_storage.Client(project, credentials)
+        storage_client = self.get_client()
         data_bucket = storage_client.lookup_bucket(bucket_name)
         signed_blob_path = data_bucket.blob(blob_name)
         expires_at_ms = datetime.now() + timedelta(minutes=self.presign_ttl)
