@@ -143,26 +143,38 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         DELETE=all_permissions.tasks_delete,
     )
 
-    @staticmethod
-    def get_serializer_context(request):
+    def get_serializer_context(self, request):
+        review = bool_from_request(self.request.GET, 'review', False)
+        if review:
+            fields = ['drafts', 'annotations']
+        else:
+            fields = ['completed_by_full', 'drafts', 'predictions', 'annotations']
+
         return {
             'resolve_uri': True,
-            'completed_by': 'full',
-            'drafts': True,
-            'predictions': True,
-            'annotations': True,
+            'completed_by': 'full' if 'completed_by_full' in fields else None,
+            'predictions': 'predictions' in fields,
+            'annotations': 'annotations' in fields,
+            'drafts': 'drafts' in fields,
             'request': request
         }
-
 
     def get(self, request, pk):
         task = self.get_object()
         context = self.get_serializer_context(request)
         context['project'] = project = task.project
 
+        review = bool_from_request(self.request.GET, 'review', False)
+        if review:
+            kwargs = {
+                'fields_for_evaluation': ['annotators', 'reviewed']
+            }
+        else:
+            kwargs = {'all_fields': True}
+
         # we need to annotate task because before it was retrieved only for permission checks and project retrieving
         task = Task.prepared.get_queryset(
-            all_fields=True, prepare_params=PrepareParams(project=project.id)
+            prepare_params=PrepareParams(project=project.id), **kwargs
         ).filter(id=task.id).first()
 
         # get prediction

@@ -13,7 +13,7 @@ from annoying.fields import AutoOneToOneField
 from functools import lru_cache
 
 from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks
-from core.utils.common import create_hash, sample_query, get_attr_or_item, load_func
+from core.utils.common import create_hash, get_attr_or_item, load_func
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.label_config import (
     validate_label_config,
@@ -25,7 +25,9 @@ from core.label_config import (
     get_all_control_tag_tuples,
     get_annotation_tuple,
 )
+from core.bulk_update_utils import bulk_update
 from label_studio_tools.core.label_config import parse_config
+
 
 logger = logging.getLogger(__name__)
 
@@ -355,31 +357,49 @@ class Project(ProjectMixin, models.Model):
         elif tasks_number_changed and self.overlap_cohort_percentage < 100 and self.maximum_annotations > 1:
             self._rearrange_overlap_cohort()
 
-        if maximum_annotations_changed or overlap_cohort_percentage_changed:
+        if maximum_annotations_changed or overlap_cohort_percentage_changed or tasks_number_changed:
             bulk_update_stats_project_tasks(
                 self.tasks.filter(Q(annotations__isnull=False) & Q(annotations__ground_truth=False))
             )
 
     def _rearrange_overlap_cohort(self):
-        tasks_with_overlap = self.tasks.filter(overlap__gt=1)
-        tasks_with_overlap_count = tasks_with_overlap.count()
-        total_tasks = self.tasks.count()
+        """
+        Rearrange overlap depending on annotation count in tasks
+        """
+        all_project_tasks = Task.objects.filter(project=self)
+        max_annotations = self.maximum_annotations
+        must_tasks = int(self.tasks.count() * self.overlap_cohort_percentage / 100 + 0.5)
 
-        new_tasks_with_overlap_count = int(self.overlap_cohort_percentage / 100 * total_tasks + 0.5)
-        if tasks_with_overlap_count > new_tasks_with_overlap_count:
-            # TODO: warn if we try to reduce current cohort that is already labeled with overlap
-            reduce_by = tasks_with_overlap_count - new_tasks_with_overlap_count
-            reduce_tasks = sample_query(tasks_with_overlap, reduce_by)
-            reduce_tasks.update(overlap=1)
-            reduced_tasks_ids = reduce_tasks.values_list('id', flat=True)
-            tasks_with_overlap.exclude(id__in=reduced_tasks_ids).update(overlap=self.maximum_annotations)
+        tasks_with_max_annotations = all_project_tasks.annotate(
+            anno=Count('annotations', filter=Q_task_finished_annotations & Q(annotations__ground_truth=False))
+        ).filter(anno__gte=max_annotations)
 
-        elif tasks_with_overlap_count < new_tasks_with_overlap_count:
-            increase_by = new_tasks_with_overlap_count - tasks_with_overlap_count
-            tasks_without_overlap = self.tasks.filter(overlap=1)
-            increase_tasks = sample_query(tasks_without_overlap, increase_by)
-            increase_tasks.update(overlap=self.maximum_annotations)
-            tasks_with_overlap.update(overlap=self.maximum_annotations)
+        tasks_with_min_annotations = all_project_tasks.exclude(
+            id__in=tasks_with_max_annotations
+        )
+
+        # check how many tasks left to finish
+        left_must_tasks = max(must_tasks - tasks_with_max_annotations.count(), 0)
+        if left_must_tasks > 0:
+            # if there are unfinished tasks update tasks with count(annotations) >= overlap
+            tasks_with_max_annotations.update(overlap=max_annotations)
+            # order other tasks by count(annotations)
+            tasks_with_min_annotations = tasks_with_min_annotations.annotate(
+                anno=Count('annotations')
+            ).order_by('-anno')
+            objs = []
+            # assign overlap depending on annotation count
+            for item in tasks_with_min_annotations[:left_must_tasks]:
+                item.overlap = max_annotations
+                objs.append(item)
+            for item in tasks_with_min_annotations[left_must_tasks:]:
+                item.overlap = 1
+                objs.append(item)
+            with transaction.atomic():
+                bulk_update(objs, update_fields=['overlap'], batch_size=settings.BATCH_SIZE)
+        else:
+            tasks_with_max_annotations.update(overlap=max_annotations)
+            tasks_with_min_annotations.update(overlap=1)
 
     def remove_tasks_by_file_uploads(self, file_upload_ids):
         self.tasks.filter(file_upload_id__in=file_upload_ids).delete()

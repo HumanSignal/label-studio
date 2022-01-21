@@ -4,6 +4,7 @@ on:
     branches: ['*', '*/*', '*/**', master]
     paths:
       - 'label_studio/**'
+      - '!label_studio/frontend/**'
       - '.github/workflows/tests.yml'
       - 'deploy/requirements.txt'
       - 'deploy/requirements-mw.txt'

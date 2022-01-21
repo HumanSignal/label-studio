@@ -15,7 +15,7 @@ from django.db.models import Sum, Count
 from django.conf import settings
 from ordered_set import OrderedSet
 
-from core.utils.common import get_object_with_check_and_log, int_from_request, load_func
+from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, load_func
 from core.permissions import all_permissions, ViewClassPermission
 from projects.models import Project
 from projects.serializers import ProjectSerializer
@@ -200,6 +200,12 @@ class TaskListAPI(generics.ListCreateAPIView):
         page = self.paginate_queryset(queryset)
         all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
         fields_for_evaluation = get_fields_for_evaluation(prepare_params, request.user)
+
+        review = bool_from_request(self.request.GET, 'review', False)
+        if review:
+            fields_for_evaluation = ['annotators', 'reviewed']
+            all_fields = None
+
         if page is not None:
             ids = [task.id for task in page]  # page is a list already
             tasks = list(
@@ -215,7 +221,7 @@ class TaskListAPI(generics.ListCreateAPIView):
             page = [tasks_by_ids[_id] for _id in ids]
 
             # retrieve ML predictions if tasks don't have them
-            if project.evaluate_predictions_automatically:
+            if not review and project.evaluate_predictions_automatically:
                 tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
                 evaluate_predictions(tasks_for_predictions)
 
