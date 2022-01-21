@@ -10,9 +10,7 @@ meta_description: Template for adding elliptical regions to images for object de
 
 Put ellipses on an image for object detection and segmentation use cases. 
 
-<img src="/images/screens/image_ellipse.png" class="img-template-example" title="Images Ellipse" />
-
-## Config 
+## Labeling Configuration 
 
 ```html
 <View>

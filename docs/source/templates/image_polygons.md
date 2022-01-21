@@ -8,28 +8,7 @@ meta_title: Semantic Segmentation with Polygons Data Labeling Template
 meta_description: Template for performing semantic segmentation with polygons with Label Studio for your machine learning and data science projects.
 ---
 
-Add polygons to images to perform semantic segmentation. 
-
-<img src="/images/screens/image_polygons.png" class="img-template-example" title="Images Polygons" />
-
-## Config 
-
-```html
-<View style="display: flex">
-  <View style="width: 100px">
-    <Header value="Pick label" />
-    <PolygonLabels name="tag" toName="img" strokewidth="2" pointstyle="circle" pointsize="small" showInline="false">
-      <Label value="Car" background="blue" />
-      <Label value="Sign" background="blue" />
-      <Label value="Person" background="blue" />
-      <Label value="Tree" background="green" />
-    </PolygonLabels>
-    </View>
-  <View>
-    <Image name="img" value="$image" showMousePos="true" zoom="true" />
-  </View>
-</View>
-```
+Add polygons to images to perform semantic segmentation.
 
 ## Labeling Configuration
 
