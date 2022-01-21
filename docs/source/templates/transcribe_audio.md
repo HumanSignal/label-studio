@@ -5,8 +5,7 @@ category: Audio/Speech Processing
 cat: audio-speech-processing
 order: 301
 meta_title: Audio Transcription Data Labeling Template
-meta_description: Label Studio Audio Transcription Template for machine learning and data science data labeling projects.
-
+meta_description: Template for audio transcription for automatic speech recognition use cases with Label Studio for your machine learning and data science projects.
 ---
 
 Listen to an audio file and transcribe its content in natural language, performing speech recognition.

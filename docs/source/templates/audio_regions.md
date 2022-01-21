@@ -4,8 +4,8 @@ type: templates
 category: Audio/Speech Processing
 cat: audio-speech-processing
 order: 308
-meta_title: Audio Regions Data Labeling Template
-meta_description: Label Studio Audio Regions Template for machine learning and data science data labeling projects.
+meta_title: Audio Classification for Segments Data Labeling Template
+meta_description: Template for classifying audio regions for segmentation tasks with Label Studio for your machine learning and data science projects.
 ---
 
 Listen to the audio file and classify it. 

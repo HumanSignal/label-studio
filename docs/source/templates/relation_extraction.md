@@ -4,8 +4,8 @@ type: templates
 category: Natural Language Processing
 cat: natural-language-processing
 order: 205
-meta_title: 
-meta_description: 
+meta_title: Relation Extraction Data Labeling Template
+meta_description: Template for extracting relations in natural language processing text tasks with Label Studio for your machine learning and data science projects.
 ---
 
 If you need to train a natural language processing model to perform relationship extraction tasks, use this template to create a dataset. This template prompts an annotator to label text spans and identify relationships between the spans. For example, identifying people and organizations, and adding relation arrows and labels to identify who founded an organization. 

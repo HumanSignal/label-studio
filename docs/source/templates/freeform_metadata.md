@@ -4,8 +4,8 @@ type: templates
 category: Structured Data Parsing
 cat: structured-data-parsing
 order: 601
-meta_title: 
-meta_description: 
+meta_title: Freeform Metadata Data Labeling Template
+meta_description: Template for adding freeform content metadata to tasks with Label Studio for your machine learning and data science projects.
 ---
 
 If you want to collect metadata for a text sample for tagging purposes, or another reason, use this template to provide a table for annotators to type in freeform metadata about a text passage. You can modify this template to show an image or another data type by using a different tag. 

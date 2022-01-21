@@ -4,9 +4,11 @@ type: templates
 category: Time Series Analysis
 cat: time-series-analysis
 order: 704
-meta_title: 
-meta_description: 
+meta_title: Signal Quality Data Labeling Template
+meta_description: Template to classify signal quality in a time series with Label Studio for your machine learning and data science projects.
 ---
+
+Identify regions on a time series and rate and classify the quality of the signal. 
 
 ## Labeling Configuration
 
@@ -51,3 +53,10 @@ meta_description:
     </TimeSeries>
 </View>
 ```
+
+## Related tags
+
+- [TimeSeriesLabels](/tags/timeserieslabels.html)
+- [Rating](/tags/rating.html)
+- [Choices](/tags/choices.html)
+- [TimeSeries](/tags/timeseries.html)

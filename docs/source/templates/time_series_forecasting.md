@@ -4,8 +4,8 @@ type: templates
 category: Time Series Analysis
 cat: time-series-analysis
 order: 701
-meta_title: 
-meta_description: 
+meta_title: Time Series Forecasting Data Labeling Template
+meta_description: Template for preparing time series data for forecasting use cases with Label Studio for your machine learning and data science projects.
 ---
 
 To train a machine learning model to perform forecasting on time series data, create a dataset using this template. This template prompts annotators to highlight predictable region spans in the time series channels and label them as "Regions", then identify the trend forecast for a specific region. 

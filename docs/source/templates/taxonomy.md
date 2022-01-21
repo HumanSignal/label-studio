@@ -4,8 +4,8 @@ type: templates
 category: Natural Language Processing
 cat: natural-language-processing
 order: 204
-meta_title: 
-meta_description: 
+meta_title: Taxonomy Data Labeling Template
+meta_description: Template for classifying a taxonomy or hierarchy with Label Studio for your machine learning and data science projects.
 ---
 
 Perform classification tasks within the context of a defined taxonomy or hierarchy of choices. 

@@ -4,8 +4,8 @@ type: templates
 category: Conversational AI
 cat: conversational-ai
 order: 404
-meta_title: 
-meta_description: 
+meta_title: Slot Filling and Intent Classification Data Labeling Template
+meta_description: Template for slot filling in natural language understanding use cases with intent classification for dialogue with Label Studio for your machine learning and data science projects.
 ---
 
 For natural language understanding cases when you need to detect the intent of a speaker in dialogue, perform intent classification and slot filling to identify the entities related to the intent of the dialogue, and classify those entities. 

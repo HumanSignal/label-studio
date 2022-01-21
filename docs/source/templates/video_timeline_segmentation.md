@@ -4,8 +4,8 @@ type: templates
 category: Videos
 cat: videos
 order: 802
-meta_title: 
-meta_description: 
+meta_title: Video Timeline Segmentation Data Labeling Template
+meta_description: Template for segmenting videos on a timeline with Label Studio for your machine learning and data science projects.
 ---
 
 To more easily identify video timelines, label segments alongside the audio channel of the video using video timeline segmentation. Use this template if you want to label the audio segment of a video on a timeline. 

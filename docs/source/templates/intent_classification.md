@@ -4,8 +4,8 @@ type: templates
 category: Audio/Speech Processing
 cat: audio-speech-processing
 order: 305
-meta_title: 
-meta_description: 
+meta_title: Intent Classification Data Labeling Template
+meta_description: Template for classifying intent of audio data with Label Studio for your machine learning and data science projects.
 ---
 
 If you want to identify the intent of an audio recording, such as an interview or customer service call, use this template to classify intent by selecting choices and listening to an audio clip.

@@ -4,8 +4,8 @@ type: templates
 category: Conversational AI
 cat: conversational-ai
 order: 402
-meta_title: 
-meta_description: 
+meta_title: Response Selection Data Labeling Template
+meta_description: Template for selecting relevant responses for conversational AI use cases with Label Studio for your machine learning and data science projects.
 ---
 
 If you want to refine the best response for a conversational AI use case, you can provide already-generated responses to annotators and have them choose the best one. 

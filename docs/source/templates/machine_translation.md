@@ -4,8 +4,8 @@ type: templates
 category: Natural Language Processing
 cat: natural-language-processing
 order: 207
-meta_title: 
-meta_description: 
+meta_title: Machine Translation Data Labeling Template
+meta_description: Template for providing translations of text with Label Studio for your machine learning and data science projects.
 ---
 
 If you want to improve existing machine translation capabilities, you want to provide a dataset with robust and accurate translation examples. Use this template to read a text in one language and store a translation in another language.

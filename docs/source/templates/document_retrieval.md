@@ -4,8 +4,8 @@ type: templates
 category: Ranking and Scoring
 cat: ranking-and-scoring
 order: 602
-meta_title: 
-meta_description: 
+meta_title: Document Retrieval Data Labeling Template
+meta_description: Template for annotating documents for document retrieval tasks with Label Studio for your machine learning and data science projects. 
 ---
 
 If you want to start training document retrieval or recommender models, you might want to develop a dataset with that identifies similar documents. Use this template to identify and choose documents that are related to a specific query or an existing document.

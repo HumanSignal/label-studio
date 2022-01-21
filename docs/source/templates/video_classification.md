@@ -5,7 +5,7 @@ category: Videos
 cat: videos
 order: 801
 meta_title: Video Classification Data Labeling Template
-meta_description: Label Studio Video Classification Template for machine learning and data science data labeling projects.
+meta_description: Template for video classification tasks with Label Studio for your machine learning and data science projects.
 ---
 
 If you want to build a video classification machine learning model, for example for content moderation or training use cases, you want a relevant dataset of classified videos. Use this template to classify videos. 
@@ -13,7 +13,7 @@ If you want to build a video classification machine learning model, for example 
 You can build a video classifier using the HyperText tag or the Video tag.
 
 ## Labeling Configuration
-Using the HyperText tag.
+Using the HyperText tag:
 
 ```html
 <View>

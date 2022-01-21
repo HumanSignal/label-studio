@@ -4,8 +4,8 @@ type: templates
 category: Computer Vision
 cat: computer-vision
 order: 107
-meta_title: 
-meta_description: 
+meta_title: Visual Question Answering Data Labeling Template
+meta_description: Template for performing visual question answering data labeling tasks with Label Studio for your machine learning and data science projects.
 ---
 
 Create a dataset with answered questions about images using this visual question answering template. In response to an image, annotators can provide free-text answers to a question and also label components of a question with relevant aspects. 

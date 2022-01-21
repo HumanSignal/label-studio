@@ -5,7 +5,7 @@ category: Audio/Speech Processing
 cat: audio-speech-processing
 order: 307
 meta_title: Audio Classification Data Labeling Template
-meta_description: Label Studio Audio Classification Template for machine learning and data science data labeling projects.
+meta_description: Template for classifying audio and intent using Label Studio for your data science and machine learning projects.
 ---
 
 Listen to the audio file and classify it. 

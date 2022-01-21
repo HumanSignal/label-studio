@@ -4,8 +4,8 @@ type: templates
 category: Computer Vision
 cat: computer-vision
 order: 101
-meta_title: Image Polygons Data Labeling Template
-meta_description: Label Studio Image Polygons Template for machine learning and data science data labeling projects.
+meta_title: Semantic Segmentation with Polygons Data Labeling Template
+meta_description: Template for performing semantic segmentation with polygons with Label Studio for your machine learning and data science projects.
 ---
 
 Add polygons to images to perform semantic segmentation. 

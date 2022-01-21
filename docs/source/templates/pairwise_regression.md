@@ -4,8 +4,8 @@ type: templates
 category: Ranking and Scoring
 cat: ranking-and-scoring
 order: 501
-meta_title: 
-meta_description: 
+meta_title: Pairwise Regression Data Labeling Template
+meta_description: Template for performing pairwise comparison tasks for regression models with Label Studio for your machine learning and data science projects.
 ---
 
 If you need a dataset to train a pairwise regression model, use this template to rate pairs of images based on how similar they are. You can also customize this template to rate different properties of different types of data, such as rating whether the sentiment of two text excerpts of movie reviews is similar. 

@@ -4,8 +4,8 @@ type: templates
 category: Conversational AI
 cat: conversational-ai
 order: 401
-meta_title: 
-meta_description: 
+meta_title: Response Generation Data Labeling Template
+meta_description: Template for generating responses in natural language understanding use cases with Label Studio for your machine learning and data science projects.
 ---
 
 Create a dataset to train a machine learning model to generate a response for a chatbot or other conversational AI use case. 

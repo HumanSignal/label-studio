@@ -4,8 +4,8 @@ type: templates
 category: Audio/Speech Processing
 cat: audio-speech-processing
 order: 303
-meta_title: 
-meta_description: 
+meta_title: Speaker Segmentation Data Labeling Template
+meta_description: Template for segmenting an audio clip based on speaker with Label Studio for your machine learning and data science projects.
 ---
 
 When preparing audio transcripts or training a machine learning model to differentiate between different speakers, use this template to perform speaker segmentation and label different regions of an audio clip with different speakers. 

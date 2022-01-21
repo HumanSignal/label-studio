@@ -1,11 +1,11 @@
 ---
-title: Image Ellipse
+title: Image Ellipse Labeling
 type: templates
 category: Computer Vision
 cat: computer-vision
 order: 110
 meta_title: Image Ellipse Data Labeling Template
-meta_description: Label Studio Image Ellipse Template for machine learning and data science data labeling projects.
+meta_description: Template for adding elliptical regions to images for object detection and segmentation use cases with Label Studio for your machine learning and data science projects.
 ---
 
 Put ellipses on an image for object detection and segmentation use cases. 

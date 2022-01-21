@@ -5,7 +5,7 @@ category: Time Series Analysis
 cat: time-series-analysis
 order: 750
 meta_title: Time Series Data Labeling Template
-meta_description: Label Studio Time Series Data Template for machine learning and data science data labeling projects.
+meta_description: Template for labeling multivariate and simple time series data with Label Studio for your machine learning and data science projects.
 ---
 
 Label any type of time series data using this generic template.

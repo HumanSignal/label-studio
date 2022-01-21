@@ -4,21 +4,11 @@ type: templates
 category: Ranking and Scoring
 cat: ranking-and-scoring
 order: 503
-meta_title: Pairwise Comparison Data Labeling Template
-meta_description: Label Studio Pairwise Comparison Template for machine learning and data science data labeling projects.
+meta_title: Pairwise Classification Data Labeling Template
+meta_description: Template for performing pairwise classification and comparison tasks with Label Studio for your machine learning and data science projects.
 ---
 
 Pairwise comparison of different objects.
-
-## Config
-
-```html
-<View>
-  <Pairwise name="pw" toName="txt-1,txt-2" />
-  <Text name="txt-1" value="$text1" />
-  <Text name="txt-2" value="$text2" />
-</View>
-```
 
 ## Labeling Configuration
 
