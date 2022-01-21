@@ -110,7 +110,10 @@ class ImportStorage(Storage):
                 data = data['data']
 
             with transaction.atomic():
-                task = Task.objects.create(data=data, project=self.project, overlap=maximum_annotations)
+                task = Task.objects.create(
+                    data=data, project=self.project, overlap=maximum_annotations,
+                    is_labeled=len(annotations) >= maximum_annotations
+                )
                 link_class.create(task, key, self)
                 logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
                 tasks_created += 1
@@ -134,6 +137,12 @@ class ImportStorage(Storage):
         self.last_sync = timezone.now()
         self.last_sync_count = tasks_created
         self.save()
+
+        self.project.update_tasks_states(
+                maximum_annotations_changed=False,
+                overlap_cohort_percentage_changed=False,
+                tasks_number_changed=True
+            )
 
     def scan_and_create_links(self):
         """This is proto method - you can override it, or just replace ImportStorageLink by your own model"""
