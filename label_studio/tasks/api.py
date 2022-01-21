@@ -68,12 +68,8 @@ class TaskListAPI(DMTaskListAPI):
         queryset = super().filter_queryset(queryset)
         return queryset.filter(project__organization=self.request.user.active_organization)
 
-    @swagger_auto_schema(auto_schema=None)
-    def get(self, request, *args, **kwargs):
-        return super(TaskListAPI, self).get(request, *args, **kwargs)
-
     def get_serializer_context(self):
-        context = super(TaskListAPI, self).get_serializer_context()
+        context = super().get_serializer_context()
         project_id = self.request.data.get('project')
         if project_id:
             context['project'] = generics.get_object_or_404(Project, pk=project_id)
