@@ -63,10 +63,28 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-${{ env.NODE }}-
 
+      - name: Set up Python
+        uses: actions/setup-python@v2.3.1
+        with:
+          python-version: '3.8'
+
+      - uses: actions/cache@v2.1.7
+        name: Configure pip cache
+        id: pip-cache
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-django-${{ hashFiles('deploy/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-django-
+
+
       - name: Install MW & LS
         run: |
+#          sudo apt-get update && sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev
+#          set -xeuo pipefail
+#          pip install -U pip==20.2
           pip3 install -r deploy/requirements-mw.txt
-          pip install -e .
+          pip3 install -e .
 
       - name: Install LSF & set version.py
         run: ./deploy/prebuild.sh
