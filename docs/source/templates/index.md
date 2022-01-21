@@ -1,18 +1,14 @@
 ---
-title: Template Library
+title: Get Started with Templates
 type: templates
-order: 1
-meta_title: Template Library For Data Labeling & Annotation
+order: 50
+meta_title: Get started with templates in Label Studio
 meta_description: Label Studio Template library of data labeling and annotation configurations for various data types.
 ---
 
 Label Studio templates provide predefined labeling interfaces for specific use cases and data types. You can use templates to get started labeling right away, or as a starting point to build a fully customized labeling interface for your data labeling project.
 
-## Available templates
-
-
-
-
+[Check out the template gallery to view all the templates!](gallery.html)
 
 ## Template components
 
