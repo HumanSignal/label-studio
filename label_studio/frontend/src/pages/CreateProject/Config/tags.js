@@ -55,6 +55,9 @@ const OBJECTS = {
   Table: {
     type: 'Table',
   },
+  Video: {
+    type: 'Video',
+  },
 };
 
 const Labels = {
@@ -64,9 +67,11 @@ const Labels = {
       title: 'Display labels:',
       type: ["bottom", "left", "right", "top"],
       control: true,
+      when: $tag => $tag.$object.tagName !== "Video",
       param: ($control, value) => {
         let $container = $control.parentNode;
         let $labels = $control;
+
         if ($container.firstChild?.tagName?.toUpperCase() === "FILTER") {
           $labels = $container;
           $container = $labels.parentNode;
@@ -76,6 +81,7 @@ const Labels = {
         const reversed = ["top", "left"].includes(value);
         const direction = (inline ? "column" : "row") + (reversed ? "-reverse" : "");
         const alreadyApplied = $container.getAttribute("style")?.includes("flex");
+
         if (!alreadyApplied) {
           $container = $obj.ownerDocument.createElement('View');
           $labels.parentNode.insertBefore($container, $obj);
@@ -87,13 +93,16 @@ const Labels = {
       },
       value: $control => {
         let $container = $control.parentNode;
+
         if ($container.firstChild?.tagName?.toUpperCase() === "FILTER") {
           $container = $container.parentNode;
         }
         const style = $container.getAttribute("style");
         const direction = style?.match(/direction:(row|column)(-reverse)?/);
+
         if (!direction) {
           const position = $control.compareDocumentPosition($control.$object);
+
           return position & Node.DOCUMENT_POSITION_FOLLOWING ? "top" : "bottom";
         }
         if (direction[1] === "column") return direction[2] ? "top" : "bottom";
@@ -108,6 +117,7 @@ const Labels = {
         if (value) {
           const $filter = $obj.ownerDocument.createElement('Filter');
           const $container = $obj.ownerDocument.createElement('View');
+
           $filter.setAttribute('toName', $obj.getAttribute('name'));
           $filter.setAttribute('minlength', 0);
           $filter.setAttribute('name', 'filter'); // @todo should be unique
@@ -116,8 +126,10 @@ const Labels = {
           $container.appendChild($obj);
         } else {
           const $filter = $obj.previousElementSibling;
+
           if ($filter.tagName.toUpperCase() === "FILTER") {
             const $container = $obj.parentNode;
+
             $container.parentNode.insertBefore($obj, $container);
             $container.parentNode.removeChild($container);
           }

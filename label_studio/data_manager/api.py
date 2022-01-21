@@ -15,7 +15,7 @@ from django.db.models import Sum, Count
 from django.conf import settings
 from ordered_set import OrderedSet
 
-from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, find_first_many_to_one_related_field_by_prefix, load_func
+from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, load_func
 from core.permissions import all_permissions, ViewClassPermission
 from projects.models import Project
 from projects.serializers import ProjectSerializer
@@ -180,17 +180,10 @@ class TaskListAPI(generics.ListAPIView):
 
     @staticmethod
     def get_task_serializer_context(request, project):
-        storage = find_first_many_to_one_related_field_by_prefix(project, '.*io_storages.*')
         all_fields = request.GET.get('fields', None) == 'all'  # false by default
 
-        resolve_uri = \
-            storage or \
-            (project.task_data_login and project.task_data_password) or \
-            settings.CLOUD_FILE_STORAGE_ENABLED
-
         return {
-            'proxy': bool_from_request(request.GET, 'proxy', True),
-            'resolve_uri': resolve_uri,
+            'resolve_uri': True,
             'request': request,
             'project': project,
             'drafts': all_fields,
@@ -225,6 +218,12 @@ class TaskListAPI(generics.ListAPIView):
         page = self.paginate_queryset(queryset)
         all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
         fields_for_evaluation = get_fields_for_evaluation(prepare_params, request.user)
+
+        review = bool_from_request(self.request.GET, 'review', False)
+        if review:
+            fields_for_evaluation = ['annotators', 'reviewed']
+            all_fields = None
+
         if page is not None:
             ids = [task.id for task in page]  # page is a list already
             tasks = list(
@@ -240,7 +239,7 @@ class TaskListAPI(generics.ListAPIView):
             page = [tasks_by_ids[_id] for _id in ids]
 
             # retrieve ML predictions if tasks don't have them
-            if project.evaluate_predictions_automatically:
+            if not review and project.evaluate_predictions_automatically:
                 tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
                 evaluate_predictions(tasks_for_predictions)
 
@@ -275,15 +274,19 @@ class TaskAPI(generics.RetrieveAPIView):
     def get_serializer_class(self):
         return DataManagerTaskSerializer
 
-    @staticmethod
-    def get_serializer_context(request):
+    def get_serializer_context(self, request):
+        review = bool_from_request(self.request.GET, 'review', False)
+        if review:
+            fields = ['drafts', 'annotations']
+        else:
+            fields = ['completed_by_full', 'drafts', 'predictions', 'annotations']
+
         return {
-            'proxy': bool_from_request(request.GET, 'proxy', True),
             'resolve_uri': True,
-            'completed_by': 'full',
-            'drafts': True,
-            'predictions': True,
-            'annotations': True,
+            'completed_by': 'full' if 'completed_by_full' in fields else None,
+            'predictions': 'predictions' in fields,
+            'annotations': 'annotations' in fields,
+            'drafts': 'drafts' in fields,
             'request': request
         }
 
@@ -297,9 +300,17 @@ class TaskAPI(generics.RetrieveAPIView):
         context = self.get_serializer_context(request)
         context['project'] = project = task.project
 
+        review = bool_from_request(self.request.GET, 'review', False)
+        if review:
+            kwargs = {
+                'fields_for_evaluation': ['annotators', 'reviewed']
+            }
+        else:
+            kwargs = {'all_fields': True}
+
         # we need to annotate task because before it was retrieved only for permission checks and project retrieving
         task = Task.prepared.get_queryset(
-            all_fields=True, prepare_params=PrepareParams(project=project.id)
+            prepare_params=PrepareParams(project=project.id), **kwargs
         ).filter(id=task.id).first()
 
         # get prediction

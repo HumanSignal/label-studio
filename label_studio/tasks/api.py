@@ -74,12 +74,6 @@ class TaskListAPI(generics.ListCreateAPIView):
         """,
         manual_parameters=[
             openapi.Parameter(
-                name='proxy',
-                type=openapi.TYPE_BOOLEAN,
-                in_=openapi.IN_QUERY,
-                description='Use the proxy parameter inline for credential access to task data'
-            ),
-            openapi.Parameter(
                 name='id',
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_PATH,
@@ -135,17 +129,17 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     
     def retrieve(self, request, *args, **kwargs):
         task = self.get_object()
+        project = task.project
 
         # call machine learning api and format response
-        if task.project.evaluate_predictions_automatically:
+        if project.evaluate_predictions_automatically:
             for ml_backend in task.project.ml_backends.all():
                 ml_backend.predict_tasks([task])
 
         result = self.get_serializer(task).data
 
         # use proxy inlining to task data (for credential access)
-        proxy = bool_from_request(request.GET, 'proxy', True)
-        result['data'] = task.resolve_uri(result['data'], proxy=proxy)
+        result['data'] = task.resolve_uri(result['data'], project)
         return Response(result)
 
     def get(self, request, *args, **kwargs):

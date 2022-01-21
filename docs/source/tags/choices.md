@@ -1,7 +1,7 @@
 ---
 title: Choices
 type: tags
-order: 403
+order: 404
 meta_title: Choices Tag for Multiple Choice Labels
 meta_description: Customize Label Studio with multiple choice labels for machine learning and data science projects.
 ---

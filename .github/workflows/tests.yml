@@ -4,6 +4,7 @@ on:
     branches: ['*', '*/*', '*/**', master]
     paths:
       - 'label_studio/**'
+      - '!label_studio/frontend/**'
       - '.github/workflows/tests.yml'
       - 'deploy/requirements.txt'
       - 'deploy/requirements-mw.txt'
@@ -61,7 +62,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v2.5.0
+        uses: actions/setup-node@v2.5.1
         with:
           node-version: "${{ env.NODE }}"
 
@@ -173,7 +174,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v2.5.0
+        uses: actions/setup-node@v2.5.1
         with:
           node-version: 14
 
@@ -284,4 +285,4 @@ jobs:
         collect_analytics: 0
       run: |
         cd label_studio/
-        coverage report -m --fail-under=40
+        coverage report -i -m --fail-under=40
