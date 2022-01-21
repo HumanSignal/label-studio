@@ -103,7 +103,6 @@ stages:
         "tasks": [
         {
           "cancelled_annotations": 0,
-          "completed_at": null,
 
           "annotations_results": "",
           "data": {
@@ -146,7 +145,7 @@ stages:
         },
         {
           "cancelled_annotations": 0,
-          "completed_at": null,
+
           "annotations_results": !raw "[{type:choices, value:{choices:[class_A]}, to_name:text, from_name:text_class}]",
           "data": {
             "text": "Test example phrase 1",
@@ -211,7 +210,6 @@ stages:
         },
         {
           "cancelled_annotations": 0,
-          "completed_at": null,
 
           "annotations_results": !raw "[{type:choices, value:{choices:[class_A]}, to_name:text, from_name:text_class}]",
           "data": {
@@ -274,7 +272,7 @@ stages:
         },
         {
           "cancelled_annotations": 0,
-          "completed_at": null,
+
 
           "annotations_results": !raw "[{type:choices, value:{choices:[class_TESTING]}, to_name:text, from_name:text_class}]",
           "data": {
@@ -1029,7 +1027,7 @@ stages:
         },
         {
           "cancelled_annotations": 0,
-          
+
 
           "data": {
             "int_field": "99",
