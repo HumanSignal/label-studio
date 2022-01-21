@@ -234,60 +234,6 @@ class TaskListAPI(generics.ListCreateAPIView):
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
     tags=['Data Manager'],
-    operation_summary='Get task by ID',
-    operation_description='Retrieve a specific task by ID.',
-    manual_parameters=[
-        openapi.Parameter(
-            name='id',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_PATH,
-            description='Task ID'),
-    ],
-))
-class TaskAPI(generics.RetrieveAPIView):
-    permission_required = all_permissions.projects_view
-
-    def get_serializer_class(self):
-        return DataManagerTaskSerializer
-
-    @staticmethod
-    def get_serializer_context(request):
-        return {
-            'resolve_uri': True,
-            'completed_by': 'full',
-            'drafts': True,
-            'predictions': True,
-            'annotations': True,
-            'request': request
-        }
-
-    def get_queryset(self):
-        return Task.objects.filter(
-            project__organization=self.request.user.active_organization
-        )
-
-    def get(self, request, pk):
-        task = self.get_object()
-        context = self.get_serializer_context(request)
-        context['project'] = project = task.project
-
-        # we need to annotate task because before it was retrieved only for permission checks and project retrieving
-        task = Task.prepared.get_queryset(
-            all_fields=True, prepare_params=PrepareParams(project=project.id)
-        ).filter(id=task.id).first()
-
-        # get prediction
-        if (project.evaluate_predictions_automatically or project.show_collab_predictions) \
-                and not task.predictions.exists():
-            evaluate_predictions([task])
-
-        serializer = self.get_serializer_class()(task, many=False, context=context)
-        data = serializer.data
-        return Response(data)
-
-
-@method_decorator(name='get', decorator=swagger_auto_schema(
-    tags=['Data Manager'],
     operation_summary='Get data manager columns',
     operation_description='Retrieve the data manager columns available for the tasks in a specific project.',
 ))

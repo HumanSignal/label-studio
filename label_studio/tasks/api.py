@@ -4,28 +4,39 @@ import logging
 
 from django.db.models import Q
 from django.utils import timezone
-
-import drf_yasg.openapi as openapi
-from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
-
-from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+import drf_yasg.openapi as openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, viewsets
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
-from core.utils.common import get_object_with_check_and_log, DjangoFilterDescriptionInspector
-from core.permissions import all_permissions, ViewClassPermission
-
-from tasks.models import Task, Annotation, Prediction, AnnotationDraft
+from core.permissions import ViewClassPermission, all_permissions
+from core.utils.common import (
+    DjangoFilterDescriptionInspector,
+    get_object_with_check_and_log,
+)
 from core.utils.common import bool_from_request
-from tasks.serializers import (
-    TaskSerializer, AnnotationSerializer, TaskSimpleSerializer, PredictionSerializer,
-    TaskWithAnnotationsAndPredictionsAndDraftsSerializer, AnnotationDraftSerializer)
-from projects.models import Project
-from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
-from webhooks.models import WebhookAction
 from data_manager.api import TaskListAPI as DMTaskListAPI
+from data_manager.functions import evaluate_predictions
+from data_manager.models import PrepareParams
+from data_manager.serializers import DataManagerTaskSerializer
+from projects.models import Project
+from tasks.models import Annotation, AnnotationDraft, Prediction, Task
+from tasks.serializers import (
+    AnnotationDraftSerializer,
+    AnnotationSerializer,
+    PredictionSerializer,
+    TaskSerializer,
+    TaskSimpleSerializer,
+)
+from webhooks.models import WebhookAction
+from webhooks.utils import (
+    api_webhook,
+    api_webhook_for_delete,
+    emit_webhooks_for_instance,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -132,13 +143,44 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         DELETE=all_permissions.tasks_delete,
     )
 
+    @staticmethod
+    def get_serializer_context(request):
+        return {
+            'resolve_uri': True,
+            'completed_by': 'full',
+            'drafts': True,
+            'predictions': True,
+            'annotations': True,
+            'request': request
+        }
+
+
+    def get(self, request, pk):
+        task = self.get_object()
+        context = self.get_serializer_context(request)
+        context['project'] = project = task.project
+
+        # we need to annotate task because before it was retrieved only for permission checks and project retrieving
+        task = Task.prepared.get_queryset(
+            all_fields=True, prepare_params=PrepareParams(project=project.id)
+        ).filter(id=task.id).first()
+
+        # get prediction
+        if (project.evaluate_predictions_automatically or project.show_collab_predictions) \
+                and not task.predictions.exists():
+            evaluate_predictions([task])
+
+        serializer = self.get_serializer_class()(task, many=False, context=context)
+        data = serializer.data
+        return Response(data)
+
     def get_queryset(self):
         return Task.objects.filter(project__organization=self.request.user.active_organization)
 
     def get_serializer_class(self):
         # GET => task + annotations + predictions + drafts
         if self.request.method == 'GET':
-            return TaskWithAnnotationsAndPredictionsAndDraftsSerializer
+            return DataManagerTaskSerializer
 
         # POST, PATCH, PUT
         else:
@@ -158,9 +200,6 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         # use proxy inlining to task data (for credential access)
         result['data'] = task.resolve_uri(result['data'], project)
         return Response(result)
-
-    def get(self, request, *args, **kwargs):
-        return super(TaskAPI, self).get(request, *args, **kwargs)
 
     def patch(self, request, *args, **kwargs):
         return super(TaskAPI, self).patch(request, *args, **kwargs)
