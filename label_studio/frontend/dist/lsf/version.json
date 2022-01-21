@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into feature/DEV-428/show-created-date",
-  "commit": "93198a9641dd97196b64120862ce8728d0e1c639",
-  "branch": "",
-  "date": "2021-12-28T16:28:16Z"
+  "message": "Merge branch 'master' into fix/DEV-1285/crosshair-coords",
+  "commit": "872f1fa16a0ada9d488f780c551d73b481d085a3",
+  "branch": "fix/DEV-1285/crosshair-coords",
+  "date": "2022-01-18T02:31:44Z"
 }

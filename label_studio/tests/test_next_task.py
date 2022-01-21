@@ -1299,6 +1299,7 @@ def test_overlap_first(business_client, setup_before_upload, show_overlap_first)
         is_published=True,
         maximum_annotations=1,
         show_overlap_first=show_overlap_first,
+        sampling="Uniform sampling",
         label_config='''
             <View>
               <Text name="text" value="$text"></Text>

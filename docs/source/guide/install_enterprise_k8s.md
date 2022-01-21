@@ -112,6 +112,11 @@ global:
   extraEnvironmentVars: {}
   # extraEnvironmentSecrets is a list of extra environment variables to set in the deplyoment, empty by default
   extraEnvironmentSecrets: {}
+
+  # Persistence is turned off by default.
+  # See more in the [Set up persistent storage](https://labelstud.io/guide/persistent_storage.html)
+  persistence:
+    enabled: false
   
 app:
   # High Availability (HA) mode: adjust according to your resources
@@ -142,14 +147,8 @@ rqworker:
    # HA mode: adjust according to your resources
    replicas: 2
 
-# HA mode: persist the uploaded data
-# storageClass should be configured in your cluster 
-#minio:
-#   mode: "distributed"
-#   persistence:
-#      enabled: "true"
-#      size: "10Gi"      # Adjust this according to your business needs
-#      storageClass: ""  # This line is optional. If you have no default storageClass, configure it here. If you're running in a public cloud such as AWS, Google Cloud, or Microsoft Azure, this value is already configured. If you're running in a different environment, your cluster admin can help you to get the right value. 
+minio:
+  enabled: false
 ```
 
 Adjust the included defaults to reflect your environment and copy these into a new file and save it as `lse-values.yaml`. 
