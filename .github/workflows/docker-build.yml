@@ -63,6 +63,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-${{ env.NODE }}-
 
+      - name: Install MW
+        run: |
+          pip3 install -r deploy/requirements-mw.txt
+
       - name: Install LSF & set version.py
         run: ./deploy/prebuild.sh
         env:
