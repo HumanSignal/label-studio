@@ -1,21 +1,19 @@
 ---
-title: Set up machine learning
+title: Add machine learning
 short: Machine learning setup
 type: guide
 order: 606
-meta_title: Set up machine learning with Label Studio
+meta_title: Add machine learning to Label Studio
 meta_description: Connect Label Studio to machine learning frameworks using the Label Studio ML backend SDK to integrate your model development pipeline seamlessly with your data labeling workflow. 
 ---
 
-Set up machine learning with your labeling process by setting up a machine learning backend for Label Studio. If you need to load static pre-annotated data into Label Studio, running an ML backend might be more than you need. Instead, you can [import pre-annotated data](predictions.html).
-
-With Label Studio, you can set up your favorite machine learning models to do the following:
-- **Pre-labeling** by letting models predict labels and then perform further manual refinements. 
+Add machine learning to your labeling process by setting up a machine learning backend for Label Studio. With Label Studio, you can set up your favorite machine learning models to do the following:
+- **Pre-labeling** by letting models predict labels and then have annotators perform further manual refinements. 
 - **Auto-labeling** by letting models create automatic annotations. 
 - **Online Learning** by simultaneously updating your model while new annotations are created, letting you retrain your model on-the-fly. 
-- [**Active Learning**](active_learning.html) by selecting example tasks that the model is uncertain how to label for your annotators to label. 
+- [**Active Learning**](active_learning.html) by selecting example tasks that the model is uncertain how to label for your annotators to label manually. 
 
-With these capabilities, you can use Label Studio as part of a production-ready prediction service. 
+If you need to load static pre-annotated data into Label Studio, running an ML backend might be more than you need. Instead, you can [import pre-annotated data](predictions.html).
 
 ## How to set up machine learning with Label Studio
 
@@ -26,12 +24,14 @@ Use the Label Studio ML backend to integrate Label Studio with machine learning 
 For example, for an image classification task, the model pre-selects an image class for data annotators to verify. For audio transcriptions, the model displays a transcription that data annotators can modify. 
 
 At a high level, do the following: 
-1. Set up an ML backend. You can [use an example ML backend](#Quickstart-with-an-example-ML-backend) or [create your own machine learning backend](ml_create.html).
+1. Set up an ML backend. You can either:
+   1. [Start an example ML backend](#Quickstart-with-an-example-ML-backend) or 
+   2. [Create your own machine learning backend](ml_create.html) and then [Start your custom ML backend](#Start-your-custom-ML-backend-with-Label-Studio).
 2. [Connect Label Studio to the ML backend](#Add-an-ML-backend-to-Label-Studio).
 
 ## Quickstart with an example ML backend
 
-Label Studio includes several example machine learning backends with popular machine learning models. See the [machine learning tutorials](ml_tutorials.html).
+Label Studio includes several example machine learning backends with popular machine learning models. See the [machine learning tutorials](ml_tutorials.html). Each example ML backend uses Docker Compose to start running the example ML backend server.
 
 To start an example machine learning backend with Docker Compose, do the following:
 1. Make sure port 9090 is available.
@@ -51,18 +51,9 @@ The machine learning backend server starts becomes available at `http://localhos
 
 ## Start your custom ML backend with Label Studio
 
-After you [create your own machine learning backend](ml_create.html), you can start the ML backend by doing the following. 
+After you [create your own machine learning backend](ml_create.html), you can start the ML backend server by following these instructions.
 
-### Prerequisites
-Specify all requirements in a `my-ml-backend/requirements.txt` file. For example, to specify scikit-learn as a requirement for your model, do the following:
-```requirements.txt
-scikit-learn
-```
-
-Use a virtual environment with `venv`, `virtualenv` or `conda` Python environments to run your ML backend. You can use the same environment as Label Studio. See the [Python documentation about creating virtual environments](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments) for more.
-
-### Start your custom ML backend 
-If you don't want to [use Docker Compose](#Quickstart-with-an-example-ML-backend), follow these steps to set up and start your ML backend server. 
+> Use a virtual environment with `venv`, `virtualenv` or `conda` Python environments to run your ML backend. You can use the same environment as Label Studio. See the [Python documentation about creating virtual environments](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments) for more.
 
 1. Clone the Label Studio Machine Learning Backend git repository. From the command line, run the following:
   ```bash
