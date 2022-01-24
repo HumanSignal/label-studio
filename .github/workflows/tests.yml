@@ -44,7 +44,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure pip cache
         id: pip-cache
         with:
@@ -70,7 +70,7 @@ jobs:
         id: npm-cache-dir
         run: echo "::set-output name=dir::$(npm config get cache)"
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure npm cache
         id: npm-cache
         with:
@@ -158,7 +158,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure pip cache
         id: pip-cache
         with:
@@ -182,7 +182,7 @@ jobs:
         id: npm-cache-dir
         run: echo "::set-output name=dir::$(npm config get cache)"
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure npm cache
         id: npm-cache
         with:
@@ -238,7 +238,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - uses: actions/cache@v2.1.6
+    - uses: actions/cache@v2.1.7
       name: Configure pip cache
       with:
         path: ~\AppData\Local\pip\Cache
