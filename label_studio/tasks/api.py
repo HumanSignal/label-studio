@@ -143,7 +143,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         DELETE=all_permissions.tasks_delete,
     )
 
-    def get_serializer_context(self, request):
+    def get_retrieve_serializer_context(self, request):
         review = bool_from_request(self.request.GET, 'review', False)
         if review:
             fields = ['drafts', 'annotations']
@@ -161,7 +161,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, pk):
         task = self.get_object()
-        context = self.get_serializer_context(request)
+        context = self.get_retrieve_serializer_context(request)
         context['project'] = project = task.project
 
         review = bool_from_request(self.request.GET, 'review', False)

@@ -75,7 +75,7 @@ stages:
 - name: stage
   request:
     method: GET
-    url: '{django_live_url}/api/dm/tasks?view={view_pk}'
+    url: '{django_live_url}/api/tasks?view={view_pk}'
   response:
     json:
       tasks:
