@@ -103,7 +103,6 @@ actions = [
         'entry_point': remove_duplicates,
         'permission': all_permissions.tasks_change,
         'title': 'Remove Duplicated Tasks',
-        'set_updated_at': False,
         'order': 1,
         'experimental': True,
         'dialog': {
