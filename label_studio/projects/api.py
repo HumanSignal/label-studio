@@ -6,13 +6,10 @@ import numpy as np
 import pathlib
 import os
 
-from collections import Counter
 from django.db import IntegrityError
-from django.db.models.fields import DecimalField
 from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
-from django.db.models import Q, When, Count, Case, OuterRef, Max, Exists, Value, BooleanField
 from rest_framework import generics, status, filters
 from rest_framework.exceptions import NotFound, ValidationError as RestValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -21,7 +18,7 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import exception_handler
 
-from core.utils.common import conditional_atomic, temporary_disconnect_all_signals
+from core.utils.common import temporary_disconnect_all_signals
 from core.label_config import config_essential_data_has_changed
 from projects.models import (
     Project, ProjectSummary, ProjectManager
@@ -29,14 +26,15 @@ from projects.models import (
 from projects.serializers import (
     ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer
 )
-from tasks.models import Task, Annotation, Prediction, TaskLock
-from tasks.serializers import TaskSerializer, TaskSimpleSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer
+from projects.functions.next_task import get_next_task
+from tasks.models import Task
+from tasks.serializers import TaskSerializer, TaskSimpleSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer, NextTaskSerializer
 from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
 from webhooks.models import WebhookAction
 
 from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import (
-    get_object_with_check_and_log, bool_from_request, paginator, paginator_help)
+    get_object_with_check_and_log, paginator)
 from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
 from core.utils.io import find_dir, find_file, read_yaml
 
@@ -240,259 +238,28 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
     permission_required = all_permissions.tasks_view
     serializer_class = TaskWithAnnotationsAndPredictionsAndDraftsSerializer  # using it for swagger API docs
+    queryset = Project.objects.all()
     swagger_schema = None # this endpoint doesn't need to be in swagger API docs
 
-    def _get_random_unlocked(self, task_query, upper_limit=None):
-        # get random task from task query, ignoring locked tasks
-        n = task_query.count()
-        if n > 0:
-            upper_limit = upper_limit or n
-            random_indices = np.random.permutation(upper_limit)
-            task_query_only = task_query.only('overlap', 'id')
+    def get(self, request, *args, **kwargs):
+        project = self.get_object()
+        dm_queue = filters_ordering_selected_items_exist(request.data)
+        prepared_tasks = get_prepared_queryset(request, project)
 
-            for i in random_indices:
-                try:
-                    task = task_query_only[int(i)]
-                except IndexError as exc:
-                    logger.error(f'Task query out of range for {int(i)}, count={task_query_only.count()}. '
-                                 f'Reason: {exc}', exc_info=True)
-                except Exception as exc:
-                    logger.error(exc, exc_info=True)
-                else:
-                    try:
-                        task = Task.objects.select_for_update(skip_locked=True).get(pk=task.id)
-                        if not task.has_lock(self.current_user):
-                            return task
-                    except Task.DoesNotExist:
-                        logger.debug('Task with id {} locked'.format(task.id))
+        next_task, queue_info = get_next_task(request.user, prepared_tasks, project, dm_queue)
 
-    def _get_first_unlocked(self, tasks_query):
-        # Skip tasks that are locked due to being taken by collaborators
-        for task_id in tasks_query.values_list('id', flat=True):
-            try:
-                task = Task.objects.select_for_update(skip_locked=True).get(pk=task_id)
-                if not task.has_lock(self.current_user):
-                    return task
-            except Task.DoesNotExist:
-                logger.debug('Task with id {} locked'.format(task_id))
-
-    def _try_ground_truth(self, tasks, project):
-        """Returns task from ground truth set"""
-        ground_truth = Annotation.objects.filter(task=OuterRef('pk'), ground_truth=True)
-        not_solved_tasks_with_ground_truths = tasks.annotate(
-            has_ground_truths=Exists(ground_truth)).filter(has_ground_truths=True)
-        if not_solved_tasks_with_ground_truths.exists():
-            if project.sampling == project.SEQUENCE:
-                return self._get_first_unlocked(not_solved_tasks_with_ground_truths)
-            return self._get_random_unlocked(not_solved_tasks_with_ground_truths)
-
-    def _try_tasks_with_overlap(self, tasks):
-        """Filter out tasks without overlap (doesn't return next task)"""
-        tasks_with_overlap = tasks.filter(overlap__gt=1)
-        if tasks_with_overlap.exists():
-            return None, tasks_with_overlap
-        else:
-            return None, tasks.filter(overlap=1)
-
-    def _try_breadth_first(self, tasks):
-        """Try to find tasks with maximum amount of annotations, since we are trying to label tasks as fast as possible
-        """
-
-        # =======
-        # This commented part is trying to solve breadth-first in a bit different way:
-        # it selects first task where any amount of annotations have been already created
-        # we've left it here to be able to select it through the project settings later
-        # =======
-        # annotations = Annotation.objects.filter(task=OuterRef('pk'), ground_truth=False)
-        # not_solved_tasks_labeling_started = tasks.annotate(labeling_started=Exists(annotations))
-        # not_solved_tasks_labeling_started_true = not_solved_tasks_labeling_started.filter(labeling_started=True)
-        # if not_solved_tasks_labeling_started_true.exists():
-        #     # try to complete tasks that are already in progress
-        #     next_task = self._get_random(not_solved_tasks_labeling_started_true)
-        #     return next_task
-
-        tasks = tasks.annotate(annotations_count=Count('annotations'))
-        max_annotations_count = tasks.aggregate(Max('annotations_count'))['annotations_count__max']
-        if max_annotations_count == 0:
-            # there is no any labeled tasks found
-            return
-
-        # find any task with maximal amount of created annotations
-        not_solved_tasks_labeling_started = tasks.annotate(
-            reach_max_annotations_count=Case(
-                When(annotations_count=max_annotations_count, then=Value(True)),
-                default=Value(False),
-                output_field=BooleanField()))
-        not_solved_tasks_labeling_with_max_annotations = not_solved_tasks_labeling_started.filter(
-            reach_max_annotations_count=True)
-        if not_solved_tasks_labeling_with_max_annotations.exists():
-            # try to complete tasks that are already in progress
-            return self._get_random_unlocked(not_solved_tasks_labeling_with_max_annotations)
-
-    def _try_uncertainty_sampling(self, tasks, project, user_solved_tasks_array):
-        task_with_current_predictions = tasks.filter(predictions__model_version=project.model_version)
-        if task_with_current_predictions.exists():
-            logger.debug('Use uncertainty sampling')
-            # collect all clusters already solved by user, count number of solved task in them
-            user_solved_clusters = project.prepared_tasks.filter(pk__in=user_solved_tasks_array).annotate(
-                cluster=Max('predictions__cluster')).values_list('cluster', flat=True)
-            user_solved_clusters = Counter(user_solved_clusters)
-            # order each task by the count of how many tasks solved in it's cluster
-            cluster_num_solved_map = [When(predictions__cluster=k, then=v) for k, v in user_solved_clusters.items()]
-
-            # WARNING! this call doesn't work after consequent annotate
-            num_tasks_with_current_predictions = task_with_current_predictions.count()
-            if cluster_num_solved_map:
-                task_with_current_predictions = task_with_current_predictions.annotate(
-                    cluster_num_solved=Case(*cluster_num_solved_map, default=0, output_field=DecimalField()))
-                # next task is chosen from least solved cluster and with lowest prediction score
-                possible_next_tasks = task_with_current_predictions.order_by('cluster_num_solved', 'predictions__score')
-            else:
-                possible_next_tasks = task_with_current_predictions.order_by('predictions__score')
-
-            num_annotators = project.annotators().count()
-            if num_annotators > 1 and num_tasks_with_current_predictions > 0:
-                # try to randomize tasks to avoid concurrent labeling between several annotators
-                next_task = self._get_random_unlocked(
-                    possible_next_tasks, upper_limit=min(num_annotators + 1, num_tasks_with_current_predictions))
-            else:
-                next_task = self._get_first_unlocked(possible_next_tasks)
-        else:
-            # uncertainty sampling fallback: choose by random sampling
-            logger.debug(f'Uncertainty sampling fallbacks to random sampling '
-                         f'(current project.model_version={str(project.model_version)})')
-            next_task = self._get_random_unlocked(tasks)
-        return next_task
-
-    def _make_response(self, next_task, request, use_task_lock=True, queue=''):
-        """Once next task has chosen, this function triggers inference and prepare the API response"""
-        user = request.user
-        project = next_task.project
-
-        if use_task_lock:
-            # set lock for the task with TTL 3x time more then current average lead time (or 1 hour by default)
-            next_task.set_lock(request.user)
-
-        # call machine learning api and format response
-        if project.show_collab_predictions:
-            for ml_backend in project.ml_backends.all():
-                ml_backend.predict_tasks([next_task])
+        if next_task is None:
+            raise NotFound(
+                f'There are still some tasks to complete for the user={request.user}, '
+                f'but they seem to be locked by another user.')
 
         # serialize task
-        context = {'request': request, 'project': project, 'resolve_uri': True,
-                   'proxy': bool_from_request(request.GET, 'proxy', True)}
-        serializer = TaskWithAnnotationsAndPredictionsAndDraftsSerializer(next_task, context=context)
+        context = {'request': request, 'project': project, 'resolve_uri': True}
+        serializer = NextTaskSerializer(next_task, context=context)
         response = serializer.data
 
-        annotations = []
-        for c in response.get('annotations', []):
-            if c.get('completed_by') == user.id and not (c.get('ground_truth') or c.get('honeypot')):
-                annotations.append(c)
-        response['annotations'] = annotations
-
-        # remove all predictions if we don't want to show it in the label stream
-        if not project.show_collab_predictions:
-            response['predictions'] = []
-
-        response['queue'] = queue
+        response['queue'] = queue_info
         return Response(response)
-
-    def get(self, request, *args, **kwargs):
-        project = get_object_with_check_and_log(request, Project, pk=self.kwargs['pk'])
-        self.check_object_permissions(request, project)
-        user = request.user
-        self.current_user = user
-        dm_queue = filters_ordering_selected_items_exist(request.data)
-
-        # support actions api call from actions/next_task.py
-        if hasattr(self, 'prepared_tasks'):
-            project.prepared_tasks = self.prepared_tasks
-        # get prepared tasks from request params (filters, selected items)
-        else:
-            project.prepared_tasks = get_prepared_queryset(self.request, project)
-
-        # detect solved and not solved tasks
-        assigned_flag = hasattr(self, 'assignee_flag') and self.assignee_flag
-        user_solved_tasks_array = user.annotations\
-            .filter(task__project=project, task__isnull=False)\
-            .distinct().values_list('task__pk', flat=True)
-
-        with conditional_atomic():
-            not_solved_tasks = project.prepared_tasks.\
-                exclude(pk__in=user_solved_tasks_array)
-
-            # if annotator is assigned for tasks, he must to solve it regardless of is_labeled=True
-
-            if not assigned_flag:
-                not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
-
-            # used only for debug logging, disabled for performance reasons
-            not_solved_tasks_count = 'unknown'
-
-            next_task = None
-            # ordered by data manager
-            if assigned_flag and not dm_queue:
-                next_task = not_solved_tasks.first()
-                if not next_task:
-                    raise NotFound('No more tasks found')
-                return self._make_response(next_task, request, use_task_lock=False, queue='Manually assigned queue')
-
-            # If current user has already lock one task - return it (without setting the lock again)
-            next_task = Task.get_locked_by(user, tasks=not_solved_tasks)
-            if next_task and not dm_queue:
-                return self._make_response(next_task, request, use_task_lock=False, queue='Task lock')
-
-            if project.show_ground_truth_first and not dm_queue:
-                logger.debug(f'User={request.user} tries ground truth from {not_solved_tasks_count} tasks')
-                next_task = self._try_ground_truth(not_solved_tasks, project)
-                if next_task:
-                    return self._make_response(next_task, request, queue='Ground truth queue')
-
-            queue_info = ''
-
-            # show tasks with overlap > 1 first
-            if project.show_overlap_first and not dm_queue:
-                # don't output anything - just filter tasks with overlap
-                logger.debug(f'User={request.user} tries overlap first from {not_solved_tasks_count} tasks')
-                _, not_solved_tasks = self._try_tasks_with_overlap(not_solved_tasks)
-                queue_info += 'Show overlap first'
-
-            # if there any tasks in progress (with maximum number of annotations), randomly sampling from them
-            logger.debug(f'User={request.user} tries depth first from {not_solved_tasks_count} tasks')
-
-            if project.maximum_annotations > 1 and not dm_queue:
-                next_task = self._try_breadth_first(not_solved_tasks)
-                if next_task:
-                    queue_info += (' & ' if queue_info else '') + 'Breadth first queue'
-                    return self._make_response(next_task, request, queue=queue_info)
-
-            # data manager queue
-            if dm_queue:
-                queue_info += (' & ' if queue_info else '') + 'Data manager queue'
-                logger.debug(f'User={request.user} tries sequence sampling from {not_solved_tasks_count} tasks')
-                next_task = not_solved_tasks.first()
-
-            elif project.sampling == project.SEQUENCE:
-                queue_info += (' & ' if queue_info else '') + 'Sequence queue'
-                logger.debug(f'User={request.user} tries sequence sampling from {not_solved_tasks_count} tasks')
-                next_task = self._get_first_unlocked(not_solved_tasks)
-
-            elif project.sampling == project.UNCERTAINTY:
-                queue_info += (' & ' if queue_info else '') + 'Active learning or random queue'
-                logger.debug(f'User={request.user} tries uncertainty sampling from {not_solved_tasks_count} tasks')
-                next_task = self._try_uncertainty_sampling(not_solved_tasks, project, user_solved_tasks_array)
-
-            elif project.sampling == project.UNIFORM:
-                queue_info += (' & ' if queue_info else '') + 'Uniform random queue'
-                logger.debug(f'User={request.user} tries random sampling from {not_solved_tasks_count} tasks')
-                next_task = self._get_random_unlocked(not_solved_tasks)
-
-            if next_task:
-                return self._make_response(next_task, request, queue=queue_info)
-            else:
-                raise NotFound(
-                    f'There are still some tasks to complete for the user={user}, '
-                    f'but they seem to be locked by another user.')
 
 
 @method_decorator(name='post', decorator=swagger_auto_schema(

@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into feature/DEV-428/show-created-date",
-  "commit": "93198a9641dd97196b64120862ce8728d0e1c639",
-  "branch": "",
-  "date": "2021-12-28T16:28:16Z"
+  "message": "DEV-1094 Add Cancel skip",
+  "commit": "b919d9d7ab8406234c7e53220404481c9bafe411",
+  "branch": "feature/dev-1094",
+  "date": "2021-11-24T09:17:42Z"
 }

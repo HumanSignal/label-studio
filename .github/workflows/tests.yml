@@ -4,6 +4,7 @@ on:
     branches: ['*', '*/*', '*/**', master]
     paths:
       - 'label_studio/**'
+      - '!label_studio/frontend/**'
       - '.github/workflows/tests.yml'
       - 'deploy/requirements.txt'
       - 'deploy/requirements-mw.txt'
@@ -43,7 +44,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure pip cache
         id: pip-cache
         with:
@@ -61,7 +62,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v2.5.0
+        uses: actions/setup-node@v2.5.1
         with:
           node-version: "${{ env.NODE }}"
 
@@ -69,7 +70,7 @@ jobs:
         id: npm-cache-dir
         run: echo "::set-output name=dir::$(npm config get cache)"
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure npm cache
         id: npm-cache
         with:
@@ -157,7 +158,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure pip cache
         id: pip-cache
         with:
@@ -173,7 +174,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v2.5.0
+        uses: actions/setup-node@v2.5.1
         with:
           node-version: 14
 
@@ -181,7 +182,7 @@ jobs:
         id: npm-cache-dir
         run: echo "::set-output name=dir::$(npm config get cache)"
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure npm cache
         id: npm-cache
         with:
@@ -237,7 +238,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - uses: actions/cache@v2.1.6
+    - uses: actions/cache@v2.1.7
       name: Configure pip cache
       with:
         path: ~\AppData\Local\pip\Cache
