@@ -13,7 +13,7 @@ from requests.adapters import HTTPAdapter
 from core.version import get_git_version
 from data_export.serializers import ExportDataSerializer
 from users.models import Token
-
+from core.feature_flags import flag_set
 
 version = get_git_version()
 logger = logging.getLogger(__name__)
@@ -163,7 +163,11 @@ class MLApi(BaseHTTPAPI):
                 'password': project.task_data_password
             }
         }
-        return self._request('train', request, verbose=False)
+        if flag_set('ff_back_dev_1417_start_training_mlbackend_webhooks_250122_long', request.user):
+            return self._request('webhook', request, verbose=False)
+        else:
+            return self._request('train', request, verbose=False)
+
 
     def make_predictions(self, tasks, model_version, project, context=None):
         request = {
