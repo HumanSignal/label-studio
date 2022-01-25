@@ -530,6 +530,27 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
         return AnnotationDraftSerializer(drafts, many=True, read_only=True, default=[], context=self.context).data
 
 
+class NextTaskSerializer(TaskWithAnnotationsAndPredictionsAndDraftsSerializer):
+    def get_predictions(self, task):
+        project = task.project
+        if not project.show_collab_predictions:
+            return []
+        else:
+            for ml_backend in project.ml_backends.all():
+                ml_backend.predict_tasks([task])
+            return super().get_predictions(task)
+
+    def get_annotations(self, task):
+        result = []
+        annotations = super().get_annotations(task)
+        if 'request' in self.context and hasattr(self.context['request'], 'user'):
+            user = self.context['request'].user
+            for annotation in annotations:
+                if annotation.get('completed_by') == user.id and not (annotation.get('ground_truth') or annotation.get('honeypot')):
+                    result.append(annotation)
+        return result
+
+
 class TaskIDWithAnnotationsAndPredictionsSerializer(ModelSerializer):
 
     def __init__(self, *args, **kwargs):

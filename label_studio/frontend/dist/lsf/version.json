@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into fix/DEV-1285/crosshair-coords",
-  "commit": "872f1fa16a0ada9d488f780c551d73b481d085a3",
-  "branch": "fix/DEV-1285/crosshair-coords",
-  "date": "2022-01-18T02:31:44Z"
+  "message": "DEV-1094 Add Cancel skip",
+  "commit": "b919d9d7ab8406234c7e53220404481c9bafe411",
+  "branch": "feature/dev-1094",
+  "date": "2021-11-24T09:17:42Z"
 }
