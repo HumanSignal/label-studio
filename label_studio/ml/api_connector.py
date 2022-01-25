@@ -147,7 +147,7 @@ class MLApi(BaseHTTPAPI):
         time_id = int(project.created_at.timestamp())
         return f'{project.id}.{time_id}'
 
-    def train(self, project, use_ground_truth=False):
+    def train(self, project, use_ground_truth=False, user=None):
         # get only tasks with annotations
         tasks = project.tasks.annotate(num_annotations=Count('annotations')).filter(num_annotations__gt=0)
 
@@ -163,7 +163,7 @@ class MLApi(BaseHTTPAPI):
                 'password': project.task_data_password
             }
         }
-        if flag_set('ff_back_dev_1417_start_training_mlbackend_webhooks_250122_long', request.user):
+        if flag_set('ff_back_dev_1417_start_training_mlbackend_webhooks_250122_long', user):
             return self._request('webhook', request, verbose=False)
         else:
             return self._request('train', request, verbose=False)
