@@ -11,12 +11,14 @@ Install Label Studio Enterprise on-premises if you need to meet strong privacy r
 
 ## Before you install 
 
-Review this high-level architecture diagram that outlines the main components of Label Studio Enterprise in an on-premises deployment.
+Review this high-level architecture diagram that outlines the main components of a Label Studio Enterprise deployment.
 
 <img src="/images/LSE_k8s_scheme.png"/>
 
-Label Studio runs on Python and uses rqworkers to perform additional tasks. Metadata and annotations are stored in a bundled version of PostgreSQL that functions as persistent storage. If you host Label Studio in the cloud, use persistent storage in the cloud instead of MinIO. 
+Label Studio runs on Python and uses rqworkers to perform additional tasks. Metadata and annotations are stored in a bundled version of PostgreSQL that functions as persistent storage. If you host Label Studio in the cloud, use [persistent storage in the cloud](persistent_storage.html) instead of MinIO.
 
+1. Set up [persistent storage](persistent_storage.html).
+2. For Kubernetes deployments, configure [ingress](ingress_config.html).
 
 ## Install Label Studio Enterprise
 
