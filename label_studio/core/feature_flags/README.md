@@ -48,7 +48,21 @@
 (check best practices from [here](https://launchdarkly.com/blog/best-practices-short-term-permanent-flags/))
 
 
-## Frontend feature flags
+## How to use
+
+### Backend development
+
+```python
+from core.feature_flags import flag_set
+
+if flag_set('ff_back_dev_123_new_feature_231221_long', request.user):
+    run_new_code()
+else:
+    run_old_code()
+```
+
+
+### Frontend development
 
 Feature flags JSON object is available on frontend via
 
