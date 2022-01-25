@@ -154,6 +154,45 @@ minio:
 Adjust the included defaults to reflect your environment and copy these into a new file and save it as `lse-values.yaml`. 
 
 
+## Setting up SSL authentication for PostgreSQL
+To configure Label Studio Enterprise to use SSL authentication for PostgreSQL, do the following.
+
+1. Create a Kubernetes secret with your SSL certificate/CA bundle, replacing `<PATH_TO_CA>` with the path to the certificate/CA bundle :
+
+```shell
+kubectl create secret generic <YOUR_SECRET_NAME> --from-file=pg_cert=<PATH_TO_CA>
+```
+2. Update your `lse-values.yaml` file with your newly-created Kubernetes secret:
+
+```yaml
+app:
+  extraEnvironmentVars:
+     POSTGRE_SSL_MODE: require
+     POSTGRE_SSLROOTCERT: /opt/heartex/secrets/pg_cert
+   
+  extraVolumeMounts:
+    - name: pg-ssl-cert
+      mountPath: /opt/heartex/secrets/pg_cert
+      readOnly: true
+
+  extraVolumes:
+    - name: pg-ssl-cert
+      secretName: <YOUR_SECRET_NAME>
+
+rqworker:
+  extraVolumeMounts:
+    - name: pg-ssl-cert
+      mountPath: /opt/heartex/secrets/pg_cert
+      readOnly: true
+
+  extraVolumes:
+    - name: pg-ssl-cert
+      secretName: <YOUR_SECRET_NAME>
+```
+
+3. Uninstall and/or deploy Label Studio Enterprise using Helm.
+
+
 ### Use Helm to install Label Studio Enterprise on your Kubernetes cluster
 
 Use Helm to install Label Studio Enterprise on your Kubernetes cluster. Provide your custom resource definitions YAML file. Specify any environment variables that you need to set for your Label Studio Enterprise installation using the `--set` argument with the `helm install` command.
