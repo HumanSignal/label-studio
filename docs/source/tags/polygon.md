@@ -1,7 +1,7 @@
 ---
 title: Polygon
 type: tags
-order: 415
+order: 416
 meta_title: Polygon Tag for Adding Polygons to Images
 meta_description: Customize Label Studio with the Polygon tag by adding polygons to images for segmentation machine learning and data science projects.
 ---
@@ -22,6 +22,8 @@ Use with the following data types: image
 | [strokeWidth] | <code>number</code> | <code>3</code> | Width of stroke |
 | [pointSize] | <code>small</code> \| <code>medium</code> \| <code>large</code> | <code>small</code> | Size of polygon handle points |
 | [pointStyle] | <code>rectangle</code> \| <code>circle</code> | <code>circle</code> | Style of points |
+| [smart] | <code>boolean</code> |  | Show smart tool for interactive pre-annotations |
+| [smartOnly] | <code>boolean</code> |  | Only show smart tool for interactive pre-annotations |
 
 ### Example
 ```html

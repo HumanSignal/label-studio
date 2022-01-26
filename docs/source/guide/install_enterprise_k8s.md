@@ -112,6 +112,11 @@ global:
   extraEnvironmentVars: {}
   # extraEnvironmentSecrets is a list of extra environment variables to set in the deplyoment, empty by default
   extraEnvironmentSecrets: {}
+
+  # Persistence is turned off by default.
+  # See more in the [Set up persistent storage](https://labelstud.io/guide/persistent_storage.html)
+  persistence:
+    enabled: false
   
 app:
   # High Availability (HA) mode: adjust according to your resources
@@ -142,17 +147,50 @@ rqworker:
    # HA mode: adjust according to your resources
    replicas: 2
 
-# HA mode: persist the uploaded data
-# storageClass should be configured in your cluster 
-#minio:
-#   mode: "distributed"
-#   persistence:
-#      enabled: "true"
-#      size: "10Gi"      # Adjust this according to your business needs
-#      storageClass: ""  # This line is optional. If you have no default storageClass, configure it here. If you're running in a public cloud such as AWS, Google Cloud, or Microsoft Azure, this value is already configured. If you're running in a different environment, your cluster admin can help you to get the right value. 
+minio:
+  enabled: false
 ```
 
 Adjust the included defaults to reflect your environment and copy these into a new file and save it as `lse-values.yaml`. 
+
+
+## Setting up SSL authentication for PostgreSQL
+To configure Label Studio Enterprise to use SSL authentication for PostgreSQL, do the following.
+
+1. Create a Kubernetes secret with your SSL certificate/CA bundle, replacing `<PATH_TO_CA>` with the path to the certificate/CA bundle :
+
+```shell
+kubectl create secret generic <YOUR_SECRET_NAME> --from-file=pg_cert=<PATH_TO_CA>
+```
+2. Update your `lse-values.yaml` file with your newly-created Kubernetes secret:
+
+```yaml
+app:
+  extraEnvironmentVars:
+     POSTGRE_SSL_MODE: require
+     POSTGRE_SSLROOTCERT: /opt/heartex/secrets/pg_cert
+   
+  extraVolumeMounts:
+    - name: pg-ssl-cert
+      mountPath: /opt/heartex/secrets/pg_cert
+      readOnly: true
+
+  extraVolumes:
+    - name: pg-ssl-cert
+      secretName: <YOUR_SECRET_NAME>
+
+rqworker:
+  extraVolumeMounts:
+    - name: pg-ssl-cert
+      mountPath: /opt/heartex/secrets/pg_cert
+      readOnly: true
+
+  extraVolumes:
+    - name: pg-ssl-cert
+      secretName: <YOUR_SECRET_NAME>
+```
+
+3. Uninstall and/or deploy Label Studio Enterprise using Helm.
 
 
 ### Use Helm to install Label Studio Enterprise on your Kubernetes cluster

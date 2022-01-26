@@ -131,7 +131,7 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
         r = urlparse(url, allow_fragments=False)
         bucket_name = r.netloc
         key = r.path.lstrip('/')
-        if self.is_gce_instance():
+        if self.is_gce_instance() and not self.google_application_credentials:
             logger.debug('Generate signed URL for GCE instance')
             return self.python_cloud_function_get_signed_url(bucket_name, key)
         else:
@@ -175,6 +175,7 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
         auth_request = requests.Request()
         credentials, project = google.auth.default()
         storage_client = google_storage.Client(project, credentials)
+        # storage_client = self.get_client()
         data_bucket = storage_client.lookup_bucket(bucket_name)
         signed_blob_path = data_bucket.blob(blob_name)
         expires_at_ms = datetime.now() + timedelta(minutes=self.presign_ttl)

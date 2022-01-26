@@ -10,12 +10,12 @@ from django.db.models import JSONField
 from django.core.validators import MinLengthValidator, MaxLengthValidator
 from django.db import transaction, models
 from annoying.fields import AutoOneToOneField
+from functools import lru_cache
 
 from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks
-from core.utils.common import create_hash, sample_query, get_attr_or_item, load_func
+from core.utils.common import create_hash, get_attr_or_item, load_func
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.label_config import (
-    parse_config,
     validate_label_config,
     extract_data_types,
     get_all_object_tag_names,
@@ -25,6 +25,9 @@ from core.label_config import (
     get_all_control_tag_tuples,
     get_annotation_tuple,
 )
+from core.bulk_update_utils import bulk_update
+from label_studio_tools.core.label_config import parse_config
+
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +87,13 @@ ProjectMixin = load_func(settings.PROJECT_MIXIN)
 
 
 class Project(ProjectMixin, models.Model):
+    class SkipQueue(models.TextChoices):
+        # requeue to the end of the same annotator’s queue => annotator gets this task at the end of the queue
+        REQUEUE_FOR_ME = 'REQUEUE_FOR_ME', 'Requeue for me'
+        # requeue skipped tasks back to the common queue, excluding skipping annotator [current default] => another annotator gets this task
+        REQUEUE_FOR_OTHERS = 'REQUEUE_FOR_OTHERS', 'Requeue for others'
+        # ignore skipped tasks => skip is a valid annotation, task is completed (finished=True)
+        IGNORE_SKIPPED = 'IGNORE_SKIPPED', 'Ignore skipped'
 
     objects = ProjectManager()
     __original_label_config = None
@@ -113,6 +123,13 @@ class Project(ProjectMixin, models.Model):
         null=True,
         default='<View></View>',
         help_text='Label config in XML format. See more about it in documentation',
+    )
+    parsed_label_config = models.TextField(
+        _('parsed label config'),
+        blank=True,
+        null=True,
+        default='',
+        help_text='Parsed label config in JSON format. See more about it in documentation',
     )
     expert_instruction = models.TextField(
         _('expert instruction'), blank=True, null=True, default='', help_text='Labeling instructions in HTML format'
@@ -196,6 +213,7 @@ class Project(ProjectMixin, models.Model):
     )
 
     sampling = models.CharField(max_length=100, choices=SAMPLING_CHOICES, null=True, default=SEQUENCE)
+    skip_queue = models.CharField(max_length=100, choices=SkipQueue.choices, null=True, default=SkipQueue.REQUEUE_FOR_OTHERS)
     show_ground_truth_first = models.BooleanField(_('show ground truth first'), default=False)
     show_overlap_first = models.BooleanField(_('show overlap first'), default=False)
     overlap_cohort_percentage = models.IntegerField(_('overlap_cohort_percentage'), default=100)
@@ -212,6 +230,7 @@ class Project(ProjectMixin, models.Model):
         self.__original_label_config = self.label_config
         self.__maximum_annotations = self.maximum_annotations
         self.__overlap_cohort_percentage = self.overlap_cohort_percentage
+        self.__skip_queue = self.skip_queue
 
         # TODO: once bugfix with incorrect data types in List
         # logging.warning('! Please, remove code below after patching of all projects (extract_data_types)')
@@ -347,31 +366,49 @@ class Project(ProjectMixin, models.Model):
         elif tasks_number_changed and self.overlap_cohort_percentage < 100 and self.maximum_annotations > 1:
             self._rearrange_overlap_cohort()
 
-        if maximum_annotations_changed or overlap_cohort_percentage_changed:
+        if maximum_annotations_changed or overlap_cohort_percentage_changed or tasks_number_changed:
             bulk_update_stats_project_tasks(
                 self.tasks.filter(Q(annotations__isnull=False) & Q(annotations__ground_truth=False))
             )
 
     def _rearrange_overlap_cohort(self):
-        tasks_with_overlap = self.tasks.filter(overlap__gt=1)
-        tasks_with_overlap_count = tasks_with_overlap.count()
-        total_tasks = self.tasks.count()
+        """
+        Rearrange overlap depending on annotation count in tasks
+        """
+        all_project_tasks = Task.objects.filter(project=self)
+        max_annotations = self.maximum_annotations
+        must_tasks = int(self.tasks.count() * self.overlap_cohort_percentage / 100 + 0.5)
 
-        new_tasks_with_overlap_count = int(self.overlap_cohort_percentage / 100 * total_tasks + 0.5)
-        if tasks_with_overlap_count > new_tasks_with_overlap_count:
-            # TODO: warn if we try to reduce current cohort that is already labeled with overlap
-            reduce_by = tasks_with_overlap_count - new_tasks_with_overlap_count
-            reduce_tasks = sample_query(tasks_with_overlap, reduce_by)
-            reduce_tasks.update(overlap=1)
-            reduced_tasks_ids = reduce_tasks.values_list('id', flat=True)
-            tasks_with_overlap.exclude(id__in=reduced_tasks_ids).update(overlap=self.maximum_annotations)
+        tasks_with_max_annotations = all_project_tasks.annotate(
+            anno=Count('annotations', filter=Q_task_finished_annotations & Q(annotations__ground_truth=False))
+        ).filter(anno__gte=max_annotations)
 
-        elif tasks_with_overlap_count < new_tasks_with_overlap_count:
-            increase_by = new_tasks_with_overlap_count - tasks_with_overlap_count
-            tasks_without_overlap = self.tasks.filter(overlap=1)
-            increase_tasks = sample_query(tasks_without_overlap, increase_by)
-            increase_tasks.update(overlap=self.maximum_annotations)
-            tasks_with_overlap.update(overlap=self.maximum_annotations)
+        tasks_with_min_annotations = all_project_tasks.exclude(
+            id__in=tasks_with_max_annotations
+        )
+
+        # check how many tasks left to finish
+        left_must_tasks = max(must_tasks - tasks_with_max_annotations.count(), 0)
+        if left_must_tasks > 0:
+            # if there are unfinished tasks update tasks with count(annotations) >= overlap
+            tasks_with_max_annotations.update(overlap=max_annotations)
+            # order other tasks by count(annotations)
+            tasks_with_min_annotations = tasks_with_min_annotations.annotate(
+                anno=Count('annotations')
+            ).order_by('-anno')
+            objs = []
+            # assign overlap depending on annotation count
+            for item in tasks_with_min_annotations[:left_must_tasks]:
+                item.overlap = max_annotations
+                objs.append(item)
+            for item in tasks_with_min_annotations[left_must_tasks:]:
+                item.overlap = 1
+                objs.append(item)
+            with transaction.atomic():
+                bulk_update(objs, update_fields=['overlap'], batch_size=settings.BATCH_SIZE)
+        else:
+            tasks_with_max_annotations.update(overlap=max_annotations)
+            tasks_with_min_annotations.update(overlap=1)
 
     def remove_tasks_by_file_uploads(self, file_upload_ids):
         self.tasks.filter(file_upload_id__in=file_upload_ids).delete()
@@ -491,7 +528,7 @@ class Project(ProjectMixin, models.Model):
         return {'deleted_predictions': count}
 
     def get_updated_weights(self):
-        outputs = parse_config(self.label_config)
+        outputs = self.get_parsed_config()
         control_weights = {}
         exclude_control_types = ('Filter',)
         for control_name in outputs:
@@ -514,6 +551,7 @@ class Project(ProjectMixin, models.Model):
         project_with_config_just_created = not exists and self.pk and self.label_config
         if self._label_config_has_changed() or project_with_config_just_created:
             self.data_types = extract_data_types(self.label_config)
+            self.parsed_label_config = parse_config(self.label_config)
 
         if self._label_config_has_changed():
             self.__original_label_config = self.label_config
@@ -532,6 +570,11 @@ class Project(ProjectMixin, models.Model):
             )
             self.__maximum_annotations = self.maximum_annotations
             self.__overlap_cohort_percentage = self.overlap_cohort_percentage
+
+        if self.__skip_queue != self.skip_queue:
+            bulk_update_stats_project_tasks(
+                self.tasks.filter(Q(annotations__isnull=False) & Q(annotations__ground_truth=False))
+            )
 
         if hasattr(self, 'summary'):
             # Ensure project.summary is consistent with current tasks / annotations
@@ -659,6 +702,8 @@ class Project(ProjectMixin, models.Model):
         return self.get_parsed_config()
 
     def get_parsed_config(self):
+        if self.parsed_label_config:
+            return self.parsed_label_config
         return parse_config(self.label_config)
 
     def get_counters(self):
@@ -682,6 +727,19 @@ class Project(ProjectMixin, models.Model):
             return output
         else:
             return list(output)
+
+    def get_all_storage_objects(self, type_='import'):
+        from io_storages.models import get_storage_classes
+
+        if hasattr(self, '_storage_objects'):
+            return self._storage_objects
+
+        storage_objects = []
+        for storage_class in get_storage_classes(type_):
+            storage_objects += list(storage_class.objects.filter(project=self))
+
+        self._storage_objects = storage_objects
+        return storage_objects
 
     def __str__(self):
         return f'{self.title} (id={self.id})' or _("Business number %d") % self.pk
