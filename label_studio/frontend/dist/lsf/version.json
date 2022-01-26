@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into fix/DEV-1235/view-all",
-  "commit": "c16927b4024fd65ef1ebf7130d11dfc6fcc40ac6",
+  "message": "Merge branch 'master' into fix/DEV-1235/view-all\n\n# Conflicts:\n#\tsrc/stores/AnnotationStore.js",
+  "commit": "a379ec966f471d85a64e70754c2b8dcbcb08042f",
   "branch": "fix/DEV-1235/view-all",
-  "date": "2022-01-19T10:48:09Z"
+  "date": "2022-01-26T02:15:40Z"
 }
