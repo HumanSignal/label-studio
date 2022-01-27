@@ -22,7 +22,6 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - 3.6
           - 3.7
           - 3.8
           - 3.9
@@ -156,7 +155,7 @@ jobs:
       - name: Install OS dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev
+          sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev python-dev
 
       - uses: actions/cache@v2.1.7
         name: Configure pip cache
@@ -216,7 +215,6 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - 3.6
           - 3.7
           - 3.8
           - 3.9
