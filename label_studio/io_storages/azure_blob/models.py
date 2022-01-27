@@ -74,8 +74,8 @@ class AzureBlobStorageMixin(models.Model):
         account_key = self.get_account_key()
         sas_token = self.get_sas_token()
         if not account_name or not (account_key or sas_token):
-            raise ValueError('Azure account name and key must be set using '
-                             'environment variables AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_ACCOUNT_KEY')
+            raise ValueError('Azure account name and key OR token must be set using '
+                             'environment variables AZURE_BLOB_ACCOUNT_NAME and one of AZURE_BLOB_ACCOUNT_KEY or AZURE_BLOB_SAS_TOKEN')
         connection_string = self.get_connection_str(account_name, account_key, sas_token)
         client = BlobServiceClient.from_connection_string(conn_str=connection_string)
         container = client.get_container_client(str(self.container))
