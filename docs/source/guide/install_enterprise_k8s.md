@@ -17,7 +17,7 @@ To install Label Studio Community Edition, see <a href="install.html">Install an
 
 If you want to install Label Studio Enterprise on Kubernetes and you have unrestricted access to the internet from your K8s cluster, follow these steps. 
 
-1. Verify that you meet the [Required software prerequisites](#Required-software-prerequisites).
+1. Verify that you meet the [Required software prerequisites](#Required-software-prerequisites) and review the [capacity planning](#Capacity-planning) guidance.
 2. [Prepare the Kubernetes cluster](#Prepare-the-Kubernetes-cluster).
 3. [Add the Helm chart repository to your Kubernetes cluster](#Add-the-Helm-chart-repository-to-your-Kubernetes-cluster).
 4. [Configure the Helm chart for Label Studio Enterprise](#Configure-the-Helm-chart-for-Label-Studio-Enterprise).
@@ -38,7 +38,9 @@ Your Kubernetes cluster can be self-hosted or installed somewhere such as Amazon
 
 ### Capacity planning
 
-The default resource requests and limits along with replicas count are configured as follows:
+To plan the capacity of your Kubernetes cluster, refer to these guidelines. 
+
+Label Studio Enterprise has the following default configurations for resource requests, resource limits, and replica counts:
 ```yaml
 app:
   replicas: 1
@@ -61,14 +63,16 @@ rqworker:
       cpu: 500m
 ```
 
-Before making changes in these values it's highly recommended to get familiar with [Kubernetes Resource Management](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/).
-Any ot these variables are adjustable according to your business needs:
-- Adjust resources requests and limits for `app` pod if you're going to have more than 2 concurrent annotators;
-- Adjust amount of replicas to increase the fault tolerance of both `app` and `rqworker` services.
+Before you make changes to these values, familiarize yourself with the [Resource Management for Pods and Containers](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) guidelines in the Kubernetes documentation. 
 
-Recommended settings for Production-ready use-cases:
-- Requests and limits example is provided in the section [Configure the Helm chart for Label Studio Enterprise](#Configure-the-Helm-chart-for-Label-Studio-Enterprise);
-- Replicas amount should be more or equal amount of availability zones in your Kubernetes cluster.
+If you choose to make changes to these default settings, consider the following:
+
+| For this case                               | Adjust this                                                                                                                                       |
+|---------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| More than 2 concurrent annotators           | Adjust the requests and limits for `resources` in the `app` pod                                                                                   |
+| Increase fault tolerance                    | Increase the number of replicas of both `app` and `rqworker` services                                                                             |
+| Production deployment (replicas)            | Replicas equivalent or greater than the number of availability zones in your Kubernetes cluster                                                   | 
+| Production deployment (requests and limits) | Refer to the example Helm chart in [Configure the Helm chart for Label Studio Enterprise](#Configure-the-Helm-chart-for-Label-Studio-Enterprise)  |
 
 ### Prepare the Kubernetes cluster
 
