@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into fix/DEV-1561/zoom-audio-tooltips",
-  "commit": "098953a42be53597e258a93d85e842ecbe15003a",
-  "branch": "fix/DEV-1561/zoom-audio-tooltips",
-  "date": "2022-01-27T10:31:19Z"
+  "message": "fix: DEV-1572: allow to uncheck single Choice (#452)\n\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
+  "commit": "05afcb9f52c033dfe7906cf974e73dc127547711",
+  "branch": "master",
+  "date": "2022-01-27T22:32:34Z"
 }
