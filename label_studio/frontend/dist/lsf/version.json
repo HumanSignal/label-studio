@@ -1,6 +1,6 @@
 {
-  "message": "DEV-1094 Add Cancel skip",
-  "commit": "b919d9d7ab8406234c7e53220404481c9bafe411",
-  "branch": "feature/dev-1094",
-  "date": "2021-11-24T09:17:42Z"
+  "message": "fix: DEV-1429: Fix hidding relations by topbar",
+  "commit": "49bee794993fe617b204475d2fc6ca824bb48e77",
+  "branch": "fix/DEV-1429/hidden-relations",
+  "date": "2022-01-25T15:41:28Z"
 }
