@@ -53,6 +53,9 @@ class LocalFilesMixin(models.Model):
 class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):
     url_scheme = 'https'
 
+    def can_resolve_url(self, url):
+        return False
+
     def iterkeys(self):
         path = Path(self.path)
         regex = re.compile(str(self.regex_filter)) if self.regex_filter else None

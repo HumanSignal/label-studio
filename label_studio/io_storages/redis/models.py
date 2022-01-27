@@ -74,6 +74,9 @@ class RedisImportStorage(ImportStorage, RedisStorageMixin):
         _('db'), default=1,
         help_text='Server Database')
 
+    def can_resolve_url(self, url):
+        return False
+
     def iterkeys(self):
         client = self.get_client()
         path = str(self.path)
