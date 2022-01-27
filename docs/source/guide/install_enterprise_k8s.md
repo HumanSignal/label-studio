@@ -36,6 +36,40 @@ This chart has been tested and confirmed to work with the [NGINX Ingress Control
 
 Your Kubernetes cluster can be self-hosted or installed somewhere such as Amazon EKS. See the Amazon tutorial on how to [Deploy a Kubernetes Application with Amazon Elastic Container Service for Kubernetes](https://aws.amazon.com/getting-started/hands-on/deploy-kubernetes-app-amazon-eks/) for more about deploying an app on Amazon EKS.
 
+### Capacity planning
+
+The default resource requests and limits along with replicas count are configured as follows:
+```yaml
+app:
+  replicas: 1
+  resources:
+    requests:
+      memory: 384Mi
+      cpu: 250m
+    limits:
+      memory: 1024Mi
+      cpu: 750m
+
+rqworker:
+  replicas: 1
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 500m
+```
+
+Before making changes in these values it's highly recommended to get familiar with [Kubernetes Resource Management](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/).
+Any ot these variables are adjustable according to your business needs:
+- Adjust resources requests and limits for `app` pod if you're going to have more than 2 concurrent annotators;
+- Adjust amount of replicas to increase the fault tolerance of both `app` and `rqworker` services.
+
+Recommended settings for Production-ready use-cases:
+- Requests and limits example is provided in the section [Configure the Helm chart for Label Studio Enterprise](#Configure-the-Helm-chart-for-Label-Studio-Enterprise);
+- Replicas amount should be more or equal amount of availability zones in your Kubernetes cluster.
+
 ### Prepare the Kubernetes cluster
 
 Before installing Label Studio Enterprise, prepare the Kubernetes cluster with [kubectl](https://kubernetes.io/docs/reference/kubectl/). 
