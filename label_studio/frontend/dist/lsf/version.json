@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1572: allow to uncheck single Choice",
-  "commit": "f257d36d14f17ea0bb6a661ade90897b1b5563c2",
-  "branch": "fix/dev-1572-unchoice",
-  "date": "2022-01-26T12:17:41Z"
+  "message": "fix: DEV-1572: allow to uncheck single Choice (#452)\n\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
+  "commit": "05afcb9f52c033dfe7906cf974e73dc127547711",
+  "branch": "master",
+  "date": "2022-01-27T22:32:34Z"
 }
