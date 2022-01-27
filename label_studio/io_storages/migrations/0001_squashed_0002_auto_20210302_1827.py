@@ -28,6 +28,7 @@ class Migration(migrations.Migration):
                 ('use_blob_urls', models.BooleanField(default=False, help_text='Interpret objects as BLOBs and generate URLs', verbose_name='use_blob_urls')),
                 ('account_name', models.TextField(blank=True, help_text='Azure Blob account name', null=True, verbose_name='account_name')),
                 ('account_key', models.TextField(blank=True, help_text='Azure Blob account key', null=True, verbose_name='account_key')),
+                ('sas_token', models.TextField(blank=True, help_text='Azure Blob SharedAccessSignature token', null=True, verbose_name='sas_token')),
             ],
         ),
         migrations.CreateModel(

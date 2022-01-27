@@ -20,6 +20,7 @@ class AzureBlobImportStorageSerializer(ImportStorageSerializer):
         result = super().to_representation(instance)
         result.pop('account_name')
         result.pop('account_key')
+        result.pop('sas_token')
         return result
 
     def validate(self, data):
@@ -39,6 +40,7 @@ class AzureBlobExportStorageSerializer(ExportStorageSerializer):
         result = super().to_representation(instance)
         result.pop('account_name')
         result.pop('account_key')
+        result.pop('sas_token')
         return result
 
     class Meta:

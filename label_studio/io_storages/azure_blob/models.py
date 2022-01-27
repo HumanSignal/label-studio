@@ -45,6 +45,9 @@ class AzureBlobStorageMixin(models.Model):
     account_key = models.TextField(
         _('account_key'), null=True, blank=True,
         help_text='Azure Blob account key')
+    sas_token = models.TextField(
+        _('sas_token'), null=True, blank=True,
+        help_text='Azure Blob account key')
 
     def get_account_name(self):
         return str(self.account_name) if self.account_name else get_env('AZURE_BLOB_ACCOUNT_NAME')
@@ -52,14 +55,28 @@ class AzureBlobStorageMixin(models.Model):
     def get_account_key(self):
         return str(self.account_key) if self.account_key else get_env('AZURE_BLOB_ACCOUNT_KEY')
 
+    def get_sas_token(self):
+        return str(self.sas_token) if self.sas_token else get_env('AZURE_BLOB_SAS_TOKEN')
+
+    def get_container(self):
+        return str(self.container) if self.container else get_env('AZURE_BLOB_CONTAINER')
+
+    def get_connection_str(self, account_name, account_key, sas_token=None) -> str:
+        if sas_token:
+            return "DefaultEndpointsProtocol=https;AccountName=" + account_name + \
+            ";SharedAccessSignature=" + sas_token + ";EndpointSuffix=core.windows.net"
+        else:
+            return "DefaultEndpointsProtocol=https;AccountName=" + account_name + \
+            ";AccountKey=" + account_key + ";EndpointSuffix=core.windows.net"
+
     def get_client_and_container(self):
         account_name = self.get_account_name()
         account_key = self.get_account_key()
-        if not account_name or not account_key:
+        sas_token = self.get_sas_token()
+        if not account_name or not (account_key or sas_token):
             raise ValueError('Azure account name and key must be set using '
                              'environment variables AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_ACCOUNT_KEY')
-        connection_string = "DefaultEndpointsProtocol=https;AccountName=" + account_name + \
-                            ";AccountKey=" + account_key + ";EndpointSuffix=core.windows.net"
+        connection_string = self.get_connection_str(account_name, account_key, sas_token)
         client = BlobServiceClient.from_connection_string(conn_str=connection_string)
         container = client.get_container_client(str(self.container))
         return client, container

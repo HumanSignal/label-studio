@@ -21,7 +21,10 @@ azure_params: &azure_params
     name: account_key
     label: Account Key
     autoComplete: "new-password"
-  - null
+  - type: password
+    name: sas_token
+    label: SAS Token
+    autoComplete: "sig="
 
 ImportStorage:
   # Title, Bucket, Prefix
@@ -36,7 +39,7 @@ ImportStorage:
         placeholder: '.*csv or .*(jpe?g|png|tiff) or .\w+-\d+.text'
         validators:
           - regexp
-  # AWS specific params
+  # Azure specific params
   - columnCount: 3
     fields: *azure_params
 
