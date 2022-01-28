@@ -684,286 +684,69 @@ Save this example JSON as a file to import it into Label Studio, for example, `e
 
 {% codeblock lang:json %}
 {
-   "data":{
-      "ocr":"/data/upload/receipt_00523.png"
+   "data": {
+      "ocr": "/data/upload/receipt_00523.png"
    },
-   "predictions":[
+   "predictions": [
       {
-         "model_version":"best_ocr_model_1_final",
-         "result":[
+         "model_version": "best_ocr_model_1_final",
+         "result": [
             {
-               "original_width":864,
-               "original_height":1296,
-               "image_rotation":0,
-               "value":{
-                  "x":16.203703703703702,
-                  "y":66.74382716049382,
-                  "width":68.28703703703704,
-                  "height":5.015432098765432,
-                  "rotation":0
+               "original_width": 864,
+               "original_height": 1296,
+               "image_rotation": 0,
+               "value": {
+                  "x": 48.93333333333333,
+                  "y": 61.333333333333336,
+                  "width": 9.733333333333333,
+                  "height": 2.8444444444444446,
+                  "rotation": 0
                },
-               "id":"bb5",
-               "from_name":"bbox",
-               "to_name":"image",
-               "type":"rectangle"
+               "id": "bb1",
+               "from_name": "bbox",
+               "to_name": "image",
+               "type": "rectangle"
             },
             {
-               "original_width":864,
-               "original_height":1296,
-               "image_rotation":0,
-               "value":{
-                  "x":16.203703703703702,
-                  "y":66.74382716049382,
-                  "width":68.28703703703704,
-                  "height":5.015432098765432,
-                  "rotation":0,
-                  "text":[
-                     "CASH 100.000 \nCHANGED 90.000"
-                  ]
-               },
-               "id":"bb5",
-               "from_name":"transcription",
-               "to_name":"image",
-               "type":"textarea",
-               "score":0.89
-            },
-            {
-               "original_width":864,
-               "original_height":1296,
-               "image_rotation":0,
-               "value":{
-                  "x":16.203703703703702,
-                  "y":66.74382716049382,
-                  "width":68.28703703703704,
-                  "height":5.015432098765432,
-                  "rotation":0,
-                  "labels":[
+               "original_width": 864,
+               "original_height": 1296,
+               "image_rotation": 0,
+               "value": {
+                  "x": 48.93333333333333,
+                  "y": 61.333333333333336,
+                  "width": 9.733333333333333,
+                  "height": 2.8444444444444446,
+                  "rotation": 0,
+                  "labels": [
                      "Text"
                   ]
                },
-               "id":"bb5",
-               "from_name":"label",
-               "to_name":"image",
-               "type":"labels"
+               "id": "bb1",
+               "from_name": "label",
+               "to_name": "image",
+               "type": "labels"
             },
             {
-               "original_width":864,
-               "original_height":1296,
-               "image_rotation":0,
-               "value":{
-                  "x":17.466666666666665,
-                  "y":54.75555555555555,
-                  "width":30.8,
-                  "height":2.488888888888889,
-                  "rotation":0
-               },
-               "id":"bb4",
-               "from_name":"bbox",
-               "to_name":"image",
-               "type":"rectangle"
-            },
-            {
-               "original_width":864,
-               "original_height":1296,
-               "image_rotation":0,
-               "value":{
-                  "x":17.466666666666665,
-                  "y":54.75555555555555,
-                  "width":30.8,
-                  "height":2.488888888888889,
-                  "rotation":0,
-                  "labels":[
-                     "Product Name"
-                  ]
-               },
-               "id":"bb4",
-               "from_name":"label",
-               "to_name":"image",
-               "type":"labels"
-            },
-            {
-               "original_width":864,
-               "original_height":1296,
-               "image_rotation":0,
-               "value":{
-                  "x":17.466666666666665,
-                  "y":54.75555555555555,
-                  "width":30.8,
-                  "height":2.488888888888889,
-                  "rotation":0,
-                  "text":[
-                     "1 Caramel Medium"
-                  ]
-               },
-               "id":"bb4",
-               "from_name":"transcription",
-               "to_name":"image",
-               "type":"textarea"
-            },
-            {
-               "original_width":864,
-               "original_height":1296,
-               "image_rotation":0,
-               "value":{
-                  "x":71.2,
-                  "y":53.333333333333336,
-                  "width":13.066666666666666,
-                  "height":3.022222222222222,
-                  "rotation":0
-               },
-               "id":"bb3",
-               "from_name":"bbox",
-               "to_name":"image",
-               "type":"rectangle"
-            },
-            {
-               "original_width":864,
-               "original_height":1296,
-               "image_rotation":0,
-               "value":{
-                  "x":71.2,
-                  "y":53.333333333333336,
-                  "width":13.066666666666666,
-                  "height":3.022222222222222,
-                  "rotation":0,
-                  "labels":[
-                     "Price"
-                  ]
-               },
-               "id":"bb3",
-               "from_name":"label",
-               "to_name":"image",
-               "type":"labels"
-            },
-            {
-               "original_width":864,
-               "original_height":1296,
-               "image_rotation":0,
-               "value":{
-                  "x":71.2,
-                  "y":53.333333333333336,
-                  "width":13.066666666666666,
-                  "height":3.022222222222222,
-                  "rotation":0,
-                  "text":[
-                     "50.000"
-                  ]
-               },
-               "id":"bb3",
-               "from_name":"transcription",
-               "to_name":"image",
-               "type":"textarea"
-            },
-            {
-               "original_width":864,
-               "original_height":1296,
-               "image_rotation":0,
-               "value":{
-                  "x":72.26666666666667,
-                  "y":59.46666666666667,
-                  "width":11.866666666666667,
-                  "height":4.444444444444445,
-                  "rotation":0
-               },
-               "id":"bb2",
-               "from_name":"bbox",
-               "to_name":"image",
-               "type":"rectangle"
-            },
-            {
-               "original_width":864,
-               "original_height":1296,
-               "image_rotation":0,
-               "value":{
-                  "x":72.26666666666667,
-                  "y":59.46666666666667,
-                  "width":11.866666666666667,
-                  "height":4.444444444444445,
-                  "rotation":0,
-                  "labels":[
-                     "Price"
-                  ]
-               },
-               "id":"bb2",
-               "from_name":"label",
-               "to_name":"image",
-               "type":"labels"
-            },
-            {
-               "original_width":864,
-               "original_height":1296,
-               "image_rotation":0,
-               "value":{
-                  "x":72.26666666666667,
-                  "y":59.46666666666667,
-                  "width":11.866666666666667,
-                  "height":4.444444444444445,
-                  "rotation":0,
-                  "text":[
-                     "50.000"
-                  ]
-               },
-               "id":"bb2",
-               "from_name":"transcription",
-               "to_name":"image",
-               "type":"textarea"
-            },
-            {
-               "original_width":864,
-               "original_height":1296,
-               "image_rotation":0,
-               "value":{
-                  "x":48.93333333333333,
-                  "y":61.333333333333336,
-                  "width":9.733333333333333,
-                  "height":2.8444444444444446,
-                  "rotation":0
-               },
-               "id":"bb1",
-               "from_name":"bbox",
-               "to_name":"image",
-               "type":"rectangle"
-            },
-            {
-               "original_width":864,
-               "original_height":1296,
-               "image_rotation":0,
-               "value":{
-                  "x":48.93333333333333,
-                  "y":61.333333333333336,
-                  "width":9.733333333333333,
-                  "height":2.8444444444444446,
-                  "rotation":0,
-                  "labels":[
-                     "Text"
-                  ]
-               },
-               "id":"bb1",
-               "from_name":"label",
-               "to_name":"image",
-               "type":"labels"
-            },
-            {
-               "original_width":864,
-               "original_height":1296,
-               "image_rotation":0,
-               "value":{
-                  "x":48.93333333333333,
-                  "y":61.333333333333336,
-                  "width":9.733333333333333,
-                  "height":2.8444444444444446,
-                  "rotation":0,
-                  "text":[
+               "original_width": 864,
+               "original_height": 1296,
+               "image_rotation": 0,
+               "value": {
+                  "x": 48.93333333333333,
+                  "y": 61.333333333333336,
+                  "width": 9.733333333333333,
+                  "height": 2.8444444444444446,
+                  "rotation": 0,
+                  "text": [
                      "TOTAL"
                   ]
                },
-               "id":"bb1",
-               "from_name":"transcription",
-               "to_name":"image",
-               "type":"textarea"
+               "id": "bb1",
+               "from_name": "transcription",
+               "to_name": "image",
+               "type": "textarea"
             }
          ],
-         "score":0.89
+         "score": 0.89
       }
    ]
 }
