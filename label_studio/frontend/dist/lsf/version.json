@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into feature/DEV-428/show-created-date",
-  "commit": "93198a9641dd97196b64120862ce8728d0e1c639",
-  "branch": "",
-  "date": "2021-12-28T16:28:16Z"
+  "message": "fix: DEV-1572: allow to uncheck single Choice (#452)\n\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
+  "commit": "05afcb9f52c033dfe7906cf974e73dc127547711",
+  "branch": "master",
+  "date": "2022-01-27T22:32:34Z"
 }

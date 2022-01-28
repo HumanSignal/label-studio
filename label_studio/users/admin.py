@@ -17,8 +17,11 @@ class UserAdminShort(UserAdmin):
     def __init__(self, *args, **kwargs):
         super(UserAdminShort, self).__init__(*args, **kwargs)
 
-        # we have empty username - remove it to escape confuse about empty fields in admin web
-        self.list_display = [l for l in self.list_display if l != 'username']
+        self.list_display = ('email', 'username', 'active_organization', 'organization', 'is_staff', 'is_superuser')
+        self.list_filter = ('is_staff', 'is_superuser', 'is_active')
+        self.search_fields = ('username', 'first_name', 'last_name', 'email',
+                              'organization__title', 'active_organization__title')
+        self.ordering = ('email',)
 
         self.fieldsets = ((None, {'fields': ('password', )}),
                           ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),

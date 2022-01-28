@@ -56,7 +56,7 @@ docker build -t heartexlabs/label-studio:latest .
 ```
 
 ### Run with Docker Compose
-Docker compose script provides production-ready stack consisting of the following components:
+Docker Compose script provides production-ready stack consisting of the following components:
 
 - Label Studio
 - [Nginx](https://www.nginx.com/) - proxy web server used to load various static data, including uploaded audio, images, etc.
@@ -70,7 +70,7 @@ docker-compose up
 ### Install locally with pip
 
 ```bash
-# Requires >=Python3.6, <3.9
+# Requires Python >=3.7 <=3.9
 pip install label-studio
 
 # Start the server at http://localhost:8080
@@ -80,7 +80,7 @@ label-studio
 ### Install locally with Anaconda
 
 ```bash
-conda create --name label-studio python=3.8
+conda create --name label-studio
 conda activate label-studio
 pip install label-studio
 ```
