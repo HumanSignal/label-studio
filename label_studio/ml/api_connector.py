@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 CONNECTION_TIMEOUT = float(get_env('ML_CONNECTION_TIMEOUT', 1))  # seconds
 TIMEOUT_DEFAULT = float(get_env('ML_TIMEOUT_DEFAULT', 100))  # seconds
 
-TIMEOUT_TRAIN = float(get_env('ML_TIMEOUT_TRAIN', 3))
+TIMEOUT_TRAIN = float(get_env('ML_TIMEOUT_TRAIN', 30))
 TIMEOUT_PREDICT = float(get_env('TIMEOUT_PREDICT', 100))
 TIMEOUT_HEALTH = float(get_env('TIMEOUT_HEALTH', 1))
 TIMEOUT_SETUP = float(get_env('TIMEOUT_SETUP', 3))
@@ -180,7 +180,7 @@ class MLApi(BaseHTTPAPI):
                 'password': project.task_data_password
             }
         }
-        return self._request('train', request, verbose=False, timeout=30.0)
+        return self._request('train', request, verbose=False, timeout=TIMEOUT_TRAIN)
 
     def make_predictions(self, tasks, model_version, project, context=None):
         request = {
