@@ -142,12 +142,15 @@ class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
 
         expiry = datetime.utcnow() + timedelta(minutes=self.presign_ttl)
 
-        sas_token = generate_blob_sas(account_name=self.get_account_name(),
+        if not self.sas_token:
+            sas_token = generate_blob_sas(account_name=self.get_account_name(),
                                       container_name=container,
                                       blob_name=blob,
                                       account_key=self.get_account_key(),
                                       permission=BlobSasPermissions(read=True),
                                       expiry=expiry)
+        else:
+            sas_token = self.sas_token
         return 'https://' + self.get_account_name() + '.blob.core.windows.net/' + container + '/' + blob + '?' + sas_token
 
     def can_resolve_url(self, url):
