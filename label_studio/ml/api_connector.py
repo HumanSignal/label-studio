@@ -25,7 +25,7 @@ class BaseHTTPAPI(object):
         'User-Agent': 'heartex/' + (version or ''),
     }
     CONNECTION_TIMEOUT = 1.0  # seconds
-    TIMEOUT = 100.0  # seconds
+    TIMEOUT = 30.0  # seconds
 
     def __init__(self, url, timeout=None, connection_timeout=None, max_retries=None, headers=None, **kwargs):
         self._url = url
@@ -57,7 +57,8 @@ class BaseHTTPAPI(object):
             return session
 
     def _prepare_kwargs(self, kwargs):
-        kwargs['timeout'] = self._connection_timeout, self._timeout
+        if 'timeout' not in kwargs:
+            kwargs['timeout'] = self._connection_timeout, self._timeout
 
     def request(self, method, *args, **kwargs):
         self._prepare_kwargs(kwargs)
@@ -163,7 +164,7 @@ class MLApi(BaseHTTPAPI):
                 'password': project.task_data_password
             }
         }
-        return self._request('train', request, verbose=False)
+        return self._request('train', request, verbose=False, timeout=30.0)
 
     def make_predictions(self, tasks, model_version, project, context=None):
         request = {
@@ -177,10 +178,10 @@ class MLApi(BaseHTTPAPI):
                 'context': context,
             },
         }
-        return self._request('predict', request, verbose=False)
+        return self._request('predict', request, verbose=False, timeout=30.0)
 
     def health(self):
-        return self._request('health', method='GET')
+        return self._request('health', method='GET', timeout=3.0)
 
     def validate(self, config):
         return self._request('validate', request={'config': config}, timeout=self._validate_request_timeout)
@@ -191,19 +192,19 @@ class MLApi(BaseHTTPAPI):
             'schema': project.label_config,
             'hostname': settings.HOSTNAME if settings.HOSTNAME else ('http://localhost:' + settings.INTERNAL_PORT),
             'access_token': project.created_by.auth_token.key
-        })
+        }, timeout=5.0)
 
     def duplicate_model(self, project_src, project_dst):
         return self._request('duplicate_model', request={
             'project_src': self._create_project_uid(project_src),
             'project_dst': self._create_project_uid(project_dst)
-        })
+        }, timeout=5)
 
     def delete(self, project):
-        return self._request('delete', request={'project': self._create_project_uid(project)})
+        return self._request('delete', request={'project': self._create_project_uid(project)}, timeout=5)
 
     def get_train_job_status(self, train_job):
-        return self._request('job_status', request={'job': train_job.job_id})
+        return self._request('job_status', request={'job': train_job.job_id}, timeout=5)
 
 
 def get_ml_api(project):
