@@ -302,7 +302,7 @@
         editor_iframe(res, modal, full)
       },
       error: function () {
-        alert("Can't load preview, demo server error");
+        console.log("=> Can't load preview, demo server error");
       }
     })
   }
