@@ -25,6 +25,31 @@ Add polygons to images to perform semantic segmentation.
     <Label value="Car" background="blue"/>
   </PolygonLabels>
 </View>
+
+<!-- {
+  "completions": [{
+    "result": [
+      {
+        "value": {
+            "points": [
+                [ 29.66, 54.34 ],
+                [ 52, 55.58 ],
+                [ 57.16, 44.91 ],
+                [ 59, 46.89 ],
+                [ 54.33, 57.81 ],
+                [ 59, 86.60 ]
+            ],
+            "polygonlabels": [
+                "Airplane"
+            ]
+        },
+        "from_name": "label",
+        "to_name": "image",
+        "type": "polygonlabels"
+      }
+    ]
+  }]  
+} -->
 ```
 
 ## Related tags

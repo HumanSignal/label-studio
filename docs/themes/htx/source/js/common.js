@@ -275,7 +275,7 @@
 
           // fix editor width
           let app_editor = obj.contentDocument.body.querySelector('div[class*="App_editor"]').style;
-          app_editor.setProperty('min-width', '100%', 'important');
+          //app_editor.setProperty('min-width', '100%', 'important');
           obj.contentDocument.body.querySelector('div[class*="Segment_block"]').style.margin='0';
         }
       }, 200);
