@@ -1,8 +1,9 @@
 ---
 title: Deploy Label Studio Enterprise on Kubernetes
+short: Deploy on Kubernetes
 badge: <i class='ent'></i>
 type: guide
-order: 203
+order: 216
 meta_title: Deploy Label Studio Enterprise on Kubernetes
 meta_description: Deploy Label Studio Enterprise on Kubernetes, such as on Amazon Elastic Container Service for Kubernetes, to create machine learning and data science projects in a scalable containerized environment. 
 ---
