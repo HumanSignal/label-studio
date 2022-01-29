@@ -10,6 +10,8 @@ meta_description: Template for performing semantic segmentation with polygons wi
 
 Add polygons to images to perform semantic segmentation.
 
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html
