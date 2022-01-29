@@ -103,7 +103,6 @@ stages:
         "tasks": [
         {
           "cancelled_annotations": 0,
-          "completed_at": null,
 
           "annotations_results": "",
           "data": {
@@ -146,7 +145,7 @@ stages:
         },
         {
           "cancelled_annotations": 0,
-          "completed_at": null,
+
           "annotations_results": !raw "[{type:choices, value:{choices:[class_A]}, to_name:text, from_name:text_class}]",
           "data": {
             "text": "Test example phrase 1",
@@ -211,7 +210,6 @@ stages:
         },
         {
           "cancelled_annotations": 0,
-          "completed_at": null,
 
           "annotations_results": !raw "[{type:choices, value:{choices:[class_A]}, to_name:text, from_name:text_class}]",
           "data": {
@@ -274,7 +272,7 @@ stages:
         },
         {
           "cancelled_annotations": 0,
-          "completed_at": null,
+
 
           "annotations_results": !raw "[{type:choices, value:{choices:[class_TESTING]}, to_name:text, from_name:text_class}]",
           "data": {
@@ -426,7 +424,7 @@ stages:
           "tasks": [
           {
             "cancelled_annotations": 0,
-            "completed_at": null,
+
 
             "annotations_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_A]}}]",
             "data": {
@@ -498,7 +496,7 @@ stages:
           },
           {
             "cancelled_annotations": 0,
-            "completed_at": null,
+
 
             "annotations_results": "",
             "data": {
@@ -544,7 +542,7 @@ stages:
           },
           {
             "cancelled_annotations": 0,
-            "completed_at": null,
+
 
             "annotations_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_A]}}]",
             "data": {
@@ -616,7 +614,7 @@ stages:
           },
           {
             "cancelled_annotations": 0,
-            "completed_at": null,
+
 
             "annotations_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_TESTING]}}]",
             "data": {
@@ -755,7 +753,7 @@ stages:
         "tasks": [
         {
           "cancelled_annotations": 0,
-          "completed_at": null,
+
 
           "annotations_results": "",
           "data": {
@@ -801,7 +799,7 @@ stages:
         },
         {
           "cancelled_annotations": 0,
-          "completed_at": null,
+
 
           "annotations_results": "",
           "data": {
@@ -822,7 +820,7 @@ stages:
         },
         {
           "cancelled_annotations": 0,
-          "completed_at": null,
+
 
           "annotations_results": "",
           "data": {
@@ -889,7 +887,7 @@ stages:
         "tasks": [
         {
           "cancelled_annotations": 0,
-          "completed_at": null,
+
 
           "data": {
             "text": "Test example phrase 1",
@@ -960,7 +958,7 @@ stages:
         },
         {
           "cancelled_annotations": 0,
-          "completed_at": null,
+
 
           "data": {
             "int_field": 20,
@@ -1029,7 +1027,7 @@ stages:
         },
         {
           "cancelled_annotations": 0,
-          "completed_at": null,
+
 
           "data": {
             "int_field": "99",

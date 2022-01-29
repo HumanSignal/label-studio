@@ -9,14 +9,14 @@ meta_description: Configure persistent storage with Label Studio Enterprise host
 
 If you host Label Studio Enterprise in the cloud, you want to set up persistent storage for uploaded task data, user images, and more in the same cloud service as your deployment.
 
-Follow the steps relevant for your deployment:
+Follow the steps relevant for your deployment. If you use Docker Compose, select the cloud service you want to use as persistent storage: 
 * [Set up Amazon S3](#Set-up-Amazon-S3) for Label Studio Enterprise deployments in Amazon Web Services (AWS).
 * [Set up Google Cloud Storage (GCS)](#Set-up-Google-Cloud-Storage) for Label Studio Enterprise deployments in Google Cloud Platform.
-* [Set up Microsoft Azure Storage](#Set-up-Microsoft-Azure-Storage) for Label Studio Enterprise deployments in Microsoft Azure. 
+* [Set up Microsoft Azure Storage](#Set-up-Microsoft-Azure-Storage) for Label Studio Enterprise deployments in Microsoft Azure.
 
 ## Set up Amazon S3
 
-Set up Amazon S3 as the persistent storage for Label Studio Enterprise hosted in AWS. 
+Set up Amazon S3 as the persistent storage for Label Studio Enterprise hosted in AWS or using Docker Compose.
 
 ### Create an S3 bucket
 
@@ -25,10 +25,11 @@ Start by [creating an S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/use
 > If you want to secure the data stored in the S3 bucket at rest, you can [set up default server-side encryption for Amazon S3 buckets](https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-encryption.html) following the steps in the Amazon Simple Storage Service User Guide. 
 
 ### Configure the S3 bucket
-After you create an S3 bucket, set up the necessary IAM permissions to grant Label Studio Enterprise access to your bucket. There are three ways that you can manage access to your S3 bucket:
-- Set up an **IAM role** with an OIDC provider (**recommended**)
-- Use **access keys**
-- Set up an **IAM role** without an OIDC provider
+After you create an S3 bucket, set up the necessary IAM permissions to grant Label Studio Enterprise access to your bucket. There are four ways that you can manage access to your S3 bucket:
+- Set up an **IAM role** with an OIDC provider (**recommended**).
+- Use **access keys**.
+- Set up an **IAM role** without an OIDC provider.
+- Use **access keys with Docker Compose**. 
 
 Select the relevant tab and follow the steps for your desired option: 
 
@@ -153,11 +154,13 @@ global:
 ```
 
 > Optionally, you can use already existing Kubernetes secret and a key
-1. Create a kubernetes secret with your AWS access keys:
+1. Create a Kubernetes secret with your AWS access keys:
+
 ```shell
 kubectl create secret generic <YOUR_SECRET_NAME> --from-literal=accesskey=<YOUR_ACCESS_KEY_ID> --from-literal=secretkey=<YOUR_SECRET_ACCESS_KEY>
 ```
 2. Update your `lse-values.yaml` file with your newly-created kubernetes secret:
+
 ```yaml
 global:
   persistence:
@@ -228,11 +231,59 @@ global:
 ```
 
   </div>
+
+  <div data-name="Docker Compose">
+
+1. Create an IAM user with **Programmatic access**. See [Creating an IAM user in your AWS account](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) in the AWS Identity and Access Management User Guide.
+2. When creating the user, for the **Set permissions** option, choose to **Attach existing policies directly**.
+3. Select **Create policy** and attach the following policy, replacing `<YOUR_S3_BUCKET>` with the name of your bucket:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::<YOUR_S3_BUCKET>"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::<YOUR_S3_BUCKET>/*"
+      ]
+    }
+  ]
+}
+```
+
+4. After you create the user, save the username and access key somewhere secure.
+5. Update your `env.list` file, replacing `<YOUR_ACCESS_KEY_ID>` and `<YOUR_SECRET_ACCESS_KEY>` with your newly-created access key ID and secret key. Optionally, you can specify a folder using `STORAGE_AWS_FOLDER` (default is `""` or omit this argument):
+
+```shell
+STORAGE_TYPE=s3
+STORAGE_AWS_ACCESS_KEY_ID="<YOUR_ACCESS_KEY_ID>"
+STORAGE_AWS_SECRET_ACCESS_KEY="<YOUR_SECRET_ACCESS_KEY>"
+STORAGE_AWS_BUCKET_NAME="<YOUR_BUCKET_NAME>"
+STORAGE_AWS_REGION_NAME="<YOUR_BUCKET_REGION>"
+STORAGE_AWS_FOLDER=""
+```
+
+  </div>
 </div>
 
 ## Set up Google Cloud Storage
 
-Set up Google Cloud Storage (GCS) as the persistent storage for Label Studio Enterprise hosted in Google Cloud Platform (GCP).
+Set up Google Cloud Storage (GCS) as the persistent storage for Label Studio Enterprise hosted in Google Cloud Platform (GCP) or Docker Compose.
 
 ### Create a GCS bucket 
 
@@ -247,13 +298,14 @@ Set up Google Cloud Storage (GCS) as the persistent storage for Label Studio Ent
       - Value: `projects/_/buckets/heartex-example-bucket-123456`
     - Or, **use a Common Expression Language** (CEL) to specify an IAM condition. For example, set the following: `resource.name.startsWith('projects/_/buckets/heartex-example-bucket-123456')`. See [CEL for Conditions in Overview of IAM Conditions](https://cloud.google.com/iam/docs/conditions-overview#cel) in the Google Cloud Storage guide. 
 
-### Configure to use GCS bucket
+### Configure the GCS bucket
 
 You can connect Label Studio Enterprise to your GCS bucket using **Workload Identity** or **Access keys**.
 
-After you create a bucket and set up IAM permissions, connect Label Studio Enterprise to your GCS bucket. There are two ways that you can connect to your bucket:
+After you create a bucket and set up IAM permissions, connect Label Studio Enterprise to your GCS bucket. There are three ways that you can connect to your bucket:
 - Use Workload Identity to allow workloads in GKE to access your GCS bucket by impersonating the service account you created (**recommended**).
 - Create a service account key to use the service account outside Google Cloud.  
+- Create a service account key to use with Docker Compose. 
 
 <div class="code-tabs">
 <div data-name="Workload Identity">
@@ -306,7 +358,10 @@ rqworker:
 </div>
 <div data-name="Service Account Key">
 
-1. Create a service account key from the UI and download the JSON. Follow the steps for [Creating and managing service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) in the Google Cloud Identity and Access Management guide.
+You can use a service account key that you create, or if you already have a Kubernetes secret and key, follow [the steps below](#Use-an-existing-Kubernetes-secret-and-key) to use those.
+
+#### Create a new service account key
+1. Create a service account key from the UI and download the JSON. Follow the steps for [Creating and managing service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) in the Google Cloud Identity and Access Management guide. 
 2. After downloading the JSON for the service account key, update or create references to the JSON, your projectID, and your bucket in your `lse-values.yaml` file.
    Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 
@@ -323,6 +378,50 @@ global:
         folder: ""
 ```
 
+#### Use an existing Kubernetes secret and key
+
+1. Create a Kubernetes secret with your GCS service account JSON file, replacing `<PATH_TO_JSON>` with the path to the service account JSON file:
+
+```shell
+kubectl create secret generic <YOUR_SECRET_NAME> --from-file=key_json=<PATH_TO_JSON>
+```
+2. Update your `lse-values.yaml` file with your newly-created Kubernetes secret:
+
+```yaml
+global:
+   persistence:
+      enabled: true
+      type: gcs
+      config:
+         gcs:
+            projectID: "<YOUR_PROJECT_ID>"
+            applicationCredentialsJSONExistingSecret: "<YOUR_SECRET_NAME>"
+            applicationCredentialsJSONExistingSecretKey: "key_json"
+            bucket: "<YOUR_BUCKET_NAME>"
+```
+
+  </div>
+
+  <div data-name="Docker Compose">
+
+1. Create a service account key from the UI and download the JSON. Follow the steps for [Creating and managing service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) in the Google Cloud Identity and Access Management guide.
+2. After downloading the JSON for the service account key, update or create references to the JSON, your projectID, and your bucket in your `env.list` file.
+   Optionally, you can choose a folder by specifying `STORAGE_GCS_FOLDER` (default is `""` or omit this argument):
+
+```shell
+STORAGE_TYPE=gcs
+STORAGE_GCS_BUCKET_NAME="<YOUR_BUCKET_NAME>"
+STORAGE_GCS_PROJECT_ID="<YOUR_PROJECT_ID>"
+STORAGE_GCS_FOLDER=""
+GOOGLE_APPLICATION_CREDENTIALS="/opt/heartex/secrets/key.json"
+```
+
+3. Place the downloaded JSON file from step 1 in the same directory as your `env.list` file.
+4. Append the following entry in `docker-compose.yml` file as the path for `app.volumes`:
+
+```yaml
+- ./service-account-file.json:/opt/heartex/secrets/key.json:ro
+```
   </div>
 </div>
 
@@ -330,17 +429,18 @@ global:
 ## Set up Microsoft Azure Storage
 
 Create a Microsoft Azure Storage container to use as persistent storage with Label Studio Enterprise.
+
 ### Create a Storage container
 
-1. Create an Azure storage account: https://docs.microsoft.com/en-us/azure/storage/common/storage-account-overview
-> Make sure that you set Stock Keeping Unit (SKU) to Premium_LRS and the kind parameter is set to BlockBlobStorage. This configuration results in a storage that uses SSDs rather than standard Hard Disk Drives (HDD). If you set this parameter to an HDD-based storage option, your instance may be too slow and might malfunction.
-2. Find the generated key in the **Storage accounts > Access keys section** in the [Azure Portal](https://portal.azure.com/) or by running the following command:
+1. Create an Azure storage account. See [Create a storage account](https://docs.microsoft.com/en-us/azure/storage/common/storage-account-create?tabs=azure-portal) in the Microsoft Azure product documentation.
+> Make sure that you set **Stock Keeping Unit (SKU)** to `Premium_LRS` and the **kind** parameter to `BlockBlobStorage`. This configuration results in storage that uses solid state drives (SSDs) rather than standard hard disk drives (HDDs). If you set this parameter to an HDD-based storage option, your instance might be too slow and could malfunction.
+2. Find the generated key in the **Storage accounts > Access keys** section in the [Azure Portal](https://portal.azure.com/) or by running the following command:
 
 ```shell
 az storage account keys list --account-name=${STORAGE_ACCOUNT}
 ```
 
-3. Create a new storage container within your storage account by following the [official documentation](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-portal) or by running the following command:
+3. Create a storage container within your storage account by following the steps to [Upload, download, and list blobs with the Azure portal](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-portal) in the Microsoft Azure product documentation, or run the following command:
 
 ```shell
 az storage container create --name <YOUR_CONTAINER_NAME> \
@@ -348,7 +448,13 @@ az storage container create --name <YOUR_CONTAINER_NAME> \
           --account-key "<YOUR_STORAGE_KEY>"
 ```
 
-### Configure to use Azure container
+### Configure the Azure container
+
+You can connect Label Studio Enterprise to your Azure container using account keys in Kubernetes or account keys in Docker Compose. Choose the option relevant to your Label Studio Enterprise deployment.
+
+<div class="code-tabs">
+  <div data-name="Kubernetes">
+
 Update your `lse-values.yaml` file with the `YOUR_CONTAINER_NAME`, `YOUR_STORAGE_ACCOUNT`, and `YOUR_STORAGE_KEY` that you created.
 Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 
@@ -364,3 +470,43 @@ global:
         containerName: "<YOUR_CONTAINER_NAME>"
         folder: ""
 ```
+
+If you have an existing key, you can use that instead to create a Kubernetes secret. 
+1. Create a Kubernetes secret with your Azure access key:
+
+```shell
+kubectl create secret generic <YOUR_SECRET_NAME> --from-literal=storageaccountname=<YOUR_STORAGE_ACCOUNT> --from-literal=storageaccountkey=<YOUR_STORAGE_KEY>
+```
+2. Update your `lse-values.yaml` file with your newly-created Kubernetes secret:
+
+```yaml
+global:
+   persistence:
+      enabled: true
+      type: azure
+      config:
+         azure:
+            storageAccountNameExistingSecret: "<YOUR_SECRET_NAME>"
+            storageAccountNameExistingSecretKey: "storageaccountname"
+            storageAccountKeyExistingSecret: "<YOUR_SECRET_NAME>"
+            storageAccountKeyExistingSecretKey: "storageaccountkey"
+            containerName: "<YOUR_CONTAINER_NAME>"
+```
+
+  </div>
+
+  <div data-name="Docker Compose">
+
+Update your `env.list` file with the `YOUR_CONTAINER_NAME`, `YOUR_STORAGE_ACCOUNT`, and `YOUR_STORAGE_KEY` that you created.
+Optionally, you can choose a folder by specifying `STORAGE_AZURE_FOLDER` (default is `""` or omit this argument):
+
+```shell
+STORAGE_TYPE=azure
+STORAGE_AZURE_ACCOUNT_NAME="<YOUR_STORAGE_ACCOUNT>"
+STORAGE_AZURE_ACCOUNT_KEY="<YOUR_STORAGE_KEY>"
+STORAGE_AZURE_CONTAINER_NAME="<YOUR_CONTAINER_NAME>"
+STORAGE_AZURE_FOLDER=""
+```
+
+  </div>
+</div>

@@ -160,7 +160,7 @@ class BaseTaskSerializer(FlexFieldsModelSerializer):
         if project:
             # resolve uri for storage (s3/gcs/etc)
             if self.context.get('resolve_uri', False):
-                instance.data = instance.resolve_uri(instance.data, proxy=self.context.get('proxy', False))
+                instance.data = instance.resolve_uri(instance.data, project)
 
             # resolve $undefined$ key in task data
             data = instance.data
@@ -292,9 +292,10 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 task_predictions.append(predictions)
 
             # add tasks first
-            for task in validated_tasks:
+            max_overlap = self.project.maximum_annotations
+            for i, task in enumerate(validated_tasks):
                 t = Task(project=self.project, data=task['data'], meta=task.get('meta', {}),
-                         overlap=self.project.maximum_annotations,
+                         overlap=max_overlap, is_labeled=len(task_annotations[i]) >= max_overlap,
                          file_upload_id=task.get('file_upload_id'))
                 db_tasks.append(t)
 
@@ -527,6 +528,27 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
             drafts = drafts.filter(user=user)
 
         return AnnotationDraftSerializer(drafts, many=True, read_only=True, default=[], context=self.context).data
+
+
+class NextTaskSerializer(TaskWithAnnotationsAndPredictionsAndDraftsSerializer):
+    def get_predictions(self, task):
+        project = task.project
+        if not project.show_collab_predictions:
+            return []
+        else:
+            for ml_backend in project.ml_backends.all():
+                ml_backend.predict_tasks([task])
+            return super().get_predictions(task)
+
+    def get_annotations(self, task):
+        result = []
+        annotations = super().get_annotations(task)
+        if 'request' in self.context and hasattr(self.context['request'], 'user'):
+            user = self.context['request'].user
+            for annotation in annotations:
+                if annotation.get('completed_by') == user.id and not (annotation.get('ground_truth') or annotation.get('honeypot')):
+                    result.append(annotation)
+        return result
 
 
 class TaskIDWithAnnotationsAndPredictionsSerializer(ModelSerializer):
