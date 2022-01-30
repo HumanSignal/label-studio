@@ -151,10 +151,10 @@ class Project(ProjectMixin, models.Model):
         _('reveal_preannotations_interactively'), default=False, help_text='Reveal pre-annotations interactively'
     )
     show_annotation_history = models.BooleanField(
-        _('show annotation history'), default=False, help_text='Show annotation history to annotator'
+        _('show annotation history'), default=False, help_text='Show annotation history to annotators'
     )
     show_data_manager_to_reviewers = models.BooleanField(
-        _('show data manager to reviewers'), default=False, help_text='Show data manager to annotator'
+        _('show data manager to reviewers'), default=False, help_text='Show data manager to reviewers'
     )
     show_collab_predictions = models.BooleanField(
         _('show predictions to annotator'), default=True, help_text='If set, the annotator can view model predictions'
