@@ -305,10 +305,10 @@ You can also create a storage connection using the Label Studio API.
 Connect your [Microsoft Azure Blob storage](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction) container with Label Studio. For details about how Label Studio secures access to cloud storage, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
 
 ### Prerequisites
-You must set two environment variables in Label Studio to connect to Azure Blob storage:
+You can use either an Account Name and Account Key, or an Account Name and SAS Token to connect to Azure Blob storage. For the connection type you choose, set two environment variables in Label Studio:
 - `AZURE_BLOB_ACCOUNT_NAME` to specify the name of the storage account.
 - `AZURE_BLOB_ACCOUNT_KEY` to specify the secret key for the storage account, ***OR***
-- `AZURE_BLOB_SAS_TOKEN` to specifcy the SharedAccessSignature for the storage account.
+- `AZURE_BLOB_SAS_TOKEN` to specify the SharedAccessSignature for the storage account.
 
 Configure the specific Azure Blob container that you want Label Studio to use in the UI.
 
@@ -325,7 +325,7 @@ In the Label Studio UI, do the following to set up the connection:
     - In the **File Filter Regex** field, specify a regular expression to filter bucket objects. Use `.*` to collect all objects.
     - In the **Account Name** field, specify the account name for the Azure storage. You can also set this field as an environment variable,`AZURE_BLOB_ACCOUNT_NAME`.
     - In the **Account Key** field, specify the secret key to access the storage account. You can also set this field as an environment variable,`AZURE_BLOB_ACCOUNT_KEY`. 
-    - Alternatively, if you do not have the Account Key, the **SAS Token** field specifically allows for authentication using the SharedAccessSignature for the given container. It may alsos be set as an environmental variable `AZURE_BLOB_SAS_TOKEN`.
+    - Alternatively, if you do not have the Account Key, the **SAS Token** field specifically allows for authentication using the SharedAccessSignature for the given container. It may also be set as an environmental variable `AZURE_BLOB_SAS_TOKEN`.
     - Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling, for example `azure-blob://container-name/image.jpg`. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file. 
     - Choose whether to disable **Use pre-signed URLs**, or [shared access signatures](https://docs.microsoft.com/en-us/rest/api/storageservices/delegate-access-with-shared-access-signature). For example, if you host Label Studio in the same network as your storage containers, you can disable presigned URLs and have direct access to the storage.
     - Adjust the counter for how many minutes the shared access signatures are valid.

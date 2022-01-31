@@ -47,7 +47,7 @@ class AzureBlobStorageMixin(models.Model):
         help_text='Azure Blob account key')
     sas_token = models.TextField(
         _('sas_token'), null=True, blank=True,
-        help_text='Azure Blob account key')
+        help_text='Azure Blob SharedAccessSignature Token')
 
     def get_account_name(self):
         return str(self.account_name) if self.account_name else get_env('AZURE_BLOB_ACCOUNT_NAME')
@@ -58,15 +58,13 @@ class AzureBlobStorageMixin(models.Model):
     def get_sas_token(self):
         return str(self.sas_token) if self.sas_token else get_env('AZURE_BLOB_SAS_TOKEN')
 
-    def get_container(self):
-        return str(self.container) if self.container else get_env('AZURE_BLOB_CONTAINER')
-
-    def get_connection_str(self, account_name, account_key, sas_token=None) -> str:
-        if sas_token:
-            return "DefaultEndpointsProtocol=https;AccountName=" + account_name + \
+    def get_connection_str(self, account_name, sas_token) -> str:
+        return "DefaultEndpointsProtocol=https;AccountName=" + account_name + \
             ";SharedAccessSignature=" + sas_token + ";EndpointSuffix=core.windows.net"
-        else:
-            return "DefaultEndpointsProtocol=https;AccountName=" + account_name + \
+        
+
+    def get_connection_str(self, account_name, account_key) -> str:
+        return "DefaultEndpointsProtocol=https;AccountName=" + account_name + \
             ";AccountKey=" + account_key + ";EndpointSuffix=core.windows.net"
 
     def get_client_and_container(self):
@@ -76,7 +74,7 @@ class AzureBlobStorageMixin(models.Model):
         if not account_name or not (account_key or sas_token):
             raise ValueError('Azure account name and key OR token must be set using '
                              'environment variables AZURE_BLOB_ACCOUNT_NAME and one of AZURE_BLOB_ACCOUNT_KEY or AZURE_BLOB_SAS_TOKEN')
-        connection_string = self.get_connection_str(account_name, account_key, sas_token)
+        connection_string = self.get_connection_str(account_name, account_key=account_key) if account_key is not None or len(account_key) == 0 else self.get_connection_str(account_name, sas_token=sas_token)
         client = BlobServiceClient.from_connection_string(conn_str=connection_string)
         container = client.get_container_client(str(self.container))
         return client, container
@@ -144,12 +142,15 @@ class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
 
         sas_token = self.get_sas_token()
         if not sas_token:
+            logging.info("Generating BLOB SAS Token using Account Name and Account Key")
             sas_token = generate_blob_sas(account_name=self.get_account_name(),
                                       container_name=container,
                                       blob_name=blob,
                                       account_key=self.get_account_key(),
                                       permission=BlobSasPermissions(read=True),
                                       expiry=expiry)
+        else:
+            logging.debug("Using specified SAS token")
         return 'https://' + self.get_account_name() + '.blob.core.windows.net/' + container + '/' + blob + '?' + sas_token
 
     def can_resolve_url(self, url):
