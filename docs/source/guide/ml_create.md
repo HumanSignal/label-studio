@@ -79,7 +79,8 @@ def predict(self, tasks, **kwargs):
                 'value': {'choices': ['My Label']}
             }],
             # optionally you can include prediction scores that you can use to sort the tasks and do active learning
-            'score': 0.987
+            'score': 0.987,
+            'model_version': 'delorean-2015.10.25'
         })
     return predictions
 ```
