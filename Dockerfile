@@ -29,8 +29,13 @@ COPY . /label-studio
 RUN --mount=type=cache,target=$PIP_CACHE_DIR \
     pip3 install -e .
 
+RUN mkdir /label-studio/static_volume
+COPY label_studio/* /label-studio/static_volume
+
 EXPOSE 8080
 RUN ./deploy/prebuild_wo_frontend.sh
+
+RUN ls -l
 
 ENTRYPOINT ["./deploy/docker-entrypoint.sh"]
 CMD ["label-studio"]

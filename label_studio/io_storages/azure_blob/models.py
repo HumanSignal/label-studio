@@ -47,7 +47,7 @@ class AzureBlobStorageMixin(models.Model):
         help_text='Azure Blob account key')
     sas_token = models.TextField(
         _('sas_token'), null=True, blank=True,
-        help_text='Azure Blob SharedAccessSignature Token')
+        help_text='Azure Blob Shared Access Signature token')
 
     def get_account_name(self):
         return str(self.account_name) if self.account_name else get_env('AZURE_BLOB_ACCOUNT_NAME')
