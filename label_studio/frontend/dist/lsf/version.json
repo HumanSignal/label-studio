@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1572: allow to uncheck single Choice (#452)\n\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "05afcb9f52c033dfe7906cf974e73dc127547711",
+  "message": "fix: DEV-1596: Fix childNodes of null (#454)\n\n* fix: DEV-1596: Fix childNodes of null\r\n\r\n* log error when we can't locate region by xpath\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
+  "commit": "e012ea2b2859986cf0232e7b1ee3016879374f4d",
   "branch": "master",
-  "date": "2022-01-27T22:32:34Z"
+  "date": "2022-01-31T13:25:38Z"
 }
