@@ -308,7 +308,7 @@ Connect your [Microsoft Azure Blob storage](https://docs.microsoft.com/en-us/azu
 You can use either an Account Name and Account Key, or an Account Name and SAS Token to connect to Azure Blob storage. For the connection type you choose, set two environment variables in Label Studio:
 - `AZURE_BLOB_ACCOUNT_NAME` to specify the name of the storage account.
 - `AZURE_BLOB_ACCOUNT_KEY` to specify the secret key for the storage account, ***OR***
-- `AZURE_BLOB_SAS_TOKEN` to specifcy the SharedAccessSignature for the storage account.
+- `AZURE_BLOB_SAS_TOKEN` to specify the SharedAccessSignature for the storage account.
 
 Configure the specific Azure Blob container that you want Label Studio to use in the UI.
 
