@@ -7,24 +7,21 @@ from pathlib import Path
 import re
 
 from django.conf import settings
-from django.db import models, transaction
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
-from core.utils.params import get_env
 from io_storages.base_models import (
       ExportStorage,
       ExportStorageLink,
       ImportStorage,
       ImportStorageLink,
 )
-from io_storages.serializers import StorageAnnotationSerializer
 from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
-url_scheme = 'https'
 
 
 class LocalFilesMixin(models.Model):
@@ -54,6 +51,10 @@ class LocalFilesMixin(models.Model):
 
 
 class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):
+    url_scheme = 'https'
+
+    def can_resolve_url(self, url):
+        return False
 
     def iterkeys(self):
         path = Path(self.path)

@@ -4,6 +4,7 @@ on:
     branches: ['*', '*/*', '*/**', master]
     paths:
       - 'label_studio/**'
+      - '!label_studio/frontend/**'
       - '.github/workflows/tests.yml'
       - 'deploy/requirements.txt'
       - 'deploy/requirements-mw.txt'
@@ -21,7 +22,6 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - 3.6
           - 3.7
           - 3.8
           - 3.9
@@ -43,7 +43,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure pip cache
         id: pip-cache
         with:
@@ -61,7 +61,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v2.5.0
+        uses: actions/setup-node@v2.5.1
         with:
           node-version: "${{ env.NODE }}"
 
@@ -69,7 +69,7 @@ jobs:
         id: npm-cache-dir
         run: echo "::set-output name=dir::$(npm config get cache)"
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure npm cache
         id: npm-cache
         with:
@@ -155,9 +155,9 @@ jobs:
       - name: Install OS dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev
+          sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev python-dev
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure pip cache
         id: pip-cache
         with:
@@ -173,7 +173,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v2.5.0
+        uses: actions/setup-node@v2.5.1
         with:
           node-version: 14
 
@@ -181,7 +181,7 @@ jobs:
         id: npm-cache-dir
         run: echo "::set-output name=dir::$(npm config get cache)"
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure npm cache
         id: npm-cache
         with:
@@ -215,7 +215,6 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - 3.6
           - 3.7
           - 3.8
           - 3.9
@@ -237,7 +236,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - uses: actions/cache@v2.1.6
+    - uses: actions/cache@v2.1.7
       name: Configure pip cache
       with:
         path: ~\AppData\Local\pip\Cache
@@ -284,4 +283,4 @@ jobs:
         collect_analytics: 0
       run: |
         cd label_studio/
-        coverage report -m --fail-under=40
+        coverage report -i -m --fail-under=40

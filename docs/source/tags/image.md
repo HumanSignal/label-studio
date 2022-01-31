@@ -30,7 +30,7 @@ When you annotate image regions with this tag, the annotations are saved as perc
 | [brightnessControl] | <code>boolean</code> | <code>false</code> | Show brightness control in toolbar |
 | [contrastControl] | <code>boolean</code> | <code>false</code> | Show contrast control in toolbar |
 | [rotateControl] | <code>boolean</code> | <code>false</code> | Show rotate control in toolbar |
-| [crosshair] | <code>boolean</code> | <code>false</code> | – Show crosshair cursor |
+| [crosshair] | <code>boolean</code> | <code>false</code> | Show crosshair cursor |
 
 ### Example
 ```html

@@ -19,7 +19,9 @@ from core.utils.common import get_object_with_check_and_log, bool_from_request, 
 from projects.models import Project
 from tasks.models import Task
 from .models import DataExport, Export
-from .serializers import ExportDataSerializer, ExportSerializer, ExportCreateSerializer
+
+from .serializers import ExportDataSerializer, ExportSerializer, ExportCreateSerializer, ExportParamSerializer
+from ranged_fileresponse import RangedFileResponse
 
 logger = logging.getLogger(__name__)
 
@@ -147,17 +149,15 @@ class ExportAPI(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         project = self.get_object()
-        export_type = (
-            request.GET.get('exportType', 'JSON')
-            if 'exportType' in request.GET
-            else request.GET.get('export_type', 'JSON')
-        )
-        only_finished = not bool_from_request(request.GET, 'download_all_tasks', False)
+        query_serializer = ExportParamSerializer(data=request.GET)
+        query_serializer.is_valid(raise_exception=True)
+
+        export_type = query_serializer.validated_data.get('exportType') or query_serializer.validated_data['export_type']
+        only_finished = not query_serializer.validated_data['download_all_tasks']
+        download_resources = query_serializer.validated_data['download_resources']
+        interpolate_key_frames = query_serializer.validated_data['interpolate_key_frames']
+
         tasks_ids = request.GET.getlist('ids[]')
-        if 'download_resources' in request.GET:
-            download_resources = bool_from_request(request.GET, 'download_resources', True)
-        else:
-            download_resources = settings.CONVERTER_DOWNLOAD_RESOURCES
 
         logger.debug('Get tasks')
         tasks = Task.objects.filter(project=project)
@@ -174,7 +174,8 @@ class ExportAPI(generics.RetrieveAPIView):
         tasks = []
         for _task_ids in batch(task_ids, 1000):
             tasks += ExportDataSerializer(
-                self.get_task_queryset(query.filter(id__in=_task_ids)), many=True, expand=['drafts']
+                self.get_task_queryset(query.filter(id__in=_task_ids)), many=True, expand=['drafts'],
+                context={'interpolate_key_frames': interpolate_key_frames}
             ).data
         logger.debug('Prepare export files')
 
@@ -450,7 +451,8 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
             return HttpResponse("Can't get file", status=404)
 
         ext = file_.name.split('.')[-1]
-        response = HttpResponse(file_, content_type=f'application/{ext}')
+
+        response = RangedFileResponse(request, file_, content_type=f'application/{ext}')
         response['Content-Disposition'] = f'attachment; filename="{file_.name}"'
         response['filename'] = file_.name
         return response

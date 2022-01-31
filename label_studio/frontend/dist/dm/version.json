@@ -1,6 +1,6 @@
 {
-  "message": "DEV-609: Load task data from server (#22)\n\n* Load task data from server\r\n\r\n* Load task data from server\r\n\r\n* Run actions on branch\r\n\r\nCo-authored-by: Sergey <Gondragos@gmail.com>",
-  "commit": "feb9f1db923039b098fd0122f3d6a87bdc224a79",
-  "branch": "master",
-  "date": "2021-11-18T20:01:55Z"
+  "message": "fix currentAnnotation.pauseAutosave();",
+  "commit": "d3a33d75e6a8183420c5177a000cb8742427d4cf",
+  "branch": "feature/dev-1094",
+  "date": "2022-01-12T16:56:37Z"
 }

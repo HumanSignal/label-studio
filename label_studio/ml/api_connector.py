@@ -11,12 +11,25 @@ from django.db.models import Q, F, Count
 from django.conf import settings
 from requests.adapters import HTTPAdapter
 from core.version import get_git_version
+from core.utils.common import get_bool_env
 from data_export.serializers import ExportDataSerializer
+from label_studio.core.utils.params import get_env
 from users.models import Token
 
 
 version = get_git_version()
 logger = logging.getLogger(__name__)
+
+CONNECTION_TIMEOUT = float(get_env('ML_CONNECTION_TIMEOUT', 1))  # seconds
+TIMEOUT_DEFAULT = float(get_env('ML_TIMEOUT_DEFAULT', 100))  # seconds
+
+TIMEOUT_TRAIN = float(get_env('ML_TIMEOUT_TRAIN', 30))
+TIMEOUT_PREDICT = float(get_env('ML_TIMEOUT_PREDICT', 100))
+TIMEOUT_HEALTH = float(get_env('ML_TIMEOUT_HEALTH', 1))
+TIMEOUT_SETUP = float(get_env('ML_TIMEOUT_SETUP', 3))
+TIMEOUT_DUPLICATE_MODEL = float(get_env('ML_TIMEOUT_DUPLICATE_MODEL', 1))
+TIMEOUT_DELETE = float(get_env('ML_TIMEOUT_DELETE', 1))
+TIMEOUT_TRAIN_JOB_STATUS = float(get_env('ML_TIMEOUT_TRAIN_JOB_STATUS', 1))
 
 
 class BaseHTTPAPI(object):
@@ -24,13 +37,11 @@ class BaseHTTPAPI(object):
     HEADERS = {
         'User-Agent': 'heartex/' + (version or ''),
     }
-    CONNECTION_TIMEOUT = 1.0  # seconds
-    TIMEOUT = 100.0  # seconds
 
     def __init__(self, url, timeout=None, connection_timeout=None, max_retries=None, headers=None, **kwargs):
         self._url = url
-        self._timeout = timeout or self.TIMEOUT
-        self._connection_timeout = connection_timeout or self.CONNECTION_TIMEOUT
+        self._timeout = timeout or TIMEOUT_DEFAULT
+        self._connection_timeout = connection_timeout or CONNECTION_TIMEOUT
         self._headers = headers or {}
         self._max_retries = max_retries or self.MAX_RETRIES
         self._sessions = {self._session_key(): self.create_session()}
@@ -57,7 +68,13 @@ class BaseHTTPAPI(object):
             return session
 
     def _prepare_kwargs(self, kwargs):
-        kwargs['timeout'] = self._connection_timeout, self._timeout
+        # add timeout if it's not presented
+        if 'timeout' not in kwargs:
+            kwargs['timeout'] = self._connection_timeout, self._timeout
+
+        # add connection timeout if it's not presented
+        elif isinstance(kwargs['timeout'], float) or isinstance(kwargs['timeout'], int):
+            kwargs['timeout'] = (self._connection_timeout, kwargs['timeout'])
 
     def request(self, method, *args, **kwargs):
         self._prepare_kwargs(kwargs)
@@ -102,7 +119,7 @@ class MLApiScheme(object):
 
 class MLApi(BaseHTTPAPI):
 
-    def __init__(self, aggregator='majority_vote', agreement_threshold=0, **kwargs):
+    def __init__(self, **kwargs):
         super(MLApi, self).__init__(**kwargs)
         self._validate_request_timeout = 10
 
@@ -163,7 +180,7 @@ class MLApi(BaseHTTPAPI):
                 'password': project.task_data_password
             }
         }
-        return self._request('train', request, verbose=False)
+        return self._request('train', request, verbose=False, timeout=TIMEOUT_TRAIN)
 
     def make_predictions(self, tasks, model_version, project, context=None):
         request = {
@@ -177,10 +194,10 @@ class MLApi(BaseHTTPAPI):
                 'context': context,
             },
         }
-        return self._request('predict', request, verbose=False)
+        return self._request('predict', request, verbose=False, timeout=TIMEOUT_PREDICT)
 
     def health(self):
-        return self._request('health', method='GET')
+        return self._request('health', method='GET', timeout=TIMEOUT_HEALTH)
 
     def validate(self, config):
         return self._request('validate', request={'config': config}, timeout=self._validate_request_timeout)
@@ -191,19 +208,19 @@ class MLApi(BaseHTTPAPI):
             'schema': project.label_config,
             'hostname': settings.HOSTNAME if settings.HOSTNAME else ('http://localhost:' + settings.INTERNAL_PORT),
             'access_token': project.created_by.auth_token.key
-        })
+        }, timeout=TIMEOUT_SETUP)
 
     def duplicate_model(self, project_src, project_dst):
         return self._request('duplicate_model', request={
             'project_src': self._create_project_uid(project_src),
             'project_dst': self._create_project_uid(project_dst)
-        })
+        }, timeout=TIMEOUT_DUPLICATE_MODEL)
 
     def delete(self, project):
-        return self._request('delete', request={'project': self._create_project_uid(project)})
+        return self._request('delete', request={'project': self._create_project_uid(project)}, timeout=TIMEOUT_DELETE)
 
     def get_train_job_status(self, train_job):
-        return self._request('job_status', request={'job': train_job.job_id})
+        return self._request('job_status', request={'job': train_job.job_id}, timeout=TIMEOUT_TRAIN_JOB_STATUS)
 
 
 def get_ml_api(project):
@@ -211,4 +228,7 @@ def get_ml_api(project):
         return None
     if project.ml_backend_active_connection.ml_backend is None:
         return None
-    return MLApi(url=project.ml_backend_active_connection.ml_backend.url)
+    return MLApi(
+        url=project.ml_backend_active_connection.ml_backend.url,
+        timeout=project.ml_backend_active_connection.ml_backend.timeout
+    )

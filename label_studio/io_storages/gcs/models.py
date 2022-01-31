@@ -13,18 +13,16 @@ from google.auth.transport import requests
 from google.oauth2 import service_account
 from urllib.parse import urlparse
 from datetime import datetime, timedelta
-from django.db import models, transaction
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
-from io_storages.utils import get_uri_via_regex
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
-url_scheme = 'gs'
 
 clients_cache = {}
 
@@ -84,6 +82,8 @@ class GCSStorageMixin(models.Model):
 
 
 class GCSImportStorage(GCSStorageMixin, ImportStorage):
+    url_scheme = 'gs'
+
     presign = models.BooleanField(
         _('presign'), default=True,
         help_text='Generate presigned URLs')
@@ -109,7 +109,7 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
 
     def get_data(self, key):
         if self.use_blob_urls:
-            return {settings.DATA_UNDEFINED_NAME: f'{url_scheme}://{self.bucket}/{key}'}
+            return {settings.DATA_UNDEFINED_NAME: f'{self.url_scheme}://{self.bucket}/{key}'}
         bucket = self.get_bucket()
         blob = bucket.blob(key)
         blob_str = blob.download_as_string()
@@ -127,11 +127,11 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
             return False
         return True
 
-    def resolve_gs(self, url, **kwargs):
+    def generate_http_url(self, url):
         r = urlparse(url, allow_fragments=False)
         bucket_name = r.netloc
         key = r.path.lstrip('/')
-        if self.is_gce_instance():
+        if self.is_gce_instance() and not self.google_application_credentials:
             logger.debug('Generate signed URL for GCE instance')
             return self.python_cloud_function_get_signed_url(bucket_name, key)
         else:
@@ -175,6 +175,7 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
         auth_request = requests.Request()
         credentials, project = google.auth.default()
         storage_client = google_storage.Client(project, credentials)
+        # storage_client = self.get_client()
         data_bucket = storage_client.lookup_bucket(bucket_name)
         signed_blob_path = data_bucket.blob(blob_name)
         expires_at_ms = datetime.now() + timedelta(minutes=self.presign_ttl)
@@ -183,18 +184,6 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
                                                                 service_account_email=None)
         signed_url = signed_blob_path.generate_signed_url(expires_at_ms, credentials=signing_credentials, version="v4")
         return signed_url
-
-    def resolve_uri(self, data):
-        uri, storage = get_uri_via_regex(data, prefixes=(url_scheme,))
-        if not storage:
-            return
-        logger.debug("Found matching storage uri in task data value: {uri}".format(uri=uri))
-        resolved_uri = self.resolve_gs(uri)
-        return data.replace(uri, resolved_uri)
-
-    def can_resolve_url(self, url):
-        # TODO: later check to the full prefix like url.startswith(url_scheme + "//" + self.bucket)
-        return url.startswith(f'{url_scheme}://')
 
     def scan_and_create_links(self):
         return self._scan_and_create_links(GCSImportStorageLink)
