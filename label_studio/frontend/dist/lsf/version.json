@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1572: allow to uncheck single Choice (#452)\n\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "05afcb9f52c033dfe7906cf974e73dc127547711",
-  "branch": "master",
-  "date": "2022-01-27T22:32:34Z"
+  "message": "log error when we can't locate region by xpath",
+  "commit": "cd7813e1749bd368072eec1d0537275f319a588f",
+  "branch": "fix/DEV-1596/child-nodes",
+  "date": "2022-01-31T11:59:51Z"
 }
