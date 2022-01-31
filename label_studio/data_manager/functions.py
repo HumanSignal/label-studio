@@ -222,6 +222,17 @@ def get_all_columns(project, *_):
                 'explore': False,
                 'labeling': False
             }
+        },
+        {
+            'id': 'updated_at',
+            'title': 'Updated at',
+            'type': 'Datetime',
+            'target': 'tasks',
+            'help': 'Task update time',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
         }
     ]
 

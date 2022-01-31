@@ -2,8 +2,10 @@
 """
 import logging
 
+from django.utils.timezone import now
+
 from core.permissions import AllPermissions
-from tasks.models import Prediction, Annotation
+from tasks.models import Prediction, Annotation, Task
 from tasks.serializers import TaskSerializerBulk
 
 all_permissions = AllPermissions()
@@ -30,7 +32,9 @@ def predictions_to_annotations(project, queryset, **kwargs):
 
     # prepare annotations
     annotations = []
+    tasks_ids = []
     for result, model_version, task_id, prediction_id in predictions_values:
+        tasks_ids.append(task_id)
         annotations.append({
             'result': result,
             'completed_by_id': user.pk,
@@ -42,6 +46,7 @@ def predictions_to_annotations(project, queryset, **kwargs):
     logger.debug(f'{count} predictions will be converter to annotations')
     db_annotations = [Annotation(**annotation) for annotation in annotations]
     db_annotations = Annotation.objects.bulk_create(db_annotations)
+    Task.objects.filter(id__in=tasks_ids).update(updated_at=now())
 
     TaskSerializerBulk.post_process_annotations(db_annotations)
     return {'response_code': 200, 'detail': f'Created {count} annotations'}
