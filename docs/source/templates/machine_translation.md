@@ -10,6 +10,8 @@ meta_description: Template for providing translations of text with Label Studio 
 
 If you want to improve existing machine translation capabilities, you want to provide a dataset with robust and accurate translation examples. Use this template to read a text in one language and store a translation in another language.
 
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html
