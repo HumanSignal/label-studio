@@ -76,7 +76,8 @@ def predict(self, tasks, **kwargs):
                 'from_name': from_name,
                 'to_name': to_name,
                 'type': 'choices',
-                'value': {'choices': ['My Label']}
+                'value': {'choices': ['My Label']},
+                'score': 0.42  # per-region score, visible in the editor only
             }],
             # optionally you can include prediction scores that you can use to sort the tasks and do active learning
             'score': 0.987,
