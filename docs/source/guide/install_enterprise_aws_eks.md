@@ -13,6 +13,8 @@ Install Label Studio Enterprise on Amazon Elastic Kubernetes Service (EKS).
 
 Before you start, review the [deployment planning guidance](install_enterprise.html).
 
+> For further details beyond these steps, see the Amazon tutorial on how to [Deploy a Kubernetes Application with Amazon Elastic Container Service for Kubernetes](https://aws.amazon.com/getting-started/hands-on/deploy-kubernetes-app-amazon-eks/).
+
 ## 1. Prerequisites
 
 Before you can install Label Studio Enterprise on an EKS cluster, make sure that the following software prerequisites are installed and configured:
@@ -77,5 +79,3 @@ Before installing Label Studio Enterprise, prepare the Kubernetes cluster with [
 ## 4. Set up Label Studio Enterprise Helm chart
 
 See [Configure a values.yaml file for Label Studio Enterprise](install_enterprise_k8s.html#Configure-values-yaml).
-
-For further details, see the Amazon tutorial on how to [Deploy a Kubernetes Application with Amazon Elastic Container Service for Kubernetes](https://aws.amazon.com/getting-started/hands-on/deploy-kubernetes-app-amazon-eks/).
