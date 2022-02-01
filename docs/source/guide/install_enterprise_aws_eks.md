@@ -76,4 +76,6 @@ Before installing Label Studio Enterprise, prepare the Kubernetes cluster with [
 
 ## 4. Set up Label Studio Enterprise Helm chart
 
-See [Configure a Helm chart for Label Studio Enterprise](install_enterprise_k8s.html).
+See [Configure a values.yaml file for Label Studio Enterprise](install_enterprise_k8s.html#Configure-values-yaml).
+
+For further details, see the Amazon tutorial on how to [Deploy a Kubernetes Application with Amazon Elastic Container Service for Kubernetes](https://aws.amazon.com/getting-started/hands-on/deploy-kubernetes-app-amazon-eks/).
