@@ -1,23 +1,17 @@
 ---
 title: Dialogue Analysis
 type: templates
-order: 301
+category: Conversational AI
+cat: conversational-ai
+order: 305
 meta_title: Dialogue Analysis Data Labeling Template
-meta_description: Label Studio Dialogue Analysis Template for machine learning and data science data labeling projects.
+meta_description: Template for performing dialogue analysis for conversational AI use cases with Label Studio for your machine learning and data science projects.
 ---
 
-Analyze the chat dialog, classify it and provide your own answer.
+If you want to evaluate and analyze the responses present in a dialogue that already happened, and optionally correct it, use this template. 
 
-<img src="/images/screens/dialogue_analysis.png" class="img-template-example" title="Dialog Analysis" />
+Use this template to provide a section of dialogue and classify it. Annotators then provide the best response to the section of dialog. 
 
-## Run
-
-```bash
-label-studio init dialog_analysis_project
-label-studio start dialog_analysis_project 
-```
-
-After starting Label Studio, set up the labeling interface and browse to this template.
 
 ## Config 
 
@@ -34,3 +28,9 @@ After starting Label Studio, set up the labeling interface and browse to this te
   <TextArea name="answer"></TextArea>
 </View>
 ```
+
+## Related tags
+
+- [HyperText](/tags/hypertext.html)
+- [Choices](/tags/choices.html)
+- [TextArea](/tags/textarea.html)
