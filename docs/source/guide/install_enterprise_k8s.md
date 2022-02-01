@@ -23,10 +23,11 @@ If you want to install Label Studio Enterprise on Kubernetes and you have unrest
 1. Verify that you meet the [Required software prerequisites](#Required-software-prerequisites) and review the [capacity planning](#Capacity-planning) guidance.
 2. [Prepare the Kubernetes cluster](#Prepare-the-Kubernetes-cluster).
 3. [Add the Helm chart repository to your Kubernetes cluster](#Add-the-Helm-chart-repository-to-your-Kubernetes-cluster).
-4. [Configure the Helm chart for Label Studio Enterprise](#Configure-the-Helm-chart-for-Label-Studio-Enterprise).
-5. [Use Helm to install Label Studio Enterprise on your Kubernetes cluster](#Use-Helm-to-install-Label-Studio-Enterprise-on-your-Kubernetes-cluster).
+4. [Configure a values.yaml file for your Label Studio Enterprise deployment](#Configure-values-yaml).
+5. (Optional) [Set up SSL authentication for PostgreSQL](#Set-up-SSL-authentication-for-PostgreSQL)
+6. [Use Helm to install Label Studio Enterprise on your Kubernetes cluster](#Use-Helm-to-install-Label-Studio-Enterprise-on-your-Kubernetes-cluster).
 
-If you use a proxy to access the internet from your Kubernetes cluster, or it is airgapped from the internet, see how to [Install Label Studio Enterprise without public internet access](#Install-Label-Studio-Enterprise-without-public-internet-access).
+If you use a proxy to access the internet from your Kubernetes cluster, or it is airgapped from the internet, see how to [Install Label Studio Enterprise without public internet access](install_enterprise_airgapped.html).
 
 ### Required software prerequisites
 
@@ -35,9 +36,9 @@ If you use a proxy to access the internet from your Kubernetes cluster, or it is
 - Redis version 6.0.5 or higher
 - PostgreSQL version 11.9 or higher
 
-This chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) and [cert-manager](https://cert-manager.io/docs/).
+This chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) and [cert-manager](https://cert-manager.io/docs/). See [Set up an ingress controller for Label Studio Enterprise Kubernetes deployments](ingress_config.html) for more on ingress settings with Label Studio Enterprise. 
 
-Your Kubernetes cluster can be self-hosted or installed somewhere such as Amazon EKS. See the Amazon tutorial on how to [Deploy a Kubernetes Application with Amazon Elastic Container Service for Kubernetes](https://aws.amazon.com/getting-started/hands-on/deploy-kubernetes-app-amazon-eks/) for more about deploying an app on Amazon EKS.
+Your Kubernetes cluster can be self-hosted or installed somewhere such as Amazon EKS. If you're using Amazon Elastic Kubernetes Service (EKS), see [Install Label Studio Enterprise on Amazon Elastic Kubernetes Service (EKS)](install_enterprise_aws_eks.html). 
 
 ### Capacity planning
 
@@ -98,13 +99,9 @@ Add the Helm chart repository to your Kubernetes cluster to easily install and u
 
 ### Configure values.yaml 
 
-You must configure a values.yaml file for your Label Studio Enterprise deployment. The following file contains default values for a minimal installation of Label Studio Enterprise.
+You must configure a `values.yaml` file for your Label Studio Enterprise deployment. The following file contains default values for a minimal installation of Label Studio Enterprise. This chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) and [cert-manager](https://cert-manager.io/docs/).
 
-For more complex configurations, create your own file based on the [list of all available Helm values]() and the examples in [this directory in the Label Studio repository]().
-
-This chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) and [cert-manager](https://cert-manager.io/docs/).
-
-Example values.yaml file for a minimal installation of Label Studio Enterprise:
+Example `values.yaml` file for a minimal installation of Label Studio Enterprise:
 ```yaml
 global:
   imagePullSecrets:
@@ -172,11 +169,12 @@ rqworker:
    replicas: 2
 ```
 
-Adjust the included defaults to reflect your environment and copy these into a new file and save it as `lse-values.yaml`. 
+Adjust the included defaults to reflect your environment and copy these into a new file and save it as `lse-values.yaml`.
 
+> For more complex configurations, you can create your own file based on the [list of all available Helm values](helm_values.html).
 
-## Setting up SSL authentication for PostgreSQL
-To configure Label Studio Enterprise to use SSL authentication for PostgreSQL, do the following.
+### Set up SSL authentication for PostgreSQL
+To configure Label Studio Enterprise to use SSL authentication for PostgreSQL, do the following:
 
 1. Create a Kubernetes secret with your SSL certificate/CA bundle, replacing `<PATH_TO_CA>` with the path to the certificate/CA bundle :
 
@@ -211,8 +209,7 @@ rqworker:
       secretName: <YOUR_SECRET_NAME>
 ```
 
-3. Uninstall and/or deploy Label Studio Enterprise using Helm.
-
+3. Deploy Label Studio Enterprise using Helm, or if you want to update an existing installation, uninstall the unsecured version of Label Studio Enterprise and redeploy using the revised Helm chart. See below for more details.
 
 ### Use Helm to install Label Studio Enterprise on your Kubernetes cluster
 
