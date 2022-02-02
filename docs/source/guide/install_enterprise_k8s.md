@@ -17,7 +17,7 @@ To install Label Studio Community Edition, see <a href="install.html">Install an
 
 If you want to install Label Studio Enterprise on Kubernetes and you have unrestricted access to the internet from your K8s cluster, follow these steps. 
 
-1. Verify that you meet the [Required software prerequisites](#Required-software-prerequisites).
+1. Verify that you meet the [Required software prerequisites](#Required-software-prerequisites) and review the [capacity planning](#Capacity-planning) guidance.
 2. [Prepare the Kubernetes cluster](#Prepare-the-Kubernetes-cluster).
 3. [Add the Helm chart repository to your Kubernetes cluster](#Add-the-Helm-chart-repository-to-your-Kubernetes-cluster).
 4. [Configure the Helm chart for Label Studio Enterprise](#Configure-the-Helm-chart-for-Label-Studio-Enterprise).
@@ -35,6 +35,44 @@ If you use a proxy to access the internet from your Kubernetes cluster, or it is
 This chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) and [cert-manager](https://cert-manager.io/docs/).
 
 Your Kubernetes cluster can be self-hosted or installed somewhere such as Amazon EKS. See the Amazon tutorial on how to [Deploy a Kubernetes Application with Amazon Elastic Container Service for Kubernetes](https://aws.amazon.com/getting-started/hands-on/deploy-kubernetes-app-amazon-eks/) for more about deploying an app on Amazon EKS.
+
+### Capacity planning
+
+To plan the capacity of your Kubernetes cluster, refer to these guidelines. 
+
+Label Studio Enterprise has the following default configurations for resource requests, resource limits, and replica counts:
+```yaml
+app:
+  replicas: 1
+  resources:
+    requests:
+      memory: 384Mi
+      cpu: 250m
+    limits:
+      memory: 1024Mi
+      cpu: 750m
+
+rqworker:
+  replicas: 1
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 500m
+```
+
+Before you make changes to these values, familiarize yourself with the [Resource Management for Pods and Containers](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) guidelines in the Kubernetes documentation. 
+
+If you choose to make changes to these default settings, consider the following:
+
+| For this case                               | Adjust this                                                                                                                                       |
+|---------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| More than 2 concurrent annotators           | Adjust the requests and limits for `resources` in the `app` pod                                                                                   |
+| Increase fault tolerance                    | Increase the number of replicas of both `app` and `rqworker` services                                                                             |
+| Production deployment (replicas)            | Replicas equivalent or greater than the number of availability zones in your Kubernetes cluster                                                   | 
+| Production deployment (requests and limits) | Refer to the example Helm chart in [Configure the Helm chart for Label Studio Enterprise](#Configure-the-Helm-chart-for-Label-Studio-Enterprise)  |
 
 ### Prepare the Kubernetes cluster
 
@@ -152,6 +190,52 @@ minio:
 ```
 
 Adjust the included defaults to reflect your environment and copy these into a new file and save it as `lse-values.yaml`. 
+
+
+## Setting up TLS for PostgreSQL
+To configure Label Studio Enterprise to use TLS for end-client connections with PostgreSQL, do the following.
+
+1. Enable TLS for your PostgreSQL instance and save Root TLS certificate, client certificate and its key for the next steps.
+2. Create a Kubernetes secret with your certificates, replacing `<PATH_TO_CA>`, `<PATH_TO_CLIENT_CRT>` and `<PATH_TO_CLIENT_KEY>` with paths to your certificates:
+
+```shell
+kubectl create secret generic <YOUR_SECRET_NAME> --from-file=ca.crt=<PATH_TO_CA> --from-file=client.crt=<PATH_TO_CLIENT_CRT> --from-file=client.key=<PATH_TO_CLIENT_KEY>
+```
+3. Update your `lse-values.yaml` file with your newly-created Kubernetes secret:
+
+> If `POSTGRE_SSL_MODE: verify-ca`, the server is verified by checking the certificate chain up to the root certificate stored on the client. If `POSTGRE_SSL_MODE: verify-full`, the server host name will be verified to make sure it matches the name stored in the server certificate. The SSL connection will fail if the server certificate cannot be verified. `verify-full` is recommended in most security-sensitive environments.
+
+```yaml
+app:
+  extraEnvironmentVars:
+     POSTGRE_SSL_MODE: verify-full
+     POSTGRE_SSLROOTCERT: /opt/heartex/secrets/pg_certs/ca.crt
+     POSTGRE_SSLCERT: /opt/heartex/secrets/pg_certs/client.crt
+     POSTGRE_SSLKEY: /opt/heartex/secrets/pg_certs/client.key
+   
+  extraVolumeMounts:
+    - name: pg-ssl-certs
+      mountPath: /opt/heartex/secrets/pg_certs
+
+  extraVolumes:
+    - name: pg-ssl-certs
+      secret:
+        secretName: <YOUR_SECRET_NAME>
+        defaultMode: 0640
+
+rqworker:
+  extraVolumeMounts:
+    - name: pg-ssl-certs
+      mountPath: /opt/heartex/secrets/pg_certs
+
+  extraVolumes:
+    - name: pg-ssl-certs
+      secret:
+        secretName: <YOUR_SECRET_NAME>
+        defaultMode: 0640
+```
+
+4. Install or upgrade Label Studio Enterprise using Helm.
 
 
 ### Use Helm to install Label Studio Enterprise on your Kubernetes cluster

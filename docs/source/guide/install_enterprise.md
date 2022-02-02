@@ -98,7 +98,8 @@ POSTGRE_PORT=5432
 # POSTGRE_SSL_MODE=require
 
 # Optional: Specify Postgre SSL certificate
-# POSTGRE_SSLROOTCERT=postgre-ca-bundle.pem
+# Certificate/bundle should be placed in the directory "certs" at the same directory as docker-compose.yml file
+# POSTGRE_SSLROOTCERT=/certs/postgre-ca-bundle.pem
 
 # Redis location e.g. redis://[:password]@localhost:6379/1
 REDIS_LOCATION=redis:6379
@@ -119,7 +120,8 @@ REDIS_LOCATION=redis:6379
 # REDIS_SSL_CERTS_REQS=required
 
 # Optional: Specify Redis SSL certificate
-# REDIS_SSL_CA_CERTS=redis-ca-bundle.pem
+# Certificate/bundle should be placed in the directory "certs" at the same directory as docker-compose.yml file
+# REDIS_SSL_CA_CERTS=/certs/redis-ca-bundle.pem
 
 # Optional: Specify SSL termination certificate & key
 # Files should be placed in the directory "certs" at the same directory as docker-compose.yml file

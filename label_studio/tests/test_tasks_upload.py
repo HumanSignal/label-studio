@@ -107,7 +107,7 @@ def test_json_task_annotation_and_meta_upload(setup_project_dialog, tasks, statu
     tasks_db = Task.objects.filter(project=setup_project_dialog.project.id)
     assert tasks_db.count() == task_count * multiply_files
     for task in tasks_db:
-        assert not task.is_labeled, 'Task should not be labeled since annotation is ground_truth'
+        assert task.is_labeled, 'Task should be labeled'
 
     # annotations
     annotations = Annotation.objects.filter(task__project=setup_project_dialog.project.id)
@@ -156,7 +156,7 @@ def test_archives(setup_project_dialog, format_type, tasks, status_code, task_co
     tasks = Task.objects.filter(project=setup_project_dialog.project.id)
     assert tasks.count() == task_count * multiplier
     for task in tasks:
-        assert not task.is_labeled, 'Task should not be labeled since annotation is ground_truth'
+        assert task.is_labeled, 'Task should be labeled'
 
     # annotations
     annotations = Annotation.objects.filter(task__project=setup_project_dialog.project.id)
@@ -224,7 +224,7 @@ def test_upload_duration(setup_project_dialog, tasks, status_code, task_count, m
     tasks = Task.objects.filter(project=setup_project_dialog.project.id)
     assert tasks.count() == task_count
     for task in tasks:
-        assert not task.is_labeled, 'Task should not be labeled since annotation is ground_truth'
+        assert task.is_labeled, 'Task should be labeled'
 
     # check max duration
     result = json.loads(r.content)
@@ -260,7 +260,7 @@ def test_url_upload(mocker, setup_project_dialog, tasks, status_code, task_count
         tasks = Task.objects.filter(project=setup_project_dialog.project.id)
         assert tasks.count() == task_count
         for task in tasks:
-            assert not task.is_labeled, 'Task should not be labeled since annotation is ground_truth'
+            assert task.is_labeled, 'Task should be labeled since annotation is ground_truth'
 
 
 @pytest.mark.parametrize('tasks, status_code, task_count, bad_token', [

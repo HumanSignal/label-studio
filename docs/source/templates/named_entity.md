@@ -1,23 +1,16 @@
 ---
-title: Text Named Entity Recognition
+title: Named Entity Recognition
 type: templates
-order: 201
+category: Natural Language Processing
+cat: natural-language-processing
+order: 203
 meta_title: Text Named Entity Recognition Data Labeling Template
-meta_description: Label Studio Text Named Entity Template for machine learning and data science data labeling projects.
+meta_description: Template for performing named entity recognition on text with Label Studio for your machine learning and data science projects.
 ---
 
 Named entity recognition for a piece of text. It supports overlapping spans and works with huge documents.
 
 <img src="/images/screens/named_entity.png" class="img-template-example" title="Named Entity Recognition" />
-
-## Run
-
-```bash
-label-studio init named_entity_project
-label-studio start named_entity_project 
-```
-
-After starting Label Studio, set up the labeling interface and browse to this template.
 
 ## Config 
 
@@ -64,3 +57,23 @@ After starting Label Studio, set up the labeling interface and browse to this te
   </View>
 </View>
 ```
+
+## Labeling Configuration
+
+```html
+<View>
+  <Labels name="label" toName="text">
+    <Label value="PER" background="red"/>
+    <Label value="ORG" background="darkorange"/>
+    <Label value="LOC" background="orange"/>
+    <Label value="MISC" background="green"/>
+  </Labels>
+
+  <Text name="text" value="$text"/>
+</View>
+```
+
+## Related tags
+
+- [Labels](/tags/labels.html)
+- [Text](/tags/text.html)
