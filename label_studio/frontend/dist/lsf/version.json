@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1507: Fix stuck avatar in annotation dropdown (#442)\n\nCo-authored-by: hlomzik <hlomzik@gmail.com>\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "e0c6d5795efec265a209c497d9cbf18574cba78b",
+  "message": "fix: DEV-23: show line numbers again for Text (#459)\n\n* fix: DEV-23: show line numbers again for Text\r\n\r\n* fix region items appearance in sidebar list\r\n\r\nfix our adjustments of antd styles\r\n\r\n* fix scroll in simple text elements\r\n\r\nline number of the last line is out of height\r\n\r\n* fix richtext tests\r\n\r\n* fix margin in inline HyperText\r\n\r\nit was shown when \"show line numbers\" enabled\r\nalso use BEM class name for text lines",
+  "commit": "016f1158d403df90224fedefbed51c157fc2bca9",
   "branch": "master",
-  "date": "2022-01-31T23:08:29Z"
+  "date": "2022-02-02T00:41:38Z"
 }
