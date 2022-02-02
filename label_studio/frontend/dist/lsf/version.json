@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-23: show line numbers again for Text (#459)\n\n* fix: DEV-23: show line numbers again for Text\r\n\r\n* fix region items appearance in sidebar list\r\n\r\nfix our adjustments of antd styles\r\n\r\n* fix scroll in simple text elements\r\n\r\nline number of the last line is out of height\r\n\r\n* fix richtext tests\r\n\r\n* fix margin in inline HyperText\r\n\r\nit was shown when \"show line numbers\" enabled\r\nalso use BEM class name for text lines",
-  "commit": "016f1158d403df90224fedefbed51c157fc2bca9",
+  "message": "Fix: DEV-1235: View all rendering issues (#426)\n\n* fix cached brushes scaling, zooming and resizing\r\n\r\n* add isReady calculation into image regions\r\n\r\n* fix grid building\r\n\r\n* clear cut events  logging\r\n\r\n* fix reseting isReady\r\n\r\n* remove broken config\r\n\r\n* [fix] Fix iframes in view all (DEV-1235)\r\n\r\n* Clear console logs\r\n\r\n* fix: DEV-1235: fix resetReady timing\r\n\r\n* refactor: DEV-1235: Move isReady functional to mixin\r\n\r\n* fix: DEV-1235: Fix setting inline RichText ready state\r\n\r\n* fix: DEV-1235: Add setting isReady to AudioPlus for correct delay in viewall\r\n\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
+  "commit": "4d9558ec0fa8b0383588dddb65fac156dfff9651",
   "branch": "master",
-  "date": "2022-02-02T00:41:38Z"
+  "date": "2022-02-02T20:54:17Z"
 }
