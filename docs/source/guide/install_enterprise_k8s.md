@@ -192,43 +192,50 @@ minio:
 Adjust the included defaults to reflect your environment and copy these into a new file and save it as `lse-values.yaml`. 
 
 
-## Setting up SSL authentication for PostgreSQL
-To configure Label Studio Enterprise to use SSL authentication for PostgreSQL, do the following.
+## Setting up TLS for PostgreSQL
+To configure Label Studio Enterprise to use TLS for end-client connections with PostgreSQL, do the following.
 
-1. Create a Kubernetes secret with your SSL certificate/CA bundle, replacing `<PATH_TO_CA>` with the path to the certificate/CA bundle :
+1. Enable TLS for your PostgreSQL instance and save Root TLS certificate, client certificate and its key for the next steps.
+2. Create a Kubernetes secret with your certificates, replacing `<PATH_TO_CA>`, `<PATH_TO_CLIENT_CRT>` and `<PATH_TO_CLIENT_KEY>` with paths to your certificates:
 
 ```shell
-kubectl create secret generic <YOUR_SECRET_NAME> --from-file=pg_cert=<PATH_TO_CA>
+kubectl create secret generic <YOUR_SECRET_NAME> --from-file=ca.crt=<PATH_TO_CA> --from-file=client.crt=<PATH_TO_CLIENT_CRT> --from-file=client.key=<PATH_TO_CLIENT_KEY>
 ```
-2. Update your `lse-values.yaml` file with your newly-created Kubernetes secret:
+3. Update your `lse-values.yaml` file with your newly-created Kubernetes secret:
+
+> If `POSTGRE_SSL_MODE: verify-ca`, the server is verified by checking the certificate chain up to the root certificate stored on the client. If `POSTGRE_SSL_MODE: verify-full`, the server host name will be verified to make sure it matches the name stored in the server certificate. The SSL connection will fail if the server certificate cannot be verified. `verify-full` is recommended in most security-sensitive environments.
 
 ```yaml
 app:
   extraEnvironmentVars:
-     POSTGRE_SSL_MODE: require
-     POSTGRE_SSLROOTCERT: /opt/heartex/secrets/pg_cert
+     POSTGRE_SSL_MODE: verify-full
+     POSTGRE_SSLROOTCERT: /opt/heartex/secrets/pg_certs/ca.crt
+     POSTGRE_SSLCERT: /opt/heartex/secrets/pg_certs/client.crt
+     POSTGRE_SSLKEY: /opt/heartex/secrets/pg_certs/client.key
    
   extraVolumeMounts:
-    - name: pg-ssl-cert
-      mountPath: /opt/heartex/secrets/pg_cert
-      readOnly: true
+    - name: pg-ssl-certs
+      mountPath: /opt/heartex/secrets/pg_certs
 
   extraVolumes:
-    - name: pg-ssl-cert
-      secretName: <YOUR_SECRET_NAME>
+    - name: pg-ssl-certs
+      secret:
+        secretName: <YOUR_SECRET_NAME>
+        defaultMode: 0640
 
 rqworker:
   extraVolumeMounts:
-    - name: pg-ssl-cert
-      mountPath: /opt/heartex/secrets/pg_cert
-      readOnly: true
+    - name: pg-ssl-certs
+      mountPath: /opt/heartex/secrets/pg_certs
 
   extraVolumes:
-    - name: pg-ssl-cert
-      secretName: <YOUR_SECRET_NAME>
+    - name: pg-ssl-certs
+      secret:
+        secretName: <YOUR_SECRET_NAME>
+        defaultMode: 0640
 ```
 
-3. Uninstall and/or deploy Label Studio Enterprise using Helm.
+4. Install or upgrade Label Studio Enterprise using Helm.
 
 
 ### Use Helm to install Label Studio Enterprise on your Kubernetes cluster
