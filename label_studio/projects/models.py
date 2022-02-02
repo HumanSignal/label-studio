@@ -183,7 +183,7 @@ class Project(ProjectMixin, models.Model):
     )
     min_annotations_to_start_training = models.IntegerField(
         _('min_annotations_to_start_training'),
-        default=10,
+        default=0,
         help_text='Minimum number of completed tasks after which model training is started',
     )
 
