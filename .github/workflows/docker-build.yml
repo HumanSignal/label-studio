@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - master
+    paths:
+      - deploy/**
+      - label_studio/**
+      - setup.py
+      - .github/workflows/docker-build.yml
     tags: [ '*' ]
 
 env:
@@ -32,6 +37,7 @@ jobs:
         uses: actions/setup-node@v2.5.1
         with:
           node-version: "${{ env.NODE }}"
+
 
       - name: Upgrade npm
         run: npm install -g npm@7
