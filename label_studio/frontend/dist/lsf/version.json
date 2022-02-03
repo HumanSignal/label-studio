@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-1490: TimeSeries overview width param (#431)\n\n* feat: DEV-1490: TimeSeries overview width param\r\n\r\nAdd param overviewWidth to set default width in percents (default 25%)\r\n\r\n* fix 100%\r\n\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "94c2be015b1aa3dd5d0575d1e9b64f4795043d3d",
-  "branch": "master",
-  "date": "2022-02-02T23:05:09Z"
+  "message": "fix: DEV-1633: Fix race of loading events in waveform tags",
+  "commit": "740541caff74b4a883b001942ba1d0a663f9ba01",
+  "branch": "fix/DEV-1633/viewall-audio",
+  "date": "2022-02-03T01:40:15Z"
 }
