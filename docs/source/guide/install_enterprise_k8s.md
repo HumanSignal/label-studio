@@ -206,13 +206,14 @@ kubectl create secret generic <YOUR_SECRET_NAME> --from-file=ca.crt=<PATH_TO_CA>
 > If `POSTGRE_SSL_MODE: verify-ca`, the server is verified by checking the certificate chain up to the root certificate stored on the client. If `POSTGRE_SSL_MODE: verify-full`, the server host name will be verified to make sure it matches the name stored in the server certificate. The SSL connection will fail if the server certificate cannot be verified. `verify-full` is recommended in most security-sensitive environments.
 
 ```yaml
-app:
+global:
   extraEnvironmentVars:
      POSTGRE_SSL_MODE: verify-full
      POSTGRE_SSLROOTCERT: /opt/heartex/secrets/pg_certs/ca.crt
      POSTGRE_SSLCERT: /opt/heartex/secrets/pg_certs/client.crt
      POSTGRE_SSLKEY: /opt/heartex/secrets/pg_certs/client.key
-   
+
+app:
   extraVolumeMounts:
     - name: pg-ssl-certs
       mountPath: /opt/heartex/secrets/pg_certs
