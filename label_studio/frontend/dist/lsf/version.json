@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1563: Fix editing of textarea result",
-  "commit": "3b713b25bead5a09be3a6c455462d34ec1cf7f40",
-  "branch": "fix/DEV-1563/textarea-result-editing",
-  "date": "2022-02-04T13:55:32Z"
+  "message": "fix: DEV-1563: Fix editing of textarea result (#469)\n\n* fix: DEV-1563: Fix editing of textarea result\r\n\r\n* fix: DEV-1563: Protect shortcuts from adding text to nonexistent elements",
+  "commit": "251e7f53863c885c91cf6dff15a6f213cccdf40f",
+  "branch": "master",
+  "date": "2022-02-04T23:09:37Z"
 }
