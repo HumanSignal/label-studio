@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-1490: TimeSeries overview width param (#431)\n\n* feat: DEV-1490: TimeSeries overview width param\r\n\r\nAdd param overviewWidth to set default width in percents (default 25%)\r\n\r\n* fix 100%\r\n\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "94c2be015b1aa3dd5d0575d1e9b64f4795043d3d",
+  "message": "fix: DEV-1566: Fix shortcuts working with textarea result editing (#462)\n\n* fix: DEV-1564: DEV-1565: Fix shortcuts focus and cursor problems\r\n\r\n* test: Improve shortcuts test to check text replacing and emoji\r\n\r\n* ff: DEV-1564: DEV-1565: Wrap with feature flag\r\n\r\n* test: DEV-1566: Add test for sortcuts in results\r\n\r\n* fix: DEV-1566: Fix unexpected termination of textarea result editing\r\n\r\nReplace turning off editting on blur event with global click and tab key pressing. Preventing it on click on shortcut button.\r\n\r\n* fix: DEV-1566: Fix working shortcuts hotkeys in textarea results\r\n\r\n* fix: DEV-1566: Fix updating value in textarea result view\r\n\r\n* test: Add setting feature flags in test\r\n\r\n* test: DEV-1566: Add shortcuts in results feature flag to tests\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
+  "commit": "b4de589a41b8007db745bc242332d4893479ff68",
   "branch": "master",
-  "date": "2022-02-02T23:05:09Z"
+  "date": "2022-02-04T02:01:37Z"
 }
