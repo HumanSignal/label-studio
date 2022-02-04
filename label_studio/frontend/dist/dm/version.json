@@ -1,6 +1,6 @@
 {
-  "message": "fix currentAnnotation.pauseAutosave();",
-  "commit": "d3a33d75e6a8183420c5177a000cb8742427d4cf",
-  "branch": "feature/dev-1094",
-  "date": "2022-01-12T16:56:37Z"
+  "message": "Merge pull request #25 from heartexlabs/feature/dev-1094\n\nDEV-1094",
+  "commit": "8d1ae18af9fb5755973ff8a7f11498b6d2a9c091",
+  "branch": "master",
+  "date": "2022-01-24T08:59:49Z"
 }
