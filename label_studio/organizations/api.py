@@ -138,10 +138,6 @@ class OrganizationAPI(generics.RetrieveUpdateAPIView):
         return super(OrganizationAPI, self).patch(request, *args, **kwargs)
 
     @swagger_auto_schema(auto_schema=None)
-    def post(self, request, *args, **kwargs):
-        return super(OrganizationAPI, self).post(request, *args, **kwargs)
-
-    @swagger_auto_schema(auto_schema=None)
     def put(self, request, *args, **kwargs):
         return super(OrganizationAPI, self).put(request, *args, **kwargs)
 

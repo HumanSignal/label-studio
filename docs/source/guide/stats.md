@@ -51,7 +51,8 @@ The following table lists the agreement metrics available in Label Studio Enterp
 
 | Agreement Metric | Tag | Labeling Type | Description |
 | --- | --- | --- | --- | 
-| [Naive comparison of result](#Naive-agreement-metric-example) | All tags | All types | Evaluates whether annotation results exactly match, ignoring any label weights. |
+| [Basic matching function](#Basic-matching-function) | All tags | All types | Performs the default evaluation function for each control tag. |
+| [Exact matching](#Exact-matching) | All tags | All types | Evaluates whether annotation results exactly match, ignoring any label weights. |
 | [Custom agreement metric](custom_metric.html) | All tags | All types | Performs the evaluation function that you define. See [create a custom agreement metric](custom_metric.html). |
 | [Exact matching choices](#Exact-matching-choices-example) | Choices | Categorical, Classification | Evaluates whether annotations exactly match, considering label weights. | 
 | [Choices per span region](#Exact-matching-choices-example) | Choices | Categorical, Classification | Evaluates whether specific choices applied to specific text spans match. | 
@@ -95,7 +96,11 @@ The following table lists the agreement metrics available in Label Studio Enterp
 | [Exact matching pairwise comparison](#Exact-matching-choices-example) | Pairwise | Comparison | Evaluates whether the results exactly match. | 
 | [Exact matching rating](#Exact-matching-choices-example) | Rating | Evaluation, Rating | Evaluates the ratings assigned to tasks exactly match. |
 
-### Naive agreement metric example 
+### Basic matching function
+
+Performs the default evaluation function for each control tag. For example for `TextArea` tag `Edit distance` metric is used.
+
+### Exact matching
 
 For example, for two given annotations `x` and `y`, an agreement metric that performs a naive comparison of the results works like the following:
 - If both `x` and `y` are empty annotations, the agreement score is `1`.

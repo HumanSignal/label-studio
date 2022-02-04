@@ -1,39 +1,59 @@
 ---
-title: Image Polygons
+title: Semantic Segmentation with Polygons
 type: templates
-order: 104
-meta_title: Image Polygons Data Labeling Template
-meta_description: Label Studio Image Polygons Template for machine learning and data science data labeling projects.
+category: Computer Vision
+cat: computer-vision
+order: 101
+meta_title: Semantic Segmentation with Polygons Data Labeling Template
+meta_description: Template for performing semantic segmentation with polygons with Label Studio for your machine learning and data science projects.
 ---
 
-Add polygons to images.
+Add polygons to images to perform semantic segmentation.
 
-<img src="/images/screens/image_polygons.png" class="img-template-example" title="Images Polygons" />
+<div id="main-preview"></div>
 
-## Run
-
-```bash
-label-studio init image_polygons_project
-label-studio start image_polygons_project
-```
-
-After starting Label Studio, set up the labeling interface and browse to this template. 
-
-## Config 
+## Labeling Configuration
 
 ```html
-<View style="display: flex">
-  <View style="width: 100px">
-    <Header value="Pick label" />
-    <PolygonLabels name="tag" toName="img" strokewidth="2" pointstyle="circle" pointsize="small" showInline="false">
-      <Label value="Car" background="blue" />
-      <Label value="Sign" background="blue" />
-      <Label value="Person" background="blue" />
-      <Label value="Tree" background="green" />
-    </PolygonLabels>
-    </View>
-  <View>
-    <Image name="img" value="$image" showMousePos="true" zoom="true" />
-  </View>
+<View>
+  <Header value="Select label and click the image to start"/>
+  <Image name="image" value="$image" zoom="true"/>
+  <PolygonLabels name="label" toName="image"
+                 strokeWidth="3" pointSize="small"
+                 opacity="0.9">
+    <Label value="Airplane" background="red"/>
+    <Label value="Car" background="blue"/>
+  </PolygonLabels>
 </View>
+
+<!-- {
+  "completions": [{
+    "result": [
+      {
+        "value": {
+            "points": [
+                [ 29.66, 54.34 ],
+                [ 52, 55.58 ],
+                [ 57.16, 44.91 ],
+                [ 59, 46.89 ],
+                [ 54.33, 57.81 ],
+                [ 59, 86.60 ]
+            ],
+            "polygonlabels": [
+                "Airplane"
+            ]
+        },
+        "from_name": "label",
+        "to_name": "image",
+        "type": "polygonlabels"
+      }
+    ]
+  }]  
+} -->
 ```
+
+## Related tags
+
+- [Image](/tags/image.html)
+- [PolygonLabels](/tags/polygonlabels.html)
+- [Label](/tags/label.html)
