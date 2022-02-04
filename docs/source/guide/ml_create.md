@@ -87,7 +87,7 @@ def predict(self, tasks, **kwargs):
 
 ### Support interactive preannotations in your ML backend
 
-If you want to support interactive preannotations in your machine learning backend, refer to [this code example for substring matching](https://github.com/heartexlabs/label-studio-ml-backend/tree/master/label_studio_ml/examples/substring_matching).
+If you want to support interactive preannotations in your machine learning backend, you need to write an inference call using the `predict()` method. For an example that does this for text labeling projects, you can refer to [this code example for substring matching](https://github.com/heartexlabs/label-studio-ml-backend/tree/master/label_studio_ml/examples/substring_matching).
 
 Do the following in your code:
 - Define an inference call with the **predict** method as outlined in the [inference section of this guide](ml_create.html#Inference-call).
@@ -119,11 +119,13 @@ You can use the `self.model` variable with this function if you want to start tr
 
 ### Trigger training with webhooks
 
-You can use webhook events to trigger training in your ML backend with the `fit()` method. 
+You can use webhook events to trigger training in your ML backend with the `fit()` method, which is called each time an annotation is created or updated. 
 
-[Add a webhook](webhooks.html#Add-a-new-webhook-in-Label-Studio) manually when you add your ML backend, or set the `LABEL_STUDIO_ML_BACKEND_V2` environment variable to `true` when you start Label Studio to have Label Studio automatically create a webhook for you when you add your ML backend. 
+[Add a webhook](webhooks.html#Add-a-new-webhook-in-Label-Studio) manually when you add your ML backend, or set the `LABEL_STUDIO_ML_BACKEND_V2` environment variable to `true` when you start Label Studio to have Label Studio automatically create a webhook for you when you add your ML backend. Version 1.4.1 of Label Studio sets this environment variable to `true` by default.  
 
-When Label Studio automatically creates a webhook for you when you add your ML backend, it sends an event to the ML backend each time an [annotation is created or updated](webhook_reference.html#Annotation-Created). 
+When Label Studio automatically creates a webhook for you when you add your ML backend, it sends an event to the ML backend each time an annotation is created or updated. See the [annotation webhook event reference](webhook_reference.html#Annotation-Created) for more details. 
+
+The `fit()` method expects the data and event keys included in the webhook event payload to retrieve the project ID and annotation event type. 
 
 > The payload of the webhook event does not contain the annotation itself. You must retrieve the annotation using the [Label Studio API](/api), [SDK](sdk.html), or by retrieving it from [target storage that you set up](storage.html) to store annotations.
 
