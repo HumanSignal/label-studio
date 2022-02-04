@@ -472,4 +472,6 @@ FEATURE_FLAGS_FROM_FILE = get_bool_env('FEATURE_FLAGS_FROM_FILE', False)
 FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE')
 # or if file is not set, default is using offline mode
 FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)
+# default value for feature flags (if not overrided by environment or client)
+FEATURE_FLAGS_DEFAULT_VALUE = False
 
