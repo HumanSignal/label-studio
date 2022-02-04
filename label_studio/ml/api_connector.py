@@ -176,7 +176,7 @@ class MLApi(BaseHTTPAPI):
                 'action': 'PROJECT_UPDATED',
                 'project': load_func(settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data
             }
-            return self._request('webhook', request, verbose=False)
+            return self._request('webhook', request, verbose=False, timeout=TIMEOUT_PREDICT)
         else:
             # get only tasks with annotations
             tasks = project.tasks.annotate(num_annotations=Count('annotations')).filter(num_annotations__gt=0)
@@ -192,7 +192,7 @@ class MLApi(BaseHTTPAPI):
                     'password': project.task_data_password
                 }
             }
-            return self._request('train', request, verbose=False)
+            return self._request('train', request, verbose=False, timeout=TIMEOUT_PREDICT)
 
     def make_predictions(self, tasks, model_version, project, context=None):
         request = {
