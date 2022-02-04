@@ -50,10 +50,14 @@ class DummyModel(LabelStudioMLBase):
         self.labels = schema['labels']
 
     def predict(self, tasks, **kwargs):
-        """ This is where inference happens: model returns the list of predictions based on input list of tasks """
+        """ This is where inference happens: model returns 
+            the list of predictions based on input list of tasks 
+        """
         predictions = []
         for task in tasks:
             predictions.append({
+                'score': 0.987,  # prediction overall score, visible in the data manager columns
+                'model_version': 'delorean-20151021',  # all predictions will be differentiated by model version
                 'result': [{
                     'from_name': self.from_name,
                     'to_name': self.to_name,
@@ -62,8 +66,7 @@ class DummyModel(LabelStudioMLBase):
                     'value': {
                         'choices': [self.labels[0]]
                     }
-                }],
-                'score': 0.987  # prediction overall score, visible in the data manager columns
+                }]
             })
         return predictions
 
