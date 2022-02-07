@@ -171,7 +171,7 @@ class MLApi(BaseHTTPAPI):
         if not user:
             user = AnonymousUser()
         # Identify if feature flag is turned on
-        if flag_set('ff_back_dev_1417_start_training_mlbackend_webhooks_250122_long', user):
+        if not flag_set('ff_back_dev_1417_start_training_mlbackend_webhooks_250122_long', user):
             request = {
                 'action': 'PROJECT_UPDATED',
                 'project': load_func(settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data
