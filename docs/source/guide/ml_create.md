@@ -121,7 +121,7 @@ You can use the `self.model` variable with this function if you want to start tr
 
 You can use webhook events to trigger training in your ML backend with the `fit()` method, which is called each time an annotation is created or updated. 
 
-[Add a webhook](webhooks.html#Add-a-new-webhook-in-Label-Studio) manually when you add your ML backend, or set the `LABEL_STUDIO_ML_BACKEND_V2` environment variable to `true` when you start Label Studio to have Label Studio automatically create a webhook for you when you add your ML backend. Version 1.4.1 of Label Studio sets this environment variable to `true` by default.  
+[Add a webhook](webhooks.html#Add-a-new-webhook-in-Label-Studio) manually when you add your ML backend, or set the `LABEL_STUDIO_ML_BACKEND_V2` environment variable to `true` when you start the ML backend to automatically create a webhook when you add your ML backend. Version 1.4.1 of Label Studio sets this environment variable to `true` by default.  
 
 When Label Studio automatically creates a webhook for you when you add your ML backend, it sends an event to the ML backend each time an annotation is created or updated. See the [annotation webhook event reference](webhook_reference.html#Annotation-Created) for more details. 
 
