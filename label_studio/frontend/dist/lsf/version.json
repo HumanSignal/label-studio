@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1566: Fix shortcuts working with textarea result editing (#462)\n\n* fix: DEV-1564: DEV-1565: Fix shortcuts focus and cursor problems\r\n\r\n* test: Improve shortcuts test to check text replacing and emoji\r\n\r\n* ff: DEV-1564: DEV-1565: Wrap with feature flag\r\n\r\n* test: DEV-1566: Add test for sortcuts in results\r\n\r\n* fix: DEV-1566: Fix unexpected termination of textarea result editing\r\n\r\nReplace turning off editting on blur event with global click and tab key pressing. Preventing it on click on shortcut button.\r\n\r\n* fix: DEV-1566: Fix working shortcuts hotkeys in textarea results\r\n\r\n* fix: DEV-1566: Fix updating value in textarea result view\r\n\r\n* test: Add setting feature flags in test\r\n\r\n* test: DEV-1566: Add shortcuts in results feature flag to tests\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "b4de589a41b8007db745bc242332d4893479ff68",
+  "message": "fix: DEV-1563: Fix editing of textarea result (#469)\n\n* fix: DEV-1563: Fix editing of textarea result\r\n\r\n* fix: DEV-1563: Protect shortcuts from adding text to nonexistent elements",
+  "commit": "251e7f53863c885c91cf6dff15a6f213cccdf40f",
   "branch": "master",
-  "date": "2022-02-04T02:01:37Z"
+  "date": "2022-02-04T23:09:37Z"
 }
