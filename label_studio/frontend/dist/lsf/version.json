@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1563: Fix editing of textarea result (#469)\n\n* fix: DEV-1563: Fix editing of textarea result\r\n\r\n* fix: DEV-1563: Protect shortcuts from adding text to nonexistent elements",
-  "commit": "251e7f53863c885c91cf6dff15a6f213cccdf40f",
+  "message": "Fix: feature flags default value",
+  "commit": "d524d8c17fe57bec0e72951422a623d70136179d",
   "branch": "master",
-  "date": "2022-02-04T23:09:37Z"
+  "date": "2022-02-07T14:19:59Z"
 }
