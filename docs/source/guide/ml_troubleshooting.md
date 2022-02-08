@@ -6,7 +6,7 @@ meta_title: Troubleshoot Machine Learning
 meta_description: Troubleshoot Label Studio connections with machine learning frameworks using the Label Studio ML backend SDK.
 ---
 
-After you [set up machine learning with Label Studio] or [create your own machine learning backend] to use with Label Studio, you can troubleshoot any issues you encounter by reviewing the possible causes on this page.
+After you [set up machine learning with Label Studio](ml.html) or [create your own machine learning backend](ml_create.html) to use with Label Studio, you can troubleshoot any issues you encounter by reviewing the possible causes on this page.
 
 ## Troubleshoot by reviewing the ML server logs
 You can investigate most problems using the server console log. The machine learning backend runs as a separate server from Label Studio, so make sure you check the correct server console logs while troubleshooting. To see more detailed logs, start the ML backend server with the `--debug` option. 

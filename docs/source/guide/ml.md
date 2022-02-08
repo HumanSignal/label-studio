@@ -99,7 +99,9 @@ After you start a machine learning backend server, add it to your Label Studio p
 4. Type a **Title** for the model and provide the URL for the ML backend. For example, `http://localhost:9090`. 
 5. (Optional) Type a description.
 6. (Optional) Select **Use for interactive preannotation**. See [Get interactive pre-annotations](#Get-interactive-preannotations) for more. 
-7. Click **Validate and Save**. If you see any errors, see [Troubleshoot machine learning](ml_troubleshooting.html).
+7. Click **Validate and Save**. 
+
+If you see any errors, see [Troubleshoot machine learning](ml_troubleshooting.html).
 
 ### Add an ML backend using the API
 
