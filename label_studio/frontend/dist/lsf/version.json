@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into feature/DEV-428/show-created-date",
-  "commit": "93198a9641dd97196b64120862ce8728d0e1c639",
-  "branch": "",
-  "date": "2021-12-28T16:28:16Z"
+  "message": "Fix: feature flags default value",
+  "commit": "d524d8c17fe57bec0e72951422a623d70136179d",
+  "branch": "master",
+  "date": "2022-02-07T14:19:59Z"
 }

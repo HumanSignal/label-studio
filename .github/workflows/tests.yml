@@ -22,7 +22,6 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - 3.6
           - 3.7
           - 3.8
           - 3.9
@@ -40,11 +39,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2.3.1
+        uses: actions/setup-python@v2.3.2
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure pip cache
         id: pip-cache
         with:
@@ -70,7 +69,7 @@ jobs:
         id: npm-cache-dir
         run: echo "::set-output name=dir::$(npm config get cache)"
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure npm cache
         id: npm-cache
         with:
@@ -149,16 +148,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2.3.1
+        uses: actions/setup-python@v2.3.2
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install OS dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev
+          sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev python-dev
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure pip cache
         id: pip-cache
         with:
@@ -182,7 +181,7 @@ jobs:
         id: npm-cache-dir
         run: echo "::set-output name=dir::$(npm config get cache)"
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure npm cache
         id: npm-cache
         with:
@@ -216,7 +215,6 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - 3.6
           - 3.7
           - 3.8
           - 3.9
@@ -234,11 +232,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2.4.0
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2.3.1
+      uses: actions/setup-python@v2.3.2
       with:
         python-version: ${{ matrix.python-version }}
 
-    - uses: actions/cache@v2.1.6
+    - uses: actions/cache@v2.1.7
       name: Configure pip cache
       with:
         path: ~\AppData\Local\pip\Cache

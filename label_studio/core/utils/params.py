@@ -126,13 +126,13 @@ def get_env_list_int(key, default=None):
     return [int(el) for el in value.split(',')]
 
 
-def get_all_env_with_prefix(prefix=None, is_bool=True):
+def get_all_env_with_prefix(prefix=None, is_bool=True, default_value=None):
     out = {}
     for key in os.environ.keys():
         if not key.startswith(prefix):
             continue
         if is_bool:
-            out[key] = bool_from_request(os.environ, key, None)
+            out[key] = bool_from_request(os.environ, key, default_value)
         else:
             out[key] = os.environ[key]
     return out

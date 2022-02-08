@@ -1,6 +1,6 @@
 {
-  "message": "[fix] Fix missed created date in drafts (#21)\n\n* [fix] Fix created date in drafts\r\n\r\n* Run actions on sub-branches\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "8f94eee9b4742377d9937cc6c5bc21bcf058c352",
+  "message": "Merge pull request #25 from heartexlabs/feature/dev-1094\n\nDEV-1094",
+  "commit": "8d1ae18af9fb5755973ff8a7f11498b6d2a9c091",
   "branch": "master",
-  "date": "2021-12-28T17:02:24Z"
+  "date": "2022-01-24T08:59:49Z"
 }
