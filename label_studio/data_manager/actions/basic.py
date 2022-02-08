@@ -6,6 +6,7 @@ from django.db.models import signals
 from datetime import datetime
 
 from core.permissions import AllPermissions
+from core.redis import start_job_async_or_sync
 from core.utils.common import temporary_disconnect_signal, temporary_disconnect_all_signals
 from tasks.models import (
     Annotation, Prediction, Task, update_is_labeled_after_removing_annotation,
@@ -77,14 +78,13 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     task_ids = queryset.values_list('id', flat=True)
     annotations = Annotation.objects.filter(task__id__in=task_ids)
     count = annotations.count()
-    
+
     # take only tasks where annotations were deleted
     real_task_ids = set(list(annotations.values_list('task__id', flat=True)))
     annotations_ids = list(annotations.values('id'))
     annotations.delete()
-
     emit_webhooks_for_instance(project.organization, project, WebhookAction.ANNOTATIONS_DELETED, annotations_ids)
-    bulk_update_stats_project_tasks(queryset)
+    start_job_async_or_sync(bulk_update_stats_project_tasks, queryset.filter(is_labeled=True))
     Task.objects.filter(id__in=real_task_ids).update(updated_at=datetime.now())
     return {'processed_items': count,
             'detail': 'Deleted ' + str(count) + ' annotations'}
@@ -100,7 +100,6 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     predictions = Prediction.objects.filter(task__id__in=task_ids)
     count = predictions.count()
     predictions.delete()
-    queryset.update(updated_at=datetime.now())
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
 
 
