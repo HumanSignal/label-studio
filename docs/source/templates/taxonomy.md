@@ -8,6 +8,8 @@ meta_title: Taxonomy Data Labeling Template
 meta_description: Template for classifying a taxonomy or hierarchy with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates/taxonomy.png" alt="" class="gif-border" width="552px" height="408px" />
+
 Perform classification tasks within the context of a defined taxonomy or hierarchy of choices. 
 
 ## Template Preview

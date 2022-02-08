@@ -8,6 +8,8 @@ meta_title: Pairwise Classification Data Labeling Template
 meta_description: Template for performing pairwise classification and comparison tasks with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates/pairwise-classification.png" alt="" class="gif-border" width="552px" height="408px" />
+
 Pairwise comparison of different objects.
 
 ## Template Preview

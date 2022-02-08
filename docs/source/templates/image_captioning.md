@@ -8,6 +8,8 @@ meta_title: Image Captioning Data Labeling Template
 meta_description: Template for adding captions to images with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates/image-captioning.png" alt="" class="gif-border" width="552px" height="408px" />
+
 If you want to train a machine learning model to caption or add alt text to images, use this template to collect captions about images. 
 
 ## Template Preview

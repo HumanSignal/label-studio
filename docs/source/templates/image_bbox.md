@@ -8,6 +8,8 @@ meta_title: Image Object Detection Data Labeling Template
 meta_description: Template for performing object detection with rectangular bounding boxes with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates/object-detection-with-bounding-boxes.png" alt="" class="gif-border" width="552px" height="408px" />
+
 Perform image bounding box labeling for object detection. 
 
 ## Template Preview

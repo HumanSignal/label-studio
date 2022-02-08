@@ -8,6 +8,8 @@ meta_title: Image Keypoint Data Labeling Template
 meta_description: Template for adding keypoints to images with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates/keypoints.png" alt="" class="gif-border" width="552px" height="408px" />
+
 Key Point labeling for images when you want to identify specific key points for facial recognition and other use cases.
 
 ## Template Preview

@@ -8,6 +8,8 @@ meta_title: Time Series Data Labeling Template
 meta_description: Template for labeling multivariate and simple time series data with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates/time-series-forecasting.png" alt="" class="gif-border" width="552px" height="408px" />
+
 Label any type of time series data using this generic template.
 
 ## Template Preview

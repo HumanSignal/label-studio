@@ -8,6 +8,8 @@ meta_title: Audio Classification Data Labeling Template
 meta_description: Template for classifying audio and intent using Label Studio for your data science and machine learning projects.
 ---
 
+<img src="/images/templates/intent-classification.png" alt="" class="gif-border" width="552px" height="408px" />
+
 Listen to the audio file and classify it.
 
 ## Template Preview

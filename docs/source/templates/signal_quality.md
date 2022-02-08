@@ -8,6 +8,8 @@ meta_title: Signal Quality Data Labeling Template
 meta_description: Template to classify signal quality in a time series with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates/signal-quality.png" alt="" class="gif-border" width="552px" height="408px" />
+
 Identify regions on a time series and rate and classify the quality of the signal. 
 
 ## Template Preview

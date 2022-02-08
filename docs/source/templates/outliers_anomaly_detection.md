@@ -8,6 +8,8 @@ meta_title: Outlier and Anomaly Detection Data Labeling Template
 meta_description: Template for detecting outliers and anomallies in time series data with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates/outliers-anomaly-detection.png" alt="" class="gif-border" width="552px" height="408px" />
+
 If you want to train a machine learning model to detect outliers and anomalies in time series data, use this template to label suspicious regions and classify those regions of the time series channels as outliers or anomalies.
 
 ## Template Preview

@@ -8,6 +8,8 @@ meta_title: Text Summarization Data Labeling Template
 meta_description: Template for summarizing text with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates/text-summarization.png" alt="" class="gif-border" width="552px" height="408px" />
+
 If you want to build a machine learning model to summarize text, use this template to create a dataset of one sentence summaries of text samples. You can also customize this template to ask for different types or lengths of summaries. 
 
 ## Template Preview

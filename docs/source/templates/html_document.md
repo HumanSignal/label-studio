@@ -3,10 +3,12 @@ title: HTML Entity Recognition
 type: templates
 category: Structured Data Parsing
 cat: structured-data-parsing
-order: 504
+order: 604
 meta_title: HTML Entity Resolution Data Labeling Template
 meta_description: Template for performing HTML document entity resolution with Label Studio for your machine learning and data science projects.
 ---
+
+<br/><img src="/images/templates/html-entity-recognition.png" alt="" class="gif-border" width="552px" height="408px" />
 
 Perform named entity recognition for HTML documents.
 

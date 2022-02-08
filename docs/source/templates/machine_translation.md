@@ -8,6 +8,8 @@ meta_title: Machine Translation Data Labeling Template
 meta_description: Template for providing translations of text with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates/machine-translation.png" alt="" class="gif-border" width="552px" height="408px" />
+
 If you want to improve existing machine translation capabilities, you want to provide a dataset with robust and accurate translation examples. Use this template to read a text in one language and store a translation in another language.
 
 ## Template Preview

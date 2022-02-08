@@ -8,6 +8,8 @@ meta_title: Text Named Entity Recognition Data Labeling Template
 meta_description: Template for performing named entity recognition on text with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates/named-entity-recognition.png" alt="" class="gif-border" width="552px" height="408px" />
+
 Named entity recognition for a piece of text. It supports overlapping spans and works with huge documents.
 
 ## Template Preview

@@ -8,6 +8,8 @@ meta_title: Dialogue Analysis Data Labeling Template
 meta_description: Template for performing dialogue analysis for conversational AI use cases with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates-misc/dialogue-analysis.png" alt="" class="gif-border" width="600px" height="512px" />
+
 If you want to evaluate and analyze the responses present in a dialogue that already happened, and optionally correct it, use this template. 
 
 Use this template to provide a section of dialogue and classify it. Annotators then provide the best response to the section of dialog. 

@@ -8,6 +8,8 @@ meta_title: Image Ellipse Data Labeling Template
 meta_description: Template for adding elliptical regions to images for object detection and segmentation use cases with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates-misc/object-detection-ellipses.png" alt="" class="gif-border" width="600px" height="408px" />
+
 Put ellipses on an image for object detection and segmentation use cases. 
 
 ## Template Preview

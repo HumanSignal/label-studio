@@ -8,6 +8,8 @@ meta_title: Coreference Entity Resolution and Linking Data Labeling Template
 meta_description: Template for labeling text data with coreferences to perform entity resolution and entity linking with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates/coreference-resolution-and-entity-linking.png" alt="" class="gif-border" width="552px" height="408px" />
+
 If you want to train a machine learning model to be capable of natural language understanding in the context of conversational AI, you will want to perform coreference resolution on a dataset.
 
 Use this template to assign coreferences using relations to specific entities identified in a passage of text. You can add relations to any identified region spans in Label Studio.

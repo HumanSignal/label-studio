@@ -8,6 +8,8 @@ meta_title: Visual Question Answering Data Labeling Template
 meta_description: Template for performing visual question answering data labeling tasks with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates/visual-question-answering.png" alt="" class="gif-border" width="552px" height="408px" />
+
 Create a dataset with answered questions about images using this visual question answering template. In response to an image, annotators can provide free-text answers to a question and also label components of a question with relevant aspects. 
 
 ## Template Preview

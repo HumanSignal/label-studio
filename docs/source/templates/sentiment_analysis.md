@@ -8,6 +8,8 @@ meta_title: Sentiment Analysis Data Labeling Template
 meta_description: Template for classifying the sentiment of text with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates/text-classification.png" alt="" class="gif-border" width="552px" height="408px" />
+
 Classify the sentiment of reviews, for example for musical instruments found on an online retailer.
 
 ## Template Preview

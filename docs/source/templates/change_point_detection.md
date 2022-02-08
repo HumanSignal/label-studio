@@ -8,6 +8,8 @@ meta_title: Change Point Detection Data Labeling Template
 meta_description: Template for labeling change point detection in time series data with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates/change-point-detection.png" alt="" class="gif-border" width="552px" height="408px" />
+
 If you need to find sudden changes in time series data, use this template to perform change point detection. Label the change on relevant time series channels. 
 
 ## Template Preview

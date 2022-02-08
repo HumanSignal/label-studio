@@ -8,6 +8,8 @@ meta_title: Content-based Image Retrieval Data Labeling Template
 meta_description: Template for labeling data for content-based image retrieval tasks with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates/content-based-image-search.png" alt="" class="gif-border" width="552px" height="408px" />
+
 If you want to train a machine learning model on content-based image retrieval computer vision tasks, use this template. This labeling configuration displays an image and prompts annotators to select a choice corresponding to one or more similar images.  
 
 ## Template Preview

@@ -8,6 +8,8 @@ meta_title: Sound Event Detection Data Labeling Template
 meta_description: Template for detecting sound from events in audio clips with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates/sound-event-detection.png" alt="" class="gif-border" width="552px" height="408px" />
+
 Label which event audio is associated with in an audio clip. 
 
 ## Template Preview
