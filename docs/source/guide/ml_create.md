@@ -90,12 +90,14 @@ def predict(self, tasks, **kwargs):
 If you want to support interactive preannotations in your machine learning backend, you need to write an inference call using the `predict()` method. For an example that does this for text labeling projects, you can refer to [this code example for substring matching](https://github.com/heartexlabs/label-studio-ml-backend/tree/master/label_studio_ml/examples/substring_matching).
 
 Do the following in your code:
-- Define an inference call with the **predict** method as outlined in the [inference section of this guide](ml_create.html#Inference-call).
-- Within that predict method, take the task data in the `tasks` parameter, containing details about the task that is being preannotated, and the context details in `kwargs['context']`, containing details about actions performed in Label Studio. 
-- With the task and context data, construct a prediction from the data received from Label Studio. 
-- Return a result in the Label Studio predictions format.
+- Define an inference call with the **predict** method as outlined in the [inference section of this guide](ml_create.html#Example-inference-call).
+- The `predict()` method takes task data and context data:
+  - the `tasks` parameter contains details about the task being pre-annotated. 
+  - the `kwargs['context']` parameter contains details about annotation actions performed in Label Studio, such as a text string highlighted sent in [Label Studio annotation results format](/export.html#Raw-JSON-format-of-completed-labeled-tasks).
+- With the task and context data, construct a prediction using the data received from Label Studio. 
+- Return a result in the [Label Studio predictions format](predictions.html#Format-pre-annotations-for-Label-Studio), which varies depending on the type of labeling being performed.
 
-Refer to the code example for more details. 
+Refer to the code example for more details about how this might be performed for a NER labeling project. 
 
 ## Train a model with your ML backend 
 
