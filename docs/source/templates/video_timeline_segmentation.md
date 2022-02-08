@@ -10,6 +10,12 @@ meta_description: Template for segmenting videos on a timeline with Label Studio
 
 To more easily identify video timelines, label segments alongside the audio channel of the video using video timeline segmentation. Use this template if you want to label the audio segment of a video on a timeline. 
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 
 ## Labeling Configuration
 

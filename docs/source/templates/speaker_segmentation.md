@@ -10,6 +10,12 @@ meta_description: Template for segmenting an audio clip based on speaker with La
 
 When preparing audio transcripts or training a machine learning model to differentiate between different speakers, use this template to perform speaker segmentation and label different regions of an audio clip with different speakers. 
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html

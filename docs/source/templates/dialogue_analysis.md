@@ -12,8 +12,14 @@ If you want to evaluate and analyze the responses present in a dialogue that alr
 
 Use this template to provide a section of dialogue and classify it. Annotators then provide the best response to the section of dialog. 
 
+## Template Preview
 
-## Config 
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
+
+## Labeling Configuration 
 
 ```html
 <View>

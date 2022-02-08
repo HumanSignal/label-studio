@@ -10,6 +10,12 @@ meta_description: Template for identifying answers to questions in tasks with La
 
 If you want to train a question answering machine learning model, use this template to develop a dataset. This template prompts annotators to read a passage of text, then highlight the span of text that answers a specific question. 
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html

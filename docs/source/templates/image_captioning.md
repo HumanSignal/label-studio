@@ -10,6 +10,12 @@ meta_description: Template for adding captions to images with Label Studio for y
 
 If you want to train a machine learning model to caption or add alt text to images, use this template to collect captions about images. 
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html

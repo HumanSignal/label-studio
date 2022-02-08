@@ -10,6 +10,12 @@ meta_description: Template for detecting outliers and anomallies in time series 
 
 If you want to train a machine learning model to detect outliers and anomalies in time series data, use this template to label suspicious regions and classify those regions of the time series channels as outliers or anomalies.
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html

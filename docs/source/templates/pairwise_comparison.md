@@ -10,6 +10,12 @@ meta_description: Template for performing pairwise classification and comparison
 
 Pairwise comparison of different objects.
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html

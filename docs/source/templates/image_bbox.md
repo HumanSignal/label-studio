@@ -10,7 +10,11 @@ meta_description: Template for performing object detection with rectangular boun
 
 Perform image bounding box labeling for object detection. 
 
-<img src="/images/screens/image_bbox.png" class="img-template-example" title="Images Bbounding box" />
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
 
 ## Labeling Configuration
 

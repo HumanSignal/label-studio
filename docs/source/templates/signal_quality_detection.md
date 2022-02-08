@@ -10,6 +10,12 @@ meta_description: Template for detecting the quality of an audio signal with Lab
 
 Rate the quality of a defined signal in an audio clip, for example when developing a machine learning model to isolate speech from a crowded bar, or remove other noise from an audio clip.
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html

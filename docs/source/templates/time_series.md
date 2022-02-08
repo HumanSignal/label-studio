@@ -9,6 +9,12 @@ meta_description: Template for labeling multivariate and simple time series data
 ---
 
 Label any type of time series data using this generic template.
+
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
   
 ## Labeling Configuration
   
@@ -50,8 +56,6 @@ time,sensorone,sensortwo
 - [TimeSeriesLabels](/tags/timeserieslabels.html) - control tag, it displays controls (buttons with labels) for labeling
 - [TimeSeries](/tags/timeseries.html) - object tag, it configures how to load the time series
 - [Channel](/tags/timeseries.html#Channel) - define channels inside time series, every channel is displayed as a single plot
-
-
 
 ## Input formats
 

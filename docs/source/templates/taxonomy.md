@@ -10,6 +10,12 @@ meta_description: Template for classifying a taxonomy or hierarchy with Label St
 
 Perform classification tasks within the context of a defined taxonomy or hierarchy of choices. 
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html

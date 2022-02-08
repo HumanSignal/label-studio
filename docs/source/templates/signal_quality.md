@@ -10,6 +10,12 @@ meta_description: Template to classify signal quality in a time series with Labe
 
 Identify regions on a time series and rate and classify the quality of the signal. 
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html

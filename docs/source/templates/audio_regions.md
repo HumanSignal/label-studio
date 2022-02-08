@@ -10,9 +10,11 @@ meta_description: Template for classifying audio regions for segmentation tasks 
 
 Listen to the audio file and classify it. 
 
-<img src="/images/screens/audio_regions.png" class="img-template-example" title="Audio Regions" />
+## Template Preview
 
-<p class="tip">For audio regions to work when you have remote URLs, you need to configure CORS to be wide open.</p>
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
 
 ## Labeling Configuration 
 

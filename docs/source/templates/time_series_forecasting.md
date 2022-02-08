@@ -10,6 +10,10 @@ meta_description: Template for preparing time series data for forecasting use ca
 
 To train a machine learning model to perform forecasting on time series data, create a dataset using this template. This template prompts annotators to highlight predictable region spans in the time series channels and label them as "Regions", then identify the trend forecast for a specific region. 
 
+## Template Preview
+
+Interactively preview this labeling template:
+
 <div id="main-preview"></div>
 
 ## Labeling Configuration

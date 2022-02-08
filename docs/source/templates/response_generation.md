@@ -12,6 +12,12 @@ Create a dataset to train a machine learning model to generate a response for a 
 
 Use this template to provide a section of dialogue and type a response. 
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html

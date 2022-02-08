@@ -10,6 +10,12 @@ meta_description: Template for classifying the sentiment of text with Label Stud
 
 Classify the sentiment of reviews, for example for musical instruments found on an online retailer.
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration 
 
 ```html

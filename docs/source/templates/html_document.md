@@ -10,7 +10,11 @@ meta_description: Template for performing HTML document entity resolution with L
 
 Perform named entity recognition for HTML documents.
 
-<img src="/images/screens/html_document.png" class="img-template-example" title="HTML Documents" />
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
 
 ## Labeling Configuration 
 

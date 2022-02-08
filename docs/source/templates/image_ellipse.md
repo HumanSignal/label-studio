@@ -10,6 +10,12 @@ meta_description: Template for adding elliptical regions to images for object de
 
 Put ellipses on an image for object detection and segmentation use cases. 
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration 
 
 ```html

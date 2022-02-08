@@ -10,6 +10,12 @@ meta_description: Template for performing semantic segmentation with brush masks
 
 Image segmentation using a brush and producing a mask.
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html

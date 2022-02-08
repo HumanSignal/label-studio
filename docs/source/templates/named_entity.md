@@ -10,7 +10,11 @@ meta_description: Template for performing named entity recognition on text with 
 
 Named entity recognition for a piece of text. It supports overlapping spans and works with huge documents.
 
-<img src="/images/screens/named_entity.png" class="img-template-example" title="Named Entity Recognition" />
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
 
 ## Config 
 

@@ -10,6 +10,12 @@ meta_description: Template for labeling tabular data with Label Studio for your 
 
 If you need to validate data stored in a table, use this template to display data in a tabular format and ask questions about the contents of the table. 
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html

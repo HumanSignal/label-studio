@@ -10,6 +10,10 @@ meta_description: Template for adding freeform content metadata to tasks with La
 
 If you want to collect metadata for a text sample for tagging purposes, or another reason, use this template to provide a table for annotators to type in freeform metadata about a text passage. You can modify this template to show an image or another data type by using a different tag. 
 
+## Template Preview
+
+Interactively preview this labeling template:
+
 <div id="main-preview"></div>
 
 ## Labeling Configuration

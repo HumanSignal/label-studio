@@ -10,6 +10,12 @@ meta_description: Template for adding keypoints to images with Label Studio for 
 
 Key Point labeling for images when you want to identify specific key points for facial recognition and other use cases.
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html

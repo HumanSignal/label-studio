@@ -10,6 +10,12 @@ meta_description: Template for detecting sound from events in audio clips with L
 
 Label which event audio is associated with in an audio clip. 
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html

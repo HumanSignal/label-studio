@@ -10,6 +10,12 @@ meta_description: Template for labeling human activity recognition in a time ser
 
 If you want to perform time series classification for human activity recognition, use this template to classify different activities across several time series channels.
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html

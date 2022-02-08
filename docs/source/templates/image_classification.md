@@ -10,6 +10,12 @@ meta_description: Template for classifying image data with Label Studio for your
 
 If you want to train a model to identify the type of content in images, for example for a content moderation use case, use this template to perform image classification with checkboxes.
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html

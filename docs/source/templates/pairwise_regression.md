@@ -10,6 +10,11 @@ meta_description: Template for performing pairwise comparison tasks for regressi
 
 If you need a dataset to train a pairwise regression model, use this template to rate pairs of images based on how similar they are. You can also customize this template to rate different properties of different types of data, such as rating whether the sentiment of two text excerpts of movie reviews is similar. 
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
 
 ## Labeling Configuration
 

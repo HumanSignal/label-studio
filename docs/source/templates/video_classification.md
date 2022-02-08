@@ -12,6 +12,12 @@ If you want to build a video classification machine learning model, for example 
 
 You can build a video classifier using the HyperText tag or the Video tag.
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 Using the HyperText tag:
 

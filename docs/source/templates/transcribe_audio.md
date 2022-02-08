@@ -10,6 +10,12 @@ meta_description: Template for audio transcription for automatic speech recognit
 
 Listen to an audio file and transcribe its content in natural language, performing speech recognition.
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html

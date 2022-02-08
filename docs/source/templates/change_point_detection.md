@@ -10,6 +10,12 @@ meta_description: Template for labeling change point detection in time series da
 
 If you need to find sudden changes in time series data, use this template to perform change point detection. Label the change on relevant time series channels. 
 
+## Template Preview
+
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
+
 ## Labeling Configuration
 
 ```html
