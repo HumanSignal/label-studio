@@ -101,35 +101,34 @@ Refer to the code example for more details.
 
 If you want to train a model, use the training call to update your model based on new annotations. You can perform training as part of an active learning with predictions, or you can create an ML backend that trains or retrains a model based on annotations. You don't need to use this call in your code if you just want to use an ML backend for predictions. 
 
-Write your own code to override the `fit(completions, **kwargs)` method, which takes [JSON-formatted Label Studio annotations](https://labelstud.io/guide/export.html#Raw-JSON-format-of-completed-labeled-tasks) and returns an arbitrary JSON dictionary where information about the created model can be stored.
+Write your own code to override the `fit()` method, which takes [JSON-formatted Label Studio annotations](/export.html#Raw-JSON-format-of-completed-labeled-tasks) and returns an arbitrary JSON dictionary where information about the created model can be stored. 
 
-> Note: The `completions` field is deprecated as of Label Studio 1.0.x and will be replaced with `annotations` in a future release of this SDK.
-
-### Example training call
-
-This example defines a training call with the `fit()` method and stores the model training results in a checkpoints directory that you can reference to consistently retrain your model, for example as part of an [active learning loop](active_learning.html). 
-
-```python
-def fit(self, completions, workdir=None, **kwargs):
-    # ... do some heavy computations, get your model and store checkpoints and resources
-    return {'checkpoints': 'my/model/checkpoints'}  # <-- you can retrieve this dict as self.train_output in the subsequent calls
-```
-
-You can use the `self.model` variable with this function if you want to start training from the previous model checkpoint. 
+> Note: The `completions` field is deprecated as of Label Studio 1.0.x. In version 1.5.0 it will be removed. Instead, use the SDK or the API to retrieve annotation and task data using annotation and task IDs. See [trigger training with webhooks](#Trigger-training-with-webhooks) for more details.
 
 ### Trigger training with webhooks
 
-You can use webhook events to trigger training in your ML backend with the `fit()` method, which is called each time an annotation is created or updated. 
+Starting in version 1.4.1 of Label Studio, when you add an ML backend to your project, Label Studio creates a webhook to your ML backend to send an event every time an annotation is created or updated.
 
-[Add a webhook](webhooks.html#Add-a-new-webhook-in-Label-Studio) manually when you add your ML backend, or set the `LABEL_STUDIO_ML_BACKEND_V2` environment variable to `true` when you start the ML backend to automatically create a webhook when you add your ML backend. Version 1.4.1 of Label Studio sets this environment variable to `true` by default.  
+By default, the payload of the webhook event does not contain the annotation itself. You can either [modify the webhook event](webhooks.html) sent by Label Studio to send the full payload, or retrieve the annotation using the [Label Studio API](/api) using the [get annotation by its ID endpoint](/api#operation/api_annotations_read), [SDK](sdk.html) using the [get task by ID method](/sdk/project.html#label_studio_sdk.project.Project.get_task), or by retrieving it from [target storage that you set up](storage.html) to store annotations.
 
-When Label Studio automatically creates a webhook for you when you add your ML backend, it sends an event to the ML backend each time an annotation is created or updated. See the [annotation webhook event reference](webhook_reference.html#Annotation-Created) for more details. 
+See the [annotation webhook event reference](webhook_reference.html#Annotation-Created) for more details about the webhook event.
 
-The `fit()` method expects the data and event keys included in the webhook event payload to retrieve the project ID and annotation event type. 
+### Example training call
 
-> The payload of the webhook event does not contain the annotation itself. You must retrieve the annotation using the [Label Studio API](/api), [SDK](sdk.html), or by retrieving it from [target storage that you set up](storage.html) to store annotations.
+This example defines a training call with the `fit()` method and stores the model training results in a `checkpoints` directory that you can reference to consistently retrain your model, such as with an [active learning loop](active_learning.html). 
 
-You can set up your `fit()` method to start training immediately when an event is received, or define your own logic to define when to begin training. For example, you can check how much data needs to be labeled, then start training your model after every 100, 200, 300, or other number of annotated tasks.
+The `fit()` method expects the data and event keys included in the webhook event payload to retrieve the project ID and annotation event type.
+
+```python
+def fit(self, tasks, workdir=None, **kwargs):
+    # Retrieve the annotation ID from the payload of the webhook event
+    # Use the ID to retrieve annotation data using the SDK or the API
+    # Do some computations and get your model
+    return {'checkpoints': 'my/model/checkpoints'}
+    ## JSON dictionary with trained model artifacts that you can use later in code with self.train_output
+```
+
+You can set up your `fit()` method to start training immediately when an event is received, or define your own logic to define when to begin training. For example, you can check how much data the model needs to be labeled, then start training your model after every 100, 200, 300, or other number of annotated tasks accordingly. You can use the `self.model` variable with this function if you want to start training from the previous model checkpoint.
 
 ## Specify requirements for your ML backend 
 

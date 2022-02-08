@@ -111,12 +111,12 @@ After you [connect a model to Label Studio as a machine learning backend](#Add-a
 
 You can prompt your model to train in several ways: 
 - Manually using the Label Studio UI. Click the **Start Training** button on the **Machine Learning** settings for your project.
-- Automatically after any annotations are submitted or updated. Enable the option `Start model training after annotations submit or update` on the **Machine Learning** settings for your project.
 - Manually using the API, cURL the API from the command line. Specify the ID of the machine learning backend and run the following command: 
    ```
    curl -X POST http://localhost:8080/api/ml/{id}/train
    ```
   See [the Train API documentation](/api/#operation/api_ml_train_create) for more.
+- (Deprecated in version 1.4.1) Automatically after any annotations are submitted or updated. Enable the option `Start model training after annotations submit or update` on the **Machine Learning** settings for your project. This option will be removed in a future version of Label Studio because you can [trigger training with webhooks](ml_create.html#Trigger-training-with-webhooks).
 
 In development mode, training logs appear in the web browser console. In production mode, you can find runtime logs in `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log` on the server running the ML backend, which might be different from the Label Studio server. To see more detailed logs, start the ML backend server with the `--debug` option. 
 
