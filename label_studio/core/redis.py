@@ -79,6 +79,8 @@ def start_job_async_or_sync(job, *args, **kwargs):
     """
     redis = redis_connected()
     queue_name = kwargs.get("queue_name", "default")
+    if 'queue_name' in kwargs:
+        del kwargs['queue_name']
     if redis:
         queue = django_rq.get_queue(queue_name)
         job = queue.enqueue(
