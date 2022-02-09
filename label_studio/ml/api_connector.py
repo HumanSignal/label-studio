@@ -166,10 +166,9 @@ class MLApi(BaseHTTPAPI):
         time_id = int(project.created_at.timestamp())
         return f'{project.id}.{time_id}'
 
-    def train(self, project, use_ground_truth=False, user=None):
+    def train(self, project, use_ground_truth=False):
         # TODO Replace AnonymousUser with real user from request
-        if not user:
-            user = AnonymousUser()
+        user = AnonymousUser()
         # Identify if feature flag is turned on
         if flag_set('ff_back_dev_1417_start_training_mlbackend_webhooks_250122_long', user):
             request = {
