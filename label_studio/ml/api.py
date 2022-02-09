@@ -207,7 +207,7 @@ class MLBackendTrainAPI(APIView):
         ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)
 
-        ml_backend.train(user=request.user)
+        ml_backend.train()
         return Response(status=status.HTTP_200_OK)
 
 
