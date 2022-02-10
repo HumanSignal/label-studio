@@ -24,14 +24,17 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!--Control tags specify the labels that you want to apply to text spans-->
   <Labels name="label" toName="text">
     <Label value="Noun" background="red"/>
     <Label value="Pronoun" background="darkorange"/>
   </Labels>
-
+<!--the Text object tag specifies the value of the text data-->
   <Text name="text" value="$text"/>
 </View>
 ```
+
+You can apply relations to the labeled text spans using the labeling interface. See [Add relations between annotations](/guide/labeling.html#Add-relations-between-annotations).
 
 ## Related tags
 

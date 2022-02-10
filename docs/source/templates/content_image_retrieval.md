@@ -22,18 +22,24 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!--object tag to specify the location of the image to use for the query-->
   <Image name="query" value="$query_image" />
+    <!--use a header to instruct annotators how to perform the task-->
   <Header value="Choose similar images:" />
+    <!--use styling in the View tag to display multiple images in a grid-->
   <View style="display: grid; column-gap: 8px; grid-template: auto/1fr 1fr 1fr">
     <Image name="image1" value="$image1" />
     <Image name="image2" value="$image2" />
     <Image name="image3" value="$image3" />
   </View>
+    <!--use the Choices control tag to display choices that apply to the original image, 
+    require a response, and allow annotators to select multiple choices-->
   <Choices name="similar" toName="query" required="true" choice="multiple">
     <Choice value="One" />
     <Choice value="Two" />
     <Choice value="Three" />
   </Choices>
+    <!--Use the Style tag to display the similar images and the choices in a form grid-->
   <Style>
     [dataneedsupdate]~div form {display: flex}
     [dataneedsupdate]~div form>* {flex-grow:1;margin-left:8px}
@@ -44,5 +50,7 @@ Interactively preview this labeling template:
 ## Related tags
 
 - [Image](/tags/image.html)
+- [Header](/tags/header.html)
+- [View](/tags/view.html)
 - [Choices](/tags/choices.html)
 - [Style](/tags/style.html)

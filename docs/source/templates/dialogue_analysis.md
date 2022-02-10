@@ -25,14 +25,20 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!--Use the HyperText object tag to display dialogue data-->
   <HyperText name="dialog" value="$dialogs"></HyperText>
+    <!-- Use the Header tag to provide instructions to the annotator-->
   <Header value="Rate last answer:"></Header>
+    <!--Use the Choices control tag to have annotators classify the dialogue response.-->
   <Choices name="chc-1" choice="single-radio" toName="dialog" showInline="true">
     <Choice value="Bad answer"></Choice>
     <Choice value="Neutral answer"></Choice>
     <Choice value="Good answer"></Choice>
   </Choices>
   <Header value="Your answer:"></Header>
+    <!--Use the TextArea control tag to provide annotators with a free text box 
+    to supply their own answer. Add the `editable=true` argument to allow them 
+    to edit their answer, or `required=true` to force annotators to supply an option.-->
   <TextArea name="answer"></TextArea>
 </View>
 ```

@@ -22,7 +22,7 @@ Interactively preview this labeling template:
 
 ```html
 <View>
-    <!-- Control tag for region labels -->
+    <!-- Control tag for region labels, use to label the time series channels with the type of activity -->
     <TimeSeriesLabels name="label" toName="ts">
         <Label value="Run" background="red"/>
         <Label value="Walk" background="green"/>
@@ -31,7 +31,8 @@ Interactively preview this labeling template:
         <Label value="Ride" background="#351"/>
     </TimeSeriesLabels>
 
-    <!-- Object tag for time series data source -->
+    <!-- Object tag for time series data source, use to manage the display 
+    of the time series data in the labeling interface -->
     <TimeSeries name="ts" valueType="url" value="$timeseriesUrl"
                 sep=","
                 timeColumn="time"

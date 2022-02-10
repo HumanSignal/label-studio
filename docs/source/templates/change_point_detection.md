@@ -22,12 +22,13 @@ Interactively preview this labeling template:
 
 ```html
 <View>
-    <!-- Control tag for region labels -->
+    <!-- Control tag for region labels, use to highlight the change -->
     <TimeSeriesLabels name="label" toName="ts">
         <Label value="Change" background="red" />
     </TimeSeriesLabels>
 
-    <!-- Object tag for time series data source -->
+    <!-- Object tag for time series data source, use to specify the 
+    location and format of the time series data -->
     <TimeSeries name="ts" valueType="url" value="$csv"
                 sep=","
                 timeColumn="time"

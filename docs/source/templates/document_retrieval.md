@@ -22,15 +22,22 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!-- Use the Text object tag to specify the text data to be annotated-->
   <Text name="query" value="$query" />
+    <!-- Use the Header tag to provide instructions to the annotators-->
   <Header value="Select document related to the query:" />
+    <!-- Add styling to the View tag to control the appearance of the text samples and choices-->
   <View style="display: flex">
     <View>
+        <!-- Use the Text object tag to display 3 other text snippets-->
     <Text name="text1" value="$text1" />
     <Text name="text2" value="$text2" />
     <Text name="text3" value="$text3" />
     </View>
+      <!-- Add styling to the View tag to place the choices next to the text samples-->
     <View style="padding: 30px">
+        <!--Use the Choices control tag to require a selection from annotators, 
+        and allow them to select multiple text snippets that apply-->
     <Choices name="selection" toName="query" required="true" choice="multiple">
       <Choice value="One" />
       <Choice value="Two" />
@@ -44,4 +51,5 @@ Interactively preview this labeling template:
 ## Related tags
 
 - [Text](/tags/text.html)
+- [View](/tags/view.html)
 - [Choices](/tags/choices.html)

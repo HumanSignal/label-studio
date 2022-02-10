@@ -21,15 +21,18 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!--Use the Style tag to control how the table for freeform metadata appears.
+    Use the div option to specify an existing div class CSS element and add custom CSS to it-->
   <Style>
     input[type="text"][name^="table"] { border-radius: 0px; border-right: none;}
     input[type="text"][name^="table_metric"] { border-right: 1px solid #ddd; }
     div[class*=" TextAreaRegion_mark"] {background: none; height: 33px; border-radius: 0; min-width: 135px;}
   </Style>
-
+<!--Use the Text object tag to specify the text to label-->
   <Text value="$text" name="text"/>
-
+<!--Add styling to the View tag to control how to display the TextArea tag options-->
   <View style="display: grid;  grid-template-columns: 1fr 1fr; max-height: 300px; width: 400px">
+      <!--Use the TextArea Control tag to display editable text boxes to annotators, with placeholder values-->
     <TextArea name="table_name_1" toName="text" placeholder="name" editable="true" maxSubmissions="1"/>
     <TextArea name="table_value_1" toName="text" placeholder="value" editable="true" maxSubmissions="1"/>
     <TextArea name="table_name_2" toName="text" placeholder="name" editable="true" maxSubmissions="1"/>
