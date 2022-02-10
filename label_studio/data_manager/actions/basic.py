@@ -7,10 +7,9 @@ from datetime import datetime
 
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
-from core.utils.common import temporary_disconnect_signal, temporary_disconnect_all_signals
+from core.utils.common import temporary_disconnect_all_signals
 from tasks.models import (
-    Annotation, Prediction, Task, update_is_labeled_after_removing_annotation,
-    bulk_update_stats_project_tasks
+    Annotation, Prediction, Task, bulk_update_stats_project_tasks
 )
 from webhooks.utils import emit_webhooks_for_instance
 from webhooks.models import WebhookAction
@@ -54,8 +53,13 @@ def delete_tasks(project, queryset, **kwargs):
     # delete only specific tasks
     else:
         # this signal re-save the task back
-        with temporary_disconnect_signal(signals.post_delete, update_is_labeled_after_removing_annotation, Annotation):
+        with temporary_disconnect_all_signals():
             queryset.delete()
+        project.update_tasks_states(
+            maximum_annotations_changed=False,
+            overlap_cohort_percentage_changed=False,
+            tasks_number_changed=True
+        )
 
     emit_webhooks_for_instance(project.organization, project, WebhookAction.TASKS_DELETED, tasks_ids)
 
