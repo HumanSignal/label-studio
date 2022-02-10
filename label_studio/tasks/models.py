@@ -100,8 +100,10 @@ class Task(TaskMixin, models.Model):
     def has_lock(self, user=None):
         """Check whether current task has been locked by some user"""
         num_locks = self.num_locks
-        num_annotations = self.annotations.filter(ground_truth=False)\
-            .exclude(Q(was_cancelled=True) & ~Q(completed_by=user)).count()
+        if self.project.skip_queue == self.project.SkipQueue.REQUEUE_FOR_ME:
+            num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) | ~Q(completed_by=user)).count()
+        else:
+            num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) & ~Q(completed_by=user)).count()
 
         num = num_locks + num_annotations
         if num > self.overlap:
@@ -113,7 +115,9 @@ class Task(TaskMixin, models.Model):
                     num_annotations=num_annotations,
                 )
             )
-        return num >= self.overlap
+        result = bool(num >= self.overlap)
+        logger.debug(f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations}')
+        return result
 
     @property
     def num_locks(self):
@@ -229,7 +233,10 @@ class Task(TaskMixin, models.Model):
     @property
     def completed_annotations(self):
         """Annotations that we take into account when set completed status to the task"""
-        return self.annotations.filter(Q_finished_annotations)
+        if self.project.skip_queue == self.project.SkipQueue.IGNORE_SKIPPED:
+            return self.annotations.filter(Q(ground_truth=False))
+        else:
+            return self.annotations.filter(Q_finished_annotations)
 
     def update_is_labeled(self):
         self.is_labeled = self._get_is_labeled_value()
@@ -340,6 +347,18 @@ class Annotation(AnnotationMixin, models.Model):
             summary = self.task.project.summary
             summary.remove_created_annotations_and_labels([self])
 
+    def save(self, *args, **kwargs):
+        result = super().save(*args, **kwargs)
+        # set updated_at field of task to now()
+        self.task.save(update_fields=['updated_at'])
+        return result
+
+    def delete(self, *args, **kwargs):
+        result = super().delete(*args, **kwargs)
+        # set updated_at field of task to now()
+        self.task.save(update_fields=['updated_at'])
+        return result
+
 
 class TaskLock(models.Model):
     task = models.ForeignKey(
@@ -447,7 +466,15 @@ class Prediction(models.Model):
     def save(self, *args, **kwargs):
         # "result" data can come in different forms - normalize them to JSON
         self.result = self.prepare_prediction_result(self.result, self.task.project)
+        # set updated_at field of task to now()
+        self.task.save(update_fields=['updated_at'])
         return super(Prediction, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        result = super().delete(*args, **kwargs)
+        # set updated_at field of task to now()
+        self.task.save(update_fields=['updated_at'])
+        return result
 
     class Meta:
         db_table = 'prediction'

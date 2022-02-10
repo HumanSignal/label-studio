@@ -102,6 +102,7 @@
     sentry_environment: "{{ settings.FRONTEND_SENTRY_ENVIRONMENT }}",
     editor_keymap: JSON.parse({{ settings.EDITOR_KEYMAP|safe }}),
     feature_flags: {{ feature_flags|json_dumps_ensure_ascii|safe }},
+    feature_flags_default_value: {{ settings.FEATURE_FLAGS_DEFAULT_VALUE|json_dumps_ensure_ascii|safe }},
 
     {% block app_more_settings %}
       flags: {

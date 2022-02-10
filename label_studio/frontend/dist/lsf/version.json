@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into fix/DEV-1200/style-parameters",
-  "commit": "338c926fa7301b2c7b71fd9d90e3c2cf5e9fc3b3",
-  "branch": "fix/DEV-1200/style-parameters",
-  "date": "2022-01-18T04:10:10Z"
+  "message": "fix: DEV-1200: Reanimate tag style parameters (#365)\n\n* [fix] Fix getting style-affecting parameters from control tag\r\n\r\n* [fix] Allow to use opacity parameter instead of fillOpacity\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>\r\nCo-authored-by: niklub <lubimov.nicolas@gmail.com>\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
+  "commit": "e0557b0db4077dc655a7ee8ffc061de12ed43d9d",
+  "branch": "master",
+  "date": "2022-02-10T01:55:06Z"
 }

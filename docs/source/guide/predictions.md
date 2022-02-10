@@ -11,15 +11,26 @@ If you have predictions generated for your dataset from a model, either as pre-a
 
 > To generate interactive pre-annotations with a machine learning model while labeling, see [Set up machine learning with Label Studio](ml.html).
 
+You can import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-data-from-the-Label-Studio-UI) or [using the API](/api#operation/projects_import_create). 
+
+## Format pre-annotations for Label Studio 
+
 To import predicted labels into Label Studio, you must use the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format) and set up your tasks with the `predictions` JSON key. The Label Studio ML backend also outputs tasks in this format. 
 
-For image pre-annotations, Label Studio expects the x, y, width, and height of image annotations to be provided in percentages of overall image dimension. See [Units for image annotations](predictions.html#Units_for_image_annotations) on this page for more about how to convert formats.
+Refer to the following examples for sample pre-annotation formats:
+- [Image pre-annotations with semantic segmentation bounding boxes](#Import-pre-annotations-for-images)
+- [Image pre-annotations with unlabeled bounding boxes](#Import-pre-annotated-regions-for-images)
+- [Text pre-annotations with NER spans](#Import-pre-annotations-for-text)
+- [Brush pre-annotations for segmentation with masks](#Import-brush-segmentation-pre-annotations-in-RLE-format)
+- [OCR pre-annotations with bounding boxes, labels, and text transcriptions](#Import-OCR-pre-annotations)
 
-Import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-data-from-the-Label-Studio-UI) or [using the API](/api#operation/projects_import_create). 
+To format pre-annotations for Label Studio not represented in these examples, refer to the sample results JSON for the relevant object and control tags for your labeling configuration, for example, the [Audio tag](/tags/audio.html). Each tag must be represented in the JSON pre-annotations format to render predictions in the Label Studio UI. Not all object and control tags list sample results JSON. You can also use the [Label Studio Playground](/playground) to preview the output JSON for a specific labeling configuration.
 
 ## Import pre-annotations for images
 
 For example, import predicted labels for tasks to determine whether an item in an image is an airplane or a car. 
+
+For image pre-annotations, Label Studio expects the x, y, width, and height of image annotations to be provided in percentages of overall image dimension. See [Units for image annotations](predictions.html#Units_for_image_annotations) on this page for more about how to convert formats.
 
 Use the following labeling configuration: 
 ```xml
@@ -37,6 +48,8 @@ Use the following labeling configuration:
   <Image name="image" value="$image"/>
 </View>
 ```
+
+### Example JSON
 
 After you set up an example project, create example tasks that match the following format. 
 
@@ -127,6 +140,8 @@ Use the following labeling configuration:
   </Labels>
 </View>
 ```
+
+### Example JSON
 
 After you set up an example project, create example tasks that match the following format. 
 
@@ -610,7 +625,7 @@ You can sort the prediction scores for each labeled region using the **Regions**
 
 ## Import brush segmentation pre-annotations in RLE format
 
-If you want to import pre-annotations for brush mask image segmentation using the BrushLabels tag, you must convert the masks to RLE format first. The [Label Studio Converter](https://github.com/heartexlabs/label-studio-converter) package has some helper functions for this. See the following for common conversion cases and guidance.
+If you want to import pre-annotations for brush mask image segmentation using the [BrushLabels tag](/tags/brushlabels.html), you must convert the masks to RLE format first. The [Label Studio Converter](https://github.com/heartexlabs/label-studio-converter) package has some helper functions for this. See the following for common conversion cases and guidance.
 
 Install Label Studio Converter:
 ```
@@ -640,6 +655,109 @@ from label_studio_converter import brush
 
 For more assistance, review this [example code creating a Label Studio task with pre-annotations](https://github.com/heartexlabs/label-studio-converter/blob/master/tests/test_brush.py#L11) for brush labels.
 
+## Import OCR pre-annotations 
+
+Import pre-annotations for optical character recognition (OCR), such as output from [tesseract like in this example blog post](/blog/Improve-OCR-quality-with-Tesseract-and-Label-Studio.html). 
+
+In this example, import pre-annotations for OCR tasks using the [OCR template](/templates/optical_character_recognition.html):
+
+```xml
+<View>
+  <Image name="image" value="$image"/>
+  <Labels name="label" toName="image">
+    <Label value="Text" background="green"/>
+    <Label value="Handwriting" background="blue"/>
+  </Labels>
+  <Rectangle name="bbox" toName="image" strokeWidth="3"/>
+  <Polygon name="poly" toName="image" strokeWidth="3"/>
+  <TextArea name="transcription" toName="image" editable="true" perRegion="true" required="true" maxSubmissions="1" rows="5" placeholder="Recognized Text" displayMode="region-list"/>
+</View>
+```
+
+### Example JSON
+
+This example JSON contains one task with three results dictionaries, one for each type of tag in the labeling configuration: Rectangle, Labels, and TextArea. 
+
+<br/>
+{% details <b>Click to expand the example image JSON</b> %}
+Save this example JSON as a file to import it into Label Studio, for example, `example_prediction_task.json`.
+
+{% codeblock lang:json %}
+{
+   "data": {
+      "ocr": "/data/upload/receipt_00523.png"
+   },
+   "predictions": [
+      {
+         "model_version": "best_ocr_model_1_final",
+         "result": [
+            {
+               "original_width": 864,
+               "original_height": 1296,
+               "image_rotation": 0,
+               "value": {
+                  "x": 48.93333333333333,
+                  "y": 61.333333333333336,
+                  "width": 9.733333333333333,
+                  "height": 2.8444444444444446,
+                  "rotation": 0
+               },
+               "id": "bb1",
+               "from_name": "bbox",
+               "to_name": "image",
+               "type": "rectangle"
+            },
+            {
+               "original_width": 864,
+               "original_height": 1296,
+               "image_rotation": 0,
+               "value": {
+                  "x": 48.93333333333333,
+                  "y": 61.333333333333336,
+                  "width": 9.733333333333333,
+                  "height": 2.8444444444444446,
+                  "rotation": 0,
+                  "labels": [
+                     "Text"
+                  ]
+               },
+               "id": "bb1",
+               "from_name": "label",
+               "to_name": "image",
+               "type": "labels"
+            },
+            {
+               "original_width": 864,
+               "original_height": 1296,
+               "image_rotation": 0,
+               "value": {
+                  "x": 48.93333333333333,
+                  "y": 61.333333333333336,
+                  "width": 9.733333333333333,
+                  "height": 2.8444444444444446,
+                  "rotation": 0,
+                  "text": [
+                     "TOTAL"
+                  ]
+               },
+               "id": "bb1",
+               "from_name": "transcription",
+               "to_name": "image",
+               "type": "textarea"
+            }
+         ],
+         "score": 0.89
+      }
+   ]
+}
+{% endcodeblock %}
+{% enddetails %}
+
+This example JSON also includes a prediction score for the task. The IDs for each rectangle result match the label assigned to the region and the textarea transcription for the region. 
+
+The image data in this example task references an uploaded file, identified by the source_filename assigned by Label Studio after uploading the image. The best way to reference image data is using presigned URLs for images stored in cloud storage, or absolute paths to image data stored in local storage and added to Label Studio by [syncing storage](storage.html). 
+
+Import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-data-from-the-Label-Studio-UI) or [using the API](/api#operation/projects_import_create).
 
 ## Troubleshoot pre-annotations
 
