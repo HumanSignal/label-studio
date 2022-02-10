@@ -45,20 +45,19 @@ def __init__(self, **kwargs):
 After you define the loaders, you can define two methods for your model: [an inference call for making predictions with the model](#Make-predictions-with-your-ML-backend), and [a training call](#Train-a-model-with-your-ML-backend), for training the model. 
 
 
+### Variables available from `LabelStudioMLBase`
+
 The inherited `LabelStudioMLBase` class provides special variables that you can use:
 
-| variable                   | contains          | details                                                                                                                                                                                                                                                                                    |                                        
-|----------------------------|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `self.parsed_label_config` | Python dictionary | Provides a structured Label Studio labeling configuration for a project. You might want to use this variable to align your model input or output with the Label Studio labeling configuration, for example for creating pre-annotations.                                                   |
-| `self.label_config`        | string            | Raw labeling configuration.                                                                                                                                                                                                                                                                |
-| `self.train_output`        | Python dictionary | Contains the results of the previous model training runs, which is the same as the output of the `fit()` method in your code defined in the [training call section](#Train-a-model-with-your-ML-backend). Use this variable to load the model for active learning updates and fine-tuning. |
+| variable                   | contains          | details                                                                                                                                                                                                                                                                                         |
+|----------------------------|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `self.label_config`        | string            | Raw labeling configuration.                                                                                                                                                                                                                                                                     |
+| `self.parsed_label_config` | Python dictionary | Provides a structured Label Studio labeling configuration for a project. You might want to use this variable to align your model input or output with the Label Studio labeling configuration, for example for [creating pre-annotations](predictions.html). See below for more format details. |
+| `self.train_output`        | Python dictionary | Contains the results of the previous model training runs, which is the same as the output of the `fit()` method in your code defined in the [training call section](#Train-a-model-with-your-ML-backend). Use this variable to load the model for active learning updates and fine-tuning.      |
 
 
+The `self.parsed_label_config` variable returns a labeling configuration in the following form:
 ```python
-def parse_config(config_string):
-    """
-    :param config_string: Label config string
-    :return: structured config of the form:
     {
         "<ControlTag>.name": {
             "type": "ControlTag",
@@ -68,9 +67,23 @@ def parse_config(config_string):
                 {"type": "ObjectTag2", "value": "<ObjectTag2>.value"}
             ],
             "labels": ["Label1", "Label2", "Label3"] // taken from "alias" if exists or "value"
+        }
     }
-    """
 ```
+For example, for a [Named Entity Recognition template](/templates/named_entity.html), the parsed_label_config looks like the following:
+```python
+{
+    "<Labels>.name": {
+        "type": "labels",
+        "to_name": ["<Text>.name"],
+        "inputs": [
+            {"type": "text", "value": "<Text>.text"}
+        ],
+        "labels": {"PER", "ORG", "LOC", "MISC"}
+    }
+}
+```
+If you use an alias for the [Labels tag](/tags/labels.html), the `labels` dictionary contains the label aliases. Otherwise, it lists the label values.
 
 ## Make predictions with your ML backend
 
