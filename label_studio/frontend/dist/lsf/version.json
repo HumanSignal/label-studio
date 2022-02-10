@@ -1,6 +1,6 @@
 {
-  "message": "Fix: feature flags default value",
-  "commit": "d524d8c17fe57bec0e72951422a623d70136179d",
+  "message": "fix: DEV-1200: Reanimate tag style parameters (#365)\n\n* [fix] Fix getting style-affecting parameters from control tag\r\n\r\n* [fix] Allow to use opacity parameter instead of fillOpacity\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>\r\nCo-authored-by: niklub <lubimov.nicolas@gmail.com>\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
+  "commit": "e0557b0db4077dc655a7ee8ffc061de12ed43d9d",
   "branch": "master",
-  "date": "2022-02-07T14:19:59Z"
+  "date": "2022-02-10T01:55:06Z"
 }
