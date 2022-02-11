@@ -12,6 +12,7 @@ from django.db import transaction, models
 from annoying.fields import AutoOneToOneField
 from functools import lru_cache
 
+from core.redis import start_job_async_or_sync
 from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks
 from core.utils.common import create_hash, get_attr_or_item, load_func
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
@@ -344,10 +345,9 @@ class Project(ProjectMixin, models.Model):
         membership = ProjectMember.objects.filter(user=user, project=self)
         return membership.exists() and membership.first().enabled
 
-    def update_tasks_states(
+    def _update_tasks_states(
         self, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed
     ):
-
         # if only maximum annotations parameter is tweaked
         if maximum_annotations_changed and not overlap_cohort_percentage_changed:
             tasks_with_overlap = self.tasks.filter(overlap__gt=1)
@@ -370,6 +370,12 @@ class Project(ProjectMixin, models.Model):
             bulk_update_stats_project_tasks(
                 self.tasks.filter(Q(annotations__isnull=False) & Q(annotations__ground_truth=False))
             )
+
+    def update_tasks_states(
+        self, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed
+    ):
+        start_job_async_or_sync(self._update_tasks_states, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed)
+
 
     def _rearrange_overlap_cohort(self):
         """
