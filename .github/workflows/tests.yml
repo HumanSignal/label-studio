@@ -79,7 +79,7 @@ jobs:
             ${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Install LSF & set version.py
-        run: ./deploy/prebuild.sh
+        run: ./deploy/prebuild_wo_frontend.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -191,7 +191,7 @@ jobs:
             ${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Install LSF & set version.py
-        run: ./deploy/prebuild.sh
+        run: ./deploy/prebuild_wo_frontend.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
