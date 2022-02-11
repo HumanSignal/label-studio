@@ -4,6 +4,7 @@ import logging
 
 from django.db.models import signals
 from datetime import datetime
+from django.db.models.signals import post_delete, pre_delete
 
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
@@ -42,24 +43,21 @@ def delete_tasks(project, queryset, **kwargs):
     if count == project.tasks.count():
         with temporary_disconnect_all_signals():
             queryset.delete()
-
         project.summary.reset()
-        project.update_tasks_states(
-            maximum_annotations_changed=False,
-            overlap_cohort_percentage_changed=False,
-            tasks_number_changed=True
-        )
 
     # delete only specific tasks
     else:
-        # this signal re-save the task back
+        # update project summary
+        project.summary.remove_created_annotations_and_labels(Annotation.objects.filter(task__in=queryset))
+        project.summary.remove_data_columns(queryset)
         with temporary_disconnect_all_signals():
             queryset.delete()
-        project.update_tasks_states(
-            maximum_annotations_changed=False,
-            overlap_cohort_percentage_changed=False,
-            tasks_number_changed=True
-        )
+
+    project.update_tasks_states(
+        maximum_annotations_changed=False,
+        overlap_cohort_percentage_changed=False,
+        tasks_number_changed=True
+    )
 
     emit_webhooks_for_instance(project.organization, project, WebhookAction.TASKS_DELETED, tasks_ids)
 
