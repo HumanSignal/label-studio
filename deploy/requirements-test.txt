@@ -9,3 +9,4 @@ tavern==1.14.0
 fakeredis==1.5.0
 pytest-env==0.6.2
 responses==0.13.0
+pytest-xdist~=2.5.0
