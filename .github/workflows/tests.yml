@@ -275,7 +275,7 @@ jobs:
         collect_analytics: 0
       run: |
         cd label_studio/
-        pytest -vv -n auto
+        python -m pytest -vv -n auto
 #        coverage run -m pytest -n auto
 
 
