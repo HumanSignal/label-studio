@@ -2,14 +2,14 @@
 """
 import logging
 
-from django.db.models import signals
 from datetime import datetime
 from django.db.models.signals import post_delete, pre_delete
 
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
-from core.utils.common import temporary_disconnect_all_signals, temporary_disconnect_list_signal
-from io_storages.s3.models import delete_annotation_from_s3_storages
+from core.utils.common import temporary_disconnect_list_signal
+from projects.models import Project
+
 from tasks.models import (
     Annotation, Prediction, Task, bulk_update_stats_project_tasks, update_is_labeled_after_removing_annotation,
     update_all_task_states_after_deleting_task, remove_data_columns, remove_project_summary_annotations
@@ -40,7 +40,7 @@ def delete_tasks(project, queryset, **kwargs):
     """
     tasks_ids = list(queryset.values('id'))
     count = len(tasks_ids)
-
+    tasks_ids_list = [task['id'] for task in tasks_ids]
     # signals to switch off
     signals = [
         (post_delete, update_is_labeled_after_removing_annotation, Annotation),
@@ -58,8 +58,7 @@ def delete_tasks(project, queryset, **kwargs):
     # delete only specific tasks
     else:
         # update project summary
-        project.summary.remove_created_annotations_and_labels(Annotation.objects.filter(task__in=queryset))
-        project.summary.remove_data_columns(queryset)
+        start_job_async_or_sync(async_project_summary_recalculation, tasks_ids_list, project.id)
 
         with temporary_disconnect_list_signal(signals):
             queryset.delete()
@@ -115,6 +114,13 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     count = predictions.count()
     predictions.delete()
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
+
+
+def async_project_summary_recalculation(tasks_ids_list, project_id):
+    queryset = Task.objects.filter(id__in=tasks_ids_list)
+    project = Project.objects.get(id=project_id)
+    project.summary.remove_created_annotations_and_labels(Annotation.objects.filter(task__in=queryset))
+    project.summary.remove_data_columns(queryset)
 
 
 actions = [
