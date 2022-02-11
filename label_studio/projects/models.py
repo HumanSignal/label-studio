@@ -124,11 +124,11 @@ class Project(ProjectMixin, models.Model):
         default='<View></View>',
         help_text='Label config in XML format. See more about it in documentation',
     )
-    parsed_label_config = models.TextField(
+    parsed_label_config = models.JSONField(
         _('parsed label config'),
         blank=True,
         null=True,
-        default='',
+        default=None,
         help_text='Parsed label config in JSON format. See more about it in documentation',
     )
     expert_instruction = models.TextField(
@@ -705,7 +705,11 @@ class Project(ProjectMixin, models.Model):
 
     def get_parsed_config(self):
         if self.parsed_label_config:
+            if isinstance(self.parsed_label_config, str):
+                print('\n\n\n======>', self.parsed_label_config, '\n\n\n')
+                return json.loads(self.parsed_label_config)
             return self.parsed_label_config
+
         return parse_config(self.label_config)
 
     def get_counters(self):
