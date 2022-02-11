@@ -275,12 +275,14 @@ jobs:
         collect_analytics: 0
       run: |
         cd label_studio/
-        coverage run -m pytest -n auto
+        pytest -vv -n auto
+#        coverage run -m pytest -n auto
 
-    - name: Collect coverage results
-      if: always()
-      env:
-        collect_analytics: 0
-      run: |
-        cd label_studio/
-        coverage report -i -m --fail-under=40
+
+#    - name: Collect coverage results
+#      if: always()
+#      env:
+#        collect_analytics: 0
+#      run: |
+#        cd label_studio/
+#        coverage report -i -m --fail-under=40
