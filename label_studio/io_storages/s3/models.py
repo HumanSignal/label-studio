@@ -10,7 +10,7 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.dispatch import receiver
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_delete
 
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from io_storages.utils import get_uri_via_regex
@@ -209,7 +209,7 @@ def export_annotation_to_s3_storages(sender, instance, **kwargs):
             storage.save_annotation(instance)
 
 
-@receiver(post_delete, sender=Annotation)
+@receiver(pre_delete, sender=Annotation)
 def delete_annotation_from_s3_storages(sender, instance, **kwargs):
     links = S3ExportStorageLink.objects.filter(annotation=instance)
     for link in links:
