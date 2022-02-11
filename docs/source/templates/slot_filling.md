@@ -24,6 +24,8 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!--Use the ParagraphLabels control tag to apply labels 
+    to specific dialogue spans-->
   <ParagraphLabels name="entity_slot" toName="dialogue">
     <Label value="Person" background="#ff0012"/>
     <Label value="Organization" background="#2311de" />
@@ -31,7 +33,10 @@ Interactively preview this labeling template:
     <Label value="Datetime" />
     <Label value="Quantity" />
   </ParagraphLabels>
+    <!--Use the Paragraphs object tag to display dialogue-->
   <Paragraphs name="dialogue" value="$dialogue" layout="dialogue" />
+    <!--Use the Choices control tag to select a single 
+    classification tag for the dialogue-->
     <Choices name="intent" toName="dialogue"
          choice="single" showInLine="true">
         <Choice value="Greeting"/>

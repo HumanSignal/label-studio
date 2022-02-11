@@ -22,10 +22,17 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!--Use the Text object tag to display text-->
   <Text name="text" value="$text"/>
+    <!--Use the Taxonomy control tag to create a taxonomy
+    of choices for annotators to select-->
   <Taxonomy name="taxonomy" toName="text">
+      <!--Use the Choice control tag to specify the options
+      of the specific taxonomy-->
     <Choice value="Archaea" />
     <Choice value="Bacteria" />
+      <!--Nest choices under a specific Choice to create
+      layers in the taxonomy-->
     <Choice value="Eukarya">
       <Choice value="Human" />
       <Choice value="Oppossum" />

@@ -22,26 +22,30 @@ Interactively preview this labeling template:
 
 ```html
 <View>
-    <!-- Control tag for region labels -->
+    <!--Use the Header tag to provide instructions to annotators-->
     <Header value="Select predictable region spans in time series:"/>
+    <!--Use the TimeSeriesLabels control tag to provide a way to label
+    specific regions on the time series graph-->
     <TimeSeriesLabels name="predictable" toName="stock">
         <Label value="Regions" background="red" />
     </TimeSeriesLabels>
 
-    <!-- Object tag for time series data source -->
+    <!-- Use the TimeSeries object tag to display time series data -->
     <TimeSeries name="stock" valueType="url" value="$csv"
                 sep=","
                 timeColumn="time"
                 timeFormat="%Y-%m-%d %H:%M:%S.%f"
                 timeDisplayFormat="%Y-%m-%d"
                 overviewChannels="value">
-
+<!--Use the Channel tag to specify the name and format of the time series channel-->
         <Channel column="value"
                  displayFormat=",.1f"
                  strokeColor="#1f77b4"
                  legend="Stock Value"/>
     </TimeSeries>
     <Header value="Forecast next trend:"/>
+    <!--Use the Choices control tag to prompt annotators to choose
+    the trend for the time series graph-->
     <Choices name="trend_forecast" toName="stock">
         <Choice value="Up"/>
         <Choice value="Down"/>

@@ -22,10 +22,13 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!--Use the Labels control tag to allow annotators to highlight specific
+    regions of the audio clip, zoom, and use a hotkey to apply labels.-->
   <Labels name="label" toName="audio" zoom="true" hotkey="ctrl+enter">
     <Label value="Speaker one" background="#00FF00"/>
     <Label value="Speaker two" background="#12ad59"/>
   </Labels>
+    <!--Use the AudioPlus object tag to display a waveform of audio-->
   <AudioPlus name="audio" value="$audio" />
 </View>
 ```

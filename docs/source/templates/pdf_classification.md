@@ -22,13 +22,16 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!--Use the Header tag to provide instructions to annotators-->
     <Header value="Rate this article"/>
+    <!--Use the Rating control tag to apply a star rating with a scale of 10 to the pdf-->
   <Rating name="rating" toName="pdf" maxRating="10" icon="star" size="medium" />
-
+<!--Use the Choices control tag to present classification options to the annotator-->
   <Choices name="choices" choice="single-radio" toName="pdf" showInline="true">
     <Choice value="Important article"/>
     <Choice value="Yellow press"/>
   </Choices>
+    <!--Use the HyperText tag to render an inline version of the PDF data-->
   <HyperText name="pdf" value="$pdf" inline="true"/>
 </View>
 ```

@@ -22,10 +22,15 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!--Use the Header tag to provide instructions to annotators-->
   <Header value="Please read the text" />
+    <!--Use the Text object tag to display text-->
   <Text name="text" value="$text" />
 
   <Header value="Provide one sentence summary" />
+    <!--Use the TextArea control tag to provide a text box with a 
+    submit button that annotators must type a summary into and can 
+    edit their responses.-->
   <TextArea name="answer" toName="text"
             showSubmitButton="true" maxSubmissions="1" editable="true"
             required="true" />

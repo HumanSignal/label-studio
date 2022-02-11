@@ -22,8 +22,12 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!--Use the Audio object tag to allow annotators to play back audio
+    on the labeling interface using a specific hotkey-->
   <Audio name="audio" value="$audio" zoom="true" hotkey="ctrl+enter" />
+    <!--Use the Header tag to provide instructions to annotators-->
   <Header value="Provide Transcription" />
+    <!--Use the TextArea control tag to prompt annotators to add a transcript for the audio-->
   <TextArea name="transcription" toName="audio" rows="4" editable="true" maxSubmissions="1" />
 </View>
 ```
@@ -32,13 +36,15 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!--Use the Labels control tag to allow annotators to highlight portions
+    of the audio that represent different types of noise-->
   <Labels name="labels" toName="audio">
     <Label value="Speech" />
     <Label value="Noise" />
   </Labels>
-
+<!--Use the AudioPlus object tag to display a waveform of audio that can be labeled-->
   <AudioPlus name="audio" value="$audio"/>
-
+<!--Use the TextArea control tag to prompt annotators to provide a transcript-->
   <TextArea name="transcription" toName="audio"
             rows="2" editable="true"
             perRegion="true" required="true" />

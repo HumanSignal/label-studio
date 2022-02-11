@@ -22,8 +22,11 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!--Use the Header tag to provide details to annotators-->
     <Header value="Table with {key: value} pairs"/>
+    <!--Use the Table object tag to display tabular data-->
     <Table name="table" value="$item"/>
+    <!--Use the Choices control tag to classify the table contents-->
     <Choices name="choice" toName="table">
         <Choice value="Correct"/>
         <Choice value="Incorrect"/>
@@ -33,5 +36,6 @@ Interactively preview this labeling template:
 
 ## Related tags
 
+- [Header](/tags/header.html)
 - [Table](/tags/table.html)
 - [Choices](/tags/choices.html)

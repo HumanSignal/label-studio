@@ -18,21 +18,24 @@ Interactively preview this labeling template:
 
 <div id="main-preview"></div>
 
-
 ## Labeling Configuration
 
 ```html
 <View>
+    <!--Use the Relations control tag to provide labels that can be 
+    applied to relations added between text spans.-->
    <Relations>
     <Relation value="org:founded_by"/>
     <Relation value="org:founded"/>
   </Relations>
+    <!--Use the Labels control tag to specify labels to apply to spans
+    of text.-->
   <Labels name="label" toName="text">
     <Label value="Organization" background="orange"/>
     <Label value="Person" background="green"/>
     <Label value="Datetime" background="blue"/>
   </Labels>
-
+<!--Use the Text object tag to display the text on the labeling interface-->
   <Text name="text" value="$text"/>
 </View>
 ```
