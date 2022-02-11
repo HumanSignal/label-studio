@@ -605,3 +605,40 @@ def round_floats(o):
     if isinstance(o, (list, tuple)):
         return [round_floats(x) for x in o]
     return o
+
+
+class temporary_disconnect_list_signal:
+    """ Temporarily disconnect a list of signals
+        Each signal tuple: (signal_type, signal_method, object)
+        Example:
+            with temporary_disconnect_list_signal(
+                [(signals.post_delete, update_is_labeled_after_removing_annotation, Annotation)]
+                ):
+                do_something()
+    """
+    def __init__(self, signals):
+        self.signals = signals
+
+    def __enter__(self):
+        for signal in self.signals:
+            sig = signal[0]
+            receiver = signal[1]
+            sender = signal[2]
+            dispatch_uid = signal[3] if len(signal) > 3 else None
+            sig.disconnect(
+                receiver=receiver,
+                sender=sender,
+                dispatch_uid=dispatch_uid
+            )
+
+    def __exit__(self, type_, value, traceback):
+        for signal in self.signals:
+            sig = signal[0]
+            receiver = signal[1]
+            sender = signal[2]
+            dispatch_uid = signal[3] if len(signal) > 3 else None
+            sig.connect(
+                receiver=receiver,
+                sender=sender,
+                dispatch_uid=dispatch_uid
+            )

@@ -13,9 +13,10 @@ This example tutorial outlines how to wrap a simple text classifier based on the
 2. [Declare and initialize a class](#Declare-and-initialize-a-class).
 3. [Make predictions with your ML backend](#Make-predictions-with-your-ML-backend).
 4. [Train a model with your ML backend](#Train-a-model-with-your-ML-backend).
-5. [Start running your ML backend](#Start-running-your-ML-backend).
+5. [Specify requirements for your ML backend](#Specify-requirements-for-your-ML-backend)
+6. [Start running your ML backend](#Start-running-your-ML-backend).
 
-If you want to create an ML backend that you can use for dynamic ML-assisted labeling with interactive pre-annotations, see [Support interactive preannotations in your ML backend](#Support-interactive-preannotations-in-your-ML-backend). 
+If you want to create an ML backend that you can use for dynamic ML-assisted labeling with interactive pre-annotations, see [Support interactive preannotations in your ML backend](#Support-interactive-preannotations-in-your-ML-backend).
 
 ## Prerequisites 
 Before you start integrating your custom model code with the Label Studio ML SDK to use it as an ML backend with Label Studio, determine the following:
@@ -86,41 +87,63 @@ def predict(self, tasks, **kwargs):
     return predictions
 ```
 
+### Support interactive preannotations in your ML backend
+
+If you want to support interactive preannotations in your machine learning backend, you need to write an inference call using the `predict()` method. For an example that does this for text labeling projects, you can refer to [this code example for substring matching](https://github.com/heartexlabs/label-studio-ml-backend/tree/master/label_studio_ml/examples/substring_matching).
+
+Do the following in your code:
+- Define an inference call with the **predict** method as outlined in the [inference section of this guide](ml_create.html#Example-inference-call).
+- The `predict()` method takes task data and context data:
+  - the `tasks` parameter contains details about the task being pre-annotated. 
+  - the `kwargs['context']` parameter contains details about annotation actions performed in Label Studio, such as a text string highlighted sent in [Label Studio annotation results format](/export.html#Raw-JSON-format-of-completed-labeled-tasks).
+- With the task and context data, construct a prediction using the data received from Label Studio. 
+- Return a result in the [Label Studio predictions format](predictions.html#Format-pre-annotations-for-Label-Studio), which varies depending on the type of labeling being performed.
+
+Refer to the code example for more details about how this might be performed for a NER labeling project. 
+
 ## Train a model with your ML backend 
 
 If you want to train a model, use the training call to update your model based on new annotations. You can perform training as part of an active learning with predictions, or you can create an ML backend that trains or retrains a model based on annotations. You don't need to use this call in your code if you just want to use an ML backend for predictions. 
 
-Write your own code to override the `fit(completions, **kwargs)` method, which takes [JSON-formatted Label Studio annotations](https://labelstud.io/guide/export.html#Raw-JSON-format-of-completed-labeled-tasks) and returns an arbitrary JSON dictionary where information about the created model can be stored.
+Write your own code to override the `fit()` method, which takes [JSON-formatted Label Studio annotations](/export.html#Raw-JSON-format-of-completed-labeled-tasks) and returns an arbitrary JSON dictionary where information about the created model can be stored. 
 
-> Note: The `completions` field is deprecated as of Label Studio 1.0.x and will be replaced with `annotations` in a future release of this SDK.  
+> Note: The `completions` field is deprecated as of Label Studio 1.0.x. In version 1.5.0 it will be removed. Instead, use the SDK or the API to retrieve annotation and task data using annotation and task IDs. See [trigger training with webhooks](#Trigger-training-with-webhooks) for more details.
+
+### Trigger training with webhooks
+
+Starting in version 1.4.1 of Label Studio, when you add an ML backend to your project, Label Studio creates a webhook to your ML backend to send an event every time an annotation is created or updated.
+
+By default, the payload of the webhook event does not contain the annotation itself. You can either [modify the webhook event](webhooks.html) sent by Label Studio to send the full payload, or retrieve the annotation using the [Label Studio API](/api) using the [get annotation by its ID endpoint](/api#operation/api_annotations_read), [SDK](sdk.html) using the [get task by ID method](/sdk/project.html#label_studio_sdk.project.Project.get_task), or by retrieving it from [target storage that you set up](storage.html) to store annotations.
+
+See the [annotation webhook event reference](webhook_reference.html#Annotation-Created) for more details about the webhook event.
 
 ### Example training call
 
-This example defines a training call with the `fit()` method and stores the model training results in a checkpoints directory that you can reference to consistently retrain your model, for example as part of an [active learning loop](active_learning.html). 
+This example defines a training call with the `fit()` method and stores the model training results in a `checkpoints` directory that you can reference to consistently retrain your model, such as with an [active learning loop](active_learning.html). 
+
+The `fit()` method expects the data and event keys included in the webhook event payload to retrieve the project ID and annotation event type.
 
 ```python
-def fit(self, completions, workdir=None, **kwargs):
-    # ... do some heavy computations, get your model and store checkpoints and resources
-    return {'checkpoints': 'my/model/checkpoints'}  # <-- you can retrieve this dict as self.train_output in the subsequent calls
+def fit(self, tasks, workdir=None, **kwargs):
+    # Retrieve the annotation ID from the payload of the webhook event
+    # Use the ID to retrieve annotation data using the SDK or the API
+    # Do some computations and get your model
+    return {'checkpoints': 'my/model/checkpoints'}
+    ## JSON dictionary with trained model artifacts that you can use later in code with self.train_output
 ```
 
-You can use the `self.model` variable with this function if you want to start training from the previous model checkpoint. 
+You can set up your `fit()` method to start training immediately when an event is received, or define your own logic to define when to begin training. For example, you can check how much data the model needs to be labeled, then start training your model after every 100, 200, 300, or other number of annotated tasks accordingly. You can use the `self.model` variable with this function if you want to start training from the previous model checkpoint.
+
+## Specify requirements for your ML backend 
+
+You must specify all requirements needed by your custom ML backend in a `my-ml-backend/requirements.txt` file. 
+
+For example, to specify scikit-learn as a requirement for your model, do the following:
+```requirements.txt
+scikit-learn
+```
 
 ## Start running your ML backend
 
-After you wrap your model code with the class, define the loaders, and define the methods, you're ready to run your model as an ML backend with Label Studio. See the [Quickstart](ml.html#Quickstart).
-
-## Support interactive preannotations in your ML backend
-
-If you want to support interactive preannotations in your machine learning backend, refer to [this code example for substring matching](https://github.com/heartexlabs/label-studio-ml-backend/tree/master/label_studio_ml/examples/substring_matching).
-
-Do the following in your code:
-- Define an inference call with the **predict** method as outlined in the [inference section of this guide](ml_create.html#Inference-call).
-- Within that predict method, take the task data in the `tasks` parameter, containing details about the task that is being preannotated, and the context details in `kwargs['context']`, containing details about actions performed in Label Studio. 
-- With the task and context data, construct a prediction from the data received from Label Studio. 
-- Return a result in the Label Studio predictions format.
-
-Refer to the code example for more details. 
-
-
+After you wrap your model code with the class, define the loaders, and define the methods, you're ready to run your model as an ML backend with Label Studio. See how to [Start your custom ML backend with Label Studio](ml.html#Start-your-custom-ML-backend-with-Label-Studio).
 
