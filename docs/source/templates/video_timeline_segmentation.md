@@ -23,13 +23,17 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!--Use the Header tag to provide descriptions to annotators-->
   <Header value="Video timeline segmentation via AudioPlus sync trick"/>
+    <!--Use the Video object tag to provide a video clip and sync it with the audio clip-->
   <Video name="video" value="$video_url" sync="audio"/>
+    <!--Use the Labels control tag to highlight the video clip with specific actions-->
   <Labels name="tricks" toName="audio" choice="multiple">
     <Label value="Kickflip" background="#1BB500"/>
     <Label value="360 Flip" background="#FFA91D"/>
     <Label value="Trick" background="#358EF3"/>
   </Labels>
+    <!--Use the AudioPlus object tag to play the audio from the video clip with the video-->
   <AudioPlus name="audio" value="$video_url" sync="video" speed="false"/>
 </View>
 ```
