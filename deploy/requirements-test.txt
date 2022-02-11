@@ -1,5 +1,5 @@
 pytest==7.0.1
-pytest-cov==2.9.0
+pytest-cov==3.0.7
 pytest-django==4.1.0
 pytest-mock==1.10.3
 requests-mock==1.5.2
