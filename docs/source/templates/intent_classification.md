@@ -22,12 +22,16 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!-- Use the Labels control tag to identify segments of the audio clip-->
   <Labels name="labels" toName="audio">
     <Label value="Segment" />
   </Labels>
-
+<!--Use the AudioPlus object tag to specify the audio data and display 
+an audio wave that can be segmented-->
   <AudioPlus name="audio" value="$audio"/>
-
+<!--Use the Choices control tag to classify the intent for each segmented 
+region of the audio clip. Each choice applies to a different segment labeled
+with the Labels option--> 
   <Choices name="intent" toName="audio" perRegion="true" required="true">
     <Choice value="Question" />
     <Choice value="Request" />

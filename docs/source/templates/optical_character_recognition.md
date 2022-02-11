@@ -22,13 +22,22 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!--Use the Image object tag to specify the image to label-->
   <Image name="image" value="$ocr"/>
+    <!--Use the Labels control tag to specify which labels are 
+    available to apply to the different shapes added to the image-->
   <Labels name="label" toName="image">
     <Label value="Text" background="green"/>
     <Label value="Handwriting" background="blue"/>
   </Labels>
+    <!--Use the Rectangle control tag to add unlabeled rectangles-->
   <Rectangle name="bbox" toName="image" strokeWidth="3"/>
+    <!--Use the Polygon control tag to add unlabeled polygons-->
   <Polygon name="poly" toName="image" strokeWidth="3"/>
+    <!--Use the TextArea control tag to add transcripts for each region,
+    or rectangle or polygon drawn on the image. Each text box has placeholder
+    text to help guide the annotator, is set to display in the region sidebar,
+    and is a required and editable field.-->
   <TextArea name="transcription" toName="image"
             editable="true"
             perRegion="true"

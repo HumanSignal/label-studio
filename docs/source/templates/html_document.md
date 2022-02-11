@@ -10,7 +10,7 @@ meta_description: Template for performing HTML document entity resolution with L
 
 <br/><img src="/images/templates/html-entity-recognition.png" alt="" class="gif-border" width="552px" height="408px" />
 
-Perform named entity recognition for HTML documents.
+Perform named entity recognition for HTML documents. Use this template to display text with HTML markup and label spans.
 
 ## Template Preview
 
@@ -22,10 +22,12 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!--Use the Labels control tag to specify the entities-->
   <Labels name="ner" toName="text">
     <Label value="Person"></Label>
     <Label value="Organization"></Label>
   </Labels>
+    <!--Use the HyperText object tag to display the text containing HTML markup-->
   <HyperText name="text" value="$text"></HyperText>
 </View>
 ```

@@ -22,12 +22,15 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!--Use styling on the View tag to place the two text samples side by side-->
   <View style="display: grid; grid-template: auto/1fr 1fr; column-gap: 1em">
+      <!--Use the Header tag to provide instructions to the annotator-->
     <Header value="Read the text in English" />
     <Header value="Provide translation in Spanish" />
-
+<!--Use the Text object tag to specify the text to be translated-->
   <Text name="english" value="$english" />
-
+<!--Use the TextArea control tag to provide an editable, required text box to provide
+a translation of the text, and include a Submit button for annotators-->
   <TextArea name="spanish" toName="english" transcription="true"
             showSubmitButton="true" maxSubmissions="1" editable="true"
             required="true"/>
@@ -37,6 +40,7 @@ Interactively preview this labeling template:
 
 ## Related tags
 
+- [View](/tags/view.html)
 - [Header](/tags/header.html)
 - [Text](/tags/text.html)
 - [TextArea](/tags/textarea.html)

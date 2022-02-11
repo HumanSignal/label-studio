@@ -23,7 +23,7 @@ Interactively preview this labeling template:
 ```html
 <View>
 
-    <!-- Object tag for time series data source -->
+    <!-- Object tag to specify the time series data source -->
     <TimeSeries name="ts" valueType="url" value="$csv"
                 sep=","
                 timeColumn="time"
@@ -37,10 +37,12 @@ Interactively preview this labeling template:
                  strokeColor="#1f77b4"
                  legend="Velocity"/>
     </TimeSeries>
-    <!-- Control tag for region labels -->
+    <!-- Control tag to specify the labels to apply to regions -->
     <TimeSeriesLabels name="label" toName="ts">
         <Label value="Region" background="red" />
     </TimeSeriesLabels>
+    <!--Use the Choices control tag to classify whether each specific
+    region is an Outlier or an Anomaly in the time series data.-->
   <Choices name="region_type" toName="ts"
         perRegion="true" required="true">
       <Choice value="Outlier"/>

@@ -22,12 +22,17 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!--Use the Header to provide instructions to annotators-->
   <Header>Set how likely these images represent the same thing:</Header>
+    <!--Add styling to the View tag to control how the image data is displayed-->
     <View style="display: grid; column-gap: 8px; grid-template: auto/1fr 1fr">
+        <!--Use the Image object tag to specify two images on the labeling interface-->
   	<Image name="image1" value="$image1" />
     <Image name="image2" value="$image2" />
   </View>
+    <!--Add styling to the View tag to control how the rating option is displayed-->
   <View style="margin-left: auto; margin-right: auto; width: 16em">
+      <!--Use the Rating control tag to display star ratings to apply to both images-->
     <Rating name="rating" toName="image1,image2"/>
     </View>
 </View>
@@ -36,5 +41,6 @@ Interactively preview this labeling template:
 ## Related tags
 
 - [Header](/tags/header.html)
+- [View](/tags/view.html)
 - [Image](/tags/image.html)
 - [Rating](/tags/rating.html)

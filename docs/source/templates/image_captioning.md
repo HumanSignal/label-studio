@@ -22,8 +22,11 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+    <!--Use the Image object tag to specify the image to caption.-->
   <Image name="image" value="$captioning"/>
+    <!--Use the Header tag to provide instructions to annotators.-->
   <Header value="Describe the image:"/>
+    <!--Use the TextArea control tag to provide a 5 row text box that annotators can type a caption into.-->
   <TextArea name="caption" toName="image" placeholder="Enter description here..." rows="5" maxSubmissions="1"/>
 </View>
 ```
@@ -31,4 +34,5 @@ Interactively preview this labeling template:
 ## Related tags
 
 - [Image](/tags/image.html)
+- [Header](/tags/header.html)
 - [TextArea](/tags/textarea.html)
