@@ -544,8 +544,7 @@ class Project(ProjectMixin, models.Model):
 
     def save(self, *args, recalc=True, **kwargs):
         exists = True if self.pk else False
-        super(Project, self).save(*args, **kwargs)
-        project_with_config_just_created = not exists and self.pk and self.label_config
+        project_with_config_just_created = not exists and self.label_config
 
         if self._label_config_has_changed() or project_with_config_just_created:
             self.data_types = extract_data_types(self.label_config)
@@ -556,6 +555,8 @@ class Project(ProjectMixin, models.Model):
 
         if self._label_config_has_changed():
             self.__original_label_config = self.label_config
+
+        super(Project, self).save(*args, **kwargs)
 
         if not exists:
             steps = ProjectOnboardingSteps.objects.all()
