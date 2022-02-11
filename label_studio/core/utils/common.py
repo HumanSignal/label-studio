@@ -611,8 +611,9 @@ class temporary_disconnect_list_signal:
     """ Temporarily disconnect a list of signals
         Each signal tuple: (signal_type, signal_method, object)
         Example:
-            with temporary_disconnect_all_signals(
-                signals.post_delete, update_is_labeled_after_removing_annotation, Annotation):
+            with temporary_disconnect_list_signal(
+                [(signals.post_delete, update_is_labeled_after_removing_annotation, Annotation)]
+                ):
                 do_something()
     """
     def __init__(self, signals):
