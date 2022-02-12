@@ -64,5 +64,9 @@ Use with the following data types: HTML
 ```
 ### Example
 ```html
-<HyperText name="p1" value="<p>Some explanations <em>with style</em></p>" />
+<View>
+  <HyperText name="p1">
+  	<p>Some explanations <em>with style</em></p>
+  </HyperText>
+</View>
 ```
