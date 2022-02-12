@@ -274,6 +274,7 @@ jobs:
       env:
         collect_analytics: 0
       run: |
+        python -m pip install -r deploy/requirements-test.txt
         cd label_studio/
         python -m pytest -vv -n auto
 #        coverage run -m pytest -n auto
