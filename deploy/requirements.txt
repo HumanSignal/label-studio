@@ -4,17 +4,18 @@ attr==0.3.1
 attrs>=19.2.0
 pyyaml>=5.3.1
 azure-storage-blob>=12.6.0
-boto==2.49.0
-boto3==1.16.28
-botocore==1.19.28
+
+boto~=2.49.0
+boto3~=1.16.28
+botocore~=1.19.28
 
 google-api-core==1.31.5
 google-auth==1.35.0
 google-cloud-appengine-logging==1.1.0
 google-cloud-audit-log==0.2.0
 google-cloud-core==1.5.0
-google-cloud-logging==2.7.0
-google-cloud-storage==1.29.0
+google-cloud-storage~=1.29.0
+google-cloud-logging~=2.7.0
 google-resumable-media==0.5.1
 googleapis-common-protos==1.52.0
 grpc-google-iam-v1==0.12.3
@@ -57,5 +58,5 @@ redis>=3.5.0
 sentry-sdk>=1.1.0
 launchdarkly-server-sdk==7.3.0
 
-label-studio-converter==0.0.38
+label-studio-converter==0.0.39
 label-studio-tools==0.0.0.dev11

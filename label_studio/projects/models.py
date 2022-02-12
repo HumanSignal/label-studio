@@ -125,11 +125,11 @@ class Project(ProjectMixin, models.Model):
         default='<View></View>',
         help_text='Label config in XML format. See more about it in documentation',
     )
-    parsed_label_config = models.TextField(
+    parsed_label_config = models.JSONField(
         _('parsed label config'),
         blank=True,
         null=True,
-        default='',
+        default=None,
         help_text='Parsed label config in JSON format. See more about it in documentation',
     )
     expert_instruction = models.TextField(
@@ -550,17 +550,19 @@ class Project(ProjectMixin, models.Model):
 
     def save(self, *args, recalc=True, **kwargs):
         exists = True if self.pk else False
+        project_with_config_just_created = not exists and self.label_config
 
-        if self.label_config and (self._label_config_has_changed() or not exists or not self.control_weights):
-            self.control_weights = self.get_updated_weights()
-        super(Project, self).save(*args, **kwargs)
-        project_with_config_just_created = not exists and self.pk and self.label_config
         if self._label_config_has_changed() or project_with_config_just_created:
             self.data_types = extract_data_types(self.label_config)
             self.parsed_label_config = parse_config(self.label_config)
 
+        if self.label_config and (self._label_config_has_changed() or not exists or not self.control_weights):
+            self.control_weights = self.get_updated_weights()
+
         if self._label_config_has_changed():
             self.__original_label_config = self.label_config
+
+        super(Project, self).save(*args, **kwargs)
 
         if not exists:
             steps = ProjectOnboardingSteps.objects.all()
@@ -710,6 +712,7 @@ class Project(ProjectMixin, models.Model):
     def get_parsed_config(self):
         if self.parsed_label_config:
             return self.parsed_label_config
+
         return parse_config(self.label_config)
 
     def get_counters(self):
