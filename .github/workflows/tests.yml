@@ -247,12 +247,12 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools
-        pip install --upgrade cython
+        python -m pip install --upgrade cython
         if (Test-Path -Path '.\deploy\requirements.txt' -PathType Leaf)
-        {pip install -r deploy\requirements.txt}
+        {python -m pip install -r deploy\requirements.txt}
         if (Test-Path -Path '.\deploy\requirements-test.txt' -PathType Leaf)
-        {pip install -r deploy/requirements-test.txt}
-        pip install -e .
+        {python -m pip install -r deploy/requirements-test.txt}
+        python -m pip install -e .
 
     - name: Fix sqlite.dll for python < 3.9
       if: ${{ matrix.python-version < '3.9' }}
@@ -275,7 +275,7 @@ jobs:
         collect_analytics: 0
       run: |
         cd label_studio/
-        python3 -m pytest -vv -n auto
+        python -m pytest -vv -n auto
 #        coverage run -m pytest -n auto
 
 
