@@ -37,7 +37,6 @@ from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
 from collections import defaultdict
 
 from base64 import b64encode
-from lockfile import LockFile
 from datetime import datetime
 from appdirs import user_cache_dir
 from functools import wraps

@@ -226,4 +226,4 @@ The accompanying labeling configuration is as follows:
 
 ### Video & audio sync with time series
 
-It's possible to synchronize TimeSeries with video and audio in Label Studio. Right now you can do this using HyperText tag with HTML objects `<audio src="path">`/`<video src="path">` and TimeSeries together. [Contact us](http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=template-timeseries) in Slack to learn more about this experimental functionality.
+It's possible to synchronize TimeSeries with video and audio in Label Studio. Right now you can do it using HyperText tag with HTML objects `<audio src="path">`/`<video src="path">` and TimeSeries together. We have some solutions for this in testing. [Contact us](https://slack.labelstudio.heartex.com/?source=template-timeseries) in Slack to learn more.
