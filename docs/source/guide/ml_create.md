@@ -71,20 +71,34 @@ The `self.parsed_label_config` variable returns a labeling configuration in the 
         }
     }
 ```
-For example, for a [Named Entity Recognition template](/templates/named_entity.html), the parsed_label_config looks like the following:
+For example, for a labeling config like follows:
+```xml
+<View>
+  <Labels name="ner" toName="textdata">
+    <Label value="PER" background="red"/>
+    <Label value="ORG" background="darkorange"/>
+    <Label value="LOC" background="orange"/>
+    <Label value="MISC" background="green"/>
+  </Labels>
+
+  <Text name="textdata" value="$sample"/>
+</View>
+```
+
+The `parsed_label_config` looks like the following:
 ```python
 {
-    "<Labels>.name": {
+    "ner": {
         "type": "labels",
-        "to_name": ["<Text>.name"],
+        "to_name": ["textdata"],
         "inputs": [
-            {"type": "text", "value": "<Text>.text"}
+            {"type": "Text", "value": "sample"}
         ],
         "labels": {"PER", "ORG", "LOC", "MISC"}
     }
 }
 ```
-If you use an alias for the [Labels tag](/tags/labels.html), the `labels` dictionary contains the label aliases. Otherwise, it lists the label values.
+If you use an alias for the [Label tag](/tags/label.html), the `labels` dictionary contains the label aliases. Otherwise, it lists the label values.
 
 ## Make predictions with your ML backend
 
