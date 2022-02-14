@@ -233,6 +233,11 @@ class MLApi(BaseHTTPAPI):
     def get_train_job_status(self, train_job):
         return self._request('job_status', request={'job': train_job.job_id}, timeout=TIMEOUT_TRAIN_JOB_STATUS)
 
+    def get_versions(self, project):
+        return self._request('versions', request={
+            'project': self._create_project_uid(project)
+        }, timeout=TIMEOUT_TRAIN_JOB_STATUS, method='POST')
+
 
 def get_ml_api(project):
     if project.ml_backend_active_connection is None:

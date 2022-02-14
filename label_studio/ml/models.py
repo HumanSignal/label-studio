@@ -87,6 +87,11 @@ class MLBackend(models.Model):
     )
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
+    auto_update = models.BooleanField(
+        _('auto_update'),
+        default=True,
+        help_text='If false, model version is set by the user, if true - getting latest version from backend.'
+    )
 
     def __str__(self):
         return f'{self.title} (id={self.id}, url={self.url})'
@@ -132,11 +137,9 @@ class MLBackend(models.Model):
                 self.state = MLBackendState.CONNECTED
                 model_version = setup_response.response.get('model_version')
                 logger.info(f'ML backend responds with success: {setup_response.response}')
-                self.model_version = model_version
-                if model_version != self.project.model_version:
-                    logger.debug(f'Changing project model version: {self.project.model_version} -> {model_version}')
-                    self.project.model_version = model_version
-                    self.project.save(update_fields=['model_version'])
+                if self.auto_update:
+                    self.model_version = model_version
+                    logger.debug(f'Changing model version: {self.model_version} -> {model_version}')
                 self.error_message = None
         self.save()
 
@@ -294,6 +297,16 @@ class MLBackend(models.Model):
 
         result['data'] = ml_results[0]
         return result
+
+    @staticmethod
+    def get_versions_(url, project):
+        api = MLApi(url=url)
+        if not isinstance(project, Project):
+            project = Project.objects.get(pk=project)
+        return api.get_versions(project)
+
+    def get_versions(self):
+        return self.get_versions_(self.url, self.project)
 
 
 class MLBackendPredictionJob(models.Model):
