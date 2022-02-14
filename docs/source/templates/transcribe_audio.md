@@ -48,7 +48,6 @@ All labeling configurations must be wrapped in [`View`](/tags/view.html) tags.
 
 ## Related tags
 
-- [AudioPlus](/tags/audioplus.html)
 - [Audio](/tags/audio.html)
 - [Labels](/tags/labels.html)
 - [TextArea](/tags/textarea.html)

@@ -62,6 +62,12 @@ with the Labels option-->
 ## Enhance this template
 
 
+
+## About the labeling configuration
+
+## Enhance this template
+
+
 ## Related tags
 
 - [Labels](/tags/labels.html)

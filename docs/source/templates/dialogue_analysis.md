@@ -43,6 +43,11 @@ Interactively preview this labeling template:
 </View>
 ```
 
+## About the labeling configuration
+
+## Enhance this template
+
+
 ## Related tags
 
 - [HyperText](/tags/hypertext.html)

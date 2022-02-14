@@ -37,7 +37,6 @@ All labeling configurations must be wrapped in [`View`](/tags/view.html) tags.
 </View>
 ```
 
-
 ## Enhance this template
 
 

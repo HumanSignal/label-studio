@@ -1,10 +1,10 @@
 ---
-title: Audio Classification for Segments
+title: Audio Classification with Segments
 type: templates
 category: Audio/Speech Processing
 cat: audio-speech-processing
 order: 308
-meta_title: Audio Classification for Segments Data Labeling Template
+meta_title: Audio Classification with Segments Data Labeling Template
 meta_description: Template for classifying audio regions for segmentation tasks with Label Studio for your machine learning and data science projects.
 ---
 
@@ -31,6 +31,10 @@ Interactively preview this labeling template:
   <AudioPlus name="audio" value="$url"></AudioPlus>
 </View>
 ```
+
+## About the labeling configuration
+
+## Enhance this template
 
 ## Related tags
 
