@@ -43,12 +43,62 @@ def __init__(self, **kwargs):
     self.model = self.load_my_model()
 ```
 
-The inherited class provides special variables that you can use:
-- `self.parsed_label_config` is a Python dict that provides a Label Studio project config structure. See the [Tags documentation](/tags) and [Template documentation](/templates) for some examples of labeling configurations. You might want to use this variable to align your model input or output with the Label Studio labeling configuration.
-- `self.label_config` is a raw labeling configuration string.
-- `self.train_output` is a Python dict that contains the results of the previous model training runs, which is the same as the output of the `fit()` method in your code, defined in the [training call section](ml_create.html#Training-call). Use this variable to load the model for active learning updates and fine-tuning.
+After you define the loaders, you can define two methods for your model: [an inference call for making predictions with the model](#Make-predictions-with-your-ML-backend), and [a training call](#Train-a-model-with-your-ML-backend), for training the model. 
 
-After you define the loaders, you can define two methods for your model: an inference call for making predictions with the model, and a training call, for training the model. 
+
+### Variables available from `LabelStudioMLBase`
+
+The inherited `LabelStudioMLBase` class provides special variables that you can use:
+
+| variable                   | contains          | details                                                                                                                                                                                                                                                                                         |
+|----------------------------|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `self.label_config`        | string            | Raw labeling configuration.                                                                                                                                                                                                                                                                     |
+| `self.parsed_label_config` | Python dictionary | Provides a structured Label Studio labeling configuration for a project. You might want to use this variable to align your model input or output with the Label Studio labeling configuration, for example for [creating pre-annotations](predictions.html). See below for more format details. |
+| `self.train_output`        | Python dictionary | Contains the results of the previous model training runs, which is the same as the output of the `fit()` method in your code defined in the [training call section](#Train-a-model-with-your-ML-backend). Use this variable to load the model for active learning updates and fine-tuning.      |
+
+
+The `self.parsed_label_config` variable returns a labeling configuration in the following form:
+```python
+    {
+        "<ControlTag>.name": {
+            "type": "ControlTag",
+            "to_name": ["<ObjectTag1>.name", "<ObjectTag2>.name"],
+            "inputs: [
+                {"type": "ObjectTag1", "value": "<ObjectTag1>.value"},
+                {"type": "ObjectTag2", "value": "<ObjectTag2>.value"}
+            ],
+            "labels": ["Label1", "Label2", "Label3"] // taken from "alias" if exists or "value"
+        }
+    }
+```
+For example, for a labeling config like follows:
+```xml
+<View>
+  <Labels name="ner" toName="textdata">
+    <Label value="PER" background="red"/>
+    <Label value="ORG" background="darkorange"/>
+    <Label value="LOC" background="orange"/>
+    <Label value="MISC" background="green"/>
+  </Labels>
+
+  <Text name="textdata" value="$sample"/>
+</View>
+```
+
+The `parsed_label_config` looks like the following:
+```python
+{
+    "ner": {
+        "type": "labels",
+        "to_name": ["textdata"],
+        "inputs": [
+            {"type": "Text", "value": "sample"}
+        ],
+        "labels": {"PER", "ORG", "LOC", "MISC"}
+    }
+}
+```
+If you use an alias for the [Label tag](/tags/label.html), the `labels` dictionary contains the label aliases. Otherwise, it lists the label values.
 
 ## Make predictions with your ML backend
 
