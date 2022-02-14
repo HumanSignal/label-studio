@@ -8,6 +8,18 @@ meta_title: Available Helm values for Label Studio Enterprise Kubernetes deploym
 meta_description: For cases when you want to customize your Label Studio Enterprise Kubernetes deployment, review these available Helm values that you can set in your Helm chart.
 ---
 
+<!-- fix first column for long helm values in tables -->
+<style>
+  td:last-child {
+    max-width: 150px;
+  }
+  td:first-child code {
+    white-space: normal;
+    word-wrap: break-word; 
+    max-width: 200px;
+  }
+</style>
+
 Refer to these tables with available Helm chart values for your `lse-values.yaml` file
 when configuring your Label Studio Enterprise deployment on Kubernetes. See [Deploy Label Studio Enterprise on Kubernetes](install_enterprise_k8s.html) for more.
 
