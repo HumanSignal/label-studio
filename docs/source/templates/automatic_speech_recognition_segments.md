@@ -9,13 +9,12 @@ meta_description: Template for audio transcription for automatic speech recognit
 ---
 
 
+
 <img src="/images/templates/automatic-speech-recognition-using-segments.png" alt="" class="gif-border" width="552px" height="408px" />
 
 Listen to an audio file and segment it, then transcribe the contents of each segment in natural language, performing speech recognition using segments.
 
 ## Interactive Template Preview
-
-Interactively preview this labeling template:
 
 <div id="main-preview"></div>
 
