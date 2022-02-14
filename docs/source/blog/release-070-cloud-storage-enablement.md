@@ -8,7 +8,7 @@ meta_description: Label Studio Release 0.7.0 includes new connectors to integrat
 
 Just a couple of weeks after our 0.6.0 release, we’re happy to announce a new big release. We’ve started the discussion about the cloud months ago, and as the first step in simplifying the integration, we’re happy to introduce cloud storage connectors, like AWS S3. 
 
-We’re also very interested to learn more from you about your ML pipelines, if you’re interested in having a conversation, please ping us on [Slack](http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=blog-release).
+We’re also very interested to learn more from you about your ML pipelines, if you’re interested in having a conversation, please ping us on [Slack](https://slack.labelstudio.heartex.com/?source=blog-release).
 
 <br/>
 <img src="/images/release-070/s3-mascot-04.png" />
