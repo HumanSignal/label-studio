@@ -39,9 +39,6 @@ Use the [Audio](/tags/audio.html) object tag to provide basic audio playback of 
 <Audio name="audio" value="$audio"/>
 ```
 
-## Enhance this template
-
-
 ## Related tags
 - [Rating](/tags/rating.html)
 - [Audio](/tags/audio.html)

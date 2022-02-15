@@ -34,8 +34,7 @@ If you want to perform audio classification tasks on specific segments of audio 
 
 ## About the labeling configuration
 
-
-All labeling configurations must be wrapped in [`View`](/tags/view.html) tags.
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
 
 You can add a [header](/tags/header.html) to provide instructions to the annotator:
 ```xml
@@ -57,8 +56,6 @@ Use the [AudioPlus](/tags/audioplus.html) object tag to specify the location of 
 ```xml
 <AudioPlus name="audio" value="$url"></AudioPlus>
 ```
-
-## Enhance this template
 
 ## Related tags
 

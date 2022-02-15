@@ -33,9 +33,9 @@ Listen to an audio file and segment it, then transcribe the contents of each seg
 
 ## About the labeling configuration
 
-All labeling configurations must be wrapped in [`View`](/tags/view.html) tags.
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
 
-Use the Labels control tag to allow annotators to highlight portions of the audio that represent different types of noise:
+Use the [Labels](/tags/labels.html) control tag to allow annotators to highlight portions of the audio that represent different types of noise:
 ```xml
 <Labels name="labels" toName="audio">
     <Label value="Speech" />
@@ -43,20 +43,18 @@ Use the Labels control tag to allow annotators to highlight portions of the audi
 </Labels>
 ```
 
-Use the AudioPlus object tag to display a waveform of audio that can be labeled:
+Use the [AudioPlus](/tags/audioplus.html) object tag to display a waveform of audio that can be labeled:
 ```xml
 <AudioPlus name="audio" value="$audio"/>
 ```
 
-Use the TextArea control tag to prompt annotators to provide a transcript for each segment of audio:
+Use the [TextArea](/tags/textarea.html) control tag to prompt annotators to provide a transcript for each segment of audio:
 ```xml
   <TextArea name="transcription" toName="audio"
             rows="2" editable="true"
             perRegion="true" required="true" />
 ```
 The `editable="true"` argument specifies that the transcript can be edited, and `required="true"` sets the transcript as a required field for the annotator. Without a transcript provided for each segment of the audio clip (set by the `perRegion="true"` argument), the annotation can't be submitted.
-
-## Enhance this template
 
 ## Related tags
 

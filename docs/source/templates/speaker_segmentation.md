@@ -45,9 +45,6 @@ Use the [AudioPlus](/tags/audioplus.html) object tag to display a waveform of au
 <AudioPlus name="audio" value="$audio" />
 ```
 
-## Enhance this template
-
-
 ## Related tags
 
 - [Labels](/tags/labels.html)

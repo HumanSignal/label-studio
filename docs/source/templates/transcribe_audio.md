@@ -46,7 +46,6 @@ Use the [TextArea](/tags/textarea.html) control tag to prompt annotators to add 
 ```
 The `rows="4"` argument lets you configure the size of the text box visible on the labeling interface. The `maxSubmissions="1"` argument limits the maximum number of transcripts submitted by an annotator for the audio clip to one, while the `editable="true"` argument allows annotators to edit the transcript. 
 
-## Enhance this template
 
 ## Related tags
 

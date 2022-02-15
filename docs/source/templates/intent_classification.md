@@ -36,7 +36,7 @@ If you want to identify the intent of an audio recording, such as an interview o
 
 ## About the labeling configuration
 
-All labeling configurations must be wrapped in [`View`](/tags/view.html) tags.
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
 
 Use the [Labels](/tags/labels.html) control tag to label specific segments of the audio clip:
  
@@ -62,8 +62,6 @@ Use the [Choices](/tags/choices.html) control tag to classify the intent for eac
   </Choices>
 ```
 Because of the `perRegion="true"` argument, each choice applies to a different segment labeled as a segment. The `required="true"` argument ensures that each labeled audio segment has a choice selected before the annotation can be submited.
-
-## Enhance this template
 
 ## Related tags
 
