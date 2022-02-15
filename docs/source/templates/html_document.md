@@ -12,11 +12,7 @@ meta_description: Template for performing HTML document entity resolution with L
 
 Perform named entity recognition for HTML documents. Use this template to display text with HTML markup and label spans.
 
-## Template Preview
-
-Interactively preview this labeling template:
-
-<div id="main-preview"></div>
+<!--Removing interactive template because it doesn't work due to the outdated version of LSF in playground-->
 
 ## Labeling Configuration 
 

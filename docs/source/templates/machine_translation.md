@@ -18,6 +18,8 @@ Interactively preview this labeling template:
 
 <div id="main-preview"></div>
 
+<!--Might need to remove preview if adding a number of rows doesn't make this work better due to outdated LSF-->
+
 ## Labeling Configuration
 
 ```html
@@ -31,9 +33,9 @@ Interactively preview this labeling template:
   <Text name="english" value="$english" />
 <!--Use the TextArea control tag to provide an editable, required text box to provide
 a translation of the text, and include a Submit button for annotators-->
-  <TextArea name="spanish" toName="english" transcription="true"
+  <TextArea name="spanish" toName="english" transcription="true" 
             showSubmitButton="true" maxSubmissions="1" editable="true"
-            required="true"/>
+            required="true" rows="5"/>
   </View>
 </View>
 ```

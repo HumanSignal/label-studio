@@ -17,6 +17,8 @@ Label any type of time series data using this generic template.
 Interactively preview this labeling template:
 
 <div id="main-preview"></div>
+
+<!--Need to fix this preview because it previews all of the configs on this page oh no-->
   
 ## Labeling Configuration
   
