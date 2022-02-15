@@ -12,13 +12,25 @@ meta_description: Template for audio transcription for automatic speech recognit
 
 Listen to an audio file and transcribe its content in natural language, performing speech recognition.
 
-## Template Preview
+## Interactive Template Preview
 
 Interactively preview this labeling template:
 
 <div id="main-preview"></div>
 
 ## Labeling Configuration
+
+```html
+<View>
+  <Audio name="audio" value="$audio" zoom="true" hotkey="ctrl+enter" />
+  <Header value="Provide Transcription" />
+  <TextArea name="transcription" toName="audio" rows="4" editable="true" maxSubmissions="1" />
+</View>
+```
+
+## About the labeling configuration
+
+All labeling configurations must be wrapped in [`View`](/tags/view.html) tags.
 
 ```html
 <View>
@@ -32,24 +44,7 @@ Interactively preview this labeling template:
 </View>
 ```
 
-## Labeling Configuration with Segments
-
-```html
-<View>
-    <!--Use the Labels control tag to allow annotators to highlight portions
-    of the audio that represent different types of noise-->
-  <Labels name="labels" toName="audio">
-    <Label value="Speech" />
-    <Label value="Noise" />
-  </Labels>
-<!--Use the AudioPlus object tag to display a waveform of audio that can be labeled-->
-  <AudioPlus name="audio" value="$audio"/>
-<!--Use the TextArea control tag to prompt annotators to provide a transcript-->
-  <TextArea name="transcription" toName="audio"
-            rows="2" editable="true"
-            perRegion="true" required="true" />
-</View>
-```
+## Enhance this template
 
 ## Related tags
 
