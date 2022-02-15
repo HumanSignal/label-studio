@@ -30,22 +30,21 @@ For cases when you need to improve sound event detection, use this template to p
 
 ## About the labeling configuration
 
-All labeling configurations must be wrapped in [`View`](/tags/view.html) tags.
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
 
-```html
-<View>
-    <!--Use the Labels control tag to highlight spans of audio with the 
-    relevant event label. Allow annotators to zoom and use a specific hotkey
-    to apply the labels.-->
+Use the [Labels](/tags/labels.html) control tag to highlight spans of audio with the relevant event label:
+```xml
   <Labels name="label" toName="audio" zoom="true" hotkey="ctrl+enter">
     <Label value="Event A" background="red"/>
     <Label value="Event B" background="green"/>
   </Labels>
-    <!--Use the AudioPlus object tag to display audio with a waveform-->
-  <AudioPlus name="audio" value="$audio"/>
-</View>
 ```
 
+
+Use the AudioPlus object tag to display audio with a waveform, segment the audio clip, and provide annotators the option to change the speed of the audio playback.
+```xml
+<AudioPlus name="audio" value="$audio" />
+```
 
 ## Enhance this template
 
