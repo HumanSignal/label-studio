@@ -40,14 +40,10 @@ Use the [Labels](/tags/labels.html) control tag to highlight spans of audio with
   </Labels>
 ```
 
-
 Use the AudioPlus object tag to display audio with a waveform, segment the audio clip, and provide annotators the option to change the speed of the audio playback.
 ```xml
 <AudioPlus name="audio" value="$audio" />
 ```
-
-## Enhance this template
-
 
 ## Related tags
 
