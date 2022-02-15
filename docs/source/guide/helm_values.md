@@ -11,24 +11,24 @@ meta_description: For cases when you want to customize your Label Studio Enterpr
 <!-- Fix for long values in table cells -->
 <style>
   td:first-child {
-    max-width: 350px !important;
+    max-width: 350px;
   }
   td:first-child code {
-    white-space: normal !important;
-    word-break: break-word !important;
-    margin-left: 0; !important;
-    padding-left: 3px !important;
+    white-space: normal;
+    word-break: break-word;
+    margin-left: 0;
+    padding-left: 3px;
   }
   td:nth-child(3) {
-    white-space: normal !important;
-    word-break: break-word !important;
-    max-width: 130px !important;
+    white-space: normal;
+    word-break: break-word;
+    max-width: 130px;
   }
   td:last-child {
-    max-width: 150px !important;
+    max-width: 150px;
   }
   td:last-child code {
-    white-space: normal !important;
+    white-space: normal;
     word-break: break-all;
   }
 </style>
