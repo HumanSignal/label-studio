@@ -12,13 +12,25 @@ meta_description: Template for detecting sound from events in audio clips with L
 
 For cases when you need to improve sound event detection, use this template to play an audio clip and label specific audio regions according to which event sound is audible from. 
 
-## Template Preview
-
-Interactively preview this labeling template:
+## Interactive Template Preview
 
 <div id="main-preview"></div>
 
 ## Labeling Configuration
+
+```html
+<View>
+  <Labels name="label" toName="audio" zoom="true" hotkey="ctrl+enter">
+    <Label value="Event A" background="red"/>
+    <Label value="Event B" background="green"/>
+  </Labels>
+  <AudioPlus name="audio" value="$audio"/>
+</View>
+```
+
+## About the labeling configuration
+
+All labeling configurations must be wrapped in [`View`](/tags/view.html) tags.
 
 ```html
 <View>
@@ -33,6 +45,10 @@ Interactively preview this labeling template:
   <AudioPlus name="audio" value="$audio"/>
 </View>
 ```
+
+
+## Enhance this template
+
 
 ## Related tags
 
