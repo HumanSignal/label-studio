@@ -14,9 +14,7 @@ If you want to evaluate and analyze the responses present in a dialogue that alr
 
 Use this template to provide a section of dialogue and classify it. Annotators then provide the best response to the section of dialog. 
 
-## Template Preview
-
-Interactively preview this labeling template:
+## Interactive Template Preview
 
 <div id="main-preview"></div>
 
@@ -39,7 +37,7 @@ Interactively preview this labeling template:
 
 ## About the labeling configuration
 
-All labeling configurations must be wrapped in [`View`](/tags/view.html) tags.
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
 
 Use the [HyperText](/tags/hypertext.html) object tag to display dialogue data, imported in Label Studio JSON format using a key of "dialogs":
 ```xml
@@ -61,13 +59,11 @@ Use the [Choices](/tags/choices.html) control tag in combination with the [Choic
 ```
 You can change the choice `value`s to provide different classification options. 
 
-Use the TextArea control tag to provide annotators with a free text box to supply their own response to the dialogue. Add the `editable=true` argument to allow them 
+Use the [TextArea](/tags/textarea.html) control tag to provide annotators with a free text box to supply their own response to the dialogue. Add the `editable=true` argument to allow them 
     to edit their answer, or `required=true` to force annotators to supply an alternate response:
 ```xml
 <TextArea name="answer"></TextArea>
 ```
-
-## Enhance this template
 
 
 ## Related tags
