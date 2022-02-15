@@ -30,19 +30,19 @@ When preparing audio transcripts or training a machine learning model to differe
 
 ## About the labeling configuration
 
-All labeling configurations must be wrapped in [`View`](/tags/view.html) tags.
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
 
-```html
-<View>
-    <!--Use the Labels control tag to allow annotators to highlight specific
-    regions of the audio clip, zoom, and use a hotkey to apply labels.-->
-  <Labels name="label" toName="audio" zoom="true" hotkey="ctrl+enter">
+Use the [Labels](/tags/labels.html) control tag to allow annotators to highlight specific regions of the audio clip and apply a label:
+```xml
+<Labels name="label" toName="audio" zoom="true" hotkey="ctrl+enter">
     <Label value="Speaker one" background="#00FF00"/>
     <Label value="Speaker two" background="#12ad59"/>
-  </Labels>
-    <!--Use the AudioPlus object tag to display a waveform of audio-->
-  <AudioPlus name="audio" value="$audio" />
-</View>
+</Labels>
+```
+
+Use the [AudioPlus](/tags/audioplus.html) object tag to display a waveform of audio and allow annotators to change the speed of the audio playback:
+```xml
+<AudioPlus name="audio" value="$audio" />
 ```
 
 ## Enhance this template
