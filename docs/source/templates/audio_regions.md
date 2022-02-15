@@ -8,6 +8,8 @@ meta_title: Audio Classification with Segments Data Labeling Template
 meta_description: Template for classifying audio regions for segmentation tasks with Label Studio for your machine learning and data science projects.
 ---
 
+<img src="/images/templates-misc/audio-classification-segments.png" alt="" class="gif-border" width="598.4px" height="319.2px" />
+
 If you want to perform audio classification tasks on specific segments of audio clips, you can use this template to listen to an audio file and classify the topic of the clip.
 
 ## Interactive Template Preview
@@ -53,7 +55,7 @@ The `choice="multiple"` argument allows one audio segment to be labeled with mul
 
 Use the [AudioPlus](/tags/audioplus.html) object tag to specify the location of the audio file to classify:
 ```xml
-<AudioPlus name="audio" value="$url"></AudioPlus>`
+<AudioPlus name="audio" value="$url"></AudioPlus>
 ```
 
 ## Enhance this template
