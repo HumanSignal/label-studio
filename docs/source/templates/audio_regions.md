@@ -8,11 +8,13 @@ meta_title: Audio Classification for Segments Data Labeling Template
 meta_description: Template for classifying audio regions for segmentation tasks with Label Studio for your machine learning and data science projects.
 ---
 
-Listen to the audio file and classify it. 
+If you want to perform audio classification tasks on specific segments of audio clips, you can use this template to listen to an audio file and classify the topic of the clip.
 
-<img src="/images/screens/audio_regions.png" class="img-template-example" title="Audio Regions" />
+## Template Preview
 
-<p class="tip">For audio regions to work when you have remote URLs, you need to configure CORS to be wide open.</p>
+Interactively preview this labeling template:
+
+<div id="main-preview"></div>
 
 ## Labeling Configuration 
 

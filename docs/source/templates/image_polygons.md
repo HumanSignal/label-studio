@@ -8,7 +8,13 @@ meta_title: Semantic Segmentation with Polygons Data Labeling Template
 meta_description: Template for performing semantic segmentation with polygons with Label Studio for your machine learning and data science projects.
 ---
 
-Add polygons to images to perform semantic segmentation.
+<img src="/images/templates/semantic-segmentation-with-polygons.png" alt="" class="gif-border" width="552px" height="408px" />
+
+If you need to perform semantic segmentation on images using polygons, use this template.
+
+## Template Preview
+
+Interactively preview this labeling template:
 
 <div id="main-preview"></div>
 
@@ -16,8 +22,14 @@ Add polygons to images to perform semantic segmentation.
 
 ```html
 <View>
+    <!--Use the Header tag to provide instructions to annotators-->
   <Header value="Select label and click the image to start"/>
+    <!--Use the Image object tag to specify the image data and
+    allow annotators to zoom the image-->
   <Image name="image" value="$image" zoom="true"/>
+    <!--Use the PolygonLabels control tag to allow annotators
+    to create polygons for specific labels. You can control the 
+    color of the labels and the styling of the polygon tool.-->
   <PolygonLabels name="label" toName="image"
                  strokeWidth="3" pointSize="small"
                  opacity="0.9">
@@ -25,35 +37,11 @@ Add polygons to images to perform semantic segmentation.
     <Label value="Car" background="blue"/>
   </PolygonLabels>
 </View>
-
-<!-- {
-  "completions": [{
-    "result": [
-      {
-        "value": {
-            "points": [
-                [ 29.66, 54.34 ],
-                [ 52, 55.58 ],
-                [ 57.16, 44.91 ],
-                [ 59, 46.89 ],
-                [ 54.33, 57.81 ],
-                [ 59, 86.60 ]
-            ],
-            "polygonlabels": [
-                "Airplane"
-            ]
-        },
-        "from_name": "label",
-        "to_name": "image",
-        "type": "polygonlabels"
-      }
-    ]
-  }]  
-} -->
 ```
 
 ## Related tags
 
+- [Header](/tags/header.html)
 - [Image](/tags/image.html)
 - [PolygonLabels](/tags/polygonlabels.html)
 - [Label](/tags/label.html)
