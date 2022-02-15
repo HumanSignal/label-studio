@@ -12,9 +12,7 @@ meta_description: Template for classifying intent of audio data with Label Studi
 
 If you want to identify the intent of an audio recording, such as an interview or customer service call, use this template to classify intent by selecting choices and listening to an audio clip.
 
-## Template Preview
-
-Interactively preview this labeling template:
+## Interactive Template Preview
 
 <div id="main-preview"></div>
 
@@ -22,6 +20,25 @@ Interactively preview this labeling template:
 
 ```html
 <View>
+  <Labels name="labels" toName="audio">
+    <Label value="Segment" />
+  </Labels>
+  <AudioPlus name="audio" value="$audio"/>
+  <Choices name="intent" toName="audio" perRegion="true" required="true">
+    <Choice value="Question" />
+    <Choice value="Request" />
+    <Choice value="Satisfied" />
+    <Choice value="Interested" />
+    <Choice value="Unsatisfied" />
+  </Choices>
+</View>
+```
+
+## About the labeling configuration
+
+All labeling configurations must be wrapped in [`View`](/tags/view.html) tags.
+
+
     <!-- Use the Labels control tag to identify segments of the audio clip-->
   <Labels name="labels" toName="audio">
     <Label value="Segment" />
@@ -39,8 +56,11 @@ with the Labels option-->
     <Choice value="Interested" />
     <Choice value="Unsatisfied" />
   </Choices>
-</View>
-```
+
+
+
+## Enhance this template
+
 
 ## Related tags
 
