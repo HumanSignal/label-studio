@@ -8,8 +8,6 @@ meta_title: Automatic Speech Recognition using Segments Data Labeling Template
 meta_description: Template for audio transcription for automatic speech recognition segmentation use cases with Label Studio for your machine learning and data science projects.
 ---
 
-
-
 <img src="/images/templates/automatic-speech-recognition-using-segments.png" alt="" class="gif-border" width="552px" height="408px" />
 
 Listen to an audio file and segment it, then transcribe the contents of each segment in natural language, performing speech recognition using segments.
@@ -37,23 +35,26 @@ Listen to an audio file and segment it, then transcribe the contents of each seg
 
 All labeling configurations must be wrapped in [`View`](/tags/view.html) tags.
 
-```html
-<View>
-    <!--Use the Labels control tag to allow annotators to highlight portions
-    of the audio that represent different types of noise-->
-  <Labels name="labels" toName="audio">
+Use the Labels control tag to allow annotators to highlight portions of the audio that represent different types of noise:
+```xml
+<Labels name="labels" toName="audio">
     <Label value="Speech" />
     <Label value="Noise" />
-  </Labels>
-<!--Use the AudioPlus object tag to display a waveform of audio that can be labeled-->
-  <AudioPlus name="audio" value="$audio"/>
-<!--Use the TextArea control tag to prompt annotators to provide a transcript-->
+</Labels>
+```
+
+Use the AudioPlus object tag to display a waveform of audio that can be labeled:
+```xml
+<AudioPlus name="audio" value="$audio"/>
+```
+
+Use the TextArea control tag to prompt annotators to provide a transcript for each segment of audio:
+```xml
   <TextArea name="transcription" toName="audio"
             rows="2" editable="true"
             perRegion="true" required="true" />
-</View>
 ```
-
+The `editable="true"` argument specifies that the transcript can be edited, and `required="true"` sets the transcript as a required field for the annotator. Without a transcript provided for each segment of the audio clip (set by the `perRegion="true"` argument), the annotation can't be submitted.
 
 ## Enhance this template
 
