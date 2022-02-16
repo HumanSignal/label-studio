@@ -71,9 +71,10 @@ def flag_set(feature_flag, user):
     ```
     """
     user_dict = _get_user_repr(user)
-    default_value = get_bool_env(feature_flag, settings.FEATURE_FLAGS_DEFAULT_VALUE)
-    is_on = client.variation(feature_flag, user_dict, default_value)
-    return is_on
+    env_value = get_bool_env(feature_flag, default=None)
+    if env_value is not None:
+        return env_value
+    return client.variation(feature_flag, user_dict, settings.FEATURE_FLAGS_DEFAULT_VALUE)
 
 
 def all_flags(user):
@@ -87,10 +88,9 @@ def all_flags(user):
     logger.debug(f'State received: {state}')
     flags = state.to_json_dict()
     logger.debug(f'Flags received: {flags}')
-    env_ff = get_all_env_with_prefix('ff_', default_value=settings.FEATURE_FLAGS_DEFAULT_VALUE)
-    logger.debug(f'Read flags from env: {env_ff}')
+    env_ff = get_all_env_with_prefix('ff_', is_bool=True)
+    logger.debug(f'Override by flags from env: {env_ff}')
     for env_flag_name, env_flag_on in env_ff.items():
-        if env_flag_name not in flags and env_flag_on:
-            flags[env_flag_name] = True
+        flags[env_flag_name] = env_flag_on
     logger.debug(f'Requested all active feature flags: {flags}')
     return flags
