@@ -1,3 +1,4 @@
+import os
 import ldclient
 import logging
 
@@ -17,7 +18,11 @@ if settings.FEATURE_FLAGS_FROM_FILE:
     if not settings.FEATURE_FLAGS_FILE:
         raise ValueError('When "FEATURE_FLAGS_FROM_FILE" is set, you have to specify a valid path for feature flags file, e.g.'
                          'FEATURE_FLAGS_FILE=my_flags.yml')
-    feature_flags_file = find_file(settings.FEATURE_FLAGS_FILE)
+
+    feature_flags_file = settings.FEATURE_FLAGS_FILE \
+        if settings.FEATURE_FLAGS_FILE.startswith('/') \
+        else os.path.join(os.path.dirname(__file__), settings.FEATURE_FLAGS_FILE)
+
     logger.info(f'Read flags from file {feature_flags_file}')
     data_source = Files.new_data_source(paths=[feature_flags_file])
     config = Config(
