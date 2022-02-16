@@ -231,15 +231,6 @@ class TaskListAPI(generics.ListAPIView):
                     Task.objects.filter(id__in=ids),
                     fields_for_evaluation=fields_for_evaluation,
                     all_fields=all_fields,
-                ).prefetch_related(
-                    'annotations', 'predictions', 'annotations__completed_by', 'project',
-                    'annotations__reviews', 'annotations__reviews__created_by',
-                    'io_storages_azureblobimportstoragelink',
-                    'io_storages_gcsimportstoragelink',
-                    'io_storages_localfilesimportstoragelink',
-                    'io_storages_redisimportstoragelink',
-                    'io_storages_s3importstoragelink',
-                    'file_upload'
                 )
             )
             tasks_by_ids = {task.id: task for task in tasks}
