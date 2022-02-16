@@ -22,7 +22,7 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     """
 
     task_number = serializers.IntegerField(default=None, read_only=True,
-                                        help_text='Total task number in project')
+                                           help_text='Total task number in project')
     total_annotations_number = serializers.IntegerField(default=None, read_only=True,
                                                     help_text='Total annotations number in project including '
                                                               'skipped_annotations_number and ground_truth_number.')
@@ -40,7 +40,8 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     skipped_annotations_number = serializers.IntegerField(default=None, read_only=True,
                                                       help_text='Skipped by collaborators annotation number in project')
     num_tasks_with_annotations = serializers.IntegerField(default=None, read_only=True, help_text='Tasks with annotations count')
-    created_by = UserSimpleSerializer(default=CreatedByFromContext())
+    created_by = SerializerMethodField(default=None, read_only=True,
+                                       help_text='Project creator')
 
     parsed_label_config = SerializerMethodField(default=None, read_only=True,
                                                 help_text='JSON-formatted labeling configuration')
@@ -49,9 +50,22 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     config_has_control_tags = SerializerMethodField(default=None, read_only=True,
                                                     help_text='Flag to detect is project ready for labeling')
 
+    def get_created_by(self, project):
+        """ Returns create_by with cache """
+        user = project.created_by
+        user_id = user.id
+        key = 'created_by_cache'
+
+        if key not in self.context:
+            self.context[key] = {}
+        if user_id not in self.context[key]:
+            self.context[key][user_id] = UserSimpleSerializer(user).data
+
+        return self.context[key][user_id]
+
     @staticmethod
     def get_config_has_control_tags(project):
-        return len(project.get_control_tags_from_config()) > 0
+        return len(project.get_parsed_config()) > 0
 
     @staticmethod
     def get_parsed_label_config(project):

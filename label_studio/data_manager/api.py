@@ -363,7 +363,7 @@ class ProjectStateAPI(APIView):
                 "target_syncing": False,
                 "task_count": project.tasks.count(),
                 "annotation_count": Annotation.objects.filter(task__project=project).count(),
-                'config_has_control_tags': len(project.get_control_tags_from_config()) > 0
+                'config_has_control_tags': len(project.get_parsed_config()) > 0
             }
         )
         return Response(data)

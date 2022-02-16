@@ -129,7 +129,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
 
     def get_queryset(self):
         projects = Project.objects.filter(organization=self.request.user.active_organization)
-        return ProjectManager.with_counts_annotate(projects)
+        return ProjectManager.with_counts_annotate(projects).prefetch_related('members', 'created_by')
 
     def get_serializer_context(self):
         context = super(ProjectListAPI, self).get_serializer_context()
