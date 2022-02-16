@@ -1,30 +1,42 @@
 ---
-title: Image Segmentation
+title: Semantic Segmentation with Masks 
 type: templates
-order: 103
-meta_title: Image Segmentation Data Labeling Template
-meta_description: Label Studio Image Segmentation Template for machine learning and data science data labeling projects.
+category: Computer Vision
+cat: computer-vision
+order: 102
+meta_title: Semantic Segmentation with Masks Data Labeling Template
+meta_description: Template for performing semantic segmentation with brush masks with Label Studio for your machine learning and data science projects.
 ---
 
-Image segmentation using a brush and producing a mask
+<img src="/images/templates/semantic-segmentation-with-masks.png" alt="" class="gif-border" width="552px" height="408px" />
 
-## Run
+Image segmentation using a brush and producing a mask.
 
-```bash
-label-studio init image_segmentation_project
-label-studio start image_segmentation_project
-```
+## Template Preview
 
-After starting Label Studio, set up the labeling interface and browse to this template.
+Interactively preview this labeling template:
 
-## Config 
+<div id="main-preview"></div>
+
+## Labeling Configuration
 
 ```html
 <View>
-  <BrushLabels name="tag" toName="img">
-    <Label value="Planet" />
-    <Label value="Moonwalker" background="rgba(255,0,0,0.5)" />
+    <!--Use the Image object tag to display the image and allow
+    the annotator to zoom the image-->
+  <Image name="image" value="$image" zoom="true"/>
+    <!--Use the BrushLabels control tag to apply brush masks
+    to the image, using the Label tag to specify the value and color
+    of the brush mask.-->
+  <BrushLabels name="tag" toName="image">
+    <Label value="Airplane" background="rgba(255, 0, 0, 0.7)"/>
+    <Label value="Car" background="rgba(0, 0, 255, 0.7)"/>
   </BrushLabels>
-  <Image name="img" value="$image" zoom="true" zoomControl="true" />
 </View>
 ```
+
+## Related tags
+
+- [Image](/tags/image.html)
+- [BrushLabels](/tags/brushlabels.html)
+- [Label](/tags/label.html)

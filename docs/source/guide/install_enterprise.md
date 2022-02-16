@@ -1,203 +1,43 @@
 ---
-title: Install Label Studio Enterprise on-premises using Docker
+title: Install Label Studio Enterprise
 badge: <i class='ent'/></i>
 type: guide
-order: 201
-meta_title: Install Label Studio Enterprise on-premises using Docker
-meta_description: Install, back up, and upgrade Label Studio Enterprise with Docker to create machine learning and data science projects on-premises.
+order: 210
+meta_title: Install Label Studio Enterprise
+meta_description: Install, back up, and upgrade Label Studio Enterprise to create machine learning and data science projects on-premises.
 ---
 
-Install Label Studio Enterprise on-premises if you need to meet strong privacy regulations, legal requirements, or want to manage a custom installation on your own infrastructure using Docker or public cloud. <!--To deploy Label Studio Enterprise on Amazon AWS in a Virtual Private Cloud (VPC), see [Install Label Studio Enterprise on AWS Private Cloud](install_enterprise_vpc.html).--> To deploy Label Studio Enterprise in the cloud, you can use Kubernetes and Helm. See [Deploy Label Studio Enterprise on Kubernetes](install_enterprise_k8s.html).
+Install Label Studio Enterprise on-premises if you need to meet strong privacy regulations, legal requirements, or want to manage a custom installation on your own infrastructure. You can run Label Studio Enterprise in an airgapped environment, and no data leaves your infrastructure.
 
-You can run Label Studio Enterprise in an airgapped environment, and no data leaves your infrastructure. See [Secure Label Studio](security.html) for more details about security and hardening for Label Studio Enterprise.
+
+This high-level architecture diagram that outlines the main components of a Label Studio Enterprise deployment.
+
+<img src="/images/LSE_k8s_scheme.png"/>
+
+Label Studio runs on Python and uses rqworkers to perform additional tasks. Metadata and annotations are stored in a bundled version of PostgreSQL that functions as persistent storage. If you host Label Studio in the cloud, use [persistent storage in the cloud](persistent_storage.html) instead of MinIO.
+
+## Before you install
+
+Before you deploy Label Studio Enterprise, prepare your environment. 
+
+1. Set up [persistent storage](persistent_storage.html).
+2. For Kubernetes deployments, configure [ingress](ingress_config.html).
+
+## Install Label Studio Enterprise
+
+Select the deployment scenario that best fits your labeling use case. 
+
+| How | Who |
+| --- | --- |
+| [Install using Docker Compose](install_enterprise_docker.html) | small-scale production data labeling activities with dozens or hundreds of annotators |
+| [Install using Kubernetes and Helm charts](install_enterprise_k8s.html) | large-scale production-grade data labeling activities with thousands of annotators |
+| [Install Label Studio Enterprise without public internet access](install_enterprise_airgapped.html) | if you use a proxy to access the internet from your Kubernetes cluster, or it is airgapped from the internet |
+
+## More details
+
+- See [Secure Label Studio](security.html) for more details about security and hardening for Label Studio Enterprise. 
+- Instead of installing, you can also use [Label Studio Enterprise as a cloud offering](https://heartex.com/product). 
 
 <div class="enterprise"><p>
 To install Label Studio Community Edition, see <a href="install.html">Install and Upgrade Label Studio</a>. This page is specific to the Enterprise version of Label Studio.
 </p></div>
-
-<!-- md deploy.md -->
-
-## Install Label Studio Enterprise using Docker
-
-1. Pull the latest image.
-2. Add the license file.
-3. Start the server using Docker Compose.
-
-### Prerequisites
-Make sure you have an authorization token to retrieve Docker images and a current license file. If you are a Label Studio Enterprise customer and do not have access, [contact us](mailto:hello@heartex.ai) to receive an authorization token and a copy of your license file.
-
-Make sure [Docker Compose](https://docs.docker.com/compose/install/) is installed on your system.
-
-After you install Label Studio Enterprise, the app is automatically connected to the following running services:
-- PostgresSQL (versions 11, 12, 13)
-- Redis (version 5)
-
-### Pull the latest image
-
-You must be authorized to access Label Studio Enterprise images. 
-
-1. Set up the Docker login to retrieve the latest Docker image:
-```bash
-docker login --username heartexlabs
-```
-When prompted to enter the password, enter the token. If login succeeds, a `~/.docker/config.json` file is created with the authorization settings.  
-
-> If you have default registries specified when logging into Docker, you might need to explicitly specify the registry: `docker  login --username heartexlabs docker.io`.
-
-2. Pull the latest Label Studio Enterprise image:
-```bash
-docker pull heartexlabs/label-studio-enterprise:latest
-```
-> Note: You might need to use `sudo` to log in or pull images.
-
-### Add the license file 
-After you retrieve the latest Label Studio Enterprise image, add the license file. You can't start the Docker image without a license file. 
-
-1. Create a working directory called `label-studio-enterprise` and place the license file in it.
-```bash
-mkdir -p label-studio-enterprise
-cd label-studio-enterprise
-```
-2. Move the license file, `license.txt`, to the `label-studio-enterprise` directory.
-
-### Start using Docker Compose
-
-To run Label Studio Enterprise in production, start it using [Docker compose](https://docs.docker.com/compose/). This configuration lets you connect Label Studio to external databases and services.
-
-1. Create a file, `label-studio-enterprise/env.list` with the required environmental variables:
-```
-# Specify the path to the license file. 
-# Alternatively, it can be a URL like LICENSE=https://lic.heartex.ai/db/20210203-1234-ab123456.lic
-LICENSE=/label-studio-enterprise/license.txt
-
-# Database engine (PostgreSQL by default)
-DJANGO_DB=default
-
-# Default configuration
-DJANGO_SETTINGS_MODULE=htx.settings.label_studio
-
-# PostgreSQL database name
-POSTGRE_NAME=postgres
-
-# PostgreSQL database user
-POSTGRE_USER=postgres
-
-# PostgreSQL database password
-POSTGRE_PASSWORD=
-
-# PostgreSQL database host
-POSTGRE_HOST=db
-
-# PostgreSQL database port
-POSTGRE_PORT=5432
-
-# Optional: PostgreSQL SSL mode
-POSTGRE_SSL_MODE=require
-
-# Optional: Specify Postgre SSL certificate
-POSTGRE_SSLROOTCERT=postgre-ca-bundle.pem
-
-# Minio configuration. Copy as-is:
-MINIO_STORAGE_ENDPOINT=http://minio:9000
-MINIO_STORAGE_ACCESS_KEY=very_secret_access_key
-MINIO_STORAGE_SECRET_KEY=very_secret_secret_key
-MINIO_ROOT_USER=very_secret_access_key
-MINIO_ROOT_PASSWORD=very_secret_secret_key
-MINIO_STORAGE_BUCKET_NAME=media
-MINIO_STORAGE_MEDIA_USE_PRESIGNED=false
-MINIO_BROWSER=off
-
-# Redis location e.g. redis://[:password]@localhost:6379/1
-REDIS_LOCATION=localhost:6379
-
-# Optional: Redis database
-REDIS_DB=1
-
-# Optional: Redis password
-REDIS_PASSWORD=12345
-
-# Optional: Redis socket timeout
-REDIS_SOCKET_TIMEOUT=3600
-
-# Optional: Use Redis SSL connection
-REDIS_SSL=1
-
-# Optional: Require certificate
-REDIS_SSL_CERTS_REQS=required
-
-# Optional: Specify Redis SSL certificate
-REDIS_SSL_CA_CERTS=redis-ca-bundle.pem
-
-# Optional: Specify SSL termination certificate & key
-# Files should be placed in the directory "certs" at the same directory as docker-compose.yml file
-NGINX_SSL_CERT=/certs/cert.pem
-NGINX_SSL_CERT_KEY=/certs/cert.key
-```
-
-2. After you set all the environment variables, create the following `docker-compose.yml`:
-
-```yaml
-version: '3.3'
-
-services:
-  app:
-    image: heartexlabs/label-studio-enterprise:latest
-    ports:
-      - 80:8085
-      - 443:8086
-    expose:
-      - "80"
-      - "443"
-    depends_on:
-      - minio
-    env_file:
-      - env.list
-    volumes:
-      - ./license.txt:/label_studio_enterprise/license.txt:ro
-      - ./certs:/certs:ro
-    working_dir: /label-studio-enterprise
-
-  rqworkers:
-    image: heartexlabs/label-studio-enterprise:latest
-    depends_on:
-      - minio
-    env_file:
-      - env.list
-    volumes:
-      - ./license.txt:/label_studio_enterprise/license.txt
-    working_dir: /label-studio-enterprise
-    command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "default" ]
-
-  minio:
-    image: heartexlabs/label-studio-enterprise:latest
-    command:
-      - /bin/bash
-      - -c
-      - |
-        mkdir -p /data/media
-        minio server /data
-    env_file:
-      - .env.list
-    volumes:
-      - ./mydata:/data:rw
-
-```
-
-3. Run Docker Compose:
-
-```bash
-docker-compose up
-```
-
-> Note: If you expose port 80, you must start Docker with `sudo`.
-
-### Get the Docker image version
-
-To check the version of the Label Studio Enterprise Docker image, use the [`docker ps`](https://docs.docker.com/engine/reference/commandline/ps/) command on the host. 
-
-From the command line, run the following as root or using `sudo` and review the output:
-```bash
-$ docker ps
-03b88eebdb65   heartexlabs/label-studio-enterprise:latest   "uwsgi --ini deploy/…"   36 hours ago   Up 36 hours   0.0.0.0:80->8000/tcp   label-studio-enterprise_app_1
-```
-In this example output, the image column displays the Docker image and version number. The image `heartexlabs/label-studio-enterprise:latest` is using the version `latest`.

@@ -96,6 +96,13 @@ task_create_response_scheme = {
 @method_decorator(name='post', decorator=swagger_auto_schema(
         tags=['Import'],
         responses=task_create_response_scheme,
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project.'),
+        ],
         operation_summary='Import tasks',
         operation_description="""
             Import data as labeling tasks in bulk using this API endpoint. You can use this API endpoint to import multiple tasks. 
@@ -142,7 +149,7 @@ task_create_response_scheme = {
             You can also provide a URL to a file with labeling tasks. Supported file formats are the same as in option 2.
             
             ```bash
-            curl -H 'Authorization: Token abc123' \\
+            curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
             -X POST '{host}/api/projects/1/import' \\
             --data '[{{"url": "http://example.com/test1.csv"}}, {{"url": "http://example.com/test2.csv"}}]'
             ```

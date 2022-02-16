@@ -28,13 +28,15 @@ from rest_framework.permissions import AllowAny
 
 from core import views
 from core.utils.static_serve import serve
+from core.utils.common import collect_versions
 
 handler500 = 'core.views.custom_500'
 
+versions = collect_versions()
 schema_view = get_schema_view(
     openapi.Info(
         title="Label Studio API",
-        default_version='v2',
+        default_version='v' + versions['release'],
         contact=openapi.Contact(url="https://labelstud.io"),
         x_logo={"url": "../../static/icons/logo-black.svg"}
     ),
@@ -51,8 +53,6 @@ urlpatterns = [
     re_path(r'^static/fonts/roboto/roboto.css$', views.static_file_with_host_resolver('static/fonts/roboto/roboto.css', content_type='text/css')),
     re_path(r'^static/(?P<path>.*)$', serve, kwargs={'document_root': settings.STATIC_ROOT, 'show_indexes': True}),
 
-
-
     re_path(r'^', include('organizations.urls')),
     re_path(r'^', include('projects.urls')),
     re_path(r'^', include('data_import.urls')),
@@ -63,7 +63,6 @@ urlpatterns = [
     re_path(r'^', include('io_storages.urls')),
     re_path(r'^', include('ml.urls')),
     re_path(r'^', include('webhooks.urls')),
-
 
     re_path(r'data/local-files/', views.localfiles_data, name="localfiles_data"),
 
@@ -85,6 +84,7 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
     path('django-rq/', include('django_rq.urls')),
+    path('feature-flags/', views.feature_flags, name='feature_flags'),
     re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
 

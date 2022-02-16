@@ -3,26 +3,25 @@ type: community
 group: Computer Vision
 image: /static/templates/optical-character-recognition.png
 details: <h1>Draw a bounding box or polygon around region and write down the text found inside</h1>
-config: '
-<View>
-  <Image name="image" value="$ocr"/>
+config: |
+  <View>
+    <Image name="image" value="$ocr"/>
 
-  <Labels name="label" toName="image">
-    <Label value="Text" background="green"/>
-    <Label value="Handwriting" background="blue"/>
-  </Labels>
+    <Labels name="label" toName="image">
+      <Label value="Text" background="green"/>
+      <Label value="Handwriting" background="blue"/>
+    </Labels>
 
-  <Rectangle name="bbox" toName="image" strokeWidth="3"/>
-  <Polygon name="poly" toName="image" strokeWidth="3"/>
+    <Rectangle name="bbox" toName="image" strokeWidth="3"/>
+    <Polygon name="poly" toName="image" strokeWidth="3"/>
 
-  <TextArea name="transcription" toName="image"
-            editable="true"
-            perRegion="true"
-            required="true"
-            maxSubmissions="1"
-            rows="5"
-            placeholder="Recognized Text"
-            displayMode="region-list"
-            />
-</View>
-'
+    <TextArea name="transcription" toName="image"
+              editable="true"
+              perRegion="true"
+              required="true"
+              maxSubmissions="1"
+              rows="5"
+              placeholder="Recognized Text"
+              displayMode="region-list"
+              />
+  </View>

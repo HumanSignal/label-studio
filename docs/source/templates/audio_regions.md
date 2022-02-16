@@ -1,27 +1,22 @@
 ---
-title: Audio Regions
+title: Audio Classification for Segments
 type: templates
-order: 402
-meta_title: Audio Regions Data Labeling Template
-meta_description: Label Studio Audio Regions Template for machine learning and data science data labeling projects.
+category: Audio/Speech Processing
+cat: audio-speech-processing
+order: 308
+meta_title: Audio Classification for Segments Data Labeling Template
+meta_description: Template for classifying audio regions for segmentation tasks with Label Studio for your machine learning and data science projects.
 ---
 
-Listen to the audio file and classify it. 
+If you want to perform audio classification tasks on specific segments of audio clips, you can use this template to listen to an audio file and classify the topic of the clip.
 
-<img src="/images/screens/audio_regions.png" class="img-template-example" title="Audio Regions" />
+## Template Preview
 
-<p class="tip">For audio regions to work when you have remote URLs, you need to configure CORS to be wide open.</p>
+Interactively preview this labeling template:
 
-## Run
+<div id="main-preview"></div>
 
-```bash
-label-studio init audio_regions_project
-label-studio start audio_regions_project 
-```
-
-After starting Label Studio, set up the labeling interface and browse to this template. 
-
-## Config 
+## Labeling Configuration 
 
 ```html
 <View>
@@ -36,3 +31,8 @@ After starting Label Studio, set up the labeling interface and browse to this te
   <AudioPlus name="audio" value="$url"></AudioPlus>
 </View>
 ```
+
+## Related tags
+
+- [AudioPlus](/tags/audioplus.html)
+- [Choices](/tags/choices.html)

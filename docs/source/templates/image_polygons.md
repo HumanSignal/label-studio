@@ -1,39 +1,47 @@
 ---
-title: Image Polygons
+title: Semantic Segmentation with Polygons
 type: templates
-order: 104
-meta_title: Image Polygons Data Labeling Template
-meta_description: Label Studio Image Polygons Template for machine learning and data science data labeling projects.
+category: Computer Vision
+cat: computer-vision
+order: 101
+meta_title: Semantic Segmentation with Polygons Data Labeling Template
+meta_description: Template for performing semantic segmentation with polygons with Label Studio for your machine learning and data science projects.
 ---
 
-Add polygons to images.
+<img src="/images/templates/semantic-segmentation-with-polygons.png" alt="" class="gif-border" width="552px" height="408px" />
 
-<img src="/images/screens/image_polygons.png" class="img-template-example" title="Images Polygons" />
+If you need to perform semantic segmentation on images using polygons, use this template.
 
-## Run
+## Template Preview
 
-```bash
-label-studio init image_polygons_project
-label-studio start image_polygons_project
-```
+Interactively preview this labeling template:
 
-After starting Label Studio, set up the labeling interface and browse to this template. 
+<div id="main-preview"></div>
 
-## Config 
+## Labeling Configuration
 
 ```html
-<View style="display: flex">
-  <View style="width: 100px">
-    <Header value="Pick label" />
-    <PolygonLabels name="tag" toName="img" strokewidth="2" pointstyle="circle" pointsize="small" showInline="false">
-      <Label value="Car" background="blue" />
-      <Label value="Sign" background="blue" />
-      <Label value="Person" background="blue" />
-      <Label value="Tree" background="green" />
-    </PolygonLabels>
-    </View>
-  <View>
-    <Image name="img" value="$image" showMousePos="true" zoom="true" />
-  </View>
+<View>
+    <!--Use the Header tag to provide instructions to annotators-->
+  <Header value="Select label and click the image to start"/>
+    <!--Use the Image object tag to specify the image data and
+    allow annotators to zoom the image-->
+  <Image name="image" value="$image" zoom="true"/>
+    <!--Use the PolygonLabels control tag to allow annotators
+    to create polygons for specific labels. You can control the 
+    color of the labels and the styling of the polygon tool.-->
+  <PolygonLabels name="label" toName="image"
+                 strokeWidth="3" pointSize="small"
+                 opacity="0.9">
+    <Label value="Airplane" background="red"/>
+    <Label value="Car" background="blue"/>
+  </PolygonLabels>
 </View>
 ```
+
+## Related tags
+
+- [Header](/tags/header.html)
+- [Image](/tags/image.html)
+- [PolygonLabels](/tags/polygonlabels.html)
+- [Label](/tags/label.html)

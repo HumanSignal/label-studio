@@ -294,7 +294,7 @@ def main():
         return
 
     # print version
-    if input_args.command == 'version':
+    if input_args.command == 'version' or input_args.version:
         from label_studio import __version__
         print('\nLabel Studio version:', __version__, '\n')
         print(json.dumps(versions, indent=4))

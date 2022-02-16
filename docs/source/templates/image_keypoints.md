@@ -1,32 +1,41 @@
 ---
-title: Image Key Points
+title: Keypoint Labeling
 type: templates
-order: 103
-meta_title: Image Keypoints Data Labeling Template
-meta_description: Label Studio Image Keypoints Template for machine learning and data science data labeling projects.
+category: Computer Vision
+cat: computer-vision
+order: 104
+meta_title: Image Keypoint Data Labeling Template
+meta_description: Template for adding keypoints to images with Label Studio for your machine learning and data science projects.
 ---
 
-Key Point labeling for images.
+<img src="/images/templates/keypoints.png" alt="" class="gif-border" width="552px" height="408px"/>
 
-<img src="/images/screens/image_keypoints.png" class="img-template-example" title="Images Key Points" />
+If you want to identify specific key points for facial recognition and other use cases, use this template to perform key point labeling on images.
 
-## Run
+## Template Preview
 
-```bash
-label-studio init image_keypoints_project
-label-studio start image_keypoints_project 
-```
+Interactively preview this labeling template:
 
-After starting Label Studio, set up the labeling interface and browse to this template.
+<div id="main-preview"></div>
 
-## Config 
+## Labeling Configuration
 
 ```html
 <View>
-  <KeyPointLabels name="tag" toName="img" strokewidth="5">
-    <Label value="Ear" background="blue"></Label>
-    <Label value="Lip" background="red"></Label>
+    <!--Use the KeyPointLabels control tag to add the 
+    option to draw labeled key points-->
+  <KeyPointLabels name="kp-1" toName="img-1">
+      <!--Use the Label control tag to specify 
+      the value and color of the key points-->
+    <Label value="Face" background="red" />
+    <Label value="Nose" background="green" />
   </KeyPointLabels>
-  <Image name="img" value="$image" zoom="true"></Image>
+    <!-- Use the Image object tag to specify the image-->
+  <Image name="img-1" value="$img" />
 </View>
 ```
+
+## Related tags
+
+- [KeyPointLabels](/tags/keypointlabels.html)
+- [Image](/tags/image.html)
