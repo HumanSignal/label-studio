@@ -474,13 +474,13 @@ def annotate_predictions_score(queryset):
     if not first_task:
         return queryset
 
-    model_version = first_task.project.model_version
-    if model_version is None:
+    model_versions = list(first_task.project.ml_backends.filter(project=first_task.project).values_list("model_version", flat=True))
+    if len(model_versions) == 0:
         return queryset.annotate(predictions_score=Avg("predictions__score"))
 
     else:
         return queryset.annotate(predictions_score=Avg(
-            "predictions__score", filter=Q(predictions__model_version=model_version)
+            "predictions__score", filter=Q(predictions__model_version__in=model_versions)
         ))
 
 

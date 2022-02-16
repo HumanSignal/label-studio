@@ -41,7 +41,7 @@ stages:
     url: '{django_live_url}/api/ml'
   response:
     json:
-      model_version: Fri Feb 19 17:10:44 2021
+      model_version: ''
       state: CO
     save:
       json:
