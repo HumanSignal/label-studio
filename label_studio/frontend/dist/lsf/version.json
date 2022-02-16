@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-1621: Add ability to create new annotations already with some results from predictions",
-  "commit": "8f4d006ffa6b000cfadc11de853f7e088d7d811f",
+  "message": "fix: DEV-1621: Fix default coords in not interactive predictions for images",
+  "commit": "3d7787fd504cc52d907a2e0b9a44a798202594fc",
   "branch": "feat/DEV-1621/interactive_mode",
-  "date": "2022-02-15T19:20:47Z"
+  "date": "2022-02-16T13:42:40Z"
 }
