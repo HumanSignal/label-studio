@@ -1,4 +1,3 @@
-import os
 import ldclient
 import logging
 
@@ -8,7 +7,7 @@ from ldclient.feature_store import CacheConfig
 
 from django.conf import settings
 from label_studio.core.utils.params import get_bool_env, get_all_env_with_prefix
-from label_studio.core.utils.io import find_file
+from label_studio.core.utils.io import find_node
 
 logger = logging.getLogger(__name__)
 
@@ -18,11 +17,9 @@ if settings.FEATURE_FLAGS_FROM_FILE:
     if not settings.FEATURE_FLAGS_FILE:
         raise ValueError('When "FEATURE_FLAGS_FROM_FILE" is set, you have to specify a valid path for feature flags file, e.g.'
                          'FEATURE_FLAGS_FILE=my_flags.yml')
-
-    feature_flags_file = settings.FEATURE_FLAGS_FILE \
-        if settings.FEATURE_FLAGS_FILE.startswith('/') \
-        else os.path.join(os.path.dirname(__file__), settings.FEATURE_FLAGS_FILE)
-
+    
+    package_name = 'label_studio' if settings.VERSION_EDITION == 'Community Edition' else 'label_studio_enterprise'
+    feature_flags_file = find_node(package_name, settings.FEATURE_FLAGS_FILE, 'file')
     logger.info(f'Read flags from file {feature_flags_file}')
     data_source = Files.new_data_source(paths=[feature_flags_file])
     config = Config(
