@@ -12,9 +12,7 @@ meta_description: Template for adding captions to images with Label Studio for y
 
 If you want to train a machine learning model to caption or add alt text to images, use this template to collect captions about images. 
 
-## Template Preview
-
-Interactively preview this labeling template:
+## Interactive Template Preview
 
 <div id="main-preview"></div>
 
@@ -22,14 +20,31 @@ Interactively preview this labeling template:
 
 ```html
 <View>
-    <!--Use the Image object tag to specify the image to caption.-->
   <Image name="image" value="$captioning"/>
-    <!--Use the Header tag to provide instructions to annotators.-->
   <Header value="Describe the image:"/>
-    <!--Use the TextArea control tag to provide a 5 row text box that annotators can type a caption into.-->
   <TextArea name="caption" toName="image" placeholder="Enter description here..." rows="5" maxSubmissions="1"/>
 </View>
 ```
+
+## About the labeling configuration
+
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
+
+Use the [Image](/tags/image.html) object tag to specify the image to caption:
+```xml
+<Image name="image" value="$captioning"/>
+```
+
+You can add a [header](/tags/header.html) to provide instructions to the annotator:
+```xml
+<Header value="Describe the image:"/>
+```
+
+Use the [TextArea](/tags/textarea.html) control tag to provide a 5 row text box that annotators can type a caption into:
+```xml
+<TextArea name="caption" toName="image" placeholder="Enter description here..." rows="5" maxSubmissions="1"/>
+```
+Use the `placeholder` argument to provide placeholder text to the annotator, which can provide an example or further instructions. 
 
 ## Related tags
 

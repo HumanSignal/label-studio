@@ -12,9 +12,7 @@ meta_description: Template for classifying image data with Label Studio for your
 
 If you want to train a model to identify the type of content in images, for example for a content moderation use case, use this template to perform image classification with checkboxes.
 
-## Template Preview
-
-Interactively preview this labeling template:
+## Interactive Template Preview
 
 <div id="main-preview"></div>
 
@@ -30,6 +28,25 @@ Interactively preview this labeling template:
   </Choices>
 </View>
 ```
+
+## About the labeling configuration
+
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
+
+Use the [Image](/tags/image.html) object tag to specify the image to classify:
+```xml
+<Image name="image" value="$image"/>
+```
+
+Use the [Choices](/tags/choices.html) control tag to display the choices available to classify the image:
+```xml
+  <Choices name="choice" toName="image">
+    <Choice value="Adult content"/>
+    <Choice value="Weapons" />
+    <Choice value="Violence" />
+  </Choices>
+```
+You can modify the values of the [Choice](/tags/choice.html) tag to provide different classification options. Review the available arguments for the Choices tag for customization options. 
 
 ## Related tags
 

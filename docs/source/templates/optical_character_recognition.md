@@ -18,22 +18,13 @@ Perform optical character recognition (OCR) tasks using a variety of shapes on a
 
 ```html
 <View>
-    <!--Use the Image object tag to specify the image to label-->
   <Image name="image" value="$ocr"/>
-    <!--Use the Labels control tag to specify which labels are 
-    available to apply to the different shapes added to the image-->
   <Labels name="label" toName="image">
     <Label value="Text" background="green"/>
     <Label value="Handwriting" background="blue"/>
   </Labels>
-    <!--Use the Rectangle control tag to add unlabeled rectangles-->
   <Rectangle name="bbox" toName="image" strokeWidth="3"/>
-    <!--Use the Polygon control tag to add unlabeled polygons-->
   <Polygon name="poly" toName="image" strokeWidth="3"/>
-    <!--Use the TextArea control tag to add transcripts for each region,
-    or rectangle or polygon drawn on the image. Each text box has placeholder
-    text to help guide the annotator, is set to display in the region sidebar,
-    and is a required and editable field.-->
   <TextArea name="transcription" toName="image"
             editable="true"
             perRegion="true"
@@ -45,6 +36,50 @@ Perform optical character recognition (OCR) tasks using a variety of shapes on a
             />
 </View>
 ```
+
+## About the labeling configuration
+
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
+
+Use the [Image](/tags/image.html) object tag to specify the image to label:
+```xml
+<Image name="image" value="$ocr"/>
+```
+
+Use the [Labels](/tags/labels.html) control tag to specify which labels are available to apply to the different shapes added to the image:
+```xml
+<Labels name="label" toName="image">
+    <Label value="Text" background="green"/>
+    <Label value="Handwriting" background="blue"/>
+</Labels>
+```
+You can change the `value` of each `Label` to assign different labels to regions on the OCR task, such as "Letters" and "Numbers" or something else. 
+
+Use the [Rectangle](/tags/rectangle.html) control tag to add unlabeled rectangles:
+```xml
+<Rectangle name="bbox" toName="image" strokeWidth="3"/>
+```
+Using the Rectangle tag instead of the [RectangleLabels](/tags/rectanglelabels.html) tag means that you can have annotators perform OCR annotation in three steps: first by creating regions to highlight text, then associating labels with each region, then transcribing the text for each region. This also makes it easier to add pre-annotations for OCR tasks.
+
+Use the [Polygon](/tags/polygon.html) control tag to add unlabeled polygons:
+```xml
+<Polygon name="poly" toName="image" strokeWidth="3"/>
+```
+The `strokeWidth` argument controls the width of the line outlining the polygon. 
+
+Use the [TextArea](/tags/textarea.html) control tag to add transcripts for each region drawn on the image, whether a rectangle or polygon. 
+```xml
+<TextArea name="transcription" toName="image"
+            editable="true"
+            perRegion="true"
+            required="true"
+            maxSubmissions="1"
+            rows="5"
+            placeholder="Recognized Text"
+            displayMode="region-list"
+            />
+```
+The `editable="true"` argument allows annotators to edit the text after submitting it, and `displayMode="region-list"` means that the text boxes appear in the region list associated with each rectangle or polygon, to make it easier to update the text. `perRegion="true"` means that each text box applies to a specific region, and `required="true"` means that annotators must add text to each text box before they can submit the annotation. The `placeholder` argument lets you specify placeholder text that is shown to annotators before they edit the text box.
 
 ## Related tags
 - [Image](/tags/image.html)
