@@ -12,9 +12,7 @@ meta_description: Template for detecting the quality of an audio signal with Lab
 
 Rate the quality of a defined signal in an audio clip, for example, when developing a machine learning model to isolate speech from a crowded bar, or to remove other noise from an audio clip.
 
-## Template Preview
-
-Interactively preview this labeling template:
+## Interactive Template Preview
 
 <div id="main-preview"></div>
 
@@ -22,11 +20,23 @@ Interactively preview this labeling template:
 
 ```html
 <View>
-    <!--Use the Rating control tag to set a 10 star rating for the audio-->
   <Rating name="rating" toName="audio" maxRating="10" icon="star" size="medium" />
-    <!--Use the Audio object tag to provide basic audio playback of the audio clip-->
   <Audio name="audio" value="$audio"/>
 </View>
+```
+
+## About the labeling configuration
+All labeling configurations must be wrapped in [`View`](/tags/view.html) tags.
+
+Use the [Rating](/tags/rating.html) control tag to display a 10-star rating scale to annotators:
+```xml
+<Rating name="rating" toName="audio" maxRating="10" icon="star" size="medium" />
+```
+Because the Rating tag appears before the Audio tag, the rating scale appears before the audio clip on the labeling interface.
+
+Use the [Audio](/tags/audio.html) object tag to provide basic audio playback of the audio clip:
+```xml
+<Audio name="audio" value="$audio"/>
 ```
 
 ## Related tags
