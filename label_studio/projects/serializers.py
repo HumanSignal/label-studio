@@ -54,7 +54,7 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         """ Returns create_by with cache """
         user = project.created_by
         if user is None:
-            return None
+            return UserSimpleSerializer(None).data
 
         user_id = user.id
         key = 'created_by_cache'
