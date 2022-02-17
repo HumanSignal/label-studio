@@ -194,6 +194,18 @@ class TaskListAPI(generics.ListAPIView):
     def get_task_queryset(self, request, prepare_params):
         return Task.prepared.only_filtered(prepare_params=prepare_params)
 
+    @staticmethod
+    def prefetch(queryset):
+        return queryset.prefetch_related(
+            'annotations', 'predictions', 'annotations__completed_by', 'project',
+            'io_storages_azureblobimportstoragelink',
+            'io_storages_gcsimportstoragelink',
+            'io_storages_localfilesimportstoragelink',
+            'io_storages_redisimportstoragelink',
+            'io_storages_s3importstoragelink',
+            'file_upload'
+        )
+
     def get(self, request):
         # get project
         view_pk = int_from_request(request.GET, 'view', 0) or int_from_request(request.data, 'view', 0)
@@ -227,10 +239,12 @@ class TaskListAPI(generics.ListAPIView):
         if page is not None:
             ids = [task.id for task in page]  # page is a list already
             tasks = list(
-                Task.prepared.annotate_queryset(
-                    Task.objects.filter(id__in=ids),
-                    fields_for_evaluation=fields_for_evaluation,
-                    all_fields=all_fields,
+                self.prefetch(
+                    Task.prepared.annotate_queryset(
+                        Task.objects.filter(id__in=ids),
+                        fields_for_evaluation=fields_for_evaluation,
+                        all_fields=all_fields,
+                    )
                 )
             )
             tasks_by_ids = {task.id: task for task in tasks}
@@ -363,7 +377,7 @@ class ProjectStateAPI(APIView):
                 "target_syncing": False,
                 "task_count": project.tasks.count(),
                 "annotation_count": Annotation.objects.filter(task__project=project).count(),
-                'config_has_control_tags': len(project.get_control_tags_from_config()) > 0
+                'config_has_control_tags': len(project.get_parsed_config()) > 0
             }
         )
         return Response(data)

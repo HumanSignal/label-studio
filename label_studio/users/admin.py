@@ -14,6 +14,10 @@ from organizations.models import Organization, OrganizationMember
 
 class UserAdminShort(UserAdmin):
 
+    add_fieldsets = (
+        (None, {'fields': ('email', 'password1', 'password2')}),
+    )
+
     def __init__(self, *args, **kwargs):
         super(UserAdminShort, self).__init__(*args, **kwargs)
 
@@ -24,10 +28,10 @@ class UserAdminShort(UserAdmin):
         self.ordering = ('email',)
 
         self.fieldsets = ((None, {'fields': ('password', )}),
-                          ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),
+                          ('Personal info', {'fields': ('email', 'username', 'first_name', 'last_name')}),
                           ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser',)}),
                           ('Important dates', {'fields': ('last_login', 'date_joined')}))
-        
+
 
 admin.site.register(User, UserAdminShort)
 admin.site.register(Project)

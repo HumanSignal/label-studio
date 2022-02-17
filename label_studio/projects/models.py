@@ -534,7 +534,7 @@ class Project(ProjectMixin, models.Model):
         return {'deleted_predictions': count}
 
     def get_updated_weights(self):
-        outputs = self.get_parsed_config()
+        outputs = self.get_parsed_config(autosave_cache=False)
         control_weights = {}
         exclude_control_types = ('Filter',)
         for control_name in outputs:
@@ -706,14 +706,14 @@ class Project(ProjectMixin, models.Model):
     def max_tasks_file_size():
         return settings.TASKS_MAX_FILE_SIZE
 
-    def get_control_tags_from_config(self):
-        return self.get_parsed_config()
+    def get_parsed_config(self, autosave_cache=True):
+        if self.parsed_label_config is None:
+            self.parsed_label_config = parse_config(self.label_config)
 
-    def get_parsed_config(self):
-        if self.parsed_label_config:
-            return self.parsed_label_config
+            if autosave_cache:
+                Project.objects.filter(id=self.id).update(parsed_label_config=self.parsed_label_config)
 
-        return parse_config(self.label_config)
+        return self.parsed_label_config
 
     def get_counters(self):
         """Method to get extra counters data from Manager method with_counts()
