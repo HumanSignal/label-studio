@@ -104,17 +104,17 @@ class MLBackend(models.Model):
         return self.project.has_permission(user)
 
     @staticmethod
-    def setup_(url, project):
+    def setup_(url, project, model_version=None):
         api = MLApi(url=url)
         if not isinstance(project, Project):
             project = Project.objects.get(pk=project)
-        return api.setup(project)
+        return api.setup(project, model_version=model_version)
 
     def healthcheck(self):
         return self.healthcheck_(self.url)
 
     def setup(self):
-        return self.setup_(self.url, self.project)
+        return self.setup_(self.url, self.project, self.model_version)
 
     @property
     def api(self):
@@ -167,7 +167,7 @@ class MLBackend(models.Model):
             tasks = Task.objects.filter(id__in=[task.id for task in tasks])
 
         tasks_ser = TaskSimpleSerializer(tasks, many=True).data
-        ml_api_result = self.api.make_predictions(tasks_ser, self.project.model_version, self.project)
+        ml_api_result = self.api.make_predictions(tasks_ser, self.model_version, self.project)
         if ml_api_result.is_error:
             logger.warning(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return
@@ -210,7 +210,7 @@ class MLBackend(models.Model):
                     'task': task['id'],
                     'result': response['result'],
                     'score': response.get('score'),
-                    'model_version': self.model_version,
+                    'model_version': ml_api_result.response.get('model_version', self.model_version),
                 }
             )
         with conditional_atomic():
