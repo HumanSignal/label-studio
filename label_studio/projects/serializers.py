@@ -40,8 +40,8 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     skipped_annotations_number = serializers.IntegerField(default=None, read_only=True,
                                                       help_text='Skipped by collaborators annotation number in project')
     num_tasks_with_annotations = serializers.IntegerField(default=None, read_only=True, help_text='Tasks with annotations count')
-    created_by = SerializerMethodField(default=None, read_only=True,
-                                       help_text='Project creator')
+
+    created_by = UserSimpleSerializer(default=CreatedByFromContext(), help_text='Project owner')
 
     parsed_label_config = SerializerMethodField(default=None, read_only=True,
                                                 help_text='JSON-formatted labeling configuration')
@@ -49,22 +49,6 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                                                                 help_text='Start model training after any annotations are submitted or updated')
     config_has_control_tags = SerializerMethodField(default=None, read_only=True,
                                                     help_text='Flag to detect is project ready for labeling')
-
-    def get_created_by(self, project):
-        """ Returns create_by with cache """
-        user = project.created_by
-        if user is None:
-            return UserSimpleSerializer(None).data
-
-        user_id = user.id
-        key = 'created_by_cache'
-
-        if key not in self.context:
-            self.context[key] = {}
-        if user_id not in self.context[key]:
-            self.context[key][user_id] = UserSimpleSerializer(user).data
-
-        return self.context[key][user_id]
 
     @staticmethod
     def get_config_has_control_tags(project):
