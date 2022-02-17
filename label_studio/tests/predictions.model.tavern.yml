@@ -326,4 +326,4 @@ stages:
   response:
     status_code: 200
     json:
-      model_version: '1'
+      model_version: 'Fri Feb 19 17:10:44 2021'

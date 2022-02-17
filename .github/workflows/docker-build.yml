@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - master
+    paths:
+      - deploy/**
+      - label_studio/**
+      - setup.py
+      - .github/workflows/docker-build.yml
     tags: [ '*' ]
 
 env:
@@ -33,6 +38,7 @@ jobs:
         with:
           node-version: "${{ env.NODE }}"
 
+
       - name: Upgrade npm
         run: npm install -g npm@7
 
@@ -59,7 +65,7 @@ jobs:
             ${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Set up Python
-        uses: actions/setup-python@v2.3.1
+        uses: actions/setup-python@v2.3.2
         with:
           python-version: '3.8'
 
@@ -83,7 +89,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        uses: docker/build-push-action@v2.8.0
+        uses: docker/build-push-action@v2.9.0
         id: docker_build_and_push
         with:
           context: .

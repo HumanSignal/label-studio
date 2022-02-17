@@ -1,6 +1,6 @@
 {
-  "message": "DEV-1094 Add Cancel skip",
-  "commit": "b919d9d7ab8406234c7e53220404481c9bafe411",
-  "branch": "feature/dev-1094",
-  "date": "2021-11-24T09:17:42Z"
+  "message": "feat: DEV-1602: Update Table Tag to show csv data (#478)\n\n* Update Table Tag to show csv data\r\n\r\n* Fix comments\r\n\r\n* Fix comments\r\n\r\n* Fix comments\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>\r\nCo-authored-by: nicholasrq <nr@fenelon.ru>",
+  "commit": "2a5de53a5d6f415335fa32593d6e23c2372caa28",
+  "branch": "master",
+  "date": "2022-02-16T18:16:26Z"
 }
