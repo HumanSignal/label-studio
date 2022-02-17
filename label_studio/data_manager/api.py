@@ -15,7 +15,7 @@ from django.db.models import Sum, Count
 from django.conf import settings
 from ordered_set import OrderedSet
 
-from core.utils.common import get_object_with_check_and_log, int_from_request, load_func
+from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, load_func
 from core.permissions import all_permissions, ViewClassPermission
 from projects.models import Project
 from projects.serializers import ProjectSerializer
@@ -194,6 +194,18 @@ class TaskListAPI(generics.ListAPIView):
     def get_task_queryset(self, request, prepare_params):
         return Task.prepared.only_filtered(prepare_params=prepare_params)
 
+    @staticmethod
+    def prefetch(queryset):
+        return queryset.prefetch_related(
+            'annotations', 'predictions', 'annotations__completed_by', 'project',
+            'io_storages_azureblobimportstoragelink',
+            'io_storages_gcsimportstoragelink',
+            'io_storages_localfilesimportstoragelink',
+            'io_storages_redisimportstoragelink',
+            'io_storages_s3importstoragelink',
+            'file_upload'
+        )
+
     def get(self, request):
         # get project
         view_pk = int_from_request(request.GET, 'view', 0) or int_from_request(request.data, 'view', 0)
@@ -218,13 +230,21 @@ class TaskListAPI(generics.ListAPIView):
         page = self.paginate_queryset(queryset)
         all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
         fields_for_evaluation = get_fields_for_evaluation(prepare_params, request.user)
+
+        review = bool_from_request(self.request.GET, 'review', False)
+        if review:
+            fields_for_evaluation = ['annotators', 'reviewed']
+            all_fields = None
+
         if page is not None:
             ids = [task.id for task in page]  # page is a list already
             tasks = list(
-                Task.prepared.annotate_queryset(
-                    Task.objects.filter(id__in=ids),
-                    fields_for_evaluation=fields_for_evaluation,
-                    all_fields=all_fields,
+                self.prefetch(
+                    Task.prepared.annotate_queryset(
+                        Task.objects.filter(id__in=ids),
+                        fields_for_evaluation=fields_for_evaluation,
+                        all_fields=all_fields,
+                    )
                 )
             )
             tasks_by_ids = {task.id: task for task in tasks}
@@ -233,7 +253,7 @@ class TaskListAPI(generics.ListAPIView):
             page = [tasks_by_ids[_id] for _id in ids]
 
             # retrieve ML predictions if tasks don't have them
-            if project.evaluate_predictions_automatically:
+            if not review and project.evaluate_predictions_automatically:
                 tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
                 evaluate_predictions(tasks_for_predictions)
 
@@ -268,14 +288,19 @@ class TaskAPI(generics.RetrieveAPIView):
     def get_serializer_class(self):
         return DataManagerTaskSerializer
 
-    @staticmethod
-    def get_serializer_context(request):
+    def get_serializer_context(self, request):
+        review = bool_from_request(self.request.GET, 'review', False)
+        if review:
+            fields = ['drafts', 'annotations']
+        else:
+            fields = ['completed_by_full', 'drafts', 'predictions', 'annotations']
+
         return {
             'resolve_uri': True,
-            'completed_by': 'full',
-            'drafts': True,
-            'predictions': True,
-            'annotations': True,
+            'completed_by': 'full' if 'completed_by_full' in fields else None,
+            'predictions': 'predictions' in fields,
+            'annotations': 'annotations' in fields,
+            'drafts': 'drafts' in fields,
             'request': request
         }
 
@@ -289,9 +314,17 @@ class TaskAPI(generics.RetrieveAPIView):
         context = self.get_serializer_context(request)
         context['project'] = project = task.project
 
+        review = bool_from_request(self.request.GET, 'review', False)
+        if review:
+            kwargs = {
+                'fields_for_evaluation': ['annotators', 'reviewed']
+            }
+        else:
+            kwargs = {'all_fields': True}
+
         # we need to annotate task because before it was retrieved only for permission checks and project retrieving
         task = Task.prepared.get_queryset(
-            all_fields=True, prepare_params=PrepareParams(project=project.id)
+            prepare_params=PrepareParams(project=project.id), **kwargs
         ).filter(id=task.id).first()
 
         # get prediction
@@ -344,7 +377,7 @@ class ProjectStateAPI(APIView):
                 "target_syncing": False,
                 "task_count": project.tasks.count(),
                 "annotation_count": Annotation.objects.filter(task__project=project).count(),
-                'config_has_control_tags': len(project.get_control_tags_from_config()) > 0
+                'config_has_control_tags': len(project.get_parsed_config()) > 0
             }
         )
         return Response(data)

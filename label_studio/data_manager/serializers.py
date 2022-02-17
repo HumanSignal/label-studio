@@ -185,6 +185,7 @@ class DataManagerTaskSerializer(TaskSerializer):
             "cancelled_annotations",
             "completed_at",
             "created_at",
+            "updated_at",
             "annotations_results",
             "data",
             "id",

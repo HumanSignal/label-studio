@@ -1,28 +1,40 @@
 ---
-title: Pairwise Comparison
+title: Pairwise Classification
 type: templates
-order: 10001
-meta_title: Pairwise Comparison Data Labeling Template
-meta_description: Label Studio Pairwise Comparison Template for machine learning and data science data labeling projects.
+category: Ranking and Scoring
+cat: ranking-and-scoring
+order: 503
+meta_title: Pairwise Classification Data Labeling Template
+meta_description: Template for performing pairwise classification and comparison tasks with Label Studio for your machine learning and data science projects.
 ---
 
-Pairwise comparison of different objects
+<img src="/images/templates/pairwise-classification.png" alt="" class="gif-border" width="552px" height="408px" />
 
-## Run
+Perform pairwise classification and comparison of different objects with Label Studio using this template.
 
-```bash
-label-studio init pairwise_project
-label-studio start pairwise_project
-```
+## Template Preview
 
-After starting Label Studio, set up the labeling interface and browse to this template.
+Interactively preview this labeling template:
 
-## Config
+<div id="main-preview"></div>
+
+## Labeling Configuration
 
 ```html
 <View>
-  <Pairwise name="pw" toName="txt-1,txt-2" />
-  <Text name="txt-1" value="$text1" />
-  <Text name="txt-2" value="$text2" />
+    <!--Use the Header to provide instructions to annotators-->
+  <Header>Select one of two items</Header>
+    <!--Use the Pairwise control tag to apply pairwise selections
+    to two samples of text.-->
+  <Pairwise name="pw" toName="text1,text2" />
+    <!--Use the Text object tag to specify two samples of text-->
+  <Text name="text1" value="$text1" />
+  <Text name="text2" value="$text2" />
 </View>
 ```
+
+## Related tags
+- [Header](/tags/header.html)
+- [Pairwise](/tags/pairwise.html)
+- [Text](tags/text.html)
+
