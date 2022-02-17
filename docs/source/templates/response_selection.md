@@ -69,7 +69,7 @@ Use the [Text](/tags/text.html) object tag to display 3 different text samples, 
 </View>
 ```
 
-Style the [View] tag that wraps the choices to make sure there is space between the text samples and the corresponding choices:
+Style the [View](/tags/view.html) tag that wraps the choices to make sure there is space between the text samples and the corresponding choices:
 ```xml
     <View style="padding: 50px;">
     <Choices name="resp" toName="prg" required="true">
