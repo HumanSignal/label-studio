@@ -12,9 +12,7 @@ meta_description: Template for performing semantic segmentation with polygons wi
 
 If you need to perform semantic segmentation on images using polygons, use this template.
 
-## Template Preview
-
-Interactively preview this labeling template:
+## Interactive Template Preview
 
 <div id="main-preview"></div>
 
@@ -22,14 +20,8 @@ Interactively preview this labeling template:
 
 ```html
 <View>
-    <!--Use the Header tag to provide instructions to annotators-->
   <Header value="Select label and click the image to start"/>
-    <!--Use the Image object tag to specify the image data and
-    allow annotators to zoom the image-->
   <Image name="image" value="$image" zoom="true"/>
-    <!--Use the PolygonLabels control tag to allow annotators
-    to create polygons for specific labels. You can control the 
-    color of the labels and the styling of the polygon tool.-->
   <PolygonLabels name="label" toName="image"
                  strokeWidth="3" pointSize="small"
                  opacity="0.9">
@@ -38,6 +30,31 @@ Interactively preview this labeling template:
   </PolygonLabels>
 </View>
 ```
+
+## About the labeling configuration
+
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
+
+You can add a [header](/tags/header.html) to provide instructions to the annotator:
+```xml
+<Header value="Select label and click the image to start"/>
+```
+
+Use the [Image](/tags/image.html) object tag to specify the image data and allow annotators to zoom the image:
+```xml
+<Image name="image" value="$image" zoom="true"/>
+```
+
+Use the [PolygonLabels](/tags/polygonlabels.html) control tag to allow annotators to create polygons for specific labels. 
+```xml
+  <PolygonLabels name="label" toName="image"
+                 strokeWidth="3" pointSize="small"
+                 opacity="0.9">
+    <Label value="Airplane" background="red"/>
+    <Label value="Car" background="blue"/>
+  </PolygonLabels>
+```
+Annotators can control the opacity of the polygons using the `opacity` argument, and the styling of the polygon tool using the `pointSize` and `strokeWidth` arguments. Use the `background` argument with the [Label](/tags/label.html) control tag to control the color of each polygon.
 
 ## Related tags
 
