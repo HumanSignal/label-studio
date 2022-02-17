@@ -89,7 +89,14 @@ jobs:
       - name: Run functional tests
         run: |
           cd label_studio/
-          pytest --junitxml report.xml --cov=. -vv -n auto
+          pytest --cov=. --cov-report=xml -vv -n auto
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2.1.0
+        with:
+          fail_ci_if_error: true
+          files: ./label_studio/coverage.xml
+          verbose: true
 
   run_pytest_postgresql:
     name: LS PostgreSQL Ubuntu
@@ -201,12 +208,14 @@ jobs:
       - name: Run functional tests
         run: |
           cd label_studio/
-          pytest --junitxml report.xml --cov=. -vv -n auto
+          pytest --cov=. --cov-report=xml -vv -n auto
 
-      - name: "Upload coverage to Codecov"
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2.1.0
         with:
           fail_ci_if_error: true
+          files: ./label_studio/coverage.xml
+          verbose: true
 
   windows_label_studio:
     name: LS SQLite Windows
@@ -276,13 +285,4 @@ jobs:
       run: |
         cd label_studio/
         python -m pytest -vv -n auto
-#        coverage run -m pytest -n auto
 
-
-#    - name: Collect coverage results
-#      if: always()
-#      env:
-#        collect_analytics: 0
-#      run: |
-#        cd label_studio/
-#        coverage report -i -m --fail-under=40

@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #25 from heartexlabs/feature/dev-1094\n\nDEV-1094",
-  "commit": "8d1ae18af9fb5755973ff8a7f11498b6d2a9c091",
-  "branch": "master",
-  "date": "2022-01-24T08:59:49Z"
+  "message": "feat: DEV-1621:  Add usage of new method to create annotation",
+  "commit": "8975918038340887dbe42096c17e2df06aab2152",
+  "branch": "feat/DEV-1621/interactive_mode",
+  "date": "2022-02-15T19:29:50Z"
 }
