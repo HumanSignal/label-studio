@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-1602: Update Table Tag to show csv data (#478)\n\n* Update Table Tag to show csv data\r\n\r\n* Fix comments\r\n\r\n* Fix comments\r\n\r\n* Fix comments\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>\r\nCo-authored-by: nicholasrq <nr@fenelon.ru>",
-  "commit": "2a5de53a5d6f415335fa32593d6e23c2372caa28",
+  "message": "DEV-1367: Image size problems (#411)\n\n## changes\r\n- fix the calculation of the stage size on the window resizing at a given image width\r\n- add frame to crop the image to the stage size\r\n- add height and maxheight params\r\n- set max width as 100% by default\r\n\r\n## commits\r\n* Add shapes ignoring when dragging an image\r\n\r\n* Add max-height attr\r\n\r\n* Add test for canvas resize problem on setting custom image width\r\n\r\n* [fix] Canvas resizing while custom image width is set\r\n\r\n* Fix tests\r\n\r\n* Fix tests\r\n\r\n* Ignore not meaningful error\r\n\r\n* Make changes accourding to comments\r\n\r\n- set heuristic maxHeight default value\r\n- add comment\r\n- remove unused volatile\r\n- remove duplicate functionality\r\n\r\n* test: Fix config according to appearence of maxHeight\r\n\r\n* test: Fix tests according to changing of default maxWidth value\r\n\r\n* fix:Add removing default tool on all tools removing\r\n\r\n* test: Allow to run tests over local start\r\n\r\nSolved by preventing preserving selected tool\r\n\r\n* fix: DEV-1367: Fix zooming in while space is available\r\n\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
+  "commit": "4a5f8d916cc029482c925b375b04f40b91253d6a",
   "branch": "master",
-  "date": "2022-02-16T18:16:26Z"
+  "date": "2022-02-17T23:01:17Z"
 }
