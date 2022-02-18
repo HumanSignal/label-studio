@@ -43,8 +43,11 @@ class TaskListAPI(generics.ListCreateAPIView):
         POST=all_permissions.tasks_create,
     )
     serializer_class = TaskSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['project',]
 
     def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
         return queryset.filter(project__organization=self.request.user.active_organization)
 
     @swagger_auto_schema(auto_schema=None)
