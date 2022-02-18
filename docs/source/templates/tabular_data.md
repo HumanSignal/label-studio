@@ -12,9 +12,7 @@ meta_description: Template for labeling tabular data with Label Studio for your 
 
 If you need to validate data stored in a table, use this template to display data in a tabular format and ask questions about the contents of the table. 
 
-## Template Preview
-
-Interactively preview this labeling template:
+## Interactive Template Preview
 
 <div id="main-preview"></div>
 
@@ -22,17 +20,37 @@ Interactively preview this labeling template:
 
 ```html
 <View>
-    <!--Use the Header tag to provide details to annotators-->
     <Header value="Table with {key: value} pairs"/>
-    <!--Use the Table object tag to display tabular data-->
     <Table name="table" value="$item"/>
-    <!--Use the Choices control tag to classify the table contents-->
     <Choices name="choice" toName="table">
         <Choice value="Correct"/>
         <Choice value="Incorrect"/>
     </Choices>
 </View>
 ```
+
+## About the labeling configuration
+
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
+
+Use the [Header](/tags/header.html) tag to provide details to annotators:
+```xml
+<Header value="Table with {key: value} pairs"/>
+```
+
+Use the [Table](/tags/table.html) object tag to display tabular data:
+```xml
+<Table name="table" value="$item"/>
+```
+
+Use the [Choices](/tags/choices.html) control tag to classify the table contents:
+```xml
+<Choices name="choice" toName="table">
+    <Choice value="Correct"/>
+    <Choice value="Incorrect"/>
+</Choices>
+```
+
 
 ## Related tags
 
