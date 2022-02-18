@@ -143,6 +143,18 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         DELETE=all_permissions.tasks_delete,
     )
 
+    @staticmethod
+    def prefetch(queryset):
+        return queryset.prefetch_related(
+            'annotations', 'predictions', 'annotations__completed_by', 'project',
+            'io_storages_azureblobimportstoragelink',
+            'io_storages_gcsimportstoragelink',
+            'io_storages_localfilesimportstoragelink',
+            'io_storages_redisimportstoragelink',
+            'io_storages_s3importstoragelink',
+            'file_upload'
+        )
+
     def get_retrieve_serializer_context(self, request):
         review = bool_from_request(self.request.GET, 'review', False)
         if review:
@@ -173,9 +185,11 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             kwargs = {'all_fields': True}
 
         # we need to annotate task because before it was retrieved only for permission checks and project retrieving
-        task = Task.prepared.get_queryset(
-            prepare_params=PrepareParams(project=project.id), **kwargs
-        ).filter(id=task.id).first()
+        task = self.prefetch(
+            Task.prepared.get_queryset(
+                prepare_params=PrepareParams(project=project.id), **kwargs
+            ).filter(id=task.id)
+        ).first()
 
         # get prediction
         if (project.evaluate_predictions_automatically or project.show_collab_predictions) \
@@ -187,7 +201,9 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         return Response(data)
 
     def get_queryset(self):
-        return Task.objects.filter(project__organization=self.request.user.active_organization)
+        return Task.objects.filter(
+            project__organization=self.request.user.active_organization
+        ).prefetch_related('project', 'project__ml_backends')
 
     def get_serializer_class(self):
         # GET => task + annotations + predictions + drafts
