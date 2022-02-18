@@ -180,28 +180,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     class Meta:
         model = Task
         ref_name = 'data_manager_task_serializer'
-
-        fields = [
-            "cancelled_annotations",
-            "completed_at",
-            "created_at",
-            "updated_at",
-            "annotations_results",
-            "data",
-            "id",
-            "predictions_results",
-            "predictions_score",
-            "total_annotations",
-            "total_predictions",
-            "annotations_ids",
-            "annotations",
-            "predictions",
-            "drafts",
-            "file_upload",
-            "annotators",
-            "project",
-            'predictions_model_versions'
-        ]
+        fields = '__all__'
 
     def to_representation(self, obj):
         """ Dynamically manage including of some fields in the API result

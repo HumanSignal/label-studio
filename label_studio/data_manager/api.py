@@ -148,27 +148,9 @@ class TaskPagination(PageNumberPagination):
         )
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
-    tags=['Data Manager'],
-    operation_summary='Get tasks list',
-    operation_description="""
-    Retrieve a list of tasks with pagination for a specific view or project, by using filters and ordering.
-    """,
-    # responses={200: DataManagerTaskSerializer(many=True)},
-    manual_parameters=[
-        openapi.Parameter(
-            name='view',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_QUERY,
-            description='View ID'),
-        openapi.Parameter(
-            name='project',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_QUERY,
-            description='Project ID'),
-    ],
-))
-class TaskListAPI(generics.ListAPIView):
+@method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
+@method_decorator(name='post', decorator=swagger_auto_schema(auto_schema=None))
+class TaskListAPI(generics.ListCreateAPIView):
     task_serializer_class = DataManagerTaskSerializer
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
@@ -268,73 +250,6 @@ class TaskListAPI(generics.ListAPIView):
         )
         serializer = self.task_serializer_class(queryset, many=True, context=context)
         return Response(serializer.data)
-
-
-@method_decorator(name='get', decorator=swagger_auto_schema(
-    tags=['Data Manager'],
-    operation_summary='Get task by ID',
-    operation_description='Retrieve a specific task by ID.',
-    manual_parameters=[
-        openapi.Parameter(
-            name='id',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_PATH,
-            description='Task ID'),
-    ],
-))
-class TaskAPI(generics.RetrieveAPIView):
-    permission_required = all_permissions.projects_view
-
-    def get_serializer_class(self):
-        return DataManagerTaskSerializer
-
-    def get_serializer_context(self, request):
-        review = bool_from_request(self.request.GET, 'review', False)
-        if review:
-            fields = ['drafts', 'annotations']
-        else:
-            fields = ['completed_by_full', 'drafts', 'predictions', 'annotations']
-
-        return {
-            'resolve_uri': True,
-            'completed_by': 'full' if 'completed_by_full' in fields else None,
-            'predictions': 'predictions' in fields,
-            'annotations': 'annotations' in fields,
-            'drafts': 'drafts' in fields,
-            'request': request
-        }
-
-    def get_queryset(self):
-        return Task.objects.filter(
-            project__organization=self.request.user.active_organization
-        )
-
-    def get(self, request, pk):
-        task = self.get_object()
-        context = self.get_serializer_context(request)
-        context['project'] = project = task.project
-
-        review = bool_from_request(self.request.GET, 'review', False)
-        if review:
-            kwargs = {
-                'fields_for_evaluation': ['annotators', 'reviewed']
-            }
-        else:
-            kwargs = {'all_fields': True}
-
-        # we need to annotate task because before it was retrieved only for permission checks and project retrieving
-        task = Task.prepared.get_queryset(
-            prepare_params=PrepareParams(project=project.id), **kwargs
-        ).filter(id=task.id).first()
-
-        # get prediction
-        if (project.evaluate_predictions_automatically or project.show_collab_predictions) \
-                and not task.predictions.exists():
-            evaluate_predictions([task])
-
-        serializer = self.get_serializer_class()(task, many=False, context=context)
-        data = serializer.data
-        return Response(data)
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
