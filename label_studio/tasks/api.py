@@ -196,10 +196,10 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             kwargs = {'all_fields': True}
         project = self.request.query_params.get('project') or self.request.data.get('project')
         if not project:
-            project = Task.objects.get(id=self.request.parser_context['kwargs'].get('pk')).project
+            project = Task.objects.get(id=self.request.parser_context['kwargs'].get('pk')).project.id
         return self.prefetch(
             Task.prepared.get_queryset(
-                prepare_params=PrepareParams(project=project.id), **kwargs
+                prepare_params=PrepareParams(project=project), **kwargs
             ))
 
     def get_serializer_class(self):
