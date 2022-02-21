@@ -4,11 +4,9 @@ from functools import wraps
 import requests
 from core.utils.common import load_func
 from django.conf import settings
-from django.db import models
 from django.db.models import Q
 
 from .models import Webhook, WebhookAction
-from .serializers_for_hooks import ProjectWebhookSerializer
 
 
 def run_webhook(webhook, action, payload=None):
@@ -176,9 +174,18 @@ def api_webhook_for_delete(action):
 
 
 def get_nested_field(value, field):
+    """
+    Get nested field from list of objects or single instance
+    :param value: Single instance or list to look up field
+    :param field: Field to lookup
+    :return: List or single instance of looked up field
+    """
     if field == '__self__':
         return value
     fields = field.split('__')
     for fld in fields:
-        value = getattr(value, fld)
+        if isinstance(value, list):
+            value = [getattr(v, fld) for v in value]
+        else:
+            value = getattr(value, fld)
     return value
