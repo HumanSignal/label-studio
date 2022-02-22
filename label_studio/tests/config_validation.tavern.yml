@@ -134,14 +134,7 @@ stages:
     method: PATCH
     url: '{django_live_url}/api/projects/{pk}'
   response:
-    json:
-      detail: Validation error
-      validation_errors:
-        label_config:
-        - 'These labels still exist in annotations:
-
-          1 (1 annotations)'
-    status_code: 400
+    status_code: 200
 - name: change config 2
   request:
     headers:
@@ -371,7 +364,7 @@ stages:
     method: PATCH
     url: '{django_live_url}/api/projects/{pk}'
   response:
-    status_code: 400
+    status_code: 200
 - name: stage
   request:
     headers:

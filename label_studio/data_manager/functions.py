@@ -222,6 +222,17 @@ def get_all_columns(project, *_):
                 'explore': False,
                 'labeling': False
             }
+        },
+        {
+            'id': 'updated_at',
+            'title': 'Updated at',
+            'type': 'Datetime',
+            'target': 'tasks',
+            'help': 'Task update time',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
         }
     ]
 
@@ -292,3 +303,16 @@ def custom_filter_expressions(*args, **kwargs):
 
 def preprocess_filter(_filter, *_):
     return _filter
+
+
+def preprocess_field_name(raw_field_name, only_undefined_field=False):
+    field_name = raw_field_name.replace("filter:", "")
+    field_name = field_name.replace("tasks:", "")
+    ascending = False if field_name[0] == '-' else True  # detect direction
+    field_name = field_name[1:] if field_name[0] == '-' else field_name  # remove direction
+    if field_name.startswith("data."):
+        if only_undefined_field:
+            field_name = f'data__{settings.DATA_UNDEFINED_NAME}'
+        else:
+            field_name = field_name.replace("data.", "data__")
+    return field_name, ascending

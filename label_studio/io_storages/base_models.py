@@ -14,15 +14,17 @@ from tasks.models import Task, Annotation
 from tasks.serializers import PredictionSerializer, AnnotationSerializer
 from data_export.serializers import ExportDataSerializer
 
-
 from core.redis import redis_connected
 from core.utils.common import get_bool_env, load_func
+from io_storages.utils import get_uri_via_regex
 
 
 logger = logging.getLogger(__name__)
 
 
 class Storage(models.Model):
+    url_scheme = ''
+
     title = models.CharField(_('title'), null=True, blank=True, max_length=256, help_text='Cloud storage title')
     description = models.TextField(_('description'), null=True, blank=True, help_text='Cloud storage description')
     project = models.ForeignKey('projects.Project', related_name='%(app_label)s_%(class)ss', on_delete=models.CASCADE,
@@ -46,26 +48,35 @@ class Storage(models.Model):
 
 
 class ImportStorage(Storage):
+
     def iterkeys(self):
         return iter(())
 
     def get_data(self, key):
         raise NotImplementedError
 
-    def resolve_uri(self, data):
-        return
+    def generate_http_url(self, url):
+        raise NotImplementedError
 
-    def resolve_task_data_uri(self, task_data):
-        out = {}
-        for key, data in task_data.items():
-            if not isinstance(data, str):
-                out[key] = data
-            resolved_uri = self.resolve_uri(data)
-            if resolved_uri:
-                out[key] = resolved_uri
-            else:
-                out[key] = data
-        return out
+    def can_resolve_url(self, url):
+        # TODO: later check to the full prefix like "url.startswith(self.path_full)"
+        # Search of occurrences inside string, e.g. for cases like "gs://bucket/file.pdf" or "<embed src='gs://bucket/file.pdf'/>"  # noqa
+        _, storage = get_uri_via_regex(url, prefixes=(self.url_scheme,))
+        if storage == self.url_scheme:
+            return True
+        # if not found any occurrences - this Storage can't resolve url
+        return False
+
+    def resolve_uri(self, uri):
+        try:
+            extracted_uri, extracted_storage = get_uri_via_regex(uri, prefixes=(self.url_scheme,))
+            if not extracted_storage:
+                logger.info(f'No storage info found for URI={uri}')
+                return
+            http_url = self.generate_http_url(extracted_uri)
+            return uri.replace(extracted_uri, http_url)
+        except Exception as exc:
+            logger.error(f'Can\'t resolve URI={uri}. Reason: {exc}', exc_info=True)
 
     def _scan_and_create_links(self, link_class):
         tasks_created = 0
@@ -110,7 +121,10 @@ class ImportStorage(Storage):
                 data = data['data']
 
             with transaction.atomic():
-                task = Task.objects.create(data=data, project=self.project, overlap=maximum_annotations)
+                task = Task.objects.create(
+                    data=data, project=self.project, overlap=maximum_annotations,
+                    is_labeled=len(annotations) >= maximum_annotations
+                )
                 link_class.create(task, key, self)
                 logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
                 tasks_created += 1
@@ -135,6 +149,12 @@ class ImportStorage(Storage):
         self.last_sync_count = tasks_created
         self.save()
 
+        self.project.update_tasks_states(
+                maximum_annotations_changed=False,
+                overlap_cohort_percentage_changed=False,
+                tasks_number_changed=True
+            )
+
     def scan_and_create_links(self):
         """This is proto method - you can override it, or just replace ImportStorageLink by your own model"""
         self._scan_and_create_links(ImportStorageLink)
@@ -148,9 +168,6 @@ class ImportStorage(Storage):
         else:
             logger.info(f'Start syncing storage {self}')
             self.scan_and_create_links()
-
-    def can_resolve_url(self, url):
-        return False
 
     class Meta:
         abstract = True

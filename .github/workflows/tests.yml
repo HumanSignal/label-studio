@@ -4,7 +4,12 @@ on:
     branches: ['*', '*/*', '*/**', master]
     paths:
       - 'label_studio/**'
+      - '!label_studio/frontend/**'
       - '.github/workflows/tests.yml'
+      - 'deploy/requirements.txt'
+      - 'deploy/requirements-mw.txt'
+      - 'deploy/requirements-test.txt'
+      - 'deploy/prebuild_wo_frontend.sh'
 
 env:
   NODE: '14'
@@ -17,7 +22,6 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - 3.6
           - 3.7
           - 3.8
           - 3.9
@@ -35,11 +39,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2.3.1
+        uses: actions/setup-python@v2.3.2
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure pip cache
         id: pip-cache
         with:
@@ -57,7 +61,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v2.5.0
+        uses: actions/setup-node@v2.5.1
         with:
           node-version: "${{ env.NODE }}"
 
@@ -65,7 +69,7 @@ jobs:
         id: npm-cache-dir
         run: echo "::set-output name=dir::$(npm config get cache)"
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure npm cache
         id: npm-cache
         with:
@@ -75,7 +79,7 @@ jobs:
             ${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Install LSF & set version.py
-        run: ./deploy/prebuild.sh
+        run: ./deploy/prebuild_wo_frontend.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -85,7 +89,14 @@ jobs:
       - name: Run functional tests
         run: |
           cd label_studio/
-          pytest --junitxml report.xml --cov=. -vv
+          pytest --cov=. --cov-report=xml -vv -n auto
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2.1.0
+        with:
+          fail_ci_if_error: true
+          files: ./label_studio/coverage.xml
+          verbose: true
 
   run_pytest_postgresql:
     name: LS PostgreSQL Ubuntu
@@ -144,16 +155,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2.3.1
+        uses: actions/setup-python@v2.3.2
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install OS dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev
+          sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev python-dev
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure pip cache
         id: pip-cache
         with:
@@ -169,7 +180,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v2.5.0
+        uses: actions/setup-node@v2.5.1
         with:
           node-version: 14
 
@@ -177,7 +188,7 @@ jobs:
         id: npm-cache-dir
         run: echo "::set-output name=dir::$(npm config get cache)"
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         name: Configure npm cache
         id: npm-cache
         with:
@@ -187,7 +198,7 @@ jobs:
             ${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Install LSF & set version.py
-        run: ./deploy/prebuild.sh
+        run: ./deploy/prebuild_wo_frontend.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -197,12 +208,14 @@ jobs:
       - name: Run functional tests
         run: |
           cd label_studio/
-          pytest --junitxml report.xml --cov=. -vv
+          pytest --cov=. --cov-report=xml -vv -n auto
 
-      - name: "Upload coverage to Codecov"
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2.1.0
         with:
           fail_ci_if_error: true
+          files: ./label_studio/coverage.xml
+          verbose: true
 
   windows_label_studio:
     name: LS SQLite Windows
@@ -211,7 +224,6 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - 3.6
           - 3.7
           - 3.8
           - 3.9
@@ -229,11 +241,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2.4.0
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2.3.1
+      uses: actions/setup-python@v2.3.2
       with:
         python-version: ${{ matrix.python-version }}
 
-    - uses: actions/cache@v2.1.6
+    - uses: actions/cache@v2.1.7
       name: Configure pip cache
       with:
         path: ~\AppData\Local\pip\Cache
@@ -272,12 +284,5 @@ jobs:
         collect_analytics: 0
       run: |
         cd label_studio/
-        coverage run -m pytest
+        python -m pytest -vv -n auto
 
-    - name: Collect coverage results
-      if: always()
-      env:
-        collect_analytics: 0
-      run: |
-        cd label_studio/
-        coverage report -m --fail-under=40

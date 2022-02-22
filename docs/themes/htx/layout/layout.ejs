@@ -69,6 +69,7 @@
       <script src="<%- url_for("js/search.js") %>"></script>
       <script src="<%- url_for("js/highlightjs-badge.min.js") %>"></script>
       <script src="<%- url_for("/js/smooth-scroll.min.js") %>"></script>
+      <script src="<%- url_for("js/code-tabs.js") %>"></script>
 
       <%- css('css/new-styles') %>
       <%- css('css/search') %>
@@ -115,14 +116,18 @@
 
   <script>
     // add HighlightJS-badge (options are optional)
-    var options = {  // optional
+    var code_badge_options = {  // optional
 
        // CSS class(es) used to render the copy icon.
        copyIconClass: "fa fa-copy",
        // CSS class(es) used to render the done icon.
        checkIconClass: "fa fa-check"
     };
-    window.highlightJsBadge(options);
+
+    setTimeout(function(){
+      window.highlightJsBadge(code_badge_options);
+    }, 300);
+
 
     $(function() {
       $('.code-badge-language').each(function (o, v) {

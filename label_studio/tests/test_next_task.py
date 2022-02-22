@@ -70,7 +70,7 @@ _project_for_text_choices_onto_A_B_classes = dict(
             {'data': {'meta_info': 'meta info B', 'text': 'text B'},
              'annotations': [{'result': [{'r': 2}], 'ground_truth': False}]},
         ],
-        200, {'id': 'uncompleted_task_ids'}
+        404, {'id': 'uncompleted_task_ids'}
     ),
         (
         dict(
@@ -614,7 +614,7 @@ def test_breadth_first_simple(business_client):
         label_config='''
             <View>
               <Text name="text" value="$text"></Text>
-              <Choices name="text_class" choice="single">
+              <Choices name="text_class" choice="single" toName="text">
                 <Choice value="class_A"></Choice>
                 <Choice value="class_B"></Choice>
               </Choices>
@@ -672,7 +672,7 @@ def test_breadth_first_overlap_3(business_client):
         label_config='''
             <View>
               <Text name="text" value="$text"></Text>
-              <Choices name="text_class" choice="single">
+              <Choices name="text_class" choice="single" toName="text">
                 <Choice value="class_A"></Choice>
                 <Choice value="class_B"></Choice>
               </Choices>
@@ -1069,7 +1069,7 @@ def test_fetch_final_taken_task(business_client):
         label_config='''
             <View>
               <Text name="text" value="$text"></Text>
-              <Choices name="text_class" choice="single">
+              <Choices name="text_class" choice="single" toName="text">
                 <Choice value="class_A"></Choice>
                 <Choice value="class_B"></Choice>
               </Choices>
@@ -1299,6 +1299,7 @@ def test_overlap_first(business_client, setup_before_upload, show_overlap_first)
         is_published=True,
         maximum_annotations=1,
         show_overlap_first=show_overlap_first,
+        sampling="Uniform sampling",
         label_config='''
             <View>
               <Text name="text" value="$text"></Text>
