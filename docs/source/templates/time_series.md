@@ -12,9 +12,7 @@ meta_description: Template for labeling multivariate and simple time series data
 
 Label any type of time series data using this generic template.
 
-## Template Preview
-
-Interactively preview this labeling template:
+## Interactive Template Preview
 
 <div id="main-preview"></div>
 
@@ -26,19 +24,38 @@ Example project configuration for multivariate time series labeling:
   
 ```html
 <View>
-    <!--Use the TimeSeriesLabels control tag to highlight
-    and label specific spans of a time series graph-->
   <TimeSeriesLabels name="label" toName="ts">
     <Label value="Run"/>
     <Label value="Walk"/>
   </TimeSeriesLabels> 
-    <!--Use the TimeSeries object tag to display time series data and channels-->
   <TimeSeries name="ts" valueType="url" value="$csv_url" timeColumn="time">
     <Channel column="sensorone" />
     <Channel column="sensortwo" />
   </TimeSeries>
 </View>
 ```
+
+## About the labeling configuration
+
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
+
+Use the [TimeSeriesLabels](/tags/timeserieslabels.html) control tag to highlight and label specific spans of a time series graph:
+```xml
+<TimeSeriesLabels name="label" toName="ts">
+    <Label value="Run"/>
+    <Label value="Walk"/>
+</TimeSeriesLabels> 
+```
+The tag is linked to the [TimeSeries](/tags/timeseries.html) object tag with a `toName` parameter.
+
+Use the [TimeSeries](/tags/timeseries.html) object tag to display time series data and channels:
+```xml
+<TimeSeries name="ts" valueType="url" value="$csv_url" timeColumn="time">
+    <Channel column="sensorone" />
+    <Channel column="sensortwo" />
+</TimeSeries>
+```
+The `valueType="url"` parameter means that Label Studio expects links to CSV files in JSON-formatted tasks. The `timeColumn` parameter specifies the column in your dataset to use as the X-axis for time. If you don't specify a `timeColumn`, Label Studio uses incremental integer values as the X-axis: `0, 1, 2, ...`.
 
 ### Input data
 Example CSV file input for the labeling configuration looks as follows:
@@ -49,15 +66,6 @@ time,sensorone,sensortwo
 1,20,30
 2,30,40
 ```
-
-### Template notes
-
-`<TimeSeriesLabels>` is linked with `<TimeSeries>` with a toName field.
-  
-`<TimeSeries>` has an attribute `valueType="url"`, which means that Label Studio expects links to CSV files in JSON-formatted tasks.
-
-Specify `timeColumn` in `TimeSeries` to use a specific column from your dataset as the X-axis. If you skip it, then Label Studio uses incremental integer values `0, 1, 2, ...` as the X-axis.
-
 
 ## Related tags
 - [TimeSeriesLabels](/tags/timeserieslabels.html)
