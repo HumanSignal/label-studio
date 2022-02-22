@@ -18,6 +18,19 @@ class BaseUserSerializer(serializers.ModelSerializer):
     def get_initials(self, user):
         return user.get_initials()
 
+    def to_representation(self, instance):
+        """ Returns user with cache, this helps to avoid multiple s3/gcs links resolving for avatars """
+
+        uid = instance.id
+        key = 'user_cache'
+
+        if key not in self.context:
+            self.context[key] = {}
+        if uid not in self.context[key]:
+            self.context[key][uid] = super().to_representation(instance)
+
+        return self.context[key][uid]
+
     class Meta:
         model = User
         fields = (

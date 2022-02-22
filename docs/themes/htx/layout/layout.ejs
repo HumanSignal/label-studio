@@ -116,14 +116,18 @@
 
   <script>
     // add HighlightJS-badge (options are optional)
-    var options = {  // optional
+    var code_badge_options = {  // optional
 
        // CSS class(es) used to render the copy icon.
        copyIconClass: "fa fa-copy",
        // CSS class(es) used to render the done icon.
        checkIconClass: "fa fa-check"
     };
-    window.highlightJsBadge(options);
+
+    setTimeout(function(){
+      window.highlightJsBadge(code_badge_options);
+    }, 300);
+
 
     $(function() {
       $('.code-badge-language').each(function (o, v) {

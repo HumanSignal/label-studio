@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'fix/DEV-1155/rotation-behavior' of github.com:heartexlabs/label-studio-frontend into fix/DEV-1155/rotation-behavior",
-  "commit": "b991f71deb09c4addb204a4a0ab411a0140bea90",
+  "message": "Merge branch 'master' into fix/DEV-1155/rotation-behavior\n\n# Conflicts:\n#\tsrc/components/ImageView/ImageView.js",
+  "commit": "d16926a0b5c38da1d911bc3808929e2d401d6b44",
   "branch": "fix/DEV-1155/rotation-behavior",
-  "date": "2022-01-19T10:40:25Z"
+  "date": "2022-02-22T19:18:13Z"
 }
