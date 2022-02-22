@@ -1,6 +1,6 @@
 {
-  "message": "Limit events from resize observer",
-  "commit": "9f0a6860393d9eaa18093cd3e55b5f63bdf77935",
+  "message": "Merge branch 'master' into fix/DEV-1373/brush-relations\n\n# Conflicts:\n#\tsrc/components/ImageView/ImageView.js",
+  "commit": "74ab69b0ccd041448c9fdb8ddc869295c221fbd9",
   "branch": "fix/DEV-1373/brush-relations",
-  "date": "2021-12-16T21:26:24Z"
+  "date": "2022-02-22T14:45:01Z"
 }
