@@ -18,7 +18,7 @@ config: |
 
   <!-- {
     "data": {
-      "pdf": "<embed src=''/static/samples/sample.pdf'' width=''100%'' height=''600px''/>"
+      "pdf": "<embed src='/static/samples/sample.pdf' width='100%' height='600px'/>"
     }
   } -->
 
