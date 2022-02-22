@@ -1,6 +1,6 @@
 {
-  "message": "test: DEV-1372: Fix required test",
-  "commit": "f384d11c7b54448e1530c4244fd1da3754ff3d2e",
+  "message": "Merge branch 'master' into feature/DEV-1372/choice-unselected\n\n# Conflicts:\n#\tsrc/utils/feature-flags.js",
+  "commit": "d2a78c55bc76d4715ba051bffe86637d9d466485",
   "branch": "feature/DEV-1372/choice-unselected",
-  "date": "2022-02-11T13:30:49Z"
+  "date": "2022-02-22T15:46:49Z"
 }

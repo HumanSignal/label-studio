@@ -22,6 +22,6 @@ stages:
 - name: get task by id from data manager
   request:
     method: GET
-    url: '{django_live_url}/api/dm/tasks/{task_pk}?project={project_pk}'
+    url: '{django_live_url}/api/tasks/{task_pk}?project={project_pk}'
   response:
     status_code: 200
