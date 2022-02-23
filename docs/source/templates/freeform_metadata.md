@@ -20,8 +20,8 @@ If you want to collect metadata for a text sample for tagging purposes, or anoth
 ```html
 <View>
   <Style>
-    input[type="text"][name^="table"] { border-radius: 0px; border-right: none;}
-    input[type="text"][name^="table_value"] { border-right: 1px solid #ddd; }
+    input[type="text"][name^="table"] { border-radius: 0px;}
+    input[type="text"][name^="table_value"] { border-left: none; }
     div[class*=" TextAreaRegion_mark"] {background: none; height: 33px; border-radius: 0; min-width: 135px;}
   </Style>
   <Text value="$text" name="text"/>
@@ -44,8 +44,8 @@ All labeling configurations must be wrapped in [View](/tags/view.html) tags.
 Use the [Style](/tags/style.html) tag to control how the table for freeform metadata appears.
 ```xml
 <Style>
-    input[type="text"][name^="table"] { border-radius: 0px; border-right: none;}
-    input[type="text"][name^="table_value"] { border-right: 1px solid #ddd; }
+    input[type="text"][name^="table"] { border-radius: 0px;}
+    input[type="text"][name^="table_value"] { border-left: none; }
     div[class*=" TextAreaRegion_mark"] {background: none; height: 33px; border-radius: 0; min-width: 135px;}
 </Style>
 ```
