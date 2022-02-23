@@ -44,7 +44,7 @@ Use the Labels control tag to specify the relevant NER labels to apply to variou
     <Label value="MISC" background="green"/>
 </Labels>
 ```
-Use the `background` argument with the Label control tag to specify a CSS color for the label.
+Use the `background` parameter with the Label control tag to specify a CSS color for the label.
 
 Use the Text object tag to specify the text data:
 ```xml
@@ -69,7 +69,7 @@ Then use a different [View](/tags/view.html) tag to wrap the labels. Because the
 ```xml
 <View style="width: 250px; margin-right: 1em; padding: 1em; background: #343c7f;">
 ```
-The styling on this tag sets a width for the section of the interface with the labels, adds a right margin between the labels and the text, adds padding aroudn the labels, and a background color for this section of the interface.
+The styling on this tag sets a width for the section of the interface with the labels, adds a right margin between the labels and the text, adds padding around the labels, and a background color for this section of the interface.
 
 Then you can add the [Labels](/tags/labels.html) control tag like usual to display the NER labels:
 ```xml
