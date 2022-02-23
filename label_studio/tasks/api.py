@@ -188,6 +188,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         review = bool_from_request(self.request.GET, 'review', False)
+        selected = {"all": False, "included": [self.kwargs.get("pk")]}
         if review:
             kwargs = {
                 'fields_for_evaluation': ['annotators', 'reviewed']
@@ -199,7 +200,8 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             project = Task.objects.get(id=self.request.parser_context['kwargs'].get('pk')).project.id
         return self.prefetch(
             Task.prepared.get_queryset(
-                prepare_params=PrepareParams(project=project), **kwargs
+                prepare_params=PrepareParams(project=project,
+                                             selectedItems=selected), **kwargs
             ))
 
     def get_serializer_class(self):
