@@ -43,7 +43,7 @@ Use the [Text](/tags/text.html) object tag to display a passage of text to the a
 ```xml
 <Text name="text" value="$text" granularity="word"/>
 ```
-Use the `granularity` argument to ensure that highlighted text spans include complete words.
+Use the `granularity` parameter to ensure that highlighted text spans include complete words.
 
 You can add a [header](/tags/header.html) to provide instructions to the annotator:
 ```xml
@@ -54,7 +54,7 @@ Use another [Text](/tags/text.html) object tag to display a second text snippet,
 ```xml
 <Text name="question" value="$question"/>
 ```
-The `name` argument must be different from the `name` used for the first text snippet, and the `value` is used to reference a column in a CSV file or a key in a JSON file with the text to display. You could also display static text with the `value` argument.
+The `name` parameter must be different from the `name` used for the first text snippet, and the `value` is used to reference a column in a CSV file or a key in a JSON file with the text to display. You can also display static text with the `value` argument.
 
 Use the [Labels](/tags/labels.html) control tag to provide an Answer label for the annotator to use to highlight the answer to the question in the original text passage:
 ```xml
