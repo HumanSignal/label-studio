@@ -60,22 +60,22 @@ Add styling to the [View](/tags/view.html) tag to control the appearance of the 
 
 Wrap the text snippets in a new [View](/tags/view.html) tag and use the [Text](/tags/text.html) object tag to display 3 other text snippets:
 ```xml
-    <View>
+<View>
     <Text name="text1" value="$text1" />
     <Text name="text2" value="$text2" />
     <Text name="text3" value="$text3" />
-    </View>
+</View>
 ```
     
 Add styling to another [View](/tags/view.html) tag to place the choices next to the text samples, then use the [Choices](/tags/choices.html) control tag to require a selection from annotators and allow them to select multiple text snippets that apply:
 ```xml
-    <View style="padding: 30px">
+<View style="padding: 30px">
     <Choices name="selection" toName="query" required="true" choice="multiple">
       <Choice value="One" />
       <Choice value="Two" />
   	  <Choice value="Three" />
     </Choices>
-    </View>
+</View>
 ```
 
 ## Related tags
