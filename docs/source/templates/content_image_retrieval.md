@@ -68,7 +68,7 @@ Use the [Choices](/tags/choices.html) control tag to display choices that apply 
     <Choice value="One" />
     <Choice value="Two" />
     <Choice value="Three" />
-  </Choices>
+</Choices>
 ```
 
 Use the [Style](/tags/style.html) tag to apply additional CSS styles to the div form classes used on the labeling interface to further enhance the grid:
@@ -76,8 +76,9 @@ Use the [Style](/tags/style.html) tag to apply additional CSS styles to the div 
 <Style>
     [dataneedsupdate]~div form {display: flex}
     [dataneedsupdate]~div form>* {flex-grow:1;margin-left:8px}
-  </Style>
+</Style>
 ```
+The `[dataneedsupdate]` option associates the styling with the object tags used in the labeling configuration.
   
 
 ## Related tags
