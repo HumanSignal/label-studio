@@ -12,9 +12,7 @@ meta_description: Template for annotating documents for document retrieval tasks
 
 If you want to start training document retrieval or recommender models, you might want to develop a dataset with that identifies similar documents. Use this template to identify and choose documents that are related to a specific query or an existing document.
 
-## Template Preview
-
-Interactively preview this labeling template:
+## Interactive Template Preview
 
 <div id="main-preview"></div>
 
@@ -22,22 +20,15 @@ Interactively preview this labeling template:
 
 ```html
 <View>
-    <!-- Use the Text object tag to specify the text data to be annotated-->
   <Text name="query" value="$query" />
-    <!-- Use the Header tag to provide instructions to the annotators-->
   <Header value="Select document related to the query:" />
-    <!-- Add styling to the View tag to control the appearance of the text samples and choices-->
   <View style="display: flex">
     <View>
-        <!-- Use the Text object tag to display 3 other text snippets-->
     <Text name="text1" value="$text1" />
     <Text name="text2" value="$text2" />
     <Text name="text3" value="$text3" />
     </View>
-      <!-- Add styling to the View tag to place the choices next to the text samples-->
     <View style="padding: 30px">
-        <!--Use the Choices control tag to require a selection from annotators, 
-        and allow them to select multiple text snippets that apply-->
     <Choices name="selection" toName="query" required="true" choice="multiple">
       <Choice value="One" />
       <Choice value="Two" />
@@ -45,6 +36,45 @@ Interactively preview this labeling template:
     </Choices>
     </View>
   </View>
+</View>
+```
+
+## About the labeling configuration
+
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
+
+Use the [Text](/tags/text.html) object tag to specify the text data to be annotated:
+```xml
+<Text name="query" value="$query" />
+```
+
+You can add a [header](/tags/header.html) to provide instructions to the annotator:
+```xml
+<Header value="Select document related to the query:" />
+```  
+
+Add styling to the [View](/tags/view.html) tag to control the appearance of the text samples and choices
+```xml
+<View style="display: flex">
+```
+
+Wrap the text snippets in a new [View](/tags/view.html) tag and use the [Text](/tags/text.html) object tag to display 3 other text snippets:
+```xml
+<View>
+    <Text name="text1" value="$text1" />
+    <Text name="text2" value="$text2" />
+    <Text name="text3" value="$text3" />
+</View>
+```
+    
+Add styling to another [View](/tags/view.html) tag to place the choices next to the text samples, then use the [Choices](/tags/choices.html) control tag to require a selection from annotators and allow them to select multiple text snippets that apply:
+```xml
+<View style="padding: 30px">
+    <Choices name="selection" toName="query" required="true" choice="multiple">
+      <Choice value="One" />
+      <Choice value="Two" />
+  	  <Choice value="Three" />
+    </Choices>
 </View>
 ```
 
