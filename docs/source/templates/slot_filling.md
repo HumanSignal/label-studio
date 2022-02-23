@@ -68,7 +68,7 @@ Use the [Choices](/tags/choices.html) control tag to select a single classificat
     <Choice value="Small talk"/>
 </Choices>
 ```
-The `choice="single"` argument restricts the annotators to one choice selection, and `showInline="true"` controls the display of the choices on the labeling interface. 
+The `choice="single"` parameter restricts the annotators to one choice selection, and `showInline="true"` controls the display of the choices on the labeling interface. 
 
 ## Related tags
 

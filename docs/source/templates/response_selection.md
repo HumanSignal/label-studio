@@ -60,7 +60,7 @@ Use a new [View](/tags/view.html) tag to control the dsiplay of text and choices
   <View style="display: flex">
 ```
 
-Use the [Text](/tags/text.html) object tag to display 3 different text samples, specified with variables in the `value` argument:
+Use the [Text](/tags/text.html) object tag to display 3 different text samples, specified with variables in the `value` parameter:
 ```xml
 <View>
     <Text name="resp1" value="$respone" />

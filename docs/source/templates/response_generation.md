@@ -30,7 +30,6 @@ If you want to train a machine learning model to generate a response for a chatb
 
 All labeling configurations must be wrapped in [View](/tags/view.html) tags.
 
-
 Use the [Paragraphs](/tags/paragraphs.html) object tag to display dialogue to annotators:
 ```xml
 <Paragraphs name="chat" value="$dialogue" layout="dialogue" />
@@ -41,12 +40,11 @@ You can add a [header](/tags/header.html) to provide instructions to the annotat
 <Header value="Provide response" />
 ```
 
-Use the [TextArea](/tags/textarea.html) control tag to provide a spot for annotators to provide a response
-    to the sample of chat dialogue: 
+Use the [TextArea](/tags/textarea.html) control tag to provide a spot for annotators to provide a response to the sample of chat dialogue: 
 ```xml
 <TextArea name="response" toName="chat" rows="4" editable="true" maxSubmissions="1" />
 ```
-The `editable="true"` argument allows them to edit their response, but `maxSubmissions="1"` ensures that annotators provide only one response.
+The `editable="true"` parameter allows annotators to edit their response, but `maxSubmissions="1"` ensures that annotators provide only one response.
 
 ## Related tags
 
