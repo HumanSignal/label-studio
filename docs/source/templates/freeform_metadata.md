@@ -49,7 +49,7 @@ Use the [Style](/tags/style.html) tag to control how the table for freeform meta
     div[class*=" TextAreaRegion_mark"] {background: none; height: 33px; border-radius: 0; min-width: 135px;}
 </Style>
 ```
-The styles in this tag are used to modify the styling of the object and control tags used in this labeling configuration. The `input` parameter applied to `name^="table"` specifies the borders of the tabular data, and the `input` parameter applied to `name^="table_value"` specifies the borders of the table values. Similarly, the `div` option modifies the existing styles of the TextArea control tag, assigning a background and other CSS styles to override the default styles.
+The styles in this tag are used to modify the styling of the object and control tags used in this labeling configuration. The `input` parameter applied to `name^="table"` specifies the borders of the tabular data, and the `input` parameter applied to `name^="table_value"` specifies the borders of only the table values. Similarly, the `div` option modifies the existing styles of the TextArea control tag, assigning a background and other CSS styles to override the default styles.
 
 Use the [Text](/tags/text.html) object tag to specify the text to label:
 ```xml
