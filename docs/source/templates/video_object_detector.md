@@ -9,12 +9,6 @@ meta_title: Video Object Detection Data Labeling Template
 meta_description: Template for detecting objects in videos with Label Studio for your machine learning and data science projects.
 ---
 
-## Interactive Template Preview
-
-<div id="main-preview"></div>
-
-<!--This probably won't work because playground is too old-->
-
 ## Labeling Configuration
 
 ```html
