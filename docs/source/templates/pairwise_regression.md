@@ -21,13 +21,13 @@ If you need a dataset to train a pairwise regression model, use this template to
 ```html
 <View>
   <Header>Set how likely these images represent the same thing:</Header>
-    <View style="display: grid; column-gap: 8px; grid-template: auto/1fr 1fr">
+  <View style="display: grid; column-gap: 8px; grid-template: auto/1fr 1fr">
   	<Image name="image1" value="$image1" />
     <Image name="image2" value="$image2" />
   </View>
   <View style="margin-left: auto; margin-right: auto; width: 16em">
     <Rating name="rating" toName="image1,image2"/>
-    </View>
+  </View>
 </View>
 ```
 
@@ -48,8 +48,8 @@ This styling displays the enclosed items in a grid with a gap of 8 pixels betwee
 
 Use the [Image](/tags/image.html) object tag to specify two images on the labeling interface:
 ```xml
-  	<Image name="image1" value="$image1" />
-    <Image name="image2" value="$image2" />
+<Image name="image1" value="$image1" />
+<Image name="image2" value="$image2" />
 ```
 Close the [View](/tags/view.html) tag after the Image tags. 
 
