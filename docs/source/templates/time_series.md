@@ -155,8 +155,7 @@ All tasks in Label Studio are stored in JSON and this is the native format for L
 
 ## Output format example
 
-
-Users make annotations while labeling a task. One annotation is represented by a JSON structure and each annotation has a `result` field that looks like the following example:
+Annotators add labels to time series tasks. Label Studio represents each completed annotation with a JSON structure. Each annotation has a `result` field that looks like the following example for time series labeling projects:
 
 ```json
 {
@@ -197,16 +196,19 @@ Users make annotations while labeling a task. One annotation is represented by a
 
 ## Enhance this template
 
+If you want to enhance this template, you can make a number of changes to the tag configurations. 
+
 ### Multiple time series in one project
 
-If you want to use multiple time series files in one project, you must make your CSV files available as URLs and create an input JSON with tasks pointing to those CSVs. For example:
+If you want to use multiple time series datasets in one project, you must make your CSV files available as URLs and import a JSON-formatted file with tasks that reference those CSV files. 
+
+For example, for a task that can reference two sets of time series data:
 
 ```json
 [ { "data": { "csv_file1": "http://example.com/path/file1.csv", "csv_file2": "http://example.com/path/file2.csv" } } ]
 ```
 
-The accompanying labeling configuration is as follows:
-
+You could then set up the following labeling configuration to reference each CSV file and be able to label them both on the same labeling interface:
 ```html
 <View>
   <Header value="First time series" />
@@ -226,8 +228,8 @@ The accompanying labeling configuration is as follows:
   </TimeSeries>
 </View>
 ```
-
+The `value` parameter in the [TimeSeries](/tags/timeseries.html) tag is used to refer to the JSON key with the CSV file URL. 
 
 ### Video & audio sync with time series
 
-It's possible to synchronize TimeSeries with video and audio in Label Studio. Right now you can do it using HyperText tag with HTML objects `<audio src="path">`/`<video src="path">` and TimeSeries together. We have some solutions for this in testing. [Contact us](https://slack.labelstudio.heartex.com/?source=template-timeseries) in Slack to learn more.
+It's possible to synchronize TimeSeries with video and audio in Label Studio. Right now you can do this using the [HyperText](/tags/hypertext.html) tag with HTML objects `<audio src="path">`/`<video src="path">` and TimeSeries together. [Contact us](https://slack.labelstudio.heartex.com/?source=template-timeseries) in Slack to learn more about this experimental functionality.
