@@ -8,6 +8,8 @@ meta_description: Troubleshoot common issues with Label Studio configuration and
 ---
 
 If you encounter an issue using Label Studio, use this page to troubleshoot it. 
+- If you need to troubleshoot a machine learning backend, see [Troubleshoot machine learning](ml_troubleshooting.html). 
+- If you need to troubleshoot a cloud or external storage connection, see [Troubleshoot CORS and access problems](storage.html#Troubleshoot-CORS-and-access-problems). 
 
 ## Blank page when loading a project
 

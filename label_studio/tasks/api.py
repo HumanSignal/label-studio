@@ -156,11 +156,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         )
 
     def get_retrieve_serializer_context(self, request):
-        review = bool_from_request(self.request.GET, 'review', False)
-        if review:
-            fields = ['drafts', 'annotations']
-        else:
-            fields = ['completed_by_full', 'drafts', 'predictions', 'annotations']
+        fields = ['completed_by_full', 'drafts', 'predictions', 'annotations']
 
         return {
             'resolve_uri': True,

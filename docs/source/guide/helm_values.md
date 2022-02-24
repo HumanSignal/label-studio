@@ -94,6 +94,7 @@ Global parameters for the Helm chart.
 | `global.persistence.config.gcs.bucket`                                      | string | ""                                  | GCS bucket name                                                                                     |
 | `global.persistence.config.gcs.folder`                                      | string | ""                                  | GCS folder name                                                                                     |
 | `global.persistence.config.gcs.urlExpirationSecs`                           | string | 86400                               | The number of seconds that a presigned URL is valid for                                             |
+| `featureFlags`                                                              | map    | {}                                  | Key/value map of Feature Flags                                                                      |
 
 ## App parameters
 Parameters specific to the `app` portion of the Label Studio Enterprise deployment.
