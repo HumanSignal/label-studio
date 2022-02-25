@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1481: shrink tabs if they're crowding",
-  "commit": "9c1957bfb1c0811cc67e57469715af9f4b03b980",
-  "branch": "fix/dev-1481-tabs",
-  "date": "2022-01-19T21:31:58Z"
+  "message": "feat: DEV-1621:  Add usage of new method to create annotation",
+  "commit": "8975918038340887dbe42096c17e2df06aab2152",
+  "branch": "feat/DEV-1621/interactive_mode",
+  "date": "2022-02-15T19:29:50Z"
 }

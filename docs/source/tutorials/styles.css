@@ -64,14 +64,16 @@ h1 {
   cursor: pointer;
   display: inline-block;
   color: green;
-  margin-top: 18px;
-  font-size: 80%;
+  opacity: 0.7;
+  margin-top: 14px;
+  margin-left: 1px;
+  font-size: 70%;
   font-weight: 500;
   letter-spacing: .08em;
   text-transform: uppercase;
 }
 .card .title {
-  margin-top: 0.3em;
+  margin-top: 0.2em;
   font-size: 130%;
   font-weight: bold;
   color: #555;

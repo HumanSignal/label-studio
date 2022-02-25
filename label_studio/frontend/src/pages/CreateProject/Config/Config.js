@@ -16,6 +16,11 @@ import { useAPI } from '../../../providers/ApiProvider';
 
 // don't do this, kids
 const formatXML = (xml) => {
+  // don't use formatting if the config has new lines
+  if (xml.indexOf("\n") >= 0) {
+    return xml;
+  }
+
   let depth = 0;
   try {
     return xml.replace(/<(\/)?.*?(\/)?>[\s\n]*/g, (tag, close1, close2) => {

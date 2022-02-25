@@ -6,7 +6,7 @@ This document provides guidelines for contributing code and documentation to Lab
 
 ## Types of Contributions
 
-You can contribute to Label Studio by submitting [bug reports and feature requests](), or by writing code to do any of the following:
+You can contribute to Label Studio by submitting [bug reports and feature requests](https://github.com/heartexlabs/label-studio/issues/new/choose), or by writing code to do any of the following:
 - Fix a bug.
 - Provide [example machine learning backend code](https://github.com/heartexlabs/label-studio-ml-backend) to help others add a machine learning backend for a specific model.
 - Share [example annotation templates](https://github.com/heartexlabs/label-studio/tree/master/label_studio/annotation_templates) for specific use cases.
@@ -15,7 +15,7 @@ You can contribute to Label Studio by submitting [bug reports and feature reques
 
 We also welcome contributions to [the documentation](https://github.com/heartexlabs/label-studio/tree/master/docs/source)! 
 
-Please don't use the issue tracker to ask questions. Instead, join the [Label Studio Slack Community](http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com/?source=github-contrib) to get help!
+Please don't use the issue tracker to ask questions. Instead, join the [Label Studio Slack Community](https://slack.labelstudio.heartex.com/?source=github-contrib) to get help!
 
 If you're not sure whether an idea you have for Label Studio matches up with our planned direction, check out the [public roadmap](https://github.com/heartexlabs/label-studio/blob/master/roadmap.md) first. 
 
@@ -60,4 +60,4 @@ Follow these code formatting guidelines:
 
 ### Additional questions
 
-If you have any questions that aren't answered in these guidelines, please find us in the #contributor channel of the [Label Studio Slack Community](http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com/?source=github-contrib).
+If you have any questions that aren't answered in these guidelines, please find us in the #contributor channel of the [Label Studio Slack Community](https://slack.labelstudio.heartex.com/?source=github-contrib).
