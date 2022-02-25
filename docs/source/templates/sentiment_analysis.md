@@ -36,6 +36,10 @@ Interactively preview this labeling template:
 </View>
 ```
 
+## Enhance this template
+
+### Multi-classification
+
 ## Related tags
 - [Text](/tags/text.html)
 - [Choices](/tags/choices.html)

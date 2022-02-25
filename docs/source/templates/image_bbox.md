@@ -45,6 +45,10 @@ Use the [RectangleLabels](/tags/rectanglelabels.html) control tag to add labels 
   </RectangleLabels>
 ```
 
+## Enhance this template
+
+### Image bboxes
+
 ## Related tags
 
 - [Image](/tags/image.html)
