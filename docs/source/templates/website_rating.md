@@ -59,6 +59,51 @@ The [Choices](/tags/choices.html) control tag lets annotators classify the websi
   </Choices>
 ```
 
+## Input data
+
+There are two ways to structure input data to use this template:
+- Use HTML files
+- Use links to websites in JSON-formatted files
+
+### Use HTML files
+**This method is recommended.** Save the website content that you want to rate as HTML files, and import the HTML files into Label Studio. 
+
+If you use this method, change the `inline` parameter for the HyperText tag to `false`. 
+
+### Use links to websites
+This method seems simpler, but due to CORS restrictions on websites appearing in iframes, it only works for websites hosted on the same domain as your Label Studio instance. For example, if you want to rate websites hosted on your organization's domain, and Label Studio is hosted on the same domain, you can probably use this option. In most cases, CORS (cross-origin resource sharing) restrictions prevent the website from being visible.  
+
+If this option will work for you, you can use the following example JSON:
+One task can be formatted like the following:
+```json
+{
+    "website": "<iframe src='https://heartex.com' width='100%' height='600px'/>"
+}
+```
+
+Or multiple tasks like the following:
+```json
+[
+   {
+      "data":{
+         "website": "<iframe src='https://heartex.com' width='100%' height='600px'/>"
+      }
+   },
+   {
+      "data":{
+         "website": "<iframe src='https://example.com' width='100%' height='600px'/>"
+      }
+   },
+   {
+      "data":{
+         "website": "<iframe src='https://labelstud.io' width='100%' height='600px'/>"
+      }
+   }
+]
+
+
+```
+
 ## Related tags
 - [HyperText](/tags/hypertext.html)
 - [Rating](/tags/rating.html)
