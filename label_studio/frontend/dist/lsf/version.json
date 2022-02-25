@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1516 Double click applies selected  (#479)\n\n* if double click save the label from the first click and apply on the second otherwise clear\r\n\r\n* add timestamp comparison to differentiate between a double click and a two staggered clicks\r\n\r\n* Use selectedValues() for label during double click\r\n\r\n* ?. just in case; comment about var\r\n\r\n* Don't use empty doubleClickSelection\r\n\r\n* Also check coords for fast clicking everywhere\r\n\r\nthis should not be treated as double click\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "5bd5637c0127ad648ff5a059a5320fe5d33506ef",
+  "message": "feat: DEV-1372: Add visibleWhen choice-unselected option (#489)\n\n* feat: DEV-1372: Add visibleWhen choice-unselected option\r\n\r\n* test: DEV-1372: Add tests for  visibleWhen choice-unselected option\r\n\r\n* test: DEV-1372: Fix required test",
+  "commit": "1d07d4ae5fdc5229fed9fa5da5e38c04a378b14c",
   "branch": "master",
-  "date": "2022-02-21T11:48:14Z"
+  "date": "2022-02-23T13:39:26Z"
 }
