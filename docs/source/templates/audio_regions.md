@@ -57,12 +57,6 @@ Use the [AudioPlus](/tags/audioplus.html) object tag to specify the location of 
 <AudioPlus name="audio" value="$url"></AudioPlus>
 ```
 
-## Enhance this template
-
-### Audio regions example
-
-
-
 ## Related tags
 
 - [AudioPlus](/tags/audioplus.html)
