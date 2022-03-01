@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1818: Horizontal scroll",
-  "commit": "ff49246a70f66732e62e1ba3de524bc7320cc37a",
+  "message": "fix: DEV-1813: Start over on play when the playback is finished",
+  "commit": "7d5940a7e773473353eb5f83005e539b6af52564",
   "branch": "feat/dev-1713/audio-view",
-  "date": "2022-03-01T12:37:39Z"
+  "date": "2022-03-01T14:07:58Z"
 }
