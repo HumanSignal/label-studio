@@ -1,6 +1,6 @@
 {
-  "message": "Fix image flex layout (column)",
-  "commit": "91400a4a867137bdcb15334d80697f0a1572270e",
+  "message": "fix: DEV-1811: Playback speed range",
+  "commit": "c7e551b9bf6c2daf06c6e0484bfa0e1649ee629a",
   "branch": "feat/dev-1713/audio-view",
-  "date": "2022-03-01T09:31:07Z"
+  "date": "2022-03-01T10:02:29Z"
 }
