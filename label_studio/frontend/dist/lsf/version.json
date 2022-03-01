@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1811: Playback speed range",
-  "commit": "c7e551b9bf6c2daf06c6e0484bfa0e1649ee629a",
+  "message": "fix: DEV-1818: Horizontal scroll",
+  "commit": "ff49246a70f66732e62e1ba3de524bc7320cc37a",
   "branch": "feat/dev-1713/audio-view",
-  "date": "2022-03-01T10:02:29Z"
+  "date": "2022-03-01T12:37:39Z"
 }
