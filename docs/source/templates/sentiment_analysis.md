@@ -53,6 +53,37 @@ Use the [Choices](/tags/choices.html) control tag to provide the classification 
 </Choices>
 ```
 
+## Enhance this template
+
+### Multi-classification
+
+You can use styling to visually separate different classification options to provide annotators a multi-classification task for text.
+
+For example, wrap the individual choice options for a single [Choices](/tags/choices.html) control tag in [View](/tags/view.html) tags that adjust the styling, and add [Header](/tags/header.html) tags to each section to visually separate the choices on the interface, while still storing all choices with the text sample in the annotations:
+```xml
+  <Choices name="sentiment" toName="text" choice="multiple">
+    <View style="display: flex; justify-content: space-between">
+      <View style="width: 50%">
+        <Header value="Select Topics" />
+        <Choice value="Politics"/>
+    	<Choice value="Business"/>
+    	<Choice value="Sport"/>
+      </View>
+      <View>
+        <Header value="Select Moods" />
+        <Choice value="Cheerful"/>
+    	<Choice value="Melancholy"/>
+    	<Choice value="Romantic"/>
+      </View>
+    </View>
+  </Choices>
+```
+
 ## Related tags
 - [Text](/tags/text.html)
 - [Choices](/tags/choices.html)
+- [Choice](/tags/choice.html)
+- [View](/tags/view.html)
+- [Header](/tags/header.html)
+
+
