@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1516 Double click applies selected  (#479)\n\n* if double click save the label from the first click and apply on the second otherwise clear\r\n\r\n* add timestamp comparison to differentiate between a double click and a two staggered clicks\r\n\r\n* Use selectedValues() for label during double click\r\n\r\n* ?. just in case; comment about var\r\n\r\n* Don't use empty doubleClickSelection\r\n\r\n* Also check coords for fast clicking everywhere\r\n\r\nthis should not be treated as double click\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "5bd5637c0127ad648ff5a059a5320fe5d33506ef",
-  "branch": "master",
-  "date": "2022-02-21T11:48:14Z"
+  "message": "Fix object component not properly passing the context",
+  "commit": "fdbdad9615d72bdd3506710a284f7cfde536af97",
+  "branch": "fix/object-component",
+  "date": "2022-03-01T18:39:20Z"
 }
