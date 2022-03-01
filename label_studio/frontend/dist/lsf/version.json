@@ -1,6 +1,6 @@
 {
-  "message": "Fix object component not properly passing the context",
-  "commit": "fdbdad9615d72bdd3506710a284f7cfde536af97",
-  "branch": "fix/object-component",
-  "date": "2022-03-01T18:39:20Z"
+  "message": "fix: DEV-1784: Fix drawing hanging when region is smaller than minimum size",
+  "commit": "8d5e87908dc9b9e7a153532b5f749f009106469f",
+  "branch": "fix/DEV-1784/drawing-hanging",
+  "date": "2022-03-01T22:52:30Z"
 }
