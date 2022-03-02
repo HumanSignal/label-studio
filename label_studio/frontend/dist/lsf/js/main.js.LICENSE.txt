@@ -25,26 +25,26 @@ License: MIT
  */
 
 /*!
- * wavesurfer.js 6.0.1 (2022-02-14)
- * https://wavesurfer-js.org
+ * wavesurfer.js 3.3.3 (2020-04-16)
+ * https://github.com/katspaugh/wavesurfer.js
  * @license BSD-3-Clause
  */
 
 /*!
- * wavesurfer.js cursor plugin 6.0.1 (2022-02-14)
- * https://wavesurfer-js.org
+ * wavesurfer.js cursor plugin 3.3.3 (2020-04-16)
+ * https://github.com/katspaugh/wavesurfer.js
  * @license BSD-3-Clause
  */
 
 /*!
- * wavesurfer.js regions plugin 6.0.1 (2022-02-14)
- * https://wavesurfer-js.org
+ * wavesurfer.js regions plugin 3.3.3 (2020-04-16)
+ * https://github.com/katspaugh/wavesurfer.js
  * @license BSD-3-Clause
  */
 
 /*!
- * wavesurfer.js timeline plugin 6.0.1 (2022-02-14)
- * https://wavesurfer-js.org
+ * wavesurfer.js timeline plugin 3.3.3 (2020-04-16)
+ * https://github.com/katspaugh/wavesurfer.js
  * @license BSD-3-Clause
  */
 
@@ -78,15 +78,15 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
-/*! ./absMax */
-
-/*! ./clamp */
+/*! ./ajax */
 
 /*! ./drawer */
 
 /*! ./drawer.canvasentry */
 
 /*! ./drawer.multicanvas */
+
+/*! ./extend */
 
 /*! ./fetch */
 
@@ -104,15 +104,11 @@ and limitations under the License.
 
 /*! ./observer */
 
-/*! ./orientation */
-
 /*! ./peakcache */
 
 /*! ./prevent-click */
 
 /*! ./request-animation-frame */
-
-/*! ./silence-mode */
 
 /*! ./style */
 
@@ -125,6 +121,8 @@ and limitations under the License.
 /*! ./webaudio */
 
 /*! debounce */
+
+/*! no static exports found */
 
 /*!***********************!*\
   !*** ./src/drawer.js ***!
@@ -146,9 +144,9 @@ and limitations under the License.
   !*** ./src/peakcache.js ***!
   \**************************/
 
-/*!***************************!*\
-  !*** ./src/util/clamp.js ***!
-  \***************************/
+/*!**************************!*\
+  !*** ./src/util/ajax.js ***!
+  \**************************/
 
 /*!***************************!*\
   !*** ./src/util/fetch.js ***!
@@ -171,7 +169,7 @@ and limitations under the License.
   \***************************/
 
 /*!****************************!*\
-  !*** ./src/util/absMax.js ***!
+  !*** ./src/util/extend.js ***!
   \****************************/
 
 /*!****************************!*\
@@ -183,16 +181,12 @@ and limitations under the License.
   \*****************************/
 
 /*!******************************!*\
-  !*** ./src/util/observer.js ***!
+  !*** ./src/plugin/cursor.js ***!
   \******************************/
 
-/*!*********************************!*\
-  !*** ./src/util/orientation.js ***!
-  \*********************************/
-
-/*!**********************************!*\
-  !*** ./src/util/silence-mode.js ***!
-  \**********************************/
+/*!******************************!*\
+  !*** ./src/util/observer.js ***!
+  \******************************/
 
 /*!***********************************!*\
   !*** ./src/drawer.canvasentry.js ***!
@@ -205,10 +199,6 @@ and limitations under the License.
 /*!***********************************!*\
   !*** ./src/util/prevent-click.js ***!
   \***********************************/
-
-/*!************************************!*\
-  !*** ./src/plugin/cursor/index.js ***!
-  \************************************/
 
 /*!**************************************!*\
   !*** ./src/mediaelement-webaudio.js ***!

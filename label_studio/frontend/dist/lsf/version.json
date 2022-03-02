@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1784: Fix errors in console while working with labels list with ocr",
-  "commit": "0e44de75f378964aeff87afe75c5c0c8df122524",
-  "branch": "fix/DEV-1784/drawing-hanging",
-  "date": "2022-03-01T23:40:46Z"
+  "message": "new row is actual row, expand parent",
+  "commit": "a90859cabe0cb96ba4acd68ffbb5478a7d80e811",
+  "branch": "dev-1567/virtualize-tree-data",
+  "date": "2022-03-01T15:09:40Z"
 }
