@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-1372: Add visibleWhen choice-unselected option (#489)\n\n* feat: DEV-1372: Add visibleWhen choice-unselected option\r\n\r\n* test: DEV-1372: Add tests for  visibleWhen choice-unselected option\r\n\r\n* test: DEV-1372: Fix required test",
-  "commit": "1d07d4ae5fdc5229fed9fa5da5e38c04a378b14c",
+  "message": "fix: DEV-1784: Fix drawing hanging when region is tiny (#516)\n\n* fix: DEV-1784: Fix drawing hanging when region is smaller than minimum size\r\n\r\n* fix: DEV-1784: Fix errors in console while working with labels list with ocr",
+  "commit": "9f7d62ab86cab84f265947eaecdee7b74aadcabd",
   "branch": "master",
-  "date": "2022-02-23T13:39:26Z"
+  "date": "2022-03-02T08:56:56Z"
 }
