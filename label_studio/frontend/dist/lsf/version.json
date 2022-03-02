@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1784: Fix drawing hanging when region is tiny (#516)\n\n* fix: DEV-1784: Fix drawing hanging when region is smaller than minimum size\r\n\r\n* fix: DEV-1784: Fix errors in console while working with labels list with ocr",
-  "commit": "9f7d62ab86cab84f265947eaecdee7b74aadcabd",
-  "branch": "master",
-  "date": "2022-03-02T08:56:56Z"
+  "message": "Merge master",
+  "commit": "5e3def268544a644a77f494b65d253062e8fa376",
+  "branch": "feature/DEV-1656",
+  "date": "2022-03-02T13:24:18Z"
 }
