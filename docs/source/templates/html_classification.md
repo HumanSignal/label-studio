@@ -8,7 +8,7 @@ meta_title: HTML Classification Data Labeling Template
 meta_description: Template for classifying HTML documents with Label Studio for your machine learning and data science projects.
 ---
 
-<img src="/images/templates-misc/html-classification.png" alt="" class="gif-border" width="552px" height="408px" />
+<img src="/images/templates-misc/html-classification.png" alt="" class="gif-border" width="552px" height="352px" />
 
 For content moderation and other use cases where you want to classify HTML content, you can use this template. 
 
@@ -22,11 +22,11 @@ For content moderation and other use cases where you want to classify HTML conte
 <View>
   <Choices name="toxicity" toName="web_page" choice="multiple" showInline="true">
     <Choice value="Toxic" background="red"/>
-    <Choice value="Severe Toxic" background="brown"/>
-    <Choice value="Obsene" background="green"/>
+    <Choice value="Severely Toxic" background="brown"/>
+    <Choice value="Obscene" background="green"/>
     <Choice value="Threat" background="blue"/>
     <Choice value="Insult" background="orange"/>
-    <Choice value="Identity Hate" background="grey"/>
+    <Choice value="Hate" background="grey"/>
   </Choices>
 
   <View style="border: 1px solid #CCC;
@@ -45,11 +45,11 @@ The [Choices](/tags/choices.html) control tag specifies the options to use to cl
 ```xml
   <Choices name="toxicity" toName="web_page" choice="multiple" showInline="true">
     <Choice value="Toxic" background="red"/>
-    <Choice value="Severe Toxic" background="brown"/>
-    <Choice value="Obsene" background="green"/>
+    <Choice value="Severely Toxic" background="brown"/>
+    <Choice value="Obscene" background="green"/>
     <Choice value="Threat" background="blue"/>
     <Choice value="Insult" background="orange"/>
-    <Choice value="Identity Hate" background="grey"/>
+    <Choice value="Hate" background="grey"/>
   </Choices>
 ```
 The `choice` parameter lets annotators select multiple choices, and the `showInline` parameter displays all the choices in a row. This template provides numerous content moderation choice values, but you can modify the template to provide different choices.

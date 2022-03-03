@@ -8,7 +8,7 @@ meta_title: Multi-Image Classification Data Labeling Template
 meta_description: Template for classifying multiple images at once with Label Studio for your machine learning and data science projects.
 ---
 
-<img src="/images/templates-misc/multi-image-classification.png" alt="" class="gif-border" width="552px" height="408px" />
+<img src="/images/templates-misc/multi-image-classification.png" alt="" class="gif-border" width="552px" height="389px" />
 
 For data labeling cases when you want to classify multiple images at once, or if you want to ask multiple questions about multiple images, you can use this template.
 
