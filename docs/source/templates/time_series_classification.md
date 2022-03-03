@@ -23,8 +23,8 @@ If you need to train a machine learning model to classify time series data, crea
     <Header value="Time Series classification"
             style="font-weight: normal"/>
     <Choices name="pattern" toName="ts">
-        <Choice value="Growth"/>
-        <Choice value="Decay"/>
+        <Choice value="Accelerating"/>
+        <Choice value="Slowing"/>
     </Choices>
     <TimeSeriesLabels name="label" toName="ts">
         <Label value="Run"/>
@@ -50,8 +50,8 @@ The `style` parameter overrides the default styling of the header to show a norm
 The [Choices](/tags/choices.html) control tag lets annotators classify the entire time series graph:
 ```xml
 <Choices name="pattern" toName="ts">
-    <Choice value="Growth"/>
-    <Choice value="Decay"/>
+    <Choice value="Accelerating"/>
+    <Choice value="Slowing"/>
 </Choices>
 ```
 
