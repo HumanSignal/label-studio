@@ -1,10 +1,15 @@
 name: pytest:ubnt
 on:
   push:
-    branches: ['*', '*/*', master]
+    branches: ['*', '*/*', '*/**', master]
     paths:
       - 'label_studio/**'
+      - '!label_studio/frontend/**'
       - '.github/workflows/tests.yml'
+      - 'deploy/requirements.txt'
+      - 'deploy/requirements-mw.txt'
+      - 'deploy/requirements-test.txt'
+      - 'deploy/prebuild_wo_frontend.sh'
 
 env:
   NODE: '14'
@@ -16,7 +21,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version:
+          - 3.7
+          - 3.8
+          - 3.9
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
@@ -31,17 +39,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2.3.1
+        uses: actions/setup-python@v2.3.2
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
+        name: Configure pip cache
         id: pip-cache
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
       - name: Install dependencies
         run: |
@@ -52,7 +61,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v2.5.0
+        uses: actions/setup-node@v2.5.1
         with:
           node-version: "${{ env.NODE }}"
 
@@ -60,7 +69,8 @@ jobs:
         id: npm-cache-dir
         run: echo "::set-output name=dir::$(npm config get cache)"
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
+        name: Configure npm cache
         id: npm-cache
         with:
           path: ${{ steps.npm-cache-dir.outputs.dir }}
@@ -69,7 +79,7 @@ jobs:
             ${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Install LSF & set version.py
-        run: ./deploy/prebuild.sh
+        run: ./deploy/prebuild_wo_frontend.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -79,11 +89,22 @@ jobs:
       - name: Run functional tests
         run: |
           cd label_studio/
-          pytest --junitxml report.xml --cov=. -vv
+          pytest --cov=. --cov-report=xml -vv -n auto
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2.1.0
+        with:
+          fail_ci_if_error: true
+          files: ./label_studio/coverage.xml
+          verbose: true
 
   run_pytest_postgresql:
-    name: LS PostgreSQL
+    name: LS PostgreSQL Ubuntu
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.8]
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
       DJANGO_DB: default
@@ -133,23 +154,24 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2.4.0
-      - name: Set up Python
-        uses: actions/setup-python@v2.3.1
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2.3.2
         with:
-          python-version: '3.7'
+          python-version: ${{ matrix.python-version }}
 
       - name: Install OS dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev
+          sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev python-dev
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
+        name: Configure pip cache
         id: pip-cache
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
       - name: Install pip dependencies
         run: |
@@ -158,7 +180,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v2.5.0
+        uses: actions/setup-node@v2.5.1
         with:
           node-version: 14
 
@@ -166,7 +188,8 @@ jobs:
         id: npm-cache-dir
         run: echo "::set-output name=dir::$(npm config get cache)"
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
+        name: Configure npm cache
         id: npm-cache
         with:
           path: ${{ steps.npm-cache-dir.outputs.dir }}
@@ -175,7 +198,7 @@ jobs:
             ${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Install LSF & set version.py
-        run: ./deploy/prebuild.sh
+        run: ./deploy/prebuild_wo_frontend.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -185,12 +208,14 @@ jobs:
       - name: Run functional tests
         run: |
           cd label_studio/
-          pytest --junitxml report.xml --cov=. -vv
+          pytest --cov=. --cov-report=xml -vv -n auto
 
-      - name: "Upload coverage to Codecov"
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2.1.0
         with:
           fail_ci_if_error: true
+          files: ./label_studio/coverage.xml
+          verbose: true
 
   windows_label_studio:
     name: LS SQLite Windows
@@ -198,7 +223,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version:
+          - 3.7
+          - 3.8
+          - 3.9
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
@@ -213,16 +241,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2.4.0
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2.3.1
+      uses: actions/setup-python@v2.3.2
       with:
         python-version: ${{ matrix.python-version }}
 
-    - uses: actions/cache@v2.1.6
+    - uses: actions/cache@v2.1.7
+      name: Configure pip cache
       with:
         path: ~\AppData\Local\pip\Cache
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
         restore-keys: |
-          ${{ runner.os }}-pip-
+          ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
     - name: Install dependencies
       run: |
@@ -234,13 +263,20 @@ jobs:
         {pip install -r deploy/requirements-test.txt}
         pip install -e .
 
-    - name: Init project
+    - name: Fix sqlite.dll for python < 3.9
+      if: ${{ matrix.python-version < '3.9' }}
       run: |
         set PYTHONIOENCODING=utf-8
         set PYTHONLEGACYWINDOWSSTDIO=utf-8
         label-studio init my_project --agree-fix-sqlite --force-fix-sqlite
-        label-studio init my_project --username test@test.com --password testpwd
         cp sqlite3.dll %pythonLocation%/DLLs/sqlite3.dll
+      shell: cmd
+
+    - name: Init project
+      run: |
+        set PYTHONIOENCODING=utf-8
+        set PYTHONLEGACYWINDOWSSTDIO=utf-8
+        label-studio init my_project --username test@test.com --password testpwd
       shell: cmd
 
     - name: Test with pytest
@@ -248,12 +284,5 @@ jobs:
         collect_analytics: 0
       run: |
         cd label_studio/
-        coverage run -m pytest
+        python -m pytest -vv -n auto
 
-    - name: Collect coverage results
-      if: always()
-      env:
-        collect_analytics: 0
-      run: |
-        cd label_studio/
-        coverage report -m --fail-under=40

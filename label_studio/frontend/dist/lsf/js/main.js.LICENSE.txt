@@ -4,6 +4,13 @@ object-assign
 @license MIT
 */
 
+/* @license
+Papa Parse
+v5.3.1
+https://github.com/mholt/PapaParse
+License: MIT
+*/
+
 /*!
   Copyright (c) 2018 Jed Watson.
   Licensed under the MIT License (MIT), see
@@ -18,26 +25,26 @@ object-assign
  */
 
 /*!
- * wavesurfer.js 3.3.3 (2020-04-16)
- * https://github.com/katspaugh/wavesurfer.js
+ * wavesurfer.js 6.0.1 (2022-02-14)
+ * https://wavesurfer-js.org
  * @license BSD-3-Clause
  */
 
 /*!
- * wavesurfer.js cursor plugin 3.3.3 (2020-04-16)
- * https://github.com/katspaugh/wavesurfer.js
+ * wavesurfer.js cursor plugin 6.0.1 (2022-02-14)
+ * https://wavesurfer-js.org
  * @license BSD-3-Clause
  */
 
 /*!
- * wavesurfer.js regions plugin 3.3.3 (2020-04-16)
- * https://github.com/katspaugh/wavesurfer.js
+ * wavesurfer.js regions plugin 6.0.1 (2022-02-14)
+ * https://wavesurfer-js.org
  * @license BSD-3-Clause
  */
 
 /*!
- * wavesurfer.js timeline plugin 3.3.3 (2020-04-16)
- * https://github.com/katspaugh/wavesurfer.js
+ * wavesurfer.js timeline plugin 6.0.1 (2022-02-14)
+ * https://wavesurfer-js.org
  * @license BSD-3-Clause
  */
 
@@ -71,15 +78,15 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
-/*! ./ajax */
+/*! ./absMax */
+
+/*! ./clamp */
 
 /*! ./drawer */
 
 /*! ./drawer.canvasentry */
 
 /*! ./drawer.multicanvas */
-
-/*! ./extend */
 
 /*! ./fetch */
 
@@ -97,11 +104,15 @@ and limitations under the License.
 
 /*! ./observer */
 
+/*! ./orientation */
+
 /*! ./peakcache */
 
 /*! ./prevent-click */
 
 /*! ./request-animation-frame */
+
+/*! ./silence-mode */
 
 /*! ./style */
 
@@ -114,8 +125,6 @@ and limitations under the License.
 /*! ./webaudio */
 
 /*! debounce */
-
-/*! no static exports found */
 
 /*!***********************!*\
   !*** ./src/drawer.js ***!
@@ -137,9 +146,9 @@ and limitations under the License.
   !*** ./src/peakcache.js ***!
   \**************************/
 
-/*!**************************!*\
-  !*** ./src/util/ajax.js ***!
-  \**************************/
+/*!***************************!*\
+  !*** ./src/util/clamp.js ***!
+  \***************************/
 
 /*!***************************!*\
   !*** ./src/util/fetch.js ***!
@@ -162,7 +171,7 @@ and limitations under the License.
   \***************************/
 
 /*!****************************!*\
-  !*** ./src/util/extend.js ***!
+  !*** ./src/util/absMax.js ***!
   \****************************/
 
 /*!****************************!*\
@@ -174,12 +183,16 @@ and limitations under the License.
   \*****************************/
 
 /*!******************************!*\
-  !*** ./src/plugin/cursor.js ***!
-  \******************************/
-
-/*!******************************!*\
   !*** ./src/util/observer.js ***!
   \******************************/
+
+/*!*********************************!*\
+  !*** ./src/util/orientation.js ***!
+  \*********************************/
+
+/*!**********************************!*\
+  !*** ./src/util/silence-mode.js ***!
+  \**********************************/
 
 /*!***********************************!*\
   !*** ./src/drawer.canvasentry.js ***!
@@ -192,6 +205,10 @@ and limitations under the License.
 /*!***********************************!*\
   !*** ./src/util/prevent-click.js ***!
   \***********************************/
+
+/*!************************************!*\
+  !*** ./src/plugin/cursor/index.js ***!
+  \************************************/
 
 /*!**************************************!*\
   !*** ./src/mediaelement-webaudio.js ***!
@@ -206,6 +223,15 @@ and limitations under the License.
   \*********************************************/
 
 /*!Please JS v0.4.2, Jordan Checkman 2014, Checkman.io, MIT License, Have fun.*/
+
+/**
+ * @license
+ * Lodash <https://lodash.com/>
+ * Copyright OpenJS Foundation and other contributors <https://openjsf.org/>
+ * Released under MIT license <https://lodash.com/license>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ */
 
 /**
  * chroma.js - JavaScript library for color conversions

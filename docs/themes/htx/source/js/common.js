@@ -7,7 +7,7 @@
     initSubHeaders();
   }
 
-  initLocationHashFuzzyMatching();
+  window.addEventListener('DOMContentLoaded', initLocationHashFuzzyMatching);
   initPreviewButtons();
 
   function parseRawHash(hash) {
@@ -197,8 +197,14 @@
    * Preview
    */
   function initPreviewButtons() {
-    var code = document.querySelectorAll(".html").forEach(code => {
+    document.querySelectorAll(".html").forEach(code => {
 
+      if ($('#main-preview').length) {
+        $('#main-preview').empty();
+        insert_render_editor(code.textContent, $('#main-preview'));
+      }
+
+      // open preview button
       var preview = createButton("Open Preview", "lnk");
       preview.onclick = function(ev) {
         ev.preventDefault();
@@ -207,6 +213,7 @@
         return false;
       };
 
+      // launch in playground button
       var pg = createButton("Launch in Playground", "lnk");
       pg.onclick = function(ev) {
         ev.preventDefault();
@@ -243,10 +250,14 @@
 
   var iframeTimer = null;
 
-  function editor_iframe(res, modal) {
+  function editor_iframe(res, modal, full) {
     // generate new iframe
     var iframe = $('<iframe onclick="event.stopPropagation()" id="render-editor"></iframe>');
-    iframe.css('width', $(window).width() * 0.9);
+
+    if (full) {
+      iframe.css('width', $(window).width() * 0.9);
+    }
+
     iframe.hide();
     modal.append(iframe);
 
@@ -259,13 +270,41 @@
       clearTimeout(iframeTimer);
       iframeTimer = setInterval(function () {
         if (obj.contentWindow) {
+          // fix editor height
           obj.style.height = (obj.contentWindow.document.body.scrollHeight) + 'px';
+
+          // fix editor width
+          let app_editor = obj.contentDocument.body.querySelector('div[class*="App_editor"]').style;
+          //app_editor.setProperty('min-width', '100%', 'important');
+          obj.contentDocument.body.querySelector('div[class*="Segment_block"]').style.margin='0';
         }
-      }, 100);
+      }, 200);
     });
 
     // load new data into iframe
     iframe.attr('srcdoc', res);
+  }
+
+  function insert_render_editor(config, modal, full) {
+    let url = "https://app.heartex.ai/demo/render-editor?playground=1&open_preview=1";
+    if (full) {
+      url += '&full_editor=t';
+    }
+    $.ajax({
+      url: url,
+      method: 'POST',
+      xhrFields: {withCredentials: true},
+      data: {
+        config: config,
+        edit_count: 0
+      },
+      success: function (res) {
+        editor_iframe(res, modal, full)
+      },
+      error: function () {
+        console.log("=> Can't load preview, demo server error");
+      }
+    })
   }
 
   function show_render_editor(config) {
@@ -275,19 +314,7 @@
     $('body').append(modal);
     $('#render-editor-loader').css('width', $(window).width() * 0.9);
 
-    $.ajax({
-      url: "https://app.heartex.ai/demo/render-editor?full_editor=t&playground=1&open_preview=1",
-      method: 'POST',
-      xhrFields: {withCredentials: true},
-      data: {
-        config: config,
-        edit_count: 0
-      },
-      success: function(res) { editor_iframe(res, modal) },
-      error: function () {
-        alert("Can't load preview, demo server error");
-      }
-    })
+    insert_render_editor(config, modal, true);
   }
 
   /**

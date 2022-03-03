@@ -82,7 +82,7 @@ If you want to change the behavior of the active learning loop, you can make man
 
 If you're using Label Studio community edition, data annotators can't experience a live active learning loop. You can mimic an active learning experience by doing the following:
 1. Manually [retrieve predictions from a model](ml.html#Get-predictions-from-a-model).
-2. [Sort the tasks in the data manager by prediction score](labeling.html#Example-Sort-by-prediction-score).
+2. [Sort the tasks in the data manager by prediction score](manage_data.html#Example-Sort-by-prediction-score).
 3. Select **Label Tasks As Displayed** when labeling tasks. 
 
 This manual active learning loop does not automatically update the order of tasks presented to annotators as the ML backend trains with each new annotation and produces new predictions. Therefore, instead of on-the-fly automated active learning, you can perform a form of batched active learning, where you perform annotation for a period, stop to train the model, then retrieve new predictions and start annotating tasks again.

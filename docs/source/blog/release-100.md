@@ -91,6 +91,6 @@ We hope you’re excited to try out this new version of Label Studio!
 
 For the next month we will be focusing on fixing bugs and issues based on your feedback, so we’d like to ask you to join our Slack channel. The community is very active and no questions go unanswered and no feedback goes unnoticed.
 
-<a href="http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=blog-release" title="Data labeling community">Join Slack</a>
+<a href="https://slack.labelstudio.heartex.com/?source=blog-release" title="Data labeling community">Join Slack</a>
 
 Next, we'll be releasing an update of our <a href="https://heartex.com/">Label Studio Enterprise</a> and then working on a new version of Label Studio. The focus for that version is more performance improvements and seamless integration into various ML pipelines. See you in Slack!

@@ -22,7 +22,7 @@ You can import many types of data, including text, timeseries, audio, and image 
 | Data type | Supported file types |
 | --- | --- |
 | Audio | .aiff, .au, .flac, .m4a, .mp3, .ogg, .wav |
-| HyperText (HTML) | .html, .htm, .xml |
+| [HyperText (HTML)](#Import-HTML-data) | .html, .htm, .xml |
 | Images | .bmp, .gif, .jpg, .png, .svg, .webp |
 | Paragraphs (Dialogue) | .json |
 | Structured data | .csv, .tsv | 
@@ -30,7 +30,7 @@ You can import many types of data, including text, timeseries, audio, and image 
 | [Time series](#Import-CSV-or-TSV-data) | .csv, .tsv, .json |
 | [Tasks with multiple data types](#Basic-Label-Studio-JSON-format) | .csv, .tsv, .json |
 
-If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=docs-gdi). 
+If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](https://slack.labelstudio.heartex.com/?source=docs-gdi). 
 
 ### How to import your data
 
@@ -131,9 +131,10 @@ You can add other, optional keys to the JSON file.
 
 | JSON key | Description |
 | --- | --- | 
-| id | Optional. Integer to use as the task ID. |
 | annotations | Optional. List of annotations exported from Label Studio. [Label Studio's annotation format](export.html#Raw-JSON-format-of-completed-tasks) allows you to import annotation results in order to use them in subsequent labeling tasks. |
 | predictions | Optional. List of model prediction results, where each result is saved using [Label Studio's prediction format](export.html#Raw-JSON-format-of-completed-tasks). Import predictions for automatic task pre-labeling and active learning. See [Import predicted labels into Label Studio](predictions.html) |
+
+See [Relevant JSON property descriptions](export.html#Relevant-JSON-property-descriptions) in the export documentation for more details about the JSON format of exported tasks.
 
 ### Example JSON format
 
@@ -301,6 +302,14 @@ this is a second task
 
 If you want to import entire plain text files without each line becoming a new labeling task, customize the labeling configuration to specify `valueType="url"` in the Text tag. See the [Text tag documentation](/tags/text.html). See more about [how to use the valueType field](#How-to-import-your-data).
 
+### Import HTML data
+
+You can import HyperText data in HTML-formatted files and annotate them in Label Studio. When you directly import HTML files, the content is minified the content is minified by compressing the text, removing whitespace and other nonfunctional data in the HTML code. Annotations that you create are applied to the minified version of the HTML. 
+
+If you want to label HTML files without minifying the data, you can do one of the following:
+- Import the HTML files as BLOB storage from [external cloud storage such as Amazon S3 or Google Cloud Storage](storage.html).
+- Update the HyperText tag in your labeling configuration to specify `valueType="url"` as described in [How to import your data](#How-to-import-your-data) on this page.
+
 ## Import data from a local directory
 
 To import data from a local directory, you have two options:
@@ -341,7 +350,7 @@ Data that you import is project-specific.
 
 ## Import data using the API
 
-Import your data using the Label Studio API. See the [API documentation for importing tasks](/api#operation/projects_import_create).
+Import your data using the Label Studio API. See the [API documentation for importing tasks](/api#operation/api_projects_import_create).
 
 ### Import data from the command line
 
