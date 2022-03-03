@@ -429,6 +429,9 @@ class TemplateListAPI(generics.ListAPIView):
         configs = []
         for config_file in pathlib.Path(annotation_templates_dir).glob('**/*.yml'):
             config = read_yaml(config_file)
+            if settings.VERSION_EDITION == 'Community':
+                if settings.VERSION_EDITION.lower() != config.get('type', 'community'):
+                    continue
             if config.get('image', '').startswith('/static') and settings.HOSTNAME:
                 # if hostname set manually, create full image urls
                 config['image'] = settings.HOSTNAME + config['image']
