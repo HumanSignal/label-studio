@@ -8,8 +8,6 @@ meta_title: Website Rating Data Labeling Template
 meta_description: Template for rating website content with Label Studio for your machine learning and data science projects.
 ---
 
-<img src="/images/templates-misc/website-rating.png" alt="" class="gif-border" width="552px" height="408px" />
-
 For cases when you want to rate the quality of websites, or rate the trustworthiness and classify the content of a website, you can use this template.
 
 ## Interactive Template Preview
@@ -71,7 +69,7 @@ There are two ways to structure input data to use this template:
 If you use this method, change the `inline` parameter for the HyperText tag to `false`. 
 
 ### Use links to websites
-This method seems simpler, but due to CORS restrictions on websites appearing in iframes, it only works for websites hosted on the same domain as your Label Studio instance. For example, if you want to rate websites hosted on your organization's domain, and Label Studio is hosted on the same domain, you can probably use this option. In most cases, CORS (cross-origin resource sharing) restrictions prevent the website from being visible.  
+This method seems simpler, but due to CORS (cross-origin resource sharing) restrictions on websites appearing in HTML iframes, it only works for websites hosted on the same domain as your Label Studio instance. For example, if you want to rate websites hosted on your organization's domain, and Label Studio is hosted on the same domain, you can probably use this option. In most cases, CORS restrictions prevent the website from being visible.  
 
 If this option will work for you, you can use the following example JSON:
 One task can be formatted like the following:
