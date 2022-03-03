@@ -50,6 +50,25 @@ Use the [TextArea](/tags/textarea.html) control tag to provide a text box with a
             required="true" />
 ```
 
+### Long text with scrollbar
+
+```xml
+<View style="display: flex;">
+  <View style="padding: 0em 1em; background: #f1f1f1; margin-right: 1em; border-radius: 3px">
+    <View style="position: sticky; top: 0">
+      <Labels name="label" toName="text">
+        <Label value="Person" />
+        <Label value="Organization" />
+      </Labels>
+    </View>
+  </View>
+
+  <View style="height: 300px; overflow: auto;">
+    <Text name="text" value="$longText" />
+  </View>
+</View>
+```
+
 ## Related tags
 
 - [Header](/tags/header.html)

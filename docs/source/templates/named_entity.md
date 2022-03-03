@@ -124,6 +124,26 @@ You can also combine the [View](/tags/view.html) tag and the `perRegion` paramet
 ```
 The `visibleWhen` parameter with the View tag means that when a specific region is selected, the Header appears, prompting the annotator to supply a rating that applies to that region.
 
+### Filter a long list of labels
+
+```xml
+<View style="display: flex;">
+  <View style="width: 350px; padding-right: 1em; height: 400px; overflow-y: auto">
+    <Filter name="fl" toName="ner" hotkey="shift+f" minlength="1" />
+    <Labels name="ner" toName="text" showInline="false">
+      <Label value="Person" />
+      <Label value="Organization" />
+    </Labels>
+  </View>
+
+  <View style="height: 400px; overflow: auto">
+    <Text name="text" value="$text" />
+  </View>
+</View>
+```
+
+
+
 ## Related tags
 
 - [View](/tags/view.html)

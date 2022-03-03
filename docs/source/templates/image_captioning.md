@@ -46,6 +46,29 @@ Use the [TextArea](/tags/textarea.html) control tag to provide a 5 row text box 
 ```
 Use the `placeholder` argument to provide placeholder text to the annotator, which can provide an example or further instructions. 
 
+## Enhance this template
+
+### Add a sticky header so that you can always view the caption
+
+
+
+```xml
+<View>
+  <View style="padding: 0 1em; margin: 1em 0; background: #f1f1f1; position: sticky; top: 0; border-radius: 3px">
+    <Labels name="label" toName="text" showInline="true">
+      <Label value="Person" />
+      <Label value="Organization" />
+    </Labels>
+  </View>
+
+  <View>
+    <Text name="text" value="$text" />
+  </View>
+</View>
+
+```
+
+
 ## Related tags
 
 - [Image](/tags/image.html)

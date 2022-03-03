@@ -79,6 +79,33 @@ For example, wrap the individual choice options for a single [Choices](/tags/cho
   </Choices>
 ```
 
+### Combine multiple types of labeling in three columns
+
+```xml
+<View style="display: flex;">
+  <View style="width: 150px; padding: 0 1em; margin-right: 0.5em; background: #f1f1f1; border-radius: 3px">
+    <Labels name="label" toName="text">
+      <Label value="Person" />
+      <Label value="Organization" />
+    </Labels>
+  </View>
+
+  <View>
+    <Text name="text" value="$text" />
+  </View>
+
+  <View style="padding: 0 1em; margin-left: 0.5em; background: #f1f1f1; border-radius: 3px">
+    <Choices name="importance" toName="text">
+      <Header value="Text Importance" />
+      <Choice value="High" />
+      <Choice value="Medium" />
+      <Choice value="Low" />
+    </Choices>
+  </View>
+</View>
+
+```
+
 ## Related tags
 - [Text](/tags/text.html)
 - [Choices](/tags/choices.html)

@@ -48,6 +48,28 @@ Use the [Choices](/tags/choices.html) control tag to display the choices availab
 ```
 You can modify the values of the [Choice](/tags/choice.html) tag to provide different classification options. Review the available arguments for the Choices tag for customization options. 
 
+## Enhance this template
+
+### Add a sticky left column
+
+```xml
+<View style="display: flex;">
+  <View style="padding: 0em 1em; background: #f1f1f1; margin-right: 1em; border-radius: 3px">
+    <View style="position: sticky; top: 0">
+      <Labels name="label" toName="text">
+        <Label value="Person" />
+        <Label value="Organization" />
+      </Labels>
+    </View>
+  </View>
+
+  <View>
+    <Text name="text" value="$text" />
+  </View>
+</View>
+
+```
+
 ## Related tags
 
 - [Image](/tags/image.html)
