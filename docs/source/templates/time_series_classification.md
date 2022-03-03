@@ -8,7 +8,7 @@ meta_title: Time Series Classification Data Labeling Template
 meta_description: Template for classifying time series data with Label Studio for your machine learning and data science projects.
 ---
 
-<img src="/images/templates-misc/time-series-classification.png" alt="" class="gif-border" width="552px" height="408px" />
+<img src="/images/templates-misc/time-series-classification.png" alt="" class="gif-border" width="552px" height="546px" />
 
 If you need to train a machine learning model to classify time series data, create a dataset using this template. This template provides a way for annotators to classify the entire time series signal graph, and an option to classify specific parts of the graph as types of activity. You can combine these classification methods or use only one.
 
