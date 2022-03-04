@@ -65,6 +65,7 @@ urlpatterns = [
     re_path(r'^', include('webhooks.urls')),
 
     re_path(r'data/local-files/', views.localfiles_data, name="localfiles_data"),
+    re_path(r'data/pfs/', views.pachyderm_data, name="pachyderm_data"),
 
     re_path(r'version/', views.version_page, name="version"),  # html page
     re_path(r'api/version/', views.version_page, name="api-version"),  # json response

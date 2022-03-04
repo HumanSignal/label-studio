@@ -22,12 +22,14 @@ from wsgiref.util import FileWrapper
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
 from django.db.models import Value, F, CharField
+from django.db.models.functions import Concat
 
 from core import utils
 from core.utils.io import find_file
 from core.label_config import generate_time_series_json
 from core.utils.common import collect_versions
 from io_storages.localfiles.models import LocalFilesImportStorage
+from io_storages.pachyderm.models import PachydermImportStorage
 from core.feature_flags import all_flags
 
 
@@ -197,6 +199,41 @@ def localfiles_data(request):
         else:
             return HttpResponseNotFound()
 
+    return HttpResponseForbidden()
+
+
+def pachyderm_data(request):
+    """Serving files for LocalFilesImportStorage"""
+    user = request.user
+    path = request.GET.get('d')
+    logging.warning(f"{user} -- {path}")
+
+    if path and request.user.is_authenticated:
+        full_path = Path(safe_join("/pfs", path))
+        user_has_permissions = False
+
+        # Try to find Local File Storage connection based prefix:
+        # storage.path=/home/user, full_path=/home/user/a/b/c/1.jpg =>
+        # full_path.startswith(path) => True
+        pachyderm_storage = PachydermImportStorage.objects \
+            .annotate(_full_path=Value(os.path.dirname(full_path), output_field=CharField())) \
+            .filter(_full_path__startswith=Concat(Value('/pfs/'), F('repository')))
+        logging.warning(list(pachyderm_storage))
+        if pachyderm_storage.exists():
+            user_has_permissions = any(storage.project.has_permission(user) for storage in pachyderm_storage)
+
+        if user_has_permissions and os.path.exists(full_path):
+            content_type, encoding = mimetypes.guess_type(str(full_path))
+            content_type = content_type or 'application/octet-stream'
+            return RangedFileResponse(request, open(full_path, mode='rb'), content_type)
+        else:
+            if not user_has_permissions:
+                logging.warning("Insufficient Permissions")
+            else:
+                logging.warning("file does not exist")
+            return HttpResponseNotFound()
+
+    logging.warning("Not Authenticated")
     return HttpResponseForbidden()
 
 

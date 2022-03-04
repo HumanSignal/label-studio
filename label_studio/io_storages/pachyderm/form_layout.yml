@@ -1,0 +1,18 @@
+# 1x3 grid
+title_bucket_prefix: &title_bucket_prefix
+  - type: text
+    name: title
+    label: Storage Title
+  - type: text
+    name: repository
+    label: Repository Name
+    required: true
+
+ImportStorage:
+  # Title, Bucket, Prefix
+  - columnCount: 2
+    fields: *title_bucket_prefix
+
+ExportStorage:
+  - columnCount: 3
+    fields: *title_bucket_prefix

@@ -4,6 +4,7 @@
 # Except:
 !deploy/docker-entrypoint.d
 !deploy/docker-entrypoint.sh
+!deploy/init-pachyderm.sh
 !deploy/prebuild_wo_frontend.sh
 !deploy/requirements-mw.txt
 !deploy/requirements.txt

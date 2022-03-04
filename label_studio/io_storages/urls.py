@@ -6,6 +6,7 @@ from .s3.api import *
 from .azure_blob.api import *
 from .gcs.api import *
 from .redis.api import *
+from .pachyderm.api import *
 from .localfiles.api import *
 from .all_api import *
 
@@ -62,6 +63,17 @@ _api_urlpatterns = [
     path('export/redis/<int:pk>/sync', RedisExportStorageSyncAPI.as_view(), name='export-storage-redis-sync'),
     path('export/redis/validate', RedisExportStorageValidateAPI.as_view(), name='export-storage-redis-validate'),
     path('export/redis/form', RedisExportStorageFormLayoutAPI.as_view(), name='export-storage-redis-form'),
+    # Pachyderm
+    path('pachyderm', PachydermImportStorageListAPI.as_view(), name='storage-pachyderm-list'),
+    path('pachyderm/<int:pk>', PachydermImportStorageDetailAPI.as_view(), name='storage-pachyderm-detail'),
+    path('pachyderm/<int:pk>/sync', PachydermImportStorageSyncAPI.as_view(), name='storage-pachyderm-sync'),
+    path('pachyderm/validate', PachydermImportStorageValidateAPI.as_view(), name='storage-pachyderm-validate'),
+    path('pachyderm/form', PachydermImportStorageFormLayoutAPI.as_view(), name='storage-pachyderm-form'),
+    path('export/pachyderm', PachydermExportStorageListAPI.as_view(), name='export-storage-pachyderm-list'),
+    path('export/pachyderm/<int:pk>', PachydermExportStorageDetailAPI.as_view(), name='export-storage-pachyderm-detail'),
+    path('export/pachyderm/<int:pk>/sync', PachydermExportStorageSyncAPI.as_view(), name='export-storage-pachyderm-sync'),
+    path('export/pachyderm/validate', PachydermExportStorageValidateAPI.as_view(), name='export-storage-pachyderm-validate'),
+    path('export/pachyderm/form', PachydermExportStorageFormLayoutAPI.as_view(), name='export-storage-pachyderm-form'),
 ]
 if settings.ENABLE_LOCAL_FILES_STORAGE:
     _api_urlpatterns += [

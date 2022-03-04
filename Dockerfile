@@ -25,6 +25,17 @@ COPY deploy/requirements.txt /label-studio
 RUN --mount=type=cache,target=$PIP_CACHE_DIR \
     pip3 install -r requirements.txt
 
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends curl fuse3\
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN curl -o /tmp/pachctl.deb -L https://github.com/pachyderm/pachyderm/releases/download/v2.0.8/pachctl_2.0.8_amd64.deb\
+ && dpkg -i /tmp/pachctl.deb
+
+RUN mkdir /pfs
+COPY deploy/init-pachyderm.sh .
+
 COPY . /label-studio
 RUN --mount=type=cache,target=$PIP_CACHE_DIR \
     pip3 install -e .
