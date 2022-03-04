@@ -40,3 +40,13 @@ class RedisExportStorageSerializer(ExportStorageSerializer):
     class Meta:
         model = RedisExportStorage
         fields = '__all__'
+
+    def validate(self, data):
+        data = super(RedisExportStorageSerializer, self).validate(data)
+
+        storage = RedisExportStorage(**data)
+        try:
+            storage.validate_connection()
+        except:
+            raise ValidationError("Can't connect to Redis server.")
+        return data
