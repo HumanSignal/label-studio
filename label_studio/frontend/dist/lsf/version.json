@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1784: Fix errors in console while working with labels list with ocr",
-  "commit": "0e44de75f378964aeff87afe75c5c0c8df122524",
-  "branch": "fix/DEV-1784/drawing-hanging",
-  "date": "2022-03-01T23:40:46Z"
+  "message": "Merge pull request #520 from heartexlabs/dependabot/github_actions/actions/upload-artifact-3\n\nbuild(deps): bump actions/upload-artifact from 2.3.1 to 3",
+  "commit": "ad68f0e8e2705d58d694271bd39df6ba8a471ff8",
+  "branch": "master",
+  "date": "2022-03-07T13:02:30Z"
 }
