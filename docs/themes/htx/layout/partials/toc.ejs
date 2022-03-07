@@ -91,10 +91,6 @@
           <li><h4>Videos</h4></li>
         <% } %>
 
-        <% if (fileName === 'gallery_cv') { %>
-          <li><h4>Template Galleries</h4></li>
-        <% } %>
-
       <% } %>
     <li>
       <a href="<%- url_for(p.path) %>" class="sidebar-link<%- page.title === p.title ? ' current' : '' %><%- p.is_new ? ' new' : '' %>">
