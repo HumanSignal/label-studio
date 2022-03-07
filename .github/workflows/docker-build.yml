@@ -31,7 +31,7 @@ jobs:
           echo "DOCKER_TAG=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
 
       - name: Checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
 
       - name: Setup node
         uses: actions/setup-node@v2.5.1
