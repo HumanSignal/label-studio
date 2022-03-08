@@ -65,7 +65,7 @@ jobs:
             ${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Set up Python
-        uses: actions/setup-python@v2.3.2
+        uses: actions/setup-python@v3
         with:
           python-version: '3.8'
 
