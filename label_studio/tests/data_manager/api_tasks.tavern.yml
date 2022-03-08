@@ -140,7 +140,7 @@ stages:
           ],
           "drafts": [],
           "annotators": [],
-          "lead_time": null
+          "avg_lead_time": null
 
         },
         {
@@ -206,7 +206,7 @@ stages:
           "annotators": [
             !int "{created_by}"
           ],
-          "lead_time": null
+          "avg_lead_time": null
         },
         {
           "cancelled_annotations": 0,
@@ -239,7 +239,7 @@ stages:
             ],
             "was_cancelled": false,
             "ground_truth": true,
-            "lead_time": null
+            "lead_time": nullgi
           }
           ],
           "predictions": [
@@ -269,7 +269,7 @@ stages:
           "annotators": [
             !int "{created_by}"
           ],
-          "lead_time": null
+          "avg_lead_time": null
         },
         {
           "cancelled_annotations": 0,

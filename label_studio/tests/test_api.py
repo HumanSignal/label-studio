@@ -178,7 +178,7 @@ def test_delete_annotations(business_client, configured_project):
          'overlap': 1, 'file_upload': None, 'annotations_ids': '', 'annotations_results': '',
          'annotators': [], 'cancelled_annotations': 0, 'completed_at': None, 'predictions_model_versions': '',
          'predictions_results': '', 'predictions_score': None, 'total_annotations': 0, 'total_predictions': 0,
-         'lead_time': None},
+         'avg_lead_time': None},
         200
     )
 ])
