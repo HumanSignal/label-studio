@@ -233,6 +233,17 @@ def get_all_columns(project, *_):
                 'explore': False,
                 'labeling': False
             }
+        },
+        {
+            'id': 'lead_time',
+            'title': "Lead time",
+            'type': 'Number',
+            'help': 'Average lead time',
+            'target': 'tasks',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
         }
     ]
 

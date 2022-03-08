@@ -139,8 +139,8 @@ stages:
           }
           ],
           "drafts": [],
-
-          "annotators": []
+          "annotators": [],
+          "lead_time": null
 
         },
         {
@@ -206,7 +206,7 @@ stages:
           "annotators": [
             !int "{created_by}"
           ],
-
+          "lead_time": null
         },
         {
           "cancelled_annotations": 0,
@@ -268,7 +268,8 @@ stages:
           "drafts": [],
           "annotators": [
             !int "{created_by}"
-          ]
+          ],
+          "lead_time": null
         },
         {
           "cancelled_annotations": 0,
