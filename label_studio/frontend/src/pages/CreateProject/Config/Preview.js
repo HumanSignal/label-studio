@@ -43,6 +43,9 @@ export const Preview = ({ config, data, error }) => {
     } catch(e) {
       console.error(e);
     }
+    return ()=>{
+      lsf.current?.destroy();
+    }
   }, [config, data, LabelStudio, lsfRoot]);
 
   return (
