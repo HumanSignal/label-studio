@@ -34,7 +34,7 @@ from webhooks.models import WebhookAction
 
 from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import (
-    get_object_with_check_and_log, paginator)
+    get_object_with_check_and_log, paginator, paginator_help)
 from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
 from core.utils.io import find_dir, find_file, read_yaml
 
@@ -401,6 +401,7 @@ class ProjectTaskListAPI(generics.ListCreateAPIView,
         emit_webhooks_for_instance(request.user.active_organization, None, WebhookAction.TASKS_DELETED, task_ids)
         return Response(data={'tasks': task_ids}, status=204)
 
+    @swagger_auto_schema(**paginator_help('tasks', 'Projects'))
     def get(self, *args, **kwargs):
         return super(ProjectTaskListAPI, self).get(*args, **kwargs)
 
