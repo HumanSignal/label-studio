@@ -31,11 +31,32 @@ class PachydermMixin(models.Model):
         _('repository'), null=True, blank=True,
         help_text='Local path')
 
+    @property
+    def mount_point(self) -> Path:
+        return PFS_DIR / str(self.repository)
+
+    @property
+    def local_path(self) -> Path:
+        return self.mount_point / str(self.repository)
+
     def validate_connection(self):
         if not PFS_DIR.is_dir():
             raise ValidationError(f"Mount directory {PFS_DIR} does not exist.")
         if run(["pachctl", "list", "branch", self.repository], check=True).returncode:
             raise ValidationError(f"Pachyderm repo not found: {self.repository}")
+
+    def mount(self, wait: int = 30) -> None:
+        command = ["pachctl", "mount", "-r", self.repository, str(self.mount_point)]
+        self.mount_point.mkdir(exist_ok=True)
+        if not self.local_path.exists():
+            self.process = Popen(command)
+            for _ in range(wait):
+                if self.local_path.exists():
+                    break
+                sleep(1)
+
+    def unmount(self) -> None:
+        run(["pachctl", "unmount", str(self.mount_point)], check=True)
 
 
 class PachydermImportStorage(PachydermMixin, ImportStorage):
@@ -45,8 +66,7 @@ class PachydermImportStorage(PachydermMixin, ImportStorage):
         return False
 
     def iterkeys(self):
-        path = PFS_DIR / str(self.repository) / str(self.repository)
-        for file in path.rglob('*'):
+        for file in self.local_path.rglob('*'):
             if file.is_file():
                 yield str(file)
 
@@ -58,15 +78,7 @@ class PachydermImportStorage(PachydermMixin, ImportStorage):
         return self._scan_and_create_links(PachydermImportStorageLink)
 
     def sync(self):
-        mount_point = PFS_DIR / str(self.repository)
-        mount_point.mkdir(exist_ok=True)
-        local_path = mount_point / str(self.repository)
-        if not local_path.exists():
-            self.process = Popen(["pachctl", "mount", "-r", self.repository, str(mount_point)])
-            for _ in range(30):
-                if local_path.exists():
-                    break
-                sleep(1)
+        self.mount()
         self.scan_and_create_links()
 
 
@@ -78,7 +90,7 @@ class PachydermExportStorage(ExportStorage, PachydermMixin):
 
         # get key that identifies this object in storage
         key = PachydermExportStorageLink.get_key(annotation)
-        key = os.path.join(PFS_DIR, str(self.repository), str(self.repository), f"{key}.json")
+        key = os.path.join(self.local_path, f"{key}.json")
 
         # put object into storage
         with open(key, mode='w') as f:
@@ -88,17 +100,11 @@ class PachydermExportStorage(ExportStorage, PachydermMixin):
         PachydermExportStorageLink.create(annotation, self)
 
     def sync(self):
+        if not self.local_path.exists():
+            self.mount()
         self.save_all_annotations()
-        mount_point = PFS_DIR / str(self.repository)
-        mount_point.mkdir(exist_ok=True)
-        local_path = mount_point / str(self.repository)
-        if local_path.exists():
-            run(["pachctl", "unmount", str(mount_point)])
-        self.process = Popen(["pachctl", "mount", "-r", f"{self.repository}+w", str(mount_point)])
-        for _ in range(30):
-            if local_path.exists():
-                break
-            sleep(1)
+        self.unmount()
+        self.mount()
 
 
 class PachydermImportStorageLink(ImportStorageLink):
