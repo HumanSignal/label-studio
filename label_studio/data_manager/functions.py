@@ -235,10 +235,10 @@ def get_all_columns(project, *_):
             }
         },
         {
-            'id': 'lead_time',
-            'title': "Lead time",
+            'id': 'avg_lead_time',
+            'title': "Lead Time",
             'type': 'Number',
-            'help': 'Average lead time',
+            'help': 'Average lead time over all annotations (seconds)',
             'target': 'tasks',
             'visibility_defaults': {
                 'explore': False,
