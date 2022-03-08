@@ -48,26 +48,19 @@ Use the `placeholder` argument to provide placeholder text to the annotator, whi
 
 ## Enhance this template
 
+You can enhance this template in many ways.
+
 ### Add a sticky header so that you can always view the caption
 
+If you want to always view the annotation options on the labeling interface, even if you need to scroll around on the image or data being labeled, you can use styling with the [View](/tags/view.html) tag to specify the position.
 
-
+In this case, wrap the caption element in styled [View](/tags/view.html) tags:
 ```xml
-<View>
-  <View style="padding: 0 1em; margin: 1em 0; background: #f1f1f1; position: sticky; top: 0; border-radius: 3px">
-    <Labels name="label" toName="text" showInline="true">
-      <Label value="Person" />
-      <Label value="Organization" />
-    </Labels>
-  </View>
-
-  <View>
-    <Text name="text" value="$text" />
-  </View>
-</View>
-
+ <View style="padding: 0 1em; margin: 1em 0; background: #f1f1f1; position: sticky; top: 0; border-radius: 3px">
+  <TextArea name="caption" toName="image" placeholder="Enter description here..." rows="5" maxSubmissions="1"/>
+ </View>
 ```
-
+The `position: sticky; top: 0;` CSS sets the [TextArea](/tags/textarea.html) to be fixed at the top of the screen after the annotator scrolls down when viewing the task. The other styling options visually differentiate the section of the interface containing the text box from the rest of the interface.
 
 ## Related tags
 
