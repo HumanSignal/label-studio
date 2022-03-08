@@ -34,7 +34,7 @@ class PachydermMixin(models.Model):
     def validate_connection(self):
         if not PFS_DIR.is_dir():
             raise ValidationError(f"Mount directory {PFS_DIR} does not exist.")
-        if run(["pachctl", "inspect", "repo", self.repository], check=True).returncode:
+        if run(["pachctl", "list", "branch", self.repository], check=True).returncode:
             raise ValidationError(f"Pachyderm repo not found: {self.repository}")
 
 
