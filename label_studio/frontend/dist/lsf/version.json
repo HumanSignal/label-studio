@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #520 from heartexlabs/dependabot/github_actions/actions/upload-artifact-3\n\nbuild(deps): bump actions/upload-artifact from 2.3.1 to 3",
-  "commit": "ad68f0e8e2705d58d694271bd39df6ba8a471ff8",
-  "branch": "master",
-  "date": "2022-03-07T13:02:30Z"
+  "message": "Merge branch 'fix/video-improvements' into fix/dev-1267/tooltips",
+  "commit": "6ad13125306be22c2d148808df05b2d6680cc3fd",
+  "branch": "fix/video-improvements",
+  "date": "2022-03-08T16:03:21Z"
 }
