@@ -211,7 +211,7 @@ stages:
         {
           "cancelled_annotations": 0,
 
-          "annotations_results": !raw "[{type:choices, value:{choices:[class_A]}, to_name:text, from_name:text_class}] [{type:choices, value:{choices:[class_A]}, to_name:text, from_name:text_class}]",
+          "annotations_results": !anystr "",
           "data": {
             "text": "x2",
             "int_field": 20
