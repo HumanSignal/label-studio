@@ -2,10 +2,12 @@
 """
 import json
 import logging
+import signal
 import os
 from pathlib import Path
 from subprocess import run, Popen
 from time import sleep
+from typing import Dict, Optional, Tuple
 
 from django.conf import settings
 from django.db import models
@@ -25,11 +27,17 @@ from tasks.models import Annotation
 PFS_DIR = Path("/pfs")
 logger = logging.getLogger(__name__)
 
+mount_processes: Dict[int, Popen] = {}
+
 
 class PachydermMixin(models.Model):
-    repository = models.TextField(
-        _('repository'), null=True, blank=True,
-        help_text='Local path')
+    repository = models.TextField(_('repository'), blank=True, help_text='Local path')
+    process: Optional[Popen] = None
+
+    @property
+    def is_mounted(self) -> bool:
+        # Maybe we should do something with the stored process here.
+        return self.local_path.exists()
 
     @property
     def mount_point(self) -> Path:
@@ -37,26 +45,73 @@ class PachydermMixin(models.Model):
 
     @property
     def local_path(self) -> Path:
-        return self.mount_point / str(self.repository)
+        repo_name, _ = self.repo_and_branch
+        return self.mount_point / repo_name
 
-    def validate_connection(self):
-        if not PFS_DIR.is_dir():
-            raise ValidationError(f"Mount directory {PFS_DIR} does not exist.")
-        if run(["pachctl", "list", "branch", self.repository], check=True).returncode:
-            raise ValidationError(f"Pachyderm repo not found: {self.repository}")
+    @property
+    def repo_and_branch(self) -> Tuple[str, str]:
+        repo_name, _, branch = str(self.repository).partition("@")
+        return repo_name, branch
 
-    def mount(self, wait: int = 30) -> None:
-        command = ["pachctl", "mount", "-r", self.repository, str(self.mount_point)]
+    def mount(self, wait: int = 30, *, writable: bool = False) -> None:
+        repository = f"{self.repository}{'+w' if writable else ''}"
+        command = ["pachctl", "mount", "-r", repository, str(self.mount_point)]
+        process = mount_processes.pop(self.pk, None)
+        if process is not None:
+            logger.warning(f"Sending SIGINT to {process.pid} to cleanup old mount")
+            # Must send SIGINT for pachctl to cleanup mount properly.
+            process.send_signal(signal.SIGINT)
+            process.wait()
+
         self.mount_point.mkdir(exist_ok=True)
-        if not self.local_path.exists():
-            self.process = Popen(command)
+        logger.debug(f"Mounting repository: {self.repository}")
+        if not self.is_mounted:
+            mount_processes[self.pk] = Popen(command)
             for _ in range(wait):
-                if self.local_path.exists():
+                if self.is_mounted:
                     break
                 sleep(1)
 
     def unmount(self) -> None:
-        run(["pachctl", "unmount", str(self.mount_point)], check=True)
+        logger.debug(f"Unmounting repository: {self.repository}")
+        run(["pachctl", "unmount", str(self.mount_point)], capture_output=True, check=True)
+        del mount_processes[self.pk]
+
+    def clean(self):
+        """
+        Hook for doing any extra model-wide validation after clean() has been
+        called on every field by self.clean_fields. Any ValidationError raised
+        by this method will not be associated with a particular field; it will
+        have a special-case association with the field defined by NON_FIELD_ERRORS.
+        """
+        repo_name, branch = self.repo_and_branch
+        branch = branch or "master"
+        self.repository = f"{repo_name}@{branch}"
+        super().clean()
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        if self.is_mounted:
+            self.unmount()
+
+    def validate_connection(self):
+        if not PFS_DIR.is_dir():
+            raise ValidationError(f"Mount directory {PFS_DIR} does not exist.")
+        repo_name, branch = self.repo_and_branch
+        list_branch = run(["pachctl", "list", "branch", repo_name], capture_output=True)
+        if list_branch.returncode:
+            raise ValidationError(f"Pachyderm repo not found: {repo_name}")
+
+        branches = {
+            line.split()[0].decode() for line in list_branch.stdout.splitlines()[1:]
+        }
+        if branch not in branches:
+            # Branch might be a commit
+            list_commit = run(["pachctl", "list", "commit", self.repository], capture_output=True)
+            if list_commit.returncode:
+                raise ValidationError(
+                    f"branch/commit {branch} not found for Pachyderm repo {repo_name}"
+                )
 
 
 class PachydermImportStorage(PachydermMixin, ImportStorage):
@@ -85,6 +140,12 @@ class PachydermImportStorage(PachydermMixin, ImportStorage):
 class PachydermExportStorage(ExportStorage, PachydermMixin):
 
     def save_annotation(self, annotation):
+        if not self.is_mounted:
+            raise RuntimeError(
+                f"Output repository \"{self.repository}\" not mounted\n"
+                f"Please sync the associated target cloud storage"
+            )
+
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
 
@@ -100,11 +161,11 @@ class PachydermExportStorage(ExportStorage, PachydermMixin):
         PachydermExportStorageLink.create(annotation, self)
 
     def sync(self):
-        if not self.local_path.exists():
-            self.mount()
+        if not self.is_mounted:
+            self.mount(writable=True)
         self.save_all_annotations()
         self.unmount()
-        self.mount()
+        self.mount(writable=True)
 
 
 class PachydermImportStorageLink(ImportStorageLink):

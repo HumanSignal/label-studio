@@ -15,16 +15,7 @@ RUN set -eux; \
     build-essential postgresql-client libmysqlclient-dev mysql-client python3.8 python3-pip python3.8-dev \
     uwsgi git libxml2-dev libxslt-dev zlib1g-dev
 
-# Copy and install middleware dependencies
-COPY deploy/requirements-mw.txt /label-studio
-RUN --mount=type=cache,target=$PIP_CACHE_DIR \
-    pip3 install -r requirements-mw.txt
-
-# Copy and install requirements.txt first for caching
-COPY deploy/requirements.txt /label-studio
-RUN --mount=type=cache,target=$PIP_CACHE_DIR \
-    pip3 install -r requirements.txt
-
+# Install fuse and pachctl
 RUN apt-get update \
  && apt-get install -y --no-install-recommends curl fuse3\
  && apt-get clean \
@@ -35,6 +26,16 @@ RUN curl -o /tmp/pachctl.deb -L https://github.com/pachyderm/pachyderm/releases/
 
 RUN mkdir /pfs
 COPY deploy/init-pachyderm.sh .
+
+# Copy and install middleware dependencies
+COPY deploy/requirements-mw.txt /label-studio
+RUN --mount=type=cache,target=$PIP_CACHE_DIR \
+    pip3 install -r requirements-mw.txt
+
+# Copy and install requirements.txt first for caching
+COPY deploy/requirements.txt /label-studio
+RUN --mount=type=cache,target=$PIP_CACHE_DIR \
+    pip3 install -r requirements.txt
 
 COPY . /label-studio
 RUN --mount=type=cache,target=$PIP_CACHE_DIR \
