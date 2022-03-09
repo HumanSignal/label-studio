@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'fix/video-improvements' into fix/dev-1267/tooltips",
-  "commit": "6ad13125306be22c2d148808df05b2d6680cc3fd",
-  "branch": "fix/video-improvements",
-  "date": "2022-03-08T16:03:21Z"
+  "message": "fix: DEV-1270: Fix video timeline expanding in fullscreen mode",
+  "commit": "4fa1e977ba764ac6d7d0e17b22da1c4bff82b8d7",
+  "branch": "fix/DEV-1270/f-screen-t-line-expand",
+  "date": "2022-03-09T11:04:42Z"
 }
