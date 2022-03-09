@@ -216,7 +216,7 @@ stages:
             "text": "x2",
             "int_field": 20
           },
-          "predictions_results": !raw "[{type:choices, value:{choices:[class_A]}, to_name:text, from_name:text_class}]",
+          "predictions_results": !anystr "",
           "predictions_score": null,
           "total_annotations": 2,
           "total_predictions": 1,
