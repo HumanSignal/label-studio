@@ -478,7 +478,7 @@ stages:
               "was_cancelled": false,
               "ground_truth": true,
 
-              "lead_time": null
+              "lead_time": 3
               
             }
             ],
@@ -596,7 +596,7 @@ stages:
               "was_cancelled": false,
               "ground_truth": true,
 
-              "lead_time": 3,
+              "lead_time": 3
               
             },
             {
@@ -619,7 +619,7 @@ stages:
               "was_cancelled": false,
               "ground_truth": true,
 
-              "lead_time": 5,
+              "lead_time": 5
 
             }
             ],
@@ -691,7 +691,7 @@ stages:
               "was_cancelled": false,
               "ground_truth": true,
 
-              "lead_time": null,
+              "lead_time": null
               
             }
             ],
@@ -963,7 +963,7 @@ stages:
             "was_cancelled": false,
             "ground_truth": true,
 
-            "lead_time": null,
+            "lead_time": 3
             
           }
           ],
@@ -1034,7 +1034,7 @@ stages:
             "was_cancelled": false,
             "ground_truth": true,
 
-            "lead_time": 3,
+            "lead_time": 3
             
           },
           {
@@ -1057,7 +1057,7 @@ stages:
             "was_cancelled": false,
             "ground_truth": true,
 
-            "lead_time": 5,
+            "lead_time": 5
 
           }
           ],
@@ -1126,7 +1126,7 @@ stages:
             "was_cancelled": false,
             "ground_truth": true,
 
-            "lead_time": null,
+            "lead_time": null
             
           }
           ],
