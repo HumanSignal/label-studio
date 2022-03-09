@@ -211,7 +211,7 @@ stages:
         {
           "cancelled_annotations": 0,
 
-          "annotations_results": !raw "[{type:choices, value:{choices:[class_A]}, to_name:text, from_name:text_class}]",
+          "annotations_results": !raw "[{type:choices, value:{choices:[class_A]}, to_name:text, from_name:text_class},{type:choices, value:{choices:[class_A]}, to_name:text, from_name:text_class}]",
           "data": {
             "text": "x2",
             "int_field": 20
@@ -564,7 +564,7 @@ stages:
             "cancelled_annotations": 0,
 
 
-            "annotations_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_A]}}]",
+            "annotations_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_A]}}, {from_name: text_class, to_name: text, type: choices, value: {choices: [class_A]}}]",
             "data": {
               "int_field": 20,
               "text": "x2"
