@@ -1,6 +1,6 @@
 {
-  "message": "FIx cases when the view is to narrow to fit side panels (#527)",
-  "commit": "b5236eed9073c0d1417bd76035eff3a705fd74f6",
-  "branch": "fix/video-improvements",
-  "date": "2022-03-09T13:56:14Z"
+  "message": "fix: DEV-1494: Fix loosing enabled value of video region on update",
+  "commit": "1c7b0127282ae102190416489912c6d7a54a7f8b",
+  "branch": "fix/DEV-1494/keep-enabled-on-update",
+  "date": "2022-03-09T22:13:53Z"
 }
