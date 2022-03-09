@@ -564,13 +564,13 @@ stages:
             "cancelled_annotations": 0,
 
 
-            "annotations_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_A]}}, {from_name: text_class, to_name: text, type: choices, value: {choices: [class_A]}}]",
+            "annotations_results": !anystr "",
             "data": {
               "int_field": 20,
               "text": "x2"
             },
             
-            "predictions_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_A]}}]",
+            "predictions_results": !anystr "",
             "predictions_score": null,
             "total_annotations": 2,
             "total_predictions": 1,
