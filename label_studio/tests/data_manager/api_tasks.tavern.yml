@@ -177,7 +177,7 @@ stages:
             ],
             "was_cancelled": false,
             "ground_truth": true,
-            "lead_time": 3
+            "lead_time": 3.0
           }
           ],
           "predictions": [
@@ -206,7 +206,7 @@ stages:
           "annotators": [
             !int "{created_by}"
           ],
-          "avg_lead_time": 3
+          "avg_lead_time": 3.0
         },
         {
           "cancelled_annotations": 0,
@@ -239,7 +239,7 @@ stages:
             ],
             "was_cancelled": false,
             "ground_truth": true,
-            "lead_time": 3
+            "lead_time": 3.0
           },
           {
             "created_username": " test_suites_user@heartex.com, {created_by}",
@@ -258,7 +258,7 @@ stages:
             ],
             "was_cancelled": false,
             "ground_truth": true,
-            "lead_time": 5
+            "lead_time": 5.0
           }
           ],
           "predictions": [
@@ -288,7 +288,7 @@ stages:
           "annotators": [
             !int "{created_by}"
           ],
-          "avg_lead_time": 4
+          "avg_lead_time": 4.0
         },
         {
           "cancelled_annotations": 0,
@@ -478,7 +478,7 @@ stages:
               "was_cancelled": false,
               "ground_truth": true,
 
-              "lead_time": 3
+              "lead_time": 3.0
               
             }
             ],
@@ -596,7 +596,7 @@ stages:
               "was_cancelled": false,
               "ground_truth": true,
 
-              "lead_time": 3
+              "lead_time": 3.0
               
             },
             {
@@ -619,7 +619,7 @@ stages:
               "was_cancelled": false,
               "ground_truth": true,
 
-              "lead_time": 5
+              "lead_time": 5.0
 
             }
             ],
@@ -963,7 +963,7 @@ stages:
             "was_cancelled": false,
             "ground_truth": true,
 
-            "lead_time": 3
+            "lead_time": 3.0
             
           }
           ],
@@ -1034,7 +1034,7 @@ stages:
             "was_cancelled": false,
             "ground_truth": true,
 
-            "lead_time": 3
+            "lead_time": 3.0
             
           },
           {
@@ -1057,7 +1057,7 @@ stages:
             "was_cancelled": false,
             "ground_truth": true,
 
-            "lead_time": 5
+            "lead_time": 5.0
 
           }
           ],
