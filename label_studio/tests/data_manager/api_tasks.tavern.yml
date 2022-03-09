@@ -218,7 +218,7 @@ stages:
           },
           "predictions_results": !raw "[{type:choices, value:{choices:[class_A]}, to_name:text, from_name:text_class}]",
           "predictions_score": null,
-          "total_annotations": 1,
+          "total_annotations": 2,
           "total_predictions": 1,
           "annotations_ids": !anystr "",
           "annotations": [
@@ -240,6 +240,25 @@ stages:
             "was_cancelled": false,
             "ground_truth": true,
             "lead_time": 3
+          },
+          {
+            "created_username": " test_suites_user@heartex.com, {created_by}",
+            "created_ago": "0\u00a0minutes",
+            "result": [
+            {
+              "type": "choices",
+              "value": {
+                "choices": [
+                  "class_A"
+                ]
+              },
+              "to_name": "text",
+              "from_name": "text_class"
+            }
+            ],
+            "was_cancelled": false,
+            "ground_truth": true,
+            "lead_time": 5
           }
           ],
           "predictions": [
@@ -553,7 +572,7 @@ stages:
             
             "predictions_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_A]}}]",
             "predictions_score": null,
-            "total_annotations": 1,
+            "total_annotations": 2,
             "total_predictions": 1,
             "annotations_ids": !anystr "",
             "annotations": [
@@ -579,6 +598,29 @@ stages:
 
               "lead_time": 3,
               
+            },
+            {
+
+              "created_username": " test_suites_user@heartex.com, {created_by}",
+              "created_ago": "0\u00a0minutes",
+              "completed_by": !int "{created_by}",
+              "result": [
+              {
+                "from_name": "text_class",
+                "to_name": "text",
+                "type": "choices",
+                "value": {
+                  "choices": [
+                    "class_A"
+                  ]
+                }
+              }
+              ],
+              "was_cancelled": false,
+              "ground_truth": true,
+
+              "lead_time": 5,
+
             }
             ],
             "predictions": [
@@ -968,7 +1010,7 @@ stages:
           
 
           "predictions_score": null,
-          "total_annotations": 1,
+          "total_annotations": 2,
           "total_predictions": 1,
           "annotations_ids": !anystr "",
           "annotations": [
@@ -992,8 +1034,31 @@ stages:
             "was_cancelled": false,
             "ground_truth": true,
 
-            "lead_time": null,
+            "lead_time": 3,
             
+          },
+          {
+
+            "created_username": " test_suites_user@heartex.com, {created_by}",
+            "created_ago": "0\u00a0minutes",
+            "completed_by": !int "{created_by}",
+            "result": [
+            {
+              "from_name": "text_class",
+              "to_name": "text",
+              "type": "choices",
+              "value": {
+                "choices": [
+                  "class_A"
+                ]
+              }
+            }
+            ],
+            "was_cancelled": false,
+            "ground_truth": true,
+
+            "lead_time": 5,
+
           }
           ],
           "predictions": [
@@ -1192,7 +1257,7 @@ stages:
           },
 
           "predictions_results": "",
-          "total_annotations": 1,
+          "total_annotations": 2,
           "annotations_ids": !anystr "",
           "drafts": [],
           "file_upload": null,
