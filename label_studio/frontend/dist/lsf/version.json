@@ -1,6 +1,6 @@
 {
-  "message": "Fix tests",
-  "commit": "49ebedc377b449d45683619fe8a8c29910622d9d",
+  "message": "FIx cases when the view is to narrow to fit side panels (#527)",
+  "commit": "b5236eed9073c0d1417bd76035eff3a705fd74f6",
   "branch": "fix/video-improvements",
-  "date": "2022-03-09T11:49:02Z"
+  "date": "2022-03-09T13:56:14Z"
 }
