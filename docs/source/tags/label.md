@@ -1,31 +1,33 @@
 ---
 title: Label
 type: tags
-order: 409
-meta_title: Label Tags for Single Label Tags
-meta_description: Label Studio Label Tags customize Label Studio with single label tags for machine learning and data science projects.
+order: 410
+meta_title: Label Tag for Single Label Tags
+meta_description: Customize Label Studio with the Label tag to assign a single label to regions in a task for machine learning and data science projects.
 ---
 
-Label tag represents a single label
+Label tag represents a single label. Use with the Labels tag, including BrushLabels, EllipseLabels, HyperTextLabels, KeyPointLabels, and other Labels tags to specify the value of a specific label.
 
 ### Parameters
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| value | <code>string</code> |  | value of the label |
-| [selected] | <code>boolean</code> | <code>false</code> | if this label should be preselected |
-| [maxUsages] | <code>number</code> |  | maximum available usages |
-| [hotkey] | <code>string</code> |  | hotkey, if not specified then will be automatically generated |
-| [alias] | <code>string</code> |  | label alias |
-| [showAlias] | <code>boolean</code> | <code>false</code> | show alias inside label text |
-| [aliasStyle] | <code>string</code> | <code>&quot;opacity:0.6&quot;</code> | alias CSS style |
-| [size] | <code>string</code> | <code>&quot;medium&quot;</code> | size of text in the label |
-| [background] | <code>string</code> |  | background color of an active label |
-| [selectedColor] | <code>string</code> |  | color of text in an active label |
-| [granularity] | <code>symbol</code> \| <code>word</code> |  | control per symbol or word selection (only for Text) |
+| value | <code>string</code> |  | Value of the label |
+| [selected] | <code>boolean</code> | <code>false</code> | Whether to preselect this label |
+| [maxUsages] | <code>number</code> |  | Maximum number of times this label can be used per task |
+| [hint] | <code>string</code> |  | Hint for label on hover |
+| [hotkey] | <code>string</code> |  | Hotkey to use for the label. Automatically generated if not specified |
+| [alias] | <code>string</code> |  | Label alias |
+| [showAlias] | <code>boolean</code> | <code>false</code> | Whether to show alias inside label text |
+| [aliasStyle] | <code>string</code> | <code>&quot;opacity:0.6&quot;</code> | CSS style for the alias |
+| [size] | <code>string</code> | <code>&quot;medium&quot;</code> | Size of text in the label |
+| [background] | <code>string</code> | <code>&quot;#36B37E&quot;</code> | Background color of an active label in hexadecimal |
+| [selectedColor] | <code>string</code> | <code>&quot;#ffffff&quot;</code> | Color of text in an active label in hexadecimal |
+| [granularity] | <code>symbol</code> \| <code>word</code> |  | Set control based on symbol or word selection (only for Text) |
 
 ### Example
 ```html
+<!--Basic named entity recognition labeling configuration for text-->
 <View>
   <Labels name="type" toName="txt-1">
     <Label alias="B" value="Brand" />

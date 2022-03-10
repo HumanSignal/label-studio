@@ -1,6 +1,10 @@
+/* global Sentry */
+
+import { createBrowserHistory } from 'history';
 import React from 'react';
 import { render } from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
+import { Router } from 'react-router-dom';
+import { initSentry } from "../config/Sentry";
 import { ApiProvider } from '../providers/ApiProvider';
 import { AppStoreProvider } from '../providers/AppStoreProvider';
 import { ConfigProvider } from '../providers/ConfigProvider';
@@ -13,9 +17,17 @@ import { AsyncPage } from './AsyncPage/AsyncPage';
 import ErrorBoundary from './ErrorBoundary';
 import { RootPage } from './RootPage';
 
-const App = ({content}) => {
-  const url = new URL(APP_SETTINGS.hostname || location.origin);
+const baseURL = new URL(APP_SETTINGS.hostname || location.origin);
 
+const browserHistory = createBrowserHistory({
+  basename: baseURL.pathname || "/",
+});
+
+window.LSH = browserHistory;
+
+initSentry(browserHistory);
+
+const App = ({content}) => {
   const libraries = {
     lsf: {
       scriptSrc: window.EDITOR_JS,
@@ -31,7 +43,7 @@ const App = ({content}) => {
 
   return (
     <ErrorBoundary>
-      <BrowserRouter basename={url.pathname || undefined}>
+      <Router history={browserHistory}>
         <MultiProvider providers={[
           <AppStoreProvider key="app-store"/>,
           <ApiProvider key="api"/>,
@@ -44,7 +56,7 @@ const App = ({content}) => {
             <RootPage content={content}/>
           </AsyncPage>
         </MultiProvider>
-      </BrowserRouter>
+      </Router>
     </ErrorBoundary>
   );
 };

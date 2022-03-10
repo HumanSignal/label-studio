@@ -7,24 +7,21 @@ from pathlib import Path
 import re
 
 from django.conf import settings
-from django.db import models, transaction
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
-from core.utils.params import get_env
 from io_storages.base_models import (
       ExportStorage,
       ExportStorageLink,
       ImportStorage,
       ImportStorageLink,
 )
-from io_storages.serializers import StorageAnnotationSerializer
 from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
-url_scheme = 'https'
 
 
 class LocalFilesMixin(models.Model):
@@ -40,14 +37,24 @@ class LocalFilesMixin(models.Model):
 
     def validate_connection(self):
         path = Path(self.path)
+        document_root = Path(settings.LOCAL_FILES_DOCUMENT_ROOT)
         if not path.exists():
             raise ValidationError(f'Path {self.path} does not exist')
+        if document_root not in path.parents:
+            raise ValidationError(f'Path {self.path} must start with '
+                                  f'LOCAL_FILES_DOCUMENT_ROOT={settings.LOCAL_FILES_DOCUMENT_ROOT} '
+                                  f'and must be a child, e.g.: {Path(settings.LOCAL_FILES_DOCUMENT_ROOT) / "abc"}')
         if settings.LOCAL_FILES_SERVING_ENABLED is False:
             raise ValidationError("Serving local files can be dangerous, so it's disabled by default. "
-                                  'You can enable it with LOCAL_FILES_SERVING_ENABLED environment variable')
+                                  'You can enable it with LOCAL_FILES_SERVING_ENABLED environment variable, '
+                                  'please check docs: https://labelstud.io/guide/storage.html#Local-storage')
 
 
 class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):
+    url_scheme = 'https'
+
+    def can_resolve_url(self, url):
+        return False
 
     def iterkeys(self):
         path = Path(self.path)
@@ -63,10 +70,11 @@ class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):
     def get_data(self, key):
         path = Path(key)
         if self.use_blob_urls:
-            # include self-hosted links pointed to local resources via {settings.HOSTNAME}/data/local-files?d=<path/to/local/dir>
-            document_root = Path(get_env('LOCAL_FILES_DOCUMENT_ROOT', default='/'))
+            # include self-hosted links pointed to local resources via
+            # {settings.HOSTNAME}/data/local-files?d=<path/to/local/dir>
+            document_root = Path(settings.LOCAL_FILES_DOCUMENT_ROOT)
             relative_path = str(path.relative_to(document_root))
-            return {settings.DATA_UNDEFINED_NAME: f'{settings.HOSTNAME}/data/local-files/?d={relative_path}'}
+            return {settings.DATA_UNDEFINED_NAME: f'{settings.HOSTNAME}/data/local-files/?d={str(relative_path)}'}
 
         try:
             with open(path, encoding='utf8') as f:
@@ -89,15 +97,17 @@ class LocalFilesExportStorage(ExportStorage, LocalFilesMixin):
     def save_annotation(self, annotation):
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
-        with transaction.atomic():
-            # Create export storage link
-            link = LocalFilesExportStorageLink.create(annotation, self)
-            key = os.path.join(self.path, f"{link.key}.json")
-            try:
-                with open(key, mode='w') as f:
-                    json.dump(ser_annotation, f, indent=2)
-            except Exception as exc:
-                logger.error(f"Can't export annotation {annotation} to local storage {self}. Reason: {exc}", exc_info=True)
+
+        # get key that identifies this object in storage
+        key = LocalFilesExportStorageLink.get_key(annotation)
+        key = os.path.join(self.path, f"{key}.json")
+
+        # put object into storage
+        with open(key, mode='w') as f:
+            json.dump(ser_annotation, f, indent=2)
+
+        # Create export storage link
+        LocalFilesExportStorageLink.create(annotation, self)
 
 
 class LocalFilesImportStorageLink(ImportStorageLink):
@@ -115,4 +125,3 @@ def export_annotation_to_local_files(sender, instance, **kwargs):
         for storage in project.io_storages_localfilesexportstorages.all():
             logger.debug(f'Export {instance} to Local Storage {storage}')
             storage.save_annotation(instance)
-            

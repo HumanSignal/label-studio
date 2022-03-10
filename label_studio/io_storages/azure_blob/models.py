@@ -6,24 +6,20 @@ import re
 
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
-from django.db import models, transaction
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from django.dispatch import receiver
 from django.db.models.signals import post_save
 
 from azure.storage.blob import BlobServiceClient, generate_blob_sas, BlobSasPermissions
 from django.dispatch import receiver
 from core.utils.params import get_env
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
-from io_storages.utils import get_uri_via_regex
-from io_storages.serializers import StorageAnnotationSerializer
 from tasks.models import Annotation
 
 
 logger = logging.getLogger(__name__)
 logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(logging.WARNING)
-url_scheme = 'azure-blob'
 
 
 class AzureBlobStorageMixin(models.Model):
@@ -70,6 +66,8 @@ class AzureBlobStorageMixin(models.Model):
 
 
 class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
+    url_scheme = 'azure-blob'
+
     presign = models.BooleanField(
         _('presign'), default=True,
         help_text='Generate presigned URLs')
@@ -97,7 +95,7 @@ class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
     def get_data(self, key):
         if self.use_blob_urls:
             data_key = settings.DATA_UNDEFINED_NAME
-            return {data_key: f'{url_scheme}://{self.container}/{key}'}
+            return {data_key: f'{self.url_scheme}://{self.container}/{key}'}
 
         container = self.get_container()
         blob = container.download_blob(key)
@@ -107,18 +105,10 @@ class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
             raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task")  # noqa
         return value
 
-    def resolve_uri(self, data):
-        uri, storage = get_uri_via_regex(data, prefixes=(url_scheme,))
-        if not storage:
-            return
-        logger.debug("Found matching storage uri in task data value: {uri}".format(uri=uri))
-        resolved_uri = self.resolve_azure_blob(uri)
-        return data.replace(uri, resolved_uri)
-
     def scan_and_create_links(self):
         return self._scan_and_create_links(AzureBlobImportStorageLink)
 
-    def resolve_azure_blob(self, url):
+    def generate_http_url(self, url):
         r = urlparse(url, allow_fragments=False)
         container = r.netloc
         blob = r.path.lstrip('/')
@@ -140,14 +130,16 @@ class AzureBlobExportStorage(ExportStorage, AzureBlobStorageMixin):
         container = self.get_container()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
-        with transaction.atomic():
-            # Create export storage link
-            link = AzureBlobExportStorageLink.create(annotation, self)
-            try:
-                blob = container.get_blob_client(link.key)
-                blob.upload_blob(json.dumps(ser_annotation), overwrite=True)
-            except Exception as exc:
-                logger.error(f"Can't export annotation {annotation} to Azure storage {self}. Reason: {exc}", exc_info=True)
+        # get key that identifies this object in storage
+        key = AzureBlobExportStorageLink.get_key(annotation)
+        key = str(self.prefix) + '/' + key if self.prefix else key
+
+        # put object into storage
+        blob = container.get_blob_client(key)
+        blob.upload_blob(json.dumps(ser_annotation), overwrite=True)
+
+        # create link if everything ok
+        AzureBlobExportStorageLink.create(annotation, self)
 
 
 @receiver(post_save, sender=Annotation)
@@ -165,11 +157,3 @@ class AzureBlobImportStorageLink(ImportStorageLink):
 
 class AzureBlobExportStorageLink(ExportStorageLink):
     storage = models.ForeignKey(AzureBlobExportStorage, on_delete=models.CASCADE, related_name='links')
-
-    @property
-    def key(self):
-        prefix = self.storage.prefix or ''
-        key = str(self.annotation.id)
-        if self.storage.prefix:
-            key = f'{self.storage.prefix}/{key}'
-        return key

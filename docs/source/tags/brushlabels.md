@@ -1,25 +1,53 @@
 ---
 title: BrushLabels
 type: tags
-order: 401
-meta_title: Brush Label Tags for Segmented Image Labeling
-meta_description: Label Studio Brush Label Tags customize Label Studio for segmented image labeling for machine learning and data science projects.
+order: 402
+meta_title: Brush Label Tag for Image Segmentation Labeling
+meta_description: Customize Label Studio with brush label tags for image segmentation labeling for machine learning and data science projects.
 ---
 
-BrushLabels tag creates segmented labeling
+Use the BrushLabels tag for image segmentation tasks where you want to apply a mask or use a brush to draw a region on the image.
+
+Use with the following data types: image
 
 ### Parameters
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| name | <code>string</code> |  | name of the element |
-| toName | <code>string</code> |  | name of the image to label |
-| [choice] | <code>single</code> \| <code>multiple</code> | <code>single</code> | configure if you can select just one or multiple labels |
-| [maxUsages] | <code>number</code> |  | maximum available usages |
-| [showInline] | <code>boolean</code> | <code>true</code> | show items in the same visual line |
+| name | <code>string</code> |  | Name of the element |
+| toName | <code>string</code> |  | Name of the image to label |
+| [choice] | <code>single</code> \| <code>multiple</code> | <code>single</code> | Configure whether the data labeler can select one or multiple labels |
+| [maxUsages] | <code>number</code> |  | Maximum number of times a label can be used per task |
+| [showInline] | <code>boolean</code> | <code>true</code> | Show labels in the same visual line |
+
+### Sample Results JSON
+
+| Name | Type | Description |
+| --- | --- | --- |
+| original_width | <code>number</code> | width of the original image (px) |
+| original_height | <code>number</code> | height of the original image (px) |
+| image_rotation | <code>number</code> | rotation degree of the image (deg) |
+| value | <code>Object</code> |  |
+| value.format | <code>&quot;rle&quot;</code> | format of the masks, only RLE is supported for now |
+| value.rle | <code>Array.&lt;number&gt;</code> | RLE-encoded image |
+
+### Example JSON
+```json
+{
+  "original_width": 1920,
+  "original_height": 1280,
+  "image_rotation": 0,
+  "value": {
+    "format": "rle",
+    "rle": [0, 1, 1, 2, 3],
+    "brushlabels": ["Car"]
+  }
+}
+```
 
 ### Example
 ```html
+<!--Basic image segmentation labeling configuration-->
 <View>
   <BrushLabels name="labels" toName="image">
     <Label value="Person" />

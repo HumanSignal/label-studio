@@ -2,12 +2,12 @@
 
 ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) ![label-studio:build](https://github.com/heartexlabs/label-studio/workflows/label-studio:build/badge.svg) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases)
 
-[Website](https://labelstud.io/) • [Docs](https://labelstud.io/guide/) • [Twitter](https://twitter.com/heartexlabs) • [Join Slack Community <img src="https://app.heartex.ai/docs/images/slack-mini.png" width="18px"/>](http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=github-1)
+[Website](https://labelstud.io/) • [Docs](https://labelstud.io/guide/) • [Twitter](https://twitter.com/heartexlabs) • [Join Slack Community <img src="https://app.heartex.ai/docs/images/slack-mini.png" width="18px"/>](https://slack.labelstudio.heartex.com/?source=github-1)
 
 
 ## What is Label Studio?
 
-<a href="https://labelstud.io/blog/release-100.html"><img src="https://github.com/heartexlabs/label-studio/raw/master/docs/themes/htx/source/images/release-100/LS-Hits-v1.0.png" align="right" /></a>
+<!-- <a href="https://labelstud.io/blog/release-130.html"><img src="https://github.com/heartexlabs/label-studio/raw/master/docs/themes/htx/source/images/release-130/LS-Hits-v1.3.png" align="right" /></a> -->
 
 Label Studio is an open source data labeling tool. It lets you label data types like audio, text, images, videos, and time series with a simple and straightforward UI and export to various model formats. It can be used to prepare raw data or improve existing training data to get more accurate ML models.
 
@@ -23,7 +23,7 @@ Have a custom dataset? You can customize Label Studio to fit your needs. Read an
 
 ## Try out Label Studio
 
-Try out Label Studio in a **[running app](https://app.labelstud.io)**, install it locally, or deploy it in a cloud instance. 
+Install Label Studio locally, or deploy it in a cloud instance. Also you can try [Label Studio Teams](https://app.heartex.com).
 
 - [Install locally with Docker](#install-locally-with-docker)
 - [Run with Docker Compose (Label Studio + Nginx + PostgreSQL)](#run-with-docker-compose)
@@ -33,9 +33,12 @@ Try out Label Studio in a **[running app](https://app.labelstud.io)**, install i
 - [Deploy in a cloud instance](#deploy-in-a-cloud-instance)
 
 ### Install locally with Docker
+Official Label Studio docker image is [here](https://hub.docker.com/r/heartexlabs/label-studio) and it can be downloaded with `docker pull`. 
 Run Label Studio in a Docker container and access it at `http://localhost:8080`.
 
+
 ```bash
+docker pull heartexlabs/label-studio:latest
 docker run -it -p 8080:8080 -v `pwd`/mydata:/label-studio/data heartexlabs/label-studio:latest
 ```
 You can find all the generated assets, including SQLite3 database storage `label_studio.sqlite3` and uploaded files, in the `./mydata` directory.
@@ -53,7 +56,7 @@ docker build -t heartexlabs/label-studio:latest .
 ```
 
 ### Run with Docker Compose
-Docker compose script provides production-ready stack consisting of the following components:
+Docker Compose script provides production-ready stack consisting of the following components:
 
 - Label Studio
 - [Nginx](https://www.nginx.com/) - proxy web server used to load various static data, including uploaded audio, images, etc.
@@ -67,7 +70,7 @@ docker-compose up
 ### Install locally with pip
 
 ```bash
-# Requires >=Python3.6, <3.9
+# Requires Python >=3.7 <=3.9
 pip install label-studio
 
 # Start the server at http://localhost:8080
@@ -77,7 +80,7 @@ label-studio
 ### Install locally with Anaconda
 
 ```bash
-conda create --name label-studio python=3.8
+conda create --name label-studio
 conda activate label-studio
 pip install label-studio
 ```
@@ -100,7 +103,6 @@ python label_studio/manage.py runserver
 You can deploy Label Studio with one click in Heroku, Microsoft Azure, or Google Cloud Platform: 
 
 [<img src="https://www.herokucdn.com/deploy/button.svg" height="30px">](https://heroku.com/deploy?template=https://github.com/heartexlabs/label-studio/tree/master)
-[<img src="https://aka.ms/deploytoazurebutton" height="30px">](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fheartexlabs%2Flabel-studio%2Fmaster%2Fazuredeploy.json)
 [<img src="https://deploy.cloud.run/button.svg" height="30px">](https://deploy.cloud.run)
 
 
@@ -109,10 +111,10 @@ You can deploy Label Studio with one click in Heroku, Microsoft Azure, or Google
 The frontend part of Label Studio app lies in the `frontend/` folder and written in React JSX. In case you've made some changes there, the following commands should be run before building / starting the instance:
 
 ```
-cd frontend/
+cd label_studio/frontend/
 npm ci
 npx webpack
-cd ..
+cd ../..
 python label_studio/manage.py collectstatic --no-input
 ```
 

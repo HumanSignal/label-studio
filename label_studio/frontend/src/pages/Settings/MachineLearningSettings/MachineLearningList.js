@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 import { useCallback, useContext } from 'react';
 import { FaEllipsisV } from 'react-icons/fa';
+import truncate from 'truncate-middle';
 import { Button, Card, Dropdown, Menu } from '../../../components';
 import { DescriptionList } from '../../../components/DescriptionList/DescriptionList';
 import { confirm } from '../../../components/Modal/Modal';
@@ -71,8 +72,8 @@ const BackendCard = ({backend, onStartTrain, onEdit, onDelete}) => {
       </div>
     )}>
       <DescriptionList className={cn('ml').elem('summary')}>
-        <DescriptionList.Item term="URL">
-          {backend.url}
+        <DescriptionList.Item term="URL" termStyle={{whiteSpace: 'nowrap'}}>
+          {truncate(backend.url, 20, 10, '...')}
         </DescriptionList.Item>
         {backend.description && (
           <DescriptionList.Item

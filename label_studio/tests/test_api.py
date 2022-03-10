@@ -175,14 +175,17 @@ def test_delete_annotations(business_client, configured_project):
         {"annotations": [], 'predictions': [], 'drafts': [],
          "data": {"text": "text B", "meta_info": "meta info B"}, "meta": {},
          "created_at": "", "updated_at": "", "is_labeled": False, "project": 0,
-         'overlap': 1, 'file_upload': None},
+         'overlap': 1, 'file_upload': None, 'annotations_ids': '', 'annotations_results': '',
+         'annotators': [], 'cancelled_annotations': 0, 'completed_at': None, 'predictions_model_versions': '',
+         'predictions_results': '', 'predictions_score': None, 'total_annotations': 0, 'total_predictions': 0,
+         'avg_lead_time': None},
         200
     )
 ])
 @pytest.mark.django_db
 def test_get_task(client_and_token, configured_project, response, status_code):
     client, token = client_and_token
-    task = configured_project.tasks.all()[0]
+    task = configured_project.tasks.order_by('-id').all()[0]
     response['project'] = configured_project.id
     response['created_at'] = task.created_at.isoformat().replace('+00:00', 'Z')
     response['updated_at'] = task.updated_at.isoformat().replace('+00:00', 'Z')

@@ -33,11 +33,16 @@ class UserSerializerWithProjects(UserSerializer):
     contributed_to_projects = serializers.SerializerMethodField(read_only=True)
 
     def get_created_projects(self, user):
-        return user.created_projects.order_by('created_at').values('id', 'title')
+        if not self.context.get('contributed_to_projects', False):
+            return None
+
+        return user.created_projects.values('id', 'title')
 
     def get_contributed_to_projects(self, user):
-        projects = user.annotations.order_by('created_at')\
-            .values('task__project__id', 'task__project__title')
+        if not self.context.get('contributed_to_projects', False):
+            return None
+
+        projects = user.annotations.values('task__project__id', 'task__project__title')
         contributed_to = [(json.dumps({'id': p['task__project__id'], 'title': p['task__project__title']}), 0)
                           for p in projects]
         contributed_to = OrderedDict(contributed_to)  # remove duplicates without ordering losing

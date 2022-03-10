@@ -1,0 +1,14 @@
+title: Keypoint Labeling
+type: community
+group: Computer Vision
+order: 10000
+image: /static/templates/keypoints.png
+details: <h1>Click the label and then on the canvas</h1>
+config: |
+  <View>
+    <KeyPointLabels name="kp-1" toName="img-1">
+      <Label value="Face" background="red" />
+      <Label value="Nose" background="green" />
+    </KeyPointLabels>
+    <Image name="img-1" value="$img" />
+  </View>

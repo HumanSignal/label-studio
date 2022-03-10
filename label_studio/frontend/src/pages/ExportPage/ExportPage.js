@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useHistory, useLocation } from 'react-router';
+import { useHistory } from 'react-router';
 import { Button } from '../../components';
 import { Form, Input } from '../../components/Form';
 import { Modal } from '../../components/Modal/Modal';
 import { Space } from '../../components/Space/Space';
 import { useAPI } from '../../providers/ApiProvider';
-import { useParams } from '../../providers/RoutesProvider';
+import { useFixedLocation, useParams } from '../../providers/RoutesProvider';
 import { BemWithSpecifiContext } from '../../utils/bem';
 import { isDefined } from '../../utils/helpers';
 import "./ExportPage.styl";
@@ -28,7 +28,7 @@ const wait = () => new Promise(resolve => setTimeout(resolve, 5000));
 
 export const ExportPage = () => {
   const history = useHistory();
-  const location = useLocation();
+  const location = useFixedLocation();
   const pageParams = useParams();
   const api = useAPI();
 
@@ -232,7 +232,7 @@ const FormatInfo = ({availableFormats, selected, onClick}) => {
       <Elem name="feedback">
         Can't find an export format?
         <br/>
-        Please let us know in <a className="no-go" href="http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=product-export">Slack</a> or submit an issue to the <a className="no-go" href="https://github.com/heartexlabs/label-studio-converter/issues">Repository</a>
+        Please let us know in <a className="no-go" href="https://slack.labelstudio.heartex.com/?source=product-export">Slack</a> or submit an issue to the <a className="no-go" href="https://github.com/heartexlabs/label-studio-converter/issues">Repository</a>
       </Elem>
     </Block>
   );

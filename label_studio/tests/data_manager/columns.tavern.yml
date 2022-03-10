@@ -1,0 +1,55 @@
+---
+test_name: dm-columns
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+
+  - id: signup
+    type: ref
+
+  - id: create_project
+    type: ref
+
+  - name: create_filter_tasks
+    request:
+      files:
+        json_file: tests/data_manager/filters/int_tasks.json
+      headers:
+        content-type: multipart/form-data
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/import'
+    response:
+      json:
+        annotation_count: 0
+        prediction_count: 1
+        task_count: 6
+      status_code: 201
+
+
+  - name: get_dm_project
+    request:
+      method: GET
+      url: '{django_live_url}/api/dm/project?project={project_pk}'
+    response:
+      json: {"title": "Test Draft 1", "description": "",
+             "label_config": "<View><Text name=\"text\" value=\"$text\"/><Choices name=\"label\" toName=\"text\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>",
+             "expert_instruction": "", "show_instruction": false, "show_skip_button": false, "enable_empty_annotation": false,
+             "show_annotation_history": false, "color": "#FFFFFF", "maximum_annotations": 1,
+             "is_published": false, "model_version": "model_version_A", "is_draft": false,
+            "min_annotations_to_start_training": 0,
+             "start_training_on_annotation_update": false, "show_collab_predictions": true, "num_tasks_with_annotations": null,
+             "task_number": null, "useful_annotation_number": null, "ground_truth_number": null, "skipped_annotations_number": null,
+             "total_annotations_number": null, "total_predictions_number": null, "sampling": "Sequential sampling",
+             "show_ground_truth_first": false, "show_overlap_first": false, "overlap_cohort_percentage": 100,
+             "task_data_login": null, "task_data_password": null,
+             "control_weights": {"label": {"overall": 1.0, "type": "Choices", "labels": {"pos": 1.0, "neg": 1.0}}},
+             "parsed_label_config": {
+               "label": {"type": "Choices", "to_name": ["text"], "inputs": [{"type": "Text", "value": "text"}],
+                         "labels": ["pos", "neg"], "labels_attrs": {"pos": {"value": "pos"}, "neg": {"value": "neg"}}}},
+             "evaluate_predictions_automatically": false, "config_has_control_tags": true, "can_delete_tasks": true,
+             "can_manage_annotations": true, "can_manage_tasks": true, "source_syncing": false, "target_syncing": false,
+             "task_count": 6, "annotation_count": 0}
+
+      status_code: 200

@@ -4,15 +4,15 @@ group: Natural Language Processing
 order: 3
 image: /static/templates/named-entity-recognition.png
 details: <h1>Extract named entities from text</h1>
-config: '
-<View>
-  <Labels name="label" toName="text">
-    <Label value="PER" background="red"/>
-    <Label value="ORG" background="darkorange"/>
-    <Label value="LOC" background="orange"/>
-    <Label value="MISC" background="green"/>
-  </Labels>
+config: |
+  <View>
+    <Labels name="label" toName="text">
+      <Label value="PER" background="red"/>
+      <Label value="ORG" background="darkorange"/>
+      <Label value="LOC" background="orange"/>
+      <Label value="MISC" background="green"/>
+    </Labels>
 
-  <Text name="text" value="$ner"/>
-</View>
-'
+    <Text name="text" value="$text"/>
+  </View>
+

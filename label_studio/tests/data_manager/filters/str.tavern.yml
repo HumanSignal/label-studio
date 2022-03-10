@@ -1,0 +1,191 @@
+---
+test_name: str-empty
+strict: false
+marks:
+  - skip
+  - usefixtures:
+      - django_live_url
+stages:
+
+  - id: signup
+    type: ref
+
+  - id: create_project
+    name: create_project
+    request:
+      data:
+        title: Test Draft 1
+        show_collab_predictions: true
+      method: POST
+      url: '{django_live_url}/api/projects'
+    response:
+      save:
+        json:
+          project_pk: id
+      status_code: 201
+
+  - name: create_filter_tasks
+    request:
+      files:
+        json_file: tests/data_manager/filters/str_tasks.json
+      headers:
+        content-type: multipart/form-data
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/import'
+    response:
+      json:
+        annotation_count: 0
+        prediction_count: 0
+        task_count: 4
+      status_code: 201
+
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "filters": {
+            "conjunction": "and",
+            "items": [
+            {
+              "filter": "filter:tasks:data.text",
+              "operator": "empty",
+              "type": "String",
+              "value": "true"
+            }
+            ]
+          },
+          "ordering": [
+            "tasks:data.text"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
+    response:
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 0,
+        "total": 3,
+        "tasks": [
+        {
+          "data": {
+            "text": ""
+          }
+        },
+        {
+          "data": {
+            "text": null
+          }
+        },
+        {
+          "data": {
+            "other": "o1"
+          }
+        }
+        ]
+      }
+      status_code: 200
+
+
+  - name: setup_views_with_regex
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "filters": {
+            "conjunction": "and",
+            "items": [
+            {
+              "filter": "filter:tasks:data.other",
+              "operator": "regex",
+              "type": "String",
+              "value": "o.*"
+            }
+            ]
+          },
+          "ordering": [
+            "tasks:data.text"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks_with_regex
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
+    response:
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 0,
+        "total": 1,
+        "tasks": [
+        {
+          "data": {
+            "other": "o1"
+          }
+        }
+        ]
+      }
+      status_code: 200
+
+
+  - name: setup_views_with_wrong_regex
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "filters": {
+            "conjunction": "and",
+            "items": [
+            {
+              "filter": "filter:tasks:data.other",
+              "operator": "regex",
+              "type": "String",
+              "value": "*"
+            }
+            ]
+          },
+          "ordering": [
+            "tasks:data.text"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks_with_wrong_regex
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
+    response:
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 0,
+        "total": 0,
+        "tasks": [
+        ]
+      }
+      status_code: 200

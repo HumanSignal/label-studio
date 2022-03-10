@@ -1,0 +1,27 @@
+---
+test_name: tasks_api_test
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+- id: create_task
+  type: ref
+- name: get list of tasks
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks?project={project_pk}'
+  response:
+    status_code: 200
+- id: create_annotation
+  type: ref
+- name: get task by id from data manager
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks/{task_pk}?project={project_pk}'
+  response:
+    status_code: 200

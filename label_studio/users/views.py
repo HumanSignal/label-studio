@@ -11,7 +11,7 @@ from rest_framework.authtoken.models import Token
 
 from users import forms
 from core.utils.common import load_func
-from core.permissions import view_with_auth, IsBusiness
+from core.middleware import enforce_csrf_checks
 from users.functions import proceed_registration
 from organizations.models import Organization
 from organizations.forms import OrganizationSignupForm
@@ -31,6 +31,7 @@ def logout(request):
     return redirect('/')
 
 
+@enforce_csrf_checks
 def user_signup(request):
     """ Sign up page
     """
@@ -67,6 +68,7 @@ def user_signup(request):
     })
 
 
+@enforce_csrf_checks
 def user_login(request):
     """ Login page
     """
@@ -97,7 +99,7 @@ def user_login(request):
     })
 
 
-@view_with_auth(['GET', 'POST'], (IsBusiness,))
+@login_required
 def user_account(request):
     user = request.user
 

@@ -6,10 +6,13 @@ import json
 import pytest
 import requests_mock
 import requests
+import tempfile
 
 from contextlib import contextmanager
 from unittest import mock
 from types import SimpleNamespace
+from box import Box
+from pathlib import Path
 
 from django.test import Client
 from django.apps import apps
@@ -39,6 +42,7 @@ def register_ml_backend_mock(m, url='http://localhost:9090', predictions=None, h
         m.get(f'{url}/health', text=json.dumps({'status': 'UP'}))
     m.post(f'{url}/train', text=json.dumps({'status': 'ok', 'job_id': train_job_id}))
     m.post(f'{url}/predict', text=json.dumps(predictions or {}))
+    m.post(f'{url}/webhook', text=json.dumps({}))
     return m
 
 
@@ -107,7 +111,7 @@ def azure_client_mock():
             self.container_name = container_name
         def download_as_string(self):
             return f'test_blob_{self.key}'
-        def upload_from_string(self, string):
+        def upload_blob(self, string, overwrite):
             print(f'String {string} uploaded to bucket {self.container_name}')
         def generate_signed_url(self, **kwargs):
             return f'https://storage.googleapis.com/{self.container_name}/{self.key}'
@@ -117,7 +121,7 @@ def azure_client_mock():
             self.name = container_name
         def list_blobs(self, name_starts_with):
             return [File('abc'), File('def'), File('ghi')]
-        def blob(self, key):
+        def get_blob_client(self, key):
             return DummyAzureBlob(self.name, key)
 
     class DummyAzureClient():
@@ -150,8 +154,9 @@ def upload_data(client, project, tasks):
     return client.post(f'/api/projects/{project.id}/tasks/bulk', data=data, content_type='application/json')
 
 
-def make_project(config, user, use_ml_backend=True, team_id=None):
-    org = Organization.objects.filter(created_by=user).first()
+def make_project(config, user, use_ml_backend=True, team_id=None, org=None):
+    if org is None:
+        org = Organization.objects.filter(created_by=user).first()
     project = Project.objects.create(created_by=user, organization=org, **config)
     if use_ml_backend:
         MLBackend.objects.create(project=project, url='http://localhost:8999')
@@ -239,3 +244,35 @@ def signin(client, email, password):
 
 def _client_is_annotator(client):
     return 'annotator' in client.user.email
+
+
+def save_response(response):
+    filename = 'tavern-output.json'
+    with open(filename, 'w') as f:
+        json.dump(response.json(), f)
+
+
+def check_response_with_json_file(response, json_file):
+    response = response.json()
+    filename = 'tavern-output.json'
+    with open(filename, 'w') as f:
+        json.dump(response, f, indent=4)
+
+    with open(json_file, 'r') as f:
+        true = json.load(f)
+        assert response == true
+
+
+def os_independent_path(_, path, add_tempdir=False):
+    os_independent_path = Path(path)
+    if add_tempdir:
+        tempdir = Path(tempfile.gettempdir())
+        os_independent_path = tempdir / os_independent_path
+
+    os_independent_path_parent = os_independent_path.parent
+    return Box(
+        {
+            'os_independent_path': str(os_independent_path),
+            'os_independent_path_parent': str(os_independent_path_parent),
+        }
+    )

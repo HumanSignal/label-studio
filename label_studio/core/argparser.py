@@ -6,7 +6,7 @@ import json
 from .utils.io import find_file
 
 
-def parse_input_args():
+def parse_input_args(input_args):
     """ Combine args with json config
 
     :return: config dict
@@ -55,7 +55,7 @@ def parse_input_args():
         '--log-level',
         dest='log_level',
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'],
-        default='ERROR',
+        default='WARNING',
         help='Logging level',
     )
     root_parser.add_argument(
@@ -88,6 +88,7 @@ def parse_input_args():
     )
     root_parser.add_argument('--password', dest='password', default='', help='Password for default user')
     root_parser.add_argument('--username', dest='username', default='', help='Username for default user')
+    root_parser.add_argument('--user-token', dest='user_token', default='', help='User token for API access')
     root_parser.add_argument('--agree-fix-sqlite', dest='agree_fix_sqlite', action='store_true',
                              help='Agree to fix SQLite issues on python 3.6-3.8 on Windows automatically')
 
@@ -99,6 +100,8 @@ def parse_input_args():
     # init sub-command parser
 
     parser_version = subparsers.add_parser('version', help='Print version info', parents=[root_parser])
+
+    parser_user = subparsers.add_parser('user', help='Print user info', parents=[root_parser])
 
     parser_init = subparsers.add_parser('init', help='Initialize Label Studio', parents=[root_parser])
     parser_init.add_argument(
@@ -121,7 +124,7 @@ def parse_input_args():
 
     parser_shell = subparsers.add_parser('shell', help='Run django shell', parents=[root_parser])
 
-    args = parser.parse_args()
+    args = parser.parse_args(input_args)
 
     if not hasattr(args, 'label_config'):
         args.label_config = None

@@ -1,0 +1,37 @@
+.code-tabs>div:not(.buttons)
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    z-index: 100;
+
+.code-tabs>.buttons
+    display: inline-block;
+    margin-top: 1em;
+    z-index: 101;
+    padding-bottom: 10px;
+
+.code-tabs>.buttons a
+    margin-right: 1em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    padding-bottom: 5px;
+
+.code-tabs>.buttons a.active
+    border-bottom: 3px solid;
+
+.code-tabs>div:not(first-child)
+    display: none;
+
+
+
+.code-tabs .code-badge-pre
+    margin: 0;
+
+.code-tabs .hljs
+    margin: 0;
+
+.code-tabs
+    p, h1, h2, h3, h4, h5
+        margin: 1em !important;
+        
+.code-tabs ol
+    margin: 1em 1em -0.5em 1em !important;

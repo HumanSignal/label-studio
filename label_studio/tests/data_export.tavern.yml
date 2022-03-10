@@ -2,35 +2,233 @@
 test_name: auth_export_error
 strict: false
 marks:
-- usefixtures:
-  - django_live_url
+  - usefixtures:
+      - django_live_url
 stages:
-- id: signup
-  type: ref
-- name: stage
-  request:
-    method: GET
-    headers:
-      X-Original-URI: test
-    url: '{django_live_url}/api/auth/export/'
-  response:
-    status_code: 422
+  - id: signup
+    type: ref
+  - name: stage
+    request:
+      method: GET
+      headers:
+        X-Original-URI: test
+      url: "{django_live_url}/api/auth/export/"
+    response:
+      status_code: 422
 ---
 test_name: auth_export
 strict: false
 marks:
-- usefixtures:
-  - django_live_url
+  - usefixtures:
+      - django_live_url
 stages:
-- id: signup
-  type: ref
-- id: create_project
-  type: ref
-- name: stage
-  request:
-    method: GET
-    headers:
-      X-Original-URI: '/export/{project_pk}-test'
-    url: '{django_live_url}/api/auth/export/'
-  response:
-    status_code: 200
+  - id: signup
+    type: ref
+  - id: create_project
+    type: ref
+  - name: stage
+    request:
+      method: GET
+      headers:
+        X-Original-URI: "/export/{project_pk}-test"
+      url: "{django_live_url}/api/auth/export/"
+    response:
+      status_code: 200
+---
+test_name: crud export
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+  - id: signup
+    type: ref
+  - id: create_project
+    type: ref
+  - id: create_task
+    type: ref
+  - name: create export
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/"
+      method: POST
+      json:
+        task_filter_options: 
+          only_with_annotations: true
+    response:
+      status_code: 201
+      json:
+        id: !anyint
+        title: !anystr
+        created_by: !anydict
+        counters: !anydict
+        md5: !anystr
+        created_at: !anystr
+        finished_at: !anystr
+        status: !anystr
+      save:
+        json:
+          export_id: id
+  - name: get exports list
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        - id: !anyint
+          title: !anystr
+          created_by: !anydict
+          counters: !anydict
+          md5: !anystr
+          created_at: !anystr
+          status: !anystr
+          finished_at: !anystr
+  - name: get export retrieve
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        id: !anyint
+        title: !anystr
+        created_by: !anydict
+        counters: !anydict
+        md5: !anystr
+        created_at: !anystr
+        status: !anystr
+        finished_at: !anystr
+  - name: download export JSON
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}/download"
+      method: GET
+    response:
+      status_code: 200
+  - name: download export CSV
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}/download"
+      method: GET
+      params:
+        exportType: CSV
+    response:
+      status_code: 200
+---
+test_name: crud export with params 1
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+  - id: signup
+    type: ref
+  - id: create_project
+    type: ref
+  - id: create_task
+    type: ref
+  - name: create export
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/"
+      method: POST
+      json:
+        task_filter_options:
+          view: 1
+          skipped: "only"
+          finished: "exclude"
+          annotated: "exclude"
+        annotation_filter_options:
+          ground_truth: true
+          usual: true
+          skipped: true
+    response:
+      status_code: 201
+      json:
+        id: !anyint
+        title: !anystr
+        created_by: !anydict
+        counters: !anydict
+        md5: !anystr
+        created_at: !anystr
+        finished_at: !anystr
+        status: !anystr
+      save:
+        json:
+          export_id: id
+---
+test_name: crud export with params 2
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+  - id: signup
+    type: ref
+  - id: create_project
+    type: ref
+  - id: create_task
+    type: ref
+  - name: create export
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/"
+      method: POST
+      json:
+        annotation_filter_options:
+          ground_truth: true
+          usual: true
+          skipped: true
+        serialization_options:
+          drafts:
+            only_id: false
+          predictions:
+            only_id: false
+          annotations__completed_by:
+            only_id: false
+    response:
+      status_code: 201
+      json:
+        id: !anyint
+        title: !anystr
+        created_by: !anydict
+        counters: !anydict
+        md5: !anystr
+        created_at: !anystr
+        finished_at: !anystr
+        status: !anystr
+      save:
+        json:
+          export_id: id
+---
+test_name: crud export with params 3
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+  - id: signup
+    type: ref
+  - id: create_project
+    type: ref
+  - id: create_task
+    type: ref
+  - name: create export
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/"
+      method: POST
+      json:
+        annotation_filter_options:
+          ground_truth: false
+          usual: false
+          skipped: false
+    response:
+      status_code: 201
+      json:
+        id: !anyint
+        title: !anystr
+        created_by: !anydict
+        counters: !anydict
+        md5: !anystr
+        created_at: !anystr
+        finished_at: !anystr
+        status: !anystr
+      save:
+        json:
+          export_id: id

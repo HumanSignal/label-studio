@@ -12,7 +12,6 @@ Install Label Studio on premises or in the cloud. Choose the installation method
 - [Install on Ubuntu](#Install-on-Ubuntu)
 - [Install from source](#Install-from-source)
 - [Install with Anaconda](#Install-with-Anaconda)
-- [Install for local development](#Install-for-local-development)
 - [Upgrade Label Studio](#Upgrade-Label-Studio)
 
 <!-- md deploy.md -->
@@ -30,14 +29,14 @@ Install Label Studio in a clean Python environment. We highly recommend using a 
 
 ## Install with pip
 
-To install Label Studio with pip and a virtual environment, you need Python version 3.6 or later. Run the following:
+To install Label Studio with pip and a virtual environment, you need Python version 3.7 or later. Run the following:
 ```bash
 python3 -m venv env
 source env/bin/activate
 python -m pip install label-studio
 ```
 
-To install Label Studio with pip, you need Python version 3.6 or later. Run the following:
+To install Label Studio with pip, you need Python version 3.7 or later. Run the following:
 ```bash
 pip install label-studio
 ```
@@ -75,7 +74,7 @@ docker build -t heartexlabs/label-studio:latest .
 ```
 
 ### Run with Docker Compose
-Use Docker Compose to serve Label Studio at `http://localhost:8080`.
+Use Docker Compose to serve Label Studio at `http://localhost:8080`. You must use Docker Compose version 1.25.0 or higher.
 
 Start Label Studio:
 ```bash
@@ -113,7 +112,7 @@ python label_studio/manage.py runserver
 ## Install with Anaconda
 
 ```bash
-conda create --name label-studio python=3.8
+conda create --name label-studio
 conda activate label-studio
 pip install label-studio
 ```

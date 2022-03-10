@@ -27,7 +27,7 @@ div.container{
 
 .main__block{
   position: relative;
-  background: rgba(112, 169, 191, 0.13);
+  background: wheat;
 }
 
 .main__content .left__content>h1{
@@ -73,7 +73,7 @@ div.container{
   margin-bottom:40px;
 }
 .main__content{
-  padding-bottom:250px;
+  padding-bottom:150px;
   margin-bottom:0px;
   display: flex;
   align-items:flex-start;
@@ -925,7 +925,7 @@ div.container{
   justify-content:flex-end;
 }
 .bottom__part{
-  background: rgba(112, 169, 191, 0.13);
+  background: wheat;
   padding-top:180px;
   position: relative;
 }
@@ -1010,6 +1010,16 @@ footer{
   display: flex;
   align-items:flex-start;
   justify-content: space-between;
+}
+.inner__footer {
+  width: 80%;
+  display: grid;
+  justify-content: space-between;
+  grid-auto-columns: 1fr;
+  grid-column-gap: 100px;
+  grid-row-gap: 16px;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: auto;
 }
 .elem__footer>ul li a:hover{
   opacity:.7;

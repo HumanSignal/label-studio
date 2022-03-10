@@ -8,8 +8,6 @@ meta_title: Manage Role-Based Access Control in Label Studio
 meta_description: Manage access and set up permissions with user roles, organizations, and project workspaces for your data labeling, machine learning, and data science projects in Label Studio Enterprise.
 ---
 
-> Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
-
 Manage access to projects, organizations, and workspaces in Label Studio to restrict who can view data, annotations, and predictions in your data labeling projects. 
 
 <div class="enterprise"><p>
@@ -22,11 +20,20 @@ There are five roles available in Label Studio Enterprise Edition. Organization 
 
 | Role | Description |
 | --- | --- |
-| Owner | Not an assignable role. Manages Label Studio. Can create organizations, modify workspaces, create and modify projects, and view activity log. |
-| Administrator | Manages an organization. Has full access to all projects. Can modify workspaces, view activity logs, and approve invitations. Can’t see the workspace owner’s account page. | 
-| Manager | Manages projects. Can view any project and has full access to their own projects. |
+| Owner | Not an assignable role. Manages Label Studio. Can create and modify workspaces, create and modify projects, and view activity log. |
+| Administrator | Has full access to all workspaces and projects. Can modify workspaces, view activity logs, and approve invitations. Can’t see the workspace owner’s account page. | 
+| Manager | After being assigned to a workspace by an Owner or Administrator, has full administrative access in the assigned workspaces. Can view any project and has full access to their own projects. |
 | Reviewer | Reviews annotated tasks. Can view projects with tasks assigned to them. Can review and update task annotations. |
 | Annotator | Labels tasks. Can view projects with tasks assigned to them and label tasks in those projects. |
+
+## Roles in Label Studio Teams
+
+There are two roles available in Label Studio Teams Edition. Organization members have different levels of access to projects and workspaces. Every member can label tasks.
+
+| Role | Description |
+| --- | --- |
+| Owner | Not an assignable role. Manages Label Studio. Can create and modify workspaces, create and modify projects, and view activity log. |
+| Manager | After being assigned to a workspace by an Owner, has full administrative access in the assigned workspaces. Can view any project and has full access to their own projects. |
 
 ## Roles and workspaces
 Use a combination of roles, to control what actions users can take, and project workspaces, to control what data and projects users have access to. 
@@ -255,43 +262,14 @@ Your changes save automatically. Repeat these steps for any additional users.
 To programmatically activate and assign roles to users, you can use the following API endpoints. 
 
 #### Assign a role to a user 
-For a given user ID and a given organization ID, POST a request to the `/api/organizations/{id}/memberships` endpoint with the following body:
-
-```json
-{
-  user_id: Int,
-  role: NO|DI|OW|AD|MA|AN|RE
-} 
-```
-
-Enumerate a role with one of the following abbreviations:
-
-| Role | Full Role Name |
-| --- | --- |
-| NO | Not Activated |
-| DI | Deactivated |
-| OW | Owner |
-| AD | Administrator |
-| MA | Manager |
-| AN | Annotator |
-| RE | Reviewer |
-
-
-For example, to set a user with an ID of 9 as an annotator, POST the following request body:
-```json
-{
-  "user_id": 9,
-  "role": "AN"
-}
-```
+For a given user ID and a given organization ID, you can programmatically assign a role to a user by sending a POST request to the `/api/organizations/{id}/memberships` endpoint. See the [Organizations API documentation inside Label Studio Enterprise](api#operation/api_organizations_memberships_create).
 
 #### Determine the organization ID or user ID
 If you're not sure what the organization ID is, you can do the following:
 - If you only have one organization in your Label Studio instance, use `0`.
-- If you have multiple organizations, make a GET request to the `/api/organizations/` endpoint.
+- If you have multiple organizations, make a GET request to the [`/api/organizations/`](/api#operation/api_organizations_read) endpoint.
 
-To retrieve user IDs for the members of an organization, make a GET request to `/api/organizations/{id}/memberships`.
-
+To retrieve user IDs for the members of an organization, make a GET request to [`/api/organizations/{id}/memberships`](/api#operation/api_organizations_memberships_list).
 
 ## Use organizations to manage data and projects
 
@@ -305,7 +283,7 @@ For example, you might set up one of the following possible configurations:
 - Multiple organizations, such as one for the customer claims department and another for the customer support department, with specific workspaces in each organization for specific types of insurance, such as home insurance claims and auto insurance claims, and specific projects in each workspace for types of claims, such as Accident Claims, Injury Claims, Natural Disaster Claims. The Customer support organization might have workspaces specific to the types of support queues, with projects for specific types of calls received.
 <img src="/images/LSE/LSE-multiple-orgs-workspaces.jpg" alt="Diagram showing Label Studio with three organizations, each one with multiple workspaces and projects within each workspace."/>
 
-When you [assign a user role](manage_users.html) to an organization member, they hold that role for all workspaces and projects for that organization.
+When you assign a user role to an organization member, they hold that role for all workspaces and projects for that organization.
   
 Managers within an organization can see all workspaces in that organization, even if they don't have access to perform actions in them. Annotators and reviewers can only see projects, not workspaces.
 

@@ -2,12 +2,14 @@
 title: Troubleshoot Label Studio
 short: Troubleshooting
 type: guide
-order: 204
+order: 210
 meta_title: Troubleshoot Label Studio
 meta_description: Troubleshoot common issues with Label Studio configuration and performance so that you can return to your machine learning and data science projects.
 ---
 
 If you encounter an issue using Label Studio, use this page to troubleshoot it. 
+- If you need to troubleshoot a machine learning backend, see [Troubleshoot machine learning](ml_troubleshooting.html). 
+- If you need to troubleshoot a cloud or external storage connection, see [Troubleshoot CORS and access problems](storage.html#Troubleshoot-CORS-and-access-problems). 
 
 ## Blank page when loading a project
 
@@ -72,6 +74,7 @@ The most common mistake while resource loading is <b>CORS</b> (Cross-Origin Reso
        }
   }
   ```
+
 - If you use Amazon S3 with Label Studio, see [Troubleshoot CORS and access problems](storage.html#Troubleshoot-CORS-and-access-problems).
 - If you use Google Cloud Storage with Label Studio, see [Troubleshoot CORS and access problems](storage.html#Troubleshoot-CORS-and-access-problems).
 - If you serve your data from an HTTP server created like follows: `python -m http.server 8081 -d`, run the following from the command line:
@@ -92,5 +95,28 @@ If you find that after annotating audio data, the visible audio wave doesn't mat
 ffmpeg -y -i audio.mp3 -ar 8k -ac 1 audio.wav
 ```
 
+## HTML label offsets are in the wrong places
 
+If the offsets for exported HTML labels don't match your expected output, such as with HTML named entity recognition (NER) tasks, the most common reason why is due to HTML minification. When you upload HTML files to Label Studio for labeling, the HTML is minified to remove whitespace. When you annotate those tasks, the offsets for the labels apply to the minified version of the HTML, rather than the original unmodified HTML files. 
 
+To prevent the HTML files from being minified, you can use a different import method. See [Import HTML data](tasks.html#Import-HTML-data) for more.
+
+If you want to correct existing annotations, you can minify your source HTML files in the same way that Label Studio does. The minification is performed with the following script:
+```python
+import htmlmin
+
+with open("sample.html", "r") as f:
+html_doc = f.read()
+
+minified_html_doc = htmlmin.minify(html_doc, remove_all_empty_space=True)
+```
+
+If minification does not seem to be affecting the offset placements, complex CSS or other reasons could be the cause. 
+
+## Predictions aren't visible to annotators  
+
+See [Troubleshoot pre-annotations](predictions.html#Troubleshoot-pre-annotations) to investigate possible reasons why predictions don't show up.
+
+## Can't label PDF data
+
+Label Studio does not support labeling PDF files directly. However, you can convert files to HTML using your PDF viewer or another tool and label the PDF as part of the HTML. See an example labeling configuration in the [Label Studio playground](/playground/?config=%3CView%3E%3Cbr%3E%20%20%3CHyperText%20name%3D%22pdf%22%20value%3D%22%24pdf%22%2F%3E%3Cbr%3E%3Cbr%3E%20%20%3CHeader%20value%3D%22Rate%20this%20article%22%2F%3E%3Cbr%3E%20%20%3CRating%20name%3D%22rating%22%20toName%3D%22pdf%22%20maxRating%3D%2210%22%20icon%3D%22star%22%20size%3D%22medium%22%20%2F%3E%3Cbr%3E%3Cbr%3E%20%20%3CChoices%20name%3D%22choices%22%20choice%3D%22single-radio%22%20toName%3D%22pdf%22%20showInline%3D%22true%22%3E%3Cbr%3E%20%20%20%20%3CChoice%20value%3D%22Important%20article%22%2F%3E%3Cbr%3E%20%20%20%20%3CChoice%20value%3D%22Yellow%20press%22%2F%3E%3Cbr%3E%20%20%3C%2FChoices%3E%3Cbr%3E%3C%2FView%3E%3Cbr%3E).

@@ -1,29 +1,36 @@
-# Building the main container
+# syntax=docker/dockerfile:1.3
 FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PIP_CACHE_DIR=/.cache \
+    DJANGO_SETTINGS_MODULE=core.settings.label_studio \
+    LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data \
+    SETUPTOOLS_USE_DISTUTILS=stdlib
 
 WORKDIR /label-studio
 
+# install packages
+RUN set -eux; \
+    apt-get update && apt-get install --no-install-recommends --no-install-suggests -y \
+    build-essential postgresql-client libmysqlclient-dev mysql-client python3.8 python3-pip python3.8-dev \
+    uwsgi git libxml2-dev libxslt-dev zlib1g-dev
+
+# Copy and install middleware dependencies
+COPY deploy/requirements-mw.txt /label-studio
+RUN --mount=type=cache,target=$PIP_CACHE_DIR \
+    pip3 install -r requirements-mw.txt
+
 # Copy and install requirements.txt first for caching
 COPY deploy/requirements.txt /label-studio
-
-ENV TZ=Europe/Berlin
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-RUN apt-get update && apt-get install -y build-essential postgresql-client python3.8 python3-pip python3.8-dev uwsgi  git libxml2-dev libxslt-dev zlib1g-dev uwsgi
-
-RUN chgrp -R 0 /var/log /var/cache /var/run /run /tmp /etc/uwsgi && \
-    chmod -R g+rwX /var/log /var/cache /var/run /run /tmp /etc/uwsgi
-
-RUN pip3 install --upgrade pip
-RUN pip3 install -r requirements.txt && pip install uwsgi
-
-ENV DJANGO_SETTINGS_MODULE=core.settings.label_studio
-ENV LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data
+RUN --mount=type=cache,target=$PIP_CACHE_DIR \
+    pip3 install -r requirements.txt
 
 COPY . /label-studio
-RUN python3.8 setup.py develop
+RUN --mount=type=cache,target=$PIP_CACHE_DIR \
+    pip3 install -e .
 
 EXPOSE 8080
 RUN ./deploy/prebuild_wo_frontend.sh
 
 ENTRYPOINT ["./deploy/docker-entrypoint.sh"]
-CMD bash /label-studio/deploy/start_label_studio.sh
+CMD ["label-studio"]

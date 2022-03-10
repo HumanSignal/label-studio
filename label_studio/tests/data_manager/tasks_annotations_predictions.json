@@ -1,0 +1,158 @@
+[
+  {
+    "data": {
+      "text": "Test example phrase 1",
+      "int_field": 1
+    },
+    "predictions": [
+      {
+        "result": [
+          {
+            "from_name": "text_class",
+            "to_name": "text",
+            "type": "choices",
+            "value": {
+              "choices": [
+                "class_A"
+              ]
+            }
+          }
+        ],
+        "model_version": "model_version_A"
+      }
+    ],
+    "annotations": [
+      {
+        "result": [
+          {
+            "from_name": "text_class",
+            "to_name": "text",
+            "type": "choices",
+            "value": {
+              "choices": [
+                "class_A"
+              ]
+            }
+          }
+        ],
+        "lead_time": 3
+      }
+    ]
+  },
+
+
+  {
+    "data": {
+      "int_field": 20,
+      "text": "x2"
+    },
+    "predictions": [
+      {
+        "result": [
+          {
+            "from_name": "text_class",
+            "to_name": "text",
+            "type": "choices",
+            "value": {
+              "choices": [
+                "class_A"
+              ]
+            }
+          }
+        ],
+        "model_version": "model_version_A"
+      }
+    ],
+    "annotations": [
+      {
+        "result": [
+          {
+            "from_name": "text_class",
+            "to_name": "text",
+            "type": "choices",
+            "value": {
+              "choices": [
+                "class_A"
+              ]
+            }
+          }
+        ],
+        "lead_time": 3
+      },
+      {
+        "result": [
+          {
+            "from_name": "text_class",
+            "to_name": "text",
+            "type": "choices",
+            "value": {
+              "choices": [
+                "class_A"
+              ]
+            }
+          }
+        ],
+        "lead_time": 5
+      }
+    ]
+  },
+
+
+  {
+    "data": {
+      "int_field": "99",
+      "text": "yoyo"
+    },
+    "annotations": [
+      {
+        "result": [
+          {
+            "from_name": "text_class",
+            "to_name": "text",
+            "type": "choices",
+            "value": {
+              "choices": [
+                "class_TESTING"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+
+
+  {
+    "text": "zzz"
+  },
+
+  {
+    "text": "vivi"
+  },
+
+
+   {
+    "data": {
+      "int_field": 42,
+      "text": "opop"
+    },
+    "predictions": [
+      {
+        "result": [
+          {
+            "from_name": "text_class",
+            "to_name": "text",
+            "type": "choices",
+            "value": {
+              "choices": [
+                "class_PREDICTIONS_TESTING"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+
+
+]

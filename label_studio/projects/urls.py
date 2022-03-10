@@ -30,16 +30,20 @@ _api_urlpatterns = [
     path('validate/', api.LabelConfigValidateAPI.as_view(), name='label-config-validate'),
 
     # Validate label config for project
-    path('<int:pk>/validate', api.ProjectLabelConfigValidateAPI.as_view(), name='project-label-config-validate'),
+    path('<int:pk>/validate/', api.ProjectLabelConfigValidateAPI.as_view(), name='project-label-config-validate'),
 
     # Project summary
     path('<int:pk>/summary/', api.ProjectSummaryAPI.as_view(), name='project-summary'),
 
     # Tasks list for the project: get and destroy
-    path('<int:pk>/tasks/', api.TasksListAPI.as_view(), name='project-tasks-list'),
+    path('<int:pk>/tasks/', api.ProjectTaskListAPI.as_view(), name='project-tasks-list'),
 
     # Generate sample task for this project
     path('<int:pk>/sample-task/', api.ProjectSampleTask.as_view(), name='project-sample-task'),
+
+    # List available model versions
+    path('<int:pk>/model-versions/', api.ProjectModelVersions.as_view(), name='project-model-versions'),
+
 ]
 
 _api_urlpatterns_templates = [

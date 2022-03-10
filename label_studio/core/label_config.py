@@ -10,17 +10,27 @@ import jsonschema
 import re
 
 from urllib.parse import urlencode
+from collections import OrderedDict
 from lxml import etree
 from collections import defaultdict
 from django.conf import settings
-from rest_framework.exceptions import ValidationError
 from label_studio.core.utils.io import find_file
+from label_studio.core.utils.exceptions import (
+    LabelStudioValidationErrorSentryIgnored, LabelStudioXMLSyntaxErrorSentryIgnored
+)
+from label_studio_tools.core import label_config
 
 logger = logging.getLogger(__name__)
 
 
 _DATA_EXAMPLES = None
-_LABEL_TAGS = {'Label', 'Choice'}
+_LABEL_TAGS = {'Label', 'Choice', 'Relation'}
+SINGLE_VALUED_TAGS = {
+    'choices': str,
+    'rating': int,
+    'number': float,
+    'textarea': str
+}
 _NOT_CONTROL_TAGS = {'Filter',}
 # TODO: move configs in right place
 _LABEL_CONFIG_SCHEMA = find_file('label_config_schema.json')
@@ -43,69 +53,23 @@ def parse_config(config_string):
             "labels": ["Label1", "Label2", "Label3"] // taken from "alias" if exists or "value"
     }
     """
-    if not config_string:
-        return {}
+    logger.warning("Using deprecated method - switch to label_studio.tools.label_config.parse_config!")
+    return label_config.parse_config(config_string)
 
-    def _is_input_tag(tag):
-        return tag.attrib.get('name') and tag.attrib.get('value')
 
-    def _is_output_tag(tag):
-        return tag.attrib.get('name') and tag.attrib.get('toName') and tag.tag not in _NOT_CONTROL_TAGS
-
-    def _get_parent_output_tag_name(tag, outputs):
-        # Find parental <Choices> tag for nested tags like <Choices><View><View><Choice>...
-        parent = tag
-        while True:
-            parent = parent.getparent()
-            if parent is None:
-                return
-            name = parent.attrib.get('name')
-            if name in outputs:
-                return name
-
-    xml_tree = etree.fromstring(config_string)
-
-    inputs, outputs, labels = {}, {}, defaultdict(dict)
-    for tag in xml_tree.iter():
-        if _is_output_tag(tag):
-            tag_info = {'type': tag.tag, 'to_name': tag.attrib['toName'].split(',')}
-            # Grab conditionals if any
-            conditionals = {}
-            if tag.attrib.get('perRegion') == 'true':
-                if tag.attrib.get('whenTagName'):
-                    conditionals = {'type': 'tag', 'name': tag.attrib['whenTagName']}
-                elif tag.attrib.get('whenLabelValue'):
-                    conditionals = {'type': 'label', 'name': tag.attrib['whenLabelValue']}
-                elif tag.attrib.get('whenChoiceValue'):
-                    conditionals = {'type': 'choice', 'name': tag.attrib['whenChoiceValue']}
-            if conditionals:
-                tag_info['conditionals'] = conditionals
-            outputs[tag.attrib['name']] = tag_info
-        elif _is_input_tag(tag):
-            inputs[tag.attrib['name']] = {'type': tag.tag, 'value': tag.attrib['value'].lstrip('$')}
-        if tag.tag not in _LABEL_TAGS:
-            continue
-        parent_name = _get_parent_output_tag_name(tag, outputs)
-        if parent_name is not None:
-            actual_value = tag.attrib.get('alias') or tag.attrib.get('value')
-            if not actual_value:
-                logger.debug(
-                    'Inspecting tag {tag_name}... found no "value" or "alias" attributes.'.format(
-                        tag_name=etree.tostring(tag, encoding='unicode').strip()[:50]))
-            else:
-                labels[parent_name][actual_value] = dict(tag.attrib)
-    for output_tag, tag_info in outputs.items():
-        tag_info['inputs'] = []
-        for input_tag_name in tag_info['to_name']:
-            if input_tag_name not in inputs:
-                logger.error(
-                    f'to_name={input_tag_name} is specified for output tag name={output_tag}, '
-                    'but we can\'t find it among input tags')
-                continue
-            tag_info['inputs'].append(inputs[input_tag_name])
-        tag_info['labels'] = list(labels[output_tag])
-        tag_info['labels_attrs'] = labels[output_tag]
-    return outputs
+def _fix_choices(config):
+    '''
+    workaround for single choice
+    https://github.com/heartexlabs/label-studio/issues/1259
+    '''
+    if 'Choices' in config and 'Choice' in config['Choices'] and not isinstance(config['Choices']['Choice'], list):
+        config['Choices']['Choice'] = [config['Choices']['Choice']]
+    if 'View' in config:
+        if isinstance(config['View'], OrderedDict):
+            config['View'] = _fix_choices(config['View'])
+        else:
+            config['View'] = [_fix_choices(view) for view in config['View']]
+    return config
 
 
 def parse_config_to_json(config_string):
@@ -114,6 +78,7 @@ def parse_config_to_json(config_string):
     if xml is None:
         raise etree.XMLSchemaParseError('xml is empty or incorrect')
     config = xmljson.badgerfish.data(xml)
+    config = _fix_choices(config)
     return config
 
 
@@ -123,16 +88,16 @@ def validate_label_config(config_string):
         config = parse_config_to_json(config_string)
         jsonschema.validate(config, _LABEL_CONFIG_SCHEMA_DATA)
     except (etree.XMLSyntaxError, etree.XMLSchemaParseError, ValueError) as exc:
-        raise ValidationError(str(exc))
+        raise LabelStudioValidationErrorSentryIgnored(str(exc))
     except jsonschema.exceptions.ValidationError as exc:
         error_message = exc.context[-1].message if len(exc.context) else exc.message
         error_message = 'Validation failed on {}: {}'.format('/'.join(exc.path), error_message.replace('@', ''))
-        raise ValidationError(error_message)
+        raise LabelStudioValidationErrorSentryIgnored(error_message)
 
     # unique names in config # FIXME: 'name =' (with spaces) won't work
     all_names = re.findall(r'name="([^"]*)"', config_string)
     if len(set(all_names)) != len(all_names):
-        raise ValidationError('Label config contains non-unique names')
+        raise LabelStudioValidationErrorSentryIgnored('Label config contains non-unique names')
 
     # toName points to existent name
     names = set(all_names)
@@ -140,7 +105,7 @@ def validate_label_config(config_string):
     for toName_ in toNames:
         for toName in toName_.split(','):
             if toName not in names:
-                raise ValidationError(f'toName="{toName}" not found in names: {sorted(names)}')
+                raise LabelStudioValidationErrorSentryIgnored(f'toName="{toName}" not found in names: {sorted(names)}')
 
 
 def extract_data_types(label_config):
@@ -277,16 +242,23 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
 
         example_from_field_name = examples.get('$' + value)
         if example_from_field_name:
-            # try get example by variable name
+            # try to get example by variable name
             task[value] = example_from_field_name
+
+        elif value == 'video' and p.tag == 'HyperText':
+            task[value] = examples.get('$videoHack')
 
         elif p.tag == 'Paragraphs':
             # Paragraphs special case - replace nameKey/textKey if presented
             name_key = p.get('nameKey') or p.get('namekey') or 'author'
             text_key = p.get('textKey') or p.get('textkey') or 'text'
-            task[value] = []
-            for item in examples[p.tag]:
-                task[value].append({name_key: item['author'], text_key: item['text']})
+            if only_urls:
+                params = {'nameKey': name_key, 'textKey': text_key}
+                task[value] = examples['ParagraphsUrl'] + urlencode(params)
+            else:
+                task[value] = []
+                for item in examples[p.tag]:
+                    task[value].append({name_key: item['author'], text_key: item['text']})
 
         elif p.tag == 'TimeSeries':
             # TimeSeries special case - generate signals on-the-fly
@@ -310,12 +282,32 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
             else:
                 # data is JSON
                 task[value] = generate_time_series_json(time_column, value_columns, time_format)
-
+        elif p.tag == 'HyperText':
+            if only_urls:
+                task[value] = examples['HyperTextUrl']
+            else:
+                task[value] = examples['HyperText']
         else:
             # patch for valueType="url"
             examples['Text'] = examples['TextUrl'] if only_urls else examples['TextRaw']
             # not found by name, try get example by type
             task[value] = examples.get(p.tag, 'Something')
+
+        # support for Repeater tag
+        if '[' in value:
+            base = value.split('[')[0]
+            child = value.split(']')[1]
+
+            # images[{{idx}}].url => { "images": [ {"url": "test.jpg"} ] }
+            if child.startswith('.'):
+                child_name = child[1:]
+                task[base] = [{child_name: task[value]}, {child_name: task[value]}]
+            # images[{{idx}}].url => { "images": [ "test.jpg", "test.jpg" ] }
+            else:
+                task[base] = [task[value], task[value]]
+
+            # remove unused "images[{{idx}}].url"
+            task.pop(value, None)
 
     return task
 
@@ -373,9 +365,11 @@ def config_essential_data_has_changed(new_config_str, old_config_str):
             return True
 
 
-def replace_task_data_undefined_with_config_field(data, project):
+def replace_task_data_undefined_with_config_field(data, project, first_key=None):
+    """ Use first key is passed (for speed up) or project.data.types.keys()[0]
+    """
     # assign undefined key name from data to the first key from config, e.g. for txt loading
-    if settings.DATA_UNDEFINED_NAME in data and project.data_types.keys():
-        key = list(project.data_types.keys())[0]
+    if settings.DATA_UNDEFINED_NAME in data and (first_key or project.data_types.keys()):
+        key = first_key or list(project.data_types.keys())[0]
         data[key] = data[settings.DATA_UNDEFINED_NAME]
         del data[settings.DATA_UNDEFINED_NAME]

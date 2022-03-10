@@ -34,6 +34,8 @@ ImportStorage:
         name: regex_filter
         label: File Filter Regex
         placeholder: '.*csv or .*(jpe?g|png|tiff) or .\w+-\d+.text'
+        validators:
+          - regexp
   # AWS specific params
   - columnCount: 3
     fields: *azure_params
@@ -41,7 +43,7 @@ ImportStorage:
   # 2 columns grid
   - columnCount: 2
     columns:
-      - width: 371
+      - width: 345
         fields:
           - type: toggle
             name: use_blob_urls
@@ -54,8 +56,9 @@ ImportStorage:
             value: true
           - type: counter
             name: presign_ttl
-            value: 1
+            label: Expiration minutes
             min: 1
+            value: 1
             dependency: presign
 
 ExportStorage:

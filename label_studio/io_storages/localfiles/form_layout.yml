@@ -19,6 +19,8 @@ ImportStorage:
         name: regex_filter
         label: File Filter Regex
         placeholder: '.*csv or .*(jpe?g|png|tiff) or .\w+-\d+.text'
+        validators:
+          - regexp
 
   # 2 columns grid
   - columnCount: 2

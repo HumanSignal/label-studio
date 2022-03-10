@@ -39,6 +39,10 @@ class OrganizationMember(models.Model):
     def is_owner(self):
         return self.user.id == self.organization.created_by.id
 
+    class Meta:
+        ordering = ['pk']
+
+
 OrganizationMixin = load_func(settings.ORGANIZATION_MIXIN)
 
 
@@ -56,6 +60,9 @@ class Organization(OrganizationMixin, models.Model):
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
+
+    def __str__(self):
+        return self.title + ', id=' + str(self.pk)
 
     @classmethod
     def from_request(cls, request):

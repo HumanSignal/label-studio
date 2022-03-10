@@ -70,7 +70,7 @@ _project_for_text_choices_onto_A_B_classes = dict(
             {'data': {'meta_info': 'meta info B', 'text': 'text B'},
              'annotations': [{'result': [{'r': 2}], 'ground_truth': False}]},
         ],
-        200, {'id': 'uncompleted_task_ids'}
+        404, {'id': 'uncompleted_task_ids'}
     ),
         (
         dict(
@@ -118,9 +118,7 @@ def test_next_task(
     r = any_client.get(f'/api/projects/{project.id}/next')
     assert r.status_code == status_code
     rdata = json.loads(r.content)
-    if r.status_code == 404:
-        assert rdata['detail'].startswith('There are no tasks remaining to be annotated')
-    else:
+    if r.status_code != 404:
         for response_key, expected_value_set in expected_response_value_set.items():
             if expected_value_set == 'uncompleted_task_ids':
                 expected_value_set = uncompleted_task_ids
@@ -437,7 +435,7 @@ def test_next_task_with_active_learning(mocker,
                                         status_code, prelabeling_result
                                         ):
 
-    project = make_project(project_config, business_client.user)
+    project = make_project(project_config, business_client.user, use_ml_backend=False)
     if _client_is_annotator(any_client):
         invite_client_to_project(any_client, project)
     if _client_is_annotator(annotator2_client):
@@ -460,8 +458,6 @@ def test_next_task_with_active_learning(mocker,
     rdata = json.loads(r.content)
     if r.status_code == 200:
         assert rdata['predictions'][0]['result'] == prelabeling_result
-    elif r.status_code == 404:
-        assert rdata['detail'].startswith('There are no tasks remaining to be annotated')
 
 
 @pytest.mark.django_db
@@ -618,7 +614,7 @@ def test_breadth_first_simple(business_client):
         label_config='''
             <View>
               <Text name="text" value="$text"></Text>
-              <Choices name="text_class" choice="single">
+              <Choices name="text_class" choice="single" toName="text">
                 <Choice value="class_A"></Choice>
                 <Choice value="class_B"></Choice>
               </Choices>
@@ -676,7 +672,7 @@ def test_breadth_first_overlap_3(business_client):
         label_config='''
             <View>
               <Text name="text" value="$text"></Text>
-              <Choices name="text_class" choice="single">
+              <Choices name="text_class" choice="single" toName="text">
                 <Choice value="class_A"></Choice>
                 <Choice value="class_B"></Choice>
               </Choices>
@@ -1073,7 +1069,7 @@ def test_fetch_final_taken_task(business_client):
         label_config='''
             <View>
               <Text name="text" value="$text"></Text>
-              <Choices name="text_class" choice="single">
+              <Choices name="text_class" choice="single" toName="text">
                 <Choice value="class_A"></Choice>
                 <Choice value="class_B"></Choice>
               </Choices>
@@ -1303,6 +1299,7 @@ def test_overlap_first(business_client, setup_before_upload, show_overlap_first)
         is_published=True,
         maximum_annotations=1,
         show_overlap_first=show_overlap_first,
+        sampling="Uniform sampling",
         label_config='''
             <View>
               <Text name="text" value="$text"></Text>

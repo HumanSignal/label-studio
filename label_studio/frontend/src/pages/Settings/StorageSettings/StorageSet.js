@@ -13,6 +13,17 @@ export const StorageSet = ({title, target, rootClass, buttonLabel}) => {
   const [storages, setStorages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [storageTypes, setStorageTypes] = useState([]);
+
+  useEffect(() => {
+    api.callApi('storageTypes', {
+      params: {
+        target,
+      },
+    }).then(types => {
+      setStorageTypes(types);
+    });
+  }, []);
 
   const fetchStorages = useCallback(async () => {
     if (!project.id) {
@@ -27,6 +38,14 @@ export const StorageSet = ({title, target, rootClass, buttonLabel}) => {
         target,
       },
     });
+
+    const storageTypes = await api.callApi('storageTypes', {
+      params: {
+        target,
+      },
+    });
+
+    setStorageTypes(storageTypes);
 
     if (result !== null) {
       setStorages(result);
@@ -51,6 +70,7 @@ export const StorageSet = ({title, target, rootClass, buttonLabel}) => {
           storage={storage}
           project={project.id}
           rootClass={rootClass}
+          storageTypes={storageTypes}
           onSubmit={async () => {
             await fetchStorages();
             modalRef.close();
@@ -114,6 +134,7 @@ export const StorageSet = ({title, target, rootClass, buttonLabel}) => {
           storage={storage}
           target={target}
           rootClass={rootClass}
+          storageTypes={storageTypes}
           onEditStorage={onEditStorage}
           onDeleteStorage={onDeleteStorage}
         />

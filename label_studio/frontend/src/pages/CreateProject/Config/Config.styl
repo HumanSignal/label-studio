@@ -204,6 +204,7 @@ styled_scroll()
   margin-left: auto;
 }
 .wizard .configure__code
+  overflow-x: hidden
   textarea
   :global(.react-codemirror2)
     flex: 1
@@ -395,6 +396,9 @@ styled_scroll()
     white-space: pre-line
     h2
       font-size: 16px
+  .editor > .common
+    flex: 1
+    max-width: 100%
 
 // super hack for LSF regions width on sideBottom layout
 div[class^=App_menu]>div

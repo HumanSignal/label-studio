@@ -1,0 +1,428 @@
+---
+test_name: int-filter-greater
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+
+  - id: signup
+    type: ref
+
+  - id: create_project
+    type: ref
+
+  - name: create_filter_tasks
+    request:
+      files:
+        json_file: tests/data_manager/filters/int_tasks.json
+      headers:
+        content-type: multipart/form-data
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/import'
+    response:
+      json:
+        annotation_count: 0
+        prediction_count: 1
+        task_count: 6
+      status_code: 201
+
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "columnsDisplayType": {
+            "tasks:data.int_field": "Number"
+          },
+          "filters": {
+            "conjunction": "and",
+            "items": [
+            {
+              "filter": "filter:tasks:data.int_field",
+              "operator": "greater",
+              "type": "Number",
+              "value": 5
+            }
+            ]
+          },
+          "ordering": [
+            "tasks:data.int_field"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
+    response:
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 0,
+        "total": 3,
+        "tasks": [
+        {
+          "data": {
+            "int_field": 20,
+            "text": "x2"
+          }
+        },
+        {
+          "data": {
+            "int_field": 30,
+            "text": "x3"
+          }
+        },
+        {
+          "data": {
+            "int_field": "50",
+            "text": "x5"
+          }
+        }
+        ]
+      }
+      status_code: 200
+
+
+
+---
+test_name: int-filter-between-in
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+
+  - id: signup
+    type: ref
+
+  - id: create_project
+    type: ref
+
+  - name: create_filter_tasks
+    request:
+      files:
+        json_file: tests/data_manager/filters/int_tasks.json
+      headers:
+        content-type: multipart/form-data
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/import'
+    response:
+      json:
+        annotation_count: 0
+        prediction_count: 1
+        task_count: 6
+      status_code: 201
+
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "columnsDisplayType": {
+            "tasks:data.int_field": "Number"
+          },
+          "filters": {
+            "conjunction": "and",
+            "items": [
+            {
+              "filter": "filter:tasks:data.int_field",
+              "operator": "in",
+              "type": "Number",
+              "value": {
+                "min": 10,
+                "max": 40
+              }
+            }
+            ]
+          },
+          "ordering": [
+            "tasks:data.int_field"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
+    response:
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 0,
+        "total": 2,
+        "tasks": [
+        {
+          "data": {
+            "int_field": 20,
+            "text": "x2"
+          }
+        },
+        {
+          "data": {
+            "int_field": 30,
+            "text": "x3"
+          }
+        }
+        ]
+      }
+      status_code: 200
+
+
+---
+test_name: int-is-empty
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+
+  - id: signup
+    type: ref
+
+  - id: create_project
+    type: ref
+
+  - name: create_filter_tasks
+    request:
+      files:
+        json_file: tests/data_manager/filters/int_tasks.json
+      headers:
+        content-type: multipart/form-data
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/import'
+    response:
+      json:
+        annotation_count: 0
+        prediction_count: 1
+        task_count: 6
+      status_code: 201
+
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "columnsDisplayType": {
+            "tasks:data.int_field": "Number"
+          },
+          "filters": {
+            "conjunction": "and",
+            "items": [
+            {
+              "filter": "filter:tasks:data.int_field",
+              "operator": "empty",
+              "type": "Number",
+              "value": "true"
+            }
+            ]
+          },
+          "ordering": [
+            "tasks:data.int_field"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
+    response:
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 0,
+        "total": 1,
+        "tasks": [
+          {
+            "data": {
+              "text": "x6"
+            }
+          }
+        ]
+      }
+      status_code: 200
+
+---
+test_name: annotation-ids
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+
+  - id: signup
+    type: ref
+
+  - id: create_project
+    type: ref
+
+  - name: create_filter_tasks
+    request:
+      files:
+        json_file: tests/data_manager/filters/int_tasks.json
+      headers:
+        content-type: multipart/form-data
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/import'
+    response:
+      json:
+        annotation_count: 0
+        prediction_count: 1
+        task_count: 6
+      status_code: 201
+
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "columnsDisplayType": {
+            "tasks:data.int_field": "Number"
+          },
+          "filters": {
+            "conjunction": "and",
+            "items": [
+            {
+              "filter": "filter:tasks:annotations_ids",
+              "operator": "empty",
+              "type": "String",
+              "value": "true"
+            }
+            ]
+          },
+          "ordering": [
+            "tasks:annotations_ids"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
+    response:
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 1,
+        "total": 6
+      }
+      status_code: 200
+
+
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "columnsDisplayType": {
+            "tasks:data.int_field": "Number"
+          },
+          "filters": {
+            "conjunction": "and",
+            "items": [
+            {
+              "filter": "filter:tasks:annotations_ids",
+              "operator": "empty",
+              "type": "String",
+              "value": "false"
+            }
+            ]
+          },
+          "ordering": [
+            "tasks:annotations_ids"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
+    response:
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 0,
+        "total": 0
+      }
+      status_code: 200
+
+
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "columnsDisplayType": {
+            "tasks:data.int_field": "Number"
+          },
+          "filters": {
+            "conjunction": "and",
+            "items": [
+            {
+              "filter": "filter:tasks:annotations_ids",
+              "operator": "equal",
+              "type": "String",
+              "value": "123wrong"
+            }
+            ]
+          },
+          "ordering": [
+            "tasks:annotations_ids"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
+    response:
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 0,
+        "total": 0
+      }
+      status_code: 200

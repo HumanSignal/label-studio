@@ -11,8 +11,6 @@ try:
     import ujson as json
 except:
     import json
-import pandas as pd
-import numpy as np
 
 from dateutil import parser
 from rest_framework.exceptions import ValidationError
@@ -64,11 +62,49 @@ def create_file_upload(request, project, file):
     return instance
 
 
+def str_to_json(data):
+    try:
+        json_acceptable_string = data.replace("'", "\"")
+        return json.loads(json_acceptable_string)
+    except ValueError:
+        return None
+
+
+def tasks_from_url(file_upload_ids, project, request, url):
+    """ Download file using URL and read tasks from it
+    """
+    # process URL with tasks
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    try:
+        filename = url.rsplit('/', 1)[-1]
+        with urlopen(url, context=ctx) as file:
+            # check size
+            meta = file.info()
+            file.size = int(meta.get("Content-Length"))
+            file.urlopen = True
+            check_file_sizes_and_number({url: file})
+            file_content = file.read()
+            if isinstance(file_content, str):
+                file_content = file_content.encode()
+            file_upload = create_file_upload(request, project, SimpleUploadedFile(filename, file_content))
+            file_upload_ids.append(file_upload.id)
+            tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(project, file_upload_ids)
+
+    except ValidationError as e:
+        raise e
+    except Exception as e:
+        raise ValidationError(str(e))
+    return data_keys, found_formats, tasks, file_upload_ids
+
+
 def load_tasks(request, project):
     """ Load tasks from different types of request.data / request.files
     """
     file_upload_ids, found_formats, data_keys = [], [], set()
     could_be_tasks_lists = False
+
     # take tasks from request FILES
     if len(request.FILES):
         check_file_sizes_and_number(request.FILES)
@@ -81,36 +117,29 @@ def load_tasks(request, project):
 
     # take tasks from url address
     elif 'application/x-www-form-urlencoded' in request.content_type:
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
+        # empty url
+        url = request.data.get('url')
+        if not url:
+            raise ValidationError('"url" is not found in request data')
 
-        try:
-            url = request.data['url']
-            filename = url.rsplit('/', 1)[-1]
-            with urlopen(url, context=ctx) as file:
-                # check size
-                meta = file.info()
-                file.size = int(meta.get("Content-Length"))
-                file.urlopen = True
-                check_file_sizes_and_number({url: file})
-                file_content = file.read()
-                if isinstance(file_content, str):
-                    file_content = file_content.encode()
-                file_upload = create_file_upload(request, project, SimpleUploadedFile(filename, file_content))
-                file_upload_ids.append(file_upload.id)
-                tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(project, file_upload_ids)
-
-        except ValidationError as e:
-            raise e
-        except Exception as e:
-            raise ValidationError(str(e))
+        # try to load json with task or tasks from url as string
+        json_data = str_to_json(url)
+        if json_data:
+            file_upload = create_file_upload(request, project, SimpleUploadedFile('inplace.json', url.encode()))
+            file_upload_ids.append(file_upload.id)
+            tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(project, file_upload_ids)
+            
+        # download file using url and read tasks from it
+        else:
+            data_keys, found_formats, tasks, file_upload_ids = tasks_from_url(
+                file_upload_ids, project, request, url
+            )
 
     # take one task from request DATA
     elif 'application/json' in request.content_type and isinstance(request.data, dict):
         tasks = [request.data]
 
-        # take many tasks from request DATA
+    # take many tasks from request DATA
     elif 'application/json' in request.content_type and isinstance(request.data, list):
         tasks = request.data
 
@@ -128,3 +157,4 @@ def load_tasks(request, project):
 
     check_max_task_number(tasks)
     return tasks, file_upload_ids, could_be_tasks_lists, found_formats, list(data_keys)
+

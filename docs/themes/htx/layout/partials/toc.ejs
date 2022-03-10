@@ -10,6 +10,9 @@
       <% if (fileName === 'install') { %>
           <li><h4>Install and Upgrade</h4></li>
       <% } %>
+      <% if (fileName === 'install_enterprise') { %>
+          <li><h4>Deploy and Install Enterprise</h4></li>
+      <% } %>
       <% if (fileName === 'security') { %>
           <li><h4>Security and Privacy</h4></li>
       <% } %>
@@ -28,6 +31,9 @@
       <% if (fileName === 'ml') { %>
           <li><h4>Machine Learning Setup</h4></li>
       <% } %>
+      <% if (fileName === 'webhooks') { %>
+          <li><h4>Integrations</h4></li>
+      <% } %>
       <% if (fileName === 'frontend') { %>
           <li><h4>Advanced Development</h4></li>
       <% } %> %>
@@ -45,19 +51,50 @@
           <li><h4>Control Tags</h4></li>
       <% } %>
 
-      <% if (fileName === 'header') { %>
+      <% if (fileName === 'filter') { %>
           <li><h4>Visual & Experience Tags</h4></li>
       <% } %>
 
       <% } %>
 
       <% if (type==="templates") { %>
-         <% if (fileName === '') { %>
-           <li><h4>Audio</h4></li>
-           <li><h4>Images</h4></li>
-           <li><h4>Text</h4></li>
-           <li><h4>Mix</h4></li>
-         <% } %>
+
+        <% if (fileName === 'image_polygons') { %>
+          <li><h4>Computer Vision</h4></li>
+        <% } %>
+
+        <% if (fileName === 'question_answering') { %>
+          <li><h4>Natural Language Processing</h4></li>
+        <% } %>
+
+        <% if (fileName === 'transcribe_audio') { %>
+          <li><h4>Audio/Speech Processing</h4></li>
+        <% } %>
+
+        <% if (fileName === 'response_generation') { %>
+          <li><h4>Conversational AI</h4></li>
+        <% } %>
+
+        <% if (fileName === 'freeform_metadata') { %>
+          <li><h4>Structured Data Parsing</h4></li>
+        <% } %>
+
+        <% if (fileName === 'pairwise_regression') { %>
+          <li><h4>Ranking and Scoring</h4></li>
+        <% } %>
+
+        <% if (fileName === 'time_series_forecasting') { %>
+          <li><h4>Time Series Analysis</h4></li>
+        <% } %>
+
+        <% if (fileName === 'video_classification') { %>
+          <li><h4>Videos</h4></li>
+        <% } %>
+
+        <% if (fileName === 'gallery_cv') { %>
+          <li><h4>Template Galleries</h4></li>
+        <% } %>
+
       <% } %>
     <li>
       <a href="<%- url_for(p.path) %>" class="sidebar-link<%- page.title === p.title ? ' current' : '' %><%- p.is_new ? ' new' : '' %>">

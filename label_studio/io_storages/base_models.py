@@ -7,38 +7,33 @@ import json
 from django.utils import timezone
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 from django_rq import job
 
-from tasks.models import Task
+from tasks.models import Task, Annotation
 from tasks.serializers import PredictionSerializer, AnnotationSerializer
 from data_export.serializers import ExportDataSerializer
 
-
 from core.redis import redis_connected
-from core.utils.common import get_bool_env
+from core.utils.common import get_bool_env, load_func
+from io_storages.utils import get_uri_via_regex
 
 
 logger = logging.getLogger(__name__)
 
 
 class Storage(models.Model):
-    title = models.CharField(
-        _('title'), null=True, max_length=256,
-        help_text='Cloud storage title')
-    description = models.TextField(
-        _('description'), null=True, blank=True,
-        help_text='Cloud storage description')
-    project = models.ForeignKey(
-        'projects.Project', related_name='%(app_label)s_%(class)ss', on_delete=models.CASCADE)
-    created_at = models.DateTimeField(
-        _('created at'), auto_now_add=True,
-        help_text='Creation time')
-    last_sync = models.DateTimeField(
-        _('last sync'), null=True, blank=True,
-        help_text='Last sync finished time')
+    url_scheme = ''
+
+    title = models.CharField(_('title'), null=True, blank=True, max_length=256, help_text='Cloud storage title')
+    description = models.TextField(_('description'), null=True, blank=True, help_text='Cloud storage description')
+    project = models.ForeignKey('projects.Project', related_name='%(app_label)s_%(class)ss', on_delete=models.CASCADE,
+                                help_text='A unique integer value identifying this project.')
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
+    last_sync = models.DateTimeField(_('last sync'), null=True, blank=True, help_text='Last sync finished time')
     last_sync_count = models.PositiveIntegerField(
-        _('last sync count'), null=True, blank=True,
-        help_text='Count of tasks synced last time')
+        _('last sync count'), null=True, blank=True, help_text='Count of tasks synced last time'
+    )
 
     def validate_connection(self, client=None):
         pass
@@ -60,23 +55,33 @@ class ImportStorage(Storage):
     def get_data(self, key):
         raise NotImplementedError
 
-    def resolve_uri(self, data):
-        return
+    def generate_http_url(self, url):
+        raise NotImplementedError
 
-    def resolve_task_data_uri(self, task_data):
-        out = {}
-        for key, data in task_data.items():
-            if not isinstance(data, str):
-                out[key] = data
-            resolved_uri = self.resolve_uri(data)
-            if resolved_uri:
-                out[key] = resolved_uri
-            else:
-                out[key] = data
-        return out
+    def can_resolve_url(self, url):
+        # TODO: later check to the full prefix like "url.startswith(self.path_full)"
+        # Search of occurrences inside string, e.g. for cases like "gs://bucket/file.pdf" or "<embed src='gs://bucket/file.pdf'/>"  # noqa
+        _, storage = get_uri_via_regex(url, prefixes=(self.url_scheme,))
+        if storage == self.url_scheme:
+            return True
+        # if not found any occurrences - this Storage can't resolve url
+        return False
+
+    def resolve_uri(self, uri):
+        try:
+            extracted_uri, extracted_storage = get_uri_via_regex(uri, prefixes=(self.url_scheme,))
+            if not extracted_storage:
+                logger.info(f'No storage info found for URI={uri}')
+                return
+            http_url = self.generate_http_url(extracted_uri)
+            return uri.replace(extracted_uri, http_url)
+        except Exception as exc:
+            logger.error(f'Can\'t resolve URI={uri}. Reason: {exc}', exc_info=True)
 
     def _scan_and_create_links(self, link_class):
         tasks_created = 0
+        maximum_annotations = self.project.maximum_annotations
+        
         for key in self.iterkeys():
             logger.debug(f'Scanning key {key}')
 
@@ -93,27 +98,33 @@ class ImportStorage(Storage):
                 raise ValueError(
                     f'Error loading JSON from file "{key}".\nIf you\'re trying to import non-JSON data '
                     f'(images, audio, text, etc.), edit storage settings and enable '
-                    f'"Treat every bucket object as a source file"')
+                    f'"Treat every bucket object as a source file"'
+                )
 
             # predictions
             predictions = data.get('predictions', [])
             if predictions:
                 if 'data' not in data:
-                    raise ValueError('If you use "predictions" field in the task, '
-                                     'you must put "data" field in the task too')
+                    raise ValueError(
+                        'If you use "predictions" field in the task, ' 'you must put "data" field in the task too'
+                    )
 
             # annotations
             annotations = data.get('annotations', [])
             if annotations:
                 if 'data' not in data:
-                    raise ValueError('If you use "annotations" field in the task, '
-                                     'you must put "data" field in the task too')
+                    raise ValueError(
+                        'If you use "annotations" field in the task, ' 'you must put "data" field in the task too'
+                    )
 
             if 'data' in data and isinstance(data['data'], dict):
                 data = data['data']
 
             with transaction.atomic():
-                task = Task.objects.create(data=data, project=self.project)
+                task = Task.objects.create(
+                    data=data, project=self.project, overlap=maximum_annotations,
+                    is_labeled=len(annotations) >= maximum_annotations
+                )
                 link_class.create(task, key, self)
                 logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
                 tasks_created += 1
@@ -137,6 +148,12 @@ class ImportStorage(Storage):
         self.last_sync = timezone.now()
         self.last_sync_count = tasks_created
         self.save()
+
+        self.project.update_tasks_states(
+                maximum_annotations_changed=False,
+                overlap_cohort_percentage_changed=False,
+                tasks_number_changed=True
+            )
 
     def scan_and_create_links(self):
         """This is proto method - you can override it, or just replace ImportStorageLink by your own model"""
@@ -163,21 +180,47 @@ def sync_background(storage_class, storage_id):
 
 
 class ExportStorage(Storage):
+    can_delete_objects = models.BooleanField(_('can_delete_objects'), null=True, blank=True, help_text='Deletion from storage enabled')
 
     def _get_serialized_data(self, annotation):
         if get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False):
             # export task with annotations
             return ExportDataSerializer(annotation.task).data
         else:
-            from io_storages.serializers import StorageAnnotationSerializer
+            serializer_class = load_func(settings.STORAGE_ANNOTATION_SERIALIZER)
             # deprecated functionality - save only annotation
-            return StorageAnnotationSerializer(annotation).data
+            return serializer_class(annotation).data
 
     def save_annotation(self, annotation):
         raise NotImplementedError
 
+    def save_all_annotations(self):
+        annotation_exported = 0
+        for annotation in Annotation.objects.filter(task__project=self.project):
+            self.save_annotation(annotation)
+            annotation_exported += 1
+
+        self.last_sync = timezone.now()
+        self.last_sync_count = annotation_exported
+        self.save()
+
+    def sync(self):
+        if redis_connected():
+            queue = django_rq.get_queue('default')
+            job = queue.enqueue(export_sync_background, self.__class__, self.id)
+            logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
+        else:
+            logger.info(f'Start syncing storage {self}')
+            self.save_all_annotations()
+
     class Meta:
         abstract = True
+
+
+@job('default')
+def export_sync_background(storage_class, storage_id):
+    storage = storage_class.objects.get(id=storage_id)
+    storage.save_all_annotations()
 
 
 class ImportStorageLink(models.Model):
@@ -185,7 +228,8 @@ class ImportStorageLink(models.Model):
     task = models.OneToOneField('tasks.Task', on_delete=models.CASCADE, related_name='%(app_label)s_%(class)s')
     key = models.TextField(_('key'), null=False, help_text='External link key')
     object_exists = models.BooleanField(
-        _('object exists'), help_text='Whether object under external link still exists', default=True)
+        _('object exists'), help_text='Whether object under external link still exists', default=True
+    )
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
 
     @classmethod
@@ -209,16 +253,22 @@ class ImportStorageLink(models.Model):
 class ExportStorageLink(models.Model):
 
     annotation = models.OneToOneField(
-        'tasks.Annotation', on_delete=models.CASCADE, related_name='%(app_label)s_%(class)s')
+        'tasks.Annotation', on_delete=models.CASCADE, related_name='%(app_label)s_%(class)s'
+    )
     object_exists = models.BooleanField(
-        _('object exists'), help_text='Whether object under external link still exists', default=True)
+        _('object exists'), help_text='Whether object under external link still exists', default=True
+    )
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
+
+    @staticmethod
+    def get_key(annotation):
+        if get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False):
+            return str(annotation.task.id)
+        return str(annotation.id)
 
     @property
     def key(self):
-        if get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False):
-            return str(self.annotation.task.id)
-        return str(self.annotation.id)
+        return self.get_key(self.annotation)
 
     @classmethod
     def exists(cls, annotation, storage):

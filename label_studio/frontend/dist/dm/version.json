@@ -1,6 +1,6 @@
 {
-  "message": "UI fixes and improvements",
-  "commit": "a9fac1800043c5befd19576b7384eac80840c69a",
-  "branch": "master",
-  "date": "2021-06-16T11:53:24Z"
+  "message": "feat: DEV-1621:  Add usage of new method to create annotation",
+  "commit": "8975918038340887dbe42096c17e2df06aab2152",
+  "branch": "feat/DEV-1621/interactive_mode",
+  "date": "2022-02-15T19:29:50Z"
 }

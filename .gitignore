@@ -1,8 +1,8 @@
 node_modules
 *.lock
 *.pyc
+*.ipynb
 __pycache__
-
 
 # docs
 __generated__
@@ -19,12 +19,18 @@ env/
 venv/
 .venv
 .vscode
+.autoenv
+.env
+.envrc
 # web/static
 
 deploy/license.txt
 deploy/logs/
 deploy/redis-data/
 deploy/dockerfiles/postgres-data
+deploy/dockerfiles/mysql-data
+postgres-data
+mysql-data
 
 label_studio/core/media
 label_studio/core/downloads
@@ -50,3 +56,9 @@ label_studio.sqlite3
 tmp
 .DS_Store
 *.sqlite3
+label_studio/core/settings/local.py
+deploy/nginx/certs/*
+!deploy/nginx/certs/.placeholder
+mydata/
+deploy/pgsql/certs/*
+!deploy/pgsql/certs/.placeholder

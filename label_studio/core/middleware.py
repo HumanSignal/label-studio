@@ -1,6 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import json
+import ujson as json
 import time
 
 from uuid import uuid4
@@ -10,16 +10,35 @@ from django.core.handlers.base import BaseHandler
 from django.core.exceptions import MiddlewareNotUsed
 from django.middleware.common import CommonMiddleware
 from django.conf import settings
-from django.utils import timezone
+
 from django.utils.http import escape_leading_slashes
 from rest_framework.permissions import SAFE_METHODS
-from rest_framework.response import Response
 from core.utils.contextlog import ContextLog
 
 
+def enforce_csrf_checks(func):
+    """ Enable csrf for specified view func
+    """
+    # USE_ENFORCE_CSRF_CHECKS=False is for tests
+    if settings.USE_ENFORCE_CSRF_CHECKS:
+        def wrapper(request, *args, **kwargs):
+            return func(request, *args, **kwargs)
+
+        wrapper._dont_enforce_csrf_checks = False
+        return wrapper
+    else:
+        return func
+
+
 class DisableCSRF(MiddlewareMixin):
-    def process_request(self, request):
-        setattr(request, '_dont_enforce_csrf_checks', True)
+    # disable csrf for api requests
+    def process_view(self, request, callback, *args, **kwargs):
+        if hasattr(callback, '_dont_enforce_csrf_checks'):
+            setattr(request, '_dont_enforce_csrf_checks', callback._dont_enforce_csrf_checks)
+        elif request.GET.get('enforce_csrf_checks'):  # _dont_enforce_csrf_checks is for test
+            setattr(request, '_dont_enforce_csrf_checks', False)
+        else:
+            setattr(request, '_dont_enforce_csrf_checks', True)
 
 
 class HttpSmartRedirectResponse(HttpResponsePermanentRedirect):
@@ -59,6 +78,8 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
 
     def process_response(self, request, response):
         response = super(CommonMiddlewareAppendSlashWithoutRedirect, self).process_response(request, response)
+
+        request.editor_keymap = settings.EDITOR_KEYMAP
 
         if isinstance(response, HttpSmartRedirectResponse):
             if not request.path.endswith('/'):

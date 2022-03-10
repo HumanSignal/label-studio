@@ -6,44 +6,55 @@
     they are called by entry_points from settings.DATA_MANAGER_ACTIONS dict items.
 """
 import os
+import copy
 import logging
 import traceback as tb
 
 from importlib import import_module
 
 from django.conf import settings
+from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 
 from data_manager.functions import DataManagerException
 
 logger = logging.getLogger('django')
 
 
-def check_permissions(params, action):
-    """ Some actions might have a permissions to perform
+def check_permissions(user, action):
+    """ Actions must have permissions, if only one is in the user role then the action is allowed
     """
-    if 'permissions' in action:
-        field = action['permissions']
-        return params[field]
-    else:
-        return True
+    if 'permission' not in action:
+        logger.error('Action must have "permission" field: %s', str(action))
+        return False
+
+    return user.has_perm(action['permission'])
 
 
-def get_all_actions(params):
+def get_all_actions(user, project):
     """ Return dict with registered actions
 
-    :param params: dict with permissions and other flags
+    :param user: list with user permissions
+    :param project: current project
     """
     # copy and sort by order key
     actions = list(settings.DATA_MANAGER_ACTIONS.values())
+    actions = copy.deepcopy(actions)
     actions = sorted(actions, key=lambda x: x['order'])
     actions = [
         {key: action[key] for key in action if key != 'entry_point'}
         for action in actions if not action.get('hidden', False)
-        and check_permissions(params, action)
+        and check_permissions(user, action)
     ]
     # remove experimental features if they are disabled
-    if not params.get('experimental_features', False):
+    if not settings.EXPERIMENTAL_FEATURES:
         actions = [action for action in actions if not action.get('experimental', False)]
+
+    # generate form if function is passed
+    for action in actions:
+        form_generator = action.get('dialog', {}).get('form')
+        if callable(form_generator):
+            action['dialog']['form'] = form_generator(user, project)
+
     return actions
 
 
@@ -77,17 +88,24 @@ def register_actions_from_dir(base_module, action_dir):
                 logger.debug('Action registered: ' + str(action['entry_point'].__name__))
 
 
-def perform_action(action_id, project, queryset, **kwargs):
+def perform_action(action_id, project, queryset, user, **kwargs):
     """ Perform action using entry point from actions
     """
     if action_id not in settings.DATA_MANAGER_ACTIONS:
         raise DataManagerException("Can't find '" + action_id + "' in registered actions")
 
+    action = settings.DATA_MANAGER_ACTIONS[action_id]
+
+    # check user permissions for this action
+    if not check_permissions(user, action):
+        raise DRFPermissionDenied(f'Action is not allowed for the current user: {action["id"]}')
+
+
     try:
-        result = settings.DATA_MANAGER_ACTIONS[action_id]['entry_point'](project, queryset, **kwargs)
+        result = action['entry_point'](project, queryset, **kwargs)
     except Exception as e:
         text = 'Error while perform action: ' + action_id + '\n' + tb.format_exc()
-        logger.error(text)
+        logger.error(text, extra={'sentry_skip': True})
         raise e
 
     return result

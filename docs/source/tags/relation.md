@@ -1,26 +1,26 @@
 ---
 title: Relation
 type: tags
-order: 420
-meta_title: Relation Tags for a Single Relation
-meta_description: Label Studio Relation Tags customize Label Studio for a single relation for machine learning and data science projects.
+order: 422
+meta_title: Relation Tag for a Single Relation
+meta_description: Customize Label Studio by using the Relation tag to add a single consistent label to relations between regions in machine learning and data science projects.
 ---
 
-Relation tag represents a single relation label
+The Relation tag represents a single relation label. Use with the Relations tag to specify the value of a label to apply to a relation between regions.
 
 ### Parameters
 
 | Param | Type | Description |
 | --- | --- | --- |
-| value | <code>string</code> | value of the relation |
-| [background] | <code>string</code> | background color of active label |
+| value | <code>string</code> | Value of the relation |
+| [background] | <code>string</code> | Background color of the active label in hexadecimal |
 
 ### Example
 ```html
+<!--Basic labeling configuration to apply the label "similar" to a relation identified between two labeled regions of text -->
 <View>
   <Relations>
-    <Relation value="hello" />
-    <Relation value="world" />
+    <Relation value="similar" />
   </Relations>
 
   <Text name="txt-1" value="$text" />

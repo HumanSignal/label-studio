@@ -18,29 +18,53 @@
       <img src="<%- url_for("/images/new/logofirst.svg") %>" alt="logofirst">
     </a>
     <div class="head__menu--wrapper">
-      <ul>
-        <li class="<%- page.type === "guide" ? "current": "" %>"><a href="<%- url_for("/guide/") %>">Guide</a></li>
-        <li class="<%- page.type === "tags" ? "current": "" %>"><a href="<%- url_for("/tags/") %>">Tags</a></li>
-        <li class="<%- page.type === "templates" ? "current": "" %>"><a href="<%- url_for("/templates/") %>">Templates</a></li>
-        <li class="<%- page.type === "api" ? "current": "" %>"><a href="<%- url_for("/api/") %>">API</a></li>
-        <li class="<%- page.type === "playground" ? "current": "" %>"><a href="<%- url_for("/playground/") %>">Playground</a></li>
-        <li class="<%- page.type === "blog" ? "current": "" %>"><a href="<%- url_for("/blog/") %>">Blog</a></li>
-      </ul>
-    </div>
-    <div class="search__head">
-      <input type="text" placeholder="Search" id="local-search-input">
-      <input type="submit" value="">
-    </div>
-  </div>
+      <a href="/blog" class="head-main-menu-item-link-single <%- page.type === "blog" ? "current": "" %>">Blog</a>
+      <div data-hover="true" data-delay="0" class="head-main-menu-dd w-dropdown">
+        <div class="head-main-menu-dd-toggle w-dropdown-toggle" aria-controls="w-dropdown-list-0" aria-haspopup="menu" aria-expanded="false" role="button">
+          <a href="/community" class="head-main-menu-item-link">Community</a>
+          <svg class="head-main-menu-dd-icon w-icon-dropdown-toggle" aria-hidden="true" viewBox="0 0 16 16" stroke="#222" width="16">
+            <path d="M2,6L8,12L14,6" stroke-width="2.2" fill="none"/>
+          </svg>
+        </div>
+        <nav class="head-main-menu-dd-list w-dropdown-list">
+          <a href="/community/webinars" class="w-dropdown-link">Webinars</a>
+          <a href="/community/slack" class="w-dropdown-link">Slack Community</a>
+          <a href="/community/newsletter" class="w-dropdown-link">Newsletter</a>
+          <a href="/community/champions" class="w-dropdown-link">Champions</a>
+        </nav>
+      </div>
+      <div data-hover="true" data-delay="0" class="head-main-menu-dd w-dropdown" style="">
+        <div class="head-main-menu-dd-toggle w-dropdown-toggle" aria-controls="w-dropdown-list-1" aria-haspopup="menu" aria-expanded="false" role="button">
+          <a href="/guide" class="<%- page.type === "guide" ? "current": "" %>">Documentation</a>
+          <svg class="head-main-menu-dd-icon w-icon-dropdown-toggle" aria-hidden="true" viewBox="0 0 16 16" stroke="#222" width="16">
+            <path d="M2,6L8,12L14,6" stroke-width="2.2" fill="none"/>
+          </svg>
+        </div>
+        <nav class="head-main-menu-dd-list w-dropdown-list">
+          <a href="/guide/index.html" class="w-dropdown-link">Quickstart</a>
+          <a href="/guide/install.html" class="w-dropdown-link">Install</a>
+          <a href="/guide/tasks.html" class="w-dropdown-link">Import Data</a>
+          <a href="/api" class="w-dropdown-link">API Reference</a>
+          <a href="/sdk" class="w-dropdown-link">SDK Reference</a>
+          <div style="margin-top: 7px; margin-bottom:7px; border-bottom:1px solid #ccc"></div>
+          <a href="/tags" class="w-dropdown-link <%- page.type === "tags" ? "current": "" %>">Customizable Tags</a>
+          <a href="/templates" class="w-dropdown-link <%- page.type === "templates" ? "current": "" %>">Labeling Templates</a>
+        </nav>
+      </div>
+      <a href="/playground" class="head-main-menu-item-link-single <%- page.type === "playground" ? "current": "" %>">Playground</a>
 
-  <div id="local-search-result-wrapper"></div>
+      <br><br>
+      <div class="search__head">
+        <input type="text" placeholder="Search" id="docsearch-input">
+        <input type="submit" value="">
+      </div>
+
+    </div>
+
+    <!-- Place this tag where you want the button to render. -->
+    <a class="github-button" href="https://github.com/heartexlabs/label-studio" data-size="large" data-show-count="true" aria-label="Star heartexlabs/label-studio on GitHub">GitHub</a>
+  </div>
   <script>
-  var search_path = "<%= config.search.path %>";
-  if (search_path.length === 0) {
-    search_path = "search.xml";
-  }
-  var path = "<%= config.root %>" + search_path;
-  searchFunc(path, 'local-search-input', 'local-search-result-wrapper');
 
   document.querySelector(".menu__icon>a").addEventListener("click", function(e){
     e.preventDefault();
@@ -54,6 +78,31 @@
       document.querySelector("body , html").style.overflow = "hidden";
     }
   });
+
+  document.addEventListener("DOMContentLoaded", function(event) {
+      function doSomething(scroll_pos) {
+          if (window.scrollY > 70) {
+            document.querySelector(".head__main").classList.add("active__head");
+            //document.querySelector("body").css("overflow", "hidden");
+          } else {
+            document.querySelector(".head__main").classList.remove("active__head");
+          }
+      }
+      document.addEventListener('scroll', function(e) {
+        doSomething();
+      });
+    });
+
+    $(document).bind('keydown',function(e){
+      console.log(e)
+      if (document.activeElement.localName === 'body'
+          && e.code !== "Space"
+          && !e.altKey && !e.shiftKey && !e.ctrlKey && !e.metaKey
+      ) {
+        $('#docsearch-input').focus();
+        $(document).unbind('keydown');
+      }
+    });
   </script>
 </div>
 

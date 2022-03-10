@@ -1,25 +1,22 @@
 ---
-title: Audio Regions
+title: Audio Classification with Segments
 type: templates
-order: 402
-meta_title: Audio Regions Data Labeling Template
-meta_description: Label Studio Audio Regions Template for machine learning and data science data labeling projects.
+category: Audio/Speech Processing
+cat: audio-speech-processing
+order: 308
+meta_title: Audio Classification with Segments Data Labeling Template
+meta_description: Template for classifying audio regions for segmentation tasks with Label Studio for your machine learning and data science projects.
 ---
 
-Listen to the audio file and classify
+<img src="/images/templates-misc/audio-classification-segments.png" alt="" class="gif-border" width="598.4px" height="319.2px" />
 
-<img src="/images/screens/audio_regions.png" class="img-template-example" title="Audio Regions" />
+If you want to perform audio classification tasks on specific segments of audio clips, you can use this template to listen to an audio file and classify the topic of the clip.
 
-<p class="tip">For audio regions to work when you have remote URLs, you need to configure CORS to be wide-open</p>
+## Interactive Template Preview
 
-## Run
+<div id="main-preview"></div>
 
-```bash
-label-studio init --template=audio_regions audio_regions_project
-label-studio start audio_regions_project 
-```
-
-## Config 
+## Labeling Configuration 
 
 ```html
 <View>
@@ -34,3 +31,33 @@ label-studio start audio_regions_project
   <AudioPlus name="audio" value="$url"></AudioPlus>
 </View>
 ```
+
+## About the labeling configuration
+
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
+
+You can add a [header](/tags/header.html) to provide instructions to the annotator:
+```xml
+<Header value="Select its topic:"></Header>
+```
+
+Use the [Labels](/tags/labels.html) control tag to allow annotators to segment the audio and classify it at the same time. 
+```xml
+<Labels name="label" toName="audio" choice="multiple">
+    <Label value="Politics" background="yellow"></Label>
+    <Label value="Business" background="red"></Label>
+    <Label value="Education" background="blue"></Label>
+    <Label value="Other"></Label>
+</Labels>
+```
+The `choice="multiple"` argument allows one audio segment to be labeled with multiple topics.
+
+Use the [AudioPlus](/tags/audioplus.html) object tag to specify the location of the audio file to classify:
+```xml
+<AudioPlus name="audio" value="$url"></AudioPlus>
+```
+
+## Related tags
+
+- [AudioPlus](/tags/audioplus.html)
+- [Labels](/tags/labels.html)

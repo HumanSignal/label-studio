@@ -4,12 +4,11 @@ import logging
 import redis
 import json
 
-from django.db import models, transaction
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
-from io_storages.serializers import StorageAnnotationSerializer
 from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
@@ -75,6 +74,9 @@ class RedisImportStorage(ImportStorage, RedisStorageMixin):
         _('db'), default=1,
         help_text='Server Database')
 
+    def can_resolve_url(self, url):
+        return False
+
     def iterkeys(self):
         client = self.get_client()
         path = str(self.path)
@@ -106,10 +108,15 @@ class RedisExportStorage(ExportStorage, RedisStorageMixin):
         client = self.get_client()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
-        with transaction.atomic():
-            # Create export storage link
-            link = RedisExportStorageLink.create(annotation, self)
-            client.set(link.key, json.dumps(ser_annotation))
+
+        # get key that identifies this object in storage
+        key = RedisExportStorageLink.get_key(annotation)
+
+        # put object into storage
+        client.set(key, json.dumps(ser_annotation))
+
+        # create link if everything ok
+        RedisExportStorageLink.create(annotation, self)
 
 
 @receiver(post_save, sender=Annotation)

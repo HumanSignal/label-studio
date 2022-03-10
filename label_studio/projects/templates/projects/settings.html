@@ -4,12 +4,3 @@
 {% load static %}
 {% load rules %}
 {% load filters %}
-
-{% block frontend_settings %}
-  {
-    project: "{{project.title}}",
-    projectId: {{project.pk}},
-    projectDescription: "{{project.description}}",
-    projectInstruction: "{{project.expert_instruction}}",
-  }
-{% endblock %}

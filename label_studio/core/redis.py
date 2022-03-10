@@ -2,6 +2,7 @@
 """
 import redis
 import logging
+import django_rq
 
 from django_rq import get_connection
 
@@ -11,7 +12,7 @@ try:
     _redis = get_connection()
     _redis.ping()
 except:
-    logger.warning('Redis is not connected.')
+    logger.debug('Redis is not connected.')
     _redis = None
 
 
@@ -66,3 +67,27 @@ def redis_delete(key):
     if not redis_healthcheck():
         return
     return _redis.delete(key)
+
+
+def start_job_async_or_sync(job, *args, **kwargs):
+    """
+    Start job async with redis or sync if redis is not connected
+    :param job: Job function
+    :param args: Function arguments
+    :param kwargs: Function keywords arguments
+    :return: Job or function result
+    """
+    redis = redis_connected()
+    queue_name = kwargs.get("queue_name", "default")
+    if 'queue_name' in kwargs:
+        del kwargs['queue_name']
+    if redis:
+        queue = django_rq.get_queue(queue_name)
+        job = queue.enqueue(
+            job,
+            *args,
+            **kwargs
+        )
+        return job
+    else:
+        return job(*args, **kwargs)

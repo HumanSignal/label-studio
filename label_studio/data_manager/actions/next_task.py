@@ -3,6 +3,12 @@
 import logging
 
 from projects.api import ProjectNextTaskAPI
+from rest_framework.exceptions import NotFound
+from data_manager.functions import filters_ordering_selected_items_exist
+from projects.functions.next_task import get_next_task
+from core.permissions import all_permissions
+from tasks.serializers import NextTaskSerializer
+
 
 logger = logging.getLogger(__name__)
 
@@ -14,20 +20,29 @@ def next_task(project, queryset, **kwargs):
     :param queryset: task ids to sample from
     :param kwargs: arguments from api request
     """
-    kwargs['pk'] = project.pk
-    api = ProjectNextTaskAPI(kwargs=kwargs)
-    api.prepared_tasks = queryset
 
-    response = api.get(request=kwargs['request'])
-    result = response.data
-    result['response_code'] = response.status_code
-    return result
+    request = kwargs['request']
+    dm_queue = filters_ordering_selected_items_exist(request.data)
+    next_task, queue_info = get_next_task(request.user, queryset, project, dm_queue)
+
+    if next_task is None:
+        raise NotFound(
+            f'There are still some tasks to complete for the user={request.user}, '
+            f'but they seem to be locked by another user.')
+
+    # serialize task
+    context = {'request': request, 'project': project, 'resolve_uri': True}
+    serializer = NextTaskSerializer(next_task, context=context)
+    response = serializer.data
+    response['queue'] = queue_info
+    return response
 
 
 actions = [
     {
         'entry_point': next_task,
-        'title': 'Generate next task',
+        'permission': all_permissions.projects_view,
+        'title': 'Generate Next Task',
         'order': 0,
         'hidden': True
     }

@@ -71,7 +71,7 @@ marks:
 stages:
 - id: signup
   type: ref
-- name: stage
+- name: create project
   request:
     data:
       label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
@@ -83,7 +83,7 @@ stages:
       json:
         pk: id
     status_code: 201
-- name: stage
+- name: import task
   request:
     headers:
       content-type: application/json
@@ -93,7 +93,7 @@ stages:
     url: '{django_live_url}/api/projects/{pk}/import'
   response:
     status_code: 201
-- name: stage
+- name: get next task
   request:
     method: GET
     url: '{django_live_url}/api/projects/{pk}/next'
@@ -102,7 +102,7 @@ stages:
       json:
         task_id: id
     status_code: 200
-- name: stage
+- name: submit annotation
   request:
     headers:
       content-type: application/json
@@ -118,13 +118,13 @@ stages:
     url: '{django_live_url}/api/tasks/{task_id}/annotations'
   response:
     status_code: 201
-- name: stage
+- name: get labeling settings page
   request:
     method: GET
     url: '{django_live_url}/projects/{pk}/settings/labeling'
   response:
     status_code: 200
-- name: stage
+- name: change config 1
   request:
     headers:
       content-type: application/json
@@ -134,15 +134,8 @@ stages:
     method: PATCH
     url: '{django_live_url}/api/projects/{pk}'
   response:
-    json:
-      detail: Validation error
-      validation_errors:
-        label_config:
-        - 'These labels still exist in annotations:
-
-          1 (1 annotations)'
-    status_code: 400
-- name: stage
+    status_code: 200
+- name: change config 2
   request:
     headers:
       content-type: application/json
@@ -161,7 +154,7 @@ stages:
 
           1 with from_name=label, to_name=text, type=choices'
     status_code: 400
-- name: stage
+- name: change config 3
   request:
     headers:
       content-type: application/json
@@ -173,13 +166,13 @@ stages:
     url: '{django_live_url}/api/projects/{pk}'
   response:
     status_code: 200
-- name: stage
+- name: delete tasks
   request:
     method: DELETE
     url: '{django_live_url}/api/projects/{pk}/tasks'
   response:
     status_code: 204
-- name: stage
+- name: change config success
   request:
     headers:
       content-type: application/json
@@ -371,7 +364,7 @@ stages:
     method: PATCH
     url: '{django_live_url}/api/projects/{pk}'
   response:
-    status_code: 400
+    status_code: 200
 - name: stage
   request:
     headers:
@@ -512,3 +505,80 @@ stages:
   response:
     status_code: 200
 
+
+---
+test_name: taxomony_validation
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+    json:
+      label_config: <View> <Text name="text" value="$text"/><Taxonomy name="taxonomy" toName="text"><Choice value="A"><Choice value="A_1"/><Choice value="A_2"/></Choice><Choice value="B"/></Taxonomy></View>
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+    - text: any text
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+
+- name: get next task
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/next'
+  response:
+    save:
+      json:
+        task_id: id
+    status_code: 200
+- name: make annotation
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+      - from_name: taxonomy
+        to_name: text
+        type: taxonomy
+        value:
+          taxonomy:
+          - ['A', 'A_1']
+          - ['B']
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_id}/annotations'
+- name: validate existing config
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: <View> <Text name="text" value="$text"/><Taxonomy name="taxonomy" toName="text"><Choice value="A"><Choice value="A_1"/><Choice value="A_2"/></Choice><Choice value="B"/></Taxonomy></View>
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 200
+
+- name: validate config with labels change
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: <View> <Text name="text" value="$text"/><Taxonomy name="taxonomy" toName="text"><Choice value="C"><Choice value="A_1"/><Choice value="A_2"/></Choice><Choice value="B"/></Taxonomy></View>
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400

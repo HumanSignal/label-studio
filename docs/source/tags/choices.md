@@ -1,37 +1,41 @@
 ---
 title: Choices
 type: tags
-order: 403
-meta_title: Choices Tags for Multiple Choice Labels
-meta_description: Label Studio Choices Tags customize Label Studio for multiple choice labels for machine learning and data science projects.
+order: 404
+meta_title: Choices Tag for Multiple Choice Labels
+meta_description: Customize Label Studio with multiple choice labels for machine learning and data science projects.
 ---
 
-Choices tag, create a group of choices, radio, or checkboxes. Shall
-be used for a single or multi-class classification.
+Use the Choices tag to create a group of choices, with radio buttons or checkboxes. Can be used for single or multi-class classification. Use for advanced classification tasks where annotators can choose one or multiple answers.
+
+Use with the following data types: audio, image, HTML, paragraphs, text, time series, video
 
 ### Parameters
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| name | <code>string</code> |  | name of the group |
-| toName | <code>string</code> |  | name of the element that you want to label |
-| [choice] | <code>single</code> \| <code>single-radio</code> \| <code>multiple</code> | <code>single</code> | single or multi-class |
-| [showInline] | <code>boolean</code> | <code>false</code> | show items in the same visual line |
-| [required] | <code>boolean</code> | <code>false</code> | validation if choice has been selected |
-| [requiredMessage] | <code>string</code> |  | message to show if validation fails |
-| [visibleWhen] | <code>region-selected</code> \| <code>choice-selected</code> \| <code>no-region-selected</code> |  | show the contents of a view when condition is true |
-| [whenTagName] | <code>string</code> |  | narrow down visibility by name of the tag, for regions use the name of the object tag, for choices use the name of the choices tag |
-| [whenLabelValue] | <code>string</code> |  | narrow down visibility by label value |
-| [whenChoiceValue] | <code>string</code> |  | narrow down visibility by choice value |
-| [perRegion] | <code>boolean</code> |  | use this tag for region labeling instead of the whole object labeling |
+| name | <code>string</code> |  | Name of the group of choices |
+| toName | <code>string</code> |  | Name of the data item that you want to label |
+| [choice] | <code>single</code> \| <code>single-radio</code> \| <code>multiple</code> | <code>single</code> | Single or multi-class classification |
+| [showInline] | <code>boolean</code> | <code>false</code> | Show choices in the same visual line |
+| [required] | <code>boolean</code> | <code>false</code> | Validate whether a choice has been selected |
+| [requiredMessage] | <code>string</code> |  | Show a message if validation fails |
+| [visibleWhen] | <code>region-selected</code> \| <code>choice-selected</code> \| <code>no-region-selected</code> |  | Control visibility of the choices. |
+| [whenTagName] | <code>string</code> |  | Use with visibleWhen. Narrow down visibility by name of the tag. For regions, use the name of the object tag, for choices, use the name of the choices tag |
+| [whenLabelValue] | <code>string</code> |  | Narrow down visibility by label value |
+| [whenChoiceValue] | <code>string</code> |  | Narrow down visibility by choice value |
+| [perRegion] | <code>boolean</code> |  | Use this tag to select a choice for a specific region instead of the entire task |
 
 ### Example
 ```html
+<!--Basic text classification labeling configuration-->
 <View>
   <Choices name="gender" toName="txt-1" choice="single-radio">
     <Choice alias="M" value="Male" />
     <Choice alias="F" value="Female" />
+    <Choice alias="NB" value="Nonbinary" />
+    <Choice alias="X" value="Other" />
   </Choices>
-  <Text name="txt-1" value="John went to see Marry" />
+  <Text name="txt-1" value="John went to see Mary" />
 </View>
 ```
