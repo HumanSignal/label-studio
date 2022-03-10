@@ -1,6 +1,5 @@
 title: Video Object Tracking
 group: Videos
-type: enterprise
 image: /static/templates/object-detection-with-bounding-boxes.png
 details: <h1>Object tracking in video with bounding boxes</h1>
 config: |
