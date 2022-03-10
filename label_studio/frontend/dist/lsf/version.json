@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #520 from heartexlabs/dependabot/github_actions/actions/upload-artifact-3\n\nbuild(deps): bump actions/upload-artifact from 2.3.1 to 3",
-  "commit": "ad68f0e8e2705d58d694271bd39df6ba8a471ff8",
-  "branch": "master",
-  "date": "2022-03-07T13:02:30Z"
+  "message": "Add Inside Label for VideoRectangle",
+  "commit": "57830856b357afd3033170ca9ea9ca178f9137ac",
+  "branch": "feature/DEV-1852",
+  "date": "2022-03-10T15:16:33Z"
 }
