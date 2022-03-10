@@ -1,10 +1,10 @@
 ---
-title: What's with the Label Studio opossums?
+title: What's with the Label Studio Opossums?
 type: blog
 order: 94
 image: /images/opossums/other/3.svg
-meta_title: Label Studio and Opossums
-meta_description: What data labeling can learn from opossums and what Heidi means to Label Studio. 
+meta_title: What's with the Label Studio Opossums?
+meta_description: Check out our blog post about what data labeling can learn from opossums and what Heidi means to Label Studio, the open source data labeling tool for all your data science and machine learning projects. 
 ---
 
 You might have wondered what creature is walking around when a page loads in Label Studio. 
@@ -33,9 +33,9 @@ Ultimately, they're both necessary nuisances. Data labeling is a crucial but ted
 
 Opossums can live just about anywhere. And so can Label Studio! You can [install Label Studio](/guide/install.html) on Linux, Windows, or Mac devices. However, unlike opossums, Label Studio works best in a clean environment, like a Docker container or a virtual environment.
 
-Just like opossums, Label Studio is [flexible about what it ingests](/guide/tasks.html). You can start a data labeling project with text, audio, images, HTML, or PDF data types, or other structured data formats like JSON, CSV, and TSV.
+Just like opossums, Label Studio is [flexible about what it ingests](/guide/tasks.html). You can start a data labeling project with text samples, audio clips, images, HTML documents, or videos. You can also import structured data formats like CSV or TSV files of time series data, or use JSON to combine multiple data types into one labeling task.
 
-Add Label Studio to your machine learning pipeline and make data labeling easier and more efficient. [Try it today](https://labelstud.io/playground/)!
+Add Label Studio to your machine learning pipeline and make data labeling easier and more efficient. [Try it today](https://labelstud.io/)!
 
 <img src="/images/opossum/other/opossum_looking.svg" alt="Illustration of a cute opossum looking back at something over its shoulder." />
 
