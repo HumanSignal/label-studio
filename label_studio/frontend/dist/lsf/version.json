@@ -1,6 +1,6 @@
 {
-  "message": "FIx cases when the view is to narrow to fit side panels (#527)",
-  "commit": "b5236eed9073c0d1417bd76035eff3a705fd74f6",
-  "branch": "fix/video-improvements",
-  "date": "2022-03-09T13:56:14Z"
+  "message": "fix: DEV-1265: Fix video drawing lag while bufferization",
+  "commit": "08d821654cb3f7b4b269ce1e8fe634363dc6ec24",
+  "branch": "fix/DEV-1265/video-start-lag",
+  "date": "2022-03-10T00:31:10Z"
 }
