@@ -1,6 +1,6 @@
 {
-  "message": "FIx cases when the view is to narrow to fit side panels (#527)",
-  "commit": "b5236eed9073c0d1417bd76035eff3a705fd74f6",
+  "message": "Preserve timeline visibility on expand/collapse (#528)",
+  "commit": "937f4085bdd345403b15d25edf71ac17aada5388",
   "branch": "fix/video-improvements",
-  "date": "2022-03-09T13:56:14Z"
+  "date": "2022-03-10T11:42:58Z"
 }
