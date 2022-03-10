@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #520 from heartexlabs/dependabot/github_actions/actions/upload-artifact-3\n\nbuild(deps): bump actions/upload-artifact from 2.3.1 to 3",
-  "commit": "ad68f0e8e2705d58d694271bd39df6ba8a471ff8",
-  "branch": "master",
-  "date": "2022-03-07T13:02:30Z"
+  "message": "when draging with shift or with mouse wheel disable transformer operations to allow stage drag",
+  "commit": "037e23ecaf0c82fe1bc720e1f5842b605163ee06",
+  "branch": "fix/DEV-1773/disable-transformer-on-stage-drag",
+  "date": "2022-03-10T19:51:03Z"
 }
