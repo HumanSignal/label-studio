@@ -7,9 +7,9 @@ meta_title: What's with the Label Studio Opossums?
 meta_description: Check out our blog post about what data labeling can learn from opossums and what Heidi means to Label Studio, the open source data labeling tool for all your data science and machine learning projects. 
 ---
 
-You might have wondered what creature is walking around when a page loads in Label Studio. 
+You might have wondered what creature is walking around when a page loads in Label Studio. We have an opossum as our mascot!
 
-We have an opossum as our mascot! Today, we want to introduce you all to Heidi.
+Today, we want to introduce you all to Heidi.
 
 <img src="/images/opossum/other/1.svg" alt="Illustration of a cute opossum dangling from a tree branch by its tail." />
 
@@ -35,7 +35,8 @@ Opossums can live just about anywhere. And so can Label Studio! You can [install
 
 Just like opossums, Label Studio is [flexible about what it ingests](/guide/tasks.html). You can start a data labeling project with text samples, audio clips, images, HTML documents, or videos. You can also import structured data formats like CSV or TSV files of time series data, or use JSON to combine multiple data types into one labeling task.
 
+Opossums are short-lived, and so is your labeled data. Make sure that you update your datasets and retrain your models to prevent data drift and account for concept drift over time. 
+
 Add Label Studio to your machine learning pipeline and make data labeling easier and more efficient. [Try it today](https://labelstud.io/)!
 
 <img src="/images/opossum/other/opossum_looking.svg" alt="Illustration of a cute opossum looking back at something over its shoulder." />
-
