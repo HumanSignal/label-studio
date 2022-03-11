@@ -152,7 +152,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             'io_storages_localfilesimportstoragelink',
             'io_storages_redisimportstoragelink',
             'io_storages_s3importstoragelink',
-            'file_upload'
+            'file_upload', 'project__ml_backends'
         )
 
     def get_retrieve_serializer_context(self, request):
@@ -168,38 +168,37 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         }
 
     def get(self, request, pk):
-        task = self.get_object()
-        context = self.get_retrieve_serializer_context(request)
-        context['project'] = project = task.project
+        self.task = self.get_object()
 
+        context = self.get_retrieve_serializer_context(request)
+        context['project'] = project = self.task.project
+
+        # get prediction
+        if (project.evaluate_predictions_automatically or project.show_collab_predictions) \
+                and not self.task.predictions.exists():
+            evaluate_predictions([self.task])
+
+        serializer = self.get_serializer_class()(self.task, many=False, context=context)
+        data = serializer.data
+        return Response(data)
+
+    def get_queryset(self):
         review = bool_from_request(self.request.GET, 'review', False)
+        selected = {"all": False, "included": [self.kwargs.get("pk")]}
         if review:
             kwargs = {
                 'fields_for_evaluation': ['annotators', 'reviewed']
             }
         else:
             kwargs = {'all_fields': True}
-
-        # we need to annotate task because before it was retrieved only for permission checks and project retrieving
-        task = self.prefetch(
+        project = self.request.query_params.get('project') or self.request.data.get('project')
+        if not project:
+            project = Task.objects.get(id=self.request.parser_context['kwargs'].get('pk')).project.id
+        return self.prefetch(
             Task.prepared.get_queryset(
-                prepare_params=PrepareParams(project=project.id), **kwargs
-            ).filter(id=task.id)
-        ).first()
-
-        # get prediction
-        if (project.evaluate_predictions_automatically or project.show_collab_predictions) \
-                and not task.predictions.exists():
-            evaluate_predictions([task])
-
-        serializer = self.get_serializer_class()(task, many=False, context=context)
-        data = serializer.data
-        return Response(data)
-
-    def get_queryset(self):
-        return Task.objects.filter(
-            project__organization=self.request.user.active_organization
-        ).prefetch_related('project', 'project__ml_backends')
+                prepare_params=PrepareParams(project=project,
+                                             selectedItems=selected), **kwargs
+            ))
 
     def get_serializer_class(self):
         # GET => task + annotations + predictions + drafts

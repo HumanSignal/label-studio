@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1598: Fix creating result from control tag without setted toname parameter",
-  "commit": "3fde96a1cf99f10c69097bbfaefc5e721d4ed44a",
+  "message": "fix: DEV-1598: Make tag type detection easier",
+  "commit": "626ec4d42b084d59db9c7d55306050e910d8d45b",
   "branch": "fix/DEV-1598/empty-toname",
-  "date": "2022-02-24T01:55:29Z"
+  "date": "2022-03-11T13:44:55Z"
 }

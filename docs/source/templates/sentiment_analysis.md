@@ -12,9 +12,7 @@ meta_description: Template for classifying the sentiment of text with Label Stud
 
 Classify the sentiment of text using this template. For example, if you want to classify the sentiment of reviews of musical instruments for sale on an online retailer.
 
-## Template Preview
-
-Interactively preview this labeling template:
+## Interactive Template Preview
 
 <div id="main-preview"></div>
 
@@ -22,13 +20,9 @@ Interactively preview this labeling template:
 
 ```html
 <View>
-    <!--Use the Header tag to provide instructions to annotators-->
   <Header value="Choose text sentiment:"/>
-    <!--Use the Text object tag to display the text to be classified-->
   <Text name="my_text" value="$reviewText"/>
-    <!--Use the Choices control tag to provide the classification options to annotators,
-    allow them to only select one option, and display the choices in a row.-->
-  <Choices name="sentiment" toName="my_text" choice="single" showInLine="true">
+  <Choices name="sentiment" toName="my_text" choice="single" showInline="true">
     <Choice value="Positive"/>
     <Choice value="Negative"/>
     <Choice value="Neutral"/>
@@ -36,6 +30,60 @@ Interactively preview this labeling template:
 </View>
 ```
 
+## About the labeling configuration
+
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
+
+You can add a [header](/tags/header.html) to provide instructions to the annotator:
+```xml
+<Header value="Choose text sentiment:"/>
+```
+
+Use the [Text](/tags/text.html) object tag to display the text to be classified:
+```xml
+<Text name="my_text" value="$reviewText"/>
+```
+
+Use the [Choices](/tags/choices.html) control tag to provide the classification options to annotators, allow them to only select one option, and display the choices in one line:
+```xml
+<Choices name="sentiment" toName="my_text" choice="single" showInline="true">
+    <Choice value="Positive"/>
+    <Choice value="Negative"/>
+    <Choice value="Neutral"/>
+</Choices>
+```
+
+## Enhance this template
+
+### Multi-classification
+
+You can use styling to visually separate different classification options to provide annotators a multi-classification task for text.
+
+For example, wrap the individual choice options for a single [Choices](/tags/choices.html) control tag in [View](/tags/view.html) tags that adjust the styling, and add [Header](/tags/header.html) tags to each section to visually separate the choices on the interface, while still storing all choices with the text sample in the annotations:
+```xml
+  <Choices name="sentiment" toName="text" choice="multiple">
+    <View style="display: flex; justify-content: space-between">
+      <View style="width: 50%">
+        <Header value="Select Topics" />
+        <Choice value="Politics"/>
+    	<Choice value="Business"/>
+    	<Choice value="Sport"/>
+      </View>
+      <View>
+        <Header value="Select Moods" />
+        <Choice value="Cheerful"/>
+    	<Choice value="Melancholy"/>
+    	<Choice value="Romantic"/>
+      </View>
+    </View>
+  </Choices>
+```
+
 ## Related tags
 - [Text](/tags/text.html)
 - [Choices](/tags/choices.html)
+- [Choice](/tags/choice.html)
+- [View](/tags/view.html)
+- [Header](/tags/header.html)
+
+
