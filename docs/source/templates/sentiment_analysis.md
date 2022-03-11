@@ -79,6 +79,8 @@ For example, wrap the individual choice options for a single [Choices](/tags/cho
   </Choices>
 ```
 
+<!-- md nested-classification.md -->
+
 ## Related tags
 - [Text](/tags/text.html)
 - [Choices](/tags/choices.html)

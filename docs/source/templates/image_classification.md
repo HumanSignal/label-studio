@@ -48,6 +48,8 @@ Use the [Choices](/tags/choices.html) control tag to display the choices availab
 ```
 You can modify the values of the [Choice](/tags/choice.html) tag to provide different classification options. Review the available arguments for the Choices tag for customization options. 
 
+<!-- md nested-classification.md -->
+
 ## Related tags
 
 - [Image](/tags/image.html)
