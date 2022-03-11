@@ -62,9 +62,9 @@ You must use the Choices tag in combination with the [Choice](/tags/choice.html)
 ## Enhance this template
 This template can be enhanced in many ways.
 
-### Change the appearance of the choices
+### Change the appearance of choices
 
-If you want to make the choices section visually distinct from the rest of the labeling interface, you can add styling to the [View](/tags/view.html) tag. Wrap the [Choices](/tags/choices.html) and [Header](/tags/header.html) in their own View tag:
+If you want to make the classification section visually distinct from the rest of the labeling interface, you can add styling to the [View](/tags/view.html) tag. Wrap the [Choices](/tags/choices.html) and [Header](/tags/header.html) in their own View tag:
 ```xml
 <View style="box-shadow: 2px 2px 5px #999;
              padding: 20px; margin-top: 2em;
@@ -78,7 +78,6 @@ If you want to make the choices section visually distinct from the rest of the l
   </Choices>
 </View>
 ```
-
 
 ## Related tags
 
