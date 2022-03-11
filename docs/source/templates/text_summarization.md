@@ -50,8 +50,34 @@ Use the [TextArea](/tags/textarea.html) control tag to provide a text box with a
             required="true" />
 ```
 
+## Enhance this template
 
-<!-- no header here because another PR has another enhancement-->
+There are many ways to enhance this template.
+
+### Display text box next to the text to summarize
+
+If you want to display the text box next to the text to summarize, do the following:
+
+1. Add flex display styling to the [View](/tags/view.html) tag for the labeling configuration: `<View style="display: flex;">`
+2. Add new [View](/tags/view.html) tags to wrap the [Header](/tags/header.html) and the [Text](/tags/text.html) sample so that they display on the left.
+3. Wrap the [TextArea](/tags/textarea.html) and [Header](/tags/header.html) tags in [View](/tags/view.html) tags with the following CSS styling so that they display neatly on the right:
+```xml
+<View style="width: 50%; padding-right: 2em; margin-left: 2em;">
+```
+Your fully enhanced labeling configuration looks like the following:
+```xml
+<View style="display: flex;">
+  <View>
+    <Header value="Please read the text" />
+    <Text name="text" value="$text" />
+  </View>
+  <View style="width: 50%; padding-right: 2em; margin-left: 2em;">
+    <Header value="Provide one sentence summary" />
+    <TextArea name="answer" toName="text"
+              showSubmitButton="true" maxSubmissions="1" editable="true"
+              required="true" />
+  </View>
+```
 
 ### Display long text samples with a scrollbar
 
