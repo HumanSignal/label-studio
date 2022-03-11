@@ -12,9 +12,7 @@ meta_description: Template for classifying a taxonomy or hierarchy with Label St
 
 Perform classification tasks within the context of a defined taxonomy or hierarchy of choices. 
 
-## Template Preview
-
-Interactively preview this labeling template:
+## Interactive Template Preview
 
 <div id="main-preview"></div>
 
@@ -22,17 +20,10 @@ Interactively preview this labeling template:
 
 ```html
 <View>
-    <!--Use the Text object tag to display text-->
   <Text name="text" value="$text"/>
-    <!--Use the Taxonomy control tag to create a taxonomy
-    of choices for annotators to select-->
   <Taxonomy name="taxonomy" toName="text">
-      <!--Use the Choice control tag to specify the options
-      of the specific taxonomy-->
     <Choice value="Archaea" />
     <Choice value="Bacteria" />
-      <!--Nest choices under a specific Choice to create
-      layers in the taxonomy-->
     <Choice value="Eukarya">
       <Choice value="Human" />
       <Choice value="Oppossum" />
@@ -41,6 +32,31 @@ Interactively preview this labeling template:
   </Taxonomy>
 </View>
 ```
+
+## About the labeling configuration
+
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
+
+Use the [Text](/tags/text.html) object tag to display text to classify:
+```xml
+<Text name="text" value="$text"/>
+```
+Use the [Taxonomy](/tags/taxonomy.html) control tag to create a taxonomy of choices for annotators to select from:
+```xml
+<Taxonomy name="taxonomy" toName="text">
+```
+Use the [Choice](/tags/choice.html) control tag within the Taxonomy tag to specify the options of the specific taxonomy:
+```xml
+    <Choice value="Archaea" />
+    <Choice value="Bacteria" />
+    <Choice value="Eukarya">
+      <Choice value="Human" />
+      <Choice value="Oppossum" />
+      <Choice value="Extraterrestial" />
+    </Choice>
+```
+Nest choices under a specific [Choice](/tags/choice.html) tag to create layers in the taxonomy.
+
 
 ## Related tags
 

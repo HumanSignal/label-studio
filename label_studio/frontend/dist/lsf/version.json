@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into fix/DEV-1155/rotation-behavior\n\n# Conflicts:\n#\tsrc/components/ImageView/ImageView.js",
-  "commit": "d16926a0b5c38da1d911bc3808929e2d401d6b44",
+  "message": "fix: DEV-1155: Fix dragging polygon regions",
+  "commit": "7f1591d1709cd5b347d2dbefecd9127569147f3c",
   "branch": "fix/DEV-1155/rotation-behavior",
-  "date": "2022-02-22T19:18:13Z"
+  "date": "2022-03-11T14:55:27Z"
 }
