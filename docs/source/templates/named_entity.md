@@ -30,7 +30,6 @@ If you want to perform named entity recognition (NER) on a sample of text, use t
 </View>
 ```
 
-
 ## About the labeling configuration
 
 All labeling configurations must be wrapped in [View](/tags/view.html) tags.
@@ -92,6 +91,53 @@ The [Text](/tags/text.html) object tag specifies the text to label:
 ```
 
 Then you can close the two remaining View tags.
+
+### Enforce word alignment
+
+If you want to allow annotations of only full words and enforce word alignment in labeling tasks, you can use the `granularity` parameter on the [Text](/tags/text.html) object tag to make sure that all highlighted spans in a NER task are complete words.
+
+For example, adjust your Text tag like follows:
+```xml
+<Text name="text" value="$text" granularity="word" />
+```
+
+### Add context to specific NER spans
+
+If you want to add context to specific NER spans, you can set up conditional **per-region labeling** with your NER template.
+
+
+For example, prompt annotators to choose the relevance of every text span in the text sample is:
+```xml
+<Choices name="relevance" toName="text" perRegion="true">
+    <Choice value="Relevant" />
+    <Choice value="Non Relevant" />
+</Choices>
+```
+The `perRegion` parameter means that these choice options apply for each text span region. 
+
+You can also combine the [View](/tags/view.html) tag and the `perRegion` parameter of the [Rating](/tags/rating.html) control tag to prompt annotators to rate their confidence in the accuracy of each individual text span region:
+```xml
+<View visibleWhen="region-selected">
+    <Header value="Your confidence" />
+</View>
+<Rating name="confidence" toName="text" perRegion="true" />
+```
+The `visibleWhen` parameter with the View tag means that when a specific region is selected, the Header appears, prompting the annotator to supply a rating that applies to that region.
+
+### Filter a long list of labels
+
+If you want to filter a long list of labels, add the [Filter](/tags/filter.html) tag to your labeling configuration. For example, to filter the named entity recognition labels, add the following:
+```xml
+<Filter name="filter" toName="label" hotkey="shift+f" minlength="1" />
+<Labels name="label" toName="text" showInline="false">
+    <Label value="PER" background="red"/>
+    <Label value="ORG" background="darkorange"/>
+    <Label value="LOC" background="orange"/>
+    <Label value="MISC" background="green"/>
+</Labels>
+```
+The `toName` parameter on the Filter tag references the `name` parameter for the [Labels](/tags/labels.html) tag. You can also specify a `hotkey` to use for the filter text box, and set the `minlength` parameter to specify the minimum number of characters typed into the filter before the list of labels is filtered. 
+
 
 ## Related tags
 

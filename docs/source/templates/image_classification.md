@@ -48,6 +48,33 @@ Use the [Choices](/tags/choices.html) control tag to display the choices availab
 ```
 You can modify the values of the [Choice](/tags/choice.html) tag to provide different classification options. Review the available arguments for the Choices tag for customization options. 
 
+## Enhance this template
+
+You can enhance this template in many ways.
+
+### Add a sticky left column
+
+If you want the classification choices to appear to the left of the image, you can add styling to the [View](/tags/view.html) tag. 
+
+```xml
+<View style="display: flex;">
+  <View style="padding: 0em 1em; background: #f1f1f1; margin-right: 1em; border-radius: 3px">
+    <View style="position: sticky; top: 0">
+    <Choices name="choice" toName="image">
+        <Choice value="Adult content"/>
+        <Choice value="Weapons" />
+        <Choice value="Violence" />
+    </Choices>
+    </View>
+  </View>
+    
+  <View>
+    <Image name="image" value="$image"/>
+  </View>
+</View>
+
+```
+
 ## Related tags
 
 - [Image](/tags/image.html)

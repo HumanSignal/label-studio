@@ -12,30 +12,51 @@ meta_description: Template for segmenting videos on a timeline with Label Studio
 
 To more easily identify video timelines, label segments alongside the audio channel of the video using video timeline segmentation. Use this template if you want to label the audio segment of a video on a timeline. 
 
-## Template Preview
-
-Interactively preview this labeling template:
+## Interactive Template Preview
 
 <div id="main-preview"></div>
-
 
 ## Labeling Configuration
 
 ```html
 <View>
-    <!--Use the Header tag to provide descriptions to annotators-->
   <Header value="Video timeline segmentation via AudioPlus sync trick"/>
-    <!--Use the Video object tag to provide a video clip and sync it with the audio clip-->
   <Video name="video" value="$video_url" sync="audio"/>
-    <!--Use the Labels control tag to highlight the video clip with specific actions-->
   <Labels name="tricks" toName="audio" choice="multiple">
     <Label value="Kickflip" background="#1BB500"/>
     <Label value="360 Flip" background="#FFA91D"/>
     <Label value="Trick" background="#358EF3"/>
   </Labels>
-    <!--Use the AudioPlus object tag to play the audio from the video clip with the video-->
   <AudioPlus name="audio" value="$video_url" sync="video" speed="false"/>
 </View>
+```
+
+## About the labeling configuration
+
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
+
+You can add a [header](/tags/header.html) to provide instructions to the annotator:
+```xml
+<Header value="Video timeline segmentation via AudioPlus sync trick"/>
+```
+
+Use the Video object tag to provide a video clip and sync it with the audio clip:
+```xml
+<Video name="video" value="$video_url" sync="audio"/>
+```
+
+Use the Labels control tag to highlight the video clip with specific actions:
+```xml
+<Labels name="tricks" toName="audio" choice="multiple">
+    <Label value="Kickflip" background="#1BB500"/>
+    <Label value="360 Flip" background="#FFA91D"/>
+    <Label value="Trick" background="#358EF3"/>
+</Labels>
+```
+
+Use the AudioPlus object tag to play the audio from the video clip with the video:
+```xml
+<AudioPlus name="audio" value="$video_url" sync="video" speed="false"/>
 ```
 
 ## Related tags

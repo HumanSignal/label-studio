@@ -77,6 +77,30 @@ Your fully enhanced labeling configuration looks like the following:
               showSubmitButton="true" maxSubmissions="1" editable="true"
               required="true" />
   </View>
+```
+
+### Display long text samples with a scrollbar
+
+If you want to change how Label Studio displays long text samples on the labeling interface, you can use the [View](/tags/view.html) tags to wrap labeling tags with CSS styling. 
+
+For example, you can constrain the text sample to a specific height, making it easier to keep the text summary that annotators provide visible.
+```xml
+<View style="height: 300px; overflow: auto;">
+    <Text name="text" value="$longText" />
+</View>
+```
+
+In this case, the entire labeling configuration looks like the following:
+```xml
+<View>
+  <Header value="Please read the text" />
+  <View style="height: 300px; overflow: auto;">
+    <Text name="text" value="$longText" />
+  </View>
+  <Header value="Provide one sentence summary" />
+  <TextArea name="answer" toName="text" 
+            showSubmitButton="true" maxSubmissions="1" editable="true" 
+            required="true" />
 </View>
 ```
 
