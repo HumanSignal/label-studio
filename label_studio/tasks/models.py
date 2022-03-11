@@ -52,8 +52,9 @@ class Task(TaskMixin, models.Model):
                                 help_text='Project ID for this task')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Time a task was created')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last time a task was updated')
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='updated_tasks',
-                                   on_delete=models.SET_NULL, null=True, verbose_name=_('updated by'))
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='updated_tasks',
+                                   on_delete=models.SET_NULL, null=True, verbose_name=_('updated by'),
+                                   help_text='Last annotator or reviewer who updated this task')
     is_labeled = models.BooleanField(_('is_labeled'), default=False,
                                      help_text='True if the number of annotations for this task is greater than or equal '
                                                'to the number of maximum_completions for the project', db_index=True)
