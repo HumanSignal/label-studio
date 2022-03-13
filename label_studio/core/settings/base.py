@@ -185,6 +185,7 @@ INSTALLED_APPS = [
     'io_storages',
     'ml',
     'webhooks',
+    'labels_manager',
 ]
 
 MIDDLEWARE = [
