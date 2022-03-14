@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1894: Hide timeline when no regions attached",
-  "commit": "d137c931873ee6fe0dd8ea9669a2dc555f1c54b6",
+  "message": "fix: DEV-1856: Fix incorrect frame indicator",
+  "commit": "8ef2abcc0e390ca06946a13ce4e5ddc212ca037d",
   "branch": "fix/video-improvements",
-  "date": "2022-03-10T12:19:23Z"
+  "date": "2022-03-14T14:32:27Z"
 }
