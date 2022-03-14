@@ -53,6 +53,10 @@
         "description": "Location for all resources."
       }
     },
+    "imageTag": {
+      "type": "string",
+      "defaultValue": "latest"
+    },
     "username": {
       "type": "string",
       "defaultValue": "username"
@@ -124,7 +128,7 @@
               "value": "1"
             }
           ],
-          "linuxFxVersion": "DOCKER|heartexlabs/label-studio:latest",
+          "linuxFxVersion": "[concat('DOCKER|heartexlabs/label-studio:', parameters('imageTag'))]",
           "appCommandLine": "[concat('label-studio --username ', parameters('username'), ' --password ', parameters('password'))]"
         },
         "clientAffinityEnabled": false
