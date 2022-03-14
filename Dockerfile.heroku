@@ -1,1 +1,5 @@
 FROM heartexlabs/label-studio:latest
+
+COPY deploy/heroku_run.sh /label-studio/deploy/
+
+ENTRYPOINT ["/bin/bash -c"]
