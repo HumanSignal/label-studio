@@ -63,6 +63,7 @@ urlpatterns = [
     re_path(r'^', include('io_storages.urls')),
     re_path(r'^', include('ml.urls')),
     re_path(r'^', include('webhooks.urls')),
+    re_path(r'^', include('labels_manager.urls')),
 
     re_path(r'data/local-files/', views.localfiles_data, name="localfiles_data"),
 

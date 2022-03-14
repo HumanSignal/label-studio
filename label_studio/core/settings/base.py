@@ -185,6 +185,7 @@ INSTALLED_APPS = [
     'io_storages',
     'ml',
     'webhooks',
+    'labels_manager',
 ]
 
 MIDDLEWARE = [
@@ -218,6 +219,7 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'core.utils.common.custom_exception_handler',
     'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    'PAGE_SIZE': 100,
 }
 
 # CORS & Host settings
@@ -451,6 +453,8 @@ WEBHOOK_SERIALIZERS = {
     'project': 'webhooks.serializers_for_hooks.ProjectWebhookSerializer',
     'task': 'webhooks.serializers_for_hooks.TaskWebhookSerializer',
     'annotation': 'webhooks.serializers_for_hooks.AnnotationWebhookSerializer',
+    'label': 'labels_manager.serializers.LabelSerializer',
+    'label_link': 'labels_manager.serializers.LabelLinkSerializer',
 }
 
 EDITOR_KEYMAP = json.dumps(get_env("EDITOR_KEYMAP"))
