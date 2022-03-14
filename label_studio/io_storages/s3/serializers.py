@@ -62,7 +62,6 @@ class S3ExportStorageSerializer(ExportStorageSerializer):
         model = S3ExportStorage
         fields = '__all__'
 
-
     def validate(self, data):
         data = super(S3ExportStorageSerializer, self).validate(data)
         if not data.get('bucket', None):
@@ -82,9 +81,11 @@ class S3ExportStorageSerializer(ExportStorageSerializer):
             if '403' == e.response.get('Error').get('Code'):
                 raise ValidationError('Cannot connect to S3 {bucket_name} with specified AWS credentials'.format(
                     bucket_name=storage.bucket))
-            if '404' in e.response.get('Error').get('Code'):
+            if '404' == e.response.get('Error').get('Code'):
                 raise ValidationError('Cannot find bucket {bucket_name} in S3'.format(
                     bucket_name=storage.bucket))
-        except:
-            raise ValidationError('Failed to connect S3 {bucket_name} due to insufficient data'.format(bucket_name=storage.bucket))
+        except Exception as exc:
+            raise ValidationError(
+                'Failed to connect S3 {bucket_name} due to insufficient data: {exc}'.format(bucket_name=storage.bucket,
+                                                                                            exc=exc))
         return data
