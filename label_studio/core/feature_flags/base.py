@@ -38,7 +38,7 @@ elif settings.FEATURE_FLAGS_OFFLINE:
     client = ldclient.get()
 else:
     # Production usage
-    if hasattr(settings, 'REDIS_LOCATION'):
+    try:
         logger.debug(f'Set LaunchDarkly config with Redis feature store at {settings.REDIS_LOCATION}')
         store = Redis.new_feature_store(
             url=settings.REDIS_LOCATION,
@@ -49,7 +49,7 @@ else:
             feature_store=store,
             http=HTTPConfig(connect_timeout=5)
         ))
-    else:
+    except:
         logger.debug('Set LaunchDarkly config without Redis...')
         ldclient.set_config(Config(settings.FEATURE_FLAGS_API_KEY, http=HTTPConfig(connect_timeout=5)))
     client = ldclient.get()
