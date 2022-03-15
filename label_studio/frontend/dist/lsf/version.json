@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1856: Fix incorrect frame indicator",
-  "commit": "8ef2abcc0e390ca06946a13ce4e5ddc212ca037d",
+  "message": "Remove traces",
+  "commit": "7b1724f4ba7e6b2dd6fcaf33a706acbc3a57a032",
   "branch": "fix/video-improvements",
-  "date": "2022-03-14T14:32:27Z"
+  "date": "2022-03-14T15:30:17Z"
 }
