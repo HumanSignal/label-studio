@@ -1,6 +1,6 @@
 {
-  "message": "DEV-1373: Fix relations over brushes (#398)\n\n* Add test for relations over brashes\r\n\r\n* [fix] Fix crash on restoration relations over brushes\r\n\r\n* [fix] Fix calculating brush bbox after restoration\r\n\r\n* Fix test code missing\r\n\r\n* Limit events from resize observer\r\n\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "3116fcb2a73c4e53b6375abcdff8a095479e08db",
-  "branch": "master",
-  "date": "2022-03-11T13:00:34Z"
+  "message": "Try to revert image in tests",
+  "commit": "67f2124ba5f69facebb825a489639f6605f2d533",
+  "branch": "fix/dev-1576/handle-open-polygon",
+  "date": "2022-03-15T17:08:11Z"
 }
