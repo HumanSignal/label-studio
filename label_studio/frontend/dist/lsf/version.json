@@ -1,6 +1,6 @@
 {
-  "message": "Remove traces",
-  "commit": "7b1724f4ba7e6b2dd6fcaf33a706acbc3a57a032",
+  "message": "fix: DEV-1933: Invalid color crash",
+  "commit": "ed00291df9b3314ba57d4abecb6541cb51fa8f2b",
   "branch": "fix/video-improvements",
-  "date": "2022-03-14T15:30:17Z"
+  "date": "2022-03-15T12:39:31Z"
 }
