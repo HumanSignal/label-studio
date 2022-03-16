@@ -409,6 +409,8 @@ EXPERIMENTAL_FEATURES = get_bool_env('EXPERIMENTAL_FEATURES', False)
 USE_ENFORCE_CSRF_CHECKS = get_bool_env('USE_ENFORCE_CSRF_CHECKS', True)  # False is for tests
 CLOUD_FILE_STORAGE_ENABLED = False
 
+VALIDATE_CONFIG_LABELS_CONSISTENCY = get_bool_env('VALIDATE_CONFIG_LABELS_CONSISTENCY', False)
+
 CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and_log'
 SAVE_USER = 'users.functions.save_user'
