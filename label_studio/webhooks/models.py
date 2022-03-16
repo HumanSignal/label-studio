@@ -9,6 +9,9 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from projects.models import Project
 from tasks.models import Annotation, Task
+from labels_manager.models import LabelLink
+# from labels_manager.serializers import LabelLinkSerializer, LabelSerializer
+
 
 from .serializers_for_hooks import (
     OnlyIDWebhookSerializer,
@@ -103,6 +106,11 @@ class WebhookAction(models.Model):
     ANNOTATION_UPDATED = 'ANNOTATION_UPDATED'
     ANNOTATIONS_DELETED = 'ANNOTATIONS_DELETED'
 
+    LABEL_LINK_CREATED = 'LABEL_LINK_CREATED'
+    LABEL_LINK_UPDATED = 'LABEL_LINK_UPDATED'
+    LABEL_LINK_DELETED = 'LABEL_LINK_DELETED'
+
+
     ACTIONS = {
         PROJECT_CREATED: {
             'name': _('Project created'),
@@ -190,6 +198,41 @@ class WebhookAction(models.Model):
             'serializer': OnlyIDWebhookSerializer,
             'project-field': 'task__project',
         },
+        LABEL_LINK_CREATED: {
+            'name': _('Label link created'),
+            'description': _(''),
+            'key': 'label_link',
+            'many': True,
+            'model': LabelLink,
+            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['label_link']),
+            'project-field': 'project',
+        },
+        LABEL_LINK_UPDATED: {
+            'name': _('Label link updated'),
+            'description': _(''),
+            'key': 'label_link',
+            'many': False,
+            'model': LabelLink,
+            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['label_link']),
+            'project-field': 'project',
+            'nested-fields': {
+                'label': {
+                    'many': False,
+                    'field': 'label',
+                    'serializer': load_func(settings.WEBHOOK_SERIALIZERS['label']),
+                },
+            }
+        },
+        LABEL_LINK_DELETED: {
+            'name': _('Label link deleted'),
+            'description': _(''),
+            'key': 'label_link',
+            'many': False,
+            'model': LabelLink,
+            'serializer': OnlyIDWebhookSerializer,
+            'project-field': 'project',
+        },
+
     }
 
     webhook = models.ForeignKey(Webhook, on_delete=models.CASCADE, related_name='actions')
