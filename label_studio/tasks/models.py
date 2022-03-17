@@ -234,7 +234,7 @@ class Task(TaskMixin, models.Model):
     def completed_annotations(self):
         """Annotations that we take into account when set completed status to the task"""
         if self.project.skip_queue == self.project.SkipQueue.IGNORE_SKIPPED:
-            return self.annotations.filter(Q(ground_truth=False))
+            return self.annotations
         else:
             return self.annotations.filter(Q_finished_annotations)
 

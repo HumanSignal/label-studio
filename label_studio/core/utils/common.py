@@ -131,7 +131,10 @@ def create_hash():
 
 
 def paginator(objects, request, default_page=1, default_size=50):
-    """ Get from request page and page_size and return paginated objects
+    """ DEPRECATED
+    TODO: change to standard drf pagination class
+
+    Get from request page and page_size and return paginated objects
 
     :param objects: all queryset
     :param request: view request object
@@ -140,6 +143,9 @@ def paginator(objects, request, default_page=1, default_size=50):
     :return: paginated objects
     """
     page_size = request.GET.get('page_size', request.GET.get('length', default_size))
+    if settings.TASK_API_PAGE_SIZE_MAX and (int(page_size) > settings.TASK_API_PAGE_SIZE_MAX or page_size == '-1'):
+        page_size = settings.TASK_API_PAGE_SIZE_MAX
+
     if 'start' in request.GET:
         page = int_from_request(request.GET, 'start', default_page)
         page = page / int(page_size) + 1
@@ -158,12 +164,16 @@ def paginator_help(objects_name, tag):
 
     :return: dict
     """
+    if settings.TASK_API_PAGE_SIZE_MAX:
+        page_size_description = f'[or "length"] {objects_name} per page. Max value {settings.TASK_API_PAGE_SIZE_MAX}'
+    else:
+        page_size_description = f'[or "length"] {objects_name} per page, use -1 to obtain all {objects_name} ' \
+                                 '(in this case "page" has no effect and this operation might be slow)'
     return dict(tags=[tag], manual_parameters=[
             openapi.Parameter(name='page', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY,
                               description='[or "start"] current page'),
             openapi.Parameter(name='page_size', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY,
-                              description=f'[or "length"] {objects_name} per page, use -1 to obtain all {objects_name} '
-                                          '(in this case "page" has no effect and this operation might be slow)')
+                              description=page_size_description)
         ],
         responses={
             200: openapi.Response(title='OK', description=''),

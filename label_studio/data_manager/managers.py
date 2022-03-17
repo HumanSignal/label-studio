@@ -499,6 +499,10 @@ def annotate_predictions_model_versions(queryset):
         return queryset.annotate(predictions_model_versions=ArrayAgg('predictions__model_version'))
 
 
+def annotate_avg_lead_time(queryset):
+    return queryset.annotate(avg_lead_time=Avg('annotations__lead_time'))
+
+
 def file_upload(queryset):
     return queryset.annotate(file_upload_field=F('file_upload__file'))
 
@@ -508,6 +512,7 @@ def dummy(queryset):
 
 
 settings.DATA_MANAGER_ANNOTATIONS_MAP = {
+    "avg_lead_time": annotate_avg_lead_time,
     "completed_at": annotate_completed_at,
     "annotations_results": annotate_annotations_results,
     "predictions_results": annotate_predictions_results,

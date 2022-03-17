@@ -2,6 +2,7 @@
 """
 import os
 import ujson as json
+from django.db.models import Avg
 
 from rest_framework import serializers
 from django.db import transaction
@@ -174,6 +175,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     file_upload = serializers.SerializerMethodField(required=False)
     annotations_ids = serializers.SerializerMethodField(required=False)
     predictions_model_versions = serializers.SerializerMethodField(required=False)
+    avg_lead_time = serializers.FloatField(required=False)
 
     CHAR_LIMITS = 500
 
