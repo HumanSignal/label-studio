@@ -239,7 +239,7 @@ def get_all_columns(project, *_):
             'title': 'Updated by',
             'type': 'List',
             'target': 'tasks',
-            'help': 'Annotator or reviewer who did the last task update',
+            'help': 'User who did the last task update',
             'schema': {'items': project.organization.members.values_list('user__id', flat=True)},
             'visibility_defaults': {
                 'explore': False,
