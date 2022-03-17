@@ -157,12 +157,22 @@ class S3ImportStorage(S3StorageMixin, ImportStorage):
         _, s3 = self.get_client_and_resource()
         bucket = s3.Bucket(self.bucket)
         obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
-        value = json.loads(obj)
-        if not isinstance(value, dict):
-            raise ValueError(f"Error on key {key}: For S3 your JSON file must be a dictionary with one task")
 
-        value = self._get_validated_task(value, key)
-        return value
+        if key.endswith(".jsonl"):
+            json_objs = obj.split("\n")
+            values = [json.loads(value) for value in json_objs]
+            error_checks = [isinstance(value, dict) for value in values]
+            if not all(error_checks):
+                raise ValueError(f"Error on key {key}: For S3 your JSONL file must contain one dictionary per line.")
+        else:
+            value = json.loads(obj)
+
+            if not isinstance(value, dict):
+                raise ValueError(f"Error on key {key}: For S3 your JSON file must be a dictionary with one task")
+            values = [value]
+        values = [self._get_validated_task(value, key) for value in values]
+        return values
+
 
     def generate_http_url(self, url):
         return resolve_s3_url(url, self.get_client(), self.presign, expires_in=self.presign_ttl * 60)
