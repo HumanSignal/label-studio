@@ -204,6 +204,7 @@ MIDDLEWARE = [
     'core.middleware.SetSessionUIDMiddleware',
     'core.middleware.ContextLogMiddleware',
     'core.middleware.DatabaseIsLockedRetryMiddleware',
+    'core.current_request.ThreadLocalMiddleware',
 ]
 
 REST_FRAMEWORK = {
