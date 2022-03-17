@@ -388,9 +388,10 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         # create annotation
         logger.debug(f'User={self.request.user}: save annotation')
         annotation = ser.save(**extra_args)
+
         logger.debug(f'Save activity for user={self.request.user}')
         self.request.user.activity_at = timezone.now()
-        self.request.user.save()
+        self.request.user.save(update_fields=['activity_at'])
 
         # Release task if it has been taken at work (it should be taken by the same user, or it makes sentry error
         logger.debug(f'User={user} releases task={task}')
