@@ -34,13 +34,13 @@ from webhooks.models import WebhookAction
 
 from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import (
-    get_object_with_check_and_log, paginator, paginator_help)
+    get_object_with_check_and_log, paginator)
 from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
 from core.utils.io import find_dir, find_file, read_yaml
 
 from data_manager.functions import get_prepared_queryset, filters_ordering_selected_items_exist
 from data_manager.models import View
-
+from concurrent.futures import ThreadPoolExecutor
 logger = logging.getLogger(__name__)
 
 
@@ -193,7 +193,9 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
 
     @api_webhook_for_delete(WebhookAction.PROJECT_DELETED)
     def delete(self, request, *args, **kwargs):
-        return super(ProjectAPI, self).delete(request, *args, **kwargs)
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            result = executor.submit(lambda x: super(ProjectAPI, self).delete(x, *args, **kwargs), request )
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @api_webhook(WebhookAction.PROJECT_UPDATED)
     def patch(self, request, *args, **kwargs):
@@ -401,7 +403,6 @@ class ProjectTaskListAPI(generics.ListCreateAPIView,
         emit_webhooks_for_instance(request.user.active_organization, None, WebhookAction.TASKS_DELETED, task_ids)
         return Response(data={'tasks': task_ids}, status=204)
 
-    @swagger_auto_schema(**paginator_help('tasks', 'Projects'))
     def get(self, *args, **kwargs):
         return super(ProjectTaskListAPI, self).get(*args, **kwargs)
 
