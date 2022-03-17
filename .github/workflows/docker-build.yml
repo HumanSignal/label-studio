@@ -33,15 +33,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: "${{ env.NODE }}"
-
-
-      - name: Upgrade npm
-        run: npm install -g npm@7
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1.6.0
 
@@ -50,43 +41,6 @@ jobs:
         with:
           username: heartexlabs
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Get npm cache directory
-        id: npm-cache-dir
-        run: echo "::set-output name=dir::$(npm config get cache)"
-
-      - uses: actions/cache@v3
-        name: Configure npm cache
-        id: npm-cache
-        with:
-          path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-${{ hashFiles('label_studio/frontend/package.json') }}-${{ hashFiles('label_studio/frontend/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ env.NODE }}-
-
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.8'
-
-      - uses: actions/cache@v3
-        name: Configure pip cache
-        id: pip-cache
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-django-${{ hashFiles('deploy/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-django-
-
-      - name: Install MW & LS
-        run: |
-          pip3 install -r deploy/requirements-mw.txt
-          pip3 install -e .
-
-      - name: Install LSF & set version.py
-        run: ./deploy/prebuild.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v2.10.0

@@ -4,6 +4,7 @@
 # Except:
 !deploy/docker-entrypoint.d
 !deploy/docker-entrypoint.sh
+!deploy/prebuild.sh
 !deploy/prebuild_wo_frontend.sh
 !deploy/requirements-mw.txt
 !deploy/requirements.txt
@@ -13,7 +14,7 @@
 !README.md
 
 # but ignore:
-label_studio/frontend
+#label_studio/frontend
 
 # except
 !label_studio/frontend/dist
