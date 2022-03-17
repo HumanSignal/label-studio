@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1933: Invalid color crash",
-  "commit": "ed00291df9b3314ba57d4abecb6541cb51fa8f2b",
+  "message": "Merge branch 'master' into fix/video-improvements",
+  "commit": "9cd2cb5469520a940a81aaff8773cddbb41b2988",
   "branch": "fix/video-improvements",
-  "date": "2022-03-15T12:39:31Z"
+  "date": "2022-03-17T10:28:13Z"
 }
