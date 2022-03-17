@@ -238,7 +238,7 @@ class DataManagerTaskSerializer(TaskSerializer):
 
     @staticmethod
     def get_updated_by(obj):
-        return [{"user_id": obj.updated_by_id}] if obj.updated_by else []
+        return [{"user_id": obj.updated_by_id}] if obj.updated_by_id else []
 
     @staticmethod
     def get_annotators(obj):
