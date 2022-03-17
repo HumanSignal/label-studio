@@ -52,14 +52,27 @@
       "metadata": {
         "description": "Location for all resources."
       }
+    },
+    "imageTag": {
+      "type": "string",
+      "defaultValue": "latest"
+    },
+    "username": {
+      "type": "string",
+      "defaultValue": "username"
+    },
+    "password": {
+      "type": "string",
+      "minLength": 6
     }
   },
   "resources": [
     {
-      "apiVersion": "2018-02-01",
+      "apiVersion": "2018-11-01",
       "name": "[parameters('hostingPlanName')]",
       "type": "Microsoft.Web/serverfarms",
       "location": "[parameters('location')]",
+      "kind": "linux",
       "tags": {
         "displayName": "HostingPlan"
       },
@@ -68,11 +81,13 @@
         "capacity": "[parameters('skuCapacity')]"
       },
       "properties": {
-        "name": "[parameters('hostingPlanName')]"
+        "name": "[parameters('hostingPlanName')]",
+        "reserved": true,
+        "zoneRedundant": false
       }
     },
     {
-      "apiVersion": "2018-02-01",
+      "apiVersion": "2018-11-01",
       "name": "[parameters('appName')]",
       "type": "Microsoft.Web/sites",
       "location": "[parameters('location')]",
@@ -85,21 +100,39 @@
       ],
       "properties": {
         "name": "[parameters('appName')]",
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
-      },
-      "resources": [
-        {
-          "apiVersion": "2018-02-01",
-          "name": "web",
-          "type": "config",
-          "dependsOn": [
-            "[concat('Microsoft.Web/sites/', parameters('appName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "DOCKER_REGISTRY_SERVER_URL",
+              "value": "https://index.docker.io"
+            },
+            {
+              "name": "DOCKER_REGISTRY_SERVER_USERNAME",
+              "value": ""
+            },
+            {
+              "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+              "value": null
+            },
+            {
+              "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
+              "value": "false"
+            },
+            {
+              "name": "DISABLE_SIGNUP_WITHOUT_LINK",
+              "value": "0"
+            },
+            {
+              "name": "LABEL_STUDIO_ONE_CLICK_DEPLOY",
+              "value": "1"
+            }
           ],
-          "properties": {
-            "pythonVersion": "3.7"
-          }
-        }
-      ]
+          "linuxFxVersion": "[concat('DOCKER|heartexlabs/label-studio:', parameters('imageTag'))]",
+          "appCommandLine": "[concat('label-studio --username ', parameters('username'), ' --password ', parameters('password'))]"
+        },
+        "clientAffinityEnabled": false
+      }
     }
   ]
 }

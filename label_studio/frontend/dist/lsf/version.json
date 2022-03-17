@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1155: Fix dragging polygon regions",
-  "commit": "7f1591d1709cd5b347d2dbefecd9127569147f3c",
+  "message": "Merge branch 'master' into fix/DEV-1155/rotation-behavior",
+  "commit": "e47004b82361b748c5b1660feeda0ee49cf40809",
   "branch": "fix/DEV-1155/rotation-behavior",
-  "date": "2022-03-11T14:55:27Z"
+  "date": "2022-03-17T16:14:45Z"
 }
