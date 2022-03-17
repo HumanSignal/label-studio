@@ -1,6 +1,6 @@
 {
-  "message": "DEV-1373: Fix relations over brushes (#398)\n\n* Add test for relations over brashes\r\n\r\n* [fix] Fix crash on restoration relations over brushes\r\n\r\n* [fix] Fix calculating brush bbox after restoration\r\n\r\n* Fix test code missing\r\n\r\n* Limit events from resize observer\r\n\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "3116fcb2a73c4e53b6375abcdff8a095479e08db",
+  "message": "fix: DEV-1567: virtualize tree data (#471)\n\n* add react-vtree and react-window as dependencies\r\n\r\n* agnostic virtual large tree data viewing component\r\n\r\n* integrate virtual tree component with taxonomy selector\r\n\r\n* imput and scrollbar padding adjustment, fix height on search and browser percentage calcualtion\r\n\r\n* removed react-vtree from dependencies, replicated functionality with react-window alone\r\n\r\n* support adding child components and couting total nested children\r\n\r\n* adjust window hight and scrolling\r\n\r\n* null block treeStructure when menu is closed\r\n\r\n* new row is actual row, expand parent\r\n\r\n* new Items add at top of list, remove unused\r\n\r\n* update enzyme-adapter to work with react@17\r\n\r\n* update yarn.lock\r\n\r\n* trigger CI\r\n\r\n* update node version to 14\r\n\r\n* update enzyme dependencies\r\n\r\n* update lock-files. again\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
+  "commit": "ba3b4989a46ed5286a75a5d5d58cf17ad608e95d",
   "branch": "master",
-  "date": "2022-03-11T13:00:34Z"
+  "date": "2022-03-15T21:47:38Z"
 }
