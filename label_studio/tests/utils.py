@@ -276,3 +276,12 @@ def os_independent_path(_, path, add_tempdir=False):
             'os_independent_path_parent': str(os_independent_path_parent),
         }
     )
+
+
+def verify_docs(response):
+    for _, path in response.json()['paths'].items():
+        print(path)
+        for _, method in path.items():
+            print(method)
+            if isinstance(method, dict):
+                assert 'api' not in method['tags'], f'Need docs for API method {method}'

@@ -1,0 +1,28 @@
+---
+
+test_name: test_docs
+
+strict: False
+
+marks:
+  - usefixtures:
+       - django_live_url
+
+stages:
+  - name: signup
+    request:
+      url: "{django_live_url}/user/signup"
+      data:
+        email: test_suites_user@heartex.com
+        password: 12345678
+      method: POST
+    response:
+      status_code: 302
+  - name: get_docs
+    request:
+      url: "{django_live_url}/docs/api?format=openapi"
+      method: GET
+    response:
+      status_code: 200
+      verify_response_with:
+        function: tests.utils:verify_docs

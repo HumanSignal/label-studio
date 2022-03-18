@@ -2,7 +2,10 @@ import logging
 
 from django.db.models import CharField, Count, F, Q
 from django.db.models.functions import Cast
+from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import views, viewsets
 from rest_framework import views, viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -22,6 +25,49 @@ from .models import Label, LabelLink
 logger = logging.getLogger(__name__)
 
 
+@method_decorator(
+    name='create',
+    decorator=swagger_auto_schema(
+        tags=['Labels'],
+        operation_summary='Create labels',
+        operation_description='Add labels to your project without updating the labeling configuration.'
+    ),
+)
+@method_decorator(
+    name='destroy',
+    decorator=swagger_auto_schema(
+        tags=['Labels'],
+        operation_summary='Remove labels',
+        operation_description='Remove labels from your project without updating the labeling configuration.'
+    ),
+)
+@method_decorator(
+    name='partial_update',
+    decorator=swagger_auto_schema(
+        tags=['Labels'],
+        operation_summary='Update labels',
+        operation_description='Update labels used for your project without updating the labeling configuration.'
+    ),
+)
+@method_decorator(
+    name='retrieve',
+    decorator=swagger_auto_schema(
+        tags=['Labels'],
+        operation_summary='Get label',
+        operation_description='''
+        Retrieve a specific custom label used for your project by its ID.
+        '''
+    ),
+)
+@method_decorator(
+    name='list',
+    decorator=swagger_auto_schema(
+        tags=['Labels'],
+        operation_summary='List labels',
+        operation_description='List all custom labels added to your project separately from the labeling configuration.'
+    ),
+)
+@method_decorator(name='update', decorator=swagger_auto_schema(auto_schema=None))
 class LabelAPI(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
     serializer_class = LabelSerializer
@@ -51,6 +97,53 @@ class LabelAPI(viewsets.ModelViewSet):
         return self.serializer_class
 
 
+@method_decorator(
+    name='create',
+    decorator=swagger_auto_schema(
+        tags=['Labels'],
+        operation_summary='Create label links',
+        operation_description='Create label links to link new custom labels to your project labeling configuration.'
+    ),
+)
+@method_decorator(
+    name='destroy',
+    decorator=swagger_auto_schema(
+        tags=['Labels'],
+        operation_summary='Remove label link',
+        operation_description='''
+        Remove a label link that links custom labels to your project labeling configuration. If you remove a label link,
+        the label stops being available for the project it was linked to. You can add a new label link at any time. 
+        '''
+        ),
+)
+@method_decorator(
+    name='partial_update',
+    decorator=swagger_auto_schema(
+        tags=['Labels'],
+        operation_summary='Update label link',
+        operation_description='''
+        Update a label link that links custom labels to a project labeling configuration, for example if the fromName,  
+        toName, or name parameters for a tag in the labeling configuration change. 
+        '''
+    ),
+)
+@method_decorator(
+    name='retrieve',
+    decorator=swagger_auto_schema(
+        tags=['Labels'],
+        operation_summary='Get label link',
+        operation_description='Get label links for a specific project configuration. '
+    ),
+)
+@method_decorator(
+    name='list',
+    decorator=swagger_auto_schema(
+        tags=['Labels'],
+        operation_summary='List label links',
+        operation_description='List label links for a specific label and project.'
+    ),
+)
+@method_decorator(name='update', decorator=swagger_auto_schema(auto_schema=None))
 class LabelLinkAPI(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = {
@@ -86,6 +179,16 @@ class LabelLinkAPI(viewsets.ModelViewSet):
         return super().destroy(request, *args, **kwargs)
 
 
+@method_decorator(
+    name='post',
+    decorator=swagger_auto_schema(
+        tags=['Labels'],
+        operation_summary='Bulk update labels',
+        operation_description='''
+        If you want to update the labels in saved annotations, use this endpoint.
+        '''
+    ),
+)
 class LabelBulkUpdateAPI(views.APIView):
     permission_required = all_permissions.labels_change
 
