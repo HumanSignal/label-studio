@@ -176,6 +176,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     annotations_ids = serializers.SerializerMethodField(required=False)
     predictions_model_versions = serializers.SerializerMethodField(required=False)
     avg_lead_time = serializers.FloatField(required=False)
+    updated_by = serializers.SerializerMethodField(required=False, read_only=True)
 
     CHAR_LIMITS = 500
 
@@ -234,6 +235,10 @@ class DataManagerTaskSerializer(TaskSerializer):
             return None
         file_upload = task.file_upload_field
         return os.path.basename(task.file_upload_field) if file_upload else None
+
+    @staticmethod
+    def get_updated_by(obj):
+        return [{"user_id": obj.updated_by_id}] if obj.updated_by_id else []
 
     @staticmethod
     def get_annotators(obj):
