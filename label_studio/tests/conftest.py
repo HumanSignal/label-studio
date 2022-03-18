@@ -398,11 +398,6 @@ def get_server_url(live_server):
     yield live_server.url
 
 
-@pytest.fixture(name="validate_config_labels_consistency")
-def validate_config_labels_consistency(settings):
-    settings.VALIDATE_CONFIG_LABELS_CONSISTENCY = True
-
-
 @pytest.fixture(name="local_files_storage")
 def local_files_storage(settings):
     settings.LOCAL_FILES_SERVING_ENABLED = True

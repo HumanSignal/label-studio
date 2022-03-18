@@ -505,8 +505,12 @@ class Project(ProjectMixin, models.Model):
                 f'Created annotations are incompatible with provided labeling schema, we found:\n{diff_str}'
             )
 
+        parsed_config = parse_config(config_string)
+        tag_types = [tag_info['type'] for _, tag_info in parsed_config.items()]
+
         # validate labels consistency
-        if settings.VALIDATE_CONFIG_LABELS_CONSISTENCY:
+        # for Taxonomy tag validation disabled: https://heartex.atlassian.net/browse/DEV-1980
+        if not 'Taxonomy' in tag_types:
             labels_from_config = get_all_labels(config_string)
             created_labels = self.summary.created_labels
             for control_tag_from_data, labels_from_data in created_labels.items():
