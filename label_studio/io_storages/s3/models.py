@@ -241,6 +241,5 @@ class S3ImportStorageLink(ImportStorageLink):
             cls.objects.filter(key=prefix + key, storage=storage.id).exists() or \
             cls.objects.filter(key=prefix + '/' + key, storage=storage.id).exists()
 
-
 class S3ExportStorageLink(ExportStorageLink):
     storage = models.ForeignKey(S3ExportStorage, on_delete=models.CASCADE, related_name='links')
