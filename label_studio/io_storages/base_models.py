@@ -100,60 +100,72 @@ class ImportStorage(Storage):
                     f'(images, audio, text, etc.), edit storage settings and enable '
                     f'"Treat every bucket object as a source file"'
                 )
-
-            # predictions
-            predictions = data.get('predictions', [])
-            if predictions:
-                if 'data' not in data:
-                    raise ValueError(
-                        'If you use "predictions" field in the task, ' 'you must put "data" field in the task too'
-                    )
-
-            # annotations
-            annotations = data.get('annotations', [])
-            if annotations:
-                if 'data' not in data:
-                    raise ValueError(
-                        'If you use "annotations" field in the task, ' 'you must put "data" field in the task too'
-                    )
-
-            if 'data' in data and isinstance(data['data'], dict):
-                data = data['data']
-
-            with transaction.atomic():
-                task = Task.objects.create(
-                    data=data, project=self.project, overlap=maximum_annotations,
-                    is_labeled=len(annotations) >= maximum_annotations
-                )
-                link_class.create(task, key, self)
-                logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
-                tasks_created += 1
-
-                # add predictions
-                logger.debug(f'Create {len(predictions)} predictions for task={task}')
-                for prediction in predictions:
-                    prediction['task'] = task.id
-                prediction_ser = PredictionSerializer(data=predictions, many=True)
-                prediction_ser.is_valid(raise_exception=True)
-                prediction_ser.save()
-
-                # add annotations
-                logger.debug(f'Create {len(annotations)} annotations for task={task}')
-                for annotation in annotations:
-                    annotation['task'] = task.id
-                annotation_ser = AnnotationSerializer(data=annotations, many=True)
-                annotation_ser.is_valid(raise_exception=True)
-                annotation_ser.save()
+            if isinstance(data, dict):
+                tasks_created += self._process_data(data, maximum_annotations, key, link_class)
+            elif isinstance(data, list):
+                for _data in data:
+                    tasks_created += self._process_data(_data, maximum_annotations, key, link_class)
+            else:
+                raise ValueError(f"get_data returned unknown format for key {key}")
 
         self.last_sync = timezone.now()
         self.last_sync_count = tasks_created
         self.save()
 
         self.project.update_tasks_states(
-                maximum_annotations_changed=False,
-                overlap_cohort_percentage_changed=False,
-                tasks_number_changed=True
+            maximum_annotations_changed=False,
+            overlap_cohort_percentage_changed=False,
+            tasks_number_changed=True
+        )
+
+    def _process_data(self, data, maximum_annotations, key, link_class):
+            # predictions
+        tasks_created = 0
+        predictions = data.get('predictions', [])
+        if predictions:
+            if 'data' not in data:
+                raise ValueError(
+                    'If you use "predictions" field in the task, ' 'you must put "data" field in the task too'
+                )
+
+        # annotations
+        annotations = data.get('annotations', [])
+        if annotations:
+            if 'data' not in data:
+                raise ValueError(
+                    'If you use "annotations" field in the task, ' 'you must put "data" field in the task too'
+                )
+
+        if 'data' in data and isinstance(data['data'], dict):
+            data = data['data']
+
+        with transaction.atomic():
+            task = Task.objects.create(
+                data=data, project=self.project, overlap=maximum_annotations,
+                is_labeled=len(annotations) >= maximum_annotations
             )
+            link_class.create(task, key, self)
+            logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
+            tasks_created += 1
+
+            # add predictions
+            logger.debug(f'Create {len(predictions)} predictions for task={task}')
+            for prediction in predictions:
+                prediction['task'] = task.id
+            prediction_ser = PredictionSerializer(data=predictions, many=True)
+            prediction_ser.is_valid(raise_exception=True)
+            prediction_ser.save()
+
+            # add annotations
+            logger.debug(f'Create {len(annotations)} annotations for task={task}')
+            for annotation in annotations:
+                annotation['task'] = task.id
+            annotation_ser = AnnotationSerializer(data=annotations, many=True)
+            annotation_ser.is_valid(raise_exception=True)
+            annotation_ser.save()
+        return tasks_created
+
+
 
     def scan_and_create_links(self):
         """This is proto method - you can override it, or just replace ImportStorageLink by your own model"""
@@ -216,8 +228,7 @@ class ExportStorage(Storage):
     class Meta:
         abstract = True
 
-
-@job('default', timeout=3600)
+@job('default')
 def export_sync_background(storage_class, storage_id):
     storage = storage_class.objects.get(id=storage_id)
     storage.save_all_annotations()
