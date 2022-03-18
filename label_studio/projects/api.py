@@ -40,7 +40,7 @@ from core.utils.io import find_dir, find_file, read_yaml
 
 from data_manager.functions import get_prepared_queryset, filters_ordering_selected_items_exist
 from data_manager.models import View
-
+from concurrent.futures import ThreadPoolExecutor
 logger = logging.getLogger(__name__)
 
 
@@ -193,7 +193,9 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
 
     @api_webhook_for_delete(WebhookAction.PROJECT_DELETED)
     def delete(self, request, *args, **kwargs):
-        return super(ProjectAPI, self).delete(request, *args, **kwargs)
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            result = executor.submit(lambda x: super(ProjectAPI, self).delete(x, *args, **kwargs), request )
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @api_webhook(WebhookAction.PROJECT_UPDATED)
     def patch(self, request, *args, **kwargs):
