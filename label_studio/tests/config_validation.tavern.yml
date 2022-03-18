@@ -383,6 +383,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - validate_config_labels_consistency
 stages:
 - id: signup
   type: ref
@@ -512,6 +513,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - validate_config_labels_consistency
 stages:
 - id: signup
   type: ref
