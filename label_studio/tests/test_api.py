@@ -205,10 +205,10 @@ def test_get_task(client_and_token, configured_project, response, status_code):
     (
         {"annotations": [], 'predictions': [],
          "data": {"text": "TEST1", "meta_info": "TEST2"}, "meta": {},
-         "created_at": "", "updated_at": "", "updated_by": [], "is_labeled": False, "project": 0, 'file_upload': None},
+         "created_at": "", "updated_at": "", "updated_by": None, "is_labeled": False, "project": 0, 'file_upload': None},
         {"id": 0, "annotations": [], 'predictions': [],
          "data": {"text": "TEST1", "meta_info": "TEST2"}, "meta": {},
-         "created_at": "", "updated_at": "", "updated_by": [], "is_labeled": False, "project": 0,
+         "created_at": "", "updated_at": "", "updated_by": None, "is_labeled": False, "project": 0,
          'overlap': 1, 'file_upload': None},
         200
     )

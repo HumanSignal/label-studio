@@ -364,47 +364,9 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         result = ser.validated_data.get('result')
         extra_args = {'task_id': self.kwargs['pk']}
 
-        # save stats about how well annotator annotations coincide with current prediction
-        # only for finished task annotations
-        if result is not None:
-            prediction = Prediction.objects.filter(task=task, model_version=task.project.model_version)
-            if prediction.exists():
-                prediction = prediction.first()
-                prediction_ser = PredictionSerializer(prediction).data
-            else:
-                logger.debug(f'User={self.request.user}: there are no predictions for task={task}')
-                prediction_ser = {}
-            # serialize annotation
-            extra_args.update({
-                'prediction': prediction_ser,
-            })
-
-        if 'was_cancelled' in self.request.GET:
-            extra_args['was_cancelled'] = bool_from_request(self.request.GET, 'was_cancelled', False)
-
-        if 'completed_by' not in ser.validated_data:
-            extra_args['completed_by'] = self.request.user
-
-        # create annotation
         logger.debug(f'User={self.request.user}: save annotation')
         annotation = ser.save(**extra_args)
 
-        logger.debug(f'Save activity for user={self.request.user}')
-        self.request.user.activity_at = timezone.now()
-        self.request.user.save(update_fields=['activity_at'])
-
-        # Release task if it has been taken at work (it should be taken by the same user, or it makes sentry error
-        logger.debug(f'User={user} releases task={task}')
-        task.release_lock(user)
-
-        # if annotation created from draft - remove this draft
-        draft_id = self.request.data.get('draft_id')
-        if draft_id is not None:
-            logger.debug(f'Remove draft {draft_id} after creating annotation {annotation.id}')
-            AnnotationDraft.objects.filter(id=draft_id).delete()
-
-        if self.request.data.get('ground_truth'):
-            annotation.task.ensure_unique_groundtruth(annotation_id=annotation.id)
 
         return annotation
 
