@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-1621: Add usage of new method to create annotation (#34)\n\n* feat: DEV-1621:  Add usage of new method to create annotation\r\n\r\n* Use proper FF notation\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>\r\nCo-authored-by: nicholasrq <nr@fenelon.ru>",
-  "commit": "48ac59180f88d302681de6d26d975c7474c92db2",
+  "message": "feat: DEV-1844: Add updated_by (#36)",
+  "commit": "4755c8759d2f4015f25bf9c27c964036ae87def7",
   "branch": "master",
-  "date": "2022-02-16T16:59:52Z"
+  "date": "2022-03-17T22:31:07Z"
 }
