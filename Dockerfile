@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.3
-FROM node:14.19.0 AS builder
+FROM node:14 AS builder
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true \
     PUPPETEER_EXECUTABLE_PATH /usr/bin/chromium
@@ -14,7 +14,8 @@ RUN set -eux \
 COPY label_studio/frontend .
 COPY label_studio/__init__.py /app/label_studio/__init__.py
 
-RUN npm ci \
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci \
  && npm run build:production
 
 
