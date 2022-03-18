@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1892: Timeline sync (2nd attempt)",
-  "commit": "8bce2275bf5e9f60587fb382e32382c039afc859",
+  "message": "Merge branch 'master' into fix/video-improvements",
+  "commit": "4f544ef480a84606fa00669ae3c5040c2946f6cf",
   "branch": "fix/video-improvements",
-  "date": "2022-03-17T17:10:29Z"
+  "date": "2022-03-18T10:15:48Z"
 }
