@@ -42,30 +42,33 @@ class Webhook(models.Model):
     url = models.URLField(_('URL of webhook'), max_length=2048, help_text=_('URL of webhook'))
 
     send_payload = models.BooleanField(
-        _("does webhook send the payload"), default=True, help_text=('If value is False send only action')
+        _("does webhook send the payload"), default=True, help_text=('If value is False send only action'),
+        db_index=True
     )
 
     send_for_all_actions = models.BooleanField(
         _("Use webhook for all actions"),
         default=True,
-        help_text=('If value is False - used only for actions from WebhookAction'),
+        help_text='If value is False - used only for actions from WebhookAction',
+        db_index=True
     )
 
     headers = models.JSONField(
         _("request extra headers of webhook"),
         validators=[JSONSchemaValidator(HEADERS_SCHEMA)],
         default=dict,
-        help_text=('Key Value Json of headers'),
+        help_text='Key Value Json of headers',
     )
 
     is_active = models.BooleanField(
         _("is webhook active"),
         default=True,
         help_text=('If value is False the webhook is disabled'),
+        db_index=True
     )
 
-    created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text=_('Creation time'))
-    updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text=_('Last update time'))
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text=_('Creation time'), db_index=True)
+    updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text=_('Last update time'), db_index=True)
 
     def get_actions(self):
         return WebhookAction.objects.filter(webhook=self).values_list('action', flat=True)
