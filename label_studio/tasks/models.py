@@ -27,9 +27,11 @@ from model_utils import FieldTracker
 from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func
 from core.utils.params import get_env
 from core.label_config import SINGLE_VALUED_TAGS
+from core.current_request import get_current_request
 from data_manager.managers import PreparedTaskManager, TaskManager
 from core.bulk_update_utils import bulk_update
 from data_import.models import FileUpload
+
 
 
 logger = logging.getLogger(__name__)
@@ -52,6 +54,9 @@ class Task(TaskMixin, models.Model):
                                 help_text='Project ID for this task')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Time a task was created')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last time a task was updated')
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='updated_tasks',
+                                   on_delete=models.SET_NULL, null=True, verbose_name=_('updated by'),
+                                   help_text='Last annotator or reviewer who updated this task')
     is_labeled = models.BooleanField(_('is_labeled'), default=False,
                                      help_text='True if the number of annotations for this task is greater than or equal '
                                                'to the number of maximum_completions for the project', db_index=True)
@@ -347,16 +352,25 @@ class Annotation(AnnotationMixin, models.Model):
             summary = self.task.project.summary
             summary.remove_created_annotations_and_labels([self])
 
+    def update_task(self):
+        update_fields = ['updated_at']
+
+        # updated_by
+        request = get_current_request()
+        if request:
+            self.task.updated_by = request.user
+            update_fields.append('updated_by')
+
+        self.task.save(update_fields=update_fields)
+
     def save(self, *args, **kwargs):
         result = super().save(*args, **kwargs)
-        # set updated_at field of task to now()
-        self.task.save(update_fields=['updated_at'])
+        self.update_task()
         return result
 
     def delete(self, *args, **kwargs):
         result = super().delete(*args, **kwargs)
-        # set updated_at field of task to now()
-        self.task.save(update_fields=['updated_at'])
+        self.update_task()
         return result
 
 
@@ -463,17 +477,28 @@ class Prediction(models.Model):
         else:
             raise ValidationError(f'Incorrect format {type(result)} for prediction result {result}')
 
+    def update_task(self):
+        update_fields = ['updated_at']
+
+        # updated_by
+        request = get_current_request()
+        if request:
+            self.task.updated_by = request.user
+            update_fields.append('updated_by')
+
+        self.task.save(update_fields=update_fields)
+
     def save(self, *args, **kwargs):
         # "result" data can come in different forms - normalize them to JSON
         self.result = self.prepare_prediction_result(self.result, self.task.project)
         # set updated_at field of task to now()
-        self.task.save(update_fields=['updated_at'])
+        self.update_task()
         return super(Prediction, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         result = super().delete(*args, **kwargs)
         # set updated_at field of task to now()
-        self.task.save(update_fields=['updated_at'])
+        self.update_task()
         return result
 
     class Meta:

@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1918: Dropdown behavior in fullscreen",
-  "commit": "1e34629b1db9977670b840f1c64eaed94a898fbb",
-  "branch": "fix/video-improvements",
-  "date": "2022-03-18T14:08:48Z"
+  "message": "Merge remote-tracking branch 'origin/master' into fix/DEV-1731/ocr-readonly-mode",
+  "commit": "08390fcbc03a3e30bb4d5f6b583b0c1f27c95501",
+  "branch": "fix/DEV-1731/ocr-readonly-mode",
+  "date": "2022-03-21T20:10:12Z"
 }
