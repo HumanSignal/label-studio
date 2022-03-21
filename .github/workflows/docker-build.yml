@@ -89,7 +89,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        uses: docker/build-push-action@v2.9.0
+        uses: docker/build-push-action@v2.10.0
         id: docker_build_and_push
         with:
           context: .
