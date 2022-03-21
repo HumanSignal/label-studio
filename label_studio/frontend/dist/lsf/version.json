@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into fix/DEV-1731/ocr-readonly-mode",
-  "commit": "3c2b26575b7e152a3b6c37e7db95f46598df3ccb",
-  "branch": "fix/DEV-1731/ocr-readonly-mode",
-  "date": "2022-03-18T12:40:53Z"
+  "message": "fix: DEV-1918: Dropdown behavior in fullscreen",
+  "commit": "1e34629b1db9977670b840f1c64eaed94a898fbb",
+  "branch": "fix/video-improvements",
+  "date": "2022-03-18T14:08:48Z"
 }
