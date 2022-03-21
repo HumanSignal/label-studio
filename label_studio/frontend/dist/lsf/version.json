@@ -1,6 +1,6 @@
 {
-  "message": "Fix: DEV-1956: new label inside new label (#541)\n\n* add react-vtree and react-window as dependencies\r\n\r\n* agnostic virtual large tree data viewing component\r\n\r\n* integrate virtual tree component with taxonomy selector\r\n\r\n* imput and scrollbar padding adjustment, fix height on search and browser percentage calcualtion\r\n\r\n* removed react-vtree from dependencies, replicated functionality with react-window alone\r\n\r\n* support adding child components and couting total nested children\r\n\r\n* adjust window hight and scrolling\r\n\r\n* null block treeStructure when menu is closed\r\n\r\n* new row is actual row, expand parent\r\n\r\n* new Items add at top of list, remove unused\r\n\r\n* update enzyme-adapter to work with react@17\r\n\r\n* update yarn.lock\r\n\r\n* trigger CI\r\n\r\n* update node version to 14\r\n\r\n* update enzyme dependencies\r\n\r\n* update lock-files. again\r\n\r\n* revert mistaken data reorder\r\n\r\n* margin to add button and input\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "fb8434e6a9a9d9ec91a9b580ab7017089b5fe57b",
+  "message": "fix: dev-1631: handle-open-polygon (#517)\n\n* if polygon is open on toolswitch close polygon\r\n\r\n* on tool change run handle tool change if available to delete unclosed polygons\r\n\r\n* Fix scenario when there's no area being drawn\r\n\r\n* Fix ctrl-z in tests\r\n\r\n* remove logging\r\n\r\n* close polygon if closeable else clear state\r\n\r\n* Try to revert image in tests\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: Nick Skriabin <nr@fenelon.ru>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
+  "commit": "bb94464732239516c5a888b5efa91353293a8c72",
   "branch": "master",
-  "date": "2022-03-18T01:31:14Z"
+  "date": "2022-03-21T18:05:13Z"
 }
