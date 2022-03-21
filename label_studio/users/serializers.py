@@ -21,7 +21,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         """ Returns user with cache, this helps to avoid multiple s3/gcs links resolving for avatars """
 
-        uid = instance.id
+        uid = instance.pk
         key = 'user_cache'
 
         if key not in self.context:

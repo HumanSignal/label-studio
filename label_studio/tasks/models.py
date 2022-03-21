@@ -33,7 +33,6 @@ from core.bulk_update_utils import bulk_update
 from data_import.models import FileUpload
 
 
-
 logger = logging.getLogger(__name__)
 
 TaskMixin = load_func(settings.TASK_MIXIN)
