@@ -22,6 +22,7 @@ from label_studio.core.utils.io import get_data_dir
 from label_studio.core.utils.params import get_bool_env, get_env, get_env_list_int
 
 logger = logging.getLogger(__name__)
+SILENCED_SYSTEM_CHECKS = []
 
 # Hostname is used for proper path generation to the resources, pages, etc
 HOSTNAME = get_env('HOST', '')
@@ -204,6 +205,7 @@ MIDDLEWARE = [
     'core.middleware.SetSessionUIDMiddleware',
     'core.middleware.ContextLogMiddleware',
     'core.middleware.DatabaseIsLockedRetryMiddleware',
+    'core.current_request.ThreadLocalMiddleware',
 ]
 
 REST_FRAMEWORK = {
@@ -220,7 +222,9 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'PAGE_SIZE': 100,
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination'
 }
+SILENCED_SYSTEM_CHECKS += ["rest_framework.W001"]
 
 # CORS & Host settings
 INTERNAL_IPS = [  # django debug toolbar for django==2.2 requirement

@@ -46,7 +46,7 @@ def predictions_to_annotations(project, queryset, **kwargs):
     logger.debug(f'{count} predictions will be converter to annotations')
     db_annotations = [Annotation(**annotation) for annotation in annotations]
     db_annotations = Annotation.objects.bulk_create(db_annotations)
-    Task.objects.filter(id__in=tasks_ids).update(updated_at=now())
+    Task.objects.filter(id__in=tasks_ids).update(updated_at=now(), updated_by=request.user)
 
     TaskSerializerBulk.post_process_annotations(db_annotations)
     return {'response_code': 200, 'detail': f'Created {count} annotations'}
