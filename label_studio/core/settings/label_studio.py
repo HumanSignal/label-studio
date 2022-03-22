@@ -43,7 +43,7 @@ sentry.init_sentry(release_name='label-studio', release_version=__version__)
 from label_studio.core.utils.common import collect_versions
 versions = collect_versions()
 
-# in Label Studio Community version, feature flags are always ON
+# Feature flags for Community version
 FEATURE_FLAGS_DEFAULT_VALUE = False
 FEATURE_FLAGS_FROM_FILE = get_bool_env('FEATURE_FLAGS_FROM_FILE', True)
 FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE', 'feature_flags.json')
