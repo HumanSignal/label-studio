@@ -1,6 +1,6 @@
 {
-  "message": "Merge remote-tracking branch 'origin/master' into fix/DEV-1731/ocr-readonly-mode",
-  "commit": "08390fcbc03a3e30bb4d5f6b583b0c1f27c95501",
+  "message": "Remove feature flag for 1731",
+  "commit": "df79a09776a49b4ab683e96219d0298fb5c80b47",
   "branch": "fix/DEV-1731/ocr-readonly-mode",
-  "date": "2022-03-21T20:10:12Z"
+  "date": "2022-03-22T14:50:56Z"
 }
