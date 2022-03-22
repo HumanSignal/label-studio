@@ -189,7 +189,12 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
         return Project.objects.with_counts().filter(organization=self.request.user.active_organization)
 
     def get(self, request, *args, **kwargs):
-        return super(ProjectAPI, self).get(request, *args, **kwargs)
+        from datetime import datetime
+        timings = {"start": float(datetime.now().timestamp())}
+        response = super(ProjectAPI, self).get(request, *args, **kwargs)
+        timings['final'] = float(datetime.now().timestamp()) - timings['start']
+        response.data['timings'].update(timings)
+        return response
 
     @api_webhook_for_delete(WebhookAction.PROJECT_DELETED)
     def delete(self, request, *args, **kwargs):
