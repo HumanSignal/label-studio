@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1284: Fix tests",
-  "commit": "fd11d9b6c106a972c2b8dba727d2dec568cfe092",
+  "message": "fix: DEV-1284: Correct history behavior if there are no suggestions",
+  "commit": "f4897b3eac8a3fdf383f199218549a5938a35233",
   "branch": "fix/DEV-1284/undo-auto",
-  "date": "2022-02-25T17:48:13Z"
+  "date": "2022-03-22T22:06:46Z"
 }
