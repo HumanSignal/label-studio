@@ -12,9 +12,7 @@ meta_description: Template for performing pairwise classification and comparison
 
 Perform pairwise classification and comparison of different objects with Label Studio using this template.
 
-## Template Preview
-
-Interactively preview this labeling template:
+## Interactive Template Preview
 
 <div id="main-preview"></div>
 
@@ -22,15 +20,31 @@ Interactively preview this labeling template:
 
 ```html
 <View>
-    <!--Use the Header to provide instructions to annotators-->
   <Header>Select one of two items</Header>
-    <!--Use the Pairwise control tag to apply pairwise selections
-    to two samples of text.-->
   <Pairwise name="pw" toName="text1,text2" />
-    <!--Use the Text object tag to specify two samples of text-->
   <Text name="text1" value="$text1" />
   <Text name="text2" value="$text2" />
 </View>
+```
+
+## About the labeling configuration
+
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
+
+You can add a [header](/tags/header.html) to provide instructions to the annotator:
+```xml
+<Header>Select one of two items</Header>
+```
+
+Use the [Pairwise](/tags/pairwise.html) control tag to apply pairwise selections to two samples of text:
+```xml
+<Pairwise name="pw" toName="text1,text2" />
+```
+
+Use the [Text](tags/text.html) object tag to specify two samples of text with distinct names:
+```xml
+<Text name="text1" value="$text1" />
+<Text name="text2" value="$text2" />
 ```
 
 ## Related tags

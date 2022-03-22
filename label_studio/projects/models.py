@@ -710,8 +710,8 @@ class Project(ProjectMixin, models.Model):
         if self.parsed_label_config is None:
             self.parsed_label_config = parse_config(self.label_config)
 
-            if autosave_cache:
-                Project.objects.filter(id=self.id).update(parsed_label_config=self.parsed_label_config)
+            # if autosave_cache:
+            #    Project.objects.filter(id=self.id).update(parsed_label_config=self.parsed_label_config)
 
         return self.parsed_label_config
 

@@ -6,16 +6,7 @@ import rules
 from pydantic import BaseModel
 from typing import Optional
 
-from django.shortcuts import redirect, reverse
-from django.core.exceptions import PermissionDenied as HTMLPermissionDenied
-from django.views.decorators.http import require_http_methods
-from django.conf import settings
-from django.apps import apps
 
-from rest_framework.permissions import IsAuthenticated, SAFE_METHODS, BasePermission
-from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
-
-from core.utils.common import get_object_with_check_and_log
 logger = logging.getLogger(__name__)
 
 
@@ -40,6 +31,11 @@ class AllPermissions(BaseModel):
     actions_perform = 'actions.perform'
     predictions_any = 'predictions.any'
     avatar_any = 'avatar.any'
+    labels_create = 'labels.create'
+    labels_view = 'labels.view'
+    labels_change = 'labels.change'
+    labels_delete = 'labels.delete'
+
 
 
 all_permissions = AllPermissions()

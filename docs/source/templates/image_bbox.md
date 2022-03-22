@@ -45,6 +45,33 @@ Use the [RectangleLabels](/tags/rectanglelabels.html) control tag to add labels 
   </RectangleLabels>
 ```
 
+## Enhance this template
+
+### Add descriptions to detected objects
+
+If you want to add further context to object detection tasks with bounding boxes, you can add some **per-region** conditional labeling parameters to your labeling configuration. 
+
+For example, to prompt annotators to add descriptions to detected objects, you can add the following to your labeling configuration:
+```xml
+  <View visibleWhen="region-selected">
+    <Header value="Describe object" />
+    <TextArea name="answer" toName="image" editable="true"
+              perRegion="true" required="true" />
+    <Choices name="choices" toName="image"
+             perRegion="true">
+      <Choice value="Correct"/>
+      <Choice value="Broken"/>
+    </Choices>
+  </View>
+```
+The `visibleWhen` parameter of the [View](/tags/view.html) tag hides the description prompt from annotators until a bounding box is selected. 
+
+After the annotator selects a bounding box, the [Header](/tags/header.html) appears and provides instructions to annotators.
+
+The [TextArea](/tags/textarea.html) control tag displays an editable text box that applies to the selected bounding box, specified with the `perRegion="true"` parameter. You can also add a `placeholder` parameter to provide suggested text to annotators. 
+
+In addition, you can prompt annotators to provide additional feedback about the content of the bounding box, such as the status of the item in the box, using the [Choices](/tags/choices.html) tag with the `perRegion` parameter.
+
 ## Related tags
 
 - [Image](/tags/image.html)

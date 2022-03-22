@@ -31,10 +31,10 @@ jobs:
           echo "DOCKER_TAG=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
 
       - name: Checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
 
       - name: Setup node
-        uses: actions/setup-node@v2.5.1
+        uses: actions/setup-node@v3
         with:
           node-version: "${{ env.NODE }}"
 
@@ -46,7 +46,7 @@ jobs:
         uses: docker/setup-buildx-action@v1.6.0
 
       - name: Login to DockerHub
-        uses: docker/login-action@v1.12.0
+        uses: docker/login-action@v1.14.1
         with:
           username: heartexlabs
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -55,7 +55,7 @@ jobs:
         id: npm-cache-dir
         run: echo "::set-output name=dir::$(npm config get cache)"
 
-      - uses: actions/cache@v2.1.7
+      - uses: actions/cache@v3
         name: Configure npm cache
         id: npm-cache
         with:
@@ -65,11 +65,11 @@ jobs:
             ${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Set up Python
-        uses: actions/setup-python@v2.3.2
+        uses: actions/setup-python@v3
         with:
           python-version: '3.8'
 
-      - uses: actions/cache@v2.1.7
+      - uses: actions/cache@v3
         name: Configure pip cache
         id: pip-cache
         with:
@@ -89,7 +89,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        uses: docker/build-push-action@v2.9.0
+        uses: docker/build-push-action@v2.10.0
         id: docker_build_and_push
         with:
           context: .

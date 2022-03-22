@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-1621:  Add usage of new method to create annotation",
-  "commit": "8975918038340887dbe42096c17e2df06aab2152",
-  "branch": "feat/DEV-1621/interactive_mode",
-  "date": "2022-02-15T19:29:50Z"
+  "message": "feat: DEV-1844: Add updated_by (#36)",
+  "commit": "4755c8759d2f4015f25bf9c27c964036ae87def7",
+  "branch": "master",
+  "date": "2022-03-17T22:31:07Z"
 }

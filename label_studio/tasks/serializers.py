@@ -498,6 +498,10 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
     predictions = serializers.SerializerMethodField(default=[], read_only=True)
     annotations = serializers.SerializerMethodField(default=[], read_only=True)
     drafts = serializers.SerializerMethodField(default=[], read_only=True)
+    updated_by = serializers.SerializerMethodField(default=[], read_only=True)
+
+    def get_updated_by(self, task):
+        return [{'user_id': task.updated_by_id}] if task.updated_by_id else []
 
     def get_predictions(self, task):
         predictions = task.predictions

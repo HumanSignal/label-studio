@@ -16,28 +16,25 @@ Set up the following cloud and other storage systems with Label Studio:
 - [Redis database](#Redis-database)
 - [Local storage](#Local-storage)
 
+If something goes wrong, check the [troubleshooting section](#Troubleshoot-CORS-and-access-problems). 
+
 ## How external storage connections and sync work
 
-### Source storages 
+You can add source storage connections to sync data from an external source to a Label Studio project, and add target storage connections to sync annotations from Label Studio to external storage. Each source and target storage setup is project-specific. You can connect multiple buckets, containers, databases, or directories as source or target storage for a project. 
 
-Add source storage connections to sync data from an external source to a Label Studio project. Add target storage connections to sync annotations from Label Studio to external storage. Each source and target storage setup is project-specific. You can connect multiple buckets, containers, databases, or directories as source or target storage for a project. 
+### Source storage
 
-Data is not synced automatically from source storage to Label Studio. If you upload new data to a connected cloud storage bucket, sync the storage connection to add the new labeling tasks to Label Studio without restarting. 
+Label Studio does not automatically sync data from source storage. If you upload new data to a connected cloud storage bucket, sync the storage connection using the UI to add the new labeling tasks to Label Studio without restarting. You can also use the API to set up or sync storage connections. See [Label Studio API](/api) and locate the relevant storage connection type. 
 
-You can also use the API to set up or sync storage connections. See [Label Studio API](/api) and locate the relevant storage connection type. 
+Task data synced from cloud storage is not stored in Label Studio. Instead, the data is accessed using a URL. You can also secure access to cloud storage using cloud storage credentials. For details, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
 
-Task data synced from cloud storage is not stored in Label Studio. Instead, the data is accessed using a URL. You can also secure access to cloud storage using workspaces and cloud storage credentials. For details, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
+### Target storage
 
-### Target storages
+When annotators click **Submit** or **Update** while labeling tasks, Label Studio saves annotations in the Label Studio database. 
 
-After setting up target storage and performing annotations, you can 
-* automatically save annotation by click Submit/Update while labeling,
-* manually sync annotations using the **Sync** button for the configured target storage. 
+If you configure target storage, annotations are sent to target storage after you click **Sync** for the configured target storage connection. The target storage receives a JSON-formatted export of each annotation. See [Label Studio JSON format of annotated tasks](export.html#Label-Studio-JSON-format-of-annotated-tasks) for details about how exported tasks appear in  target storage.
 
-Annotations are still stored in the Label Studio database, and the target storage receives a JSON export of each annotation. 
-
-If you're using Label Studio Enterprise with Amazon S3, you can also <i>delete annotations in external storage</i> if they are deleted in Label Studio. 
-
+If you're using Label Studio Enterprise with Amazon S3, you can also delete annotations in target storage when they are deleted in Label Studio. See [Set up target storage connection in the Label Studio UI](storage.html#Set-up-target-storage-connection-in-the-Label-Studio-UI) for more details.
 
 ## Amazon S3
 

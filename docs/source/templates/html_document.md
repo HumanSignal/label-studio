@@ -18,15 +18,31 @@ Perform named entity recognition for HTML documents. Use this template to displa
 
 ```html
 <View>
-    <!--Use the Labels control tag to specify the entities-->
   <Labels name="ner" toName="text">
     <Label value="Person"></Label>
     <Label value="Organization"></Label>
   </Labels>
-    <!--Use the HyperText object tag to display the text containing HTML markup-->
   <HyperText name="text" value="$text"></HyperText>
 </View>
 ```
+
+## About the labeling configuration
+
+All labeling configurations must be wrapped in [View](/tags/view.html) tags.
+
+Use the [Labels](/tags/labels.html) control tag to specify the entities that you want annotators to annotate on the HTML document:
+```xml
+<Labels name="ner" toName="text">
+    <Label value="Person"></Label>
+    <Label value="Organization"></Label>
+</Labels>
+```
+
+Use the [HyperText](/tags/hypertext.html) object tag to display the text containing HTML markup:
+```xml
+<HyperText name="text" value="$text"></HyperText>
+```
+
 ## Related tags
 
 - [Labels](/tags/labels.html)
