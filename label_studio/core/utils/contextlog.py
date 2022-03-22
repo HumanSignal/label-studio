@@ -38,8 +38,11 @@ class ContextLog(object):
         user_id_file = os.path.join(get_config_dir(), 'user_id')
         if not os.path.exists(user_id_file):
             user_id = str(uuid4())
-            with io.open(user_id_file, mode='w', encoding='utf-8') as fout:
-                fout.write(user_id)
+            try:
+                with io.open(user_id_file, mode='w', encoding='utf-8') as fout:
+                    fout.write(user_id)
+            except OSError:
+                return 'np-' + user_id  # not persistent user id
         else:
             with io.open(user_id_file, encoding='utf-8') as f:
                 user_id = f.read()

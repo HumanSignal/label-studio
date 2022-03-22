@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1598: Make tag type detection easier",
-  "commit": "626ec4d42b084d59db9c7d55306050e910d8d45b",
+  "message": "fix: DEV-1598: Make fix work only for textarea",
+  "commit": "78aa5a5da7402e57657bd0dc4d2840b6e5b538b1",
   "branch": "fix/DEV-1598/empty-toname",
-  "date": "2022-03-11T13:44:55Z"
+  "date": "2022-03-22T14:03:01Z"
 }

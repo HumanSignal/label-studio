@@ -55,7 +55,7 @@ jobs:
         id: npm-cache-dir
         run: echo "::set-output name=dir::$(npm config get cache)"
 
-      - uses: actions/cache@v2.1.7
+      - uses: actions/cache@v3
         name: Configure npm cache
         id: npm-cache
         with:
@@ -69,7 +69,7 @@ jobs:
         with:
           python-version: '3.8'
 
-      - uses: actions/cache@v2.1.7
+      - uses: actions/cache@v3
         name: Configure pip cache
         id: pip-cache
         with:
@@ -89,7 +89,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        uses: docker/build-push-action@v2.9.0
+        uses: docker/build-push-action@v2.10.0
         id: docker_build_and_push
         with:
           context: .

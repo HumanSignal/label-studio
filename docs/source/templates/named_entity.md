@@ -124,6 +124,21 @@ You can also combine the [View](/tags/view.html) tag and the `perRegion` paramet
 ```
 The `visibleWhen` parameter with the View tag means that when a specific region is selected, the Header appears, prompting the annotator to supply a rating that applies to that region.
 
+### Filter a long list of labels
+
+If you want to filter a long list of labels, add the [Filter](/tags/filter.html) tag to your labeling configuration. For example, to filter the named entity recognition labels, add the following:
+```xml
+<Filter name="filter" toName="label" hotkey="shift+f" minlength="1" />
+<Labels name="label" toName="text" showInline="false">
+    <Label value="PER" background="red"/>
+    <Label value="ORG" background="darkorange"/>
+    <Label value="LOC" background="orange"/>
+    <Label value="MISC" background="green"/>
+</Labels>
+```
+The `toName` parameter on the Filter tag references the `name` parameter for the [Labels](/tags/labels.html) tag. You can also specify a `hotkey` to use for the filter text box, and set the `minlength` parameter to specify the minimum number of characters typed into the filter before the list of labels is filtered. 
+
+
 ## Related tags
 
 - [View](/tags/view.html)

@@ -25,25 +25,25 @@ License: MIT
  */
 
 /*!
- * wavesurfer.js 6.0.1 (2022-02-14)
+ * wavesurfer.js 6.0.4 (2022-03-08)
  * https://wavesurfer-js.org
  * @license BSD-3-Clause
  */
 
 /*!
- * wavesurfer.js cursor plugin 6.0.1 (2022-02-14)
+ * wavesurfer.js cursor plugin 6.0.4 (2022-03-08)
  * https://wavesurfer-js.org
  * @license BSD-3-Clause
  */
 
 /*!
- * wavesurfer.js regions plugin 6.0.1 (2022-02-14)
+ * wavesurfer.js regions plugin 6.0.4 (2022-03-08)
  * https://wavesurfer-js.org
  * @license BSD-3-Clause
  */
 
 /*!
- * wavesurfer.js timeline plugin 6.0.1 (2022-02-14)
+ * wavesurfer.js timeline plugin 6.0.4 (2022-03-08)
  * https://wavesurfer-js.org
  * @license BSD-3-Clause
  */

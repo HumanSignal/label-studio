@@ -871,7 +871,7 @@ class ProjectSummary(models.Model):
             self.common_data_columns = list(sorted(set(self.common_data_columns) & common_data_columns))
         logger.debug(f'summary.all_data_columns = {self.all_data_columns}')
         logger.debug(f'summary.common_data_columns = {self.common_data_columns}')
-        self.save()
+        self.save(update_fields=['all_data_columns', 'common_data_columns'])
 
     def remove_data_columns(self, tasks):
         all_data_columns = dict(self.all_data_columns)
@@ -895,7 +895,7 @@ class ProjectSummary(models.Model):
             self.common_data_columns = common_data_columns
         logger.debug(f'summary.all_data_columns = {self.all_data_columns}')
         logger.debug(f'summary.common_data_columns = {self.common_data_columns}')
-        self.save()
+        self.save(update_fields=['all_data_columns', 'common_data_columns', ])
 
     def _get_annotation_key(self, result):
         result_type = result.get('type', None)
@@ -955,7 +955,7 @@ class ProjectSummary(models.Model):
         logger.debug(f'summary.created_labels = {labels}')
         self.created_annotations = created_annotations
         self.created_labels = labels
-        self.save()
+        self.save(update_fields=['created_annotations', 'created_labels'])
 
     def remove_created_annotations_and_labels(self, annotations):
         created_annotations = dict(self.created_annotations)
@@ -989,4 +989,4 @@ class ProjectSummary(models.Model):
         logger.debug(f'summary.created_labels = {labels}')
         self.created_annotations = created_annotations
         self.created_labels = labels
-        self.save()
+        self.save(update_fields=['created_annotations', 'created_labels'])
