@@ -18,7 +18,7 @@ if settings.FEATURE_FLAGS_FROM_FILE:
         raise ValueError('When "FEATURE_FLAGS_FROM_FILE" is set, you have to specify a valid path for feature flags file, e.g.'
                          'FEATURE_FLAGS_FILE=my_flags.yml')
 
-    package_name = 'label_studio' if settings.VERSION_EDITION == 'Community Edition' else 'label_studio_enterprise'
+    package_name = 'label_studio' if settings.VERSION_EDITION == 'Community' else 'label_studio_enterprise'
     if settings.FEATURE_FLAGS_FILE.startswith('/'):
         feature_flags_file = settings.FEATURE_FLAGS_FILE
     else:
