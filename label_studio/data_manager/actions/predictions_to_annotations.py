@@ -50,9 +50,10 @@ def predictions_to_annotations(project, queryset, **kwargs):
     db_annotations = Annotation.objects.bulk_create(db_annotations)
     Task.objects.filter(id__in=tasks_ids).update(updated_at=now())
 
-    TaskSerializerBulk.post_process_annotations(db_annotations)
-    # Execute webhook for created annotations
-    emit_webhooks_for_instance(user.active_organization, project, WebhookAction.ANNOTATIONS_CREATED, db_annotations)
+    if db_annotations:
+        TaskSerializerBulk.post_process_annotations(db_annotations)
+        # Execute webhook for created annotations
+        emit_webhooks_for_instance(user.active_organization, project, WebhookAction.ANNOTATIONS_CREATED, db_annotations)
 
     return {'response_code': 200, 'detail': f'Created {count} annotations'}
 
