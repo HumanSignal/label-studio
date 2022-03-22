@@ -1,18 +1,18 @@
 # syntax=docker/dockerfile:1.3
 FROM node:14 AS builder
 
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true \
-    PUPPETEER_EXECUTABLE_PATH /usr/bin/chromium
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-WORKDIR /app/label_studio/frontend
+WORKDIR /label-studio/label_studio/frontend
 
 RUN set -eux \
  && apt-get update \
  && apt-get install --no-install-recommends --no-install-suggests -y \
-    chromium fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1
+    chromium
 
 COPY label_studio/frontend .
-COPY label_studio/__init__.py /app/label_studio/__init__.py
+COPY label_studio/__init__.py /label-studio/label_studio/__init__.py
 
 RUN --mount=type=cache,target=/root/.npm \
     npm ci \
@@ -54,10 +54,10 @@ RUN --mount=type=cache,target=$PIP_CACHE_DIR \
     pip3 install -e .
 
 RUN rm -rf ./label_studio/frontend
-COPY --chown=$USER:0 --from=builder /app/label_studio/frontend/dist ./label_studio/frontend/dist
+COPY --chown=$USER:0 --from=builder /label-studio/label_studio/frontend/dist ./label_studio/frontend/dist
 
 RUN python3 label_studio/manage.py collectstatic --no-input
-RUN python3 label_studio/core/version.py
+
 RUN chown -R 54546:0 $LS_DIR \
  && chmod -R g=u $LS_DIR
 

@@ -12,9 +12,6 @@ on:
     tags: [ '*' ]
 
 env:
-  # increment it in case if you need to reset cache
-  CACHE_NAME_PREFIX: v1
-  NODE: '14'
   DOCKER_CLI_EXPERIMENTAL: enabled
   IMAGE_NAME: heartexlabs/label-studio
   DOCKER_TAG: 'latest'
@@ -41,6 +38,16 @@ jobs:
         with:
           username: heartexlabs
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+
+      - name: Create version_.py
+        run: |
+          python3 $(pwd)/label_studio/core/version.py
+          cat $(pwd)/label_studio/core/version_.py
 
       - name: Build and push
         uses: docker/build-push-action@v2.10.0
