@@ -103,6 +103,7 @@ class WebhookAction(models.Model):
     TASKS_DELETED = 'TASKS_DELETED'
 
     ANNOTATION_CREATED = 'ANNOTATION_CREATED'
+    ANNOTATIONS_CREATED = 'ANNOTATIONS_CREATED'
     ANNOTATION_UPDATED = 'ANNOTATION_UPDATED'
     ANNOTATIONS_DELETED = 'ANNOTATIONS_DELETED'
 
@@ -169,6 +170,22 @@ class WebhookAction(models.Model):
                 'task': {
                     'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),
                     'many': False,
+                    'field': 'task',
+                },
+            },
+        },
+        ANNOTATIONS_CREATED: {
+            'name': _('Annotations created'),
+            'description': _(''),
+            'key': 'annotation',
+            'many': True,
+            'model': Annotation,
+            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['annotation']),
+            'project-field': 'task__project',
+            'nested-fields': {
+                'task': {
+                    'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),
+                    'many': True,
                     'field': 'task',
                 },
             },
