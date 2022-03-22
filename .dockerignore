@@ -2,7 +2,7 @@
 **
 
 # Except:
-!deploy/docker-entrypoint.d
+!deploy/docker-entrypoint.d/**
 !deploy/docker-entrypoint.sh
 !deploy/requirements-mw.txt
 !deploy/requirements.txt
@@ -10,6 +10,3 @@
 !label_studio/**
 !setup.py
 !README.md
-
-# except
-!label_studio/frontend/dist

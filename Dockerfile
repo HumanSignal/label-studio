@@ -1,20 +1,14 @@
 # syntax=docker/dockerfile:1.3
-FROM node:14 AS builder
+FROM node:14 AS frontend-builder
 
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+ENV NPM_CACHE_LOCATION=/root/.npm
 
 WORKDIR /label-studio/label_studio/frontend
-
-RUN set -eux \
- && apt-get update \
- && apt-get install --no-install-recommends --no-install-suggests -y \
-    chromium
 
 COPY label_studio/frontend .
 COPY label_studio/__init__.py /label-studio/label_studio/__init__.py
 
-RUN --mount=type=cache,target=/root/.npm \
+RUN --mount=type=cache,target=$NPM_CACHE_LOCATION \
     npm ci \
  && npm run build:production
 
@@ -54,11 +48,11 @@ RUN --mount=type=cache,target=$PIP_CACHE_DIR \
     pip3 install -e .
 
 RUN rm -rf ./label_studio/frontend
-COPY --chown=$USER:0 --from=builder /label-studio/label_studio/frontend/dist ./label_studio/frontend/dist
+COPY --chown=$USER:0 --from=frontend-builder /label-studio/label_studio/frontend/dist ./label_studio/frontend/dist
 
 RUN python3 label_studio/manage.py collectstatic --no-input
 
-RUN chown -R 54546:0 $LS_DIR \
+RUN chown -R $USER:0 $LS_DIR \
  && chmod -R g=u $LS_DIR
 
 USER $USER
