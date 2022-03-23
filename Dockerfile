@@ -16,8 +16,6 @@ RUN --mount=type=cache,target=$NPM_CACHE_LOCATION \
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
-    USER=54546 \
-    HOME=/label-studio \
     LS_DIR=/label-studio \
     PIP_CACHE_DIR=/.cache \
     DJANGO_SETTINGS_MODULE=core.settings.label_studio \
@@ -34,28 +32,23 @@ RUN set -eux \
     uwsgi git libxml2-dev libxslt-dev zlib1g-dev
 
 # Copy and install middleware dependencies
-COPY --chown=$USER:0 deploy/requirements-mw.txt .
+COPY deploy/requirements-mw.txt .
 RUN --mount=type=cache,target=$PIP_CACHE_DIR \
     pip3 install -r requirements-mw.txt
 
 # Copy and install requirements.txt first for caching
-COPY --chown=$USER:0 deploy/requirements.txt .
+COPY deploy/requirements.txt .
 RUN --mount=type=cache,target=$PIP_CACHE_DIR \
     pip3 install -r requirements.txt
 
-COPY --chown=$USER:0 . .
+COPY . .
 RUN --mount=type=cache,target=$PIP_CACHE_DIR \
     pip3 install -e .
 
 RUN rm -rf ./label_studio/frontend
-COPY --chown=$USER:0 --from=frontend-builder /label-studio/label_studio/frontend/dist ./label_studio/frontend/dist
+COPY --from=frontend-builder /label-studio/label_studio/frontend/dist ./label_studio/frontend/dist
 
 RUN python3 label_studio/manage.py collectstatic --no-input
-
-RUN chown -R $USER:0 $LS_DIR \
- && chmod -R g=u $LS_DIR
-
-USER $USER
 
 EXPOSE 8080
 
