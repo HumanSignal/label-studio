@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1784: Fix errors in console while working with labels list with ocr",
-  "commit": "0e44de75f378964aeff87afe75c5c0c8df122524",
-  "branch": "fix/DEV-1784/drawing-hanging",
-  "date": "2022-03-01T23:40:46Z"
+  "message": "fix: dev-1631: handle-open-polygon (#517)\n\n* if polygon is open on toolswitch close polygon\r\n\r\n* on tool change run handle tool change if available to delete unclosed polygons\r\n\r\n* Fix scenario when there's no area being drawn\r\n\r\n* Fix ctrl-z in tests\r\n\r\n* remove logging\r\n\r\n* close polygon if closeable else clear state\r\n\r\n* Try to revert image in tests\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: Nick Skriabin <nr@fenelon.ru>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
+  "commit": "bb94464732239516c5a888b5efa91353293a8c72",
+  "branch": "master",
+  "date": "2022-03-21T18:05:13Z"
 }

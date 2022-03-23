@@ -217,7 +217,7 @@ class ExportStorage(Storage):
         abstract = True
 
 
-@job('default')
+@job('default', timeout=3600)
 def export_sync_background(storage_class, storage_id):
     storage = storage_class.objects.get(id=storage_id)
     storage.save_all_annotations()

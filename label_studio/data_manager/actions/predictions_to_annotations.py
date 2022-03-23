@@ -7,6 +7,8 @@ from django.utils.timezone import now
 from core.permissions import AllPermissions
 from tasks.models import Prediction, Annotation, Task
 from tasks.serializers import TaskSerializerBulk
+from webhooks.models import WebhookAction
+from webhooks.utils import emit_webhooks_for_instance
 
 all_permissions = AllPermissions()
 logger = logging.getLogger(__name__)
@@ -46,9 +48,13 @@ def predictions_to_annotations(project, queryset, **kwargs):
     logger.debug(f'{count} predictions will be converter to annotations')
     db_annotations = [Annotation(**annotation) for annotation in annotations]
     db_annotations = Annotation.objects.bulk_create(db_annotations)
-    Task.objects.filter(id__in=tasks_ids).update(updated_at=now())
+    Task.objects.filter(id__in=tasks_ids).update(updated_at=now(), updated_by=request.user)
 
-    TaskSerializerBulk.post_process_annotations(db_annotations)
+    if db_annotations:
+        TaskSerializerBulk.post_process_annotations(db_annotations)
+        # Execute webhook for created annotations
+        emit_webhooks_for_instance(user.active_organization, project, WebhookAction.ANNOTATIONS_CREATED, db_annotations)
+
     return {'response_code': 200, 'detail': f'Created {count} annotations'}
 
 
