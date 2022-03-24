@@ -1,6 +1,6 @@
 {
-  "message": "fix: dev-1631: handle-open-polygon (#517)\n\n* if polygon is open on toolswitch close polygon\r\n\r\n* on tool change run handle tool change if available to delete unclosed polygons\r\n\r\n* Fix scenario when there's no area being drawn\r\n\r\n* Fix ctrl-z in tests\r\n\r\n* remove logging\r\n\r\n* close polygon if closeable else clear state\r\n\r\n* Try to revert image in tests\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: Nick Skriabin <nr@fenelon.ru>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "bb94464732239516c5a888b5efa91353293a8c72",
+  "message": "fix: DEV-1731: Add support of editable and readonly for OCR (#505)\n\n* fix: DEV-1731: Add support of editable and readonly in per-region textarea with region-list display mode\r\n\r\n* fix: DEV-1731: Fix textarea region delete icon\r\n\r\n* Fix editable and readonly\r\n\r\n* Remove feature flag for 1731\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>\r\nCo-authored-by: Nick Skriabin <nr@fenelon.ru>",
+  "commit": "a13203dd7b08075d5c4e42436a1925c5e0b01619",
   "branch": "master",
-  "date": "2022-03-21T18:05:13Z"
+  "date": "2022-03-23T13:53:46Z"
 }
