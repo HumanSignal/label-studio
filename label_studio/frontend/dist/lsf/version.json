@@ -1,6 +1,6 @@
 {
-  "message": "Preserve timeline visibility on expand/collapse (#528)",
-  "commit": "b8cb4471c2ab208332cc424b9002f03e2f8ef9b2",
-  "branch": "fix/dev-1870/preserve-timeline-state",
-  "date": "2022-03-10T11:42:58Z"
+  "message": "Preserve timeline visibility on expand/collapse (#528) (#545)",
+  "commit": "bdd0c5766fde6e81acbde35045bff25625f3a235",
+  "branch": "master",
+  "date": "2022-03-24T09:30:40Z"
 }
