@@ -16,6 +16,7 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+from django.core.paginator import Paginator
 from rest_framework.views import exception_handler
 
 from core.utils.common import temporary_disconnect_all_signals
@@ -85,9 +86,50 @@ _task_data_schema = openapi.Schema(
 )
 
 
+class ProjectPaginator(Paginator):
+    def page(self, number):
+        """Return a Page object for the given 1-based page number."""
+        number = self.validate_number(number)
+        bottom = (number - 1) * self.per_page
+        top = bottom + self.per_page
+        if top + self.orphans >= self.count:
+            top = self.count
+
+        self.page_queryset = self.object_list.all()[bottom:top]
+        return self._get_page(self.object_list.all()[bottom:top], number, self)
+    
+    
 class ProjectListPagination(PageNumberPagination):
     page_size = 30
     page_size_query_param = 'page_size'
+    django_paginator_class = ProjectPaginator
+
+    def paginate_queryset(self, queryset, request, view=None):
+        """
+        Paginate a queryset if required, either returning a
+        page object, or `None` if pagination is not configured for this view.
+        """
+        page_size = self.get_page_size(request)
+        if not page_size:
+            return None
+
+        paginator = self.django_paginator_class(queryset, page_size)
+        page_number = self.get_page_number(request, paginator)
+
+        try:
+            self.page = paginator.page(page_number)
+        except InvalidPage as exc:
+            msg = self.invalid_page_message.format(
+                page_number=page_number, message=str(exc)
+            )
+            raise NotFound(msg)
+
+        if paginator.num_pages > 1 and self.template is not None:
+            # The browsable API should display pagination controls.
+            self.display_page_controls = True
+
+        self.request = request
+        return paginator.page_queryset
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
