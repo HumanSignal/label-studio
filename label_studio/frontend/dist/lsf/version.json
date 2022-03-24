@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1598: Make fix work only for textarea",
-  "commit": "78aa5a5da7402e57657bd0dc4d2840b6e5b538b1",
+  "message": "Merge branch 'master' into fix/DEV-1598/empty-toname",
+  "commit": "7ec05fde20e7294d75038312bc2f8a167afde0d6",
   "branch": "fix/DEV-1598/empty-toname",
-  "date": "2022-03-22T14:03:01Z"
+  "date": "2022-03-24T11:17:31Z"
 }
