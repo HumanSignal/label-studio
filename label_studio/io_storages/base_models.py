@@ -17,7 +17,7 @@ from data_export.serializers import ExportDataSerializer
 from core.redis import redis_connected
 from core.utils.common import get_bool_env, load_func
 from io_storages.utils import get_uri_via_regex
-
+from tasks.validation import ValidationError as TaskValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -52,9 +52,31 @@ class ImportStorage(Storage):
     def iterkeys(self):
         return iter(())
 
+    def process_key(self, key, obj):
+        if key.endswith(".jsonl"):
+            json_objs = obj.split("\n")
+            values = [json.loads(value) for value in json_objs]
+            error_checks = [isinstance(value, dict) for value in values]
+            if not all(error_checks):
+                raise ValueError(f"Error on key {key}: Your JSONL file must contain one dictionary per line.")
+        else:
+            value = json.loads(obj)
+
+            if not isinstance(value, dict):
+                raise ValueError(f"Error on key {key}: Your JSON file must be a dictionary with one task")
+            values = [value]
+        values = [self._get_validated_task(value, key) for value in values]
+        return values
+
     def get_data(self, key):
         raise NotImplementedError
-
+    def _get_validated_task(self, parsed_data, key):
+        """ Validate parsed data with labeling config and task structure
+        """
+        if not isinstance(parsed_data, dict):
+            raise TaskValidationError('Error at ' + str(key) + ':\n'
+                                      'Cloud storage supports one task (one dict object) per JSON file only. ')
+        return parsed_data
     def generate_http_url(self, url):
         raise NotImplementedError
 

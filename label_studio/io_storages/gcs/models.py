@@ -113,10 +113,8 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
         bucket = self.get_bucket()
         blob = bucket.blob(key)
         blob_str = blob.download_as_string()
-        value = json.loads(blob_str)
-        if not isinstance(value, dict):
-            raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
-        return value
+        values = self.process_key(key, blob_str)
+        return values
 
     @classmethod
     def is_gce_instance(cls):

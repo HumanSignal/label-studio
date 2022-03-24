@@ -88,7 +88,7 @@ class RedisImportStorage(ImportStorage, RedisStorageMixin):
         value = client.get(key)
         if not value:
             return
-        return json.loads(value)
+        return self.process_key(key, json.loads(value))
 
     def scan_and_create_links(self):
         return self._scan_and_create_links(RedisImportStorageLink)

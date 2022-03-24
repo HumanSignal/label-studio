@@ -78,7 +78,7 @@ class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):
 
         try:
             with open(path, encoding='utf8') as f:
-                value = json.load(f)
+                value = f.read()
         except (UnicodeDecodeError, json.decoder.JSONDecodeError):
             raise ValueError(
                 f"Can\'t import JSON-formatted tasks from {key}. If you're trying to import binary objects, "
@@ -86,7 +86,7 @@ class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):
 
         if not isinstance(value, dict):
             raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
-        return value
+        return self.process_key(key, value)
 
     def scan_and_create_links(self):
         return self._scan_and_create_links(LocalFilesImportStorageLink)

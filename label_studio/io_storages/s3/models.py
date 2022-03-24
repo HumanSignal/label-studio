@@ -139,13 +139,7 @@ class S3ImportStorage(S3StorageMixin, ImportStorage):
     def scan_and_create_links(self):
         return self._scan_and_create_links(S3ImportStorageLink)
 
-    def _get_validated_task(self, parsed_data, key):
-        """ Validate parsed data with labeling config and task structure
-        """
-        if not isinstance(parsed_data, dict):
-            raise TaskValidationError('Error at ' + str(key) + ':\n'
-                                      'Cloud storage supports one task (one dict object) per JSON file only. ')
-        return parsed_data
+
 
     def get_data(self, key):
         uri = f'{self.url_scheme}://{self.bucket}/{key}'
@@ -158,19 +152,7 @@ class S3ImportStorage(S3StorageMixin, ImportStorage):
         bucket = s3.Bucket(self.bucket)
         obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
 
-        if key.endswith(".jsonl"):
-            json_objs = obj.split("\n")
-            values = [json.loads(value) for value in json_objs]
-            error_checks = [isinstance(value, dict) for value in values]
-            if not all(error_checks):
-                raise ValueError(f"Error on key {key}: For S3 your JSONL file must contain one dictionary per line.")
-        else:
-            value = json.loads(obj)
-
-            if not isinstance(value, dict):
-                raise ValueError(f"Error on key {key}: For S3 your JSON file must be a dictionary with one task")
-            values = [value]
-        values = [self._get_validated_task(value, key) for value in values]
+        values = self.process_key(key, obj)
         return values
 
 
