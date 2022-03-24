@@ -8,6 +8,7 @@ import os
 
 from django.db import IntegrityError
 from django.conf import settings
+from django.http import HttpResponse
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 from rest_framework import generics, status, filters
@@ -193,10 +194,16 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
 
     @api_webhook_for_delete(WebhookAction.PROJECT_DELETED)
     def delete(self, request, *args, **kwargs):
+        if not request.user.is_superuser:
+            return HttpResponse(status=501)
+
         return super(ProjectAPI, self).delete(request, *args, **kwargs)
 
     @api_webhook(WebhookAction.PROJECT_UPDATED)
     def patch(self, request, *args, **kwargs):
+        if not request.user.is_superuser:
+            return HttpResponse(status=501)
+
         project = self.get_object()
         label_config = self.request.data.get('label_config')
 

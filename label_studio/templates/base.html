@@ -94,6 +94,7 @@
       avatar: "{{user.avatar_url|safe}}",
       {% endif %}
     },
+    show_admin: {{ user.is_superuser|yesno:"true,false" }},
     debug: {{settings.DEBUG|yesno:"true,false"}},
     hostname: "{{settings.HOSTNAME}}",
     version: {{ versions|json_dumps_ensure_ascii|safe }},

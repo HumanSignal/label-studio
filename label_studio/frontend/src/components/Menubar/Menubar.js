@@ -41,6 +41,7 @@ const RightContextMenu = ({className, ...props}) => {
 
 export const Menubar = ({
   enabled,
+  showAdmin,
   defaultOpened,
   defaultPinned,
   children,
@@ -175,13 +176,13 @@ export const Menubar = ({
                   data-external
                   exact
                 />
-                <Menu.Item
+                {showAdmin ? <Menu.Item
                   label="Organization"
                   to="/organization"
                   icon={<IconPersonInCircle/>}
                   data-external
                   exact
-                />
+                /> : null}
 
                 <Menu.Spacer/>
 

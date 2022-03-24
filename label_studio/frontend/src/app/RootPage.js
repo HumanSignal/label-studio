@@ -9,6 +9,7 @@ export const RootPage = ({content}) => {
   return (
     <Menubar
       enabled={true}
+      showAdmin={window.APP_SETTINGS.show_admin || false}
       defaultOpened={opened}
       defaultPinned={pinned}
       onSidebarToggle={(visible) => localStorage.setItem('sidebar-opened', visible)}

@@ -237,7 +237,7 @@ DataManagerPage.context = ({ dmRef }) => {
         </Button>
       )}
 
-      {Object.entries(links).map(([path, label]) => (
+      {window.APP_SETTINGS.show_admin && Object.entries(links).map(([path, label]) => (
         <Button
           key={path}
           tag={NavLink}

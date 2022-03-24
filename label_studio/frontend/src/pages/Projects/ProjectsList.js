@@ -37,7 +37,7 @@ export const EmptyProjectsList = ({ openModal }) => {
       <Elem name="heidi" tag="img" src={absoluteURL("/static/images/opossum_looking.png")} />
       <Elem name="header" tag="h1">Heidi doesn’t see any projects here</Elem>
       <p>Create one and start labeling your data</p>
-      <Elem name="action" tag={Button} onClick={openModal} look="primary">Create Project</Elem>
+      {window.APP_SETTINGS.show_admin && <Elem name="action" tag={Button} onClick={openModal} look="primary">Create Project</Elem>}
     </Block>
   );
 };
@@ -69,7 +69,7 @@ const ProjectCard = ({ project }) => {
             }}>
               <Dropdown.Trigger content={(
                 <Menu>
-                  <Menu.Item href={`/projects/${project.id}/settings`}>Settings</Menu.Item>
+                  {window.APP_SETTINGS.show_admin && <Menu.Item href={`/projects/${project.id}/settings`}>Settings</Menu.Item>}
                   <Menu.Item href={`/projects/${project.id}/data?labeling=1`}>Label</Menu.Item>
                 </Menu>
               )}>

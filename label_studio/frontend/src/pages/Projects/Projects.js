@@ -55,7 +55,9 @@ export const ProjectsPage = () => {
   React.useEffect(() => {
     // there is a nice page with Create button when list is empty
     // so don't show the context button in that case
-    setContextProps({ openModal, showButton: projectsList.length > 0 });
+    const showButton = projectsList.length > 0 && window.APP_SETTINGS.show_admin;
+
+    setContextProps({ openModal, showButton });
   }, [projectsList.length]);
 
   return (
