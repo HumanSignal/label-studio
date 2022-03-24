@@ -173,6 +173,24 @@ class ProjectListAPI(generics.ListCreateAPIView):
         projects = Project.objects.filter(organization=self.request.user.active_organization)
         return ProjectManager.with_counts_annotate(projects).prefetch_related('members', 'created_by')
 
+    def prefetch(self, queryset):
+        return queryset.prefetch_related('members', 'created_by')
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+
+        page = self.prefetch(ProjectManager.with_counts_annotate(page))
+        page = list(page)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.paginator.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     def get_serializer_context(self):
         context = super(ProjectListAPI, self).get_serializer_context()
         context['created_by'] = self.request.user
