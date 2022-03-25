@@ -1,6 +1,6 @@
 {
-  "message": "Preserve timeline visibility on expand/collapse (#528) (#545)",
-  "commit": "bdd0c5766fde6e81acbde35045bff25625f3a235",
-  "branch": "master",
-  "date": "2022-03-24T09:30:40Z"
+  "message": "feat: DEV-2007: DEV-2008: Add functional of dynamic children\n\nIt affects Choices, Taxonomy and all types of Labels",
+  "commit": "638070e9506541010f38f3c749b5c72a7839af21",
+  "branch": "feat/DEV-2007-DEV-2008/dynamic-tag-children",
+  "date": "2022-03-25T12:09:41Z"
 }
