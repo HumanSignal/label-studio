@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2007: DEV-2008: Add functional of dynamic children\n\nIt affects Choices, Taxonomy and all types of Labels",
-  "commit": "638070e9506541010f38f3c749b5c72a7839af21",
+  "message": "fix: DEV-2007: DEV-2008: Fix working with empty list of dynamic children",
+  "commit": "c6b3cbf0365e0d5a280bd77adac96e2a2a891af6",
   "branch": "feat/DEV-2007-DEV-2008/dynamic-tag-children",
-  "date": "2022-03-25T12:09:41Z"
+  "date": "2022-03-25T15:44:44Z"
 }
