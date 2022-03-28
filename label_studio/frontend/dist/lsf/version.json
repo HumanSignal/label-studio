@@ -1,6 +1,6 @@
 {
-  "message": "Preserve timeline visibility on expand/collapse (#528) (#545)",
-  "commit": "bdd0c5766fde6e81acbde35045bff25625f3a235",
-  "branch": "master",
-  "date": "2022-03-24T09:30:40Z"
+  "message": "use history to go back on button click",
+  "commit": "f638483bae813b211c07fa27e3452918685c4528",
+  "branch": "fix/DEV-1883/no-more-tasks-screen",
+  "date": "2022-03-28T18:58:36Z"
 }
