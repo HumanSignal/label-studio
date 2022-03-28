@@ -945,7 +945,7 @@ class ProjectSummary(models.Model):
                 from_name = result['from_name']
 
                 # aggregate labels
-                if from_name not in self.created_labels:
+                if from_name not in labels:
                     labels[from_name] = dict()
 
                 for label in self._get_labels(result):
