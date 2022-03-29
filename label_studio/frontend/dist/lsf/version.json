@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2007: DEV-2008: Fix working with empty list of dynamic children",
-  "commit": "c6b3cbf0365e0d5a280bd77adac96e2a2a891af6",
+  "message": "feat: DEV-2007: Make choices be able to be nested",
+  "commit": "14c7650fd7ee8a1cc7b4847a06f9e6d88d527fda",
   "branch": "feat/DEV-2007-DEV-2008/dynamic-tag-children",
-  "date": "2022-03-25T15:44:44Z"
+  "date": "2022-03-29T22:05:04Z"
 }
