@@ -27,7 +27,7 @@ from data_manager.models import View, PrepareParams
 from data_manager.managers import get_fields_for_evaluation
 from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer, ViewResetSerializer
 from data_manager.actions import get_all_actions, perform_action
-from django.core.cache import cache
+
 
 logger = logging.getLogger(__name__)
 
@@ -206,25 +206,17 @@ class TaskListAPI(generics.ListCreateAPIView):
             return Response({'detail': 'Neither project nor view id specified'}, status=404)
         # get prepare params (from view or from payload directly)
         prepare_params = get_prepare_params(request, project)
-        cache_key = "-".join([str(request.user), str(view_pk), str(prepare_params)])
         queryset = self.get_task_queryset(request, prepare_params)
         context = self.get_task_serializer_context(self.request, project)
-
-        # get counters from cache
-        if not cache.get(cache_key):
-            total_predictions = queryset.aggregate(Count('predictions'))['predictions__count']
-            total_annotations = queryset.aggregate(Count('annotations'))['annotations__count']
-            total_tasks = queryset.count()
-            cache.add(cache_key, (total_tasks, total_annotations, total_predictions), timeout=3600, version=None)
-        else:
-            total_tasks, total_annotations, total_predictions = cache.get(cache_key)
-
+        # get counters 
+        total_predictions = queryset.aggregate(Count('predictions'))['predictions__count']
+        total_annotations = queryset.aggregate(Sum('total_annotations'))['total_annotations__sum']
+        total_tasks = queryset.count()
         # paginated tasks
         if page_number:
-            page = queryset[page_size * (page_number - 1):page_size * page_number]
+            page = queryset[page_size*(page_number-1):page_size*page_number]
         else:
             page = queryset
-
         all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
         fields_for_evaluation = get_fields_for_evaluation(prepare_params, request.user)
         review = bool_from_request(self.request.GET, 'review', False)
