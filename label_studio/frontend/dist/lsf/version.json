@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into fix/dev-1324-audio-undo",
-  "commit": "e732b74d7112181f552e8e72291bee6b667b2823",
+  "message": "Create only one history step on region create",
+  "commit": "ea4e1be2a7421a14f8be1c606b52ae751d99ef66",
   "branch": "fix/dev-1324-audio-undo",
-  "date": "2022-03-11T09:08:02Z"
+  "date": "2022-03-25T14:56:03Z"
 }

@@ -235,6 +235,18 @@ def get_all_columns(project, *_):
             }
         },
         {
+            'id': 'updated_by',
+            'title': 'Updated by',
+            'type': 'List',
+            'target': 'tasks',
+            'help': 'User who did the last task update',
+            'schema': {'items': project.organization.members.values_list('user__id', flat=True)},
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        },
+        {
             'id': 'avg_lead_time',
             'title': "Lead Time",
             'type': 'Number',

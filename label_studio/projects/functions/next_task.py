@@ -196,7 +196,6 @@ def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_fla
         next_task = _try_ground_truth(not_solved_tasks, project, user)
         queue_info += (' & ' if queue_info else '') + 'Ground truth queue'
 
-
     if not next_task and project.maximum_annotations > 1:
         # if there any tasks in progress (with maximum number of annotations), randomly sampling from them
         logger.debug(f'User={user} tries depth first from prepared tasks')

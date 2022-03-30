@@ -81,6 +81,82 @@ def remove_duplicates(project, queryset, **kwargs):
     return {'response_code': 200, 'detail': f'Removed {len(removing)} tasks'}
 
 
+def rename_labels(project, queryset, **kwargs):
+    request = kwargs['request']
+
+    old_label_name = request.data.get('old_label_name')
+    new_label_name = request.data.get('new_label_name')
+    control_tag = request.data.get('control_tag')
+
+    labels = project.get_parsed_config()
+    if control_tag not in labels:
+        raise Exception('Wrong old label name, it is not from labeling config: ' + old_label_name)
+    label_type = labels[control_tag]['type'].lower()
+
+    annotations = Annotation.objects.filter(task__project=project)
+    annotations = annotations \
+        .filter(result__contains=[{'from_name': control_tag}]) \
+        .filter(result__contains=[{'value': {label_type: [old_label_name]}}])
+
+    label_count = 0
+    annotation_count = 0
+    for annotation in annotations:
+        changed = False
+        for sub in annotation.result:
+            if sub.get('from_name', None) == control_tag \
+                    and old_label_name in sub.get('value', {}).get(label_type, []):
+
+                new_labels = []
+                for label in sub['value'][label_type]:
+                    if label == old_label_name:
+                        new_labels.append(new_label_name)
+                        label_count += 1
+                        changed = True
+                    else:
+                        new_labels.append(label)
+
+                sub['value'][label_type] = new_labels
+
+        if changed:
+            annotation.save(update_fields=['result'])
+            annotation_count += 1
+
+    return {'response_code': 200, 'detail': f'Updated {label_count} labels in {annotation_count}'}
+
+
+def rename_labels_form(user, project):
+    labels = project.get_parsed_config()
+
+    old_names = []
+    control_tags = []
+    for key, label in labels.items():
+        old_names += label.get('labels', [])
+        control_tags.append(key)
+
+    return [{
+        'columnCount': 1,
+        'fields': [
+            {
+                'type': 'select',
+                'name': 'control_tag',
+                'label': 'Choose a label control tag',
+                'options': control_tags,
+            },
+            {
+                'type': 'select',
+                'name': 'old_label_name',
+                'label': 'Old label name',
+                'options': list(set(old_names)),
+            },
+            {
+                'type': 'input',
+                'name': 'new_label_name',
+                'label': 'New label name'
+            },
+        ]
+    }]
+
+
 actions = [
     {
         'entry_point': propagate_annotations,
@@ -110,5 +186,20 @@ actions = [
                     'Only tasks without annotations will be deleted.',
             'type': 'confirm'
         }
+    },
+
+    {
+        'entry_point': rename_labels,
+        'permission': all_permissions.tasks_change,
+        'title': 'Rename Labels',
+        'order': 1,
+        'experimental': True,
+        'dialog': {
+            'text': 'Confirm that you want to rename a label in all annotations. '
+                    'Also you have to change label names in the labeling config manually.',
+            'type': 'confirm',
+            'form': rename_labels_form,
+        }
     }
+
 ]
