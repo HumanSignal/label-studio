@@ -370,6 +370,8 @@ class Project(ProjectMixin, models.Model):
             bulk_update_stats_project_tasks(
                 self.tasks.filter(Q(annotations__isnull=False) & Q(annotations__ground_truth=False))
             )
+        if tasks_number_changed:
+            self.update_tasks_counters(self.tasks.filter(Q(annotations__isnull=False)))
 
     def update_tasks_states(
         self, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed
@@ -749,6 +751,15 @@ class Project(ProjectMixin, models.Model):
 
         self._storage_objects = storage_objects
         return storage_objects
+
+    def update_tasks_counters(self, queryset):
+        for task in queryset:
+            total_annotations = task.annotations.all().count()
+            cancelled_annotations = task.annotations.all().filter(was_cancelled=True).count()
+            task.total_annotations = total_annotations - cancelled_annotations
+            task.total_cancelled_annotations = cancelled_annotations
+            task.total_predictions = task.predictions.all().count()
+            task.save()
 
     def __str__(self):
         return f'{self.title} (id={self.id})' or _("Business number %d") % self.pk

@@ -17,7 +17,7 @@ from django.db.models.functions import Cast
 from django.db.models import FloatField
 from datetime import datetime
 
-from data_manager.prepare_params import ConjunctionEnum
+from data_manager.prepare_params import ConjunctionEnum, SelectedItems
 from label_studio.core.utils.params import cast_bool_from_str
 from label_studio.core.utils.common import load_func
 
@@ -543,20 +543,6 @@ class PreparedTaskManager(models.Manager):
         if fields_for_evaluation is None:
             fields_for_evaluation = []
 
-        # default annotations for calculating total values in pagination output
-        if 'total_annotations' in fields_for_evaluation or 'annotators' in fields_for_evaluation or all_fields:
-            queryset = queryset.annotate(
-                total_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
-            )
-        if 'cancelled_annotations' in fields_for_evaluation or all_fields:
-            queryset = queryset.annotate(
-                cancelled_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True))
-            )
-        if 'total_predictions' in fields_for_evaluation or all_fields:
-            queryset = queryset.annotate(
-                total_predictions=Count("predictions", distinct=True)
-            )
-
         # db annotations applied only if we need them in ordering or filters
         for field in annotations_map.keys():
             if field in fields_for_evaluation or all_fields:
@@ -577,10 +563,8 @@ class PreparedTaskManager(models.Manager):
 
     def only_filtered(self, prepare_params=None):
         queryset = TaskQuerySet(self.model).filter(project=prepare_params.project)
-
         fields_for_filter_ordering = get_fields_for_filter_ordering(prepare_params)
         queryset = self.annotate_queryset(queryset, fields_for_evaluation=fields_for_filter_ordering)
-
         return queryset.prepared(prepare_params=prepare_params)
 
 
