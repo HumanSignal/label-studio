@@ -437,7 +437,7 @@ Path to all your files inside task will start with string `/data/local-files/?d=
   }
 }]
 ```
-There are several ways to add your hand mad task: API, web interface, another storage. The simplest one is to use **Import** button inside project main page. Drag and drop your json file inside window, after this push blue button **Import**.
+There are several ways to add your hand made task: API, web interface, another storage. The simplest one is to use **Import** button inside project main page. Drag and drop your json file inside window, after this push blue button **Import**.
 <img src="/images/upload-task.png" alt="Task upload via web." width="100%">
 
 #### Add storage with the Label Studio API
