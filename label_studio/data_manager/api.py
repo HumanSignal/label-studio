@@ -212,8 +212,8 @@ class TaskListAPI(generics.ListCreateAPIView):
 
         # get counters from cache
         if not cache.get(cache_key):
-            total_predictions = queryset.aggregate(Count('predictions'))['predictions__count']
-            total_annotations = queryset.aggregate(Count('annotations'))['annotations__count']
+            total_predictions = Prediction.objects.filter(task_id__in=queryset).count()
+            total_annotations = Annotation.objects.filter(task_id__in=queryset, was_cancelled=False).count()
             total_tasks = queryset.count()
             cache.add(cache_key, (total_tasks, total_annotations, total_predictions), timeout=3600, version=None)
         else:
