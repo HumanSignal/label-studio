@@ -66,7 +66,12 @@ class Task(TaskMixin, models.Model):
         help_text='Uploaded file used as data source for this task'
     )
     updates = ['is_labeled']
-
+    total_annotations = models.IntegerField(_('total_annotations'), default=0, db_index=True,
+                                  help_text='Number of total annotations for the current task')
+    total_canceled_annotations = models.IntegerField(_('total_canceled_annotations'), default=0, db_index=True,
+                                            help_text='Number of total cancelled annotations for the current task')
+    total_predictions = models.IntegerField(_('total_predictions'), default=0, db_index=True,
+                                  help_text='Number of total predictions for the current task')
     objects = TaskManager()  # task manager by default
     prepared = PreparedTaskManager()  # task manager with filters, ordering, etc for data_manager app
 
