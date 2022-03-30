@@ -189,11 +189,10 @@ class Project(ProjectMixin, models.Model):
     )
 
     control_weights = JSONField(_('control weights'), null=True, default=dict, help_text="Dict of weights for each control tag in metric calculation. Each control tag (e.g. label or choice) will "
-                                                                                         "have it's own key in control weight dict with type, weight for each label and overall weight." 
-                                                                                         'For example for default object detection with bounding boxes control tags dict will look like this: '
-                                                                                         '{"label": {"type": "RectangleLabels", "labels": {"Car": 1.0, "Airplane": 1.0}, "overall": 1.0}}'
-                                                                                         'First key label is the name of control in label config. Inside the dict there are: type of labels (RectangleLabels),'
-                                                                                         'in labels dict weight for each label and overall weight of the control tag.')
+                                                                                         "have it's own key in control weight dict with weight for each label and overall weight." 
+                                                                                         "For example, if bounding box annotation with control tag named my_bbox should be included with 0.33 weight in agreement calculation, "
+                                                                                         "and the first label Car should be twice more important than Airplaine, then you have to need the specify: "
+                                                                                         "{'my_bbox': {'type': 'RectangleLabels', 'labels': {'Car': 1.0, 'Airplaine': 0.5}, 'overall': 0.33}")
     model_version = models.TextField(
         _('model version'), blank=True, null=True, default='', help_text='Machine learning model version'
     )
