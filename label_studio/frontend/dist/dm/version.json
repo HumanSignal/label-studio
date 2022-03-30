@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-1621:  Add usage of new method to create annotation",
-  "commit": "8975918038340887dbe42096c17e2df06aab2152",
-  "branch": "feat/DEV-1621/interactive_mode",
-  "date": "2022-02-15T19:29:50Z"
+  "message": "Fix: DEV-790: return column button quick-view (#37)\n\n* gear icon\r\n\r\n* detect scroll bar width\r\n\r\n* sticky columns button\r\n\r\n* calc width of scrollbar from ref\r\n\r\n* remove gear when not labeling\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: Sergey <Gondragos@gmail.com>",
+  "commit": "4e6b392ada45e7e7e614e5dec0c1a8e0e771016f",
+  "branch": "master",
+  "date": "2022-03-24T15:46:41Z"
 }
