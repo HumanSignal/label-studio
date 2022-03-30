@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2007: Make choices be able to be nested",
-  "commit": "14c7650fd7ee8a1cc7b4847a06f9e6d88d527fda",
+  "message": "feat: DEV-2007: Add allowNested attribute",
+  "commit": "d7f127b234b44b4aa74e0b715eb4630b8d434439",
   "branch": "feat/DEV-2007-DEV-2008/dynamic-tag-children",
-  "date": "2022-03-29T22:05:04Z"
+  "date": "2022-03-30T14:59:42Z"
 }
