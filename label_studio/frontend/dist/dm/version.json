@@ -1,6 +1,6 @@
 {
-  "message": "Fix fields button in the QuickView mode",
-  "commit": "1a7653b7911a98553b4e56d116d5c1df24c109fb",
+  "message": "Hide pagenav title and page size in Quick View",
+  "commit": "bb3e529d7d952c5659f6cdfb6e07a61dcfb12d5b",
   "branch": "fix/dev-1470/dm-tasks-pagination",
-  "date": "2022-03-31T08:43:13Z"
+  "date": "2022-03-31T09:32:09Z"
 }
