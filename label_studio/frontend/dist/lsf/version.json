@@ -1,6 +1,6 @@
 {
-  "message": "Preserve timeline visibility on expand/collapse (#528) (#545)",
-  "commit": "bdd0c5766fde6e81acbde35045bff25625f3a235",
-  "branch": "master",
-  "date": "2022-03-24T09:30:40Z"
+  "message": "Merge branch 'feat/dev-2043/debug-info' into fix/dev-2055-html-shifted",
+  "commit": "c1f23da048975958d2f9302a6abcbd142b6f304a",
+  "branch": "fix/dev-2055-html-shifted",
+  "date": "2022-03-31T06:24:10Z"
 }
