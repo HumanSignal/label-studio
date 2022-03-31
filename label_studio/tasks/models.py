@@ -606,7 +606,7 @@ def remove_predictions_from_project(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Prediction)
-def remove_predictions_from_project(sender, instance, **kwargs):
+def save_predictions_to_project(sender, instance, **kwargs):
     """Add predictions counters"""
     instance.task.total_predictions = instance.task.total_predictions + 1
 
