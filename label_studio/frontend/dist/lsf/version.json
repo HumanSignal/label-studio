@@ -1,6 +1,6 @@
 {
-  "message": "Preserve timeline visibility on expand/collapse (#528) (#545)",
-  "commit": "bdd0c5766fde6e81acbde35045bff25625f3a235",
+  "message": "fix: DEV-1970: whenLabelValue in required TextArea (#550)",
+  "commit": "ef6bb952b827f2ed466abc048c586861a5e718b3",
   "branch": "master",
-  "date": "2022-03-24T09:30:40Z"
+  "date": "2022-03-30T18:25:34Z"
 }
