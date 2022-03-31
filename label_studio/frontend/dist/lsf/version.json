@@ -1,6 +1,6 @@
 {
-  "message": "Fix buttons sync issue",
-  "commit": "f689b8b119cad0413e95d0682eacc1376065f830",
+  "message": "Merge branch 'master' into fix/video-improvements",
+  "commit": "8b20f79cf55b695968b7701d128bdf27a6ebc407",
   "branch": "fix/video-improvements",
-  "date": "2022-03-30T10:14:48Z"
+  "date": "2022-03-31T10:39:23Z"
 }
