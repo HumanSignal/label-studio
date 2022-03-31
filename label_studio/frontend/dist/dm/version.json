@@ -1,6 +1,6 @@
 {
-  "message": "Preserve selected task on page change",
-  "commit": "20a2eb780816e75a205a5269c5a131ebe6e581a3",
+  "message": "Fix fields button in the QuickView mode",
+  "commit": "1a7653b7911a98553b4e56d116d5c1df24c109fb",
   "branch": "fix/dev-1470/dm-tasks-pagination",
-  "date": "2022-03-30T15:37:20Z"
+  "date": "2022-03-31T08:43:13Z"
 }
