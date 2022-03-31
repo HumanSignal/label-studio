@@ -19,15 +19,19 @@ Export your completed annotations from Label Studio.
 
 > Some export formats export only the annotations and not the data from the task. See the [export formats supported by Label Studio](#Export-formats-supported-by-Label-Studio).
 
-### Export using the UI in Label Studio
+### Export using the UI in Community Edition of Label Studio
 
 You can export data and annotations from the Label Studio UI. 
 
 1. For a project, click **Export**.
 2. Select an available export format.
-3. Click **Export** to export your data. 
+3. Click **Export** to export your data.
 
-If the export times out, see how to [export snapshots using the API](#Export-snapshots-using-the-API).
+#### Notes 
+* Export will always include the annotated tasks, regardless of filters set on the tab. 
+* Cancelled annotated tasks will be included in the exported result too.
+* If you want to apply tab filters to the export, try to use [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-API).
+* If the export times out, see how to [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-API).
 
 ### <i class='ent'></i> Export snapshots using the UI
 
