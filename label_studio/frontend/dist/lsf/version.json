@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2007: Add allowNested attribute",
-  "commit": "d7f127b234b44b4aa74e0b715eb4630b8d434439",
+  "message": "Merge branch 'master' into feat/DEV-2007-DEV-2008/dynamic-tag-children",
+  "commit": "cb9b540916ec60d8ad89f0c4d71784d51975df27",
   "branch": "feat/DEV-2007-DEV-2008/dynamic-tag-children",
-  "date": "2022-03-30T14:59:42Z"
+  "date": "2022-03-31T22:38:03Z"
 }
