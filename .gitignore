@@ -62,3 +62,8 @@ deploy/nginx/certs/*
 mydata/
 deploy/pgsql/certs/*
 !deploy/pgsql/certs/.placeholder
+
+*.swp
+*.swo
+*.swn
+1/*
