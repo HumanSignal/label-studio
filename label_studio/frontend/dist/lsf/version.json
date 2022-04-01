@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into feat/DEV-2007-DEV-2008/dynamic-tag-children",
-  "commit": "cb9b540916ec60d8ad89f0c4d71784d51975df27",
-  "branch": "feat/DEV-2007-DEV-2008/dynamic-tag-children",
-  "date": "2022-03-31T22:38:03Z"
+  "message": "Preserve timeline visibility on expand/collapse (#528) (#545)",
+  "commit": "bdd0c5766fde6e81acbde35045bff25625f3a235",
+  "branch": "master",
+  "date": "2022-03-24T09:30:40Z"
 }
