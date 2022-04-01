@@ -2,7 +2,7 @@
 test_name: test_import_from_localstorage
 strict: false
 marks:
-- skipif: 'platform.system() in ["Windows", "Darwin"]'
+- skipif: '"Windows" in platform.system()'
 - usefixtures:
   - django_live_url
   - local_files_storage
@@ -57,13 +57,13 @@ stages:
     url: '{django_live_url}/api/projects/{project_pk}/next'
   response:
     json:
-      data:
-        image_url: !re_match \/data\/local-files\/\?d=tmp[\/\\]files[\/\\]subdir[\/\\]test_image2.png
+      data: # TODO: test should now pass on Windows
+        image_url: !re_match \/data\/local-files\/\?d=(tmp|var/folders/[A-Za-z0-9]+/[A-Za-z0-9]+/T|C:\\Users\\[A-Za-z]+\\AppData\\Local\\Temp)[\/\\]files[\/\\]subdir[\/\\]test_image2.png
     status_code: 200
 - name: stage
   request:
     method: GET
-    url: '{django_live_url}/data/local-files/?d=tmp/files/subdir/test_image2.png'
+    url: "{django_live_url}/data/local-files/?d={os_independent_path_tmpdir}/files/subdir/test_image2.png"
   response:
     status_code: 200
 - name: stage
@@ -84,14 +84,14 @@ stages:
   response:
     json:
       tasks:
-        - data:
-            image_url: !re_match \/data\/local-files\/\?d=tmp[\/\\]files[\/\\]subdir[\/\\]test_image2.png
+        - data: # TODO: test should now pass on Windows
+            image_url: !re_match \/data\/local-files\/\?d=(tmp|var/folders/[A-Za-z0-9]+/[A-Za-z0-9]+/T|C:\\Users\\[A-Za-z]+\\AppData\\Local\\Temp)[\/\\]files[\/\\]subdir[\/\\]test_image2.png
     status_code: 200
 ---
 test_name: test_local_files_not_enabled
 strict: false
 marks:
-- skipif: 'platform.system() in ["Windows", "Darwin"]'
+- skipif: '"Windows" in platform.system()'
 - usefixtures:
   - django_live_url
 stages:
@@ -109,7 +109,7 @@ stages:
       $ext:
         function: tests.utils:os_independent_path
         extra_kwargs:
-          path: 'tmp/files/subdir/test_image2.png'
+          path: "tmp/files/subdir/test_image2.png"
 - name: stage
   request:
     method: GET
@@ -120,7 +120,7 @@ stages:
 test_name: test_local_files_without_storage_not_available
 strict: false
 marks:
-- skipif: 'platform.system() in ["Windows", "Darwin"]'
+- skipif: '"Windows" in platform.system()'
 - usefixtures:
   - django_live_url
   - local_files_storage
@@ -140,7 +140,7 @@ stages:
       $ext:
         function: tests.utils:os_independent_path
         extra_kwargs:
-          path: 'tmp/files/subdir/test_image2.png'
+          path: "tmp/files/subdir/test_image2.png"
 - name: stage
   request:
     method: GET
@@ -151,7 +151,7 @@ stages:
 test_name: test_local_files_without_import
 strict: false
 marks:
-- skipif: 'platform.system() in ["Windows", "Darwin"]'
+- skipif: '"Windows" in platform.system()'
 - usefixtures:
   - django_live_url
   - local_files_storage
@@ -186,7 +186,7 @@ stages:
 test_name: test_local_files_without_import_document_root
 strict: false
 marks:
-- skipif: 'platform.system() in ["Windows", "Darwin"]'
+- skipif: '"Windows" in platform.system()'
 - usefixtures:
   - django_live_url
   - local_files_storage
@@ -232,7 +232,7 @@ stages:
 test_name: test_import_from_localstorage_document_root
 strict: false
 marks:
-- skipif: 'platform.system() in ["Windows", "Darwin"]'
+- skipif: '"Windows" in platform.system()'
 - usefixtures:
   - django_live_url
   - local_files_storage

@@ -67,3 +67,4 @@ deploy/pgsql/certs/*
 *.swo
 *.swn
 1/*
+*/*/1/*
