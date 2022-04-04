@@ -180,8 +180,8 @@ def paginator_help(objects_name, tag):
                               description=page_size_description)
         ],
         responses={
-            200: openapi.Response(title='OK', description=''),
-            404: openapi.Response(title='', description=f'No more {objects_name} found')
+            200: openapi.Response(title='OK', description='')
+            # 404: openapi.Response(title='', description=f'No more {objects_name} found')
         })
 
 
