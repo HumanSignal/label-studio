@@ -145,7 +145,12 @@ pip install label-studio
 ```bash
 pip install -r deploy/requirements-test.txt
 cd label_studio
+
+# postgres (assumes default postgres user,db,pass)
 DJANGO_DB=default DJANGO_SETTINGS_MODULE=core.settings.label_studio python -m pytest -vv -n auto
+
+# sqlite3
+DJANGO_DB=sqlite DJANGO_SETTINGS_MODULE=core.settings.label_studio python -m pytest -vv -n auto
 ```
 
 

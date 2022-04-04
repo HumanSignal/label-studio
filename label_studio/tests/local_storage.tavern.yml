@@ -63,7 +63,7 @@ stages:
 - name: stage
   request:
     method: GET
-    url: "{django_live_url}/data/local-files/?d={os_independent_path_tmpdir}/files/subdir/test_image2.png"
+    url: '{django_live_url}/data/local-files/?d={os_independent_path_tmpdir}/files/subdir/test_image2.png'
   response:
     status_code: 200
 - name: stage
@@ -109,7 +109,7 @@ stages:
       $ext:
         function: tests.utils:os_independent_path
         extra_kwargs:
-          path: "tmp/files/subdir/test_image2.png"
+          path: 'tmp/files/subdir/test_image2.png'
 - name: stage
   request:
     method: GET
@@ -140,7 +140,7 @@ stages:
       $ext:
         function: tests.utils:os_independent_path
         extra_kwargs:
-          path: "tmp/files/subdir/test_image2.png"
+          path: 'tmp/files/subdir/test_image2.png'
 - name: stage
   request:
     method: GET
