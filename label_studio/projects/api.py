@@ -514,6 +514,6 @@ class ProjectStorageProxy(generics.RetrieveAPIView):
                 resolved_uri = None
 
             if resolved_uri:
-                return Response(headers={'Location': resolved_uri})
+                return Response(status=status.HTTP_302_FOUND, headers={'Location': resolved_uri})
 
         return Response(status=status.HTTP_404_NOT_FOUND)
