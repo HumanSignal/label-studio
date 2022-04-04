@@ -508,7 +508,7 @@ class ProjectStorageProxy(generics.RetrieveAPIView):
 
         if storage:
             try:
-                resolved_uri = storage.resolve_uri(task_data[field])
+                resolved_uri = storage.resolve_uri(raw_url)
             except Exception as exc:
                 logger.error(exc, exc_info=True)
                 resolved_uri = None

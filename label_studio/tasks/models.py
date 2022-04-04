@@ -202,7 +202,7 @@ class Task(TaskMixin, models.Model):
                 storage = self.storage or self._get_storage_by_url(task_data[field], storage_objects)
                 if storage:
                     proxy_url = reverse('project-storage-proxy', kwargs={'pk': project.pk})
-                    task_data[field] = proxy_url + '?url=' + quote(task_data[field])
+                    task_data[field] = urljoin(settings.HOSTNAME, proxy_url + '?url=' + quote(task_data[field]))
             return task_data
 
     def _get_storage_by_url(self, url, storage_objects):
