@@ -27,7 +27,6 @@ from data_manager.models import View, PrepareParams
 from data_manager.managers import get_fields_for_evaluation
 from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer, ViewResetSerializer
 from data_manager.actions import get_all_actions, perform_action
-from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
@@ -206,18 +205,13 @@ class TaskListAPI(generics.ListCreateAPIView):
             return Response({'detail': 'Neither project nor view id specified'}, status=404)
         # get prepare params (from view or from payload directly)
         prepare_params = get_prepare_params(request, project)
-        cache_key = "-".join([str(request.user), str(view_pk), str(prepare_params)])
         queryset = self.get_task_queryset(request, prepare_params)
         context = self.get_task_serializer_context(self.request, project)
 
-        # get counters from cache
-        if not cache.get(cache_key):
-            total_predictions = Prediction.objects.filter(task_id__in=queryset).count()
-            total_annotations = Annotation.objects.filter(task_id__in=queryset, was_cancelled=False).count()
-            total_tasks = queryset.count()
-            cache.add(cache_key, (total_tasks, total_annotations, total_predictions), timeout=3600, version=None)
-        else:
-            total_tasks, total_annotations, total_predictions = cache.get(cache_key)
+        # get counters
+        total_predictions = Prediction.objects.filter(task_id__in=queryset).count()
+        total_annotations = Annotation.objects.filter(task_id__in=queryset, was_cancelled=False).count()
+        total_tasks = queryset.count()
 
         # paginated tasks
         if page_number:
