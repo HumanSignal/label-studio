@@ -23,7 +23,7 @@ import re
 
 from django.db import models, transaction
 from django.utils.module_loading import import_string
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from django.conf import settings
@@ -148,16 +148,20 @@ def paginator(objects, request, default_page=1, default_size=50):
 
     if 'start' in request.GET:
         page = int_from_request(request.GET, 'start', default_page)
-        page = page / int(page_size) + 1
+        if page and int(page) > int(page_size):
+            page = int(page / int(page_size)) + 1
+        else:
+            page += 1
     else:
         page = int_from_request(request.GET, 'page', default_page)
 
     if page_size == '-1':
         return objects
-    else:
-        paginator = Paginator(objects, page_size)
-        return paginator.page(page).object_list
 
+    try:
+        return Paginator(objects, page_size).page(page).object_list
+    except EmptyPage:
+        return []
 
 def paginator_help(objects_name, tag):
     """ API help for paginator, use it with swagger_auto_schema
