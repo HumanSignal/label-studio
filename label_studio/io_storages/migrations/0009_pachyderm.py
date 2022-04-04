@@ -18,9 +18,9 @@ class Migration(migrations.Migration):
                 ('repository', models.TextField(blank=True, help_text='Repository', null=True, verbose_name='repository')),
                 ('regex_filter', models.TextField(blank=True, help_text='Regex for filtering objects', null=True,
                                                   verbose_name='regex_filter')),
-                # ('use_blob_urls',
-                #  models.BooleanField(default=False, help_text='Interpret objects as BLOBs and generate URLs',
-                #                      verbose_name='use_blob_urls')),
+                ('use_blob_urls',
+                 models.BooleanField(default=False, help_text='Interpret objects as BLOBs and generate URLs',
+                                     verbose_name='use_blob_urls')),
             ],
         ),
         migrations.CreateModel(
