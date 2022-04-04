@@ -201,13 +201,8 @@ class Task(TaskMixin, models.Model):
                 # project storage
                 storage = self.storage or self._get_storage_by_url(task_data[field], storage_objects)
                 if storage:
-                    try:
-                        resolved_uri = storage.resolve_uri(task_data[field])
-                    except Exception as exc:
-                        logger.error(exc, exc_info=True)
-                        resolved_uri = None
-                    if resolved_uri:
-                        task_data[field] = resolved_uri
+                    proxy_url = reverse('project-storage-proxy', kwargs={'pk': project.pk})
+                    task_data[field] = proxy_url + '?url=' + quote(task_data[field])
             return task_data
 
     def _get_storage_by_url(self, url, storage_objects):

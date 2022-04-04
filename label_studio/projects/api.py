@@ -18,7 +18,7 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import exception_handler
 
-from core.utils.common import temporary_disconnect_all_signals
+from core.utils.common import find_first_one_to_one_related_field_by_prefix, temporary_disconnect_all_signals
 from core.label_config import config_essential_data_has_changed
 from projects.models import (
     Project, ProjectSummary, ProjectManager
@@ -469,3 +469,51 @@ class ProjectModelVersions(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         project = self.get_object()
         return Response(data=project.get_model_versions(with_counters=True))
+
+class ProjectStorageProxy(generics.RetrieveAPIView):
+    parser_classes = (JSONParser,)
+    swagger_schema = None
+    permission_required = all_permissions.projects_view
+    queryset = Project.objects.all()
+
+    @property
+    def storage(self):
+        # maybe project has storage link
+        storage_link = find_first_one_to_one_related_field_by_prefix(self, '.*io_storages_')
+        if storage_link:
+            return storage_link.storage
+
+        # or try global storage settings (only s3 for now)
+        elif get_env('USE_DEFAULT_S3_STORAGE', default=False, is_bool=True):
+            # TODO: this is used to access global environment storage settings.
+            # We may use more than one and non-default S3 storage (like GCS, Azure)
+            from io_storages.s3.models import S3ImportStorage
+            return S3ImportStorage()
+
+    def _get_storage_by_url(self, url, storage_objects):
+        """Find the first compatible storage and returns pre-signed URL"""
+        from io_storages.models import get_storage_classes
+
+        for storage_object in storage_objects:
+            # check url is string because task can have int, float, dict, list
+            # and 'can_resolve_url' will fail
+            if isinstance(url, str) and storage_object.can_resolve_url(url):
+                return storage_object
+
+    def get(self, request, *args, **kwargs):
+        project = self.get_object()
+        raw_url = self.request.data.get('url')
+        storage_objects = project.get_all_storage_objects(type_='import')
+        storage = self.storage or self._get_storage_by_url(raw_url, storage_objects)
+
+        if storage:
+            try:
+                resolved_uri = storage.resolve_uri(task_data[field])
+            except Exception as exc:
+                logger.error(exc, exc_info=True)
+                resolved_uri = None
+
+            if resolved_uri:
+                return Response(headers={'Location': resolved_uri})
+
+        return Response(status=status.HTTP_404_NOT_FOUND)
