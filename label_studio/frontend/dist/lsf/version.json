@@ -1,6 +1,6 @@
 {
-  "message": "Preserve timeline visibility on expand/collapse (#528) (#545)",
-  "commit": "bdd0c5766fde6e81acbde35045bff25625f3a235",
+  "message": "add defaultscale to audio config params (#556)\n\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
+  "commit": "85365b0ee3c48475c445ba820deb65d6424481e2",
   "branch": "master",
-  "date": "2022-03-24T09:30:40Z"
+  "date": "2022-04-05T11:58:12Z"
 }
