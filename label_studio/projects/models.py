@@ -757,7 +757,7 @@ class Project(ProjectMixin, models.Model):
             total_annotations = task.annotations.all().count()
             cancelled_annotations = task.annotations.all().filter(was_cancelled=True).count()
             task.total_annotations = total_annotations - cancelled_annotations
-            task.total_cancelled_annotations = cancelled_annotations
+            task.total_canceled_annotations = cancelled_annotations
             task.total_predictions = task.predictions.all().count()
             task.save()
 
