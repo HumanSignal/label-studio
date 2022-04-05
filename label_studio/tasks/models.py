@@ -586,7 +586,7 @@ def update_project_summary_annotations_and_is_labeled(sender, instance, created,
             instance.task.total_canceled_annotations = instance.task.total_canceled_annotations + 1
         else:
             instance.task.total_annotations = instance.task.total_annotations + 1
-        instance.task.save(update_fields=['is_labeled'])
+        instance.task.save(update_fields=['is_labeled', 'total_annotations', 'total_canceled_annotations'])
 
 
 @receiver(pre_delete, sender=Annotation)
@@ -597,18 +597,20 @@ def remove_project_summary_annotations(sender, instance, **kwargs):
         instance.task.total_canceled_annotations = instance.task.total_canceled_annotations - 1
     else:
         instance.task.total_annotations = instance.task.total_annotations - 1
+    instance.task.save(update_fields=['total_annotations', 'total_canceled_annotations'])
 
 
 @receiver(pre_delete, sender=Prediction)
 def remove_predictions_from_project(sender, instance, **kwargs):
     """Remove predictions counters"""
     instance.task.total_predictions = instance.task.total_predictions - 1
-
+    instance.task.save(update_fields=['total_predictions'])
 
 @receiver(post_save, sender=Prediction)
 def save_predictions_to_project(sender, instance, **kwargs):
     """Add predictions counters"""
     instance.task.total_predictions = instance.task.total_predictions + 1
+    instance.task.save(update_fields=['total_predictions'])
 
 
 # =========== END OF PROJECT SUMMARY UPDATES ===========
