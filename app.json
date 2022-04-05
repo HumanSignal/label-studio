@@ -37,7 +37,7 @@
   "hooks": {
     "prebuild": {
       "commands": [
-        "DOCKER_BUILDKIT=1 docker build -t $IMAGE_URL label-studio/"
+        "DOCKER_BUILDKIT=1 docker build -t $IMAGE_URL $APP_DIR/"
       ]
     }
   }
