@@ -2,7 +2,7 @@
 test_name: test_import_from_localstorage
 strict: false
 marks:
-- skipif: '"Windows" in platform.system()'
+  #- skipif: '"Windows" in platform.system()'
 - usefixtures:
   - django_live_url
   - local_files_storage
