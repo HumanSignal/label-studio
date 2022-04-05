@@ -42,7 +42,6 @@ stages:
       status_code: 200
       headers:
         content-type: application/json
-        content-length: "248"
 
   - name: get list of tasks paging
     request:
@@ -70,7 +69,6 @@ stages:
       status_code: 200
       headers:
         content-type: application/json
-        content-length: "248"
 
   - name: get list all tasks paging
     request:
@@ -98,7 +96,6 @@ stages:
       status_code: 200
       headers:
         content-type: application/json
-        content-length: "248"
 
   - name: get empty list of tasks
     request:
