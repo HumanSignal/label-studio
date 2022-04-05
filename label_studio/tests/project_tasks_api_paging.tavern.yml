@@ -2,7 +2,7 @@
 test_name: project_tasks_api_paging_test
 strict: false
 marks:
-  #- skipif: '"Windows" in platform.system()'
+- skipif: '"Windows" in platform.system()'
 - usefixtures:
   - django_live_url
 stages:
