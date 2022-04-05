@@ -37,8 +37,7 @@
   "hooks": {
     "prebuild": {
       "commands": [
-        "pwd",
-        "DOCKER_BUILDKIT=1 docker build -t $IMAGE_URL $APP_DIR/"
+        "DOCKER_BUILDKIT=1 docker build -t $IMAGE_URL ."
       ]
     }
   }
