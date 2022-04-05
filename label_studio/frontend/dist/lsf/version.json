@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into feat/dev-2033/timestamp-tooltip-on-timeline",
-  "commit": "450bed636d4f836b8ca859d06f6aac44e0eb7864",
-  "branch": "feat/dev-2033/timestamp-tooltip-on-timeline",
-  "date": "2022-04-05T08:30:46Z"
+  "message": "overlay timeline on top of waveform for full height timestamp tooltip (#555)\n\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
+  "commit": "71673f8c5d625a4c4eb4b4aaa74bbbac612a4545",
+  "branch": "master",
+  "date": "2022-04-05T08:45:05Z"
 }
