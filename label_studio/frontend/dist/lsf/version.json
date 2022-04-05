@@ -1,6 +1,6 @@
 {
-  "message": "overlay timeline on top of waveform for full height timestamp tooltip (#555)\n\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
-  "commit": "71673f8c5d625a4c4eb4b4aaa74bbbac612a4545",
-  "branch": "master",
-  "date": "2022-04-05T08:45:05Z"
+  "message": "Merge branch 'master' into feat/dev-2040/add-default-y-scale-parameter",
+  "commit": "3ddcf6df117c2bdc38631ed6df72e72a1192ff23",
+  "branch": "feat/dev-2040/add-default-y-scale-parameter",
+  "date": "2022-04-04T11:32:09Z"
 }
