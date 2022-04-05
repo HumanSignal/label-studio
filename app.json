@@ -32,12 +32,12 @@
     }
   },
   "build": {
-    "skip": false
+    "skip": true
   },
   "hooks": {
     "prebuild": {
       "commands": [
-        "DOCKER_BUILDKIT=1 docker build -t $IMAGE_URL label-studio"
+        "DOCKER_BUILDKIT=1 docker build -t $IMAGE_URL label-studio/"
       ]
     }
   }
