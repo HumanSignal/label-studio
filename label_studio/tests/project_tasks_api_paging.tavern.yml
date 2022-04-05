@@ -23,7 +23,7 @@ stages:
     response:
       json: [
         {
-          "id": 1,
+          "id": !anyint "",
           "data": {
             "text": "Test text"
           }, 
@@ -50,7 +50,7 @@ stages:
     response:
       json: [
         {
-          "id": 1,
+          "id": !anyint "",
           "data": {
             "text": "Test text"
           }, 
@@ -77,7 +77,7 @@ stages:
     response:
       json: [
         {
-          "id": 1,
+          "id": !anyint "",
           "data": {
             "text": "Test text"
           }, 
