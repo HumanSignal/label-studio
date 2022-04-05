@@ -2,7 +2,7 @@
 test_name: test_import_from_localstorage
 strict: false
 marks:
-  #- skipif: '"Windows" in platform.system()'
+- skipif: '"Windows" in platform.system()'
 - usefixtures:
   - django_live_url
   - local_files_storage
@@ -57,8 +57,8 @@ stages:
     url: '{django_live_url}/api/projects/{project_pk}/next'
   response:
     json:
-      data: # TODO: test should now pass on Windows
-        image_url: !re_match \/data\/local-files\/\?d=(tmp|var/folders/[A-Za-z0-9]+/[A-Za-z0-9]+/T|C:\\Users\\[A-Za-z0-9~]+\\AppData\\Local\\Temp)[\/\\]files[\/\\]subdir[\/\\]test_image2.png
+      data:
+        image_url: !re_match \/data\/local-files\/\?d=(tmp|var/folders/[A-Za-z0-9]+/[A-Za-z0-9]+/T)[\/\\]files[\/\\]subdir[\/\\]test_image2.png
     status_code: 200
 - name: stage
   request:
@@ -84,8 +84,8 @@ stages:
   response:
     json:
       tasks:
-        - data: # TODO: test should now pass on Windows
-            image_url: !re_match \/data\/local-files\/\?d=(tmp|var/folders/[A-Za-z0-9]+/[A-Za-z0-9]+/T|C:\\Users\\[A-Za-z0-9~]+\\AppData\\Local\\Temp)[\/\\]files[\/\\]subdir[\/\\]test_image2.png
+        - data:
+            image_url: !re_match \/data\/local-files\/\?d=(tmp|var/folders/[A-Za-z0-9]+/[A-Za-z0-9]+/T)[\/\\]files[\/\\]subdir[\/\\]test_image2.png
     status_code: 200
 ---
 test_name: test_local_files_not_enabled
