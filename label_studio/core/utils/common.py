@@ -146,22 +146,33 @@ def paginator(objects, request, default_page=1, default_size=50):
     if settings.TASK_API_PAGE_SIZE_MAX and (int(page_size) > settings.TASK_API_PAGE_SIZE_MAX or page_size == '-1'):
         page_size = settings.TASK_API_PAGE_SIZE_MAX
 
+    # if 'start' in request.GET:
+    #     page = int_from_request(request.GET, 'start', default_page)
+    #     if page and int(page) > int(page_size):
+    #         page = int(page / int(page_size)) + 1
+    #     else:
+    #         page += 1
+    # else:
+    #     page = int_from_request(request.GET, 'page', default_page)
+
+    # if page_size == '-1':
+    #     return objects
+
+    # try:
+    #     return Paginator(objects, page_size).page(page).object_list
+    # except EmptyPage:
+    #     return []
     if 'start' in request.GET:
         page = int_from_request(request.GET, 'start', default_page)
-        if page and int(page) > int(page_size):
-            page = int(page / int(page_size)) + 1
-        else:
-            page += 1
+        page = page / int(page_size) + 1
     else:
         page = int_from_request(request.GET, 'page', default_page)
 
     if page_size == '-1':
         return objects
-
-    try:
-        return Paginator(objects, page_size).page(page).object_list
-    except EmptyPage:
-        return []
+    else:
+        paginator = Paginator(objects, page_size)
+        return paginator.page(page).object_list
 
 def paginator_help(objects_name, tag):
     """ API help for paginator, use it with swagger_auto_schema

@@ -1,0 +1,122 @@
+---
+test_name: project_tasks_api_paging_test
+strict: false
+marks:
+  - usefixtures:
+    - django_live_url
+
+stages:
+
+  - id: signup
+    type: ref
+
+  - id: create_project
+    type: ref
+
+  - id: create_task
+    type: ref
+
+  - name: get default list of tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects/{project_pk}/tasks'
+    response:
+      json: [
+        {
+          "id": 1,
+          "data": {
+            "text": "Test text"
+          }, 
+          "meta": {}, 
+          "created_at": !anystr "",
+          "updated_at": !anystr "",
+          "is_labeled": False,
+          "overlap": 1,
+          "project": !int "{project_pk}", 
+          "updated_by": null, 
+          "file_upload": null, 
+          "annotations": [],
+          "predictions": []
+        }
+      ]
+      status_code: 200
+      headers:
+        content-type: application/json
+        content-length: "248"
+
+  - name: get list of tasks paging
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects/{project_pk}/tasks?start=0&page_size=1'
+    response:
+      json: [
+        {
+          "id": 1,
+          "data": {
+            "text": "Test text"
+          }, 
+          "meta": {}, 
+          "created_at": !anystr "",
+          "updated_at": !anystr "",
+          "is_labeled": False,
+          "overlap": 1,
+          "project": !int "{project_pk}", 
+          "updated_by": null, 
+          "file_upload": null, 
+          "annotations": [],
+          "predictions": []
+        }
+      ]
+      status_code: 200
+      headers:
+        content-type: application/json
+        content-length: "248"
+
+  - name: get list all tasks paging
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects/{project_pk}/tasks?page_size=-1'
+    response:
+      json: [
+        {
+          "id": 1,
+          "data": {
+            "text": "Test text"
+          }, 
+          "meta": {}, 
+          "created_at": !anystr "",
+          "updated_at": !anystr "",
+          "is_labeled": False,
+          "overlap": 1,
+          "project": !int "{project_pk}", 
+          "updated_by": null, 
+          "file_upload": null, 
+          "annotations": [],
+          "predictions": []
+        }
+      ]
+      status_code: 200
+      headers:
+        content-type: application/json
+        content-length: "248"
+
+  - name: get empty list of tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects/{project_pk}/tasks?start=0&page_size=4'
+    response:
+      status_code: 500
+
+  - name: get empty list of tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects/{project_pk}/tasks?start=1&page_size=0'
+    response:
+      status_code: 500
+
+  - name: get empty list of tasks, invalid params
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects/{project_pk}/tasks?start=240000&page_size=100000000'
+    response:
+      status_code: 500
