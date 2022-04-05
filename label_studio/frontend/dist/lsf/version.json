@@ -1,6 +1,6 @@
 {
-  "message": "add defaultscale to audio config params (#556)\n\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
-  "commit": "85365b0ee3c48475c445ba820deb65d6424481e2",
-  "branch": "master",
-  "date": "2022-04-05T11:58:12Z"
+  "message": "Fix saving readonly results",
+  "commit": "b91228f28f8ffe34215f1a7674bcce311cf802d3",
+  "branch": "fix/dev-2001/export-readonly",
+  "date": "2022-04-05T17:36:58Z"
 }
