@@ -229,6 +229,7 @@ class ImportAPI(generics.CreateAPIView):
             logger.info('Tasks bulk_update finished')
 
             project.summary.update_data_columns(parsed_data)
+            project.update_tasks_counters(tasks)
             # TODO: project.summary.update_created_annotations_and_labels
         else:
             # Do nothing - just output file upload ids for further use
@@ -280,7 +281,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
                 model_version=item.get('model_version', 'undefined')
             ))
         predictions_obj = Prediction.objects.bulk_create(predictions, batch_size=settings.BATCH_SIZE)
-
+        project.update_tasks_counters(Task.objects.filter(id__in=tasks_ids))
         return Response({'created': len(predictions_obj)}, status=status.HTTP_201_CREATED)
 
 
@@ -329,6 +330,7 @@ class ReImportAPI(ImportAPI):
             overlap_cohort_percentage_changed=False,
             tasks_number_changed=True
         )
+        project.update_tasks_counters(tasks)
         logger.info('Tasks bulk_update finished')
 
         project.summary.update_data_columns(tasks)
