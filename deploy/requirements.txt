@@ -58,5 +58,5 @@ redis>=3.5.0
 sentry-sdk>=1.1.0
 launchdarkly-server-sdk==7.3.0
 
-label-studio-converter==0.0.39
+label-studio-converter==0.0.40
 label-studio-tools==0.0.0.dev11
