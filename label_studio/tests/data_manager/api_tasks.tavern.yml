@@ -102,7 +102,7 @@ stages:
         "total": 4,
         "tasks": [
         {
-          "cancelled_annotations": 0,
+          "total_canceled_annotations": 0,
 
           "annotations_results": "",
           "data": {
@@ -144,7 +144,7 @@ stages:
 
         },
         {
-          "cancelled_annotations": 0,
+          "total_canceled_annotations": 0,
 
           "annotations_results": !raw "[{type:choices, value:{choices:[class_A]}, to_name:text, from_name:text_class}]",
           "data": {
@@ -209,7 +209,7 @@ stages:
           "avg_lead_time": 3.0
         },
         {
-          "cancelled_annotations": 0,
+          "total_canceled_annotations": 0,
 
           "annotations_results": !anystr "",
           "data": {
@@ -291,7 +291,7 @@ stages:
           "avg_lead_time": 4.0
         },
         {
-          "cancelled_annotations": 0,
+          "total_canceled_annotations": 0,
 
 
           "annotations_results": !raw "[{type:choices, value:{choices:[class_TESTING]}, to_name:text, from_name:text_class}]",
@@ -443,7 +443,7 @@ stages:
           "total": 4,
           "tasks": [
           {
-            "cancelled_annotations": 0,
+            "total_canceled_annotations": 0,
 
 
             "annotations_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_A]}}]",
@@ -515,7 +515,7 @@ stages:
             "project": !int "{project_pk}"
           },
           {
-            "cancelled_annotations": 0,
+            "total_canceled_annotations": 0,
 
 
             "annotations_results": "",
@@ -561,7 +561,7 @@ stages:
             "project": !int "{project_pk}"
           },
           {
-            "cancelled_annotations": 0,
+            "total_canceled_annotations": 0,
 
 
             "annotations_results": !anystr "",
@@ -656,7 +656,7 @@ stages:
             "project": !int "{project_pk}"
           },
           {
-            "cancelled_annotations": 0,
+            "total_canceled_annotations": 0,
 
 
             "annotations_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_TESTING]}}]",
@@ -795,7 +795,7 @@ stages:
         "total": 3,
         "tasks": [
         {
-          "cancelled_annotations": 0,
+          "total_canceled_annotations": 0,
 
 
           "annotations_results": "",
@@ -841,7 +841,7 @@ stages:
           "project": !int "{project_pk}"
         },
         {
-          "cancelled_annotations": 0,
+          "total_canceled_annotations": 0,
 
 
           "annotations_results": "",
@@ -862,7 +862,7 @@ stages:
           "project": !int "{project_pk}"
         },
         {
-          "cancelled_annotations": 0,
+          "total_canceled_annotations": 0,
 
 
           "annotations_results": "",
@@ -929,7 +929,7 @@ stages:
         "total": 3,
         "tasks": [
         {
-          "cancelled_annotations": 0,
+          "total_canceled_annotations": 0,
 
 
           "data": {
@@ -1000,7 +1000,7 @@ stages:
           "project": !int "{project_pk}"
         },
         {
-          "cancelled_annotations": 0,
+          "total_canceled_annotations": 0,
 
 
           "data": {
@@ -1092,7 +1092,7 @@ stages:
           "project": !int "{project_pk}"
         },
         {
-          "cancelled_annotations": 0,
+          "total_canceled_annotations": 0,
 
 
           "data": {
