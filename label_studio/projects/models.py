@@ -772,12 +772,12 @@ class Project(ProjectMixin, models.Model):
             total_annotations = task.annotations.all().count()
             cancelled_annotations = task.annotations.all().filter(was_cancelled=True).count()
             task.total_annotations = total_annotations - cancelled_annotations
-            task.total_canceled_annotations = cancelled_annotations
+            task.cancelled_annotations = cancelled_annotations
             task.total_predictions = task.predictions.all().count()
             objs.append(task)
 
         with transaction.atomic():
-            bulk_update(objs, update_fields=['total_annotations', 'total_canceled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
+            bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
 
 
 

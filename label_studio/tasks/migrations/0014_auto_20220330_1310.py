@@ -17,8 +17,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='task',
-            name='total_canceled_annotations',
-            field=models.IntegerField(db_index=True, default=0, help_text='Number of total cancelled annotations for the current task', verbose_name='total_canceled_annotations'),
+            name='cancelled_annotations',
+            field=models.IntegerField(db_index=True, default=0, help_text='Number of total cancelled annotations for the current task', verbose_name='cancelled_annotations'),
         ),
         migrations.AddField(
             model_name='task',

@@ -58,7 +58,7 @@ def test_views_tasks_api(business_client, project_id):
     assert response_data["tasks"][0]["data"] == task_data
     assert response_data["tasks"][0]["total_annotations"] == 1
     assert "annotations_results" in response_data["tasks"][0]
-    assert response_data["tasks"][0]["total_canceled_annotations"] == 1
+    assert response_data["tasks"][0]["cancelled_annotations"] == 1
     assert response_data["tasks"][0]["total_predictions"] == 1
     assert "predictions_results" in response_data["tasks"][0]
 

@@ -68,8 +68,8 @@ class Task(TaskMixin, models.Model):
     updates = ['is_labeled']
     total_annotations = models.IntegerField(_('total_annotations'), default=0, db_index=True,
                                   help_text='Number of total annotations for the current task')
-    total_canceled_annotations = models.IntegerField(_('total_canceled_annotations'), default=0, db_index=True,
-                                            help_text='Number of total cancelled annotations for the current task')
+    cancelled_annotations = models.IntegerField(_('cancelled_annotations'), default=0, db_index=True,
+                                                help_text='Number of total cancelled annotations for the current task')
     total_predictions = models.IntegerField(_('total_predictions'), default=0, db_index=True,
                                   help_text='Number of total predictions for the current task')
     objects = TaskManager()  # task manager by default
@@ -583,10 +583,10 @@ def update_project_summary_annotations_and_is_labeled(sender, instance, created,
         logger.debug(f'Update task stats for task={instance.task}')
         instance.task.update_is_labeled()
         if instance.was_cancelled:
-            instance.task.total_canceled_annotations = instance.task.total_canceled_annotations + 1
+            instance.task.cancelled_annotations = instance.task.cancelled_annotations + 1
         else:
             instance.task.total_annotations = instance.task.total_annotations + 1
-        instance.task.save(update_fields=['is_labeled', 'total_annotations', 'total_canceled_annotations'])
+        instance.task.save(update_fields=['is_labeled', 'total_annotations', 'cancelled_annotations'])
 
 
 @receiver(pre_delete, sender=Annotation)
@@ -594,10 +594,10 @@ def remove_project_summary_annotations(sender, instance, **kwargs):
     """Remove annotation counters in project summary followed by deleting an annotation"""
     instance.decrease_project_summary_counters()
     if instance.was_cancelled:
-        instance.task.total_canceled_annotations = instance.task.total_canceled_annotations - 1
+        instance.task.cancelled_annotations = instance.task.cancelled_annotations - 1
     else:
         instance.task.total_annotations = instance.task.total_annotations - 1
-    instance.task.save(update_fields=['total_annotations', 'total_canceled_annotations'])
+    instance.task.save(update_fields=['total_annotations', 'cancelled_annotations'])
 
 
 @receiver(pre_delete, sender=Prediction)
