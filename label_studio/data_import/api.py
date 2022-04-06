@@ -221,15 +221,15 @@ class ImportAPI(generics.CreateAPIView):
             # after bulk create we can bulk update tasks stats with
             # flag_update_stats=True but they are already updated with signal in same transaction
             # so just update tasks_number_changed
-            project.update_tasks_states(
+            project.update_tasks_states_with_counters(
                 maximum_annotations_changed=False,
                 overlap_cohort_percentage_changed=False,
-                tasks_number_changed=True
+                tasks_number_changed=True,
+                tasks_queryset=tasks
             )
             logger.info('Tasks bulk_update finished')
 
             project.summary.update_data_columns(parsed_data)
-            project.update_tasks_counters(tasks)
             # TODO: project.summary.update_created_annotations_and_labels
         else:
             # Do nothing - just output file upload ids for further use
@@ -325,12 +325,12 @@ class ReImportAPI(ImportAPI):
         # after bulk create we can bulk update task stats with
         # flag_update_stats=True but they are already updated with signal in same transaction
         # so just update tasks_number_changed
-        project.update_tasks_states(
+        project.update_tasks_states_with_counters(
             maximum_annotations_changed=False,
             overlap_cohort_percentage_changed=False,
-            tasks_number_changed=True
+            tasks_number_changed=True,
+            tasks_queryset=tasks
         )
-        project.update_tasks_counters(tasks)
         logger.info('Tasks bulk_update finished')
 
         project.summary.update_data_columns(tasks)

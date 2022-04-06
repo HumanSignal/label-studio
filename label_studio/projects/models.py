@@ -370,14 +370,28 @@ class Project(ProjectMixin, models.Model):
             bulk_update_stats_project_tasks(
                 self.tasks.filter(Q(annotations__isnull=False) & Q(annotations__ground_truth=False))
             )
-        if tasks_number_changed:
-            self.update_tasks_counters(self.tasks.filter(Q(annotations__isnull=False)))
 
     def update_tasks_states(
         self, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed
     ):
         start_job_async_or_sync(self._update_tasks_states, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed)
 
+
+    def update_tasks_states_with_counters(
+        self, maximum_annotations_changed, overlap_cohort_percentage_changed,
+            tasks_number_changed, tasks_queryset
+    ):
+        start_job_async_or_sync(self._update_tasks_states_with_counters, maximum_annotations_changed,
+                                overlap_cohort_percentage_changed, tasks_number_changed, tasks_queryset)
+
+
+    def _update_tasks_states_with_counters(
+        self, maximum_annotations_changed, overlap_cohort_percentage_changed,
+            tasks_number_changed, tasks_queryset
+    ):
+        self._update_tasks_states(maximum_annotations_changed, overlap_cohort_percentage_changed,
+            tasks_number_changed)
+        self.update_tasks_counters(tasks_queryset)
 
     def _rearrange_overlap_cohort(self):
         """
@@ -753,13 +767,19 @@ class Project(ProjectMixin, models.Model):
         return storage_objects
 
     def update_tasks_counters(self, queryset):
+        objs = []
         for task in queryset:
             total_annotations = task.annotations.all().count()
             cancelled_annotations = task.annotations.all().filter(was_cancelled=True).count()
             task.total_annotations = total_annotations - cancelled_annotations
             task.total_canceled_annotations = cancelled_annotations
             task.total_predictions = task.predictions.all().count()
-            task.save()
+            objs.append(task)
+
+        with transaction.atomic():
+            bulk_update(objs, update_fields=['total_annotations', 'total_canceled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
+
+
 
     def __str__(self):
         return f'{self.title} (id={self.id})' or _("Business number %d") % self.pk
