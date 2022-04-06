@@ -1,6 +1,6 @@
 {
-  "message": "Fix view all for audio and video",
-  "commit": "ad78da67bd43c8080e0869bb457a3d49ceaddfa1",
-  "branch": "fix/dev-2033/fix-view-all",
-  "date": "2022-03-31T11:37:12Z"
+  "message": "Fix view all for audio and video (#552)",
+  "commit": "54d7b31dbb5539de07128ee89e51e963f5d9fd33",
+  "branch": "master",
+  "date": "2022-04-06T12:12:59Z"
 }
