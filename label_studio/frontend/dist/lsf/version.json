@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into fix/dev-2057/width-is-auto-adjustable",
-  "commit": "a114afe95c7ddd0ff6de7a6dd0fb0da4e375a8a3",
-  "branch": "fix/dev-2057/width-is-auto-adjustable",
-  "date": "2022-03-30T22:29:51Z"
+  "message": "fix: dev-2057: width is auto adjustable  (#551)\n\n* calcualte row width based on the biggest visible taxonomy item\r\n\r\n* resolve max width with elepisis\r\n\r\n* add min and max width to config options\r\n\r\n* mad typo\r\n\r\n* fix min/maxWidth parameters for Taxonomy\r\n\r\n* will scroll if beyond maximum width\r\n\r\n* scroll if too wide\r\n\r\n* fix extra block for long labels\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
+  "commit": "ce5beb31e62d41ddbb7ba8ba72d30ca5fe230a5e",
+  "branch": "master",
+  "date": "2022-04-06T12:38:06Z"
 }
