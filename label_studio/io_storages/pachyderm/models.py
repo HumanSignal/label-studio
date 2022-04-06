@@ -33,6 +33,9 @@ mount_processes: Dict[int, Popen] = {}
 class PachydermMixin(models.Model):
     repository = models.TextField(_('repository'), blank=True, help_text='Local path')
     process: Optional[Popen] = None
+    use_blob_urls = models.BooleanField(
+        _('use_blob_urls'), default=False,
+        help_text='Interpret objects as BLOBs and generate URLs')
 
     @property
     def is_mounted(self) -> bool:
@@ -90,9 +93,9 @@ class PachydermMixin(models.Model):
         super().clean()
 
     def delete(self, *args, **kwargs):
-        super().delete(*args, **kwargs)
         if self.is_mounted:
             self.unmount()
+        super().delete(*args, **kwargs)
 
     def validate_connection(self):
         if not PFS_DIR.is_dir():
@@ -126,8 +129,21 @@ class PachydermImportStorage(PachydermMixin, ImportStorage):
                 yield str(file)
 
     def get_data(self, key):
-        relative_path = str(Path(key).relative_to(PFS_DIR))
-        return {settings.DATA_UNDEFINED_NAME: f'{settings.HOSTNAME}/data/pfs/?d={relative_path}'}
+        if self.use_blob_urls:
+            relative_path = str(Path(key).relative_to(PFS_DIR))
+            return {settings.DATA_UNDEFINED_NAME: f'{settings.HOSTNAME}/data/pfs/?d={relative_path}'}
+
+        try:
+            with Path(key).open(encoding='utf8') as f:
+                value = json.load(f)
+        except (UnicodeDecodeError, json.decoder.JSONDecodeError):
+            raise ValueError(
+                f"Can\'t import JSON-formatted tasks from {key}. If you're trying to import binary objects, "
+                f"perhaps you've forgot to enable \"Treat every bucket object as a source file\" option?")
+
+        if not isinstance(value, dict):
+            raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
+        return value
 
     def scan_and_create_links(self):
         return self._scan_and_create_links(PachydermImportStorageLink)
