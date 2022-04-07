@@ -90,6 +90,17 @@ def get_all_columns(project, *_):
             }
         },
         {
+            'id': 'inner_id',
+            'title': "Inner ID",
+            'type': 'Number',
+            'help': 'Internal task ID starting from zero for the current project',
+            'target': 'tasks',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        },
+        {
             'id': 'completed_at',
             'title': 'Completed',
             'type': 'Datetime',
