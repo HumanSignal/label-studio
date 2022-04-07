@@ -1,6 +1,6 @@
 {
-  "message": "Fix view all for audio and video (#552)",
-  "commit": "54d7b31dbb5539de07128ee89e51e963f5d9fd33",
+  "message": "Fix view all for the new audio UI (#567)",
+  "commit": "6fad489da3df8d10853c9527276c0d4d3b1bcc66",
   "branch": "master",
-  "date": "2022-04-06T12:12:59Z"
+  "date": "2022-04-07T16:52:53Z"
 }
