@@ -1,6 +1,6 @@
 {
-  "message": "Fix view all for the new audio UI",
-  "commit": "85e125d180133078c457396001ebc62c24bb4efd",
-  "branch": "fix/dev-1820/view-all-audio",
-  "date": "2022-04-07T14:13:58Z"
+  "message": "Fix view all for the new audio UI (#567)",
+  "commit": "6fad489da3df8d10853c9527276c0d4d3b1bcc66",
+  "branch": "master",
+  "date": "2022-04-07T16:52:53Z"
 }
