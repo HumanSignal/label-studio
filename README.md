@@ -204,10 +204,9 @@ Want to use **The Coolest Feature X** but Label Studio doesn't support it? Check
   author={
     Maxim Tkachenko and
     Mikhail Malyuk and
-    Nikita Shevchenko and
     Andrey Holmanyuk and
     Nikolai Liubimov},
-  year={2020-2021},
+  year={2020-2022},
 }
 ```
 
