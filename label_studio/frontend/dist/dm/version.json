@@ -1,6 +1,6 @@
 {
-  "message": "Fix: DEV-790: return column button quick-view (#37)\n\n* gear icon\r\n\r\n* detect scroll bar width\r\n\r\n* sticky columns button\r\n\r\n* calc width of scrollbar from ref\r\n\r\n* remove gear when not labeling\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: Sergey <Gondragos@gmail.com>",
-  "commit": "4e6b392ada45e7e7e614e5dec0c1a8e0e771016f",
-  "branch": "master",
-  "date": "2022-03-24T15:46:41Z"
+  "message": "fix: DEV-2098: sum lead_time for different runs (#42)",
+  "commit": "191e8cc7475433f55808fb4d3570fb490faec8e3",
+  "branch": "release/2.2.0",
+  "date": "2022-04-06T09:04:25Z"
 }

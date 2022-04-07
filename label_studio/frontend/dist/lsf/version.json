@@ -1,6 +1,6 @@
 {
-  "message": "Fix view all for audio and video (#552)",
-  "commit": "54d7b31dbb5539de07128ee89e51e963f5d9fd33",
-  "branch": "master",
-  "date": "2022-04-06T12:12:59Z"
+  "message": "fix: DEV-2098: reset loadTime every time (#562)",
+  "commit": "131e15bee6885cb23180f0c012b5ac130b13c70a",
+  "branch": "release/2.2.0",
+  "date": "2022-04-06T09:04:01Z"
 }
