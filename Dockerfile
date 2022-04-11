@@ -52,7 +52,5 @@ RUN python3 label_studio/manage.py collectstatic --no-input
 
 EXPOSE 8080
 
-RUN ls -l
-
 ENTRYPOINT ["./deploy/docker-entrypoint.sh"]
 CMD ["label-studio"]
