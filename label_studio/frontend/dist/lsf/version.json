@@ -1,6 +1,6 @@
 {
-  "message": "Preserve timeline visibility on expand/collapse (#528) (#545)",
-  "commit": "bdd0c5766fde6e81acbde35045bff25625f3a235",
-  "branch": "master",
-  "date": "2022-03-24T09:30:40Z"
+  "message": "check the number of pointes if points",
+  "commit": "0631eb0c4c3fb8c92c0d26e3eee95ae5e418d479",
+  "branch": "fix/dev-2068/toolswitch-finish-drawing",
+  "date": "2022-04-11T18:52:25Z"
 }
