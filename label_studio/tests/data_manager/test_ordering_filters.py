@@ -76,7 +76,7 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
 
     task_ids = [task_id_1, task_id_2]
 
-    response = business_client.get(f"/api/dm/tasks?view={view_id}")
+    response = business_client.get(f"/api/tasks?view={view_id}")
     response_data = response.json()
 
     assert response_data["tasks"][0]["id"] == task_ids[element_index]
@@ -358,7 +358,7 @@ def test_views_filters(filters, ids, business_client, project_id):
         content_type="application/json",
     )
 
-    response = business_client.get(f"/api/dm/tasks/?view={view_id}")
+    response = business_client.get(f"/api/tasks/?view={view_id}")
     response_data = response.json()
 
     assert 'tasks' in response_data, response_data

@@ -206,7 +206,7 @@ class UserWhoAmIAPI(generics.RetrieveAPIView):
     serializer_class = UserSerializer
 
     def get_object(self):
-        return User.objects.get(id=self.request.user.id)
+        return self.request.user
 
     def get(self, request, *args, **kwargs):
         return super(UserWhoAmIAPI, self).get(request, *args, **kwargs)

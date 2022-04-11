@@ -71,7 +71,10 @@ def get_temp_dir():
 
 def get_config_dir():
     config_dir = user_config_dir(appname=_DIR_APP_NAME)
-    os.makedirs(config_dir, exist_ok=True)
+    try:
+        os.makedirs(config_dir, exist_ok=True)
+    except OSError:
+        pass
     return config_dir
 
 

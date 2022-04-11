@@ -131,6 +131,7 @@ class TaskPagination(PageNumberPagination):
     page_size_query_param = "page_size"
     total_annotations = 0
     total_predictions = 0
+    max_page_size = settings.TASK_API_PAGE_SIZE_MAX
 
     def paginate_queryset(self, queryset, request, view=None):
         self.total_predictions = Prediction.objects.filter(task_id__in=queryset).count()
@@ -148,27 +149,9 @@ class TaskPagination(PageNumberPagination):
         )
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
-    tags=['Data Manager'],
-    operation_summary='Get tasks list',
-    operation_description="""
-    Retrieve a list of tasks with pagination for a specific view or project, by using filters and ordering.
-    """,
-    # responses={200: DataManagerTaskSerializer(many=True)},
-    manual_parameters=[
-        openapi.Parameter(
-            name='view',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_QUERY,
-            description='View ID'),
-        openapi.Parameter(
-            name='project',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_QUERY,
-            description='Project ID'),
-    ],
-))
-class TaskListAPI(generics.ListAPIView):
+@method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
+@method_decorator(name='post', decorator=swagger_auto_schema(auto_schema=None))
+class TaskListAPI(generics.ListCreateAPIView):
     task_serializer_class = DataManagerTaskSerializer
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
@@ -193,6 +176,18 @@ class TaskListAPI(generics.ListAPIView):
 
     def get_task_queryset(self, request, prepare_params):
         return Task.prepared.only_filtered(prepare_params=prepare_params)
+
+    @staticmethod
+    def prefetch(queryset):
+        return queryset.prefetch_related(
+            'annotations', 'predictions', 'annotations__completed_by', 'project',
+            'io_storages_azureblobimportstoragelink',
+            'io_storages_gcsimportstoragelink',
+            'io_storages_localfilesimportstoragelink',
+            'io_storages_redisimportstoragelink',
+            'io_storages_s3importstoragelink',
+            'file_upload'
+        )
 
     def get(self, request):
         # get project
@@ -227,10 +222,12 @@ class TaskListAPI(generics.ListAPIView):
         if page is not None:
             ids = [task.id for task in page]  # page is a list already
             tasks = list(
-                Task.prepared.annotate_queryset(
-                    Task.objects.filter(id__in=ids),
-                    fields_for_evaluation=fields_for_evaluation,
-                    all_fields=all_fields,
+                self.prefetch(
+                    Task.prepared.annotate_queryset(
+                        Task.objects.filter(id__in=ids),
+                        fields_for_evaluation=fields_for_evaluation,
+                        all_fields=all_fields,
+                    )
                 )
             )
             tasks_by_ids = {task.id: task for task in tasks}
@@ -254,73 +251,6 @@ class TaskListAPI(generics.ListAPIView):
         )
         serializer = self.task_serializer_class(queryset, many=True, context=context)
         return Response(serializer.data)
-
-
-@method_decorator(name='get', decorator=swagger_auto_schema(
-    tags=['Data Manager'],
-    operation_summary='Get task by ID',
-    operation_description='Retrieve a specific task by ID.',
-    manual_parameters=[
-        openapi.Parameter(
-            name='id',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_PATH,
-            description='Task ID'),
-    ],
-))
-class TaskAPI(generics.RetrieveAPIView):
-    permission_required = all_permissions.projects_view
-
-    def get_serializer_class(self):
-        return DataManagerTaskSerializer
-
-    def get_serializer_context(self, request):
-        review = bool_from_request(self.request.GET, 'review', False)
-        if review:
-            fields = ['drafts', 'annotations']
-        else:
-            fields = ['completed_by_full', 'drafts', 'predictions', 'annotations']
-
-        return {
-            'resolve_uri': True,
-            'completed_by': 'full' if 'completed_by_full' in fields else None,
-            'predictions': 'predictions' in fields,
-            'annotations': 'annotations' in fields,
-            'drafts': 'drafts' in fields,
-            'request': request
-        }
-
-    def get_queryset(self):
-        return Task.objects.filter(
-            project__organization=self.request.user.active_organization
-        )
-
-    def get(self, request, pk):
-        task = self.get_object()
-        context = self.get_serializer_context(request)
-        context['project'] = project = task.project
-
-        review = bool_from_request(self.request.GET, 'review', False)
-        if review:
-            kwargs = {
-                'fields_for_evaluation': ['annotators', 'reviewed']
-            }
-        else:
-            kwargs = {'all_fields': True}
-
-        # we need to annotate task because before it was retrieved only for permission checks and project retrieving
-        task = Task.prepared.get_queryset(
-            prepare_params=PrepareParams(project=project.id), **kwargs
-        ).filter(id=task.id).first()
-
-        # get prediction
-        if (project.evaluate_predictions_automatically or project.show_collab_predictions) \
-                and not task.predictions.exists():
-            evaluate_predictions([task])
-
-        serializer = self.get_serializer_class()(task, many=False, context=context)
-        data = serializer.data
-        return Response(data)
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
@@ -363,7 +293,7 @@ class ProjectStateAPI(APIView):
                 "target_syncing": False,
                 "task_count": project.tasks.count(),
                 "annotation_count": Annotation.objects.filter(task__project=project).count(),
-                'config_has_control_tags': len(project.get_control_tags_from_config()) > 0
+                'config_has_control_tags': len(project.get_parsed_config()) > 0
             }
         )
         return Response(data)

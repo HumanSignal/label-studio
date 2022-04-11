@@ -2,12 +2,14 @@
 title: Troubleshoot Label Studio
 short: Troubleshooting
 type: guide
-order: 204
+order: 210
 meta_title: Troubleshoot Label Studio
 meta_description: Troubleshoot common issues with Label Studio configuration and performance so that you can return to your machine learning and data science projects.
 ---
 
 If you encounter an issue using Label Studio, use this page to troubleshoot it. 
+- If you need to troubleshoot a machine learning backend, see [Troubleshoot machine learning](ml_troubleshooting.html). 
+- If you need to troubleshoot a cloud or external storage connection, see [Troubleshoot CORS and access problems](storage.html#Troubleshoot-CORS-and-access-problems). 
 
 ## Blank page when loading a project
 

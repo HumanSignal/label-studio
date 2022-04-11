@@ -30,7 +30,7 @@ You can import many types of data, including text, timeseries, audio, and image 
 | [Time series](#Import-CSV-or-TSV-data) | .csv, .tsv, .json |
 | [Tasks with multiple data types](#Basic-Label-Studio-JSON-format) | .csv, .tsv, .json |
 
-If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=docs-gdi). 
+If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](https://slack.labelstudio.heartex.com/?source=docs-gdi). 
 
 ### How to import your data
 
@@ -350,7 +350,7 @@ Data that you import is project-specific.
 
 ## Import data using the API
 
-Import your data using the Label Studio API. See the [API documentation for importing tasks](/api#operation/projects_import_create).
+Import your data using the Label Studio API. See the [API documentation for importing tasks](/api#operation/api_projects_import_create).
 
 ### Import data from the command line
 

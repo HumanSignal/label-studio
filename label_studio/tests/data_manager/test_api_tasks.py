@@ -21,7 +21,7 @@ def test_views_tasks_api(business_client, project_id):
     view_id = response.json()["id"]
 
     # no tasks
-    response = business_client.get(f"/api/dm/tasks?fields=all&view={view_id}")
+    response = business_client.get(f"/api/tasks?fields=all&view={view_id}")
 
     assert response.status_code == 200, response.content
     assert response.json()["total"] == 0
@@ -48,7 +48,7 @@ def test_views_tasks_api(business_client, project_id):
         task_id,
     )
 
-    response = business_client.get(f"/api/dm/tasks?fields=all&view={view_id}")
+    response = business_client.get(f"/api/tasks?fields=all&view={view_id}")
 
     assert response.status_code == 200, response.content
     response_data = response.json()
@@ -95,7 +95,7 @@ def test_views_total_counters(tasks_count, annotations_count, predictions_count,
         for _ in range(0, predictions_count):
             make_prediction({"result": []}, task_id)
 
-    response = business_client.get(f"/api/dm/tasks?fields=all&view={view_id}")
+    response = business_client.get(f"/api/tasks?fields=all&view={view_id}")
 
     response_data = response.json()
 

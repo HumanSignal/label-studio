@@ -16,6 +16,11 @@ import { useAPI } from '../../../providers/ApiProvider';
 
 // don't do this, kids
 const formatXML = (xml) => {
+  // don't use formatting if the config has new lines
+  if (xml.indexOf("\n") >= 0) {
+    return xml;
+  }
+
   let depth = 0;
   try {
     return xml.replace(/<(\/)?.*?(\/)?>[\s\n]*/g, (tag, close1, close2) => {
@@ -120,8 +125,8 @@ const ConfigureSettings = ({ template }) => {
   const items = keys.map(key => {
     const options = settings[key];
     const type = Array.isArray(options.type) ? Array : options.type;
-    const $object = template.objects[0];
-    const $tag = options.control ? $object.$controls[0] : $object;
+    const $object = options.object;
+    const $tag = options.control ? options.control : $object;
     if (!$tag) return null;
     if (options.when && !options.when($tag)) return;
     let value = false;
@@ -163,7 +168,7 @@ const ConfigureSettings = ({ template }) => {
         size = options.type === Number ? 5 : undefined;
         onChange = e => {
           if (typeof options.param === "function") {
-            options.param($object, e.target.value);
+            options.param($tag, e.target.value);
           } else {
             $object.setAttribute(options.param, e.target.value);
           }

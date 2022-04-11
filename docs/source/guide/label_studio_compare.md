@@ -107,12 +107,6 @@ Label Studio is available as a Community Edition open source data labeling tool 
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td>Synchronize data from and to remote data storage.</td>
-    <td style="text-align:center">✔️</td>
-    <td style="text-align:center">✔️</td>
-    <td style="text-align:center">✔️</td>
-  </tr>
-  <tr>
     <td>Annotator-specific view.</td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">❌</td>
@@ -161,7 +155,7 @@ Label Studio is available as a Community Edition open source data labeling tool 
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td>Accelerate labeling with active learning.</td>
+    <td><a href="active_learning.html">Accelerate labeling with active learning.</a></td>
     <td style="text-align:center">✔️</td>
     <td style="text-align:center">✔️</td>
     <td style="text-align:center">✔️</td>
@@ -176,7 +170,7 @@ Label Studio is available as a Community Edition open source data labeling tool 
     <td colspan="3"><b>Analytics and Reporting</b></td>
   </tr>
   <tr>
-    <td>Reporting and analytics on labeling and annotation activity.</td>
+    <td><a href="quality.html#Verify-model-and-annotator-performance">Reporting and analytics on labeling and annotation activity.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
     <td style="text-align:center">✔️</td>
@@ -197,8 +191,8 @@ Label Studio is available as a Community Edition open source data labeling tool 
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td>On-premises hosting of Label Studio.</td>
-    <td style="text-align:center">❌</td>
+    <td>On-premises deployment of Label Studio.</td>
+    <td style="text-align:center">✔️</td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
@@ -209,4 +203,3 @@ Label Studio is available as a Community Edition open source data labeling tool 
     <td style="text-align:center">✔️</td>
   </tr>
 </table>
-

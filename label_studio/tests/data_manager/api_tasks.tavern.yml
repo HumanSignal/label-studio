@@ -36,7 +36,7 @@ stages:
       url: '{django_live_url}/api/projects/{project_pk}/import'
     response:
       json:
-        annotation_count: 3
+        annotation_count: 4
         prediction_count: 3
         task_count: 6
       status_code: 201
@@ -91,13 +91,13 @@ stages:
   - name: get_tasks
     request:
       method: GET
-      url: '{django_live_url}/api/dm/tasks?fields=all&view={view.id}'
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
     response:
       status_code: 200
       verify_response_with:
         function: label_studio.tests.utils:save_response
       json: {
-        "total_annotations": 3,
+        "total_annotations": 4,
         "total_predictions": 3,
         "total": 4,
         "tasks": [
@@ -139,8 +139,8 @@ stages:
           }
           ],
           "drafts": [],
-
-          "annotators": []
+          "annotators": [],
+          "avg_lead_time": null
 
         },
         {
@@ -177,7 +177,7 @@ stages:
             ],
             "was_cancelled": false,
             "ground_truth": true,
-            "lead_time": null
+            "lead_time": 3.0
           }
           ],
           "predictions": [
@@ -206,19 +206,19 @@ stages:
           "annotators": [
             !int "{created_by}"
           ],
-
+          "avg_lead_time": 3.0
         },
         {
           "cancelled_annotations": 0,
 
-          "annotations_results": !raw "[{type:choices, value:{choices:[class_A]}, to_name:text, from_name:text_class}]",
+          "annotations_results": !anystr "",
           "data": {
             "text": "x2",
             "int_field": 20
           },
-          "predictions_results": !raw "[{type:choices, value:{choices:[class_A]}, to_name:text, from_name:text_class}]",
+          "predictions_results": !anystr "",
           "predictions_score": null,
-          "total_annotations": 1,
+          "total_annotations": 2,
           "total_predictions": 1,
           "annotations_ids": !anystr "",
           "annotations": [
@@ -239,7 +239,26 @@ stages:
             ],
             "was_cancelled": false,
             "ground_truth": true,
-            "lead_time": null
+            "lead_time": 3.0
+          },
+          {
+            "created_username": " test_suites_user@heartex.com, {created_by}",
+            "created_ago": "0\u00a0minutes",
+            "result": [
+            {
+              "type": "choices",
+              "value": {
+                "choices": [
+                  "class_A"
+                ]
+              },
+              "to_name": "text",
+              "from_name": "text_class"
+            }
+            ],
+            "was_cancelled": false,
+            "ground_truth": true,
+            "lead_time": 5.0
           }
           ],
           "predictions": [
@@ -268,7 +287,8 @@ stages:
           "drafts": [],
           "annotators": [
             !int "{created_by}"
-          ]
+          ],
+          "avg_lead_time": 4.0
         },
         {
           "cancelled_annotations": 0,
@@ -356,7 +376,7 @@ stages:
       url: '{django_live_url}/api/projects/{project_pk}/import'
     response:
       json:
-        annotation_count: 3
+        annotation_count: 4
         prediction_count: 3
         task_count: 6
       status_code: 201
@@ -411,14 +431,14 @@ stages:
   - name: get_tasks
     request:
       method: GET
-      url: '{django_live_url}/api/dm/tasks?fields=all&view={view.id}'
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
     response:
       status_code: 200
       # verify_response_with:
       #  function: label_studio.tests.utils:save_response
       json:
         {
-          "total_annotations": 3,
+          "total_annotations": 4,
           "total_predictions": 3,
           "total": 4,
           "tasks": [
@@ -458,7 +478,7 @@ stages:
               "was_cancelled": false,
               "ground_truth": true,
 
-              "lead_time": null,
+              "lead_time": 3.0
               
             }
             ],
@@ -544,15 +564,15 @@ stages:
             "cancelled_annotations": 0,
 
 
-            "annotations_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_A]}}]",
+            "annotations_results": !anystr "",
             "data": {
               "int_field": 20,
               "text": "x2"
             },
             
-            "predictions_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_A]}}]",
+            "predictions_results": !anystr "",
             "predictions_score": null,
-            "total_annotations": 1,
+            "total_annotations": 2,
             "total_predictions": 1,
             "annotations_ids": !anystr "",
             "annotations": [
@@ -576,8 +596,31 @@ stages:
               "was_cancelled": false,
               "ground_truth": true,
 
-              "lead_time": null,
+              "lead_time": 3.0
               
+            },
+            {
+
+              "created_username": " test_suites_user@heartex.com, {created_by}",
+              "created_ago": "0\u00a0minutes",
+              "completed_by": !int "{created_by}",
+              "result": [
+              {
+                "from_name": "text_class",
+                "to_name": "text",
+                "type": "choices",
+                "value": {
+                  "choices": [
+                    "class_A"
+                  ]
+                }
+              }
+              ],
+              "was_cancelled": false,
+              "ground_truth": true,
+
+              "lead_time": 5.0
+
             }
             ],
             "predictions": [
@@ -648,7 +691,7 @@ stages:
               "was_cancelled": false,
               "ground_truth": true,
 
-              "lead_time": null,
+              "lead_time": null
               
             }
             ],
@@ -704,7 +747,7 @@ stages:
       url: '{django_live_url}/api/projects/{project_pk}/import'
     response:
       json:
-        annotation_count: 3
+        annotation_count: 4
         prediction_count: 3
         task_count: 6
       status_code: 201
@@ -741,7 +784,7 @@ stages:
   - name: get_tasks
     request:
       method: GET
-      url: '{django_live_url}/api/dm/tasks?fields=all&view={view.id}'
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
     response:
       status_code: 200
       verify_response_with:
@@ -875,13 +918,13 @@ stages:
   - name: get_tasks
     request:
       method: GET
-      url: '{django_live_url}/api/dm/tasks?fields=all&view={view.id}'
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
     response:
       status_code: 200
       verify_response_with:
         function: label_studio.tests.utils:save_response
       json: {
-        "total_annotations": 3,
+        "total_annotations": 4,
         "total_predictions": 2,
         "total": 3,
         "tasks": [
@@ -920,7 +963,7 @@ stages:
             "was_cancelled": false,
             "ground_truth": true,
 
-            "lead_time": null,
+            "lead_time": 3.0
             
           }
           ],
@@ -967,7 +1010,7 @@ stages:
           
 
           "predictions_score": null,
-          "total_annotations": 1,
+          "total_annotations": 2,
           "total_predictions": 1,
           "annotations_ids": !anystr "",
           "annotations": [
@@ -991,8 +1034,31 @@ stages:
             "was_cancelled": false,
             "ground_truth": true,
 
-            "lead_time": null,
+            "lead_time": 3.0
             
+          },
+          {
+
+            "created_username": " test_suites_user@heartex.com, {created_by}",
+            "created_ago": "0\u00a0minutes",
+            "completed_by": !int "{created_by}",
+            "result": [
+            {
+              "from_name": "text_class",
+              "to_name": "text",
+              "type": "choices",
+              "value": {
+                "choices": [
+                  "class_A"
+                ]
+              }
+            }
+            ],
+            "was_cancelled": false,
+            "ground_truth": true,
+
+            "lead_time": 5.0
+
           }
           ],
           "predictions": [
@@ -1060,7 +1126,7 @@ stages:
             "was_cancelled": false,
             "ground_truth": true,
 
-            "lead_time": null,
+            "lead_time": null
             
           }
           ],
@@ -1117,7 +1183,7 @@ stages:
       url: '{django_live_url}/api/projects/{project_pk}/import'
     response:
       json:
-        annotation_count: 3
+        annotation_count: 4
         prediction_count: 3
         task_count: 6
       status_code: 201
@@ -1154,13 +1220,13 @@ stages:
   - name: get_tasks
     request:
       method: GET
-      url: '{django_live_url}/api/dm/tasks?view={view.id}'
+      url: '{django_live_url}/api/tasks?view={view.id}'
     response:
       status_code: 200
       verify_response_with:
         function: label_studio.tests.utils:save_response
       json: {
-        "total_annotations": 3,
+        "total_annotations": 4,
         "total_predictions": 2,
         "total": 3,
         "tasks": [
@@ -1191,7 +1257,7 @@ stages:
           },
 
           "predictions_results": "",
-          "total_annotations": 1,
+          "total_annotations": 2,
           "annotations_ids": !anystr "",
           "drafts": [],
           "file_upload": null,
@@ -1259,7 +1325,7 @@ stages:
   - name: get_tasks
     request:
       method: GET
-      url: '{django_live_url}/api/dm/tasks?view={view.id}'
+      url: '{django_live_url}/api/tasks?view={view.id}'
     response:
       status_code: 200
       verify_response_with:
