@@ -2,6 +2,8 @@
 FROM node:14 AS frontend-builder
 
 ENV NPM_CACHE_LOCATION=/root/.npm
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 WORKDIR /label-studio/label_studio/frontend
 
@@ -29,7 +31,7 @@ RUN set -eux \
  && apt-get update \
  && apt-get install --no-install-recommends --no-install-suggests -y \
     build-essential postgresql-client libmysqlclient-dev mysql-client python3.8 python3-pip python3.8-dev \
-    uwsgi git libxml2-dev libxslt-dev zlib1g-dev
+    uwsgi git libxml2-dev libxslt-dev zlib1g-dev chromium-browser
 
 # Copy and install middleware dependencies
 COPY deploy/requirements-mw.txt .
