@@ -295,10 +295,9 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             max_overlap = self.project.maximum_annotations
             # identify max inner id
             tasks = Task.objects.filter(project=self.project)
-            max_inner_id = 0
+            max_inner_id = 1
             if tasks:
                 max_inner_id = tasks.order_by("-inner_id")[0].inner_id
-            max_inner_id += 1
             for i, task in enumerate(validated_tasks):
                 t = Task(project=self.project, data=task['data'], meta=task.get('meta', {}),
                          overlap=max_overlap, is_labeled=len(task_annotations[i]) >= max_overlap,
