@@ -65,7 +65,7 @@ class Task(TaskMixin, models.Model):
         'data_import.FileUpload', on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks',
         help_text='Uploaded file used as data source for this task'
     )
-    inner_id = models.BigIntegerField(_('inner id'), default=0, db_index=True,
+    inner_id = models.BigIntegerField(_('inner id'), default=0, db_index=True, null=True,
                                       help_text='Internal task ID in the project, starts with 1')
     updates = ['is_labeled']
 
