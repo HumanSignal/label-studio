@@ -260,6 +260,15 @@ class Task(TaskMixin, models.Model):
     def ensure_unique_groundtruth(self, annotation_id):
         self.annotations.exclude(id=annotation_id).update(ground_truth=False)
 
+    def save(self, *args, **kwargs):
+        if self.inner_id == 0:
+            tasks = Task.objects.filter(project=self.project)
+            max_inner_id = 0
+            if tasks:
+                max_inner_id = tasks.order_by("-inner_id")[0].inner_id
+            self.inner_id = max_inner_id + 1
+        super().save(*args, **kwargs)
+
 
 pre_bulk_create = Signal(providing_args=["objs", "batch_size"])
 post_bulk_create = Signal(providing_args=["objs", "batch_size"])

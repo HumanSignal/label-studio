@@ -293,12 +293,18 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
             # add tasks first
             max_overlap = self.project.maximum_annotations
+            # identify max inner id
+            tasks = Task.objects.filter(project=self.project)
+            max_inner_id = 0
+            if tasks:
+                max_inner_id = tasks.order_by("-inner_id")[0].inner_id
+            max_inner_id += 1
             for i, task in enumerate(validated_tasks):
                 t = Task(project=self.project, data=task['data'], meta=task.get('meta', {}),
                          overlap=max_overlap, is_labeled=len(task_annotations[i]) >= max_overlap,
-                         file_upload_id=task.get('file_upload_id'))
+                         file_upload_id=task.get('file_upload_id'), inner_id=max_inner_id)
                 db_tasks.append(t)
-
+                max_inner_id += 1
                 # deprecated meta warning
                 if 'meta' in task:
                     logger.warning('You task data has field "meta" which is deprecated and it will be removed in future')
