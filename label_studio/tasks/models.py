@@ -66,7 +66,7 @@ class Task(TaskMixin, models.Model):
         help_text='Uploaded file used as data source for this task'
     )
     inner_id = models.BigIntegerField(_('inner id'), default=0, db_index=True,
-                                      help_text='Internal task ID in the project, starts with 0')
+                                      help_text='Internal task ID in the project, starts with 1')
     updates = ['is_labeled']
 
     objects = TaskManager()  # task manager by default
