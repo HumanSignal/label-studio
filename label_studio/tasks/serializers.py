@@ -4,6 +4,7 @@ import logging
 import ujson as json
 import numbers
 
+from django.contrib.auth.models import AnonymousUser
 from django.db import transaction
 from drf_dynamic_fields import DynamicFieldsMixin
 from django.conf import settings
@@ -15,6 +16,7 @@ from rest_framework.fields import SkipField
 from rest_framework.settings import api_settings
 from rest_flex_fields import FlexFieldsModelSerializer
 
+from core.feature_flags import flag_set
 from projects.models import Project
 from tasks.models import Task, Annotation, AnnotationDraft, Prediction
 from tasks.validation import TaskValidator
@@ -294,14 +296,21 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             # add tasks first
             max_overlap = self.project.maximum_annotations
             # identify max inner id
-            tasks = Task.objects.filter(project=self.project)
-            max_inner_id = 1
-            if tasks:
-                max_inner_id = tasks.order_by("-inner_id")[0].inner_id
+            user = AnonymousUser()
+            if flag_set('ff_back_2070_inner_id_12052022_short', user):
+                tasks = Task.objects.filter(project=self.project)
+                max_inner_id = 1
+                if tasks:
+                    max_inner_id = tasks.order_by("-inner_id")[0].inner_id
             for i, task in enumerate(validated_tasks):
-                t = Task(project=self.project, data=task['data'], meta=task.get('meta', {}),
+                if flag_set('ff_back_2070_inner_id_12052022_short', user):
+                    t = Task(project=self.project, data=task['data'], meta=task.get('meta', {}),
                          overlap=max_overlap, is_labeled=len(task_annotations[i]) >= max_overlap,
                          file_upload_id=task.get('file_upload_id'), inner_id=max_inner_id)
+                else:
+                    t = Task(project=self.project, data=task['data'], meta=task.get('meta', {}),
+                             overlap=max_overlap, is_labeled=len(task_annotations[i]) >= max_overlap,
+                             file_upload_id=task.get('file_upload_id'))
                 db_tasks.append(t)
                 max_inner_id += 1
                 # deprecated meta warning

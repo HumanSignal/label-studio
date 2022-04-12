@@ -9,6 +9,7 @@ import numbers
 from urllib.parse import urljoin, quote
 
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.db import models, connection, transaction
 from django.db.models import Q, F, When, Count, Case, Subquery, OuterRef, Value
 from django.db.models.functions import Coalesce
@@ -24,6 +25,7 @@ from rest_framework.exceptions import ValidationError
 
 from model_utils import FieldTracker
 
+from core.feature_flags import flag_set
 from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func
 from core.utils.params import get_env
 from core.label_config import SINGLE_VALUED_TAGS
@@ -261,12 +263,14 @@ class Task(TaskMixin, models.Model):
         self.annotations.exclude(id=annotation_id).update(ground_truth=False)
 
     def save(self, *args, **kwargs):
-        if self.inner_id == 0:
-            tasks = Task.objects.filter(project=self.project)
-            max_inner_id = 1
-            if tasks:
-                max_inner_id = tasks.order_by("-inner_id")[0].inner_id
-            self.inner_id = max_inner_id + 1
+        user = AnonymousUser()
+        if flag_set('ff_back_2070_inner_id_12052022_short', user):
+            if self.inner_id == 0:
+                tasks = Task.objects.filter(project=self.project)
+                max_inner_id = 1
+                if tasks:
+                    max_inner_id = tasks.order_by("-inner_id")[0].inner_id
+                self.inner_id = max_inner_id + 1
         super().save(*args, **kwargs)
 
 
