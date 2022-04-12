@@ -484,14 +484,6 @@ def annotate_predictions_score(queryset):
         ))
 
 
-def annotate_inner_id(queryset):
-    first_task = queryset.order_by('id')[:1]
-    if not first_task:
-        return queryset
-    first_task_id = first_task[0].id
-    return queryset.annotate(inner_id=F('id')-first_task_id)
-
-
 def annotate_annotations_ids(queryset):
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
         return queryset.annotate(annotations_ids=GroupConcat('annotations__id', output_field=models.CharField()))
@@ -520,7 +512,6 @@ def dummy(queryset):
 
 
 settings.DATA_MANAGER_ANNOTATIONS_MAP = {
-    "inner_id": annotate_inner_id,
     "avg_lead_time": annotate_avg_lead_time,
     "completed_at": annotate_completed_at,
     "annotations_results": annotate_annotations_results,
