@@ -1,6 +1,6 @@
 {
-  "message": "Fix view all for the new audio UI (#567)",
-  "commit": "6fad489da3df8d10853c9527276c0d4d3b1bcc66",
+  "message": "null block points reduce polygon (#544)\n\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
+  "commit": "f29fcbd43520d931b3727c5e937045f7026b7ee3",
   "branch": "master",
-  "date": "2022-04-07T16:52:53Z"
+  "date": "2022-04-12T16:55:45Z"
 }
