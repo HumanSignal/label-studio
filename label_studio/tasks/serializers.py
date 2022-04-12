@@ -4,7 +4,6 @@ import logging
 import ujson as json
 import numbers
 
-from django.contrib.auth.models import AnonymousUser
 from django.db import transaction
 from drf_dynamic_fields import DynamicFieldsMixin
 from django.conf import settings
@@ -296,14 +295,13 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             # add tasks first
             max_overlap = self.project.maximum_annotations
             # identify max inner id
-            user = AnonymousUser()
-            if flag_set('ff_back_2070_inner_id_12052022_short', user):
+            if flag_set('ff_back_2070_inner_id_12052022_short', self.project.organization.created_by):
                 tasks = Task.objects.filter(project=self.project)
                 max_inner_id = 1
                 if tasks:
                     max_inner_id = tasks.order_by("-inner_id")[0].inner_id
             for i, task in enumerate(validated_tasks):
-                if flag_set('ff_back_2070_inner_id_12052022_short', user):
+                if flag_set('ff_back_2070_inner_id_12052022_short', self.project.organization.created_by):
                     t = Task(project=self.project, data=task['data'], meta=task.get('meta', {}),
                          overlap=max_overlap, is_labeled=len(task_annotations[i]) >= max_overlap,
                          file_upload_id=task.get('file_upload_id'), inner_id=max_inner_id)
