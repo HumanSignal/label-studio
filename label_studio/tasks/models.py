@@ -263,7 +263,7 @@ class Task(TaskMixin, models.Model):
     def save(self, *args, **kwargs):
         if self.inner_id == 0:
             tasks = Task.objects.filter(project=self.project)
-            max_inner_id = 0
+            max_inner_id = 1
             if tasks:
                 max_inner_id = tasks.order_by("-inner_id")[0].inner_id
             self.inner_id = max_inner_id + 1
