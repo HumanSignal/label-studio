@@ -266,10 +266,10 @@ class Task(TaskMixin, models.Model):
         user = AnonymousUser()
         if flag_set('ff_back_2070_inner_id_12052022_short', user):
             if self.inner_id == 0:
-                tasks = Task.objects.filter(project=self.project)
+                task = Task.objects.filter(project=self.project).order_by("-inner_id").first()
                 max_inner_id = 1
-                if tasks:
-                    max_inner_id = tasks.order_by("-inner_id")[0].inner_id
+                if task:
+                    max_inner_id = task.inner_id
                 self.inner_id = max_inner_id + 1
         super().save(*args, **kwargs)
 
