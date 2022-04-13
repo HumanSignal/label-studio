@@ -1,6 +1,6 @@
 {
-  "message": "null block points reduce polygon (#544)\n\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "f29fcbd43520d931b3727c5e937045f7026b7ee3",
+  "message": "feat: DEV-1750: Update on Number Tag for slider option (#524)\n\n* Update on Number Tag for slider option\r\n\r\n* Fix comments for Number Slide Type\r\n\r\n* remove padding from slider preventing a full range of slide\r\n\r\n* no value by default: this fixes required\r\n\r\nwe can't show default 0 and say that field is required, enter value;\r\nso show nothing\r\n\r\n* fix Number docs: add slider; fix texts\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
+  "commit": "b29c9596a196aa1659ed0c5a4d9efe24de3f29ae",
   "branch": "master",
-  "date": "2022-04-12T16:55:45Z"
+  "date": "2022-04-13T12:16:19Z"
 }
