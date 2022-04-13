@@ -18,7 +18,7 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import exception_handler
 
-from core.utils.common import temporary_disconnect_all_signals
+from core.utils.common import temporary_disconnect_all_signals, get_fields_from_request
 from core.label_config import config_essential_data_has_changed
 from projects.models import (
     Project, ProjectSummary, ProjectManager
@@ -186,7 +186,8 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
     redirect_kwarg = 'pk'
 
     def get_queryset(self):
-        return Project.objects.with_counts().filter(organization=self.request.user.active_organization)
+        fields = get_fields_from_request(self.request)
+        return Project.objects.with_counts(fields=fields).filter(organization=self.request.user.active_organization)
 
     def get(self, request, *args, **kwargs):
         return super(ProjectAPI, self).get(request, *args, **kwargs)
