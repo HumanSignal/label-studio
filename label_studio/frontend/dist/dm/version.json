@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1470: Tasks list page navigation (#41)\n\n* Introducing page navigation in DM\r\n\r\n* Preserve selected task on page change\r\n\r\n* Remove virtualized list from the tasks list\r\n\r\n* Fix fields button in the QuickView mode\r\n\r\n* Hide pagenav title and page size in Quick View\r\n\r\n* Code cleanup\r\n\r\n* Restructure the app, prepare for the feature flags\r\n\r\n* Add old components, introduce a feature flag",
-  "commit": "e1c6869ced44da6609c6db92ef375082770a4ea7",
+  "message": "Fix tasks selection (#44)",
+  "commit": "97e33ac0a9b0ea09398b00d7916671ca76cf2a71",
   "branch": "master",
-  "date": "2022-04-13T12:31:18Z"
+  "date": "2022-04-13T13:55:17Z"
 }
