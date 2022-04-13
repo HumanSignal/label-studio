@@ -1,6 +1,6 @@
 {
-  "message": "null block points reduce polygon (#544)\n\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "f29fcbd43520d931b3727c5e937045f7026b7ee3",
-  "branch": "master",
-  "date": "2022-04-12T16:55:45Z"
+  "message": "fix: DEV-2096: DEV-2097: Fix basic functional of dynamic children\n\nhorkeys, selected, etc.",
+  "commit": "4035062d4ac8c962dcbcbeff51e73171f9513843",
+  "branch": "fix/DEV-2096-DEV-2097/hotkey-and-selected",
+  "date": "2022-04-13T11:59:22Z"
 }
