@@ -1,6 +1,6 @@
 {
-  "message": "Hide pagenav title and page size in Quick View",
-  "commit": "bb3e529d7d952c5659f6cdfb6e07a61dcfb12d5b",
+  "message": "Merge branch 'master' into fix/dev-1470/dm-tasks-pagination",
+  "commit": "8f4b90c6df46a6f1f2a49f1cea530d036d258479",
   "branch": "fix/dev-1470/dm-tasks-pagination",
-  "date": "2022-03-31T09:32:09Z"
+  "date": "2022-04-13T10:49:17Z"
 }
