@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-1750: Update on Number Tag for slider option (#524)\n\n* Update on Number Tag for slider option\r\n\r\n* Fix comments for Number Slide Type\r\n\r\n* remove padding from slider preventing a full range of slide\r\n\r\n* no value by default: this fixes required\r\n\r\nwe can't show default 0 and say that field is required, enter value;\r\nso show nothing\r\n\r\n* fix Number docs: add slider; fix texts\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
-  "commit": "b29c9596a196aa1659ed0c5a4d9efe24de3f29ae",
+  "message": "fix: dev-2068: toolswitch-finish-drawing (#574)\n\n* check the number of pointes if points\r\n\r\n* remove logging\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
+  "commit": "02b1197a8abd249459e50471a0c13c0c627e94e3",
   "branch": "master",
-  "date": "2022-04-13T12:16:19Z"
+  "date": "2022-04-14T10:01:18Z"
 }
