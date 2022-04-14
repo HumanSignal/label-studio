@@ -141,6 +141,19 @@ pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl
 pip install label-studio
 ```
 
+#### Run test suite
+```bash
+pip install -r deploy/requirements-test.txt
+cd label_studio
+
+# postgres (assumes default postgres user,db,pass)
+DJANGO_DB=default DJANGO_SETTINGS_MODULE=core.settings.label_studio python -m pytest -vv -n auto
+
+# sqlite3
+DJANGO_DB=sqlite DJANGO_SETTINGS_MODULE=core.settings.label_studio python -m pytest -vv -n auto
+```
+
+
 ## What you get from Label Studio
 
 ![Screenshot of Label Studio data manager grid view with images](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/labelstudio-ui.gif)

@@ -274,9 +274,9 @@ def os_independent_path(_, path, add_tempdir=False):
         {
             'os_independent_path': str(os_independent_path),
             'os_independent_path_parent': str(os_independent_path_parent),
+            'os_independent_path_tmpdir': str(Path(tempfile.gettempdir())),
         }
     )
-
 
 def verify_docs(response):
     for _, path in response.json()['paths'].items():
