@@ -24,6 +24,7 @@ _DATA_TYPES = {
     'TimeSeriesChannel': [dict, list, str],
     'List': [list],
     'Choices': [str, list],
+    'Taxonomy': [list],
     'PolygonLabels': [list]
 }
 logger = logging.getLogger(__name__)
