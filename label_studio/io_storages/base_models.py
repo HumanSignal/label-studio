@@ -116,6 +116,7 @@ class ImportStorage(Storage):
                     raise ValueError(
                         'If you use "annotations" field in the task, ' 'you must put "data" field in the task too'
                     )
+                cancelled_annotations = len([a for a in annotations if a['was_cancelled']])
 
             if 'data' in data and isinstance(data['data'], dict):
                 data = data['data']
@@ -123,7 +124,9 @@ class ImportStorage(Storage):
             with transaction.atomic():
                 task = Task.objects.create(
                     data=data, project=self.project, overlap=maximum_annotations,
-                    is_labeled=len(annotations) >= maximum_annotations
+                    is_labeled=len(annotations) >= maximum_annotations, total_predictions=len(predictions),
+                    total_annotations=len(annotations)-cancelled_annotations,
+                    cancelled_annotations=cancelled_annotations
                 )
                 link_class.create(task, key, self)
                 logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
