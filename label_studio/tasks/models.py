@@ -23,8 +23,6 @@ from django.dispatch import receiver, Signal
 from django.core.files.storage import default_storage
 from rest_framework.exceptions import ValidationError
 
-from model_utils import FieldTracker
-
 from core.feature_flags import flag_set
 from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func
 from core.utils.params import get_env
@@ -301,7 +299,6 @@ class Annotation(AnnotationMixin, models.Model):
     """ Annotations & Labeling results
     """
     objects = AnnotationManager()
-    tracker = FieldTracker(fields=['ground_truth', 'result'])
 
     result = JSONField('result', null=True, default=None, help_text='The main value of annotator work - '
                                                                     'labeling result in JSON format')
