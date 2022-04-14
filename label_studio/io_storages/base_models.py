@@ -111,6 +111,7 @@ class ImportStorage(Storage):
 
             # annotations
             annotations = data.get('annotations', [])
+            cancelled_annotations = 0
             if annotations:
                 if 'data' not in data:
                     raise ValueError(
