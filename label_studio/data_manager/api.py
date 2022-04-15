@@ -223,7 +223,7 @@ class TaskListAPI(generics.ListCreateAPIView):
         total_tasks = queryset.count()
         total_annotations = Annotation.objects.filter(task_id__in=queryset, was_cancelled=False).count()
         total_predictions = Prediction.objects.filter(task_id__in=queryset).count()
-        
+
         if review:
             fields_for_evaluation = ['annotators', 'reviewed']
             all_fields = None

@@ -772,7 +772,8 @@ class Project(ProjectMixin, models.Model):
         total_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
         cancelled_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True))
         total_predictions = Count("predictions", distinct=True)
-
+        if isinstance(queryset, list):
+            queryset = Task.objects.filter(id__in=[task.id for task in queryset])
         queryset = queryset.annotate(new_total_annotations=total_annotations,
                                      new_cancelled_annotations=cancelled_annotations,
                                      new_total_predictions=total_predictions)
