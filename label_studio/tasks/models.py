@@ -67,7 +67,7 @@ class Task(TaskMixin, models.Model):
     )
     updates = ['is_labeled']
     total_annotations = models.IntegerField(_('total_annotations'), default=0, db_index=True,
-                                  help_text='Number of total annotations for the current task')
+                                  help_text='Number of total annotations for the current task except cancelled annotations')
     cancelled_annotations = models.IntegerField(_('cancelled_annotations'), default=0, db_index=True,
                                                 help_text='Number of total cancelled annotations for the current task')
     total_predictions = models.IntegerField(_('total_predictions'), default=0, db_index=True,
