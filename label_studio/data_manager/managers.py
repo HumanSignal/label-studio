@@ -8,7 +8,7 @@ import logging
 from pydantic import BaseModel
 
 from django.db import models
-from django.db.models import Aggregate, Count, Exists, OuterRef, Subquery, Avg, Q, F, Value
+from django.db.models import Aggregate, OuterRef, Subquery, Avg, Q, F, Value
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from django.db.models.functions import Coalesce
@@ -17,7 +17,7 @@ from django.db.models.functions import Cast
 from django.db.models import FloatField
 from datetime import datetime
 
-from data_manager.prepare_params import ConjunctionEnum, SelectedItems
+from data_manager.prepare_params import ConjunctionEnum
 from label_studio.core.utils.params import cast_bool_from_str
 from label_studio.core.utils.common import load_func
 
