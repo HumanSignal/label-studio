@@ -521,9 +521,6 @@ settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     "annotators": annotate_annotators,
     "annotations_ids": annotate_annotations_ids,
     "file_upload": file_upload,
-    "cancelled_annotations": dummy,
-    "total_annotations": dummy,
-    "total_predictions": dummy
 }
 
 
