@@ -3,6 +3,8 @@ import logging
 from django.db import migrations
 
 from django.conf import settings
+from django.db.models import F, Subquery, OuterRef, Count, Q
+
 from core.bulk_update_utils import bulk_update
 
 logger = logging.getLogger(__name__)
@@ -13,14 +15,23 @@ def forwards(apps, schema_editor):
 
     all_projects = Project.objects.all()
 
+    total_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
+    cancelled_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True))
+    total_predictions = Count("predictions", distinct=True)
+
     for project in all_projects:
+        if not project.tasks.exists():
+            continue
         objs = []
-        for task in project.tasks.all():
-            total_annotations = task.annotations.all().count()
-            cancelled_annotations = task.annotations.all().filter(was_cancelled=True).count()
-            task.total_annotations = total_annotations - cancelled_annotations
-            task.cancelled_annotations = cancelled_annotations
-            task.total_predictions = task.predictions.all().count()
+        results = project.tasks.all()
+        results = results.annotate(total_annotations1=total_annotations,
+                                   cancelled_annotations1=cancelled_annotations,
+                                   total_predictions1=total_predictions)
+
+        for task in results:
+            task.total_annotations = task.total_annotations1 - task.cancelled_annotations1
+            task.cancelled_annotations = task.cancelled_annotations1
+            task.total_predictions = task.total_predictions1
             objs.append(task)
 
         bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'],
