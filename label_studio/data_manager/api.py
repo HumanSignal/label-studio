@@ -208,20 +208,25 @@ class TaskListAPI(generics.ListCreateAPIView):
         queryset = self.get_task_queryset(request, prepare_params)
         context = self.get_task_serializer_context(self.request, project)
 
-        # get counters
-        total_predictions = Prediction.objects.filter(task_id__in=queryset).count()
-        total_annotations = Annotation.objects.filter(task_id__in=queryset, was_cancelled=False).count()
-        total_tasks = queryset.count()
-
         # paginated tasks
         if page_number:
             page = queryset[page_size * (page_number - 1):page_size * page_number]
         else:
             page = queryset
 
+        # get request params
         all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
         fields_for_evaluation = get_fields_for_evaluation(prepare_params, request.user)
         review = bool_from_request(self.request.GET, 'review', False)
+
+        # get counters
+        total_tasks = queryset.count()
+        total_annotations = None
+        total_predictions = None
+        if 'total_annotations' in fields_for_evaluation or 'annotators' in fields_for_evaluation or all_fields:
+            total_annotations = Annotation.objects.filter(task_id__in=queryset, was_cancelled=False).count()
+        if 'total_predictions' in fields_for_evaluation or all_fields:
+            total_predictions = Prediction.objects.filter(task_id__in=queryset).count()
         if review:
             fields_for_evaluation = ['annotators', 'reviewed']
             all_fields = None
