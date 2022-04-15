@@ -768,12 +768,19 @@ class Project(ProjectMixin, models.Model):
 
     def update_tasks_counters(self, queryset):
         objs = []
+
+        total_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
+        cancelled_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True))
+        total_predictions = Count("predictions", distinct=True)
+
+        queryset = queryset.annotate(new_total_annotations=total_annotations,
+                                     new_cancelled_annotations=cancelled_annotations,
+                                     new_total_predictions=total_predictions)
+
         for task in queryset:
-            total_annotations = task.annotations.all().count()
-            cancelled_annotations = task.annotations.all().filter(was_cancelled=True).count()
-            task.total_annotations = total_annotations - cancelled_annotations
-            task.cancelled_annotations = cancelled_annotations
-            task.total_predictions = task.predictions.all().count()
+            task.total_annotations = task.new_total_annotations - task.new_cancelled_annotations
+            task.cancelled_annotations = task.new_cancelled_annotations
+            task.total_predictions = task.new_total_predictions
             objs.append(task)
 
         with transaction.atomic():

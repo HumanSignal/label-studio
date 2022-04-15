@@ -24,14 +24,14 @@ def forwards(apps, schema_editor):
             continue
         objs = []
         results = project.tasks.all()
-        results = results.annotate(total_annotations1=total_annotations,
-                                   cancelled_annotations1=cancelled_annotations,
-                                   total_predictions1=total_predictions)
+        results = results.annotate(new_total_annotations=total_annotations,
+                                   new_cancelled_annotations=cancelled_annotations,
+                                   new_total_predictions=total_predictions)
 
         for task in results:
-            task.total_annotations = task.total_annotations1 - task.cancelled_annotations1
-            task.cancelled_annotations = task.cancelled_annotations1
-            task.total_predictions = task.total_predictions1
+            task.total_annotations = task.new_total_annotations - task.new_cancelled_annotations
+            task.cancelled_annotations = task.new_cancelled_annotations
+            task.total_predictions = task.new_total_predictions
             objs.append(task)
 
         bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'],
