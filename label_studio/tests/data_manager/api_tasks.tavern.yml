@@ -1314,3 +1314,17 @@ stages:
         "total_predictions": 0,
         "total": 0,
         }
+
+  - name: get_tasks_with_page
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?view={view.id}&page=1'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: label_studio.tests.utils:save_response
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 0,
+        "total": 0,
+      }
