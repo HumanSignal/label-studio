@@ -141,7 +141,9 @@ class ExportMixin:
                 "annotations",
                 queryset=annotations_qs,
             )
-        )
+        ).select_related('project').prefetch_related(
+                'predictions', 'drafts'
+            )
 
     def get_export_data(self, task_filter_options=None, annotation_filter_options=None, serialization_options=None):
         """
@@ -175,9 +177,7 @@ class ExportMixin:
             # counters = Project.objects.with_counts().filter(id=self.project.id)[0].get_counters()
             counters = {'task_number': 0}
             result = []
-            all_tasks = self.project.tasks.select_related('project').prefetch_related(
-                'annotations', 'predictions', 'drafts'
-            )
+            all_tasks = self.project.tasks
             logger.debug('Tasks filtration')
             task_ids = (
                 self._get_filtered_tasks(all_tasks, task_filter_options=task_filter_options)
