@@ -582,9 +582,9 @@ def update_project_summary_annotations_and_is_labeled(sender, instance, created,
         # If new annotation created, update task.is_labeled state
         logger.debug(f'Update task stats for task={instance.task}')
         if instance.was_cancelled:
-            instance.task.cancelled_annotations += 1
+            instance.task.cancelled_annotations = instance.task.annotations.all().filter(was_cancelled=True).count()
         else:
-            instance.task.total_annotations += 1
+            instance.task.total_annotations = instance.task.annotations.all().filter(was_cancelled=False).count()
         instance.task.update_is_labeled()
         instance.task.save(update_fields=['is_labeled', 'total_annotations', 'cancelled_annotations'])
 
@@ -594,22 +594,22 @@ def remove_project_summary_annotations(sender, instance, **kwargs):
     """Remove annotation counters in project summary followed by deleting an annotation"""
     instance.decrease_project_summary_counters()
     if instance.was_cancelled:
-        instance.task.cancelled_annotations -= 1
+        instance.task.cancelled_annotations = instance.task.annotations.all().filter(was_cancelled=True).count()
     else:
-        instance.task.total_annotations -= 1
+        instance.task.total_annotations = instance.task.annotations.all().filter(was_cancelled=False).count()
     instance.task.save(update_fields=['total_annotations', 'cancelled_annotations'])
 
 
 @receiver(pre_delete, sender=Prediction)
 def remove_predictions_from_project(sender, instance, **kwargs):
     """Remove predictions counters"""
-    instance.task.total_predictions -= 1
+    instance.task.total_predictions = instance.task.predictions.all().count()
     instance.task.save(update_fields=['total_predictions'])
 
 @receiver(post_save, sender=Prediction)
 def save_predictions_to_project(sender, instance, **kwargs):
     """Add predictions counters"""
-    instance.task.total_predictions += 1
+    instance.task.total_predictions = instance.task.predictions.all().count()
     instance.task.save(update_fields=['total_predictions'])
 
 
