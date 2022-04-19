@@ -32,7 +32,8 @@ _DATA_TYPES = {
     'KeyPointLabels': [str, list],
     'ParagraphLabels': [str, list],
     'RectangleLabels': [str, list],
-    'TimeSeriesLabels': [str, list]
+    'TimeSeriesLabels': [str, list],
+    'Taxonomy': [str, list],
 }
 logger = logging.getLogger(__name__)
 
