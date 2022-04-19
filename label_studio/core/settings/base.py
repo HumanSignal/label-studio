@@ -22,6 +22,7 @@ from label_studio.core.utils.io import get_data_dir
 from label_studio.core.utils.params import get_bool_env, get_env, get_env_list_int
 
 logger = logging.getLogger(__name__)
+SILENCED_SYSTEM_CHECKS = []
 
 # Hostname is used for proper path generation to the resources, pages, etc
 HOSTNAME = get_env('HOST', '')
@@ -185,6 +186,7 @@ INSTALLED_APPS = [
     'io_storages',
     'ml',
     'webhooks',
+    'labels_manager',
 ]
 
 MIDDLEWARE = [
@@ -203,6 +205,7 @@ MIDDLEWARE = [
     'core.middleware.SetSessionUIDMiddleware',
     'core.middleware.ContextLogMiddleware',
     'core.middleware.DatabaseIsLockedRetryMiddleware',
+    'core.current_request.ThreadLocalMiddleware',
 ]
 
 REST_FRAMEWORK = {
@@ -218,7 +221,10 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'core.utils.common.custom_exception_handler',
     'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    'PAGE_SIZE': 100,
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination'
 }
+SILENCED_SYSTEM_CHECKS += ["rest_framework.W001"]
 
 # CORS & Host settings
 INTERNAL_IPS = [  # django debug toolbar for django==2.2 requirement
@@ -451,6 +457,8 @@ WEBHOOK_SERIALIZERS = {
     'project': 'webhooks.serializers_for_hooks.ProjectWebhookSerializer',
     'task': 'webhooks.serializers_for_hooks.TaskWebhookSerializer',
     'annotation': 'webhooks.serializers_for_hooks.AnnotationWebhookSerializer',
+    'label': 'labels_manager.serializers.LabelSerializer',
+    'label_link': 'labels_manager.serializers.LabelLinkSerializer',
 }
 
 EDITOR_KEYMAP = json.dumps(get_env("EDITOR_KEYMAP"))

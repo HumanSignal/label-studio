@@ -1,6 +1,6 @@
 {
-  "message": "DEV-1373: Fix relations over brushes (#398)\n\n* Add test for relations over brashes\r\n\r\n* [fix] Fix crash on restoration relations over brushes\r\n\r\n* [fix] Fix calculating brush bbox after restoration\r\n\r\n* Fix test code missing\r\n\r\n* Limit events from resize observer\r\n\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "3116fcb2a73c4e53b6375abcdff8a095479e08db",
-  "branch": "master",
-  "date": "2022-03-11T13:00:34Z"
+  "message": "use history to go back on button click",
+  "commit": "f638483bae813b211c07fa27e3452918685c4528",
+  "branch": "fix/DEV-1883/no-more-tasks-screen",
+  "date": "2022-03-28T18:58:36Z"
 }
