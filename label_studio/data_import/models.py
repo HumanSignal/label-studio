@@ -43,6 +43,8 @@ class FileUpload(models.Model):
     def url(self):
         if settings.HOSTNAME and settings.CLOUD_FILE_STORAGE_ENABLED:
             return settings.HOSTNAME + self.file.url
+        elif settings.FORCE_SCRIPT_NAME:
+            return settings.FORCE_SCRIPT_NAME + '/' + self.file.url
         else:
             return self.file.url
 

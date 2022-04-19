@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2096: DEV-2097: Fix basic functional of dynamic children\n\nhorkeys, selected, etc.",
-  "commit": "4035062d4ac8c962dcbcbeff51e73171f9513843",
-  "branch": "fix/DEV-2096-DEV-2097/hotkey-and-selected",
-  "date": "2022-04-13T11:59:22Z"
+  "message": "fix: DEV-2096: DEV-2097: Fix basic functional of dynamic children (#576)\n\nhorkeys, selected, etc.",
+  "commit": "0b9721c1f99072da64582e09298cdb1ff9e9dd00",
+  "branch": "master",
+  "date": "2022-04-19T22:29:43Z"
 }
