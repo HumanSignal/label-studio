@@ -286,6 +286,24 @@ RQ_QUEUES = {
         'DB': 0,
         'DEFAULT_TIMEOUT': 180,
     },
+    'export': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 180,
+    },
+    'background': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 180,
+    },
+    'exporting': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 180,
+    },
 }
 
 # Swagger: automatic API documentation
