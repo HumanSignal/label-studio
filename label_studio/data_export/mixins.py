@@ -8,6 +8,7 @@ import pathlib
 import shutil
 
 from django.core.files import File
+from django.core.files import temp as tempfile
 from django.db import transaction
 from django.db.models import Prefetch
 from django.db.models.query_utils import Q
@@ -18,7 +19,13 @@ from django.conf import settings
 
 from core.redis import redis_connected
 from core.utils.common import batch
-from core.utils.io import get_all_files_from_dir, get_temp_dir, read_bytes_stream, get_all_dirs_from_dir
+from core.utils.io import (
+    get_all_files_from_dir,
+    get_temp_dir,
+    read_bytes_stream,
+    get_all_dirs_from_dir,
+    SerializableGenerator,
+)
 from data_manager.models import View
 from projects.models import Project
 from tasks.models import Annotation, Task
@@ -175,7 +182,7 @@ class ExportMixin:
         with transaction.atomic():
             # TODO: make counters from queryset
             # counters = Project.objects.with_counts().filter(id=self.project.id)[0].get_counters()
-            counters = {'task_number': 0}
+            self.counters = {'task_number': 0}
             result = []
             all_tasks = self.project.tasks
             logger.debug('Tasks filtration')
@@ -195,10 +202,8 @@ class ExportMixin:
                     tasks = [task for task in tasks if task.annotations.all()]
 
                 serializer = ExportDataSerializer(tasks, many=True, **base_export_serializer_option)
-                result += serializer.data
-
-        counters['task_number'] = len(result)
-        return result, counters
+                self.counters['task_number'] += len(tasks)
+                yield serializer.data
 
     def export_to_file(self, task_filter_options=None, annotation_filter_options=None, serialization_options=None):
         logger.debug(
@@ -208,23 +213,36 @@ class ExportMixin:
             f'serialization_options: {serialization_options}\n'
         )
         try:
-            data, counters = self.get_export_data(
-                task_filter_options=task_filter_options,
-                annotation_filter_options=annotation_filter_options,
-                serialization_options=serialization_options,
+            iter_json = json.JSONEncoder(ensure_ascii=False).iterencode(
+                SerializableGenerator(
+                    self.get_export_data(
+                        task_filter_options=task_filter_options,
+                        annotation_filter_options=annotation_filter_options,
+                        serialization_options=serialization_options,
+                    )
+                )
             )
+            file = tempfile.NamedTemporaryFile(suffix=".export.json", dir=settings.FILE_UPLOAD_TEMP_DIR)
+            for chunk in iter_json:
+                encoded_chunk = chunk.encode('utf-8')
+                file.write(encoded_chunk)
+
+            md5_object = hashlib.md5()
+            block_size = 128 * md5_object.block_size
+            chunk = file.read(block_size)
+            while chunk:
+                md5_object.update(chunk)
+                chunk = file.read(block_size)
+            md5 = md5_object.hexdigest()
 
             now = datetime.now()
-            json_data = json.dumps(data, ensure_ascii=False).encode('utf-8')
-            md5 = hashlib.md5(json_data).hexdigest()
             file_name = f'project-{self.project.id}-at-{now.strftime("%Y-%m-%d-%H-%M")}-{md5[0:8]}.json'
             file_path = (
                 f'{self.project.id}/{file_name}'
-            )  # finlay file will be in settings.DELAYED_EXPORT_DIR/self.project.id/file_name
-            file_ = File(io.BytesIO(json_data), name=file_path)
+            )  # finally file will be in settings.DELAYED_EXPORT_DIR/self.project.id/file_name
+            file_ = File(file, name=file_path)
             self.file.save(file_path, file_)
             self.md5 = md5
-            self.counters = counters
             self.save(update_fields=['file', 'md5', 'counters'])
 
             self.status = self.Status.COMPLETED
