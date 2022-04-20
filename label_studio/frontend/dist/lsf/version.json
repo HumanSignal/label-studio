@@ -1,6 +1,6 @@
 {
-  "message": "fix: dev-2068: toolswitch-finish-drawing (#574)\n\n* check the number of pointes if points\r\n\r\n* remove logging\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "02b1197a8abd249459e50471a0c13c0c627e94e3",
+  "message": "fix: DEV-2096: DEV-2097: Fix basic functional of dynamic children (#576)\n\nhorkeys, selected, etc.",
+  "commit": "0b9721c1f99072da64582e09298cdb1ff9e9dd00",
   "branch": "master",
-  "date": "2022-04-14T10:01:18Z"
+  "date": "2022-04-19T22:29:43Z"
 }
