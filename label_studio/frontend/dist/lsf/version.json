@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2100: Fix duplicating annotation with preselected choices (#577)\n\n* fix: DEV-2100: Make duplicated results prioritize over preselected choices\r\n\r\n* Revert \"fix: DEV-2100: Make duplicated results prioritize over preselected choices\"\r\n\r\nThis reverts commit b6ea12c31b28a82a160200d0c80ea5023ee0dbf2.\r\n\r\n* fix: DEV-2100: Remove unnecessary classification areas after result deserialization\r\n\r\n* test: DEV-2100: Add test for choices selected by default during annotation copying\r\n\r\n* fix: DEV-2100: Add feature flags",
-  "commit": "15152dc32ac9cfaf03ab31fd66cf3d2a62d83cf0",
+  "message": "feat: DEV-2128: Allow to use html inside label-tags (#578)",
+  "commit": "b78e6fbd3b3be0241ed4b41398dc5668494535e0",
   "branch": "master",
-  "date": "2022-04-20T14:39:47Z"
+  "date": "2022-04-20T20:01:35Z"
 }
