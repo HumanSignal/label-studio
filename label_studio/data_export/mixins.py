@@ -246,7 +246,7 @@ class ExportMixin:
         self.save(update_fields=['status'])
 
         if redis_connected():
-            queue = django_rq.get_queue('exporting')
+            queue = django_rq.get_queue('low')
             job = queue.enqueue(
                 export_background,
                 self.id,
