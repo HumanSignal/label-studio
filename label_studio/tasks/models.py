@@ -23,8 +23,6 @@ from django.dispatch import receiver, Signal
 from django.core.files.storage import default_storage
 from rest_framework.exceptions import ValidationError
 
-from model_utils import FieldTracker
-
 from core.feature_flags import flag_set
 from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func
 from core.utils.params import get_env
@@ -79,6 +77,7 @@ class Task(TaskMixin, models.Model):
         ordering = ['-updated_at']
         indexes = [
             models.Index(fields=['project', 'is_labeled']),
+            models.Index(fields=['id', 'project']),
             models.Index(fields=['id', 'overlap']),
             models.Index(fields=['overlap']),
             models.Index(fields=['is_labeled'])
@@ -301,7 +300,6 @@ class Annotation(AnnotationMixin, models.Model):
     """ Annotations & Labeling results
     """
     objects = AnnotationManager()
-    tracker = FieldTracker(fields=['ground_truth', 'result'])
 
     result = JSONField('result', null=True, default=None, help_text='The main value of annotator work - '
                                                                     'labeling result in JSON format')
@@ -332,6 +330,7 @@ class Annotation(AnnotationMixin, models.Model):
         db_table = 'task_completion'
         indexes = [
             models.Index(fields=['task', 'ground_truth']),
+            models.Index(fields=['task', 'completed_by']),
             models.Index(fields=['was_cancelled']),
             models.Index(fields=['ground_truth']),
             models.Index(fields=['created_at']),
