@@ -199,7 +199,7 @@ class ExportMixin:
                 tasks = list(self.get_task_queryset(ids, annotation_filter_options))
                 logger.debug(f'Batch: {i*BATCH_SIZE}')
                 if isinstance(task_filter_options, dict) and task_filter_options.get('only_with_annotations'):
-                    tasks = [task for task in tasks if task.annotations.all()]
+                    tasks = [task for task in tasks if task.annotations.exists()]
 
                 serializer = ExportDataSerializer(tasks, many=True, **base_export_serializer_option)
                 self.counters['task_number'] += len(tasks)
