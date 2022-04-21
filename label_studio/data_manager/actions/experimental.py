@@ -90,7 +90,7 @@ def remove_duplicates(project, queryset, **kwargs):
                 one_task_saved = True
             else:
                 new_root.append(task)
-                
+
         for task in new_root:
             # keep the first task in safety
             if not one_task_saved:
@@ -101,7 +101,10 @@ def remove_duplicates(project, queryset, **kwargs):
 
     # remove tasks
     queryset = queryset.filter(id__in=removing, annotations__isnull=True)
-    assert queryset.count() == len(removing), 'Bug in remove_duplicates, operation is not finished'
+    assert queryset.count() == len(removing), \
+        f'Remove duplicates failed, operation is not finished: ' \
+        f'queryset count {queryset.count()} != removing {len(removing)}'
+
     delete_tasks(project, queryset)
     return {'response_code': 200, 'detail': f'Removed {len(removing)} tasks'}
 
