@@ -205,6 +205,28 @@ class ExportMixin:
                 self.counters['task_number'] += len(tasks)
                 yield serializer.data
 
+    @staticmethod
+    def eval_md5(file):
+        md5_object = hashlib.md5()
+        block_size = 128 * md5_object.block_size
+        chunk = file.read(block_size)
+        while chunk:
+            md5_object.update(chunk)
+            chunk = file.read(block_size)
+        md5 = md5_object.hexdigest()
+        return md5
+
+    def save_file(self, file, md5):
+        now = datetime.now()
+        file_name = f'project-{self.project.id}-at-{now.strftime("%Y-%m-%d-%H-%M")}-{md5[0:8]}.json'
+        file_path = (
+            f'{self.project.id}/{file_name}'
+        )  # finally file will be in settings.DELAYED_EXPORT_DIR/self.project.id/file_name
+        file_ = File(file, name=file_path)
+        self.file.save(file_path, file_)
+        self.md5 = md5
+        self.save(update_fields=['file', 'md5', 'counters'])
+
     def export_to_file(self, task_filter_options=None, annotation_filter_options=None, serialization_options=None):
         logger.debug(
             f'Run export for {self.id} with params:\n'
@@ -222,31 +244,18 @@ class ExportMixin:
                     )
                 )
             )
-            file = tempfile.NamedTemporaryFile(suffix=".export.json", dir=settings.FILE_UPLOAD_TEMP_DIR)
-            for chunk in iter_json:
-                encoded_chunk = chunk.encode('utf-8')
-                file.write(encoded_chunk)
+            with tempfile.NamedTemporaryFile(suffix=".export.json", dir=settings.FILE_UPLOAD_TEMP_DIR) as file:
+                for chunk in iter_json:
+                    encoded_chunk = chunk.encode('utf-8')
+                    file.write(encoded_chunk)
+                file.seek(0)
 
-            md5_object = hashlib.md5()
-            block_size = 128 * md5_object.block_size
-            chunk = file.read(block_size)
-            while chunk:
-                md5_object.update(chunk)
-                chunk = file.read(block_size)
-            md5 = md5_object.hexdigest()
-
-            now = datetime.now()
-            file_name = f'project-{self.project.id}-at-{now.strftime("%Y-%m-%d-%H-%M")}-{md5[0:8]}.json'
-            file_path = (
-                f'{self.project.id}/{file_name}'
-            )  # finally file will be in settings.DELAYED_EXPORT_DIR/self.project.id/file_name
-            file_ = File(file, name=file_path)
-            self.file.save(file_path, file_)
-            self.md5 = md5
-            self.save(update_fields=['file', 'md5', 'counters'])
+                md5 = self.eval_md5(file)
+                self.save_file(file, md5)
 
             self.status = self.Status.COMPLETED
             self.save(update_fields=['status'])
+
         except Exception as exc:
             self.status = self.Status.FAILED
             self.save(update_fields=['status'])
