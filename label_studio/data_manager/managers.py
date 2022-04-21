@@ -166,7 +166,7 @@ def apply_filters(queryset, filters, only_undefined_field=False):
     # convert conjunction to orm statement
     filter_expressions = []
 
-    for _filter in filters.items:
+    for index, _filter in enumerate(filters.items):
 
         # we can also have annotations filters
         if not _filter.filter.startswith("filter:tasks:") or _filter.value is None:
@@ -201,21 +201,25 @@ def apply_filters(queryset, filters, only_undefined_field=False):
 
         # annotations results & predictions results
         if field_name in ['annotations_results', 'predictions_results']:
-            name = 'annotations__result' if field_name == 'annotations_results' else 'predictions__result'
+            from tasks.models import Annotation, Prediction
+
+            _class = Annotation if field_name == 'annotations_results' else Prediction
             if _filter.operator in [Operator.EQUAL, Operator.NOT_EQUAL]:
                 try:
                     value = json.loads(_filter.value)
                 except:
                     return queryset.none()
 
-                q = Q(**{name: value})
+                q = Exists(_class.objects.filter(Q(task=OuterRef('pk')) & Q(result=value)))
                 filter_expressions.append(q if _filter.operator == Operator.EQUAL else ~q)
                 continue
             elif _filter.operator == Operator.CONTAINS:
-                filter_expressions.append(Q(**{name + '__icontains': _filter.value}))
+                subquery = Exists(_class.objects.filter(Q(task=OuterRef('pk')) & Q(result__icontains=_filter.value)))
+                filter_expressions.append(Q(subquery))
                 continue
             elif _filter.operator == Operator.NOT_CONTAINS:
-                filter_expressions.append(~Q(**{name + '__icontains': _filter.value}))
+                subquery = Exists(_class.objects.filter(Q(task=OuterRef('pk')) & ~Q(result__icontains=_filter.value)))
+                filter_expressions.append(Q(subquery))
                 continue
 
         # annotation ids
