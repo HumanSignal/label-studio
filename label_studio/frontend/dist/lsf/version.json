@@ -1,6 +1,6 @@
 {
-  "message": "fix: dev-2068: toolswitch-finish-drawing (#574)\n\n* check the number of pointes if points\r\n\r\n* remove logging\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "02b1197a8abd249459e50471a0c13c0c627e94e3",
+  "message": "feat: DEV-2128: Allow to use html inside label-tags (#578)",
+  "commit": "b78e6fbd3b3be0241ed4b41398dc5668494535e0",
   "branch": "master",
-  "date": "2022-04-14T10:01:18Z"
+  "date": "2022-04-20T20:01:35Z"
 }
