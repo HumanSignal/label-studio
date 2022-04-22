@@ -166,7 +166,7 @@ def apply_filters(queryset, filters, only_undefined_field=False):
     # convert conjunction to orm statement
     filter_expressions = []
 
-    for index, _filter in enumerate(filters.items):
+    for _filter in filters.items:
 
         # we can also have annotations filters
         if not _filter.filter.startswith("filter:tasks:") or _filter.value is None:
