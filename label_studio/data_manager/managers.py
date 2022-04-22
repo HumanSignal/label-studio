@@ -218,8 +218,8 @@ def apply_filters(queryset, filters, only_undefined_field=False):
                 filter_expressions.append(Q(subquery))
                 continue
             elif _filter.operator == Operator.NOT_CONTAINS:
-                subquery = Exists(_class.objects.filter(Q(task=OuterRef('pk')) & ~Q(result__icontains=_filter.value)))
-                filter_expressions.append(Q(subquery))
+                subquery = Exists(_class.objects.filter(Q(task=OuterRef('pk')) & Q(result__icontains=_filter.value)))
+                filter_expressions.append(~Q(subquery))
                 continue
 
         # annotation ids
