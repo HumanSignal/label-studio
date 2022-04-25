@@ -369,7 +369,8 @@ class Annotation(AnnotationMixin, models.Model):
 
         # updated_by
         request = get_current_request()
-        if request:
+        # TODO: rewrite tests to create annotations through API and remove is_authenticated check
+        if request and request.user.is_authenticated:
             self.task.updated_by = request.user
             update_fields.append('updated_by')
 
@@ -494,7 +495,8 @@ class Prediction(models.Model):
 
         # updated_by
         request = get_current_request()
-        if request:
+        # TODO: rewrite tests to create annotations through API and remove is_authenticated check
+        if request and request.user.is_authenticated:
             self.task.updated_by = request.user
             update_fields.append('updated_by')
 
