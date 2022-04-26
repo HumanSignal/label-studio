@@ -127,7 +127,8 @@
   {% block bottomjs %}
   {% endblock %}
 
-  {% try_include 'checks.html' %}
+  {% block billing-checks %}
+  {% endblock %}
 
 </div>
 
