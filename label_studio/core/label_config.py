@@ -132,10 +132,13 @@ def extract_data_types(label_config):
 def get_all_labels(label_config):
     outputs = parse_config(label_config)
     labels = defaultdict(list)
+    dynamic_labels = defaultdict(bool)
     for control_name in outputs:
         for label in outputs[control_name].get('labels', []):
             labels[control_name].append(label)
-    return labels
+        if outputs[control_name].get('dynamic_labels', False):
+            dynamic_labels[control_name] = True
+    return labels, dynamic_labels
 
 
 def get_annotation_tuple(from_name, to_name, type):
