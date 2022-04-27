@@ -171,6 +171,8 @@ You can then import text tasks to label that match the following JSON format:
       "from_name": "sentiment_class",
       "to_name": "message",
       "type": "choices",
+      "readonly": false,
+      "hidden": false,
       "value": {
         "choices": ["Positive"]
       }
@@ -184,6 +186,8 @@ You can then import text tasks to label that match the following JSON format:
       "from_name": "sentiment_class",
       "to_name": "message",
       "type": "choices",
+      "readonly": false,
+      "hidden": false,
       "value": {
         "choices": ["Neutral"]
       }
