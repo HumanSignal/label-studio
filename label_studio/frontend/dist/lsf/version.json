@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2128: Allow to use html inside label-tags (#578)",
-  "commit": "b78e6fbd3b3be0241ed4b41398dc5668494535e0",
+  "message": "fix: DEV-2100: Fix preselected choices (#584)\n\n- working with empty annotation\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
+  "commit": "ee38e771760e1ce57ac62dc1556ddd0718f62487",
   "branch": "master",
-  "date": "2022-04-20T20:01:35Z"
+  "date": "2022-04-27T11:55:50Z"
 }

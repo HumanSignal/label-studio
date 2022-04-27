@@ -290,6 +290,8 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
                 task[value] = examples['HyperTextUrl']
             else:
                 task[value] = examples['HyperText']
+        elif p.tag.lower().endswith('labels'):
+            task[value] = examples['Labels']
         else:
             # patch for valueType="url"
             examples['Text'] = examples['TextUrl'] if only_urls else examples['TextRaw']
