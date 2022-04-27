@@ -149,3 +149,14 @@ stages:
       save:
         json:
           annotation_pk: id
+  - id: get_invite_url
+    name: Get invite link
+    request:
+      url: "{django_live_url}/api/invite"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        json:
+          invite_url: invite_url
+          invite_token: token
