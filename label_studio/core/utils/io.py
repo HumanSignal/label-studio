@@ -156,7 +156,7 @@ class SerializableGenerator(list):
     def __init__(self, iterable):
         tmp_body = iter(iterable)
         try:
-            self._head = iter(next(tmp_body))
+            self._head = iter([next(tmp_body)])
             self.append(tmp_body)
         except StopIteration:
             self._head = []

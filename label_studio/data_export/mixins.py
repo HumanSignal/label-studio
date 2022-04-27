@@ -203,7 +203,8 @@ class ExportMixin:
 
                 serializer = ExportDataSerializer(tasks, many=True, **base_export_serializer_option)
                 self.counters['task_number'] += len(tasks)
-                yield serializer.data
+                for task in serializer.data:
+                    yield task
 
     @staticmethod
     def eval_md5(file):
