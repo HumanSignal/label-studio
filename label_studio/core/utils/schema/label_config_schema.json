@@ -140,7 +140,7 @@
     "Labels": {
       "type": "object",
       "anyOf": [
-        {"required": ["@name", "@toName", "Label"]},
+        {"required": ["@name", "@toName"]},
         {"required": ["@name", "@toName", "View"]}
       ],
       "properties": {
