@@ -1,6 +1,6 @@
 {
-  "message": "Preserve timeline visibility on expand/collapse (#528) (#545)",
-  "commit": "bdd0c5766fde6e81acbde35045bff25625f3a235",
+  "message": "feat: DEV-2128: Allow to use html inside label-tags (#578)",
+  "commit": "b78e6fbd3b3be0241ed4b41398dc5668494535e0",
   "branch": "master",
-  "date": "2022-03-24T09:30:40Z"
+  "date": "2022-04-20T20:01:35Z"
 }

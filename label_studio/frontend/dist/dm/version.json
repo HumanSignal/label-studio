@@ -1,6 +1,6 @@
 {
-  "message": "Fix: DEV-790: return column button quick-view (#37)\n\n* gear icon\r\n\r\n* detect scroll bar width\r\n\r\n* sticky columns button\r\n\r\n* calc width of scrollbar from ref\r\n\r\n* remove gear when not labeling\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: Sergey <Gondragos@gmail.com>",
-  "commit": "4e6b392ada45e7e7e614e5dec0c1a8e0e771016f",
+  "message": "Fix tasks selection (#44)",
+  "commit": "97e33ac0a9b0ea09398b00d7916671ca76cf2a71",
   "branch": "master",
-  "date": "2022-03-24T15:46:41Z"
+  "date": "2022-04-13T13:55:17Z"
 }

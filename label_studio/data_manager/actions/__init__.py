@@ -79,13 +79,20 @@ def register_actions_from_dir(base_module, action_dir):
     """ Find all python files nearby this file and try to load 'actions' from them
     """
     for path in os.listdir(action_dir):
-        if '.py' in path and '__init__' not in path:
-            name = path[0:path.find('.py')]  # get only module name to read *.py and *.pyc
-            module_actions = import_module(base_module + '.' + name).actions
+        # skip non module files
+        if '__init__' in path or path.startswith('.'):
+            continue
 
-            for action in module_actions:
-                register_action(**action)
-                logger.debug('Action registered: ' + str(action['entry_point'].__name__))
+        name = path[0:path.find('.py')]  # get only module name to read *.py and *.pyc
+        try:
+            module_actions = import_module(f'{base_module}.{name}').actions
+        except ModuleNotFoundError as e:
+            logger.info(e)
+            continue
+
+        for action in module_actions:
+            register_action(**action)
+            logger.debug('Action registered: ' + str(action['entry_point'].__name__))
 
 
 def perform_action(action_id, project, queryset, user, **kwargs):

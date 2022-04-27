@@ -145,7 +145,7 @@ class ExportAPI(generics.RetrieveAPIView):
         return Project.objects.filter(organization=self.request.user.active_organization)
 
     def get_task_queryset(self, queryset):
-        return queryset
+        return queryset.select_related('project').prefetch_related('annotations', 'predictions')
 
     def get(self, request, *args, **kwargs):
         project = self.get_object()
@@ -160,11 +160,10 @@ class ExportAPI(generics.RetrieveAPIView):
         tasks_ids = request.GET.getlist('ids[]')
 
         logger.debug('Get tasks')
-        tasks = Task.objects.filter(project=project)
+        query = Task.objects.filter(project=project)
         if tasks_ids and len(tasks_ids) > 0:
             logger.debug(f'Select only subset of {len(tasks_ids)} tasks')
-            tasks = tasks.filter(id__in=tasks_ids)
-        query = tasks.select_related('project').prefetch_related('annotations', 'predictions')
+            query = query.filter(id__in=tasks_ids)
         if only_finished:
             query = query.filter(annotations__isnull=False).distinct()
 
