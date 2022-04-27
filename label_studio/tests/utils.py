@@ -285,3 +285,7 @@ def verify_docs(response):
             print(method)
             if isinstance(method, dict):
                 assert 'api' not in method['tags'], f'Need docs for API method {method}'
+
+
+def empty_list(response):
+    assert len(response.json()) == 0, f'Response should be empty, but is {response.json()}'
