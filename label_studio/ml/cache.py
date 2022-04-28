@@ -2,7 +2,7 @@ from django.core.cache import cache
 
 
 def cached_ml_backend_key(project_id):
-    return f'ml_backends_project_id{project_id}'
+    return f'ml_backend_project_id_{project_id}'
 
 
 def cached_ml_backend_remove(project_id):
