@@ -288,15 +288,13 @@ RQ_QUEUES = {
     },
 }
 
-# # TODO: confirm if needed when LS running standalone
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-#         'LOCATION': '/var/tmp/django_cache',
-#         # 'LOCATION': 'c:/foo/bar',
-#     }
-# }
-
+CACHES = {
+    'default': {
+        # 'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'TIMEOUT': 86400,  # 24 hours
+    }
+}
 
 # Swagger: automatic API documentation
 SWAGGER_SETTINGS = {
