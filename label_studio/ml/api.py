@@ -87,14 +87,27 @@ class MLBackendListAPI(generics.ListCreateAPIView):
         project_pk = self.request.query_params.get('project')
         project = get_object_with_check_and_log(self.request, Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
+
+        from ml.cache import cached_ml_backend_get, cached_ml_backend_set
+        ml_backends = cached_ml_backend_get(project.id)
+        if ml_backends:
+            return ml_backends
+
         ml_backends = MLBackend.objects.filter(project_id=project.id)
         for mlb in ml_backends:
             mlb.update_state()
+        cached_ml_backend_set(project.id, ml_backends)
         return ml_backends
 
     def perform_create(self, serializer):
         ml_backend = serializer.save()
         ml_backend.update_state()
+        # TODO: expire cache on save
+        # project_pk = self.request.query_params.get('project')
+        # project = get_object_with_check_and_log(self.request, Project, pk=project_pk)
+        # if project.id:
+        # from ml.cache import cached_ml_backend_remove
+        # cached_ml_backend_remove(project.id)
 
 
 @method_decorator(
