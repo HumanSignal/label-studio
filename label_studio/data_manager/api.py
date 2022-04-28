@@ -123,7 +123,20 @@ class ViewAPI(viewsets.ModelViewSet):
         return Response(status=204)
 
     def get_queryset(self):
-        return View.objects.filter(project__organization=self.request.user.active_organization)
+        # return View.objects.filter(project__organization=self.request.user.active_organization)
+
+        # XXX not sure this will work correctly here
+        from data_manager.cache import cached_dm_tasks_view_get, cached_dm_tasks_view_set
+
+        org_id = self.request.user.active_organization.id
+        tasks = cached_dm_tasks_view_get(org_id)
+        if tasks:
+            return tasks
+
+        tasks = View.objects.filter(project__organization=self.request.user.active_organization)
+        if tasks:
+            cached_dm_tasks_view_set(org_id, tasks)
+        return tasks
 
 
 class TaskPagination(PageNumberPagination):
@@ -193,6 +206,7 @@ class TaskListAPI(generics.ListCreateAPIView):
         """
         api/tasks?page=1&page_size=30&view=1&project=1
         api/tasks?page=2&page_size=30&view=2&interaction=scroll&project=1
+        api/tasks?page=3&page_size=30&view=2&interaction=filter&project=1
         """
         # get project
         view_pk = int_from_request(request.GET, 'view', 0) or int_from_request(request.data, 'view', 0)
