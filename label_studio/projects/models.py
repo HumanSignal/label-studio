@@ -597,6 +597,10 @@ class Project(ProjectMixin, models.Model):
             elif self.num_annotations == 0:
                 self.summary.reset(tasks_data_based=False)
 
+        if self.created_by_id:
+            from projects.cache import cached_projects_remove
+            cached_projects_remove(self.created_by_id)
+
     def get_member_ids(self):
         if hasattr(self, 'team_link'):
             # project has defined team scope

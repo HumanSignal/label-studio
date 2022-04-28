@@ -79,6 +79,10 @@ def user_login(request):
     form = login_form()
 
     if user.is_authenticated:
+        # pre-load stuff for better user experience 
+        # XXX never reached...
+        from users.pre_load import cache_projects_list
+        cache_projects_list(user, request)
         return redirect(next_page)
 
     if request.method == 'POST':
