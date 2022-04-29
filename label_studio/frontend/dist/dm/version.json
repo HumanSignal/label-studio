@@ -1,6 +1,6 @@
 {
-  "message": "Fix: DEV-790: return column button quick-view (#37)\n\n* gear icon\r\n\r\n* detect scroll bar width\r\n\r\n* sticky columns button\r\n\r\n* calc width of scrollbar from ref\r\n\r\n* remove gear when not labeling\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: Sergey <Gondragos@gmail.com>",
-  "commit": "4e6b392ada45e7e7e614e5dec0c1a8e0e771016f",
-  "branch": "master",
-  "date": "2022-03-24T15:46:41Z"
+  "message": "update scroll method",
+  "commit": "54155becea8fa3b7d7f996aa88a3ce7da8a87f81",
+  "branch": "fix/DEV-1703/lost-task-position-in-quickview-and-fullview",
+  "date": "2022-04-28T22:50:21Z"
 }
