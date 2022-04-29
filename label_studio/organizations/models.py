@@ -115,11 +115,6 @@ class Organization(OrganizationMixin, models.Model):
             return om    
     
     def reset_token(self):
-        from rest_framework.authtoken.models import Token
-
-        token = Token.objects.filter(user_id=self.id)
-        if token.exists():
-            token.delete()
         self.token = create_hash()
         self.save()
 

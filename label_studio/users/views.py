@@ -45,20 +45,26 @@ def user_signup(request):
     if user.is_authenticated:
         return redirect(next_page)
 
-    # make a new user
     if request.method == 'POST':
-        organization = Organization.objects.first()
-        if settings.DISABLE_SIGNUP_WITHOUT_LINK is True:
-            if not(token and organization and token == organization.token):
-                raise PermissionDenied()
-
         user_form = forms.UserSignupForm(request.POST)
         organization_form = OrganizationSignupForm(request.POST)
+    elif request.method == 'GET':
+        user_form = forms.UserSignupForm(request.GET)
+        organization_form = OrganizationSignupForm(request.GET)
 
-        if user_form.is_valid():
-            redirect_response = proceed_registration(request, user_form, organization_form, next_page)
-            if redirect_response:
-                return redirect_response
+    # make a new user
+    organization = Organization.objects.first()
+    if settings.DISABLE_SIGNUP_WITHOUT_LINK is True:
+        if not(token and organization and token == organization.token):
+            raise PermissionDenied()
+    else:
+        if token and organization and token != organization.token:
+            raise PermissionDenied()
+
+    if user_form.is_valid():
+        redirect_response = proceed_registration(request, user_form, organization_form, next_page)
+        if redirect_response:
+            return redirect_response
 
     return render(request, 'users/user_signup.html', {
         'user_form': user_form,
