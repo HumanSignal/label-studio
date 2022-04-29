@@ -146,18 +146,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
             raise LabelStudioDatabaseException('Database error during project creation. Try again.')
 
     def get(self, request, *args, **kwargs):
-        from projects.cache import cached_projects_get, cached_projects_set
-
-        user_id = self.request.user.id
-        response = cached_projects_get(user_id)
-        if response:
-            return Response(response)
-
-        response = super(ProjectListAPI, self).get(request, *args, **kwargs)
-        cached_projects_set(user_id, response.data)
-
-        return response
-
+        return super(ProjectListAPI, self).get(request, *args, **kwargs)
 
     @api_webhook(WebhookAction.PROJECT_CREATED)
     def post(self, request, *args, **kwargs):
