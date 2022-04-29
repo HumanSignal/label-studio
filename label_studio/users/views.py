@@ -110,7 +110,11 @@ def user_account(request):
         return redirect(reverse('main'))
 
     form = forms.UserProfileForm(instance=user)
-    token = Token.objects.get(user=user)
+    try:
+        token = Token.objects.get(user=user)
+    except Token.DoesNotExist as e:
+        logger.info(e)
+        token = None
 
     if request.method == 'POST':
         form = forms.UserProfileForm(request.POST, instance=user)
