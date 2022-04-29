@@ -51,3 +51,14 @@ def test_reset_token_not_valid(business_client, client, settings):
             data={'email': 'test_user1@example.com', 'password': 'test_password'}
     )
     assert response.status_code == 403, response.content
+
+@pytest.mark.django_db
+def test_token_get_not_post_shows_form(business_client, client, settings):
+    settings.DISABLE_SIGNUP_WITHOUT_LINK = True
+
+    # cant bypass post
+    response = business_client.get('/api/invite')
+    invite_url = response.json()['invite_url']
+    response = client.get(f'{invite_url}&email=test_user@example.com&password=test_password')
+    assert response.status_code == 200, response.content
+    assert str(response.content).find('Create Account') != -1
