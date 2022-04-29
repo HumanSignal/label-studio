@@ -575,6 +575,10 @@ class Project(ProjectMixin, models.Model):
             objs = [ProjectOnboarding(project=self, step=step) for step in steps]
             ProjectOnboarding.objects.bulk_create(objs)
 
+            if self.created_by_id:
+                from projects.cache import cached_projects_remove
+                cached_projects_remove(self.created_by_id)
+
         # argument for recalculate project task stats
         if recalc:
             self.update_tasks_states(

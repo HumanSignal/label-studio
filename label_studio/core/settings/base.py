@@ -288,6 +288,14 @@ RQ_QUEUES = {
     },
 }
 
+CACHES = {
+    'default': {
+        # 'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'TIMEOUT': 86400,  # 24 hours
+    }
+}
+
 # Swagger: automatic API documentation
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
