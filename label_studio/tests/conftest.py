@@ -398,6 +398,11 @@ def get_server_url(live_server):
     yield live_server.url
 
 
+@pytest.fixture(name="export_test_dir")
+def export_test_dir():
+    os.makedirs('/tmp/export_test', exist_ok=True)
+
+    
 @pytest.fixture(name="local_files_storage")
 def local_files_storage(settings):
     settings.LOCAL_FILES_SERVING_ENABLED = True

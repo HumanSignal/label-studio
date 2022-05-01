@@ -40,3 +40,13 @@ ImportStorage:
 ExportStorage:
   - columnCount: 2
     fields: *redis_params
+  - columnCount: 1
+    columns:
+      - width: 345
+        fields:
+          - type: select
+            name: export_type
+            label: Export type
+            options:
+              - task
+              - annotation
