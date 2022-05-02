@@ -1,6 +1,6 @@
 {
-  "message": "use history to go back on button click",
-  "commit": "f638483bae813b211c07fa27e3452918685c4528",
-  "branch": "fix/DEV-1883/no-more-tasks-screen",
-  "date": "2022-03-28T18:58:36Z"
+  "message": "use select not sel to determine selection of choice",
+  "commit": "dea84d07c45a49984053c79d2f9be62243d4b798",
+  "branch": "fix/dev-659/choice-selected-preview",
+  "date": "2022-05-02T15:09:03Z"
 }
