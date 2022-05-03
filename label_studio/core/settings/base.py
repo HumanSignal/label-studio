@@ -39,7 +39,7 @@ if HOSTNAME:
             FORCE_SCRIPT_NAME = match.group(3)
             if FORCE_SCRIPT_NAME:
                 logger.info("=> Django URL prefix is set to: %s", FORCE_SCRIPT_NAME)
-    elif HOSTNAME.startswith('/')
+    elif HOSTNAME.startswith('/'):
         logger.info(
             "! HOST variable found in environment, and it contains a relative prefix path that we use as HOSTNAME: %s", HOSTNAME
         )
