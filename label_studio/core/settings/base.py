@@ -27,16 +27,10 @@ SILENCED_SYSTEM_CHECKS = []
 # Hostname is used for proper path generation to the resources, pages, etc
 HOSTNAME = get_env('HOST', '')
 if HOSTNAME:
-    if not HOSTNAME.startswith('http://') and not HOSTNAME.startswith('https://'):
-        logger.info(
-            "! HOST variable found in environment, but it must start with http:// or https://, ignore it: %s", HOSTNAME
-        )
-        HOSTNAME = ''
-    else:
-        logger.info("=> Hostname correctly is set to: %s", HOSTNAME)
+    if HOSTNAME.startswith('http://') or HOSTNAME.startswith('https://'):
+        logger.info("=> Hostname is set correctly to: %s", HOSTNAME)
         if HOSTNAME.endswith('/'):
             HOSTNAME = HOSTNAME[0:-1]
-
         # for django url resolver
         if HOSTNAME:
             # http[s]://domain.com:8080/script_name => /script_name
@@ -45,6 +39,23 @@ if HOSTNAME:
             FORCE_SCRIPT_NAME = match.group(3)
             if FORCE_SCRIPT_NAME:
                 logger.info("=> Django URL prefix is set to: %s", FORCE_SCRIPT_NAME)
+    elif HOSTNAME.startswith('/')
+        logger.info(
+            "! HOST variable found in environment, and it contains a relative prefix path that we use as HOSTNAME: %s", HOSTNAME
+        )
+        if HOSTNAME.endswith('/'):
+            HOSTNAME = HOSTNAME[0:-1]
+        # for django url resolver
+        if HOSTNAME:
+            FORCE_SCRIPT_NAME = HOSTNAME
+            if FORCE_SCRIPT_NAME:
+                logger.info("=> Django URL prefix is set to: %s", FORCE_SCRIPT_NAME)
+    else: 
+        logger.info(
+            "! HOST variable found in environment, but it must start with / or http:// or https://, ignore it: %s", HOSTNAME
+        )
+        HOSTNAME = ''
+
 
 INTERNAL_PORT = '8080'
 
