@@ -57,8 +57,8 @@ operators = {
     Operator.IN_LIST: "",
     Operator.NOT_IN_LIST: "",
     Operator.EMPTY: "__isnull",
-    Operator.CONTAINS: "__icontains",
-    Operator.NOT_CONTAINS: "__icontains",
+    Operator.CONTAINS: "__contains",
+    Operator.NOT_CONTAINS: "__contains",
     Operator.REGEX: "__regex"
 }
 
@@ -212,10 +212,10 @@ def apply_filters(queryset, filters, only_undefined_field=False):
                 filter_expressions.append(q if _filter.operator == Operator.EQUAL else ~q)
                 continue
             elif _filter.operator == Operator.CONTAINS:
-                filter_expressions.append(Q(**{name + '__icontains': _filter.value}))
+                filter_expressions.append(Q(**{name + '__contains': _filter.value}))
                 continue
             elif _filter.operator == Operator.NOT_CONTAINS:
-                filter_expressions.append(~Q(**{name + '__icontains': _filter.value}))
+                filter_expressions.append(~Q(**{name + '__contains': _filter.value}))
                 continue
 
         # annotation ids
