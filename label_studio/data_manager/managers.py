@@ -57,8 +57,8 @@ operators = {
     Operator.IN_LIST: "",
     Operator.NOT_IN_LIST: "",
     Operator.EMPTY: "__isnull",
-    Operator.CONTAINS: "__contains",
-    Operator.NOT_CONTAINS: "__contains",
+    Operator.CONTAINS: "__icontains",
+    Operator.NOT_CONTAINS: "__icontains",
     Operator.REGEX: "__regex"
 }
 
