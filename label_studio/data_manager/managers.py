@@ -207,7 +207,7 @@ def apply_filters(queryset, filters, only_undefined_field=False):
             _class = Annotation if field_name == 'annotations_results' else Prediction
             subquery = Exists(
                 _class.objects
-                .annotate(json_str=RawSQL('"result"::text', ''))
+                .annotate(json_str=RawSQL('cast(result as text)', ''))
                 .filter(Q(task=OuterRef('pk')) & Q(json_str__contains=_filter.value))
             )
 
