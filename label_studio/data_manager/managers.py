@@ -201,21 +201,30 @@ def apply_filters(queryset, filters, only_undefined_field=False):
 
         # annotations results & predictions results
         if field_name in ['annotations_results', 'predictions_results']:
-            name = 'annotations__result' if field_name == 'annotations_results' else 'predictions__result'
+            from django.db.models.expressions import RawSQL
+            from tasks.models import Annotation, Prediction
+
+            _class = Annotation if field_name == 'annotations_results' else Prediction
+            subquery = Exists(
+                _class.objects
+                .annotate(json_str=RawSQL('"result"::text', ''))
+                .filter(Q(task=OuterRef('pk')) & Q(json_str__contains=_filter.value))
+            )
+
             if _filter.operator in [Operator.EQUAL, Operator.NOT_EQUAL]:
                 try:
                     value = json.loads(_filter.value)
                 except:
                     return queryset.none()
 
-                q = Q(**{name: value})
+                q = Exists(_class.objects.filter(Q(task=OuterRef('pk')) & Q(result=value)))
                 filter_expressions.append(q if _filter.operator == Operator.EQUAL else ~q)
                 continue
             elif _filter.operator == Operator.CONTAINS:
-                filter_expressions.append(Q(**{name + '__contains': _filter.value}))
+                filter_expressions.append(Q(subquery))
                 continue
             elif _filter.operator == Operator.NOT_CONTAINS:
-                filter_expressions.append(~Q(**{name + '__contains': _filter.value}))
+                filter_expressions.append(~Q(subquery))
                 continue
 
         # annotation ids
