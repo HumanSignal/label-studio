@@ -17,6 +17,7 @@ from tasks.models import (
 from webhooks.utils import emit_webhooks_for_instance
 from webhooks.models import WebhookAction
 from data_manager.functions import evaluate_predictions
+from django.db import connection
 
 all_permissions = AllPermissions()
 logger = logging.getLogger(__name__)
@@ -40,7 +41,7 @@ def delete_tasks(project, queryset, **kwargs):
     """
     tasks_ids = list(queryset.values('id'))
     count = len(tasks_ids)
-    tasks_ids_list = [task['id'] for task in tasks_ids]
+    tasks_ids_list = [str(task['id']) for task in tasks_ids]
     # signals to switch off
     signals = [
         (post_delete, update_is_labeled_after_removing_annotation, Annotation),
@@ -52,26 +53,24 @@ def delete_tasks(project, queryset, **kwargs):
     # delete all project tasks
     if count == project.tasks.count():
         with temporary_disconnect_list_signal(signals):
-            queryset.delete()
+            with connection.cursor() as cursor:
+                cursor.execute(f'DELETE FROM task WHERE id in ({",".join(tasks_ids_list)})')
         project.summary.reset()
-
     # delete only specific tasks
     else:
         # update project summary
         start_job_async_or_sync(async_project_summary_recalculation, tasks_ids_list, project.id)
-
         with temporary_disconnect_list_signal(signals):
-            queryset.delete()
+            with connection.cursor() as cursor:
+                cursor.execute(f'DELETE FROM task WHERE id in ({",".join(tasks_ids_list)})')
 
     project.update_tasks_states(
         maximum_annotations_changed=False,
         overlap_cohort_percentage_changed=False,
         tasks_number_changed=True
     )
-
     # emit webhooks for project
     emit_webhooks_for_instance(project.organization, project, WebhookAction.TASKS_DELETED, tasks_ids)
-
     # remove all tabs if there are no tasks in project
     reload = False
     if not project.tasks.exists():
