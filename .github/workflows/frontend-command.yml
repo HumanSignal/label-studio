@@ -19,13 +19,25 @@ jobs:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.pull_request.head.repo.full_name }}
           ref: ${{ github.event.client_payload.pull_request.head.ref }}
-          submodules: 'recursive'
           fetch-depth: 0
 
       - name: Setup node
         uses: actions/setup-node@v3
         with:
           node-version: "${{ env.NODE }}"
+
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: echo "::set-output name=dir::$(npm config get cache)"
+
+      - uses: actions/cache@v3
+        name: Configure npm cache
+        id: npm-cache
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ env.NODE }}-
 
       - name: Install node-fetch
         run: |
@@ -39,16 +51,27 @@ jobs:
           REPO: ${{ github.event.client_payload.slash_command.args.unnamed.arg2 || 'all' }}
           SHA: ${{ github.event.client_payload.slash_command.args.unnamed.arg3 || 'master' }}
         run: |
+          set -xeuo pipefail
           if [ "${REPO}" = "all" ]; then
-            node label_studio/frontend/get-build.js lsf
-            node label_studio/frontend/get-build.js dm
+            node label_studio/frontend/get-build.js lsf | tee -a /tmp/output
+            grep 'Build link:' /tmp/output | cut -d":" -f2- >> /tmp/info_commit_msg 
+            node label_studio/frontend/get-build.js dm | tee -a /tmp/output
+            grep 'Build link:' /tmp/output | cut -d":" -f2- >> /tmp/info_commit_msg 
           else
-            node label_studio/frontend/get-build.js "${REPO}" "${SHA}"
+            node label_studio/frontend/get-build.js "${REPO}" "${SHA}" | tee -a /tmp/output
+            grep 'Build link:' /tmp/output | cut -d":" -f2- >> /tmp/info_commit_msg 
           fi
+          
+          echo "::set-output name=commit_msg_file::$(cat /tmp/info_commit_msg)"
+          echo "COMMIT_MSG_FILE<<EOF" >> $GITHUB_ENV
+          echo "$(cat /tmp/info_commit_msg)" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Commit and push
         id: commit_and_push
         shell: bash
+        env:
+          REPO: ${{ github.event.client_payload.slash_command.args.unnamed.arg2 || 'all' }}
         run: |
           set -xeuo pipefail
           
@@ -61,7 +84,7 @@ jobs:
             echo "::set-output name=changes::no"
             exit 0
           else 
-            git commit -m "[frontend] Get build"
+            git commit -m "[frontend] Get build ${REPO}"
           fi
           git push origin HEAD
 
@@ -87,6 +110,7 @@ jobs:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: |
             > Successfully pushed new changes
+            > ${{ env.COMMIT_MSG_FILE }}
             >
             > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
           reactions: "+1"
