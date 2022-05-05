@@ -70,6 +70,5 @@ deploy/pgsql/certs/*
 */*/1/*
 label_studio/tavern-output.json
 
-.config/*
 .python_history
 .viminfo
