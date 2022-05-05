@@ -280,12 +280,30 @@ TEMPLATES = [
 
 # RQ
 RQ_QUEUES = {
+    'critical': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 180,
+    },
+    'high': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 180,
+    },
     'default': {
         'HOST': 'localhost',
         'PORT': 6379,
         'DB': 0,
         'DEFAULT_TIMEOUT': 180,
-    }
+    },
+    'low': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 180,
+    },
 }
 
 # Swagger: automatic API documentation
