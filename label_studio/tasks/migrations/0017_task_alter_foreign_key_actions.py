@@ -33,7 +33,7 @@ def backwards(apps, schema_editor):
 class Migration(migrations.Migration):
     atomic = False
 
-    dependencies = [('tasks', '0015_task_fill_inner_id')]
+    dependencies = [('tasks', '0016_auto_20220414_1408')]
 
     operations = [
         TrigramExtension(),
