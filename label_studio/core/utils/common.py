@@ -29,7 +29,6 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.db.utils import OperationalError
 from django.db.models.signals import *
-from django.db import connection
 from rest_framework.views import Response, exception_handler
 from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
@@ -425,7 +424,7 @@ def collect_versions(force=False):
     :return: dict with sub-dicts of version descriptions
     """
     import label_studio
-    
+
     # prevent excess checks by time intervals
     current_time = time.time()
     need_check = current_time - settings.VERSIONS_CHECK_TIME > 300
@@ -475,14 +474,6 @@ def collect_versions(force=False):
     try:
         import label_studio_ml
         result['label-studio-ml'] = {'version': label_studio_ml.__version__}
-    except Exception as e:
-        pass
-
-    try:
-        result['database'] = {
-            'name': settings.DATABASE_NAME,
-            'version': str(connection.cursor().connection.server_version),
-        }
     except Exception as e:
         pass
 
