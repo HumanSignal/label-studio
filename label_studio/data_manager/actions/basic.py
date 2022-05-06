@@ -4,6 +4,8 @@ import logging
 
 from datetime import datetime
 from django.db.models.signals import post_delete, pre_delete
+from django.db import connection
+from django.conf import settings
 
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
@@ -17,7 +19,6 @@ from tasks.models import (
 from webhooks.utils import emit_webhooks_for_instance
 from webhooks.models import WebhookAction
 from data_manager.functions import evaluate_predictions
-from django.db import connection
 
 all_permissions = AllPermissions()
 logger = logging.getLogger(__name__)
@@ -50,19 +51,20 @@ def delete_tasks(project, queryset, **kwargs):
         (pre_delete, remove_project_summary_annotations, Annotation)
     ]
 
-    # delete all project tasks
-    if count == project.tasks.count():
-        with temporary_disconnect_list_signal(signals):
-            with connection.cursor() as cursor:
-                cursor.execute(f'DELETE FROM task WHERE id in ({",".join(tasks_ids_list)})')
-        project.summary.reset()
-    # delete only specific tasks
-    else:
-        # update project summary
+    if count != project.tasks.count():
+        # recalculate project summary if only specific tasks are deleted
         start_job_async_or_sync(async_project_summary_recalculation, tasks_ids_list, project.id)
+    if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
         with temporary_disconnect_list_signal(signals):
-            with connection.cursor() as cursor:
-                cursor.execute(f'DELETE FROM task WHERE id in ({",".join(tasks_ids_list)})')
+            Annotation.objects.filter(task__id__in=tasks_ids_list).delte()
+            Prediction.objects.filter(task__id__in=tasks_ids_list).delte()
+            queryset.delete()
+    else:
+        with connection.cursor() as cursor:
+            cursor.execute(f'DELETE FROM task WHERE id in ({",".join(tasks_ids_list)})')
+    if count == project.tasks.count():
+        # reset project summary if all tasks are deleted
+        project.summary.reset()
 
     project.update_tasks_states(
         maximum_annotations_changed=False,
