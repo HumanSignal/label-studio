@@ -504,16 +504,18 @@ class UploadedFileResponse(generics.RetrieveAPIView):
                 safe_attrs_only=False,
                 remove_unknown_tags=False)
 
-        fd_dirty = open(dirty_file.path, 'r')
-        dirty_xml = fd_dirty.read()
-        clean_xml = cleaner.clean_html(dirty_xml)
-        clean_xml = clean_xml.replace('<div>', '').replace('</div>', '')
-        fd_dirty.close()
-
-        fd_clean = tempfile.NamedTemporaryFile(delete=False)
         try:
-            fd_clean.write(clean_xml.encode())
-            fd_clean.seek(0)
-            return fd_clean
-        except IOError as e:
-            logger.debug(f'Sanitize svg file upload error {e}')
+            fd_dirty = open(dirty_file.path, 'r')
+            dirty_xml = fd_dirty.read()
+            clean_xml = cleaner.clean_html(dirty_xml)
+            clean_xml = clean_xml.replace('<div>', '').replace('</div>', '')
+            fd_dirty.close()
+            fd_clean = tempfile.NamedTemporaryFile(delete=False)
+            try:
+                fd_clean.write(clean_xml.encode())
+                fd_clean.seek(0)
+                return fd_clean
+            except IOError as error:
+                logger.debug(f'Sanitize SVG file error {error}')
+        except (IOError, OSError, FileNotFoundError) as error:
+            logger.debug(f'open SVG file error {error}')
