@@ -29,6 +29,7 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.db.utils import OperationalError
 from django.db.models.signals import *
+from django.db import connection
 from rest_framework.views import Response, exception_handler
 from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
@@ -148,7 +149,7 @@ def paginator(objects, request, default_page=1, default_size=50):
 
     if 'start' in request.GET:
         page = int_from_request(request.GET, 'start', default_page)
-        if page and int(page) > int(page_size) and int(page_size) > 0:
+        if page and int(page) > int(page_size) > 0:
             page = int(page / int(page_size)) + 1
         else:
             page += 1
@@ -164,6 +165,7 @@ def paginator(objects, request, default_page=1, default_size=50):
         return []
     except EmptyPage:
         return []
+
 
 def paginator_help(objects_name, tag):
     """ API help for paginator, use it with swagger_auto_schema
@@ -473,6 +475,14 @@ def collect_versions(force=False):
     try:
         import label_studio_ml
         result['label-studio-ml'] = {'version': label_studio_ml.__version__}
+    except Exception as e:
+        pass
+
+    try:
+        result['database'] = {
+            'name': settings.DATABASE_NAME,
+            'version': str(connection.cursor().connection.server_version),
+        }
     except Exception as e:
         pass
 
