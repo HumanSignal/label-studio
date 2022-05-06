@@ -483,6 +483,9 @@ class UploadedFileResponse(generics.RetrieveAPIView):
         import tempfile
 
         allow_tags = [
+                'xml',
+                'DOCTYPE',
+                'svg',
                 'circle',
                 'ellipse',
                 'line',
@@ -494,12 +497,17 @@ class UploadedFileResponse(generics.RetrieveAPIView):
 
         cleaner = clean.Cleaner(
                 allow_tags=allow_tags,
-                remove_unknown_tags=False
-        )
+                style=True,
+                links=True,
+                add_nofollow=False,
+                page_structure=True,
+                safe_attrs_only=False,
+                remove_unknown_tags=False)
 
         fd_dirty = open(dirty_file.path, 'r')
         dirty_xml = fd_dirty.read()
         clean_xml = cleaner.clean_html(dirty_xml)
+        clean_xml = clean_xml.replace('<div>', '').replace('</div>', '')
         fd_dirty.close()
 
         fd_clean = tempfile.NamedTemporaryFile(delete=False)
