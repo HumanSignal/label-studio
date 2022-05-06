@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import os.path
 import time
 import logging
 import drf_yasg.openapi as openapi
@@ -449,7 +450,7 @@ class UploadedFileResponse(generics.RetrieveAPIView):
     def get(self, *args, **kwargs):
         request = self.request
         filename = kwargs['filename']
-        file = settings.UPLOAD_DIR + ('/' if not settings.UPLOAD_DIR.endswith('/') else '') + filename
+        file = os.path.join(settings.UPLOAD_DIR, filename)
         logger.debug(f'Fetch uploaded file by user {request.user} => {file}')
         file_upload = FileUpload.objects.filter(file=file).last()
 
@@ -459,8 +460,52 @@ class UploadedFileResponse(generics.RetrieveAPIView):
         file = file_upload.file
         if file.storage.exists(file.name):
             content_type, encoding = mimetypes.guess_type(str(file.name))
-            if content_type not in ['image/jpeg', 'image/gif', 'image/png', 'application/pdf']:
-                content_type = 'text/plain'
+            content_type = content_type or 'application/octet-stream'
+            mime_type_filter = [
+                    'image/svg+xml',
+                    # 'application/xhtml+xml',
+                    # 'text/html',
+                    # 'text/javascript'
+            ]
+            if content_type in mime_type_filter:
+                return RangedFileResponse(
+                        request, self._allowlist_svg(file),
+                        content_type=content_type)
+
             return RangedFileResponse(request, file.open(mode='rb'), content_type=content_type)
+
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def _allowlist_svg(self, dirty_file):
+        """Define allowed tags for SVG files"""
+        from lxml.html import clean
+        import tempfile
+
+        allow_tags = [
+                'circle',
+                'ellipse',
+                'line',
+                'path',
+                'polygon',
+                'polyline',
+                'rect'
+        ]
+
+        cleaner = clean.Cleaner(
+                allow_tags=allow_tags,
+                remove_unknown_tags=False
+        )
+
+        fd_dirty = open(dirty_file.path, 'r')
+        dirty_xml = fd_dirty.read()
+        clean_xml = cleaner.clean_html(dirty_xml)
+        fd_dirty.close()
+
+        fd_clean = tempfile.NamedTemporaryFile(delete=False)
+        try:
+            fd_clean.write(clean_xml.encode())
+            fd_clean.seek(0)
+            return fd_clean
+        except IOError as e:
+            logger.debug(f'Sanitize svg file upload error {e}')

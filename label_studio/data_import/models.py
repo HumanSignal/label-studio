@@ -67,6 +67,8 @@ class FileUpload(models.Model):
             body = getattr(self, '_file_body')
         else:
             body = self.file.read().decode('utf-8')
+            # TODO: ? filter out malicious/harmful content from file.
+            # e.g. bleach
             setattr(self, '_file_body', body)
         return body
 
