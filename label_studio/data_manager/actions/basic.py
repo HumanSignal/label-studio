@@ -56,8 +56,8 @@ def delete_tasks(project, queryset, **kwargs):
         start_job_async_or_sync(async_project_summary_recalculation, tasks_ids_list, project.id)
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
         with temporary_disconnect_list_signal(signals):
-            Annotation.objects.filter(task__id__in=tasks_ids_list).delte()
-            Prediction.objects.filter(task__id__in=tasks_ids_list).delte()
+            Annotation.objects.filter(task__id__in=tasks_ids_list).delete()
+            Prediction.objects.filter(task__id__in=tasks_ids_list).delete()
             queryset.delete()
     else:
         with connection.cursor() as cursor:
