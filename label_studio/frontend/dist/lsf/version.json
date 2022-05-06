@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2100: Fix preselected choices (#584)\n\n- working with empty annotation\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "ee38e771760e1ce57ac62dc1556ddd0718f62487",
-  "branch": "master",
-  "date": "2022-04-27T11:55:50Z"
+  "message": "Prevent item selection on collapse/expand",
+  "commit": "9b7c06839754364bd8d6b7f332e761a6346f5717",
+  "branch": "fix/dev-2267/truncate-comments",
+  "date": "2022-05-06T12:39:03Z"
 }
