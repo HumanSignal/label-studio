@@ -7,6 +7,7 @@ import ssl
 import uuid
 import pickle
 import logging
+import mimetypes
 try:
     import ujson as json
 except:
@@ -58,8 +59,53 @@ def check_file_sizes_and_number(files):
 
 def create_file_upload(request, project, file):
     instance = FileUpload(user=request.user, project=project, file=file)
+    content_type, encoding = mimetypes.guess_type(str(instance.file.name))
+    if content_type in ['image/svg+xml']:
+        clean_xml = _allowlist_svg(instance.file.read())
+        instance.file.seek(0)
+        instance.file.write(clean_xml)
+        instance.file.truncate()
     instance.save()
     return instance
+
+
+def _allowlist_svg(dirty_xml):
+    """Filter out malicious/harmful content from SVG files
+    by defining allowed tags
+    """
+    from lxml import etree
+    from lxml.html import clean
+
+    dirty_xml_parsed = etree.fromstring(
+            dirty_xml, parser=etree.XMLParser(recover=True))
+
+    dirty_xml = etree.tostring(
+            dirty_xml_parsed, pretty_print=True,
+            xml_declaration=True, encoding='UTF-8', standalone=True)
+
+    allow_tags = [
+            'xml',
+            'svg',
+            'circle',
+            'ellipse',
+            'line',
+            'path',
+            'polygon',
+            'polyline',
+            'rect'
+    ]
+
+    cleaner = clean.Cleaner(
+            allow_tags=allow_tags,
+            style=True,
+            links=True,
+            add_nofollow=False,
+            page_structure=True,
+            safe_attrs_only=False,
+            remove_unknown_tags=False)
+
+    clean_xml = cleaner.clean_html(dirty_xml)
+    return clean_xml
 
 
 def str_to_json(data):
