@@ -462,6 +462,5 @@ class UploadedFileResponse(generics.RetrieveAPIView):
             content_type, encoding = mimetypes.guess_type(str(file.name))
             content_type = content_type or 'application/octet-stream'
             return RangedFileResponse(request, file.open(mode='rb'), content_type=content_type)
-
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
