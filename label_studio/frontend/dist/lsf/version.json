@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1690: Fix tools multiplication issue (#481)\n\nClear tools list on destroy",
-  "commit": "214b0032521a52c56e07162fd57e828dadde3d88",
+  "message": "fix: DEV-2348: don't scroll out TopBar (#611)",
+  "commit": "50ddc7c8f7159d92a65919afc97e68d41e8d9b25",
   "branch": "master",
-  "date": "2022-05-09T19:42:43Z"
+  "date": "2022-05-10T11:03:46Z"
 }
