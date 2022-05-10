@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2100: Fix preselected choices (#584)\n\n- working with empty annotation\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "ee38e771760e1ce57ac62dc1556ddd0718f62487",
+  "message": "fix: DEV-1690: Fix tools multiplication issue (#481)\n\nClear tools list on destroy",
+  "commit": "214b0032521a52c56e07162fd57e828dadde3d88",
   "branch": "master",
-  "date": "2022-04-27T11:55:50Z"
+  "date": "2022-05-09T19:42:43Z"
 }
