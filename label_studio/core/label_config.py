@@ -8,10 +8,10 @@ import os
 import xmljson
 import jsonschema
 import re
+import defusedxml.ElementTree as etree
 
 from urllib.parse import urlencode
 from collections import OrderedDict
-from defusedxml import lxml as dlxml
 from collections import defaultdict
 from django.conf import settings
 from label_studio.core.utils.io import find_file
@@ -74,7 +74,7 @@ def _fix_choices(config):
 
 def parse_config_to_json(config_string):
     parser = etree.XMLParser(recover=False)
-    xml = dlxml.fromstring(config_string, parser)
+    xml = etree.fromstring(config_string, parser)
     if xml is None:
         raise etree.XMLSchemaParseError('xml is empty or incorrect')
     config = xmljson.badgerfish.data(xml)
@@ -111,7 +111,7 @@ def validate_label_config(config_string):
 def extract_data_types(label_config):
     # load config
     parser = etree.XMLParser()
-    xml = dlxml.fromstring(label_config, parser)
+    xml = etree.fromstring(label_config, parser)
     if xml is None:
         raise etree.XMLSchemaParseError('Project config is empty or incorrect')
 
@@ -160,7 +160,7 @@ def get_all_object_tag_names(label_config):
 
 
 def config_line_stipped(c):
-    tree = dlxml.fromstring(c)
+    tree = etree.fromstring(c)
     comments = tree.xpath('//comment()')
 
     for c in comments:
@@ -221,7 +221,7 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
     """
     # load config
     parser = etree.XMLParser()
-    xml = dlxml.fromstring(label_config, parser)
+    xml = etree.fromstring(label_config, parser)
     if xml is None:
         raise etree.XMLSchemaParseError('Project config is empty or incorrect')
 

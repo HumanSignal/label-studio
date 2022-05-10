@@ -2,7 +2,7 @@
 """
 from rest_framework.exceptions import APIException, ValidationError
 from rest_framework import status
-from lxml.etree import XMLSyntaxError
+from defusedxml import DefusedXmlException
 
 
 class LabelStudioError(Exception):
