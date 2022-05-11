@@ -11,8 +11,9 @@ logger = logging.getLogger(__name__)
 try:
     _redis = get_connection()
     _redis.ping()
+    logger.debug('=> Redis is connected successfully.')
 except:
-    logger.debug('Redis is not connected.')
+    logger.debug('=> Redis is not connected.')
     _redis = None
 
 

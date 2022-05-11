@@ -178,7 +178,7 @@ def test_delete_annotations(business_client, configured_project):
          'overlap': 1, 'file_upload': None, 'annotations_ids': '', 'annotations_results': '',
          'annotators': [], 'cancelled_annotations': 0, 'completed_at': None, 'predictions_model_versions': '',
          'predictions_results': '', 'predictions_score': None, 'total_annotations': 0, 'total_predictions': 0,
-         'avg_lead_time': None},
+         'avg_lead_time': None, 'inner_id': 0},
         200
     )
 ])
@@ -209,7 +209,7 @@ def test_get_task(client_and_token, configured_project, response, status_code):
         {"id": 0, "annotations": [], 'predictions': [],
          "data": {"text": "TEST1", "meta_info": "TEST2"}, "meta": {},
          "created_at": "", "updated_at": "", "updated_by": None, "is_labeled": False, "project": 0,
-         'overlap': 1, 'file_upload': None},
+         'overlap': 1, 'file_upload': None, "inner_id": 1},
         200
     )
 ])

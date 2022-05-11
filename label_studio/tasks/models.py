@@ -9,6 +9,7 @@ import numbers
 from urllib.parse import urljoin, quote
 
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.db import models, connection, transaction
 from django.db.models import Q, F, When, Count, Case, Subquery, OuterRef, Value
 from django.db.models.functions import Coalesce
@@ -22,8 +23,7 @@ from django.dispatch import receiver, Signal
 from django.core.files.storage import default_storage
 from rest_framework.exceptions import ValidationError
 
-from model_utils import FieldTracker
-
+from core.feature_flags import flag_set
 from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func
 from core.utils.params import get_env
 from core.label_config import SINGLE_VALUED_TAGS
@@ -65,6 +65,8 @@ class Task(TaskMixin, models.Model):
         'data_import.FileUpload', on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks',
         help_text='Uploaded file used as data source for this task'
     )
+    inner_id = models.BigIntegerField(_('inner id'), default=0, db_index=True, null=True,
+                                      help_text='Internal task ID in the project, starts with 1')
     updates = ['is_labeled']
 
     objects = TaskManager()  # task manager by default
@@ -75,6 +77,7 @@ class Task(TaskMixin, models.Model):
         ordering = ['-updated_at']
         indexes = [
             models.Index(fields=['project', 'is_labeled']),
+            models.Index(fields=['id', 'project']),
             models.Index(fields=['id', 'overlap']),
             models.Index(fields=['overlap']),
             models.Index(fields=['is_labeled'])
@@ -258,6 +261,16 @@ class Task(TaskMixin, models.Model):
     def ensure_unique_groundtruth(self, annotation_id):
         self.annotations.exclude(id=annotation_id).update(ground_truth=False)
 
+    def save(self, *args, **kwargs):
+        if flag_set('ff_back_2070_inner_id_12052022_short', self.project.organization.created_by):
+            if self.inner_id == 0:
+                task = Task.objects.filter(project=self.project).order_by("-inner_id").first()
+                max_inner_id = 1
+                if task:
+                    max_inner_id = task.inner_id
+                self.inner_id = max_inner_id + 1
+        super().save(*args, **kwargs)
+
 
 pre_bulk_create = Signal(providing_args=["objs", "batch_size"])
 post_bulk_create = Signal(providing_args=["objs", "batch_size"])
@@ -287,7 +300,6 @@ class Annotation(AnnotationMixin, models.Model):
     """ Annotations & Labeling results
     """
     objects = AnnotationManager()
-    tracker = FieldTracker(fields=['ground_truth', 'result'])
 
     result = JSONField('result', null=True, default=None, help_text='The main value of annotator work - '
                                                                     'labeling result in JSON format')
@@ -318,6 +330,7 @@ class Annotation(AnnotationMixin, models.Model):
         db_table = 'task_completion'
         indexes = [
             models.Index(fields=['task', 'ground_truth']),
+            models.Index(fields=['task', 'completed_by']),
             models.Index(fields=['was_cancelled']),
             models.Index(fields=['ground_truth']),
             models.Index(fields=['created_at']),
@@ -610,8 +623,6 @@ def update_is_labeled_after_removing_annotation(sender, instance, **kwargs):
 def delete_draft(sender, instance, **kwargs):
     task = instance.task
     query_args = {'task': instance.task, 'annotation': instance}
-    if instance.completed_by is not None:
-        query_args['user'] = instance.completed_by
     drafts = AnnotationDraft.objects.filter(**query_args)
     num_drafts = drafts.count()
     drafts.delete()

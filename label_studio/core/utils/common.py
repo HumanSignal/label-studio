@@ -23,7 +23,7 @@ import re
 
 from django.db import models, transaction
 from django.utils.module_loading import import_string
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from django.conf import settings
@@ -148,15 +148,22 @@ def paginator(objects, request, default_page=1, default_size=50):
 
     if 'start' in request.GET:
         page = int_from_request(request.GET, 'start', default_page)
-        page = page / int(page_size) + 1
+        if page and int(page) > int(page_size) > 0:
+            page = int(page / int(page_size)) + 1
+        else:
+            page += 1
     else:
         page = int_from_request(request.GET, 'page', default_page)
 
     if page_size == '-1':
         return objects
-    else:
-        paginator = Paginator(objects, page_size)
-        return paginator.page(page).object_list
+
+    try:
+        return Paginator(objects, page_size).page(page).object_list
+    except ZeroDivisionError:
+        return []
+    except EmptyPage:
+        return []
 
 
 def paginator_help(objects_name, tag):
@@ -176,8 +183,8 @@ def paginator_help(objects_name, tag):
                               description=page_size_description)
         ],
         responses={
-            200: openapi.Response(title='OK', description=''),
-            404: openapi.Response(title='', description=f'No more {objects_name} found')
+            200: openapi.Response(title='OK', description='')
+            # 404: openapi.Response(title='', description=f'No more {objects_name} found')
         })
 
 
@@ -417,7 +424,7 @@ def collect_versions(force=False):
     :return: dict with sub-dicts of version descriptions
     """
     import label_studio
-    
+
     # prevent excess checks by time intervals
     current_time = time.time()
     need_check = current_time - settings.VERSIONS_CHECK_TIME > 300
