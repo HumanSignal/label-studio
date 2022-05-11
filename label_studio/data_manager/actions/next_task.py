@@ -2,7 +2,6 @@
 """
 import logging
 
-from projects.api import ProjectNextTaskAPI
 from rest_framework.exceptions import NotFound
 from data_manager.functions import filters_ordering_selected_items_exist
 from projects.functions.next_task import get_next_task

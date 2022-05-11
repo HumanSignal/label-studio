@@ -242,24 +242,8 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
     swagger_schema = None # this endpoint doesn't need to be in swagger API docs
 
     def get(self, request, *args, **kwargs):
-        project = self.get_object()
-        dm_queue = filters_ordering_selected_items_exist(request.data)
-        prepared_tasks = get_prepared_queryset(request, project)
-
-        next_task, queue_info = get_next_task(request.user, prepared_tasks, project, dm_queue)
-
-        if next_task is None:
-            raise NotFound(
-                f'There are still some tasks to complete for the user={request.user}, '
-                f'but they seem to be locked by another user.')
-
-        # serialize task
-        context = {'request': request, 'project': project, 'resolve_uri': True}
-        serializer = NextTaskSerializer(next_task, context=context)
-        response = serializer.data
-
-        response['queue'] = queue_info
-        return Response(response)
+        logger.error('This endpoint is under construction')
+        return Response(status=404)
 
 
 @method_decorator(name='post', decorator=swagger_auto_schema(
