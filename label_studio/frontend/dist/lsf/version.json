@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2348: don't scroll out TopBar (#611)",
-  "commit": "50ddc7c8f7159d92a65919afc97e68d41e8d9b25",
-  "branch": "master",
-  "date": "2022-05-10T11:03:46Z"
+  "message": "Disable poly and keypoint for the history items",
+  "commit": "45c43f1e8a1fad6f07a0143681ea35769c89f12f",
+  "branch": "fix/dev-2283/readonly-history-2",
+  "date": "2022-05-11T16:52:46Z"
 }
