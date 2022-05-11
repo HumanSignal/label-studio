@@ -16,6 +16,7 @@ from django.conf import settings
 from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 
 from data_manager.functions import DataManagerException
+from core.feature_flags import flag_set
 
 logger = logging.getLogger('django')
 
@@ -46,7 +47,10 @@ def get_all_actions(user, project):
         and check_permissions(user, action)
     ]
     # remove experimental features if they are disabled
-    if not settings.EXPERIMENTAL_FEATURES:
+    if not (
+            flag_set('ff_back_experimental_features', user=project.organization.created_by)
+            or settings.EXPERIMENTAL_FEATURES
+    ):
         actions = [action for action in actions if not action.get('experimental', False)]
 
     # generate form if function is passed
