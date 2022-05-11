@@ -1,10 +1,10 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from core.label_config import generate_sample_task_without_check
-from drf_dynamic_fields import DynamicFieldsMixin
 from rest_framework import serializers
+from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework.serializers import SerializerMethodField
 from users.serializers import UserSimpleSerializer
+
 
 from projects.models import Project, ProjectOnboarding, ProjectSummary
 
@@ -16,7 +16,7 @@ class CreatedByFromContext:
         return serializer_field.context.get('created_by')
 
 
-class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+class ProjectSerializer(FlexFieldsModelSerializer):
     """ Serializer get numbers from project queryset annotation,
         make sure, that you use correct one(Project.objects.with_counts())
     """

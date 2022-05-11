@@ -1,6 +1,6 @@
 {
-  "message": "Fix: DEV-790: return column button quick-view (#37)\n\n* gear icon\r\n\r\n* detect scroll bar width\r\n\r\n* sticky columns button\r\n\r\n* calc width of scrollbar from ref\r\n\r\n* remove gear when not labeling\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: Sergey <Gondragos@gmail.com>",
-  "commit": "4e6b392ada45e7e7e614e5dec0c1a8e0e771016f",
+  "message": "Merge pull request #55 from heartexlabs/fix/dev-706/time-picking\n\nfix: DEV-706: Time picking in the DM filter",
+  "commit": "c3a003ea8a7305767ec3b87cdf50c4b5a33e1aba",
   "branch": "master",
-  "date": "2022-03-24T15:46:41Z"
+  "date": "2022-05-06T15:02:31Z"
 }

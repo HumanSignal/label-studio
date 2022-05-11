@@ -1,6 +1,6 @@
 {
-  "message": "Fix saving readonly results",
-  "commit": "b91228f28f8ffe34215f1a7674bcce311cf802d3",
+  "message": "Properly export readonly property",
+  "commit": "84be634588a768f8a9f938ec4c95d6becae933b3",
   "branch": "fix/dev-2001/export-readonly",
-  "date": "2022-04-05T17:36:58Z"
+  "date": "2022-05-11T17:36:53Z"
 }
