@@ -1,6 +1,6 @@
 {
-  "message": "Disable poly and keypoint for the history items",
-  "commit": "45c43f1e8a1fad6f07a0143681ea35769c89f12f",
-  "branch": "fix/dev-2283/readonly-history-2",
-  "date": "2022-05-11T16:52:46Z"
+  "message": "fix: DEV-2001: Saving readonly regions (#560)\n\n* Fix saving readonly results\r\n\r\n* Properly export readonly property",
+  "commit": "071f7989f4a69ce0f6fea4ea8f54651e2964c74c",
+  "branch": "master",
+  "date": "2022-05-12T08:53:19Z"
 }
