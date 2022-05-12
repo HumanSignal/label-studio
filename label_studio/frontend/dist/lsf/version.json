@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2100: Fix preselected choices (#584)\n\n- working with empty annotation\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "ee38e771760e1ce57ac62dc1556ddd0718f62487",
+  "message": "fix: DEV-2267: Truncate comments (#609)\n\n* Properly truncate long comments\r\n\r\n* Prevent item selection on collapse/expand\r\n\r\n* Comment",
+  "commit": "e9a3190ddcd0da50a43014ba508b16b213fb64fe",
   "branch": "master",
-  "date": "2022-04-27T11:55:50Z"
+  "date": "2022-05-12T13:15:47Z"
 }

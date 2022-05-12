@@ -7,6 +7,7 @@ from rest_framework import serializers
 
 from core.label_config import replace_task_data_undefined_with_config_field
 from core.utils.common import load_func
+from ml.mixins import InteractiveMixin
 from tasks.models import Annotation, Task
 from tasks.serializers import AnnotationDraftSerializer, PredictionSerializer
 from users.models import User
@@ -144,6 +145,10 @@ class ExportParamSerializer(serializers.Serializer):
     download_all_tasks = serializers.BooleanField(default=False,
                                                   help_text='Download all tasks or only finished.',
                                                   required=False)
+
+
+class BaseExportDataSerializerForInteractive(InteractiveMixin, BaseExportDataSerializer):
+    pass
 
 
 ExportDataSerializer = load_func(settings.EXPORT_DATA_SERIALIZER)

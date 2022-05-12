@@ -554,8 +554,8 @@ class NextTaskSerializer(TaskWithAnnotationsAndPredictionsAndDraftsSerializer):
 
     def get_annotations(self, task):
         result = []
-        annotations = super().get_annotations(task)
-        if 'request' in self.context and hasattr(self.context['request'], 'user'):
+        if self.context.get('annotations', False):
+            annotations = super().get_annotations(task)
             user = self.context['request'].user
             for annotation in annotations:
                 if annotation.get('completed_by') == user.id:
