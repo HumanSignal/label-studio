@@ -171,6 +171,8 @@ You can then import text tasks to label that match the following JSON format:
       "from_name": "sentiment_class",
       "to_name": "message",
       "type": "choices",
+      "readonly": false,
+      "hidden": false,
       "value": {
         "choices": ["Positive"]
       }
@@ -184,6 +186,8 @@ You can then import text tasks to label that match the following JSON format:
       "from_name": "sentiment_class",
       "to_name": "message",
       "type": "choices",
+      "readonly": false,
+      "hidden": false,
       "value": {
         "choices": ["Neutral"]
       }
@@ -342,11 +346,13 @@ If you're running Label Studio on Docker and want to add local file storage, you
 ## Import data from the Label Studio UI
 
 To import data from the Label Studio UI, do the following:
-1. On the Label Studio UI, open a specific project.
-2. Click **Import** to open the import page available at [http://localhost:8080/import](http://localhost:8080/import).
+1. On the Label Studio UI, open the Data Manager page for a specific project.
+2. Click **Import** to open the Import dialog.
 3. Import your data from files or URLs. 
 
-Data that you import is project-specific. 
+Data that you import is project-specific.
+
+<img src="/images/screens/import-button.png" class="img-template-example" title="Import Button in Data Manager" /> 
 
 ## Import data using the API
 

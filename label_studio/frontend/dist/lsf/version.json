@@ -1,6 +1,6 @@
 {
-  "message": "fix: dev-2068: toolswitch-finish-drawing (#574)\n\n* check the number of pointes if points\r\n\r\n* remove logging\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "02b1197a8abd249459e50471a0c13c0c627e94e3",
+  "message": "fix: DEV-2001: Saving readonly regions (#560)\n\n* Fix saving readonly results\r\n\r\n* Properly export readonly property",
+  "commit": "071f7989f4a69ce0f6fea4ea8f54651e2964c74c",
   "branch": "master",
-  "date": "2022-04-14T10:01:18Z"
+  "date": "2022-05-12T08:53:19Z"
 }

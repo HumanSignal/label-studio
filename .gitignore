@@ -69,6 +69,7 @@ deploy/pgsql/certs/*
 1/*
 */*/1/*
 label_studio/tavern-output.json
+docker-compose.override.yml
 
 .config/*
 .python_history

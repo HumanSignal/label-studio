@@ -3,13 +3,16 @@
 import logging
 import ujson as json
 
-from collections import Counter
 from django.conf import settings
+from django.db.models import Count
 
 from tasks.models import Annotation
 from tasks.serializers import TaskSerializerBulk
 from data_manager.functions import DataManagerException
+from data_manager.actions.basic import delete_tasks
 from core.permissions import AllPermissions
+from collections import defaultdict
+
 
 logger = logging.getLogger(__name__)
 all_permissions = AllPermissions()
@@ -61,23 +64,48 @@ def propagate_annotations_form(user, project):
 
 
 def remove_duplicates(project, queryset, **kwargs):
-    tasks = list(queryset.values('data', 'id'))
+    tasks = list(
+        queryset
+        .annotate(total_annotations=Count('annotations'))
+        .values('data', 'id', 'total_annotations')
+    )
+    duplicates = defaultdict(list)
     for task in list(tasks):
         task['data'] = json.dumps(task['data'])
-
-    counter = Counter([task['data'] for task in tasks])
+        duplicates[task['data']].append(task)
 
     removing = []
-    first = set()
-    for task in tasks:
-        if counter[task['data']] > 1 and task['data'] in first:
-            removing.append(task['id'])
-        else:
-            first.add(task['data'])
 
-    # iterate by duplicate groups
-    queryset.filter(id__in=removing, annotations__isnull=True).delete()
+    # prepare main tasks which won't be deleted
+    for data in duplicates:
+        root = duplicates[data]
+        if len(root) == 1:
+            continue
 
+        one_task_saved = False
+        new_root = []
+        for task in root:
+            # keep all tasks with annotations in safety
+            if task['total_annotations'] > 0:
+                one_task_saved = True
+            else:
+                new_root.append(task)
+
+        for task in new_root:
+            # keep the first task in safety
+            if not one_task_saved:
+                one_task_saved = True
+            # remove all other tasks
+            else:
+                removing.append(task['id'])
+
+    # remove tasks
+    queryset = queryset.filter(id__in=removing, annotations__isnull=True)
+    assert queryset.count() == len(removing), \
+        f'Remove duplicates failed, operation is not finished: ' \
+        f'queryset count {queryset.count()} != removing {len(removing)}'
+
+    delete_tasks(project, queryset)
     return {'response_code': 200, 'detail': f'Removed {len(removing)} tasks'}
 
 
