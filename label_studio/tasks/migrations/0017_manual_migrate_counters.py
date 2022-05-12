@@ -48,7 +48,7 @@ def backwards(apps, schema_editor):
 class Migration(migrations.Migration):
     atomic = False
 
-    dependencies = [('tasks', '0014_auto_20220330_1310')]
+    dependencies = [('tasks', '0016_auto_20220414_1408')]
 
     operations = [
         migrations.RunPython(forwards, backwards),
