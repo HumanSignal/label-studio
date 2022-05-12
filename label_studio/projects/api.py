@@ -17,6 +17,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import exception_handler
+from django.http import Http404
 
 from core.utils.common import temporary_disconnect_all_signals
 from core.label_config import config_essential_data_has_changed
@@ -28,7 +29,7 @@ from projects.serializers import (
 )
 from projects.functions.next_task import get_next_task
 from tasks.models import Task
-from tasks.serializers import TaskSerializer, TaskSimpleSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer
+from tasks.serializers import TaskSerializer, TaskSimpleSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer, NextTaskSerializer
 from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
 from webhooks.models import WebhookAction
 
@@ -242,8 +243,24 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
     swagger_schema = None # this endpoint doesn't need to be in swagger API docs
 
     def get(self, request, *args, **kwargs):
-        logger.error('This endpoint is under construction')
-        return Response(status=404)
+        project = self.get_object()
+        dm_queue = filters_ordering_selected_items_exist(request.data)
+        prepared_tasks = get_prepared_queryset(request, project)
+
+        next_task, queue_info = get_next_task(request.user, prepared_tasks, project, dm_queue)
+
+        if next_task is None:
+            raise NotFound(
+                f'There are still some tasks to complete for the user={request.user}, '
+                f'but they seem to be locked by another user.')
+
+        # serialize task
+        context = {'request': request, 'project': project, 'resolve_uri': True, 'annotations': False}
+        serializer = NextTaskSerializer(next_task, context=context)
+        response = serializer.data
+
+        response['queue'] = queue_info
+        return Response(response)
 
 
 @method_decorator(name='post', decorator=swagger_auto_schema(
@@ -376,7 +393,11 @@ class ProjectTaskListAPI(generics.ListCreateAPIView,
     def filter_queryset(self, queryset):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
         tasks = Task.objects.filter(project=project)
-        return paginator(tasks, self.request)
+        page = paginator(tasks, self.request)
+        if page:
+            return page
+        else:
+            raise Http404
 
     def delete(self, request, *args, **kwargs):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
