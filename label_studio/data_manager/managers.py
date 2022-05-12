@@ -557,9 +557,13 @@ class PreparedTaskManager(models.Manager):
                 total_predictions=Count("predictions", distinct=True)
             )
 
+        first_task = queryset.first()
+        project = None if first_task is None else first_task.project
+
         # db annotations applied only if we need them in ordering or filters
         for field in annotations_map.keys():
             if field in fields_for_evaluation or all_fields:
+                queryset.project = project
                 function = annotations_map[field]
                 queryset = function(queryset)
 
