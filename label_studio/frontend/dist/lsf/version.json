@@ -1,6 +1,6 @@
 {
-  "message": "fix: dev-2068: toolswitch-finish-drawing (#574)\n\n* check the number of pointes if points\r\n\r\n* remove logging\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "02b1197a8abd249459e50471a0c13c0c627e94e3",
+  "message": "fix: DEV-2348: don't scroll out TopBar (#611)",
+  "commit": "50ddc7c8f7159d92a65919afc97e68d41e8d9b25",
   "branch": "master",
-  "date": "2022-04-14T10:01:18Z"
+  "date": "2022-05-10T11:03:46Z"
 }

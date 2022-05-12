@@ -15,4 +15,6 @@ def create_organization(title, created_by):
 def destroy_organization(org):
     with temporary_disconnect_all_signals():
         Project.objects.filter(organization=org).delete()
+        if hasattr(org, 'saml'):
+            org.saml.delete()
         org.delete()
