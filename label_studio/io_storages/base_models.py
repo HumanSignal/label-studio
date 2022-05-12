@@ -81,6 +81,8 @@ class ImportStorage(Storage):
     def _scan_and_create_links(self, link_class):
         tasks_created = 0
         maximum_annotations = self.project.maximum_annotations
+        task = self.project.tasks.order_by('-inner_id').first()
+        max_inner_id = (task.inner_id + 1) if task else 1
         
         for key in self.iterkeys():
             logger.debug(f'Scanning key {key}')
@@ -111,11 +113,13 @@ class ImportStorage(Storage):
 
             # annotations
             annotations = data.get('annotations', [])
+            cancelled_annotations = 0
             if annotations:
                 if 'data' not in data:
                     raise ValueError(
                         'If you use "annotations" field in the task, ' 'you must put "data" field in the task too'
                     )
+                cancelled_annotations = len([a for a in annotations if a['was_cancelled']])
 
             if 'data' in data and isinstance(data['data'], dict):
                 data = data['data']
@@ -123,8 +127,12 @@ class ImportStorage(Storage):
             with transaction.atomic():
                 task = Task.objects.create(
                     data=data, project=self.project, overlap=maximum_annotations,
-                    is_labeled=len(annotations) >= maximum_annotations
+                    is_labeled=len(annotations) >= maximum_annotations, total_predictions=len(predictions),
+                    total_annotations=len(annotations)-cancelled_annotations,
+                    cancelled_annotations=cancelled_annotations, inner_id=max_inner_id
                 )
+                max_inner_id += 1
+
                 link_class.create(task, key, self)
                 logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
                 tasks_created += 1

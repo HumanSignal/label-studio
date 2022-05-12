@@ -3,13 +3,13 @@
 import logging
 from django.db import models
 
-# Create your models here.
 from django.utils.translation import gettext_lazy as _
 from django.dispatch import receiver
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import post_save
+from django.conf import settings
 
-from core.utils.common import safe_float, conditional_atomic
-from data_export.serializers import ExportDataSerializer
+from core.utils.common import safe_float, conditional_atomic, load_func
+
 from ml.api_connector import MLApi
 from projects.models import Project
 from tasks.models import Prediction
@@ -19,6 +19,8 @@ from webhooks.serializers import WebhookSerializer, Webhook
 logger = logging.getLogger(__name__)
 
 MAX_JOBS_PER_PROJECT = 1
+
+InteractiveAnnotatingDataSerializer = load_func(settings.INTERACTIVE_DATA_SERIALIZER)
 
 
 class MLBackendState(models.TextChoices):
@@ -256,13 +258,16 @@ class MLBackend(models.Model):
 
         return prediction
 
-    def interactive_annotating(self, task, context=None):
+    def interactive_annotating(self, task, context=None, user=None):
         result = {}
+        options = {}
+        if user:
+            options = {'user': user}
         if not self.is_interactive:
             result['errors'] = ["Model is not set to be used for interactive preannotations"]
             return result
 
-        tasks_ser = ExportDataSerializer([task], many=True, expand=['drafts', 'predictions', 'annotations']).data
+        tasks_ser = InteractiveAnnotatingDataSerializer([task], many=True, expand=['drafts', 'predictions', 'annotations'], context=options).data
         ml_api_result = self.api.make_predictions(
             tasks=tasks_ser,
             model_version=self.model_version,

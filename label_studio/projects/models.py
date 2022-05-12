@@ -188,7 +188,11 @@ class Project(ProjectMixin, models.Model):
         help_text='Minimum number of completed tasks after which model training is started',
     )
 
-    control_weights = JSONField(_('control weights'), null=True, default=dict, help_text='Weights for control tags')
+    control_weights = JSONField(_('control weights'), null=True, default=dict, help_text="Dict of weights for each control tag in metric calculation. Each control tag (e.g. label or choice) will "
+                                                                                         "have it's own key in control weight dict with weight for each label and overall weight." 
+                                                                                         "For example, if bounding box annotation with control tag named my_bbox should be included with 0.33 weight in agreement calculation, "
+                                                                                         "and the first label Car should be twice more important than Airplaine, then you have to need the specify: "
+                                                                                         "{'my_bbox': {'type': 'RectangleLabels', 'labels': {'Car': 1.0, 'Airplaine': 0.5}, 'overall': 0.33}")
     model_version = models.TextField(
         _('model version'), blank=True, null=True, default='', help_text='Machine learning model version'
     )
@@ -377,6 +381,22 @@ class Project(ProjectMixin, models.Model):
         start_job_async_or_sync(self._update_tasks_states, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed)
 
 
+    def update_tasks_states_with_counters(
+        self, maximum_annotations_changed, overlap_cohort_percentage_changed,
+            tasks_number_changed, tasks_queryset
+    ):
+        start_job_async_or_sync(self._update_tasks_states_with_counters, maximum_annotations_changed,
+                                overlap_cohort_percentage_changed, tasks_number_changed, tasks_queryset)
+
+
+    def _update_tasks_states_with_counters(
+        self, maximum_annotations_changed, overlap_cohort_percentage_changed,
+            tasks_number_changed, tasks_queryset
+    ):
+        self._update_tasks_states(maximum_annotations_changed, overlap_cohort_percentage_changed,
+            tasks_number_changed)
+        self.update_tasks_counters(tasks_queryset)
+
     def _rearrange_overlap_cohort(self):
         """
         Rearrange overlap depending on annotation count in tasks
@@ -506,11 +526,12 @@ class Project(ProjectMixin, models.Model):
             )
 
         # validate labels consistency
-        labels_from_config = get_all_labels(config_string)
+        labels_from_config, dynamic_label_from_config = get_all_labels(config_string)
         created_labels = self.summary.created_labels
         for control_tag_from_data, labels_from_data in created_labels.items():
             # Check if labels created in annotations, and their control tag has been removed
-            if labels_from_data and control_tag_from_data not in labels_from_config:
+            if labels_from_data and ((control_tag_from_data not in labels_from_config) and (
+                    control_tag_from_data not in dynamic_label_from_config)):
                 raise LabelStudioValidationErrorSentryIgnored(
                     f'There are {sum(labels_from_data.values(), 0)} annotation(s) created with tag '
                     f'"{control_tag_from_data}", you can\'t remove it'
@@ -519,8 +540,9 @@ class Project(ProjectMixin, models.Model):
             if not set(labels_from_data).issubset(set(labels_from_config_by_tag)):
                 different_labels = list(set(labels_from_data).difference(labels_from_config_by_tag))
                 diff_str = '\n'.join(f'{l} ({labels_from_data[l]} annotations)' for l in different_labels)
-                if strict is True:
-                    raise LabelStudioValidationErrorSentryIgnored(f'These labels still exist in annotations:\n{diff_str}')
+                if (strict is True) and (control_tag_from_data not in dynamic_label_from_config):
+                    raise LabelStudioValidationErrorSentryIgnored(
+                        f'These labels still exist in annotations:\n{diff_str}')
                 else:
                     logger.warning(f'project_id={self.id} inconsistent labels in config and annotations: {diff_str}')
 
@@ -749,6 +771,27 @@ class Project(ProjectMixin, models.Model):
 
         self._storage_objects = storage_objects
         return storage_objects
+
+    def update_tasks_counters(self, queryset):
+        objs = []
+
+        total_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
+        cancelled_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True))
+        total_predictions = Count("predictions", distinct=True)
+        if isinstance(queryset, list):
+            queryset = Task.objects.filter(id__in=[task.id for task in queryset])
+        queryset = queryset.annotate(new_total_annotations=total_annotations,
+                                     new_cancelled_annotations=cancelled_annotations,
+                                     new_total_predictions=total_predictions)
+
+        for task in queryset:
+            task.total_annotations = task.new_total_annotations - task.new_cancelled_annotations
+            task.cancelled_annotations = task.new_cancelled_annotations
+            task.total_predictions = task.new_total_predictions
+            objs.append(task)
+
+        with transaction.atomic():
+            bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
 
     def __str__(self):
         return f'{self.title} (id={self.id})' or _("Business number %d") % self.pk

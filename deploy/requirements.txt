@@ -25,7 +25,7 @@ django_annoying==0.10.6
 django_debug_toolbar==3.2.1
 django_filter==2.4.0
 django_model_utils==4.1.1
-django_rq==2.4.1
+django_rq==2.5.1
 django-cors-headers==3.6.0
 django-extensions==3.1.0
 django-rest-swagger==2.2.0
@@ -48,15 +48,15 @@ pydantic>=1.7.3,<=1.8.2
 python_dateutil==2.8.1
 pytz==2019.3
 requests>=2.22.0,<3
-rq==1.10.0
+rq==1.10.1
 rules==2.2
 ujson>=3.0.0
 xmljson==0.2.0
 colorama>=0.4.4
 boxing>=0.1.4
-redis>=3.5.0
+redis>=4.2.0
 sentry-sdk>=1.1.0
 launchdarkly-server-sdk==7.3.0
 
-label-studio-converter==0.0.39
-label-studio-tools==0.0.0.dev11
+label-studio-converter==0.0.40
+label-studio-tools==0.0.0.dev14

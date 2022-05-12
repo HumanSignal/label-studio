@@ -1,6 +1,6 @@
 {
-  "message": "update scroll method",
-  "commit": "54155becea8fa3b7d7f996aa88a3ce7da8a87f81",
-  "branch": "fix/DEV-1703/lost-task-position-in-quickview-and-fullview",
-  "date": "2022-04-28T22:50:21Z"
+  "message": "fix: DEV-1703: add scroll to view when focus changes to stickyList in table component (#35)\n\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
+  "commit": "172c8eeb252a2bfef81133a87fdcbca146781d04",
+  "branch": "master",
+  "date": "2022-05-12T18:31:27Z"
 }
