@@ -381,6 +381,22 @@ class Project(ProjectMixin, models.Model):
         start_job_async_or_sync(self._update_tasks_states, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed)
 
 
+    def update_tasks_states_with_counters(
+        self, maximum_annotations_changed, overlap_cohort_percentage_changed,
+            tasks_number_changed, tasks_queryset
+    ):
+        start_job_async_or_sync(self._update_tasks_states_with_counters, maximum_annotations_changed,
+                                overlap_cohort_percentage_changed, tasks_number_changed, tasks_queryset)
+
+
+    def _update_tasks_states_with_counters(
+        self, maximum_annotations_changed, overlap_cohort_percentage_changed,
+            tasks_number_changed, tasks_queryset
+    ):
+        self._update_tasks_states(maximum_annotations_changed, overlap_cohort_percentage_changed,
+            tasks_number_changed)
+        self.update_tasks_counters(tasks_queryset)
+
     def _rearrange_overlap_cohort(self):
         """
         Rearrange overlap depending on annotation count in tasks
@@ -755,6 +771,27 @@ class Project(ProjectMixin, models.Model):
 
         self._storage_objects = storage_objects
         return storage_objects
+
+    def update_tasks_counters(self, queryset):
+        objs = []
+
+        total_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
+        cancelled_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True))
+        total_predictions = Count("predictions", distinct=True)
+        if isinstance(queryset, list):
+            queryset = Task.objects.filter(id__in=[task.id for task in queryset])
+        queryset = queryset.annotate(new_total_annotations=total_annotations,
+                                     new_cancelled_annotations=cancelled_annotations,
+                                     new_total_predictions=total_predictions)
+
+        for task in queryset:
+            task.total_annotations = task.new_total_annotations - task.new_cancelled_annotations
+            task.cancelled_annotations = task.new_cancelled_annotations
+            task.total_predictions = task.new_total_predictions
+            objs.append(task)
+
+        with transaction.atomic():
+            bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
 
     def __str__(self):
         return f'{self.title} (id={self.id})' or _("Business number %d") % self.pk

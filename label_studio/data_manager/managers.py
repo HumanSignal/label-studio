@@ -8,13 +8,13 @@ import logging
 from pydantic import BaseModel
 
 from django.db import models
-from django.db.models import Aggregate, Count, Exists, OuterRef, Subquery, Avg, Q, F, Value
+from django.db.models import Aggregate, OuterRef, Subquery, Avg, Q, F, Value
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from django.db.models.functions import Coalesce
 from django.conf import settings
 from django.db.models.functions import Cast
-from django.db.models import FloatField
+from django.db.models import FloatField, Count
 from datetime import datetime
 
 from data_manager.prepare_params import ConjunctionEnum
@@ -521,9 +521,6 @@ settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     "annotators": annotate_annotators,
     "annotations_ids": annotate_annotations_ids,
     "file_upload": file_upload,
-    "cancelled_annotations": dummy,
-    "total_annotations": dummy,
-    "total_predictions": dummy
 }
 
 
@@ -542,20 +539,6 @@ class PreparedTaskManager(models.Manager):
 
         if fields_for_evaluation is None:
             fields_for_evaluation = []
-
-        # default annotations for calculating total values in pagination output
-        if 'total_annotations' in fields_for_evaluation or 'annotators' in fields_for_evaluation or all_fields:
-            queryset = queryset.annotate(
-                total_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
-            )
-        if 'cancelled_annotations' in fields_for_evaluation or all_fields:
-            queryset = queryset.annotate(
-                cancelled_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True))
-            )
-        if 'total_predictions' in fields_for_evaluation or all_fields:
-            queryset = queryset.annotate(
-                total_predictions=Count("predictions", distinct=True)
-            )
 
         first_task = queryset.first()
         project = None if first_task is None else first_task.project
@@ -581,10 +564,8 @@ class PreparedTaskManager(models.Manager):
 
     def only_filtered(self, prepare_params=None):
         queryset = TaskQuerySet(self.model).filter(project=prepare_params.project)
-
         fields_for_filter_ordering = get_fields_for_filter_ordering(prepare_params)
         queryset = self.annotate_queryset(queryset, fields_for_evaluation=fields_for_filter_ordering)
-
         return queryset.prepared(prepare_params=prepare_params)
 
 

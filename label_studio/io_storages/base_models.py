@@ -113,11 +113,13 @@ class ImportStorage(Storage):
 
             # annotations
             annotations = data.get('annotations', [])
+            cancelled_annotations = 0
             if annotations:
                 if 'data' not in data:
                     raise ValueError(
                         'If you use "annotations" field in the task, ' 'you must put "data" field in the task too'
                     )
+                cancelled_annotations = len([a for a in annotations if a['was_cancelled']])
 
             if 'data' in data and isinstance(data['data'], dict):
                 data = data['data']
@@ -125,8 +127,9 @@ class ImportStorage(Storage):
             with transaction.atomic():
                 task = Task.objects.create(
                     data=data, project=self.project, overlap=maximum_annotations,
-                    is_labeled=len(annotations) >= maximum_annotations,
-                    inner_id=max_inner_id
+                    is_labeled=len(annotations) >= maximum_annotations, total_predictions=len(predictions),
+                    total_annotations=len(annotations)-cancelled_annotations,
+                    cancelled_annotations=cancelled_annotations, inner_id=max_inner_id
                 )
                 max_inner_id += 1
 

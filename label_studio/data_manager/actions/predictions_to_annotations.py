@@ -5,6 +5,7 @@ import logging
 from django.utils.timezone import now
 
 from core.permissions import AllPermissions
+from core.redis import start_job_async_or_sync
 from tasks.models import Prediction, Annotation, Task
 from tasks.serializers import TaskSerializerBulk
 from webhooks.models import WebhookAction
@@ -54,6 +55,8 @@ def predictions_to_annotations(project, queryset, **kwargs):
         TaskSerializerBulk.post_process_annotations(db_annotations)
         # Execute webhook for created annotations
         emit_webhooks_for_instance(user.active_organization, project, WebhookAction.ANNOTATIONS_CREATED, db_annotations)
+        # recalculate tasks counters
+        start_job_async_or_sync(project.update_tasks_counters, Task.objects.filter(id__in=tasks_ids))
 
     return {'response_code': 200, 'detail': f'Created {count} annotations'}
 
