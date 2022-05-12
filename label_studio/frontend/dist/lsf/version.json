@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2100: Fix preselected choices (#584)\n\n- working with empty annotation\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "ee38e771760e1ce57ac62dc1556ddd0718f62487",
+  "message": "fix: DEV-2001: Saving readonly regions (#560)\n\n* Fix saving readonly results\r\n\r\n* Properly export readonly property",
+  "commit": "071f7989f4a69ce0f6fea4ea8f54651e2964c74c",
   "branch": "master",
-  "date": "2022-04-27T11:55:50Z"
+  "date": "2022-05-12T08:53:19Z"
 }
