@@ -201,25 +201,21 @@ def apply_filters(queryset, filters, only_undefined_field=False):
 
         # annotations results & predictions results
         if field_name in ['annotations_results', 'predictions_results']:
-            from tasks.models import Annotation, Prediction
-
-            _class = Annotation if field_name == 'annotations_results' else Prediction
+            name = 'annotations__result' if field_name == 'annotations_results' else 'predictions__result'
             if _filter.operator in [Operator.EQUAL, Operator.NOT_EQUAL]:
                 try:
                     value = json.loads(_filter.value)
                 except:
                     return queryset.none()
 
-                q = Exists(_class.objects.filter(Q(task=OuterRef('pk')) & Q(result=value)))
+                q = Q(**{name: value})
                 filter_expressions.append(q if _filter.operator == Operator.EQUAL else ~q)
                 continue
             elif _filter.operator == Operator.CONTAINS:
-                subquery = Exists(_class.objects.filter(Q(task=OuterRef('pk')) & Q(result__icontains=_filter.value)))
-                filter_expressions.append(Q(subquery))
+                filter_expressions.append(Q(**{name + '__icontains': _filter.value}))
                 continue
             elif _filter.operator == Operator.NOT_CONTAINS:
-                subquery = Exists(_class.objects.filter(Q(task=OuterRef('pk')) & Q(result__icontains=_filter.value)))
-                filter_expressions.append(~Q(subquery))
+                filter_expressions.append(~Q(**{name + '__icontains': _filter.value}))
                 continue
 
         # annotation ids
