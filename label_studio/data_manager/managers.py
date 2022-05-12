@@ -480,6 +480,15 @@ class GroupConcat(Aggregate):
 def annotate_completed_at(queryset):
     from tasks.models import Annotation
 
+    # "Planning Time: 5.840 ms"
+    # "Execution Time: 0.500 ms"
+    # "Sort  (cost=148.76..148.78 rows=6 width=368) (actual time=0.150..0.178 rows=6 loops=1)"
+    # newest = Annotation.objects.filter(task=OuterRef("pk"), task__is_labeled=True).distinct().order_by("-created_at")
+    # return queryset.annotate(completed_at=Subquery(newest.values("created_at")[:1]))
+
+    # "Planning Time: 0.420 ms"
+    # "Execution Time: 0.076 ms"
+    # "Sort  (cost=95.96..95.98 rows=6 width=368) (actual time=0.081..0.083 rows=6 loops=1)"
     newest = Annotation.objects.filter(task=OuterRef("pk")).order_by("-id")[:1]
     return queryset.annotate(
         completed_at=Case(
