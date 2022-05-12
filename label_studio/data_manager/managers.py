@@ -14,7 +14,7 @@ from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from django.db.models.functions import Coalesce
 from django.conf import settings
 from django.db.models.functions import Cast
-from django.db.models import FloatField
+from django.db.models import FloatField, Count
 from datetime import datetime
 
 from data_manager.prepare_params import ConjunctionEnum
@@ -539,20 +539,6 @@ class PreparedTaskManager(models.Manager):
 
         if fields_for_evaluation is None:
             fields_for_evaluation = []
-
-        # default annotations for calculating total values in pagination output
-        if 'total_annotations' in fields_for_evaluation or 'annotators' in fields_for_evaluation or all_fields:
-            queryset = queryset.annotate(
-                total_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
-            )
-        if 'cancelled_annotations' in fields_for_evaluation or all_fields:
-            queryset = queryset.annotate(
-                cancelled_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True))
-            )
-        if 'total_predictions' in fields_for_evaluation or all_fields:
-            queryset = queryset.annotate(
-                total_predictions=Count("predictions", distinct=True)
-            )
 
         first_task = queryset.first()
         project = None if first_task is None else first_task.project
