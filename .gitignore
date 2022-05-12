@@ -62,3 +62,10 @@ deploy/nginx/certs/*
 mydata/
 deploy/pgsql/certs/*
 !deploy/pgsql/certs/.placeholder
+
+*.swp
+*.swo
+*.swn
+1/*
+*/*/1/*
+label_studio/tavern-output.json

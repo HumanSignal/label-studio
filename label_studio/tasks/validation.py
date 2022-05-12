@@ -23,7 +23,17 @@ _DATA_TYPES = {
     'TimeSeries': [dict, list, str],
     'TimeSeriesChannel': [dict, list, str],
     'List': [list],
-    'PolygonLabels': [list]
+    'Choices': [str, list],
+    'PolygonLabels': [str, list],
+    'Labels': [str, list],
+    'BrushLabels': [str, list],
+    'EllipseLabels': [str, list],
+    'HyperTextLabels': [str, list],
+    'KeyPointLabels': [str, list],
+    'ParagraphLabels': [str, list],
+    'RectangleLabels': [str, list],
+    'TimeSeriesLabels': [str, list],
+    'Taxonomy': [str, list],
 }
 logger = logging.getLogger(__name__)
 

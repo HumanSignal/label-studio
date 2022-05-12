@@ -1,7 +1,8 @@
 # syntax=docker/dockerfile:1.3
 FROM node:14 AS frontend-builder
 
-ENV NPM_CACHE_LOCATION=/root/.npm
+ENV NPM_CACHE_LOCATION=/root/.npm \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 WORKDIR /label-studio/label_studio/frontend
 

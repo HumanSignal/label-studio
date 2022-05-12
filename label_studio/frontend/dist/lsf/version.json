@@ -1,6 +1,6 @@
 {
-  "message": "use history to go back on button click",
-  "commit": "f638483bae813b211c07fa27e3452918685c4528",
-  "branch": "fix/DEV-1883/no-more-tasks-screen",
-  "date": "2022-03-28T18:58:36Z"
+  "message": "fix: DEV-2100: Fix preselected choices (#584)\n\n- working with empty annotation\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
+  "commit": "ee38e771760e1ce57ac62dc1556ddd0718f62487",
+  "branch": "master",
+  "date": "2022-04-27T11:55:50Z"
 }
