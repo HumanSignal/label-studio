@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2267: Truncate comments (#609)\n\n* Properly truncate long comments\r\n\r\n* Prevent item selection on collapse/expand\r\n\r\n* Comment",
-  "commit": "e9a3190ddcd0da50a43014ba508b16b213fb64fe",
+  "message": "fix: DEV-1577: add default settings (#619)\n\n* feat: DEV-1577: add default settings to editor\r\n\r\n* add an ability to set default settings when initializing the LSF",
+  "commit": "5e4da39533dd477ae1e303f649c71684ec43354a",
   "branch": "master",
-  "date": "2022-05-12T13:15:47Z"
+  "date": "2022-05-13T08:58:57Z"
 }
