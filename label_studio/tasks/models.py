@@ -331,6 +331,23 @@ class Annotation(AnnotationMixin, models.Model):
                                           null=True,
                                           help_text='Points to the parent annotation from which this annotation was created')
 
+    last_action = models.CharField(
+        _('last action'),
+        max_length=128,
+        choices=AnnotationHistory.ActionType.choices,
+        help_text='Action which was performed in the last annotation history item',
+        default=None,
+        null=True,
+    )
+    last_created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        verbose_name=_('last created by'),
+        help_text='User who created the last annotation history item',
+        default=None,
+        null=True
+    )
+
     class Meta:
         db_table = 'task_completion'
         indexes = [
