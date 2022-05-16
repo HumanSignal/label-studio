@@ -36,14 +36,18 @@ def propagate_annotations(project, queryset, **kwargs):
     # copy source annotation to new annotations for each task
     db_annotations = []
     for i in tasks:
+        body = {
+            'task_id': i,
+            'completed_by_id': user.id,
+            'result': source_annotation.result,
+            'result_count': source_annotation.result_count,
+            'parent_annotation_id': source_annotation.id
+        }
+        if hasattr(Annotation, 'last_action'):
+            body.update({'last_action': 'imported', 'last_created_by': user})
+
         db_annotations.append(
-            Annotation(
-                task_id=i,
-                completed_by_id=user.id,
-                result=source_annotation.result,
-                result_count=source_annotation.result_count,
-                parent_annotation_id=source_annotation.id
-            )
+            Annotation(**body)
         )
 
     db_annotations = Annotation.objects.bulk_create(db_annotations, batch_size=settings.BATCH_SIZE)
@@ -53,13 +57,17 @@ def propagate_annotations(project, queryset, **kwargs):
 
 
 def propagate_annotations_form(user, project):
+    first_annotation = Annotation.objects.filter(task__project=project).first()
+    field = {
+        'type': 'number',
+        'name': 'source_annotation_id',
+        'label': 'Enter source annotation ID'
+    }
+    if first_annotation:
+        field.update({'value': str(first_annotation.id)})
     return [{
         'columnCount': 1,
-        'fields': [{
-            'type': 'number',
-            'name': 'source_annotation_id',
-            'label': 'Enter source annotation ID'
-        }]
+        'fields': [field]
     }]
 
 

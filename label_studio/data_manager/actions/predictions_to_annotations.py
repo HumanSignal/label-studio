@@ -38,12 +38,15 @@ def predictions_to_annotations(project, queryset, **kwargs):
     tasks_ids = []
     for result, model_version, task_id, prediction_id in predictions_values:
         tasks_ids.append(task_id)
-        annotations.append({
+        body = {
             'result': result,
             'completed_by_id': user.pk,
             'task_id': task_id,
             'parent_prediction_id': prediction_id
-        })
+        }
+        if hasattr(Annotation, 'last_action'):
+            body.update({'last_action': 'prediction', 'last_created_by': user})
+        annotations.append(body)
 
     count = len(annotations)
     logger.debug(f'{count} predictions will be converter to annotations')
