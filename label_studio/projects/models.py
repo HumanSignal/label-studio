@@ -785,7 +785,7 @@ class Project(ProjectMixin, models.Model):
                                      new_total_predictions=total_predictions)
 
         for task in queryset:
-            task.total_annotations = task.new_total_annotations - task.new_cancelled_annotations
+            task.total_annotations = task.new_total_annotations
             task.cancelled_annotations = task.new_cancelled_annotations
             task.total_predictions = task.new_total_predictions
             objs.append(task)
