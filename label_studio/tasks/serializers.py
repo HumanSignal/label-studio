@@ -301,6 +301,8 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             max_inner_id = (prev_inner_id + 1) if prev_inner_id else 1
 
             for i, task in enumerate(validated_tasks):
+                cancelled_annotations = len([ann for ann in task_annotations[i] if ann.get('was_cancelled', False)])
+                total_annotations = len(task_annotations[i]) - cancelled_annotations
                 t = Task(
                     project=self.project,
                     data=task['data'],
@@ -308,7 +310,10 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                     overlap=max_overlap,
                     is_labeled=len(task_annotations[i]) >= max_overlap,
                     file_upload_id=task.get('file_upload_id'),
-                    inner_id=None if prev_inner_id is None else max_inner_id + i
+                    inner_id=None if prev_inner_id is None else max_inner_id + i,
+                    total_predictions=len(task_predictions[i]),
+                    total_annotations=total_annotations,
+                    cancelled_annotations=cancelled_annotations
                 )
                 db_tasks.append(t)
 

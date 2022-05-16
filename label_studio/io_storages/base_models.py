@@ -153,6 +153,8 @@ class ImportStorage(Storage):
                 annotation_ser.is_valid(raise_exception=True)
                 annotation_ser.save()
 
+                # FIXME: add_annotation_history / post_process_annotations should be here
+
         self.last_sync = timezone.now()
         self.last_sync_count = tasks_created
         self.save()
