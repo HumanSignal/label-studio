@@ -347,8 +347,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                         'result': annotation['result'],
                         'lead_time': lead_time
                     }
-                    if hasattr(Annotation, 'last_action'):
-                        body.update({'last_action': 'imported', 'last_created_by': user})
+                    body = self.add_annotation_fields(body, user, 'imported')
                     db_annotations.append(Annotation(**body))
 
             # add predictions
@@ -402,12 +401,16 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 self.project.model_version = last_model_version
                 self.project.save()
 
-        self.post_process_annotations(self.db_annotations)
+        self.post_process_annotations(user, self.db_annotations, 'imported')
         return db_tasks
 
     @staticmethod
-    def post_process_annotations(db_annotations):
+    def post_process_annotations(user, db_annotations, action):
         pass
+
+    @staticmethod
+    def add_annotation_fields(body, user, action):
+        return body
 
     class Meta:
         model = Task

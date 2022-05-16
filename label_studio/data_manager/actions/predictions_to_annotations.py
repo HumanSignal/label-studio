@@ -44,8 +44,7 @@ def predictions_to_annotations(project, queryset, **kwargs):
             'task_id': task_id,
             'parent_prediction_id': prediction_id
         }
-        if hasattr(Annotation, 'last_action'):
-            body.update({'last_action': 'prediction', 'last_created_by': user})
+        body = TaskSerializerBulk.add_annotation_fields(body, user, 'prediction')
         annotations.append(body)
 
     count = len(annotations)
@@ -55,7 +54,7 @@ def predictions_to_annotations(project, queryset, **kwargs):
     Task.objects.filter(id__in=tasks_ids).update(updated_at=now(), updated_by=request.user)
 
     if db_annotations:
-        TaskSerializerBulk.post_process_annotations(db_annotations)
+        TaskSerializerBulk.post_process_annotations(user, db_annotations, 'prediction')
         # Execute webhook for created annotations
         emit_webhooks_for_instance(user.active_organization, project, WebhookAction.ANNOTATIONS_CREATED, db_annotations)
         # recalculate tasks counters

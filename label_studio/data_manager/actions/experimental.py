@@ -43,15 +43,11 @@ def propagate_annotations(project, queryset, **kwargs):
             'result_count': source_annotation.result_count,
             'parent_annotation_id': source_annotation.id
         }
-        if hasattr(Annotation, 'last_action'):
-            body.update({'last_action': 'imported', 'last_created_by': user})
-
-        db_annotations.append(
-            Annotation(**body)
-        )
+        body = TaskSerializerBulk.add_annotation_fields(body, user, 'propagated_annotation')
+        db_annotations.append(Annotation(**body))
 
     db_annotations = Annotation.objects.bulk_create(db_annotations, batch_size=settings.BATCH_SIZE)
-    TaskSerializerBulk.post_process_annotations(db_annotations)
+    TaskSerializerBulk.post_process_annotations(user, db_annotations, 'propagated_annotation')
 
     return {'response_code': 200, 'detail': f'Created {len(db_annotations)} annotations'}
 
