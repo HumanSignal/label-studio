@@ -6,13 +6,13 @@ import ujson as json
 from django.conf import settings
 from django.db.models import Count
 
-from tasks.models import Annotation
+from tasks.models import Annotation, Task
 from tasks.serializers import TaskSerializerBulk
 from data_manager.functions import DataManagerException
 from data_manager.actions.basic import delete_tasks
 from core.permissions import AllPermissions
 from collections import defaultdict
-
+from core.redis import start_job_async_or_sync
 
 logger = logging.getLogger(__name__)
 all_permissions = AllPermissions()
@@ -49,6 +49,7 @@ def propagate_annotations(project, queryset, **kwargs):
     db_annotations = Annotation.objects.bulk_create(db_annotations, batch_size=settings.BATCH_SIZE)
     TaskSerializerBulk.post_process_annotations(user, db_annotations, 'propagated_annotation')
 
+    start_job_async_or_sync(project.update_tasks_counters, Task.objects.filter(id__in=tasks))
     return {'response_code': 200, 'detail': f'Created {len(db_annotations)} annotations'}
 
 
