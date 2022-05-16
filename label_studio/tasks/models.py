@@ -336,6 +336,8 @@ class Annotation(AnnotationMixin, models.Model):
         indexes = [
             models.Index(fields=['task', 'ground_truth']),
             models.Index(fields=['task', 'completed_by']),
+            models.Index(fields=['id', 'task']),
+            models.Index(fields=['task', 'was_cancelled']),
             models.Index(fields=['was_cancelled']),
             models.Index(fields=['ground_truth']),
             models.Index(fields=['created_at']),
