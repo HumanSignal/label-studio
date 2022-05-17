@@ -251,6 +251,10 @@ def save_response(response):
     with open(filename, 'w') as f:
         json.dump(response.json(), f)
 
+def save_response_macosx(response):
+    filename = 'tavern-output-mac-osx.json'
+    with open(filename, 'w') as f:
+        json.dump(response.json(), f)
 
 def check_response_with_json_file(response, json_file):
     response = response.json()

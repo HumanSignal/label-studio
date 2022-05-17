@@ -4,7 +4,7 @@ strict: false
 marks:
   - usefixtures:
       - django_live_url
-  - skipif: "'default' not in '{tavern.env_vars.DJANGO_DB}'"
+  - skipif: "'default' not in '{tavern.env_vars.DJANGO_DB}' or 'Darwin' in platform.system()"
 
 stages:
 
