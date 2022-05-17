@@ -588,6 +588,16 @@ def delete_project_summary_annotations_before_updating_annotation(sender, instan
         # annotation just created - do nothing
         return
     old_annotation.decrease_project_summary_counters()
+    # update task counters if annotation changes it's was_cancelled status
+    if old_annotation.was_cancelled != instance.was_cancelled:
+        if instance.was_cancelled:
+            instance.task.cancelled_annotations = instance.task.cancelled_annotations + 1
+            instance.task.total_annotations = instance.task.total_annotations - 1
+        else:
+            instance.task.cancelled_annotations = instance.task.cancelled_annotations - 1
+            instance.task.total_annotations = instance.task.total_annotations + 1
+        instance.task.update_is_labeled()
+        instance.task.save(update_fields=['is_labeled', 'total_annotations', 'cancelled_annotations'])
 
 
 @receiver(post_save, sender=Annotation)
