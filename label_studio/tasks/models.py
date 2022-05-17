@@ -273,7 +273,9 @@ class Task(TaskMixin, models.Model):
                 max_inner_id = 1
                 if task:
                     max_inner_id = task.inner_id
-                self.inner_id = max_inner_id + 1
+
+                # max_inner_id might be None in the old projects
+                self.inner_id = None if max_inner_id is None else (max_inner_id + 1)
         super().save(*args, **kwargs)
 
 
@@ -341,7 +343,7 @@ class Annotation(AnnotationMixin, models.Model):
             models.Index(fields=['was_cancelled']),
             models.Index(fields=['ground_truth']),
             models.Index(fields=['created_at']),
-        ]
+        ] + AnnotationMixin.Meta.indexes
 
     def created_ago(self):
         """ Humanize date """
