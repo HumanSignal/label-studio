@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1703: add scroll to view when focus changes to stickyList in table component (#35)\n\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
-  "commit": "172c8eeb252a2bfef81133a87fdcbca146781d04",
-  "branch": "master",
-  "date": "2022-05-12T18:31:27Z"
+  "message": "Merge branch 'master' into fix/DEV-2153/pagination",
+  "commit": "42f3e614109a06f2320fd35f58d70ce642e95445",
+  "branch": "fix/DEV-2153/pagination",
+  "date": "2022-05-17T15:18:30Z"
 }
