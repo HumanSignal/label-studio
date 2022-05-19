@@ -91,9 +91,9 @@ def user_login(request):
             auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
 
             # user is organization member
-            org_pk = Organization.find_by_user(user).pk
-            user.active_organization_id = org_pk
-            user.save(update_fields=['active_organization'])
+            # org_pk = Organization.find_by_user(user).pk
+            # user.active_organization_id = org_pk
+            # user.save(update_fields=['active_organization'])
             return redirect(next_page)
 
     return render(request, 'users/user_login.html', {
