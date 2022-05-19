@@ -11,6 +11,9 @@ logger = logging.getLogger(__name__)
 
 
 def forwards(apps, schema_editor):
+    logger.warning("To recalculate stats use Django command calculate_stats for your organization.")
+    return  # we don't want to apply this migration to all projects
+    """
     Project = apps.get_model('projects', 'Project')
 
     all_projects = Project.objects.all()
@@ -38,7 +41,7 @@ def forwards(apps, schema_editor):
                         batch_size=settings.BATCH_SIZE)
 
     number = all_projects.count()
-    logger.info(f'Patched {number} project with new is_labeled.')
+    logger.info(f'Patched {number} project with new is_labeled.')"""
 
 
 def backwards(apps, schema_editor):
