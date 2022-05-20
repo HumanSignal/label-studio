@@ -8,18 +8,19 @@ import logging
 from pydantic import BaseModel
 
 from django.db import models
-from django.db.models import Aggregate, Count, Exists, OuterRef, Subquery, Avg, Q, F, Value
+from django.db.models import Aggregate, OuterRef, Subquery, Avg, Q, F, Value, Exists, When, Case
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from django.db.models.functions import Coalesce
 from django.conf import settings
 from django.db.models.functions import Cast
-from django.db.models import FloatField
+from django.db.models import FloatField, Count
 from datetime import datetime
 
 from data_manager.prepare_params import ConjunctionEnum
 from label_studio.core.utils.params import cast_bool_from_str
 from label_studio.core.utils.common import load_func
+from core.feature_flags import flag_set
 
 logger = logging.getLogger(__name__)
 
@@ -119,10 +120,10 @@ def get_fields_for_evaluation(prepare_params, user):
     return result
 
 
-def apply_ordering(queryset, ordering, only_undefined_field=False):
+def apply_ordering(queryset, ordering, project):
     if ordering:
         preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
-        field_name, ascending = preprocess_field_name(ordering[0], only_undefined_field=only_undefined_field)
+        field_name, ascending = preprocess_field_name(ordering[0], only_undefined_field=project.only_undefined_field)
 
         if field_name.startswith('data__'):
             # annotate task with data field for float/int/bool ordering support
@@ -159,7 +160,56 @@ def cast_value(_filter):
             _filter.value = cast_bool_from_str(_filter.value)
 
 
-def apply_filters(queryset, filters, only_undefined_field=False):
+def add_result_filter(field_name, _filter, filter_expressions, project):
+    from django.db.models.expressions import RawSQL
+    from tasks.models import Annotation, Prediction
+
+    # new approach with contain instead of icontains
+    if flag_set('ff_back_2214_annotation_result_12052022_short', project.organization.created_by):
+        _class = Annotation if field_name == 'annotations_results' else Prediction
+        subquery = Exists(
+            _class.objects
+            .annotate(json_str=RawSQL('cast(result as text)', ''))
+            .filter(Q(task=OuterRef('pk')) & Q(json_str__contains=_filter.value))
+        )
+
+        if _filter.operator in [Operator.EQUAL, Operator.NOT_EQUAL]:
+            try:
+                value = json.loads(_filter.value)
+            except:
+                return 'exit'
+
+            q = Exists(_class.objects.filter(Q(task=OuterRef('pk')) & Q(result=value)))
+            filter_expressions.append(q if _filter.operator == Operator.EQUAL else ~q)
+            return 'continue'
+        elif _filter.operator == Operator.CONTAINS:
+            filter_expressions.append(Q(subquery))
+            return 'continue'
+        elif _filter.operator == Operator.NOT_CONTAINS:
+            filter_expressions.append(~Q(subquery))
+            return 'continue'
+
+    # old approach
+    else:
+        name = 'annotations__result' if field_name == 'annotations_results' else 'predictions__result'
+        if _filter.operator in [Operator.EQUAL, Operator.NOT_EQUAL]:
+            try:
+                value = json.loads(_filter.value)
+            except:
+                return 'exit'
+
+            q = Q(**{name: value})
+            filter_expressions.append(q if _filter.operator == Operator.EQUAL else ~q)
+            return 'continue'
+        elif _filter.operator == Operator.CONTAINS:
+            filter_expressions.append(Q(**{name + '__icontains': _filter.value}))
+            return 'continue'
+        elif _filter.operator == Operator.NOT_CONTAINS:
+            filter_expressions.append(~Q(**{name + '__icontains': _filter.value}))
+            return 'continue'
+
+
+def apply_filters(queryset, filters, project):
     if not filters:
         return queryset
 
@@ -174,7 +224,7 @@ def apply_filters(queryset, filters, only_undefined_field=False):
 
         # django orm loop expression attached to column name
         preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
-        field_name, _ = preprocess_field_name(_filter.filter, only_undefined_field)
+        field_name, _ = preprocess_field_name(_filter.filter, project.only_undefined_field)
 
         # filter preprocessing, value type conversion, etc..
         preprocess_filter = load_func(settings.DATA_MANAGER_PREPROCESS_FILTER)
@@ -201,21 +251,10 @@ def apply_filters(queryset, filters, only_undefined_field=False):
 
         # annotations results & predictions results
         if field_name in ['annotations_results', 'predictions_results']:
-            name = 'annotations__result' if field_name == 'annotations_results' else 'predictions__result'
-            if _filter.operator in [Operator.EQUAL, Operator.NOT_EQUAL]:
-                try:
-                    value = json.loads(_filter.value)
-                except:
-                    return queryset.none()
-
-                q = Q(**{name: value})
-                filter_expressions.append(q if _filter.operator == Operator.EQUAL else ~q)
-                continue
-            elif _filter.operator == Operator.CONTAINS:
-                filter_expressions.append(Q(**{name + '__icontains': _filter.value}))
-                continue
-            elif _filter.operator == Operator.NOT_CONTAINS:
-                filter_expressions.append(~Q(**{name + '__icontains': _filter.value}))
+            result = add_result_filter(field_name, _filter, filter_expressions, project)
+            if result == 'exit':
+                return queryset.none()
+            elif result == 'continue':
                 continue
 
         # annotation ids
@@ -381,7 +420,7 @@ def apply_filters(queryset, filters, only_undefined_field=False):
         else:
             cast_value(_filter)
             filter_expressions.append(Q(**{field_name: _filter.value}))
-    
+
     logger.debug(f'Apply filter: {filter_expressions}')
     if filters.conjunction == ConjunctionEnum.OR:
         result_filter = Q()
@@ -410,8 +449,8 @@ class TaskQuerySet(models.QuerySet):
 
         project = Project.objects.get(pk=prepare_params.project)
 
-        queryset = apply_filters(queryset, prepare_params.filters, only_undefined_field=project.only_undefined_field)
-        queryset = apply_ordering(queryset, prepare_params.ordering, only_undefined_field=project.only_undefined_field)
+        queryset = apply_filters(queryset, prepare_params.filters, project)
+        queryset = apply_ordering(queryset, prepare_params.ordering, project)
 
         if not prepare_params.selectedItems:
             return queryset
@@ -441,8 +480,12 @@ class GroupConcat(Aggregate):
 def annotate_completed_at(queryset):
     from tasks.models import Annotation
 
-    newest = Annotation.objects.filter(task=OuterRef("pk"), task__is_labeled=True).distinct().order_by("-created_at")
-    return queryset.annotate(completed_at=Subquery(newest.values("created_at")[:1]))
+    newest = Annotation.objects.filter(task=OuterRef("pk")).order_by("-id")[:1]
+    return queryset.annotate(
+        completed_at=Case(
+            When(is_labeled=True, then=Subquery(newest.values("created_at")))
+        )
+    )
 
 
 def annotate_annotations_results(queryset):
@@ -521,9 +564,6 @@ settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     "annotators": annotate_annotators,
     "annotations_ids": annotate_annotations_ids,
     "file_upload": file_upload,
-    "cancelled_annotations": dummy,
-    "total_annotations": dummy,
-    "total_predictions": dummy
 }
 
 
@@ -543,23 +583,13 @@ class PreparedTaskManager(models.Manager):
         if fields_for_evaluation is None:
             fields_for_evaluation = []
 
-        # default annotations for calculating total values in pagination output
-        if 'total_annotations' in fields_for_evaluation or 'annotators' in fields_for_evaluation or all_fields:
-            queryset = queryset.annotate(
-                total_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
-            )
-        if 'cancelled_annotations' in fields_for_evaluation or all_fields:
-            queryset = queryset.annotate(
-                cancelled_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True))
-            )
-        if 'total_predictions' in fields_for_evaluation or all_fields:
-            queryset = queryset.annotate(
-                total_predictions=Count("predictions", distinct=True)
-            )
+        first_task = queryset.first()
+        project = None if first_task is None else first_task.project
 
         # db annotations applied only if we need them in ordering or filters
         for field in annotations_map.keys():
             if field in fields_for_evaluation or all_fields:
+                queryset.project = project
                 function = annotations_map[field]
                 queryset = function(queryset)
 
@@ -577,10 +607,8 @@ class PreparedTaskManager(models.Manager):
 
     def only_filtered(self, prepare_params=None):
         queryset = TaskQuerySet(self.model).filter(project=prepare_params.project)
-
         fields_for_filter_ordering = get_fields_for_filter_ordering(prepare_params)
         queryset = self.annotate_queryset(queryset, fields_for_evaluation=fields_for_filter_ordering)
-
         return queryset.prepared(prepare_params=prepare_params)
 
 
