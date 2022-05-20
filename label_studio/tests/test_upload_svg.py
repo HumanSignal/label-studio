@@ -22,7 +22,7 @@ def test_svg_upload_sanitize(setup_project_dialog):
 
     assert r.status_code == 201
 
-    expected = '''<svg xmlns="http://www.w3.org/2000/svg" version="1.1" baseprofile="full">
+    expected = '''<svg version="1.1" baseprofile="full" xmlns="http://www.w3.org/2000/svg">
     <polygon id="triangle" points="0,0 0,50 50,0" fill="#009900" stroke="#004400"></polygon>\n
     </svg>\n'''
 
@@ -32,6 +32,30 @@ def test_svg_upload_sanitize(setup_project_dialog):
     assert len("".join(actual.decode('UTF-8').split())) > 100 # confirm not empty
 
     assert "".join(expected.split()) == "".join(actual.decode('UTF-8').split())
+
+
+@pytest.mark.django_db
+def test_svg_upload_invalid_format(setup_project_dialog):
+    """ Upload invalid SVG file - still accepted"""
+    xml_dirty = """<?xml version="1.0" standalone="no"?>
+                <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+                <svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg">gibberish</svg>"""
+    f = io.StringIO(xml_dirty)
+
+    endpoint = f'/api/projects/{setup_project_dialog.project.id}/import?commit_to_project=true'
+    r = setup_project_dialog.post(endpoint, {'xss_svg.svg': f})
+
+    assert r.status_code == 201
+
+    expected = '''
+    <svgversion="1.1"baseprofile="full"xmlns="http://www.w3.org/2000/svg">gibberish</svg>
+    '''
+
+    actual = FileUpload.objects.filter(
+            id=r.data['file_upload_ids'][0]).last().file.read()
+
+    assert "".join(expected.split()) == "".join(actual.decode('UTF-8').split())
+
 
 @pytest.mark.django_db
 def test_svg_upload_do_not_sanitize(setup_project_dialog):

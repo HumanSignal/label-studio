@@ -61,7 +61,7 @@ def create_file_upload(request, project, file):
     instance = FileUpload(user=request.user, project=project, file=file)
     content_type, encoding = mimetypes.guess_type(str(instance.file.name))
     if settings.SVG_SECURITY_CLEANUP and content_type in ['image/svg+xml']:
-        clean_xml = _allowlist_svg(instance.file.read())
+        clean_xml = allowlist_svg(instance.file.read())
         instance.file.seek(0)
         instance.file.write(clean_xml)
         instance.file.truncate()
@@ -69,19 +69,11 @@ def create_file_upload(request, project, file):
     return instance
 
 
-def _allowlist_svg(dirty_xml):
+def allowlist_svg(dirty_xml):
     """Filter out malicious/harmful content from SVG files
     by defining allowed tags
     """
-    from lxml import etree
     from lxml.html import clean
-
-    dirty_xml_parsed = etree.fromstring(
-            dirty_xml, parser=etree.XMLParser(recover=True))
-
-    dirty_xml = etree.tostring(
-            dirty_xml_parsed, pretty_print=True,
-            xml_declaration=True, encoding='UTF-8', standalone=True)
 
     allow_tags = [
             'xml',
