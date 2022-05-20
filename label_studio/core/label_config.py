@@ -111,7 +111,7 @@ def validate_label_config(config_string):
 def extract_data_types(label_config):
     # load config
     parser = etree.XMLParser()
-    xml = etree.fromstring(config_string, parser)
+    xml = etree.fromstring(label_config, parser)
     if xml is None:
         raise etree.XMLSchemaParseError('Project config is empty or incorrect')
 
