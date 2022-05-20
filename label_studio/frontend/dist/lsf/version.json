@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1690: Fix tools multiplication issue (#481)\n\nClear tools list on destroy",
-  "commit": "214b0032521a52c56e07162fd57e828dadde3d88",
+  "message": "fix: DEV-1577: add default settings (#619)\n\n* feat: DEV-1577: add default settings to editor\r\n\r\n* add an ability to set default settings when initializing the LSF",
+  "commit": "5e4da39533dd477ae1e303f649c71684ec43354a",
   "branch": "master",
-  "date": "2022-05-09T19:42:43Z"
+  "date": "2022-05-13T08:58:57Z"
 }

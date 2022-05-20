@@ -907,3 +907,8 @@ If you wanted to add predicted text and suggested transcriptions for this labeli
 }
 ```
 Because the TextArea tag applies to each labeled region, the IDs for the label results and the textarea results must match. 
+
+
+### Read only and hidden regions
+
+In some situations it's very helpful to hide or to make `read-only` bounding boxes, text spans, audio segments, etc. You can put `"readonly": true` or `"hidden": true` in regions to achieve this (the dict inside of `annotations.result` list).  

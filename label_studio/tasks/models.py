@@ -68,7 +68,12 @@ class Task(TaskMixin, models.Model):
     inner_id = models.BigIntegerField(_('inner id'), default=0, db_index=True, null=True,
                                       help_text='Internal task ID in the project, starts with 1')
     updates = ['is_labeled']
-
+    total_annotations = models.IntegerField(_('total_annotations'), default=0, db_index=True,
+                                  help_text='Number of total annotations for the current task except cancelled annotations')
+    cancelled_annotations = models.IntegerField(_('cancelled_annotations'), default=0, db_index=True,
+                                                help_text='Number of total cancelled annotations for the current task')
+    total_predictions = models.IntegerField(_('total_predictions'), default=0, db_index=True,
+                                  help_text='Number of total predictions for the current task')
     objects = TaskManager()  # task manager by default
     prepared = PreparedTaskManager()  # task manager with filters, ordering, etc for data_manager app
 
@@ -268,7 +273,9 @@ class Task(TaskMixin, models.Model):
                 max_inner_id = 1
                 if task:
                     max_inner_id = task.inner_id
-                self.inner_id = max_inner_id + 1
+
+                # max_inner_id might be None in the old projects
+                self.inner_id = None if max_inner_id is None else (max_inner_id + 1)
         super().save(*args, **kwargs)
 
 
@@ -331,10 +338,12 @@ class Annotation(AnnotationMixin, models.Model):
         indexes = [
             models.Index(fields=['task', 'ground_truth']),
             models.Index(fields=['task', 'completed_by']),
+            models.Index(fields=['id', 'task']),
+            models.Index(fields=['task', 'was_cancelled']),
             models.Index(fields=['was_cancelled']),
             models.Index(fields=['ground_truth']),
             models.Index(fields=['created_at']),
-        ]
+        ] + AnnotationMixin.Meta.indexes
 
     def created_ago(self):
         """ Humanize date """
@@ -580,6 +589,23 @@ def delete_project_summary_annotations_before_updating_annotation(sender, instan
         return
     old_annotation.decrease_project_summary_counters()
 
+    # update task counters if annotation changes it's was_cancelled status
+    task = instance.task
+    if old_annotation.was_cancelled != instance.was_cancelled:
+        if instance.was_cancelled:
+            task.cancelled_annotations = task.cancelled_annotations + 1
+            task.total_annotations = task.total_annotations - 1
+        else:
+            task.cancelled_annotations = task.cancelled_annotations - 1
+            task.total_annotations = task.total_annotations + 1
+        task.update_is_labeled()
+
+        Task.objects.filter(id=instance.task.id).update(
+            is_labeled=task.is_labeled,
+            total_annotations=task.total_annotations,
+            cancelled_annotations=task.cancelled_annotations
+        )
+
 
 @receiver(post_save, sender=Annotation)
 def update_project_summary_annotations_and_is_labeled(sender, instance, created, **kwargs):
@@ -589,14 +615,37 @@ def update_project_summary_annotations_and_is_labeled(sender, instance, created,
     if created:
         # If new annotation created, update task.is_labeled state
         logger.debug(f'Update task stats for task={instance.task}')
+        if instance.was_cancelled:
+            instance.task.cancelled_annotations = instance.task.annotations.all().filter(was_cancelled=True).count()
+        else:
+            instance.task.total_annotations = instance.task.annotations.all().filter(was_cancelled=False).count()
         instance.task.update_is_labeled()
-        instance.task.save(update_fields=['is_labeled'])
+        instance.task.save(update_fields=['is_labeled', 'total_annotations', 'cancelled_annotations'])
 
 
 @receiver(pre_delete, sender=Annotation)
 def remove_project_summary_annotations(sender, instance, **kwargs):
     """Remove annotation counters in project summary followed by deleting an annotation"""
     instance.decrease_project_summary_counters()
+    if instance.was_cancelled:
+        instance.task.cancelled_annotations = instance.task.annotations.all().filter(was_cancelled=True).count() - 1
+    else:
+        instance.task.total_annotations = instance.task.annotations.all().filter(was_cancelled=False).count() - 1
+    instance.task.save(update_fields=['total_annotations', 'cancelled_annotations'])
+
+
+@receiver(pre_delete, sender=Prediction)
+def remove_predictions_from_project(sender, instance, **kwargs):
+    """Remove predictions counters"""
+    instance.task.total_predictions = instance.task.predictions.all().count() - 1
+    instance.task.save(update_fields=['total_predictions'])
+
+@receiver(post_save, sender=Prediction)
+def save_predictions_to_project(sender, instance, **kwargs):
+    """Add predictions counters"""
+    instance.task.total_predictions = instance.task.predictions.all().count()
+    instance.task.save(update_fields=['total_predictions'])
+
 
 # =========== END OF PROJECT SUMMARY UPDATES ===========
 

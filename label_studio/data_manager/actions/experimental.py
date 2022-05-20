@@ -6,13 +6,13 @@ import ujson as json
 from django.conf import settings
 from django.db.models import Count
 
-from tasks.models import Annotation
+from tasks.models import Annotation, Task
 from tasks.serializers import TaskSerializerBulk
 from data_manager.functions import DataManagerException
 from data_manager.actions.basic import delete_tasks
 from core.permissions import AllPermissions
 from collections import defaultdict
-
+from core.redis import start_job_async_or_sync
 
 logger = logging.getLogger(__name__)
 all_permissions = AllPermissions()
@@ -36,30 +36,35 @@ def propagate_annotations(project, queryset, **kwargs):
     # copy source annotation to new annotations for each task
     db_annotations = []
     for i in tasks:
-        db_annotations.append(
-            Annotation(
-                task_id=i,
-                completed_by_id=user.id,
-                result=source_annotation.result,
-                result_count=source_annotation.result_count,
-                parent_annotation_id=source_annotation.id
-            )
-        )
+        body = {
+            'task_id': i,
+            'completed_by_id': user.id,
+            'result': source_annotation.result,
+            'result_count': source_annotation.result_count,
+            'parent_annotation_id': source_annotation.id
+        }
+        body = TaskSerializerBulk.add_annotation_fields(body, user, 'propagated_annotation')
+        db_annotations.append(Annotation(**body))
 
     db_annotations = Annotation.objects.bulk_create(db_annotations, batch_size=settings.BATCH_SIZE)
-    TaskSerializerBulk.post_process_annotations(db_annotations)
+    TaskSerializerBulk.post_process_annotations(user, db_annotations, 'propagated_annotation')
 
+    start_job_async_or_sync(project.update_tasks_counters, Task.objects.filter(id__in=tasks))
     return {'response_code': 200, 'detail': f'Created {len(db_annotations)} annotations'}
 
 
 def propagate_annotations_form(user, project):
+    first_annotation = Annotation.objects.filter(task__project=project).first()
+    field = {
+        'type': 'number',
+        'name': 'source_annotation_id',
+        'label': 'Enter source annotation ID'
+    }
+    if first_annotation:
+        field.update({'value': str(first_annotation.id)})
     return [{
         'columnCount': 1,
-        'fields': [{
-            'type': 'number',
-            'name': 'source_annotation_id',
-            'label': 'Enter source annotation ID'
-        }]
+        'fields': [field]
     }]
 
 
