@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1577: add default settings (#619)\n\n* feat: DEV-1577: add default settings to editor\r\n\r\n* add an ability to set default settings when initializing the LSF",
-  "commit": "5e4da39533dd477ae1e303f649c71684ec43354a",
-  "branch": "master",
-  "date": "2022-05-13T08:58:57Z"
+  "message": "fix: DEV-2244: Fix feature flag missprint  in tests",
+  "commit": "9c218ed5cd86393c559c5a42aa0967644ed44fd0",
+  "branch": "fix/DEV-2244/choices-indeterminate-state",
+  "date": "2022-05-20T16:54:47Z"
 }
