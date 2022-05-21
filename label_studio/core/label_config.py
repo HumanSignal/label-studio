@@ -11,7 +11,7 @@ import re
 
 from urllib.parse import urlencode
 from collections import OrderedDict
-from lxml import etree
+import defusedxml.ElementTree as etree
 from collections import defaultdict
 from django.conf import settings
 from label_studio.core.utils.io import find_file
@@ -73,10 +73,13 @@ def _fix_choices(config):
 
 
 def parse_config_to_json(config_string):
-    parser = etree.XMLParser(recover=False)
-    xml = etree.fromstring(config_string, parser)
+    parser = etree.XMLParser()
+    try:
+        xml = etree.fromstring(config_string, parser)
+    except TypeError as error:
+        raise etree.ParseError('can only parse strings')
     if xml is None:
-        raise etree.XMLSchemaParseError('xml is empty or incorrect')
+        raise etree.ParseError('xml is empty or incorrect')
     config = xmljson.badgerfish.data(xml)
     config = _fix_choices(config)
     return config
@@ -87,7 +90,7 @@ def validate_label_config(config_string):
     try:
         config = parse_config_to_json(config_string)
         jsonschema.validate(config, _LABEL_CONFIG_SCHEMA_DATA)
-    except (etree.XMLSyntaxError, etree.XMLSchemaParseError, ValueError) as exc:
+    except (etree.ParseError, ValueError) as exc:
         raise LabelStudioValidationErrorSentryIgnored(str(exc))
     except jsonschema.exceptions.ValidationError as exc:
         error_message = exc.context[-1].message if len(exc.context) else exc.message
@@ -113,7 +116,7 @@ def extract_data_types(label_config):
     parser = etree.XMLParser()
     xml = etree.fromstring(label_config, parser)
     if xml is None:
-        raise etree.XMLSchemaParseError('Project config is empty or incorrect')
+        raise etree.ParseError('Project config is empty or incorrect')
 
     # take all tags with values attribute and fit them to tag types
     data_type = {}
@@ -223,7 +226,7 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
     parser = etree.XMLParser()
     xml = etree.fromstring(label_config, parser)
     if xml is None:
-        raise etree.XMLSchemaParseError('Project config is empty or incorrect')
+        raise etree.ParseError('Project config is empty or incorrect')
 
     # make examples pretty
     examples = data_examples(mode=mode)
