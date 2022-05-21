@@ -172,7 +172,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     completed_at = serializers.DateTimeField(required=False)
     annotations_results = serializers.SerializerMethodField(required=False)
     predictions_results = serializers.SerializerMethodField(required=False)
-    predictions_score = serializers.FloatField(required=False)
+    predictions_score = serializers.SerializerMethodField(required=False)
     file_upload = serializers.SerializerMethodField(required=False)
     annotations_ids = serializers.SerializerMethodField(required=False)
     predictions_model_versions = serializers.SerializerMethodField(required=False)
@@ -219,10 +219,13 @@ class DataManagerTaskSerializer(TaskSerializer):
         return output[:self.CHAR_LIMITS].replace(',"', ', "').replace('],[', "] [").replace('"', '')
 
     def get_annotations_results(self, task):
-        return self._pretty_results(task, 'annotations_results')
+        return self._pretty_results(task.annotations.last(), 'result')
 
     def get_predictions_results(self, task):
-        return self._pretty_results(task, 'predictions_results')
+        return self._pretty_results(task.predictions.last(), 'result')
+
+    def get_predictions_score(self,task):
+        return task.predictions.first().score
 
     def get_annotations(self, task):
         return AnnotationSerializer(task.annotations, many=True, default=[], read_only=True).data
@@ -257,10 +260,10 @@ class DataManagerTaskSerializer(TaskSerializer):
         return annotators if hasattr(obj, 'annotators') and annotators else []
 
     def get_annotations_ids(self, task):
-        return self._pretty_results(task, 'annotations_ids', unique=True)
+        return self._pretty_results(task.annotations.last(), 'id', unique=True)
 
     def get_predictions_model_versions(self, task):
-        return self._pretty_results(task, 'predictions_model_versions', unique=True)
+        return self._pretty_results(task.predictions.last(), 'model_version', unique=True)
 
     def get_drafts(self, task):
         """Return drafts only for the current user"""
