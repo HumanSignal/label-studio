@@ -269,6 +269,7 @@ class ExportStorageLink(models.Model):
         _('object exists'), help_text='Whether object under external link still exists', default=True
     )
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
+    updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Update time')
 
     @staticmethod
     def get_key(annotation):
@@ -287,6 +288,9 @@ class ExportStorageLink(models.Model):
     @classmethod
     def create(cls, annotation, storage):
         link, created = cls.objects.get_or_create(annotation=annotation, storage=storage, object_exists=True)
+        if not created:
+            # update updated_at field
+            link.save()
         return link
 
     def has_permission(self, user):
