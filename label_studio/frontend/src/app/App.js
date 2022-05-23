@@ -12,6 +12,7 @@ import { LibraryProvider } from "../providers/LibraryProvider";
 import { MultiProvider } from "../providers/MultiProvider";
 import { ProjectProvider } from "../providers/ProjectProvider";
 import { RoutesProvider } from "../providers/RoutesProvider";
+import { CurrentUserProvider } from "../providers/CurrentUser";
 import "./App.styl";
 import { AsyncPage } from "./AsyncPage/AsyncPage";
 import ErrorBoundary from "./ErrorBoundary";
@@ -52,6 +53,7 @@ const App = ({ content }) => {
                         <LibraryProvider key='lsf' libraries={libraries} />,
                         <RoutesProvider key='rotes' />,
                         <ProjectProvider key='project' />,
+                        <CurrentUserProvider key='currentUser' />,
                     ]}
                 >
                     <AsyncPage>
