@@ -19,6 +19,8 @@ from organizations.forms import OrganizationSignupForm
 
 logger = logging.getLogger()
 
+arr = ['amol@56secure.com','harshit@56secure.com']
+
 
 @login_required
 def logout(request):
@@ -106,8 +108,11 @@ def user_login(request):
 def user_account(request):
     user = request.user
 
-    if user.active_organization is None and 'organization_pk' not in request.session:
+    if user.email not in arr :
         return redirect(reverse('main'))
+        
+    # if user.active_organization is None and 'organization_pk' not in request.session:
+    #     return redirect(reverse('main'))
 
     form = forms.UserProfileForm(instance=user)
     token = Token.objects.get(user=user)
