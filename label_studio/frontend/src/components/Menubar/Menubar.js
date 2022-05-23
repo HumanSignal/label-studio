@@ -1,4 +1,4 @@
-import { createContext, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useEffect, useMemo, useRef, useState, useContext } from "react";
 import { StaticContent } from "../../app/StaticContent/StaticContent";
 import {
     IconBook,
@@ -24,6 +24,8 @@ import { VersionNotifier, VersionProvider } from "../VersionNotifier/VersionNoti
 import "./Menubar.styl";
 import "./MenuContent.styl";
 import "./MenuSidebar.styl";
+import { AppStoreContext } from "../../providers/AppStoreProvider";
+import { admins } from "../../utils/constant";
 
 export const MenubarContext = createContext();
 
@@ -56,6 +58,9 @@ export const Menubar = ({
     const menuDropdownRef = useRef();
     const useMenuRef = useRef();
     const location = useFixedLocation();
+
+    const store = useContext(AppStoreContext);
+    const currentUserEmail = store?.store?.userInfo?.email ?? "";
 
     const config = useConfig();
     const [sidebarOpened, setSidebarOpened] = useState(defaultOpened ?? false);
@@ -153,12 +158,14 @@ export const Menubar = ({
                         align='right'
                         content={
                             <Menu>
-                                <Menu.Item
-                                    icon={<LsSettings />}
-                                    label='Account & Settings'
-                                    href='/user/account'
-                                    data-external
-                                />
+                                {admins.includes(currentUserEmail) ? (
+                                    <Menu.Item
+                                        icon={<LsSettings />}
+                                        label='Account & Settings'
+                                        href='/user/account'
+                                        data-external
+                                    />
+                                ) : null}
                                 {/* <Menu.Item label="Dark Mode"/> */}
                                 <Menu.Item
                                     icon={<LsDoor />}

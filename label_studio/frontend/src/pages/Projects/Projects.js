@@ -13,7 +13,6 @@ import { DataManagerPage } from "../DataManager/DataManager";
 import { SettingsPage } from "../Settings";
 import "./Projects.styl";
 import { EmptyProjectsList, ProjectsList } from "./ProjectsList";
-import { useCurrentUser } from "../../providers/CurrentUser";
 import { admins } from "../../utils/constant";
 
 const getCurrentPage = () => {
