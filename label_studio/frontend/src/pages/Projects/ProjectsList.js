@@ -8,7 +8,7 @@ import { Block, Elem } from "../../utils/bem";
 import { absoluteURL } from "../../utils/helpers";
 import { admins } from "../../utils/constant";
 
-export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, pageSize, store }) => {
+export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, pageSize, appStore }) => {
     return (
         <>
             <Elem name='list'>
@@ -16,7 +16,7 @@ export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, 
                     <ProjectCard
                         key={project.id}
                         project={project}
-                        currentUserEmail={store?.store?.userInfo?.email ?? ""}
+                        currentUserEmail={appStore?.store?.userInfo?.email ?? ""}
                     />
                 ))}
             </Elem>
