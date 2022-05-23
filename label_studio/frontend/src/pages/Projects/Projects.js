@@ -5,6 +5,7 @@ import { Button } from "../../components";
 import { Oneof } from "../../components/Oneof/Oneof";
 import { Spinner } from "../../components/Spinner/Spinner";
 import { ApiContext } from "../../providers/ApiProvider";
+import { AppStoreContext } from "../../providers/AppStoreProvider";
 import { useContextProps } from "../../providers/RoutesProvider";
 import { Block, Elem } from "../../utils/bem";
 import { CreateProject } from "../CreateProject/CreateProject";
@@ -105,8 +106,9 @@ ProjectsPage.routes = ({ store }) => [
 ];
 ProjectsPage.context = ({ openModal, showButton }) => {
     if (!showButton) return null;
-    const currentUser = useCurrentUser();
-    const currentUserEmail = currentUser?.user?.email ?? "";
+
+    const store = React.useContext(AppStoreContext);
+    const currentUserEmail = store?.store?.userInfo?.email ?? "";
 
     if (admins.includes(currentUserEmail)) {
         return (
