@@ -22,6 +22,7 @@ const getCurrentPage = () => {
 
 export const ProjectsPage = () => {
     const api = React.useContext(ApiContext);
+    const store = React.useContext(AppStoreContext);
     const [projectsList, setProjectsList] = React.useState([]);
     const [networkState, setNetworkState] = React.useState(null);
     const [currentPage, setCurrentPage] = useState(getCurrentPage());
@@ -73,6 +74,7 @@ export const ProjectsPage = () => {
                             totalItems={totalItems}
                             loadNextPage={loadNextPage}
                             pageSize={defaultPageSize}
+                            appStore={store}
                         />
                     ) : (
                         <EmptyProjectsList openModal={openModal} />
