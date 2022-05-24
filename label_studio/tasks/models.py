@@ -629,9 +629,10 @@ def remove_project_summary_annotations(sender, instance, **kwargs):
     instance.decrease_project_summary_counters()
     if instance.was_cancelled:
         instance.task.cancelled_annotations = instance.task.annotations.all().filter(was_cancelled=True).count() - 1
+        instance.task.save(update_fields=['cancelled_annotations'])
     else:
         instance.task.total_annotations = instance.task.annotations.all().filter(was_cancelled=False).count() - 1
-    instance.task.save(update_fields=['total_annotations', 'cancelled_annotations'])
+        instance.task.save(update_fields=['total_annotations'])
 
 
 @receiver(pre_delete, sender=Prediction)
