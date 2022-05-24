@@ -232,7 +232,7 @@ def apply_filters(queryset, filters, project):
 
         # custom expressions for enterprise
         custom_filter_expressions = load_func(settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS)
-        filter_expression = custom_filter_expressions(_filter, field_name)
+        filter_expression = custom_filter_expressions(_filter, field_name, project)
         if filter_expression:
             filter_expressions.append(filter_expression)
             continue
