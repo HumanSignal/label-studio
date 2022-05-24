@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2100: Fix preselected choices (#584)\n\n- working with empty annotation\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "ee38e771760e1ce57ac62dc1556ddd0718f62487",
-  "branch": "master",
-  "date": "2022-04-27T11:55:50Z"
+  "message": "reign in the timeline controls by removing padding and negative calc",
+  "commit": "f0d4011d488e18208ecf6231ece7840b2687c874",
+  "branch": "fix/dev-2203/view-all-style-fix",
+  "date": "2022-05-24T22:20:08Z"
 }
