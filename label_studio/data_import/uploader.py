@@ -134,6 +134,7 @@ def load_tasks(request, project):
             data_keys, found_formats, tasks, file_upload_ids = tasks_from_url(
                 file_upload_ids, project, request, url
             )
+            could_be_tasks_lists = looks_like_task_list(found_formats, tasks)
 
     # take one task from request DATA
     elif 'application/json' in request.content_type and isinstance(request.data, dict):
@@ -158,3 +159,23 @@ def load_tasks(request, project):
     check_max_task_number(tasks)
     return tasks, file_upload_ids, could_be_tasks_lists, found_formats, list(data_keys)
 
+def looks_like_task_list(found_formats, tasks):
+    """ csv/tsv/txt file is a list of urls process as task list
+    like how json works currently
+    """
+    try:
+        if list(found_formats.keys())[0] in ('.csv', '.tsv', '.txt'):
+            for data in tasks:
+                for key in data:
+                    if type(data[key]) != dict:
+                        continue
+                    if data[key].get('$undefined$'):
+                        if data[key]['$undefined$'][0:4] == 'http':
+                            return True
+                    if list(data[key].values())[0][0:4] == 'http':
+                        return True
+    except (IndexError, KeyError, TypeError, ValueError) as err:
+        logger.info(f'processing csv/txt as possible task list {err}')
+        pass
+
+    return False
