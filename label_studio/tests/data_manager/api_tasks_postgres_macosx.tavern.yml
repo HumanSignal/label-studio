@@ -1,0 +1,341 @@
+# NOTE: this test is identical to  tests/data_manager/api_tasks.tavern.yml
+# except this one the json order of `name: get_tasks` on dwright mac osx box
+---
+test_name: tasks-all-fields-postgre
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+  - skipif: "'default' not in '{tavern.env_vars.DJANGO_DB}' or 'Darwin' not in platform.system()"
+
+stages:
+
+  - id: signup
+    type: ref
+
+  - id: create_project
+    name: create_project
+    request:
+      data:
+        title: Test Draft 1
+        show_collab_predictions: true
+      method: POST
+      url: '{django_live_url}/api/projects'
+    response:
+      save:
+        json:
+          project_pk: id
+          created_by: created_by.id
+      status_code: 201
+
+  - name: create_filter_tasks
+    request:
+      files:
+        json_file: tests/data_manager/tasks_annotations_predictions.json
+      headers:
+        content-type: multipart/form-data
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/import'
+    response:
+      json:
+        annotation_count: 4
+        prediction_count: 3
+        task_count: 6
+      status_code: 201
+
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "filters": {
+            "conjunction": "or",
+            "items": [
+              {
+                "filter": "filter:tasks:data.text",
+                "operator": "equal",
+                "type": "String",
+                "value": "Test example phrase 1"
+              },
+              {
+                "filter": "filter:tasks:data.text",
+                "operator": "contains",
+                "type": "String",
+                "value": "x"
+              },
+              {
+                "filter": "filter:tasks:annotations_results",
+                "operator": "contains",
+                "type": "String",
+                "value": "TESTING"
+              },
+              {
+                "filter": "filter:tasks:predictions_results",
+                "operator": "contains",
+                "type": "String",
+                "value": "PREDICTIONS"
+              }
+            ]
+          },
+          "ordering": [
+            "tasks:data.text"
+          ]
+        },
+        "project": !int "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: label_studio.tests.utils:save_response_macosx
+      json: {
+        "total_annotations": 4,
+        "total_predictions": 3,
+        "total": 4,
+        "tasks": [
+        {
+          "cancelled_annotations": 0,
+
+          "annotations_results": !raw "[{type:choices, value:{choices:[class_A]}, to_name:text, from_name:text_class}]",
+          "data": {
+            "text": "Test example phrase 1",
+            "int_field": 1
+          },
+
+          "predictions_results": !raw "[{type:choices, value:{choices:[class_A]}, to_name:text, from_name:text_class}]",
+          "predictions_score": null,
+          "total_annotations": 1,
+          "total_predictions": 1,
+          "annotations_ids": !anystr "",
+          "annotations": [
+          {
+
+            "created_username": " test_suites_user@heartex.com, {created_by}",
+            "created_ago": "0\u00a0minutes",
+            "completed_by": !int "{created_by}",
+            "result": [
+            {
+              "type": "choices",
+              "value": {
+                "choices": [
+                  "class_A"
+                ]
+              },
+              "to_name": "text",
+              "from_name": "text_class"
+            }
+            ],
+            "was_cancelled": false,
+            "ground_truth": true,
+            "lead_time": 3.0
+          }
+          ],
+          "predictions": [
+          {
+            "model_version": "model_version_A",
+            "created_ago": "0\u00a0minutes",
+            "result": [
+            {
+              "type": "choices",
+              "value": {
+                "choices": [
+                  "class_A"
+                ]
+              },
+              "to_name": "text",
+              "from_name": "text_class"
+            }
+            ],
+            "score": null,
+            "cluster": null,
+            "neighbors": null,
+            "mislabeling": 0.0
+          }
+          ],
+          "drafts": [],
+          "annotators": [
+            !int "{created_by}"
+          ],
+          "avg_lead_time": 3.0
+        }, 
+        {
+          "cancelled_annotations": 0,
+
+          "annotations_results": "",
+          "data": {
+            "text": "opop",
+            "int_field": 42
+          },
+
+          "predictions_results": !raw "[{type:choices, value:{choices:[class_PREDICTIONS_TESTING]}, to_name:text, from_name:text_class}]",
+          "predictions_score": null,
+          "total_annotations": 0,
+          "total_predictions": 1,
+          "annotations_ids": "",
+          "annotations": [],
+          "predictions": [
+          {
+            "model_version": "undefined",
+            "created_ago": "0\u00a0minutes",
+            "result": [
+            {
+              "type": "choices",
+              "value": {
+                "choices": [
+                  "class_PREDICTIONS_TESTING"
+                ]
+              },
+              "to_name": "text",
+              "from_name": "text_class"
+            }
+            ],
+            "score": null,
+            "cluster": null,
+            "neighbors": null,
+            "mislabeling": 0.0
+          }
+          ],
+          "drafts": [],
+          "annotators": [],
+          "avg_lead_time": null
+        },
+        {
+          "cancelled_annotations": 0,
+
+          "annotations_results": !anystr "",
+          "data": {
+            "text": "x2",
+            "int_field": 20
+          },
+          "predictions_results": !anystr "",
+          "predictions_score": null,
+          "total_annotations": 2,
+          "total_predictions": 1,
+          "annotations_ids": !anystr "",
+          "annotations": [
+          {
+            "created_username": " test_suites_user@heartex.com, {created_by}",
+            "created_ago": "0\u00a0minutes",
+            "result": [
+            {
+              "type": "choices",
+              "value": {
+                "choices": [
+                  "class_A"
+                ]
+              },
+              "to_name": "text",
+              "from_name": "text_class"
+            }
+            ],
+            "was_cancelled": false,
+            "ground_truth": true,
+            "lead_time": 3.0
+          },
+          {
+            "created_username": " test_suites_user@heartex.com, {created_by}",
+            "created_ago": "0\u00a0minutes",
+            "result": [
+            {
+              "type": "choices",
+              "value": {
+                "choices": [
+                  "class_A"
+                ]
+              },
+              "to_name": "text",
+              "from_name": "text_class"
+            }
+            ],
+            "was_cancelled": false,
+            "ground_truth": true,
+            "lead_time": 5.0
+          }
+          ],
+          "predictions": [
+          {
+
+            "model_version": "model_version_A",
+            "created_ago": "0\u00a0minutes",
+            "result": [
+            {
+              "type": "choices",
+              "value": {
+                "choices": [
+                  "class_A"
+                ]
+              },
+              "to_name": "text",
+              "from_name": "text_class"
+            }
+            ],
+            "score": null,
+            "cluster": null,
+            "neighbors": null,
+            "mislabeling": 0.0
+          }
+          ],
+          "drafts": [],
+          "annotators": [
+            !int "{created_by}"
+          ],
+          "avg_lead_time": 4.0
+        },
+        {
+          "cancelled_annotations": 0,
+
+
+          "annotations_results": !raw "[{type:choices, value:{choices:[class_TESTING]}, to_name:text, from_name:text_class}]",
+          "data": {
+            "text": "yoyo",
+            "int_field": "99"
+          },
+
+          "predictions_results": "",
+          "predictions_score": null,
+          "total_annotations": 1,
+          "total_predictions": 0,
+          "annotations_ids": !anystr "",
+          "annotations": [
+          {
+            "created_ago": "0\u00a0minutes",
+            "completed_by": !int "{created_by}",
+            "result": [
+            {
+              "type": "choices",
+              "value": {
+                "choices": [
+                  "class_TESTING"
+                ]
+              },
+              "to_name": "text",
+              "from_name": "text_class"
+            }
+            ],
+            "was_cancelled": false,
+            "ground_truth": true,
+            "lead_time": null
+
+          }
+          ],
+          "predictions": [],
+          "drafts": [],
+
+          "annotators": [
+            !int "{created_by}"
+          ]
+
+        }
+  ]
+}
+
