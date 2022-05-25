@@ -281,6 +281,10 @@ class Task(TaskMixin, models.Model):
 
     @staticmethod
     def delete_tasks_without_signals(queryset):
+        """
+        Delete Tasks queryset with switched off signals
+        :param queryset: Tasks queryset
+        """
         signals = [
             (post_delete, update_is_labeled_after_removing_annotation, Annotation),
             (post_delete, update_all_task_states_after_deleting_task, Task),
@@ -674,7 +678,7 @@ def _task_exists_in_db(task):
 def update_is_labeled_after_removing_annotation(sender, instance, **kwargs):
     # Update task.is_labeled state
     task = instance.task
-    if _task_exists_in_db(instance.task): # To prevent django.db.utils.DatabaseError: Save with update_fields did not affect any rows.
+    if _task_exists_in_db(task): # To prevent django.db.utils.DatabaseError: Save with update_fields did not affect any rows.
         logger.debug(f'Update task stats for task={task}')
         instance.task.update_is_labeled()
         instance.task.save(update_fields=['is_labeled'])
