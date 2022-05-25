@@ -662,9 +662,8 @@ def _task_exists_in_db(task):
 @receiver(post_delete, sender=Annotation)
 def update_is_labeled_after_removing_annotation(sender, instance, **kwargs):
     # Update task.is_labeled state
-    task = instance.task
-    if _task_exists_in_db(task): # To prevent django.db.utils.DatabaseError: Save with update_fields did not affect any rows.
-        logger.debug(f'Update task stats for task={task}')
+    if _task_exists_in_db(instance.task): # To prevent django.db.utils.DatabaseError: Save with update_fields did not affect any rows.
+        logger.debug(f'Update task stats for task={instance.task}')
         instance.task.update_is_labeled()
         instance.task.save(update_fields=['is_labeled'])
 
