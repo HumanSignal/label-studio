@@ -245,7 +245,7 @@ def apply_filters(queryset, filters, project):
         _filter = preprocess_filter(_filter, field_name)
 
         # custom expressions for enterprise
-        filter_expression = custom_filter_expressions(_filter, field_name)
+        filter_expression = custom_filter_expressions(_filter, field_name, project)
         if filter_expression:
             filter_expressions.append(filter_expression)
             continue
