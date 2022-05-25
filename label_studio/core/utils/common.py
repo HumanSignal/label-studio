@@ -125,10 +125,9 @@ def custom_exception_handler(exc, context):
 
 def create_hash():
     """This function generate 40 character long hash"""
-    h = hashlib.sha1()
+    h = hashlib.sha512()
     h.update(str(time.time()).encode('utf-8'))
     return h.hexdigest()[0:16]
-
 
 def paginator(objects, request, default_page=1, default_size=50):
     """ DEPRECATED

@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1577: add default settings (#619)\n\n* feat: DEV-1577: add default settings to editor\r\n\r\n* add an ability to set default settings when initializing the LSF",
-  "commit": "5e4da39533dd477ae1e303f649c71684ec43354a",
-  "branch": "master",
-  "date": "2022-05-13T08:58:57Z"
+  "message": "fix: DEV-2408: Regions disappearing from UI (#631)\n\n* fix: DEV-2408: Regions disappearing from UI\r\n\r\n* test: DEV-2408: Add test for wrong reordered results of per-region textarea and richtext",
+  "commit": "6ef0657ffa22fe4001129a84ef8aa21e430b2a0b",
+  "branch": "",
+  "date": "2022-05-20T16:49:57Z"
 }
