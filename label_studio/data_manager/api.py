@@ -192,8 +192,6 @@ class TaskListAPI(generics.ListCreateAPIView):
         # get project
         view_pk = int_from_request(request.GET, 'view', 0) or int_from_request(request.data, 'view', 0)
         project_pk = int_from_request(request.GET, 'project', 0) or int_from_request(request.data, 'project', 0)
-        page_number = int_from_request(request.GET, 'page', 0)
-        page_size = int_from_request(request.GET, 'page_size', 0)
         if project_pk:
             project = get_object_with_check_and_log(request, Project, pk=project_pk)
             self.check_object_permissions(request, project)
@@ -209,20 +207,13 @@ class TaskListAPI(generics.ListCreateAPIView):
         context = self.get_task_serializer_context(self.request, project)
 
         # paginated tasks
-        if page_number:
-            page = queryset[page_size * (page_number - 1):page_size * page_number]
-        else:
-            page = queryset
+        self.pagination_class = TaskPagination
+        page = self.paginate_queryset(queryset)
 
         # get request params
         all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
         fields_for_evaluation = get_fields_for_evaluation(prepare_params, request.user)
         review = bool_from_request(self.request.GET, 'review', False)
-
-        # get counters
-        total_tasks = queryset.count()
-        total_annotations = Annotation.objects.filter(task_id__in=queryset, was_cancelled=False).count()
-        total_predictions = Prediction.objects.filter(task_id__in=queryset).count()
 
         if review:
             fields_for_evaluation = ['annotators', 'reviewed']
@@ -248,12 +239,7 @@ class TaskListAPI(generics.ListCreateAPIView):
                 evaluate_predictions(tasks_for_predictions)
 
             serializer = self.task_serializer_class(page, many=True, context=context)
-            return Response({
-                "total_annotations": total_annotations,
-                "total_predictions": total_predictions,
-                "total": total_tasks,
-                "tasks": serializer.data,
-            })
+            return self.get_paginated_response(serializer.data)
         # all tasks
         if project.evaluate_predictions_automatically:
             evaluate_predictions(queryset.filter(predictions__isnull=True))
