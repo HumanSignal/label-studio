@@ -24,7 +24,8 @@ from django.core.files.storage import default_storage
 from rest_framework.exceptions import ValidationError
 
 from core.feature_flags import flag_set
-from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func
+from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func, \
+    temporary_disconnect_list_signal
 from core.utils.params import get_env
 from core.label_config import SINGLE_VALUED_TAGS
 from core.current_request import get_current_request
@@ -394,6 +395,16 @@ class Annotation(AnnotationMixin, models.Model):
         self.update_task()
         return result
 
+    @staticmethod
+    def delete_tasks_without_signals(queryset):
+        signals = [
+            (post_delete, update_is_labeled_after_removing_annotation, Annotation),
+            (post_delete, update_all_task_states_after_deleting_task, Task),
+            (pre_delete, remove_data_columns, Task),
+            (post_delete, remove_project_summary_annotations, Annotation)
+        ]
+        with temporary_disconnect_list_signal(signals):
+            queryset.delete()
 
 class TaskLock(models.Model):
     task = models.ForeignKey(
@@ -662,8 +673,9 @@ def _task_exists_in_db(task):
 @receiver(post_delete, sender=Annotation)
 def update_is_labeled_after_removing_annotation(sender, instance, **kwargs):
     # Update task.is_labeled state
+    task = instance.task
     if _task_exists_in_db(instance.task): # To prevent django.db.utils.DatabaseError: Save with update_fields did not affect any rows.
-        logger.debug(f'Update task stats for task={instance.task}')
+        logger.debug(f'Update task stats for task={task}')
         instance.task.update_is_labeled()
         instance.task.save(update_fields=['is_labeled'])
 
