@@ -46,7 +46,7 @@ def delete_tasks(project, queryset, **kwargs):
         (post_delete, update_is_labeled_after_removing_annotation, Annotation),
         (post_delete, update_all_task_states_after_deleting_task, Task),
         (pre_delete, remove_data_columns, Task),
-        (pre_delete, remove_project_summary_annotations, Annotation)
+        (post_delete, remove_project_summary_annotations, Annotation)
     ]
 
     # delete all project tasks
