@@ -61,7 +61,7 @@ def propagate_annotations_form(user, project):
         'label': 'Enter source annotation ID'
     }
     if first_annotation:
-        field.update({'value': str(first_annotation.id)})
+        field.update({'defaultValue': str(first_annotation.id)})
     return [{
         'columnCount': 1,
         'fields': [field]

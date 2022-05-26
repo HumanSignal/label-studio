@@ -41,27 +41,17 @@ def delete_tasks(project, queryset, **kwargs):
     tasks_ids = list(queryset.values('id'))
     count = len(tasks_ids)
     tasks_ids_list = [task['id'] for task in tasks_ids]
-    # signals to switch off
-    signals = [
-        (post_delete, update_is_labeled_after_removing_annotation, Annotation),
-        (post_delete, update_all_task_states_after_deleting_task, Task),
-        (pre_delete, remove_data_columns, Task),
-        (pre_delete, remove_project_summary_annotations, Annotation)
-    ]
 
     # delete all project tasks
     if count == project.tasks.count():
-        with temporary_disconnect_list_signal(signals):
-            queryset.delete()
+        Task.delete_tasks_without_signals(queryset)
         project.summary.reset()
 
     # delete only specific tasks
     else:
         # update project summary
         start_job_async_or_sync(async_project_summary_recalculation, tasks_ids_list, project.id)
-
-        with temporary_disconnect_list_signal(signals):
-            queryset.delete()
+        Task.delete_tasks_without_signals(queryset)
 
     project.update_tasks_states(
         maximum_annotations_changed=False,
