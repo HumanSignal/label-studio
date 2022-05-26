@@ -145,7 +145,7 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
 
     if project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
         user_solved_tasks_array = user_solved_tasks_array.filter(was_cancelled=False)
-        queue_info += ' Requeued for me from cancelled tasks '
+        queue_info += ' Requeued for me from skipped tasks '
 
     user_solved_tasks_array = user_solved_tasks_array.distinct().values_list('task__pk', flat=True)
     not_solved_tasks = prepared_tasks.exclude(pk__in=user_solved_tasks_array)
@@ -164,9 +164,9 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
     if project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
         # Ordering works different for sqlite and postgresql, details: https://code.djangoproject.com/ticket/19726
         if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
-            not_solved_tasks = not_solved_tasks.order_by('annotations__was_cancelled', 'id')
+            not_solved_tasks = not_solved_tasks.order_by('annotations__was_cancelled', 'updated_at')
         else:
-            not_solved_tasks = not_solved_tasks.order_by('-annotations__was_cancelled', 'id')
+            not_solved_tasks = not_solved_tasks.order_by('-annotations__was_cancelled', 'updated_at')
 
     return not_solved_tasks, user_solved_tasks_array, queue_info
 
