@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2100: Fix preselected choices (#584)\n\n- working with empty annotation\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "ee38e771760e1ce57ac62dc1556ddd0718f62487",
-  "branch": "master",
-  "date": "2022-04-27T11:55:50Z"
+  "message": "Merge branch 'master' into fix/dev-2199/view-all-audio-crash-fix",
+  "commit": "48b93ba4f859bbc0accba2b5b6561162c020857d",
+  "branch": "fix/dev-2199/view-all-audio-crash-fix",
+  "date": "2022-05-26T14:49:16Z"
 }
