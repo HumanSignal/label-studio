@@ -24,7 +24,8 @@ from django.core.files.storage import default_storage
 from rest_framework.exceptions import ValidationError
 
 from core.feature_flags import flag_set
-from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func
+from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func, \
+    temporary_disconnect_list_signal
 from core.utils.params import get_env
 from core.label_config import SINGLE_VALUED_TAGS
 from core.current_request import get_current_request
@@ -278,6 +279,20 @@ class Task(TaskMixin, models.Model):
                 self.inner_id = None if max_inner_id is None else (max_inner_id + 1)
         super().save(*args, **kwargs)
 
+    @staticmethod
+    def delete_tasks_without_signals(queryset):
+        """
+        Delete Tasks queryset with switched off signals
+        :param queryset: Tasks queryset
+        """
+        signals = [
+            (post_delete, update_is_labeled_after_removing_annotation, Annotation),
+            (post_delete, update_all_task_states_after_deleting_task, Task),
+            (pre_delete, remove_data_columns, Task),
+            (post_delete, remove_project_summary_annotations, Annotation)
+        ]
+        with temporary_disconnect_list_signal(signals):
+            queryset.delete()
 
 pre_bulk_create = Signal(providing_args=["objs", "batch_size"])
 post_bulk_create = Signal(providing_args=["objs", "batch_size"])
