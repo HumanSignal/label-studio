@@ -59,7 +59,7 @@ def propagate_annotations_form(user, project):
         'type': 'number',
         'name': 'source_annotation_id',
         'label': 'Enter source annotation ID' +
-                 (f'[first ID: {str(first_annotation.id)}]' if first_annotation else '')
+                 (f' [first ID: {str(first_annotation.id)}]' if first_annotation else '')
     }
     return [{
         'columnCount': 1,
