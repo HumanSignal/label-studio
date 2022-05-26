@@ -50,13 +50,16 @@ def propagate_annotations(project, queryset, **kwargs):
 
 
 def propagate_annotations_form(user, project):
+    first_annotation = Annotation.objects.filter(task__project=project).first()
+    field = {
+        'type': 'number',
+        'name': 'source_annotation_id',
+        'label': 'Enter source annotation ID' +
+                 (f' [first ID: {str(first_annotation.id)}]' if first_annotation else '')
+    }
     return [{
         'columnCount': 1,
-        'fields': [{
-            'type': 'number',
-            'name': 'source_annotation_id',
-            'label': 'Enter source annotation ID'
-        }]
+        'fields': [field]
     }]
 
 
