@@ -289,7 +289,8 @@ class Task(TaskMixin, models.Model):
             (post_delete, update_is_labeled_after_removing_annotation, Annotation),
             (post_delete, update_all_task_states_after_deleting_task, Task),
             (pre_delete, remove_data_columns, Task),
-            (post_delete, remove_project_summary_annotations, Annotation)
+            (post_delete, remove_project_summary_annotations, Annotation),
+            (post_delete, remove_annotation_update_counters, Annotation)
         ]
         with temporary_disconnect_list_signal(signals):
             queryset.delete()
@@ -643,6 +644,10 @@ def update_project_summary_annotations_and_is_labeled(sender, instance, created,
 def remove_project_summary_annotations(sender, instance, **kwargs):
     """Remove annotation counters in project summary followed by deleting an annotation"""
     instance.decrease_project_summary_counters()
+
+@receiver(post_delete, sender=Annotation)
+def remove_annotation_update_counters(sender, instance, **kwargs):
+    """Update task counters after annotation deletion"""
     if instance.was_cancelled:
         Task.objects.filter(id=instance.task.id).update(
             cancelled_annotations=instance.task.annotations.all().filter(was_cancelled=True).count())
