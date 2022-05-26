@@ -1124,7 +1124,7 @@ marks:
   - usefixtures:
       - django_live_url
 stages:
-
+  
   - id: signup
     type: ref
 
@@ -1320,6 +1320,16 @@ stages:
         "total": 0,
       }
 
+  - name: get_first_task
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects/{project_pk}/next'
+    response:
+      save:
+        json:
+          first_task_id: id
+      status_code: 200
+
   - name: create_annotation_first_task
     request:
       headers:
@@ -1334,7 +1344,7 @@ stages:
             choices:
             - class_B
       method: POST
-      url: '{django_live_url}/api/tasks/1/annotations'
+      url: '{django_live_url}/api/tasks/{first_task_id}/annotations'
     response:
       save:
         json:
@@ -1379,8 +1389,8 @@ stages:
       verify_response_with:
         function: label_studio.tests.utils:save_response
       json: {
-        "total_annotations": 2,
-        "total_predictions": 1,
+        "total_annotations": 1,
+        "total_predictions": 0,
         "total": 1,
       }
 
@@ -1422,8 +1432,8 @@ stages:
       verify_response_with:
         function: label_studio.tests.utils:save_response
       json: {
-        "total_annotations": 3,
-        "total_predictions": 2,
+        "total_annotations": 4,
+        "total_predictions": 3,
         "total": 5,
       }
 
@@ -1465,7 +1475,7 @@ stages:
       verify_response_with:
         function: label_studio.tests.utils:save_response
       json: {
-        "total_annotations": 2,
-        "total_predictions": 1,
+        "total_annotations": 1,
+        "total_predictions": 0,
         "total": 1,
       }
