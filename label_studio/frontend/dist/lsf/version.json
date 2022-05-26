@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2100: Fix preselected choices (#584)\n\n- working with empty annotation\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "ee38e771760e1ce57ac62dc1556ddd0718f62487",
-  "branch": "master",
-  "date": "2022-04-27T11:55:50Z"
+  "message": "fix: DEV-2408: Regions disappearing from UI (#631)\n\n* fix: DEV-2408: Regions disappearing from UI\n\n* test: DEV-2408: Add test for wrong reordered results of per-region textarea and richtext\n\n(cherry picked from commit 6ef0657ffa22fe4001129a84ef8aa21e430b2a0b)",
+  "commit": "71916cca1854650a4c269f5adc8c49c4cd2460be",
+  "branch": "lse-release/2.2.7",
+  "date": "2022-05-20T16:49:57Z"
 }
