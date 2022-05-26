@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2408: Regions disappearing from UI (#631)\n\n* fix: DEV-2408: Regions disappearing from UI\r\n\r\n* test: DEV-2408: Add test for wrong reordered results of per-region textarea and richtext",
-  "commit": "6ef0657ffa22fe4001129a84ef8aa21e430b2a0b",
-  "branch": "",
-  "date": "2022-05-20T16:49:57Z"
+  "message": "test: DEV-2394: Add test for bounds of transformations for zoomed image regions",
+  "commit": "65467bde45b8dc8d5c2bff83ad3747fa7cb2e90d",
+  "branch": "fix/DEV-2394/zoomed-transform-limits",
+  "date": "2022-05-26T21:36:45Z"
 }
