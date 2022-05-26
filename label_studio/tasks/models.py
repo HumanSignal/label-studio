@@ -636,6 +636,7 @@ def update_project_summary_annotations_and_is_labeled(sender, instance, created,
             instance.task.total_annotations = instance.task.annotations.all().filter(was_cancelled=False).count()
         instance.task.update_is_labeled()
         instance.task.save(update_fields=['is_labeled', 'total_annotations', 'cancelled_annotations'])
+        logger.debug(f"Updated total_annotations and cancelled_annotations for {instance.task.id}.")
 
 
 @receiver(post_delete, sender=Annotation)
@@ -645,9 +646,11 @@ def remove_project_summary_annotations(sender, instance, **kwargs):
     if instance.was_cancelled:
         Task.objects.filter(id=instance.task.id).update(
             cancelled_annotations=instance.task.annotations.all().filter(was_cancelled=True).count())
+        logger.debug(f"Updated cancelled_annotations for {instance.task.id}.")
     else:
         Task.objects.filter(id=instance.task.id).update(
             total_annotations=instance.task.annotations.all().filter(was_cancelled=False).count())
+        logger.debug(f"Updated total_annotations for {instance.task.id}.")
 
 
 @receiver(pre_delete, sender=Prediction)
@@ -655,12 +658,15 @@ def remove_predictions_from_project(sender, instance, **kwargs):
     """Remove predictions counters"""
     instance.task.total_predictions = instance.task.predictions.all().count() - 1
     instance.task.save(update_fields=['total_predictions'])
+    logger.debug(f"Updated total_predictions for {instance.task.id}.")
+
 
 @receiver(post_save, sender=Prediction)
 def save_predictions_to_project(sender, instance, **kwargs):
     """Add predictions counters"""
     instance.task.total_predictions = instance.task.predictions.all().count()
     instance.task.save(update_fields=['total_predictions'])
+    logger.debug(f"Updated total_predictions for {instance.task.id}.")
 
 
 # =========== END OF PROJECT SUMMARY UPDATES ===========
