@@ -657,35 +657,26 @@ def save_predictions_to_project(sender, instance, **kwargs):
 # =========== END OF PROJECT SUMMARY UPDATES ===========
 
 
-def _task_exists_in_db(task):
-    try:
-        Task.objects.get(id=task.id)
-    except Task.DoesNotExist:
-        return False
-    return True
-
-
 @receiver(post_delete, sender=Annotation, weak=False)
 def remove_annotation_update_counters(sender, instance, **kwargs):
     """Update task counters after annotation deletion"""
-    logger.debug(f"On delete updated counters for {instance.task.id}.")
+    logger.debug(f"Start updating counters for task {instance.task.id}.")
     if instance.was_cancelled:
-        Task.objects.filter(id=instance.task.id).update(
-            cancelled_annotations=instance.task.annotations.all().filter(was_cancelled=True).count())
-        logger.debug(f"On delete updated cancelled_annotations for {instance.task.id}.")
+        cancelled = instance.task.annotations.all().filter(was_cancelled=True).count()
+        Task.objects.filter(id=instance.task.id).update(cancelled_annotations=cancelled)
+        logger.debug(f"On delete updated cancelled_annotations for task {instance.task.id}")
     else:
-        Task.objects.filter(id=instance.task.id).update(
-            total_annotations=instance.task.annotations.all().filter(was_cancelled=False).count())
-        logger.debug(f"On delete updated total_annotations for {instance.task.id}.")
+        total = instance.task.annotations.all().filter(was_cancelled=False).count()
+        Task.objects.filter(id=instance.task.id).update(total_annotations=total)
+        logger.debug(f"On delete updated total_annotations for task {instance.task.id}")
 
-    # Update task.is_labeled state
+    # update task.is_labeled state
     task = instance.task
-    if _task_exists_in_db(task):  # To prevent django.db.utils.DatabaseError: Save with update_fields did not affect any rows.
-        logger.debug(f'Update task stats for task={task}')
-        instance.task.update_is_labeled()
-        instance.task.save(update_fields=['is_labeled'])
+    logger.debug(f'Update task stats for task={task}')
+    task.update_is_labeled()
+    Task.objects.filter(id=task.id).update(is_labeled=task.is_labeled)
 
-    """Remove annotation counters in project summary followed by deleting an annotation"""
+    # remove annotation counters in project summary followed by deleting an annotation
     logger.debug("Remove annotation counters in project summary followed by deleting an annotation")
     instance.decrease_project_summary_counters()
 
