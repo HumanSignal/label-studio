@@ -665,7 +665,7 @@ def _task_exists_in_db(task):
     return True
 
 
-@receiver(post_delete, sender=Annotation)
+@receiver(post_delete, sender=Annotation, weak=False)
 def remove_annotation_update_counters(sender, instance, **kwargs):
     """Update task counters after annotation deletion"""
     logger.debug(f"On delete updated counters for {instance.task.id}.")
