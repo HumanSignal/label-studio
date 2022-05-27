@@ -643,19 +643,21 @@ def update_project_summary_annotations_and_is_labeled(sender, instance, created,
 @receiver(post_delete, sender=Annotation)
 def remove_project_summary_annotations(sender, instance, **kwargs):
     """Remove annotation counters in project summary followed by deleting an annotation"""
+    logger.debug("Remove annotation counters in project summary followed by deleting an annotation")
     instance.decrease_project_summary_counters()
 
 @receiver(post_delete, sender=Annotation)
 def remove_annotation_update_counters(sender, instance, **kwargs):
     """Update task counters after annotation deletion"""
+    logger.debug(f"On delete updated counters for {instance.task.id}.")
     if instance.was_cancelled:
         Task.objects.filter(id=instance.task.id).update(
             cancelled_annotations=instance.task.annotations.all().filter(was_cancelled=True).count())
-        logger.debug(f"Updated cancelled_annotations for {instance.task.id}.")
+        logger.debug(f"On delete updated cancelled_annotations for {instance.task.id}.")
     else:
         Task.objects.filter(id=instance.task.id).update(
             total_annotations=instance.task.annotations.all().filter(was_cancelled=False).count())
-        logger.debug(f"Updated total_annotations for {instance.task.id}.")
+        logger.debug(f"On delete updated total_annotations for {instance.task.id}.")
 
 
 @receiver(pre_delete, sender=Prediction)
