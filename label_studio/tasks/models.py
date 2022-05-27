@@ -660,18 +660,20 @@ def save_predictions_to_project(sender, instance, **kwargs):
 @receiver(post_delete, sender=Annotation, weak=False)
 def remove_annotation_update_counters(sender, instance, **kwargs):
     """Update task counters after annotation deletion"""
-    logger.debug(f"Start updating counters for task {instance.task.id}.")
+    task = instance.task
+
+    logger.debug(f"Start updating counters for task {task.id}.")
     if instance.was_cancelled:
-        cancelled = instance.task.annotations.all().filter(was_cancelled=True).count()
-        Task.objects.filter(id=instance.task.id).update(cancelled_annotations=cancelled)
-        logger.debug(f"On delete updated cancelled_annotations for task {instance.task.id}")
+        cancelled = task.annotations.all().filter(was_cancelled=True).count()
+        Task.objects.filter(id=task.id).update(cancelled_annotations=cancelled)
+        logger.debug(f"On delete updated cancelled_annotations for task {task.id}")
     else:
-        total = instance.task.annotations.all().filter(was_cancelled=False).count()
-        Task.objects.filter(id=instance.task.id).update(total_annotations=total)
-        logger.debug(f"On delete updated total_annotations for task {instance.task.id}")
+        total = task.annotations.all().filter(was_cancelled=False).count()
+        Task.objects.filter(id=task.id).update(total_annotations=total)
+        logger.debug(f"On delete updated total_annotations for task {task.id}")
 
     # update task.is_labeled state
-    task = instance.task
+
     logger.debug(f'Update task stats for task={task}')
     task.update_is_labeled()
     Task.objects.filter(id=task.id).update(is_labeled=task.is_labeled)
@@ -684,7 +686,7 @@ def remove_annotation_update_counters(sender, instance, **kwargs):
 @receiver(post_save, sender=Annotation)
 def delete_draft(sender, instance, **kwargs):
     task = instance.task
-    query_args = {'task': instance.task, 'annotation': instance}
+    query_args = {'task': task, 'annotation': instance}
     drafts = AnnotationDraft.objects.filter(**query_args)
     num_drafts = drafts.count()
     drafts.delete()
