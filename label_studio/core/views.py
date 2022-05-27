@@ -215,11 +215,7 @@ def localfiles_data(request):
         if user_has_permissions and os.path.exists(full_path):
             content_type, encoding = mimetypes.guess_type(str(full_path))
             content_type = content_type or 'application/octet-stream'
-            # full_path = "Users/dwright/Documents/datasource/images/test/LSE + + + project import 30K queues.jpeg"
-            response = RangedFileResponse(request, open(full_path, mode='rb'), content_type)
-            return response
-            # from django.http.response import FileResponse
-            # return FileResponse(request, open(full_path, mode='rb'), content_type)
+            return RangedFileResponse(request, open(full_path, mode='rb'), content_type)
         else:
             return HttpResponseNotFound()
 
