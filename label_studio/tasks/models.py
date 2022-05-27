@@ -680,7 +680,8 @@ def remove_annotation_update_counters(sender, instance, **kwargs):
 
     # Update task.is_labeled state
     task = instance.task
-    if _task_exists_in_db(task):  # To prevent django.db.utils.DatabaseError: Save with update_fields did not affect any rows.
+    # To prevent django.db.utils.DatabaseError: Save with update_fields did not affect any rows.
+    if _task_exists_in_db(task):
         logger.debug(f'Update task stats for task={task}')
         instance.task.update_is_labeled()
         instance.task.save(update_fields=['is_labeled'])
