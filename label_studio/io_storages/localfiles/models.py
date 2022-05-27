@@ -23,6 +23,7 @@ from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
 
+
 class LocalFilesMixin(models.Model):
     path = models.TextField(
         _('path'), null=True, blank=True,
