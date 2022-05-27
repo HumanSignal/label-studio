@@ -23,8 +23,6 @@ from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
 
-NOT_ALLOWED_IN_FILENAME = '[:/\|<>"?*+]'
-
 class LocalFilesMixin(models.Model):
     path = models.TextField(
         _('path'), null=True, blank=True,
@@ -57,11 +55,6 @@ class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):
     def can_resolve_url(self, url):
         return False
 
-    def is_disallowed(self, filename):
-        notallowed = re.compile(NOT_ALLOWED_IN_FILENAME)
-        if notallowed.search(filename):
-            return True
-
     def iterkeys(self):
         path = Path(self.path)
         regex = re.compile(str(self.regex_filter)) if self.regex_filter else None
@@ -70,11 +63,6 @@ class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):
         for file in sorted(path.rglob('*'), key=os.path.basename):
             if file.is_file():
                 key = file.name
-                if self.is_disallowed(key):
-                    raise ValidationError(
-                        f'''Filname contains disallowed character: {NOT_ALLOWED_IN_FILENAME} '''
-                    )
-
                 if regex and not regex.match(key):
                     logger.debug(key + ' is skipped by regex filter')
                     continue

@@ -166,15 +166,37 @@ def samples_paragraphs(request):
     return HttpResponse(json.dumps(result), content_type='application/json')
 
 
+def _encode_params(request):
+    """
+    Encode localfile get params
+
+    e.g.
+    "GET /data/local-files/?d=Users/dwright/Documents/datasource/images/test/curiosity_selfie--+--.jpeg HTTP/1.1" 404
+    =>
+    "GET /data/local-files/?d=Users/dwright/Documents/datasource/images/test/curiosity_selfie--%2B--.jpeg HTTP/1.1" 200
+    """
+    import urllib.parse
+
+    query_string = request.environ.get("QUERY_STRING")
+
+    path = query_string.replace('d=', '')
+    path_unencoded = urllib.parse.unquote(path)
+
+    request.GET._mutable = True
+    request.GET['d'] = urllib.parse.quote(path_unencoded)
+    request.GET._mutable = False
+
+    return path
+
+
 def localfiles_data(request):
     """Serving files for LocalFilesImportStorage"""
-    user = request.user
-    path = request.GET.get('d')
     if settings.LOCAL_FILES_SERVING_ENABLED is False:
         return HttpResponseForbidden("Serving local files can be dangerous, so it's disabled by default. "
                                      'You can enable it with LOCAL_FILES_SERVING_ENABLED environment variable, '
                                      'please check docs: https://labelstud.io/guide/storage.html#Local-storage')
-
+    user = request.user
+    path = _encode_params(request)
     local_serving_document_root = settings.LOCAL_FILES_DOCUMENT_ROOT
     if path and request.user.is_authenticated:
         path = posixpath.normpath(path).lstrip('/')
@@ -193,7 +215,11 @@ def localfiles_data(request):
         if user_has_permissions and os.path.exists(full_path):
             content_type, encoding = mimetypes.guess_type(str(full_path))
             content_type = content_type or 'application/octet-stream'
-            return RangedFileResponse(request, open(full_path, mode='rb'), content_type)
+            # full_path = "Users/dwright/Documents/datasource/images/test/LSE + + + project import 30K queues.jpeg"
+            response = RangedFileResponse(request, open(full_path, mode='rb'), content_type)
+            return response
+            # from django.http.response import FileResponse
+            # return FileResponse(request, open(full_path, mode='rb'), content_type)
         else:
             return HttpResponseNotFound()
 
