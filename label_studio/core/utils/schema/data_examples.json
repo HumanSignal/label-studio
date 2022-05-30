@@ -14,28 +14,28 @@
     "$videoHack": "<video src='<HOSTNAME>/static/samples/opossum_snow.mp4' width=100% controls>",
     "Video": "<HOSTNAME>/static/samples/opossum_snow.mp4",
     "Labels": [
-      { "value": "Label 1", "background": "#ff0000" },
-      { "value": "Label 2", "background": "#0000ff" }
+      { "value": "DynamicLabel1", "background": "#ff0000" },
+      { "value": "DynamicLabel2", "background": "#0000ff" }
     ],
     "Choices": [
-      { "value": "Option 1" },
-      { "value": "Option 2" },
-      { "value": "Option 3" }
+      { "value": "DynamicChoice1" },
+      { "value": "DynamicChoice2" },
+      { "value": "DynamicChoice3" }
     ],
     "NestedChoices": [
       {
-        "value": "Option 1",
+        "value": "DynamicChoiceHeader1",
         "children": [
-          { "value": "Sub-option 1.1" },
-          { "value": "Sub-option 1.2" }
+          { "value": "DynamicChoice1.1" },
+          { "value": "DynamicChoice1.2" }
         ]
       },
       {
-        "value": "Option 2",
+        "value": "DynamicChoiceHeader2",
         "children": [
-          { "value": "Sub-option 2.1" },
-          { "value": "Sub-option 2.2" },
-          { "value": "Sub-option 2.3" }
+          { "value": "DynamicChoice2.1" },
+          { "value": "DynamicChoice2.2" },
+          { "value": "DynamicChoice2.3" }
         ]
       }
     ],
