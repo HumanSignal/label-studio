@@ -92,7 +92,7 @@ jobs:
           pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.0.0
+        uses: codecov/codecov-action@v3.1.0
         with:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
@@ -211,7 +211,7 @@ jobs:
           pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.0.0
+        uses: codecov/codecov-action@v3.1.0
         with:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
