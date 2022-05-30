@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2408: Regions disappearing from UI (#631)\n\n* fix: DEV-2408: Regions disappearing from UI\r\n\r\n* test: DEV-2408: Add test for wrong reordered results of per-region textarea and richtext",
-  "commit": "6ef0657ffa22fe4001129a84ef8aa21e430b2a0b",
-  "branch": "",
-  "date": "2022-05-20T16:49:57Z"
+  "message": "ci: bump release-drafter/release-drafter from 5.19.0 to 5.20.0 (#649)\n\nBumps [release-drafter/release-drafter](https://github.com/release-drafter/release-drafter) from 5.19.0 to 5.20.0.\r\n- [Release notes](https://github.com/release-drafter/release-drafter/releases)\r\n- [Commits](https://github.com/release-drafter/release-drafter/compare/v5.19.0...v5.20.0)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: release-drafter/release-drafter\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+  "commit": "0eccb5ba45695e254dddd92352e8d269c6ac9d24",
+  "branch": "master",
+  "date": "2022-05-30T14:28:44Z"
 }
