@@ -295,6 +295,12 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
                 task[value] = examples['HyperText']
         elif p.tag.lower().endswith('labels'):
             task[value] = examples['Labels']
+        elif p.tag.lower() == "choices":
+            allow_nested = p.get('allowNested') or p.get('allownested') or "false"
+            if allow_nested == "true":
+                task[value] = examples['NestedChoices']
+            else:
+                task[value] = examples['Choices']
         else:
             # patch for valueType="url"
             examples['Text'] = examples['TextUrl'] if only_urls else examples['TextRaw']
