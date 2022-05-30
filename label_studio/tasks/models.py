@@ -10,9 +10,8 @@ from urllib.parse import urljoin, quote
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.db import models, connection, transaction
-from django.db.models import Q, F, When, Count, Case, Subquery, OuterRef, Value
-from django.db.models.functions import Coalesce
+from django.db import models, transaction
+from django.db.models import Q
 from django.db.models.signals import post_delete, pre_save, post_save, pre_delete
 from django.utils.translation import gettext_lazy as _
 from django.db.models import JSONField
@@ -286,7 +285,6 @@ class Task(TaskMixin, models.Model):
         :param queryset: Tasks queryset
         """
         signals = [
-            (post_delete, remove_annotation_update_counters, Annotation),
             (post_delete, update_all_task_states_after_deleting_task, Task),
             (pre_delete, remove_data_columns, Task)
         ]
@@ -406,7 +404,28 @@ class Annotation(AnnotationMixin, models.Model):
     def delete(self, *args, **kwargs):
         result = super().delete(*args, **kwargs)
         self.update_task()
+        self.on_delete_update_counters()
         return result
+
+    def on_delete_update_counters(self):
+        task = self.task
+        logger.debug(f"Start updating counters for task {task.id}.")
+        if self.was_cancelled:
+            cancelled = task.annotations.all().filter(was_cancelled=True).count()
+            Task.objects.filter(id=task.id).update(cancelled_annotations=cancelled)
+            logger.debug(f"On delete updated cancelled_annotations for task {task.id}")
+        else:
+            total = task.annotations.all().filter(was_cancelled=False).count()
+            Task.objects.filter(id=task.id).update(total_annotations=total)
+            logger.debug(f"On delete updated total_annotations for task {task.id}")
+
+        logger.debug(f'Update task stats for task={task}')
+        task.update_is_labeled()
+        Task.objects.filter(id=task.id).update(is_labeled=task.is_labeled)
+
+        # remove annotation counters in project summary followed by deleting an annotation
+        logger.debug("Remove annotation counters in project summary followed by deleting an annotation")
+        self.decrease_project_summary_counters()
 
 
 class TaskLock(models.Model):
@@ -653,34 +672,7 @@ def save_predictions_to_project(sender, instance, **kwargs):
     instance.task.save(update_fields=['total_predictions'])
     logger.debug(f"Updated total_predictions for {instance.task.id}.")
 
-
 # =========== END OF PROJECT SUMMARY UPDATES ===========
-
-
-@receiver(post_delete, sender=Annotation, weak=False)
-def remove_annotation_update_counters(sender, instance, **kwargs):
-    """Update task counters after annotation deletion"""
-    task = instance.task
-
-    logger.debug(f"Start updating counters for task {task.id}.")
-    if instance.was_cancelled:
-        cancelled = task.annotations.all().filter(was_cancelled=True).count()
-        Task.objects.filter(id=task.id).update(cancelled_annotations=cancelled)
-        logger.debug(f"On delete updated cancelled_annotations for task {task.id}")
-    else:
-        total = task.annotations.all().filter(was_cancelled=False).count()
-        Task.objects.filter(id=task.id).update(total_annotations=total)
-        logger.debug(f"On delete updated total_annotations for task {task.id}")
-
-    # update task.is_labeled state
-
-    logger.debug(f'Update task stats for task={task}')
-    task.update_is_labeled()
-    Task.objects.filter(id=task.id).update(is_labeled=task.is_labeled)
-
-    # remove annotation counters in project summary followed by deleting an annotation
-    logger.debug("Remove annotation counters in project summary followed by deleting an annotation")
-    instance.decrease_project_summary_counters()
 
 
 @receiver(post_save, sender=Annotation)
@@ -713,7 +705,7 @@ def update_task_stats(task, stats=('is_labeled',), save=True):
     """Update single task statistics:
         accuracy
         is_labeled
-    :param task_id:
+    :param task: Task to update
     :param stats: to update separate stats
     :param save: to skip saving in some cases
     :return:
@@ -732,7 +724,6 @@ def bulk_update_stats_project_tasks(tasks):
        on updated Task objects
        in single transaction as execute sql
     :param tasks:
-    :param batch_size:
     :return:
     """
     # recalc accuracy
