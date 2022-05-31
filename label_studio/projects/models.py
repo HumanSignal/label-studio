@@ -780,11 +780,16 @@ class Project(ProjectMixin, models.Model):
         total_predictions = Count("predictions", distinct=True)
         if isinstance(queryset, list):
             queryset = Task.objects.filter(id__in=[task.id for task in queryset])
+        # filter our tasks with 0 annotations and 0 predictions and update them with 0
+        queryset.filter(annotations__isnull=True, predictions__isnull=True).\
+            update(total_annotations=0, cancelled_annotations=0, total_predictions=0)
+        # filter our tasks with 0 annotations and 0 predictions
+        queryset = queryset.filter(Q(annotations__isnull=False) | Q(predictions__isnull=False))
         queryset = queryset.annotate(new_total_annotations=total_annotations,
                                      new_cancelled_annotations=cancelled_annotations,
                                      new_total_predictions=total_predictions)
 
-        for task in queryset:
+        for task in queryset.only('id', 'total_annotations', 'cancelled_annotations', 'total_predictions'):
             task.total_annotations = task.new_total_annotations
             task.cancelled_annotations = task.new_cancelled_annotations
             task.total_predictions = task.new_total_predictions
