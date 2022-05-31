@@ -10,6 +10,8 @@ on:
       - synchronize
     branches:
       - develop
+    paths-ignore:
+      - 'label_studio/frontend/**'
 
 env:
   DOWNSTREAM_REPO_OWNER: heartexlabs
