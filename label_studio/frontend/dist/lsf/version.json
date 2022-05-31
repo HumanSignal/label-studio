@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2100: Fix preselected choices (#584)\n\n- working with empty annotation\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "ee38e771760e1ce57ac62dc1556ddd0718f62487",
-  "branch": "master",
-  "date": "2022-04-27T11:55:50Z"
+  "message": "make sure viewing all overrides grid template column with active sidebar",
+  "commit": "2a11cafbab1dc60c0a7de42962dc1e32669ce4dc",
+  "branch": "fb-dev-2203/sidebar-grid-fix",
+  "date": "2022-05-31T18:44:24Z"
 }
