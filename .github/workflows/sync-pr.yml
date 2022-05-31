@@ -1,0 +1,107 @@
+name: Sync PR
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - closed
+      - converted_to_draft
+      - ready_for_review
+      - synchronize
+    branches:
+      - master
+
+env:
+  DOWNSTREAM_REPO_OWNER: heartexlabs
+  DOWNSTREAM_REPO: label-studio-enterprise
+
+jobs:
+  sync:
+    name: "Sync"
+    if: startsWith(github.head_ref, 'fb-')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v2.0.1
+
+      - name: Check user's membership
+        uses: actions/github-script@v6
+        id: check-membership
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            try {
+              return (await github.rest.orgs.getMembershipForUser({
+                org: '${{ env.DOWNSTREAM_REPO_OWNER }}',
+                username: '${{ github.actor }}',
+              }))?.data?.state == "active";
+            } catch (error) {
+              return false;
+            }
+
+      - name: Notify user on failure
+        if: steps.check-membership.outputs.result == 'false'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const result = await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: '${{ github.event.number }}',
+              body: [
+                'Hi @${{ github.actor }}!',
+                '',
+                'Unfortunately you don\'t have membership in ${{ env.DOWNSTREAM_REPO_OWNER }} organization, your PR wasn\'t synced with ${{ env.DOWNSTREAM_REPO }}.'
+              ].join('\n')
+            });
+
+      - name: Sync Merged PR
+        uses: actions/github-script@v6
+        if: |
+          steps.check-membership.outputs.result == 'true' &&
+          github.event.pull_request.merged == true
+        id: sync-merge-pr
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const result = await github.rest.repos.createDispatchEvent({
+              owner: '${{ env.DOWNSTREAM_REPO_OWNER }}',
+              repo: '${{ env.DOWNSTREAM_REPO }}',
+              event_type: 'upstream_repo_update',
+              client_payload: {
+                branch_name: '${{ github.head_ref }}',
+                repo_name: '${{ github.repository }}',
+                commit_sha : '${{ github.sha }}',
+                title: '${{ github.event.pull_request.title }}',
+                html_url: '${{ github.event.pull_request.html_url }}',
+                actor: '${{ github.actor }}',
+                event_action: 'merged'
+              }
+            });
+            return result
+
+      - name: Sync PR
+        uses: actions/github-script@v6
+        if: |
+          steps.check-membership.outputs.result == 'true' &&
+          github.event.pull_request.merged != true
+        id: sync-pr
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const result = await github.rest.repos.createDispatchEvent({
+              owner: '${{ env.DOWNSTREAM_REPO_OWNER }}',
+              repo: '${{ env.DOWNSTREAM_REPO }}',
+              event_type: 'upstream_repo_update',
+              client_payload: {
+                branch_name: '${{ github.head_ref }}',
+                repo_name: '${{ github.repository }}',
+                commit_sha : '${{ github.event.pull_request.head.sha }}',
+                title: '${{ github.event.pull_request.title }}',
+                html_url: '${{ github.event.pull_request.html_url }}',
+                actor: '${{ github.actor }}',
+                event_action: '${{ github.event.action }}'
+              }
+            });
+            return result
