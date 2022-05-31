@@ -9,7 +9,7 @@ on:
       - ready_for_review
       - synchronize
     branches:
-      - master
+      - develop
 
 env:
   DOWNSTREAM_REPO_OWNER: heartexlabs
