@@ -11,7 +11,7 @@ on:
     branches:
       - develop
     paths-ignore:
-      - 'frontend/**'
+      - 'label_studio/frontend/**'
 
 env:
   DOWNSTREAM_REPO_OWNER: heartexlabs
