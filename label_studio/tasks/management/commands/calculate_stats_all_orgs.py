@@ -11,17 +11,17 @@ class Command(BaseCommand):
     help = 'Recalculate project stats (total_annotations, etc) for all organizations'
 
     def handle(self, *args, **options):
-        orgs = Organization.objects.all()
+        orgs = Organization.objects.order_by('-id')
 
         for org in orgs:
-            logger.debug(f"Start recalculating for Organization {org.id}.")
+            logger.debug(f"Start recalculating stats for Organization {org.id}.")
             projects = Project.objects.filter(organization=org)
 
             for project in projects:
-                logger.debug(f"Start processing project {project.id}.")
+                logger.debug(f"Start processing stats project {project.id}.")
                 project.update_tasks_counters(project.tasks.all())
-                logger.debug(f"End processing project {project.id}.")
+                logger.debug(f"End processing stats project {project.id}.")
 
             logger.debug(f"Organization {org.id} stats were recalculated.")
 
-        logger.debug("All organization were recalculated.")
+        logger.debug("All organizations were recalculated.")
