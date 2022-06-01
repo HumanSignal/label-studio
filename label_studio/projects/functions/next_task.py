@@ -1,7 +1,7 @@
 from collections import Counter
 import logging
 
-from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Value, When
+from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Value, When, Q
 from django.db.models.fields import DecimalField
 from django.conf import settings
 import numpy as np
@@ -75,7 +75,7 @@ def _try_breadth_first(tasks, user):
     """Try to find tasks with maximum amount of annotations, since we are trying to label tasks as fast as possible
     """
 
-    tasks = tasks.annotate(annotations_count=Count('annotations'))
+    tasks = tasks.annotate(annotations_count=Count('annotations', filter=~Q(annotations__completed_by=user)))
     max_annotations_count = tasks.aggregate(Max('annotations_count'))['annotations_count__max']
     if max_annotations_count == 0:
         # there is no any labeled tasks found
@@ -145,7 +145,7 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
 
     if project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
         user_solved_tasks_array = user_solved_tasks_array.filter(was_cancelled=False)
-        queue_info += ' Requeued for me from cancelled tasks '
+        queue_info += ' Requeued for me from skipped tasks '
 
     user_solved_tasks_array = user_solved_tasks_array.distinct().values_list('task__pk', flat=True)
     not_solved_tasks = prepared_tasks.exclude(pk__in=user_solved_tasks_array)
@@ -164,9 +164,9 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
     if project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
         # Ordering works different for sqlite and postgresql, details: https://code.djangoproject.com/ticket/19726
         if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
-            not_solved_tasks = not_solved_tasks.order_by('annotations__was_cancelled', 'id')
+            not_solved_tasks = not_solved_tasks.order_by('annotations__was_cancelled', 'updated_at')
         else:
-            not_solved_tasks = not_solved_tasks.order_by('-annotations__was_cancelled', 'id')
+            not_solved_tasks = not_solved_tasks.order_by('-annotations__was_cancelled', 'updated_at')
 
     return not_solved_tasks, user_solved_tasks_array, queue_info
 
@@ -195,7 +195,6 @@ def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_fla
         logger.debug(f'User={user} tries ground truth from prepared tasks')
         next_task = _try_ground_truth(not_solved_tasks, project, user)
         queue_info += (' & ' if queue_info else '') + 'Ground truth queue'
-
 
     if not next_task and project.maximum_annotations > 1:
         # if there any tasks in progress (with maximum number of annotations), randomly sampling from them

@@ -188,33 +188,39 @@ kubectl create secret generic <YOUR_SECRET_NAME> --from-file=ca.crt=<PATH_TO_CA>
 
 ```yaml
 global:
-  extraEnvironmentVars:
-     POSTGRE_SSL_MODE: verify-full
-     POSTGRE_SSLROOTCERT: /opt/heartex/secrets/pg_certs/ca.crt
-     POSTGRE_SSLCERT: /opt/heartex/secrets/pg_certs/client.crt
-     POSTGRE_SSLKEY: /opt/heartex/secrets/pg_certs/client.key
+  pgConfig:
+    ssl:
+      pgSslMode: "verify-full"
+      pgSslSecretName: "<YOUR_SECRET_NAME>"
+      pgSslRootCertSecretKey: "ca.crt"
+      pgSslCertSecretKey: "client.crt"
+      pgSslKeySecretKey: "client.key"
+```
 
-app:
-  extraVolumeMounts:
-    - name: pg-ssl-certs
-      mountPath: /opt/heartex/secrets/pg_certs
+4. Install or upgrade Label Studio Enterprise using Helm.
 
-  extraVolumes:
-    - name: pg-ssl-certs
-      secret:
-        secretName: <YOUR_SECRET_NAME>
-        defaultMode: 0640
+## Set up TLS for Redis
+To configure Label Studio Enterprise to use TLS for end-client connections with Redis, do the following:
 
-rqworker:
-  extraVolumeMounts:
-    - name: pg-ssl-certs
-      mountPath: /opt/heartex/secrets/pg_certs
+1. Enable TLS for your Redis instance and save Root TLS certificate, client certificate and its key for the next steps.
+2. Create a Kubernetes secret with your certificates, replacing `<PATH_TO_CA>`, `<PATH_TO_CLIENT_CRT>` and `<PATH_TO_CLIENT_KEY>` with paths to your certificates:
 
-  extraVolumes:
-    - name: pg-ssl-certs
-      secret:
-        secretName: <YOUR_SECRET_NAME>
-        defaultMode: 0640
+```shell
+kubectl create secret generic <YOUR_SECRET_NAME> --from-file=ca.crt=<PATH_TO_CA> --from-file=client.crt=<PATH_TO_CLIENT_CRT> --from-file=client.key=<PATH_TO_CLIENT_KEY>
+```
+3. Update your `lse-values.yaml` file with your newly-created Kubernetes secret:
+
+> In the case if you're using self signed certificates that host cannot verify you have to set `redisSslCertReqs` to `None`
+
+```yaml
+global:
+  redisConfig:
+    ssl:
+      redisSslCertReqs: "required"
+      redisSslSecretName: "<YOUR_SECRET_NAME>"
+      redisSslCaCertsSecretKey: "ca.crt"
+      redisSslCertFileSecretKey: "client.crt"
+      redisSslKeyFileSecretKey: "client.key"
 ```
 
 4. Install or upgrade Label Studio Enterprise using Helm.

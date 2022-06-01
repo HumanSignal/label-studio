@@ -1,5 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import os
+
 from core.settings.base import *
 
 DJANGO_DB = get_env('DJANGO_DB', DJANGO_DB_SQLITE)
@@ -43,7 +45,7 @@ sentry.init_sentry(release_name='label-studio', release_version=__version__)
 from label_studio.core.utils.common import collect_versions
 versions = collect_versions()
 
-# Feature flags for Community version
-FEATURE_FLAGS_DEFAULT_VALUE = False
-FEATURE_FLAGS_FROM_FILE = get_bool_env('FEATURE_FLAGS_FROM_FILE', True)
-FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE', 'feature_flags.json')
+# in Label Studio Community version, feature flags are always ON
+FEATURE_FLAGS_DEFAULT_VALUE = True
+FEATURE_FLAGS_FILE = os.path.join(os.path.dirname(__file__), '..', '..', 'feature_flags.json')
+FEATURE_FLAGS_FROM_FILE = os.path.exists(FEATURE_FLAGS_FILE)

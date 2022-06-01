@@ -5,7 +5,6 @@ marks:
   - usefixtures:
       - django_live_url
   - skipif: "'default' not in '{tavern.env_vars.DJANGO_DB}'"
-
 stages:
 
   - id: signup
@@ -338,7 +337,6 @@ stages:
         ]
       }
 
-
 ---
 test_name: tasks-all-fields-sqlite
 strict: false
@@ -444,14 +442,11 @@ stages:
           "tasks": [
           {
             "cancelled_annotations": 0,
-
-
             "annotations_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_A]}}]",
             "data": {
               "text": "Test example phrase 1",
               "int_field": 1
             },
-            
             "predictions_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_A]}}]",
             "predictions_score": null,
             "total_annotations": 1,
@@ -459,7 +454,7 @@ stages:
             "annotations_ids": !anystr "",
             "annotations": [
             {
-              
+
               "created_username": " test_suites_user@heartex.com, {created_by}",
               "created_ago": "0\u00a0minutes",
               "completed_by": !int "{created_by}",
@@ -479,12 +474,12 @@ stages:
               "ground_truth": true,
 
               "lead_time": 3.0
-              
+
             }
             ],
             "predictions": [
             {
-              
+
               "model_version": "model_version_A",
               "created_ago": "0\u00a0minutes",
               "result": [
@@ -504,11 +499,10 @@ stages:
               "neighbors": null,
               "mislabeling": 0.0,
 
-              
+
             }
             ],
             "drafts": [],
-
             "annotators": [
               !int "{created_by}"
             ],
@@ -516,14 +510,11 @@ stages:
           },
           {
             "cancelled_annotations": 0,
-
-
             "annotations_results": "",
             "data": {
               "int_field": 42,
               "text": "opop"
             },
-            
             "predictions_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_PREDICTIONS_TESTING]}}]",
             "predictions_score": null,
             "total_annotations": 0,
@@ -532,7 +523,7 @@ stages:
             "annotations": [],
             "predictions": [
             {
-              
+
               "model_version": "undefined",
               "created_ago": "0\u00a0minutes",
               "result": [
@@ -552,24 +543,20 @@ stages:
               "neighbors": null,
               "mislabeling": 0.0,
 
-              
+
             }
             ],
             "drafts": [],
-
             "annotators": [],
             "project": !int "{project_pk}"
           },
           {
             "cancelled_annotations": 0,
-
-
             "annotations_results": !anystr "",
             "data": {
               "int_field": 20,
               "text": "x2"
             },
-            
             "predictions_results": !anystr "",
             "predictions_score": null,
             "total_annotations": 2,
@@ -577,7 +564,7 @@ stages:
             "annotations_ids": !anystr "",
             "annotations": [
             {
-              
+
               "created_username": " test_suites_user@heartex.com, {created_by}",
               "created_ago": "0\u00a0minutes",
               "completed_by": !int "{created_by}",
@@ -597,7 +584,7 @@ stages:
               "ground_truth": true,
 
               "lead_time": 3.0
-              
+
             },
             {
 
@@ -625,7 +612,7 @@ stages:
             ],
             "predictions": [
             {
-              
+
               "model_version": "model_version_A",
               "created_ago": "0\u00a0minutes",
               "result": [
@@ -645,11 +632,10 @@ stages:
               "neighbors": null,
               "mislabeling": 0.0,
 
-              
+
             }
             ],
             "drafts": [],
-
             "annotators": [
               !int "{created_by}"
             ],
@@ -657,14 +643,11 @@ stages:
           },
           {
             "cancelled_annotations": 0,
-
-
             "annotations_results": !raw "[{from_name: text_class, to_name: text, type: choices, value: {choices: [class_TESTING]}}]",
             "data": {
               "int_field": "99",
               "text": "yoyo"
             },
-            
             "predictions_results": "",
             "predictions_score": null,
             "total_annotations": 1,
@@ -672,7 +655,7 @@ stages:
             "annotations_ids": !anystr "",
             "annotations": [
             {
-              
+
               "created_username": " test_suites_user@heartex.com, {created_by}",
               "created_ago": "0\u00a0minutes",
               "completed_by": !int "{created_by}",
@@ -692,12 +675,11 @@ stages:
               "ground_truth": true,
 
               "lead_time": null
-              
+
             }
             ],
             "predictions": [],
             "drafts": [],
-
             "annotators": [
               !int "{created_by}"
             ],
@@ -705,11 +687,6 @@ stages:
           }
           ]
         }
-
-
-
-
-
 
 ---
 test_name: tasks-annotators
@@ -803,7 +780,7 @@ stages:
             "int_field": 42,
             "text": "opop"
           },
-          
+
 
           "predictions_score": null,
           "total_annotations": 0,
@@ -812,7 +789,7 @@ stages:
           "annotations": [],
           "predictions": [
           {
-            
+
             "model_version": "undefined",
             "created_ago": "0\u00a0minutes",
             "result": [
@@ -832,7 +809,7 @@ stages:
             "neighbors": null,
             "mislabeling": 0.0,
 
-            
+
           }
           ],
           "drafts": [],
@@ -848,7 +825,7 @@ stages:
           "data": {
             "text": "vivi"
           },
-          
+
           "predictions_results": "",
           "predictions_score": null,
           "total_annotations": 0,
@@ -869,7 +846,7 @@ stages:
           "data": {
             "text": "zzz"
           },
-          
+
           "predictions_results": "",
           "predictions_score": null,
           "total_annotations": 0,
@@ -884,7 +861,6 @@ stages:
         }
         ]
       }
-
 
   - name: setup_views
     request:
@@ -915,7 +891,7 @@ stages:
           view: "@"
       status_code: 201
 
-  - name: get_tasks
+  - name: get_tasks_after_setup
     request:
       method: GET
       url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
@@ -936,7 +912,7 @@ stages:
             "text": "Test example phrase 1",
             "int_field": 1
           },
-          
+
 
           "predictions_score": null,
           "total_annotations": 1,
@@ -944,7 +920,7 @@ stages:
           "annotations_ids": !anystr "",
           "annotations": [
           {
-            
+
             "created_username": " test_suites_user@heartex.com, {created_by}",
             "created_ago": "0\u00a0minutes",
             "completed_by": !int "{created_by}",
@@ -964,12 +940,12 @@ stages:
             "ground_truth": true,
 
             "lead_time": 3.0
-            
+
           }
           ],
           "predictions": [
           {
-            
+
             "model_version": "model_version_A",
             "created_ago": "0\u00a0minutes",
             "result": [
@@ -989,7 +965,7 @@ stages:
             "neighbors": null,
             "mislabeling": 0.0,
 
-            
+
           }
           ],
           "drafts": [],
@@ -1007,7 +983,7 @@ stages:
             "int_field": 20,
             "text": "x2"
           },
-          
+
 
           "predictions_score": null,
           "total_annotations": 2,
@@ -1015,7 +991,7 @@ stages:
           "annotations_ids": !anystr "",
           "annotations": [
           {
-            
+
             "created_username": " test_suites_user@heartex.com, {created_by}",
             "created_ago": "0\u00a0minutes",
             "completed_by": !int "{created_by}",
@@ -1035,7 +1011,7 @@ stages:
             "ground_truth": true,
 
             "lead_time": 3.0
-            
+
           },
           {
 
@@ -1063,7 +1039,7 @@ stages:
           ],
           "predictions": [
           {
-            
+
             "model_version": "model_version_A",
             "created_ago": "0\u00a0minutes",
             "result": [
@@ -1082,7 +1058,7 @@ stages:
             "cluster": null,
             "neighbors": null,
             "mislabeling": 0.0,
-            
+
           }
           ],
           "drafts": [],
@@ -1099,7 +1075,7 @@ stages:
             "int_field": "99",
             "text": "yoyo"
           },
-          
+
           "predictions_results": "",
           "predictions_score": null,
           "total_annotations": 1,
@@ -1107,7 +1083,7 @@ stages:
           "annotations_ids": !anystr "",
           "annotations": [
           {
-            
+
             "created_username": " test_suites_user@heartex.com, {created_by}",
             "created_ago": "0\u00a0minutes",
             "completed_by": !int "{created_by}",
@@ -1127,7 +1103,7 @@ stages:
             "ground_truth": true,
 
             "lead_time": null
-            
+
           }
           ],
           "predictions": [],
@@ -1141,12 +1117,6 @@ stages:
         ]
       }
 
-
-
-
-
-
-
 ---
 test_name: tasks-minimal-fields
 strict: false
@@ -1154,7 +1124,7 @@ marks:
   - usefixtures:
       - django_live_url
 stages:
-
+  
   - id: signup
     type: ref
 
@@ -1335,3 +1305,177 @@ stages:
         "total_predictions": 0,
         "total": 0,
         }
+
+  - name: get_tasks_with_page
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?view={view.id}&page=1'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: label_studio.tests.utils:save_response
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 0,
+        "total": 0,
+      }
+
+  - name: get_first_task
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects/{project_pk}/next'
+    response:
+      save:
+        json:
+          first_task_id: id
+      status_code: 200
+
+  - name: create_annotation_first_task
+    request:
+      headers:
+        content-type: application/json
+      json:
+        lead_time: 5
+        result:
+        - from_name: label
+          to_name: text
+          type: choices
+          value:
+            choices:
+            - class_B
+      method: POST
+      url: '{django_live_url}/api/tasks/{first_task_id}/annotations'
+    response:
+      save:
+        json:
+          annotation_pk: id
+      status_code: 201
+
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "filters": {
+            "conjunction": "or",
+            "items": [
+              {
+                "filter": "filter:tasks:updated_by",
+                "operator": "contains",
+                "type": "List",
+                "value": !int "{created_by}",
+              }
+            ]
+          },
+          "ordering": [
+            "tasks:data.text"
+          ]
+        },
+        "project": !int "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?view={view.id}'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: label_studio.tests.utils:save_response
+      json: {
+        "total_annotations": 1,
+        "total_predictions": 0,
+        "total": 1,
+      }
+
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "filters": {
+            "conjunction": "or",
+            "items": [
+              {
+                "filter": "filter:tasks:updated_by",
+                "operator": "not_contains",
+                "type": "List",
+                "value": !int "{created_by}",
+              }
+            ]
+          },
+          "ordering": [
+            "tasks:data.text"
+          ]
+        },
+        "project": !int "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?view={view.id}'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: label_studio.tests.utils:save_response
+      json: {
+        "total_annotations": 4,
+        "total_predictions": 3,
+        "total": 5,
+      }
+
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "filters": {
+            "conjunction": "or",
+            "items": [
+              {
+                "filter": "filter:tasks:updated_by",
+                "operator": "equal",
+                "type": "List",
+                "value": !int "{created_by}",
+              }
+            ]
+          },
+          "ordering": [
+            "tasks:data.text"
+          ]
+        },
+        "project": !int "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?view={view.id}'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: label_studio.tests.utils:save_response
+      json: {
+        "total_annotations": 1,
+        "total_predictions": 0,
+        "total": 1,
+      }
