@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2364: Annotation history name/timestamp spacing improvement",
-  "commit": "0becc941de766a3e4b6103161fd96f208bddd9f8",
-  "branch": "fb-dev-2364",
-  "date": "2022-06-01T13:22:14Z"
+  "message": "fix: DEV-2364: Annotation history name/timestamp spacing improvement (#661)",
+  "commit": "a525513fd83d0e51d88213dc9fba817a215dfbe1",
+  "branch": "master",
+  "date": "2022-06-01T17:06:16Z"
 }
