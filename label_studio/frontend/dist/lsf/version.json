@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2480: convenient text region offsets (#646)\n\nWhen `start` is on the last char or `end` is on the first char\nof text node, find better to fit to have first char for `start`\nor last char for `end`.\n\n(cherry picked from commit 228085343e015b781a03fcd0c1ae40e0f4bc53a0)",
-  "commit": "4c0e633421c3af240474fc12b2df4758cd051dd1",
+  "message": "fix: DEV-2480: fix startOffset for empty nodes (#659)\n\n* fix: DEV-2480: fix startOffset for empty nodes\r\n\r\n* fix endOffset for good text nodes\r\n\r\n* Add comments about text nodes fix",
+  "commit": "b7c40ab08104d907e6f12b16373b72741b72e5f4",
   "branch": "lse-release/2.2.8",
-  "date": "2022-05-27T18:01:41Z"
+  "date": "2022-06-01T04:48:06Z"
 }
