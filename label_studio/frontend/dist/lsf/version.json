@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2364: Annotation history name/timestamp spacing improvement (#661)",
-  "commit": "a525513fd83d0e51d88213dc9fba817a215dfbe1",
+  "message": "fix: DEV-2199: View all audio crash fix (#641)\n\n* reign in the timeline controls by removing padding and negative calc\r\n\r\n* better check if there is a ready instance of waveurfer region\r\n\r\n* add -15px back into grid\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
+  "commit": "f7e6cf7a7946efb8ee80799bc0d41f7d74daaece",
   "branch": "master",
-  "date": "2022-06-01T17:06:16Z"
+  "date": "2022-06-01T19:42:22Z"
 }
