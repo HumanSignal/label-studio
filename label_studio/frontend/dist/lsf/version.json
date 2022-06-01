@@ -1,6 +1,6 @@
 {
-  "message": "ci: bump release-drafter/release-drafter from 5.19.0 to 5.20.0 (#649)\n\nBumps [release-drafter/release-drafter](https://github.com/release-drafter/release-drafter) from 5.19.0 to 5.20.0.\r\n- [Release notes](https://github.com/release-drafter/release-drafter/releases)\r\n- [Commits](https://github.com/release-drafter/release-drafter/compare/v5.19.0...v5.20.0)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: release-drafter/release-drafter\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
-  "commit": "0eccb5ba45695e254dddd92352e8d269c6ac9d24",
-  "branch": "master",
-  "date": "2022-05-30T14:28:44Z"
+  "message": "fix: DEV-2364: Annotation history name/timestamp spacing improvement",
+  "commit": "0becc941de766a3e4b6103161fd96f208bddd9f8",
+  "branch": "fb-dev-2364",
+  "date": "2022-06-01T13:22:14Z"
 }
