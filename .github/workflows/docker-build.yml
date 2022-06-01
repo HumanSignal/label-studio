@@ -49,6 +49,11 @@ jobs:
           python3 $(pwd)/label_studio/core/version.py
           cat $(pwd)/label_studio/core/version_.py
 
+      - name: Download feature flags
+        env:
+          LAUNCHDARKLY_COMMUNITY_SDK_KEY: ${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}
+        run: ./get_feature_flags.sh
+
       - name: Build and push
         uses: docker/build-push-action@v3.0.0
         id: docker_build_and_push

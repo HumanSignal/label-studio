@@ -26,6 +26,11 @@ jobs:
         run: |
           pip install twine
 
+      - name: Download feature flags
+        env:
+          LAUNCHDARKLY_COMMUNITY_SDK_KEY: ${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}
+        run: ./get_feature_flags.sh
+
       - name: Package and Upload
         env:
           STACKMANAGER_VERSION: ${{ github.event.release.tag_name }}
