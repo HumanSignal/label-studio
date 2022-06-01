@@ -10,33 +10,40 @@ import "./CreateProject.styl";
 import { ImportPage } from './Import/Import';
 import { useImportPage } from './Import/useImportPage';
 import { useDraftProject } from './utils/useDraftProject';
+import { Trans, useTranslation } from 'react-i18next';
+import "../../translations/i18n";
 
+const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true }) => {
+  if( !show )
+    return null;
+  const { t } = useTranslation();
 
-const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true }) => !show ? null :(
-  <form className={cn("project-name")} onSubmit={e => { e.preventDefault(); onSubmit(); }}>
-    <div className="field field--wide">
-      <label htmlFor="project_name">Project Name</label>
-      <input name="name" id="project_name" value={name} onChange={e => setName(e.target.value)} onBlur={onSaveName} />
-      {error && <span className="error">{error}</span>}
-    </div>
-    <div className="field field--wide">
-      <label htmlFor="project_description">Description</label>
-      <textarea
-        name="description"
-        id="project_description"
-        placeholder="Optional description of your project"
-        rows="4"
-        value={description}
-        onChange={e => setDescription(e.target.value)}
-      />
-    </div>
-  </form>
-);
+  return (
+    <form className={cn("project-name")} onSubmit={e => { e.preventDefault(); onSubmit(); }}>
+      <div className="field field--wide">
+        <label htmlFor="project_name">{t("pages.create_project.project_name.name_title")}</label>
+        <input name="name" id="project_name" value={name} onChange={e => setName(e.target.value)} onBlur={onSaveName} />
+        {error && <span className="error">{error}</span>}
+      </div>
+      <div className="field field--wide">
+        <label htmlFor="project_description">{t("pages.create_project.project_name.description_title")}</label>
+        <textarea
+          name="description"
+          id="project_description"
+          placeholder={t("pages.create_project.project_name.description_placeholder")}
+          rows="4"
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+        />
+      </div>
+    </form>
+  );
+};
 
 export const CreateProject = ({ onClose }) => {
   const [step, setStep] = React.useState("name"); // name | import | config
   const [waiting, setWaitingStatus] = React.useState(false);
-
+  const { t } = useTranslation();
   const project = useDraftProject();
   const history = useHistory();
   const api = useAPI();
@@ -53,9 +60,9 @@ export const CreateProject = ({ onClose }) => {
   const rootClass = cn("create-project");
   const tabClass = rootClass.elem("tab");
   const steps = {
-    name: <span className={tabClass.mod({ disabled: !!error })}>Project Name</span>,
-    import: <span className={tabClass.mod({ disabled: uploadDisabled })}>Data Import</span>,
-    config: "Labeling Setup",
+    name: <span className={tabClass.mod({ disabled: !!error })}>{t("pages.create_project.steps.name")}</span>,
+    import: <span className={tabClass.mod({ disabled: uploadDisabled })}>{t("pages.create_project.steps.import")}</span>,
+    config: t("pages.create_project.steps.config"),
   };
 
   // name intentionally skipped from deps:
@@ -70,6 +77,7 @@ export const CreateProject = ({ onClose }) => {
 
   const onCreate = React.useCallback(async () => {
     const imported = await finishUpload();
+
     if (!imported) return;
 
     setWaitingStatus(true);
@@ -79,6 +87,7 @@ export const CreateProject = ({ onClose }) => {
       },
       body: projectBody,
     });
+
     setWaitingStatus(false);
 
     if (response !== null) {
@@ -96,8 +105,10 @@ export const CreateProject = ({ onClose }) => {
         title: name,
       },
     });
+
     if (res.ok) return;
     const err = await res.json();
+
     setError(err.validation_errors?.title);
   };
 
@@ -117,12 +128,14 @@ export const CreateProject = ({ onClose }) => {
     <Modal onHide={onDelete} fullscreen visible bare closeOnClickOutside={false}>
       <div className={rootClass}>
         <Modal.Header>
-          <h1>Create Project</h1>
+          <h1>{t("pages.create_project.title")}</h1>
           <ToggleItems items={steps} active={step} onSelect={setStep} />
 
           <Space>
-            <Button look="danger" size="compact" onClick={onDelete} waiting={waiting}>Delete</Button>
-            <Button look="primary" size="compact" onClick={onCreate} waiting={waiting || uploading} disabled={!project || uploadDisabled || error}>Save</Button>
+            <Button look="danger" size="compact" onClick={onDelete} waiting={waiting}>{t("pages.create_project.delete_button")}</Button>
+            <Button look="primary" size="compact" onClick={onCreate} waiting={waiting || uploading} disabled={!project || uploadDisabled || error}>
+              {t("pages.create_project.save_button")}
+            </Button>
           </Space>
         </Modal.Header>
         <ProjectName
