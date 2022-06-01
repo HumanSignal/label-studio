@@ -372,7 +372,7 @@ class Project(ProjectMixin, models.Model):
 
         if maximum_annotations_changed or overlap_cohort_percentage_changed or tasks_number_changed:
             bulk_update_stats_project_tasks(
-                self.tasks.filter(Q(annotations__isnull=False) & Q(annotations__ground_truth=False))
+                self.tasks.filter(Q(annotations__isnull=False))
             )
 
     def update_tasks_states(
