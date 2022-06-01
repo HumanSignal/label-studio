@@ -28,6 +28,7 @@ from core.label_config import (
 )
 from core.bulk_update_utils import bulk_update
 from label_studio_tools.core.label_config import parse_config
+from labels_manager.models import Label
 
 
 logger = logging.getLogger(__name__)
@@ -525,6 +526,7 @@ class Project(ProjectMixin, models.Model):
                 f'Created annotations are incompatible with provided labeling schema, we found:\n{diff_str}'
             )
 
+
         # validate labels consistency
         labels_from_config, dynamic_label_from_config = get_all_labels(config_string)
         created_labels = self.summary.created_labels
@@ -537,6 +539,12 @@ class Project(ProjectMixin, models.Model):
                     f'"{control_tag_from_data}", you can\'t remove it'
                 )
             labels_from_config_by_tag = set(labels_from_config[control_tag_from_data])
+            parsed_config = parse_config(config_string)
+            tag_types = [tag_info['type'] for _, tag_info in parsed_config.items()]
+            if 'Taxonomy' in tag_types:
+                custom_tags = Label.objects.filter(links__project=self).values_list('value', flat=True)
+                flat_custom_tags = set([item for sublist in custom_tags for item in sublist])
+                labels_from_config_by_tag |= flat_custom_tags
             if not set(labels_from_data).issubset(set(labels_from_config_by_tag)):
                 different_labels = list(set(labels_from_data).difference(labels_from_config_by_tag))
                 diff_str = '\n'.join(f'{l} ({labels_from_data[l]} annotations)' for l in different_labels)
