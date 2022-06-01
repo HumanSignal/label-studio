@@ -1,0 +1,36 @@
+<View>
+  <Header value="Please read the passage" />
+  <Text name="text" value="$text" granularity="word"/>
+  <Header value="Select a text span answering the following question:"/>
+  <Text name="question" value="$question"/>
+
+  <Labels name="answer" toName="text">
+    <Label value="Answer" maxUsage="1" background="red"/>
+  </Labels>
+
+</View>
+
+<!-- {"data": {
+"text": "The boundary of the region from which no escape is possible is called the event horizon. Although the event horizon has an enormous effect on the fate and circumstances of an object crossing it, according to general relativity it has no locally detectable features.[4] In many ways, a black hole acts like an ideal black body, as it reflects no light.[5][6] Moreover, quantum field theory in curved spacetime predicts that event horizons emit Hawking radiation, with the same spectrum as a black body of a temperature inversely proportional to its mass. This temperature is on the order of billionths of a kelvin for black holes of stellar mass, making it essentially impossible to observe directly.",
+"question": "How could black holes be detected?"
+},
+"annotations": [{"result":
+[
+    {
+        "value": {
+            "start": 423,
+            "end": 553,
+            "text": "event horizons emit Hawking radiation, with the same spectrum as a black body of a temperature inversely proportional to its mass.",
+            "labels": [
+                "Answer"
+            ]
+        },
+        "id": "b0wKkdnnRc",
+        "from_name": "answer",
+        "to_name": "text",
+        "type": "labels"
+    }
+]
+}]
+}
+-->

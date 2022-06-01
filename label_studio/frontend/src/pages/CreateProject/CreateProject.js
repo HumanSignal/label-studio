@@ -14,10 +14,10 @@ import { Trans, useTranslation } from 'react-i18next';
 import "../../translations/i18n";
 
 const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true }) => {
-  if( !show )
-    return null;
   const { t } = useTranslation();
 
+  if( !show )
+    return null;
   return (
     <form className={cn("project-name")} onSubmit={e => { e.preventDefault(); onSubmit(); }}>
       <div className="field field--wide">

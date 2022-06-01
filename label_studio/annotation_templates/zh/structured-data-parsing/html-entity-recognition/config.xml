@@ -1,0 +1,80 @@
+<View>
+  <HyperTextLabels name="ner" toName="text">
+    <Label value="Title" background="green"/>
+    <Label value="Author" background="blue"/>
+    <Label value="Body" background="yellow"/>
+  </HyperTextLabels>
+
+  <View style="border: 1px solid #CCC;
+               border-radius: 10px;
+               padding: 5px">
+    <HyperText name="text" value="$text"/>
+  </View>
+</View>
+
+<!-- {
+"data": {"text": "<p><b>Preannotated data for templates</b></p> #1342
+ Draft
+<table><tr><td>niklub</td><td>28.09.2020</td></tr></table>
++177 −22
+ Conversation 0
+ Commits 2
+ Checks 2
+ Files changed 9
+Conversation
+commented 35 minutes ago
+No description provided."},
+"annotations": [{"result":
+[
+    {
+        "value": {
+            "start": "/p[1]/b[1]/text()[1]",
+            "end": "/p[1]/b[1]/text()[1]",
+            "startOffset": 0,
+            "endOffset": 31,
+            "text": "Preannotated data for templates",
+            "htmllabels": [
+                "Title"
+            ]
+        },
+        "id": "dy4JNJ25zg",
+        "from_name": "ner",
+        "to_name": "text",
+        "type": "hypertextlabels"
+    },
+    {
+        "value": {
+            "start": "/table[1]/tbody[1]/tr[1]/td[1]/text()[1]",
+            "end": "/table[1]/tbody[1]/tr[1]/td[1]/text()[1]",
+            "startOffset": 0,
+            "endOffset": 6,
+            "text": "niklub",
+            "htmllabels": [
+                "Author"
+            ]
+        },
+        "id": "QApL4wc7SH",
+        "from_name": "ner",
+        "to_name": "text",
+        "type": "hypertextlabels"
+    },
+    {
+        "value": {
+            "start": "/text()[2]",
+            "end": "/text()[2]",
+            "startOffset": 102,
+            "endOffset": 126,
+            "text": "No description provided.",
+            "htmllabels": [
+                "Body"
+            ]
+        },
+        "id": "mTk772nWDo",
+        "from_name": "ner",
+        "to_name": "text",
+        "type": "hypertextlabels"
+    }
+]
+}]
+}
+-->

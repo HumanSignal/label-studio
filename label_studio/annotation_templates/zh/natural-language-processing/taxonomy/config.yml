@@ -1,0 +1,20 @@
+title: 分类
+type: community
+group: 自然语言处理
+order: 4
+image: /static/templates/taxonomy.png
+details: <h1>做多标签层次分类</h1>
+config: |
+  <View>
+    <Text name="text" value="$text"/>
+    <Taxonomy name="taxonomy" toName="text">
+      <Choice value="Archaea" />
+      <Choice value="Bacteria" />
+      <Choice value="Eukarya">
+        <Choice value="Human" />
+        <Choice value="Oppossum" />
+        <Choice value="Extraterrestial" />
+      </Choice>
+    </Taxonomy>
+  </View>
+

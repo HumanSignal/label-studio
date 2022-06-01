@@ -1,0 +1,42 @@
+<View>
+  <Text name="query" value="$query" />
+  <Header value="Select document related to the query:" />
+  <View style="display: flex">
+    <View>
+    <Text name="text1" value="$text1" />
+    <Text name="text2" value="$text2" />
+    <Text name="text3" value="$text3" />
+    </View>
+    <View style="padding: 30px">
+    <Choices name="selection" toName="query" required="true" choice="multiple">
+      <Choice value="One" />
+      <Choice value="Two" />
+  	  <Choice value="Three" />
+    </Choices>
+    </View>
+  </View>
+</View>
+
+<!-- {"data": {
+    "query": "What is the most beautiful data labeling tool in the world?",
+    "text1": "Discover the best data labeling software in less than 3 minutes",
+    "text2": "Label Studio is one of the best solutions for your data",
+    "text3": "Nobody can live without using Label Studio in their daily routine..."
+},
+"annotations": [{"result":
+[
+    {
+        "value": {
+            "choices": [
+                "Two",
+                "Three"
+            ]
+        },
+        "id": "W82tf6hGHu",
+        "from_name": "selection",
+        "to_name": "query",
+        "type": "choices"
+    }
+]
+}]}
+-->

@@ -1,0 +1,15 @@
+title: 使用掩码进行语义分割
+type: community
+group: 计算机视觉
+order: 2
+image: /static/templates/semantic-segmentation-with-masks.png
+details: <h1>使用画笔工具在对象周围绘制蒙版</h1>
+config: |
+  <View>
+    <Image name="image" value="$image" zoom="true"/>
+    <BrushLabels name="tag" toName="image">
+      <Label value="Airplane" background="rgba(255, 0, 0, 0.7)"/>
+      <Label value="Car" background="rgba(0, 0, 255, 0.7)"/>
+    </BrushLabels>
+  </View>
+

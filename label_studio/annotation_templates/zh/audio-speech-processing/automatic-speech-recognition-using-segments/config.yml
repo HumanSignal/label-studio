@@ -1,0 +1,20 @@
+title: 使用分段的自动语音识别
+type: community
+group: 音频/语音处理
+image: /static/templates/automatic-speech-recognition-using-segments.png
+details: <h1>进行语音活动分割并提供音频的转录本</h1>
+config: |
+  <View>
+    <Labels name="labels" toName="audio">
+      <Label value="Speech" />
+      <Label value="Noise" />
+    </Labels>
+
+    <AudioPlus name="audio" value="$audio"/>
+
+    <TextArea name="transcription" toName="audio"
+              rows="2" editable="true"
+              perRegion="true" required="true" />
+  </View>
+
+

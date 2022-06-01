@@ -432,7 +432,11 @@ class TemplateListAPI(generics.ListAPIView):
     swagger_schema = None
 
     def list(self, request, *args, **kwargs):
-        annotation_templates_dir = find_dir('annotation_templates')
+        try:
+            language = request.query_params['language']
+        except KeyError:
+            language = 'en'
+        annotation_templates_dir = find_dir(os.path.join('annotation_templates', language))
         configs = []
         for config_file in pathlib.Path(annotation_templates_dir).glob('**/*.yml'):
             config = read_yaml(config_file)
@@ -443,7 +447,7 @@ class TemplateListAPI(generics.ListAPIView):
                 # if hostname set manually, create full image urls
                 config['image'] = settings.HOSTNAME + config['image']
             configs.append(config)
-        template_groups_file = find_file(os.path.join('annotation_templates', 'groups.txt'))
+        template_groups_file = find_file(os.path.join('annotation_templates', language, 'groups.txt'))
         with open(template_groups_file, encoding='utf-8') as f:
             groups = f.read().splitlines()
         logger.debug(f'{len(configs)} templates found.')

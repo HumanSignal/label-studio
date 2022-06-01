@@ -1,0 +1,13 @@
+title: 成对回归
+type: community
+group: 排名和评分
+image: /static/templates/pairwise-regression.png
+details: <h1>选择两个项目同时出现的可能性</h1>
+config: |
+  <View>
+    <Header>Set how likely it is that these images represent the same thing:</Header>
+      <Rating name="rating" toName="image1,image2"/>
+      <Image name="image1" value="$image1" />
+      <Image name="image2" value="$image2" />
+  </View>
+

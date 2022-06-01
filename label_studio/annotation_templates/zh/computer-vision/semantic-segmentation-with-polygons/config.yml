@@ -1,0 +1,20 @@
+title: 多边形语义分割
+type: community
+group: 计算机视觉
+order: 1
+image: /static/templates/semantic-segmentation-with-polygons.png
+details: <h1>在对象周围绘制多边形</h1>
+config: |
+  <View>
+
+    <Header value="Select label and click the image to start"/>
+    <Image name="image" value="$image" zoom="true"/>
+
+    <PolygonLabels name="label" toName="image"
+                   strokeWidth="3" pointSize="small"
+                   opacity="0.9">
+      <Label value="Airplane" background="red"/>
+      <Label value="Car" background="blue"/>
+    </PolygonLabels>
+
+  </View>

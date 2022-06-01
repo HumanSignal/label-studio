@@ -5,6 +5,8 @@ import { unique } from '../../../utils/helpers';
 import "./Import.styl";
 import { IconUpload, IconInfo, IconError } from '../../../assets/icons';
 import { useAPI } from '../../../providers/ApiProvider';
+import { Trans, useTranslation } from 'react-i18next';
+import "../../../translations/i18n";
 
 const importClass = cn("upload_page");
 const dropzoneClass = cn("dropzone");
@@ -52,11 +54,14 @@ function getFiles(files) {
 }
 
 const Footer = () => {
+  const { t } = useTranslation();
+
   return (
     <Modal.Footer>
       <IconInfo className={importClass.elem("info-icon")} width="20" height="20" />
-      See the&nbsp;documentation to <a target="_blank" href="https://labelstud.io/guide/predictions.html">import preannotated data</a>{" "}
-      or&nbsp;to <a target="_blank" href="https://labelstud.io/guide/storage.html">sync data from a&nbsp;database or&nbsp;cloud storage</a>.
+      {t("pages.create_project.import_data.footer_msg_part1")}
+      <a target="_blank" href="https://labelstud.io/guide/predictions.html">{t("pages.create_project.import_data.footer_msg_part2")}</a>
+      {t("pages.create_project.import_data.footer_msg_part3")}<a target="_blank" href="https://labelstud.io/guide/storage.html">{t("pages.create_project.import_data.footer_msg_part4")}</a>
     </Modal.Footer>
   );
 };
@@ -119,6 +124,7 @@ export const ImportPage = ({
   setCsvHandling,
   addColumns,
 }) => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState();
   const [ids, _setIds] = useState([]);
@@ -263,7 +269,6 @@ export const ImportPage = ({
     type: "radio",
     onChange: e => setCsvHandling(e.target.value),
   };
-
   return (
     <div className={importClass}>
       {highlightCsvHandling && <div className={importClass.elem("csv-splash")}/>}
@@ -271,13 +276,13 @@ export const ImportPage = ({
 
       <header>
         <form className={importClass.elem("url-form") + " inline"} method="POST" onSubmit={onLoadURL}>
-          <input placeholder="Dataset URL" name="url" ref={urlRef} />
-          <button type="submit">Add URL</button>
+          <input placeholder={t("pages.create_project.import_data.dataset_url")} name="url" ref={urlRef} />
+          <button type="submit">{t("pages.create_project.import_data.add_url")}</button>
         </form>
-        <span>or</span>
+        <span>{t("pages.create_project.import_data.or")}</span>
         <button onClick={() => document.getElementById('file-input').click()} className={importClass.elem("upload-button")}>
           <IconUpload width="16" height="16" className={importClass.elem("upload-icon")} />
-          Upload {files.uploaded.length ? "More " : ""}Files
+          {t("pages.create_project.import_data.upload") + (files.uploaded.length ? t("pages.create_project.import_data.more") : "") + t("pages.create_project.import_data.files")}
         </button>
         <div className={importClass.elem("csv-handling").mod({ highlighted: highlightCsvHandling, hidden: !csvHandling })}>
           <span>Treat CSV/TSV as</span>
@@ -298,15 +303,15 @@ export const ImportPage = ({
           {!showList && (
             <label htmlFor="file-input">
               <div className={dropzoneClass.elem("content")}>
-                <header>Drag & drop files here<br/>or click to browse</header>
+                <header><Trans i18nKey="pages.create_project.import_data.upload_file_msg" t={t}></Trans></header>
                 <IconUpload height="64" className={dropzoneClass.elem("icon")} />
                 <dl>
-                  <dt>Text</dt><dd>txt</dd>
-                  <dt>Audio</dt><dd>wav, aiff, mp3, au, flac, m4a, ogg</dd>
-                  <dt>Images</dt><dd>jpg, png, gif, bmp, svg, webp</dd>
-                  <dt>HTML</dt><dd>html, htm, xml</dd>
-                  <dt>Time Series</dt><dd>csv, tsv</dd>
-                  <dt>Common Formats</dt><dd>csv, tsv, txt, json</dd>
+                  <dt>{t("common.media_file_type.Text")}</dt><dd>txt</dd>
+                  <dt>{t("common.media_file_type.Audio")}</dt><dd>wav, aiff, mp3, au, flac, m4a, ogg</dd>
+                  <dt>{t("common.media_file_type.Images")}</dt><dd>jpg, png, gif, bmp, svg, webp</dd>
+                  <dt>{t("common.media_file_type.HTML")}</dt><dd>html, htm, xml</dd>
+                  <dt>{t("common.media_file_type.TimeSeries")}</dt><dd>csv, tsv</dd>
+                  <dt>{t("common.media_file_type.CommonFormats")}</dt><dd>csv, tsv, txt, json</dd>
                 </dl>
               </div>
             </label>

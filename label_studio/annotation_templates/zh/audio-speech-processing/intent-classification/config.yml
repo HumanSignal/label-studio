@@ -1,0 +1,21 @@
+title: 意图分类
+type: community
+group: 音频/语音处理
+image: /static/templates/intent-classification.png
+details: <h1>进行语音活动分割并选择语音意图</h1>
+config: |
+  <View>
+    <Labels name="labels" toName="audio">
+      <Label value="Segment" />
+    </Labels>
+
+    <AudioPlus name="audio" value="$audio"/>
+
+    <Choices name="intent" toName="audio" perRegion="true" required="true">
+      <Choice value="Question" />
+      <Choice value="Request" />
+      <Choice value="Satisfied" />
+      <Choice value="Interested" />
+      <Choice value="Unsatisfied" />
+    </Choices>
+  </View>

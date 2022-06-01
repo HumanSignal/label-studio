@@ -1,0 +1,58 @@
+<View>
+    <!-- Control tag for region labels -->
+    <Header value="Select predictable region spans in time series:"/>
+    <TimeSeriesLabels name="predictable" toName="stock">
+        <Label value="Regions" background="red" />
+    </TimeSeriesLabels>
+
+    <!-- Object tag for time series data source -->
+    <TimeSeries name="stock" valueType="url" value="$csv"
+                sep=","
+                timeColumn="time"
+                timeFormat="%Y-%m-%d %H:%M:%S.%f"
+                timeDisplayFormat="%Y-%m-%d"
+                overviewChannels="value">
+
+        <Channel column="value"
+                 displayFormat=",.1f"
+                 strokeColor="#1f77b4"
+                 legend="Stock Value"/>
+    </TimeSeries>
+    <Header value="Forecast next trend:"/>
+    <Choices name="trend_forecast" toName="stock">
+        <Choice value="Up"/>
+        <Choice value="Down"/>
+        <Choice value="Steady"/>
+    </Choices>
+</View>
+
+<!-- {"annotations": [{"result":
+[
+    {
+        "value": {
+            "start": "2020-01-05 00:00:00.000000",
+            "end": "2020-01-19 00:00:00.000000",
+            "instant": false,
+            "timeserieslabels": [
+                "Regions"
+            ]
+        },
+        "id": "2_35auTPfV",
+        "from_name": "predictable",
+        "to_name": "stock",
+        "type": "timeserieslabels"
+    },
+    {
+        "value": {
+            "choices": [
+                "Up"
+            ]
+        },
+        "id": "cg05auwweZ",
+        "from_name": "trend_forecast",
+        "to_name": "stock",
+        "type": "choices"
+    }
+]
+}]}
+-->

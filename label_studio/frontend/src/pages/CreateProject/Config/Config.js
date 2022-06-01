@@ -13,6 +13,8 @@ import { Preview } from './Preview';
 import { DEFAULT_COLUMN, EMPTY_CONFIG, isEmptyConfig, Template } from './Template';
 import { TemplatesList } from './TemplatesList';
 import { useAPI } from '../../../providers/ApiProvider';
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
 
 // don't do this, kids
 const formatXML = (xml) => {
@@ -78,6 +80,7 @@ const Label = ({ label, template, color }) => {
 };
 
 const ConfigureControl = ({ control, template }) => {
+  const { t } = useTranslation();
   const refLabels = React.useRef();
   const tagname = control.tagName;
 
@@ -99,9 +102,9 @@ const ConfigureControl = ({ control, template }) => {
   return (
     <div className={configClass.elem("labels")}>
       <form className={configClass.elem("add-labels")} action="">
-        <h4>{tagname === "Choices" ? "Add choices" : "Add label names"}</h4>
+        <h4>{tagname === "Choices" ? t("pages.create_project.config_label.add_choices") : t("pages.create_project.config_label.add_label_names")}</h4>
         <textarea name="labels" id="" cols="30" rows="5" ref={refLabels} onKeyPress={onKeyPress}></textarea>
-        <input type="button" value="Add" onClick={onAddLabels} />
+        <input type="button" value={t("pages.create_project.config_label.add")} onClick={onAddLabels} />
       </form>
       <div className={configClass.elem("current-labels")}>
         <h3>{tagname === "Choices" ? "Choices" : "Labels"} ({control.children.length})</h3>
@@ -121,6 +124,7 @@ const ConfigureControl = ({ control, template }) => {
 };
 
 const ConfigureSettings = ({ template }) => {
+  const { t } = useTranslation();
   const { settings } = template;
 
   if (!settings) return null;
@@ -154,8 +158,8 @@ const ConfigureSettings = ({ template }) => {
           template.render();
         };
         return (
-          <li key={key}><label>{options.title} <select value={value} onChange={onChange}>{options.type.map(option => (
-            <option key={option} value={option}>{option}</option>
+          <li key={key}><label>{t("common.tags.title."+options.title)} : <select value={value} onChange={onChange}>{options.type.map(option => (
+            <option key={option} value={option}>{t("common.tags."+options.title+"."+option)}</option>
           ))}</select></label></li>
         );
       case Boolean:
@@ -168,7 +172,7 @@ const ConfigureSettings = ({ template }) => {
           template.render();
         };
         return (
-          <li key={key}><label><input type="checkbox" checked={value} onChange={onChange} /> {options.title}</label></li>
+          <li key={key}><label><input type="checkbox" checked={value} onChange={onChange} /> {t("common.tags.title."+options.title)} </label></li>
         );
       case String:
       case Number:
@@ -182,7 +186,7 @@ const ConfigureSettings = ({ template }) => {
           template.render();
         };
         return (
-          <li key={key}><label>{options.title} <input type="text" onInput={onChange} value={value} size={size} /></label></li>
+          <li key={key}><label>{t("common.tags.title."+options.title)} <input type="text" onInput={onChange} value={value} size={size} /></label></li>
         );
     }
   });
@@ -193,7 +197,7 @@ const ConfigureSettings = ({ template }) => {
   return (
     <ul className={configClass.elem("settings")}>
       <li>
-        <h4>Configure settings</h4>
+        <h4>{t("pages.create_project.config_label.configure_settings")}</h4>
         <ul className={configClass.elem("object-settings")}>
           {items}
         </ul>
@@ -203,6 +207,7 @@ const ConfigureSettings = ({ template }) => {
 };
 
 const ConfigureColumns = ({ columns, template }) => {
+  const { t } = useTranslation();
   const updateValue = obj => e => {
     const attrName = e.target.value.replace(/^\$/, "");
 
@@ -214,13 +219,13 @@ const ConfigureColumns = ({ columns, template }) => {
 
   return (
     <div className={configClass.elem("object")}>
-      <h4>Configure data</h4>
+      <h4>{t("pages.create_project.config_label.configure_data")}</h4>
       {template.objects.length > 1 && columns?.length > 0 && columns.length < template.objects.length && (
-        <p className={configClass.elem("object-error")}>This template requires more data then you have for now</p>
+        <p className={configClass.elem("object-error")}>{t("pages.create_project.config_label.require_more_data")}</p>
       )}
       {columns?.length === 0 && (
         <p className={configClass.elem("object-error")}>
-          To select which field(s) to label you need to upload the data. Alternatively, you can provide it using Code mode.
+          {t("pages.create_project.config_label.need_upload_data")}
         </p>
       )}
       {template.objects.map(obj => (
@@ -246,6 +251,7 @@ const ConfigureColumns = ({ columns, template }) => {
 };
 
 const Configurator = ({ columns, config, project, template, setTemplate, onBrowse, onSaveClick, onValidate, disableSaveButton }) => {
+  const { t } = useTranslation();
   const [configure, setConfigure] = React.useState(isEmptyConfig(config) ? "code" : "visual");
   const [visualLoaded, loadVisual] = React.useState(configure === "visual");
   const [waiting, setWaiting] = React.useState(false);
@@ -305,7 +311,7 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
   // so load it on the first access, then just show/hide
   const onSelect = value => {
     setConfigure(value);
-    if (value === "visual") loadVisual(true);
+    if (value === t("pages.create_project.config_label.visual")) loadVisual(true);
   };
 
   const onSave = async () => {
@@ -332,11 +338,11 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
     <div className={configClass}>
       <div className={configClass.elem("container")}>
         <header>
-          <button onClick={onBrowse}>Browse Templates</button>
-          <ToggleItems items={{ code: "Code", visual: "Visual" }} active={configure} onSelect={onSelect} />
+          <button onClick={onBrowse}>{t("pages.create_project.config_label.browse_templates")}</button>
+          <ToggleItems items={{ code: t("pages.create_project.config_label.code"), visual: t("pages.create_project.config_label.visual") }} active={configure} onSelect={onSelect} />
         </header>
         <div className={configClass.elem('editor')}>
-          {configure === "code" && (
+          {configure === t("pages.create_project.config_label.code") && (
             <div className={configClass.elem("code")} style={{ display: configure === "code" ? undefined : "none" }}>
               <CodeMirror
                 name="code"

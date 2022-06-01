@@ -1,0 +1,14 @@
+title: 使用边界框进行目标检测
+type: community
+group: 计算机视觉
+order: 3
+image: /static/templates/object-detection-with-bounding-boxes.png
+details: <h1>在对象周围绘制一个边界框</h1>
+config: |
+  <View>
+    <Image name="image" value="$image"/>
+    <RectangleLabels name="label" toName="image">
+      <Label value="Airplane" background="green"/>
+      <Label value="Car" background="blue"/>
+    </RectangleLabels>
+  </View>

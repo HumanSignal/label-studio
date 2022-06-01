@@ -1,0 +1,25 @@
+<View>
+  <Header>Select one of two items</Header>
+  <Pairwise name="pw" toName="text1,text2" />
+  <Text name="text1" value="$text1" />
+  <Text name="text2" value="$text2" />
+</View>
+
+<!-- {
+"data": {"text1": "Look at this! It's a brand new product",
+         "text2": "Look at this! It's an awesome piece of sh*t"},
+"annotations": [{"result":
+[
+    {
+        "value": {
+            "selected": "left"
+        },
+        "id": "Prs1iTKZzp",
+        "from_name": "pw",
+        "to_name": "pw",
+        "type": "pairwise"
+    }
+]
+}]
+}
+-->

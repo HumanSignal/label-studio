@@ -1,0 +1,15 @@
+title: 表格数据
+type: community
+group: 结构化数据解析
+image: /static/templates/tabular-data.png
+details: <h1>注释表格中的数据</h1>
+config: |
+  <View>
+      <Header value="Table with {key: value} pairs"/>
+      <Table name="table" value="$item"/>
+      <Choices name="choice" toName="table">
+          <Choice value="Correct"/>
+          <Choice value="Incorrect"/>
+      </Choices>
+  </View>
+

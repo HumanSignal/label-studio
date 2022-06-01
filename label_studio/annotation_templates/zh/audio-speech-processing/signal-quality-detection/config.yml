@@ -1,0 +1,10 @@
+title: 信号质量检测
+type: community
+group: 音频/语音处理
+image: /static/templates/signal-quality-detection.png
+details: <h1>评价信号质量</h1>
+config: |
+  <View>
+    <Rating name="rating" toName="audio" maxRating="10" icon="star" size="medium" />
+    <Audio name="audio" value="$audio"/>
+  </View>
