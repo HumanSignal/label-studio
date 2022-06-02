@@ -9,9 +9,8 @@ on:
       - ready_for_review
       - synchronize
     branches:
-      - develop
-    paths-ignore:
-      - 'label_studio/frontend/**'
+      - master
+      - 'lse-release/**'
 
 env:
   DOWNSTREAM_REPO_OWNER: heartexlabs
@@ -67,17 +66,26 @@ jobs:
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
+            const { repo, owner } = context.repo;
+            const getCommitResponse = await github.rest.repos.getCommit({
+              owner,
+              repo,
+              ref: '${{ github.sha }}'
+            });
             const result = await github.rest.repos.createDispatchEvent({
               owner: '${{ env.DOWNSTREAM_REPO_OWNER }}',
               repo: '${{ env.DOWNSTREAM_REPO }}',
               event_type: 'upstream_repo_update',
               client_payload: {
                 branch_name: '${{ github.head_ref }}',
+                base_branch_name: '${{ github.base_ref }}',
                 repo_name: '${{ github.repository }}',
                 commit_sha : '${{ github.sha }}',
                 title: '${{ github.event.pull_request.title }}',
                 html_url: '${{ github.event.pull_request.html_url }}',
                 actor: '${{ github.actor }}',
+                author_username: getCommitResponse.data.commit.author.name,
+                author_email: getCommitResponse.data.commit.author.email,
                 event_action: 'merged'
               }
             });
@@ -92,17 +100,26 @@ jobs:
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
+            const { repo, owner } = context.repo;
+            const getCommitResponse = await github.rest.repos.getCommit({
+              owner,
+              repo,
+              ref: '${{ github.event.pull_request.head.sha }}'
+            });
             const result = await github.rest.repos.createDispatchEvent({
               owner: '${{ env.DOWNSTREAM_REPO_OWNER }}',
               repo: '${{ env.DOWNSTREAM_REPO }}',
               event_type: 'upstream_repo_update',
               client_payload: {
                 branch_name: '${{ github.head_ref }}',
+                base_branch_name: '${{ github.base_ref }}',
                 repo_name: '${{ github.repository }}',
                 commit_sha : '${{ github.event.pull_request.head.sha }}',
                 title: '${{ github.event.pull_request.title }}',
                 html_url: '${{ github.event.pull_request.html_url }}',
                 actor: '${{ github.actor }}',
+                author_username: getCommitResponse.data.commit.author.name,
+                author_email: getCommitResponse.data.commit.author.email,
                 event_action: '${{ github.event.action }}'
               }
             });
