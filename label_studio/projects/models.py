@@ -772,7 +772,7 @@ class Project(ProjectMixin, models.Model):
         self._storage_objects = storage_objects
         return storage_objects
 
-    def update_tasks_counters(self, queryset):
+    def update_tasks_counters(self, queryset, from_scratch=True):
         objs = []
 
         total_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
@@ -780,9 +780,18 @@ class Project(ProjectMixin, models.Model):
         total_predictions = Count("predictions", distinct=True)
         if isinstance(queryset, list):
             queryset = Task.objects.filter(id__in=[task.id for task in queryset])
+
+        if not from_scratch:
+            queryset = queryset.exclude(
+                Q(total_annotations__gt=0) |
+                Q(cancelled_annotations__gt=0) |
+                Q(total_predictions__gt=0)
+            )
+
         # filter our tasks with 0 annotations and 0 predictions and update them with 0
         queryset.filter(annotations__isnull=True, predictions__isnull=True).\
             update(total_annotations=0, cancelled_annotations=0, total_predictions=0)
+
         # filter our tasks with 0 annotations and 0 predictions
         queryset = queryset.filter(Q(annotations__isnull=False) | Q(predictions__isnull=False))
         queryset = queryset.annotate(new_total_annotations=total_annotations,
@@ -797,6 +806,7 @@ class Project(ProjectMixin, models.Model):
 
         with transaction.atomic():
             bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
+        return len(objs)
 
     def __str__(self):
         return f'{self.title} (id={self.id})' or _("Business number %d") % self.pk
