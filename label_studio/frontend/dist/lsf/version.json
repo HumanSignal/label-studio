@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2068: Pan does not finish polygon (#626)\n\ncheck if is pan on toolswich from polygon, igonre if true\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
-  "commit": "9f06a9113c68f31b4f859acb2c872e47bf4351ad",
-  "branch": "master",
-  "date": "2022-06-02T01:24:07Z"
+  "message": "fix: resolving an issue that caused a broken quickview that seems to be stuck on loading",
+  "commit": "cbf33e504644f9676bec2be86e9fc1341396073a",
+  "branch": "fb-dev-2465",
+  "date": "2022-06-01T20:25:44Z"
 }
