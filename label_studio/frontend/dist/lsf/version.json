@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2497: disable smoothing",
-  "commit": "5a78c73958a4d9f8c54d31c7c753038d43c848f2",
+  "message": "fix: DEV-2497: FF removed",
+  "commit": "96a0f29b184d22fb4577b0c2f8ad0630a7f69457",
   "branch": "fb-dev-2497",
-  "date": "2022-06-01T21:07:50Z"
+  "date": "2022-06-02T14:19:36Z"
 }
