@@ -9,7 +9,7 @@ class Command(BaseCommand):
                             dest='from_scratch',
                             action='store_true',
                             default=False,
-                            help='Start recalculation from scratch, 0 for continuation')
+                            help='Start recalculation from scratch')
 
     def handle(self, *args, **options):
         from tasks.functions import calculate_stats_all_orgs
