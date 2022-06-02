@@ -806,6 +806,7 @@ class Project(ProjectMixin, models.Model):
 
         with transaction.atomic():
             bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
+        return len(objs)
 
     def __str__(self):
         return f'{self.title} (id={self.id})' or _("Business number %d") % self.pk
