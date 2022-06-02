@@ -171,7 +171,7 @@ class ImportStorage(Storage):
 
     def sync(self):
         if redis_connected():
-            queue = django_rq.get_queue('default')
+            queue = django_rq.get_queue('low')
             job = queue.enqueue(sync_background, self.__class__, self.id)
             # job_id = sync_background.delay()  # TODO: @niklub: check this fix
             logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
@@ -183,7 +183,7 @@ class ImportStorage(Storage):
         abstract = True
 
 
-@job('default')
+@job('low')
 def sync_background(storage_class, storage_id):
     storage = storage_class.objects.get(id=storage_id)
     storage.scan_and_create_links()
@@ -216,7 +216,7 @@ class ExportStorage(Storage):
 
     def sync(self):
         if redis_connected():
-            queue = django_rq.get_queue('default')
+            queue = django_rq.get_queue('low')
             job = queue.enqueue(export_sync_background, self.__class__, self.id)
             logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
         else:
@@ -227,7 +227,7 @@ class ExportStorage(Storage):
         abstract = True
 
 
-@job('default', timeout=3600)
+@job('low', timeout=3600)
 def export_sync_background(storage_class, storage_id):
     storage = storage_class.objects.get(id=storage_id)
     storage.save_all_annotations()
@@ -269,6 +269,7 @@ class ExportStorageLink(models.Model):
         _('object exists'), help_text='Whether object under external link still exists', default=True
     )
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
+    updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Update time')
 
     @staticmethod
     def get_key(annotation):
@@ -287,6 +288,9 @@ class ExportStorageLink(models.Model):
     @classmethod
     def create(cls, annotation, storage):
         link, created = cls.objects.get_or_create(annotation=annotation, storage=storage, object_exists=True)
+        if not created:
+            # update updated_at field
+            link.save()
         return link
 
     def has_permission(self, user):

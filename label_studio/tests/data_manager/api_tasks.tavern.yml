@@ -5,7 +5,6 @@ marks:
   - usefixtures:
       - django_live_url
   - skipif: "'default' not in '{tavern.env_vars.DJANGO_DB}'"
-
 stages:
 
   - id: signup
@@ -337,7 +336,6 @@ stages:
         }
         ]
       }
-
 
 ---
 test_name: tasks-all-fields-sqlite
@@ -864,7 +862,6 @@ stages:
         ]
       }
 
-
   - name: setup_views
     request:
       method: POST
@@ -1120,12 +1117,6 @@ stages:
         ]
       }
 
-
-
-
-
-
-
 ---
 test_name: tasks-minimal-fields
 strict: false
@@ -1133,7 +1124,7 @@ marks:
   - usefixtures:
       - django_live_url
 stages:
-
+  
   - id: signup
     type: ref
 
@@ -1327,4 +1318,164 @@ stages:
         "total_annotations": 0,
         "total_predictions": 0,
         "total": 0,
+      }
+
+  - name: get_first_task
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects/{project_pk}/next'
+    response:
+      save:
+        json:
+          first_task_id: id
+      status_code: 200
+
+  - name: create_annotation_first_task
+    request:
+      headers:
+        content-type: application/json
+      json:
+        lead_time: 5
+        result:
+        - from_name: label
+          to_name: text
+          type: choices
+          value:
+            choices:
+            - class_B
+      method: POST
+      url: '{django_live_url}/api/tasks/{first_task_id}/annotations'
+    response:
+      save:
+        json:
+          annotation_pk: id
+      status_code: 201
+
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "filters": {
+            "conjunction": "or",
+            "items": [
+              {
+                "filter": "filter:tasks:updated_by",
+                "operator": "contains",
+                "type": "List",
+                "value": !int "{created_by}",
+              }
+            ]
+          },
+          "ordering": [
+            "tasks:data.text"
+          ]
+        },
+        "project": !int "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?view={view.id}'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: label_studio.tests.utils:save_response
+      json: {
+        "total_annotations": 1,
+        "total_predictions": 0,
+        "total": 1,
+      }
+
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "filters": {
+            "conjunction": "or",
+            "items": [
+              {
+                "filter": "filter:tasks:updated_by",
+                "operator": "not_contains",
+                "type": "List",
+                "value": !int "{created_by}",
+              }
+            ]
+          },
+          "ordering": [
+            "tasks:data.text"
+          ]
+        },
+        "project": !int "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?view={view.id}'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: label_studio.tests.utils:save_response
+      json: {
+        "total_annotations": 4,
+        "total_predictions": 3,
+        "total": 5,
+      }
+
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "filters": {
+            "conjunction": "or",
+            "items": [
+              {
+                "filter": "filter:tasks:updated_by",
+                "operator": "equal",
+                "type": "List",
+                "value": !int "{created_by}",
+              }
+            ]
+          },
+          "ordering": [
+            "tasks:data.text"
+          ]
+        },
+        "project": !int "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?view={view.id}'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: label_studio.tests.utils:save_response
+      json: {
+        "total_annotations": 1,
+        "total_predictions": 0,
+        "total": 1,
       }

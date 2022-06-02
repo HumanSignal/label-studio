@@ -280,7 +280,25 @@ TEMPLATES = [
 
 # RQ
 RQ_QUEUES = {
+    'critical': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 180,
+    },
+    'high': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 180,
+    },
     'default': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 180,
+    },
+    'low': {
         'HOST': 'localhost',
         'PORT': 6379,
         'DB': 0,
@@ -385,6 +403,8 @@ EMAIL_BACKEND = get_env('EMAIL_BACKEND', 'django.core.mail.backends.dummy.EmailB
 ENABLE_LOCAL_FILES_STORAGE = get_bool_env('ENABLE_LOCAL_FILES_STORAGE', default=True)
 LOCAL_FILES_SERVING_ENABLED = get_bool_env('LOCAL_FILES_SERVING_ENABLED', default=False)
 LOCAL_FILES_DOCUMENT_ROOT = get_env('LOCAL_FILES_DOCUMENT_ROOT', default=os.path.abspath(os.sep))
+
+SYNC_ON_TARGET_STORAGE_CREATION = get_bool_env('SYNC_ON_TARGET_STORAGE_CREATION', default=True)
 
 """ React Libraries: do not forget to change this dir in /etc/nginx/nginx.conf """
 # EDITOR = label-studio-frontend repository
