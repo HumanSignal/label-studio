@@ -16,8 +16,9 @@ def calculate_stats_all_orgs():
         for project in projects:
             logger.debug(f"Start processing stats project {project.id} "
                          f"with task count {project.tasks.count()} and updated_at {project.updated_at}")
-            project.update_tasks_counters(project.tasks.all())
-            logger.debug(f"End processing stats project {project.id}.")
+            tasks = project.update_tasks_counters(project.tasks.all())
+            logger.debug(f"End processing stats project {project.id}."
+                         f"Processed {str(tasks)} tasks.")
 
         logger.debug(f"Organization {org.id} stats were recalculated.")
 
