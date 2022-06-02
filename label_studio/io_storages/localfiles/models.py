@@ -59,7 +59,9 @@ class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):
     def iterkeys(self):
         path = Path(self.path)
         regex = re.compile(str(self.regex_filter)) if self.regex_filter else None
-        for file in path.rglob('*'):
+        # For better control of imported tasks, file reading has been changed to ascending order of filenames.
+        # In other words, the task IDs are sorted by filename order.
+        for file in sorted(path.rglob('*'), key=os.path.basename):
             if file.is_file():
                 key = file.name
                 if regex and not regex.match(key):

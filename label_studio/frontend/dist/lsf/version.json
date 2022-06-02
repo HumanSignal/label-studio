@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into fix/dev-2203/view-all-style-fix",
-  "commit": "ff3df860e181ba64eec56770aca6a15eccf8e23d",
-  "branch": "",
-  "date": "2022-06-02T20:14:24Z"
+  "message": "fix: DEV-2244: Nested choices indeterminate state (#633)\n\n* fix: DEV-2244: Nested choices indeterminate state\r\n\r\n* test: DEV-2244: Add test for indeterminate states of choices\r\n\r\n* fix: DEV-2244: Apply feature flag\r\n\r\n* fix: DEV-2244: Fix feature flag missprint  in tests\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
+  "commit": "b5289dccbf3373e8e0139bfb215494d66fbd4675",
+  "branch": "master",
+  "date": "2022-06-02T18:09:15Z"
 }

@@ -132,7 +132,7 @@ def read_yaml(filepath):
     if not os.path.exists(filepath):
         filepath = find_file(filepath)
     with io.open(filepath, encoding='utf-8') as f:
-        data = yaml.load(f, Loader=yaml.FullLoader)
+        data = yaml.load(f, Loader=yaml.FullLoader)  # nosec
     return data
 
 
