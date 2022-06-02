@@ -16,7 +16,9 @@ def calculate_stats_all_orgs(from_scratch):
         for project in projects:
             logger.debug(f"Start processing stats project {project.id} "
                          f"with task count {project.tasks.count()} and updated_at {project.updated_at}")
+
             tasks = project.update_tasks_counters(project.tasks.all(), from_scratch=from_scratch)
+
             logger.debug(f"End processing stats project {project.id}."
                          f"Processed {str(tasks)} tasks.")
 
