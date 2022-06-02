@@ -9,8 +9,10 @@ on:
       - ready_for_review
       - synchronize
     branches:
-      - master
+      - develop
       - 'lse-release/**'
+    paths-ignore:
+      - 'label_studio/frontend/**'
 
 env:
   DOWNSTREAM_REPO_OWNER: heartexlabs
