@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2244: Nested choices indeterminate state (#633)\n\n* fix: DEV-2244: Nested choices indeterminate state\r\n\r\n* test: DEV-2244: Add test for indeterminate states of choices\r\n\r\n* fix: DEV-2244: Apply feature flag\r\n\r\n* fix: DEV-2244: Fix feature flag missprint  in tests\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
-  "commit": "b5289dccbf3373e8e0139bfb215494d66fbd4675",
-  "branch": "master",
-  "date": "2022-06-02T18:09:15Z"
+  "message": "fix: dev-2269: null block loading a wavesurver instance that does not have a value",
+  "commit": "b5e71152352c8873f1878cd433a52142fefb11d9",
+  "branch": "",
+  "date": "2022-06-02T17:42:02Z"
 }
