@@ -672,3 +672,49 @@ stages:
                   - BBB
           score: null
           model_version: abcdefgh
+
+---
+test_name: import_groud_truth_preannotations
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: Create project
+  request:
+    data:
+      label_config: <View><Image name="image" value="$image"/><RectangleLabels name="objects" toName="image" choices="multiple"><Label
+        value="Cat"/><Label value="Dog"/></RectangleLabels></View>
+      title: Image Classification Project
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: Import images with preannotations
+  request:
+    files:
+      csv: tests/test_suites/samples/image_urls_with_bboxes_gt.json
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/import?return_task_ids=true'
+  response:
+    status_code: 201
+    save:
+      json:
+        first_task: "task_ids[0]"
+        second_task: "task_ids[1]"
+- name: Check 1st task with prediction
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks/{first_task}'
+  response:
+    status_code: 200
+    json:
+      id: !int '{first_task}'
+      is_labeled: true

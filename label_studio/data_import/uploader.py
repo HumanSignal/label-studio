@@ -79,7 +79,7 @@ def tasks_from_url(file_upload_ids, project, request, url):
     ctx.verify_mode = ssl.CERT_NONE
     try:
         filename = url.rsplit('/', 1)[-1]
-        with urlopen(url, context=ctx) as file:
+        with urlopen(url, context=ctx) as file:   # nosec
             # check size
             meta = file.info()
             file.size = int(meta.get("Content-Length"))

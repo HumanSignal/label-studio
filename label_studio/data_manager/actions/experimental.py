@@ -58,10 +58,9 @@ def propagate_annotations_form(user, project):
     field = {
         'type': 'number',
         'name': 'source_annotation_id',
-        'label': 'Enter source annotation ID'
+        'label': 'Enter source annotation ID' +
+                 (f' [first ID: {str(first_annotation.id)}]' if first_annotation else '')
     }
-    if first_annotation:
-        field.update({'value': str(first_annotation.id)})
     return [{
         'columnCount': 1,
         'fields': [field]

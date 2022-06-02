@@ -418,7 +418,7 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
 class ExportDownloadAPI(generics.RetrieveAPIView):
     queryset = Export.objects.all()
     project_model = Project
-    serializer_class = ExportSerializer
+    serializer_class = None
     lookup_url_kwarg = 'export_pk'
     permission_required = all_permissions.projects_change
 
