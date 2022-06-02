@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2068: Pan does not finish polygon (#626)\n\ncheck if is pan on toolswich from polygon, igonre if true\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
-  "commit": "9f06a9113c68f31b4f859acb2c872e47bf4351ad",
+  "message": "fix: DEV-2244: Nested choices indeterminate state (#633)\n\n* fix: DEV-2244: Nested choices indeterminate state\r\n\r\n* test: DEV-2244: Add test for indeterminate states of choices\r\n\r\n* fix: DEV-2244: Apply feature flag\r\n\r\n* fix: DEV-2244: Fix feature flag missprint  in tests\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
+  "commit": "b5289dccbf3373e8e0139bfb215494d66fbd4675",
   "branch": "master",
-  "date": "2022-06-02T01:24:07Z"
+  "date": "2022-06-02T18:09:15Z"
 }
