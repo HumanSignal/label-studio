@@ -6,7 +6,7 @@ from projects.models import Project
 logger = logging.getLogger(__name__)
 
 
-def calculate_stats_all_orgs():
+def calculate_stats_all_orgs(from_scratch):
     orgs = Organization.objects.order_by('-id')
 
     for org in orgs:
@@ -16,7 +16,7 @@ def calculate_stats_all_orgs():
         for project in projects:
             logger.debug(f"Start processing stats project {project.id} "
                          f"with task count {project.tasks.count()} and updated_at {project.updated_at}")
-            project.update_tasks_counters(project.tasks.all())
+            project.update_tasks_counters(project.tasks.all(), from_scratch=from_scratch)
             logger.debug(f"End processing stats project {project.id}.")
 
         logger.debug(f"Organization {org.id} stats were recalculated.")

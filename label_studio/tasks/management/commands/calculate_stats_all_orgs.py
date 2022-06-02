@@ -7,4 +7,4 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         from tasks.functions import calculate_stats_all_orgs
 
-        calculate_stats_all_orgs()
+        calculate_stats_all_orgs(from_scratch=False)  # @Konstantine: please add command line param for from_scratch
