@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2199: View all audio crash fix (#641)\n\n* reign in the timeline controls by removing padding and negative calc\r\n\r\n* better check if there is a ready instance of waveurfer region\r\n\r\n* add -15px back into grid\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
-  "commit": "f7e6cf7a7946efb8ee80799bc0d41f7d74daaece",
+  "message": "fix: DEV-2068: Pan does not finish polygon (#626)\n\ncheck if is pan on toolswich from polygon, igonre if true\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
+  "commit": "9f06a9113c68f31b4f859acb2c872e47bf4351ad",
   "branch": "master",
-  "date": "2022-06-01T19:42:22Z"
+  "date": "2022-06-02T01:24:07Z"
 }
