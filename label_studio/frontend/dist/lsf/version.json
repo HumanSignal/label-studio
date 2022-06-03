@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2244: Nested choices indeterminate state (#633)\n\n* fix: DEV-2244: Nested choices indeterminate state\r\n\r\n* test: DEV-2244: Add test for indeterminate states of choices\r\n\r\n* fix: DEV-2244: Apply feature flag\r\n\r\n* fix: DEV-2244: Fix feature flag missprint  in tests\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
-  "commit": "b5289dccbf3373e8e0139bfb215494d66fbd4675",
+  "message": "fix: DEV-2394: Zoomed image region out of bounds (#642)\n\n* fix: DEV-2394: Zoomed image region out of bounds\r\n\r\n* test: DEV-2394: Add test for bounds of transformations for zoomed image regions\r\n\r\n* fix: DEV-2394: Fix stage position recalculation on window resize\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
+  "commit": "efb2149a13ae2f17d6f71678deb41a2b9b179fac",
   "branch": "master",
-  "date": "2022-06-02T18:09:15Z"
+  "date": "2022-06-03T09:25:28Z"
 }
