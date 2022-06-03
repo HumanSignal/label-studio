@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2394: Fix stage position recalculation on window resize",
-  "commit": "90e42f74eb5d54ad89b8d982a3818a83c204b631",
-  "branch": "fix/DEV-2394/zoomed-transform-limits",
-  "date": "2022-05-27T02:27:51Z"
+  "message": "fix: DEV-2394: Zoomed image region out of bounds (#642)\n\n* fix: DEV-2394: Zoomed image region out of bounds\r\n\r\n* test: DEV-2394: Add test for bounds of transformations for zoomed image regions\r\n\r\n* fix: DEV-2394: Fix stage position recalculation on window resize\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
+  "commit": "efb2149a13ae2f17d6f71678deb41a2b9b179fac",
+  "branch": "master",
+  "date": "2022-06-03T09:25:28Z"
 }
