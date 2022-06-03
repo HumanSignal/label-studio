@@ -10,9 +10,8 @@ from urllib.parse import urljoin, quote
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.db import models, connection, transaction
-from django.db.models import Q, F, When, Count, Case, Subquery, OuterRef, Value
-from django.db.models.functions import Coalesce
+from django.db import models, transaction
+from django.db.models import Q
 from django.db.models.signals import post_delete, pre_save, post_save, pre_delete
 from django.utils.translation import gettext_lazy as _
 from django.db.models import JSONField
@@ -46,6 +45,7 @@ class Task(TaskMixin, models.Model):
     data = JSONField('data', null=False, help_text='User imported or uploaded data for a task. Data is formatted according to '
                                                    'the project label config. You can find examples of data for your project '
                                                    'on the Import page in the Label Studio Data Manager UI.')
+
     meta = JSONField('meta', null=True, default=dict,
                      help_text='Meta is user imported (uploaded) data and can be useful as input for an ML '
                                'Backend for embeddings, advanced vectors, and other info. It is passed to '
@@ -286,10 +286,8 @@ class Task(TaskMixin, models.Model):
         :param queryset: Tasks queryset
         """
         signals = [
-            (post_delete, update_is_labeled_after_removing_annotation, Annotation),
             (post_delete, update_all_task_states_after_deleting_task, Task),
-            (pre_delete, remove_data_columns, Task),
-            (post_delete, remove_project_summary_annotations, Annotation)
+            (pre_delete, remove_data_columns, Task)
         ]
         with temporary_disconnect_list_signal(signals):
             queryset.delete()
@@ -407,7 +405,28 @@ class Annotation(AnnotationMixin, models.Model):
     def delete(self, *args, **kwargs):
         result = super().delete(*args, **kwargs)
         self.update_task()
+        self.on_delete_update_counters()
         return result
+
+    def on_delete_update_counters(self):
+        task = self.task
+        logger.debug(f"Start updating counters for task {task.id}.")
+        if self.was_cancelled:
+            cancelled = task.annotations.all().filter(was_cancelled=True).count()
+            Task.objects.filter(id=task.id).update(cancelled_annotations=cancelled)
+            logger.debug(f"On delete updated cancelled_annotations for task {task.id}")
+        else:
+            total = task.annotations.all().filter(was_cancelled=False).count()
+            Task.objects.filter(id=task.id).update(total_annotations=total)
+            logger.debug(f"On delete updated total_annotations for task {task.id}")
+
+        logger.debug(f'Update task stats for task={task}')
+        task.update_is_labeled()
+        Task.objects.filter(id=task.id).update(is_labeled=task.is_labeled)
+
+        # remove annotation counters in project summary followed by deleting an annotation
+        logger.debug("Remove annotation counters in project summary followed by deleting an annotation")
+        self.decrease_project_summary_counters()
 
 
 class TaskLock(models.Model):
@@ -639,20 +658,6 @@ def update_project_summary_annotations_and_is_labeled(sender, instance, created,
         logger.debug(f"Updated total_annotations and cancelled_annotations for {instance.task.id}.")
 
 
-@receiver(post_delete, sender=Annotation)
-def remove_project_summary_annotations(sender, instance, **kwargs):
-    """Remove annotation counters in project summary followed by deleting an annotation"""
-    instance.decrease_project_summary_counters()
-    if instance.was_cancelled:
-        Task.objects.filter(id=instance.task.id).update(
-            cancelled_annotations=instance.task.annotations.all().filter(was_cancelled=True).count())
-        logger.debug(f"Updated cancelled_annotations for {instance.task.id}.")
-    else:
-        Task.objects.filter(id=instance.task.id).update(
-            total_annotations=instance.task.annotations.all().filter(was_cancelled=False).count())
-        logger.debug(f"Updated total_annotations for {instance.task.id}.")
-
-
 @receiver(pre_delete, sender=Prediction)
 def remove_predictions_from_project(sender, instance, **kwargs):
     """Remove predictions counters"""
@@ -668,32 +673,13 @@ def save_predictions_to_project(sender, instance, **kwargs):
     instance.task.save(update_fields=['total_predictions'])
     logger.debug(f"Updated total_predictions for {instance.task.id}.")
 
-
 # =========== END OF PROJECT SUMMARY UPDATES ===========
-
-
-def _task_exists_in_db(task):
-    try:
-        Task.objects.get(id=task.id)
-    except Task.DoesNotExist:
-        return False
-    return True
-
-
-@receiver(post_delete, sender=Annotation)
-def update_is_labeled_after_removing_annotation(sender, instance, **kwargs):
-    # Update task.is_labeled state
-    task = instance.task
-    if _task_exists_in_db(task): # To prevent django.db.utils.DatabaseError: Save with update_fields did not affect any rows.
-        logger.debug(f'Update task stats for task={task}')
-        instance.task.update_is_labeled()
-        instance.task.save(update_fields=['is_labeled'])
 
 
 @receiver(post_save, sender=Annotation)
 def delete_draft(sender, instance, **kwargs):
     task = instance.task
-    query_args = {'task': instance.task, 'annotation': instance}
+    query_args = {'task': task, 'annotation': instance}
     drafts = AnnotationDraft.objects.filter(**query_args)
     num_drafts = drafts.count()
     drafts.delete()
@@ -720,7 +706,7 @@ def update_task_stats(task, stats=('is_labeled',), save=True):
     """Update single task statistics:
         accuracy
         is_labeled
-    :param task_id:
+    :param task: Task to update
     :param stats: to update separate stats
     :param save: to skip saving in some cases
     :return:
@@ -739,7 +725,6 @@ def bulk_update_stats_project_tasks(tasks):
        on updated Task objects
        in single transaction as execute sql
     :param tasks:
-    :param batch_size:
     :return:
     """
     # recalc accuracy
