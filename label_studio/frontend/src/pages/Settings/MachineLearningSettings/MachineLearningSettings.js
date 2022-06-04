@@ -5,11 +5,11 @@ import { Divider } from '../../../components/Divider/Divider';
 import { ErrorWrapper } from '../../../components/Error/Error';
 import { InlineError } from '../../../components/Error/InlineError';
 import { Form, Input, Label, Select, TextArea, Toggle } from '../../../components/Form';
-import { FormResponseContext } from '../../../components/Form/FormContext';
 import { modal } from '../../../components/Modal/Modal';
 import { useAPI } from '../../../providers/ApiProvider';
 import { ProjectContext } from '../../../providers/ProjectProvider';
 import { MachineLearningList } from './MachineLearningList';
+import { ModelVersionSelector } from './ModelVersionSelector';
 import './MachineLearningSettings.styl';
 
 export const MachineLearningSettings = () => {
@@ -17,7 +17,7 @@ export const MachineLearningSettings = () => {
   const { project, fetchProject, updateProject } = useContext(ProjectContext);
   const [mlError, setMLError] = useState();
   const [backends, setBackends] = useState([]);
-  const [versions, setVersions] = useState([]);
+  const [projectModelVersions, setProjectModelVersions] = useState([]);
 
   const resetMLVersion = useCallback(async (e) => {
     e.preventDefault();
@@ -35,33 +35,27 @@ export const MachineLearningSettings = () => {
       },
     });
 
-
     if (models) setBackends(models);
   }, [api, project, setBackends]);
 
-  const fetchMLVersions = useCallback(async () => {
-    const modelVersions = await api.callApi("modelVersions", {
+  const fetchProjectMLVersions = useCallback(async () => {
+    const modelVersions = await api.callApi("projectModelVersions", {
       params: {
         pk: project.id,
       },
     });
 
-    var versions = [];
+    const versions = Object.entries(modelVersions).reduce((v, [key, value]) => [...v, {
+      value: key,
+      label: key + " (" + value + " predictions)",
+    }], []);
 
-    for (const [key, value] of Object.entries(modelVersions)) {
-      versions.push({
-        value: key,
-        label: key + " (" + value + " predictions)",
-      });
-    }
-
-    setVersions(versions);
+    setProjectModelVersions(versions);
   }, [api, project.id]);
 
   const showMLFormModal = useCallback((backend) => {
     const action = backend ? "updateMLBackend" : "addMLBackend";
 
-    console.log({ backend });
     const modalProps = {
       title: `${backend ? 'Edit' : 'Add'} model`,
       style: { width: 760 },
@@ -89,7 +83,15 @@ export const MachineLearningSettings = () => {
             <TextArea name="description" label="Description" style={{ minHeight: 120 }}/>
           </Form.Row>
 
-          <Form.Row columnCount={1}>
+          <Form.Row columnCount={backend ? 2 : 1}>
+            {!!backend && (
+              <ModelVersionSelector
+                object={backend}
+                apiName="modelVersions"
+                valueName="version"
+                label="Version"
+              />
+            )}
             <Toggle
               name="is_interactive"
               label="Use for interactive preannotations"
@@ -126,7 +128,7 @@ export const MachineLearningSettings = () => {
   useEffect(() => {
     if (project.id) {
       fetchBackends();
-      fetchMLVersions();
+      fetchProjectMLVersions();
     }
   }, [project]);
 
@@ -177,7 +179,7 @@ export const MachineLearningSettings = () => {
           </div>
         </Form.Row>
 
-        {versions.length > 1 && (
+        {projectModelVersions.length > 0 && (
           <Form.Row columnCount={1}>
             <Label
               text="Model Version"
@@ -191,9 +193,7 @@ export const MachineLearningSettings = () => {
                 <Select
                   name="model_version"
                   defaultValue={null}
-                  options={[
-                    ...versions,
-                  ]}
+                  options={projectModelVersions}
                   placeholder="No model version selected"
                 />
               </div>
