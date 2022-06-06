@@ -657,10 +657,3 @@ class temporary_disconnect_list_signal:
                 sender=sender,
                 dispatch_uid=dispatch_uid
             )
-
-
-def get_fields_from_request(request):
-    fields = request.query_params.get('include', None)
-    if fields:
-        return fields.split(',')
-    return None

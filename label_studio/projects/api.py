@@ -19,7 +19,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import exception_handler
 from django.http import Http404
 
-from core.utils.common import temporary_disconnect_all_signals, get_fields_from_request
+from core.utils.common import temporary_disconnect_all_signals
 from core.label_config import config_essential_data_has_changed
 from projects.models import (
     Project, ProjectSummary, ProjectManager
