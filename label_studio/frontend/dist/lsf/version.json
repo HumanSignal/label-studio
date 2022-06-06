@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2394: Zoomed image region out of bounds (#642)\n\n* fix: DEV-2394: Zoomed image region out of bounds\r\n\r\n* test: DEV-2394: Add test for bounds of transformations for zoomed image regions\r\n\r\n* fix: DEV-2394: Fix stage position recalculation on window resize\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
-  "commit": "efb2149a13ae2f17d6f71678deb41a2b9b179fac",
-  "branch": "master",
-  "date": "2022-06-03T09:25:28Z"
+  "message": "Merge pull request #681 from heartexlabs/fb-dev-2203/view-all-audio-responsive\n\nfix: DEV-2203: View all audio responsive",
+  "commit": "f30cc010581585e0fe3df72653cb0a3747d329b6",
+  "branch": "",
+  "date": "2022-06-06T17:34:36Z"
 }
