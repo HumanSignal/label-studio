@@ -1,6 +1,6 @@
 {
-  "message": "refactor grid froward and back logic to accomidate various grids",
-  "commit": "64459d7aaf03c9d3efe87225940b6c6d4a2672ef",
+  "message": "Merge pull request #681 from heartexlabs/fb-dev-2203/view-all-audio-responsive\n\nfix: DEV-2203: View all audio responsive",
+  "commit": "f30cc010581585e0fe3df72653cb0a3747d329b6",
   "branch": "",
-  "date": "2022-06-03T22:14:14Z"
+  "date": "2022-06-06T17:34:36Z"
 }
