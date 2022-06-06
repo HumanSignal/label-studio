@@ -267,6 +267,7 @@ class Task(TaskMixin, models.Model):
         self.annotations.exclude(id=annotation_id).update(ground_truth=False)
 
     def save(self, *args, **kwargs):
+        exists = True if self.pk else False
         if flag_set('ff_back_2070_inner_id_12052022_short', self.project.organization.created_by):
             if self.inner_id == 0:
                 task = Task.objects.filter(project=self.project).order_by("-inner_id").first()
@@ -276,7 +277,19 @@ class Task(TaskMixin, models.Model):
 
                 # max_inner_id might be None in the old projects
                 self.inner_id = None if max_inner_id is None else (max_inner_id + 1)
+        if exists:
+            if 'update_fields' in kwargs:
+                # we don't need to update counters when other than task.data fields are updated
+                if not _task_data_is_not_updated(kwargs['update_fields']):
+                    self.decrease_project_summary_counters()
+            else:
+                self.decrease_project_summary_counters()
         super().save(*args, **kwargs)
+        if 'update_fields' in kwargs:
+            if not _task_data_is_not_updated(kwargs['update_fields']):
+                self.increase_project_summary_counters()
+        else:
+            self.increase_project_summary_counters()
 
     @staticmethod
     def delete_tasks_without_signals(queryset):
@@ -285,11 +298,27 @@ class Task(TaskMixin, models.Model):
         :param queryset: Tasks queryset
         """
         signals = [
-            (post_delete, update_all_task_states_after_deleting_task, Task),
-            (pre_delete, remove_data_columns, Task)
         ]
         with temporary_disconnect_list_signal(signals):
             queryset.delete()
+
+    def delete(self, *args, **kwargs):
+        """Reduce data column counters afer removing task"""
+        self.decrease_project_summary_counters()
+        # BEFORE DELETE
+        super().save(*args, **kwargs)
+        # AFTER DELETE
+        try:
+            # in case of maximum_annotations > 1 and cohort_percentage < 100
+            # we should rearrange overlap and recalculate is_labeled
+            self.project.update_tasks_states(
+                maximum_annotations_changed=False,
+                overlap_cohort_percentage_changed=False,
+                tasks_number_changed=True
+            )
+        except Exception as exc:
+            logger.error('Error in update_all_task_states_after_deleting_task: ' + str(exc))
+
 
 pre_bulk_create = Signal(providing_args=["objs", "batch_size"])
 post_bulk_create = Signal(providing_args=["objs", "batch_size"])
@@ -397,7 +426,40 @@ class Annotation(AnnotationMixin, models.Model):
         self.task.save(update_fields=update_fields)
 
     def save(self, *args, **kwargs):
+        created = False if self.pk else True
+        self.decrease_project_summary_counters()
+        # PRE SAVE
+        old_annotation_was_cancelled = self.was_cancelled
         result = super().save(*args, **kwargs)
+        # POST SAVE
+        if old_annotation_was_cancelled != self.was_cancelled:
+            if self.was_cancelled:
+                self.task.cancelled_annotations = self.task.cancelled_annotations + 1
+                self.task.total_annotations = self.task.total_annotations - 1
+            else:
+                self.task.cancelled_annotations = self.task.cancelled_annotations - 1
+                self.task.total_annotations = self.task.total_annotations + 1
+            self.task.update_is_labeled()
+
+            Task.objects.filter(id=self.task.id).update(
+                is_labeled=self.task.is_labeled,
+                total_annotations=self.task.total_annotations,
+                cancelled_annotations=self.task.cancelled_annotations
+            )
+        self.increase_project_summary_counters()
+        if created:
+            # If new annotation created, update task.is_labeled state
+            logger.debug(f'Update task stats for task={self.task}')
+            if self.was_cancelled:
+                self.task.cancelled_annotations = self.task.annotations.all().filter(was_cancelled=True).count()
+            else:
+                self.task.total_annotations = self.task.annotations.all().filter(was_cancelled=False).count()
+            self.task.update_is_labeled()
+            self.task.save(update_fields=['is_labeled', 'total_annotations', 'cancelled_annotations'])
+            logger.debug(f"Updated total_annotations and cancelled_annotations for {self.task.id}.")
+        self.delete_drafts()
+        if created:
+            self.update_ml_backend()
         self.update_task()
         return result
 
@@ -426,6 +488,27 @@ class Annotation(AnnotationMixin, models.Model):
         # remove annotation counters in project summary followed by deleting an annotation
         logger.debug("Remove annotation counters in project summary followed by deleting an annotation")
         self.decrease_project_summary_counters()
+
+    def delete_drafts(self):
+        task = self.task
+        query_args = {'task': task, 'annotation': self}
+        drafts = AnnotationDraft.objects.filter(**query_args)
+        num_drafts = drafts.count()
+        drafts.delete()
+        logger.debug(f'{num_drafts} drafts removed from task {task} after saving annotation {self}')
+
+    def update_ml_backend(self):
+        if self.ground_truth:
+            return
+
+        project = self.task.project
+
+        if hasattr(project, 'ml_backends') and project.min_annotations_to_start_training:
+            annotation_count = Annotation.objects.filter(task__project=project).count()
+            # start training every N annotation
+            if annotation_count % project.min_annotations_to_start_training == 0:
+                for ml_backend in project.ml_backends.all():
+                    ml_backend.train()
 
 
 class TaskLock(models.Model):
@@ -542,16 +625,31 @@ class Prediction(models.Model):
 
         self.task.save(update_fields=update_fields)
 
+    def update_task_after_save(self):
+        """Add predictions counters"""
+        self.task.total_predictions = self.task.predictions.all().count()
+        self.task.save(update_fields=['total_predictions'])
+        logger.debug(f"Updated total_predictions for {self.task.id}.")
+
+    def update_task_after_delete(self):
+        """Remove predictions counters"""
+        self.task.total_predictions = self.task.predictions.all().count()
+        self.task.save(update_fields=['total_predictions'])
+        logger.debug(f"Updated total_predictions for {self.task.id}.")
+
     def save(self, *args, **kwargs):
         # "result" data can come in different forms - normalize them to JSON
         self.result = self.prepare_prediction_result(self.result, self.task.project)
         # set updated_at field of task to now()
         self.update_task()
-        return super(Prediction, self).save(*args, **kwargs)
+        result = super(Prediction, self).save(*args, **kwargs)
+        self.update_task_after_save()
+        return result
 
     def delete(self, *args, **kwargs):
         result = super().delete(*args, **kwargs)
         # set updated_at field of task to now()
+        self.update_task_after_delete()
         self.update_task()
         return result
 
@@ -559,147 +657,13 @@ class Prediction(models.Model):
         db_table = 'prediction'
 
 
-@receiver(post_delete, sender=Task)
-def update_all_task_states_after_deleting_task(sender, instance, **kwargs):
-    """ after deleting_task
-        use update_tasks_states for all project
-        but call only tasks_number_changed section
-    """
-    try:
-        instance.project.update_tasks_states(
-            maximum_annotations_changed=False,
-            overlap_cohort_percentage_changed=False,
-            tasks_number_changed=True
-        )
-    except Exception as exc:
-        logger.error('Error in update_all_task_states_after_deleting_task: ' + str(exc))
-
-
 # =========== PROJECT SUMMARY UPDATES ===========
-
-
-@receiver(pre_delete, sender=Task)
-def remove_data_columns(sender, instance, **kwargs):
-    """Reduce data column counters afer removing task"""
-    instance.decrease_project_summary_counters()
-
 
 def _task_data_is_not_updated(update_fields):
     if update_fields and list(update_fields) == ['is_labeled']:
         return True
 
-
-@receiver(pre_save, sender=Task)
-def delete_project_summary_data_columns_before_updating_task(sender, instance, update_fields, **kwargs):
-    """Before updating task fields - ensure previous info removed from project.summary"""
-    if _task_data_is_not_updated(update_fields):
-        # we don't need to update counters when other than task.data fields are updated
-        return
-    try:
-        old_task = sender.objects.get(id=instance.id)
-    except Task.DoesNotExist:
-        # task just created - do nothing
-        return
-    old_task.decrease_project_summary_counters()
-
-
-@receiver(post_save, sender=Task)
-def update_project_summary_data_columns(sender, instance, created, update_fields, **kwargs):
-    """Update task counters in project summary in case when new task has been created"""
-    if _task_data_is_not_updated(update_fields):
-        # we don't need to update counters when other than task.data fields are updated
-        return
-    instance.increase_project_summary_counters()
-
-
-@receiver(pre_save, sender=Annotation)
-def delete_project_summary_annotations_before_updating_annotation(sender, instance, **kwargs):
-    """Before updating annotation fields - ensure previous info removed from project.summary"""
-    try:
-        old_annotation = sender.objects.get(id=instance.id)
-    except Annotation.DoesNotExist:
-        # annotation just created - do nothing
-        return
-    old_annotation.decrease_project_summary_counters()
-
-    # update task counters if annotation changes it's was_cancelled status
-    task = instance.task
-    if old_annotation.was_cancelled != instance.was_cancelled:
-        if instance.was_cancelled:
-            task.cancelled_annotations = task.cancelled_annotations + 1
-            task.total_annotations = task.total_annotations - 1
-        else:
-            task.cancelled_annotations = task.cancelled_annotations - 1
-            task.total_annotations = task.total_annotations + 1
-        task.update_is_labeled()
-
-        Task.objects.filter(id=instance.task.id).update(
-            is_labeled=task.is_labeled,
-            total_annotations=task.total_annotations,
-            cancelled_annotations=task.cancelled_annotations
-        )
-
-
-@receiver(post_save, sender=Annotation)
-def update_project_summary_annotations_and_is_labeled(sender, instance, created, **kwargs):
-    """Update annotation counters in project summary"""
-    instance.increase_project_summary_counters()
-
-    if created:
-        # If new annotation created, update task.is_labeled state
-        logger.debug(f'Update task stats for task={instance.task}')
-        if instance.was_cancelled:
-            instance.task.cancelled_annotations = instance.task.annotations.all().filter(was_cancelled=True).count()
-        else:
-            instance.task.total_annotations = instance.task.annotations.all().filter(was_cancelled=False).count()
-        instance.task.update_is_labeled()
-        instance.task.save(update_fields=['is_labeled', 'total_annotations', 'cancelled_annotations'])
-        logger.debug(f"Updated total_annotations and cancelled_annotations for {instance.task.id}.")
-
-
-@receiver(pre_delete, sender=Prediction)
-def remove_predictions_from_project(sender, instance, **kwargs):
-    """Remove predictions counters"""
-    instance.task.total_predictions = instance.task.predictions.all().count() - 1
-    instance.task.save(update_fields=['total_predictions'])
-    logger.debug(f"Updated total_predictions for {instance.task.id}.")
-
-
-@receiver(post_save, sender=Prediction)
-def save_predictions_to_project(sender, instance, **kwargs):
-    """Add predictions counters"""
-    instance.task.total_predictions = instance.task.predictions.all().count()
-    instance.task.save(update_fields=['total_predictions'])
-    logger.debug(f"Updated total_predictions for {instance.task.id}.")
-
 # =========== END OF PROJECT SUMMARY UPDATES ===========
-
-
-@receiver(post_save, sender=Annotation)
-def delete_draft(sender, instance, **kwargs):
-    task = instance.task
-    query_args = {'task': task, 'annotation': instance}
-    drafts = AnnotationDraft.objects.filter(**query_args)
-    num_drafts = drafts.count()
-    drafts.delete()
-    logger.debug(f'{num_drafts} drafts removed from task {task} after saving annotation {instance}')
-
-
-@receiver(post_save, sender=Annotation)
-def update_ml_backend(sender, instance, **kwargs):
-    if instance.ground_truth:
-        return
-
-    project = instance.task.project
-
-    if hasattr(project, 'ml_backends') and project.min_annotations_to_start_training:
-        annotation_count = Annotation.objects.filter(task__project=project).count()
-
-        # start training every N annotation
-        if annotation_count % project.min_annotations_to_start_training == 0:
-            for ml_backend in project.ml_backends.all():
-                ml_backend.train()
-
 
 def update_task_stats(task, stats=('is_labeled',), save=True):
     """Update single task statistics:

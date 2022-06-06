@@ -11,8 +11,7 @@ from core.utils.common import temporary_disconnect_list_signal
 from projects.models import Project
 
 from tasks.models import (
-    Annotation, Prediction, Task, bulk_update_stats_project_tasks,
-    update_all_task_states_after_deleting_task, remove_data_columns,
+    Annotation, Prediction, Task, bulk_update_stats_project_tasks
 )
 from webhooks.utils import emit_webhooks_for_instance
 from webhooks.models import WebhookAction

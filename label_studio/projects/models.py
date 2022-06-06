@@ -364,13 +364,19 @@ class Project(ProjectMixin, models.Model):
 
         # if cohort slider is tweaked
         elif overlap_cohort_percentage_changed and self.maximum_annotations > 1:
-            self._rearrange_overlap_cohort()
+            tasks = self._rearrange_overlap_cohort()
+            bulk_update_stats_project_tasks(
+                tasks
+            )
 
         # if adding/deleting tasks and cohort settings are applied
         elif tasks_number_changed and self.overlap_cohort_percentage < 100 and self.maximum_annotations > 1:
-            self._rearrange_overlap_cohort()
+            tasks = self._rearrange_overlap_cohort()
+            bulk_update_stats_project_tasks(
+                tasks
+            )
 
-        if maximum_annotations_changed or overlap_cohort_percentage_changed or tasks_number_changed:
+        if maximum_annotations_changed or overlap_cohort_percentage_changed:
             bulk_update_stats_project_tasks(
                 self.tasks.filter(Q(annotations__isnull=False))
             )
@@ -432,9 +438,11 @@ class Project(ProjectMixin, models.Model):
                 objs.append(item)
             with transaction.atomic():
                 bulk_update(objs, update_fields=['overlap'], batch_size=settings.BATCH_SIZE)
+            return objs
         else:
             tasks_with_max_annotations.update(overlap=max_annotations)
             tasks_with_min_annotations.update(overlap=1)
+            return tasks_with_max_annotations | tasks_with_min_annotations
 
     def remove_tasks_by_file_uploads(self, file_upload_ids):
         self.tasks.filter(file_upload_id__in=file_upload_ids).delete()
