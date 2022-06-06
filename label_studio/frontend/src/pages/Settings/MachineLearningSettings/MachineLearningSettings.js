@@ -4,7 +4,7 @@ import { Description } from '../../../components/Description/Description';
 import { Divider } from '../../../components/Divider/Divider';
 import { ErrorWrapper } from '../../../components/Error/Error';
 import { InlineError } from '../../../components/Error/InlineError';
-import { Form, Input, Label, Select, TextArea, Toggle } from '../../../components/Form';
+import { Form, Input, Label, TextArea, Toggle } from '../../../components/Form';
 import { modal } from '../../../components/Modal/Modal';
 import { useAPI } from '../../../providers/ApiProvider';
 import { ProjectContext } from '../../../providers/ProjectProvider';
@@ -14,19 +14,9 @@ import './MachineLearningSettings.styl';
 
 export const MachineLearningSettings = () => {
   const api = useAPI();
-  const { project, fetchProject, updateProject } = useContext(ProjectContext);
+  const { project, fetchProject } = useContext(ProjectContext);
   const [mlError, setMLError] = useState();
   const [backends, setBackends] = useState([]);
-  const [projectModelVersions, setProjectModelVersions] = useState([]);
-
-  const resetMLVersion = useCallback(async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    await updateProject({
-      model_version: null,
-    });
-  }, [api, project]);
 
   const fetchBackends = useCallback(async () => {
     const models = await api.callApi('mlBackends', {
@@ -37,21 +27,6 @@ export const MachineLearningSettings = () => {
 
     if (models) setBackends(models);
   }, [api, project, setBackends]);
-
-  const fetchProjectMLVersions = useCallback(async () => {
-    const modelVersions = await api.callApi("projectModelVersions", {
-      params: {
-        pk: project.id,
-      },
-    });
-
-    const versions = Object.entries(modelVersions).reduce((v, [key, value]) => [...v, {
-      value: key,
-      label: key + " (" + value + " predictions)",
-    }], []);
-
-    setProjectModelVersions(versions);
-  }, [api, project.id]);
 
   const showMLFormModal = useCallback((backend) => {
     const action = backend ? "updateMLBackend" : "addMLBackend";
@@ -83,15 +58,13 @@ export const MachineLearningSettings = () => {
             <TextArea name="description" label="Description" style={{ minHeight: 120 }}/>
           </Form.Row>
 
-          <Form.Row columnCount={backend ? 2 : 1}>
-            {!!backend && (
-              <ModelVersionSelector
-                object={backend}
-                apiName="modelVersions"
-                valueName="version"
-                label="Version"
-              />
-            )}
+          <Form.Row columnCount={2}>
+            <ModelVersionSelector
+              object={backend}
+              apiName="modelVersions"
+              valueName="version"
+              label="Version"
+            />
             <Toggle
               name="is_interactive"
               label="Use for interactive preannotations"
@@ -128,7 +101,6 @@ export const MachineLearningSettings = () => {
   useEffect(() => {
     if (project.id) {
       fetchBackends();
-      fetchProjectMLVersions();
     }
   }, [project]);
 
@@ -178,33 +150,6 @@ export const MachineLearningSettings = () => {
             />
           </div>
         </Form.Row>
-
-        {projectModelVersions.length > 0 && (
-          <Form.Row columnCount={1}>
-            <Label
-              text="Model Version"
-              description="Model version allows you to specify which prediction will be shown to the annotators."
-              style={{ marginTop: 16 }}
-              large
-            />
-
-            <div style={{ display: 'flex', alignItems: 'center', width: 400, paddingLeft: 16 }}>
-              <div style={{ flex: 1, paddingRight: 16 }}>
-                <Select
-                  name="model_version"
-                  defaultValue={null}
-                  options={projectModelVersions}
-                  placeholder="No model version selected"
-                />
-              </div>
-
-              <Button onClick={resetMLVersion}>
-                Reset
-              </Button>
-            </div>
-
-          </Form.Row>
-        )}
       </Form>
 
       <MachineLearningList

@@ -37,6 +37,7 @@ export const ModelVersionSelector = ({
   return (
     <Select
       name={name}
+      disabled={!versions.length}
       defaultValue={object?.[valueName] || null}
       options={versions}
       placeholder={placeholder}
