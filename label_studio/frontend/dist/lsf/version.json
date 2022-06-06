@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2408: Regions disappearing from UI (#631)\n\n* fix: DEV-2408: Regions disappearing from UI\r\n\r\n* test: DEV-2408: Add test for wrong reordered results of per-region textarea and richtext",
-  "commit": "6ef0657ffa22fe4001129a84ef8aa21e430b2a0b",
-  "branch": "",
-  "date": "2022-05-20T16:49:57Z"
+  "message": "fix: DEV-2394: Zoomed image region out of bounds (#642)\n\n* fix: DEV-2394: Zoomed image region out of bounds\r\n\r\n* test: DEV-2394: Add test for bounds of transformations for zoomed image regions\r\n\r\n* fix: DEV-2394: Fix stage position recalculation on window resize\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
+  "commit": "efb2149a13ae2f17d6f71678deb41a2b9b179fac",
+  "branch": "master",
+  "date": "2022-06-03T09:25:28Z"
 }
