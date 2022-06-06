@@ -1,6 +1,6 @@
 {
-  "message": "fix: dev-2269: null block loading a wavesurver instance that does not have a value",
-  "commit": "b5e71152352c8873f1878cd433a52142fefb11d9",
+  "message": "Merge pull request #681 from heartexlabs/fb-dev-2203/view-all-audio-responsive\n\nfix: DEV-2203: View all audio responsive",
+  "commit": "f30cc010581585e0fe3df72653cb0a3747d329b6",
   "branch": "",
-  "date": "2022-06-02T17:42:02Z"
+  "date": "2022-06-06T17:34:36Z"
 }
