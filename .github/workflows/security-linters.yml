@@ -11,7 +11,6 @@ on:
   pull_request_target:
     types: [ opened, synchronize, reopened, ready_for_review ]
     branches:
-      - master
       - develop
 
 env:
@@ -27,7 +26,6 @@ jobs:
   bandit:
     name: "Bandit"
     timeout-minutes: 2
-    if: ${{ github.head_ref != 'master' }}
     runs-on: ubuntu-latest
     steps:
       - uses: hmarr/debug-action@v2.0.1
