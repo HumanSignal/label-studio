@@ -28,7 +28,11 @@ from core.label_config import (
 )
 from core.bulk_update_utils import bulk_update
 from label_studio_tools.core.label_config import parse_config
-from projects.functions import annotate_task_number, annotate_finished_task_number, annotate_total_predictions_number, annotate_total_annotations_number, annotate_num_tasks_with_annotations, annotate_useful_annotation_number, annotate_ground_truth_number, annotate_skipped_annotations_number
+from projects.functions import (
+    annotate_task_number, annotate_finished_task_number, annotate_total_predictions_number,
+    annotate_total_annotations_number, annotate_num_tasks_with_annotations,
+    annotate_useful_annotation_number, annotate_ground_truth_number, annotate_skipped_annotations_number
+)
 from labels_manager.models import Label
 
 
