@@ -102,7 +102,8 @@ python label_studio/manage.py runserver
 
 You can deploy Label Studio with one click in Heroku, Microsoft Azure, or Google Cloud Platform: 
 
-[<img src="https://www.herokucdn.com/deploy/button.svg" height="30px">](https://heroku.com/deploy?template=https://github.com/heartexlabs/label-studio/tree/master)
+[<img src="https://www.herokucdn.com/deploy/button.svg" height="30px">](https://heroku.com/deploy?template=https://github.com/heartexlabs/label-studio/tree/heroku-persistent-pg)
+[<img src="https://aka.ms/deploytoazurebutton" height="30px">](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fheartexlabs%2Flabel-studio%2Fmaster%2Fazuredeploy.json)
 [<img src="https://deploy.cloud.run/button.svg" height="30px">](https://deploy.cloud.run)
 
 
@@ -139,6 +140,19 @@ pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl
 # Install label studio
 pip install label-studio
 ```
+
+#### Run test suite
+```bash
+pip install -r deploy/requirements-test.txt
+cd label_studio
+
+# postgres (assumes default postgres user,db,pass)
+DJANGO_DB=default DJANGO_SETTINGS_MODULE=core.settings.label_studio python -m pytest -vv -n auto
+
+# sqlite3
+DJANGO_DB=sqlite DJANGO_SETTINGS_MODULE=core.settings.label_studio python -m pytest -vv -n auto
+```
+
 
 ## What you get from Label Studio
 
@@ -203,10 +217,9 @@ Want to use **The Coolest Feature X** but Label Studio doesn't support it? Check
   author={
     Maxim Tkachenko and
     Mikhail Malyuk and
-    Nikita Shevchenko and
     Andrey Holmanyuk and
     Nikolai Liubimov},
-  year={2020-2021},
+  year={2020-2022},
 }
 ```
 

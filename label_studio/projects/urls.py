@@ -30,7 +30,7 @@ _api_urlpatterns = [
     path('validate/', api.LabelConfigValidateAPI.as_view(), name='label-config-validate'),
 
     # Validate label config for project
-    path('<int:pk>/validate', api.ProjectLabelConfigValidateAPI.as_view(), name='project-label-config-validate'),
+    path('<int:pk>/validate/', api.ProjectLabelConfigValidateAPI.as_view(), name='project-label-config-validate'),
 
     # Project summary
     path('<int:pk>/summary/', api.ProjectSummaryAPI.as_view(), name='project-summary'),

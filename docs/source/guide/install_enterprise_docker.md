@@ -103,8 +103,13 @@ POSTGRE_PORT=5432
 # Optional: Specify Postgre SSL certificate
 # POSTGRE_SSLROOTCERT=postgre-ca-bundle.pem
 
-# Redis location e.g. redis://[:password]@localhost:6379/1
-REDIS_LOCATION=redis:6379
+# Optional: Client-side certificate and key
+# POSTGRE_SSLCERT=client.crt
+# POSTGRE_SSLKEY=client.key
+
+# Redis location e.g. redis[s]://[:password]@localhost:6379/1
+# rediss:// scheme is mandatory to use SSL  
+REDIS_LOCATION=redis://redis:6379/1
 
 # Optional: Redis database
 # REDIS_DB=1
@@ -115,14 +120,15 @@ REDIS_LOCATION=redis:6379
 # Optional: Redis socket timeout
 # REDIS_SOCKET_TIMEOUT=3600
 
-# Optional: Use Redis SSL connection
-# REDIS_SSL=1
-
 # Optional: Require certificate
 # REDIS_SSL_CERTS_REQS=required
 
 # Optional: Specify Redis SSL certificate
 # REDIS_SSL_CA_CERTS=redis-ca-bundle.pem
+
+# Optional: Client-side certificate and key
+# REDIS_SSL_CERTFILE=client.crt
+# REDIS_SSL_KEYFILE=client.key
 
 # Optional: Specify SSL termination certificate & key
 # Files should be placed in the directory "certs" at the same directory as docker-compose.yml file

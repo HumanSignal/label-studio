@@ -7,7 +7,7 @@ from ldclient.feature_store import CacheConfig
 
 from django.conf import settings
 from label_studio.core.utils.params import get_bool_env, get_all_env_with_prefix
-from label_studio.core.utils.io import find_file
+from label_studio.core.utils.io import find_node
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,13 @@ if settings.FEATURE_FLAGS_FROM_FILE:
     if not settings.FEATURE_FLAGS_FILE:
         raise ValueError('When "FEATURE_FLAGS_FROM_FILE" is set, you have to specify a valid path for feature flags file, e.g.'
                          'FEATURE_FLAGS_FILE=my_flags.yml')
-    feature_flags_file = find_file(settings.FEATURE_FLAGS_FILE)
+
+    package_name = 'label_studio' if settings.VERSION_EDITION == 'Community' else 'label_studio_enterprise'
+    if settings.FEATURE_FLAGS_FILE.startswith('/'):
+        feature_flags_file = settings.FEATURE_FLAGS_FILE
+    else:
+        feature_flags_file = find_node(package_name, settings.FEATURE_FLAGS_FILE, 'file')
+
     logger.info(f'Read flags from file {feature_flags_file}')
     data_source = Files.new_data_source(paths=[feature_flags_file])
     config = Config(
@@ -71,9 +77,10 @@ def flag_set(feature_flag, user):
     ```
     """
     user_dict = _get_user_repr(user)
-    default_value = get_bool_env(feature_flag, settings.FEATURE_FLAGS_DEFAULT_VALUE)
-    is_on = client.variation(feature_flag, user_dict, default_value)
-    return is_on
+    env_value = get_bool_env(feature_flag, default=None)
+    if env_value is not None:
+        return env_value
+    return client.variation(feature_flag, user_dict, settings.FEATURE_FLAGS_DEFAULT_VALUE)
 
 
 def all_flags(user):
@@ -87,10 +94,9 @@ def all_flags(user):
     logger.debug(f'State received: {state}')
     flags = state.to_json_dict()
     logger.debug(f'Flags received: {flags}')
-    env_ff = get_all_env_with_prefix('ff_', default_value=settings.FEATURE_FLAGS_DEFAULT_VALUE)
-    logger.debug(f'Read flags from env: {env_ff}')
+    env_ff = get_all_env_with_prefix('ff_', is_bool=True)
+    logger.debug(f'Override by flags from env: {env_ff}')
     for env_flag_name, env_flag_on in env_ff.items():
-        if env_flag_name not in flags and env_flag_on:
-            flags[env_flag_name] = True
+        flags[env_flag_name] = env_flag_on
     logger.debug(f'Requested all active feature flags: {flags}')
     return flags

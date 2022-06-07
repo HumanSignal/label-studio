@@ -6,6 +6,7 @@ import socket
 import google.auth
 import re
 
+from core.redis import start_job_async_or_sync
 from google.auth import compute_engine
 from google.cloud import storage as google_storage
 from google.cloud.storage.client import _marker
@@ -208,13 +209,17 @@ class GCSExportStorage(GCSStorageMixin, ExportStorage):
         GCSExportStorageLink.create(annotation, self)
 
 
-@receiver(post_save, sender=Annotation)
-def export_annotation_to_gcs_storages(sender, instance, **kwargs):
-    project = instance.task.project
+def async_export_annotation_to_gcs_storages(annotation):
+    project = annotation.task.project
     if hasattr(project, 'io_storages_gcsexportstorages'):
         for storage in project.io_storages_gcsexportstorages.all():
-            logger.debug(f'Export {instance} to GCS storage {storage}')
-            storage.save_annotation(instance)
+            logger.debug(f'Export {annotation} to GCS storage {storage}')
+            storage.save_annotation(annotation)
+
+
+@receiver(post_save, sender=Annotation)
+def export_annotation_to_s3_storages(sender, instance, **kwargs):
+    start_job_async_or_sync(async_export_annotation_to_gcs_storages, instance)
 
 
 class GCSImportStorageLink(ImportStorageLink):

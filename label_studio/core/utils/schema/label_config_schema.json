@@ -108,6 +108,7 @@
       "type": "object",
       "anyOf": [
         {"required": ["@name", "@toName", "Choice"]},
+        {"required": ["@name", "@toName", "@value"]},
         {"required": ["@name", "@toName", "View"]}
       ],
       "properties": {
@@ -116,6 +117,9 @@
         },
         "@toName": {
           "$ref": "#/definitions/@toName"
+        },
+        "@value": {
+          "$ref": "#/definitions/@value"
         },
         "$": {
           "$ref": "#/definitions/$"
@@ -137,6 +141,7 @@
       "type": "object",
       "anyOf": [
         {"required": ["@name", "@toName", "Label"]},
+        {"required": ["@name", "@toName", "@value"]},
         {"required": ["@name", "@toName", "View"]}
       ],
       "properties": {
@@ -145,6 +150,9 @@
         },
         "@toName": {
           "$ref": "#/definitions/@toName"
+        },
+        "@value": {
+          "$ref": "#/definitions/@value"
         },
         "$": {
           "$ref": "#/definitions/$"

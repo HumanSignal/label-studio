@@ -37,13 +37,13 @@ jobs:
       # SENTRY_DSN:
 
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2.3.2
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/cache@v2.1.7
+      - uses: actions/cache@v3
         name: Configure pip cache
         id: pip-cache
         with:
@@ -61,7 +61,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v2.5.1
+        uses: actions/setup-node@v3
         with:
           node-version: "${{ env.NODE }}"
 
@@ -69,7 +69,7 @@ jobs:
         id: npm-cache-dir
         run: echo "::set-output name=dir::$(npm config get cache)"
 
-      - uses: actions/cache@v2.1.7
+      - uses: actions/cache@v3
         name: Configure npm cache
         id: npm-cache
         with:
@@ -89,7 +89,14 @@ jobs:
       - name: Run functional tests
         run: |
           cd label_studio/
-          pytest --junitxml report.xml --cov=. -vv -n auto
+          pytest --cov=. --cov-report=xml -vv -n auto
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3.1.0
+        with:
+          fail_ci_if_error: true
+          files: ./label_studio/coverage.xml
+          verbose: true
 
   run_pytest_postgresql:
     name: LS PostgreSQL Ubuntu
@@ -146,9 +153,9 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2.3.2
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -157,7 +164,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev python-dev
 
-      - uses: actions/cache@v2.1.7
+      - uses: actions/cache@v3
         name: Configure pip cache
         id: pip-cache
         with:
@@ -173,7 +180,7 @@ jobs:
           pip install -e .
 
       - name: Setup node
-        uses: actions/setup-node@v2.5.1
+        uses: actions/setup-node@v3
         with:
           node-version: 14
 
@@ -181,7 +188,7 @@ jobs:
         id: npm-cache-dir
         run: echo "::set-output name=dir::$(npm config get cache)"
 
-      - uses: actions/cache@v2.1.7
+      - uses: actions/cache@v3
         name: Configure npm cache
         id: npm-cache
         with:
@@ -201,12 +208,14 @@ jobs:
       - name: Run functional tests
         run: |
           cd label_studio/
-          pytest --junitxml report.xml --cov=. -vv -n auto
+          pytest --cov=. --cov-report=xml -vv -n auto
 
-      - name: "Upload coverage to Codecov"
-        uses: codecov/codecov-action@v2.1.0
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3.1.0
         with:
           fail_ci_if_error: true
+          files: ./label_studio/coverage.xml
+          verbose: true
 
   windows_label_studio:
     name: LS SQLite Windows
@@ -230,13 +239,13 @@ jobs:
       # SENTRY_DSN:
 
     steps:
-    - uses: actions/checkout@v2.4.0
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2.3.2
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
 
-    - uses: actions/cache@v2.1.7
+    - uses: actions/cache@v3
       name: Configure pip cache
       with:
         path: ~\AppData\Local\pip\Cache
@@ -276,13 +285,4 @@ jobs:
       run: |
         cd label_studio/
         python -m pytest -vv -n auto
-#        coverage run -m pytest -n auto
 
-
-#    - name: Collect coverage results
-#      if: always()
-#      env:
-#        collect_analytics: 0
-#      run: |
-#        cd label_studio/
-#        coverage report -i -m --fail-under=40

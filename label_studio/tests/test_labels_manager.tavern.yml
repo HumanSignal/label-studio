@@ -1,0 +1,260 @@
+---
+
+test_name: test_labels_manager
+
+strict: False
+
+marks:
+  - usefixtures:
+       - django_live_url
+
+stages:
+  - id: signup
+    type: ref
+  - id: get_user_token
+    type: ref
+  - id: create_project
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: create_batch_tasks_assignments
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk: id
+  - name: bulk_create_label
+    request:
+      method: POST
+      url: '{django_live_url}/api/labels'
+      json:
+        - title: Test label1
+          value:
+            key: value1
+          from_name: test1
+          project: !int "{project_pk}"
+        - title: Test label2
+          value:
+            key: value2
+          from_name: test2
+          project: !int "{project_pk}"
+    response:
+      status_code: 201
+      save:
+        json:
+          label1_pk: '[0].id'
+          label2_pk: '[1].id'
+  - name: bulk_create_label_reuse_existing
+    request:
+      method: POST
+      url: '{django_live_url}/api/labels'
+      json:
+        - title: Test label1
+          value:
+            key: value1
+          from_name: test1
+          project: !int "{project_pk}"
+        - title: Test label3
+          value:
+            key: value3
+          from_name: test3
+          project: !int "{project_pk}"
+    response:
+      status_code: 201
+      save:
+        json:
+          label3_pk: '[1].id'
+  - name: get_links
+    request:
+      url: "{django_live_url}/api/label_links"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        results:
+          - from_name: test3
+            project: !int "{project_pk}"
+            label: !int "{label3_pk}"
+  - name: get_labels
+    request:
+      url: "{django_live_url}/api/labels?expand=links"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        results:
+          - title: Test label2
+            value:
+              key: value2
+            projects:
+              - !int "{project_pk}"
+            links:
+              - from_name: test2
+  - name: get_one_label
+    request:
+      url: "{django_live_url}/api/labels/{label1_pk}?expand=links"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        id: !int "{label1_pk}"
+        title: Test label1
+        value:
+          key: value1
+        links:
+          - from_name: test1
+        projects:
+          - !int "{project_pk}"
+---
+
+test_name: test_bulk_update_label_in_annotations
+
+strict: False
+
+marks:
+  - usefixtures:
+       - django_live_url
+
+stages:
+  - id: signup
+    type: ref
+  - id: get_user_token
+    type: ref
+  - id: create_project
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: create_batch_tasks_assignments
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk: id
+  - id: import_task
+    type: ref
+  - id: create_annotation
+    type: ref
+  - name: bulk_update_annotations
+    request:
+      method: POST
+      url: '{django_live_url}/api/labels/bulk'
+      json:
+        project: !int "{project_pk}"
+        # old_label: '["pos"]'
+        # new_label: '["neg"]'
+        old_label: ["pos"]
+        new_label: ["neg"]
+    response:
+      status_code: 200
+  - name: get_annotation
+    request:
+      url: "{django_live_url}/api/annotations/{annotation_pk}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        result: 
+         - from_name: label
+           to_name: text
+           type: choices
+           value:
+             choices:
+               - neg
+
+---
+
+test_name: test_validation_with_custom_labels
+
+strict: False
+
+marks:
+  - usefixtures:
+       - django_live_url
+
+stages:
+  - id: signup
+    type: ref
+  - id: get_user_token
+    type: ref
+  - id: create_project
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: create_batch_tasks_assignments
+        label_config: <View> <Text name="text" value="$text"/> <Taxonomy name="taxonomy" toName="text"> <Choice value="Archaea" /> <Choice value="Bacteria" /> <Choice value="Eukarya"> <Choice value="Human" /> <Choice value="Oppossum" /> <Choice value="Extraterrestial" /> </Choice> </Taxonomy> </View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk: id
+  - id: import_task
+    type: ref
+  - name: bulk_create_label
+    request:
+      method: POST
+      url: '{django_live_url}/api/labels'
+      json:
+        - title: Test label1
+          value:
+            - value1
+          from_name: test1
+          project: !int "{project_pk}"
+        - title: Test label2
+          value:
+            - value2
+          from_name: test2
+          project: !int "{project_pk}"
+    response:
+      status_code: 201
+      save:
+        json:
+          label1_pk: '[0].id'
+          label2_pk: '[1].id'
+  - id: create_annotation
+    name: create_annotation
+    request:
+      headers:
+        content-type: application/json
+      json:
+        lead_time: 12.34
+        result:
+        - from_name: taxonomy
+          to_name: text
+          type: taxonomy
+          value:
+            taxonomy:
+              - - value2
+      method: POST
+      url: '{django_live_url}/api/tasks/{task_pk}/annotations'
+    response:
+      save:
+        json:
+          annotation_pk: id
+      status_code: 201
+  - name: validate config with labels change
+    request:
+      headers:
+        content-type: application/json
+      json:
+        label_config: <View> <Text name="text" value="$text"/> <Taxonomy name="taxonomy" toName="text"> <Choice value="Archaea" /> <Choice value="Bacteria" /> <Choice value="Eukarya"> <Choice value="Human" /> <Choice value="Oppossum" /> <Choice value="Extraterrestial" /> </Choice> </Taxonomy> </View>
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/validate'
+    response:
+      status_code: 200

@@ -1,7 +1,10 @@
 {
   "name": "Label Studio",
   "description": "Multi-type data labeling, annotation and exploration tool",
-  "keywords": ["data annotation", "data labeling"],
+  "keywords": [
+    "data annotation",
+    "data labeling"
+  ],
   "website": "https://labelstud.io",
   "repository": "https://github.com/heartexlabs/label-studio",
   "logo": "https://labelstud.io/images/opossum/heartex_icon_opossum_green.svg",
@@ -26,6 +29,16 @@
       "description": "Password for default user",
       "value": "",
       "required": false
+    }
+  },
+  "build": {
+    "skip": true
+  },
+  "hooks": {
+    "prebuild": {
+      "commands": [
+        "docker build -f Dockerfile.cloudrun -t $IMAGE_URL ."
+      ]
     }
   }
 }

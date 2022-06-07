@@ -12,7 +12,7 @@ from data_manager.prepare_params import PrepareParams
 from data_manager.models import View
 from tasks.models import Task
 from urllib.parse import unquote
-
+from core.feature_flags import flag_set
 
 TASKS = 'tasks:'
 logger = logging.getLogger(__name__)
@@ -88,7 +88,23 @@ def get_all_columns(project, *_):
                 'explore': True,
                 'labeling': False
             }
-        },
+        }
+    ]
+
+    if flag_set('ff_back_2070_inner_id_12052022_short', user=project.organization.created_by):
+        result['columns'] += [{
+            'id': 'inner_id',
+            'title': "Inner ID",
+            'type': 'Number',
+            'help': 'Internal task ID starting from 1 for the current project',
+            'target': 'tasks',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        }]
+
+    result['columns'] += [
         {
             'id': 'completed_at',
             'title': 'Completed',
@@ -229,6 +245,29 @@ def get_all_columns(project, *_):
             'type': 'Datetime',
             'target': 'tasks',
             'help': 'Task update time',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        },
+        {
+            'id': 'updated_by',
+            'title': 'Updated by',
+            'type': 'List',
+            'target': 'tasks',
+            'help': 'User who did the last task update',
+            'schema': {'items': project.organization.members.values_list('user__id', flat=True)},
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        },
+        {
+            'id': 'avg_lead_time',
+            'title': "Lead Time",
+            'type': 'Number',
+            'help': 'Average lead time over all annotations (seconds)',
+            'target': 'tasks',
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False

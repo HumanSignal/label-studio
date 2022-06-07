@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #25 from heartexlabs/feature/dev-1094\n\nDEV-1094",
-  "commit": "8d1ae18af9fb5755973ff8a7f11498b6d2a9c091",
+  "message": "fix: DEV-1703: add scroll to view when focus changes to stickyList in table component (#35)\n\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
+  "commit": "172c8eeb252a2bfef81133a87fdcbca146781d04",
   "branch": "master",
-  "date": "2022-01-24T08:59:49Z"
+  "date": "2022-05-12T18:31:27Z"
 }

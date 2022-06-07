@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1200: Reanimate tag style parameters (#365)\n\n* [fix] Fix getting style-affecting parameters from control tag\r\n\r\n* [fix] Allow to use opacity parameter instead of fillOpacity\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>\r\nCo-authored-by: niklub <lubimov.nicolas@gmail.com>\r\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "e0557b0db4077dc655a7ee8ffc061de12ed43d9d",
-  "branch": "master",
-  "date": "2022-02-10T01:55:06Z"
+  "message": "Merge pull request #681 from heartexlabs/fb-dev-2203/view-all-audio-responsive\n\nfix: DEV-2203: View all audio responsive",
+  "commit": "f30cc010581585e0fe3df72653cb0a3747d329b6",
+  "branch": "",
+  "date": "2022-06-06T17:34:36Z"
 }

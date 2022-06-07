@@ -11,6 +11,7 @@ from django.conf import settings
 from users.models import User
 
 
+EMAIL_MAX_LENGTH = 256
 PASS_MAX_LENGTH = 64
 PASS_MIN_LENGTH = 8
 USERNAME_MAX_LENGTH = 30
@@ -35,6 +36,8 @@ class LoginForm(forms.Form):
         cleaned = super(LoginForm, self).clean()
         email = cleaned.get('email', '').lower()
         password = cleaned.get('password', '')
+        if len(email) >= EMAIL_MAX_LENGTH:
+            raise forms.ValidationError('Email is too long')
 
         # advanced way for user auth
         user = settings.USER_AUTH(User, email, password)
@@ -69,9 +72,11 @@ class UserSignupForm(forms.Form):
 
     def clean_email(self):
         email = self.cleaned_data.get('email').lower()
+        if len(email) >= EMAIL_MAX_LENGTH:
+            raise forms.ValidationError('Email is too long')
 
         if email and User.objects.filter(email=email).exists():
-            raise forms.ValidationError('User with email already exists')
+            raise forms.ValidationError('User with this email already exists')
 
         return email
 

@@ -1,0 +1,108 @@
+[{
+        "id": 282278,
+        "annotations": [
+		{
+                "id": 618584,
+                
+                "result": [{
+                        "id": "UKz0YvhhKF",
+                        "type": "rectanglelabels",
+                        "value": {
+                            "x": 1,
+                            "y": 1,
+                            "width": 2,
+                            "height": 2,
+                            "rotation": 0,
+                            "rectanglelabels": ["Cat"]
+                        },
+                        "origin": "manual",
+                        "to_name": "image",
+                        "from_name": "label",
+                        "image_rotation": 0,
+                        "original_width": 320,
+                        "original_height": 240
+                    }
+                ],
+                "was_cancelled": false,
+                "ground_truth": true,
+                "created_at": "2022-05-16T08:27:28.980535Z",
+                "updated_at": "2022-05-16T08:27:28.980535Z",
+                "lead_time": 4.369,
+                "prediction": {},
+                "result_count": 0,
+                "task": 545275,
+                "parent_prediction": null,
+                "parent_annotation": null
+            }
+		],
+        "file_upload": "c44d2f77-image_urls_with_bboxes.json",
+        "drafts": [],
+        "predictions": [],
+        "agreement": null,
+        "data": {
+            "image": "https://pytest.heartex.com/image1.jpg"
+        },
+        "meta": {},
+        "created_at": "2022-06-01T14:24:24.055474Z",
+        "updated_at": "2022-06-01T14:24:24.055495Z",
+        "inner_id": 1,
+        "total_annotations": 0,
+        "cancelled_annotations": 0,
+        "total_predictions": 0,
+        "project": 769,
+        "updated_by": null
+    }, {
+        "id": 282279,
+        "annotations": [
+		{
+                "id": 618584,
+                
+                "result": [{
+                        "id": "UKz0YvhhKF",
+                        "type": "rectanglelabels",
+                        "value": {
+                            "x": 2,
+                            "y": 2,
+                            "width": 3,
+                            "height": 3,
+                            "rotation": 0,
+                            "rectanglelabels": ["Cat"]
+                        },
+                        "origin": "manual",
+                        "to_name": "image",
+                        "from_name": "label",
+                        "image_rotation": 0,
+                        "original_width": 320,
+                        "original_height": 240
+                    }
+                ],
+                "was_cancelled": false,
+                "ground_truth": true,
+                "created_at": "2022-05-16T08:27:28.980535Z",
+                "updated_at": "2022-05-16T08:27:28.980535Z",
+                "lead_time": 4.369,
+                "prediction": {},
+                "result_count": 0,
+                "task": 545275,
+                "parent_prediction": null,
+                "parent_annotation": null
+            }
+		],
+        "file_upload": "c44d2f77-image_urls_with_bboxes.json",
+        "drafts": [],
+        "predictions": [],
+        "agreement": null,
+        "data": {
+            "image": "https://pytest.heartex.com/image1.jpg"
+        },
+        "meta": {},
+        "created_at": "2022-06-01T14:24:24.055563Z",
+        "updated_at": "2022-06-01T14:24:24.055573Z",
+        "inner_id": 2,
+        "total_annotations": 0,
+        "cancelled_annotations": 0,
+        "total_predictions": 0,
+        "project": 769,
+        "updated_by": null
+    }
+]

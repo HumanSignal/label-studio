@@ -4,55 +4,83 @@ import logging
 
 from django.db.models import Q
 from django.utils import timezone
-
-import drf_yasg.openapi as openapi
-from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
-
-from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+import drf_yasg.openapi as openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, viewsets
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
-from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 
-from core.utils.common import get_object_with_check_and_log, DjangoFilterDescriptionInspector
-from core.permissions import all_permissions, ViewClassPermission
-
-from tasks.models import Task, Annotation, Prediction, AnnotationDraft
-from core.utils.common import bool_from_request, int_from_request
-from tasks.serializers import (
-    TaskSerializer, AnnotationSerializer, TaskSimpleSerializer, PredictionSerializer,
-    TaskWithAnnotationsAndPredictionsAndDraftsSerializer, AnnotationDraftSerializer, PredictionQuerySerializer)
+from core.permissions import ViewClassPermission, all_permissions
+from core.utils.common import (
+    DjangoFilterDescriptionInspector,
+    get_object_with_check_and_log,
+)
+from core.utils.common import bool_from_request
+from data_manager.api import TaskListAPI as DMTaskListAPI
+from data_manager.functions import evaluate_predictions
+from data_manager.models import PrepareParams
+from data_manager.serializers import DataManagerTaskSerializer
 from projects.models import Project
-from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
+from tasks.models import Annotation, AnnotationDraft, Prediction, Task
+from tasks.serializers import (
+    AnnotationDraftSerializer,
+    AnnotationSerializer,
+    PredictionSerializer,
+    TaskSerializer,
+    TaskSimpleSerializer,
+)
 from webhooks.models import WebhookAction
+from webhooks.utils import (
+    api_webhook,
+    api_webhook_for_delete,
+    emit_webhooks_for_instance,
+)
 
 logger = logging.getLogger(__name__)
 
 
+# TODO: fix after switch to api/tasks from api/dm/tasks
 @method_decorator(name='post', decorator=swagger_auto_schema(
         tags=['Tasks'],
         operation_summary='Create task',
         operation_description='Create a new labeling task in Label Studio.',
         request_body=TaskSerializer))
-class TaskListAPI(generics.ListCreateAPIView):
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
-    queryset = Task.objects.all()
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Tasks'],
+    operation_summary='Get tasks list',
+    operation_description="""
+    Retrieve a list of tasks with pagination for a specific view or project, by using filters and ordering.
+    """,
+    manual_parameters=[
+        openapi.Parameter(
+            name='view',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_QUERY,
+            description='View ID'),
+        openapi.Parameter(
+            name='project',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_QUERY,
+            description='Project ID'),
+    ],
+))
+class TaskListAPI(DMTaskListAPI):
+    serializer_class = TaskSerializer
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
         POST=all_permissions.tasks_create,
     )
-    serializer_class = TaskSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['project',]
 
     def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
         return queryset.filter(project__organization=self.request.user.active_organization)
 
-    @swagger_auto_schema(auto_schema=None)
-    def get(self, request, *args, **kwargs):
-        return super(TaskListAPI, self).get(request, *args, **kwargs)
-
     def get_serializer_context(self):
-        context = super(TaskListAPI, self).get_serializer_context()
+        context = super().get_serializer_context()
         project_id = self.request.data.get('project')
         if project_id:
             context['project'] = generics.get_object_or_404(Project, pk=project_id)
@@ -115,13 +143,67 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         DELETE=all_permissions.tasks_delete,
     )
 
+    @staticmethod
+    def prefetch(queryset):
+        return queryset.prefetch_related(
+            'annotations', 'predictions', 'annotations__completed_by', 'project',
+            'io_storages_azureblobimportstoragelink',
+            'io_storages_gcsimportstoragelink',
+            'io_storages_localfilesimportstoragelink',
+            'io_storages_redisimportstoragelink',
+            'io_storages_s3importstoragelink',
+            'file_upload', 'project__ml_backends'
+        )
+
+    def get_retrieve_serializer_context(self, request):
+        fields = ['completed_by_full', 'drafts', 'predictions', 'annotations']
+
+        return {
+            'resolve_uri': True,
+            'completed_by': 'full' if 'completed_by_full' in fields else None,
+            'predictions': 'predictions' in fields,
+            'annotations': 'annotations' in fields,
+            'drafts': 'drafts' in fields,
+            'request': request
+        }
+
+    def get(self, request, pk):
+        self.task = self.get_object()
+
+        context = self.get_retrieve_serializer_context(request)
+        context['project'] = project = self.task.project
+
+        # get prediction
+        if (project.evaluate_predictions_automatically or project.show_collab_predictions) \
+                and not self.task.predictions.exists():
+            evaluate_predictions([self.task])
+
+        serializer = self.get_serializer_class()(self.task, many=False, context=context)
+        data = serializer.data
+        return Response(data)
+
     def get_queryset(self):
-        return Task.objects.filter(project__organization=self.request.user.active_organization)
+        review = bool_from_request(self.request.GET, 'review', False)
+        selected = {"all": False, "included": [self.kwargs.get("pk")]}
+        if review:
+            kwargs = {
+                'fields_for_evaluation': ['annotators', 'reviewed']
+            }
+        else:
+            kwargs = {'all_fields': True}
+        project = self.request.query_params.get('project') or self.request.data.get('project')
+        if not project:
+            project = Task.objects.get(id=self.request.parser_context['kwargs'].get('pk')).project.id
+        return self.prefetch(
+            Task.prepared.get_queryset(
+                prepare_params=PrepareParams(project=project,
+                                             selectedItems=selected), **kwargs
+            ))
 
     def get_serializer_class(self):
         # GET => task + annotations + predictions + drafts
         if self.request.method == 'GET':
-            return TaskWithAnnotationsAndPredictionsAndDraftsSerializer
+            return DataManagerTaskSerializer
 
         # POST, PATCH, PUT
         else:
@@ -141,9 +223,6 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         # use proxy inlining to task data (for credential access)
         result['data'] = task.resolve_uri(result['data'], project)
         return Response(result)
-
-    def get(self, request, *args, **kwargs):
-        return super(TaskAPI, self).get(request, *args, **kwargs)
 
     def patch(self, request, *args, **kwargs):
         return super(TaskAPI, self).patch(request, *args, **kwargs)

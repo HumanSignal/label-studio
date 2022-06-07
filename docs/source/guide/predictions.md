@@ -17,6 +17,8 @@ You can import pre-annotated tasks into Label Studio [using the UI](tasks.html#I
 
 To import predicted labels into Label Studio, you must use the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format) and set up your tasks with the `predictions` JSON key. The Label Studio ML backend also outputs tasks in this format. 
 
+### Specific examples for pre-annotations
+
 Refer to the following examples for sample pre-annotation formats:
 - [Image pre-annotations with semantic segmentation bounding boxes](#Import-pre-annotations-for-images)
 - [Image pre-annotations with unlabeled bounding boxes](#Import-pre-annotated-regions-for-images)
@@ -24,7 +26,57 @@ Refer to the following examples for sample pre-annotation formats:
 - [Brush pre-annotations for segmentation with masks](#Import-brush-segmentation-pre-annotations-in-RLE-format)
 - [OCR pre-annotations with bounding boxes, labels, and text transcriptions](#Import-OCR-pre-annotations)
 
-To format pre-annotations for Label Studio not represented in these examples, refer to the sample results JSON for the relevant object and control tags for your labeling configuration, for example, the [Audio tag](/tags/audio.html). Each tag must be represented in the JSON pre-annotations format to render predictions in the Label Studio UI. Not all object and control tags list sample results JSON. You can also use the [Label Studio Playground](/playground) to preview the output JSON for a specific labeling configuration.
+To format pre-annotations for Label Studio not represented in these examples, refer to the sample results JSON for the relevant object and control tags for your labeling configuration, such as the [Audio tag](/tags/audio.html) for audio classification tasks. Each tag must be represented in the JSON pre-annotations format to render predictions in the Label Studio UI. Not all object and control tags list sample results JSON. 
+
+You can also use the [Label Studio Playground](/playground) to preview the output JSON for a specific labeling configuration.
+
+### JSON format for pre-annotations
+
+Label Studio JSON format for pre-annotations must contain two sections:
+- A `data` object which references the source of the data that the pre-annotations apply to. This can be a URL to an audio file, a pre-signed cloud storage link to an image, plain text, a reference to a CSV file stored in Label Studio, or something else. See how to [specify the data object](#Specify-the-data-object).
+- A `predictions` array that contains the pre-annotation results for the different types of labeling. See how to [add results to the predictions array](#Add-results-to-the-predictions-array).
+
+The JSON format for pre-annotations must match the labeling configuration used for your data labeling project. 
+
+#### Specify the data object 
+Use the `data` object to reference the `value` of the data specified by the [Object tag](/tags) in your labeling configuration. For example, the following excerpt of a time series labeling configuration:
+```xml
+...
+    <TimeSeries name="ts" value="$csv" valueType="url">
+        <Channel column="first_column"/>
+    </TimeSeries>
+...
+```
+This excerpt specifies `value="$csv"` in the TimeSeries Object tag. As a result, the data object for the pre-annotations JSON file for this labeling configuration must use "csv" to specify the location of the CSV data for the time series pre-annotations, like in the following example:
+
+```json
+[
+  {
+    "data": {
+      "csv": "https://app.heartex.ai/samples/time-series.csv?time=None&values=first_column"    },
+    "predictions": []
+  }
+]
+```
+
+#### Add results to the predictions array 
+
+The `predictions` array also depends on the labeling configuration. Some pre-annotation fields are only relevant for certain types of labeling. The following table describes the JSON objects and arrays that exist for all pre-annotations: 
+
+| JSON key | type   | description                                                                                                                                      |
+| --- |--------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `predictions` | array  | Contains all pre-annotations for a specific task.                                                                                                | 
+| `predictions.model_version` | string | Specifies the model version that produced the prediction.                                                                                        |
+| `predictions.result` | array  | Contains all pre-annotated results for a specific task in a JSON object.                                                                         |
+| `result.value` | object | Contains details for a specific labeled region.                                                                                                  |
+| `result.id` | string | Arbitrary string used to identify a labeled region. Must match related regions, such as in [OCR pre-annotations](#Import-OCR-pre-annotations).   |
+| `result.from_name` | string | String used to reference the labeling configuration `from_name` for the type of labeling being performed. Must match the labeling configuration. |
+| `result.to_name` | string | String used to reference the labeling configuration `to_name` for the type of labeling being performed. Must match the labeling configuration.   |
+| `result.type` | string | Specify the labeling tag for the type of labeling being performed. For example, a named entity recognition task has a type of `labels`.          |
+
+Other types of annotation contain specific fields. You can review the [examples on this page](#Specific-examples-for-pre-annotations), or review the [tag documentation for the Object and Control tags](/tags) in your labeling configuration labeling-specific `result` objects. For example, the [Audio tag](tags/audio.html), [HyperText tag](tags/hypertext.html), [Paragraphs tag](tags/paragraphs.html), [KeyPointLabels](/tags/keypointlabels.html) and more all contain sample `result` JSON examples.
+
+> Note: If you're generating pre-annotations for a [custom ML backend](ml_create.html), you can use the `self.parsed_label_config` variable to retrieve the labeling configuration for a project and generate pre-annotations. See the [custom ML backend](ml_create.html) documentation for more details.
 
 ## Import pre-annotations for images
 
@@ -663,7 +715,7 @@ In this example, import pre-annotations for OCR tasks using the [OCR template](/
 
 ```xml
 <View>
-  <Image name="image" value="$image"/>
+  <Image name="image" value="$ocr"/>
   <Labels name="label" toName="image">
     <Label value="Text" background="green"/>
     <Label value="Handwriting" background="blue"/>
@@ -753,9 +805,9 @@ Save this example JSON as a file to import it into Label Studio, for example, `e
 {% endcodeblock %}
 {% enddetails %}
 
-This example JSON also includes a prediction score for the task. The IDs for each rectangle result match the label assigned to the region and the textarea transcription for the region. 
+This example JSON also includes a prediction score for the task. The IDs for each rectangle result match the label assigned to the region and the text area transcription for the region. 
 
-The image data in this example task references an uploaded file, identified by the source_filename assigned by Label Studio after uploading the image. The best way to reference image data is using presigned URLs for images stored in cloud storage, or absolute paths to image data stored in local storage and added to Label Studio by [syncing storage](storage.html). 
+> The image data in this example task references an uploaded file, identified by the source_filename assigned by Label Studio after uploading the image. The best way to reference image data is using presigned URLs for images stored in cloud storage, or absolute paths to image data stored in local storage and added to Label Studio by [syncing storage](storage.html). 
 
 Import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-data-from-the-Label-Studio-UI) or [using the API](/api#operation/projects_import_create).
 
@@ -855,3 +907,8 @@ If you wanted to add predicted text and suggested transcriptions for this labeli
 }
 ```
 Because the TextArea tag applies to each labeled region, the IDs for the label results and the textarea results must match. 
+
+
+### Read only and hidden regions
+
+In some situations it's very helpful to hide or to make `read-only` bounding boxes, text spans, audio segments, etc. You can put `"readonly": true` or `"hidden": true` in regions to achieve this (the dict inside of `annotations.result` list).  

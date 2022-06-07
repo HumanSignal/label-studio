@@ -62,7 +62,7 @@ def parse_input_args(input_args):
         '--internal-host',
         dest='internal_host',
         type=str,
-        default='0.0.0.0',
+        default='0.0.0.0',   # nosec
         help='Web server internal host, e.g.: "localhost" or "0.0.0.0"',
     )
     root_parser.add_argument(

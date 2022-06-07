@@ -6,7 +6,7 @@ This document provides guidelines for contributing code and documentation to Lab
 
 ## Types of Contributions
 
-You can contribute to Label Studio by submitting [bug reports and feature requests](), or by writing code to do any of the following:
+You can contribute to Label Studio by submitting [bug reports and feature requests](https://github.com/heartexlabs/label-studio/issues/new/choose), or by writing code to do any of the following:
 - Fix a bug.
 - Provide [example machine learning backend code](https://github.com/heartexlabs/label-studio-ml-backend) to help others add a machine learning backend for a specific model.
 - Share [example annotation templates](https://github.com/heartexlabs/label-studio/tree/master/label_studio/annotation_templates) for specific use cases.

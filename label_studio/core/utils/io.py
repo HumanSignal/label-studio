@@ -6,6 +6,7 @@ import shutil
 import glob
 import io
 import ujson as json
+import itertools
 import yaml
 
 from contextlib import contextmanager
@@ -71,7 +72,10 @@ def get_temp_dir():
 
 def get_config_dir():
     config_dir = user_config_dir(appname=_DIR_APP_NAME)
-    os.makedirs(config_dir, exist_ok=True)
+    try:
+        os.makedirs(config_dir, exist_ok=True)
+    except OSError:
+        pass
     return config_dir
 
 
@@ -128,7 +132,7 @@ def read_yaml(filepath):
     if not os.path.exists(filepath):
         filepath = find_file(filepath)
     with io.open(filepath, encoding='utf-8') as f:
-        data = yaml.load(f, Loader=yaml.FullLoader)
+        data = yaml.load(f, Loader=yaml.FullLoader)  # nosec
     return data
 
 
@@ -144,3 +148,18 @@ def get_all_dirs_from_dir(d):
         if os.path.isdir(filepath):
             out.append(filepath)
     return out
+
+
+class SerializableGenerator(list):
+    """Generator that is serializable by JSON"""
+
+    def __init__(self, iterable):
+        tmp_body = iter(iterable)
+        try:
+            self._head = iter([next(tmp_body)])
+            self.append(tmp_body)
+        except StopIteration:
+            self._head = []
+
+    def __iter__(self):
+        return itertools.chain(self._head, *self[:1])
