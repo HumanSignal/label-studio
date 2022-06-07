@@ -65,6 +65,8 @@ jobs:
           steps.check-membership.outputs.result == 'true' &&
           github.event.pull_request.merged == true
         id: sync-merge-pr
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
@@ -83,7 +85,7 @@ jobs:
                 base_branch_name: '${{ github.base_ref }}',
                 repo_name: '${{ github.repository }}',
                 commit_sha : '${{ github.sha }}',
-                title: '${{ github.event.pull_request.title }}',
+                title: process.env.TITLE,
                 html_url: '${{ github.event.pull_request.html_url }}',
                 actor: '${{ github.actor }}',
                 author_username: getCommitResponse.data.commit.author.name,
@@ -99,6 +101,8 @@ jobs:
           steps.check-membership.outputs.result == 'true' &&
           github.event.pull_request.merged != true
         id: sync-pr
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
@@ -117,7 +121,7 @@ jobs:
                 base_branch_name: '${{ github.base_ref }}',
                 repo_name: '${{ github.repository }}',
                 commit_sha : '${{ github.event.pull_request.head.sha }}',
-                title: '${{ github.event.pull_request.title }}',
+                title: process.env.TITLE,
                 html_url: '${{ github.event.pull_request.html_url }}',
                 actor: '${{ github.actor }}',
                 author_username: getCommitResponse.data.commit.author.name,
