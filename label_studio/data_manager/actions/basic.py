@@ -81,7 +81,7 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     annotations = Annotation.objects.filter(task__id__in=task_ids)
     count = annotations.count()
     # recalculate project summary
-    start_job_async_or_sync(project.summary.remove_created_annotations_and_labels, queryset)
+    start_job_async_or_sync(project.summary.remove_created_annotations_and_labels, annotations)
     # take only tasks where annotations were deleted
     real_task_ids = set(list(annotations.values_list('task__id', flat=True)))
     annotations_ids = list(annotations.values('id'))
