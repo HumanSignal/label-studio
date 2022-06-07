@@ -61,6 +61,8 @@ def predictions_to_annotations(project, queryset, **kwargs):
         start_job_async_or_sync(project.update_tasks_counters, Task.objects.filter(id__in=tasks_ids))
         # recalculate is_labeled
         start_job_async_or_sync(bulk_update_stats_project_tasks, Task.objects.filter(id__in=tasks_ids))
+        # recalculate project summary
+        start_job_async_or_sync(project.summary.update_created_annotations_and_labels, db_annotations)
     return {'response_code': 200, 'detail': f'Created {count} annotations'}
 
 
