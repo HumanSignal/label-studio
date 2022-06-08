@@ -426,42 +426,52 @@ class Annotation(AnnotationMixin, models.Model):
         self.task.save(update_fields=update_fields)
 
     def save(self, *args, **kwargs):
+        # Pre save actions
         created = False if self.pk else True
         self.decrease_project_summary_counters()
-        # PRE SAVE
         old_annotation_was_cancelled = self.was_cancelled
-        result = super().save(*args, **kwargs)
-        # POST SAVE
-        if old_annotation_was_cancelled != self.was_cancelled:
-            if self.was_cancelled:
-                self.task.cancelled_annotations = self.task.cancelled_annotations + 1
-                self.task.total_annotations = self.task.total_annotations - 1
-            else:
-                self.task.cancelled_annotations = self.task.cancelled_annotations - 1
-                self.task.total_annotations = self.task.total_annotations + 1
-            self.task.update_is_labeled()
 
-            Task.objects.filter(id=self.task.id).update(
-                is_labeled=self.task.is_labeled,
-                total_annotations=self.task.total_annotations,
-                cancelled_annotations=self.task.cancelled_annotations
-            )
+        result = super().save(*args, **kwargs)
+
+        # Post save actions
+        if old_annotation_was_cancelled != self.was_cancelled:
+            self.change_counter_on_cancelled_change()
         self.increase_project_summary_counters()
-        if created:
-            # If new annotation created, update task.is_labeled state
-            logger.debug(f'Update task stats for task={self.task}')
-            if self.was_cancelled:
-                self.task.cancelled_annotations = self.task.annotations.all().filter(was_cancelled=True).count()
-            else:
-                self.task.total_annotations = self.task.annotations.all().filter(was_cancelled=False).count()
-            self.task.update_is_labeled()
-            self.task.save(update_fields=['is_labeled', 'total_annotations', 'cancelled_annotations'])
-            logger.debug(f"Updated total_annotations and cancelled_annotations for {self.task.id}.")
         self.delete_drafts()
         if created:
+            self.update_stats_for_new_annotation()
             self.update_ml_backend()
         self.update_task()
         return result
+
+    def change_counter_on_cancelled_change(self):
+        """
+        Change counters if was_cancelled was changed
+        """
+        if self.was_cancelled:
+            self.task.cancelled_annotations = self.task.cancelled_annotations + 1
+            self.task.total_annotations = self.task.total_annotations - 1
+        else:
+            self.task.cancelled_annotations = self.task.cancelled_annotations - 1
+            self.task.total_annotations = self.task.total_annotations + 1
+        self.task.update_is_labeled()
+
+        Task.objects.filter(id=self.task.id).update(
+            is_labeled=self.task.is_labeled,
+            total_annotations=self.task.total_annotations,
+            cancelled_annotations=self.task.cancelled_annotations
+        )
+
+    def update_stats_for_new_annotation(self):
+        # If new annotation created, update task.is_labeled state
+        logger.debug(f'Update task stats for task={self.task}')
+        if self.was_cancelled:
+            self.task.cancelled_annotations = self.task.annotations.all().filter(was_cancelled=True).count()
+        else:
+            self.task.total_annotations = self.task.annotations.all().filter(was_cancelled=False).count()
+        self.task.update_is_labeled()
+        self.task.save(update_fields=['is_labeled', 'total_annotations', 'cancelled_annotations'])
+        logger.debug(f"Updated total_annotations and cancelled_annotations for {self.task.id}.")
 
     def delete(self, *args, **kwargs):
         result = super().delete(*args, **kwargs)
@@ -490,6 +500,7 @@ class Annotation(AnnotationMixin, models.Model):
         self.decrease_project_summary_counters()
 
     def delete_drafts(self):
+        """Remove drafts of annotation"""
         task = self.task
         query_args = {'task': task, 'annotation': self}
         drafts = AnnotationDraft.objects.filter(**query_args)
@@ -498,11 +509,11 @@ class Annotation(AnnotationMixin, models.Model):
         logger.debug(f'{num_drafts} drafts removed from task {task} after saving annotation {self}')
 
     def update_ml_backend(self):
+        """Start ML training for N annotation"""
         if self.ground_truth:
             return
 
         project = self.task.project
-
         if hasattr(project, 'ml_backends') and project.min_annotations_to_start_training:
             annotation_count = Annotation.objects.filter(task__project=project).count()
             # start training every N annotation
