@@ -402,7 +402,7 @@ class ProjectTaskListAPI(generics.ListCreateAPIView,
     def delete(self, request, *args, **kwargs):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
         task_ids = list(Task.objects.filter(project=project).values('id'))
-        Task.delete_tasks_without_signals(Task.objects.filter(project=project))
+        Task.objects.filter(project=project).delete()
         project.summary.reset()
         emit_webhooks_for_instance(request.user.active_organization, None, WebhookAction.TASKS_DELETED, task_ids)
         return Response(data={'tasks': task_ids}, status=204)

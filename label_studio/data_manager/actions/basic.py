@@ -43,14 +43,14 @@ def delete_tasks(project, queryset, **kwargs):
 
     # delete all project tasks
     if count == project.tasks.count():
-        Task.delete_tasks_without_signals(queryset)
+        queryset.delete()
         project.summary.reset()
 
     # delete only specific tasks
     else:
         # update project summary
         start_job_async_or_sync(async_project_summary_recalculation, tasks_ids_list, project.id)
-        Task.delete_tasks_without_signals(queryset)
+        queryset.delete()
 
     project.update_tasks_states(
         maximum_annotations_changed=False,

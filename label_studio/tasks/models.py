@@ -12,13 +12,12 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.db import models, transaction
 from django.db.models import Q
-from django.db.models.signals import post_delete, pre_save, post_save, pre_delete
 from django.utils.translation import gettext_lazy as _
 from django.db.models import JSONField
 from django.urls import reverse
 from django.utils.timesince import timesince
 from django.utils.timezone import now
-from django.dispatch import receiver, Signal
+from django.dispatch import Signal
 from django.core.files.storage import default_storage
 from rest_framework.exceptions import ValidationError
 
@@ -291,23 +290,12 @@ class Task(TaskMixin, models.Model):
         else:
             self.increase_project_summary_counters()
 
-    @staticmethod
-    def delete_tasks_without_signals(queryset):
-        """
-        Delete Tasks queryset with switched off signals
-        :param queryset: Tasks queryset
-        """
-        signals = [
-        ]
-        with temporary_disconnect_list_signal(signals):
-            queryset.delete()
-
     def delete(self, *args, **kwargs):
         """Reduce data column counters afer removing task"""
+        # Before delete actions
         self.decrease_project_summary_counters()
-        # BEFORE DELETE
         super().delete(*args, **kwargs)
-        # AFTER DELETE
+        # After delete actions
         try:
             # in case of maximum_annotations > 1 and cohort_percentage < 100
             # we should rearrange overlap and recalculate is_labeled
@@ -435,7 +423,7 @@ class Annotation(AnnotationMixin, models.Model):
 
         # Post save actions
         if old_annotation_was_cancelled != self.was_cancelled:
-            self.change_counter_on_cancelled_change()
+            self.change_counters_on_cancelled_change()
         self.increase_project_summary_counters()
         self.delete_drafts()
         if created:
@@ -444,7 +432,7 @@ class Annotation(AnnotationMixin, models.Model):
         self.update_task()
         return result
 
-    def change_counter_on_cancelled_change(self):
+    def change_counters_on_cancelled_change(self):
         """
         Change counters if was_cancelled was changed
         """
