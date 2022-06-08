@@ -82,10 +82,6 @@ export const MachineLearningSettings = () => {
             />
           </Form.Row>
 
-          {!isFF(FF_DEV_1682) && (
-            <ProjectModelVersionSelector />
-          )}
-
           <Form.Actions>
             <Button type="submit" look="primary" onClick={() => setMLError(null)}>
               Validate and Save
@@ -165,6 +161,17 @@ export const MachineLearningSettings = () => {
             />
           </div>
         </Form.Row>
+
+        {!isFF(FF_DEV_1682) && (
+          <ProjectModelVersionSelector />
+        )}
+
+        <Form.Actions>
+          <Form.Indicator>
+            <span case="success">Saved!</span>
+          </Form.Indicator>
+          <Button type="submit" look="primary" style={{ width: 120 }}>Save</Button>
+        </Form.Actions>
       </Form>
 
       <MachineLearningList
