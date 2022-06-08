@@ -417,7 +417,8 @@ class Annotation(AnnotationMixin, models.Model):
         # Pre save actions
         created = False if self.pk else True
         self.decrease_project_summary_counters()
-        old_annotation_was_cancelled = None if created else Annotation.objects.get(id=self.id).was_cancelled
+        old_annotation = Annotation.objects.filter(id=self.id).first()
+        old_annotation_was_cancelled = old_annotation.was_cancelled if old_annotation else None
 
         result = super().save(*args, **kwargs)
 
