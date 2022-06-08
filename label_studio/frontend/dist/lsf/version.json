@@ -1,6 +1,6 @@
 {
-  "message": "check visibiltiy mixin for taxonomy",
-  "commit": "8a3071dafd72589dd8a49e301cfdf719fa157c5a",
-  "branch": "fb-dev-1975/support-long-unborken-taxonomy",
-  "date": "2022-06-07T18:03:32Z"
+  "message": "alt or on mac opt click will delete created or in progress polyon point",
+  "commit": "9e6226194c97082bd9af9d33b434afb5660dfd1a",
+  "branch": "fb-dev-2431/alt-click-deletes-polygon-point",
+  "date": "2022-06-08T17:58:08Z"
 }
