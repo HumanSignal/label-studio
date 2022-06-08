@@ -306,7 +306,7 @@ class Task(TaskMixin, models.Model):
         """Reduce data column counters afer removing task"""
         self.decrease_project_summary_counters()
         # BEFORE DELETE
-        super().save(*args, **kwargs)
+        super().delete(*args, **kwargs)
         # AFTER DELETE
         try:
             # in case of maximum_annotations > 1 and cohort_percentage < 100
