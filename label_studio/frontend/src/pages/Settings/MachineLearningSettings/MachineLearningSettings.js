@@ -9,7 +9,9 @@ import { modal } from '../../../components/Modal/Modal';
 import { useAPI } from '../../../providers/ApiProvider';
 import { ProjectContext } from '../../../providers/ProjectProvider';
 import { MachineLearningList } from './MachineLearningList';
+import { ProjectModelVersionSelector } from './ProjectModelVersionSelector';
 import { ModelVersionSelector } from './ModelVersionSelector';
+import { FF_DEV_1682, isFF } from '../../../utils/feature-flags';
 import './MachineLearningSettings.styl';
 
 export const MachineLearningSettings = () => {
@@ -58,18 +60,31 @@ export const MachineLearningSettings = () => {
             <TextArea name="description" label="Description" style={{ minHeight: 120 }}/>
           </Form.Row>
 
-          <Form.Row columnCount={2}>
-            <ModelVersionSelector
-              object={backend}
-              apiName="modelVersions"
-              valueName="version"
-              label="Version"
-            />
+          <Form.Row columnCount={isFF(FF_DEV_1682) ? 3 : 1}>
+            {isFF(FF_DEV_1682) && (
+              <>
+                <ModelVersionSelector
+                  object={backend}
+                  apiName="modelVersions"
+                  valueName="version"
+                  label="Version"
+                />
+
+                <Toggle
+                  name="auto_update"
+                  label="Allow version auto-update"
+                />
+              </>
+            )}
             <Toggle
               name="is_interactive"
               label="Use for interactive preannotations"
             />
           </Form.Row>
+
+          {!isFF(FF_DEV_1682) && (
+            <ProjectModelVersionSelector />
+          )}
 
           <Form.Actions>
             <Button type="submit" look="primary" onClick={() => setMLError(null)}>
