@@ -1,6 +1,6 @@
 {
-  "message": "Fix video regions not rendering",
-  "commit": "ee6cb6e6e0499cf201720f7e1aa8cc0c6552530d",
-  "branch": "fb-dev-2494/video-regions",
-  "date": "2022-06-03T09:25:28Z"
+  "message": "fix: DEV-2494: Video regions not rendering (#656)\n\nFix video regions not rendering",
+  "commit": "1e5cb82091e26a506a4eaac1746b6135b0b05840",
+  "branch": "master",
+  "date": "2022-06-09T16:06:10Z"
 }
