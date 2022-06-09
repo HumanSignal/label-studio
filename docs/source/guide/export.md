@@ -139,6 +139,12 @@ To transform Label Studio annotations into spaCy binary format, do the following
 -DOCSTART- -X- O O
 ```
 3. From the command line, run spacy convert to convert the CONLL-formatted annotations to spaCy binary format, replacing `/path/to/<filename>` with the path and file name of your annotations:
+
+spacy version 2:
+```shell
+spacy convert /path/to/<filename>.conll -c ner
+```
+spacy version 3:
 ```shell
 spacy convert /path/to/<filename>.conll -c conll . 
 ```

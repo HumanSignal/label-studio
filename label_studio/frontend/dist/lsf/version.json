@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2128: Allow to use html inside label-tags (#578)",
-  "commit": "b78e6fbd3b3be0241ed4b41398dc5668494535e0",
-  "branch": "master",
-  "date": "2022-04-20T20:01:35Z"
+  "message": "check visibiltiy mixin for taxonomy",
+  "commit": "8a3071dafd72589dd8a49e301cfdf719fa157c5a",
+  "branch": "fb-dev-1975/support-long-unborken-taxonomy",
+  "date": "2022-06-07T18:03:32Z"
 }
