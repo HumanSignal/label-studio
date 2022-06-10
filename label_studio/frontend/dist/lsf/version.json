@@ -1,6 +1,6 @@
 {
-  "message": "fix: resolving an issue that caused a broken quickview that seems to be stuck on loading",
-  "commit": "cbf33e504644f9676bec2be86e9fc1341396073a",
-  "branch": "fb-dev-2465",
-  "date": "2022-06-01T20:25:44Z"
+  "message": "fix: DEV-2465: Paragraphs data is not loading to QuickView (#665)\n\nfix: resolving an issue that caused a broken quickview that seems to be stuck on loading",
+  "commit": "be71e0926724630a20b05cead1eae8cc6137ddf3",
+  "branch": "master",
+  "date": "2022-06-10T00:23:52Z"
 }
