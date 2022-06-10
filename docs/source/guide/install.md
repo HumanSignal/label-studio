@@ -83,8 +83,8 @@ docker-compose up -d
 
 This starts Label Studio with a PostgreSQL database backend. You can also use a PostgreSQL database without Docker Compose. See [Set up database storage](storedata.html).
 
-### Install Lable Studio without internet access
-Download label-studio docker image(host with internet access and docker):
+### Install Label Studio without internet access
+Download label-studio docker image (host with internet access and docker):
 ```bash 
 docker pull heartexlabs/label-studio:latest
 ```
