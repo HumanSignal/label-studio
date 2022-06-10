@@ -177,7 +177,7 @@ def url_is_local(url):
         raise LabelStudioAPIException(f"Can't resolve hostname {domain}")
     else:
         if ip in (
-            '0.0.0.0',
+            '0.0.0.0', # nosec
         ):
             return True
         local_subnets = [
