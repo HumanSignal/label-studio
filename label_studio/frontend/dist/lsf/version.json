@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2465: Paragraphs data is not loading to QuickView (#665)\n\nfix: resolving an issue that caused a broken quickview that seems to be stuck on loading",
-  "commit": "be71e0926724630a20b05cead1eae8cc6137ddf3",
+  "message": "fix: DEV-2367: User is able to edit Time Series results imported as read-only (#676)\n\nfix: resolving editable readonly time series results",
+  "commit": "d5209b4a0a01ba263f394a0b41a7b7d9996652ad",
   "branch": "master",
-  "date": "2022-06-10T00:23:52Z"
+  "date": "2022-06-10T02:18:19Z"
 }
