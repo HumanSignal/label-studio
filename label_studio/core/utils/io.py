@@ -176,6 +176,10 @@ def url_is_local(url):
         from core.utils.exceptions import LabelStudioAPIException
         raise LabelStudioAPIException(f"Can't resolve hostname {domain}")
     else:
+        if ip in (
+            '0.0.0.0',
+        ):
+            return True
         local_subnets = [
             '127.0.0.0/8',
             '10.0.0.0/8',
