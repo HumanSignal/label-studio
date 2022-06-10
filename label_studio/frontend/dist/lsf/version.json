@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2367: User is able to edit Time Series results imported as read-only (#676)\n\nfix: resolving editable readonly time series results",
-  "commit": "d5209b4a0a01ba263f394a0b41a7b7d9996652ad",
-  "branch": "master",
-  "date": "2022-06-10T02:18:19Z"
+  "message": "increase the minimum and default zoom to 300, the min set for wavesurfer",
+  "commit": "2ea93c86a22229d0e9164d8415d98258d361963b",
+  "branch": "fb-dev-1714/x-axis-zoom-threshold",
+  "date": "2022-06-10T16:02:20Z"
 }
