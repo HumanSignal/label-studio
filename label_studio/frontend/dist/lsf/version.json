@@ -1,6 +1,6 @@
 {
-  "message": "check visibiltiy mixin for taxonomy",
-  "commit": "8a3071dafd72589dd8a49e301cfdf719fa157c5a",
-  "branch": "fb-dev-1975/support-long-unborken-taxonomy",
-  "date": "2022-06-07T18:03:32Z"
+  "message": "fix: DEV-2465: Paragraphs data is not loading to QuickView (#665)\n\nfix: resolving an issue that caused a broken quickview that seems to be stuck on loading",
+  "commit": "be71e0926724630a20b05cead1eae8cc6137ddf3",
+  "branch": "master",
+  "date": "2022-06-10T00:23:52Z"
 }
