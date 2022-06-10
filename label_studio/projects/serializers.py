@@ -113,3 +113,12 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectSummary
         fields = '__all__'
+
+
+class GetFieldsSerializer(serializers.Serializer):
+    include = serializers.CharField(required=False)
+
+    def validate_include(self, value):
+        if value is not None:
+            value = value.split(',')
+        return value

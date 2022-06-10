@@ -10,10 +10,10 @@ def forwards(apps, schema_editor):
     from tasks.models import Task
 
     if Task.objects.count() > 100000:
-        logger.error("You instance has a lot of tasks. You should run the migration manually as a separate process "
-                     "to recalculate task counters, please use Django command `manage.py calculate_stats_all_args`")
+        logger.error("Your instance has a lot of tasks. You should run the migration manually as a separate process "
+                     "to recalculate task counters, please use Django command `manage.py calculate_stats_all_orgs`")
     else:
-        logger.debug('You instance has < 100000 tasks, starting calculate_stats_all_orgs')
+        logger.debug('Your instance has < 100000 tasks, starting calculate_stats_all_orgs')
         calculate_stats_all_orgs(from_scratch=False)
 
     return
