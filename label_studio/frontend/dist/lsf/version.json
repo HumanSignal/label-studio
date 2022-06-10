@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1714: X-axis zoom threshold (#699)\n\n* increase the minimum and default zoom to 300, the min set for wave-surfer\r\n\r\n* make default value explicit",
-  "commit": "05cf97840bbd82484e3085b289651627ff24bcd4",
-  "branch": "",
-  "date": "2022-06-10T16:57:52Z"
+  "message": "fix: DEV-2309: don't show the delete all region button when annotation is readonly",
+  "commit": "7673ec9412a3f098a93b6ae5efca076463783750",
+  "branch": "fb-dev-2309",
+  "date": "2022-06-10T20:53:25Z"
 }
