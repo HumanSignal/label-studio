@@ -59,9 +59,13 @@ def _get_user_repr(user):
     """Turn user object into dict with required properties"""
     from users.serializers import UserSerializer
     if user.is_anonymous:
-        return {'key': str(user)}
+        return {'key': str(user), 'custom': {'organization': None}}
     user_data = UserSerializer(user).data
     user_data['key'] = user_data['email']
+    if user.active_organization is not None:
+        user_data['custom'] = {'organization': user.active_organization.created_by.email}
+    else:
+        user_data['custom'] = {'organization': None}
     logger.debug(f'Read user properties: {user_data}')
     return user_data
 

@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2394: Zoomed image region out of bounds (#642)\n\n* fix: DEV-2394: Zoomed image region out of bounds\r\n\r\n* test: DEV-2394: Add test for bounds of transformations for zoomed image regions\r\n\r\n* fix: DEV-2394: Fix stage position recalculation on window resize\r\n\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
-  "commit": "efb2149a13ae2f17d6f71678deb41a2b9b179fac",
+  "message": "fix: DEV-2367: User is able to edit Time Series results imported as read-only (#676)\n\nfix: resolving editable readonly time series results",
+  "commit": "d5209b4a0a01ba263f394a0b41a7b7d9996652ad",
   "branch": "master",
-  "date": "2022-06-03T09:25:28Z"
+  "date": "2022-06-10T02:18:19Z"
 }
