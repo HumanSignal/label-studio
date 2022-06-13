@@ -1,6 +1,6 @@
 {
-  "message": "check visibiltiy mixin for taxonomy",
-  "commit": "8a3071dafd72589dd8a49e301cfdf719fa157c5a",
-  "branch": "fb-dev-1975/support-long-unborken-taxonomy",
-  "date": "2022-06-07T18:03:32Z"
+  "message": "fix: DEV-1714: X-axis zoom threshold (#699)\n\n* increase the minimum and default zoom to 300, the min set for wave-surfer\r\n\r\n* make default value explicit",
+  "commit": "05cf97840bbd82484e3085b289651627ff24bcd4",
+  "branch": "",
+  "date": "2022-06-10T16:57:52Z"
 }
