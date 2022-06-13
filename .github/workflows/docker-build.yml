@@ -3,7 +3,7 @@ name: "Docker build & push"
 on:
   push:
     branches:
-      - master
+      - develop
     paths:
       - deploy/**
       - label_studio/**
