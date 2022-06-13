@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import os
+import pathlib
 
 from core.settings.base import *
 
@@ -47,5 +48,5 @@ versions = collect_versions()
 
 # in Label Studio Community version, feature flags are always ON
 FEATURE_FLAGS_DEFAULT_VALUE = True
-FEATURE_FLAGS_FILE = os.path.join(os.path.dirname(__file__), '..', '..', 'feature_flags.json')
+FEATURE_FLAGS_FILE = pathlib.Path(os.path.dirname(__file__), '..', '..', 'feature_flags.json').resolve()
 FEATURE_FLAGS_FROM_FILE = os.path.exists(FEATURE_FLAGS_FILE)
