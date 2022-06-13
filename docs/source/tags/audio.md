@@ -1,7 +1,7 @@
 ---
 title: Audio
 type: tags
-order: 301
+order: 302
 meta_title: Audio Tag for Labeling Audio
 meta_description: Customize Label Studio to label audio data for machine learning and data science projects.
 ---
