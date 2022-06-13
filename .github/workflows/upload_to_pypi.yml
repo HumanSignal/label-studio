@@ -7,7 +7,7 @@ on:
 
 jobs:
   ReleaseNotification:
-    name: "notify"
+    name: "Build & Upload"
     runs-on: ubuntu-latest
     steps:
       - uses: hmarr/debug-action@v2.0.1
@@ -22,9 +22,24 @@ jobs:
         with:
           python-version: '3.7'
 
+      - name: Configure pip cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('deploy/requirements-mw.txt') }}-${{ hashFiles('deploy/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install dependencies
         run: |
+          pip install -r deploy/requirements-mw.txt
+          pip install -r deploy/requirements.txt
+          pip install -e .
           pip install twine
+
+      - name: Collect static
+        run: |
+          python label_studio/manage.py collectstatic
 
       - name: Download feature flags
         run: |
