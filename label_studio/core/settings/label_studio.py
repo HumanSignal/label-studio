@@ -48,5 +48,5 @@ versions = collect_versions()
 
 # in Label Studio Community version, feature flags are always ON
 FEATURE_FLAGS_DEFAULT_VALUE = True
-FEATURE_FLAGS_FILE = pathlib.Path(os.path.dirname(__file__), '..', '..', 'feature_flags.json').resolve()
+FEATURE_FLAGS_FILE = str(pathlib.Path(os.path.dirname(__file__), '..', '..', 'feature_flags.json').resolve())
 FEATURE_FLAGS_FROM_FILE = os.path.exists(FEATURE_FLAGS_FILE)
