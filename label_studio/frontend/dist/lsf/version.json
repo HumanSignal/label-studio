@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1714: X-axis zoom threshold (#699)\n\n* increase the minimum and default zoom to 300, the min set for wave-surfer\r\n\r\n* make default value explicit",
-  "commit": "05cf97840bbd82484e3085b289651627ff24bcd4",
-  "branch": "",
-  "date": "2022-06-10T16:57:52Z"
+  "message": "fix: DEV-2510: add guard with error message for non incremental, non sequential datasets. (#1752) (#698)\n\n* fix: DEV-2510: add guard with error message for non incremental, non sequential datasets.\r\n\r\n* fix: DEV-2510: remove redundant checks\r\n\r\n* fix: DEV-2510: put everything in the same if statement\r\n\r\n* fix: DEV-2510: changing checks for sequence values to be used always, adding tests\r\n\r\n* fix: DEV-2510: update timeseries tests to new script exec method",
+  "commit": "d3b26733017ef62f5e03541da8e0c1c71baf8225",
+  "branch": "master",
+  "date": "2022-06-13T17:31:41Z"
 }
