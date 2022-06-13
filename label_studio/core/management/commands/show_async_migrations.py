@@ -19,7 +19,7 @@ class Command(BaseCommand):
         if org == -1:
             migrations = AsyncMigrationStatus.objects.all()
         else:
-            migrations = AsyncMigrationStatus.objects.filter(organization_id=org)
+            migrations = AsyncMigrationStatus.objects.filter(project__organization_id=org)
 
         for m in migrations:
             logger.debug(f"Migration: {m.name} \t {m.status}")
