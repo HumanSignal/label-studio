@@ -12,11 +12,13 @@ Use with the following data types: audio
 
 ### Parameters
 
-| Param | Type | Description |
-| --- | --- | --- |
-| name | <code>string</code> | Name of the element |
-| value | <code>string</code> | Data field containing path or a URL to the audio |
-| hotkey | <code>string</code> | Hotkey used to play or pause audio |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>string</code> |  | Name of the element |
+| value | <code>string</code> |  | Data field containing path or a URL to the audio |
+| hotkey | <code>string</code> |  | Hotkey used to play or pause audio |
+| [cursorwidth] | <code>string</code> | <code>1</code> | Audio pane cursor width. it's Measured in pixels. |
+| [cursorcolor] | <code>string</code> | <code>&quot;#333&quot;</code> | Audio pane cursor color. Color should be specify in hex decimal string |
 
 ### Sample Results JSON
 

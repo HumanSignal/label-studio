@@ -25,6 +25,7 @@ Use with the following data types: time series
 | [timeDisplayFormat] | <code>string</code> |  | Format used to display temporal value. Can be a number or a date. If a temporal column is a date, use strftime to format it. If it's a number, use [d3 number](https://github.com/d3/d3-format#locale_format) formatting. |
 | [sep] | <code>string</code> | <code>&quot;,&quot;</code> | Separator for your CSV file. |
 | [overviewChannels] | <code>string</code> |  | Comma-separated list of channel names or indexes displayed in overview. |
+| [overviewWidth] | <code>string</code> | <code>&quot;25%&quot;</code> | Default width of overview window in percents |
 | [fixedScale] | <code>boolean</code> | <code>false</code> | Whether to scale y-axis to the maximum to fit all the values. If false, current view scales to fit only the displayed values. |
 
 ## Channel

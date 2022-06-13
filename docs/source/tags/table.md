@@ -10,9 +10,10 @@ Use the Table tag to display object keys and values in a table.
 
 ### Parameters
 
-| Param | Type |
-| --- | --- |
-| value | <code>string</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| valuetype | <code>string</code> | Value to define the data type in Table |
+| value | <code>string</code> | Data field value containing JSON type for Table |
 
 ### Example
 
