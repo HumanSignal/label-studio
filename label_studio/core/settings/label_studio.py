@@ -48,3 +48,17 @@ versions = collect_versions()
 
 # in Label Studio Community version, feature flags are always ON
 FEATURE_FLAGS_DEFAULT_VALUE = True
+# or if file is not set, default is using offline mode
+FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)
+
+from core.utils.io import find_file
+FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE', 'feature_flags.json')
+FEATURE_FLAGS_FROM_FILE = True
+try:
+    from core.utils.io import find_node
+    find_node('label_studio', FEATURE_FLAGS_FILE, 'file')
+except IOError:
+    FEATURE_FLAGS_FROM_FILE = False
+
+
+
