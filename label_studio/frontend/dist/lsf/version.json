@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2510: add guard with error message for non incremental, non sequential datasets. (#1752) (#698)\n\n* fix: DEV-2510: add guard with error message for non incremental, non sequential datasets.\r\n\r\n* fix: DEV-2510: remove redundant checks\r\n\r\n* fix: DEV-2510: put everything in the same if statement\r\n\r\n* fix: DEV-2510: changing checks for sequence values to be used always, adding tests\r\n\r\n* fix: DEV-2510: update timeseries tests to new script exec method",
-  "commit": "d3b26733017ef62f5e03541da8e0c1c71baf8225",
-  "branch": "master",
-  "date": "2022-06-13T17:31:41Z"
+  "message": "fix: DEV-2592: Bounding box is flickering during region creation",
+  "commit": "76ad1f6c00d1039bb01ef9f684b9696968383e63",
+  "branch": "fb-dev-2592",
+  "date": "2022-06-13T18:13:49Z"
 }
