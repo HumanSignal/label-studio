@@ -500,8 +500,8 @@ INTERPOLATE_KEY_FRAMES = get_env('INTERPOLATE_KEY_FRAMES', False)
 FEATURE_FLAGS_API_KEY = get_env('FEATURE_FLAGS_API_KEY', default='any key')
 
 # we may set feature flags from file
-FEATURE_FLAGS_FROM_FILE = get_bool_env('FEATURE_FLAGS_FROM_FILE', False)
-FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE')
+FEATURE_FLAGS_FROM_FILE = get_bool_env('FEATURE_FLAGS_FROM_FILE', True)
+FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE', 'feature_flags.json')
 # or if file is not set, default is using offline mode
 FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)
 # default value for feature flags (if not overrided by environment or client)
