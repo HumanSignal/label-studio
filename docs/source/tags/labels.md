@@ -35,3 +35,31 @@ Use with the following data types: audio, text. Other data types have type-speci
   <Text name="txt-1" value="$text" />
 </View>
 ```
+**Example** *(This config with dynamic labels)*  
+```html
+<!--
+All types of `Labels` can have dynamic `value` to load labels from task.
+This task data should contain a list of options to create underlying `<Label>`s.
+All the parameters from options will be transferred to corresponding tags.
+-->
+<PolygonLabels name="product" toName="shelf" value="$labels" />
+<!-- {
+  "data": {
+    "options": [
+      { "value": "Big brand" },
+      { "value": "Another brand", "background": "orange" },
+      { "value": "Local brand" },
+      { "value": "Green brand", "alias": "Eco", showalias: true }
+    ]
+  }
+} -->
+```
+**Example** *(is equivalent to this config)*  
+```html
+<PolygonLabels name="product" toName="shelf">
+  <Label value="Big brand" />
+  <Label value="Another brand" background="orange" />
+  <Label value="Local brand" />
+  <Label value="Green brand" alias="Eco" showAlias="true" />
+</PolygonLabels>
+```
