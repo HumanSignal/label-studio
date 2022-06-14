@@ -137,7 +137,7 @@
     </form>
 
     <!-- Notifications -->
-    <form action="{% url 'user-detail' pk=user.pk %}" method="patch" class="notifications block-info" id="notifications">
+    <form action="{% url 'user-detail' pk=user.pk %}?update-notifications=1" method="patch" class="notifications block-info" id="notifications">
       <header>
         Notifications
         <br>
@@ -150,13 +150,16 @@
           <input name="email" type="hidden" value="{{ user.email }}">
           <input name="first_name" type="hidden" value="{{ user.first_name }}">
           <input name="last_name" type="hidden" value="{{ user.last_name }}">
-{% if user.allow_newsletters is None %}false{% else %}{{ user.allow_newsletters|yesno:"true,false" }}{% endif %}
-          <input name="allow_newsletters" id="allow_newsletters" type="checkbox"
-                 style="width: auto;"
-                 checked="{% if user.allow_newsletters is None %}false{% else %}{{ user.allow_newsletters|yesno:"true,false" }}{% endif %}"
-                 onclick="if (this.value === 'on') this.value='true'; else this.value='false'; smart_submit()">
 
-          <label for="allow_newsletters" style="display: inline-block; cursor: pointer; margin-top: -10px">
+          <input name="allow_newsletters" type="hidden"
+                 value="{% if user.allow_newsletters is None %}true{% else %}{{ user.allow_newsletters|yesno:"false,true" }}{% endif %}">
+
+          <input name="allow_newsletters_visual" id="allow_newsletters_visual" type="checkbox"
+                 style="width: auto;"
+                 {% if user.allow_newsletters %}checked="true"{% endif %}
+                 onclick="smart_submit()">
+
+          <label for="allow_newsletters_visual" style="display: inline-block; cursor: pointer; margin-top: -10px">
             Get the latest news from Heidi
             <img src="{{ settings.HOSTNAME }}{% static 'images/heidi.png' %}" alt="Heidi"
                  width="25" style="display: inline; margin: 0; position: relative; top: 5px; left: 0">
