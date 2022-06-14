@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='user',
-            name='newsletters',
-            field=models.BooleanField(default=None, help_text='Allow sending newsletters to user', null=True, verbose_name='newsletters'),
+            name='allow_newsletters',
+            field=models.BooleanField(default=None, help_text='Allow sending newsletters to user', null=True, verbose_name='allow newsletters'),
         ),
     ]

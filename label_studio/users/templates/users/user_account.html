@@ -112,7 +112,7 @@
     </form>
 
 
-   <!-- Organization -->
+    <!-- Organization -->
     <form action="" class="organization" id="organization">
       <header>
         {{ user.active_organization.title }}
@@ -135,6 +135,28 @@
       </table>
 
     </form>
+
+    <!-- Notifications -->
+    <form action="" class="notifications" id="organization">
+      <header>
+        Notifications
+        <br>
+        <sub style="font-size: 16px; margin-top: 0; color: rgba(0,0,0,0.2); ">Email and other notifications</sub>
+      </header>
+
+      <table>
+        <tr><td>
+          <input name="allow_newsletters" id="allow_newsletters" type="checkbox" style="width: auto" value="{{ user.allow_newsletter }}">
+          <label for="allow_newsletters" style="display: inline-block; cursor: pointer; margin-top: -10px">
+            Get the latest news from Heidi
+            <img src="{{ settings.HOSTNAME }}{% static 'images/heidi.png' %}" alt="Heidi"
+                 width="25" style="display: inline; margin: 0; position: relative; top: 5px; left: 0">
+          </label>
+        </td></tr>
+      </table>
+
+    </form>
+
 
   </div>
 

@@ -108,7 +108,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         related_name='active_users'
     )
 
-    newsletters = models.BooleanField(
+    allow_newsletters = models.BooleanField(
         _('allow newsletters'),
         null=True,
         default=None,
