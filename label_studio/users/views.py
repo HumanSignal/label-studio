@@ -118,13 +118,15 @@ def user_account(request):
             form.save()
             return redirect(reverse('user-account'))
 
-    if user.allow_newsletters is None:
-        user.allow_newsletters = False
-        user.save(update_fields=['allow_newsletters'])
-
-    return render(request, 'users/user_account.html', {
+    page = render(request, 'users/user_account.html', {
         'settings': settings,
         'user': user,
         'user_profile_form': form,
         'token': token
     })
+
+    #if user.allow_newsletters is None:
+    #    user.allow_newsletters = False
+    #    user.save(update_fields=['allow_newsletters'])
+
+    return page
