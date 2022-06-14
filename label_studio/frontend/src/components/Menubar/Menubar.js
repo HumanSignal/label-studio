@@ -153,10 +153,12 @@ export const Menubar = ({
                   <Menu.Divider />
                   <Menu.Item
                     className={cn("newsletter-menu-item")}
-                    label="We've added option to subscribe for our newsletters, so check your settings, please"
                     href="/user/account"
                     data-external
-                  />
+                  >
+                    We've added option to subscribe for our newsletters, so check your settings, please
+                    <span className={cn("newsletter-menu-badge")} />
+                  </Menu.Item>
                 </>
               )}
             </Menu>
