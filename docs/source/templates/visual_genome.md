@@ -7,6 +7,7 @@ order: 154
 meta_title: Label different described features
 meta_description: 
 ---
+Use the [Visual Genome](https://visualgenome.org/) task to connect structured image concepts to language.
 
 ## Labeling Configuration
 
