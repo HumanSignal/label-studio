@@ -57,6 +57,7 @@ class UserSignupForm(forms.Form):
     password = forms.CharField(max_length=PASS_MAX_LENGTH,
                                error_messages={'required': PASS_LENGTH_ERR},
                                widget=forms.TextInput(attrs={'type': 'password'}))
+    newsletters = forms.BooleanField()
 
     def clean_password(self):
         password = self.cleaned_data['password']
