@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2309: don't show the delete all region button when annotation is readonly (#707)",
-  "commit": "ed8a5904c689db026aefd3a0e3507204479cd7d4",
-  "branch": "master",
-  "date": "2022-06-14T18:08:14Z"
+  "message": "update drawing region sizes on zoom",
+  "commit": "c66aba49421c4c4bbda0039a983eecfc4360b187",
+  "branch": "",
+  "date": "2022-06-14T19:46:35Z"
 }
