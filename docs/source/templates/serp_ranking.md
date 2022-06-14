@@ -7,6 +7,7 @@ order: 155
 meta_title: Rank different kinds of results by given search query
 meta_description: 
 ---
+Based on your search input query, you can run the search results provided by snippets. 
 
 ## Labeling Configuration
 
