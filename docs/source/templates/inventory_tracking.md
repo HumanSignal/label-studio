@@ -7,6 +7,7 @@ order: 152
 meta_title: Label exact products on the shelves
 meta_description: 
 ---
+For the inventory tracking system, you can annotate the inventory item based on the visual analysis of the item. For example, if you want to annotate the product shelf based on a cocacola image then you can start drawing the annotation around the selected image. 
 
 ## Labeling Configuration
 
