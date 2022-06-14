@@ -154,7 +154,7 @@
           <input name="allow_newsletters" id="allow_newsletters" type="checkbox"
                  style="width: auto;"
                  checked="{% if user.allow_newsletters is None %}false{% else %}{{ user.allow_newsletters|yesno:"true,false" }}{% endif %}"
-                 onclick="smart_submit()">
+                 onclick="if (this.value === 'on') this.value='true'; else this.value='false'; smart_submit()">
 
           <label for="allow_newsletters" style="display: inline-block; cursor: pointer; margin-top: -10px">
             Get the latest news from Heidi
