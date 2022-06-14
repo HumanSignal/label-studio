@@ -393,6 +393,7 @@ TASK_LOCK_TTL = int(get_env('TASK_LOCK_TTL')) if get_env('TASK_LOCK_TTL') else N
 TASK_LOCK_DEFAULT_TTL = int(get_env('TASK_LOCK_DEFAULT_TTL', 3600))
 TASK_LOCK_MIN_TTL = int(get_env('TASK_LOCK_MIN_TTL', 120))
 
+RANDOM_NEXT_TASK_SAMPLE_SIZE = int(get_env('RANDOM_NEXT_TASK_SAMPLE_SIZE', 50))
 
 TASK_API_PAGE_SIZE_MAX = int(get_env('TASK_API_PAGE_SIZE_MAX', 0)) or None
 
@@ -501,7 +502,7 @@ FEATURE_FLAGS_API_KEY = get_env('FEATURE_FLAGS_API_KEY', default='any key')
 
 # we may set feature flags from file
 FEATURE_FLAGS_FROM_FILE = get_bool_env('FEATURE_FLAGS_FROM_FILE', False)
-FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE')
+FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE', 'feature_flags.json')
 # or if file is not set, default is using offline mode
 FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)
 # default value for feature flags (if not overrided by environment or client)
