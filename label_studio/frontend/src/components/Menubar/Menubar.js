@@ -65,6 +65,9 @@ export const Menubar = ({
   const contentClass = cn('content-wrapper');
   const contextItem = menubarClass.elem('context-item');
 
+  const isAccountPage = /\/user\/account\/?$/.test(location.pathname);
+  const showNewsletterDot = !isDefined(config.user.allow_newsletters) && !isAccountPage;
+
   const sidebarPin = useCallback((e) => {
     e.preventDefault();
 
@@ -147,8 +150,7 @@ export const Menubar = ({
                 href={absoluteURL("/logout")}
                 data-external
               />
-              {/* {!isDefined(config.user.allow_newsletters) && ( */}
-              {!config.user.allow_newsletters && (
+              {showNewsletterDot && (
                 <>
                   <Menu.Divider />
                   <Menu.Item
@@ -165,8 +167,7 @@ export const Menubar = ({
           )}>
             <div className={menubarClass.elem('user')}>
               <Userpic user={config.user}/>
-              {/* {!isDefined(config.user.allow_newsletters) && ( */}
-              {!config.user.allow_newsletters && (
+              {showNewsletterDot && (
                 <div className={menubarClass.elem('userpic-badge')} />
               )}
             </div>
