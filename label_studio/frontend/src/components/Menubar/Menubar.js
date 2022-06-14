@@ -4,7 +4,7 @@ import { IconBook, IconFolder, IconPersonInCircle, IconPin, IconTerminal, LsDoor
 import { useConfig } from '../../providers/ConfigProvider';
 import { useContextComponent, useFixedLocation } from '../../providers/RoutesProvider';
 import { cn } from '../../utils/bem';
-import { absoluteURL } from '../../utils/helpers';
+import { absoluteURL, isDefined } from '../../utils/helpers';
 import { Breadcrumbs } from '../Breadcrumbs/Breadcrumbs';
 import { Dropdown } from "../Dropdown/Dropdown";
 import { Hamburger } from "../Hamburger/Hamburger";
@@ -136,7 +136,7 @@ export const Menubar = ({
             <Menu>
               <Menu.Item
                 icon={<LsSettings/>}
-                label="Account & Settings"
+                label="Account &amp; Settings"
                 href="/user/account"
                 data-external
               />
@@ -147,10 +147,26 @@ export const Menubar = ({
                 href={absoluteURL("/logout")}
                 data-external
               />
+              {/* {!isDefined(config.user.allow_newsletters) && ( */}
+              {!config.user.allow_newsletters && (
+                <>
+                  <Menu.Divider />
+                  <Menu.Item
+                    className={cn("newsletter-menu-item")}
+                    label="We've added option to subscribe for our newsletters, so check your settings, please"
+                    href="/user/account"
+                    data-external
+                  />
+                </>
+              )}
             </Menu>
           )}>
             <div className={menubarClass.elem('user')}>
               <Userpic user={config.user}/>
+              {/* {!isDefined(config.user.allow_newsletters) && ( */}
+              {!config.user.allow_newsletters && (
+                <div className={menubarClass.elem('userpic-badge')} />
+              )}
             </div>
           </Dropdown.Trigger>
         </div>
