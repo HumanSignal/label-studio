@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2592: Bounding box is flickering during region creation",
-  "commit": "76ad1f6c00d1039bb01ef9f684b9696968383e63",
-  "branch": "fb-dev-2592",
-  "date": "2022-06-13T18:13:49Z"
+  "message": "fix: DEV-2309: don't show the delete all region button when annotation is readonly (#707)",
+  "commit": "ed8a5904c689db026aefd3a0e3507204479cd7d4",
+  "branch": "master",
+  "date": "2022-06-14T18:08:14Z"
 }
