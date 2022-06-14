@@ -4,9 +4,10 @@ type: templates
 category: Dynamic Labels
 cat: dynamic-labels
 order: 151
-meta_title: Choose the most accurate Automatic Speach Recognition (ASR) hypothese
+meta_title: Choose the most accurate Automatic Speech Recognition (ASR) hypotheses
 meta_description: 
 ---
+When you work with automatic speech transcribers, you are provided with several transcription hypotheses. Now, you can can select one of the variations from the list of transcription hypotheses.
 
 ## Labeling Configuration
 
