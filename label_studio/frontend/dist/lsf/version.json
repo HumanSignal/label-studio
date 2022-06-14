@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2592: Bounding box is flickering during region creation",
-  "commit": "76ad1f6c00d1039bb01ef9f684b9696968383e63",
-  "branch": "fb-dev-2592",
-  "date": "2022-06-13T18:13:49Z"
+  "message": "fix: DEV-2592: Bounding box is flickering during region creation (#705)",
+  "commit": "3e01641ac72088f6f5965509cd96a5af6f97550f",
+  "branch": "master",
+  "date": "2022-06-13T23:07:55Z"
 }
