@@ -134,6 +134,7 @@ class ContextLog(object):
             'method': request.method,
             'values': request.GET.dict(),
             'json': body,
+            'advanced_json': request.advanced_json if hasattr(request, 'advanced_json') else None,
             'language': request.LANGUAGE_CODE,
             'content_type': request.content_type,
             'content_length': int(request.environ.get('CONTENT_LENGTH')) if request.environ.get('CONTENT_LENGTH') else None,

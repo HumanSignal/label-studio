@@ -132,7 +132,16 @@ class UserAPI(viewsets.ModelViewSet):
         return super(UserAPI, self).retrieve(request, *args, **kwargs)
 
     def partial_update(self, request, *args, **kwargs):
-        return super(UserAPI, self).partial_update(request, *args, **kwargs)
+        result = super(UserAPI, self).partial_update(request, *args, **kwargs)
+
+        # newsletters
+        if 'allow_newsletters' in request.data:
+            user = User.objects.get(id=request.user.id)  # we need an updated user
+            request.advanced_json = {
+                'email': user.email, 'allow_newsletters': user.allow_newsletters,
+                'update-notifications': 1, 'new-user': 0
+            }
+        return result
 
     def destroy(self, request, *args, **kwargs):
         return super(UserAPI, self).destroy(request, *args, **kwargs)
