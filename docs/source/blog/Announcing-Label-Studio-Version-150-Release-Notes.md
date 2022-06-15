@@ -2,7 +2,7 @@
 title: Announcing the Label Studio SDK with Label Studio 1.5.0
 type: blog
 image: /images/release-150/visual-label.gif
-order: 98
+order: 97
 meta_title: Label Studio Release Notes 1.5.0
 meta_description: Release notes and information about Label Studio version 1.5.0, announcing the Label Studio SDK to work with the open source data labeling tool Label Studio, or the enterprise version Label Studio Enterprise. 
 ---
