@@ -118,9 +118,15 @@ class ContextLog(object):
                hasattr(request.user_agent, 'browser') and request.user_agent.browser
 
     def create_payload(self, request, response, body):
+        advanced_json = None
+        if hasattr(request, 'advanced_json'):
+            advanced_json = request.advanced_json
+        elif hasattr(request, 'user') and hasattr(request.user, 'advanced_json'):
+            advanced_json = request.user.advanced_json
+
         payload = {
             'url': request.build_absolute_uri(),
-            'server_id': self._get_server_id(),
+            'server_id': self.server_id,
             'server_time': self._get_timestamp_now(),
             'session_id': request.session.get('uid', None),
             'client_ip': get_client_ip(request),
@@ -134,7 +140,7 @@ class ContextLog(object):
             'method': request.method,
             'values': request.GET.dict(),
             'json': body,
-            'advanced_json': request.advanced_json if hasattr(request, 'advanced_json') else None,
+            'advanced_json': advanced_json,
             'language': request.LANGUAGE_CODE,
             'content_type': request.content_type,
             'content_length': int(request.environ.get('CONTENT_LENGTH')) if request.environ.get('CONTENT_LENGTH') else None,
