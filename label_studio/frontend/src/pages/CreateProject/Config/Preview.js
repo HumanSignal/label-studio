@@ -41,9 +41,7 @@ export const Preview = ({ config, data, error, loading }) => {
           LS.settings.bottomSidePanel = true;
 
           const as = LS.annotationStore;
-          const c = as.addAnnotation({
-            userGenerate: true,
-          });
+          const c = as.createAnnotation();
 
           as.selectAnnotation(c.id);
         },
