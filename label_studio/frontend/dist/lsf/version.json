@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1714: X-axis zoom threshold (#699)\n\n* increase the minimum and default zoom to 300, the min set for wave-surfer\r\n\r\n* make default value explicit",
-  "commit": "05cf97840bbd82484e3085b289651627ff24bcd4",
-  "branch": "",
-  "date": "2022-06-10T16:57:52Z"
+  "message": "fix: DEV-1442: deselection of ImageView bounding box before creating another (#684)\n\n* fix: DEV-1422: clicking off a previously selected image rect region should deselect and not start a new region\r\n\r\n* fix: DEV-1442: image transformer test should deselect before region multiselect\r\n\r\n* fix: DEV-1442: travel through brush history test\r\n\r\n* fix: DEV-1442: spacing\r\n\r\n* fix: DEV-1442: ctrl usage to CommandOrControl in tests\r\n\r\n* fix: DEV-1442: put change behind FF\r\n\r\n* fix: DEV-1422: update to fix handling to include multi point polyregions",
+  "commit": "c36dec7c872b3c8c23dfe4f02004ffa6e33607af",
+  "branch": "master",
+  "date": "2022-06-15T13:47:31Z"
 }

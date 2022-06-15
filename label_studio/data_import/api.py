@@ -205,6 +205,7 @@ class ImportAPI(generics.CreateAPIView):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
 
         # upload files from request, and parse all tasks
+        # TODO: Stop passing request to load_tasks function, make all validation before
         parsed_data, file_upload_ids, could_be_tasks_lists, found_formats, data_columns = load_tasks(request, project)
 
         if preannotated_from_fields:
