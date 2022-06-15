@@ -1,6 +1,6 @@
 title: Visual Genome
 type: community
-group: Dynamic Labels
+group: Computer Vision
 image: /static/templates/visual-genome.png
 details: <h1>Label different described features</h1>
 config: |

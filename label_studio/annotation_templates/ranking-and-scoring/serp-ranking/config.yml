@@ -1,6 +1,6 @@
 title: Search Page Ranking
 type: community
-group: Dynamic Labels
+group: Ranking & Scoring
 image: /static/templates/serp-ranking.png
 details: <h1>Rank different kinds of results by given search query</h1>
 config: |
