@@ -7,7 +7,11 @@ order: 151
 meta_title: Choose the most accurate Automatic Speech Recognition (ASR) hypotheses
 meta_description: 
 ---
-When you work with automatic speech transcribers, you are provided with several transcription hypotheses. Now, you can can select one of the variations from the list of transcription hypotheses.
+
+When you work with automatic speech transcribers, you are provided with several transcription hypotheses. Now, you can select one of the variations from the list of transcription hypotheses.
+<br/>
+
+<img src="/images/templates/asr-hypotheses.png" alt="ASR Hypotheses Selection example" class="gif-border" width="552px" height="408px" />
 
 ## Labeling Configuration
 

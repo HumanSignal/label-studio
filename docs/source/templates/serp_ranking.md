@@ -7,7 +7,11 @@ order: 155
 meta_title: Rank different kinds of results by given search query
 meta_description: 
 ---
-Based on your search input query, you can run the search results provided by snippets. 
+
+Based on your search input query, you can run the search results provided by snippets.
+<br/>
+
+<img src="/images/templates/serp-ranking.png" alt="Search Page Ranking example" class="gif-border" width="552px" height="408px" />
 
 ## Labeling Configuration
 
