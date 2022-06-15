@@ -17,7 +17,7 @@ Rather than having annotators scroll through an extensive list of choices, Label
 
 Example use cases include:
 
-[Images with captions]
+<br/><img src="/images/release-150/dynamic-label.gif" alt="Gif of Dynamic Labels" class="gif-border" />
 
 ## Visual Labels
 
@@ -25,13 +25,13 @@ Before the Label Studio 1.5.0 release, the only option was to label data with te
 
 Example use cases include:
 
-[Images with captions]
+<br/><img src="/images/release-150/visual-label.gif" alt="Image of Visual Labels" class="gif-border" />
 
 ## User-defined Labels
 
 The latest release allows annotators to add new classes in a taxonomy as they work through the dataset, so teams can start annotating a new dataset without the need to predefine classes in advance. This is helpful when you are not sure what classes might be inside the dataset, and want to provide those as you explore your dataset. This configuration option can be enabled or disabled depending on the use case and maturity of the model. 
 
-[Image or GIF]
+<br/><img src="/images/release-150/user-defined-label.gif" alt="Image of User-defined Labels" class="gif-border" />
 
 The Label Studio 1.5.0 release also includes updates to XX, XX, and other exciting improvements and bug fixes. To see the full list of updates and contributors to this release, check out the [changelog on GitHub](**LINK TO CHANGELOG ON GITHUB**).
 
