@@ -1,6 +1,6 @@
 {
-  "message": "update drawing region sizes on zoom",
-  "commit": "c66aba49421c4c4bbda0039a983eecfc4360b187",
-  "branch": "",
-  "date": "2022-06-14T19:46:35Z"
+  "message": "fix: DEV-2313: Unfinished polygon zoom fix (#708)\n\nupdate drawing region sizes on zoom\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
+  "commit": "a5ff831a925117623cb873d574bf4aa1c83a76b5",
+  "branch": "master",
+  "date": "2022-06-15T15:07:38Z"
 }
