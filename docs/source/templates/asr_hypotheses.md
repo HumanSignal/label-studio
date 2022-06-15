@@ -25,19 +25,19 @@ When you work with automatic speech transcribers, you are provided with several 
   "data": {
     "audio": "https://htx-pub.s3.amazonaws.com/datasets/audio/f2btrop6.0.wav",
     "transcriptions": [{
-            "style": "padding-left: 5px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; background-color: #FFFFFF",
+      "style": "padding-left: 5px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; background-color: #FFFFFF",
       "value": "potrostith points out that if school based clinics were established parental permission would be required for students to receive each service offered"
     }, {
-            "style": "padding-left: 5px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; background-color: #F8F8F8",
+      "style": "padding-left: 5px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; background-color: #F8F8F8",
       "value": "potrostith points out that if school-based clinics were established parental permission would be required for students to receive each service offered"
     }, {
-            "style": "padding-left: 5px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; background-color: #F5F5F5",
+      "style": "padding-left: 5px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; background-color: #F5F5F5",
       "value": "purporting points out that if school based clinics were established parental permission would be required for students to receive each service offered"
     }, {
-            "style": "padding-left: 5px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; background-color: #F0F0F0",
+      "style": "padding-left: 5px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; background-color: #F0F0F0",
       "value": "pork roasted points out that if school based clinics were establish parental permission would be required for students to receive each service offered"
     }, {
-            "style": "padding-left: 5px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; background-color: #E8E8E8",
+      "style": "padding-left: 5px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; background-color: #E8E8E8",
       "value": "purpose it points out that if school based clinics war establish parental permission would be required for students to receive each service offered"
     }]
   }
