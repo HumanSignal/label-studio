@@ -69,7 +69,10 @@ export const Preview = ({ config, data, error, loading }) => {
     return () => {
       if (lsf.current) {
         console.info('Destroying LSF');
-        lsf.current.destroy();
+        // there is can be weird error from LSF, but we can just skip it for now
+        try {
+          lsf.current.destroy();
+        } catch(e) {}
         lsf.current = null;
       }
     };
