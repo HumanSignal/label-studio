@@ -1,7 +1,6 @@
 Computer Vision
 Natural Language Processing
 Audio/Speech Processing
-Dynamic Labels
 Conversational AI
 Ranking & Scoring
 Structured Data Parsing
