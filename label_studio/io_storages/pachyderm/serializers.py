@@ -15,7 +15,7 @@ class PachydermImportStorageSerializer(ImportStorageSerializer):
         fields = '__all__'
 
     def validate(self, data):
-        # Validate local file path
+        # Validate pachyderm resource exists
         data = super(PachydermImportStorageSerializer, self).validate(data)
         storage = PachydermImportStorage(**data)
         try:
@@ -33,7 +33,11 @@ class PachydermExportStorageSerializer(ExportStorageSerializer):
         fields = '__all__'
 
     def validate(self, data):
-        # Validate local file path
+        # Validate pachyderm resource exists
         data = super(PachydermExportStorageSerializer, self).validate(data)
+        storage = PachydermExportStorage(**data)
+        try:
+            storage.validate_connection()
+        except Exception as exc:
+            raise ValidationError(exc)
         return data
-

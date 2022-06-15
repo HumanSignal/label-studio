@@ -153,7 +153,7 @@ class PachydermImportStorage(PachydermMixin, ImportStorage):
         self.scan_and_create_links()
 
 
-class PachydermExportStorage(ExportStorage, PachydermMixin):
+class PachydermExportStorage(PachydermMixin, ExportStorage):
 
     def save_annotation(self, annotation):
         if not self.is_mounted:
