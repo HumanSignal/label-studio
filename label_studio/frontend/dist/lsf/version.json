@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2313: Unfinished polygon zoom fix (#708)\n\nupdate drawing region sizes on zoom\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
-  "commit": "a5ff831a925117623cb873d574bf4aa1c83a76b5",
-  "branch": "master",
-  "date": "2022-06-15T15:07:38Z"
+  "message": "fix: DEV-2207: sync speed between video and audio",
+  "commit": "5120811dcfe388a6e81fd94eaa71ad41d71fce82",
+  "branch": "fb-dev-2207",
+  "date": "2022-06-15T18:34:04Z"
 }
