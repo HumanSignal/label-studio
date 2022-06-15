@@ -64,9 +64,7 @@ export const Menubar = ({
   const sidebarClass = cn('sidebar');
   const contentClass = cn('content-wrapper');
   const contextItem = menubarClass.elem('context-item');
-
-  const isAccountPage = /\/user\/account\/?$/.test(location.pathname);
-  const showNewsletterDot = !isDefined(config.user.allow_newsletters) && !isAccountPage;
+  const showNewsletterDot = !isDefined(config.user.allow_newsletters);
 
   const sidebarPin = useCallback((e) => {
     e.preventDefault();
