@@ -19,7 +19,7 @@ Use with the following data types: video
 | [frameRate] | <code>number</code> | <code>24</code> | videp frame rate per second; default is 24 |
 | [sync] | <code>string</code> |  | object name to sync with |
 | [muted] | <code>boolean</code> | <code>false</code> | muted video |
-| [heihght] | <code>number</code> | <code>600</code> | heihght of the video |
+| [height] | <code>number</code> | <code>600</code> | height of the video |
 
 ### Example
 ```html
