@@ -17,8 +17,10 @@ For the inventory tracking system, you can annotate the inventory item based on 
 
 ```xml
 <View>
+  <View style="display:flex;justify-content:center">
+    <PolygonLabels name="objects" toName="image" value="$objects"/>
+  </View>
   <Image name="image" value="$image"/>
-  <PolygonLabels name="objects" toName="image" value="$objects"/>
 </View>
 ```
 
