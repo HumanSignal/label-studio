@@ -5,8 +5,10 @@ image: /static/templates/inventory-tracking.png
 details: <h1>Label exact products on the shelves</h1>
 config: |
   <View>
+    <View style="display:flex;justify-content:center">
+      <PolygonLabels name="objects" toName="image" value="$objects"/>
+    </View>
     <Image name="image" value="$image"/>
-    <PolygonLabels name="objects" toName="image" value="$objects"/>
   </View>
   <!-- {
     "data": {
