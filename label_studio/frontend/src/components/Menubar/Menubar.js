@@ -158,14 +158,14 @@ export const Menubar = ({
                     href="/user/account"
                     data-external
                   >
-                    We've added option to subscribe for our newsletters, so check your settings, please
+                    <span>Please check new notification settings in the Account & Settings page</span>
                     <span className={cn("newsletter-menu-badge")} />
                   </Menu.Item>
                 </>
               )}
             </Menu>
           )}>
-            <div className={menubarClass.elem('user')}>
+            <div title={config.user.email} className={menubarClass.elem('user')}>
               <Userpic user={config.user}/>
               {showNewsletterDot && (
                 <div className={menubarClass.elem('userpic-badge')} />
