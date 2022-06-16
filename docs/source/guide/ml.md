@@ -7,7 +7,7 @@ meta_title: Integrate Label Studio into your machine learning pipeline
 meta_description: Connect Label Studio to machine learning frameworks using the Label Studio ML backend SDK to integrate your model development pipeline seamlessly with your data labeling workflow. 
 ---
 
-Integrate your model development pipeline with your data labeling workflow by adding a machine learning backend to Label Studio. You can set up your favorite machine learning frameworks to do the following:
+Integrate your model development pipeline with your data labeling workflow by adding a machine learning (ML) backend to Label Studio. You can set up your favorite machine learning frameworks to do the following:
 - **Pre-labeling** by letting models predict labels and then have annotators perform further manual refinements. 
 - **Auto-labeling** by letting models create automatic annotations. 
 - **Online Learning** by simultaneously updating your model while new annotations are created, letting you retrain your model on-the-fly. 
@@ -135,7 +135,7 @@ You can also retrieve predictions automatically by loading tasks. To do this, en
 
 > Note: For a large dataset, the HTTP request to retrieve predictions might be interrupted by a timeout. If you want to **get all predictions** for all tasks in a dataset from connected machine learning backends, make a [POST call to the predictions endpoint of the Label Studio API](/api/#operation/api_predictions_create) for each task to prompt the machine learning backend to create predictions for the tasks. 
 
-If you want to retrieve predictions manually for a list of tasks **using only an ML backend**, make a GET request to the `/predict` URL of your ML backend with a payload of the tasks that you want to see predictions for, formatted like the following example: 
+If you want to retrieve predictions manually for a list of tasks **using only an ML backend**, make a POST request to the `/predict` URL of your ML backend with a payload of the tasks that you want to see predictions for, formatted like the following example: 
 
 ```json
 {

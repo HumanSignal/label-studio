@@ -4,6 +4,7 @@ import logging
 import json
 import re
 
+from core.redis import start_job_async_or_sync
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
 from django.db import models
@@ -142,13 +143,17 @@ class AzureBlobExportStorage(ExportStorage, AzureBlobStorageMixin):
         AzureBlobExportStorageLink.create(annotation, self)
 
 
-@receiver(post_save, sender=Annotation)
-def export_annotation_to_azure_storages(sender, instance, **kwargs):
-    project = instance.task.project
+def async_export_annotation_to_azure_storages(annotation):
+    project = annotation.task.project
     if hasattr(project, 'io_storages_azureblobexportstorages'):
         for storage in project.io_storages_azureblobexportstorages.all():
-            logger.debug(f'Export {instance} to Azure Blob storage {storage}')
-            storage.save_annotation(instance)
+            logger.debug(f'Export {annotation} to Azure Blob storage {storage}')
+            storage.save_annotation(annotation)
+
+
+@receiver(post_save, sender=Annotation)
+def export_annotation_to_azure_storages(sender, instance, **kwargs):
+    start_job_async_or_sync(async_export_annotation_to_azure_storages, instance)
 
 
 class AzureBlobImportStorageLink(ImportStorageLink):

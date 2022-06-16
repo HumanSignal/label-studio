@@ -1,6 +1,6 @@
 {
-  "message": "fix: dev-2068: toolswitch-finish-drawing (#574)\n\n* check the number of pointes if points\r\n\r\n* remove logging\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "02b1197a8abd249459e50471a0c13c0c627e94e3",
+  "message": "fix: DEV-2313: Unfinished polygon zoom fix (#708)\n\nupdate drawing region sizes on zoom\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
+  "commit": "a5ff831a925117623cb873d574bf4aa1c83a76b5",
   "branch": "master",
-  "date": "2022-04-14T10:01:18Z"
+  "date": "2022-06-15T15:07:38Z"
 }

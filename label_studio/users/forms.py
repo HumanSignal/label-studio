@@ -11,6 +11,7 @@ from django.conf import settings
 from users.models import User
 
 
+EMAIL_MAX_LENGTH = 256
 PASS_MAX_LENGTH = 64
 PASS_MIN_LENGTH = 8
 USERNAME_MAX_LENGTH = 30
@@ -35,6 +36,8 @@ class LoginForm(forms.Form):
         cleaned = super(LoginForm, self).clean()
         email = cleaned.get('email', '').lower()
         password = cleaned.get('password', '')
+        if len(email) >= EMAIL_MAX_LENGTH:
+            raise forms.ValidationError('Email is too long')
 
         # advanced way for user auth
         user = settings.USER_AUTH(User, email, password)
@@ -54,6 +57,7 @@ class UserSignupForm(forms.Form):
     password = forms.CharField(max_length=PASS_MAX_LENGTH,
                                error_messages={'required': PASS_LENGTH_ERR},
                                widget=forms.TextInput(attrs={'type': 'password'}))
+    allow_newsletters = forms.BooleanField(required=False)
 
     def clean_password(self):
         password = self.cleaned_data['password']
@@ -69,6 +73,8 @@ class UserSignupForm(forms.Form):
 
     def clean_email(self):
         email = self.cleaned_data.get('email').lower()
+        if len(email) >= EMAIL_MAX_LENGTH:
+            raise forms.ValidationError('Email is too long')
 
         if email and User.objects.filter(email=email).exists():
             raise forms.ValidationError('User with this email already exists')
@@ -79,7 +85,10 @@ class UserSignupForm(forms.Form):
         cleaned = self.cleaned_data
         password = cleaned['password']
         email = cleaned['email'].lower()
-        user = User.objects.create_user(email, password)
+        allow_newsletters = None
+        if 'allow_newsletters' in cleaned:
+            allow_newsletters = cleaned['allow_newsletters']
+        user = User.objects.create_user(email, password, allow_newsletters=allow_newsletters)
         return user
 
 
@@ -88,5 +97,5 @@ class UserProfileForm(forms.ModelForm):
     """
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'phone')
+        fields = ('first_name', 'last_name', 'phone', 'allow_newsletters')
 
