@@ -26,6 +26,7 @@ def forwards(apps, schema_editor):
                 f"You used --skip-long-migrations, so you should run the migration manually as a separate process "
                 f"to recalculate task counters, please use Django command `manage.py calculate_stats_all_orgs`"
             )
+            return 
 
         logger.debug('Your instance has < 100000 tasks, starting calculate_stats_all_orgs')
         calculate_stats_all_orgs(from_scratch=False)
