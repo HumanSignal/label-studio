@@ -8,12 +8,18 @@ meta_title: Rank different kinds of results by given search query
 meta_description: 
 ---
 
-Based on your search input query, you can run the search results provided by snippets.
+Based on your search input query, you can select the most relevant search results provided by search engine.
 <br/>
 
 <img src="/images/templates/serp-ranking.png" alt="Search Page Ranking example" class="gif-border" width="552px" height="408px" />
 
 ## Labeling Configuration
+
+There are a lot of styles to make it look like search engine page. Search query is loaded as `$text` for `Text` objects. Specially formatted search results in html format are loaded as dynamic `Choices` via `value="$options"` parameter. Task data should contain field `options` with a list of objects, each one contains parameters for generated `Choice`. They also can be nested via `children` parameter to visually group results from the same domain.
+
+`html` content in task data should have escaped quotes (`\"`). `html` content in config should be html-escaped, see example in `Choices name="confidence"`.
+
+Example data for this config you can see below.
 
 ```xml
 <View>
