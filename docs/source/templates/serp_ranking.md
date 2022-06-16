@@ -15,7 +15,10 @@ Based on your search input query, you can select the most relevant search result
 
 ## Labeling Configuration
 
-There are a lot of styles to make it look like search engine page. Search query is loaded as `$text` for `Text` objects. Specially formatted search results in html format are loaded as dynamic `Choices` via `value="$options"` parameter. Task data should contain field `options` with a list of objects, each one contains parameters for generated `Choice`. They also can be nested via `children` parameter to visually group results from the same domain.
+There are a lot of styles to make it look like search engine page. Search query is loaded as `$text` for `Text` objects. Specially formatted search results in html format are loaded as dynamic `Choices` via `value="$options"` parameter. Task data should contain field `options` with a list of objects, each one contains parameters for generated `Choice`.
+
+Options also can be nested via `children` parameter to visually group results from the same domain. This also requires `allownested="true"` in `Choices` tag. Important thing here is that result will be different — instead of usual array of selected choices values you'll get array of arrays, every item is a list of values from topmost parent choice down to selected one. For example in provided example you'll se in result:
+`"choices": [ [ "result1", "result11" ] ]`
 
 `html` content in task data should have escaped quotes (`\"`). `html` content in config should be html-escaped, see example in `Choices name="confidence"`.
 
