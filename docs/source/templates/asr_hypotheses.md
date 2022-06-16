@@ -1,9 +1,9 @@
 ---
 title: ASR Hypotheses Selection
 type: templates
-category: Dynamic Labels
-cat: dynamic-labels
-order: 151
+category: Ranking and Scoring
+cat: ranking-and-scoring
+order: 551
 meta_title: Choose the most accurate Automatic Speech Recognition (ASR) hypotheses
 meta_description: 
 ---

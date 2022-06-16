@@ -1,8 +1,8 @@
 ---
 title: Visual Genome
 type: templates
-category: Dynamic Labels
-cat: dynamic-labels
+category: Computer Vision
+cat: computer-vision
 order: 154
 meta_title: Label different described features
 meta_description: 

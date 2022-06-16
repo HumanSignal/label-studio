@@ -1,8 +1,8 @@
 ---
 title: Inventory Tracking
 type: templates
-category: Dynamic Labels
-cat: dynamic-labels
+category: Computer Vision
+cat: computer-vision
 order: 152
 meta_title: Label exact products on the shelves
 meta_description: 
