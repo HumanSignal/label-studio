@@ -43,7 +43,7 @@ def parse_input_args(input_args):
     root_parser.add_argument(
         '-l', '--label-config', dest='label_config', type=valid_filepath, help='Label config file path'
     )
-    root_parser.add_argument('--skip-long-migrations', dest='skip_long_migrations', nargs='+',
+    root_parser.add_argument('--skip-long-migrations', dest='skip_long_migrations', action='store_true',
                              help='Skip long migrations on start')
     root_parser.add_argument('--ml-backends', dest='ml_backends', nargs='+', help='Machine learning backends URLs')
     root_parser.add_argument(
