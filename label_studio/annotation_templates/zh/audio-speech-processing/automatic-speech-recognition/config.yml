@@ -1,0 +1,13 @@
+title: 自动语音识别
+type: community
+group: 音频/语音处理
+image: /static/templates/automatic-speech-recognition.png
+details: <h1>P提供音频文本</h1>
+config: |
+  <View>
+    <Audio name="audio" value="$audio" zoom="true" hotkey="ctrl+enter" />
+    <Header value="Provide Transcription" />
+    <TextArea name="transcription" toName="audio"
+              rows="4" editable="true" maxSubmissions="1" />
+  </View>
+

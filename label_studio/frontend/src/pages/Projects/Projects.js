@@ -12,7 +12,9 @@ import { DataManagerPage } from '../DataManager/DataManager';
 import { SettingsPage } from '../Settings';
 import './Projects.styl';
 import { EmptyProjectsList, ProjectsList } from './ProjectsList';
-
+import { Trans, useTranslation } from 'react-i18next';
+import i18n from "i18next";
+import "../../translations/i18n";
 const getCurrentPage = () => {
   const pageNumberFromURL = new URLSearchParams(location.search).get("page");
 
@@ -20,6 +22,7 @@ const getCurrentPage = () => {
 };
 
 export const ProjectsPage = () => {
+  const { t } = useTranslation();
   const api = React.useContext(ApiContext);
   const [projectsList, setProjectsList] = React.useState([]);
   const [networkState, setNetworkState] = React.useState(null);

@@ -1,0 +1,14 @@
+title: 关键点标注
+type: community
+group: 计算机视觉
+order: 10000
+image: /static/templates/keypoints.png
+details: <h1>单击标签，然后在画布上</h1>
+config: |
+  <View>
+    <KeyPointLabels name="kp-1" toName="img-1">
+      <Label value="Face" background="red" />
+      <Label value="Nose" background="green" />
+    </KeyPointLabels>
+    <Image name="img-1" value="$img" />
+  </View>

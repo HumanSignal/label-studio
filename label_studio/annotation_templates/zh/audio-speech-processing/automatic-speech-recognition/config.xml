@@ -1,0 +1,25 @@
+<View>
+  <Audio name="audio" value="$audio" zoom="true" hotkey="ctrl+enter" />
+  <Header value="Provide Transcription" />
+  <TextArea name="transcription" toName="audio" rows="4" editable="true" maxSubmissions="1" />
+</View>
+
+<!-- { "data":
+
+{"audio": "/static/samples/game.wav"},
+"annotations": [{
+"result": [
+    {
+        "value": {
+            "text": [
+                "Wow wow wow!... "
+            ]
+        },
+        "id": "hj0mP4gEC1",
+        "from_name": "transcription",
+        "to_name": "audio",
+        "type": "textarea"
+    }
+]
+}]
+} -->

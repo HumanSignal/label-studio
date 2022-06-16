@@ -1,0 +1,15 @@
+title: 共指解析和实体链接
+type: community
+group: 对话式人工智能
+image: /static/templates/coreference-resolution-and-entity-linking.png
+details: <h1>在文本中的词性和链接实体之间进行共指解析</h1>
+config: |
+  <View>
+    <Labels name="label" toName="text">
+      <Label value="Noun" background="red"/>
+      <Label value="Pronoun" background="darkorange"/>
+    </Labels>
+
+    <Text name="text" value="$corefText"/>
+  </View>
+

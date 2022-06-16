@@ -1,0 +1,76 @@
+<View>
+  <Labels name="label" toName="text">
+    <Label value="PER" background="red"/>
+    <Label value="ORG" background="darkorange"/>
+    <Label value="LOC" background="orange"/>
+    <Label value="MISC" background="green"/>
+  </Labels>
+
+  <Text name="text" value="$text"/>
+</View>
+
+<!-- {"data": {
+  "text": "A Florida restaurant paid 10,925 pounds ($16,935) for the draft of \"Ain't no telling\", which Hendrix penned on a piece of London hotel stationery in late 1966."
+},
+"annotations": [{"result":
+[
+    {
+        "value": {
+            "start": 2,
+            "end": 9,
+            "text": "Florida",
+            "labels": [
+                "LOC"
+            ]
+        },
+        "id": "eKp4GFOe0i",
+        "from_name": "label",
+        "to_name": "text",
+        "type": "labels"
+    },
+    {
+        "value": {
+            "start": 68,
+            "end": 84,
+            "text": "Ain't no telling",
+            "labels": [
+                "MISC"
+            ]
+        },
+        "id": "5TX2lN7gpf",
+        "from_name": "label",
+        "to_name": "text",
+        "type": "labels"
+    },
+    {
+        "value": {
+            "start": 93,
+            "end": 100,
+            "text": "Hendrix",
+            "labels": [
+                "PER"
+            ]
+        },
+        "id": "vvCi3V1YiS",
+        "from_name": "label",
+        "to_name": "text",
+        "type": "labels"
+    },
+    {
+        "value": {
+            "start": 122,
+            "end": 128,
+            "text": "London",
+            "labels": [
+                "LOC"
+            ]
+        },
+        "id": "09r8VxrAe2",
+        "from_name": "label",
+        "to_name": "text",
+        "type": "labels"
+    }
+]
+}]
+}
+-->

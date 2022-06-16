@@ -1,0 +1,15 @@
+title: 图像分类
+type: community
+group: 计算机视觉
+image: /static/templates/image-classification.png
+details: <h1>对图像进行分类</h1>
+config: |
+  <View>
+    <Image name="image" value="$image"/>
+    <Choices name="choice" toName="image">
+      <Choice value="Adult content"/>
+      <Choice value="Weapons" />
+      <Choice value="Violence" />
+    </Choices>
+  </View>
+

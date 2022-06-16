@@ -6,7 +6,9 @@ import { useAPI } from '../../../providers/ApiProvider';
 import { cn } from '../../../utils/bem';
 import './Config.styl';
 import { IconInfo } from '../../../assets/icons';
-
+import i18n from "i18next";
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n"
 
 const listClass = cn("templates-list");
 
@@ -38,12 +40,13 @@ const TemplatesInGroup = ({ templates, group, onSelectRecipe }) => {
 };
 
 export const TemplatesList = ({ selectedGroup, selectedRecipe, onCustomTemplate, onSelectGroup, onSelectRecipe }) => {
+  const { t } = useTranslation();
   const [groups, setGroups] = React.useState([]);
   const [templates, setTemplates] = React.useState();
   const api = useAPI();
 
   React.useEffect(async () => {
-    const res = await api.callApi('configTemplates');
+    const res = await api.callApi('configTemplates', { params: { language: i18n.language } });
     if (!res) return;
     const { templates, groups } = res;
     setTemplates(templates);
@@ -70,7 +73,7 @@ export const TemplatesList = ({ selectedGroup, selectedRecipe, onCustomTemplate,
             </li>
           ))}
         </ul>
-        <button type="button" onClick={onCustomTemplate} className={listClass.elem("custom-template")}>Custom template</button>
+        <button type="button" onClick={onCustomTemplate} className={listClass.elem("custom-template")}>{t("pages.create_project.config_label.custom_template")}</button>
       </aside>
       <main>
         {!templates && <Spinner style={{ width: "100%", height: 200 }} />}
@@ -78,7 +81,7 @@ export const TemplatesList = ({ selectedGroup, selectedRecipe, onCustomTemplate,
       </main>
       <footer>
         <IconInfo className={listClass.elem("info-icon")} width="20" height="20" />
-        See the documentation to <a href="https://labelstud.io/guide" target="_blank">contribute a template</a>.
+        {t("pages.create_project.config_label.footer_mst_part1")}<a href="https://labelstud.io/guide" target="_blank">{t("pages.create_project.config_label.footer_mst_part2")}</a>
       </footer>
     </div>
   );

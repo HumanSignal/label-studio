@@ -1,0 +1,81 @@
+<View>
+    <!-- Control tag for region labels -->
+    <TimeSeriesLabels name="label" toName="ts">
+        <Label value="Run" background="red"/>
+        <Label value="Walk" background="green"/>
+        <Label value="Fly" background="blue"/>
+        <Label value="Swim" background="#f6a"/>
+        <Label value="Ride" background="#351"/>
+    </TimeSeriesLabels>
+
+    <!-- Object tag for time series data source -->
+    <TimeSeries name="ts" valueType="url" value="$timeseriesUrl"
+                sep=","
+                timeColumn="time"
+                timeFormat="%Y-%m-%d %H:%M:%S.%f"
+                timeDisplayFormat="%Y-%m-%d"
+                overviewChannels="velocity">
+
+        <Channel column="velocity"
+                 units="miles/h"
+                 displayFormat=",.1f"
+                 strokeColor="#1f77b4"
+                 legend="Velocity"/>
+
+        <Channel column="acceleration"
+                 units="miles/h^2"
+                 displayFormat=",.1f"
+                 strokeColor="#ff7f0e"
+                 legend="Acceleration"/>
+    </TimeSeries>
+</View>
+
+<!-- { "data": { "timeseriesUrl": "/samples/time-series.csv?time=time&values=velocity%2Cacceleration&sep=%2C&tf=%25Y-%25m-%25d+%25H%3A%25M%3A%25S.%25f" },
+ "annotations": [{"result":
+ [
+    {
+        "value": {
+            "start": "2020-01-04 00:00:00.000000",
+            "end": "2020-01-11 00:00:00.000000",
+            "instant": false,
+            "timeserieslabels": [
+                "Run"
+            ]
+        },
+        "id": "kbNNRWV2xs",
+        "from_name": "label",
+        "to_name": "ts",
+        "type": "timeserieslabels"
+    },
+    {
+        "value": {
+            "start": "2020-01-12 00:00:00.000000",
+            "end": "2020-01-19 00:00:00.000000",
+            "instant": false,
+            "timeserieslabels": [
+                "Walk"
+            ]
+        },
+        "id": "VcO7Ge7Hio",
+        "from_name": "label",
+        "to_name": "ts",
+        "type": "timeserieslabels"
+    },
+    {
+        "value": {
+            "start": "2020-01-21 00:00:00.000000",
+            "end": "2020-01-26 00:00:00.000000",
+            "instant": false,
+            "timeserieslabels": [
+                "Fly"
+            ]
+        },
+        "id": "Pi7JClerJJ",
+        "from_name": "label",
+        "to_name": "ts",
+        "type": "timeserieslabels"
+    }
+]
+ }]
+
+ } -->

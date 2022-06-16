@@ -1,0 +1,12 @@
+title: 响应生成
+type: community
+group: 对话式人工智能
+image: /static/templates/response-generation.png
+details: <h1>通过生成下一个对话响应来收集聊天机器人训练数据</h1>
+config: |
+  <View>
+    <Paragraphs name="chat" value="$dialogue" layout="dialogue" />
+    <Header value="Provide response" />
+    <TextArea name="response" toName="chat" rows="4" editable="true" maxSubmissions="1" />
+  </View>
+

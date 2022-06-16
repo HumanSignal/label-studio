@@ -1,0 +1,13 @@
+title: 图片说明
+type: community
+group: 计算机视觉
+image: /static/templates/image-captioning.png
+details: <h1>写描述图像的文字</h1>
+config: |
+  <View>
+    <Image name="image" value="$captioning"/>
+    <Header value="Describe the image:"/>
+    <TextArea name="caption" toName="image" placeholder="Enter description here..."
+              rows="5" maxSubmissions="1"/>
+  </View>
+

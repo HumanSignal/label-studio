@@ -4,10 +4,13 @@ import { useLibrary } from '../../../providers/LibraryProvider';
 import { cn } from '../../../utils/bem';
 import './Config.styl';
 import { EMPTY_CONFIG } from './Template';
+import { useTranslation } from "react-i18next";
+import "../../../translations/i18n";
 
 const configClass = cn("configure");
 
 export const Preview = ({ config, data, error, loading }) => {
+  const { t } = useTranslation();
   const LabelStudio = useLibrary('lsf');
   const lsf = useRef(null);
   const rootRef = useRef();
@@ -102,7 +105,7 @@ export const Preview = ({ config, data, error, loading }) => {
 
   return (
     <div className={configClass.elem("preview")}>
-      <h3>UI Preview</h3>
+      <h3>{t("pages.create_project.config_label.ui_preview")}</h3>
       {error && (
         <div className={configClass.elem("preview-error")}>
           <h2>{error.detail} {error.id}</h2>

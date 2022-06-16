@@ -1,0 +1,25 @@
+title: 关系抽取
+type: community
+group: 自然语言处理
+order: 5
+image: /static/templates/relation-extraction.png
+details: <h1>预测句子中实体的属性和关系</h1>
+config: |
+  <View>
+     <Relations>
+      <Relation value="org:founded_by"/>
+      <Relation value="org:founded"/>
+    </Relations>
+    <Labels name="label" toName="text">
+      <Label value="Organization" background="orange"/>
+      <Label value="Person" background="green"/>
+      <Label value="Datetime" background="blue"/>
+    </Labels>
+
+    <Text name="text" value="$text"/>
+  </View>
+
+  <!-- {"data": {
+    "text": "Microsoft was founded by Bill Gates and Paul Allen on April 4, 1975, to develop and sell BASIC interpreters for the Altair 8800."
+  }} -->
+

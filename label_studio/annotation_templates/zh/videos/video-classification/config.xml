@@ -1,0 +1,28 @@
+<View>
+  <Video name="video" value="$video"/>
+  <Choices name="choice" toName="video" showInLine="true">
+    <Choice value="Blurry" />
+    <Choice value="Sharp" />
+  </Choices>
+</View>
+
+<!-- {"data": {
+ "video": "/static/samples/opossum_snow.mp4"
+},
+"predictions": [{"result":
+[
+    {
+        "value": {
+            "choices": [
+                "Blurry"
+            ]
+        },
+        "id": "vB3U85jSU4",
+        "from_name": "choice",
+        "to_name": "video",
+        "type": "choices"
+    }
+]
+}]
+ }
+-->

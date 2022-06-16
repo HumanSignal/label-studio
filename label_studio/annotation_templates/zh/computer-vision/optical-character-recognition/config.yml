@@ -1,0 +1,27 @@
+title: 光学字符识别
+type: community
+group: 计算机视觉
+image: /static/templates/optical-character-recognition.png
+details: <h1>在区域周围绘制一个边界框或多边形并写下在里面找到的文本</h1>
+config: |
+  <View>
+    <Image name="image" value="$ocr"/>
+
+    <Labels name="label" toName="image">
+      <Label value="Text" background="green"/>
+      <Label value="Handwriting" background="blue"/>
+    </Labels>
+
+    <Rectangle name="bbox" toName="image" strokeWidth="3"/>
+    <Polygon name="poly" toName="image" strokeWidth="3"/>
+
+    <TextArea name="transcription" toName="image"
+              editable="true"
+              perRegion="true"
+              required="true"
+              maxSubmissions="1"
+              rows="5"
+              placeholder="Recognized Text"
+              displayMode="region-list"
+              />
+  </View>

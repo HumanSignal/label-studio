@@ -64,7 +64,7 @@ const Labels = {
   type: 'Labels',
   settings: {
     placeLabelsLeft: {
-      title: 'Display labels:',
+      title: 'Display labels',
       type: ["bottom", "left", "right", "top"],
       control: true,
       when: $tag => $tag.$object.tagName !== "Video",

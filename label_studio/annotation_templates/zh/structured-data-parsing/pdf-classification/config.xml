@@ -1,0 +1,41 @@
+<View>
+    <Header value="Rate this article"/>
+  <Rating name="rating" toName="pdf" maxRating="10" icon="star" size="medium" />
+
+  <Choices name="choices" choice="single-radio" toName="pdf" showInline="true">
+    <Choice value="Important article"/>
+    <Choice value="Yellow press"/>
+  </Choices>
+  <HyperText name="pdf" value="$pdf" inline="true"/>
+</View>
+
+
+<!-- {
+"data": {"text": "<embed src='static/samples/sample.pdf' width='100%' height='600px'/>"},
+"annotations": [{
+"result": [
+    {
+        "value": {
+            "rating": 6
+        },
+        "id": "LBtpNELmQx",
+        "from_name": "rating",
+        "to_name": "pdf",
+        "type": "rating"
+    },
+    {
+        "value": {
+            "choices": [
+                "Important article"
+            ]
+        },
+        "id": "NsP16im1Jg",
+        "from_name": "choices",
+        "to_name": "pdf",
+        "type": "choices"
+    }
+]
+}]
+
+}
+-->

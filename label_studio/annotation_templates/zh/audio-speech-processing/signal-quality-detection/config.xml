@@ -1,0 +1,18 @@
+<View>
+  <Rating name="rating" toName="audio" maxRating="10" icon="star" size="medium" />
+  <Audio name="audio" value="$audio"/>
+</View>
+
+<!-- { "data": {"audio": "/static/samples/game.wav"},
+"annotations": [{"result":[
+    {
+        "value": {
+            "rating": 8
+        },
+        "id": "aqzIGbO44M",
+        "from_name": "rating",
+        "to_name": "audio",
+        "type": "rating"
+    }
+]}]
+} -->

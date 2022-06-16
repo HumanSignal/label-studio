@@ -1,0 +1,25 @@
+title: 基于内容的图像检索
+type: community
+group: 排名和评分
+image: /static/templates/content-based-image-search.png
+details: <h1>选择与查询图像相关的图像</h1>
+config: |
+  <View>
+    <Image name="query" value="$query_image" />
+    <Header value="Choose similar images:" />
+    <View style="display: flex">
+      <View>
+      <Image name="image1" value="$image1" />
+      <Image name="image2" value="$image2" />
+      <Image name="image3" value="$image3" />
+      </View>
+      <View>
+      <Choices name="similar" toName="query" required="true" choice="multiple">
+        <Choice value="One" />
+        <Choice value="Two" />
+        <Choice value="Two" />
+      </Choices>
+      </View>
+    </View>
+  </View>
+
