@@ -1,5 +1,5 @@
 ---
-title: Label Studio 1.5.0 - Introducing the new features to customize label sets
+title: Announcing the Label Studio 1.5.0 Features and Release Notes
 type: blog
 image: /images/release-150/visual-label.png
 order: 97
