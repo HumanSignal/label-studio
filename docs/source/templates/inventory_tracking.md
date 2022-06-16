@@ -15,13 +15,6 @@ Inventory Tracking system allows you to label exact products by given brand name
 
 <img src="/images/templates/inventory-tracking.png" alt="Inventory Tracking example" class="gif-border" width="552px" height="408px" />
 
-Let's get trough configuration. `View` is used only for visual purposes. The main thing here is the `value` in `PolygonLabels`, it allows us to load labels dynamically for every task from related array in task data, one `Label` per item. Every parameter from such item in data will be present as parameter in generated `Label` tag.
-
-Also there is new `html` parameter for `Label` tag which allows to display rich content as label. This content should be html-escaped — `<` -> `&lt;`, `"` -> `&quot;`, `>` -> `&gt;`, etc.
-Stored value still comes from `value` parameter, it's required.
-
-You can also use usual static `Label`s inside `Labels` tag in combination with dynamic ones — static labels will be displayed first.
-
 ## Labeling Configuration
 
 ```xml
@@ -33,9 +26,21 @@ You can also use usual static `Label`s inside `Labels` tag in combination with d
 </View>
 ```
 
-We use `value=$objects` so we should set `objects` field in task data as the source for generated labels, every item contains parameters for such tags, these parameters can be different for every label, the only required is `value`. `html` content should be string-escaped, so it's better to use single quotes here.
+Let's get trough configuration. `View` is used only for layout purposes. The main thing here is the `value` in `PolygonLabels`, it allows us to load labels dynamically for every task from related array in task data, one `Label` per item. Every parameter from such item in data will be present as parameter in generated `Label` tag.
+
+Also there is new `html` parameter for `Label` tag which allows to display rich content as label. This content should be html-escaped:
+- `<` &rarr; `&lt;`
+- `"` &rarr; `&quot;`
+- `>` &rarr; `&gt;`
+- etc.
+
+Stored value still comes from `value` parameter, it's required.
+
+You can also use usual static `Label`s inside `Labels` tag in combination with dynamic ones — static labels will be displayed first.
 
 ## Example data
+
+We use `value=$objects` so we should set `objects` field in task data as the source for generated labels, every item contains parameters for such tags, these parameters can be different for every label, the only required is `value`. `html` content should be string-escaped, so it's better to use single quotes here.
 
 ```json
 {
