@@ -1,0 +1,93 @@
+title: Search Page Ranking
+type: community
+group: Ranking & Scoring
+image: /static/templates/serp-ranking.png
+details: <h1>Rank different kinds of results by given search query</h1>
+config: |
+  <View>
+    <View style="margin:5px;      width:575px;      border-radius:30px;      border:1px solid #dcdcdc;             height:45px;      width:500px;      font-size:16px;             display: flex;             justify-content: center;             padding: 8px;      outline: none;             background-image: url('https://htx-pub.s3.amazonaws.com/samples/google-search-magnifying-glass-icon-5.jpeg');             background-position: left center;             background-size: 24px;             background-repeat: no-repeat;             background-origin: content-box;                ">
+      <Text name="text" value="$text"/>
+    </View>
+    <View className="dynamic_choices">
+      <Choices name="dynamic_choices" toName="text" selection="checkbox" value="$options" layout="vertical" choice="multiple" allownested="true"/>
+    </View>
+    <View style="box-shadow: 2px 2px 5px #999; padding: 20px; margin-top: 1em; border-radius: 5px;">
+      <Header value="Search Quality"/>
+      <Rating name="relevance" toName="text"/>
+    </View>
+    <View style="box-shadow: 2px 2px 5px #999; padding: 15px 5px 10px 20px; margin-top: 1.5em; margin-bottom: 1.25em; border-radius: 5px; display: flex; align-items: center;">
+      <Header value="Labeling Confidence" style="font-size: 1.25em"/>
+      <View style="margin: 0 1em 0.5em 1.5em">
+        <Choices name="confidence" toName="text" choice="single" showInLine="true">
+          <Choice value="Low" html="&lt;img width='40' src='https://www.iconsdb.com/icons/preview/green/thumbs-up-xxl.png'/&gt;"/>
+          <Choice value="High" html="&lt;img width='40' src='https://www.iconsdb.com/icons/preview/red/thumbs-down-xxl.png'/&gt;"/>
+        </Choices>
+      </View>
+    </View>
+    <Style>
+    .searchresultsarea {
+      margin-left: 10px;
+      font-family: 'Arial';
+    }
+    .searchresult {
+    	margin-left: 8px;
+  	}
+  	.searchresult h2 {
+      font-size: 19px;
+      line-height: 18px;
+      font-weight: normal;
+      color: rgb(29, 1, 189);
+      margin-bottom: 0px;
+      margin-top: 25px;
+  	}
+  	.searchresult a {
+      font-size: 14px;
+      line-height: 14px;
+      color: green;
+      margin-bottom: 0px;
+  	}
+    .searchresult button {
+      font-size: 10px;
+      line-height: 14px;
+      color: green;
+      margin-bottom: 0px;
+      padding: 0px;
+      border-width: 0px;
+      background-color: white;
+    }
+    </Style>
+  </View>
+  <!-- {
+    "data": {
+      "text": "Which is the biggest black hole in the universe?",
+        "options": [
+          {
+            "value": "Wikipedia page",
+            "html": "<div id=\"searchresultsarea\"><div class=\"searchresult\"><h2>Lock (computer science) - Wikipedia</h2><a>https://en.wikipedia.org/wiki/Lock_(computer_science)</a> <p>In computer science, a lock or mutex (from mutual exclusion) is a synchronization mechanism for enforcing limits on access to a resource in an environment where there are many threads of execution.</p></div>"
+          },
+          {
+            "value": "Wikipedia page",
+            "html": "<a href='https://en.wikipedia.org/wiki/List_of_most_massive_black_holes' target='_blank'>List of most massive black holes - Wikipedia</a>"
+          }, {
+            "value": "People also ask",
+            "html": "<p style='font-size: 14px'>People also ask</p>",
+            "children": [
+              {
+                "value": "Which is bigger universe or black hole?",
+                "selected": true,
+                "hotkey": "q"
+              },
+              {
+                "value": "What is the biggest a black hole can get?"
+              },
+              {
+                "value": "What is the biggest a black hole can get?"
+              },
+              {
+                "value": "What is bigger Uy scuti or 618?"
+              }
+            ]
+          }
+        ]
+    }
+  } -->
