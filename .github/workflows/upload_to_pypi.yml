@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'version'
+        description: 'Version'
         type: string
         required: true
       ref:
-        description: 'Ref'
+        description: 'ref'
         type: string
         required: true
   release:
