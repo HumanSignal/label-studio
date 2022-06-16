@@ -1,6 +1,16 @@
 name: "Upload to PYPI"
 
 on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version'
+        type: string
+        required: true
+      ref:
+        description: 'ref'
+        type: string
+        required: true
   release:
     types:
       - released
@@ -13,9 +23,16 @@ jobs:
       - uses: hmarr/debug-action@v2.0.1
 
       - name: Checkout
+        if: github.event_name == 'release'
         uses: actions/checkout@v3
         with:
           ref: ${{ github.event.release.tag_name }}
+
+      - name: Checkout
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -47,7 +64,7 @@ jobs:
 
       - name: Package and Upload
         env:
-          STACKMANAGER_VERSION: ${{ github.event.release.tag_name }}
+          STACKMANAGER_VERSION: ${{ github.event.release.tag_name || inputs.version }}
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_APIKEY }}
         run: |
