@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2313: Unfinished polygon zoom fix (#708)\n\nupdate drawing region sizes on zoom\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
-  "commit": "a5ff831a925117623cb873d574bf4aa1c83a76b5",
+  "message": "fix: DEV-1442: fix FF ticket number (#710)\n\n* fix: DEV-1422: clicking off a previously selected image rect region should deselect and not start a new region\r\n\r\n* fix: DEV-1442: image transformer test should deselect before region multiselect\r\n\r\n* fix: DEV-1442: travel through brush history test\r\n\r\n* fix: DEV-1442: spacing\r\n\r\n* fix: DEV-1442: ctrl usage to CommandOrControl in tests\r\n\r\n* fix: DEV-1442: put change behind FF\r\n\r\n* fix: DEV-1422: update to fix handling to include multi point polyregions\r\n\r\n* fix: DEV-1442: fix FF ticket number",
+  "commit": "ab2c1539aacbcc6729429cf8cf17995f49f8dff6",
   "branch": "master",
-  "date": "2022-06-15T15:07:38Z"
+  "date": "2022-06-16T15:57:30Z"
 }
