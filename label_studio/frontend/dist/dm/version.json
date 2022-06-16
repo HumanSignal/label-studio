@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1703: add scroll to view when focus changes to stickyList in table component (#35)\n\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
-  "commit": "172c8eeb252a2bfef81133a87fdcbca146781d04",
+  "message": "ci: DEV-2445: Add Review/Merge Automation (#66)",
+  "commit": "3caaedb264407951f6f07adef76a51102bea64ab",
   "branch": "master",
-  "date": "2022-05-12T18:31:27Z"
+  "date": "2022-05-31T09:27:40Z"
 }

@@ -1,6 +1,6 @@
 {
-  "message": "check visibiltiy mixin for taxonomy",
-  "commit": "8a3071dafd72589dd8a49e301cfdf719fa157c5a",
-  "branch": "fb-dev-1975/support-long-unborken-taxonomy",
-  "date": "2022-06-07T18:03:32Z"
+  "message": "fix: DEV-2313: Unfinished polygon zoom fix (#708)\n\nupdate drawing region sizes on zoom\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
+  "commit": "a5ff831a925117623cb873d574bf4aa1c83a76b5",
+  "branch": "master",
+  "date": "2022-06-15T15:07:38Z"
 }
