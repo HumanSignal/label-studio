@@ -7,7 +7,9 @@ meta_description: Customize Label Studio by using the Labels tag to provide a se
 ---
 
 The Labels tag provides a set of labels for labeling regions in tasks for machine learning and data science projects. Use the Labels tag to create a set of labels that can be assigned to identified region and specify the values of labels to assign to regions.
+
 All types of Labels can have dynamic value to load labels from task. This task data should contain a list of options to create underlying <Label>s. All the parameters from options will be transferred to corresponding tags.
+
 The Labels tag can be used with audio and text data types. Other data types have type-specific Labels tags.
 
 ### Parameters
@@ -23,7 +25,7 @@ The Labels tag can be used with audio and text data types. Other data types have
 | [fillColor] | <code>string</code> |  | Rectangle fill color in hexadecimal |
 | [strokeColor] | <code>string</code> | <code>&quot;#f48a42&quot;</code> | Stroke color in hexadecimal |
 | [strokeWidth] | <code>number</code> | <code>1</code> | Width of the stroke |
-| [value] | <code>string</code> |  | Task data field containing a list of dynamicly loaded labels (see example) |
+| [value] | <code>string</code> |  | Task data field containing a list of dynamically loaded labels (see example below) |
 
 ### Example
 ```html
@@ -36,12 +38,12 @@ The Labels tag can be used with audio and text data types. Other data types have
   <Text name="txt-1" value="$text" />
 </View>
 ```
-**Example** *(This config with dynamic labels)*  
+**Example** *(This part of config with dynamic labels)*  
 ```html
-<PolygonLabels name="product" toName="shelf" value="$labels" />
+<Labels name="product" toName="shelf" value="$brands" />
 <!-- {
   "data": {
-    "options": [
+    "brands": [
       { "value": "Big brand" },
       { "value": "Another brand", "background": "orange" },
       { "value": "Local brand" },
@@ -52,10 +54,10 @@ The Labels tag can be used with audio and text data types. Other data types have
 ```
 **Example** *(is equivalent to this config)*  
 ```html
-<PolygonLabels name="product" toName="shelf">
+<Labels name="product" toName="shelf">
   <Label value="Big brand" />
   <Label value="Another brand" background="orange" />
   <Label value="Local brand" />
   <Label value="Green brand" alias="Eco" showAlias="true" />
-</PolygonLabels>
+</Labels>
 ```
