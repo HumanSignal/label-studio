@@ -101,7 +101,19 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
 
     activity_at = models.DateTimeField(_('last annotation activity'), auto_now=True)
 
-    active_organization = models.ForeignKey('organizations.Organization', on_delete=models.SET_NULL, related_name='active_users', null=True)
+    active_organization = models.ForeignKey(
+        'organizations.Organization',
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='active_users'
+    )
+
+    allow_newsletters = models.BooleanField(
+        _('allow newsletters'),
+        null=True,
+        default=None,
+        help_text=_('Allow sending newsletters to user')
+    )
 
     objects = UserManager()
 

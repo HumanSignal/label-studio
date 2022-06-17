@@ -208,7 +208,7 @@ class ExportMixin:
 
     @staticmethod
     def eval_md5(file):
-        md5_object = hashlib.md5()
+        md5_object = hashlib.md5()   # nosec
         block_size = 128 * md5_object.block_size
         chunk = file.read(block_size)
         while chunk:

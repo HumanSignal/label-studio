@@ -13,30 +13,13 @@ logger = logging.getLogger(__name__)
 
 
 def _get_random_unlocked(task_query, user, upper_limit=None):
-    # get random task from task query, ignoring locked tasks
-    n = task_query.count()
-    if n > 0:
-        upper_limit = upper_limit or n
-        random_indices = np.random.permutation(upper_limit)
-        task_query_only = task_query.only('overlap', 'id')
-
-        for i in random_indices:
-            try:
-                task = task_query_only[int(i)]
-            except IndexError as exc:
-                logger.error(
-                    f'Task query out of range for {int(i)}, count={task_query_only.count()}. ' f'Reason: {exc}',
-                    exc_info=True,
-                )
-            except Exception as exc:
-                logger.error(exc, exc_info=True)
-            else:
-                try:
-                    task = Task.objects.select_for_update(skip_locked=True).get(pk=task.id)
-                    if not task.has_lock(user):
-                        return task
-                except Task.DoesNotExist:
-                    logger.debug('Task with id {} locked'.format(task.id))
+    for task in task_query.order_by('?').only('id')[:settings.RANDOM_NEXT_TASK_SAMPLE_SIZE]:
+        try:
+            task = Task.objects.select_for_update(skip_locked=True).get(pk=task.id)
+            if not task.has_lock(user):
+                return task
+        except Task.DoesNotExist:
+            logger.debug('Task with id {} locked'.format(task.id))
 
 
 def _get_first_unlocked(tasks_query, user):
@@ -145,7 +128,7 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
 
     if project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
         user_solved_tasks_array = user_solved_tasks_array.filter(was_cancelled=False)
-        queue_info += ' Requeued for me from cancelled tasks '
+        queue_info += ' Requeued for me from skipped tasks '
 
     user_solved_tasks_array = user_solved_tasks_array.distinct().values_list('task__pk', flat=True)
     not_solved_tasks = prepared_tasks.exclude(pk__in=user_solved_tasks_array)
@@ -164,9 +147,9 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
     if project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
         # Ordering works different for sqlite and postgresql, details: https://code.djangoproject.com/ticket/19726
         if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
-            not_solved_tasks = not_solved_tasks.order_by('annotations__was_cancelled', 'id')
+            not_solved_tasks = not_solved_tasks.order_by('annotations__was_cancelled', 'updated_at')
         else:
-            not_solved_tasks = not_solved_tasks.order_by('-annotations__was_cancelled', 'id')
+            not_solved_tasks = not_solved_tasks.order_by('-annotations__was_cancelled', 'updated_at')
 
     return not_solved_tasks, user_solved_tasks_array, queue_info
 

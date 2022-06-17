@@ -34,7 +34,7 @@ async function get(projectName, ref = 'master') {
   if (!REPO) {
     const repos = Object.entries(PROJECTS).map(a => "\t" + a.join("\t")).join("\n");
     console.error(`\n${RED}Cannot fetch from repo ${REPO}.${NC}\nOnly available:\n${repos}`);
-    return;
+    throw new Error();
   }
 
   if (!fs.existsSync(dir)) {
@@ -50,7 +50,7 @@ async function get(projectName, ref = 'master') {
     if (!json || !json.object) {
       console.log(`\n${RED}Wrong response from GitHub. Check that you use correct GITHUB_TOKEN and given branch was successfully built.${NC}`);
       console.log(json);
-      return;
+      throw new Error();
     }
 
     sha = json.object.sha;
@@ -59,6 +59,8 @@ async function get(projectName, ref = 'master') {
   } else {
     sha = ref;
   }
+
+  console.info(`Build link: ${REPO}@${sha}`)
 
   const artifactsUrl = `https://api.github.com/repos/${REPO}/actions/artifacts`;
   res = await fetch(artifactsUrl, { headers: { Authorization: `token ${TOKEN}` }});

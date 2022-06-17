@@ -1,0 +1,22 @@
+name: "/help command"
+
+on:
+  repository_dispatch:
+    types: [ help-command ]
+jobs:
+  help:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Update comment if empty
+        if: ${{ github.event.client_payload.slash_command.args.all == '' }}
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > Command | Description
+            > --- | ---
+            > /frontend [\<args\> ...] | Actions with frontend. Type `/frontend help` for an additional help.
+          reaction-type: hooray
