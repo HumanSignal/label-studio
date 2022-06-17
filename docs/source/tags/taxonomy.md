@@ -20,6 +20,8 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [showFullPath] | <code>boolean</code> | <code>false</code> | Whether to show the full path of selected items |
 | [pathSeparator] | <code>string</code> | <code>&quot;/&quot;</code> | Separator to show in the full path |
 | [maxUsages] | <code>number</code> |  | Maximum number of times a choice can be selected per task |
+| [maxWidth] | <code>number</code> |  | Maximum width for dropdown |
+| [minWidth] | <code>number</code> |  | Minimum width for dropdown |
 | [required] | <code>boolean</code> | <code>false</code> | Whether taxonomy validation is required |
 | [requiredMessage] | <code>string</code> |  | Message to show if validation fails |
 | [placeholder=] | <code>string</code> |  | What to display as prompt on the input |
