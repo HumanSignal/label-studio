@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'fb-dev-2647' of github.com:heartexlabs/label-studio-frontend into fb-dev-2647",
-  "commit": "e8777b386f4674716482914d15e2298cf2a3dfe8",
+  "message": "fix: DEV-2647: rotating bounding box bugs",
+  "commit": "0e0de9a171e6d5aaff1c40ccae0f78325efc58a8",
   "branch": "fb-dev-2647",
-  "date": "2022-06-17T14:55:56Z"
+  "date": "2022-06-17T21:06:04Z"
 }
