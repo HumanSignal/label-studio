@@ -14,7 +14,8 @@ on:
 env:
   DOCKER_CLI_EXPERIMENTAL: enabled
   IMAGE_NAME: heartexlabs/label-studio
-  DOCKER_TAG: 'latest'
+  RELEASE_TAG: 'latest'
+  DEVELOP_TAG: 'develop'
 
 jobs:
   docker_build_and_push:
@@ -22,10 +23,15 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
-      - name: Override image tag on 'tag'
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Extract branch name on direct push to a branch
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')
         run: |
-          echo "DOCKER_TAG=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
+          echo "DOCKER_TAGS=${{ env.IMAGE_NAME }}:${{ env.DEVELOP_TAG }}" >> $GITHUB_ENV
+
+      - name: Extract branch name on release
+        if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags/')
+        run: |
+          echo "DOCKER_TAGS=${{ env.IMAGE_NAME }}:$(echo ${GITHUB_REF#refs/tags/}),${{ env.IMAGE_NAME }}:${{ env.RELEASE_TAG }}" >> $GITHUB_ENV
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -40,7 +46,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8'
 
@@ -59,6 +65,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }}
+          tags: ${{ env.DOCKER_TAGS }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
