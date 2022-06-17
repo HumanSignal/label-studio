@@ -60,26 +60,35 @@ export const MachineLearningSettings = () => {
             <TextArea name="description" label="Description" style={{ minHeight: 120 }}/>
           </Form.Row>
 
-          <Form.Row columnCount={isFF(FF_DEV_1682) ? 3 : 1}>
-            {isFF(FF_DEV_1682) && (
-              <>
-                <ModelVersionSelector
-                  object={backend}
-                  apiName="modelVersions"
-                  valueName="version"
-                  label="Version"
-                />
+          {isFF(FF_DEV_1682) && !!backend && (
+            <Form.Row columnCount={2}>
+              <ModelVersionSelector
+                object={backend}
+                apiName="modelVersions"
+                valueName="version"
+                label="Version"
+              />
+            </Form.Row>
+          )}
 
+          {isFF(FF_DEV_1682) && (
+            <Form.Row columnCount={1}>
+              <div>
                 <Toggle
                   name="auto_update"
                   label="Allow version auto-update"
                 />
-              </>
-            )}
-            <Toggle
-              name="is_interactive"
-              label="Use for interactive preannotations"
-            />
+              </div>
+            </Form.Row>
+          )}
+
+          <Form.Row columnCount={1}>
+            <div>
+              <Toggle
+                name="is_interactive"
+                label="Use for interactive preannotations"
+              />
+            </div>
           </Form.Row>
 
           <Form.Actions>
