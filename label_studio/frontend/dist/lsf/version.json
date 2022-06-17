@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1442: fix FF ticket number (#710)\n\n* fix: DEV-1422: clicking off a previously selected image rect region should deselect and not start a new region\r\n\r\n* fix: DEV-1442: image transformer test should deselect before region multiselect\r\n\r\n* fix: DEV-1442: travel through brush history test\r\n\r\n* fix: DEV-1442: spacing\r\n\r\n* fix: DEV-1442: ctrl usage to CommandOrControl in tests\r\n\r\n* fix: DEV-1442: put change behind FF\r\n\r\n* fix: DEV-1422: update to fix handling to include multi point polyregions\r\n\r\n* fix: DEV-1442: fix FF ticket number",
-  "commit": "ab2c1539aacbcc6729429cf8cf17995f49f8dff6",
-  "branch": "master",
-  "date": "2022-06-16T15:57:30Z"
+  "message": "date change on region click and date not saved fixes",
+  "commit": "2b90e107b63ea70b7e7ee50e0887d565fc3420dd",
+  "branch": "fb-dev-117/datetime-tag",
+  "date": "2022-06-17T19:11:31Z"
 }
