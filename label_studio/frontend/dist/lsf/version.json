@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2351: hypertext-security",
-  "commit": "52b0b5eb037c8734e2c215301a92a5e2a19a34ed",
-  "branch": "fix/dev-2351/hypertext-security",
-  "date": "2022-05-30T16:06:34Z"
+  "message": "docs: DEV-2578: examples for dynamic labels (#704)\n\n* docs: DEV-2578: examples for dynamic labels\r\n\r\n* Small fixes for Audio, Table, Video jsdoc\r\n\r\n* Fix documentation for Labels\r\n\r\nexamples, description, param\r\n\r\n* Documentation for Dynamic Choices",
+  "commit": "e7feefada567b6a757fc52fa8fb2814e93f7ab90",
+  "branch": "master",
+  "date": "2022-06-17T21:56:45Z"
 }
