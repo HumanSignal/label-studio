@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2207: sync speed between video and audio",
-  "commit": "5120811dcfe388a6e81fd94eaa71ad41d71fce82",
-  "branch": "fb-dev-2207",
-  "date": "2022-06-15T18:34:04Z"
+  "message": "docs: DEV-2578: examples for dynamic labels (#704)\n\n* docs: DEV-2578: examples for dynamic labels\r\n\r\n* Small fixes for Audio, Table, Video jsdoc\r\n\r\n* Fix documentation for Labels\r\n\r\nexamples, description, param\r\n\r\n* Documentation for Dynamic Choices",
+  "commit": "e7feefada567b6a757fc52fa8fb2814e93f7ab90",
+  "branch": "master",
+  "date": "2022-06-17T21:56:45Z"
 }
