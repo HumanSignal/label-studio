@@ -44,7 +44,7 @@ To manage access to Label Studio Enterprise, add the application to your SCIM pr
 6. Click **Edit** in the right corner.
 
 Fill in the fields:
- - **SCIM connector base URL**: https://{LABEL_STUDIO_BASE_URL}/scim/v2/ where {LABEL_STUDIO_BASE_URL} is the base URL of your Label Studio Enterprise instance.
+ - **SCIM connector base URL**: https://{LABEL_STUDIO_BASE_URL}/scim/v2/ where `{LABEL_STUDIO_BASE_URL}` is the base URL of your Label Studio Enterprise instance.
  - **Unique identifier field for users**: Leave `userName`. Label Studio Enterprise uses email as user identifier in this field.
  - **Supported provisioning actions**: Select the following items:
    - Import New Users and Profile Updates
