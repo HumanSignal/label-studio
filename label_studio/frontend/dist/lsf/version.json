@@ -1,6 +1,6 @@
 {
-  "message": "docs: DEV-2578: examples for dynamic labels (#704)\n\n* docs: DEV-2578: examples for dynamic labels\r\n\r\n* Small fixes for Audio, Table, Video jsdoc\r\n\r\n* Fix documentation for Labels\r\n\r\nexamples, description, param\r\n\r\n* Documentation for Dynamic Choices",
-  "commit": "e7feefada567b6a757fc52fa8fb2814e93f7ab90",
-  "branch": "master",
-  "date": "2022-06-17T21:56:45Z"
+  "message": "fix: dev-2431: add extra checks to delete point function to know if a shape is closed or not to prevent 3 point delete blocking and also prevent deletion of the last point in a shape",
+  "commit": "3759ff3bcceac4d80fed68fb8caf41aadb944bdb",
+  "branch": "fb-dev-2430/improve-delete-point-functionality",
+  "date": "2022-06-20T21:44:08Z"
 }
