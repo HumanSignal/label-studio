@@ -5,9 +5,7 @@ meta_title: Decommission minio
 ---
 
 > WARNING: Decommissioning Minio is a hazardous action because you may lose all your data uploaded using direct file upload. 
-For more information or support: 
-- Enterprise users: Contact the [Heartex team](hi@heartex.com) to provide an invitation link. 
-- Open Source users: Contact the [Heartex team](hi@heartex.com).
+For more information or support, contact the [Heartex team](hi@heartex.com).
 
 To decommission Minio, do the following:
 
