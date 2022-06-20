@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2170: On project open set number of tasks defined by task per page (#70)\n\n* fix: DEV-2170: on project open number of tasks defined by task per page is being displayed\r\n\r\n* fix: DEV-2170: on project open number of tasks defined by task per page is being displayed\r\n\r\n* fix: DEV-2170: remove extra space\r\n\r\n* fix: DEV-2170: on project open number of tasks defined by task per page is being displayed\r\n\r\nCo-authored-by: bmartel <brandonmartel@gmail.com>",
-  "commit": "4ee750448b6c799592767b9fd13de7e6c945b916",
-  "branch": "master",
-  "date": "2022-06-17T20:24:11Z"
+  "message": "Merge branch 'fix/DEV-2153/pagination' of github.com:heartexlabs/dm2 into fix/DEV-2153/pagination",
+  "commit": "9f3f14554f5b28434162ba861eaf4ce98622eabf",
+  "branch": "fix/DEV-2153/pagination",
+  "date": "2022-06-20T14:25:53Z"
 }
