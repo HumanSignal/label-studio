@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1577: add default settings (#619)\n\n* feat: DEV-1577: add default settings to editor\r\n\r\n* add an ability to set default settings when initializing the LSF",
-  "commit": "5e4da39533dd477ae1e303f649c71684ec43354a",
+  "message": "docs: DEV-2578: examples for dynamic labels (#704)\n\n* docs: DEV-2578: examples for dynamic labels\r\n\r\n* Small fixes for Audio, Table, Video jsdoc\r\n\r\n* Fix documentation for Labels\r\n\r\nexamples, description, param\r\n\r\n* Documentation for Dynamic Choices",
+  "commit": "e7feefada567b6a757fc52fa8fb2814e93f7ab90",
   "branch": "master",
-  "date": "2022-05-13T08:58:57Z"
+  "date": "2022-06-17T21:56:45Z"
 }

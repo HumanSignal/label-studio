@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -92,7 +92,7 @@ jobs:
           pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.0.0
+        uses: codecov/codecov-action@v3.1.0
         with:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
@@ -155,7 +155,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -211,7 +211,7 @@ jobs:
           pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.0.0
+        uses: codecov/codecov-action@v3.1.0
         with:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
@@ -241,7 +241,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 

@@ -209,12 +209,26 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
             return 'continue'
 
 
+def add_user_filter(enabled, key, _filter, filter_expressions):
+    if enabled and _filter.operator == Operator.CONTAINS:
+        filter_expressions.append(Q(**{key: int(_filter.value)}))
+        return 'continue'
+    elif enabled and _filter.operator == Operator.NOT_CONTAINS:
+        filter_expressions.append(~Q(**{key: int(_filter.value)}))
+        return 'continue'
+    elif enabled and _filter.operator == Operator.EMPTY:
+        value = cast_bool_from_str(_filter.value)
+        filter_expressions.append(Q(**{key+'__isnull': value}))
+        return 'continue'
+
+
 def apply_filters(queryset, filters, project):
     if not filters:
         return queryset
 
     # convert conjunction to orm statement
     filter_expressions = []
+    custom_filter_expressions = load_func(settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS)
 
     for _filter in filters.items:
 
@@ -231,22 +245,19 @@ def apply_filters(queryset, filters, project):
         _filter = preprocess_filter(_filter, field_name)
 
         # custom expressions for enterprise
-        custom_filter_expressions = load_func(settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS)
-        filter_expression = custom_filter_expressions(_filter, field_name)
+        filter_expression = custom_filter_expressions(_filter, field_name, project)
         if filter_expression:
             filter_expressions.append(filter_expression)
             continue
 
         # annotators
-        if field_name == 'annotators' and _filter.operator == Operator.CONTAINS:
-            filter_expressions.append(Q(annotations__completed_by=int(_filter.value)))
+        result = add_user_filter(field_name == 'annotators', 'annotations__completed_by', _filter, filter_expressions)
+        if result == 'continue':
             continue
-        elif field_name == 'annotators' and _filter.operator == Operator.NOT_CONTAINS:
-            filter_expressions.append(~Q(annotations__completed_by=int(_filter.value)))
-            continue
-        elif field_name == 'annotators' and _filter.operator == Operator.EMPTY:
-            value = cast_bool_from_str(_filter.value)
-            filter_expressions.append(Q(annotations__completed_by__isnull=value))
+
+        # updated_by
+        result = add_user_filter(field_name == 'updated_by', 'updated_by', _filter, filter_expressions)
+        if result == 'continue':
             continue
 
         # annotations results & predictions results
@@ -269,18 +280,6 @@ def apply_filters(queryset, filters, project):
             elif 'equal' in _filter.operator:
                 if not _filter.value.isdigit():
                     _filter.value = 0
-
-        # annotators
-        if field_name == 'annotators' and _filter.operator == Operator.CONTAINS:
-            filter_expressions.append(Q(annotations__completed_by=int(_filter.value)))
-            continue
-        elif field_name == 'annotators' and _filter.operator == Operator.NOT_CONTAINS:
-            filter_expressions.append(~Q(annotations__completed_by=int(_filter.value)))
-            continue
-        elif field_name == 'annotators' and _filter.operator == Operator.EMPTY:
-            value = cast_bool_from_str(_filter.value)
-            filter_expressions.append(Q(annotations__completed_by__isnull=value))
-            continue
 
         # predictions model versions
         if field_name == 'predictions_model_versions' and _filter.operator == Operator.CONTAINS:

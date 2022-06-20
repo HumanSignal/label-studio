@@ -173,3 +173,88 @@ stages:
              choices:
                - neg
 
+---
+
+test_name: test_validation_with_custom_labels
+
+strict: False
+
+marks:
+  - usefixtures:
+       - django_live_url
+
+stages:
+  - id: signup
+    type: ref
+  - id: get_user_token
+    type: ref
+  - id: create_project
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: create_batch_tasks_assignments
+        label_config: <View> <Text name="text" value="$text"/> <Taxonomy name="taxonomy" toName="text"> <Choice value="Archaea" /> <Choice value="Bacteria" /> <Choice value="Eukarya"> <Choice value="Human" /> <Choice value="Oppossum" /> <Choice value="Extraterrestial" /> </Choice> </Taxonomy> </View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk: id
+  - id: import_task
+    type: ref
+  - name: bulk_create_label
+    request:
+      method: POST
+      url: '{django_live_url}/api/labels'
+      json:
+        - title: Test label1
+          value:
+            - value1
+          from_name: test1
+          project: !int "{project_pk}"
+        - title: Test label2
+          value:
+            - value2
+          from_name: test2
+          project: !int "{project_pk}"
+    response:
+      status_code: 201
+      save:
+        json:
+          label1_pk: '[0].id'
+          label2_pk: '[1].id'
+  - id: create_annotation
+    name: create_annotation
+    request:
+      headers:
+        content-type: application/json
+      json:
+        lead_time: 12.34
+        result:
+        - from_name: taxonomy
+          to_name: text
+          type: taxonomy
+          value:
+            taxonomy:
+              - - value2
+      method: POST
+      url: '{django_live_url}/api/tasks/{task_pk}/annotations'
+    response:
+      save:
+        json:
+          annotation_pk: id
+      status_code: 201
+  - name: validate config with labels change
+    request:
+      headers:
+        content-type: application/json
+      json:
+        label_config: <View> <Text name="text" value="$text"/> <Taxonomy name="taxonomy" toName="text"> <Choice value="Archaea" /> <Choice value="Bacteria" /> <Choice value="Eukarya"> <Choice value="Human" /> <Choice value="Oppossum" /> <Choice value="Extraterrestial" /> </Choice> </Taxonomy> </View>
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/validate'
+    response:
+      status_code: 200

@@ -1,44 +1,37 @@
+import sys
 import logging
 
 from django.db import migrations
-
-from django.conf import settings
-from django.db.models import F, Subquery, OuterRef, Count, Q
-
-from core.bulk_update_utils import bulk_update
 
 logger = logging.getLogger(__name__)
 
 
 def forwards(apps, schema_editor):
-    Project = apps.get_model('projects', 'Project')
+    import label_studio
+    from tasks.functions import calculate_stats_all_orgs
+    from tasks.models import Task
+    from django.conf import settings
 
-    all_projects = Project.objects.all()
+    if settings.VERSION_EDITION == 'Community':
+        run_command = 'label-studio calculate_stats_all_orgs'
+    else:
+        run_command = 'manage.py calculate_stats_all_orgs'
 
-    total_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
-    cancelled_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True))
-    total_predictions = Count("predictions", distinct=True)
+    if Task.objects.count() > 100000 and settings.VERSION_EDITION != 'Community':
+        logger.error(f"Your instance has a lot of tasks. You should run the migration manually as a separate process "
+                     f"to recalculate task counters, please use Django command `{run_command}`")
+    else:
+        if '--skip-long-migrations' in sys.argv:
+            logger.error(
+                f"You used --skip-long-migrations, so you should run the migration manually as a separate process "
+                f"to recalculate task counters, please use Django command `{run_command}`"
+            )
+            return
 
-    for project in all_projects:
-        if not project.tasks.exists():
-            continue
-        objs = []
-        results = project.tasks.all()
-        results = results.annotate(new_total_annotations=total_annotations,
-                                   new_cancelled_annotations=cancelled_annotations,
-                                   new_total_predictions=total_predictions)
+        logger.debug('Your instance has < 100000 tasks, starting calculate_stats_all_orgs')
+        calculate_stats_all_orgs(from_scratch=False)
 
-        for task in results:
-            task.total_annotations = task.new_total_annotations
-            task.cancelled_annotations = task.new_cancelled_annotations
-            task.total_predictions = task.new_total_predictions
-            objs.append(task)
-
-        bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'],
-                        batch_size=settings.BATCH_SIZE)
-
-    number = all_projects.count()
-    logger.info(f'Patched {number} project with new is_labeled.')
+    return
 
 
 def backwards(apps, schema_editor):
