@@ -28,6 +28,11 @@ from core.label_config import (
 )
 from core.bulk_update_utils import bulk_update
 from label_studio_tools.core.label_config import parse_config
+from projects.functions import (
+    annotate_task_number, annotate_finished_task_number, annotate_total_predictions_number,
+    annotate_total_annotations_number, annotate_num_tasks_with_annotations,
+    annotate_useful_annotation_number, annotate_ground_truth_number, annotate_skipped_annotations_number
+)
 from labels_manager.models import Label
 
 
@@ -49,40 +54,30 @@ class ProjectManager(models.Manager):
         'skipped_annotations_number',
     ]
 
-    def with_counts(self):
-        return self.with_counts_annotate(self)
+    def with_counts(self, fields=None):
+        return self.with_counts_annotate(self, fields=fields)
 
     @staticmethod
-    def with_counts_annotate(queryset):
-        return queryset.annotate(
-            task_number=Count('tasks', distinct=True),
-            finished_task_number=Count('tasks', distinct=True, filter=Q(tasks__is_labeled=True)),
-            total_predictions_number=Count('tasks__predictions', distinct=True),
-            total_annotations_number=Count(
-                'tasks__annotations__id', distinct=True, filter=Q(tasks__annotations__was_cancelled=False)
-            ),
-            num_tasks_with_annotations=Count(
-                'tasks__id',
-                distinct=True,
-                filter=Q(tasks__annotations__isnull=False)
-                & Q(tasks__annotations__ground_truth=False)
-                & Q(tasks__annotations__was_cancelled=False)
-                & Q(tasks__annotations__result__isnull=False),
-            ),
-            useful_annotation_number=Count(
-                'tasks__annotations__id',
-                distinct=True,
-                filter=Q(tasks__annotations__was_cancelled=False)
-                & Q(tasks__annotations__ground_truth=False)
-                & Q(tasks__annotations__result__isnull=False),
-            ),
-            ground_truth_number=Count(
-                'tasks__annotations__id', distinct=True, filter=Q(tasks__annotations__ground_truth=True)
-            ),
-            skipped_annotations_number=Count(
-                'tasks__annotations__id', distinct=True, filter=Q(tasks__annotations__was_cancelled=True)
-            ),
-        )
+    def with_counts_annotate(queryset, fields=None):
+        available_fields = {
+            'task_number': annotate_task_number,
+            'finished_task_number': annotate_finished_task_number,
+            'total_predictions_number': annotate_total_predictions_number,
+            'total_annotations_number': annotate_total_annotations_number,
+            'num_tasks_with_annotations': annotate_num_tasks_with_annotations,
+            'useful_annotation_number': annotate_useful_annotation_number,
+            'ground_truth_number': annotate_ground_truth_number,
+            'skipped_annotations_number': annotate_skipped_annotations_number,
+        }
+        if fields is None:
+            to_annotate = available_fields
+        else:
+            to_annotate = {field: available_fields[field] for field in fields if field in available_fields}
+
+        for _, annotate_func in to_annotate.items():
+            queryset = annotate_func(queryset)
+
+        return queryset
 
 
 ProjectMixin = load_func(settings.PROJECT_MIXIN)

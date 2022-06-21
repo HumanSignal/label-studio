@@ -33,3 +33,6 @@ recursive-include label_studio/tests/test_suites/samples *
 recursive-include label_studio/tests/test_suites *.yml
 
 include label_studio/pytest.ini
+
+# feature flags
+include label_studio/feature_flags.json
