@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1714: X-axis zoom threshold (#699)\n\n* increase the minimum and default zoom to 300, the min set for wave-surfer\r\n\r\n* make default value explicit",
-  "commit": "05cf97840bbd82484e3085b289651627ff24bcd4",
-  "branch": "",
-  "date": "2022-06-10T16:57:52Z"
+  "message": "docs: DEV-2578: examples for dynamic labels (#704)\n\n* docs: DEV-2578: examples for dynamic labels\r\n\r\n* Small fixes for Audio, Table, Video jsdoc\r\n\r\n* Fix documentation for Labels\r\n\r\nexamples, description, param\r\n\r\n* Documentation for Dynamic Choices",
+  "commit": "e7feefada567b6a757fc52fa8fb2814e93f7ab90",
+  "branch": "master",
+  "date": "2022-06-17T21:56:45Z"
 }

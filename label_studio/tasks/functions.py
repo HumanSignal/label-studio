@@ -1,3 +1,4 @@
+import sys
 import logging
 
 from core.models import AsyncMigrationStatus
@@ -5,15 +6,14 @@ from core.redis import start_job_async_or_sync
 from organizations.models import Organization
 from projects.models import Project
 
-logger = logging.getLogger(__name__)
-
 
 def calculate_stats_all_orgs(from_scratch):
+    logger = logging.getLogger(__name__)
     orgs = Organization.objects.order_by('-id')
 
     for org in orgs:
         logger.debug(f"Start recalculating stats for Organization {org.id}.")
-        
+
         # start async calculation job on redis
         start_job_async_or_sync(redis_job_for_calculation, org, from_scratch)
 
@@ -28,6 +28,15 @@ def redis_job_for_calculation(org, from_scratch):
     :param org: Organization to recalculate
     :param from_scratch: Start calculation from scratch or skip calculated tasks
     """
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    
     projects = Project.objects.filter(organization=org).order_by('-updated_at')
     for project in projects:
         migration = AsyncMigrationStatus.objects.create(
