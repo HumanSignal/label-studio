@@ -1,6 +1,6 @@
 {
-  "message": "docs: DEV-2578: examples for dynamic labels (#704)\n\n* docs: DEV-2578: examples for dynamic labels\r\n\r\n* Small fixes for Audio, Table, Video jsdoc\r\n\r\n* Fix documentation for Labels\r\n\r\nexamples, description, param\r\n\r\n* Documentation for Dynamic Choices",
-  "commit": "e7feefada567b6a757fc52fa8fb2814e93f7ab90",
-  "branch": "master",
-  "date": "2022-06-17T21:56:45Z"
+  "message": "fix: DEV-2432: allow saving draft of unfinished polygon",
+  "commit": "4b47f1d40734f609f0bcc53da7361492a89a862f",
+  "branch": "fb-dev-2432",
+  "date": "2022-06-21T00:30:20Z"
 }
