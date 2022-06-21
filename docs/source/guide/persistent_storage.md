@@ -24,6 +24,31 @@ Start by [creating an S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/use
 
 > If you want to secure the data stored in the S3 bucket at rest, you can [set up default server-side encryption for Amazon S3 buckets](https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-encryption.html) following the steps in the Amazon Simple Storage Service User Guide. 
 
+### Configure CORS for the S3 bucket
+
+Set up cross-origin resource sharing (CORS) access to your bucket. See [Configuring cross-origin resource sharing (CORS)](https://docs.aws.amazon.com/AmazonS3/latest/userguide/enabling-cors-examples.html) in the Amazon S3 User Guide. Use or modify the following example:
+```json
+[
+   {
+      "AllowedHeaders": [
+         "*"
+      ],
+      "AllowedMethods": [
+         "GET"
+      ],
+      "AllowedOrigins": [
+         "*"
+      ],
+      "ExposeHeaders": [
+         "x-amz-server-side-encryption",
+         "x-amz-request-id",
+         "x-amz-id-2"
+      ],
+      "MaxAgeSeconds": 86400
+   }
+]
+```
+
 ### Configure the S3 bucket
 After you create an S3 bucket, set up the necessary IAM permissions to grant Label Studio Enterprise access to your bucket. There are four ways that you can manage access to your S3 bucket:
 - Set up an **IAM role** with an OIDC provider (**recommended**).
