@@ -58,7 +58,7 @@ def predictions_to_annotations(project, queryset, **kwargs):
         # Execute webhook for created annotations
         emit_webhooks_for_instance(user.active_organization, project, WebhookAction.ANNOTATIONS_CREATED, db_annotations)
         # recalculate tasks counters
-        start_job_async_or_sync(project.update_tasks_counters, Task.objects.filter(id__in=tasks_ids))
+        project.update_tasks_counters(Task.objects.filter(id__in=tasks_ids))
         # recalculate is_labeled
         start_job_async_or_sync(bulk_update_stats_project_tasks, Task.objects.filter(id__in=tasks_ids))
     return {'response_code': 200, 'detail': f'Created {count} annotations'}
