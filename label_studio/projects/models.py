@@ -783,10 +783,10 @@ class Project(ProjectMixin, models.Model):
         cancelled_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True))
         total_predictions = Count("predictions", distinct=True)
         # construct QuerySet in case of list of Tasks
-        if isinstance(queryset, list) and isinstance(queryset[0], Task):
+        if isinstance(queryset, list) and len(queryset) > 0 and isinstance(queryset[0], Task):
             queryset = Task.objects.filter(id__in=[task.id for task in queryset])
         # construct QuerySet in case annotated queryset
-        if isinstance(queryset, TaskQuerySet) and isinstance(queryset[0], int):
+        if isinstance(queryset, TaskQuerySet) and queryset.exists() and isinstance(queryset[0], int):
             queryset = Task.objects.filter(id__in=queryset)
 
         if not from_scratch:
