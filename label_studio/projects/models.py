@@ -581,7 +581,7 @@ class Project(ProjectMixin, models.Model):
 
         # argument for recalculate project task stats
         if recalc:
-            self.update_tasks_states(
+            self._update_tasks_states(
                 maximum_annotations_changed=self.__maximum_annotations != self.maximum_annotations,
                 overlap_cohort_percentage_changed=self.__overlap_cohort_percentage != self.overlap_cohort_percentage,
                 tasks_number_changed=False,
