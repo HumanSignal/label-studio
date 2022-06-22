@@ -1,6 +1,6 @@
 {
-  "message": "docs: DEV-2578: examples for dynamic labels (#704)\n\n* docs: DEV-2578: examples for dynamic labels\r\n\r\n* Small fixes for Audio, Table, Video jsdoc\r\n\r\n* Fix documentation for Labels\r\n\r\nexamples, description, param\r\n\r\n* Documentation for Dynamic Choices",
-  "commit": "e7feefada567b6a757fc52fa8fb2814e93f7ab90",
-  "branch": "master",
-  "date": "2022-06-17T21:56:45Z"
+  "message": "after expand return focus to menu",
+  "commit": "2c68a035869a75a75483309d4cfe59a1cb6767f6",
+  "branch": "fb-dev-2424/key-commands-taxonomy",
+  "date": "2022-06-22T16:27:07Z"
 }
