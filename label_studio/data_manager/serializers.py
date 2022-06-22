@@ -232,10 +232,13 @@ class DataManagerTaskSerializer(TaskSerializer):
 
     @staticmethod
     def get_file_upload(task):
-        if not hasattr(task, 'file_upload_field'):
-            return None
-        file_upload = task.file_upload_field
-        return os.path.basename(task.file_upload_field) if file_upload else None
+        import_storage_key = task.import_storage_key
+        if import_storage_key is not None:
+            return import_storage_key
+        if hasattr(task, 'file_upload_field'):
+            file_upload = task.file_upload_field
+            return os.path.basename(task.file_upload_field) if file_upload else None
+        return None
 
     @staticmethod
     def get_updated_by(obj):
