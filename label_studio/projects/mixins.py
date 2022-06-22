@@ -30,3 +30,9 @@ class ProjectMixin:
                                 maximum_annotations_changed,
                                 overlap_cohort_percentage_changed,
                                 tasks_number_changed)
+
+    def has_permission(self, user):
+        """
+        Dummy stub for has_permission
+        """
+        return True
