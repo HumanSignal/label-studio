@@ -362,7 +362,7 @@ class Project(ProjectMixin, models.Model):
             else:
                 # otherwise affect all tasks
                 self.tasks.update(overlap=self.maximum_annotations)
-                tasks_with_overlap = self.tasks
+                tasks_with_overlap = self.tasks.all()
             # update is_labeled after change
             bulk_update_stats_project_tasks(
                 tasks_with_overlap
