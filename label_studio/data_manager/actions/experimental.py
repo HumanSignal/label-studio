@@ -189,6 +189,55 @@ def rename_labels_form(user, project):
     }]
 
 
+def add_data_field(project, queryset, **kwargs):
+    from django.db.models import F, Func, Value, JSONField
+
+    request = kwargs['request']
+    value_name = request.data.get('value_name')
+    value_type = request.data.get('value_type')
+    value = request.data.get('value')
+
+    cast = {'String': str, 'Number': float, 'Expression': str}
+    assert value_type in cast.keys()
+    value = cast[value_type](value)
+
+    queryset.update(
+        data=Func(
+            F("data"),
+            Value([value_name]),
+            Value(value, JSONField()),
+            function="jsonb_set",
+        )
+    )
+
+    project.summary.update_data_columns([queryset.first()])
+    return {'response_code': 200, 'detail': f'Updated {queryset.count()} tasks'}
+
+
+def add_data_field_form(user, project):
+    return [{
+        'columnCount': 1,
+        'fields': [
+            {
+                'type': 'input',
+                'name': 'value_name',
+                'label': 'Name'
+            },
+            {
+                'type': 'select',
+                'name': 'value_type',
+                'label': 'Type',
+                'options': ['String', 'Number'],
+            },
+            {
+                'type': 'input',
+                'name': 'value',
+                'label': 'Value'
+            }
+        ]
+    }]
+
+
 actions = [
     {
         'entry_point': propagate_annotations,
@@ -231,6 +280,20 @@ actions = [
                     'Also you have to change label names in the labeling config manually.',
             'type': 'confirm',
             'form': rename_labels_form,
+        }
+    },
+
+    {
+        'entry_point': add_data_field,
+        'permission': all_permissions.tasks_change,
+        'title': 'Add Data Field',
+        'order': 1,
+        'experimental': True,
+        'dialog': {
+            'text': 'Confirm that you want to add a new field in tasks. '
+                    'After this operation you must refresh the Data Manager page fully to see the new column!',
+            'type': 'confirm',
+            'form': add_data_field_form,
         }
     }
 
