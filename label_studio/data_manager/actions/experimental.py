@@ -220,10 +220,24 @@ def add_data_field(project, queryset, **kwargs):
     return {'response_code': 200, 'detail': f'Updated {size} tasks'}
 
 
+def process_arrays(params):
+    start, end = params.find('['), -1
+    while start != end:
+        end = start + params[start:].find(']') + 1
+        params = params[0:start] + params[start:end].replace(',', ';') + params[end:]
+        start = end + params[end:].find('[') + 1
+    return params
+
+
 def add_expression(queryset, size, value, value_name):
     # simple parsing
-    command, params = value.split('(')
-    params = params.replace(')', ',').split(',')
+    command, args = value.split('(')
+    args = process_arrays(args)
+    args = args.replace(')', '').split(',')
+    # return comma back, convert quotation mark to doubled quotation mark for json parsing
+    for i, arg in enumerate(args):
+        args[i] = arg.replace(';', ',').replace("'", '"')
+
     tasks = list(queryset.only('data'))
 
     # sampling
@@ -234,21 +248,26 @@ def add_expression(queryset, size, value, value_name):
 
     # random
     elif command == 'random':
-        minimum, maximum = int(params[0]), int(params[1])
+        minimum, maximum = int(args[0]), int(args[1])
         for i in range(size):
             tasks[i].data[value_name] = random.randint(minimum, maximum)
 
     elif command == 'choices':
         values = random.choices(
-            population=json.loads(params[1].replace("'", '"')),
-            weights=json.loads(params[2]),
-            k=int(params[3])
+            population=json.loads(args[0]),
+            weights=json.loads(args[1]),
+            k=size
         )
         for i, v in enumerate(values):
             tasks[i].data[value_name] = v
 
     else:
-        raise Exception('Undefined expression, you can use random(<min_int>, <max_int>) or sample()')
+        raise Exception(
+            'Undefined expression, you can use: '
+            'sample() or'
+            'random(<min_int>, <max_int>) or '
+            'choices([<value1>, <value2>, ...], [<weight1>, <weight2>, ...])'
+        )
 
     Task.objects.bulk_update(tasks, fields=['data'], batch_size=1000)
 
