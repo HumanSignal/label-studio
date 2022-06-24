@@ -229,6 +229,14 @@ def process_arrays(params):
     return params
 
 
+add_data_field_examples = (
+    'sample() or '
+    'random(<min_int>, <max_int>) or '
+    'choices(["<value1>", "<value2>", ...], [<weight1>, <weight2>, ...]) or '
+    'replace("old-string", "new-string")'
+)
+
+
 def add_expression(queryset, size, value, value_name):
     # simple parsing
     command, args = value.split('(')
@@ -262,12 +270,16 @@ def add_expression(queryset, size, value, value_name):
         for i, v in enumerate(values):
             tasks[i].data[value_name] = v
 
+    # replaceg
+    elif command == 'replace':
+        old_value, new_value = json.loads(args[0]), json.loads(args[1])
+        for task in tasks:
+            if value_name in task.data:
+                task.data[value_name] = task.data[value_name].replace(old_value, new_value)
+
     else:
         raise Exception(
-            'Undefined expression, you can use: '
-            'sample() or'
-            'random(<min_int>, <max_int>) or '
-            'choices([<value1>, <value2>, ...], [<weight1>, <weight2>, ...])'
+            'Undefined expression, you can use: ' + add_data_field_examples
         )
 
     Task.objects.bulk_update(tasks, fields=['data'], batch_size=1000)
@@ -301,13 +313,13 @@ actions = [
     {
         'entry_point': add_data_field,
         'permission': all_permissions.tasks_change,
-        'title': 'Add Data Field',
+        'title': 'Add Or Modify Data Field',
         'order': 1,
         'experimental': True,
         'dialog': {
             'text': 'Confirm that you want to add a new field in tasks. '
                     'After this operation you must refresh the Data Manager page fully to see the new column! '
-                    'You can use the following expressions: sample(), random(<min_int>, <max_int>)',
+                    'You can use the following expressions: ' + add_data_field_examples,
             'type': 'confirm',
             'form': add_data_field_form,
         }
