@@ -24,7 +24,9 @@ Start by [creating an S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/use
 
 > If you want to secure the data stored in the S3 bucket at rest, you can [set up default server-side encryption for Amazon S3 buckets](https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-encryption.html) following the steps in the Amazon Simple Storage Service User Guide. 
 
-### Configure CORS for the S3 bucket
+### Optional: Configure CORS for the S3 bucket
+
+> In the case if you're going to use direct file upload feature and store media files like audio, video, csv you should complete this step.
 
 Set up cross-origin resource sharing (CORS) access to your bucket. See [Configuring cross-origin resource sharing (CORS)](https://docs.aws.amazon.com/AmazonS3/latest/userguide/enabling-cors-examples.html) in the Amazon S3 User Guide. Use or modify the following example:
 ```json
@@ -34,7 +36,12 @@ Set up cross-origin resource sharing (CORS) access to your bucket. See [Configur
          "*"
       ],
       "AllowedMethods": [
-         "GET"
+         "GET",
+         "POST",
+         "PATCH",
+         "PUT",
+         "DELETE",
+         "OPTIONS"
       ],
       "AllowedOrigins": [
          "*"
@@ -44,7 +51,7 @@ Set up cross-origin resource sharing (CORS) access to your bucket. See [Configur
          "x-amz-request-id",
          "x-amz-id-2"
       ],
-      "MaxAgeSeconds": 86400
+      "MaxAgeSeconds": 3600
    }
 ]
 ```
@@ -323,6 +330,27 @@ Set up Google Cloud Storage (GCS) as the persistent storage for Label Studio Ent
       - Value: `projects/_/buckets/heartex-example-bucket-123456`
     - Or, **use a Common Expression Language** (CEL) to specify an IAM condition. For example, set the following: `resource.name.startsWith('projects/_/buckets/heartex-example-bucket-123456')`. See [CEL for Conditions in Overview of IAM Conditions](https://cloud.google.com/iam/docs/conditions-overview#cel) in the Google Cloud Storage guide. 
 
+### Optional: Configure CORS for the GCS bucket
+
+> In the case if you're going to use direct file upload feature and store media files like audio, video, csv you should complete this step.
+
+Set up cross-origin resource sharing (CORS) access to your bucket. See [Configuring cross-origin resource sharing (CORS)](https://cloud.google.com/storage/docs/configuring-cors#configure-cors-bucket) in the Google Cloud User Guide. Use or modify the following example:
+```shell
+echo '[
+   {
+      "origin": ["*"],
+      "method": ["GET","POST","PATCH","PUT","DELETE","OPTIONS"],
+      "responseHeader": ["Content-Type"],
+      "maxAgeSeconds": 3600
+   }
+]' > cors-config.json
+```
+
+Replace `YOUR_BUCKET_NAME` with your actual bucket name in the following command to update CORS for your bucket:
+```shell
+gsutil cors set cors-config.json gs://YOUR_BUCKET_NAME
+```
+
 ### Configure the GCS bucket
 
 You can connect Label Studio Enterprise to your GCS bucket using **Workload Identity** or **Access keys**.
@@ -471,6 +499,23 @@ az storage account keys list --account-name=${STORAGE_ACCOUNT}
 az storage container create --name <YOUR_CONTAINER_NAME> \
           --account-name <YOUR_STORAGE_ACCOUNT> \
           --account-key "<YOUR_STORAGE_KEY>"
+```
+
+### Optional: Configure CORS for the Azure bucket
+
+> In the case if you're going to use direct file upload feature and store media files like audio, video, csv you should complete this step.
+
+Set up cross-origin resource sharing (CORS) access to your bucket. See [Configuring cross-origin resource sharing (CORS)](https://docs.microsoft.com/en-us/rest/api/storageservices/cross-origin-resource-sharing--cors--support-for-the-azure-storage-services#enabling-cors-for-azure-storage) in the Azure User Guide. Use or modify the following example:
+```xml
+<Cors>
+    <CorsRule>  
+        <AllowedOrigins>*</AllowedOrigins>  
+        <AllowedMethods>GET,POST,PATCH,PUT,DELETE,OPTIONS</AllowedMethods>  
+        <AllowedHeaders>x-ms-blob-content-type</AllowedHeaders>  
+        <ExposedHeaders>x-ms-*</ExposedHeaders>  
+        <MaxAgeInSeconds>3600</MaxAgeInSeconds>  
+    </CorsRule>  
+<Cors>
 ```
 
 ### Configure the Azure container
