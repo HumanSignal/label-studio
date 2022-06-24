@@ -240,18 +240,19 @@ def add_expression(queryset, size, value, value_name):
 
     tasks = list(queryset.only('data'))
 
-    # sampling
+    # permutation sampling
     if command == 'sample':
         values = random.sample(range(0, size), size)
         for i, v in enumerate(values):
             tasks[i].data[value_name] = v
 
-    # random
+    # uniform random
     elif command == 'random':
         minimum, maximum = int(args[0]), int(args[1])
         for i in range(size):
             tasks[i].data[value_name] = random.randint(minimum, maximum)
 
+    # sampling with choices and weights
     elif command == 'choices':
         values = random.choices(
             population=json.loads(args[0]),
