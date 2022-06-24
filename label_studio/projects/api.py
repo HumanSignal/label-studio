@@ -2,7 +2,6 @@
 """
 import drf_yasg.openapi as openapi
 import logging
-import numpy as np
 import pathlib
 import os
 
@@ -10,6 +9,8 @@ from django.db import IntegrityError
 from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
+from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import FilterSet
 from rest_framework import generics, status, filters
 from rest_framework.exceptions import NotFound, ValidationError as RestValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -38,6 +39,7 @@ from core.utils.common import (
     get_object_with_check_and_log, paginator, paginator_help)
 from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
 from core.utils.io import find_dir, find_file, read_yaml
+from core.filters import ListFilter
 
 from data_manager.functions import get_prepared_queryset, filters_ordering_selected_items_exist
 from data_manager.models import View
@@ -91,6 +93,10 @@ class ProjectListPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
 
 
+class ProjectFilterSet(FilterSet):
+    ids = ListFilter(field_name="id", lookup_expr="in")
+
+
 @method_decorator(name='get', decorator=swagger_auto_schema(
     tags=['Projects'],
     operation_summary='List your projects',
@@ -120,7 +126,8 @@ class ProjectListPagination(PageNumberPagination):
 class ProjectListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ProjectSerializer
-    filter_backends = [filters.OrderingFilter]
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
+    filterset_class = ProjectFilterSet
     permission_required = ViewClassPermission(
         GET=all_permissions.projects_view,
         POST=all_permissions.projects_create,
