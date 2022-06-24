@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import random
 import logging
 import ujson as json
 
@@ -196,22 +197,60 @@ def add_data_field(project, queryset, **kwargs):
     value_name = request.data.get('value_name')
     value_type = request.data.get('value_type')
     value = request.data.get('value')
+    size = queryset.count()
 
     cast = {'String': str, 'Number': float, 'Expression': str}
     assert value_type in cast.keys()
     value = cast[value_type](value)
 
-    queryset.update(
-        data=Func(
-            F("data"),
-            Value([value_name]),
-            Value(value, JSONField()),
-            function="jsonb_set",
+    if value_type == 'Expression':
+        add_expression(queryset, size, value, value_name)
+
+    else:
+        queryset.update(
+            data=Func(
+                F("data"),
+                Value([value_name]),
+                Value(value, JSONField()),
+                function="jsonb_set",
+            )
         )
-    )
 
     project.summary.update_data_columns([queryset.first()])
-    return {'response_code': 200, 'detail': f'Updated {queryset.count()} tasks'}
+    return {'response_code': 200, 'detail': f'Updated {size} tasks'}
+
+
+def add_expression(queryset, size, value, value_name):
+    # simple parsing
+    command, params = value.split('(')
+    params = params.replace(')', ',').split(',')
+    tasks = list(queryset.only('data'))
+
+    # sampling
+    if command == 'sample':
+        values = random.sample(range(0, size), size)
+        for i, v in enumerate(values):
+            tasks[i].data[value_name] = v
+
+    # random
+    elif command == 'random':
+        minimum, maximum = int(params[0]), int(params[1])
+        for i in range(size):
+            tasks[i].data[value_name] = random.randint(minimum, maximum)
+
+    elif command == 'choices':
+        values = random.choices(
+            population=json.loads(params[1].replace("'", '"')),
+            weights=json.loads(params[2]),
+            k=int(params[3])
+        )
+        for i, v in enumerate(values):
+            tasks[i].data[value_name] = v
+
+    else:
+        raise Exception('Undefined expression, you can use random(<min_int>, <max_int>) or sample()')
+
+    Task.objects.bulk_update(tasks, fields=['data'], batch_size=1000)
 
 
 def add_data_field_form(user, project):
@@ -227,7 +266,7 @@ def add_data_field_form(user, project):
                 'type': 'select',
                 'name': 'value_type',
                 'label': 'Type',
-                'options': ['String', 'Number'],
+                'options': ['String', 'Number', 'Expression'],
             },
             {
                 'type': 'input',
@@ -239,6 +278,21 @@ def add_data_field_form(user, project):
 
 
 actions = [
+    {
+        'entry_point': add_data_field,
+        'permission': all_permissions.tasks_change,
+        'title': 'Add Data Field',
+        'order': 1,
+        'experimental': True,
+        'dialog': {
+            'text': 'Confirm that you want to add a new field in tasks. '
+                    'After this operation you must refresh the Data Manager page fully to see the new column! '
+                    'You can use the following expressions: sample(), random(<min_int>, <max_int>)',
+            'type': 'confirm',
+            'form': add_data_field_form,
+        }
+    },
+
     {
         'entry_point': propagate_annotations,
         'permission': all_permissions.tasks_change,
@@ -280,20 +334,6 @@ actions = [
                     'Also you have to change label names in the labeling config manually.',
             'type': 'confirm',
             'form': rename_labels_form,
-        }
-    },
-
-    {
-        'entry_point': add_data_field,
-        'permission': all_permissions.tasks_change,
-        'title': 'Add Data Field',
-        'order': 1,
-        'experimental': True,
-        'dialog': {
-            'text': 'Confirm that you want to add a new field in tasks. '
-                    'After this operation you must refresh the Data Manager page fully to see the new column!',
-            'type': 'confirm',
-            'form': add_data_field_form,
         }
     }
 
