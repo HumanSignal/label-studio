@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #681 from heartexlabs/fb-dev-2203/view-all-audio-responsive\n\nfix: DEV-2203: View all audio responsive",
-  "commit": "f30cc010581585e0fe3df72653cb0a3747d329b6",
-  "branch": "",
-  "date": "2022-06-06T17:34:36Z"
+  "message": "docs: DEV-2578: examples for dynamic labels (#704)\n\n* docs: DEV-2578: examples for dynamic labels\r\n\r\n* Small fixes for Audio, Table, Video jsdoc\r\n\r\n* Fix documentation for Labels\r\n\r\nexamples, description, param\r\n\r\n* Documentation for Dynamic Choices",
+  "commit": "e7feefada567b6a757fc52fa8fb2814e93f7ab90",
+  "branch": "master",
+  "date": "2022-06-17T21:56:45Z"
 }

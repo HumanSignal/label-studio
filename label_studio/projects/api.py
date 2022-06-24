@@ -25,7 +25,7 @@ from projects.models import (
     Project, ProjectSummary, ProjectManager
 )
 from projects.serializers import (
-    ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer
+    ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer, GetFieldsSerializer
 )
 from projects.functions.next_task import get_next_task
 from tasks.models import Task
@@ -129,8 +129,11 @@ class ProjectListAPI(generics.ListCreateAPIView):
     pagination_class = ProjectListPagination
 
     def get_queryset(self):
+        serializer = GetFieldsSerializer(data=self.request.query_params)
+        serializer.is_valid(raise_exception=True)
+        fields = serializer.validated_data.get('include')
         projects = Project.objects.filter(organization=self.request.user.active_organization)
-        return ProjectManager.with_counts_annotate(projects).prefetch_related('members', 'created_by')
+        return ProjectManager.with_counts_annotate(projects, fields=fields).prefetch_related('members', 'created_by')
 
     def get_serializer_context(self):
         context = super(ProjectListAPI, self).get_serializer_context()
@@ -187,7 +190,10 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
     redirect_kwarg = 'pk'
 
     def get_queryset(self):
-        return Project.objects.with_counts().filter(organization=self.request.user.active_organization)
+        serializer = GetFieldsSerializer(data=self.request.query_params)
+        serializer.is_valid(raise_exception=True)
+        fields = serializer.validated_data.get('include')
+        return Project.objects.with_counts(fields=fields).filter(organization=self.request.user.active_organization)
 
     def get(self, request, *args, **kwargs):
         return super(ProjectAPI, self).get(request, *args, **kwargs)

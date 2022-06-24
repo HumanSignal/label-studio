@@ -24,6 +24,7 @@ Label tag represents a single label. Use with the Labels tag, including BrushLab
 | [background] | <code>string</code> | <code>&quot;#36B37E&quot;</code> | Background color of an active label in hexadecimal |
 | [selectedColor] | <code>string</code> | <code>&quot;#ffffff&quot;</code> | Color of text in an active label in hexadecimal |
 | [granularity] | <code>symbol</code> \| <code>word</code> |  | Set control based on symbol or word selection (only for Text) |
+| [html] | <code>string</code> |  | HTML code is used to display label button instead of raw text provided by `value` (should be properly escaped) |
 
 ### Example
 ```html
