@@ -295,7 +295,7 @@ def main():
 
     if input_args.command == 'calculate_stats_all_orgs':
         from tasks.functions import calculate_stats_all_orgs
-        calculate_stats_all_orgs(input_args.from_scratch)
+        calculate_stats_all_orgs(input_args.from_scratch, redis=True)
         return
 
     # print version
