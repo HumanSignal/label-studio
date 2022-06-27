@@ -138,7 +138,7 @@ class Task(TaskMixin, models.Model):
         return self.locks.filter(expire_at__gt=now()).count()
 
     @property
-    def import_storage_key(self):
+    def storage_filename(self):
         for link_name in settings.IO_STORAGES_IMPORT_LINK_NAMES:
             if hasattr(self, link_name):
                 return getattr(self, link_name).key

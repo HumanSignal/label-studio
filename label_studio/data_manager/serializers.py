@@ -174,6 +174,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     predictions_results = serializers.SerializerMethodField(required=False)
     predictions_score = serializers.FloatField(required=False)
     file_upload = serializers.SerializerMethodField(required=False)
+    storage_filename = serializers.SerializerMethodField(required=False)
     annotations_ids = serializers.SerializerMethodField(required=False)
     predictions_model_versions = serializers.SerializerMethodField(required=False)
     avg_lead_time = serializers.FloatField(required=False)
@@ -232,13 +233,14 @@ class DataManagerTaskSerializer(TaskSerializer):
 
     @staticmethod
     def get_file_upload(task):
-        import_storage_key = task.import_storage_key
-        if import_storage_key is not None:
-            return import_storage_key
         if hasattr(task, 'file_upload_field'):
             file_upload = task.file_upload_field
             return os.path.basename(task.file_upload_field) if file_upload else None
         return None
+
+    @staticmethod
+    def get_storage_filename(task):
+        return task.storage_filename
 
     @staticmethod
     def get_updated_by(obj):
