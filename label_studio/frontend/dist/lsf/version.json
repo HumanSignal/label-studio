@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2647: rotating bounding box bugs (#711)\n\n* fix: DEV-2647: rotating bounding box bugs\r\n\r\n* fix: DEV-2647: rotating bounding box bugs\r\n\r\n* fix: DEV-2647: rotating bounding box bugs\r\n\r\n* Use one mixin for 2- and 3-point rect\r\n\r\n* fix: DEV-2647: handling rotated and reversed rectangles has veen improved\r\n\r\n* Fix calculations of rect height after 2nd point\r\n\r\n* fix: DEV-2647: fixing overflowing rectangles\r\n\r\n* fix: DEV-2647: cursor no longer changes while hovering over other regions when drawing\r\n\r\n* Fix contraints on mouse leave; whitespaces; ff check\r\n\r\nFF check in global scope can be possibly over-optimized by webpack\r\n\r\n* Remove console.log\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "d7af0e7c45b495345c76fa852b788a0e8ff0d531",
+  "message": "fix: DEV-2655: Allow cmd or ctrl to create regions immediately with deselect on canvas click enabled. (#717)\n\nfix: DEV-2655: allow cmd or ctrl to create regions immediately even with deselect on canvas click enabled.",
+  "commit": "16fdd27db4c3ed9b380bd8fe465aa199b1115eb6",
   "branch": "master",
-  "date": "2022-06-21T13:20:50Z"
+  "date": "2022-06-27T18:48:17Z"
 }
