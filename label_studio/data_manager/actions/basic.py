@@ -11,8 +11,8 @@ from core.utils.common import temporary_disconnect_list_signal
 from projects.models import Project
 
 from tasks.models import (
-    Annotation, Prediction, Task, bulk_update_stats_project_tasks, update_is_labeled_after_removing_annotation,
-    update_all_task_states_after_deleting_task, remove_data_columns, remove_project_summary_annotations
+    Annotation, Prediction, Task, bulk_update_stats_project_tasks,
+    update_all_task_states_after_deleting_task, remove_data_columns,
 )
 from webhooks.utils import emit_webhooks_for_instance
 from webhooks.models import WebhookAction
@@ -41,27 +41,17 @@ def delete_tasks(project, queryset, **kwargs):
     tasks_ids = list(queryset.values('id'))
     count = len(tasks_ids)
     tasks_ids_list = [task['id'] for task in tasks_ids]
-    # signals to switch off
-    signals = [
-        (post_delete, update_is_labeled_after_removing_annotation, Annotation),
-        (post_delete, update_all_task_states_after_deleting_task, Task),
-        (pre_delete, remove_data_columns, Task),
-        (pre_delete, remove_project_summary_annotations, Annotation)
-    ]
 
     # delete all project tasks
     if count == project.tasks.count():
-        with temporary_disconnect_list_signal(signals):
-            queryset.delete()
+        Task.delete_tasks_without_signals(queryset)
         project.summary.reset()
 
     # delete only specific tasks
     else:
         # update project summary
         start_job_async_or_sync(async_project_summary_recalculation, tasks_ids_list, project.id)
-
-        with temporary_disconnect_list_signal(signals):
-            queryset.delete()
+        Task.delete_tasks_without_signals(queryset)
 
     project.update_tasks_states(
         maximum_annotations_changed=False,
@@ -98,7 +88,7 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     annotations.delete()
     emit_webhooks_for_instance(project.organization, project, WebhookAction.ANNOTATIONS_DELETED, annotations_ids)
     start_job_async_or_sync(bulk_update_stats_project_tasks, queryset.filter(is_labeled=True))
-
+    start_job_async_or_sync(project.update_tasks_counters, queryset)
     request = kwargs['request']
     Task.objects.filter(id__in=real_task_ids).update(updated_at=datetime.now(), updated_by=request.user)
     return {'processed_items': count,
@@ -115,6 +105,7 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     predictions = Prediction.objects.filter(task__id__in=task_ids)
     count = predictions.count()
     predictions.delete()
+    start_job_async_or_sync(project.update_tasks_counters, queryset)
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
 
 

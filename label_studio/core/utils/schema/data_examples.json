@@ -14,8 +14,30 @@
     "$videoHack": "<video src='<HOSTNAME>/static/samples/opossum_snow.mp4' width=100% controls>",
     "Video": "<HOSTNAME>/static/samples/opossum_snow.mp4",
     "Labels": [
-      { "value": "Label 1", "background": "#ff0000" },
-      { "value": "Label 2", "background": "#0000ff" }
+      { "value": "DynamicLabel1", "background": "#ff0000" },
+      { "value": "DynamicLabel2", "background": "#0000ff" }
+    ],
+    "Choices": [
+      { "value": "DynamicChoice1" },
+      { "value": "DynamicChoice2" },
+      { "value": "DynamicChoice3" }
+    ],
+    "NestedChoices": [
+      {
+        "value": "DynamicChoiceHeader1",
+        "children": [
+          { "value": "DynamicChoice1.1" },
+          { "value": "DynamicChoice1.2" }
+        ]
+      },
+      {
+        "value": "DynamicChoiceHeader2",
+        "children": [
+          { "value": "DynamicChoice2.1" },
+          { "value": "DynamicChoice2.2" },
+          { "value": "DynamicChoice2.3" }
+        ]
+      }
     ],
     "$longText": "Opossums are frequently considered to be living fossils, and as a result are often used to approximate the ancestral therian condition in comparative studies. However, this is inaccurate, the oldest opossum fossils are early Miocene in age (roughly 20 million years old) and the last common ancestor of all living opossums approximately dates to the Oligocene-Miocene boundary (roughly 23 million years ago) and is at most no older than Oligocene in age. Many extinct metatherians once considered early opossums, such as Alphadon, Peradectes, Herpetotherium, and Pucadelphys, have since been recognized to have been previously grouped with opossums on the basis of plesiomorphies and are now considered to represent older branches of Metatheria only distantly related to modern opossums.",
     "$corefText": "I voted for Obama because he was most aligned with my values, she said.",

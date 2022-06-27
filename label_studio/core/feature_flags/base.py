@@ -15,10 +15,12 @@ logger = logging.getLogger(__name__)
 if settings.FEATURE_FLAGS_FROM_FILE:
     # Feature flags from file
     if not settings.FEATURE_FLAGS_FILE:
-        raise ValueError('When "FEATURE_FLAGS_FROM_FILE" is set, you have to specify a valid path for feature flags file, e.g.'
-                         'FEATURE_FLAGS_FILE=my_flags.yml')
+        raise ValueError(
+            'When "FEATURE_FLAGS_FROM_FILE" is set, you have to specify a valid path for feature flags file, e.g.'
+            'FEATURE_FLAGS_FILE=my_flags.yml'
+        )
 
-    package_name = 'label_studio' if settings.VERSION_EDITION == 'Community Edition' else 'label_studio_enterprise'
+    package_name = 'label_studio' if settings.VERSION_EDITION == 'Community' else 'label_studio_enterprise'
     if settings.FEATURE_FLAGS_FILE.startswith('/'):
         feature_flags_file = settings.FEATURE_FLAGS_FILE
     else:
@@ -59,9 +61,13 @@ def _get_user_repr(user):
     """Turn user object into dict with required properties"""
     from users.serializers import UserSerializer
     if user.is_anonymous:
-        return {'key': str(user)}
+        return {'key': str(user), 'custom': {'organization': None}}
     user_data = UserSerializer(user).data
     user_data['key'] = user_data['email']
+    if user.active_organization is not None:
+        user_data['custom'] = {'organization': user.active_organization.created_by.email}
+    else:
+        user_data['custom'] = {'organization': None}
     logger.debug(f'Read user properties: {user_data}')
     return user_data
 
