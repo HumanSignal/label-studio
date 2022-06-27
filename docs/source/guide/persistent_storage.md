@@ -28,7 +28,7 @@ Start by [creating an S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/use
 
 > In the case if you're going to use direct file upload feature and store media files like audio, video, csv you should complete this step.
 
-Set up cross-origin resource sharing (CORS) access to your bucket. See [Configuring cross-origin resource sharing (CORS)](https://docs.aws.amazon.com/AmazonS3/latest/userguide/enabling-cors-examples.html) in the Amazon S3 User Guide. Use or modify the following example:
+Set up Cross-Origin Resource Sharing (CORS) access to your bucket. See [Configuring cross-origin resource sharing (CORS)](https://docs.aws.amazon.com/AmazonS3/latest/userguide/enabling-cors-examples.html) in the Amazon S3 User Guide. Use or modify the following example:
 ```json
 [
    {
@@ -334,7 +334,7 @@ Set up Google Cloud Storage (GCS) as the persistent storage for Label Studio Ent
 
 > In the case if you're going to use direct file upload feature and store media files like audio, video, csv you should complete this step.
 
-Set up cross-origin resource sharing (CORS) access to your bucket. See [Configuring cross-origin resource sharing (CORS)](https://cloud.google.com/storage/docs/configuring-cors#configure-cors-bucket) in the Google Cloud User Guide. Use or modify the following example:
+Set up CORS access to your bucket. See [Configuring cross-origin resource sharing (CORS)](https://cloud.google.com/storage/docs/configuring-cors#configure-cors-bucket) in the Google Cloud User Guide. Use or modify the following example:
 ```shell
 echo '[
    {
@@ -505,7 +505,8 @@ az storage container create --name <YOUR_CONTAINER_NAME> \
 
 > In the case if you're going to use direct file upload feature and store media files like audio, video, csv you should complete this step.
 
-Set up cross-origin resource sharing (CORS) access to your bucket. See [Configuring cross-origin resource sharing (CORS)](https://docs.microsoft.com/en-us/rest/api/storageservices/cross-origin-resource-sharing--cors--support-for-the-azure-storage-services#enabling-cors-for-azure-storage) in the Azure User Guide. Use or modify the following example:
+Set up CORS access to your bucket. See [Configuring cross-origin resource sharing (CORS)](https://docs.microsoft.com/en-us/rest/api/storageservices/cross-origin-resource-sharing--cors--support-for-the-azure-storage-services#enabling-cors-for-azure-storage) in the Azure User Guide. Use or modify the following example:
+
 ```xml
 <Cors>
     <CorsRule>  
