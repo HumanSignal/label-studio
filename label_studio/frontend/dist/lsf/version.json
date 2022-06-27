@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2655: allow cmd or ctrl to create regions immediately even with deselect on canvas click enabled.",
-  "commit": "1dd10efc7e432de66c7c3009a54a447ea348c158",
-  "branch": "fb-dev-2655",
-  "date": "2022-06-21T19:30:20Z"
+  "message": "fix: DEV-2655: Allow cmd or ctrl to create regions immediately with deselect on canvas click enabled. (#717)\n\nfix: DEV-2655: allow cmd or ctrl to create regions immediately even with deselect on canvas click enabled.",
+  "commit": "16fdd27db4c3ed9b380bd8fe465aa199b1115eb6",
+  "branch": "master",
+  "date": "2022-06-27T18:48:17Z"
 }
