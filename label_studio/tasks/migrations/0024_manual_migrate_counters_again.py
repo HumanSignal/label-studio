@@ -7,9 +7,6 @@ logger = logging.getLogger(__name__)
 
 
 def forwards(apps, schema_editor):
-    # This migration was moved to 0024_manual_migrate_counters_again.py
-
-    """
     from tasks.functions import calculate_stats_all_orgs
     from django.conf import settings
 
@@ -26,10 +23,8 @@ def forwards(apps, schema_editor):
         )
         return
 
-    logger.debug('=> Starting calculate_stats_all_orgs for task counters')
+    logger.debug('=> Starting calculate_stats_all_orgs for task counters again')
     calculate_stats_all_orgs(from_scratch=False, redis=True)
-    """
-    return
 
 
 def backwards(apps, schema_editor):
@@ -39,7 +34,7 @@ def backwards(apps, schema_editor):
 class Migration(migrations.Migration):
     atomic = False
 
-    dependencies = [('tasks', '0017_auto_20220330_1310'), ]
+    dependencies = [('tasks', '0023_auto_20220620_1007'), ('core', '0001_initial')]
 
     operations = [
         migrations.RunPython(forwards, backwards),
