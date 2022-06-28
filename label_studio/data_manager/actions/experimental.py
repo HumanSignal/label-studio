@@ -207,14 +207,24 @@ def add_data_field(project, queryset, **kwargs):
         add_expression(queryset, size, value, value_name)
 
     else:
-        queryset.update(
-            data=Func(
-                F("data"),
-                Value([value_name]),
-                Value(value, JSONField()),
-                function="jsonb_set",
+
+        # sqlite
+        if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
+            tasks = list(queryset.only('data'))
+            for task in tasks:
+                task.data[value_name] = value
+            Task.objects.bulk_update(tasks, fields=['data'], batch_size=1000)
+
+        # postgres and other DB
+        else:
+            queryset.update(
+                data=Func(
+                    F("data"),
+                    Value([value_name]),
+                    Value(value, JSONField()),
+                    function="jsonb_set",
+                )
             )
-        )
 
     project.summary.update_data_columns([queryset.first()])
     return {'response_code': 200, 'detail': f'Updated {size} tasks'}
