@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2655: Allow cmd or ctrl to create regions immediately with deselect on canvas click enabled. (#717)\n\nfix: DEV-2655: allow cmd or ctrl to create regions immediately even with deselect on canvas click enabled.",
-  "commit": "16fdd27db4c3ed9b380bd8fe465aa199b1115eb6",
+  "message": "fix: DEV-2655: Support both region drawing behaviours with a settings flag (#726)\n\n* fix: DEV-2655: allow cmd or ctrl to create regions immediately even with deselect on canvas click enabled.\r\n\r\n* fix: DEV-2655: Support both region drawing behaviours with a settings flag.\r\n\r\n* fix: DEV-2655: use the settings flag exlusively\r\n\r\n* fix: DEV-2655: typo in settings description\r\n\r\n* Update ImageView.js\r\n\r\n* fix: DEV-2655: put deselection behaviour settings behind feature flag",
+  "commit": "16d4023b49a5831f0773c85551c2358db985f7cc",
   "branch": "master",
-  "date": "2022-06-27T18:48:17Z"
+  "date": "2022-06-28T16:24:42Z"
 }
