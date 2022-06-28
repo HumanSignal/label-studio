@@ -41,6 +41,12 @@ jobs:
               - 'label_studio/**'
               - '!label_studio/frontend/**'
               - 'deploy/requirements**'
+              - 'setup.py'
+            docker:
+              - 'label_studio/**'
+              - 'deploy/**'
+              - 'Dockerfile'
+              - 'setup.py'
 
   gitleaks:
     name: "Linter"
@@ -63,7 +69,9 @@ jobs:
 
   build:
     name: "Build"
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    needs:
+      - changed_files
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && needs.changed_files.outputs.docker == 'true'
     uses: heartexlabs/label-studio/.github/workflows/docker-build.yml@develop
     with:
       ref: ${{ github.event.pull_request.head.ref || github.ref }}
