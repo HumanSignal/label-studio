@@ -260,21 +260,25 @@ def add_expression(queryset, size, value, value_name):
 
     # permutation sampling
     if command == 'sample':
+        assert len(args) == 0, "sample() doesn't have arguments"
         values = random.sample(range(0, size), size)
         for i, v in enumerate(values):
             tasks[i].data[value_name] = v
 
     # uniform random
     elif command == 'random':
+        assert len(args) == 2, 'random() should have 2 args: min & max'
         minimum, maximum = int(args[0]), int(args[1])
         for i in range(size):
             tasks[i].data[value_name] = random.randint(minimum, maximum)
 
     # sampling with choices and weights
     elif command == 'choices':
+        assert 0 < len(args) < 3, 'choices() should have 1 or 2 args: values & weights (default=None)'
+        weights = json.loads(args[1]) if len(args) == 2 else None
         values = random.choices(
             population=json.loads(args[0]),
-            weights=json.loads(args[1]),
+            weights=weights,
             k=size
         )
         for i, v in enumerate(values):
@@ -282,6 +286,7 @@ def add_expression(queryset, size, value, value_name):
 
     # replaceg
     elif command == 'replace':
+        assert len(args) == 2, 'replace() should have 2 args: old value & new value'
         old_value, new_value = json.loads(args[0]), json.loads(args[1])
         for task in tasks:
             if value_name in task.data:
