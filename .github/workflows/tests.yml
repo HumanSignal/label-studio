@@ -1,15 +1,11 @@
-name: pytest:ubnt
+name: "Tests"
+
 on:
-  push:
-    branches: ['*', '*/*', '*/**', master]
-    paths:
-      - 'label_studio/**'
-      - '!label_studio/frontend/**'
-      - '.github/workflows/tests.yml'
-      - 'deploy/requirements.txt'
-      - 'deploy/requirements-mw.txt'
-      - 'deploy/requirements-test.txt'
-      - 'deploy/prebuild_wo_frontend.sh'
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
 
 env:
   NODE: '14'
@@ -37,7 +33,14 @@ jobs:
       # SENTRY_DSN:
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: hmarr/debug-action@v2.0.1
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          ref: ${{ inputs.ref }}
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -104,7 +107,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.8]
+        python-version: [ 3.8 ]
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
       DJANGO_DB: default
@@ -153,7 +156,14 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: hmarr/debug-action@v2.0.1
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          ref: ${{ inputs.ref }}
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -239,50 +249,56 @@ jobs:
       # SENTRY_DSN:
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+      - uses: hmarr/debug-action@v2.0.1
 
-    - uses: actions/cache@v3
-      name: Configure pip cache
-      with:
-        path: ~\AppData\Local\pip\Cache
-        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-${{ matrix.python-version }}-
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          ref: ${{ inputs.ref }}
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip setuptools
-        pip install --upgrade cython
-        if (Test-Path -Path '.\deploy\requirements.txt' -PathType Leaf)
-        {pip install -r deploy\requirements.txt}
-        if (Test-Path -Path '.\deploy\requirements-test.txt' -PathType Leaf)
-        {pip install -r deploy/requirements-test.txt}
-        pip install -e .
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Fix sqlite.dll for python < 3.9
-      if: ${{ matrix.python-version < '3.9' }}
-      run: |
-        set PYTHONIOENCODING=utf-8
-        set PYTHONLEGACYWINDOWSSTDIO=utf-8
-        label-studio init my_project --agree-fix-sqlite --force-fix-sqlite
-        cp sqlite3.dll %pythonLocation%/DLLs/sqlite3.dll
-      shell: cmd
+      - uses: actions/cache@v3
+        name: Configure pip cache
+        with:
+          path: ~\AppData\Local\pip\Cache
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
-    - name: Init project
-      run: |
-        set PYTHONIOENCODING=utf-8
-        set PYTHONLEGACYWINDOWSSTDIO=utf-8
-        label-studio init my_project --username test@test.com --password testpwd
-      shell: cmd
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools
+          pip install --upgrade cython
+          if (Test-Path -Path '.\deploy\requirements.txt' -PathType Leaf)
+          {pip install -r deploy\requirements.txt}
+          if (Test-Path -Path '.\deploy\requirements-test.txt' -PathType Leaf)
+          {pip install -r deploy/requirements-test.txt}
+          pip install -e .
 
-    - name: Test with pytest
-      env:
-        collect_analytics: 0
-      run: |
-        cd label_studio/
-        python -m pytest -vv -n auto
+      - name: Fix sqlite.dll for python < 3.9
+        if: ${{ matrix.python-version < '3.9' }}
+        run: |
+          set PYTHONIOENCODING=utf-8
+          set PYTHONLEGACYWINDOWSSTDIO=utf-8
+          label-studio init my_project --agree-fix-sqlite --force-fix-sqlite
+          cp sqlite3.dll %pythonLocation%/DLLs/sqlite3.dll
+        shell: cmd
 
+      - name: Init project
+        run: |
+          set PYTHONIOENCODING=utf-8
+          set PYTHONLEGACYWINDOWSSTDIO=utf-8
+          label-studio init my_project --username test@test.com --password testpwd
+        shell: cmd
+
+      - name: Test with pytest
+        env:
+          collect_analytics: 0
+        run: |
+          cd label_studio/
+          python -m pytest -vv -n auto
