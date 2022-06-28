@@ -1,0 +1,65 @@
+name: "Gitleaks"
+
+on:
+  workflow_call:
+    inputs:
+      head_sha:
+        required: true
+        type: string
+      base_sha:
+        required: true
+        type: string
+
+env:
+  GIT_GITLEAKS_VERSION: 8.8.7
+  ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
+
+jobs:
+  gitleaks:
+    name: "Gitleaks"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v2.0.1
+
+      - name: Configure gitleaks binary cache
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: /usr/local/bin/gitleaks
+          key: gitleaks-${{ env.GIT_GITLEAKS_VERSION }}
+
+      - name: Install tools
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          wget -O - \
+          "https://github.com/zricethezav/gitleaks/releases/download/v${{ env.GIT_GITLEAKS_VERSION }}/gitleaks_${{ env.GIT_GITLEAKS_VERSION }}_linux_x64.tar.gz" \
+            | sudo tar xzf - -C /usr/local/bin
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+          token: ${{ secrets.GIT_PAT }}
+          fetch-depth: 0
+
+      - name: Run gitleaks
+        run: |
+          set -euo pipefail ${ACTIONS_STEP_DEBUG:+-x}
+
+          gitleaks \
+            detect \
+            --source="." \
+            --redact \
+            -v \
+            --exit-code=2 \
+            --report-format=sarif \
+            --report-path=results.sarif \
+            --log-level=debug \
+            --log-opts='${{ inputs.base_sha }}..${{ inputs.head_sha }}'
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: GitLeaks results
+          path: results.sarif
