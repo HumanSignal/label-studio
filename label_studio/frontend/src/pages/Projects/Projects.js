@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useParams as useRouterParams } from 'react-router';
 import { Redirect } from 'react-router-dom';
 import { Button } from '../../components';
@@ -7,6 +7,7 @@ import { Spinner } from '../../components/Spinner/Spinner';
 import { ApiContext } from '../../providers/ApiProvider';
 import { useContextProps } from '../../providers/RoutesProvider';
 import { Block, Elem } from '../../utils/bem';
+import { FF_DEV_2575, isFF } from '../../utils/feature-flags';
 import { CreateProject } from '../CreateProject/CreateProject';
 import { DataManagerPage } from '../DataManager/DataManager';
 import { SettingsPage } from '../Settings';
@@ -34,13 +35,30 @@ export const ProjectsPage = () => {
 
   const fetchProjects = async (page  = currentPage, pageSize = defaultPageSize) => {
     setNetworkState('loading');
+
+    const requestParams = { page, page_size: pageSize };
+
+    if (isFF(2575)) {
+      requestParams.include = 'id,title,created_by,created_at,color,is_published,assignment_settings';
+    }
+
     const data = await api.callApi("projects", {
-      params: { page, page_size: pageSize },
+      params: requestParams,
     });
 
     setTotalItems(data?.count ?? 1);
     setProjectsList(data.results ?? []);
     setNetworkState('loaded');
+
+    if (isFF(FF_DEV_2575) && data?.results?.length) {
+      const additionalData = await api.callApi("projects", {
+        params: { ids: data?.results?.map(({ id }) => id).join(',') },
+      });
+
+      if (additionalData?.results?.length) {
+        setProjectsList(additionalData.results);
+      }
+    }
   };
 
   const loadNextPage = async (page, pageSize) => {
