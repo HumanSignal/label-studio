@@ -6,6 +6,7 @@ import { Oneof } from '../../components/Oneof/Oneof';
 import { Spinner } from '../../components/Spinner/Spinner';
 import { ApiContext } from '../../providers/ApiProvider';
 import { useContextProps } from '../../providers/RoutesProvider';
+import { useAbortController } from "../../hooks/useAbortController";
 import { Block, Elem } from '../../utils/bem';
 import { FF_DEV_2575, isFF } from '../../utils/feature-flags';
 import { CreateProject } from '../CreateProject/CreateProject';
@@ -22,6 +23,7 @@ const getCurrentPage = () => {
 
 export const ProjectsPage = () => {
   const api = React.useContext(ApiContext);
+  const abortController = useAbortController();
   const [projectsList, setProjectsList] = React.useState([]);
   const [networkState, setNetworkState] = React.useState(null);
   const [currentPage, setCurrentPage] = useState(getCurrentPage());
@@ -35,6 +37,7 @@ export const ProjectsPage = () => {
 
   const fetchProjects = async (page  = currentPage, pageSize = defaultPageSize) => {
     setNetworkState('loading');
+    abortController.renew(); // Cancel any in flight requests
 
     const requestParams = { page, page_size: pageSize };
 
@@ -44,6 +47,8 @@ export const ProjectsPage = () => {
 
     const data = await api.callApi("projects", {
       params: requestParams,
+      signal: abortController.controller.current.signal,
+      errorFilter: (e) => e.error.includes('aborted'), 
     });
 
     setTotalItems(data?.count ?? 1);
@@ -53,6 +58,8 @@ export const ProjectsPage = () => {
     if (isFF(FF_DEV_2575) && data?.results?.length) {
       const additionalData = await api.callApi("projects", {
         params: { ids: data?.results?.map(({ id }) => id).join(',') },
+        signal: abortController.controller.current.signal,
+        errorFilter: (e) => e.error.includes('aborted'), 
       });
 
       if (additionalData?.results?.length) {
