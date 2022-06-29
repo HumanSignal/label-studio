@@ -55,6 +55,12 @@ jobs:
               - 'Dockerfile'
               - 'setup.py'
 
+  pr_labeler:
+    name: "Validate"
+    if: github.event_name == 'pull_request_target'
+    uses: heartexlabs/label-studio/.github/workflows/pr-labeler.yml@develop
+    secrets: inherit
+
   gitleaks:
     name: "Linter"
     if: github.event_name == 'pull_request_target'
