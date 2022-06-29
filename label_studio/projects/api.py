@@ -372,7 +372,7 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
         operation_description="""
             Retrieve a paginated list of tasks for a specific project. For example, use the following cURL command:
             ```bash
-            curl -X GET {}/api/projects/{{id}}/tasks/ -H 'Authorization: Token abc123'
+            curl -X GET {}/api/projects/{{id}}/tasks/?page=1&page_size=10 -H 'Authorization: Token abc123'
             ```
         """.format(settings.HOSTNAME or 'https://localhost:8080'),
         manual_parameters=[
@@ -381,7 +381,7 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
                 description='A unique integer value identifying this project.'),
-        ],
+        ] + paginator_help('tasks', 'Projects')['manual_parameters'],
     ))
 class ProjectTaskListAPI(generics.ListCreateAPIView,
                          generics.DestroyAPIView):
@@ -420,7 +420,6 @@ class ProjectTaskListAPI(generics.ListCreateAPIView,
         emit_webhooks_for_instance(request.user.active_organization, None, WebhookAction.TASKS_DELETED, task_ids)
         return Response(data={'tasks': task_ids}, status=204)
 
-    @swagger_auto_schema(**paginator_help('tasks', 'Projects'))
     def get(self, *args, **kwargs):
         return super(ProjectTaskListAPI, self).get(*args, **kwargs)
 
