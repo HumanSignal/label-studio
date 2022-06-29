@@ -27,19 +27,26 @@ concurrency:
 jobs:
   changed_files:
     name: "Changed files"
-    if: github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
     outputs:
       src: ${{ steps.changes.outputs.src }}
+      docker: ${{ steps.changes.outputs.docker }}
     timeout-minutes: 5
     steps:
+      - uses: hmarr/debug-action@v2.0.1
+
+      - name: Checkout
+        if: github.event_name == 'push'
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
       - uses: dorny/paths-filter@v2
         id: changes
         with:
           filters: |
             src:
-              - 'label_studio/**'
-              - '!label_studio/frontend/**'
+              - 'label_studio/!(frontend)/**'
               - 'deploy/requirements**'
               - 'setup.py'
             docker:
@@ -69,7 +76,9 @@ jobs:
 
   build:
     name: "Build"
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    needs:
+      - changed_files
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && needs.changed_files.outputs.docker == 'true'
     uses: heartexlabs/label-studio/.github/workflows/docker-build.yml@develop
     with:
       ref: ${{ github.event.pull_request.head.ref || github.ref }}
