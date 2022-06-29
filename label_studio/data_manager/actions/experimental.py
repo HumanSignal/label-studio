@@ -252,6 +252,7 @@ def add_expression(queryset, size, value, value_name):
     command, args = value.split('(')
     args = process_arrays(args)
     args = args.replace(')', '').split(',')
+    args = [] if len(args) == 1 and args[0] == '' else args
     # return comma back, convert quotation mark to doubled quotation mark for json parsing
     for i, arg in enumerate(args):
         args[i] = arg.replace(';', ',').replace("'", '"')
@@ -284,7 +285,7 @@ def add_expression(queryset, size, value, value_name):
         for i, v in enumerate(values):
             tasks[i].data[value_name] = v
 
-    # replaceg
+    # replace
     elif command == 'replace':
         assert len(args) == 2, 'replace() should have 2 args: old value & new value'
         old_value, new_value = json.loads(args[0]), json.loads(args[1])
