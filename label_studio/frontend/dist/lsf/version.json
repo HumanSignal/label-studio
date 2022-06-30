@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2655: Support both region drawing behaviours with a settings flag (#726)\n\n* fix: DEV-2655: allow cmd or ctrl to create regions immediately even with deselect on canvas click enabled.\r\n\r\n* fix: DEV-2655: Support both region drawing behaviours with a settings flag.\r\n\r\n* fix: DEV-2655: use the settings flag exlusively\r\n\r\n* fix: DEV-2655: typo in settings description\r\n\r\n* Update ImageView.js\r\n\r\n* fix: DEV-2655: put deselection behaviour settings behind feature flag",
-  "commit": "16d4023b49a5831f0773c85551c2358db985f7cc",
+  "message": "fix: DEV-2432: Allow unfinished polygons to be saved as draft (#716)\n\n* fix: DEV-2432: allow saving draft of unfinished polygon\r\n\r\n* fix: DEV-2432: encapsulate the polygon draft saving change to the Polygon tool itself\r\n\r\n* fix: DEV-2432: forgot to set Super.startDrawing, and original implementation back to createDrawingRegion",
+  "commit": "22a45ad555467d4011a1142496afa7da970b590c",
   "branch": "master",
-  "date": "2022-06-28T16:24:42Z"
+  "date": "2022-06-30T13:44:41Z"
 }
