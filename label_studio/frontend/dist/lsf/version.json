@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2437: Retain history on initial load of annotation review stream",
-  "commit": "c35d2be04a29521fdb4bc05def7a0f64b9aa5a22",
-  "branch": "fb-dev-2437",
-  "date": "2022-06-23T18:38:04Z"
+  "message": "fix: DEV-2437: Retain history on initial load of annotation review stream (#721)",
+  "commit": "946894d376ea3bbe59c533925c1890d4226f8a4a",
+  "branch": "master",
+  "date": "2022-06-30T20:55:10Z"
 }
