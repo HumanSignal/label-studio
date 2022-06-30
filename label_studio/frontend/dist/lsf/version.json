@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2432: allow saving draft of unfinished polygon",
-  "commit": "4b47f1d40734f609f0bcc53da7361492a89a862f",
-  "branch": "fb-dev-2432",
-  "date": "2022-06-21T00:30:20Z"
+  "message": "fix: DEV-2432: Allow unfinished polygons to be saved as draft (#716)\n\n* fix: DEV-2432: allow saving draft of unfinished polygon\r\n\r\n* fix: DEV-2432: encapsulate the polygon draft saving change to the Polygon tool itself\r\n\r\n* fix: DEV-2432: forgot to set Super.startDrawing, and original implementation back to createDrawingRegion",
+  "commit": "22a45ad555467d4011a1142496afa7da970b590c",
+  "branch": "master",
+  "date": "2022-06-30T13:44:41Z"
 }
