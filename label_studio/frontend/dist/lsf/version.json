@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2432: Allow unfinished polygons to be saved as draft (#716)\n\n* fix: DEV-2432: allow saving draft of unfinished polygon\r\n\r\n* fix: DEV-2432: encapsulate the polygon draft saving change to the Polygon tool itself\r\n\r\n* fix: DEV-2432: forgot to set Super.startDrawing, and original implementation back to createDrawingRegion",
-  "commit": "22a45ad555467d4011a1142496afa7da970b590c",
+  "message": "fix: DEV-2437: Retain history on initial load of annotation review stream (#721)",
+  "commit": "946894d376ea3bbe59c533925c1890d4226f8a4a",
   "branch": "master",
-  "date": "2022-06-30T13:44:41Z"
+  "date": "2022-06-30T20:55:10Z"
 }
