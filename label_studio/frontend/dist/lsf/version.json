@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1714: X-axis zoom threshold (#699)\n\n* increase the minimum and default zoom to 300, the min set for wave-surfer\r\n\r\n* make default value explicit",
-  "commit": "05cf97840bbd82484e3085b289651627ff24bcd4",
-  "branch": "",
-  "date": "2022-06-10T16:57:52Z"
+  "message": "fix: DEV-2432: Allow unfinished polygons to be saved as draft (#716)\n\n* fix: DEV-2432: allow saving draft of unfinished polygon\r\n\r\n* fix: DEV-2432: encapsulate the polygon draft saving change to the Polygon tool itself\r\n\r\n* fix: DEV-2432: forgot to set Super.startDrawing, and original implementation back to createDrawingRegion",
+  "commit": "22a45ad555467d4011a1142496afa7da970b590c",
+  "branch": "master",
+  "date": "2022-06-30T13:44:41Z"
 }
