@@ -6,18 +6,20 @@ meta_title: Start Commands for Label Studio
 meta_description: Documentation for starting Label Studio and configuring the environment to use Label Studio with your machine learning or data science project. 
 ---
 
-After you install Label Studio, start the server to start using it. 
+After you install Label Studio, run the following command to start the server.
 
 ```bash
 label-studio start
 ```
 
-By default, Label Studio starts with a SQLite database to store labeling tasks and annotations. You can specify different source and target storage for labeling tasks and annotations using Label Studio UI or the API. See [Database storage](storedata.html) for more.
+By default, Label Studio starts with an SQLite database to store labeling tasks and annotations. You can specify different sources and target storage for labeling tasks and annotations using Label Studio UI or the API. For more information, see [Database storage](storedata.html).
+
 
 ## Command line arguments for starting Label Studio
+
 You can specify a machine learning backend and other options using the command line interface. Run `label-studio --help` to see all available options, or refer to the following tables.
 
-Some available commands for Label Studio provide information or start the Label Studio server:
+The following Label Studio commands provide information or allow you to start the Label Studio server.
 
 | Command |  Description |
 | --- | ---- |
@@ -56,36 +58,39 @@ The following command line arguments are optional and must be specified with `la
 | N/A | `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` | `/` | Specify the root directory for Label Studio to use when accessing local file directories. See [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage). |
 
 ### Set environment variables
+
 How you set environment variables depends on the operating system and the environment in which you deploy Label Studio. 
 
 In *nix operating systems, you can set environment variables from the command line or with an environment setup file. For example:
 ```bash
 export LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
 ```
-You can also use an `.env` file. 
+You can also use a `.env` file. 
 
 On Windows, you can use the following syntax:
 ```bash
 set LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
 ```
 
-To check if you set an environment variable successfully, run the following on *nix operating systems:
+To check if you set an environment variable successfully, run the following command on *nix operating systems:
 ```bash
 echo $LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED
 ```
 
-Or the following on Windows operating systems:
+Or run the following command on Windows operating systems:
 ```bash
 echo %LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED%
 ```
 
+
 ## Run Label Studio on localhost with a different port
-By default, Label Studio runs on port 8080. If that port is already in use or if you want to specify a different port, start Label Studio with the following command:
+
+By default, Label Studio runs on port `8080`. If that port is already in use or if you want to specify a different port, start Label Studio with the following command:
 ```bash
 label-studio start --port <port>
 ```
 
-For example, start Label Studio on port 9001:
+For example, start Label Studio on port `9001`:
 ```bash
 label-studio start --port 9001
 ```
@@ -95,14 +100,15 @@ Or, set the following environment variable:
 LABEL_STUDIO_PORT = 9001
 ```
 
+
 ## Run Label Studio on Docker with a different port
 
-To run Label Studio on Docker with a port other than the default of 8080, use the port argument when starting Label Studio on Docker. For example, to start Label Studio in a Docker container accessible with port 9001, run the following: 
+To run Label Studio on Docker with a port other than the default of 8080, use the port argument when starting Label Studio on Docker. For example, to start Label Studio in a Docker container accessible with port `9001`, run the following: 
 ```bash
 docker run -it -p 9001:8080 -v `pwd`/mydata:/label-studio/data heartexlabs/label-studio:latest label-studio
 ```
 
-Or, if you're using Docker Compose, update the `docker-compose.yml` file that you're using to expose a different port for the NGINX server used to proxy the connection to Label Studio. For example, this portion of the [`docker-compose.yml`](https://github.com/heartexlabs/label-studio/blob/master/docker-compose.yml) file exposes port 9001 instead of port 80 for proxying Label Studio:
+Or, if you are using Docker Compose, update the `docker-compose.yml` file that exposes a different port for the NGINX server used to proxy the connection to Label Studio. For example, this portion of the [`docker-compose.yml`](https://github.com/heartexlabs/label-studio/blob/master/docker-compose.yml) file exposes port `9001` instead of port `80` for proxying Label Studio:
 ```
 ...
 nginx:
@@ -114,17 +120,20 @@ nginx:
 ...
 ```
 
+
 ## Run Label Studio on Docker with a host and sub-path
 
-To run Label Studio on Docker with a host and sub-path, just pass `LABEL_STUDIO_HOST` env variable with sub-path to docker/docker-compose:
+To run Label Studio on Docker with a host and sub-path, pass `LABEL_STUDIO_HOST` environment variable with sub-path to `docker/docker-compose`:
 ```
 LABEL_STUDIO_HOST=http://localhost:8080/foo docker-compose up -d
 ```
 
-## Run Label Studio on Docker and use local storage
-To run Label Studio on Docker and reference persistent local storage directories, mount those directories as volumes when you start Label Studio and specify any environment variables you need.
 
-The following command starts a Docker container with the latest image of Label Studio with port 8080 and an environment variable that allows Label Studio to access local files. In this example, a local directory `./myfiles` is mounted to the `/label-studio/files` location. 
+## Run Label Studio on Docker and use local storage
+
+To run Label Studio on Docker and reference persistent local storage directories, mount the directories as volumes when you start Label Studio and specify any environment variables you need.
+
+The following command starts a Docker container with the latest image of Label Studio with port `8080` and an environment variable that allows Label Studio to access local files. In this example, a local directory `./myfiles` is mounted to the `/label-studio/files` location. 
 ```bash
 docker run -it -p 8080:8080 -v `pwd`/mydata:/label-studio/data \
 --env LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true \ 
@@ -133,39 +142,45 @@ docker run -it -p 8080:8080 -v `pwd`/mydata:/label-studio/data \
 heartexlabs/label-studio:latest label-studio
 ```
 
-By specifying the environment variable `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/label-studio/files`, Label Studio only scans this directory for local files. It's highly recommended to explicitly specify a `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` path to secure the volume access from the Docker container to your local machine.
+By specifying the environment variable `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/label-studio/files`, Label Studio only scans this directory for local files. Heartex highly recommends you explicitly specify a `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` path to secure the volume access from the Docker container to your local machine.
 
 Place files in the specified source directory (`./myfiles` in this example) and reference that directory when you set up [local storage](storage.html#Local_storage). For more information about using volume mounts in Docker, see the [Docker documentation on volumes](https://docs.docker.com/storage/volumes/).  
 
-If you're using Docker Compose, specify the volumes in the Docker Compose YAML file and add the relevant environment variables to the app container. For more about specifying volumes in Docker Compose, see the volumes section of the [Docker Compose file documentation](https://docs.docker.com/compose/compose-file/compose-file-v3/#volumes).
+If you are using Docker Compose, specify the volumes in the Docker Compose YAML file and add the relevant environment variables to the app container. For more about specifying volumes in Docker Compose, see the volumes section of the [Docker Compose file documentation](https://docs.docker.com/compose/compose-file/compose-file-v3/#volumes).
+
 
 ## Run Label Studio with HTTPS
+
 To run Label Studio with HTTPS and access the web server using HTTPS in the browser, use NGINX or another web server to run HTTPS for Label Studio.  
 
 
-
 ## Run Label Studio on the cloud using Heroku
+
 To run Label Studio on the cloud using Heroku, specify an environment variable so that Label Studio loads. 
 
 ```
 LABEL_STUDIO_HOST
 ```
 
-If you want, you can specify a different hostname for Label Studio, but you don't need to.
+!!! note
+    It is optional for you to specify a different hostname for Label Studio.
 
 To run Label Studio with Heroku and use PostgreSQL as the [database storage](storedata.html), specify the PostgreSQL environment variables required as part of the Heroku environment variable `DATABASE_URL`. For example, to specify a PostgreSQL database hosted on Amazon:
 ```
 DATABASE_URL = postgres://username:password@hostname.compute.amazonaws.com:5432/dbname
 ```
-Then you can specify the required environment variables for a PostgreSQL connection as config variables. See [Database storage](storedata.html).
+Then you can specify the required environment variables for a PostgreSQL connection as config variables. For more information, see [Database storage](storedata.html).
 
-Our Heroku manifest uses [postgresql addon](https://elements.heroku.com/addons/heroku-postgresql) out of the box.
-Please notice that the storage capacity is limited.
+!!! warning 
+    The Heroku manifest uses [postgresql addon](https://elements.heroku.com/addons/heroku-postgresql) out of the box. The storage capacity is limited.
 
 [<img src="https://www.herokucdn.com/deploy/button.svg" height="30px">](https://heroku.com/deploy?template=https://github.com/heartexlabs/label-studio/tree/master)
 
-Please notice that all uploaded data via import will be lost after a dyno replace since [filesystem is ephemeral](https://devcenter.heroku.com/articles/dynos#ephemeral-filesystem).
-Using S3 storage is recommended.
+!!! warning
+    All uploaded data via import will be lost after a dyno replace since [filesystem is ephemeral](https://devcenter.heroku.com/articles/dynos#ephemeral-filesystem).
+
+!!! info
+    Tip: Heartex recommends you use S3 storage.
 
 <!--
 ## Run Label Studio on the cloud using a different cloud provider
@@ -192,6 +207,7 @@ You must specify the protocol for the domain name: `http://` or `https://`
 
 If your external host has a port, specify the port as part of the host name. 
 
+
 ## Set up task sampling for your project 
 
 When you start Label Studio, you can control the order in which tasks are exposed to annotators for a specific project.  
@@ -209,6 +225,6 @@ The following table lists the available sampling options:
 | uniform | Tasks are sampled with equal probabilities. |
 | prediction-score-min | Tasks with the minimum average prediction score are shown to annotators. To use this option, you must also include predictions data in the task data that you import into Label Studio. |
 
-You can also use the API to set up sampling for a specific project. Send a PATCH request to the `/api/projects/<project_id>` endpoint to set sampling for the specified project. See the [API reference for projects](/api#operation/projects_partial_update). 
+You can also use the API to set up sampling for a specific project. Send a PATCH request to the `/api/projects/<project_id>` endpoint to set sampling for the specified project. For more information, see the [API reference for projects](/api#operation/projects_partial_update). 
 
-Individual annotators can also control the order in which they label tasks by adjusting the filtering and ordering of labeling tasks in the Label Studio UI. See [Set up your labeling project](setup.html).
+Individual annotators can also control the order in which they label tasks by adjusting the filtering and ordering of labeling tasks in the Label Studio UI. For more information, see [Set up your labeling project](setup.html).

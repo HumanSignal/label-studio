@@ -9,10 +9,11 @@ meta_description: Configure persistent storage with Label Studio Enterprise host
 
 If you host Label Studio Enterprise in the cloud, you want to set up persistent storage for uploaded task data, user images, and more in the same cloud service as your deployment.
 
-Follow the steps relevant for your deployment. If you use Docker Compose, select the cloud service you want to use as persistent storage: 
+Follow the steps relevant to your deployment. If you use Docker Compose, select the cloud service you want to use as persistent storage: 
 * [Set up Amazon S3](#Set-up-Amazon-S3) for Label Studio Enterprise deployments in Amazon Web Services (AWS).
 * [Set up Google Cloud Storage (GCS)](#Set-up-Google-Cloud-Storage) for Label Studio Enterprise deployments in Google Cloud Platform.
 * [Set up Microsoft Azure Storage](#Set-up-Microsoft-Azure-Storage) for Label Studio Enterprise deployments in Microsoft Azure.
+
 
 ## Set up Amazon S3
 
@@ -20,12 +21,14 @@ Set up Amazon S3 as the persistent storage for Label Studio Enterprise hosted in
 
 ### Create an S3 bucket
 
-Start by [creating an S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/create-bucket-overview.html) following the Amazon Simple Storage Service User Guide steps.
+Start by [creating an S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/create-bucket-overview.html) following the [Amazon Simple Storage Service User Guide](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html) steps.
 
-> If you want to secure the data stored in the S3 bucket at rest, you can [set up default server-side encryption for Amazon S3 buckets](https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-encryption.html) following the steps in the Amazon Simple Storage Service User Guide. 
+!!! info
+    Tip: If you want to secure the data stored in the S3 bucket at rest, you can [set up default server-side encryption for Amazon [S3 buckets](https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-encryption.html) by following the steps in the [Amazon Simple Storage Service User Guide](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html). 
 
 ### Configure the S3 bucket
-After you create an S3 bucket, set up the necessary IAM permissions to grant Label Studio Enterprise access to your bucket. There are four ways that you can manage access to your S3 bucket:
+
+After you create an S3 bucket, set up the necessary Identity and Access Management (IAM) permissions to grant Label Studio Enterprise access to your bucket. There are four ways that you can manage access to your S3 bucket:
 - Set up an **IAM role** with an OIDC provider (**recommended**).
 - Use **access keys**.
 - Set up an **IAM role** without an OIDC provider.
@@ -36,10 +39,11 @@ Select the relevant tab and follow the steps for your desired option:
 <div class="code-tabs">
   <div data-name="IAM role (OIDC)">
 
-> To set up an IAM role using this method, you must have a configured and provisioned OIDC provider for your cluster. See [Create an IAM OIDC provider for your cluster](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html) in the Amazon EKS User Guide.
+!!! note
+    To set up an IAM role using this method, you must have a configured and provisioned OIDC provider for your cluster. See [Create an IAM OIDC provider for your cluster](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html) in the [Amazon EKS User Guide](https://docs.aws.amazon.com/eks/latest/userguide/getting-started.html).
 
-1. Follow the steps to [create an IAM role and policy for your service account](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html) in the Amazon EKS User Guide.
-2. Use the following IAM Policy, replacing `<YOUR_S3_BUCKET>` with the name of your bucket:
+1. Follow the steps to [create an IAM role and policy for your service account](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html) in the [Amazon EKS User Guide](https://docs.aws.amazon.com/eks/latest/userguide/getting-started.html).
+2. Use the following IAM Policy to replace `<YOUR_S3_BUCKET>` with the name of your bucket:
 
 ```json
 {
@@ -69,12 +73,12 @@ Select the relevant tab and follow the steps for your desired option:
 }
 ```
 
-3. Create an **IAM role as a Web Identity** using the cluster OIDC provider as the identity provider:
-   1. Create a new **Role** from your IAM Console.
-   2. Select the **Web identity** Tab.
-   3. In the **Identity Provider** drop-down, select the OpenID Connect provider URL of your EKS and `sts.amazonaws.com` as the Audience.
-   4. Attach the newly created permission to the Role and name it.
-   5. Retrieve the Role arn for the next step.
+3. Create an **IAM role as a Web Identity** using the cluster OpenID Connect (OIDC) provider as the identity provider:
+   - Create a new **Role** from your IAM Console.
+   - Select the **Web identity** tab.
+   - In the **Identity Provider** drop-down, select the OIDC provider URL of your EKS and `sts.amazonaws.com` as the Audience.
+   - Attach the newly created permission to the Role and name it.
+   - Retrieve the Role `arn` for the next step.
 4. After you create an IAM role, add it as an annotation in your `lse-values.yaml` file.
    Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 
@@ -302,15 +306,16 @@ Set up Google Cloud Storage (GCS) as the persistent storage for Label Studio Ent
 
 You can connect Label Studio Enterprise to your GCS bucket using **Workload Identity** or **Access keys**.
 
-After you create a bucket and set up IAM permissions, connect Label Studio Enterprise to your GCS bucket. There are three ways that you can connect to your bucket:
-- Use Workload Identity to allow workloads in GKE to access your GCS bucket by impersonating the service account you created (**recommended**).
-- Create a service account key to use the service account outside Google Cloud.  
-- Create a service account key to use with Docker Compose. 
+After you create a bucket and set up IAM permissions, connect Label Studio Enterprise to your GCS bucket. There are three ways that you can connect to your bucket as follows:
+1. Heartex recommends you use Workload Identity to allow workloads in GKE to access your GCS bucket by impersonating the service account you created.
+2. Create a service account key to use the service account outside Google Cloud.  
+3. Create a service account key to use with Docker Compose. 
 
 <div class="code-tabs">
 <div data-name="Workload Identity">
 
-> Make sure that Workload Identity is enabled on your GKE cluster and that you meet the necessary prerequisites. See [Using Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) in the Google Kubernetes Engine guide.
+!!! note 
+    Make sure that Workload Identity is enabled on your GKE cluster and that you meet the necessary prerequisites. See [Using Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) in the Google Kubernetes Engine guide.
 
 1. Set up the following environment variables, specifying the service account you created as the `GCP_SA` variable, and replacing the other references in `<>` as needed:
 
@@ -433,7 +438,10 @@ Create a Microsoft Azure Storage container to use as persistent storage with Lab
 ### Create a Storage container
 
 1. Create an Azure storage account. See [Create a storage account](https://docs.microsoft.com/en-us/azure/storage/common/storage-account-create?tabs=azure-portal) in the Microsoft Azure product documentation.
-> Make sure that you set **Stock Keeping Unit (SKU)** to `Premium_LRS` and the **kind** parameter to `BlockBlobStorage`. This configuration results in storage that uses solid state drives (SSDs) rather than standard hard disk drives (HDDs). If you set this parameter to an HDD-based storage option, your instance might be too slow and could malfunction.
+
+!!! note
+    Make sure that you set **Stock Keeping Unit (SKU)** to `Premium_LRS` and the **kind** parameter to `BlockBlobStorage`. This configuration results in storage that uses Solid State Drives (SSDs) rather than standard Hard Disk Drives (HDDs). If you set this parameter to an HDD-based storage option, your instance might be too slow and could malfunction.
+
 2. Find the generated key in the **Storage accounts > Access keys** section in the [Azure Portal](https://portal.azure.com/) or by running the following command:
 
 ```shell

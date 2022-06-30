@@ -29,22 +29,18 @@ p.admonition-title {
 }
 
 .info>.admonition-title, .todo>.admonition-title {
-  background-color: rgba(0,184,212,.1);
+  background-color: #0099FFBB;
 }
 
-.warning>.admonition-title, .attention>.admonition-title, .caution>.admonition-title {
-  background-color: rgba(255,145,0,.1);
-}
-
-.failure>.admonition-title, .missing>.admonition-title, .fail>.admonition-title, .error>.admonition-title {
-  background-color: rgba(255,82,82,.1);
+.warning>.admonition-title, .important.admonition-title, .attention>.admonition-title, .caution>.admonition-title {
+  background-color:#D98F00BB;
 }
 
 .admonition.info, .admonition.todo {
   border-color: #00b8d4;
 }
 
-.admonition.warning, .admonition.attention, .admonition.caution {
+.admonition.warning, .admonition.important, .admonition.attention, .admonition.caution {
   border-color: #ff9100;
 }
 
@@ -57,7 +53,7 @@ p.admonition-title {
   border-radius: 50%;
 }
 
-.warning>.admonition-title::before, .attention>.admonition-title::before, .caution>.admonition-title::before {
+.warning>.admonition-title::before, .important>.admonition-title, .attention>.admonition-title::before, .caution>.admonition-title::before {
   background-color: #ff9100;
   border-radius: 50%;
 }

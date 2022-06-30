@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<!-- saved from url=(0093)http://localhost:3101/init-/Users/anithamuthu/Desktop/label-studio/docs/source/guide/tasks.md -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+    <title>Document</title>
+
+<script>
+/* axios v0.27.2 | (c) 2022 by Matt Zabriskie */
+!function(e,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports.axios=t():e.axios=t()}(this,(function(){return function(e){var t={};function n(r){if(t[r])return t[r].exports;var o=t[r]={i:r,l:!1,exports:{}};return e[r].call(o.exports,o,o.exports,n),o.l=!0,o.exports}return n.m=e,n.c=t,n.d=function(e,t,r){n.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:r})},n.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},n.t=function(e,t){if(1&t&&(e=n(e)),8&t)return e;if(4&t&&"object"==typeof e&&e&&e.__esModule)return e;var r=Object.create(null);if(n.r(r),Object.defineProperty(r,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var o in e)n.d(r,o,function(t){return e[t]}.bind(null,o));return r},n.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return n.d(t,"a",t),t},n.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},n.p="",n(n.s=13)}([function(e,t,n){"use strict";var r,o=n(4),i=Object.prototype.toString,s=(r=Object.create(null),function(e){var t=i.call(e);return r[t]||(r[t]=t.slice(8,-1).toLowerCase())});function a(e){return e=e.toLowerCase(),function(t){return s(t)===e}}function u(e){return Array.isArray(e)}function c(e){return void 0===e}var f=a("ArrayBuffer");function l(e){return null!==e&&"object"==typeof e}function p(e){if("object"!==s(e))return!1;var t=Object.getPrototypeOf(e);return null===t||t===Object.prototype}var d=a("Date"),h=a("File"),m=a("Blob"),v=a("FileList");function y(e){return"[object Function]"===i.call(e)}var g=a("URLSearchParams");function E(e,t){if(null!=e)if("object"!=typeof e&&(e=[e]),u(e))for(var n=0,r=e.length;n<r;n++)t.call(null,e[n],n,e);else for(var o in e)Object.prototype.hasOwnProperty.call(e,o)&&t.call(null,e[o],o,e)}var b,O=(b="undefined"!=typeof Uint8Array&&Object.getPrototypeOf(Uint8Array),function(e){return b&&e instanceof b});e.exports={isArray:u,isArrayBuffer:f,isBuffer:function(e){return null!==e&&!c(e)&&null!==e.constructor&&!c(e.constructor)&&"function"==typeof e.constructor.isBuffer&&e.constructor.isBuffer(e)},isFormData:function(e){return e&&("function"==typeof FormData&&e instanceof FormData||"[object FormData]"===i.call(e)||y(e.toString)&&"[object FormData]"===e.toString())},isArrayBufferView:function(e){return"undefined"!=typeof ArrayBuffer&&ArrayBuffer.isView?ArrayBuffer.isView(e):e&&e.buffer&&f(e.buffer)},isString:function(e){return"string"==typeof e},isNumber:function(e){return"number"==typeof e},isObject:l,isPlainObject:p,isUndefined:c,isDate:d,isFile:h,isBlob:m,isFunction:y,isStream:function(e){return l(e)&&y(e.pipe)},isURLSearchParams:g,isStandardBrowserEnv:function(){return("undefined"==typeof navigator||"ReactNative"!==navigator.product&&"NativeScript"!==navigator.product&&"NS"!==navigator.product)&&("undefined"!=typeof window&&"undefined"!=typeof document)},forEach:E,merge:function e(){var t={};function n(n,r){p(t[r])&&p(n)?t[r]=e(t[r],n):p(n)?t[r]=e({},n):u(n)?t[r]=n.slice():t[r]=n}for(var r=0,o=arguments.length;r<o;r++)E(arguments[r],n);return t},extend:function(e,t,n){return E(t,(function(t,r){e[r]=n&&"function"==typeof t?o(t,n):t})),e},trim:function(e){return e.trim?e.trim():e.replace(/^\s+|\s+$/g,"")},stripBOM:function(e){return 65279===e.charCodeAt(0)&&(e=e.slice(1)),e},inherits:function(e,t,n,r){e.prototype=Object.create(t.prototype,r),e.prototype.constructor=e,n&&Object.assign(e.prototype,n)},toFlatObject:function(e,t,n){var r,o,i,s={};t=t||{};do{for(o=(r=Object.getOwnPropertyNames(e)).length;o-- >0;)s[i=r[o]]||(t[i]=e[i],s[i]=!0);e=Object.getPrototypeOf(e)}while(e&&(!n||n(e,t))&&e!==Object.prototype);return t},kindOf:s,kindOfTest:a,endsWith:function(e,t,n){e=String(e),(void 0===n||n>e.length)&&(n=e.length),n-=t.length;var r=e.indexOf(t,n);return-1!==r&&r===n},toArray:function(e){if(!e)return null;var t=e.length;if(c(t))return null;for(var n=new Array(t);t-- >0;)n[t]=e[t];return n},isTypedArray:O,isFileList:v}},function(e,t,n){"use strict";var r=n(0);function o(e,t,n,r,o){Error.call(this),this.message=e,this.name="AxiosError",t&&(this.code=t),n&&(this.config=n),r&&(this.request=r),o&&(this.response=o)}r.inherits(o,Error,{toJSON:function(){return{message:this.message,name:this.name,description:this.description,number:this.number,fileName:this.fileName,lineNumber:this.lineNumber,columnNumber:this.columnNumber,stack:this.stack,config:this.config,code:this.code,status:this.response&&this.response.status?this.response.status:null}}});var i=o.prototype,s={};["ERR_BAD_OPTION_VALUE","ERR_BAD_OPTION","ECONNABORTED","ETIMEDOUT","ERR_NETWORK","ERR_FR_TOO_MANY_REDIRECTS","ERR_DEPRECATED","ERR_BAD_RESPONSE","ERR_BAD_REQUEST","ERR_CANCELED"].forEach((function(e){s[e]={value:e}})),Object.defineProperties(o,s),Object.defineProperty(i,"isAxiosError",{value:!0}),o.from=function(e,t,n,s,a,u){var c=Object.create(i);return r.toFlatObject(e,c,(function(e){return e!==Error.prototype})),o.call(c,e.message,t,n,s,a),c.name=e.name,u&&Object.assign(c,u),c},e.exports=o},function(e,t,n){"use strict";var r=n(1);function o(e){r.call(this,null==e?"canceled":e,r.ERR_CANCELED),this.name="CanceledError"}n(0).inherits(o,r,{__CANCEL__:!0}),e.exports=o},function(e,t,n){"use strict";var r=n(0),o=n(19),i=n(1),s=n(6),a=n(7),u={"Content-Type":"application/x-www-form-urlencoded"};function c(e,t){!r.isUndefined(e)&&r.isUndefined(e["Content-Type"])&&(e["Content-Type"]=t)}var f,l={transitional:s,adapter:(("undefined"!=typeof XMLHttpRequest||"undefined"!=typeof process&&"[object process]"===Object.prototype.toString.call(process))&&(f=n(8)),f),transformRequest:[function(e,t){if(o(t,"Accept"),o(t,"Content-Type"),r.isFormData(e)||r.isArrayBuffer(e)||r.isBuffer(e)||r.isStream(e)||r.isFile(e)||r.isBlob(e))return e;if(r.isArrayBufferView(e))return e.buffer;if(r.isURLSearchParams(e))return c(t,"application/x-www-form-urlencoded;charset=utf-8"),e.toString();var n,i=r.isObject(e),s=t&&t["Content-Type"];if((n=r.isFileList(e))||i&&"multipart/form-data"===s){var u=this.env&&this.env.FormData;return a(n?{"files[]":e}:e,u&&new u)}return i||"application/json"===s?(c(t,"application/json"),function(e,t,n){if(r.isString(e))try{return(t||JSON.parse)(e),r.trim(e)}catch(e){if("SyntaxError"!==e.name)throw e}return(n||JSON.stringify)(e)}(e)):e}],transformResponse:[function(e){var t=this.transitional||l.transitional,n=t&&t.silentJSONParsing,o=t&&t.forcedJSONParsing,s=!n&&"json"===this.responseType;if(s||o&&r.isString(e)&&e.length)try{return JSON.parse(e)}catch(e){if(s){if("SyntaxError"===e.name)throw i.from(e,i.ERR_BAD_RESPONSE,this,null,this.response);throw e}}return e}],timeout:0,xsrfCookieName:"XSRF-TOKEN",xsrfHeaderName:"X-XSRF-TOKEN",maxContentLength:-1,maxBodyLength:-1,env:{FormData:n(27)},validateStatus:function(e){return e>=200&&e<300},headers:{common:{Accept:"application/json, text/plain, */*"}}};r.forEach(["delete","get","head"],(function(e){l.headers[e]={}})),r.forEach(["post","put","patch"],(function(e){l.headers[e]=r.merge(u)})),e.exports=l},function(e,t,n){"use strict";e.exports=function(e,t){return function(){for(var n=new Array(arguments.length),r=0;r<n.length;r++)n[r]=arguments[r];return e.apply(t,n)}}},function(e,t,n){"use strict";var r=n(0);function o(e){return encodeURIComponent(e).replace(/%3A/gi,":").replace(/%24/g,"$").replace(/%2C/gi,",").replace(/%20/g,"+").replace(/%5B/gi,"[").replace(/%5D/gi,"]")}e.exports=function(e,t,n){if(!t)return e;var i;if(n)i=n(t);else if(r.isURLSearchParams(t))i=t.toString();else{var s=[];r.forEach(t,(function(e,t){null!=e&&(r.isArray(e)?t+="[]":e=[e],r.forEach(e,(function(e){r.isDate(e)?e=e.toISOString():r.isObject(e)&&(e=JSON.stringify(e)),s.push(o(t)+"="+o(e))})))})),i=s.join("&")}if(i){var a=e.indexOf("#");-1!==a&&(e=e.slice(0,a)),e+=(-1===e.indexOf("?")?"?":"&")+i}return e}},function(e,t,n){"use strict";e.exports={silentJSONParsing:!0,forcedJSONParsing:!0,clarifyTimeoutError:!1}},function(e,t,n){"use strict";var r=n(0);e.exports=function(e,t){t=t||new FormData;var n=[];function o(e){return null===e?"":r.isDate(e)?e.toISOString():r.isArrayBuffer(e)||r.isTypedArray(e)?"function"==typeof Blob?new Blob([e]):Buffer.from(e):e}return function e(i,s){if(r.isPlainObject(i)||r.isArray(i)){if(-1!==n.indexOf(i))throw Error("Circular reference detected in "+s);n.push(i),r.forEach(i,(function(n,i){if(!r.isUndefined(n)){var a,u=s?s+"."+i:i;if(n&&!s&&"object"==typeof n)if(r.endsWith(i,"{}"))n=JSON.stringify(n);else if(r.endsWith(i,"[]")&&(a=r.toArray(n)))return void a.forEach((function(e){!r.isUndefined(e)&&t.append(u,o(e))}));e(n,u)}})),n.pop()}else t.append(s,o(i))}(e),t}},function(e,t,n){"use strict";var r=n(0),o=n(20),i=n(21),s=n(5),a=n(9),u=n(24),c=n(25),f=n(6),l=n(1),p=n(2),d=n(26);e.exports=function(e){return new Promise((function(t,n){var h,m=e.data,v=e.headers,y=e.responseType;function g(){e.cancelToken&&e.cancelToken.unsubscribe(h),e.signal&&e.signal.removeEventListener("abort",h)}r.isFormData(m)&&r.isStandardBrowserEnv()&&delete v["Content-Type"];var E=new XMLHttpRequest;if(e.auth){var b=e.auth.username||"",O=e.auth.password?unescape(encodeURIComponent(e.auth.password)):"";v.Authorization="Basic "+btoa(b+":"+O)}var x=a(e.baseURL,e.url);function w(){if(E){var r="getAllResponseHeaders"in E?u(E.getAllResponseHeaders()):null,i={data:y&&"text"!==y&&"json"!==y?E.response:E.responseText,status:E.status,statusText:E.statusText,headers:r,config:e,request:E};o((function(e){t(e),g()}),(function(e){n(e),g()}),i),E=null}}if(E.open(e.method.toUpperCase(),s(x,e.params,e.paramsSerializer),!0),E.timeout=e.timeout,"onloadend"in E?E.onloadend=w:E.onreadystatechange=function(){E&&4===E.readyState&&(0!==E.status||E.responseURL&&0===E.responseURL.indexOf("file:"))&&setTimeout(w)},E.onabort=function(){E&&(n(new l("Request aborted",l.ECONNABORTED,e,E)),E=null)},E.onerror=function(){n(new l("Network Error",l.ERR_NETWORK,e,E,E)),E=null},E.ontimeout=function(){var t=e.timeout?"timeout of "+e.timeout+"ms exceeded":"timeout exceeded",r=e.transitional||f;e.timeoutErrorMessage&&(t=e.timeoutErrorMessage),n(new l(t,r.clarifyTimeoutError?l.ETIMEDOUT:l.ECONNABORTED,e,E)),E=null},r.isStandardBrowserEnv()){var R=(e.withCredentials||c(x))&&e.xsrfCookieName?i.read(e.xsrfCookieName):void 0;R&&(v[e.xsrfHeaderName]=R)}"setRequestHeader"in E&&r.forEach(v,(function(e,t){void 0===m&&"content-type"===t.toLowerCase()?delete v[t]:E.setRequestHeader(t,e)})),r.isUndefined(e.withCredentials)||(E.withCredentials=!!e.withCredentials),y&&"json"!==y&&(E.responseType=e.responseType),"function"==typeof e.onDownloadProgress&&E.addEventListener("progress",e.onDownloadProgress),"function"==typeof e.onUploadProgress&&E.upload&&E.upload.addEventListener("progress",e.onUploadProgress),(e.cancelToken||e.signal)&&(h=function(e){E&&(n(!e||e&&e.type?new p:e),E.abort(),E=null)},e.cancelToken&&e.cancelToken.subscribe(h),e.signal&&(e.signal.aborted?h():e.signal.addEventListener("abort",h))),m||(m=null);var S=d(x);S&&-1===["http","https","file"].indexOf(S)?n(new l("Unsupported protocol "+S+":",l.ERR_BAD_REQUEST,e)):E.send(m)}))}},function(e,t,n){"use strict";var r=n(22),o=n(23);e.exports=function(e,t){return e&&!r(t)?o(e,t):t}},function(e,t,n){"use strict";e.exports=function(e){return!(!e||!e.__CANCEL__)}},function(e,t,n){"use strict";var r=n(0);e.exports=function(e,t){t=t||{};var n={};function o(e,t){return r.isPlainObject(e)&&r.isPlainObject(t)?r.merge(e,t):r.isPlainObject(t)?r.merge({},t):r.isArray(t)?t.slice():t}function i(n){return r.isUndefined(t[n])?r.isUndefined(e[n])?void 0:o(void 0,e[n]):o(e[n],t[n])}function s(e){if(!r.isUndefined(t[e]))return o(void 0,t[e])}function a(n){return r.isUndefined(t[n])?r.isUndefined(e[n])?void 0:o(void 0,e[n]):o(void 0,t[n])}function u(n){return n in t?o(e[n],t[n]):n in e?o(void 0,e[n]):void 0}var c={url:s,method:s,data:s,baseURL:a,transformRequest:a,transformResponse:a,paramsSerializer:a,timeout:a,timeoutMessage:a,withCredentials:a,adapter:a,responseType:a,xsrfCookieName:a,xsrfHeaderName:a,onUploadProgress:a,onDownloadProgress:a,decompress:a,maxContentLength:a,maxBodyLength:a,beforeRedirect:a,transport:a,httpAgent:a,httpsAgent:a,cancelToken:a,socketPath:a,responseEncoding:a,validateStatus:u};return r.forEach(Object.keys(e).concat(Object.keys(t)),(function(e){var t=c[e]||i,o=t(e);r.isUndefined(o)&&t!==u||(n[e]=o)})),n}},function(e,t){e.exports={version:"0.27.2"}},function(e,t,n){e.exports=n(14)},function(e,t,n){"use strict";var r=n(0),o=n(4),i=n(15),s=n(11);var a=function e(t){var n=new i(t),a=o(i.prototype.request,n);return r.extend(a,i.prototype,n),r.extend(a,n),a.create=function(n){return e(s(t,n))},a}(n(3));a.Axios=i,a.CanceledError=n(2),a.CancelToken=n(29),a.isCancel=n(10),a.VERSION=n(12).version,a.toFormData=n(7),a.AxiosError=n(1),a.Cancel=a.CanceledError,a.all=function(e){return Promise.all(e)},a.spread=n(30),a.isAxiosError=n(31),e.exports=a,e.exports.default=a},function(e,t,n){"use strict";var r=n(0),o=n(5),i=n(16),s=n(17),a=n(11),u=n(9),c=n(28),f=c.validators;function l(e){this.defaults=e,this.interceptors={request:new i,response:new i}}l.prototype.request=function(e,t){"string"==typeof e?(t=t||{}).url=e:t=e||{},(t=a(this.defaults,t)).method?t.method=t.method.toLowerCase():this.defaults.method?t.method=this.defaults.method.toLowerCase():t.method="get";var n=t.transitional;void 0!==n&&c.assertOptions(n,{silentJSONParsing:f.transitional(f.boolean),forcedJSONParsing:f.transitional(f.boolean),clarifyTimeoutError:f.transitional(f.boolean)},!1);var r=[],o=!0;this.interceptors.request.forEach((function(e){"function"==typeof e.runWhen&&!1===e.runWhen(t)||(o=o&&e.synchronous,r.unshift(e.fulfilled,e.rejected))}));var i,u=[];if(this.interceptors.response.forEach((function(e){u.push(e.fulfilled,e.rejected)})),!o){var l=[s,void 0];for(Array.prototype.unshift.apply(l,r),l=l.concat(u),i=Promise.resolve(t);l.length;)i=i.then(l.shift(),l.shift());return i}for(var p=t;r.length;){var d=r.shift(),h=r.shift();try{p=d(p)}catch(e){h(e);break}}try{i=s(p)}catch(e){return Promise.reject(e)}for(;u.length;)i=i.then(u.shift(),u.shift());return i},l.prototype.getUri=function(e){e=a(this.defaults,e);var t=u(e.baseURL,e.url);return o(t,e.params,e.paramsSerializer)},r.forEach(["delete","get","head","options"],(function(e){l.prototype[e]=function(t,n){return this.request(a(n||{},{method:e,url:t,data:(n||{}).data}))}})),r.forEach(["post","put","patch"],(function(e){function t(t){return function(n,r,o){return this.request(a(o||{},{method:e,headers:t?{"Content-Type":"multipart/form-data"}:{},url:n,data:r}))}}l.prototype[e]=t(),l.prototype[e+"Form"]=t(!0)})),e.exports=l},function(e,t,n){"use strict";var r=n(0);function o(){this.handlers=[]}o.prototype.use=function(e,t,n){return this.handlers.push({fulfilled:e,rejected:t,synchronous:!!n&&n.synchronous,runWhen:n?n.runWhen:null}),this.handlers.length-1},o.prototype.eject=function(e){this.handlers[e]&&(this.handlers[e]=null)},o.prototype.forEach=function(e){r.forEach(this.handlers,(function(t){null!==t&&e(t)}))},e.exports=o},function(e,t,n){"use strict";var r=n(0),o=n(18),i=n(10),s=n(3),a=n(2);function u(e){if(e.cancelToken&&e.cancelToken.throwIfRequested(),e.signal&&e.signal.aborted)throw new a}e.exports=function(e){return u(e),e.headers=e.headers||{},e.data=o.call(e,e.data,e.headers,e.transformRequest),e.headers=r.merge(e.headers.common||{},e.headers[e.method]||{},e.headers),r.forEach(["delete","get","head","post","put","patch","common"],(function(t){delete e.headers[t]})),(e.adapter||s.adapter)(e).then((function(t){return u(e),t.data=o.call(e,t.data,t.headers,e.transformResponse),t}),(function(t){return i(t)||(u(e),t&&t.response&&(t.response.data=o.call(e,t.response.data,t.response.headers,e.transformResponse))),Promise.reject(t)}))}},function(e,t,n){"use strict";var r=n(0),o=n(3);e.exports=function(e,t,n){var i=this||o;return r.forEach(n,(function(n){e=n.call(i,e,t)})),e}},function(e,t,n){"use strict";var r=n(0);e.exports=function(e,t){r.forEach(e,(function(n,r){r!==t&&r.toUpperCase()===t.toUpperCase()&&(e[t]=n,delete e[r])}))}},function(e,t,n){"use strict";var r=n(1);e.exports=function(e,t,n){var o=n.config.validateStatus;n.status&&o&&!o(n.status)?t(new r("Request failed with status code "+n.status,[r.ERR_BAD_REQUEST,r.ERR_BAD_RESPONSE][Math.floor(n.status/100)-4],n.config,n.request,n)):e(n)}},function(e,t,n){"use strict";var r=n(0);e.exports=r.isStandardBrowserEnv()?{write:function(e,t,n,o,i,s){var a=[];a.push(e+"="+encodeURIComponent(t)),r.isNumber(n)&&a.push("expires="+new Date(n).toGMTString()),r.isString(o)&&a.push("path="+o),r.isString(i)&&a.push("domain="+i),!0===s&&a.push("secure"),document.cookie=a.join("; ")},read:function(e){var t=document.cookie.match(new RegExp("(^|;\\s*)("+e+")=([^;]*)"));return t?decodeURIComponent(t[3]):null},remove:function(e){this.write(e,"",Date.now()-864e5)}}:{write:function(){},read:function(){return null},remove:function(){}}},function(e,t,n){"use strict";e.exports=function(e){return/^([a-z][a-z\d+\-.]*:)?\/\//i.test(e)}},function(e,t,n){"use strict";e.exports=function(e,t){return t?e.replace(/\/+$/,"")+"/"+t.replace(/^\/+/,""):e}},function(e,t,n){"use strict";var r=n(0),o=["age","authorization","content-length","content-type","etag","expires","from","host","if-modified-since","if-unmodified-since","last-modified","location","max-forwards","proxy-authorization","referer","retry-after","user-agent"];e.exports=function(e){var t,n,i,s={};return e?(r.forEach(e.split("\n"),(function(e){if(i=e.indexOf(":"),t=r.trim(e.substr(0,i)).toLowerCase(),n=r.trim(e.substr(i+1)),t){if(s[t]&&o.indexOf(t)>=0)return;s[t]="set-cookie"===t?(s[t]?s[t]:[]).concat([n]):s[t]?s[t]+", "+n:n}})),s):s}},function(e,t,n){"use strict";var r=n(0);e.exports=r.isStandardBrowserEnv()?function(){var e,t=/(msie|trident)/i.test(navigator.userAgent),n=document.createElement("a");function o(e){var r=e;return t&&(n.setAttribute("href",r),r=n.href),n.setAttribute("href",r),{href:n.href,protocol:n.protocol?n.protocol.replace(/:$/,""):"",host:n.host,search:n.search?n.search.replace(/^\?/,""):"",hash:n.hash?n.hash.replace(/^#/,""):"",hostname:n.hostname,port:n.port,pathname:"/"===n.pathname.charAt(0)?n.pathname:"/"+n.pathname}}return e=o(window.location.href),function(t){var n=r.isString(t)?o(t):t;return n.protocol===e.protocol&&n.host===e.host}}():function(){return!0}},function(e,t,n){"use strict";e.exports=function(e){var t=/^([-+\w]{1,25})(:?\/\/|:)/.exec(e);return t&&t[1]||""}},function(e,t){e.exports=null},function(e,t,n){"use strict";var r=n(12).version,o=n(1),i={};["object","boolean","number","function","string","symbol"].forEach((function(e,t){i[e]=function(n){return typeof n===e||"a"+(t<1?"n ":" ")+e}}));var s={};i.transitional=function(e,t,n){function i(e,t){return"[Axios v"+r+"] Transitional option '"+e+"'"+t+(n?". "+n:"")}return function(n,r,a){if(!1===e)throw new o(i(r," has been removed"+(t?" in "+t:"")),o.ERR_DEPRECATED);return t&&!s[r]&&(s[r]=!0,console.warn(i(r," has been deprecated since v"+t+" and will be removed in the near future"))),!e||e(n,r,a)}},e.exports={assertOptions:function(e,t,n){if("object"!=typeof e)throw new o("options must be an object",o.ERR_BAD_OPTION_VALUE);for(var r=Object.keys(e),i=r.length;i-- >0;){var s=r[i],a=t[s];if(a){var u=e[s],c=void 0===u||a(u,s,e);if(!0!==c)throw new o("option "+s+" must be "+c,o.ERR_BAD_OPTION_VALUE)}else if(!0!==n)throw new o("Unknown option "+s,o.ERR_BAD_OPTION)}},validators:i}},function(e,t,n){"use strict";var r=n(2);function o(e){if("function"!=typeof e)throw new TypeError("executor must be a function.");var t;this.promise=new Promise((function(e){t=e}));var n=this;this.promise.then((function(e){if(n._listeners){var t,r=n._listeners.length;for(t=0;t<r;t++)n._listeners[t](e);n._listeners=null}})),this.promise.then=function(e){var t,r=new Promise((function(e){n.subscribe(e),t=e})).then(e);return r.cancel=function(){n.unsubscribe(t)},r},e((function(e){n.reason||(n.reason=new r(e),t(n.reason))}))}o.prototype.throwIfRequested=function(){if(this.reason)throw this.reason},o.prototype.subscribe=function(e){this.reason?e(this.reason):this._listeners?this._listeners.push(e):this._listeners=[e]},o.prototype.unsubscribe=function(e){if(this._listeners){var t=this._listeners.indexOf(e);-1!==t&&this._listeners.splice(t,1)}},o.source=function(){var e;return{token:new o((function(t){e=t})),cancel:e}},e.exports=o},function(e,t,n){"use strict";e.exports=function(e){return function(t){return e.apply(null,t)}}},function(e,t,n){"use strict";var r=n(0);e.exports=function(e){return r.isObject(e)&&!0===e.isAxiosError}}])}));
+//# sourceMappingURL=axios.min.map
+</script>
+<style>
+.topBtn{margin-left:5px;margin-right:5px}.topBtns{display:flex;list-style-type:none;align-items:center;justify-content:space-around}#sidebar{background-color:black;color:white;padding:5px;min-height:100vh;width:175px}.sidemenu{list-style-type:none;padding:0}#main{display:flex;flex-direction:column;align-items:center;width:100%}.btn{width:100%;color:white;margin-bottom:10px;border:black;padding-top:5px;padding-bottom:5px;cursor:pointer}.btn-primary{background-color:#0182ec}.btn-secondary{background-color:#676969}.btn-success{background-color:#03fc5eb1}.btn-danger{background-color:#fd042a7d}#header{max-width:1000px;background-color:lightblue;width:100%;padding-left:10px;padding-right:10px}#content{min-height:100vh;max-width:1000px;width:100%;padding:10px}
+</style>
+    
+</head>
+<body style="margin:0; display:flex; background-color:#454646;" onload="init()" data-new-gr-c-s-check-loaded="14.1065.0" data-gr-ext-installed="" data-new-gr-c-s-loaded="14.1065.0">
+
+    <section id="sidebar">
+        <ul class="sidemenu">
+            <li>
+            <button class="btn btn-primary" onclick="save1()">Save [ctrl +s]</button>
+            </li>
+            <li>
+            <a href="http://localhost:3101/init-/Users/anithamuthu/Desktop/label-studio/docs/source/guide/tasks.md"><button class="btn btn-success">Reload File [ctrl + r]</button></a>
+            </li>
+            <li>
+            <button class="btn btn-danger" onclick="window.close()">Exit [ctrl + x]</button>
+            </li>
+            
+            
+        </ul>
+           
+            
+    </section>
+    
+
+    <section id="main">
+    <div id="header">
+		<h2>File: /Users/anithamuthu/Desktop/label-studio/docs/source/guide/tasks.md</h2>
+	</div>
+
+
+
+
+  <textarea class="item3 basic" id="content">  ---
+title: Get data into Label Studio
+short: Import data
+type: guide
+order: 300
+meta_title: Import Data into Label Studio
+meta_description: Import and upload data labeling tasks from audio, HTML, image, CSV, text, and time series datasets using common file formats or the Label Studio JSON format to label and annotate that data for your machine learning and data science projects. 
+---
+
+Get data into Label Studio by importing files, referencing URLs, or syncing with cloud or database storage. 
+
+- If your data is stored in a cloud storage bucket, see [Sync data from cloud or database storage](storage.html).
+- If your data is stored in a Redis database, see [Sync data from cloud or database storage](storage.html).
+- If your data is stored at internet-accessible URLs, in files, or directories, [import it from the Label Studio UI](#Import-data-from-the-Label-Studio-UI).
+- If your data is stored locally, [import it into Label Studio](#Import-data-from-a-local-directory).
+- If your data contains predictions or pre-annotations, see [Import pre-annotated data into Label Studio](predictions.html).
+
+
+## Types of data you can import into Label Studio
+
+You can import many types of data, including text, time series, audio, and image data. The file types supported depend on the type of data. 
+
+| Data type | Supported file types |
+| --- | --- |
+| Audio | .aiff, .au, .flac, .m4a, .mp3, .ogg, .wav |
+| [HyperText (HTML)](#Import-HTML-data) | .html, .htm, .xml |
+| Images | .bmp, .gif, .jpg, .png, .svg, .webp |
+| Paragraphs (Dialogue) | .json |
+| Structured data | .csv, .tsv | 
+| [Text](#Plain-text) | .txt, .json |
+| [Time series](#Import-CSV-or-TSV-data) | .csv, .tsv, .json |
+| [Tasks with multiple data types](#Basic-Label-Studio-JSON-format) | .csv, .tsv, .json |
+
+If you don't see a supported data or file type that you want to import, contact the [Label Studio Slack community](https://slack.labelstudio.heartex.com/?source=docs-gdi). 
+
+### How to import your data
+
+The most secure and reliable method to import your data is to store the data outside of Label Studio and import references to the data using URLs. You can import a list of URLs in a TXT, CSV, or TSV file, or reference the URLs in [JSON task format](#Basic-Label-Studio-JSON-format).
+
+If you are importing audio, image, or video data, you must use URLs to refer to those data types. 
+
+If you are importing HTML, text, dialogue, or timeseries data using the `&lt;HyperText&gt;`, `&lt;Text&gt;`, `&lt;Paragraphs&gt;`, or `&lt;TimeSeries&gt;` tags in your labeling configuration, you can either load data directly, or load data from a URL. 
+
+- To load data from a URL, specify `valueType="url"` in your labeling configuration. 
+- To load data directly into the Label Studio database, specify `valueType="text"` for HyperText or Text data, or `valueType="json"` for Paragraph or TimeSeries data.
+
+!!! note
+    If you load data from a URL, the data is not saved in Label Studio. If you want an annotated task export to include the data that you annotated, you must import the data into the Label Studio database without using URL references, or combine the data with the annotations after exporting.
+
+&lt;br/&gt;
+{% details &lt;b&gt;Click to expand example configurations with each valueType&lt;/b&gt; %}
+
+#### Example with valueType="text"
+&lt;div style="margin-left: 1em;"&gt;
+
+Labeling configuration:
+
+{% codeblock lang:xml %}
+&lt;View&gt; 
+  &lt;Text name="text1" value="text" valueType="text"&gt; 
+&lt;/View&gt;
+{% endcodeblock %}
+
+JSON file to import:
+{% codeblock lang:json %}
+{
+  "text": "My awesome opossum"
+}
+{% endcodeblock %}
+
+CSV file to import:
+{% codeblock lang:csv %}
+text
+My awesome opossum
+{% endcodeblock %}
+
+&lt;/div&gt;
+
+#### Example with valueType="url"
+
+&lt;div style="margin-left: 1em;"&gt;
+
+Labeling config:
+
+{% codeblock lang:xml %}
+&lt;View&gt; 
+  &lt;Text name="text1" value="text" valueType="url"&gt; 
+&lt;/View&gt;
+{% endcodeblock %}
+
+Import JSON file:
+{% codeblock lang:json %}
+{
+  "text": "http://example.com/text.txt"
+}
+{% endcodeblock %}
+
+Import CSV file:
+{% codeblock lang:csv %}
+text
+http://example.com/text.txt
+{% endcodeblock %}
+
+&lt;/div&gt;
+
+{% enddetails %}
+
+
+## How to format your data to import it
+
+Label Studio treats various file types in different ways. 
+
+If you want to import multiple types of data to label at the same time, for example, images with captions or audio recordings with transcripts, you must use the [basic Label Studio JSON format](#Basic-Label-Studio-JSON-format). 
+
+[You can also use a CSV file or a JSON list of tasks to point to URLs with the data](#How-to-import-your-data), rather than directly importing the data if you need to import thousands of files. You can import files containing up to 250,000 tasks or up to 50MB in size into Label Studio.
+
+If you are specifying data in a cloud storage bucket or container, and you don't want to [sync cloud storage](storage.html), create and specify [presigned URLs for Amazon S3 storage](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html), [signed URLs for Google Cloud Storage](https://cloud.google.com/storage/docs/access-control/signed-urls), or [shared access signatures for Microsoft Azure](https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview) in a JSON, CSV, TSV, or TXT file. 
+
+### Basic Label Studio JSON format
+
+The best way to import data into Label Studio is to use a JSON-formatted list of tasks. The `data` key of the JSON file references each task as an entry in a JSON dictionary. If there is no `data` key, Label Studio interprets the entire JSON file as one task. 
+
+In the `data` JSON dictionary, use key-value pairs that correspond to the source key expected by the object tag in the [label configuration](setup.html#Customize-the-labeling-interface-for-your-project) that you set up for your project. 
+
+Depending on the type of object tag, Label Studio interprets field values differently:
+- `&lt;Text value="$key"&gt;`: `value` is interpreted as plain text.
+- `&lt;HyperText value="$key"&gt;`: `value` is interpreted as HTML markup.
+- `&lt;HyperText value="$key" encoding="base64"&gt;`: `value` is interpreted as a base64 encoded HTML markup.
+- `&lt;Audio value="$key"&gt;`: `value` is interpreted as a valid URL to an audio file.
+- `&lt;AudioPlus value="$key"&gt;`: `value` is interpreted as a valid URL to an audio file with CORS policy enabled on the server side.
+- `&lt;Image value="$key"&gt;`: `value` is interpreted as a valid URL to an image file
+- `&lt;TimeSeries value="$key"&gt;`: `value` is interpreted as a valid URL to a CSV/TSV file if `valueType="url"`, otherwise it is interpreted as a JSON dictionary with column arrays: `"value": {"first_column": [...], ...}` if `valueType="json"`. See more about [how to use valueType](#How-to-import-your-data).
+    
+You can add other, optional keys to the JSON file.
+
+| JSON key | Description |
+| --- | --- | 
+| annotations | Optional. List of annotations exported from Label Studio. [Label Studio's annotation format](export.html#Raw-JSON-format-of-completed-tasks) allows you to import annotation results in order to use them in subsequent labeling tasks. |
+| predictions | Optional. List of model prediction results, where each result is saved using [Label Studio's prediction format](export.html#Raw-JSON-format-of-completed-tasks). Import predictions for automatic task pre-labeling and active learning. See [Import predicted labels into Label Studio](predictions.html) |
+
+See [Relevant JSON property descriptions](export.html#Relevant-JSON-property-descriptions) in the export documentation for more details about the JSON format of exported tasks.
+
+### Example JSON format
+
+For an example text classification project, you can set up the following label configuration
+```html
+&lt;View&gt;
+  &lt;Text name="message" value="$my_text"/&gt;
+  &lt;Choices name="sentiment_class" toName="message"&gt;
+    &lt;Choice value="Positive"/&gt;
+    &lt;Choice value="Neutral"/&gt;
+    &lt;Choice value="Negative"/&gt;
+  &lt;/Choices&gt;
+&lt;/View&gt;
+
+```
+
+You can then import text tasks to label that match the following JSON format:
+
+```yaml
+[{
+  # "data" must contain the "my_text" field defined in the text labeling config as the value and can optionally include other fields
+  "data": {
+    "my_text": "Opossums are great",
+    "ref_id": 456,
+    "meta_info": {
+      "timestamp": "2020-03-09 18:15:28.212882",
+      "location": "North Pole"
+    } 
+  },
+
+  # annotations are not required and are the list of annotation results matching the labeling config schema
+  "annotations": [{
+    "result": [{
+      "from_name": "sentiment_class",
+      "to_name": "message",
+      "type": "choices",
+      "readonly": false,
+      "hidden": false,
+      "value": {
+        "choices": ["Positive"]
+      }
+    }]
+  }],
+
+  # "predictions" are pretty similar to "annotations" 
+  # except that they also include some ML-related fields like a prediction "score"
+  "predictions": [{
+    "result": [{
+      "from_name": "sentiment_class",
+      "to_name": "message",
+      "type": "choices",
+      "readonly": false,
+      "hidden": false,
+      "value": {
+        "choices": ["Neutral"]
+      }
+    }],
+  # score is used for active learning sampling mode
+    "score": 0.95
+  }]
+}]
+```
+If you're placing JSON files in [cloud storage](storage.html), place 1 task in each JSON file in the storage bucket. If you want to upload a JSON file from your machine directly into Label Studio, you can place multiple tasks in one JSON file. 
+
+#### Example JSON with multiple tasks
+You can place multiple tasks in one JSON file if you're uploading the JSON file to Label Studio. 
+
+&lt;br/&gt;
+{% details &lt;b&gt;To place multiple tasks in one JSON file, use this JSON format example&lt;/b&gt; %}
+This example contains multiple text classification tasks with no annotations or predictions.
+
+The "data" parameter must contain the "my_text" field defined in the text labeling config and can optionally include other fields. The "id" parameter is not required.
+
+{% codeblock lang:json %}
+[
+   {
+      "id":1,
+      "data":{
+         "my_text":"Opossums like to be aloft in trees."
+      }
+   },
+   {
+      "id":2,
+      "data":{
+         "my_text":"Opossums are opportunistic."
+      }
+   },
+   {
+      "id":3,
+      "data":{
+         "my_text":"Opossums like to forage for food."
+      }
+   }
+]
+{% endcodeblock %}
+{% enddetails %}
+
+#### Example JSON for older versions of Label Studio
+If you're still using a Label Studio version earlier than 1.0.0, refer to this example JSON format. 
+
+&lt;br/&gt;
+{% details &lt;b&gt;For versions of Label Studio earlier than 1.0.0, use this JSON format example.&lt;/b&gt; %}
+If you're using a version of Label Studio earlier than version 1.0.0, import tasks that match the following JSON format: 
+
+{% codeblock lang:json %}
+[{
+  # "data" must contain the "my_text" field defined by labeling config,
+  # and can optionally include other fields
+  "data": {
+    "my_text": "Opossums are great",
+    "ref_id": 456,
+    "meta_info": {
+      "timestamp": "2020-03-09 18:15:28.212882",
+      "location": "North Pole"
+    } 
+  },
+
+  # completions are the list of annotation results matching the labeling config schema
+  "completions": [{
+    "result": [{
+      "from_name": "sentiment_class",
+      "to_name": "message",
+      "type": "choices",
+      "value": {
+        "choices": ["Positive"]
+      }
+    }]
+  }],
+
+  # "predictions" are pretty similar to "completions" 
+  # except that they also include some ML-related fields like a prediction "score"
+  "predictions": [{
+    "result": [{
+      "from_name": "sentiment_class",
+      "to_name": "message",
+      "type": "choices",
+      "value": {
+        "choices": ["Neutral"]
+      }
+    }],
+  # score is used for active learning sampling mode
+    "score": 0.95
+  }]
+}]
+{% endcodeblock %}
+{% enddetails %}
+
+### Import CSV or TSV data
+
+When you import a CSV / TSV formatted text file, Label Studio interprets the column names are as task data keys that correspond to the labeling config you set up: 
+```csv
+my_text,optional_field
+this is a first task,123
+this is a second task,456
+```
+
+&gt; Note: If your labeling config has a TimeSeries tag, Label Studio interprets the CSV/TSV as time series data when you import it. This CSV/TSV is hosted as a resource file and Label Studio automatically creates a task with a link to the uploaded CSV/TSV.
+
+### Plain text
+
+Import data as plain text. Label Studio interprets each line in a plain text file as a separate data labeling task. 
+
+You might use plain text for labeling tasks if you have only one stream of input data, and only one [object tag](/tags) specified in your label config. 
+
+```text
+this is a first task
+this is a second task
+```
+
+If you want to import entire plain text files without each line becoming a new labeling task, customize the labeling configuration to specify `valueType="url"` in the Text tag. See the [Text tag documentation](/tags/text.html). See more about [how to use the valueType field](#How-to-import-your-data).
+
+### Import HTML data
+
+You can import HyperText data in HTML-formatted files and annotate them in Label Studio. When you directly import HTML files, the content is minified the content is minified by compressing the text, removing whitespace and other nonfunctional data in the HTML code. Annotations that you create are applied to the minified version of the HTML. 
+
+If you want to label HTML files without minifying the data, you can do one of the following:
+- Import the HTML files as BLOB storage from [external cloud storage such as Amazon S3 or Google Cloud Storage](storage.html).
+- Update the HyperText tag in your labeling configuration to specify `valueType="url"` as described in [How to import your data](#How-to-import-your-data) on this page.
+
+
+## Import data from a local directory
+
+To import data from a local directory, you have two options:
+- Run a web server to generate URLs for the files, then upload a file that references the URLs to Label Studio. 
+- Add the file directory as a source or target [local storage](storage.html#Local-storage) connection in the Label Studio UI.
+
+### Run a web server to generate URLs to local files
+
+To run a web server to generate URLs for the files, you can refer to this provided [helper shell script in the Label Studio repository](https://github.com/heartexlabs/label-studio/blob/master/scripts/serve_local_files.sh) or write your own script. 
+Use that script to do the following:
+
+1. On the machine with the file directory that you want Label Studio to import, call the helper script and specify a regex pattern to match the files that you want to import. In this example, the script identifies files with the JPG file extension:
+   ```bash
+   ./script/serve_local_files.sh &lt;directory/with/files&gt; *.jpg
+   ```
+  The script collects the links to the files provided by that HTTP server and saves them to a `files.txt` file with one URL per line. 
+2. Import the file with URLs into Label Studio using the Label Studio UI. 
+
+!!! note
+    You must keep the web server running while you perform your data labeling so that the URLs remain accessible to Label Studio.
+
+If your labeling configuration supports HyperText or multiple data types, use the Label Studio JSON format to specify the local file locations instead of a `txt` file. See [an example of this format](storage.html#Tasks-with-local-storage-file-references).
+
+If you serve your data from an HTTP server created like follows: `python -m http.server 8081 -d`, you might need to set up CORS for that server so that Label Studio can access the data files successfully. If needed, run the following from the command line:
+```bash
+npm install http-server -g
+http-server -p 3000 --cors
+```
+
+### Add the file directory as source storage in the Label Studio UI
+If you're running Label Studio on Docker and want to add local file storage, you need to mount the file directory and set up environment variables. See [Run Label Studio on Docker and use local storage](start.html#Run-Label-Studio-on-Docker-and-use-local-storage).
+
+## Import data from the Label Studio UI
+
+To import data from the Label Studio UI, do the following:
+1. On the Label Studio UI, open the Data Manager page for a specific project.
+2. Click **Import** to open the Import dialog.
+3. Import your data from files or URLs. 
+
+Data that you import is project-specific.
+
+&lt;img src="/images/screens/import-button.png" class="img-template-example" title="Import Button in Data Manager" /&gt; 
+
+## Import data using the API
+
+Import your data using the Label Studio API. See the [API documentation for importing tasks](/api#operation/api_projects_import_create).
+
+### Import data from the command line
+
+In versions of Label Studio earlier than 1.0.0, you can import data from a local directory using the command line. 
+
+To import data from the command line, do the following:
+
+1. Start Label Studio and use command line arguments to specify the path to the data and format of the data. &lt;br/&gt;For example: &lt;br/&gt;`label-studio init --input-path my_tasks.json --input-format json`
+2. Open the Label Studio UI and confirm that your data was properly imported. 
+
+You can use the `--input-path` argument to specify a file or directory with the data that you want to label. You can specify other data formats using the `--input-format` argument. For example run the following command to start Label Studio and import audio files from a local directory:
+
+```bash
+label-studio init my-project --input-path=my/audios/dir --input-format=audio-dir --label-config=config.xml --allow-serving-local-files
+```
+
+&gt; WARNING: the `--allow-serving-local-files` argument is intended for use only with locally-running instances of Label Studio. Avoid using it for remote servers unless you are sure what you're doing.
+
+By default, Label Studio expects JSON-formatted tasks using the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format). 
+
+If you add more files to a local directory after Label Studio starts, you must restart Label Studio to import the tasks in the additional files.
+  
+</textarea> 
+
+<div id="filePath" style="display:none">/Users/anithamuthu/Desktop/label-studio/docs/source/guide/tasks.md</div>
+  
+</section>
+ 
+
+ <script>
+ function save1(){var e=document.getElementById("filePath").innerHTML,t=document.getElementById("content").value;axios.post("http://localhost:3101",{content:t,path:e}).then(e=>{console.log(e.data)})}function reload1(){var e=document.getElementById("filePath").innerHTML,e="http://localhost:3101/init-"+encodeURI(e);axios.get(e)}function getInitUrl(){var e=document.getElementById("filePath").innerHTML;return"/init-"+encodeURI(e)}function init(){document.getElementById("content").focus()}document.addEventListener("keydown",function(e){if(e.ctrlKey&&83===e.which)return save1(),e.preventDefault(),!1}),document.addEventListener("keydown",function(e){var t;if(e.ctrlKey&&82===e.which)return t=getInitUrl(),location.href=t,e.preventDefault(),!1}),document.addEventListener("keydown",function(e){if(e.ctrlKey&&88===e.which)return window.close(),e.preventDefault(),!1});;
+
+ </script>
+
+
+
+</body><grammarly-desktop-integration data-grammarly-shadow-root="true"></grammarly-desktop-integration></html>

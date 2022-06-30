@@ -7,9 +7,10 @@ meta_title: Troubleshoot Label Studio
 meta_description: Troubleshoot common issues with Label Studio configuration and performance so that you can return to your machine learning and data science projects.
 ---
 
-If you encounter an issue using Label Studio, use this page to troubleshoot it. 
+This page describes the troubleshooting steps to take if you experience known problems in Label Studio.
 - If you need to troubleshoot a machine learning backend, see [Troubleshoot machine learning](ml_troubleshooting.html). 
 - If you need to troubleshoot a cloud or external storage connection, see [Troubleshoot CORS and access problems](storage.html#Troubleshoot-CORS-and-access-problems). 
+
 
 ## Blank page when loading a project
 
@@ -19,19 +20,19 @@ After starting Label Studio and opening a project, you see a blank page. Several
 
 If you specify a host without a protocol such as `http://` or `https://` when starting Label Studio, Label Studio can fail to locate the correct files to load the project page. 
 
-To resolve this issue, update the host specified as an environment variable or when starting Label Studio. See [Start Label Studio](start.html)
+To resolve this issue, update the host specified as an environment variable or when starting Label Studio. For more information, see [Start Label Studio](start.html).
 
 
 ## Slowness while labeling
 
-If you're using the SQLite database and another user imports a large volume of data, labeling might slow down for other users on the server due to the database load. 
+If you are using the SQLite database and another user imports a large volume of data, labeling might slow down for other users on the server due to the database load. 
 
-If you want to upload a large volume of data (thousands of items), consider doing that at a time when people are not labeling or use a different database backend such as PostgreSQL or Redis. You can run Docker Compose from the root directory of Label Studio to use PostgreSQL: `docker-compose up -d`, or see [Sync data from cloud or database storage](storage.html). 
+If you want to upload a large volume of data (thousands of items), consider doing that at a time when people are not labeling or use a different database backend such as PostgreSQL or Redis. You can run Docker Compose from the root directory of Label Studio to use PostgreSQL: `docker-compose up -d` or for more information, see [Sync data from cloud or database storage](storage.html). 
 
 
 ## Image/audio/resource loading error while labeling
 
-The most common mistake while resource loading is <b>CORS</b> (Cross-Origin Resource Sharing) problem or Cross Domain. When you are trying to fetch a picture from external hosting it could be blocked by security reasons. Go to browser console (Ctrl + Shift + i for Chrome) and check errors there. Typically, this problem is solved by the external host setup.
+The most common mistake while resource loading is Cross-Origin Resource Sharing <b>CORS</b> problem or Cross Domain. When you are trying to fetch a picture from external hosting it could be blocked by security reasons. Go to browser console (`Ctrl + Shift + i` for Chrome) and check errors there. Typically, this problem is solved by the external host setup.
 
 <br>
 <center>
@@ -42,7 +43,7 @@ The most common mistake while resource loading is <b>CORS</b> (Cross-Origin Reso
   <img src='/images/cors-error-2.png' style="max-width:500px; width: 100%; opacity: 0.8">
 </center>
 
-- If you have access to the hosting server as admin then you need to allow CORS for the web server. For example, on nginx, you can try to add <a href="javascript:void(0)" onclick="$('#nginx-cors-code').toggle()">these lines</a> to `/etc/nginx/nginx.conf` into your `location` section:
+- If you have access to the hosting server as an administrator then you need to allow CORS for the web server. For example, on Nginx, you can try to add <a href="javascript:void(0)" onclick="$('#nginx-cors-code').toggle()">these lines</a> to `/etc/nginx/nginx.conf` into your `location` section:
  ```
   location <YOUR_LOCATION> {
        if ($request_method = 'OPTIONS') {
@@ -83,9 +84,10 @@ npm install http-server -g
 http-server -p 3000 --cors
 ```
 
-Not every host supports CORS setup, but you can to try locate CORS settings in the admin area of your host configuration.      
+Not every host supports CORS setup, but you can try to locate CORS settings in the admin area of your host configuration.      
 
 <br/> 
+
 
 ## Audio wave doesn't match annotations
 
@@ -95,11 +97,12 @@ If you find that after annotating audio data, the visible audio wave doesn't mat
 ffmpeg -y -i audio.mp3 -ar 8k -ac 1 audio.wav
 ```
 
+
 ## HTML label offsets are in the wrong places
 
-If the offsets for exported HTML labels don't match your expected output, such as with HTML named entity recognition (NER) tasks, the most common reason why is due to HTML minification. When you upload HTML files to Label Studio for labeling, the HTML is minified to remove whitespace. When you annotate those tasks, the offsets for the labels apply to the minified version of the HTML, rather than the original unmodified HTML files. 
+If the offsets for exported HTML labels don't match your expected output, such as with HTML Named Entity Recognition (NER) tasks, the most common reason why is due to HTML minification. When you upload HTML files to Label Studio for labeling, the HTML is minified to remove whitespace. When you annotate those tasks, the offsets for the labels apply to the minified version of the HTML, rather than the original unmodified HTML files. 
 
-To prevent the HTML files from being minified, you can use a different import method. See [Import HTML data](tasks.html#Import-HTML-data) for more.
+To prevent the HTML files from being minified, you can use a different import method. For more information, see [Import HTML data](tasks.html#Import-HTML-data).
 
 If you want to correct existing annotations, you can minify your source HTML files in the same way that Label Studio does. The minification is performed with the following script:
 ```python
@@ -113,9 +116,11 @@ minified_html_doc = htmlmin.minify(html_doc, remove_all_empty_space=True)
 
 If minification does not seem to be affecting the offset placements, complex CSS or other reasons could be the cause. 
 
+
 ## Predictions aren't visible to annotators  
 
-See [Troubleshoot pre-annotations](predictions.html#Troubleshoot-pre-annotations) to investigate possible reasons why predictions don't show up.
+When predictions don't show up, see [Troubleshoot pre-annotations](predictions.html#Troubleshoot-pre-annotations) to investigate the possible reasons. 
+
 
 ## Can't label PDF data
 

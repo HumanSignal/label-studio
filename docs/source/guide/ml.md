@@ -8,9 +8,9 @@ meta_description: Connect Label Studio to machine learning frameworks using the 
 ---
 
 Integrate your model development pipeline with your data labeling workflow by adding a machine learning (ML) backend to Label Studio. You can set up your favorite ML frameworks to do the following:
-- **Pre-labeling** by allowing models predict labels and then have annotators perform further manual refinements. 
-- **Auto-labeling** by allowing models create automatic annotations. 
-- **Online Learning** by simultaneously updating your model while new annotations are created, allowing you retrain your model on-the-fly. 
+- **Pre-labeling** by allowing models to predict labels and then have annotators perform further manual refinements. 
+- **Auto-labeling** by allowing models to create automatic annotations. 
+- **Online Learning** by simultaneously updating your model while new annotations are created, allowing you to retrain your model on-the-fly. 
 - [**Active Learning**](active_learning.html) by selecting example tasks that the model is uncertain how to label for your annotators to label manually. 
 
 If you need to load static pre-annotated data into Label Studio, running an ML backend might be more than you need. Instead, you can [import pre-annotated data](predictions.html).
@@ -26,8 +26,7 @@ For example, for an image classification task, the model pre-selects an image cl
 At a high level, do the following: 
 1. Set up an ML backend. You can either:
    - [Start an example ML backend](#Quickstart-with-an-example-ML-backend) 
-      OR 
-   - [Create your own machine learning backend](ml_create.html) and then [Start your custom ML backend](#Start-your-custom-ML-backend-with-Label-Studio).
+      OR [Create your machine learning](ml_create.html) backend](ml_create.html) and then [Start your custom ML backend](#Start-your-custom-ML-backend-with-Label-Studio).
 2. [Connect Label Studio to the ML backend](#Add-an-ML-backend-to-Label-Studio).
 
 ## Quickstart with an example ML backend
@@ -48,11 +47,11 @@ To start an example ML backend with Docker Compose, do the following:
     ```bash
     docker-compose up
     ```
-The ML backend server starts becomes available at `http://localhost:9090`. You can now [add the machine learning backend to Label Studio](#Add-an-ML-backend-to-Label-Studio) and [set up your project](setup_project.html).
+The ML backend server starts and becomes available at `http://localhost:9090`. You can now [add the machine learning backend to Label Studio](#Add-an-ML-backend-to-Label-Studio) and [set up your project](setup_project.html).
 
 ## Start your custom ML backend with Label Studio
 
-After you [create your own machine learning backend](ml_create.html), you can start the ML backend server by following these instructions.
+After you [create your machine learning](ml_create.html) backend](ml_create.html), you can start the ML backend server by following these instructions.
 
 > Use a virtual environment with `venv`, `virtualenv` or `conda` Python environments to run your ML backend. You can use the same environment as Label Studio. See the [Python documentation about creating virtual environments](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments) for more.
 
@@ -90,7 +89,7 @@ You can now [add the machine learning backend to Label Studio](#Add-an-ML-backen
 
 ## Add an ML backend to Label Studio 
 
-After you start a ML backend server, add it to your Label Studio project.
+After you start an ML backend server, add it to your Label Studio project.
 
 ### Add an ML backend using the Label Studio UI
 
@@ -119,7 +118,7 @@ You can prompt your model to train in several ways:
    curl -X POST http://localhost:8080/api/ml/{id}/train
    ```
   See [the Train API documentation](/api/#operation/api_ml_train_create) for more.
-- (Deprecated in version 1.4.1) Automatically after any annotations are submitted or updated. Enable the option `Start model training after annotations submit or update` on the **Machine Learning** settings for your project. This option will be removed in a future version of Label Studio because you can [trigger training with webhooks](ml_create.html#Trigger-training-with-webhooks).
+- (Deprecated in version 1.4.1) Automatically after any annotations are submitted or updated. Enable the option `Start model training after annotations submit or update` the **Machine Learning** settings for your project. This option will be removed in a future version of Label Studio because you can [trigger training with webhooks](ml_create.html#Trigger-training-with-webhooks).
 
 In development mode, training logs appear in the web browser console. In production mode, you can find runtime logs in `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log` on the server running the ML backend, which might be different from the Label Studio server. To see more detailed logs, start the ML backend server with the `--debug` option. 
 
