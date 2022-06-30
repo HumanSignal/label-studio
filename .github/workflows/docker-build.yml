@@ -1,15 +1,11 @@
 name: "Docker build & push"
 
 on:
-  push:
-    branches:
-      - develop
-    paths:
-      - deploy/**
-      - label_studio/**
-      - setup.py
-      - .github/workflows/docker-build.yml
-    tags: [ '*' ]
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
 
 env:
   DOCKER_CLI_EXPERIMENTAL: enabled
@@ -19,22 +15,17 @@ env:
 
 jobs:
   docker_build_and_push:
-    name: "Docker build and push"
+    name: "Docker image"
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
-      - name: Extract branch name on direct push to a branch
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')
-        run: |
-          echo "DOCKER_TAGS=${{ env.IMAGE_NAME }}:${{ env.DEVELOP_TAG }}" >> $GITHUB_ENV
-
-      - name: Extract branch name on release
-        if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags/')
-        run: |
-          echo "DOCKER_TAGS=${{ env.IMAGE_NAME }}:$(echo ${GITHUB_REF#refs/tags/}),${{ env.IMAGE_NAME }}:${{ env.RELEASE_TAG }}" >> $GITHUB_ENV
+      - uses: hmarr/debug-action@v2.0.1
 
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          ref: ${{ inputs.ref }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2.0.0
@@ -57,7 +48,7 @@ jobs:
 
       - name: Download feature flags
         run: |
-          curl -H "Authorization: ${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}" https://app.launchdarkly.com/sdk/latest-all >label_studio/feature_flags.json
+          curl -H "Authorization: ${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}" https://app.launchdarkly.com/sdk/latest-all > label_studio/feature_flags.json
 
       - name: Build and push
         uses: docker/build-push-action@v3.0.0
@@ -65,6 +56,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.DOCKER_TAGS }}
+          tags: ${{ env.IMAGE_NAME }}:${{ env.DEVELOP_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

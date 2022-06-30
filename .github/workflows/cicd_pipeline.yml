@@ -1,0 +1,101 @@
+name: "CI/CD Pipeline"
+
+on:
+  push:
+    branches:
+      - develop
+      - 'ls-release/**'
+    paths:
+      - deploy/**
+      - label_studio/**
+      - setup.py
+      - .github/workflows/docker-build.yml
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+    branches:
+      - develop
+      - 'ls-release/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changed_files:
+    name: "Changed files"
+    runs-on: ubuntu-latest
+    outputs:
+      src: ${{ steps.changes.outputs.src }}
+      docker: ${{ steps.changes.outputs.docker }}
+    timeout-minutes: 5
+    steps:
+      - uses: hmarr/debug-action@v2.0.1
+
+      - name: Checkout
+        if: github.event_name == 'push'
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            src:
+              - 'label_studio/!(frontend)/**'
+              - 'deploy/requirements**'
+              - 'setup.py'
+            docker:
+              - 'label_studio/**'
+              - 'deploy/**'
+              - 'Dockerfile'
+              - 'setup.py'
+
+  pr_labeler:
+    name: "Validate"
+    if: github.event_name == 'pull_request_target'
+    uses: heartexlabs/label-studio/.github/workflows/pr-labeler.yml@develop
+    secrets: inherit
+
+  gitleaks:
+    name: "Linter"
+    if: github.event_name == 'pull_request_target'
+    uses: heartexlabs/label-studio/.github/workflows/gitleaks.yml@develop
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+      base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
+    secrets: inherit
+
+  bandit:
+    name: "Linter"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.src == 'true'
+    uses: heartexlabs/label-studio/.github/workflows/bandit.yml@develop
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+    secrets: inherit
+
+  build:
+    name: "Build"
+    needs:
+      - changed_files
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && needs.changed_files.outputs.docker == 'true'
+    uses: heartexlabs/label-studio/.github/workflows/docker-build.yml@develop
+    with:
+      ref: ${{ github.event.pull_request.head.ref || github.ref }}
+    secrets: inherit
+
+  pytest:
+    name: "Tests"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.src == 'true'
+    uses: heartexlabs/label-studio/.github/workflows/tests.yml@develop
+    with:
+      ref: ${{ github.event.pull_request.head.ref || github.ref }}
+    secrets: inherit
