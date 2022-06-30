@@ -62,5 +62,17 @@ Expression: ${user.memberOfGroupNames == null ? '': #string.join(user.memberOfGr
 
 You can find LSE SAML SSO settings on the Organization page => SAML SSO. You are able to map user roles and workspaces with `Groups` attribute.  
  
+<br>
 <img src="/images/pingone/saml-settings.png" class="gif-border">
 
+## Login using SSO 
+
+Now you are able to login using your SSO session, write your company domain on the SSO Login page:
+
+<br>
+<img src="/images/pingone/login-sso.png" class="gif-border">
+
+Administrators can find the domain on the SAML SSO page:
+
+<br>
+<img src="/images/pingone/domain-settings.png" class="gif-border">
