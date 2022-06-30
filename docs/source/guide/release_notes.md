@@ -16,26 +16,29 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
 ## Label Studio Enterprise 2.2.9  
 This section highlights the new features and enhancements, breaking changes, and bug fixes in Label Studio Enterprise 2.2.9. 
 
+### Breaking changes
+Label Studio Enterprise 2.2.9 includes the following breaking change:
+
+- This release decommissions MinIO as a service. [DEV-2600](https://heartex.atlassian.net/browse/DEV-2600).
+
 ### New features and enhancements 
 Label Studio Enterprise 2.2.9 introduces the following new features and enhancements.
 
-#### GUI
-- This release includes the ability to select model version on model cards from the machine learning page >> **Settings**. [DEV-1868](https://heartex.atlassian.net/browse/DEV-1868).
+#### Frontend
+- The ability to select model version on model cards from the machine learning page >> **Settings**. [DEV-1868](https://heartex.atlassian.net/browse/DEV-1868).
+- Show comments column in the Data Manager to reviewers. [DEV-2598](https://heartex.atlassian.net/browse/DEV-2598).
+
+#### Backend
+- Provided proxy support for content-range HTTP responses. [DEV-2496](https://heartex.atlassian.net/browse/DEV-2496).
+- Added API for project duplication [DEV-2538](https://heartex.atlassian.net/browse/DEV-2538)
  
 #### Templates
 - This release introduces [Dynamic Labels templates](https://labelstud.io/templates/gallery_dynamic_labels.html#main). You can now show labels dynamically as a task input, either as a prediction from the model, or from a database lookup. With a broader set of options, dynamic labeling saves time and increases the consistency of labeling the objects. [DEV-2636](https://heartex.atlassian.net/browse/DEV-2636). 
 
-### Breaking changes
-Label Studio Enterprise 2.2.9 includes the following breaking change.
-
-- This release decommissions MinIO as a service. [DEV-2600](https://heartex.atlassian.net/browse/DEV-2600).
-
 ### Bug fixes
-Label Studio 2.2.9 includes the following bug fixes.
+Label Studio 2.2.9 includes the following bug fixes:
 
-- Fixed empty agreement for taxonomy with extra labels. [DEV-2440](https://heartex.atlassian.net/browse/DEV-2440).
-- Fixed `is_labeled` calculation after task import. [DEV-2389](https://heartex.atlassian.net/browse/DEV-2389).
-- Provided proxy support for content-range HTTP responses. [DEV-2496](https://heartex.atlassian.net/browse/DEV-2496).
+#### Frontend 
 - Fixed the regions that disappeared from UI in Annotation History. [DEV-2408](https://heartex.atlassian.net/browse/DEV-2408). 
 - Improved the Annotation History name/timestamp spacing. [DEV-23640](https://heartex.atlassian.net/browse/DEV-23640).
 - Fixed audio crashes in View All mode. [DEV-2199](https://heartex.atlassian.net/browse/DEV-2199).
@@ -48,32 +51,33 @@ Label Studio 2.2.9 includes the following bug fixes.
 - Resynchronized annotations that failed to synchronize in Target Storage. [DEV-1781](https://heartex.atlassian.net/browse/DEV-1781).
 - Supported lengthy unbroken taxonomy line breaks. [DEV-1975](https://heartex.atlassian.net/browse/DEV-1975) and [DEV-1843](https://heartex.atlassian.net/browse/DEV-1843).
 - Retained the size for key points. [DEV-2577](https://heartex.atlassian.net/browse/DEV-2577). 
-- Enabled additional count. [DEV-2334](https://heartex.atlassian.net/browse/DEV-2334).
+- Display the correct number of member's icons on project cards. [DEV-2334](https://heartex.atlassian.net/browse/DEV-2334).
 - Fixed rendering issue on video regions. [DEV-2494](https://heartex.atlassian.net/browse/DEV-2494).
 - Fixed the loading issue for Paragraph data on QuickView. [DEV-2465](https://heartex.atlassian.net/browse/DEV-2465).
 - Allowed edit action on Time Series results imported as read-only. [DEV-2367](https://heartex.atlassian.net/browse/DEV-2367).
 - Fixed Annotation History when exiting **View All**. [DEV-2302](https://heartex.atlassian.net/browse/DEV-2302). 
-- Enabled show comments in Data Manager to reviewers. [DEV-2598](https://heartex.atlassian.net/browse/DEV-2598).
-- Optimized dashboard-members API performance for reviews. [DEV-1669](https://heartex.atlassian.net/browse/DEV-1669). 
 - Added X-axis zoom threshold. [DEV-1714](https://heartex.atlassian.net/browse/DEV-1714).
-- Added guard with an error message for non-incremental, non-sequential datasets. [DEV-2510](https://heartex.atlassian.net/browse/DEV-2510).
-- Enabled Query optimization for Uniform Sampling. [DEV-2184](https://heartex.atlassian.net/browse/DEV-2184).
+- Added guard with an error message for non-incremental, non-sequential datasets in Time Series. [DEV-2510](https://heartex.atlassian.net/browse/DEV-2510).
 - Disabled the delete **all region** button when an annotation is read-only. [DEV-2309](https://heartex.atlassian.net/browse/DEV-2309).
 - Fixed blind Server-side Request Forgery (SSRF) on add model and import. [DEV-2235](https://heartex.atlassian.net/browse/DEV-2235).
 - Deselected ImageView bounding box before creating another. [DEV-1422](https://heartex.atlassian.net/browse/DEV-1422]). 
-- Fixed FF ticket number. [DEV-1442](https://heartex.atlassian.net/browse/DEV-1442).
-- Fixed runtime error when duration was not extracted. [DEV-2095](https://heartex.atlassian.net/browse/DEV-2095).
-- Fixed permissions for a manager role. [DEV-2650](https://heartex.atlassian.net/browse/DEV-2650).
-- Fixed `annotation_id` was provided as float value in CSV export. [DEV-2139](https://heartex.atlassian.net/browse/DEV-2139).
 - Fixed data in SERP (Search Engine Results Page) ranking in-app template. [DEV-2604](https://heartex.atlassian.net/browse/DEV-2604). 
-- Fixed an issue where the Newsletter notification disappeared and then reappeared. [DEV-2617](https://heartex.atlassian.net/browse/DEV-2617).
 - Unfinished polygon zoom fix. [DEV-2313](https://heartex.atlassian.net/browse/DEV-2313). 
 - Fixed flickering issue when regions were created with the Bounding box. [DEV-2592](https://heartex.atlassian.net/browse/DEV-2592).
 - Video regions were edited when Annotation History was selected. [DEV-2303](https://heartex.atlassian.net/browse/DEV-2303).
-- Added background as a new parameter. [DEV-2423](https://heartex.atlassian.net/browse/DEV-2423).
+- Added background as a new parameter to text shortcuts. [DEV-2423](https://heartex.atlassian.net/browse/DEV-2423).
 - Fixed the form layout and allowed model version selector when the ML backend was edited. [DEV-1682](https://heartex.atlassian.net/browse/DEV-1682).
-- Added to string. [DEV-2459](https://heartex.atlassian.net/browse/DEV-2459).
+- Text and Header tags work with integers now. [DEV-2459](https://heartex.atlassian.net/browse/DEV-2459).
 - Fixed synchronization speed between video and audio. [DEV-2207](https://heartex.atlassian.net/browse/DEV-2207).
-- Replaced `inner_id` index with multicolumn. [DEV-2667](https://heartex.atlassian.net/browse/DEV-2667).
 - Fixed an issue with prop `whenChoiceValue`. [DEV-1833](https://heartex.atlassian.net/browse/DEV-1833).
+
+#### Backend
+- Optimized dashboard-members API performance for reviews. [DEV-1669](https://heartex.atlassian.net/browse/DEV-1669).
+- Enabled Query optimization for Uniform Sampling in the Labeling Stream. [DEV-2184](https://heartex.atlassian.net/browse/DEV-2184).
+- Fixed runtime error when duration was not extracted on ASR_MANIFEST export. [DEV-2095](https://heartex.atlassian.net/browse/DEV-2095).
+- Fixed permissions for a manager role. [DEV-2650](https://heartex.atlassian.net/browse/DEV-2650).
+- Fixed `annotation_id` was provided as float value in CSV export. [DEV-2139](https://heartex.atlassian.net/browse/DEV-2139).
+- Replaced `inner_id` index with multicolumn. [DEV-2667](https://heartex.atlassian.net/browse/DEV-2667).
 - If control weights are updated - recalculate stats. [DEV-2083](https://heartex.atlassian.net/browse/DEV-2083).
+- Fixed empty agreement for taxonomy with extra labels. [DEV-2440](https://heartex.atlassian.net/browse/DEV-2440).
+- Fixed `is_labeled` calculation after task import. [DEV-2389](https://heartex.atlassian.net/browse/DEV-2389).
