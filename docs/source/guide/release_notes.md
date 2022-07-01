@@ -13,7 +13,21 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
     The release notes for Label Studio Community Edition is available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
 
 
-## Label Studio Enterprise 2.2.9 
+## Label Studio Enterprise 2.2.10 
+
+### Bug fixes
+
+#### Backend 
+Per label score for Choices should be calculated in case of no Choice is selected [DEV-2688]
+Fix error for actions with ordering by joined field [DEV-2658]
+Fix auto-generated docs for api/tasks [DEV-2737]
+
+#### Frontend
+Safari browser stops working [DEV-2777]
+Fix scrollable area in Review mode [DEV-2348]
+
+
+## Label Studio Enterprise 2.2.9
 
 This section highlights the breaking changes, new features and enhancements, and bug fixes in Label Studio Enterprise 2.2.9. 
 
@@ -90,3 +104,67 @@ Label Studio 2.2.9 includes the following bug fixes:
 - Text and Header tags work with integers now. [DEV-2459].
 - Fixed synchronization speed between video and audio. [DEV-2207].
 - Fixed an issue with prop `whenChoiceValue`. [DEV-1833].
+
+
+## Label Studio Enterprise 2.2.8
+
+### Features
+- Show comments in DM to reviewers [DEV-2598]
+- Redis SSL support [DEV-1768]
+- Add tags and prefix to AWS metric params [DEV-1917]
+- Change review api to take into account feedback loop [DEV-2198]
+- Notification Center [DEV-1658]
+- Drafts in Annotation History [DEV-2290]
+- New history types [DEV-2387]
+- SCIM2 user provisioning [DEV-1823]
+- Pass comment to API on skip [DEV-2458]
+
+### Bugfixes
+- Per label score for Choices should be calculated in case of no Choice is selected (hotfix-7) [DEV-2688]
+- Rotating bounding box bugs (hotfix-4) [DEV-2647]
+- Fix permissions for manager role (hotfix-3) [DEV-2650]
+- Fix export to file SerializableGenerator [DEV-2248]
+- Fix accepted state [DEV-2256]
+- Make annotation history with Reject linear (Reject = Update + Reject) [DEV-2263]
+- Fix anno history icons [DEV-2264]
+- Annotation history fixes [DEV-2265, DEV-2268, DEV-2271]
+- Fix anno history not loading because of string ID [DEV-2278]
+- Fix validation in Labeling Interface preview with Dynamic Labels [DEV-2249]
+- Fix history 404 on unskip in label stream [DEV-2262]
+- Fix annotions history reset for predictions [DEV-2271]
+- Fix job cancellation for _update_tasks_states [DEV-2294]
+- Return 404 for api/project/id/tasks if page is out of scope [DEV-2336]
+- Interactive preannotations for Paragraphs [DEV-2253]
+- Assign request takes 180secs [DEV-2060]
+- Disable Poly and Keypoints for anno history [DEV-2283]
+- Fix tools multiplication issue [DEV-1690]
+- Don't scroll out TopBar [DEV-2348]
+- Fix skip queue [DEV-2354]
+- Canvas should fill all the space [DEV-930]
+- Truncate long words in comments [DEV-2267]
+- Add scroll to view when focus changes to stickyList in table component [DEV-1703]
+- Use contain instead of icontain for Annotation Result field in the Data manager filters [DEV-2214]
+- Fix is_labeled for tasks with no assignments [DEV-1872]
+- Add default settings [DEV-1577]
+- Go to previous task in review [DEV-1676]
+- Refactor and Optimize Redis Queues [DEV-2213]
+- Fix Runtime Error during import with no total_annotations and other [DEV-2374]
+- Review Next Task api performance [DEV-2350]
+- Reset rejected status after annotation update [DEV-2216, DEV-2321]
+- Fix skip annotation history for prev task in label stream [DEV-2407]
+- Fix Reviewed filter [DEV-1948]
+- Fix counters for skipped annotations [DEV-2406]
+- Tasks are flagged as REVIEWED by default [DEV-2438]
+- Fix skipped tasks get the "Completed" status [DEV-2413]
+- Fix error when user tries to delete all tasks [DEV-2456]
+- Fix filter by empty reviewers [DEV-2390]
+- Incorrect review card counters in feedback loop for skipped annotations [DEV-2433]
+- Move from signal to model delete method [DEV-2410]
+- New skip behaviour (#2520) fix: DEV-2410: Separate remove annotation signal [DEV-2379]
+- Annotation history drafts fixes [DEV-2290]
+- Small important UI fixes [DEV-2473]
+- Fix startOffset for empty nodes [DEV-2480]
+- Error on entering deleted annotation [DEV-2306]
+- Add command for all orgs and optimize update_tasks_counters [DEV-2492]
+- After annotations from predictions is_labeled should be recalculated [DEV-2490]
+- Fix 404 on skip [DEV-2416]
