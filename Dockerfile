@@ -13,7 +13,6 @@ RUN --mount=type=cache,target=$NPM_CACHE_LOCATION \
     npm ci \
  && npm run build:production
 
-
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
