@@ -31,30 +31,45 @@ p.admonition-title {
 .info>.admonition-title, .todo>.admonition-title {
   background-color: #0099FFBB;
 }
-
-.warning>.admonition-title, .important.admonition-title, .attention>.admonition-title, .caution>.admonition-title {
-  background-color:#D98F00BB;
+.warning>.admonition-title{
+  background-color: #f45240;
+} 
+.attention>.admonition-title {
+  background-color:#6db1edbb;
+}
+.caution>.admonition-title {
+  background-color:#e8b466bb;
 }
 
 .admonition.info, .admonition.todo {
-  border-color: #00b8d4;
+  border-color: #0099FFBB;
 }
-
-.admonition.warning, .admonition.important, .admonition.attention, .admonition.caution {
-  border-color: #ff9100;
+.admonition.warning {
+  border-color: #f45240;
 }
-
+.admonition.attention {
+  border-color: #1460a2bb;
+}
+.admonition.caution {
+  border-color: #e8b466bb;
+}
 .admonition.failure, .admonition.missing, .admonition.fail, .admonition.error {
   border-color: #ff5252;
 }
-
 .info>.admonition-title::before, .todo>.admonition-title::before {
-  background-color: #00b8d4;
+  background-color: #0099FFBB;
   border-radius: 50%;
 }
-
-.warning>.admonition-title::before, .important>.admonition-title, .attention>.admonition-title::before, .caution>.admonition-title::before {
-  background-color: #ff9100;
+.warning>.admonition-title::before {
+  background-color: #f45240;
+  border-radius: 50%;
+} 
+.attention>.admonition-title::before{
+  background-color:#1460a2bb;
+  border-radius: 50%;
+}
+.caution>.admonition-title::before {
+  background-color: #e8b466bb;
   border-radius: 50%;
 }
 

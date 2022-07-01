@@ -198,6 +198,7 @@ To make sure an existing project gets migrated when you [start Label Studio](sta
 label-studio start path/to/old/project 
 ```
 
-The most important change to be aware of is changes to rename "completions" to "annotations". For more information, see the [updated JSON format for completed tasks](export.html#Raw_JSON_format_of_completed_tasks). 
+!!! attention "important"
+    Be aware of changes to rename "completions" to "annotations". For more information, see the [updated JSON format for completed tasks](export.html#Raw_JSON_format_of_completed_tasks). 
 
 If you customized the Label Studio Frontend, see the [Frontend reference guide](frontend_reference.html) for required updates to maintain compatibility with version 1.0.0.  

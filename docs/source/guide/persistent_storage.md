@@ -7,7 +7,7 @@ meta_title: Set up persistent storage with Label Studio Enterprise
 meta_description: Configure persistent storage with Label Studio Enterprise hosted in the cloud to store uploaded data such as task data, user images, and more. 
 ---
 
-If you host Label Studio Enterprise in the cloud, you want to set up persistent storage for uploaded task data, user images, and more in the same cloud service as your deployment.
+If you host Label Studio Enterprise in the cloud, you must set up persistent storage for uploaded task data, user images, and more in the same cloud service as your deployment.
 
 Follow the steps relevant to your deployment. If you use Docker Compose, select the cloud service you want to use as persistent storage: 
 * [Set up Amazon S3](#Set-up-Amazon-S3) for Label Studio Enterprise deployments in Amazon Web Services (AWS).
@@ -23,12 +23,12 @@ Set up Amazon S3 as the persistent storage for Label Studio Enterprise hosted in
 
 Start by [creating an S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/create-bucket-overview.html) following the [Amazon Simple Storage Service User Guide](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html) steps.
 
-!!! info
-    Tip: If you want to secure the data stored in the S3 bucket at rest, you can [set up default server-side encryption for Amazon [S3 buckets](https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-encryption.html) by following the steps in the [Amazon Simple Storage Service User Guide](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html). 
+!!! attention "Tip"
+    If you want to secure the data stored in the S3 bucket at rest, you can set up default server-side encryption for Amazon [S3 buckets](https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-encryption.html) by following the steps in the [Amazon Simple Storage Service User Guide](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html). 
 
 ### Configure the S3 bucket
 
-After you create an S3 bucket, set up the necessary Identity and Access Management (IAM) permissions to grant Label Studio Enterprise access to your bucket. There are four ways that you can manage access to your S3 bucket:
+After you create an S3 bucket, set up the necessary Identity and Access Management (IAM) permissions to grant Label Studio Enterprise access to your bucket. Use one of the following ways to manage access to your S3 bucket:
 - Set up an **IAM role** with an OIDC provider (**recommended**).
 - Use **access keys**.
 - Set up an **IAM role** without an OIDC provider.
@@ -184,8 +184,7 @@ global:
 
   <div data-name="IAM role (EKS node)">
 
-To create an IAM role without using OIDC in EKS, follow these steps.
-
+To create an IAM role without using OIDC in EKS:
 1. In the AWS console UI, go to **EKS > Clusters > `YOUR_CLUSTER_NAME` > Node Group**.
 2. Select the name of `YOUR_NODE_GROUP` with Label Studio Enterprise deployed.
 3. On the **Details** page, locate and select the option for Node IAM Role ARN and choose to **Attach existing policies directly**.
@@ -363,7 +362,7 @@ rqworker:
 </div>
 <div data-name="Service Account Key">
 
-You can use a service account key that you create, or if you already have a Kubernetes secret and key, follow [the steps below](#Use-an-existing-Kubernetes-secret-and-key) to use those.
+You canß use a service account key that you create, or if you already have a Kubernetes secret and key, follow the steps to [set up Microsoft Azure Storage](#Use-an-existing-Kubernetes-secret-and-key) to use those.
 
 #### Create a new service account key
 1. Create a service account key from the UI and download the JSON. Follow the steps for [Creating and managing service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) in the Google Cloud Identity and Access Management guide. 

@@ -142,7 +142,10 @@ docker run -it -p 8080:8080 -v `pwd`/mydata:/label-studio/data \
 heartexlabs/label-studio:latest label-studio
 ```
 
-By specifying the environment variable `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/label-studio/files`, Label Studio only scans this directory for local files. Heartex highly recommends you explicitly specify a `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` path to secure the volume access from the Docker container to your local machine.
+By specifying the environment variable `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/label-studio/files`, Label Studio only scans this directory for local files. 
+
+!!! attention "important"
+    Heartex recommends you explicitly specify a `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` path to secure the volume access from the Docker container to your local machine.
 
 Place files in the specified source directory (`./myfiles` in this example) and reference that directory when you set up [local storage](storage.html#Local_storage). For more information about using volume mounts in Docker, see the [Docker documentation on volumes](https://docs.docker.com/storage/volumes/).  
 
@@ -162,7 +165,7 @@ To run Label Studio on the cloud using Heroku, specify an environment variable s
 LABEL_STUDIO_HOST
 ```
 
-!!! note
+!!! attention "Tip"
     It is optional for you to specify a different hostname for Label Studio.
 
 To run Label Studio with Heroku and use PostgreSQL as the [database storage](storedata.html), specify the PostgreSQL environment variables required as part of the Heroku environment variable `DATABASE_URL`. For example, to specify a PostgreSQL database hosted on Amazon:
@@ -172,15 +175,14 @@ DATABASE_URL = postgres://username:password@hostname.compute.amazonaws.com:5432/
 Then you can specify the required environment variables for a PostgreSQL connection as config variables. For more information, see [Database storage](storedata.html).
 
 !!! warning 
-    The Heroku manifest uses [postgresql addon](https://elements.heroku.com/addons/heroku-postgresql) out of the box. The storage capacity is limited.
+    1. The Heroku manifest uses [postgresql addon](https://elements.heroku.com/addons/heroku-postgresql) out of the box. The storage capacity is limited.
+
+    2. All uploaded data via import will be lost after a dyno replace since [filesystem is ephemeral](https://devcenter.heroku.com/articles/dynos#ephemeral-filesystem).
 
 [<img src="https://www.herokucdn.com/deploy/button.svg" height="30px">](https://heroku.com/deploy?template=https://github.com/heartexlabs/label-studio/tree/master)
 
-!!! warning
-    All uploaded data via import will be lost after a dyno replace since [filesystem is ephemeral](https://devcenter.heroku.com/articles/dynos#ephemeral-filesystem).
-
-!!! info
-    Tip: Heartex recommends you use S3 storage.
+!!! attention "Important"
+    Heartex recommends you use S3 storage.
 
 <!--
 ## Run Label Studio on the cloud using a different cloud provider
@@ -188,11 +190,11 @@ To run Label Studio on the cloud using a cloud provider such as Google Cloud Ser
 -->
 ## Run Label Studio with an external domain name
 
-If you want multiple people to collaborate on a project, you might want to run Label Studio with an external domain name. 
+If you want multiple users to collaborate on a project, you can run Label Studio with an external domain name. 
 
-To do that, use the `host` parameter when you start Label Studio. These parameters ensure that the correct URLs are created when importing resource files (images, audio, etc) and generating labeling tasks.   
+To do that, use the `host` parameter when you start Label Studio. These parameters ensure that the correct URLs are created when importing resource files (images, audio, and so on) and generating labeling tasks.   
 
-There are several possible ways to run Label Studio with an external domain name.
+Use the following way to run Label Studio with an external domain name:
  
 - Replace the `host` parameter in the file which you specified with `--config` option. If you don't use `--config` then edit `label_studio/utils/schema/default_config.json` in the Label Studio package directory.
 - Specify the parameters when you start Label Studio: `label-studio start --host http://your.domain.com/ls-root`.

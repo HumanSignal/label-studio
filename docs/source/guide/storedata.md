@@ -22,17 +22,29 @@ Label Studio uses SQLite by default. You don't need to configure anything. Label
 
 ## PostgreSQL database
 
-You can also store your tasks and completions in a [PostgreSQL database](https://www.postgresql.org/) instead of the default SQLite database. This is recommended if you intend to frequently import new labeling tasks, or plan to label hundreds of thousands of tasks or more across projects.
+!!! attention "important"
+    Heartex recommends the following method only if you intend to frequently import new labeling tasks, or plan to label hundreds of thousands of tasks or more across projects.
+
+You can also store your tasks and completions in a [PostgreSQL database](https://www.postgresql.org/) instead of the default SQLite database. 
+
 
 ### Create a connection on startup
 
-Run the following command to launch Label Studio, configure the connection to your PostgreSQL database, scan for existing tasks, and load them into the app for labeling for a specific project.
+To create a connection on startup, do the following steps:
+
+1. Run the following command to launch Label Studio.
 
 ```bash
 label-studio start my_project --init -db postgresql 
 ```
 
-You must set the following environment variables to connect Label Studio to PostgreSQL:
+2. Configure the connection to your PostgreSQL database.
+
+3. Scan for existing tasks.
+
+4. Load the existing tasks into the app to label a specific project.
+
+5. Set the following environment variables to connect Label Studio to PostgreSQL:
 
 ```
 DJANGO_DB=default
@@ -45,7 +57,8 @@ POSTGRE_HOST=db
 
 ### Create a connection with Docker Compose
 
-When you start Label Studio using Docker Compose, you start it using a PostgreSQL database:
+To create a connection with Docker Compose, use a PostgreSQL database by running the following command:
+
 ```bash
 docker-compose up -d
 ```
@@ -53,7 +66,7 @@ docker-compose up -d
 
 ## Data persistence
 
-If you're using a Docker container, Heroku, or another cloud provider, you might want your data to persist after shutting down Label Studio. You can [export your data](export.html) to persist your labeling task data and annotations, but to preserve the state of Label Studio and assets such as files that you uploaded for labeling, set up data persistence. 
+If you are using a Docker container, Heroku, or another cloud provider, you might want your data to persist after shutting down Label Studio. You can [export your data](export.html) to persist your labeling task data and annotations, but to preserve the state of Label Studio and assets such as files that you uploaded for labeling, set up data persistence. 
 
 ### Persist data with Docker
 
@@ -83,6 +96,4 @@ For more about specifying volumes in Docker Compose, see the volumes section of 
 
 ### Persist data with a cloud provider
 
-Host a PostgreSQL server that you manage and set up the PostgreSQL environment variables with Label Studio to persist data from a cloud provider such as Heroku, Amazon Web Services, Google Cloud Services, or Microsoft Azure. 
-
-
+Host a PostgreSQL server that you manage and set up the PostgreSQL environment variables with Label Studio to persist data from a cloud provider (Heroku, Amazon Web Services, Google Cloud Services, or Microsoft Azure). 

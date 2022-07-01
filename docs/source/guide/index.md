@@ -33,11 +33,11 @@ Start and finish a labeling project with Label Studio by following these steps:
 
 ## Quick start
 
-1. Install Label Studio:
+1. Install Label Studio.
 ```bash
 pip install label-studio
 ```
-2. Start Label Studio
+2. Start Label Studio.
 ```bash
 label-studio start
 ```
