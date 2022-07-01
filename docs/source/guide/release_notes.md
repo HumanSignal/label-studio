@@ -53,7 +53,7 @@ Label Studio 2.2.9 includes the following bug fixes:
 - Fixed permissions for a manager role. [DEV-2650].
 - Fixed `annotation_id` was provided as float value in CSV export. [DEV-2139].
 - Replaced `inner_id` index with multicolumn. [DEV-2667].
-- Recalculatec stats when control weights were updated. [DEV-2083].
+- Recalculate stats when control weights were updated. [DEV-2083].
 - Fixed empty agreement for taxonomy with extra labels. [DEV-2440].
 - Fixed `is_labeled` calculation after task import. [DEV-2389].
 
