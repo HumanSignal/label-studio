@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2437: Retain history on initial load of annotation review stream (#721)",
-  "commit": "946894d376ea3bbe59c533925c1890d4226f8a4a",
-  "branch": "master",
-  "date": "2022-06-30T20:55:10Z"
+  "message": "fix/dev-2763/resolve multiple rendered labels in regions with multiple=true, unique render keys",
+  "commit": "734dcf23640d5f07a20ce86130dbfe84fcf08c97",
+  "branch": "",
+  "date": "2022-06-30T15:46:43Z"
 }
