@@ -1,0 +1,32 @@
+template: "Mandatory field" #https://github.com/release-drafter/release-drafter/blob/master/bin/generate-schema.js#L15
+autolabeler:
+  - label: 'breaking'
+    body:
+      - '/BREAKING CHANGE/i'
+  - label: 'fix'
+    title:
+      - '/^fix:/'
+  - label: 'feat'
+    title:
+      - '/^feat:/'
+  - label: 'docs'
+    title:
+      - '/^docs:/'
+  - label: 'chore'
+    title:
+      - '/^chore:/'
+  - label: 'ci'
+    title:
+      - '/^ci:/'
+  - label: 'perf'
+    title:
+      - '/^perf:/'
+  - label: 'refactor'
+    title:
+      - '/^refactor:/'
+  - label: 'style'
+    title:
+      - '/^style:/'
+  - label: 'test'
+    title:
+      - '/^test:/'

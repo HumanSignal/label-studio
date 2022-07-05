@@ -19,6 +19,8 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from urllib.request import urlopen
 
 from .models import FileUpload
+from core.utils.io import url_is_local
+from core.utils.exceptions import ImportFromLocalIPError
 
 logger = logging.getLogger(__name__)
 csv.field_size_limit(131072 * 10)
@@ -131,6 +133,8 @@ def load_tasks(request, project):
             
         # download file using url and read tasks from it
         else:
+            if settings.SSRF_PROTECTION_ENABLED and url_is_local(url):
+                raise ImportFromLocalIPError
             data_keys, found_formats, tasks, file_upload_ids = tasks_from_url(
                 file_upload_ids, project, request, url
             )
