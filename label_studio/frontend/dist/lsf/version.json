@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2777: remove lookbehind in regex for Safari (#730)",
-  "commit": "ebb08ce18fbc7bd557497b5d26ef8cbc9600eb40",
+  "message": "fix: DEV-2647: rotating bounding box bugs (#711)\n\n* fix: DEV-2647: rotating bounding box bugs\r\n\r\n* fix: DEV-2647: rotating bounding box bugs\r\n\r\n* fix: DEV-2647: rotating bounding box bugs\r\n\r\n* Use one mixin for 2- and 3-point rect\r\n\r\n* fix: DEV-2647: handling rotated and reversed rectangles has veen improved\r\n\r\n* Fix calculations of rect height after 2nd point\r\n\r\n* fix: DEV-2647: fixing overflowing rectangles\r\n\r\n* fix: DEV-2647: cursor no longer changes while hovering over other regions when drawing\r\n\r\n* Fix contraints on mouse leave; whitespaces; ff check\r\n\r\nFF check in global scope can be possibly over-optimized by webpack\r\n\r\n* Remove console.log\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
+  "commit": "d7af0e7c45b495345c76fa852b788a0e8ff0d531",
   "branch": "master",
-  "date": "2022-07-01T16:44:40Z"
+  "date": "2022-06-21T13:20:50Z"
 }
