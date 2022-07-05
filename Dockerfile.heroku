@@ -1,4 +1,4 @@
-FROM heartexlabs/label-studio:latest
+FROM heartexlabs/label-studio:develop
 
 COPY deploy/heroku_run.sh /label-studio/deploy/
 
