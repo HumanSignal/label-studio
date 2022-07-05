@@ -1,0 +1,283 @@
+name: "Draft new release/hotfix"
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'
+        required: true
+        type: string
+      ref:
+        description: 'Commit SHA or ref name or tag'
+        required: true
+        default: 'develop'
+        type: string
+      hotfix:
+        type: boolean
+        required: false
+        description: 'Draft hotfix'
+
+env:
+  PYTHON_VERSION_FILE: 'label_studio/__init__.py'
+
+jobs:
+  draft-new-release:
+    name: "Draft new release/hotfix"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v2.0.1
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          ref: ${{ github.event.inputs.ref }}
+          submodules: 'recursive'
+          fetch-depth: 0
+
+      - name: Configure git
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          git config --global user.name 'robot-ci-heartex'
+          git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
+
+      - name: Calculate branch name and version
+        id: calculate_branch_name_and_version
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          
+          if [ '${{ github.event.inputs.hotfix }}' = 'true' ]; then
+            if git tag -l | grep "${{ github.event.inputs.version }}" | grep -; then 
+              latest_hotfix=$(git tag -l | grep "${{ github.event.inputs.version }}" | grep - | sort | tail -n1)
+              latest_hotfix_number=$(echo "${latest_hotfix}" | cut -d'-' -f2)
+              hotfix_number=$(($latest_hotfix_number + 1))
+            else
+              hotfix_number=1
+            fi
+            next_hotfix_number=$(($hotfix_number + 1))
+            release_version="${{ github.event.inputs.version }}-${hotfix_number}"
+            next_develop_version="${{ github.event.inputs.version }}-${next_hotfix_number}"
+          else
+            release_version=${{ github.event.inputs.version }}
+            minor_version=$(echo "${release_version}" | sed -n -e 's/.*\.\([0-9]\{1,\}\)$/\1/p')
+            base_version=$(echo "${release_version}" | sed -n -e 's/\(.*\)\..*/\1/p')
+            next_minor_version=$(($minor_version + 1))
+            next_develop_version="${base_version}.${next_minor_version}"
+          fi
+          
+          echo "::set-output name=release_branch::ls-release/${{ github.event.inputs.version }}"
+          echo "::set-output name=release_version::$release_version"
+          echo "::set-output name=next_develop_version::$next_develop_version"
+
+      - name: Cut dependencies release branches
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const release = '${{ steps.calculate_branch_name_and_version.outputs.release_branch }}'
+
+            let submodules = [
+                {owner: 'heartexlabs', repo: 'label-studio-frontend'},
+                {owner: 'heartexlabs', repo: 'dm2'},
+                {owner: 'heartexlabs', repo: 'label-studio-tools'},
+                {owner: 'heartexlabs', repo: 'label-studio-converter'}
+            ]
+            
+            for (let submodule of submodules) {
+                const {data: submoduleRepo} = await github.rest.repos.get({
+                    owner: submodule.owner,
+                    repo: submodule.repo,
+                });
+                const {data: branch} = await github.rest.repos.getBranch({
+                    owner: submodule.owner,
+                    repo: submodule.repo,
+                    branch: submoduleRepo.default_branch,
+                });
+                const response = await github.rest.git.createRef({
+                    owner: submodule.owner,
+                    repo: submodule.repo,
+                    ref: `refs/heads/${release}`,
+                    sha: branch.commit.sha,
+                });
+            }
+
+      - name: Commit version files to release branch
+        id: make-release-commit
+        if: github.event.inputs.hotfix != 'true'
+        run: |
+          set -euo pipefail
+          
+          sed -i "s/^__version__[ ]*=.*/__version__ = '${{ steps.calculate_branch_name_and_version.outputs.release_version }}'/g" ${{ env.PYTHON_VERSION_FILE }}
+          
+          git add ${{ env.PYTHON_VERSION_FILE }}
+          git commit --message "ci: cut release ${{ steps.calculate_branch_name_and_version.outputs.release_version }}"
+
+          echo "::set-output name=commit::$(git rev-parse HEAD)"
+          git push origin HEAD:refs/heads/${{ steps.calculate_branch_name_and_version.outputs.release_branch }}
+
+      - uses: actions/cache@v3
+        name: Configure pip cache
+        id: pip-cache
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-gh-actions-${{ hashFiles('.github/helpers/gh_jira_comparisonator/requirements.txt') }}-${{ hashFiles('.github/helpers/gh_changelog_generator/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-gh-actions-
+
+      - name: Install tools and dependencies
+        run: |
+          pip3 install -r .github/helpers/gh_jira_comparisonator/requirements.txt
+          pip3 install -r .github/helpers/gh_changelog_generator/requirements.txt
+
+      - name: Generate release changelog
+        id: changelog_md
+        env:
+          RELEASE_VERSION: "${{ steps.calculate_branch_name_and_version.outputs.release_version }}"
+          CHANGELOG_SOURCE: "/tmp/changelog_md"
+          JIRA_USERNAME: "${{ secrets.JIRA_USERNAME }}"
+          JIRA_TOKEN: "${{ secrets.JIRA_TOKEN }}"
+          GH_TOKEN: "${{ secrets.GIT_PAT }}"
+        run: |
+          set -eux
+          
+          if grep -q '-' <<< '${{ env.RELEASE_VERSION }}'; then
+            previous_ref=$(git rev-list --tags --max-count=1)
+            previous_tag=$(git describe --tags $previous_ref)
+          else
+            previous_tag=$(git tag --sort=-committerdate | grep -v - | head -n1)
+          fi
+          
+          export PREVIOUS_REF=${previous_tag} 
+          python3 .github/helpers/gh_changelog_generator/gh_changelog_generator.py > /tmp/changelog_md
+          
+          echo >> /tmp/changelog_md
+          echo ">Choose actions you want to perform:" >> /tmp/changelog_md
+          echo ">- [ ] NOTIFY_CUSTOMERS" >> /tmp/changelog_md
+          echo ">- [ ] DEPLOY_TO_APP_HEARTEX_COM" >> /tmp/changelog_md
+          echo ">" >> /tmp/changelog_md
+          echo ">**Full Changelog**: [${previous_tag}...${{ steps.calculate_branch_name_and_version.outputs.release_branch }}](${{ github.server_url }}/${{ github.repository }}/compare/${previous_tag}...${{ steps.calculate_branch_name_and_version.outputs.release_branch }})" >> /tmp/changelog_md
+          echo ">This changelog was created in response to a manual trigger of the release draft workflow of ${{ github.event.inputs.version }}. [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> /tmp/changelog_md
+          echo ">" >> /tmp/changelog_md
+          python3 .github/helpers/gh_jira_comparisonator/gh_jira_releases.py >> /tmp/changelog_md
+          echo ">" >> /tmp/changelog_md
+          echo ">**ALL LINES STARTING FROM QUOTE WILL BE IGNORED**" >> /tmp/changelog_md
+          echo "::set-output name=changelog_msg_b64::$(cat /tmp/changelog_md | base64 -w 0)"
+
+      - name: Create release draft
+        uses: actions/github-script@v6
+        id: create-draft-release
+        with:
+          script: |
+            try {
+              const response = await github.rest.repos.createRelease({
+                draft: true,
+                body: atob(`${{ steps.changelog_md.outputs.changelog_msg_b64 }}`),
+                name: '${{ steps.calculate_branch_name_and_version.outputs.release_version }}',
+                owner: context.repo.owner,
+                prerelease: false,
+                repo: context.repo.repo,
+                target_commitish: '${{ steps.calculate_branch_name_and_version.outputs.release_branch }}',
+                tag_name: '${{ steps.calculate_branch_name_and_version.outputs.release_version }}',
+              });
+              return response;
+            } catch (error) {
+              core.setFailed(error.message);
+            }
+
+      - name: Commit version files to 'develop'
+        id: make-develop-commit
+        if: github.event.inputs.hotfix != 'true'
+        run: |
+          set -euo pipefail
+          
+          git checkout '${{ github.event.repository.default_branch }}'
+          
+          branch='bump-version-${{ steps.calculate_branch_name_and_version.outputs.next_develop_version }}dev'
+          echo "::set-output name=branch::${branch}"
+          git checkout -b "${branch}"
+          
+          sed -i "s/^__version__[ ]*=.*/__version__ = '${{ steps.calculate_branch_name_and_version.outputs.next_develop_version }}dev'/g" ${{ env.PYTHON_VERSION_FILE }}
+          
+          git add ${{ env.PYTHON_VERSION_FILE }}
+          git commit --message "chore: Bump version to ${{ steps.calculate_branch_name_and_version.outputs.next_develop_version }}dev"
+
+          echo "::set-output name=commit::$(git rev-parse HEAD)"
+          git push origin HEAD:refs/heads/${branch}
+
+      - name: Create PR to 'develop'
+        if: github.event.inputs.hotfix != 'true'
+        uses: actions/github-script@v6
+        id: create-pr
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const createPullResponse = await github.rest.pulls.create({
+              title: 'chore: Bump version to ${{ steps.calculate_branch_name_and_version.outputs.next_develop_version }}dev',
+              owner,
+              repo,
+              head: '${{ steps.make-develop-commit.outputs.branch }}',
+              base: '${{ github.event.repository.default_branch }}',
+              body: [
+                'Hi @${{ github.actor }}!',
+                '',
+                'This PR was created in response to a manual trigger of the release workflow here: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}.',
+              ].join('\n')
+            });
+            github.rest.pulls.requestReviewers({
+              owner,
+              repo,
+              pull_number: createPullResponse.data.number,
+               reviewers: [ '${{ github.actor }}' ]
+            });
+            return createPullResponse
+
+      - name: Enable AutoMerge
+        id: enable-pr-automerge
+        if: github.event.inputs.hotfix != 'true'
+        shell: bash
+        run: |
+          echo ${{ secrets.GIT_PAT }} | gh auth login --with-token
+          gh api graphql -f pull='${{ fromJson(steps.create-pr.outputs.result).data.node_id }}' -f query='
+            mutation($pull: ID!) {
+              enablePullRequestAutoMerge(input: {pullRequestId: $pull, mergeMethod: SQUASH}) {
+                pullRequest {
+                  id
+                  number
+                }
+              }
+            }'
+
+      - name: Notify to Slack on draft release
+        id: slack_notify_ops_release
+        if: github.event.inputs.hotfix != 'true'
+        uses: slackapi/slack-github-action@v1.19
+        with:
+          channel-id: 'C03F181D2J2'
+          slack-message: |
+            Release ${{ steps.calculate_branch_name_and_version.outputs.release_version }} is coming!
+            
+            Draft Release: ${{ fromJson(steps.create-draft-release.outputs.result).data.html_url }}
+            Release branch: ${{ github.server_url }}/${{ github.repository }}/tree/${{ steps.calculate_branch_name_and_version.outputs.release_branch }}
+            Version Bump PR: ${{ fromJson(steps.create-pr.outputs.result).data.html_url }}
+            
+            >This message was created in response to a manual trigger of the release workflow here: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}.
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+      - name: Notify to Slack on hotfix
+        id: slack_notify_ops_hotfix
+        if: github.event.inputs.hotfix == 'true'
+        uses: slackapi/slack-github-action@v1.19
+        with:
+          channel-id: 'C03F181D2J2'
+          slack-message: |
+            Release ${{ steps.calculate_branch_name_and_version.outputs.release_version }} is coming!
+            
+            Draft Release: ${{ fromJson(steps.create-draft-release.outputs.result).data.html_url }}
+            
+            >This message was created in response to a manual trigger of the release workflow here: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}.
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
