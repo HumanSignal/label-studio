@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2669: Create filters for authors in Paragraph Transcription (#719)\n\n* feat: DEV-2669: adding filterBy name capability to Paragraph model\r\n\r\n* feat: DEV-2669: implement author filter search\r\n\r\n* feat: DEV-2669: tag styling for multi select render items\r\n\r\n* feat: DEV-2669: select item color and bg color need to stay the same for selection state contrast\r\n\r\n* feat: DEV-2669: ensure the filter is handled correctly on clear all\r\n\r\n* refactor styles to css for select dropdown\r\n\r\n* removing commented out line",
-  "commit": "f50bd5e352c1027071aac27899c47c8cd481a447",
+  "message": "fix: DEV-2777: remove lookbehind in regex for Safari (#730)",
+  "commit": "ebb08ce18fbc7bd557497b5d26ef8cbc9600eb40",
   "branch": "master",
-  "date": "2022-06-30T21:37:57Z"
+  "date": "2022-07-01T16:44:40Z"
 }
