@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'fix/DEV-2153/pagination' of github.com:heartexlabs/dm2 into fix/DEV-2153/pagination",
-  "commit": "9f3f14554f5b28434162ba861eaf4ce98622eabf",
-  "branch": "fix/DEV-2153/pagination",
-  "date": "2022-06-20T14:25:53Z"
+  "message": "fix: DEV-2170: on project open number of tasks defined by task per page is being displayed",
+  "commit": "20a6002a5a6f122cafcb248514ea0b047a9adf14",
+  "branch": "fb-dev-2170",
+  "date": "2022-06-06T20:55:36Z"
 }
