@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2379:  Deselect image region bbox on short click",
-  "commit": "47b21a4520c884027067ae2635db667b4bed3783",
-  "branch": "fb-dev-2739",
-  "date": "2022-07-05T02:20:29Z"
+  "message": "fix: DEV-2379:  Deselect image region bbox on short click (#732)",
+  "commit": "8e3dd251cc192cac93471122e421ecb53bd4ef7b",
+  "branch": "master",
+  "date": "2022-07-05T19:29:16Z"
 }
