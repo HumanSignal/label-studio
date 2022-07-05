@@ -137,6 +137,12 @@ class Task(TaskMixin, models.Model):
     def num_locks(self):
         return self.locks.filter(expire_at__gt=now()).count()
 
+    @property
+    def storage_filename(self):
+        for link_name in settings.IO_STORAGES_IMPORT_LINK_NAMES:
+            if hasattr(self, link_name):
+                return getattr(self, link_name).key
+
     def get_lock_ttl(self):
         if settings.TASK_LOCK_TTL is not None:
             return settings.TASK_LOCK_TTL
