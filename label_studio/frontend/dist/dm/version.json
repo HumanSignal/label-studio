@@ -1,6 +1,6 @@
 {
-  "message": "ci: DEV-2445: Add Review/Merge Automation (#66)",
-  "commit": "3caaedb264407951f6f07adef76a51102bea64ab",
-  "branch": "master",
-  "date": "2022-05-31T09:27:40Z"
+  "message": "fix: DEV-2170: on project open number of tasks defined by task per page is being displayed",
+  "commit": "20a6002a5a6f122cafcb248514ea0b047a9adf14",
+  "branch": "fb-dev-2170",
+  "date": "2022-06-06T20:55:36Z"
 }

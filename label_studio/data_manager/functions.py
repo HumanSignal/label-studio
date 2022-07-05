@@ -219,10 +219,21 @@ def get_all_columns(project, *_):
         },
         {
             'id': 'file_upload',
-            'title': "Source filename",
+            'title': "Upload filename",
             'type': "String",
             'target': 'tasks',
-            'help': 'Source filename from import step',
+            'help': 'Filename of uploaded file',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        },
+        {
+            'id': 'storage_filename',
+            'title': "Storage filename",
+            'type': "String",
+            'target': 'tasks',
+            'help': 'Filename from import storage',
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useParams as useRouterParams } from 'react-router';
 import { Redirect } from 'react-router-dom';
 import { Button } from '../../components';
@@ -6,7 +6,9 @@ import { Oneof } from '../../components/Oneof/Oneof';
 import { Spinner } from '../../components/Spinner/Spinner';
 import { ApiContext } from '../../providers/ApiProvider';
 import { useContextProps } from '../../providers/RoutesProvider';
+import { useAbortController } from "../../hooks/useAbortController";
 import { Block, Elem } from '../../utils/bem';
+import { FF_DEV_2575, isFF } from '../../utils/feature-flags';
 import { CreateProject } from '../CreateProject/CreateProject';
 import { DataManagerPage } from '../DataManager/DataManager';
 import { SettingsPage } from '../Settings';
@@ -21,6 +23,7 @@ const getCurrentPage = () => {
 
 export const ProjectsPage = () => {
   const api = React.useContext(ApiContext);
+  const abortController = useAbortController();
   const [projectsList, setProjectsList] = React.useState([]);
   const [networkState, setNetworkState] = React.useState(null);
   const [currentPage, setCurrentPage] = useState(getCurrentPage());
@@ -34,13 +37,45 @@ export const ProjectsPage = () => {
 
   const fetchProjects = async (page  = currentPage, pageSize = defaultPageSize) => {
     setNetworkState('loading');
+    abortController.renew(); // Cancel any in flight requests
+
+    const requestParams = { page, page_size: pageSize };
+
+    if (isFF(2575)) {
+      requestParams.include = [
+        'id',
+        'title',
+        'created_by',
+        'created_at', 
+        'color', 
+        'is_published', 
+        'assignment_settings', 
+      ].join(',');
+    }
+
     const data = await api.callApi("projects", {
-      params: { page, page_size: pageSize },
+      params: requestParams,
+      ...(isFF(FF_DEV_2575) ? {
+        signal: abortController.controller.current.signal,
+        errorFilter: (e) => e.error.includes('aborted'), 
+      } : null),
     });
 
     setTotalItems(data?.count ?? 1);
     setProjectsList(data.results ?? []);
     setNetworkState('loaded');
+
+    if (isFF(FF_DEV_2575) && data?.results?.length) {
+      const additionalData = await api.callApi("projects", {
+        params: { ids: data?.results?.map(({ id }) => id).join(',') },
+        signal: abortController.controller.current.signal,
+        errorFilter: (e) => e.error.includes('aborted'), 
+      });
+
+      if (additionalData?.results?.length) {
+        setProjectsList(additionalData.results);
+      }
+    }
   };
 
   const loadNextPage = async (page, pageSize) => {
