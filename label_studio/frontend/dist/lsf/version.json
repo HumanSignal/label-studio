@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #681 from heartexlabs/fb-dev-2203/view-all-audio-responsive\n\nfix: DEV-2203: View all audio responsive",
-  "commit": "f30cc010581585e0fe3df72653cb0a3747d329b6",
-  "branch": "",
-  "date": "2022-06-06T17:34:36Z"
+  "message": "fix: DEV-2777: remove lookbehind in regex for Safari (#730)",
+  "commit": "ebb08ce18fbc7bd557497b5d26ef8cbc9600eb40",
+  "branch": "master",
+  "date": "2022-07-01T16:44:40Z"
 }
