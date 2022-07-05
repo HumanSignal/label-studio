@@ -42,7 +42,15 @@ export const ProjectsPage = () => {
     const requestParams = { page, page_size: pageSize };
 
     if (isFF(2575)) {
-      requestParams.include = 'id,title,created_by,created_at,color,is_published,assignment_settings';
+      requestParams.include = [
+        'id',
+        'title',
+        'created_by',
+        'created_at', 
+        'color', 
+        'is_published', 
+        'assignment_settings', 
+      ].join(',');
     }
 
     const data = await api.callApi("projects", {
