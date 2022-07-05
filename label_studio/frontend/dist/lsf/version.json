@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2365: User is able to edit choice results imported as read-only (#702)",
-  "commit": "e638232aeb73533a26a835009acc998971fe1ea9",
-  "branch": "master",
-  "date": "2022-07-05T21:25:37Z"
+  "message": "Merge branch 'master' into fb-dev-2671",
+  "commit": "0cadb70b6e62ac4f476b86d890e0abfac364cace",
+  "branch": "fb-dev-2671",
+  "date": "2022-07-01T21:32:50Z"
 }
