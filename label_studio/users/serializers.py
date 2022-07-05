@@ -44,6 +44,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
             'initials',
             'phone',
             'active_organization',
+            'allow_newsletters'
         )
 
 
