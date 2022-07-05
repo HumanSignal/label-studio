@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2669: Create filters for authors in Paragraph Transcription (#719)\n\n* feat: DEV-2669: adding filterBy name capability to Paragraph model\r\n\r\n* feat: DEV-2669: implement author filter search\r\n\r\n* feat: DEV-2669: tag styling for multi select render items\r\n\r\n* feat: DEV-2669: select item color and bg color need to stay the same for selection state contrast\r\n\r\n* feat: DEV-2669: ensure the filter is handled correctly on clear all\r\n\r\n* refactor styles to css for select dropdown\r\n\r\n* removing commented out line",
-  "commit": "f50bd5e352c1027071aac27899c47c8cd481a447",
-  "branch": "master",
-  "date": "2022-06-30T21:37:57Z"
+  "message": "fix: DEV-2379:  Deselect image region bbox on short click",
+  "commit": "47b21a4520c884027067ae2635db667b4bed3783",
+  "branch": "fb-dev-2739",
+  "date": "2022-07-05T02:20:29Z"
 }
