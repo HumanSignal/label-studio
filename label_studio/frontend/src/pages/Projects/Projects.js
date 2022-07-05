@@ -47,8 +47,10 @@ export const ProjectsPage = () => {
 
     const data = await api.callApi("projects", {
       params: requestParams,
-      signal: abortController.controller.current.signal,
-      errorFilter: (e) => e.error.includes('aborted'), 
+      ...(isFF(FF_DEV_2575) ? {
+        signal: abortController.controller.current.signal,
+        errorFilter: (e) => e.error.includes('aborted'), 
+      } : null),
     });
 
     setTotalItems(data?.count ?? 1);
