@@ -8,74 +8,164 @@ meta_title: Release notes for Label Studio Enterprise
 meta_description: Discover what's new and improved, and review bug fixes, in the release notes and changelog for Label Studio Enterprise.
 ---
 
-This is a list of noteworthy new features and bug fixes for the latest version of Label Studio Enterprise. 
+!!! info 
+    <i class='ent'></i> 
+    The release notes for Label Studio Community Edition is available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
 
-<div class="enterprise"><p>
-For the release notes for Label Studio Community Edition, see the <a href="https://github.com/heartexlabs/label-studio/releases">release notes on GitHub</a>.
-</p></div>
 
-## New features
+## Label Studio Enterprise 2.2.10 
+This section highlights the bug fixes in Label Studio Enterprise 2.2.10.
 
-This version of Label Studio Enterprise introduces the following new features:
+### Bug fixes
+Label Studio 2.2.10 includes the following bug fixes:
 
-- Write a custom agreement metric to evaluate annotator and model performance according to metrics that you define. See [how to write a custom agreement metric](custom_metric.html) for more.
-- Export a snapshot of your data labeling project, specifying what to include in the export. See [more details in the export documentation](export.html).
-- Set up webhooks to send events to a configured URL to take automated action in your model pipeline. See [how to set up webhooks](webhooks.html).
-- Perform dynamic ML-assisted labeling with interactive preannotation. See [more about ML-assisted labeling with interactive preannotations](labeling.html#Perform-ML-assisted-labeling-with-interactive-preannotations).
+#### Backend 
+- Per label score for `Choices` was calculated when `no Choice` was selected [DEV-2688].
+- Fixed an error for actions with ordering by **joined** field [DEV-2658].
+- Fixed auto-generated docs for `api/tasks` [DEV-2737].
 
-This release also includes other important improvements.
+#### Frontend
+- Fixed an issue when the Safari browser stopped working [DEV-2777].
+- Fixed scrollable area in **Review** mode [DEV-2348].
 
-### Data manager improvements
-- Create annotations from predictions by selecting tasks and using the drop-down menu options. 
-- Added the ability to remove reviewer and annotator assignments to tasks using the drop-down menu options for selected tasks. <!--HTX-2143-->
-- Enhanced filtering behavior to be robust and support filtering by reviewers, annotators, and fields in your task data. 
-- Added the ability to label tasks as displayed, allowing you to filter and sort your data and label tasks accordingly. See more in [Filter or sort project data](manage_data.html#Filter-or-sort-project-data).
-- Improved performance by reducing the time it takes to load tasks.
 
-### Labeling and tag improvements
+## Label Studio Enterprise 2.2.9
+This section highlights the breaking changes, new features and enhancements, and bug fixes in Label Studio Enterprise 2.2.9. 
 
-- Added the ability to manipulate regions when labeling images, such as selecting and moving multiple regions, duplicating regions, and more. See [Advanced image labeling](labeling.html#Advanced-image-labeling). 
-- Added [new hotkeys to accelerate labeling](labeling.html#Use-keyboard-shortcuts-to-label-regions-faster).
-- Added a dedicated [`<Video>` tag](/tags/video.html) and a [`<Number>` tag](/tags/number.html). 
-- Added a `hint` parameter for the [`<Label>` tag](/tags/label.html) so that you can provide additional guidance to annotators. <!--HTX-1933--> 
+### Breaking changes
+Label Studio Enterprise 2.2.9 includes the following breaking change:
 
-### Import and export improvements
+- This release decommissions MinIO as a service [DEV-2600].
 
-- Remove annotations from a synced S3 bucket when an annotation is deleted. <!--HTX-2084--> 
-- Manually sync annotations to a target storage bucket. <!--HTX-1944--> 
-- Added the review status for annotations synced to a target storage bucket. <!--HTX-1878--> 
-- Export specific tasks by ID. <!--HTX-1868--> 
-- Scan bucket prefixes recursively to account for nested dataset storage. <!--HTX-1821--> 
-- Specify Google Cloud Storage (GCS) credentials for target storage connections.
+### New features and enhancements 
+Label Studio Enterprise 2.2.9 introduces the following new features and enhancements.
 
-See more details in the [cloud storage setup](storage.html) documentation. 
+#### Backend
+- This release provides proxy support for content-range HTTP responses [DEV-2496].
+- Add API for project duplication [DEV-2538].
 
-### Assorted other improvements
+#### Frontend
+- This release introduces the ability to select model version on model cards from the machine learning page >> **Settings** [DEV-1868].
+- Now, you can show the comments column in the Data Manager to reviewers [DEV-2598].
+ 
+#### Templates
+- This release introduces [Dynamic Labels templates](https://labelstud.io/templates/gallery_dynamic_labels.html#main). You can now show labels dynamically as a task input, either as a prediction from the model or from a database lookup. With a broader set of options, dynamic labeling saves time and increases the consistency of labeling the objects [DEV-2636]. 
 
-- Improve LDAP user management to support permission syncing at the workspace level and disallow manual management of project members. See how to [set up LDAP authentication](auth_setup.html#Set-up-LDAP-authentication) for more. 
-- See information about your active organization on your user account and settings page, such as your organization ID and an overview of your project and annotation activity. 
-- Added the ability to switch between mean time and median time when reviewing how much time annotators took to annotate a task. See more details in the [dashboard documentation](quality.html#Review-annotator-performance). <!--HTX-2041-->
-- Added pagination for the projects page. 
-- Updated the result format of the API call for `/api/project/id/tasks` to be consistent with the format returned by `/api/tasks/id`. 
-- Added the option to hide the skip button from annotators. <!--HTX-1942--> 
-- Added the ability to retrieve predictions for all tasks in a project using the API. <!--HTX-1897--> 
+### Bug fixes
+Label Studio 2.2.9 includes the following bug fixes:
 
-## Bug fixes
+#### Backend
+- Optimized dashboard-members API performance for reviews [DEV-1669].
+- Enabled Query optimization for Uniform Sampling in the Labeling Stream [DEV-2184].
+- Fixed runtime error when duration was not extracted on `ASR_MANIFEST` export [DEV-2095].
+- Fixed permissions for a manager role [DEV-2650].
+- Fixed `annotation_id` was provided as float value in CSV export [DEV-2139].
+- Replaced `inner_id` index with multicolumn [DEV-2667].
+- Recalculate stats when control weights were updated [DEV-2083].
+- Fixed empty agreement for taxonomy with extra labels [DEV-2440].
+- Fixed `is_labeled` calculation after task import [DEV-2389].
 
-This release of Label Studio Enterprise includes fixes for the following bugs and other improvements.
+#### Frontend 
 
-- Instructions were not appearing for annotators before labeling in some cases.
-- Annotators logging in for the first time with LDAP accounts saw a runtime error. <!--HTX-2169-->
-- The "Review Finished" modal appeared before annotation reviews were complete. <!--HTX-2152--> 
-- Using the Naive matching metric for brush annotation projects led to unexpected behavior when saving annotations. <!--HTX-2144-->
-- Creating users using the API did not work as expected. <!--HTX-2133--> 
-- Specifying the `completed_by` user when creating an annotation with the API did not work as expected. <!--HTX-2130-->
-- There was an issue with the `Paragraphs` tag. <!--HTX-2119--> 
-- There was an issue with labeling only selected tasks. <!--HTX-2110-->
-- Brush strokes did not change size when zooming in on an image for labeling.  
-- Improved the cards that display to reviewers and annotators. <!--HTX-1997-->
-- Submitting predictions as annotations did not work as expected. <!--HTX-1990--> 
-- Hotkeys stopping working after submitting an annotation. <!--HTX-1976-->
-- The `selected` parameter did not work properly for the `<Label>` tag. <!--HTX-1945--> 
-- There was an issue submitting and loading annotations with relations. <!--HTX-1708--> 
-- Updating an annotation in the review stream did not work as expected. <!--HTX-1677--> 
+- Fixed the regions that disappeared from UI in **Annotation History** [DEV-2408]. 
+- Improved the **Annotation History** name/timestamp spacing [DEV-23640].
+- Fixed audio crashes in **View All** mode [DEV-2199].
+- Pan does not finish the polygon [DEV-2068].
+- Fixed nested choices for the indeterminate state [DEV-2244].
+- Fixed an issue to get text after granularity was applied in **Annotation Result** [DEV-1592].
+- Zoomed image region out of bounds [DEV-2394].
+- Viewed all audio responsive [DEV-2203].
+- Fixed an issue where all parts of audio in the **View All** mode were equally responsive to browser size changes [DEV-2577].
+- Resynchronized annotations that failed to synchronize in **Target Storage** [DEV-1781].
+- Supported lengthy unbroken taxonomy line breaks [DEV-1975] and [DEV-1843].
+- Retained the size for key points [DEV-2577]. 
+- Display the correct number of member icons on project cards [DEV-2334].
+- Fixed rendering issue on video regions [DEV-2494].
+- Fixed the loading issue for `Paragraph` data on **QuickView** [DEV-2465].
+- Allowed edit action on Time Series results imported as read-only [DEV-2367].
+- Fixed Annotation History when exiting **View All** [DEV-2302]. 
+- Added X-axis zoom threshold [DEV-1714].
+- Added guard with an error message for non-incremental, non-sequential datasets in Time Series [DEV-2510].
+- Disabled the delete **all region** button when an annotation is read-only [DEV-2309].
+- Fixed blind Server-side Request Forgery (SSRF) on add model and import [DEV-2235].
+- Deselected the ImageView bounding box before creating another [DEV-1422]. 
+- Fixed data in Search Engine Results Page (SERP) ranking in-app template [DEV-2604]. 
+- Unfinished polygon zoom fix [DEV-2313]. 
+- Fixed flickering issue when regions were created with the Bounding box [DEV-2592].
+- Video regions were edited when Annotation History was selected [DEV-2303].
+- Added background as a new parameter to text shortcuts [DEV-2423].
+- Fixed the form layout and allowed the model version selector when the ML backend was edited [DEV-1682].
+- Text and Header tags work with integers now [DEV-2459].
+- Fixed synchronization speed between video and audio [DEV-2207].
+- Fixed an issue with prop `whenChoiceValue` [DEV-1833].
+
+
+## Label Studio Enterprise 2.2.8
+This section highlights the breaking changes, new features and enhancements, and bug fixes in Label Studio Enterprise 2.2.8. 
+
+### New features and enhancements
+Label Studio Enterprise 2.2.8 introduces the following new features and enhancements.
+
+- This release displays comments in **DM** to reviewers [DEV-2598].
+- Support for [Redis Secure Sockets Layer (SSL)](security.html#Secure-access-to-Redis-storage) [DEV-1768].
+- Add tags and prefixes to [AWS metric parameters](custom_metric.html#How-to-write-your-custom-agreement-metric) [DEV-1917].
+- Change review API to take into account feedback loop [DEV-2198].
+- Notification Center [DEV-1658]
+- Add drafts in Annotation History [DEV-2290].
+- Introduce new history types [DEV-2387]. 
+- Support for System for Cross-domain Identity Management (SCIM 2.0) user and group provisioning [DEV-1823].
+- Add the ability to pass a comment to APIs on skip [DEV-2458].
+
+### Bugfixes
+Label Studio 2.2.8 includes the following bug fixes:
+
+- Per label score for Choices was calculated when no Choice was selected (hotfix-7) [DEV-2688].
+- Fixed Rotating bounding box bugs (hotfix-4) [DEV-2647]
+- Fixed permissions for manager role (hotfix-3) [DEV-2650]
+- Fixed export to file using `SerializableGenerator` [DEV-2248].
+- Fixed accepted state in review. [DEV-2256]
+- Made Annotation History with linear Reject (Reject = Update + Reject) [DEV-2263].
+- Fixed Annotation History icons [DEV-2264].
+- Annotation history fixes [DEV-2265], [DEV-2268], [DEV-2271].
+- Fixed an issue where the Annotation History was not loading because of string ID [DEV-2278].
+- Fixed validation in Labeling Interface preview with Dynamic Labels [DEV-2249].
+- Fixed history 404 on unskip in label stream [DEV-2262].
+- Fixed **Annotation History** reset for predictions [DEV-2271].
+- Fixed job cancellation for `_update_tasks_states` [DEV-2294].
+- Fixed an issue to return `404` for `api/project/id/tasks` when the page was out of scope [DEV-2336]
+- Interactive preannotations for **Paragraphs** [DEV-2253].
+- Improved the speed to 180 secs for assigned tasks [DEV-2060].
+- Disabled **Poly** and **Keypoints** for **Annotation History** [DEV-2283].
+- Fixed tools multiplication issue [DEV-1690].
+- Prevented the scroll-out **TopBar** option [DEV-2348].
+- Fixed skip queue [DEV-2354].
+- Allowed **Canvas** to fill all the space [DEV-930].
+- Truncated long words in comments [DEV-2267].
+- Added scroll to view when focus changes to `stickyList` in table component [DEV-1703].
+- Used `contain` instead of `icontain` for **Annotation Result** field in the **Data manager** filters [DEV-2214].
+- Fixed `is_labeled` for tasks with no assignments [DEV-1872].
+- Added default settings [DEV-1577].
+- Implemented `Go back to previously reviewed task` functionality for reviewing stream [DEV-1676].
+- Refactored and optimized Redis Queues [DEV-2213].
+- Fixed runtime error during import with no `total_annotations` and other [DEV-2374].
+- Reviewed Next Task API performance optimizations [DEV-2350].
+- Fixed the reset rejected status after the annotation update. [DEV-2216], [DEV-2321].
+- Fixed skip **Annotation History** for the previous task in label stream [DEV-2407].
+- Fixed Reviewed filter [DEV-1948].
+- Fixed counters for skipped annotations [DEV-2406].
+- Fixed an issue where tasks were flagged as REVIEWED by default [DEV-2438].
+- Fixed an issue for skipped tasks to get the `Completed` status [DEV-2413].
+- Fixed error when a user tried to delete all tasks [DEV-2456].
+- Fixed filter by empty reviewers [DEV-2390].
+- Fixed incorrect review card counters in the feedback loop for skipped annotations [DEV-2433].
+- Moved from signal to model delete method [DEV-2410].
+- Added new skip behavior for annotations that are requeued back to annotator [DEV-2617].
+- Fixed **Annotation History** drafts [DEV-2290].
+- Fixed regions for text span when it was out of bounding in the regions list and created horizontal scroll [DEV-2473].
+- Fixed in **Manage Members** modal (on project **Members** tab, on workspace members, on **Members** settings) header with search overlaps by the main list [DEV-2473].
+- Fixed `Textarea` for **Custom Function** on the **Quality** settings page [DEV-2473].
+- Fixed `startOffset` for empty nodes [DEV-2480].
+- Fixed the runtime error for users who deleted an annotation from Quickview',  switched to another task, and returned back to the same task [DEV-2306].
+- Added command for all orgs and optimize `update_tasks_counters` [DEV-2492].
+- After annotations from predictions `is_labeled` should be recalculated [DEV-2490].
+- Fixed 404 on skip [DEV-2416].

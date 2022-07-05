@@ -13,6 +13,7 @@ from annoying.fields import AutoOneToOneField
 from functools import lru_cache
 
 from core.redis import start_job_async_or_sync
+from data_manager.managers import TaskQuerySet
 from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks
 from core.utils.common import create_hash, get_attr_or_item, load_func
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
@@ -781,8 +782,12 @@ class Project(ProjectMixin, models.Model):
         total_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
         cancelled_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True))
         total_predictions = Count("predictions", distinct=True)
-        if isinstance(queryset, list):
+        # construct QuerySet in case of list of Tasks
+        if isinstance(queryset, list) and len(queryset) > 0 and isinstance(queryset[0], Task):
             queryset = Task.objects.filter(id__in=[task.id for task in queryset])
+        # construct QuerySet in case annotated queryset
+        if isinstance(queryset, TaskQuerySet) and queryset.exists() and isinstance(queryset[0], int):
+            queryset = Task.objects.filter(id__in=queryset)
 
         if not from_scratch:
             queryset = queryset.exclude(
