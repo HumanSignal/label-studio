@@ -1,6 +1,6 @@
 {
-  "message": "fix/dev-2763/resolve multiple rendered labels in regions with multiple=true, unique render keys",
-  "commit": "734dcf23640d5f07a20ce86130dbfe84fcf08c97",
-  "branch": "",
-  "date": "2022-06-30T15:46:43Z"
+  "message": "Merge branch 'master' into fb-dev-2671",
+  "commit": "0cadb70b6e62ac4f476b86d890e0abfac364cace",
+  "branch": "fb-dev-2671",
+  "date": "2022-07-01T21:32:50Z"
 }
