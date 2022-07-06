@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into fb-dev-2671",
-  "commit": "0cadb70b6e62ac4f476b86d890e0abfac364cace",
-  "branch": "fb-dev-2671",
-  "date": "2022-07-01T21:32:50Z"
+  "message": "fix: DEV-2671: Change rotate anchor of bbox (#731)",
+  "commit": "510331fc8ff7fa6a0e47145c04048215637d0579",
+  "branch": "master",
+  "date": "2022-07-05T22:49:08Z"
 }
