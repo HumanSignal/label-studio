@@ -52,7 +52,7 @@ jobs:
             docker:
               - 'label_studio/**'
               - 'deploy/**'
-              - 'Dockerfile'
+              - 'Dockerfile**'
               - 'setup.py'
 
   pr_labeler:

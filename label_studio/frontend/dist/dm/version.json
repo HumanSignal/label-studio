@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2170: on project open number of tasks defined by task per page is being displayed",
-  "commit": "20a6002a5a6f122cafcb248514ea0b047a9adf14",
-  "branch": "fb-dev-2170",
-  "date": "2022-06-06T20:55:36Z"
+  "message": "fix: DEV-2526: Don't crash because of undefined LSF (#75)",
+  "commit": "34742984929748380ad6f7bbb053c7ced97d994d",
+  "branch": "master",
+  "date": "2022-07-05T19:38:39Z"
 }
