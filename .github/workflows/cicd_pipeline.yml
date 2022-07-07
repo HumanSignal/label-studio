@@ -60,6 +60,8 @@ jobs:
               - 'deploy/**'
               - 'Dockerfile**'
               - 'setup.py'
+              - '.github/workflows/cicd_pipeline.yml'
+              - '.github/workflows/docker-build.yml'
 
   pr_labeler:
     name: "Validate"
