@@ -79,7 +79,7 @@ jobs:
         run: |
           yarn run build:module
           if [[ "${{ github.event.client_payload.event_action }}" == 'merged' ]]; then 
-            branch="${{ github.event.client_payload.base_branch_name }}/dm"
+            branch="${{ github.event.client_payload.base_branch_name }}"
           else
             branch="${{ github.event.client_payload.branch_name }}"
           fi
