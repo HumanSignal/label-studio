@@ -227,27 +227,27 @@ def check_port_in_use(host, port):
 
 def _get_free_port(port, debug):
     # check port is busy
-    if not debug:
-        original_port = port
-        # try up to 1000 new ports
-        while check_port_in_use('localhost', port):
-            old_port = port
-            port = int(port) + 1
-            if port - original_port >= 1000:
-                raise ConnectionError(
-                    '\n*** WARNING! ***\n Could not find an available port\n'
-                    + ' to launch label studio. \n Last tested port was '
-                    + str(port)
-                    + '\n****************\n'
-                )
-            print(
-                '\n*** WARNING! ***\n* Port '
-                + str(old_port)
-                + ' is in use.\n'
-                + '* Trying to start at '
-                + str(port)
-                + '\n****************\n'
-            )
+    # if not debug:
+    #     original_port = port
+    #     # try up to 1000 new ports
+    #     while check_port_in_use('localhost', port):
+    #         old_port = port
+    #         port = int(port) + 1
+    #         if port - original_port >= 1000:
+    #             raise ConnectionError(
+    #                 '\n*** WARNING! ***\n Could not find an available port\n'
+    #                 + ' to launch label studio. \n Last tested port was '
+    #                 + str(port)
+    #                 + '\n****************\n'
+    #             )
+    #         print(
+    #             '\n*** WARNING! ***\n* Port '
+    #             + str(old_port)
+    #             + ' is in use.\n'
+    #             + '* Trying to start at '
+    #             + str(port)
+    #             + '\n****************\n'
+    #         )
     return port
 
 

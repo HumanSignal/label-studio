@@ -15,6 +15,8 @@ import { isDefined } from '../../utils/helpers';
 import { ImportModal } from '../CreateProject/Import/ImportModal';
 import { ExportPage } from '../ExportPage/ExportPage';
 import { APIConfig } from './api-config';
+import axios from 'axios'
+import Swal from 'sweetalert2'
 import "./DataManager.styl";
 
 const initializeDataManager = async (root, props, params) => {
@@ -232,7 +234,29 @@ DataManagerPage.context = ({ dmRef }) => {
     updateCrumbs(currentMode);
     showLabelingInstruction(currentMode);
   };
+  const importAnnotations = () => {
+    console.log('Import Annotations')
 
+    Swal.fire({
+      title: 'Attention',
+      text: "We will import annotations from the annotations folder in your project local directory, please make sure to add them there!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, Import them!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios.post('http://localhost:3535/import_annotations?id='+project.id)
+          .then(data =>
+              console.log(data)
+          ).catch(err => {
+              console.log(err)
+              return null
+          })
+      }
+    })
+  }
   useEffect(() => {
     if (dmRef) {
       dmRef.on('modeChanged', onDMModeChanged);
@@ -245,6 +269,7 @@ DataManagerPage.context = ({ dmRef }) => {
 
   return project && project.id ? (
     <Space size="small">
+      <Button size = "compact" onClick={() => importAnnotations()}>Import Annotations</Button>
       {(project.expert_instruction && mode !== 'explorer') && (
         <Button size="compact" onClick={() => {
           modal({

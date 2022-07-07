@@ -8,7 +8,8 @@ import { confirm } from '../../../components/Modal/Modal';
 import { Oneof } from '../../../components/Oneof/Oneof';
 import { ApiContext } from '../../../providers/ApiProvider';
 import { cn } from '../../../utils/bem';
-
+import axios from 'axios'
+import Swal from 'sweetalert'
 export const MachineLearningList = ({ backends, fetchBackends, onEdit }) => {
   const rootClass = cn('ml');
   const api = useContext(ApiContext);
@@ -23,10 +24,29 @@ export const MachineLearningList = ({ backends, fetchBackends, onEdit }) => {
   }, [fetchBackends, api]);
 
   const onStartTraining = useCallback(async (backend) => {
-    await api.callApi('trainMLBackend', {
-      params: {
-        pk: backend.id,
-      },
+    console.log('training')
+    await axios
+    .get('http://localhost:3535/can_press')
+        .then((response) => {
+          console.log(response);
+          let can_press = response.data.can_press;
+          if (can_press == undefined) {
+            Swal('Someone has just trained or predicted, please wait for a moment')
+          }
+          else if (can_press == true) {
+            Swal('Training has started')
+             api.callApi('trainMLBackend', {
+              params: {
+                pk: backend.id,
+              },
+            });
+          }
+          else {
+            Swal(`All Gpus are occupied, your training didn't start`)
+          }
+        })
+    .catch((error) => {
+        console.log(error);
     });
     await fetchBackends();
   }, [fetchBackends, api]);
