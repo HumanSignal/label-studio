@@ -12,6 +12,9 @@ on:
       target_branch:
         required: true
         type: string
+      repo:
+        required: true
+        type: string
 
 env:
   ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
@@ -28,7 +31,7 @@ jobs:
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
-            const { repo, owner } = context.repo;
+            var [owner, repo] = '${{ inputs.repo }}'.split('/');
             const head_sha = '${{ inputs.head_sha }}'
             const base_sha = '${{ inputs.base_sha }}'
             const targetBranch = '${{ inputs.target_branch }}'.replace('refs/heads/', '')

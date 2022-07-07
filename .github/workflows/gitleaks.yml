@@ -9,6 +9,9 @@ on:
       base_sha:
         required: true
         type: string
+      repo:
+        required: true
+        type: string
 
 env:
   GIT_GITLEAKS_VERSION: 8.8.7
@@ -38,9 +41,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          submodules: 'recursive'
-          token: ${{ secrets.GIT_PAT }}
           fetch-depth: 0
+          repo: ${{ inputs.repo }}
 
       - name: Run gitleaks
         run: |
