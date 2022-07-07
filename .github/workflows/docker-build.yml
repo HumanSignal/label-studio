@@ -9,10 +9,8 @@ on:
 
 env:
   DOCKER_CLI_EXPERIMENTAL: enabled
-  IMAGE_NAME: heartexlabs/label-studio
   RELEASE_TAG: 'latest'
   DEVELOP_TAG: 'develop'
-  UBI_TAG: 'ubi_develop'
 
 jobs:
   docker_build_and_push:
@@ -60,7 +58,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ${{ env.IMAGE_NAME }}:${{ env.DEVELOP_TAG }}
+          tags: heartexlabs/label-studio:${{ env.DEVELOP_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -78,6 +76,6 @@ jobs:
           context: .
           file: Dockerfile.redhat
           push: true
-          tags: scan.connect.redhat.com/${{ secrets.REDHAT_MARKETPLACE_LS_PASSWORD }}/${{ env.IMAGE_NAME }}:${{ env.UBI_TAG }}
+          tags: scan.connect.redhat.com/${{ secrets.REDHAT_MARKETPLACE_LS_OSPID }}/label-studio:${{ env.DEVELOP_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
