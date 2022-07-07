@@ -6,6 +6,9 @@ on:
       head_sha:
         required: true
         type: string
+      repo:
+        required: true
+        type: string
 
 env:
   BANDIT_VERSION: 1.7.4
@@ -24,6 +27,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
+          repo: ${{ inputs.repo }}
           ref: ${{ inputs.head_sha }}
 
       - name: Set up Python

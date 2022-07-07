@@ -6,6 +6,9 @@ on:
       ref:
         required: true
         type: string
+      repo:
+        required: true
+        type: string
 
 env:
   NODE: '14'
@@ -38,7 +41,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GIT_PAT }}
+          repo: ${{ inputs.repo }}
           ref: ${{ inputs.ref }}
 
       - name: Set up Python ${{ matrix.python-version }}

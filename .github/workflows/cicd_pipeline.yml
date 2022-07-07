@@ -65,6 +65,7 @@ jobs:
     name: "Validate"
     uses: heartexlabs/label-studio/.github/workflows/submodules-validator.yml@develop
     with:
+      repo: ${{ github.event.pull_request.head.repo.full_name || github.event.repo.name }}
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
       base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
       target_branch: ${{ github.event.pull_request.base.ref || github.event.ref }}
@@ -75,6 +76,7 @@ jobs:
     if: github.event_name == 'pull_request_target'
     uses: heartexlabs/label-studio/.github/workflows/gitleaks.yml@develop
     with:
+      repo: ${{ github.event.pull_request.head.repo.full_name || github.event.repo.name }}
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
       base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
     secrets: inherit
@@ -86,6 +88,7 @@ jobs:
     if: needs.changed_files.outputs.src == 'true'
     uses: heartexlabs/label-studio/.github/workflows/bandit.yml@develop
     with:
+      repo: ${{ github.event.pull_request.head.repo.full_name || github.event.repo.name }}
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
     secrets: inherit
 
@@ -106,5 +109,6 @@ jobs:
     if: needs.changed_files.outputs.src == 'true'
     uses: heartexlabs/label-studio/.github/workflows/tests.yml@develop
     with:
+      repo: ${{ github.event.pull_request.head.repo.full_name || github.event.repo.name }}
       ref: ${{ github.event.pull_request.head.ref || github.ref }}
     secrets: inherit
