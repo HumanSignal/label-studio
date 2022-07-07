@@ -25,6 +25,9 @@ Label Studio Enterprise uses version 2 of SCIM standard. As an example, this gui
 
 ## Set up SCIM integration
 
+<i>Check this video tutorial about SCIM + Okta setup</i>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/MA3de3gu18A" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 To manage access to Label Studio Enterprise, add the application to your SCIM provider (Okta). Okta uses OAuth token to interact with REST API endpoints of the application to provision and deprovision access.
 
 ### Add Label Studio Enterprise (if not complete)
@@ -115,3 +118,7 @@ To unassign a group from the application, follow the similar steps as for indivi
 2. Select **Group** in the left menu.
 3. Click the delete cross against the group you would like to unassign.
 4. Confirm the unassignment.
+
+
+<i>Check this video tutorial about group & user removing</i>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/vMA0TLhHGYE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
