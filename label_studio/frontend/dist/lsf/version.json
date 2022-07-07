@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2671: Change rotate anchor of bbox (#731)",
-  "commit": "510331fc8ff7fa6a0e47145c04048215637d0579",
+  "message": "fix: DEV-2806: Unable to delete relationships between regions (#734)\n\n* fix: DEV-2806: Unable to delete relationships between regions\r\n\r\n* minor cleanup\r\n\r\n* minor improvement to be clearer",
+  "commit": "2dfda8a8b1652d12dc989bb2073b361c190cac26",
   "branch": "master",
-  "date": "2022-07-05T22:49:08Z"
+  "date": "2022-07-06T16:32:07Z"
 }
