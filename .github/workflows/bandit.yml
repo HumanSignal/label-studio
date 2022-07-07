@@ -9,6 +9,7 @@ on:
       repo:
         required: true
         type: string
+        default: heartexlabs/label-studio
 
 env:
   BANDIT_VERSION: 1.7.4

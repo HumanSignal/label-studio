@@ -12,6 +12,7 @@ on:
       repo:
         required: true
         type: string
+        default: heartexlabs/label-studio
 
 env:
   GIT_GITLEAKS_VERSION: 8.8.7

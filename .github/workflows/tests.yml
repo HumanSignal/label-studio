@@ -9,6 +9,7 @@ on:
       repo:
         required: true
         type: string
+        default: heartexlabs/label-studio
 
 env:
   NODE: '14'

@@ -15,6 +15,7 @@ on:
       repo:
         required: true
         type: string
+        default: heartexlabs/label-studio
 
 env:
   ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
