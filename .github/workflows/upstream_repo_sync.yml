@@ -129,7 +129,7 @@ jobs:
 
           git add "${{ env.STATIC_DIST }}"
           git status -s
-          git commit --allow-empty -m '[submodules] Bump ${{ github.event.client_payload.repo_name }} version ${{ github.event.client_payload.commit_sha }}'
+          git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}'
           git push origin HEAD
 
       - name: Get PRs
@@ -271,8 +271,10 @@ jobs:
           steps.check-all-submodules.outputs.result == 'true'
         id: ready-for-review-pr
         shell: bash
+        env:
+          GIT_PAT: ${{ secrets.GIT_PAT }}
         run: |
-          echo ${{ secrets.GIT_PAT }} | gh auth login --with-token
+          echo "$GIT_PAT" | gh auth login --with-token
           gh api graphql -F id='${{ fromJson(steps.get-pr.outputs.result).data[0].node_id }}' -f query='
             mutation($id: ID!) {
               markPullRequestReadyForReview(input: { pullRequestId: $id }) {
@@ -289,8 +291,10 @@ jobs:
           github.event.client_payload.event_action == 'merged' &&
           steps.check-all-submodules.outputs.result == 'true'
         shell: bash
+        env:
+          GIT_PAT: ${{ secrets.GIT_PAT }}
         run: |
-          echo ${{ secrets.GIT_PAT }} | gh auth login --with-token
+          echo "$GIT_PAT" | gh auth login --with-token
           gh api graphql -f pull='${{ fromJson(steps.get-pr.outputs.result).data[0].node_id }}' -f query='
             mutation($pull: ID!) {
               enablePullRequestAutoMerge(input: {pullRequestId: $pull, mergeMethod: SQUASH}) {
@@ -351,8 +355,10 @@ jobs:
         if: github.event.client_payload.event_action == 'converted_to_draft'
         id: convert-pr-to-draft
         shell: bash
+        env:
+          GIT_PAT: ${{ secrets.GIT_PAT }}
         run: |
-          echo ${{ secrets.GIT_PAT }} | gh auth login --with-token
+          echo "$GIT_PAT" | gh auth login --with-token
           gh api graphql -F id='${{ fromJson(steps.get-pr.outputs.result).data[0].node_id }}' -f query='
             mutation($id: ID!) {
               convertPullRequestToDraft(input: { pullRequestId: $id }) {
@@ -368,8 +374,10 @@ jobs:
         if: github.event.client_payload.event_action == 'ready_for_review'
         id: ready-for-review-pr
         shell: bash
+        env:
+          GIT_PAT: ${{ secrets.GIT_PAT }}
         run: |
-          echo ${{ secrets.GIT_PAT }} | gh auth login --with-token
+          echo "$GIT_PAT" | gh auth login --with-token
           gh api graphql -F id='${{ fromJson(steps.get-pr.outputs.result).data[0].node_id }}' -f query='
             mutation($id: ID!) {
               markPullRequestReadyForReview(input: { pullRequestId: $id }) {
