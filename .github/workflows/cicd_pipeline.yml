@@ -9,6 +9,7 @@ on:
       - deploy/**
       - label_studio/**
       - setup.py
+      - .github/workflows/cicd_pipeline.yml
       - .github/workflows/pr-labeler.yml
       - .github/workflows/submodules-validator.yml
       - .github/workflows/gitleaks.yml
