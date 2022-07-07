@@ -103,3 +103,89 @@ stages:
         results:
           - id: !int "{project_pk1}"
           - id: !int "{project_pk2}"
+---
+
+test_name: test_project_pinned_at
+
+strict: False
+
+marks:
+  - usefixtures:
+       - django_live_url
+
+stages:
+  - id: signup
+    type: ref
+  - id: get_user_token
+    type: ref
+  - id: create_project1
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: create_batch_tasks_assignments
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        is_published: true
+        pinned_at: '2022-06-17T18:20:09.707589Z'
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk1: id
+  - id: create_project2
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: create_batch_tasks_assignments
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk2: id
+  - name: get_first
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects?filter=pinned_only'
+    response:
+      status_code: 200
+      json:
+        results:
+          - id: !int "{project_pk1}"
+  - name: get_second
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects?filter=exclude_pinned'
+    response:
+      status_code: 200
+      json:
+        results:
+          - id: !int "{project_pk2}"
+  - name: get_both
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects?filter=all'
+    response:
+      status_code: 200
+      json:
+        results:
+          - id: !int "{project_pk1}"
+          - id: !int "{project_pk2}"
+  - name: get_both_without_params
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects'
+    response:
+      status_code: 200
+      json:
+        results:
+          - id: !int "{project_pk1}"
+          - id: !int "{project_pk2}"

@@ -9,7 +9,13 @@ on:
       - deploy/**
       - label_studio/**
       - setup.py
+      - .github/workflows/cicd_pipeline.yml
+      - .github/workflows/pr-labeler.yml
+      - .github/workflows/submodules-validator.yml
+      - .github/workflows/gitleaks.yml
+      - .github/workflows/bandit.yml
       - .github/workflows/docker-build.yml
+      - .github/workflows/tests.yml
   pull_request_target:
     types:
       - opened
@@ -52,8 +58,10 @@ jobs:
             docker:
               - 'label_studio/**'
               - 'deploy/**'
-              - 'Dockerfile'
+              - 'Dockerfile**'
               - 'setup.py'
+              - '.github/workflows/cicd_pipeline.yml'
+              - '.github/workflows/docker-build.yml'
 
   pr_labeler:
     name: "Validate"
@@ -61,11 +69,22 @@ jobs:
     uses: heartexlabs/label-studio/.github/workflows/pr-labeler.yml@develop
     secrets: inherit
 
+  validate_submodules:
+    name: "Validate"
+    uses: heartexlabs/label-studio/.github/workflows/submodules-validator.yml@develop
+    with:
+      repo: ${{ github.event.pull_request.head.repo.full_name || github.event.repo.name || github.repository }}
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+      base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
+      target_branch: ${{ github.event.pull_request.base.ref || github.event.ref }}
+    secrets: inherit
+
   gitleaks:
     name: "Linter"
     if: github.event_name == 'pull_request_target'
     uses: heartexlabs/label-studio/.github/workflows/gitleaks.yml@develop
     with:
+      repo: ${{ github.event.pull_request.head.repo.full_name || github.event.repo.name || github.repository }}
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
       base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
     secrets: inherit
@@ -77,6 +96,7 @@ jobs:
     if: needs.changed_files.outputs.src == 'true'
     uses: heartexlabs/label-studio/.github/workflows/bandit.yml@develop
     with:
+      repo: ${{ github.event.pull_request.head.repo.full_name || github.event.repo.name || github.repository }}
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
     secrets: inherit
 
@@ -97,5 +117,6 @@ jobs:
     if: needs.changed_files.outputs.src == 'true'
     uses: heartexlabs/label-studio/.github/workflows/tests.yml@develop
     with:
+      repo: ${{ github.event.pull_request.head.repo.full_name || github.event.repo.name || github.repository }}
       ref: ${{ github.event.pull_request.head.ref || github.ref }}
     secrets: inherit
