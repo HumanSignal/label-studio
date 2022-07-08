@@ -59,8 +59,10 @@ jobs:
           python label_studio/manage.py collectstatic
 
       - name: Download feature flags
+        env:
+          LAUNCHDARKLY_COMMUNITY_SDK_KEY: ${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}
         run: |
-          curl -H "Authorization: ${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}" https://app.launchdarkly.com/sdk/latest-all >label_studio/feature_flags.json
+          curl -H "Authorization: $LAUNCHDARKLY_COMMUNITY_SDK_KEY" https://app.launchdarkly.com/sdk/latest-all >label_studio/feature_flags.json
 
       - name: Package
         run: python setup.py sdist bdist_wheel

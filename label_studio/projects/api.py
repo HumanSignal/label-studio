@@ -7,6 +7,7 @@ import os
 
 from django.db import IntegrityError
 from django.conf import settings
+from django.db.models import F
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
@@ -132,14 +133,17 @@ class ProjectListAPI(generics.ListCreateAPIView):
         GET=all_permissions.projects_view,
         POST=all_permissions.projects_create,
     )
-    ordering = ['-created_at']
     pagination_class = ProjectListPagination
 
     def get_queryset(self):
         serializer = GetFieldsSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
         fields = serializer.validated_data.get('include')
-        projects = Project.objects.filter(organization=self.request.user.active_organization)
+        filter = serializer.validated_data.get('filter')
+        projects = Project.objects.filter(organization=self.request.user.active_organization).\
+            order_by(F('pinned_at').desc(nulls_last=True), "-created_at")
+        if filter in ['pinned_only', 'exclude_pinned']:
+            projects = projects.filter(pinned_at__isnull=filter == 'exclude_pinned')
         return ProjectManager.with_counts_annotate(projects, fields=fields).prefetch_related('members', 'created_by')
 
     def get_serializer_context(self):
