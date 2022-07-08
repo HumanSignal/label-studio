@@ -1,6 +1,6 @@
 {
-  "message": "docs: DEV-2578: examples for dynamic labels (#704)\n\n* docs: DEV-2578: examples for dynamic labels\r\n\r\n* Small fixes for Audio, Table, Video jsdoc\r\n\r\n* Fix documentation for Labels\r\n\r\nexamples, description, param\r\n\r\n* Documentation for Dynamic Choices",
-  "commit": "e7feefada567b6a757fc52fa8fb2814e93f7ab90",
+  "message": "fix: DEV-2806: Unable to delete relationships between regions (#734)\n\n* fix: DEV-2806: Unable to delete relationships between regions\r\n\r\n* minor cleanup\r\n\r\n* minor improvement to be clearer",
+  "commit": "2dfda8a8b1652d12dc989bb2073b361c190cac26",
   "branch": "master",
-  "date": "2022-06-17T21:56:45Z"
+  "date": "2022-07-06T16:32:07Z"
 }

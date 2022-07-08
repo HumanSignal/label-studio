@@ -1,6 +1,6 @@
 {
-  "message": "ci: DEV-2445: Add Review/Merge Automation (#66)",
-  "commit": "3caaedb264407951f6f07adef76a51102bea64ab",
+  "message": "fix: DEV-2526: Don't crash because of undefined LSF (#75)",
+  "commit": "34742984929748380ad6f7bbb053c7ced97d994d",
   "branch": "master",
-  "date": "2022-05-31T09:27:40Z"
+  "date": "2022-07-05T19:38:39Z"
 }

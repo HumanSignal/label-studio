@@ -2,14 +2,16 @@
 """
 import drf_yasg.openapi as openapi
 import logging
-import numpy as np
 import pathlib
 import os
 
 from django.db import IntegrityError
 from django.conf import settings
+from django.db.models import F
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
+from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import FilterSet
 from rest_framework import generics, status, filters
 from rest_framework.exceptions import NotFound, ValidationError as RestValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -38,6 +40,7 @@ from core.utils.common import (
     get_object_with_check_and_log, paginator, paginator_help)
 from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
 from core.utils.io import find_dir, find_file, read_yaml
+from core.filters import ListFilter
 
 from data_manager.functions import get_prepared_queryset, filters_ordering_selected_items_exist
 from data_manager.models import View
@@ -91,6 +94,10 @@ class ProjectListPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
 
 
+class ProjectFilterSet(FilterSet):
+    ids = ListFilter(field_name="id", lookup_expr="in")
+
+
 @method_decorator(name='get', decorator=swagger_auto_schema(
     tags=['Projects'],
     operation_summary='List your projects',
@@ -120,19 +127,23 @@ class ProjectListPagination(PageNumberPagination):
 class ProjectListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ProjectSerializer
-    filter_backends = [filters.OrderingFilter]
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
+    filterset_class = ProjectFilterSet
     permission_required = ViewClassPermission(
         GET=all_permissions.projects_view,
         POST=all_permissions.projects_create,
     )
-    ordering = ['-created_at']
     pagination_class = ProjectListPagination
 
     def get_queryset(self):
         serializer = GetFieldsSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
         fields = serializer.validated_data.get('include')
-        projects = Project.objects.filter(organization=self.request.user.active_organization)
+        filter = serializer.validated_data.get('filter')
+        projects = Project.objects.filter(organization=self.request.user.active_organization).\
+            order_by(F('pinned_at').desc(nulls_last=True), "-created_at")
+        if filter in ['pinned_only', 'exclude_pinned']:
+            projects = projects.filter(pinned_at__isnull=filter == 'exclude_pinned')
         return ProjectManager.with_counts_annotate(projects, fields=fields).prefetch_related('members', 'created_by')
 
     def get_serializer_context(self):
@@ -365,7 +376,7 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
         operation_description="""
             Retrieve a paginated list of tasks for a specific project. For example, use the following cURL command:
             ```bash
-            curl -X GET {}/api/projects/{{id}}/tasks/ -H 'Authorization: Token abc123'
+            curl -X GET {}/api/projects/{{id}}/tasks/?page=1&page_size=10 -H 'Authorization: Token abc123'
             ```
         """.format(settings.HOSTNAME or 'https://localhost:8080'),
         manual_parameters=[
@@ -374,7 +385,7 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
                 description='A unique integer value identifying this project.'),
-        ],
+        ] + paginator_help('tasks', 'Projects')['manual_parameters'],
     ))
 class ProjectTaskListAPI(generics.ListCreateAPIView,
                          generics.DestroyAPIView):
@@ -413,7 +424,6 @@ class ProjectTaskListAPI(generics.ListCreateAPIView,
         emit_webhooks_for_instance(request.user.active_organization, None, WebhookAction.TASKS_DELETED, task_ids)
         return Response(data={'tasks': task_ids}, status=204)
 
-    @swagger_auto_schema(**paginator_help('tasks', 'Projects'))
     def get(self, *args, **kwargs):
         return super(ProjectTaskListAPI, self).get(*args, **kwargs)
 
