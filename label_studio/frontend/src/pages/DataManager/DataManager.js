@@ -248,9 +248,15 @@ DataManagerPage.context = ({ dmRef }) => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios.post('http://localhost:3535/import_annotations?id='+project.id)
-          .then(data =>
-              console.log(data)
-          ).catch(err => {
+          .then(response => {
+            let number_of_annotations = response.data.annotations;
+            let project_id = response.data.project_id;
+            Swal.fire({
+              title: 'Annotations are imported',
+              text: number_of_annotations + " are imported for project id " + project_id,
+              icon: 'success'
+            })
+          }).catch(err => {
               console.log(err)
               return null
           })
