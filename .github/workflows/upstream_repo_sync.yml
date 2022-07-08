@@ -71,7 +71,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          rm package-lock.json
+          rm package-lock.json || true
           yarn install
         working-directory: tmp
 
