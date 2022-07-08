@@ -11,6 +11,8 @@ env:
   DOCKER_CLI_EXPERIMENTAL: enabled
   RELEASE_TAG: 'latest'
   DEVELOP_TAG: 'develop'
+  PREFLIGHT_REPO: quay.io/opdev/preflight:stable
+  DOCKER_CONFIG_PATH: /home/runner/.docker/config.json
 
 jobs:
   docker_build_and_push:
@@ -79,3 +81,14 @@ jobs:
           tags: scan.connect.redhat.com/${{ secrets.REDHAT_MARKETPLACE_LS_OSPID }}/label-studio:${{ env.DEVELOP_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Run preflight and submit validation results to RedHat
+        run: |
+          docker pull ${{ env.PREFLIGHT_REPO }}
+          docker run --rm -v ${{ env.DOCKER_CONFIG_PATH }}:${{ env.DOCKER_CONFIG_PATH }} \
+          --env PFLT_DOCKERCONFIG=${{ env.DOCKER_CONFIG_PATH }} \
+          --env PFLT_PYXIS_API_TOKEN=${{ secrets.REDHAT_MARKETPLACE_LS_PYXIS_TOKEN }} \
+          --env PFLT_CERTIFICATION_PROJECT_ID=${{ secrets.REDHAT_MARKETPLACE_LS_PROJECT_ID }} \
+          ${{ env.PREFLIGHT_REPO }} \
+          check container scan.connect.redhat.com/${{ secrets.REDHAT_MARKETPLACE_LS_OSPID }}/label-studio:${{ env.DEVELOP_TAG }} \
+          --submit
