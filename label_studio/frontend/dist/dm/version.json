@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2526: Don't crash because of undefined LSF (#75)",
-  "commit": "34742984929748380ad6f7bbb053c7ced97d994d",
-  "branch": "master",
-  "date": "2022-07-05T19:38:39Z"
+  "message": "ci: Bump Node version",
+  "commit": "4d85f8b09addb03d692c8267ad5a0e1457b97ed4",
+  "branch": "fb-node-14",
+  "date": "2022/07/08 22:25:46"
 }
