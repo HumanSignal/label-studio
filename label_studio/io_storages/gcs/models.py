@@ -7,6 +7,7 @@ import google.auth
 import re
 
 from core.redis import start_job_async_or_sync
+from core.utils.io import parse_constant
 from google.auth import compute_engine
 from google.cloud import storage as google_storage
 from google.cloud.storage.client import _marker
@@ -114,7 +115,7 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
         bucket = self.get_bucket()
         blob = bucket.blob(key)
         blob_str = blob.download_as_string()
-        value = json.loads(blob_str)
+        value = json.loads(blob_str, parse_constant=parse_constant)
         if not isinstance(value, dict):
             raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
         return value
