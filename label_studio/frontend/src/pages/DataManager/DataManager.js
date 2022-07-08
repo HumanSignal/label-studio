@@ -253,7 +253,7 @@ DataManagerPage.context = ({ dmRef }) => {
             let project_id = response.data.project_id;
             Swal.fire({
               title: 'Annotations are imported',
-              text: number_of_annotations + " are imported for project id " + project_id,
+              text: number_of_annotations + " annotations are imported for project id " + project_id,
               icon: 'success'
             })
           }).catch(err => {
