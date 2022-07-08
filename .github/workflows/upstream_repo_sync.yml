@@ -9,7 +9,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.client_payload.branch_name || 'schedule' }}
 
 env:
-  NODE: 12
+  NODE: 14
   CACHE_NAME_PREFIX: v1
   STATIC_DIST: 'label_studio/frontend/dist'
 
