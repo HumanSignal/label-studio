@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2669: align the select dropdown items",
-  "commit": "ecd95d63d86b964bec025da46ec1314a5d24bee5",
-  "branch": "fb-dev-2669",
-  "date": "2022-07-07T23:23:26Z"
+  "message": "fix: DEV-2669: align filter items and ensure visually displays selected authors correctly (#738)\n\n* feat: DEV-2669: adding filterBy name capability to Paragraph model\r\n\r\n* feat: DEV-2669: implement author filter search\r\n\r\n* feat: DEV-2669: tag styling for multi select render items\r\n\r\n* feat: DEV-2669: select item color and bg color need to stay the same for selection state contrast\r\n\r\n* feat: DEV-2669: ensure the filter is handled correctly on clear all\r\n\r\n* refactor styles to css for select dropdown\r\n\r\n* removing commented out line\r\n\r\n* fix: DEV-2669: Ensure filtered transcripts are collapsed\r\n\r\n* fix: DEV-2669: align the select dropdown items",
+  "commit": "d8257f6e201d535ed92cc6f2f76e4f7373d90700",
+  "branch": "master",
+  "date": "2022-07-08T17:33:45Z"
 }
