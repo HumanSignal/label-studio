@@ -227,6 +227,8 @@ class Project(ProjectMixin, models.Model):
         _('task_data_password'), max_length=256, blank=True, null=True, help_text='Task data credentials: password'
     )
 
+    pinned_at = models.DateTimeField(_('pinned at'), null=True, default=None, help_text='Pinned date and time')
+
     def __init__(self, *args, **kwargs):
         super(Project, self).__init__(*args, **kwargs)
         self.__original_label_config = self.label_config
