@@ -11,6 +11,7 @@ env:
   DOCKER_CLI_EXPERIMENTAL: enabled
   RELEASE_TAG: 'latest'
   DEVELOP_TAG: 'develop'
+  UBI_DEVELOP_TAG: 'ubi_develop'
   PREFLIGHT_REPO: quay.io/opdev/preflight:stable
   DOCKER_CONFIG_PATH: /home/runner/.docker/config.json
 
@@ -78,7 +79,7 @@ jobs:
           context: .
           file: Dockerfile.redhat
           push: true
-          tags: scan.connect.redhat.com/${{ secrets.REDHAT_MARKETPLACE_LS_OSPID }}/label-studio:${{ env.DEVELOP_TAG }}
+          tags: scan.connect.redhat.com/${{ secrets.REDHAT_MARKETPLACE_LS_OSPID }}/label-studio:${{ env.DEVELOP_TAG }},heartexlabs/label-studio:${{ env.UBI_DEVELOP_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
