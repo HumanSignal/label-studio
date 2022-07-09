@@ -1,6 +1,6 @@
 {
-  "message": "date change on region click and date not saved fixes",
-  "commit": "2b90e107b63ea70b7e7ee50e0887d565fc3420dd",
+  "message": "fix: DEV-117: DEV-1179: DateTime tag, fixes for date save and region switch",
+  "commit": "d6ff4d32c3ebeaa16f5a6c2e95257fb887b79c0d",
   "branch": "fb-dev-117/datetime-tag",
-  "date": "2022-06-17T19:11:31Z"
+  "date": "2022/07/09 17:14:49"
 }
