@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #685 from heartexlabs/fb-dev-1975/support-long-unborken-taxonomy\n\nfix: DEV-1975: DEV-1843: Support long unbroken taxonomy line breaks",
-  "commit": "1bdc91ca6c321358f92099103cc4464dad4ff6a0",
-  "branch": "master",
-  "date": "2022-06-07T22:39:08Z"
+  "message": "fix: DEV-2777: remove lookbehind in regex for Safari (#730)",
+  "commit": "4331b56b6a7fb0ffaea2c8b010cb0b8cec6ad7dc",
+  "branch": "ls-release/1.5.0",
+  "date": "2022-07-01T16:44:40Z"
 }
