@@ -62,8 +62,10 @@ In *nix operating systems, you can set environment variables from the command li
 ```bash
 export LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
 ```
-You can also use an `.env` file. 
 
+!!! attention "important"
+    The [`.env` file works with Docker only](https://docs.docker.com/compose/env-file/). 
+    
 On Windows, you can use the following syntax:
 ```bash
 set LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
