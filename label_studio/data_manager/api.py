@@ -148,8 +148,6 @@ class TaskPagination(PageNumberPagination):
         )
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
-@method_decorator(name='post', decorator=swagger_auto_schema(auto_schema=None))
 class TaskListAPI(generics.ListCreateAPIView):
     task_serializer_class = DataManagerTaskSerializer
     permission_required = ViewClassPermission(

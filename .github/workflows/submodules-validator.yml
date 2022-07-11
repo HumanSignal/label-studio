@@ -1,0 +1,175 @@
+name: "Dependencies check"
+
+on:
+  workflow_call:
+    inputs:
+      head_sha:
+        required: true
+        type: string
+      base_sha:
+        required: true
+        type: string
+      target_branch:
+        required: true
+        type: string
+      repo:
+        required: true
+        type: string
+        default: heartexlabs/label-studio
+
+env:
+  ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
+
+jobs:
+  validate_submodules_and_ls_dependencies:
+    name: "Submodules/deps"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v2.0.1
+
+      - name: Validate
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            var [owner, repo] = '${{ inputs.repo }}'.split('/');
+            const head_sha = '${{ inputs.head_sha }}'
+            const base_sha = '${{ inputs.base_sha }}'
+            const targetBranch = '${{ inputs.target_branch }}'.replace('refs/heads/', '')
+            const strictCheckBranchPrefixes = ['ls-release/']
+
+            let submodules = [
+                {owner: 'heartexlabs', repo: 'label-studio-frontend'},
+                {owner: 'heartexlabs', repo: 'dm2'}
+            ]
+            
+            
+            async function getLSSubmoduleVersions(sha) {
+                let {data: lsTreeData} = await github.rest.git.getTree({
+                    owner,
+                    repo,
+                    tree_sha: sha
+                })
+                lsTreeData = (await github.rest.git.getTree({
+                    owner,
+                    repo,
+                    tree_sha: lsTreeData.tree.find(e => e.path === 'label_studio' && e.type === 'tree').sha
+                })).data
+                lsTreeData = (await github.rest.git.getTree({
+                    owner,
+                    repo,
+                    tree_sha: lsTreeData.tree.find(e => e.path === 'frontend' && e.type === 'tree').sha
+                })).data
+                lsTreeData = (await github.rest.git.getTree({
+                    owner,
+                    repo,
+                    tree_sha: lsTreeData.tree.find(e => e.path === 'dist' && e.type === 'tree').sha
+                })).data
+                const {data: lsDMTreeData} = await github.rest.git.getTree({
+                    owner,
+                    repo,
+                    tree_sha: lsTreeData.tree.find(e => e.path === 'dm' && e.type === 'tree').sha
+                })
+                const {data: dmfVersion} = await github.rest.git.getBlob({
+                    owner,
+                    repo,
+                    file_sha: lsDMTreeData.tree.find(e => e.path === 'version.json' && e.type === 'blob').sha
+                })
+                const dmVersionContent = Buffer.from(dmfVersion.content, dmfVersion.encoding).toString("utf8")
+                const matchDM = dmVersionContent.match('"commit": "(.*)",')
+                const {data: lsLSFTreeData} = await github.rest.git.getTree({
+                    owner,
+                    repo,
+                    tree_sha: lsTreeData.tree.find(e => e.path === 'lsf' && e.type === 'tree').sha
+                })
+                const {data: lsfVersion} = await github.rest.git.getBlob({
+                    owner,
+                    repo,
+                    file_sha: lsLSFTreeData.tree.find(e => e.path === 'version.json' && e.type === 'blob').sha
+                })
+                const lsfVersionContent = Buffer.from(lsfVersion.content, lsfVersion.encoding).toString("utf8")
+                const matchLSF = lsfVersionContent.match('"commit": "(.*)",')
+                return {
+                    'label-studio-frontend': matchLSF[1],
+                    'dm2': matchDM[1],
+                }
+            }
+            
+            let base_sha_redacted = base_sha
+            if (base_sha_redacted === '0000000000000000000000000000000000000000') {
+                console.log(`Branch creation event. Using head_sha (${head_sha}) parent as base_sha`)
+                const {data: commit} = await github.rest.git.getCommit({
+                    owner,
+                    repo,
+                    commit_sha: head_sha,
+                });
+                console.log(commit.parents)
+                base_sha_redacted = commit.parents[0].sha
+            }
+            
+            const baseVersions = await getLSSubmoduleVersions(base_sha_redacted)
+            console.log(`before: ${base_sha_redacted}`)
+            console.log(baseVersions)
+            
+            const headVersions = await getLSSubmoduleVersions(head_sha)
+            console.log(`after: ${head_sha}`)
+            console.log(headVersions)
+            
+            const strictCheck = strictCheckBranchPrefixes.some(e => targetBranch.startsWith(e))
+            console.log(`Strict check: ${strictCheck}`)
+            
+            let failed = []
+            for (let submodule of submodules) {
+                if (baseVersions[submodule.repo] === headVersions[submodule.repo] && !strictCheck) {
+                    console.log(`${submodule.repo}: Is not changed`)
+                    continue
+                }
+            
+                const {data: submoduleRepo} = await github.rest.repos.get({
+                    owner: submodule.owner,
+                    repo: submodule.repo,
+                });
+                const submoduleBranch = targetBranch === 'develop' ? submoduleRepo.default_branch : targetBranch
+                const {data: listCommits} = await github.rest.repos.listCommits({
+                    owner: submodule.owner,
+                    repo: submodule.repo,
+                    per_page: 100,
+                    sha: submoduleBranch
+                });
+            
+                const commits = listCommits.map(e => e.sha)
+            
+                const headCommitNumber = commits.indexOf(headVersions[submodule.repo])
+                if (headCommitNumber === -1) {
+                    console.log(`${submodule.repo}: ${headVersions[submodule.repo]} from PR is not found in submodule ${submoduleBranch} branch`)
+                    failed.push(submodule.repo)
+                    continue
+                }
+                if (strictCheck && headCommitNumber !== 0) {
+                    console.log(`${submodule.repo}: For the release branch, submodule should be pointed to the latest commit in submodule corresponding release branch which is ${listCommits[0].html_url}`)
+                    failed.push(submodule.repo)
+                    continue
+                }
+            
+                const baseCommitNumber = commits.indexOf(baseVersions[submodule.repo])
+                if (baseCommitNumber === -1) {
+                    console.log(`${submodule.repo}: ${baseVersions[submodule.repo]} from ${targetBranch} is not found in submodule ${submoduleBranch} branch`)
+                    continue
+                }
+            
+                const {data: compare} = await github.rest.repos.compareCommits({
+                    owner: submodule.owner,
+                    repo: submodule.repo,
+                    base: baseVersions[submodule.repo],
+                    head: headVersions[submodule.repo],
+                });
+                console.log(`${submodule.repo}: ${headVersions[submodule.repo]} is ${compare.ahead_by} ahead and ${compare.behind_by} behind ${baseVersions[submodule.repo]}: ${compare.html_url}`)
+                if (compare.behind_by > 0) {
+                    failed.push(submodule.repo)
+                    continue
+                }
+            }
+            
+            if (failed.length !== 0) {
+                throw `Versions for ${failed.toString()} are downgraded or not found`;
+            }
