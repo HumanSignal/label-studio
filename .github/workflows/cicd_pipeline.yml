@@ -36,6 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       src: ${{ steps.changes.outputs.src }}
+      frontend: ${{ steps.changes.outputs.frontend }}
       docker: ${{ steps.changes.outputs.docker }}
     timeout-minutes: 5
     steps:
@@ -55,6 +56,8 @@ jobs:
               - 'label_studio/!(frontend)/**'
               - 'deploy/requirements**'
               - 'setup.py'
+            frontend:
+              - 'label_studio/frontend/**'
             docker:
               - 'label_studio/**'
               - 'deploy/**'
@@ -98,6 +101,18 @@ jobs:
     with:
       repo: ${{ github.event.pull_request.head.repo.full_name || github.event.repo.name || github.repository }}
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+    secrets: inherit
+
+  frontend-build:
+    name: "Build"
+    needs:
+      - changed_files
+    if: |
+      github.event_name == 'pull_request_target' &&
+      needs.changed_files.outputs.frontend == 'true'
+    uses: heartexlabs/label-studio/.github/workflows/frontend-build.yml@develop
+    with:
+      ref: ${{ github.event.pull_request.head.ref || github.ref }}
     secrets: inherit
 
   build:
