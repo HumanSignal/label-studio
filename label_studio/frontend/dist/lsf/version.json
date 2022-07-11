@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-117: DEV-1179: DateTime tag, fixes for date save and region switch",
-  "commit": "d6ff4d32c3ebeaa16f5a6c2e95257fb887b79c0d",
+  "commit": "2d90d393e51ee972daf3de561e6609d28b99bce5",
   "branch": "fb-dev-117/datetime-tag",
-  "date": "2022/07/09 17:14:49"
+  "date": "2022/07/11 11:26:28"
 }
