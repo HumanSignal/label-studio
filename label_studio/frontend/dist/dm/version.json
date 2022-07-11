@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2170: On project open set number of tasks defined by task per page",
-  "commit": "f39abee43414effb890724d9f654b1797dd99495",
+  "commit": "bf756d882b579989a4435bc885c5f56995136e5a",
   "branch": "fb-dev-2170",
-  "date": "2022/07/08 17:24:32"
+  "date": "2022/07/11 10:42:59"
 }
