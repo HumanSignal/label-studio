@@ -131,11 +131,8 @@ For example:
 
 ```html
 <Header>Label audio:</Header>
-
 <Header value="Label only fully visible cars" />
-
 <Text name="instruction" value="Label only fully visible cars" />
-
 <Label>cat</Label>
 
 <Choice>other</Choice>
