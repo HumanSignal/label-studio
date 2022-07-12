@@ -121,7 +121,7 @@ In most cases, the `Object` tag has the value with one variable (prefixed with a
     In most cases, the `Object` tag has the value with one variable (prefixed with a $) in it. For example, `<Audio value="$audio" ... />`. All the variables point to a field in task data. For example, `$audio => task.data.audio`.
 
 
-#### Text
+#### Plain text
 
 The value parameter can be a string. It is useful for `Header` and `Text`. 
 
@@ -129,7 +129,7 @@ Also, you can use the content of the tag as value. It is useful for descriptive 
 
 For example:
 
-```html
+```xml
 <Header>Label audio:</Header>
 <Header value="Label only fully visible cars" />
 <Text name="instruction" value="Label only fully visible cars" />
@@ -143,19 +143,25 @@ For example:
 1. The `value` parameter can be a text containing variables prefixed by $.
 
     For example:
-    ```html
+    ```xml
     <Header value="url: $image"/>
     ```
 
 2. The `value` parameter can also refer to nested data in arrays and dicts (`$texts[2]` and `$audio.url`). 
 
     For example: 
-    ```html
+    ```xml
     <Image name="image" value="$images[0]"/>
     ```
 
-3. The `value` parameter can include `Repeater` tag substitution, by default `{{idx}} ($audios[{{idx}}].url)`. 
-The `value` parameter can be a string. It is useful for `Header` and `Text`. 
+3. The `value` parameter can include [`Repeater`](/tags/repeater.html) tag substitution, by default `{{idx}}`.
+
+    For example:
+    ```xml
+    <Repeater on="$audios">
+      <Audio name="audio_{{idx}}" value="$audios[{{idx}}].url"/>
+    </Repeater>
+    ```
 
 
 ### `valueType` (optional)
@@ -171,7 +177,7 @@ For example:
 
 ### `resolver` (optional)
 
-Task data can point to a data file on S3 storage or cloud storage with the actual data. You can retrieve it only in run-time.
+Task data can point to a data file on [S3 or other cloud storage](/guide/storage.html) with the actual data. You can retrieve it only in run-time.
 
 To retrieve the task data, use rules from the `resolver` parameter. 
 
@@ -185,30 +191,28 @@ When the user has a CSV file with a list of tasks. The column “S3” in the CS
 
 To retrieve the file, use the following parameters:
 
-1. `value="S3"`: The URL to CSV on S3. If you use the `resolver` parameter the value is treated as a URL.
+1. `value="S3"`: The URL to CSV on S3 is in "S3" field of task data. If you use the `resolver` parameter the `value` is always treated as a URL.
 
 2. `resolver="csv|column=url"`: Load this file in run-time, parse it as CSV, and get the “url” column from the first row. 
 
-3. `valueType="url"`: Use the value of the “url” column as the actual URL.
+3. `valueType="url"`: Use the value of the “url” column as the actual URL. (If you use `valueType="text"` the content of "url" column will be shown as is.)
 
 4. Load the text by using the above URL and display the result.
 
 **Syntax**
 
-The syntax for the `resolver` parameter consists of a list of options separated by a `|` symbol. 
+The syntax for the `resolver` parameter consists of a list of options separated by a `|` symbol.
 
-The first option is the type of file. 
+The first option is the type of file.
 
 !!! note
-    Currently, CSV files are supported. 
+    Currently, only CSV files are supported.
 
 The remaining options are parameters of the specified file type with optional values. The parameters for CSV files are:
 
-- `headless`: A CSV file does not have headers. 
-
-- `separator=;` 
-
-- `column=1`: In `headless` mode, use index otherwise use column name. 
+- `headless`: A CSV file does not have headers (this parameter is boolean and can't have a value).
+- `separator=;`: CSV separator, usually can be detected automatically.
+- `column=1`: In `headless` mode use zero-based index, otherwise use column name.
 
 For example, `resolver="csv|headless|separator=;|column=1"`
 
@@ -250,7 +254,7 @@ See [Relevant JSON property descriptions](export.html#Relevant-JSON-property-des
 ### Example JSON format
 
 For an example text classification project, you can set up a label config like the following:
-```html
+```xml
 <View>
   <Text name="message" value="$my_text"/>
   <Choices name="sentiment_class" toName="message">
@@ -420,7 +424,7 @@ If you want to import entire plain text files without each line becoming a new l
 
 ### Import HTML data
 
-You can import `HyperText` data in HTML-formatted files and annotate them in Label Studio. When you directly import HTML files, the content is minified the content is minified by compressing the text, removing whitespace and other nonfunctional data in the HTML code. Annotations that you create are applied to the minified version of the HTML. 
+You can import `HyperText` data in HTML-formatted files and annotate them in Label Studio. When you directly import HTML files, the content is minified by compressing the text, removing whitespace and other nonfunctional data in the HTML code. Annotations that you create are applied to the minified version of the HTML.
 
 If you want to label HTML files without minifying the data, you can do one of the following:
 - Import the HTML files as BLOB storage from [external cloud storage such as Amazon S3 or Google Cloud Storage](storage.html).
