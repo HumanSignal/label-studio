@@ -88,7 +88,7 @@ Button.displayName = "Button";
 Button.Group = ({ className, children, collapsed }) => {
   return (
     <Block name="button-group" mod={{ collapsed }} mix={className}>
-      {children}
+      {children}o_o
     </Block>
   );
 };
