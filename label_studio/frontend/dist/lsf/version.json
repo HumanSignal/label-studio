@@ -1,6 +1,6 @@
 {
-  "message": "Fix: DEV-2430 improve delete point logic",
+  "message": "fix/dev-2430/ remove problematic logic for delete point",
   "commit": "2e8daa94515b847c75e9a7f57a6ae0e977dc4f2b",
   "branch": "fb-dev-2430/improve-delete-point-functionality",
-  "date": "2022/07/12 11:14:25"
+  "date": "2022-07-12T16:14:25Z"
 }

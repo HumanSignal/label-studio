@@ -36,7 +36,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       src: ${{ steps.changes.outputs.src }}
+      frontend: ${{ steps.changes.outputs.frontend }}
       docker: ${{ steps.changes.outputs.docker }}
+      commit-message: ${{ steps.commit-details.outputs.message }}
     timeout-minutes: 5
     steps:
       - uses: hmarr/debug-action@v2.0.1
@@ -55,6 +57,8 @@ jobs:
               - 'label_studio/!(frontend)/**'
               - 'deploy/requirements**'
               - 'setup.py'
+            frontend:
+              - 'label_studio/frontend/**'
             docker:
               - 'label_studio/**'
               - 'deploy/**'
@@ -62,6 +66,19 @@ jobs:
               - 'setup.py'
               - '.github/workflows/cicd_pipeline.yml'
               - '.github/workflows/docker-build.yml'
+
+      - uses: actions/github-script@v6
+        id: commit-details
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const { data: commit } = await github.rest.repos.getCommit({
+                owner,
+                repo,
+                ref: '${{ github.event.pull_request.head.sha || github.event.after }}'
+            });
+            core.setOutput("message", commit.commit.message);
 
   pr_labeler:
     name: "Validate"
@@ -98,6 +115,19 @@ jobs:
     with:
       repo: ${{ github.event.pull_request.head.repo.full_name || github.event.repo.name || github.repository }}
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+    secrets: inherit
+
+  frontend-build:
+    name: "Build"
+    needs:
+      - changed_files
+    if: |
+      github.event_name == 'pull_request_target' &&
+      needs.changed_files.outputs.frontend == 'true' &&
+      needs.changed_files.outputs.commit-message != 'Build frontend'
+    uses: heartexlabs/label-studio/.github/workflows/frontend-build.yml@develop
+    with:
+      ref: ${{ github.event.pull_request.head.ref || github.ref }}
     secrets: inherit
 
   build:
