@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2431: Improve delete point functionality (#715)\n\nfix: dev-2431: add extra checks to delete point function to know if a shape is closed or not to prevent 3 point delete blocking and also prevent deletion of the last point in a shape\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
-  "commit": "749513cb662c944eca6e6dfd5c13249951ba9028",
-  "branch": "master",
-  "date": "2022-07-11T20:53:58Z"
+  "message": "Fix: DEV-2430 improve delete point logic",
+  "commit": "2e8daa94515b847c75e9a7f57a6ae0e977dc4f2b",
+  "branch": "fb-dev-2430/improve-delete-point-functionality",
+  "date": "2022/07/12 11:14:25"
 }
