@@ -115,11 +115,16 @@ The `value` parameter represents the source of the data. It can be plain text or
 
 #### Variables 
 
-In most cases, the `Object` tag has the value with one variable (prefixed with a $) in it. For example, `<Audio value="$audio" ... />`. All variables  point to field in task data. For example, `$audio => task.data.audio`
+In most cases, the `Object` tag has the value with one variable (prefixed with a $) in it.
 
-!!! attention "important"
-    In most cases, the `Object` tag has the value with one variable (prefixed with a $) in it. For example, `<Audio value="$audio" ... />`. All the variables point to a field in task data. For example, `$audio => task.data.audio`.
-
+For example, `<Audio value="$audio" ... />` seeks the "audio" field in the imported JSON object:
+```json
+{
+  "data": {
+    "audio": "https://host.name/myaudio.wav"
+  }
+}
+```
 
 #### Plain text
 
