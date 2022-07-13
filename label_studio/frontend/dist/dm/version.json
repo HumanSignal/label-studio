@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2526: Don't crash because of undefined LSF (#75)",
-  "commit": "34742984929748380ad6f7bbb053c7ced97d994d",
-  "branch": "master",
-  "date": "2022-07-05T19:38:39Z"
+  "message": "fix: DEV-2170: On project open set number of tasks defined by task per page",
+  "commit": "bf756d882b579989a4435bc885c5f56995136e5a",
+  "branch": "fb-dev-2170",
+  "date": "2022/07/11 10:42:59"
 }
