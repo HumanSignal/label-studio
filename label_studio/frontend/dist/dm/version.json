@@ -1,6 +1,6 @@
 {
-  "message": "ci: DEV-2445: Set concurrency for PR Sync (#72)",
-  "commit": "fef23777df2832daec664ace96bee9bcc399dd4d",
-  "branch": "master",
-  "date": "2022-06-07T11:28:06Z"
+  "message": "fix: DEV-2526: Don't crash because of undefined LSF (#75)",
+  "commit": "5104ecf3227380649a7139b73a636c11b7a07ea9",
+  "branch": "ls-release/1.5.0",
+  "date": "2022-07-05T19:38:39Z"
 }
