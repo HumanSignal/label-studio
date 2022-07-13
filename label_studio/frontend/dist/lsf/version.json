@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2671: Change rotate anchor of bbox",
-  "commit": "d3b279cb35f784a1de5db8f6589f210e663944f8",
+  "commit": "56d79bc0b7fb37041a98614e2cdb06910cedf3ef",
   "branch": "fb-dev-2671",
-  "date": "2022/07/13 17:45:09"
+  "date": "2022/07/13 17:54:32"
 }
