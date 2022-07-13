@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2431: Improve delete point logic",
-  "commit": "91e30f09fe125f335dfd3f63ab546f01ea76a6b5",
-  "branch": "master",
-  "date": "2022/07/12 13:46:04"
+  "message": "fix: DEV-2432: Allow polygon to save closed state as snapshot to retain state of unfinished polygon points",
+  "commit": "8b8ff6cb3aa784edbb1a80d6fd7c702754cc31ce",
+  "branch": "fb-dev-2432-fix",
+  "date": "2022/07/13 16:13:49"
 }
