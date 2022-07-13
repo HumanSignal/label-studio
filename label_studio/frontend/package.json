@@ -153,7 +153,9 @@
     "browserContext": "default"
   },
   "dependencies": {
+    "axios": "^0.27.2",
     "lodash.clonedeep": "^4.5.0",
+    "sweetalert": "^2.1.2",
     "sweetalert2": "^11.4.19"
   }
 }
