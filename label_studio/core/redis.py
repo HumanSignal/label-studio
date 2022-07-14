@@ -108,7 +108,7 @@ def rqworker_healthcheck():
     RATIO = 100
     error_text = ""
     # check redis connection
-    if not redis_healthcheck:
+    if not redis_healthcheck():
         return False, "Redis health check has failed."
     # check queues
     total_jobs = 0
