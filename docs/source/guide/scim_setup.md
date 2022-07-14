@@ -16,16 +16,18 @@ Using SCIM provider, you can manage access to Label Studio Enterprise workspaces
 
 SCIM interacts with your SSO integration. 
 
-> Note: 
+!!! note
 Okta or similar SSO providers have SCIM integration based on SSO.
 
+
+!!! attention "important"
 If you do not have SSO set up yet, then follow [Set up SSO](auth_setup.md).
 
-Label Studio Enterprise uses version 2 of SCIM standard. As an example, this guide uses integration with [Okta](https://www.okta.com/integrate/). However, Label Studio Enterprise follows [SCIM RFC 5741](https://datatracker.ietf.org/doc/html/rfc7644#section-3.2) and can be integrated with any access management services that supports the standard.
+Label Studio Enterprise uses SCIM Version 2.0 standard. As an example, this page uses integration with [Okta](https://www.okta.com/integrate/). However, Label Studio Enterprise follows [SCIM RFC 5741](https://datatracker.ietf.org/doc/html/rfc7644#section-3.2) and can be integrated with any access management services that support the standard.
 
 ## Set up SCIM integration
 
-<i>Check this video tutorial about SCIM + Okta setup</i>
+<i>Check this video tutorial about SCIM and Okta setup</i>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/MA3de3gu18A" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 To manage access to Label Studio Enterprise, add the application to your SCIM provider (Okta). Okta uses OAuth token to interact with REST API endpoints of the application to provision and deprovision access.
@@ -100,7 +102,7 @@ The most convenient way to manage access to the application is via groups. You c
 
 After saving the group assignment, the update will be queued and sent to Label Studio. 
 
-> Note:
+!!! note
 Alternatively, you can push the changes immediately to Label Studio.
 
 ### Sync groups to the application
@@ -108,11 +110,11 @@ Alternatively, you can push the changes immediately to Label Studio.
 1. Using Okta, navigate to the **application** page and open the **Push Groups** tab. 
 2. Click **Push Groups** and select **Find groups by name**. 
 3. Find the group you would like to sync to Label Studio. 
-4. Choose either **Create Group** or **Link Group** (in case you already have a workplace with the same name as specified in the SCIM settings page).
+4. 4. Choose either **Create Group** or **Link Group**, if you already have a workplace with the same name as specified on the **SCIM** >>**Settings** page.
 
 ## Unassigning the application for groups
 
-To unassign a group from the application, follow the similar steps as for individual users.
+To unassign a group from the application, follow the steps for [Unassigning the application for users](#Unassigning the application for users).
 
 1. On the **application** page, navigate to the **Assignments** tab.
 2. Select **Group** in the left menu.
@@ -120,5 +122,5 @@ To unassign a group from the application, follow the similar steps as for indivi
 4. Confirm the unassignment.
 
 
-<i>Check this video tutorial about group & user removing</i>
+<i>Check this video tutorial to remove a user and group.</i>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/vMA0TLhHGYE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
