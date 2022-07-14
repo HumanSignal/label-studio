@@ -5,17 +5,6 @@ on:
     branches:
       - develop
       - 'ls-release/**'
-    paths:
-      - deploy/**
-      - label_studio/**
-      - setup.py
-      - .github/workflows/cicd_pipeline.yml
-      - .github/workflows/pr-labeler.yml
-      - .github/workflows/submodules-validator.yml
-      - .github/workflows/gitleaks.yml
-      - .github/workflows/bandit.yml
-      - .github/workflows/docker-build.yml
-      - .github/workflows/tests.yml
   pull_request_target:
     types:
       - opened
@@ -134,10 +123,13 @@ jobs:
     name: "Build"
     needs:
       - changed_files
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && needs.changed_files.outputs.docker == 'true'
-    uses: heartexlabs/label-studio/.github/workflows/docker-build.yml@develop
+    if: |
+      github.event_name == 'push' &&
+      ( ( github.ref_name == 'develop' && needs.changed_files.outputs.docker == 'true' )
+        || startsWith(github.ref_name, 'ls-release/') )
+    uses: nikitabelonogov/label-studio/.github/workflows/docker-build.yml@develop
     with:
-      ref: ${{ github.event.pull_request.head.ref || github.ref }}
+      ref: ${{ github.ref_name }}
     secrets: inherit
 
   pytest:
