@@ -10,3 +10,5 @@
 !label_studio/**
 !setup.py
 !README.md
+!licenses/**
+!LICENSE

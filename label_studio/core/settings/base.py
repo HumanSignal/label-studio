@@ -438,6 +438,14 @@ EXPERIMENTAL_FEATURES = get_bool_env('EXPERIMENTAL_FEATURES', False)
 USE_ENFORCE_CSRF_CHECKS = get_bool_env('USE_ENFORCE_CSRF_CHECKS', True)  # False is for tests
 CLOUD_FILE_STORAGE_ENABLED = False
 
+IO_STORAGES_IMPORT_LINK_NAMES = [
+    'io_storages_s3importstoragelink',
+    'io_storages_gcsimportstoragelink',
+    'io_storages_azureblobimportstoragelink',
+    'io_storages_localfilesimportstoragelink',
+    'io_storages_redisimportstoragelink',
+]
+
 CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and_log'
 SAVE_USER = 'users.functions.save_user'

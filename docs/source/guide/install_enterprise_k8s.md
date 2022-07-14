@@ -23,9 +23,10 @@ If you want to install Label Studio Enterprise on Kubernetes and you have unrest
 1. Verify that you meet the [Required software prerequisites](#Required-software-prerequisites) and review the [capacity planning](#Capacity-planning) guidance.
 2. [Prepare the Kubernetes cluster](#Prepare-the-Kubernetes-cluster).
 3. [Add the Helm chart repository to your Kubernetes cluster](#Add-the-Helm-chart-repository-to-your-Kubernetes-cluster).
-4. [Configure a values.yaml file for your Label Studio Enterprise deployment](#Configure-values-yaml).
-5. (Optional) [Set up SSL authentication for PostgreSQL](#Set-up-SSL-authentication-for-PostgreSQL)
-6. [Use Helm to install Label Studio Enterprise on your Kubernetes cluster](#Use-Helm-to-install-Label-Studio-Enterprise-on-your-Kubernetes-cluster).
+4. [Configure Kubernetes secrets](#Configure-Kubernetes-secrets)
+5. [Configure a values.yaml file for your Label Studio Enterprise deployment](#Configure-values-yaml).
+6. (Optional) [Set up SSL authentication for PostgreSQL](#Set-up-SSL-authentication-for-PostgreSQL)
+7. [Use Helm to install Label Studio Enterprise on your Kubernetes cluster](#Use-Helm-to-install-Label-Studio-Enterprise-on-your-Kubernetes-cluster).
 
 If you use a proxy to access the internet from your Kubernetes cluster, or it is airgapped from the internet, see how to [Install Label Studio Enterprise without public internet access](install_enterprise_airgapped.html).
 
@@ -82,7 +83,7 @@ If you choose to make changes to these default settings, consider the following:
 
 Before installing Label Studio Enterprise, prepare the Kubernetes cluster with [kubectl](https://kubernetes.io/docs/reference/kubectl/). 
 
-Install Label Studio Enterprise and set up a PostgreSQL or Redis database to store relevant Label Studio Enterprise configurations and annotations using the Helm chart. You must configure specific values for your deployment in a YAML file that you specify when installing using Helm.
+Install Label Studio Enterprise and set up a PostgreSQL and Redis databases to store relevant Label Studio Enterprise configurations and annotations using the Helm chart. You must configure specific values for your deployment in a YAML file that you specify when installing using Helm.
 
 ### Add the Helm chart repository to your Kubernetes cluster
 Add the Helm chart repository to your Kubernetes cluster to easily install and update Label Studio Enterprise.
@@ -95,6 +96,26 @@ Add the Helm chart repository to your Kubernetes cluster to easily install and u
 2. If you want, check for available versions:
    ```shell
    helm search repo heartex/label-studio-enterprise
+   ```
+
+### Configure Kubernetes secrets
+
+1. Ensure that you have license key and Docker Hub credentials or request them from Heartex Team.
+2. Create a key to pull the latest Label Studio Enterprise image from the Docker registry. From the command line of your cluster, run the following:
+    ```shell
+    kubectl create secret docker-registry heartex-pull-key \
+        --docker-server=https://index.docker.io/v2/ \
+        --docker-username=heartexlabs \
+        --docker-password=<CUSTOMER_PASSWORD>
+    ```
+3. Create the Label Studio Enterprise license as a Kubernetes secret. You can specify it as a file or as a specific URL.
+   From the command line, specify the license as a file:
+   ```shell
+   kubectl create secret generic lse-license --from-file=license=path/to/lic
+   ```
+   Or from the command line, specify the license as a URL:
+   ```shell
+   kubectl create secret generic lse-license --from-literal=license=https://lic.heartex.ai/db/<CUSTOMER_LICENSE_ID>
    ```
 
 ### Configure values.yaml 
