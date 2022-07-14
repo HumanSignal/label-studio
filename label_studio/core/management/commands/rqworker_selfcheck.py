@@ -1,4 +1,5 @@
 import logging
+import sys
 
 from django.core.management.base import BaseCommand
 from django.db import connections
@@ -19,7 +20,7 @@ class Command(BaseCommand):
         logger.debug(f"===> Start redis connection check.")
         redis_status = redis_connected()
         logger.debug(f"===> Redis check {'is successful' if redis_status else 'has failed'}.")
-        return 0 if db_status & redis_status else 1
+        sys.exit(0 if db_status & redis_status else 1)
 
     def db_check(self):
         db_conn = connections['default']
