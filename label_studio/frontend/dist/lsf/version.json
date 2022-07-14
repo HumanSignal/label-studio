@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2431: Improve delete point logic",
-  "commit": "91e30f09fe125f335dfd3f63ab546f01ea76a6b5",
+  "message": "fix: DEV-2655: Hold to continuous draw image view shapes show immediately (#744)\n\n* fix: DEV-2655: Hold to continuous draw image region shapes shows immediately when dragged\r\n\r\n* fix: DEV-2655: Hold and drag should count as one continuous action and draw the next shape immediately\r\n\r\n* fix: DEV-2655: Ensure shape is not in drawing mode when deselecting\r\n\r\n* fix: DEV-2655: Ensure no other tools are affected by deselection when clicking on canvas.",
+  "commit": "169adcd0a057920ba2034327a681496d2487f4f6",
   "branch": "master",
-  "date": "2022/07/12 13:46:04"
+  "date": "2022-07-14T14:20:40Z"
 }
