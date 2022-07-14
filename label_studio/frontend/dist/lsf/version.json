@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2655: Hold to continuous draw image view shapes show immediately",
-  "commit": "8f71e05e0eaf455ad051e94802e4345011f81e4e",
-  "branch": "fb-dev-2655",
-  "date": "2022/07/13 17:13:07"
+  "commit": "169adcd0a057920ba2034327a681496d2487f4f6",
+  "branch": "master",
+  "date": "2022/07/14 09:20:40"
 }
