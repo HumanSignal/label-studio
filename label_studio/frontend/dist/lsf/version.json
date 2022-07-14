@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2851: Outliner updated collapse/expand UI",
-  "commit": "399a5faf0bb19490651d9d2e9602f4dc79009f40",
+  "commit": "137b90d244cd57356343c992640413e199f3b43a",
   "branch": "fb-dev-2851/outliner-collapsed-expanded-ui",
-  "date": "2022/07/14 18:20:35"
+  "date": "2022/07/14 19:27:29"
 }
