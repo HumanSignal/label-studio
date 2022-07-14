@@ -6,20 +6,29 @@ on:
       ref:
         required: true
         type: string
+    outputs:
+      image_version:
+        description: "Docker tag"
+        value: ${{ jobs.docker_build_and_push.outputs.image_version }}
+      ubi_image_version:
+        description: "Docker UBI tag"
+        value: ${{ jobs.docker_build_and_push.outputs.ubi_image_version }}
 
 env:
   DOCKER_CLI_EXPERIMENTAL: enabled
-  RELEASE_TAG: 'latest'
-  DEVELOP_TAG: 'develop'
-  UBI_DEVELOP_TAG: 'ubi_develop'
+  IMAGE_NAME: heartexlabs/label-studio
   PREFLIGHT_REPO: quay.io/opdev/preflight:stable
   DOCKER_CONFIG_PATH: /home/runner/.docker/config.json
+  DOCKER_IMAGE_TAG_CHECK_NAME: "Docker image tag"
 
 jobs:
   docker_build_and_push:
     name: "Docker image"
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    outputs:
+      image_version: ${{ steps.version.outputs.image_version }}
+      ubi_image_version: ${{ steps.version.outputs.ubi_image_version }}
     steps:
       - uses: hmarr/debug-action@v2.0.1
 
@@ -28,6 +37,22 @@ jobs:
         with:
           token: ${{ secrets.GIT_PAT }}
           ref: ${{ inputs.ref }}
+
+      - name: Calculate version
+        id: version
+        shell: bash
+        run: |
+          set -x
+          sha="$(git rev-parse HEAD)"
+          echo "::set-output name=sha::$sha"
+          regexp='^ls-release\/(.*)$'; 
+          if [[ '${{ inputs.ref }}' =~ $regexp ]]; then
+            image_version="${BASH_REMATCH[1]}rc${sha}"
+          else
+            image_version='${{ inputs.ref }}'
+          fi
+          echo "::set-output name=image_version::${image_version}"
+          echo "::set-output name=ubi_image_version::ubi_${image_version}"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2.0.0
@@ -61,9 +86,38 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: heartexlabs/label-studio:${{ env.DEVELOP_TAG }}
+          tags: ${{ env.IMAGE_NAME }}:${{ env.DEVELOP_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Create Docker image tag Check
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { repo, owner } = context.repo;
+            const details = {
+              "image_version": "${{ steps.version.outputs.image_version }}",
+              "ubi_image_version": "${{ steps.version.outputs.ubi_image_version }}",
+              "sha": "${{ steps.version.outputs.sha }}"
+            }
+            const { data: check } = await github.rest.checks.create({
+              owner,
+              repo,
+              name: '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}',
+              head_sha: '${{ steps.version.outputs.sha }}',
+              status: 'in_progress',
+              output: {
+                title: '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}',
+                summary: JSON.stringify(details)
+              }
+            });
+            await github.rest.checks.update({
+              owner,
+              repo,
+              check_run_id: check.id,
+              status: 'completed',
+              conclusion: 'success'
+            });
 
       - name: Login to RedHat Registry
         uses: docker/login-action@v2.0.0
@@ -79,7 +133,7 @@ jobs:
           context: .
           file: Dockerfile.redhat
           push: true
-          tags: scan.connect.redhat.com/${{ secrets.REDHAT_MARKETPLACE_LS_OSPID }}/label-studio:${{ env.DEVELOP_TAG }},heartexlabs/label-studio:${{ env.UBI_DEVELOP_TAG }}
+          tags: scan.connect.redhat.com/${{ secrets.REDHAT_MARKETPLACE_LS_OSPID }}/label-studio:${{ steps.version.outputs.image_version }},${{ env.IMAGE_NAME }}:${{ steps.version.outputs.ubi_image_version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -91,5 +145,5 @@ jobs:
           --env PFLT_PYXIS_API_TOKEN=${{ secrets.REDHAT_MARKETPLACE_LS_PYXIS_TOKEN }} \
           --env PFLT_CERTIFICATION_PROJECT_ID=${{ secrets.REDHAT_MARKETPLACE_LS_PROJECT_ID }} \
           ${{ env.PREFLIGHT_REPO }} \
-          check container scan.connect.redhat.com/${{ secrets.REDHAT_MARKETPLACE_LS_OSPID }}/label-studio:${{ env.DEVELOP_TAG }} \
+          check container scan.connect.redhat.com/${{ secrets.REDHAT_MARKETPLACE_LS_OSPID }}/label-studio:${{ steps.version.outputs.image_version }} \
           --submit
