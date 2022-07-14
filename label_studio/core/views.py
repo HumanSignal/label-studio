@@ -27,8 +27,17 @@ from core import utils
 from core.utils.io import find_file
 from core.label_config import generate_time_series_json
 from core.utils.common import collect_versions
+from core.utils.params import bool_from_request
 from io_storages.localfiles.models import LocalFilesImportStorage
 from core.feature_flags import all_flags
+
+from django.http import JsonResponse
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+
+from core.permissions import all_permissions
+from core.redis import rqworker_healthcheck
 
 
 logger = logging.getLogger(__name__)
@@ -78,10 +87,16 @@ def version_page(request):
 
 def health(request):
     """ System health info """
-    logger.debug('Got /health request.')
-    return HttpResponse(json.dumps({
-        "status": "UP"
-    }))
+    redis = bool_from_request(request.GET, "redis", False)
+    if not redis:
+        logger.debug('Got /health request.')
+        return HttpResponse(json.dumps({
+            "status": "UP"
+        }))
+    else:
+        health_state = rqworker_healthcheck()
+        result = {"message": health_state[1]}
+        return JsonResponse(result, status=200 if health_state[0] else 500)
 
 
 def metrics(request):

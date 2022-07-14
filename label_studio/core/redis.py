@@ -5,6 +5,8 @@ import logging
 import django_rq
 
 from django_rq import get_connection
+from django.conf import settings
+from rq import Worker
 
 logger = logging.getLogger(__name__)
 
@@ -100,3 +102,30 @@ def start_job_async_or_sync(job, *args, **kwargs):
         return job
     else:
         return job(*args, **kwargs)
+
+
+def rqworker_healthcheck():
+    RATIO = 100
+    error_text = ""
+    # check redis connection
+    if not redis_healthcheck:
+        return False, "Redis health check has failed."
+    # check queues
+    total_jobs = 0
+    for queue_name in settings.RQ_QUEUES:
+        try:
+            queue = django_rq.get_queue(queue_name)
+        except KeyError:
+            return False, f"No queue {queue_name} on redis."
+        total_jobs += len(queue)
+    # check workers
+    workers = Worker.all(connection=_redis)
+    workers_count = len(workers)
+    if workers_count == 0:
+        return False, "No workers found. Start several workers."
+    if workers_count * RATIO < total_jobs:
+        error_text = f"Workers seems to be overloaded. {total_jobs} jobs in the queues."
+    # check if workers in correct state
+    if all([worker for worker in workers if worker.state in ['started', 'busy', 'idle']]):
+        return False, "No workers found. Start several workers."
+    return True, error_text
