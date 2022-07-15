@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2432: Allow polygon to save closed state as snapshot to retain state of unfinished polygon points",
-  "commit": "8b8ff6cb3aa784edbb1a80d6fd7c702754cc31ce",
+  "commit": "8ad4b80a1afca1f4f34e590c5c53843609efe81c",
   "branch": "fb-dev-2432-fix",
-  "date": "2022/07/13 16:13:49"
+  "date": "2022/07/15 09:25:10"
 }
