@@ -45,6 +45,9 @@
     <title>Label Studio</title>
   {% endblock %}
 
+  <script src="{{settings.HOSTNAME}}{% static 'js/Toast.min.js' %}"></script>
+  <link href="{{settings.HOSTNAME}}{% static 'css/Toast.min.css' %}" rel="stylesheet">
+
   {% get_current_language as LANGUAGE_CODE %}
   {% get_available_languages as LANGUAGES %}
 </head>
@@ -115,6 +118,16 @@
 </script>
 
 <script src="{{settings.HOSTNAME}}/react-app/index.js?v={{ versions.backend.commit }}"></script>
+
+<script>
+  {# storage persistance #}
+  {% if not settings.STORAGE_PERSISTENCE %}
+  new Toast({
+    message: 'Data persistance not configured',
+    type: 'danger'
+  });
+  {% endif %}
+</script>
 
 <div id="dynamic-content">
   <script>
