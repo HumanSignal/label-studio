@@ -221,11 +221,11 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
             # set lock for the task with TTL 3x time more then current average lead time (or 1 hour by default)
             next_task.set_lock(user)
 
-        if not next_tasks and project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
-            skipped_annotations = user.annotations.filter(task__project=project, task__isnull=False,
-                                                            was_cancelled=True)
-            skipped_tasks = cancelled_annotations.order_by('updated_at').values_list('task__pk', flat=True)
-            next_task = skipped_tasks.first()
+        if not next_task and project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
+            q = Q(task__project=project, task__isnull=False, was_cancelled=True)
+            skipped_tasks = user.annotations.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
+            preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(skipped_tasks)])
+            next_task = prepared_tasks.filter(pk__in=skipped_tasks).order_by(preserved_order).first()
             queue_info += ' Requeued for me from skipped tasks '
 
         logger.debug(f'get_next_task finished. next_task: {next_task}, queue_info: {queue_info}')
