@@ -5,6 +5,7 @@ import logging
 import os
 from pathlib import Path
 import re
+from urllib.parse import quote
 
 from django.conf import settings
 from django.db import models
@@ -76,7 +77,7 @@ class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):
             # {settings.HOSTNAME}/data/local-files?d=<path/to/local/dir>
             document_root = Path(settings.LOCAL_FILES_DOCUMENT_ROOT)
             relative_path = str(path.relative_to(document_root))
-            return {settings.DATA_UNDEFINED_NAME: f'{settings.HOSTNAME}/data/local-files/?d={str(relative_path)}'}
+            return {settings.DATA_UNDEFINED_NAME: f'{settings.HOSTNAME}/data/local-files/?d={quote(str(relative_path))}'}
 
         try:
             with open(path, encoding='utf8') as f:

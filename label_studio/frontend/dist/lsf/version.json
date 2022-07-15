@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2431: Improve delete point functionality (#715)\n\nfix: dev-2431: add extra checks to delete point function to know if a shape is closed or not to prevent 3 point delete blocking and also prevent deletion of the last point in a shape\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
-  "commit": "749513cb662c944eca6e6dfd5c13249951ba9028",
+  "message": "fix: DEV-2655: Hold to continuous draw image view shapes show immediately (#744)\n\n* fix: DEV-2655: Hold to continuous draw image region shapes shows immediately when dragged\r\n\r\n* fix: DEV-2655: Hold and drag should count as one continuous action and draw the next shape immediately\r\n\r\n* fix: DEV-2655: Ensure shape is not in drawing mode when deselecting\r\n\r\n* fix: DEV-2655: Ensure no other tools are affected by deselection when clicking on canvas.",
+  "commit": "169adcd0a057920ba2034327a681496d2487f4f6",
   "branch": "master",
-  "date": "2022-07-11T20:53:58Z"
+  "date": "2022-07-14T14:20:40Z"
 }
