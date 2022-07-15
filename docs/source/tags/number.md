@@ -1,7 +1,7 @@
 ---
 title: Number
 type: tags
-order: 413
+order: 414
 meta_title: Number Tag to Numerically Classify
 meta_description: Customize Label Studio with the Number tag to numerically classify tasks in your machine learning and data science projects.
 ---

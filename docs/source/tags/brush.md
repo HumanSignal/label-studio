@@ -1,12 +1,12 @@
 ---
-title: BrushLabels
+title: Brush
 type: tags
-order: 402
-meta_title: Brush Label Tag for Image Segmentation Labeling
-meta_description: Customize Label Studio with brush label tags for image segmentation labeling for machine learning and data science projects.
+order: 401
+meta_title: Brush Tag for Image Segmentation Labeling
+meta_description: Customize Label Studio with brush tags for image segmentation labeling for machine learning and data science projects.
 ---
 
-Use the BrushLabels tag for image segmentation tasks where you want to apply a mask or use a brush to draw a region on the image.
+Use the Brush tag for image segmentation tasks where you want to apply a mask or use a brush to draw a region on the image.
 
 Use with the following data types: image
 
@@ -19,6 +19,8 @@ Use with the following data types: image
 | [choice] | <code>single</code> \| <code>multiple</code> | <code>single</code> | Configure whether the data labeler can select one or multiple labels |
 | [maxUsages] | <code>number</code> |  | Maximum number of times a label can be used per task |
 | [showInline] | <code>boolean</code> | <code>true</code> | Show labels in the same visual line |
+| [smart] | <code>boolean</code> |  | Show smart tool for interactive pre-annotations |
+| [smartOnly] | <code>boolean</code> |  | Only show smart tool for interactive pre-annotations |
 
 ### Sample Results JSON
 
@@ -49,10 +51,10 @@ Use with the following data types: image
 ```html
 <!--Basic image segmentation labeling configuration-->
 <View>
-  <BrushLabels name="labels" toName="image">
+  <Brush name="labels" toName="image">
     <Label value="Person" />
     <Label value="Animal" />
-  </BrushLabels>
+  </Brush>
   <Image name="image" value="$image" />
 </View>
 ```
