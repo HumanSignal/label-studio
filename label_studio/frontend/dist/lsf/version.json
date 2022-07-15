@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2431: Improve delete point logic (#745)\n\n* fix: dev-2431: add extra checks to delete point function to know if a shape is closed or not to prevent 3 point delete blocking and also prevent deletion of the last point in a shape\r\n\r\n* fix/dev-2430/ remove problematic logic for delete point\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
-  "commit": "91e30f09fe125f335dfd3f63ab546f01ea76a6b5",
-  "branch": "master",
-  "date": "2022-07-12T18:46:04Z"
+  "message": "fix: DEV-2671: Change rotate anchor of bbox",
+  "commit": "4e1f5277d9d61b14e06630583aa9ae2605718830",
+  "branch": "fb-dev-2671",
+  "date": "2022/07/15 11:08:38"
 }
