@@ -125,6 +125,11 @@ def _try_uncertainty_sampling(tasks, project, user_solved_tasks_array, user, pre
 
 def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_info):
     user_solved_tasks_array = user.annotations.filter(task__project=project, task__isnull=False)
+
+    if project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
+        user_solved_tasks_array = user_solved_tasks_array.filter(was_cancelled=False)
+        queue_info += ' Requeued for me from skipped tasks '
+
     user_solved_tasks_array = user_solved_tasks_array.distinct().values_list('task__pk', flat=True)
     not_solved_tasks = prepared_tasks.exclude(pk__in=user_solved_tasks_array)
 
@@ -138,6 +143,13 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
         logger.debug(f'User={user} tries overlap first from prepared tasks')
         _, not_solved_tasks = _try_tasks_with_overlap(not_solved_tasks)
         queue_info += 'Show overlap first'
+
+    if project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
+        # Ordering works different for sqlite and postgresql, details: https://code.djangoproject.com/ticket/19726
+        if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
+            not_solved_tasks = not_solved_tasks.order_by('annotations__was_cancelled', 'updated_at')
+        else:
+            not_solved_tasks = not_solved_tasks.order_by('-annotations__was_cancelled', 'updated_at')
 
     return not_solved_tasks, user_solved_tasks_array, queue_info
 
@@ -220,13 +232,6 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
         if next_task and use_task_lock:
             # set lock for the task with TTL 3x time more then current average lead time (or 1 hour by default)
             next_task.set_lock(user)
-
-        if not next_tasks and project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
-            skipped_annotations = user.annotations.filter(task__project=project, task__isnull=False,
-                                                            was_cancelled=True)
-            skipped_tasks = cancelled_annotations.order_by('updated_at').values_list('task__pk', flat=True)
-            next_task = skipped_tasks.first()
-            queue_info += ' Requeued for me from skipped tasks '
 
         logger.debug(f'get_next_task finished. next_task: {next_task}, queue_info: {queue_info}')
         return next_task, queue_info
