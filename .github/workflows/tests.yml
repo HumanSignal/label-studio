@@ -83,7 +83,7 @@ jobs:
       - name: Install LSF & set version.py
         run: ./deploy/prebuild_wo_frontend.sh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Do migrations
         run: python label_studio/manage.py migrate
@@ -208,7 +208,7 @@ jobs:
       - name: Install LSF & set version.py
         run: ./deploy/prebuild_wo_frontend.sh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Do migrations
         run: python label_studio/manage.py migrate
