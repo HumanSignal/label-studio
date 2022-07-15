@@ -16,38 +16,40 @@ Set up the following cloud and other storage systems with Label Studio:
 - [Redis database](#Redis-database)
 - [Local storage](#Local-storage)
 
-If something goes wrong, check the [troubleshooting section](#Troubleshoot-CORS-and-access-problems). 
+!!! attention "Tip"
+    If something goes wrong, check the [troubleshooting section](#Troubleshoot-CORS-and-access-problems). 
+
 
 ## How external storage connections and sync work
 
-You can add source storage connections to sync data from an external source to a Label Studio project, and add target storage connections to sync annotations from Label Studio to external storage. Each source and target storage setup is project-specific. You can connect multiple buckets, containers, databases, or directories as source or target storage for a project. 
+You can add source storage connections to sync data from an external source to a Label Studio project, and add target storage connections to sync annotations from Label Studio to external storage. Each source and target storage setup is project-specific. You can connect multiple buckets, containers, databases, or directories as a source or target storage for a project. 
 
 ### Source storage
 
 Label Studio does not automatically sync data from source storage. If you upload new data to a connected cloud storage bucket, sync the storage connection using the UI to add the new labeling tasks to Label Studio without restarting. You can also use the API to set up or sync storage connections. See [Label Studio API](/api) and locate the relevant storage connection type. 
 
-Task data synced from cloud storage is not stored in Label Studio. Instead, the data is accessed using a URL. You can also secure access to cloud storage using cloud storage credentials. For details, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
+Task data synced from cloud storage is not stored in Label Studio. Instead, the data is accessed using a URL. You can also secure access to cloud storage using cloud storage credentials. For more information, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
 
 ### Target storage
 
 When annotators click **Submit** or **Update** while labeling tasks, Label Studio saves annotations in the Label Studio database. 
 
-If you configure target storage, annotations are sent to target storage after you click **Sync** for the configured target storage connection. The target storage receives a JSON-formatted export of each annotation. See [Label Studio JSON format of annotated tasks](export.html#Label-Studio-JSON-format-of-annotated-tasks) for details about how exported tasks appear in  target storage.
+If you configure target storage, annotations are sent to target storage after you click **Sync** for the configured target storage connection. The target storage receives a JSON-formatted export of each annotation. For more information on how exported tasks appear in target storage, see [Label Studio JSON format of annotated tasks](export.html#Label-Studio-JSON-format-of-annotated-tasks). 
+If you are using Label Studio Enterprise with Amazon S3, you can also delete annotations in target storage when they are deleted in Label Studio. For more information, see [Set up target storage connection in the Label Studio UI](storage.html#Set-up-target-storage-connection-in-the-Label-Studio-UI).
 
-If you're using Label Studio Enterprise with Amazon S3, you can also delete annotations in target storage when they are deleted in Label Studio. See [Set up target storage connection in the Label Studio UI](storage.html#Set-up-target-storage-connection-in-the-Label-Studio-UI) for more details.
 
 ## Amazon S3
 
-Connect your [Amazon S3]((https://aws.amazon.com/s3)) bucket to Label Studio to retrieve labeling tasks or store completed annotations. 
-
-For details about how Label Studio secures access to cloud storage, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
+Connect your [Amazon S3]((https://aws.amazon.com/s3)) bucket to Label Studio to retrieve labeling tasks or store completed annotations. For details about how Label Studio secures access to cloud storage, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
 
 ### Configure access to your S3 bucket
-Before you set up your S3 bucket or buckets with Label Studio, configure access and permissions. These steps assume that you're using the same AWS role to manage both source and target storage with Label Studio. If you only use S3 for source storage, Label Studio does not need PUT access to the bucket. 
+
+Before you set up your S3 bucket or buckets with Label Studio, configure access and permissions. These steps assume that you are using the same AWS role to manage both source and target storage with Label Studio. If you only use S3 for source storage, Label Studio does not need PUT access to the bucket. 
 
 1. Enable programmatic access to your bucket. [See the Amazon Boto3 configuration documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html#configuration) for more on how to set up access to your S3 bucket. 
 
-> Note: A session token is only required in case of temporary security credentials. See the AWS Identity and Access Management documentation on [Requesting temporary security credentials](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html). 
+!!! note
+    A session token is only required in case of temporary security credentials. See the AWS Identity and Access Management documentation on [Requesting temporary security credentials](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html). 
 
 2. Assign the following role policy to an account you set up to retrieve source tasks and store annotations in S3, replacing `<your_bucket_name>` with your bucket name:
 ```json
@@ -71,56 +73,39 @@ Before you set up your S3 bucket or buckets with Label Studio, configure access 
     ]
 }
 ```
-> `"s3:PutObject"` is only needed for target storage connections, and `"s3:DeleteObject` is only needed for target storage connections in Label Studio Enterprise where you want to allow deleted annotations in Label Studio to also be deleted in the target S3 bucket.  
-3. Set up cross-origin resource sharing (CORS) access to your bucket, using a policy that allows GET access from the same host name as your Label Studio deployment. See [Configuring cross-origin resource sharing (CORS)](https://docs.aws.amazon.com/AmazonS3/latest/userguide/enabling-cors-examples.html) in the Amazon S3 User Guide. Use or modify the following example:
-```json
-[
-    {
-        "AllowedHeaders": [
-            "*"
-        ],
-        "AllowedMethods": [
-            "GET"
-        ],
-        "AllowedOrigins": [
-            "*"
-        ],
-        "ExposeHeaders": [
-            "x-amz-server-side-encryption",
-            "x-amz-request-id",
-            "x-amz-id-2"
-        ],
-        "MaxAgeSeconds": 3000
-    }
-]
-```
 
+!!! note
+    - `"s3:PutObject"` is only needed for target storage connections.
+    - `"s3:DeleteObject"` is only needed for target storage connections in Label Studio Enterprise, where you want to allow deleted annotations in Label Studio to also be deleted in the target S3 bucket.
 
-### Set up connection in the Label Studio UI
-After you [configure access to your S3 bucket](#Configure-access-to-your-S3-bucket), do the following to set up Amazon S3 as a data source connection:
+3. Set up cross-origin resource sharing (CORS) access to your bucket, using a policy that allows GET access from the same hostname as your Label Studio deployment. See [Configuring cross-origin resource sharing (CORS)](https://docs.aws.amazon.com/AmazonS3/latest/userguide/enabling-cors-examples.html) in the Amazon S3 User Guide. 
 
-1. Open Label Studio in your web browser.
-2. For a specific project, open **Settings > Cloud Storage**.
-3. Click **Add Source Storage**.  
-4. In the dialog box that appears, select **Amazon S3** as the storage type.
-5. In the **Storage Title** field, type a name for the storage to appear in the Label Studio UI.
-6. Specify the name of the S3 bucket, and if relevant, the bucket prefix to specify an internal folder or container.
-7. Adjust the remaining parameters:
-    - In the **File Filter Regex** field, specify a regular expression to filter bucket objects. Use `.*` to collect all objects.
-    - In the **Region Name** field, specify the AWS region name. For example `us-east-1`.
-    - (Optional) In the **S3 Endpoint** field, specify an S3 endpoint if you want to override the URL created by S3 to access your bucket.
-    - In the **Access Key ID** field, specify the access key ID of the temporary security credentials for an AWS account with access to your S3 bucket.
-    - In the **Secret Access Key** field, specify the secret key of the temporary security credentials for an AWS account with access to your S3 bucket.
-    - In the **Session Token** field, specify a session token of the temporary security credentials for an AWS account with access to your S3 bucket.
-    - (Optional) Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file.
-    - (Optional) Enable **Recursive scan** to perform recursive scans over the bucket contents if you have nested folders in your S3 bucket.
-    - Choose whether to disable **Use pre-signed URLs**. For example, if you host Label Studio in the same AWS network as your storage buckets, you can disable presigned URLs and have direct access to the storage using `s3://` links.
-    - Adjust the counter for how many minutes the pre-signed URLs are valid.
-8. Click **Add Storage**.
+    Use or modify the following example:
+    (i) Set up the connection in the Label Studio UI
+    (ii) After you [configure access to your S3 bucket](#Configure-access-to-your-S3-bucket), do the following to set up Amazon S3 as a data source connection:
 
-After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync import storage](/api#operation/api_storages_s3_sync_create).
+    - Open Label Studio in your web browser.
+    - For a specific project, open **Settings > Cloud Storage**.
+    - Click **Add Source Storage**.  
+    - In the dialog box that appears, select **Amazon S3** as the storage type.
+    - In the **Storage Title** field, type a name for the storage to appear in the Label Studio UI.
+    - Specify the name of the S3 bucket, and if relevant, the bucket prefix to specify an internal folder or container.
+    - Adjust the remaining parameters:
+        * In the **File Filter Regex** field, specify a regular expression to filter bucket objects. Use `.*` to collect all objects.
+        * In the **Region Name** field, specify the AWS region name. For example `us-east-1`.
+        * (Optional) In the **S3 Endpoint** field, specify an S3 endpoint if you want to override the URL created by S3 to access your bucket.
+        * In the **Access Key ID** field, specify the access key ID of the temporary security credentials for an AWS account with access to your S3 bucket.
+        * In the **Secret Access Key** field, specify the secret key of the temporary security credentials for an AWS account with access to your S3 bucket.
+        * In the **Session Token** field, specify a session token of the temporary security credentials for an AWS account with access to your S3 bucket.
+        * (Optional) Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file.
+        * (Optional) Enable **Recursive scan** to perform recursive scans over the bucket contents if you have nested folders in your S3 bucket.
+        * Choose whether to disable **Use pre-signed URLs**. For example, if you host Label Studio in the same AWS network as your storage buckets, you can disable pre-signed URLs and have direct access to the storage using `s3://` links.
+        * Adjust the counter for how many minutes the pre-signed URLs are valid.
+    - Click **Add Storage**.
+4. After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync import storage](/api#operation/api_storages_s3_sync_create).
 
 ### Set up target storage connection in the Label Studio UI
+
 After you [configure access to your S3 bucket](#Configure-access-to-your-S3-bucket), do the following to set up Amazon S3 as a target storage connection:
 
 1. Open Label Studio in your web browser.
@@ -137,8 +122,7 @@ After you [configure access to your S3 bucket](#Configure-access-to-your-S3-buck
     - In the **Session Token** field, specify a session token of the temporary security credentials for an AWS account with access to your S3 bucket.
     - <i class='ent'></i> (Optional) Enable **Can delete objects from storage** if you want to delete annotations stored in the S3 bucket when they are deleted in Label Studio. The storage credentials associated with the bucket must include the ability to delete bucket objects. Leave disabled to not take any action on annotations if they are deleted in Label Studio. 
 8. Click **Add Storage**.
-
-After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync export storage](/api#operation/api_storages_export_s3_sync_create).
+9. After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync export storage](/api#operation/api_storages_export_s3_sync_create).
 
 
 ### <i class='ent'></i> Set up an S3 connection with IAM role access
@@ -146,10 +130,11 @@ After adding the storage, click **Sync** to collect tasks from the bucket, or ma
 If you want to use a revocable method to grant Label Studio access to your Amazon S3 bucket, use an IAM role and its temporary security credentials instead of an access key ID and secret. This added layer of security is only available in Label Studio Enterprise. For more details about security in Label Studio and Label Studio Enterprise, see [Secure Label Studio](security.html).
 
 #### Set up an IAM role in Amazon AWS
+
 Set up an IAM role in Amazon AWS to use with Label Studio.
 
-1. In the Label Studio UI, open the **Organization** page to get an `External ID` to use for the IAM role creation in Amazon AWS. You must be an administrator to view the Organization page.
-2. Follow the [Amazon AWS documentation to create an IAM role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user.html) in your AWS account. <br/>Make sure to require an external ID and do not require multi-factor authentication when you set up the role. Select an existing permissions policy, or create one that allows programmatic access to the bucket.
+1. In the Label Studio UI, open the **Organization** page to get a `External ID` to use for the IAM role creation on Amazon AWS. You must be an administrator to view the Organization page.
+2. Follow the [Amazon AWS documentation to create an IAM role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user.html) in your AWS account. <br/> Make sure to require an external ID and do not require multi-factor authentication when you set up the role. Select an existing permissions' policy, or create one that allows programmatic access to the bucket.
 3. Create a trust policy using the external ID. Use the following example: 
 ```json
 {
@@ -217,12 +202,15 @@ Use the following role policy for S3 target storage:
     ]
 }
 ```
-> `"s3:DeleteObject` is only needed for target storage connections where you want deleted annotations in Label Studio to also be deleted in the target S3 bucket.  
+
+!!! note
+    `"s3:DeleteObject"` is only needed for target storage connections where you want deleted annotations in Label Studio to also be deleted in the target S3 bucket.  
 
 
 For more details about using an IAM role with an external ID to provide access to a third party (Label Studio), see the Amazon AWS documentation [How to use an external ID when granting access to your AWS resources to a third party](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html).
 
 #### Create the connection to S3 in the Label Studio UI
+
 In the Label Studio UI, do the following to set up the connection:
 
 1. Open Label Studio in your web browser.
@@ -246,6 +234,7 @@ In the Label Studio UI, do the following to set up the connection:
 After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync import storage](https://app.heartex.com/docs/api#operation/api_storages_s3s_sync_create).
 
 #### Create a target storage connection to S3 in the Label Studio UI
+
 In the Label Studio UI, do the following to set up a target storage connection to save annotations in an S3 bucket with IAM role access set up:
 
 1. Open Label Studio in your web browser.
@@ -265,9 +254,11 @@ In the Label Studio UI, do the following to set up a target storage connection t
 After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync export storage](https://app.heartex.com/docs/api#operation/api_storages_export_s3s_sync_create).
 
 ### Add storage with the Label Studio API
+
 You can also create a storage connection using the Label Studio API. 
 - See [Create new import storage](/api#operation/api_storages_s3_create) then [sync the import storage](/api#operation/api_storages_s3_sync_create).
 - See [Create export storage](/api#operation/api_storages_export_s3_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_s3_sync_create).
+
 
 ## Google Cloud Storage
 
@@ -276,11 +267,12 @@ Dynamically import tasks and export annotations to Google Cloud Storage (GCS) bu
 ### Prerequisites
 
 To connect your [GCS](https://cloud.google.com/storage) bucket with Label Studio, set up the following:
-- **Enable programmatic access to your bucket.** See [Cloud Storage Client Libraries](https://cloud.google.com/storage/docs/reference/libraries) in the Google Cloud Storage documentation for how to set up access to your GCS bucket.
+- **Enable programmatic access to your bucket.** For how to set up access to your GCS bucket, see [Cloud Storage Client Libraries](https://cloud.google.com/storage/docs/reference/libraries) in the Google Cloud Storage documentation.
 - **Set up authentication to your bucket.** Your account must have the **Service Account Token Creator** and **Storage Object Viewer** roles and **storage.buckets.get** access permission. See [Setting up authentication](https://cloud.google.com/storage/docs/reference/libraries#setting_up_authentication) and [IAM permissions for Cloud Storage](https://cloud.google.com/storage/docs/access-control/iam-permissions) in the Google Cloud Storage documentation. 
-- If you're using a service account to authorize access to the Google Cloud Platform, make sure to activate it. See [gcloud auth activate-service-account](https://cloud.google.com/sdk/gcloud/reference/auth/activate-service-account) in the Google Cloud SDK: Command Line Interface documentation.
+- If you are using a service account to authorize access to the Google Cloud Platform, make sure to activate it. See [gcloud auth activate-service-account](https://cloud.google.com/sdk/gcloud/reference/auth/activate-service-account) in the Google Cloud SDK: Command Line Interface documentation.
 
 ### Set up connection in the Label Studio UI
+
 In the Label Studio UI, do the following to set up the connection:
 
 1. Open Label Studio in your web browser.
@@ -304,15 +296,18 @@ In the Label Studio UI, do the following to set up the connection:
 After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync import storage](/api#operation/api_storages_gcs_sync_create).
 
 ### Add storage with the Label Studio API
+
 You can also create a storage connection using the Label Studio API. 
 - See [Create new import storage](/api#operation/api_storages_gcs_create) then [sync the import storage](/api#operation/api_storages_gcs_sync_create). 
 - See [Create export storage](/api#operation/api_storages_export_gcs_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_gcs_sync_create).
+
 
 ##  Microsoft Azure Blob storage
 
 Connect your [Microsoft Azure Blob storage](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction) container with Label Studio. For details about how Label Studio secures access to cloud storage, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
 
 ### Prerequisites
+
 You must set two environment variables in Label Studio to connect to Azure Blob storage:
 - `AZURE_BLOB_ACCOUNT_NAME` to specify the name of the storage account.
 - `AZURE_BLOB_ACCOUNT_KEY` to specify the secret key for the storage account.
@@ -320,6 +315,7 @@ You must set two environment variables in Label Studio to connect to Azure Blob 
 Configure the specific Azure Blob container that you want Label Studio to use in the UI.
 
 ### Set up connection in the Label Studio UI
+
 In the Label Studio UI, do the following to set up the connection:
 
 1. Open Label Studio in your web browser.
@@ -341,6 +337,7 @@ In the Label Studio UI, do the following to set up the connection:
 After adding the storage, click **Sync** to collect tasks from the container, or make an API call to [sync import storage](/api#operation/api_storages_azure_sync_create).
 
 ### Add storage with the Label Studio API
+
 You can also create a storage connection using the Label Studio API. 
 - See [Create new import storage](/api#operation/api_storages_azure_create) then [sync the import storage](/api#operation/api_storages_azure_sync_create). 
 - See [Create export storage](/api#operation/api_storages_export_azure_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_azure_sync_create).
@@ -354,6 +351,7 @@ Currently, this configuration is only supported if you host the Redis database i
 Label Studio does not manage the Redis database for you. See the [Redis Quick Start](https://redis.io/topics/quickstart) for details about hosting and managing your own Redis database. Because Redis is an in-memory database, data saved in Redis does not persist. To make sure you don't lose data, set up [Redis persistence](https://redis.io/topics/persistence) or use another method to persist the data, such as using Redis in the cloud with [Microsoft Azure](https://azure.microsoft.com/en-us/services/cache/) or [Amazon AWS](https://aws.amazon.com/redis/).
 
 ### Set up connection in the Label Studio UI
+
 In the Label Studio UI, do the following to set up the connection:
 
 1. Open Label Studio in your web browser.
@@ -374,14 +372,18 @@ After adding the storage, click **Sync** to collect tasks from the database, or 
 
 
 ### Add storage with the Label Studio API
+
 You can also create a storage connection using the Label Studio API. 
 - See [Create new import storage](/api#operation/api_storages_redis_create) then [sync the import storage](/api#operation/api_storages_redis_sync_create). 
 - See [Create export storage](/api#operation/api_storages_export_redis_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_redis_sync_create).
 
+
 ## Local storage
-If you have local files that you want to add to Label Studio from a specific directory, you can set up a specific local directory on the machine where LS is running as source or target storage. Label Studio steps through the directory recursively to read tasks.
+
+If you have local files that you want to add to Label Studio from a specific directory, you can set up a specific local directory on the machine where Lable Studio is running as source or target storage. Label Studio steps through the directory recursively to read tasks.
 
 ### Tasks with local storage file references 
+
 In cases where your tasks have multiple or complex input sources, such as multiple object tags in the labeling config or a HyperText tag with custom data values, you must prepare tasks manually. 
 
 In those cases, you can add local storage without syncing (to avoid automatic task creation from storage files) and specify the local files in your data values. For example, to specify multiple data types in the Label Studio JSON format, specifically an audio file `1.wav` and an image file `1.jpg`:
@@ -395,6 +397,7 @@ In those cases, you can add local storage without syncing (to avoid automatic ta
 ```
 
 ### Prerequisites
+
 Add these variables to your environment setup:
 - `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true`
 - `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/home/user` (or `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=C:\\data\\media` for Windows).
@@ -402,6 +405,7 @@ Add these variables to your environment setup:
 Without these settings, Local storage and URLs in tasks that point to local files won't work. Keep in mind that serving data from the local file system can be a **security risk**. See [Set environment variables](start.html#Set_environment_variables) for more about using environment variables.
 
 ### Set up connection in the Label Studio UI
+
 In the Label Studio UI, do the following to set up the connection:
 
 1. Open Label Studio in your web browser.
@@ -422,18 +426,22 @@ In the Label Studio UI, do the following to set up the connection:
 After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync import storage](/api#operation/api_storages_localfiles_sync_create).
 
 #### Add storage with the Label Studio API
+
 You can also create a storage connection using the Label Studio API. 
 - See [Create new import storage](/api#operation/api_storages_localfiles_create) then [sync the import storage](/api#operation/api_storages_localfiles_sync_create). 
 - See [Create export storage](/api#operation/api_storages_export_localfiles_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_localfiles_sync_create).
 
 ### Set up local storage with Docker
-If you're using Label Studio in Docker, you need to mount the local directory that you want to access as a volume when you start the Docker container. See [Run Label Studio on Docker and use local storage](start.html#Run-Label-Studio-on-Docker-and-use-local-storage).
+
+If you are using Label Studio in Docker, you need to mount the local directory that you want to access as a volume when you start the Docker container. See [Run Label Studio on Docker and use local storage](start.html#Run-Label-Studio-on-Docker-and-use-local-storage).
+
 
 ## Troubleshoot CORS and access problems
 
 Troubleshoot some common problems when using cloud or external storage with Label Studio. 
 
 ### I can't see the data in my tasks
+
 Check your web browser console for errors.
 
 - If you see CORS problems, make sure you have CORS set up properly. 
@@ -457,16 +465,16 @@ Check your web browser console for errors.
 
 ### Tasks or annotations do not sync
 
-If you're pressing the **Sync** button but tasks do not sync, or you can't see the new tasks in the Data Manager, check the following:
+If you are pressing the **Sync** button, but tasks do not sync, or you can't see the new tasks in the Data Manager, check the following:
 
 - Make sure you specified the correct credentials.
     - For Amazon S3, see [Configuration and credential file settings](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) in the Amazon AWS Command Line Interface User Guide. Also be sure to check that they work from the [aws client](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).
     - For GCS, see [Setting up authentication](https://cloud.google.com/storage/docs/reference/libraries#setting_up_authentication) in the Google Cloud Storage documentation. Your account must have the **Service Account Token Creator** and **Storage Object Viewer** roles and **storage.buckets.get** access permission. See [Setting up authentication](https://cloud.google.com/storage/docs/reference/libraries#setting_up_authentication) and [IAM permissions for Cloud Storage](https://cloud.google.com/storage/docs/access-control/iam-permissions) in the Google Cloud Storage documentation. Also, if you're using a service account to authorize access to the Google Cloud Platform, make sure to activate it. See [gcloud auth activate-service-account](https://cloud.google.com/sdk/gcloud/reference/auth/activate-service-account) in the Google Cloud SDK: Command Line Interface documentation.
     
-- Make sure that files exist under the specified bucket or container prefix, and that your file filter regex matches the files. When you set the prefix, subfolders are not recursively scanned.
+- Make sure that files exist under the specified bucket or container prefix, and that your file filter Regex matches the files. When you set the prefix, subfolders are not recursively scanned.
 
 ### Tasks don't load the way I expect
 
 If the tasks sync to Label Studio but don't appear the way that you expect, maybe with URLs instead of images or with one task where you expect to see many, check the following:
-- If you're placing JSON files in [cloud storage](storage.html), place 1 task in each JSON file in the storage bucket. If you want to upload a JSON file from local storage into Label Studio, you can place multiple tasks in one JSON file. 
-- If you're syncing image or audio files, make sure **Treat every bucket object as a source file** is enabled. 
+- If you are placing JSON files in [cloud storage](storage.html), place 1 task in each JSON file in the storage bucket. If you want to upload a JSON file from local storage into Label Studio, you can place multiple tasks in one JSON file. 
+- If you are syncing image or audio files, make sure **Treat every bucket object as a source file** is enabled. 

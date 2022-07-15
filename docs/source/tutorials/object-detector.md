@@ -6,9 +6,10 @@ order: 40
 
 ## OpenMMLab Image object detector or MMDetection
 
-This [Machine Learning backend](/guide/ml.html) lets you to automatically pre-annotate your images with bounding boxes. It's powered by the amazing [OpenMMLab MMDetection library](https://github.com/open-mmlab/mmdetection), which gives you access to many existing state-of-the-art models like FasterRCNN, RetinaNet, YOLO and others. 
+This [Machine Learning backend](/guide/ml.html) allows you to automatically pre-annotate your images with bounding boxes. It is powered by the amazing [OpenMMLab MMDetection library](https://github.com/open-mmlab/mmdetection), which gives you access to many existing state-of-the-art models like FasterRCNN, RetinaNet, YOLO, and others. 
 
 Follow this installation guide and then play around with them, picking the best model that suits your current dataset!
+
 
 ## Start using it
 

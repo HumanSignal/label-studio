@@ -8,6 +8,7 @@ meta_description: Customize and configure your data labeling and annotation inte
 
 All labeling activities in Label Studio occur in the context of a project. After you [create a project](setup_project.html#Create-a-project) and [import data](tasks.html), set up the labeling interface and labeling configuration for your project. This setup process is essential to your labeling project. 
 
+
 ## Set up the labeling interface for your project
 
 Configure the labels and task type for annotators using the templates included with Label Studio or by defining your own combination of tags to set up the labeling interface for your project. 
@@ -20,16 +21,20 @@ Configure the labels and task type for annotators using the templates included w
 6. Click **Save**. 
 
 ### Modify the labeling interface 
+
 You can make changes to the labeling interface and configuration in the project settings.
 
-> **Note:** You cannot remove labels or change the type of labeling being performed unless you delete existing annotations using those labels.
+!!! note
+    You cannot remove labels or change the type of labeling being performed unless you delete existing annotations using those labels.
 
 1. In Label Studio UI, open the project you want to modify.
 2. Click **Settings**.
 3. Click **Labeling Interface**.
 4. Browse templates, update the available labels, or use the `Code` option to further customize the interface using [tags](/tags).
 
-> If you make changes to the labeling configuration, any tabs that you might have created in the data manager are removed. 
+!!! note 
+    If you make changes to the labeling configuration, any tabs that you might have created in the data manager are removed. 
+
 
 ## Customize a template
 
@@ -47,9 +52,9 @@ You can combine these tags to create a custom label configuration for your datas
 
 <a class="button" href="/tags">See All Available Tags</a>
 
-### Example labeling config
+### Example labeling configuration
 
-For example, to classify images that are referenced in your data as URLs (`$image_url`) into one of two classes, Cat or Dog, use this example labeling configuration: 
+For example, to classify images that are referenced in your data as URLs (`$image_url`) into one of two classes, "Cat" or "Dog", use the following example labeling configuration: 
 ```xml
 <View>
   <Image name="image_object" value="$image_url"/>
@@ -74,11 +79,13 @@ If you want to customize this example, such as to allow labelers to select both 
 </View>
 ```
 
+
 ## Set up labeling config in other ways
 
 If you want to specify a labeling configuration for your project without using the Label Studio UI, you can use the command line or the API. 
 
 ### Add a labeling config from the command line
+
 You can define the labeling configuration in a `config.xml` file and initialize a specific project in Label Studio with that file. 
 
 ```bash
@@ -86,4 +93,5 @@ label-studio my_new_project start --label-config config.xml
 ```
 
 ### Add a labeling config with the API
-You can configure your labeling configuration with the server API. See the [Backend API](api.html) documentation for more details.
+
+You can configure your labeling configuration with the server API. For more information, see the [Backend API](api.html) documentation.

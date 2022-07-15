@@ -14,20 +14,25 @@ Label and annotate your data with the open source data labeling tool, Label Stud
 4. Follow the project instructions for labeling and deciding whether to skip tasks. 
 5. Click the project name to return to the data manager.
 
-You can also [collaborate with other annotators](#Label-with-collaborators) to improve the quality of your labeled data. 
+
+!!! attention "Tip"
+    You can also [collaborate with other annotators](#Label-with-collaborators) to improve the quality of your labeled data. 
+
 
 ## Start labeling
 
 Some labeling tasks can be complicated to perform, for example, labeling that includes text, image, and audio data objects as part of one dataset and labeling task, or creating relations between annotations on a labeling task. This section includes guidance on how to perform more complex labeling tasks, such as labeling with relations, overlapping regions, selected tasks, or changing labels. 
 
 ### Choose which tasks to label
+
 From a project, click **Label All Tasks** to start labeling all tasks. To label the tasks as they are filtered and sorted in the data manager, select **Label Tasks As Displayed** instead. 
 
 You can also label a specific task in the **Quick View** or **Preview** by clicking it from the project data manager view, but you won't automatically see the next task in the labeling queue after submitting your annotations. 
 
-You can also select the checkboxes next to specific tasks and then click **Label $n Tasks** to label the selected number of tasks. For example, select the checkboxes for 5 different tasks, then click **Label 5 Tasks** to label only those 5 tasks. 
+You can also select the checkboxes next to specific tasks and then click **Label $n Tasks** to label the selected number of tasks. For example, select the checkboxes for five different tasks, then click **Label 5 Tasks** to label only those five tasks. 
 
 ### Label a region in the data
+
 Annotate a section of the data by adding a region. 
 
 1. Select the label you want to apply to the region. For some configurations, you can skip this step.
@@ -35,6 +40,7 @@ Annotate a section of the data by adding a region.
 3. Click **Submit** to submit the completed annotation and move on to the next task.
 
 ### Label overlapping regions
+
 When you label with bounding boxes and other image segmentation tasks, or when you're highlighting text for NLP and NER labeling, you might want to label overlapping regions. To do this easily, hide labeled regions after you annotate them. 
 
 1. Select the label that you want to apply to the region.
@@ -54,26 +60,30 @@ You can select multiple regions while labeling to make changes to them together.
 3. Click a selected region or press `u` to deselect it.
 
 ### Duplicate regions
+
 You can duplicate a region to create many identically-sized polygons, rectangles, or ellipses. 
 
 1. Select the region that you want to duplicate.
-2. Press `ctrl + d` to duplicate the region, or the sequence of `ctrl + c` and `ctrl + v` to copy and paste the region. Duplicated regions appear in the exact location as the region being duplicated. If you're using a Mac keyboard, use `cmd` instead of `ctrl`. 
+2. Press `ctrl + d` to duplicate the region, or the sequence of `ctrl + c` and `ctrl + v` to copy and paste the region. Duplicated regions appear in the exact location as the region being duplicated. If you are using a Mac keyboard, use `cmd` instead of `ctrl`. 
 3. Click the arrow tool, then move and resize the newly-created region.
 
 ### Change the label
+
 You can change the label of an existing region. 
 
-1. Select the labeled region, for example a span, bounding box, image segment, audio region, or other region, on the object or using the **Regions** sidebar.
+1. Select the labeled region, for example, a span, bounding box, image segment, audio region, or another region, on the object or using the **Regions** sidebar.
 2. Select a new label. Your changes to the label save automatically. 
 3. Click **Submit** to submit the completed annotation and move on to the next task.
 
 ### Delete a labeled region
-You can delete labeled regions, such as bounding boxes or text spans, if needed.  
+
+You can delete labeled regions, such as bounding boxes or text spans if needed.  
 
 1. Select the labeled region on the object or in the **Regions** sidebar. 
 2. Press the Backspace key, or go to the **Results** panel and remove the selected annotation.
 
 ### Delete an annotation
+
 After labeling a task, you can delete the annotation by clicking the trash can button to delete an annotation on the task. If you haven't saved your annotation yet, click the `X` icon to reset the task and remove your labeling activity.
 
 You can also delete all annotations on a task from the project page. See [Delete tasks or annotations](manage_data.html#Delete_tasks_or_annotations).
@@ -82,7 +92,7 @@ You can also delete all annotations on a task from the project page. See [Delete
 
 You can create relations between two results with both directions and labels. To add labels to directions, you must set up a labeling config with the relations tag. See more about [relations with labels](/tags/relations.html) in the Tags documentation.
 
-1. Select the region for the annotation that you want to relate to another annotation. If you're creating a direction-based relation, select the first one first. 
+1. Select the region for the annotation that you want to relate to another annotation. If you are creating a direction-based relation, select the first one first. 
 2. In the **Regions** section of the **Results** sidebar, click the **Create Relation** button that looks like a hyperlink icon.
 3. Select the second region for the annotation to complete the relation.
 
@@ -97,22 +107,20 @@ After you relate two annotation regions, you can modify the relation in the **Re
 
 When annotators skip a task, the task no longer appears in the labeling queue for that annotator. Other annotators still see the task in their labeling queue. 
 
+
 ## Label with collaborators
 
-In both Label Studio and Label Studio Enterprise, you can label tasks with collaborators. Tasks are locked while someone performs annotations so that you don't accidentally overwrite the annotations of another annotator. After the other annotator finishes with the task, it can appear in your queue for labeling if the minimum annotations per task is set to more than one. By default, tasks only need to be annotated by one annotator. 
+In both Label Studio and Label Studio Enterprise, you can label tasks with collaborators. Tasks are locked while someone performs annotations so that you don't accidentally overwrite the annotations of another annotator. After the other annotator finishes with the task, it can appear in your queue for labeling if the minimum annotations per task are set to more than one. By default, tasks only need to be annotated by one annotator. 
 
-<div class="enterprise"><p>
-If you're using Label Studio Enterprise and want more than one annotator to annotate tasks, <a href="setup_project.html">update the project settings</a>. After you update the minimum annotations required per task, annotators can use the Label Stream workflow to label their tasks.  
-</p></div>
+<i class='ent'></i> If you are using Label Studio Enterprise and want more than one annotator to annotate tasks, <a href="setup_project.html">update the project settings</a>. After you update the minimum annotations required per task, annotators can use the Label Stream workflow to label their tasks.  
 
-If you want to label tasks more than once, even if the minimum annotations required is set to one, do the following:
-
-To label tasks multiple times while the minimum annotations required is set to one, do the following:
+To label tasks multiple times while the minimum annotations required are set to one, do the following:
 1. In the data manager for the project, click a task to open the quick labeling view.
 2. Click the `+` icon next to the task annotation ID to open an annotation tab. 
 3. Label the task.
 4. Click **Submit** to save your annotation.
 5. Click the next task in the data manager to open the quick labeling view for that task and repeat steps 2-4.
+
 
 ## Perform ML-assisted labeling with interactive preannotations
 
@@ -121,10 +129,12 @@ If you have a machine learning backend set up to [get interactive preannotations
 1. After you start labeling, you can enable **Auto-Annotation** to see and use the smart option to assign a label to draw a shape, mask, or assign a keypoint. After using the smart option to draw on an image, or labeling a text or HTML span, the ML backend returns predictions.  
 2. For image labeling, you can choose whether to **Auto accept annotation suggestions** after you enable auto-annotation. If you automatically accept annotation suggestions, regions show up automatically and are immediately created. If you don't automatically accept suggestions, the regions appear but you can reject or approve them manually, either individually or all at once. Predicted text regions are automatically accepted.
 
+
 ## Use keyboard shortcuts to label regions faster
+
 Use keyboard shortcuts, or hotkeys, to improve your labeling performance. When performing a labeling task, click the gear icon to see more details about hotkeys or to enable or disable hotkeys. 
 
-This table describes the hotkeys for a standard keyboard. For a Mac keyboard, use return instead of enter, delete instead of backspace, and option instead of alt.
+The following table describes the hotkeys for a standard keyboard. For a Mac keyboard, use return instead of enter, delete instead of backspace, and option instead of alt.
 
 | Key | Description |
 | --- | --- | 
@@ -197,6 +207,7 @@ When labeling video data with the `Video` tag, you can use specific hotkeys to t
 | `alt` + `right arrow` | Fast forward one frame. | 
 
 ### Customize hotkeys
+
 You can specify custom hotkeys for labeling using the [Shortcut tag](/tags/shortcut.html), or change the hotkeys used for specific actions using an environment variable. 
 
 If you want to change the hotkeys used for specific actions, set the `EDITOR_KEYMAP` environment variable with valid JSON in your `.env` file or when starting Label Studio. For example, to change the keyboard shortcut used to submit an annotation to `shift` + `s`, set the environment variable as follows:
@@ -207,11 +218,13 @@ This overwrites the existing hotkey mapping with your custom mapping. See [more 
 
 Refer to the full list of customizable hotkeys in the [`keymap.json` file of the `label-studio-frontend`](https://github.com/heartexlabs/label-studio-frontend/blob/master/src/core/settings/keymap.json) repository to update a different hotkey combination. 
 
-You cannot use this environment variable to remove an existing or add a new keyboard shortcut. 
+!!! warning 
+    Do not use the environment variable to remove an existing or add a new keyboard shortcut. 
+
 
 ## Customize the labeling interface 
 
-Click the settings icon when labeling to configure the labeling interface to suit your labeling use case. 
+Click the **Settings** icon when labeling to configure the labeling interface to suit your labeling use case. 
 
 For example, keep a label selected after creating a region, display labels on bounding boxes, polygons and other regions while labeling, and show line numbers for text labeling.
 
@@ -220,6 +233,7 @@ For example, keep a label selected after creating a region, display labels on bo
 </center>
 
 You can also modify the layout of the screen, hide or show predictions, annotations, or the results panel, and hide or show various controls and buttons.
+
 
 ## Advanced image labeling
 
@@ -234,9 +248,7 @@ You can add multiple types of regions to image annotations. You can add any of t
 - Polygons
 - Brush masks
 
-To add different types of regions to your image annotations, follow this example.
-
-Create a custom template for your labeling interface using the following example:
+Use the following example to add different types of regions to your image annotations and to create a custom template for your labeling interface:
 ```xml
 <View>
   <Image name="image" value="$image" />
@@ -273,9 +285,7 @@ When you're annotating images, you can create regions without applying labels.
 3. Select the label that you want to apply to the region.
 4. Repeat these steps for any regions that you want to create.
 
-This can be helpful for two-step labeling, where you want one annotator to create regions and another annotator to label the regions. 
-
-By default, regions without labels appear gray.
+This can be helpful for two-step labeling, where you want one annotator to create regions and another annotator to label the regions. By default, regions without labels appear gray.
 
 ### Erase brush mask labels
 

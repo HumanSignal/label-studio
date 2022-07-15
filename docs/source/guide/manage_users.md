@@ -10,9 +10,9 @@ meta_description: Manage access and set up permissions with user roles, organiza
 
 Manage access to projects, organizations, and workspaces in Label Studio to restrict who can view data, annotations, and predictions in your data labeling projects. 
 
-<div class="enterprise"><p>
-Role-based access control, organizations, and workspaces are available only in Label Studio Enterprise Edition. For information about users in the open source Label Studio Community Edition, see <a href="signup.html">Set up user accounts for Label Studio</a>.
-</p></div>
+
+<i class='ent'></i> Role-based access control, organizations, and workspaces are available only in Label Studio Enterprise Edition. For information about users in the open source Label Studio Community Edition, see <a href="signup.html">Set up user accounts for Label Studio</a>.
+
 
 ## Roles in Label Studio Enterprise
 
@@ -20,11 +20,12 @@ There are five roles available in Label Studio Enterprise Edition. Organization 
 
 | Role | Description |
 | --- | --- |
-| Owner | Not an assignable role. Manages Label Studio. Can create and modify workspaces, create and modify projects, and view activity log. |
-| Administrator | Has full access to all workspaces and projects. Can modify workspaces, view activity logs, and approve invitations. Can’t see the workspace owner’s account page. | 
-| Manager | After being assigned to a workspace by an Owner or Administrator, has full administrative access in the assigned workspaces. Can view any project and has full access to their own projects. |
-| Reviewer | Reviews annotated tasks. Can view projects with tasks assigned to them. Can review and update task annotations. |
-| Annotator | Labels tasks. Can view projects with tasks assigned to them and label tasks in those projects. |
+| Owner | Not an assignable role. <br> Manages Label Studio. <br> Create and modify workspaces. <br> Create and modify projects. <br> View activity log. |
+| Administrator | Has full access to all workspaces and projects. <br> Modify workspaces. <br> View activity logs. <br> Approve invitations. <br> Cannot see the workspace owner’s account page. | 
+| Manager | After being assigned to a workspace by an Owner or Administrator, has full administrative access in the assigned workspaces. <br> View any project and has full access to their own projects. |
+| Reviewer | Reviews annotated tasks. <br> View projects with tasks assigned to them. <br> Can review and update task annotations. |
+| Annotator | Labels tasks. <br> View projects with tasks assigned to them and label tasks in those projects. |
+
 
 ## Roles in Label Studio Teams
 
@@ -32,10 +33,12 @@ There are two roles available in Label Studio Teams Edition. Organization member
 
 | Role | Description |
 | --- | --- |
-| Owner | Not an assignable role. Manages Label Studio. Can create and modify workspaces, create and modify projects, and view activity log. |
-| Manager | After being assigned to a workspace by an Owner, has full administrative access in the assigned workspaces. Can view any project and has full access to their own projects. |
+| Owner | Not an assignable role. <br> Manages Label Studio. <br> Create and modify workspaces. <br>  Create and modify projects. <br> View activity log. |
+| Manager | After being assigned to a workspace by an Owner, has full administrative access in the assigned workspaces. <br> View any project and has full access to their own projects. |
+
 
 ## Roles and workspaces
+
 Use a combination of roles, to control what actions users can take, and project workspaces, to control what data and projects users have access to. 
 
 For example, a project annotator using Label Studio sees only the projects they have access to:
@@ -280,7 +283,7 @@ If permitted by your Label Studio Enterprise plan, you can create organizations 
 For example, you might set up one of the following possible configurations:
 - One organization for your company, with one workspace for the support department and another for the development team, with specific projects in each workspace for different types of customer requests. 
   <img src="/images/LSE/LSE-one-org-many-workspaces.jpg" alt="Diagram showing Label Studio with one organization with multiple workspaces and projects within each workspace."/>
-- Multiple organizations, such as one for the customer claims department and another for the customer support department, with specific workspaces in each organization for specific types of insurance, such as home insurance claims and auto insurance claims, and specific projects in each workspace for types of claims, such as Accident Claims, Injury Claims, Natural Disaster Claims. The Customer support organization might have workspaces specific to the types of support queues, with projects for specific types of calls received.
+- Multiple organizations, such as one for the customer claims department and another for the customer support department, with specific workspaces in each organization for specific types of insurance. For example, home insurance claims and auto insurance claims, and specific projects in each workspace for types of claims, such as Accident Claims, Injury Claims, and Natural Disaster Claims. The Customer support organization might have workspaces specific to the types of support queues, with projects for specific types of calls received.
 <img src="/images/LSE/LSE-multiple-orgs-workspaces.jpg" alt="Diagram showing Label Studio with three organizations, each one with multiple workspaces and projects within each workspace."/>
 
 When you assign a user role to an organization member, they hold that role for all workspaces and projects for that organization.
@@ -289,19 +292,21 @@ Managers within an organization can see all workspaces in that organization, eve
 
 If you have access to multiple organizations, use the **Organizations** page to switch between the organizations that you are a member of.
 
+
 ## Create workspaces to organize projects
+
 Within an organization, owners, administrators, and managers can create and manage workspaces. Workspace managers can only manage workspaces that they create or have been added to. 
 
-Create a workspace to organize projects by doing the following:
+To create a workspace and organize projects:
 1. In the Label Studio UI, click the `+` sign next to **Workspaces** in the menu.
 2. Name the workspace, and if you want, select a color.
 3. Click **Save**
 
-After creating a workspace, you can create projects for that workspace, or use the **Project Settings** page to move a project to the new workspace. Your private sandbox also functions as a workspace, but only you can see projects in your sandbox. 
+After creating a workspace, you can create projects for that workspace, or use the **Project Settings** page to move a project to the new workspace. Your private Sandbox also functions as a workspace, but only you can see projects in your Sandbox. 
 
 ### Add or remove members to a workspace
 
-From a specific workspace inside the Label Studio UI, do the following:
+To add or remove members from a specific workspace inside the Label Studio UI:
 1. Click **Manage Members**.
 2. Use the search functionality to locate the user that you want to add to the workspace.
 3. Select the checkbox next to their name and click the `>` arrow so that they appear in the list of users that **Belong to the Workspace**.
@@ -310,12 +315,14 @@ From a specific workspace inside the Label Studio UI, do the following:
 You can also remove yourself or other members from a workspace by following the same process and removing members with the `<` arrow. 
 
 ### Sandbox workspace
+
 Each user has a personal Sandbox workspace that they can use to experiment with project settings and get familiar with Label Studio. After you set up a project and want others to collaborate on it with you, you can update the project workspace in the **Project Settings**. You cannot add members to your Sandbox workspace.
 
 ### Delete a workspace
+
 You can only delete a workspace if it has no projects. If you want to delete a workspace, first delete the projects or move them to another workspace. 
 
-To delete a workspace, do the following:
+To delete a workspace:
 1. In the Label Studio UI, open the workspace.
 2. Click the gear icon next to the workspace name.
 3. In the dialog box that appears, click **Delete Workspace**. If the button is not available to select, the workspace still contains projects. 

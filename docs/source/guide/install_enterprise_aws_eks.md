@@ -13,7 +13,9 @@ Install Label Studio Enterprise on Amazon Elastic Kubernetes Service (EKS).
 
 Before you start, review the [deployment planning guidance](install_enterprise.html).
 
-> For further details beyond these steps, see the Amazon tutorial on how to [Deploy a Kubernetes Application with Amazon Elastic Container Service for Kubernetes](https://aws.amazon.com/getting-started/hands-on/deploy-kubernetes-app-amazon-eks/).
+!!! note
+    For further details beyond these steps, see the Amazon tutorial on how to [Deploy a Kubernetes Application with Amazon Elastic Container Service for Kubernetes](https://aws.amazon.com/getting-started/hands-on/deploy-kubernetes-app-amazon-eks/).
+
 
 ## 1. Prerequisites
 
@@ -29,11 +31,12 @@ Before you can install Label Studio Enterprise on an EKS cluster, make sure that
 | Redis | version 6.0.5 or higher |
 | PostgreSQL | version 11.9 or higher |
 
-## 2. Deploy Kubernetes using eksctl
+## 2. Deploy Kubernetes using `eksctl`
 
-Use the eksctl tool to deploy an EKS cluster in your Amazon AWS environment. The eksctl create cluster command creates a virtual private cloud (VPC), a security group, and an IAM role for Kubernetes to create resources. For detailed instructions, see [Getting started with Amazon EKS](https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html) in the Amazon EKS User Guide. 
+Use the `eksctl` tool to deploy an EKS cluster in your Amazon AWS environment. The `eksctl` create cluster command creates a virtual private cloud (VPC), a security group, and an IAM role for Kubernetes to create resources. For detailed instructions, see [Getting started with Amazon EKS](https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html) in the Amazon EKS User Guide. 
 
-> Note: The Amazon user that creates the cluster is the one managing the cluster. See [Managing users or IAM roles for your cluster](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html) in the Amazon EKS User Guide.
+!!! note 
+    The Amazon user that creates the cluster is the one managing the cluster. See [Managing users or IAM roles for your cluster](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html) in the Amazon EKS User Guide.
 
 1. To deploy an EKS cluster, run the following:
 ```shell
@@ -42,20 +45,22 @@ eksctl create cluster \
 --region region-code \
 ```
 
-For example:
-```shell
-eksctl create cluster --name label-studio-enterprise --region us-east-2
-```
+    For example:
+    ```shell
+    eksctl create cluster --name label-studio-enterprise --region us-east-2
+    ```
 2. Then, verify that the deployment was successful:
 ```shell
 kubectl get all
 ```
 
-After your cluster is up and running, and you configure your infrastructure such as ingress, you can prepare your cluster to install Label Studio Enterprise. 
+    To prepare your cluster to install Label Studio Enterprise, the following conditions must be met: 
+    - Your cluster must be up and running.
+    - Your infrastructure such as ingress must be configured.
 
 ## 3. Prepare the Kubernetes cluster to install Label Studio Enterprise
 
-Before installing Label Studio Enterprise, prepare the Kubernetes cluster with [kubectl](https://kubernetes.io/docs/reference/kubectl/). 
+Before installing Label Studio Enterprise, prepare the Kubernetes cluster with [`kubectl`](https://kubernetes.io/docs/reference/kubectl/). 
 
 ### Retrieve Label Studio Enterprise and configure the license
 
@@ -78,4 +83,4 @@ Before installing Label Studio Enterprise, prepare the Kubernetes cluster with [
 
 ## 4. Set up Label Studio Enterprise Helm chart
 
-See [Configure a values.yaml file for Label Studio Enterprise](install_enterprise_k8s.html#Configure-values-yaml).
+To set up Label Studio Enterprise Helm chart, see [Configure a `values.yaml` file for Label Studio Enterprise](install_enterprise_k8s.html#Configure-values-yaml).

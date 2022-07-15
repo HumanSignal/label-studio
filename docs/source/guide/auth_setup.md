@@ -10,15 +10,16 @@ meta_description: Label Studio Enterprise documentation for setting up SSO and L
 
 Set up single sign-on using SAML to manage access to Label Studio using your existing Identity Provider (IdP), or use LDAP authentication.
 
-<div class="enterprise"><p>
-SSO and LDAP authentication are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
-</p></div>
+<i class='ent'></i>
+SSO and LDAP authentication are only available in Label Studio Enterprise Edition. If you are using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
+
 
 To more easily [manage access to Label Studio Enterprise](manage_users.html), you can map SAML or LDAP groups to both `roles` or `workspaces`. 
 
+
 ## Set up SAML SSO
 
-The organization owner for Label Studio Enterprise can set up SSO & SAML for the instance. Label Studio Enterprise supports the following IdPs:
+The organization owner for Label Studio Enterprise can set up SSO and SAML for the instance. Label Studio Enterprise supports the following IdPs:
 - Microsoft Active Directory
 - Okta
 - OneLogin
@@ -34,12 +35,12 @@ Set up Label Studio Enterprise as a Service Provider (SP) with your Identity Pro
 2. Click **SSO & SAML**.
 3. In the **Organization** field, specify the domain used for your organization by your SAML IdP. 
 4. Open your IdP configuration options and add the following URLs from Label Studio Enterprise to your IdP:
-  1. Copy the **URL for the Assertion Consumer Service (ACS)** that the IdP uses to redirect users to after a successful authentication and paste it into the appropriate location in your IdP configuration options.
+  1. Copy the **URL for the Assertion Consumer Service (ACS)** that the IdP uses to redirect users to after successful authentication and paste it into the appropriate location in your IdP configuration options.
   2. Copy the **login URL** used for logging in to Label Studio Enterprise and paste it into the appropriate location in your IdP configuration options.
   3. Copy the **logout URL** used to redirect users after successfully logging out of Label Studio Enterprise and paste it into the appropriate location in your IdP configuration options.
 5. In your IdP, generate a metadata XML file, or a URL that specifies the metadata for the IdP. 
 6. In Label Studio Enterprise, upload the metadata XML file or specify the metadata URL. 
-7. In your IdP, set up or confirm setup of the following SAML attributes. Label Studio Enterprise expects specific attribute mappings for user identities.
+7. In your IdP, set up or confirm the setup of the following SAML attributes. Label Studio Enterprise expects specific attribute mappings for user identities.
    | Data | Required Attribute |
    | --- | --- |
    | Email address | Email |
@@ -47,22 +48,26 @@ Set up Label Studio Enterprise as a Service Provider (SP) with your Identity Pro
    | Last or family name | LastName |
    | Group name | Groups |
 8. If you want users in specific groups to get access to specific workspaces in Label Studio Enterprise, map the **Workspace name** to a **Group** passed as SAML attributes in the SAML authentication response.
-    1. In the **Workspaces to Groups Mapping** section, click **+ Add Mapping**.
-    2. In the **Workspace** field, type a new workspace name or select a workspace from the drop-down list. Then, type a **Group** that matches a group name sent as an attribute in a SAML authentication response by your IdP. You can map multiple groups to the same workspace. 
-    3. Click **+ Add Mapping** to map additional workspaces to groups. 
+    - In the **Workspaces to Groups Mapping** section, click **+ Add Mapping**.
+    - In the **Workspace** field, type a new workspace name or select a workspace from the drop-down list. Then, type a **Group** that matches a group name sent as an attribute in a SAML authentication response by your IdP. You can map multiple groups to the same workspace. 
+    - Click **+ Add Mapping** to map additional workspaces to groups. 
 9. You can also map specific user groups to specific user roles in Label Studio Enterprise. 
-   1. In the **Roles to Groups Mapping** section, click **+ Add Mapping**.
-   2. Select a **Role** from the drop-down list of options, then type a **Group** that matches a group name sent as an attribute in a SAML authentication response by your IdP. You can map multiple groups to the same role. 
-   3. Click **+ Add Mapping** to map additional roles to groups. 
+   - In the **Roles to Groups Mapping** section, click **+ Add Mapping**.
+   - Select a **Role** from the drop-down list of options, then type a **Group** that matches a group name sent as an attribute in a SAML authentication response by your IdP. You can map multiple groups to the same role. 
+   - Click **+ Add Mapping** to map additional roles to groups. 
 10. Click **Save** to save your SAML and SSO settings. 
 
 Test the configuration by logging in to Label Studio Enterprise with your SSO account.
 
+
 ## Set up LDAP authentication 
 
-After you set up LDAP authentication, you can no longer use native authentication to log in to the Label Studio UI. Set up LDAP authentication and assign LDAP users to your Label Studio Enterprise organization using environment variables in Docker. 
+!!! note
+    After you set up LDAP authentication, you can no longer use native authentication to log in to the Label Studio UI. 
 
-You can also map specific LDAP groups to specific organization roles and workspaces in Label Studio Enterprise, making it easier to set up and manage role-based access control (RBAC) and project access in Label Studio Enterprise. 
+Set up LDAP authentication and assign LDAP users to your Label Studio Enterprise organization using environment variables in Docker. 
+
+You can also map specific LDAP groups to specific organizational roles and workspaces in Label Studio Enterprise, making it easier to set up and manage role-based access control (RBAC) and project access in Label Studio Enterprise. 
 
 You can refer to this example environment variable file for your own LDAP setup:
 

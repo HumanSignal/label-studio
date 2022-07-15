@@ -362,7 +362,7 @@ rqworker:
 </div>
 <div data-name="Service Account Key">
 
-You canß use a service account key that you create, or if you already have a Kubernetes secret and key, follow the steps to [set up Microsoft Azure Storage](#Use-an-existing-Kubernetes-secret-and-key) to use those.
+You can use a service account key that you create, or if you already have a Kubernetes secret and key, follow the steps to [set up Microsoft Azure Storage](#Use-an-existing-Kubernetes-secret-and-key) to use those.
 
 #### Create a new service account key
 1. Create a service account key from the UI and download the JSON. Follow the steps for [Creating and managing service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) in the Google Cloud Identity and Access Management guide. 

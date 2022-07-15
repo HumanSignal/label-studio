@@ -34,9 +34,11 @@ meta_description: For cases when you want to customize your Label Studio Enterpr
 </style>
 
 Refer to these tables with available Helm chart values for your `lse-values.yaml` file
-when configuring your Label Studio Enterprise deployment on Kubernetes. See [Deploy Label Studio Enterprise on Kubernetes](install_enterprise_k8s.html) for more.
+when configuring your Label Studio Enterprise deployment on Kubernetes. For more information, see [Deploy Label Studio Enterprise on Kubernetes](install_enterprise_k8s.html). 
+
 
 ## Global parameters
+
 Global parameters for the Helm chart.
 
 | Key                                                                         | Type   | Default Value                       | Description                                                                                         |
@@ -96,7 +98,9 @@ Global parameters for the Helm chart.
 | `global.persistence.config.gcs.urlExpirationSecs`                           | string | 86400                               | The number of seconds that a presigned URL is valid for                                             |
 | `featureFlags`                                                              | map    | {}                                  | Key/value map of Feature Flags                                                                      |
 
+
 ## App parameters
+
 Parameters specific to the `app` portion of the Label Studio Enterprise deployment.
 
 | Key                                                     | Type    | Default  Value    | Description                                                                                 |
@@ -109,20 +113,20 @@ Parameters specific to the `app` portion of the Label Studio Enterprise deployme
 | `app.NameOverride`                                      | string  | ""                | String to partially override release template name                                          |
 | `app.FullnameOverride`                                  | string  | ""                | String to fully override release template name                                              |
 | `app.resources.requests.memory`                         | string  | 384Mi             | The requested memory resources for the App container                                        |
-| `app.resources.requests.cpu`                            | string  | 250m              | The requested cpu resources for the App container                                           |
+| `app.resources.requests.cpu`                            | string  | 250m              | The requested CPU resources for the App container                                           |
 | `app.resources.limits.memory`                           | string  | 1024Mi            | The memory resources limits for the App container                                           |
-| `app.resources.limits.cpu`                              | string  | 750m              | The cpu resources limits for the App container                                              |
+| `app.resources.limits.cpu`                              | string  | 750m              | The CPU resources limits for the App container                                              |
 | `app.logLevel`                                          | string  | INFO              | Application log level                                                                       |
 | `app.debug`                                             | string  | ""                | Application DEBUG mode                                                                      |
 | `app.extraEnvironmentVars`                              | map     | {}                | A map of extra environment variables to set                                                 |
 | `app.extraEnvironmentSecrets`                           | map     | {}                | A map of extra environment secrets to set                                                   |
-| `app.nodeSelector`                                      | map     | {}                | labels for pod assignment, formatted as a multi-line string or YAML map                     |
+| `app.nodeSelector`                                      | map     | {}                | Labels for pod assignment, formatted as a multi-line string or YAML map                     |
 | `app.annotations`                                       | map     | {}                | k8s annotations to attach to the app pods                                                   |
-| `app.extraLabels`                                       | map     | {}                | extra k8s labels to attach                                                                  |
+| `app.extraLabels`                                       | map     | {}                | Extra k8s labels to attach                                                                  |
 | `app.affinity`                                          | map     | {}                | Affinity for pod assignment                                                                 |
 | `app.tolerations`                                       | list    | []                | Toleration settings for pod                                                                 |
-| `app.readinessProbe.enabled`                            | string  | true              | Enable redinessProbe                                                                        |
-| `app.readinessProbe.path`                               | string  | /version          | Path for reasinessProbe                                                                     |
+| `app.readinessProbe.enabled`                            | string  | true              | Enable readinessProbe                                                                        |
+| `app.readinessProbe.path`                               | string  | /version          | Path for readinessProbe                                                                     |
 | `app.readinessProbe.failureThreshold`                   | string  | 2                 | When a probe fails, Kubernetes will try failureThreshold times before giving up             |
 | `app.readinessProbe.initialDelaySeconds`                | string  | 10                | Number of seconds after the container has started before probe initiates                    |
 | `app.readinessProbe.periodSeconds`                      | string  | 10                | How often (in seconds) to perform the probe                                                 |
@@ -137,7 +141,7 @@ Parameters specific to the `app` portion of the Label Studio Enterprise deployme
 | `app.livenessProbe.timeoutSeconds`                      | string  | 5                 | Number of seconds after which the probe times out                                           |
 | `app.service.type`                                      | string  | ClusterIP         | k8s service type                                                                            |
 | `app.service.port`                                      | string  | 80                | k8s service port                                                                            |
-| `app.service.targetPort`                                | string  | 8085              | k8s servuce target port                                                                     |
+| `app.service.targetPort`                                | string  | 8085              | k8s service target port                                                                     |
 | `app.service.portName`                                  | string  | service           | k8s service port name                                                                       |
 | `app.service.annotations`                               | map     | {}                | Custom annotations for app service                                                          |
 | `app.service.sessionAffinity`                           | string  | "None"            | Session Affinity for Kubernetes service, can be "None" or "ClientIP"                        |
@@ -162,15 +166,12 @@ Parameters specific to the `app` portion of the Label Studio Enterprise deployme
 | `app.dnsPolicy`                                         | string  | ""                | Pod DNS policy                                                                              |
 | `app.enableServiceLinks`                                | boolean | false             | Service environment variables                                                               |
 | `app.shareProcessNamespace`                             | boolean | false             | Enable shared process namespace in a pod                                                    |
-| `app.automountServiceAccountToken`                      | bollean | true              | Automount service account token for the server service account                              |
-
-
-
+| `app.automountServiceAccountToken`                      | bolean | true              | Automount service account token for the server service account                              |
 
 
 ## Rqworker parameters
 
-Parameters specific to the `rqworkers` service of your Label Studio Enterprise deployment.
+Parameters are specific to the `rqworkers` service of your Label Studio Enterprise deployment.
 
 | Key                                                          | Type     | Default  | Description                                                                                 |
 |--------------------------------------------------------------|----------|----------|---------------------------------------------------------------------------------------------|
@@ -180,20 +181,20 @@ Parameters specific to the `rqworkers` service of your Label Studio Enterprise d
 | `rqworker.deploymentStrategy.type`                           | string   | Recreate | Deployment strategy type                                                                    |
 | `rqworker.replicas`                                          | string   | 1        | Amount of rqworker replicas                                                                 |
 | `rqworker.resources.requests.memory`                         | string   | 256Mi    | The requested memory resources for the Rqworker container                                   |
-| `rqworker.resources.requests.cpu`                            | string   | 100m     | The requested cpu resources for the Rqworker container                                      |
+| `rqworker.resources.requests.cpu`                            | string   | 100m     | The requested CPU resources for the Rqworker container                                      |
 | `rqworker.resources.limits.memory`                           | string   | 512Mi    | The memory resources limits for the Rqworker container                                      |
-| `rqworker.resources.limits.cpu`                              | string   | 500m     | The cpu resources limits for the Rqworker container                                         |
+| `rqworker.resources.limits.cpu`                              | string   | 500m     | The CPU resources limits for the Rqworker container                                         |
 | `rqworker.logLevel`                                          | string   | INFO     | Rqworker log level                                                                          |
 | `rqworker.debug`                                             | string   | ""       | Rqworker DEBUG mode                                                                         |
 | `rqworker.extraEnvironmentVars`                              | map      | {}       | A map of extra environment variables to set                                                 |
 | `rqworker.extraEnvironmentSecrets`                           | map      | {}       | A map of extra environment secrets to set                                                   |
-| `rqworker.nodeSelector`                                      | map      | {}       | labels for pod assignment, formatted as a multi-line string or YAML map                     |
+| `rqworker.nodeSelector`                                      | map      | {}       | Labels for pod assignment, formatted as a multi-line string or YAML map                     |
 | `rqworker.annotations`                                       | map      | {}       | k8s annotations to attach to the rqworker pods                                              |
-| `rqworker.extraLabels`                                       | map      | {}       | extra k8s labels to attach                                                                  |
+| `rqworker.extraLabels`                                       | map      | {}       | Extra k8s labels to attach                                                                  |
 | `rqworker.affinity`                                          | map      | {}       | Affinity for pod assignment                                                                 |
 | `rqworker.tolerations`                                       | list     | []       | Toleration settings for pod                                                                 |
 | `rqworker.readinessProbe.enabled`                            | string   | false    | Enable redinessProbe                                                                        |
-| `rqworker.readinessProbe.path`                               | string   | /version | Path for reasinessProbe                                                                     |
+| `rqworker.readinessProbe.path`                               | string   | /version | Path for readinessProbe                                                                     |
 | `rqworker.readinessProbe.failureThreshold`                   | string   | 2        | When a probe fails, Kubernetes will try failureThreshold times before giving up             |
 | `rqworker.readinessProbe.initialDelaySeconds`                | string   | 35       | Number of seconds after the container has started before probe initiates                    |
 | `rqworker.readinessProbe.periodSeconds`                      | string   | 5        | How often (in seconds) to perform the probe                                                 |
@@ -220,6 +221,7 @@ Parameters specific to the `rqworkers` service of your Label Studio Enterprise d
 | `rqworker.enableServiceLinks`                                | boolean  | false    | Service environment variables                                                               |
 | `rqworker.shareProcessNamespace`                             | boolean  | false    | Enable shared process namespace in a pod                                                    |
 | `rqworker.automountServiceAccountToken`                      | bollean  | true     | Automount service account token for the server service account                              |
+
 
 ## Deprecated parameters
 

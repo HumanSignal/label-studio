@@ -8,7 +8,7 @@ meta_description: Label Studio tutorial for creating and integrating your Machin
 
 ## Create the simplest Machine Learning backend
 
-This tutorial explains the basics of using a Machine Learning (ML) backend  with Label Studio. For the sake of simpflicity, this tutorial relies on a _dummy model_ that just produces random predictions.
+This tutorial explains the basics of using a Machine Learning (ML) backend with Label Studio. For the sake of simplicity, this tutorial relies on a _dummy model_ that just produces random predictions.
 This model is compatible with any classification task, such as those projects where the `<Choices>` tag is used.
 
 For example, let's consider this labeling config: 
@@ -87,9 +87,10 @@ Call your ML backend `my_backend` and from the command line, initialize the ML b
 label-studio-ml init my_backend
 ```
 
-The last command takes your script `./model.py` and creates an `./my_backend` directory at the same level, copying the configs and scripts needed to launch the ML backend in either development or production modes.
+The last command takes your script `./model.py` and creates a `./my_backend` directory at the same level, copying the configs and scripts needed to launch the ML backend in either development or production modes.
 
-> Note: You can specify different location for your model script, for example: `label-studio-ml init my_backend --script /path/to/my/script.py`
+!!! note 
+    You can specify different location for your model script, for example: `label-studio-ml init my_backend --script /path/to/my/script.py`
 
 ### Launch ML backend server
 
