@@ -19,6 +19,7 @@ Use with the following data types: text
 | name | <code>string</code> |  | Name of the element |
 | value | <code>string</code> |  | Data field containing text or a UR |
 | [valueType] | <code>url</code> \| <code>text</code> | <code>text</code> | Whether the text is stored directly in uploaded data or needs to be loaded from a URL |
+| [resolver] | <code>string</code> | | [Multi-step retrieval of the content from the storage](/guide/tasks.html#how-to-retrieve-data) |
 | [saveTextResult] | <code>yes</code> \| <code>no</code> |  | Whether to store labeled text along with the results. By default, doesn't store text for `valueType=url` |
 | [encoding] | <code>none</code> \| <code>base64</code> \| <code>base64unicode</code> |  | How to decode values from encoded strings |
 | [selectionEnabled] | <code>boolean</code> | <code>true</code> | Enable or disable selection |
