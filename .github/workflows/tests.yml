@@ -6,10 +6,6 @@ on:
       ref:
         required: true
         type: string
-      repo:
-        required: true
-        type: string
-        default: heartexlabs/label-studio
 
 env:
   NODE: '14'
@@ -42,7 +38,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          repository: ${{ inputs.repo }}
           ref: ${{ inputs.ref }}
 
       - name: Set up Python ${{ matrix.python-version }}
@@ -165,7 +160,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          repository: ${{ inputs.repo }}
           ref: ${{ inputs.ref }}
 
       - name: Set up Python ${{ matrix.python-version }}
@@ -258,7 +252,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          repository: ${{ inputs.repo }}
           ref: ${{ inputs.ref }}
 
       - name: Set up Python ${{ matrix.python-version }}
