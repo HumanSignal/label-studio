@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2655: Hold to continuous draw image view shapes show immediately (#744)\n\n* fix: DEV-2655: Hold to continuous draw image region shapes shows immediately when dragged\r\n\r\n* fix: DEV-2655: Hold and drag should count as one continuous action and draw the next shape immediately\r\n\r\n* fix: DEV-2655: Ensure shape is not in drawing mode when deselecting\r\n\r\n* fix: DEV-2655: Ensure no other tools are affected by deselection when clicking on canvas.",
-  "commit": "169adcd0a057920ba2034327a681496d2487f4f6",
-  "branch": "master",
-  "date": "2022-07-14T14:20:40Z"
+  "message": "fix: DEV-2696: 3point bbox tool remains selected but hidden, when user changes label configuration from Rectangle to RectangleLabels",
+  "commit": "88ba482f7ad798240fb4b36252b6a8db9fe760a7",
+  "branch": "fb-dev-2696",
+  "date": "2022/07/15 10:51:51"
 }
