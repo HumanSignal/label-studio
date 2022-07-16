@@ -8,10 +8,10 @@ meta_description: Label Studio tutorial for creating and integrating your Machin
 
 ## Create the simplest Machine Learning backend
 
-This tutorial explains the basics of using a Machine Learning (ML) backend with Label Studio. For the sake of simplicity, this tutorial relies on a _dummy model_ that just produces random predictions.
+This tutorial explains the basics of using a Machine Learning backend to Label Studio. For the sake of simplicity, this tutorial relies on a dummy model that just produces random predictions.
 This model is compatible with any classification task, such as those projects where the `<Choices>` tag is used.
 
-For example, let's consider this labeling config: 
+For example, consider the following labeling configuration:
 ```
 <View>
   <Image name="image" value="$image"/>
@@ -27,7 +27,7 @@ For example, let's consider this labeling config:
 If you create an ML backend using [Label Studio's ML SDK](/guide/ml_create.html), make sure your ML backend script does the following:
 
 - Inherit the created model class from `label_studio_ml.LabelStudioMLBase`
-- Override the 2 methods:
+- Override the following methods:
     - `predict()`, which takes [input tasks](/guide/tasks.html#Basic-Label-Studio-JSON-format) and outputs [predictions](/guide/predictions.html) in the Label Studio JSON format.
     - `fit()`, which receives [annotations](/guide/export.html#Label-Studio-JSON-format-of-annotated-tasks) iterable and returns a dictionary with created links and resources. This dictionary is used later to load models with the `self.train_output` field.
 
@@ -111,14 +111,14 @@ The server started on `http://localhost:9090` and outputs logs in console.
 Production mode is powered by a Redis server and RQ jobs that take care of background training processes. This means that you can start training your model and continue making requests for predictions from the current model state. 
 After the model finishes the training process, the new model version updates automatically.
 
-For production mode, please make sure you have Docker and docker-compose installed on your system. Then run the following from the command line:
+For production mode, make sure you have Docker and docker-compose installed on your system. Then run the following from the command line:
 
 ```bash
 cd my_backend/
 docker-compose up
 ```
 
-You can explore runtime logs in `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log`
+You can explore runtime logs in `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log`.
 
 ### Using ML backend with Label Studio
 

@@ -11,6 +11,8 @@ Label Studio includes several types of webhook events that trigger when specific
 
 Webhooks sent from Label Studio include the following:
 
+<i>Table 1: Details of webhooks sent from Label Studio.</i>
+
 | Key | Details |
 | --- | --- |
 | action | Details the action that the event represents. |
@@ -35,6 +37,8 @@ Sent when a task is created in Label Studio. See how to [set up a webhook for th
 ### Webhook payload details
 
 The webhook payload includes the name of the action and some additional task data. The task-relevant data is the same as is included in the [response when you create a task using the API](/api#operation/api_tasks_create).
+
+<i>Table 2: Webhook payload details for task created in Label Studio.</i>
 
 | Key | Type | Description |
 | --- | --- | --- | 
@@ -143,6 +147,8 @@ Sent when a task is deleted from Label Studio. See how to [set up a webhook for 
 
 ### Webhook payload details
 
+<i>Table 3: Webhook playload details for task deleted in Label Studio.</i>
+
 | Key | Type | Description |
 | --- | --- | --- | 
 | action | string | Name of the action. In this case, `TASK_DELETED` or `TASKS_DELETED` if multiple tasks were deleted at once. | 
@@ -228,12 +234,16 @@ Sent when a task is deleted from Label Studio. See how to [set up a webhook for 
 {% enddetails %}
 <br/>
 
+
 ## Annotation Created
+
 Sent when an annotation is created for a task in Label Studio. See how to [set up a webhook for this event](webhooks.html).
 
 ### Webhook payload details
 
 The webhook payload includes the name of the action and some additional annotation data. The annotation-relevant data is the same as is included in the [response when you create an annotation using the API](/api#operation/api_tasks_annotations_create).
+
+<i>Table 4: Webhook payload details for annotation created in Label Studio.</i>
 
 | Key | Type | Description |
 | --- | --- | --- | 
@@ -343,6 +353,8 @@ Sent when an annotation is updated. See how to [set up a webhook for this event]
 ### Webhook payload details
 
 The webhook payload includes the name of the action and some additional annotation data. The annotation-relevant data is the same as is included in the [response when you update an annotation using the API](/api#operation/api_annotations_partial_update).
+
+<i>Table 5: Webhook payload details for annotation updated in Label Studio.</i>
 
 | Key | Type | Description |
 | --- | --- | --- | 
@@ -476,6 +488,8 @@ Sent when an annotation is deleted. See how to [set up a webhook for this event]
 
 ### Webhook payload details
 
+<i>Table 6: Webhook payload details for annotation deleted in Label Studio.</i>
+
 | Key | Type | Description |
 | --- | --- | --- | 
 | action | string  | Name of the action. In this case, `ANNOTATION_DELETED`, or for bulk actions, `ANNOTATIONS_DELETED` | 
@@ -483,7 +497,6 @@ Sent when an annotation is deleted. See how to [set up a webhook for this event]
 | project | JSON dictionary | Details about the project that the annotations were deleted from. | 
 
 ### Example payload
-
 
 <br/>
 {% details <b>Click to expand the example payload</b> %}
@@ -557,6 +570,7 @@ You must [enable organization-level webhooks](webhooks.html#Enable-organization-
 
 The webhook payload includes the name of the action and some additional project data. The project-relevant data is the same as is included in the [response when you create a project using the API](/api#operation/api_projects_create).
 
+<i>Table 7: Webhook payload details for project created in Label Studio. </i>
 
 | Key | Type | Description |
 | --- | ---  | --- |
@@ -617,6 +631,8 @@ Sent when a project is updated. See how to [set up a webhook for this event](web
 ### Webhook payload details
 
 The webhook payload includes the name of the action and some additional project data. The project-relevant data is the same as is included in the [response when you update a project using the API](/api#operation/api_projects_partial_update).
+
+<i>Table 8: Webhook payload details for project updated in Label Studio. </i>
 
 | Key | Type | Description |
 | --- | ---  | --- |
@@ -688,6 +704,8 @@ Sent when a project is deleted. See how to [set up a webhook for this event](web
 You must [enable organization-level webhooks](webhooks.html#Enable-organization-level-webhooks) to use this event.
 
 ### Webhook payload details
+
+<i>Table 9: Webhook payload details for project deleted in Label Studio.</i>
 
 | Key | Type | Description |
 | --- | --- | --- | 

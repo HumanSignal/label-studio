@@ -134,7 +134,7 @@ If you want to use a revocable method to grant Label Studio access to your Amazo
 Set up an IAM role in Amazon AWS to use with Label Studio.
 
 1. In the Label Studio UI, open the **Organization** page to get a `External ID` to use for the IAM role creation on Amazon AWS. You must be an administrator to view the Organization page.
-2. Follow the [Amazon AWS documentation to create an IAM role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user.html) in your AWS account. <br/> Make sure to require an external ID and do not require multi-factor authentication when you set up the role. Select an existing permissions' policy, or create one that allows programmatic access to the bucket.
+2. Follow the [Amazon AWS documentation to create an IAM role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user.html) in your AWS account. <br/> Make sure to require an external ID and do not require multifactor authentication when you set up the role. Select an existing permissions' policy, or create one that allows programmatic access to the bucket.
 3. Create a trust policy using the external ID. Use the following example: 
 ```json
 {
@@ -308,7 +308,7 @@ Connect your [Microsoft Azure Blob storage](https://docs.microsoft.com/en-us/azu
 
 ### Prerequisites
 
-You must set two environment variables in Label Studio to connect to Azure Blob storage:
+You must set two environment variables in Label Studio to connect to Azure Blob storage.
 - `AZURE_BLOB_ACCOUNT_NAME` to specify the name of the storage account.
 - `AZURE_BLOB_ACCOUNT_KEY` to specify the secret key for the storage account.
 
@@ -342,9 +342,10 @@ You can also create a storage connection using the Label Studio API.
 - See [Create new import storage](/api#operation/api_storages_azure_create) then [sync the import storage](/api#operation/api_storages_azure_sync_create). 
 - See [Create export storage](/api#operation/api_storages_export_azure_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_azure_sync_create).
 
+
 ## Redis database
 
-You can also store your tasks and annotations in a [Redis database](https://redis.io/). You must store the tasks and annotations in different databases. You might want to use a Redis database if you find that relying on a file-based cloud storage connection is slow for your datasets. 
+You can also store your tasks and annotations in a [Redis database](https://redis.io/). You must store the tasks and annotations in different databases. Furthermore, you might want to use a Redis database if you find that relying on a file-based cloud storage connection is slow for your datasets. 
 
 Currently, this configuration is only supported if you host the Redis database in the default mode, with the default IP address. 
 
@@ -380,11 +381,11 @@ You can also create a storage connection using the Label Studio API.
 
 ## Local storage
 
-If you have local files that you want to add to Label Studio from a specific directory, you can set up a specific local directory on the machine where Lable Studio is running as source or target storage. Label Studio steps through the directory recursively to read tasks.
+If you have local files that you want to add to Label Studio from a specific directory, you can set up a specific local directory on the machine where Label Studio is running as source or target storage. Label Studio steps through the directory recursively to read tasks.
 
 ### Tasks with local storage file references 
 
-In cases where your tasks have multiple or complex input sources, such as multiple object tags in the labeling config or a HyperText tag with custom data values, you must prepare tasks manually. 
+In cases where your tasks have multiple or complex input sources, such as multiple object tags in the labeling config or a `HyperText` tag with custom data values, you must prepare tasks manually. 
 
 In those cases, you can add local storage without syncing (to avoid automatic task creation from storage files) and specify the local files in your data values. For example, to specify multiple data types in the Label Studio JSON format, specifically an audio file `1.wav` and an image file `1.jpg`:
 ```
@@ -412,6 +413,7 @@ In the Label Studio UI, do the following to set up the connection:
 2. For a specific project, open **Settings > Cloud Storage**.
 3. Click **Add Source Storage**.
    <img src="/images/local-storage-settings.png" alt="Screenshot of the storage settings modal described in the preceding steps." width=670 height=490 style="border: 1px solid #eee">
+   <center><i>Figure 1: Storage settings modal described in the preceding steps.</i></center>.
 4. In the dialog box that appears, select **Local Files** as the storage type.
 5. In the **Storage Title** field, type a name for the storage to appear in the Label Studio UI.
 5. Specify an **Absolute local path** to the directory with your files. The local path must be an absolute path and include the `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` value. 
@@ -419,7 +421,7 @@ In the Label Studio UI, do the following to set up the connection:
 6. (Optional) In the **File Filter Regex** field, specify a regular expression to filter bucket objects. Use `.*` to collect all objects.
 7. (Optional) Toggle **Treat every bucket object as a source file**. 
    - Enable this option if you want to create Label Studio tasks from media files automatically, such as JPG, MP3, or similar file types. Use this option for labeling configurations with one source tag.
-   - Disable this option if you want to import tasks in Label Studio JSON format directly from your storage. Use this option for complex labeling configurations with HyperText or multiple source tags.    
+   - Disable this option if you want to import tasks in Label Studio JSON format directly from your storage. Use this option for complex labeling configurations with `HyperText` or multiple source tags.    
 8. Click **Add Storage**.
 9. Repeat these steps for **Add Target Storage** to use a local file directory for exporting.
 
@@ -468,7 +470,7 @@ Check your web browser console for errors.
 If you are pressing the **Sync** button, but tasks do not sync, or you can't see the new tasks in the Data Manager, check the following:
 
 - Make sure you specified the correct credentials.
-    - For Amazon S3, see [Configuration and credential file settings](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) in the Amazon AWS Command Line Interface User Guide. Also be sure to check that they work from the [aws client](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).
+    - For Amazon S3, see [Configuration and credential file settings](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) in the Amazon AWS Command Line Interface User Guide. Also be sure to check that they work from the [AWS client](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).
     - For GCS, see [Setting up authentication](https://cloud.google.com/storage/docs/reference/libraries#setting_up_authentication) in the Google Cloud Storage documentation. Your account must have the **Service Account Token Creator** and **Storage Object Viewer** roles and **storage.buckets.get** access permission. See [Setting up authentication](https://cloud.google.com/storage/docs/reference/libraries#setting_up_authentication) and [IAM permissions for Cloud Storage](https://cloud.google.com/storage/docs/access-control/iam-permissions) in the Google Cloud Storage documentation. Also, if you're using a service account to authorize access to the Google Cloud Platform, make sure to activate it. See [gcloud auth activate-service-account](https://cloud.google.com/sdk/gcloud/reference/auth/activate-service-account) in the Google Cloud SDK: Command Line Interface documentation.
     
 - Make sure that files exist under the specified bucket or container prefix, and that your file filter Regex matches the files. When you set the prefix, subfolders are not recursively scanned.
@@ -478,3 +480,4 @@ If you are pressing the **Sync** button, but tasks do not sync, or you can't see
 If the tasks sync to Label Studio but don't appear the way that you expect, maybe with URLs instead of images or with one task where you expect to see many, check the following:
 - If you are placing JSON files in [cloud storage](storage.html), place 1 task in each JSON file in the storage bucket. If you want to upload a JSON file from local storage into Label Studio, you can place multiple tasks in one JSON file. 
 - If you are syncing image or audio files, make sure **Treat every bucket object as a source file** is enabled. 
+

@@ -26,14 +26,15 @@ For more information about security and hardening for Label Studio Enterprise, s
 3. Start the server using Docker Compose.
 
 ### Prerequisites
+
 Make sure you have an authorization token to retrieve Docker images and a current license file. If you are a Label Studio Enterprise customer and do not have access, [contact us](mailto:hello@heartex.ai) to receive an authorization token and a copy of your license file.
 
 !!! attention "important" 
     Make sure [Docker Compose](https://docs.docker.com/compose/install/) is installed on your system.
 
 After you install Label Studio Enterprise, the app is automatically connected to the following running services:
-- PostgreSQL (versions 11, 12, 13)
-- Redis (version 5)
+- PostgreSQL (versions 11, 12, 13).
+- Redis (version 5).
 
 ### Pull the latest image
 

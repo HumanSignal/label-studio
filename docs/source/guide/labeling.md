@@ -98,6 +98,7 @@ You can create relations between two results with both directions and labels. To
 
 <br>
 <img src="../images/relation.png">
+<i>Figure 1: Add relations between annotations.</i>
 
 After you relate two annotation regions, you can modify the relation in the **Relations** section of the **Results** sidebar. 
 - To change the direction of the relation, click the direction button between the two related regions.
@@ -136,6 +137,8 @@ Use keyboard shortcuts, or hotkeys, to improve your labeling performance. When p
 
 The following table describes the hotkeys for a standard keyboard. For a Mac keyboard, use return instead of enter, delete instead of backspace, and option instead of alt.
 
+<i>Table 1: Hotkeys for a standard keyboard.</i>
+
 | Key | Description |
 | --- | --- | 
 | `ctrl` + `enter` | Submit a task. |
@@ -159,6 +162,8 @@ Other annotation types have labeling-specific shortcuts, such as numbers to sele
 
 When labeling image data types with the `Rectangle`, `BrushLabels`, `Ellipse`, `Polygon`, or `KeyPoints` tags, you can use specific hotkeys to take image labeling-specific actions.
 
+<i>Table 2: Image-specific hotkeys.</i>
+
 | Key | Description |
 | --- | --- | 
 | `h` | Pan the image, after zooming in. |
@@ -177,6 +182,8 @@ When labeling image data types with the `Rectangle`, `BrushLabels`, `Ellipse`, `
 
 When labeling audio data types with the `Audio` or `AudioPlus` tags, you can use specific hotkeys to take audio-specific actions.
 
+<i>Table 3: Audio-specific hotkeys.</i>
+
 | Key | Description |
 | --- | --- | 
 | `ctrl` + `b` OR `cmd` + `b` | Rewind audio 1 second. |
@@ -184,6 +191,8 @@ When labeling audio data types with the `Audio` or `AudioPlus` tags, you can use
 ### Time series-specific hotkeys
 
 When labeling timeseries data with the `TimeSeries` tag, you can use specific hotkeys to take actions on a selected region on the time series data.
+
+<i>Table 4: Time series-specific hotkeys.</i>
 
 | Key | Description |
 | --- | --- | 
@@ -199,6 +208,8 @@ When labeling timeseries data with the `TimeSeries` tag, you can use specific ho
 ### Video-specific hotkeys
 
 When labeling video data with the `Video` tag, you can use specific hotkeys to take video-specific actions.
+
+<i>Table 5: Video-specific hotkeys.</i>
 
 | Key | Description |
 | --- | --- | 
@@ -231,6 +242,7 @@ For example, keep a label selected after creating a region, display labels on bo
 <center>
   <img src='../images/lsf-settings.png'>
 </center>
+<i>Figure 2: Customize the labeling interface </i>
 
 You can also modify the layout of the screen, hide or show predictions, annotations, or the results panel, and hide or show various controls and buttons.
 
@@ -278,7 +290,7 @@ If you accidentally select a point on an image while creating a polygon, just do
 
 ### Create regions without labels
 
-When you're annotating images, you can create regions without applying labels. 
+When you are annotating images, you can create regions without applying labels. 
 
 1. Create a region by double-clicking or clicking and dragging to create a bounding box, or click the points necessary to construct a polygon.
 2. Select the created region in the sidebar or on the image.

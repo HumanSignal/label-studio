@@ -9,7 +9,7 @@ meta_description: Label Studio documentation for exporting data labeling annotat
 
 At any point in your labeling project, you can export the annotations from Label Studio. 
 
-Label Studio stores your annotations in a raw JSON format in the SQLite database backend, PostGreSQL database backend, or whichever cloud or database storage you specify as target storage. Cloud storage buckets contain one file per labeled task named `task_id.json`. For more information about syncing target storage, see [Cloud storage setup](storage.html).
+Label Studio stores your annotations in a raw JSON format in the SQLite database backend, PostgreSQL database backend, or whichever cloud or database storage you specify as target storage. Cloud storage buckets contain one file per labeled task named `task_id.json`. For more information about syncing target storage, see [Cloud storage setup](storage.html).
 
 Image annotations exported in JSON format use percentages of overall image size, not pixels, to describe the size and location of the bounding boxes. See [how to convert the image annotation units](#Units-of-image-annotations).
 
@@ -261,6 +261,8 @@ When you annotate data, Label Studio stores the output in JSON format. The raw J
 ### Relevant JSON property descriptions
 
 Review the full list of JSON properties in the [API documentation](api.html).
+
+<i> Table 1: JSON properties in the API documentation.</i>
 
 | JSON property name | Description |
 | --- | --- | 

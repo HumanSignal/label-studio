@@ -21,6 +21,8 @@ You can specify a machine learning backend and other options using the command l
 
 The following Label Studio commands provide information or allow you to start the Label Studio server.
 
+<i>Table 1: CLI arguments to start Label Studio. </i>
+
 | Command |  Description |
 | --- | ---- |
 | `label-studio` | Start the Label Studio server. |
@@ -33,6 +35,9 @@ The following Label Studio commands provide information or allow you to start th
 | `label-studio user --username <email>` | Show the user info with token.
 
 The following command line arguments are optional and must be specified with `label-studio start <argument> <value>` or as an environment variable when you set up the environment to host Label Studio:
+
+
+<i>Table 2: Optional CLI arguments to start Label Studio. </i>
 
 | Command line argument | Environment variable | Default | Description |
 | --- | ---- | --- | ---- |
@@ -188,6 +193,8 @@ Then you can specify the required environment variables for a PostgreSQL connect
 ## Run Label Studio on the cloud using a different cloud provider
 To run Label Studio on the cloud using a cloud provider such as Google Cloud Services (GCS), Amazon Web Services (AWS), or Microsoft Azure, 
 -->
+
+
 ## Run Label Studio with an external domain name
 
 If you want multiple users to collaborate on a project, you can run Label Studio with an external domain name. 
@@ -220,6 +227,9 @@ label-studio start <project_name> --sampling sequential
 ```
 
 The following table lists the available sampling options: 
+
+
+<i>Table 3: Sampling options. </i>
 
 | Option | Description |
 | --- | --- | 

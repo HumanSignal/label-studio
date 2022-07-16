@@ -10,9 +10,8 @@ Label Studio provides many ways to secure access to your data and your deploymen
 
 All application component interactions are encrypted using the TLS protocol. 
 
-<div class="enterprise"><p>
-<img src="/images/LSE/en.svg" width=64 height=16 alt="Enterprise" style="vertical-align:middle"/> Role-based access control is only available in Label Studio Enterprise deployments. Label Studio Enterprise is available as on-premises software that you manage or as a Software-as-a-Service (SaaS) offering.
-</p></div>
+<i class='ent'></i> Role-based access control is only available in Label Studio Enterprise deployments. Label Studio Enterprise is available as on-premises software that you manage or as a Software-as-a-Service (SaaS) offering.
+
 
 <!--If you need to meet strong privacy regulations, legal requirements, or you want to make a custom installation within your infrastructure or any public cloud (AWS, Google, Azure, etc.), Label Studio Enterprise works on-premises. It is a self-contained version (no Internet connection is required) of the Platform, no data will leave your infrastructure. To make the installation the most accessible, we offer a Docker image.-->
 
@@ -60,7 +59,7 @@ Label Studio accesses the data stored in remote cloud storage using URLs, so pla
 
 Use workspaces, projects, and roles to further secure access to cloud storage and data accessed using URLs by setting up cloud storage credentials. You can provide cloud storage authentication credentials globally for all projects in Label Studio, or use different credentials for access to different buckets on a per-project basis. Label Studio allows you to configure different cloud storage buckets for different projects, making it easier to manage access to the data. For more information, see [Sync data from external storage](storage.html).
 
-In Label Studio Enterprise, if you are using Amazon S3, Label Studio can use an IAM role configured with an external ID to access S3 bucket contents in a secured fashion. For more information, see [Set up an S3 connection with IAM role access](storage.html#Set-up-an-S3-connection-with-IAM-role-access)
+In Label Studio Enterprise, if you are using Amazon S3, Label Studio can use an IAM role configured with an external ID to access S3 bucket contents in a secured fashion. For more information, see [Set up an S3 connection with IAM role access](storage.html#Set-up-an-S3-connection-with-IAM-role-access).
 
 ### Secure access to Redis storage
 

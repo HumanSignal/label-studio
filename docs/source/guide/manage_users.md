@@ -18,6 +18,8 @@ Manage access to projects, organizations, and workspaces in Label Studio to rest
 
 There are five roles available in Label Studio Enterprise Edition. Organization members have different levels of access to projects and workspaces. Every member can label tasks.
 
+<i>Table 1: Roles in LSE edition.</i>
+
 | Role | Description |
 | --- | --- |
 | Owner | Not an assignable role. <br> Manages Label Studio. <br> Create and modify workspaces. <br> Create and modify projects. <br> View activity log. |
@@ -31,6 +33,8 @@ There are five roles available in Label Studio Enterprise Edition. Organization 
 
 There are two roles available in Label Studio Teams Edition. Organization members have different levels of access to projects and workspaces. Every member can label tasks.
 
+<i>Table 2: Roles in Label Studio Teams.</i>
+
 | Role | Description |
 | --- | --- |
 | Owner | Not an assignable role. <br> Manages Label Studio. <br> Create and modify workspaces. <br>  Create and modify projects. <br> View activity log. |
@@ -43,12 +47,16 @@ Use a combination of roles, to control what actions users can take, and project 
 
 For example, a project annotator using Label Studio sees only the projects they have access to:
 <img src="/images/LSE/LSE-annotator-view.jpg" width=400 height=275 alt="Diagram showing that only Label Studio projects that they have been added to are visible to an annotator."/>
+<i>Figure 1: An annotator can see the added Label Studio projects.</i>
 
 A Label Studio administrator sees all projects and workspaces that exist in the Label Studio instance:
 <img src="/images/LSE/LSE-admin-view.jpg" width=600 height=400 alt="Diagram showing that an administrator can view all projects and workspaces in a Label Studio instance."/>
+<i>Figure 2: An administrator can view all projects and workspaces.</i>
+
 
 ## Permissions in Label Studio Enterprise 
 
+<i>Table 3: Permissions in LSE.</i>
 <table>
   <tr>
     <th>Action</th>
@@ -253,6 +261,7 @@ Invite users to your organization by doing the following:
 3. In the dialog box that appears, click **Copy Link** and share the invitation link to your Label Studio instance with the people that you want to join your organization.
 
 ### Assign roles to invited users
+
 After a user that you invite clicks the link and signs up for an account, their account exists but must be activated by an organization owner or administrator. When you activate someone's account, you also assign them a role in Label Studio. 
 
 To activate a user account and assign a role, do the following:
@@ -262,17 +271,21 @@ To activate a user account and assign a role, do the following:
 Your changes save automatically. Repeat these steps for any additional users. 
 
 ### Programmatically assign roles
+
 To programmatically activate and assign roles to users, you can use the following API endpoints. 
 
 #### Assign a role to a user 
+
 For a given user ID and a given organization ID, you can programmatically assign a role to a user by sending a POST request to the `/api/organizations/{id}/memberships` endpoint. See the [Organizations API documentation inside Label Studio Enterprise](api#operation/api_organizations_memberships_create).
 
 #### Determine the organization ID or user ID
-If you're not sure what the organization ID is, you can do the following:
+
+If you are not sure what the organization ID is, you can do the following:
 - If you only have one organization in your Label Studio instance, use `0`.
 - If you have multiple organizations, make a GET request to the [`/api/organizations/`](/api#operation/api_organizations_read) endpoint.
 
 To retrieve user IDs for the members of an organization, make a GET request to [`/api/organizations/{id}/memberships`](/api#operation/api_organizations_memberships_list).
+
 
 ## Use organizations to manage data and projects
 
@@ -282,9 +295,13 @@ If permitted by your Label Studio Enterprise plan, you can create organizations 
 
 For example, you might set up one of the following possible configurations:
 - One organization for your company, with one workspace for the support department and another for the development team, with specific projects in each workspace for different types of customer requests. 
+
   <img src="/images/LSE/LSE-one-org-many-workspaces.jpg" alt="Diagram showing Label Studio with one organization with multiple workspaces and projects within each workspace."/>
+  <i>Figure 3:  Label Studio with one organization with multiple workspaces and projects within each workspace.</i>
+
 - Multiple organizations, such as one for the customer claims department and another for the customer support department, with specific workspaces in each organization for specific types of insurance. For example, home insurance claims and auto insurance claims, and specific projects in each workspace for types of claims, such as Accident Claims, Injury Claims, and Natural Disaster Claims. The Customer support organization might have workspaces specific to the types of support queues, with projects for specific types of calls received.
-<img src="/images/LSE/LSE-multiple-orgs-workspaces.jpg" alt="Diagram showing Label Studio with three organizations, each one with multiple workspaces and projects within each workspace."/>
+  <img src="/images/LSE/LSE-multiple-orgs-workspaces.jpg" alt="Diagram showing Label Studio with three organizations, each one with multiple workspaces and projects within each workspace."/>
+  <i>Figure 4: Label Studio with three organizations, each one with multiple workspaces and projects within each workspace.</i>
 
 When you assign a user role to an organization member, they hold that role for all workspaces and projects for that organization.
   

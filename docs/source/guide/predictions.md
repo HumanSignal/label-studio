@@ -22,11 +22,11 @@ To import predicted labels into Label Studio, you must use the [Basic Label Stud
 ### Specific examples for pre-annotations
 
 Refer to the following examples for sample pre-annotation formats:
-- [Image pre-annotations with semantic segmentation bounding boxes](#Import-pre-annotations-for-images)
-- [Image pre-annotations with unlabeled bounding boxes](#Import-pre-annotated-regions-for-images)
-- [Text pre-annotations with NER spans](#Import-pre-annotations-for-text)
-- [Brush pre-annotations for segmentation with masks](#Import-brush-segmentation-pre-annotations-in-RLE-format)
-- [OCR pre-annotations with bounding boxes, labels, and text transcriptions](#Import-OCR-pre-annotations)
+- [Image pre-annotations with semantic segmentation bounding boxes](#Import-pre-annotations-for-images).
+- [Image pre-annotations with unlabeled bounding boxes](#Import-pre-annotated-regions-for-images).
+- [Text pre-annotations with NER spans](#Import-pre-annotations-for-text).
+- [Brush pre-annotations for segmentation with masks](#Import-brush-segmentation-pre-annotations-in-RLE-format).
+- [OCR pre-annotations with bounding boxes, labels, and text transcriptions](#Import-OCR-pre-annotations).
 
 To format pre-annotations for Label Studio not represented in these examples, refer to the sample results JSON for the relevant object and control tags for your labeling configuration, such as the [Audio tag](/tags/audio.html) for audio classification tasks. Each tag must be represented in the JSON pre-annotations format to render predictions in the Label Studio UI. Not all object and control tags list sample results JSON. 
 
@@ -35,7 +35,7 @@ You can also use the [Label Studio Playground](/playground) to preview the outpu
 ### JSON format for pre-annotations
 
 Label Studio JSON format for pre-annotations must contain two sections:
-- A `data` object which references the source of the data that the pre-annotations apply to. This can be a URL to an audio file, a presigned cloud storage link to an image, plain text, a reference to a CSV file stored in Label Studio, or something else. See how to [specify the data object](#Specify-the-data-object).
+- A `data` object which references the source of the data that the pre-annotations apply to. This can be a URL to an audio file, a presigned cloud storage link to an image, plain text, a reference to a CSV file stored in Label Studio, or another input. See how to [specify the data object](#Specify-the-data-object).
 - A `predictions` array that contains the pre-annotation results for the different types of labeling. See how to [add results to the predictions array](#Add-results-to-the-predictions-array).
 
 The JSON format for pre-annotations must match the labeling configuration used for your data labeling project. 
@@ -65,6 +65,8 @@ This excerpt specifies `value="$csv"` in the TimeSeries Object tag. As a result,
 #### Add results to the predictions array 
 
 The `predictions` array also depends on the labeling configuration. Some pre-annotation fields are only relevant for certain types of labeling. The following table describes the JSON objects and arrays that exist for all pre-annotations: 
+
+<i>Table 1: Add results to the predictions array.</i>
 
 | JSON key | type   | description                                                                                                                                      |
 | --- |--------|--------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -174,6 +176,7 @@ Import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-da
 
 In the Label Studio UI, the imported prediction for this task looks like the following: 
 <center><img src="../images/predictions_loaded.png" alt="screenshot of the Label Studio UI showing an image of airplanes with bounding boxes covering each airplane." style="width: 100%; max-width: 700px"></center>
+<center><i>Figure 1: An image of airplanes with bounding boxes covering each airplane.</i></center>
 
 
 ## Import pre-annotated regions for images 
@@ -678,6 +681,7 @@ Import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-da
 
 In the Label Studio UI, the imported prediction for the first task looks like the following: 
 <center><img src="../images/predictions_loaded_text.png" alt="screenshot of the Label Studio UI showing the text with highlighted text labels and prediction scores visible." style="width: 100%; max-width: 700px"></center>
+<center><i>Figure 2: Label Studio UI showing the text with highlighted text labels and prediction scores visible.</i></center>
 
 You can sort the prediction scores for each labeled region using the **Regions** pane options. 
 
@@ -924,4 +928,4 @@ Because the TextArea tag applies to each labeled region, the IDs for the label r
 
 ### Read only and hidden regions
 
-In some situations, it's very helpful to hide or to make `read-only` bounding boxes, text spans, audio segments, etc. You can put `"readonly": true` or `"hidden": true` in regions to achieve this (the dict inside of `annotations.result` list).  
+In some situations, it's very helpful to hide or to make `read-only` bounding boxes, text spans, audio segments, and so on. You can put `"readonly": true` or `"hidden": true` in regions to achieve this (the dict inside of `annotations.result` list).  

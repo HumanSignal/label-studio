@@ -8,8 +8,15 @@ meta_description: Label Studio Frontend reference documentation for implementing
 
 Label Studio Frontend (LSF) includes a number of UI options and callbacks that you can use when implementing the frontend with a custom labeling backend, or when customizing the Label Studio interface.
 
+
 ## Updates to LSF in version 1.0.0 
-LSF version 1.0.0 is not compatible with earlier versions of Label Studio. If you use LSF with a custom backend, you must make changes to the API callbacks that you use as follows:
+
+!!! warning 
+    LSF version 1.0.0 is not compatible with earlier versions of Label Studio. 
+
+If you use LSF with a custom backend, you must make changes to the API callbacks that you use as follows:
+
+<i>Table 1: API callback.</i>
 
 | Callback in 0.9.1 and earlier | Renamed callback in 1.0.0 |
 | --- | --- |
@@ -19,8 +26,8 @@ LSF version 1.0.0 is not compatible with earlier versions of Label Studio. If yo
 
 If you rely on specific formatting of Label Studio completed tasks, [Label Studio's annotation format](export.html#Raw-JSON-format-of-completed-tasks) has also been updated. 
 
-## Implement the Label Studio Frontend
 
+## Implement the Label Studio Frontend
 
 ```javascript
 var labelStudio = new LabelStudio('editor', options);
@@ -61,16 +68,16 @@ Collection of UI elements to show:
 ]
 ```
 
-- `annotations:add-new` - show add new annotations button
-- `annotations:delete` - show delete current annotation button
-- `annotations:menu` - show annotations menu
-- `controls` - enable panel with controls (submit, update, skip)
-- `panel` - navigation panel for current task with buttons: undo, redo and reset
-- `predictions:menu` - show predictions menu
-- `side-column` - enable panel with entities
-- `skip` - show button to skip current task
-- `submit` - show button to submit or update current annotation
-- `update` - show button to update current task after submitting
+- `annotations:add-new` - Show add new annotations button.
+- `annotations:delete` - Show delete current annotation button.
+- `annotations:menu` - Show annotations menu.
+- `controls` - Enable panel with controls (submit, update, skip).
+- `panel` - Navigation panel for current task with buttons: undo, redo and reset.
+- `predictions:menu` - Show predictions menu.
+- `side-column` - Enable panel with entities.
+- `skip` - Show button to skip current task.
+- `submit` - Show button to submit or update current annotation.
+- `update` - Show button to update current task after submitting.
 
 ### messages
 
@@ -89,10 +96,10 @@ Messaging used for different actions
 }
 ```
 
-- `DONE` - Shown after the task is submitted to the server
-- `NO_COMP_LEFT` - Shown if there are no more annotations
-- `NO_NEXT_TASK` - No next task to load
-- `NO_ACCESS` - Can't access the provided task
+- `DONE` - Shown after the task is submitted to the server.
+- `NO_COMP_LEFT` - Shown if there are no more annotations.
+- `NO_NEXT_TASK` - No next task to load.
+- `NO_ACCESS` - Can't access the provided task.
 
 ### description
 
@@ -135,13 +142,13 @@ Default: `null`
 
 Type data: `array`
 
-Array of annotations. See the [annotation documentation](export.html#Raw-JSON-format-of-completed-tasks) for more information.
+Array of annotations. For more information, see the [annotation documentation](export.html#Raw-JSON-format-of-completed-tasks).
 
 #### predictions
 
 Type data: `array`
 
-Array of predictions. Similar structure as completions or annotations. See the [annotation documentation](export.html#Raw-JSON-format-of-completed-tasks) and [guidance for importing predicted labels](predictions.html) for more information.
+Array of predictions. Similar structure as completions or annotations. For more information, see the [annotation documentation](export.html#Raw-JSON-format-of-completed-tasks) and [guidance for importing predicted labels](predictions.html).
 
 ### user
 

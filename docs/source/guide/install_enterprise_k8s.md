@@ -22,17 +22,17 @@ Use the following steps, if you want to install Label Studio Enterprise on Kuber
 2. [Prepare the Kubernetes cluster](#Prepare-the-Kubernetes-cluster).
 3. [Add the Helm chart repository to your Kubernetes cluster](#Add-the-Helm-chart-repository-to-your-Kubernetes-cluster).
 4. [Configure a values.yaml file for your Label Studio Enterprise deployment](#Configure-values-yaml).
-5. (Optional) [Set up SSL authentication for PostgreSQL](#Set-up-SSL-authentication-for-PostgreSQL)
+5. (Optional) [Set up SSL authentication for PostgreSQL](#Set-up-SSL-authentication-for-PostgreSQL).
 6. [Use Helm to install Label Studio Enterprise on your Kubernetes cluster](#Use-Helm-to-install-Label-Studio-Enterprise-on-your-Kubernetes-cluster).
 
 If you use a proxy to access the internet from your Kubernetes cluster, or it is airgapped from the internet, see how to [Install Label Studio Enterprise without public internet access](install_enterprise_airgapped.html).
 
 ### Required software prerequisites
 
-- Kubernetes and kubectl version 1.17 or higher
-- Helm version 3.6.3 or higher
-- Redis version 6.0.5 or higher
-- PostgreSQL version 11.9 or higher
+- Kubernetes and kubectl version 1.17 or higher.
+- Helm version 3.6.3 or higher.
+- Redis version 6.0.5 or higher.
+- PostgreSQL version 11.9 or higher.
 
 The Helm chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) and [cert-manager](https://cert-manager.io/docs/). For more on ingress settings with Label Studio Enterprise, see [Set up an ingress controller for Label Studio Enterprise Kubernetes deployments](ingress_config.html). 
 
@@ -69,6 +69,8 @@ rqworker:
     Before you make changes to these values, familiarize yourself with the [Resource Management for Pods and Containers](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) guidelines in the Kubernetes documentation. 
 
 If you choose to make changes to these default settings, consider the following:
+
+<i>Table 1: Capacity planning use cases and appropriate actions.</i>
 
 | Use case                              | Action                                                                                                                                       |
 |---------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|

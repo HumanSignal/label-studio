@@ -141,13 +141,13 @@ After you [connect a model to Label Studio as a machine learning backend](#Add-a
 If the model has not been trained yet, do the following to get predictions to appear:
 1. Start labeling data in Label Studio. 
 2. Return to the **Machine Learning** settings for your project and click **Start Training** to start training the model.
-3. In the data manager for your project, select the tasks that you want to get predictions for and select **Retrieve predictions** using the drop-down actions menu. Label Studio sends the selected tasks to your ML backend. 
+3. In the data manager for your project, select the tasks that you want to get predictions for and select **Retrieve predictions** using the drop-down actions' menu. Label Studio sends the selected tasks to your ML backend. 
 4. After retrieving the predictions, they appear in the task preview and Label stream modes for the selected tasks.  
 
 You can also retrieve predictions automatically by loading tasks. To do this, enable `Retrieve predictions when loading a task automatically` on the **Machine Learning** settings for your project. When you scroll through tasks in the data manager for a project, the predictions for those tasks are automatically retrieved from the ML backend. Predictions also appear when labeling tasks in the Label stream workflow.
 
 !!! note
-    For a large dataset, the HTTP request to retrieve predictions might be interrupted by a timeout. If you want to **get all predictions** for all tasks in a dataset from connected ML backends, make a [POST call to the predictions endpoint of the Label Studio API](/api/#operation/api_predictions_create) for each task to prompt the ML backend to create predictions for the tasks. 
+    For a large dataset, the HTTP request to retrieve predictions might be interrupted by a timeout. If you want to **get all predictions** for all tasks in a dataset from connected ML backends, make a [POST call to the predictions' endpoint of the Label Studio API](/api/#operation/api_predictions_create) for each task to prompt the ML backend to create predictions for the tasks. 
 
 If you want to retrieve predictions manually for a list of tasks **using only an ML backend**, make a POST request to the `/predict` URL of your ML backend with a payload of the tasks that you want to see predictions for, formatted like the following example: 
 
@@ -161,7 +161,7 @@ If you want to retrieve predictions manually for a list of tasks **using only an
 
 ### Get interactive preannotations
 
-ML-assisted labeling with interactive preannotations works with image segmentation and object detection tasks using rectangles, ellipses, polygons, brush masks, and keypoints, as well as with HTML and text named entity recognition tasks. Your ML backend must support the type of labeling that you're performing and recognize the input that you create and be able to respond with the relevant output for a prediction.
+ML-assisted labeling with interactive preannotations works with image segmentation and object detection tasks using rectangles, ellipses, polygons, brush masks, and keypoints, as well as with HTML and text named entity recognition tasks. Your ML backend must support the type of labeling that you are performing and recognize the input that you create and be able to respond with the relevant output for a prediction.
 
 1. Set up your ML backend for ML-assisted labeling.
    - For your project, open **Settings > Machine Learning**.
@@ -170,7 +170,7 @@ ML-assisted labeling with interactive preannotations works with image segmentati
    - Enter the **URL** for the running ML backend. For example, `http://example.com:9090`.
    - Enable **Use for interactive preannotation**.
    - Click **Validate and Save**. 
-2. For image labeling, you can update your labeling configuration to include `smart="true"` option for the type of labeling you're performing. Smart tools appear by default if auto-annotation is enabled. <br>This option is supported for Rectangle, Ellipse, Polygon, Keypoint, and Brush tags. See the [tag documentation](/tags). If you only want the smart option to appear and don't want to perform manual labeling at all, use `smartOnly="true"`. 
+2. For image labeling, you can update your labeling configuration to include `smart="true"` option for the type of labeling you are performing. Smart tools appear by default if auto-annotation is enabled. <br>This option is supported for Rectangle, Ellipse, Polygon, Keypoint, and Brush tags. See the [tag documentation](/tags). If you only want the smart option to appear and don't want to perform manual labeling at all, use `smartOnly="true"`. 
    - For your project, open **Settings > Labeling Interface**.
    - Click **Code** to view the XML labeling configuration.
    - For the relevant tag type that you want to use to generate predictions with your ML backend, add the `smart="true"` parameter. For example: 
@@ -180,6 +180,7 @@ ML-assisted labeling with interactive preannotations works with image segmentati
 4. For image labeling, after you enable auto-annotation you can choose whether to **Auto accept annotation suggestions**. If you automatically accept annotation suggestions, regions show up automatically and are immediately created. If you don't automatically accept suggestions, the regions appear, but you can reject or approve them manually, either individually or all at once.
 
 <br/><img src="/images/release-130/predict-owl-region.gif" alt="" class="gif-border" width="800px" height="533px" />
+<i>Figure 1: Predict owl region.</i>
    
 ### Delete predictions 
 

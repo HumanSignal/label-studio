@@ -7,6 +7,7 @@ meta_title: Get Started with Label Studio
 meta_description: Get started with Label Studio by creating projects to label and annotate data for machine learning and data science models.
 ---
 
+
 ## What is Label Studio?
 
 Label Studio is an open source data labeling tool for labeling and exploring multiple types of data. You can perform different types of labeling with many data formats. 
@@ -14,6 +15,7 @@ Label Studio is an open source data labeling tool for labeling and exploring mul
 You can also integrate Label Studio with machine learning models to supply predictions for labels (pre-labels), or perform continuous active learning. See [Set up machine learning with your labeling process](ml.html). 
 
 Label Studio is also available in Enterprise and Cloud editions with additional features. See [Label Studio features](label_studio_compare.html) for more.
+
 
 ## Labeling workflow with Label Studio
 
@@ -49,11 +51,14 @@ label-studio start
 8. Click **Labeling Setup** and choose a template and customize the label names for your use case. 
 9. Click **Save** to save your project. 
 
-You're ready to start [labeling and annotating your data](labeling.html)!
+You are ready to start [labeling and annotating your data](labeling.html)!
+
 
 ## Label Studio terminology
 
 When you upload data to Label Studio, each item in the dataset becomes a labeling task. The following table describes some terms you might encounter as you use Label Studio.
+
+<i>Table 1: Label Studio terminology.</i>
 
 | Term | Description |
 | --- | --- |
@@ -69,10 +74,14 @@ When you upload data to Label Studio, each item in the dataset becomes a labelin
 | Templates | Example labeling configurations that you can use to specify the type of labeling that you're performing with your dataset. See [all available templates](/templates) |
 | Tags | Configuration options to customize the labeling interface. See [more about tags](/tags). |
 
+
 ## Components and architecture
+
 You can use any of the Label Studio components in your own tools, or customize them to suit your needs. Before customizing Label Studio extensively, you might want to review Label Studio Enterprise Edition to see if it already contains the relevant functionality you want to build. See [Label Studio Features](label_studio_compare.html) for more.
 
 The component parts of Label Studio are available as modular extensible packages that you can integrate into your existing machine learning processes and tools. 
+
+<i>Table 2: Label Studio components and architecture.</i>
 
 | Module | Technology | Description |
 | --- | --- | --- | 
@@ -81,12 +90,18 @@ The component parts of Label Studio are available as modular extensible packages
 | [Data Manager](https://github.com/heartexlabs/dm2) | JavaScript web app using [React](https://reactjs.org/) | Manage data and tasks for labeling. |
 | [Machine Learning Backends](https://github.com/heartexlabs/label-studio-ml-backend) | Python | Predict data labels at various parts of the labeling process. |
 
-<br>
-<div style="margin:auto; text-align:center;"><img src="/images/ls-modules-scheme.png" style="opacity: 0.8"/></div>
+
+<br/><img src="/images/ls-modules-scheme.png" style="opacity: 0.8" />
+<i>Figure 1: Visual Labels.</i>
 <!--update to include data manager--> 
+
 
 ## Information collected by Label Studio
 
-Label Studio collects anonymous usage statistics about the number of page visits and data types being used in labeling configurations that you set up. No sensitive information is included in the information we collect. The information we collect helps us improve the experience of labeling data in Label Studio and helps us plan future data types and labeling configurations to support. 
+Label Studio collects anonymous usage statistics about the number of page visits and data types being used in labeling configurations that you set up. No sensitive information is included in the collected information. 
+
+Use the collected information to do the following:
+- Improve the experience of labeling data in Label Studio.
+- Plan future data types and labeling configurations to support. 
 
 

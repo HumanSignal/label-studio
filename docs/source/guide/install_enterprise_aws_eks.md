@@ -19,7 +19,9 @@ Before you start, review the [deployment planning guidance](install_enterprise.h
 
 ## 1. Prerequisites
 
-Before you can install Label Studio Enterprise on an EKS cluster, make sure that the following software prerequisites are installed and configured:
+Before you can install Label Studio Enterprise on EKS cluster, make sure that the following software prerequisites are installed and configured:
+
+<i>Table 1: Prerequisites for LSE on EKS cluster. </i>
 
 | Software | Version |
 | --- | --- |
@@ -30,6 +32,7 @@ Before you can install Label Studio Enterprise on an EKS cluster, make sure that
 | Helm | version 3.6.3 or higher |
 | Redis | version 6.0.5 or higher |
 | PostgreSQL | version 11.9 or higher |
+
 
 ## 2. Deploy Kubernetes using `eksctl`
 
@@ -57,6 +60,7 @@ kubectl get all
     To prepare your cluster to install Label Studio Enterprise, the following conditions must be met: 
     - Your cluster must be up and running.
     - Your infrastructure such as ingress must be configured.
+
 
 ## 3. Prepare the Kubernetes cluster to install Label Studio Enterprise
 

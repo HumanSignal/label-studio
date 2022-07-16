@@ -43,6 +43,8 @@ def agreement(annotation_1, annotation_2, per_label=False) -> float:
 
 This function takes the following arguments:
 
+<i>Table 1: Input parameters.</i>
+
 | argument | format | description |
 | --- | --- | --- |
 | `annotation_1` | JSON object | The first annotation or prediction to compare when calculating agreement. Retrieved in [Label Studio JSON format](export.html#Label-Studio-JSON-format-of-annotated-tasks). |

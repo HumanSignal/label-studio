@@ -15,6 +15,7 @@
     });
 </script>
 
+
 ## Units of image annotations
 
 The units, such as the x, y, width, and height of image annotations are provided in percentages of overall image dimension. 

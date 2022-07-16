@@ -32,10 +32,12 @@ The agreement method defines how [agreement scores](stats.html#Agreement-score) 
 
 Review the diagram for a full explanation:
 <div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, agreement scores are computed for each pair, the resulting scores are averaged for a task." width=800 height=365 src="/images/LSE/stats-no_grouping.png"/></div>
+<i>Figure 1: Agreement method.</i>
 
 ### Example
 One annotation labels the text span "Excellent tool" as "positive", a second annotation labels the span "tool" as "positive", and a third annotation labels the text span "tool" as "negative".
 <br/><div style="text-align:center"><img alt="diagram showing example labeling scenario duplicated in surrounding text" width=800 height=100 src="/images/LSE/stats-agreement-example.jpg"/></div>
+<i>Figure 2: Example labeling scenario duplicated in surrounding text.</i>
 
 The agreement score for the first two annotations is 50%, based on the intersection of the text spans. The agreement score comparing the second annotation with the third annotation is 0%, because the same text span was labeled differently. 
 
@@ -51,6 +53,8 @@ The agreement score assesses the similarity of annotations for a specific task.
 ### Available agreement metrics
 
 The following table lists the agreement metrics available in Label Studio Enterprise. If you want to use a different agreement metric, you can [create a custom agreement metric](custom_metric.html).
+
+<i>Table 1: Available agreement metrics. </i>
 
 | Agreement Metric | Tag | Labeling Type | Description |
 | --- | --- | --- | --- | 

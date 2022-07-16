@@ -10,20 +10,22 @@ meta_description: Set up an end-to-end active learning loop with Label Studio us
 
 Follow this tutorial to set up an active learning loop with Label Studio. 
 
-<div class="enterprise"><p>
-Use Label Studio Enterprise Edition to build an automated active learning loop with a machine learning model backend. If you use the open source Community Edition of Label Studio, you can manually sort tasks and retrieve predictions to mimic an active learning process. If you're using Label Studio Community Edition, see <a href="#Customize-your-active-learning-loop">how to customize your active learning loop</a>.
-</p></div>
+<i class='ent'></i> Use Label Studio Enterprise edition to build an automated active learning loop with a machine learning model backend. If you use the open source Community Edition of Label Studio, you can manually sort tasks and retrieve predictions to mimic an active learning process. If you are using Label Studio Community edition, see <a href="#Customize-your-active-learning-loop">how to customize your active learning loop</a>.
+
 
 ## About Active Learning
+
 Creating annotated training data for supervised machine learning models can be expensive and time-consuming. Active Learning is a branch of machine learning that seeks to **minimize the total amount of data required for labeling by strategically sampling observations** that provide new insight into the problem. In particular, Active Learning algorithms aim to select diverse and informative data for annotation, rather than random observations, from a pool of unlabeled data using **prediction scores**. For more about the practice of active learning, read [this article written by Heartex CTO on Towards Data Science](https://towardsdatascience.com/learn-faster-with-smarter-data-labeling-15d0272614c4).
+
 
 ## Set up an automated active learning loop
 
 Continuously train and review predictions from a connected machine learning model using Label Studio. 
 
 <br/><img src="/images/LS-active-learning.jpg" alt="Diagram of the active learning workflow described in surrounding text" class="gif-border" width="800px" height="472px" />
+<i>Figure 1: Active learning workflow described in surrounding text.</i>
 
-After a user creates an annotation in Label Studio, the configured webhook sends a message to the machine learning backend with the information about the created annotation. The fit() method of the ML backend runs to train the model. When the user moves on to the next labeling task, Label Studio retrieves the latest prediction for the task from the ML backend, which runs the predict() method on the task.
+After you create an annotation in Label Studio, the configured webhook sends a message to the machine learning backend with the information about the created annotation. The fit() method of the ML backend runs to train the model. When you move on to the next labeling task, Label Studio retrieves the latest prediction for the task from the ML backend, which runs the predict() method on the task.
 
 To set up this active learning, do the following: 
 1. [Set up an ML model as an ML backend for active learning](#Set-up-an-ML-model-as-an-ML-backend-for-active-learning).
@@ -34,14 +36,17 @@ To set up this active learning, do the following:
 
 As you label tasks, Label Studio sends webhook events to your machine learning backend and prompts it to retrain. As the model retrains, the predictions from the latest model version appear in Label Studio. 
 
+
 ## Set up an ML model as an ML backend for active learning
 
 [Set up an example machine learning model as an ML backend](ml.html#Get-started-with-an-example-ML-backend), or [create a custom machine learning model](ml_create.html).
+
 
 ## Connect the ML backend to Label Studio for active learning
 
 1. Follow the steps to [Add an ML backend to Label Studio](ml.html#Add-an-ML-backend-to-Label-Studio).
 2. Under **ML-Assisted Labeling**, enable the setting to **Show predictions to annotators in the Label Stream and Quick View**. 
+
 
 ## Configure webhooks to send a training event to the ML backend (optional)
 
@@ -59,6 +64,7 @@ If you want, you can set up your project to send a webhook event and use that ev
 
 For more details on the webhook event payloads, see the full [payload details for the annotation webhook](webhook_reference.html#Annotation-Created). 
 
+
 ## Set up task sampling with prediction scores
 
 In order to maximize the training efficiency and effectiveness of your machine learning model, you want your annotators to focus on labeling the tasks with the least confident, or most uncertain, prediction scores from your model. To do make sure of that, [set up uncertainty task sampling](setup_project.html#Set-up-task-sampling).
@@ -69,18 +75,19 @@ On the project data manager, select **Label All Tasks** to start labeling.
 
 As your model retrains and a new version is updated in Label Studio, the tasks shown next to annotators are always those with the lowest prediction scores, reflecting those with the lowest model certainty. The predictions for the tasks correspond to the latest model version.
 
+
 ## Customize your active learning loop
 
-If you want to change the behavior of the active learning loop, you can make manual changes.
+To change the behavior of the active learning loop, you can make manual changes as follows:
 
-- Customize the prediction score produced by the model by modifying the inference call. See [Make predictions with your ML backend](#Make-predictions-with-your-ML-backend) for details and example code. 
+- Customize the prediction score produced by the model by modifying the inference call. For more information and example code, see [Make predictions with your ML backend](#Make-predictions-with-your-ML-backend)  
 - To change the version of the model used to show predictions to annotators, update it in the machine learning settings. See [Choose which predictions to show to annotators](ml.html#Choose-which-predictions-to-display-to-annotators).
 - If you want to delete all predictions after your model is retrained, see how to [delete predictions](ml.html#Delete-predictions).
 - If you need to retrieve and save predictions for all tasks, see the recommendations for [retrieving predictions from a model](ml.html#Get-predictions-from-a-model).
 
 ### Set up manual active learning 
 
-If you're using Label Studio community edition, data annotators can't experience a live active learning loop. You can mimic an active learning experience by doing the following:
+If you are using Label Studio community edition, data annotators can't experience a live active learning loop. You can mimic an active learning experience by doing the following:
 1. Manually [retrieve predictions from a model](ml.html#Get-predictions-from-a-model).
 2. [Sort the tasks in the data manager by prediction score](manage_data.html#Example-Sort-by-prediction-score).
 3. Select **Label Tasks As Displayed** when labeling tasks. 

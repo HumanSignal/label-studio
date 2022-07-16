@@ -62,6 +62,8 @@ After you define the loaders, you can define two methods for your model:
 
 The inherited `LabelStudioMLBase` class provides special variables that you can use:
 
+<i>Table 1: Variables available from `LabelStudioMLBase`. </i>
+
 | variable                   | contains          | details                                                                                                                                                                                                                                                                                         |
 |----------------------------|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `self.label_config`        | string            | Raw labeling configuration.                                                                                                                                                                                                                                                                     |
@@ -171,7 +173,7 @@ If you want to train a model, use the training call to update your model based o
 Write your own code to override the `fit()` method, which takes [JSON-formatted Label Studio annotations](/export.html#Raw-JSON-format-of-completed-labeled-tasks) and returns an arbitrary JSON dictionary where information about the created model can be stored. 
 
 !!! warning
-    The `completions` field is deprecated as of Label Studio 1.0.x and removed in version 1.5.0. Instead, use the SDK or the API to retrieve annotation and task data using annotation and task IDs. For more information, see [trigger training with webhooks](#Trigger-training-with-webhooks).
+    The `Annotations` field is deprecated as of Label Studio 1.0.x and removed in version 1.5.0. Instead, use the SDK or the API to retrieve annotation and task data using annotation and task IDs. For more information, see [trigger training with webhooks](#Trigger-training-with-webhooks).
 
 #### Trigger training with webhooks
 

@@ -8,11 +8,12 @@ meta_title: Update scripts and API calls to new version
 meta_description: Label Studio Enterprise documentation about updates and changes to the API endpoints in version 2.0. 
 ---
  
- With the new version of Label Studio Enterprise, you must update your scripts and API calls to match new API endpoints and formats. Some endpoints are new, some arguments for existing endpoints are deprecated and removed, and some payloads have changed for POST requests.
+With the new version of Label Studio Enterprise, you must update your scripts and API calls to match new API endpoints and formats. Some endpoints are new, some arguments for existing endpoints are deprecated and removed, and some payloads have changed for POST requests.
   
-> Throughout the new version, `completions` have been renamed `annotations`. In addition, "Teams" are now called "Workspaces", to better reflect the fact that they are a way to organize projects, rather than people. 
+In addition, "Teams" are now called "Workspaces", to better reflect the fact that they are a way to organize projects, rather than people. 
 
-> If you rely on existing object IDs (like project_id, task_id, annotation_id, etc.), these were likely changed due to database migration.
+!!! note 
+    If you rely on existing object IDs (like `project_id`, `task_id`, `annotation_id`, and so on.), these were likely changed due to database migration.
 
 
 ## Import data
@@ -64,16 +65,20 @@ Needs to be updated to the following, with the rest of the task data remaining t
 }
 ```
 
+
 ## Export data
 
-The export endpoint has changed, and so have the available options for that endpoint and the response parameters. Rather than list all completions for a specific project, use the new export endpoint to see all the task and annotation details for a project.
+The export endpoint has changed, and so have the available options for that endpoint and the response parameters. Rather than list all annotations for a specific project, use the new export endpoint to see all the task and annotation details for a project.
 
 ### Updated export endpoint
+
 To export annotations from Label Studio Enterprise, you must call a new endpoint.
 
 Requests made to `/api/projects/<project_ID>/results/` or `/api/projects/<project_id>/completions/` fail. Instead, call `/api/projects/<project_ID>/export?exportType=JSON`. See the [export API endpoint documentation](/api#operation/api_projects_export_read).
 
 With this change, several arguments are no longer supported:
+
+<i>Table 1: Deprecated arguments and behavior.</i>
 
 | Deprecated argument | New behavior |
 | --- | --- |
@@ -82,7 +87,6 @@ With this change, several arguments are no longer supported:
 | `?return_task=1` | Tasks always returned. |
 | `?return_predictions=1` | Predictions always returned. |
 | `?return_ground_truths=1` | Ground truth annotations always returned. | 
-
 
 ### Changes to the endpoint response
 
@@ -98,7 +102,7 @@ The content of the response also has some changes:
 #### Previous version response
 
 ```json
-"completions": [ 
+"annotations": [ 
  {
    "aggregated": true,
    "aggregated_completed_by": [
@@ -201,7 +205,8 @@ Links that invite people directly to projects are no longer supported. Instead, 
 
 
 ## Create and update external and cloud storage
-Some endpoints have been updated and some payload parameters are different when performing actions with the storage API.
+
+Some endpoints have been updated, and some payload parameters are different when performing actions with the storage API.
 
 ### Updates to storage endpoints
 
@@ -216,11 +221,14 @@ Instead of `/api/storages/<int:pk>/sync/`, call `/api/storages/s3/<project_ID>/s
 
 Some parameters have changed as listed in the following table:
 
+<i>Table 2: List of changed parameters.</i>
+
 | Previous parameter | New parameter |
 | --- | --- |
 | path | bucket |
 | regex | regex_filter |
 | data_key | None. Instead, BLOBs are attached to the first available object tag |
+
 
 ## Create projects
 
@@ -283,6 +291,6 @@ Instead, do the following:
     "workspace": 0
     }
     ```
-    - To retrieve a list of users in your organization, make a GET request to `<host>/api/users/`. 
+    - To retrieve a list of users in your organization, make a `GET` request to `<host>/api/users/`. 
     
  

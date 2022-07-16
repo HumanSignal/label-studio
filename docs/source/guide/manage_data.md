@@ -7,11 +7,12 @@ meta_title: Manage data for your labeling project
 meta_description: Manage, filter, and sort project data for your machine learning data science labeling project.
 ---
 
-After you [set up your project](setup_project.html) and [labeling interface](setup.html) and [import your data](tasks.html), you can filter and sort your data to prepare it for [labeling](labeling.html).
+After you [set up your project](setup_project.html), [label the interface](setup.html), and [import your data](tasks.html), you can filter and sort your data to prepare it for [labeling](labeling.html).
 
 You can also take steps to manage your data, such as assigning annotators to tasks in Label Studio Enterprise, or deleting tasks and annotations if needed. 
 
 <br/><img src="/images/ls-data-manager.png" alt="Screenshot of the Label Studio UI showing an OCR project including photographs of receipts, prediction scores, and other metadata for each labeling task." class="gif-border" width="800px" height="515px" />
+<i>Figure 1: an OCR project including photographs of receipts, prediction scores, and other metadata for each labeling task.</i>
 
 In Label Studio Community edition, the data manager is the default view for your data. In Label Studio Enterprise, click **Data Manager** to open and view the data manager page. Every row in the data manager represents a labeling task in your dataset.
 
@@ -81,7 +82,7 @@ In Label Studio Enterprise, if you are an administrator or project manager, you 
 If you have duplicate tasks, or want to remove annotations, you can delete tasks and annotations from Label Studio.
 
 1. In Label Studio UI, open the project you want to update.
-2. Filter the Data Manager page to show only the data you want to delete. For example, specific annotations, or tasks annotated by a specific annotator. 
+2. Filter the **Data Manager** page to show only the data you want to delete. For example, specific annotations, or tasks annotated by a specific annotator. 
 3. Select the checkboxes for the tasks or annotations that you want to delete.
 4. Select the dropdown with the number of tasks, and choose **Delete tasks** or **Delete annotations**. 
 5. Click **Ok** to confirm your action.

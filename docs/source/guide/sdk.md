@@ -7,26 +7,27 @@ meta_title: Label Studio Python SDK Tutorial
 meta_description: Tutorial documentation for the Label Studio Python SDK that covers how and why to use the SDK to easily include data labeling project creation and annotated task parsing in your data pipeline python scripts for data science and machine learning projects. 
 ---
 
-You can use the Label Studio Python SDK to make annotating data a more integrated part of your data science and machine learning pipelines. This software development kit (SDK) lets you call the Label Studio API directly from scripts using predefined classes and methods. 
+You can use the Label Studio Python SDK to make annotating data a more integrated part of your data science and machine learning pipelines. This software development kit (SDK) allows you to call the Label Studio API directly from scripts using predefined classes and methods. 
 
 With the Label Studio Python SDK, you can perform the following tasks in a Python script:
-- [Authenticate to the Label Studio API](#Start-using-the-Label-Studio-Python-SDK)
+- [Authenticate to the Label Studio API](#Start-using-the-Label-Studio-Python-SDK).
 - [Create a Label Studio project](#Create-a-project-with-the-Label-Studio-Python-SDK), including setting up a labeling configuration. 
 - [Import tasks](#Import-tasks-with-the-Label-Studio-Python-SDK).
-- [Manage pre-annotated tasks and model predictions](#Add-predictions-to-existing-tasks-with-the-Label-Studio-Python-SDK).
+- [Manage pre-annotated tasks and model predictions].(#Add-predictions-to-existing-tasks-with-the-Label-Studio-Python-SDK).
 - [Connect to a cloud storage provider](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/annotate_data_from_gcs/annotate_data_from_gcs.ipynb), such as Amazon S3, Microsoft Azure, or Google Cloud Services (GCS), to retrieve unlabeled tasks and store annotated tasks.
 - [Modify project settings](/sdk/project.html#label_studio_sdk.project.Project.set_params), such as task sampling or the model version used to display predictions. 
 
 See the [full SDK reference documentation for all available modules](/sdk/index.html), or review the available [API endpoints](/api) for any tasks that the SDK does not cover. 
+
 
 ## Start using the Label Studio Python SDK
 
 1. Install the SDK:
    `pip install label-studio-sdk`
 2. In your Python script, do the following:
-   1. Import the SDK.
-   2. Define your API key and Label Studio URL (API key is available at _Account_ page).
-   3. Connect to the API.
+   - Import the SDK.
+   - Define your API key and Label Studio URL (API key is available at **Account** page).
+   - Connect to the API.
 ```python
 # Define the URL where Label Studio is accessible and the API key for your user account
 LABEL_STUDIO_URL = 'http://localhost:8080'
@@ -62,6 +63,7 @@ project = ls.start_project(
 
 For more about what you can do with the project module of the SDK, see the [project module SDK reference](/sdk/project.html). 
 
+
 ## Import tasks with the Label Studio Python SDK
 
 You can import tasks from your script using the Label Studio Python SDK. 
@@ -78,8 +80,8 @@ project.import_tasks(
 ```
 
 You can also import predictions:
-- [Add predictions to an existing task](#Add-predictions-to-existing-tasks-with-the-Label-Studio-Python-SDK)
-- [Import pre-annotated tasks](#Import-pre-annotated-tasks-into-Label-Studio)
+- [Add predictions to an existing task](#Add-predictions-to-existing-tasks-with-the-Label-Studio-Python-SDK).
+- [Import pre-annotated tasks](#Import-pre-annotated-tasks-into-Label-Studio).
 
 ### Add predictions to existing tasks with the Label Studio Python SDK
 
@@ -116,9 +118,10 @@ The image is specified in the `image` key using a public URL, and the prediction
 
 For more examples, see the [Jupyter notebook example of importing pre-annotated data](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/import_preannotations/import_preannotations.ipynb).
 
+
 ## Prepare and manage data with filters
 
-You can also use the SDK to control how tasks appear in the data manager to annotators or reviewers. You can create custom filters and ordering for the tasks based on parameters that you specify with the SDK. This lets you have more granular control over which tasks in your dataset get labeled or reviewed, and in which order.
+You can also use the SDK to control how tasks appear in the data manager to annotators or reviewers. You can create custom filters and ordering for the tasks based on parameters that you specify with the SDK. This allows you have more granular control over which tasks in your dataset get labeled or reviewed, and in which order.
 
 ### Prepare unlabeled data with filters
 

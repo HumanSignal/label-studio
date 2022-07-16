@@ -11,13 +11,11 @@ You can use the Label Studio API to import data for labeling, export annotations
 
 See the [API reference documentation](/api) for further guidance and interactive examples. If you want to write Python scripts using the API, use the [Label Studio Python SDK](sdk.html). 
 
-<div class="enterprise"><p>
-The Label Studio Enterprise API shares many endpoints with the Label Studio Community Edition API, but includes extra payload options and additional endpoints specific to Enterprise features. Access the full Label Studio Enterprise API reference documentation by doing the following:</p>
-<ol>
-<li>Log in to Label Studio Enterprise</li>
-<li>Open the menu and click <b>API</b></li>
-</ol>
-</div>
+<i class='ent'></i> 
+The Label Studio Enterprise API shares many endpoints with the Label Studio Community Edition API, but includes extra payload options and additional endpoints specific to Enterprise features. Access the full Label Studio Enterprise API reference documentation by doing the following:
+
+1. Log in to Label Studio Enterprise.
+2. Open the menu and click <b>API</b>.
 
 ### Authenticate to the API
 
@@ -39,7 +37,7 @@ label-studio user --username <username>
 ```
 2. In the output returned in your terminal, the token for the user is listed as part of the user info.  
 
-See [API documentation for authentication](/api#section/Authentication).
+For more information, see [API documentation for authentication](/api#section/Authentication).
 
 ### List all projects
 
@@ -56,10 +54,11 @@ If you want to make sure the configuration for your labeling interface is valid 
 To import tasks using the API, make sure you know the project ID that you want to add tasks to. See additional examples and parameter descriptions in the [import data endpoint documentation](/api#operation/api_projects_import_create)
 
 ### Retrieve tasks
+
 Retrieve a paginated list of tasks for a specific project. If you want, you can also retrieve tasks and annotations using this API endpoint, as an alternative to exporting annotations. See details and parameters in the [list project tasks endpoint documentation](/api#operation/api_projects_tasks_list).
 
 ### Export annotations
 
 To export annotations, first see [which formats are available to export for your project](/api#operation/api_projects_export_formats_read). 
 
-Choose your selected format from the response and then call the export endpoint. See the [export annotations](/api#operation/api_projects_export_read) endpoint documentation for more details.
+Choose your selected format from the response and then call the export endpoint. For more information, see the [export annotations](/api#operation/api_projects_export_read) endpoint documentation.

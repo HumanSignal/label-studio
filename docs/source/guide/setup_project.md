@@ -143,7 +143,8 @@ In the project settings, you can add instructions and choose whether to show the
 1. Within a project on the Label Studio UI, click **Settings**.
 2. Click **Review**. 
 3. Type instructions and choose whether to show the instructions to reviewers before reviewing annotated tasks. If you want to provide additional details or links for reference, instructions support HTML markup.
-4. Click **Save**. <br/>Click **Data Manager** to return to the data manager view. 
+4. Click **Save**. 
+5. Click **Data Manager** to return to the data manager view. 
 
 ### Set reviewing options
 
