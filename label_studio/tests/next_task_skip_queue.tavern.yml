@@ -171,7 +171,6 @@ stages:
     headers:
       content-type: application/json
     json:
-      was_cancelled: false
       lead_time: 12.34
       result:
       - from_name: label
@@ -180,15 +179,14 @@ stages:
         value:
           choices:
           - pos
-    method: PATCH
-    url: '{django_live_url}/api/annotations/{first_skipped_annotation_pk}'
+    method: POST
+    url: '{django_live_url}/api/tasks/{first_task_pk}/annotations'
   response:
     save:
       json:
         annotation_pk: id
-    status_code: 200
-    was_cancelled: false
-
+    status_code: 201
+    
 - *get_next_task_queue_is_empty
 
 - &check_first_task_is_labeled
