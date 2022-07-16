@@ -270,7 +270,6 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         # save user history with annotator_id, time & annotation result
         annotation_id = self.kwargs['pk']
         annotation = get_object_with_check_and_log(request, Annotation, pk=annotation_id)
-        result = super(AnnotationAPI, self).update(request, *args, **kwargs)
 
         task = annotation.task
         if self.request.data.get('ground_truth'):
@@ -278,7 +277,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         task.update_is_labeled()
         task.save()  # refresh task metrics
 
-        return result
+        return super(AnnotationAPI, self).update(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).get(request, *args, **kwargs)
