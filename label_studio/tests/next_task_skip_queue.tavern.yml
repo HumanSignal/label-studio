@@ -186,7 +186,7 @@ stages:
       json:
         annotation_pk: id
     status_code: 201
-    
+
 - *get_next_task_queue_is_empty
 
 - &check_first_task_is_labeled

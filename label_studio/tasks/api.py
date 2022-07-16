@@ -277,7 +277,11 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         task.update_is_labeled()
         task.save()  # refresh task metrics
 
-        return super(AnnotationAPI, self).update(request, *args, **kwargs)
+        result = super(AnnotationAPI, self).update(request, *args, **kwargs)
+
+        task.update_is_labeled()
+        task.save(update_fields=['updated_at'])  # refresh task metrics
+        return result
 
     def get(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).get(request, *args, **kwargs)
