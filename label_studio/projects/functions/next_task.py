@@ -177,6 +177,17 @@ def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_fla
     return next_task, use_task_lock, queue_info
 
 
+def skipped_queue(next_task, prepared_tasks, project, user):
+    if not next_task and project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
+        q = Q(task__project=project, task__isnull=False, was_cancelled=True)
+        skipped_tasks = user.annotations.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
+        if skipped_tasks.exists():
+            preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(skipped_tasks)])
+            next_task = prepared_tasks.filter(pk__in=skipped_tasks).order_by(preserved_order).first()
+
+    return next_task
+
+
 def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
     logger.debug(f'get_next_task called. user: {user}, project: {project}, dm_queue: {dm_queue}')
 
@@ -221,13 +232,9 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
             # set lock for the task with TTL 3x time more then current average lead time (or 1 hour by default)
             next_task.set_lock(user)
 
-        if not next_task and project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
-            q = Q(task__project=project, task__isnull=False, was_cancelled=True)
-            skipped_tasks = user.annotations.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
-            preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(skipped_tasks)])
-            next_task = prepared_tasks.filter(pk__in=skipped_tasks).order_by(preserved_order).first()
-            queue_info += ' Requeued for me from skipped tasks '
+        next_task = skipped_queue(next_task, prepared_tasks, project, user)
 
         logger.debug(f'get_next_task finished. next_task: {next_task}, queue_info: {queue_info}')
         return next_task, queue_info
+
 
