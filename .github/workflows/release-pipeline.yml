@@ -1,0 +1,27 @@
+name: "Release Pipeline"
+
+on:
+  release:
+    types:
+      - released
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  promote_docker_image:
+    name: "Promote"
+    uses: heartexlabs/label-studio/.github/workflows/docker-release-promote.yml@develop
+    with:
+      release_tag: ${{ github.ref_name }}
+    secrets: inherit
+
+  upload_to_pypi:
+    name: "Upload"
+    uses: heartexlabs/label-studio/.github/workflows/upload_to_pypi.yml@develop
+    with:
+      version: ${{ github.ref_name }}
+      ref: ${{ github.ref_name }}
+      upload_to_pypi: true
+    secrets: inherit

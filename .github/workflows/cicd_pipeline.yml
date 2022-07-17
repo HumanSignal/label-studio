@@ -81,7 +81,7 @@ jobs:
     name: "Validate"
     uses: heartexlabs/label-studio/.github/workflows/submodules-validator.yml@develop
     with:
-      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+      head_sha: ${{ github.sha }}
       base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
       target_branch: ${{ github.event.pull_request.base.ref || github.event.ref }}
 
