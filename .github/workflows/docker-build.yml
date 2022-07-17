@@ -35,7 +35,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GIT_PAT }}
           ref: ${{ inputs.ref }}
 
       - name: Calculate version

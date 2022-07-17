@@ -16,7 +16,6 @@ jobs:
       - name: "Validate PR's title"
         uses: thehanimo/pr-title-checker@v1.3.4
         with:
-          GITHUB_TOKEN: ${{ secrets.GIT_PAT }}
           pass_on_octokit_error: false
           configuration_path: ".github/pr-title-checker-config.json"
 

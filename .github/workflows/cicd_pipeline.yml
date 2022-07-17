@@ -59,7 +59,6 @@ jobs:
       - uses: actions/github-script@v6
         id: commit-details
         with:
-          github-token: ${{ secrets.GIT_PAT }}
           script: |
             const { repo, owner } = context.repo;
             const { data: commit } = await github.rest.repos.getCommit({
@@ -124,7 +123,7 @@ jobs:
       github.event_name == 'push' &&
       ( ( github.ref_name == 'develop' && needs.changed_files.outputs.docker == 'true' )
         || startsWith(github.ref_name, 'ls-release/') )
-    uses: nikitabelonogov/label-studio/.github/workflows/docker-build.yml@develop
+    uses: heartexlabs/label-studio/.github/workflows/docker-build.yml@develop
     with:
       ref: ${{ github.ref_name }}
     secrets: inherit
