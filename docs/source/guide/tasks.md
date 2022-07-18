@@ -181,28 +181,38 @@ For example:
 - Using “text”: `<Text name="text" value="$text" valueType="text"/>` displays the URL without loading the text.
 
 ### `resolver` (optional)
-
-Task data can point to a data file on [S3 or other cloud storage](/guide/storage.html) with the actual data. You can retrieve it only in run-time.
-
-To retrieve the task data, use rules from the `resolver` parameter. 
+    
+Use this parameter to retrieve data from multi-column csv on [S3 or other cloud storage](/guide/storage.html). Label Studio can retrieve it only in run-time, so it's secure.
 
 If you import a file with a list of tasks, and every task in this list is a link to another file in the storage. In this case, you can use the `resolver` parameter to retrieve the content of these files from a storage. 
 
 **Use case**
 
-When the user has a CSV file with a list of tasks. The column “S3” in the CSV file is a link to another CSV file in the storage. Every CSV file has a “url” column. The “url” column is a link to the text file which is retrieved for labeling.
+When the user has a list of tasks. The field “remote-csv” of every task is a link to a CSV file in the storage. Every CSV file has a “text” column with text to be labeled. For example:
+
+Tasks:
+```json
+[
+    { "remote-csv": "s3://bucket/text1.csv" },
+    { "remote-csv": "s3://bucket/text2.csv" }
+]
+```
+
+CSV file:
+```csv
+id;text
+12;The most flexible data annotation tool. Quickly installable. Build custom UIs or use pre-built labeling templates.
+```
 
 **Solution**
 
 To retrieve the file, use the following parameters:
 
-1. `value="S3"`: The URL to CSV on S3 is in "S3" field of task data. If you use the `resolver` parameter the `value` is always treated as a URL.
+1. `value="$remote-csv"`: The URL to CSV on S3 is in "remote-csv" field of task data. If you use the `resolver` parameter the `value` is always treated as a URL, so you don't need to set `valueType`.
 
-2. `resolver="csv|column=url"`: Load this file in run-time, parse it as CSV, and get the “url” column from the first row. 
+2. `resolver="csv|separator=;|column=text"`: Load this file in run-time, parse it as CSV, and get the “text” column from the first row. 
 
-3. `valueType="url"`: Use the value of the “url” column as the actual URL. (If you use `valueType="text"` the content of "url" column will be shown as is.)
-
-4. Load the text by using the above URL and display the result.
+3. Display the result.
 
 **Syntax**
 
