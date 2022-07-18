@@ -89,35 +89,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Create Docker image tag Check
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { repo, owner } = context.repo;
-            const details = {
-              "image_version": "${{ steps.version.outputs.image_version }}",
-              "ubi_image_version": "${{ steps.version.outputs.ubi_image_version }}",
-              "sha": "${{ steps.version.outputs.sha }}"
-            }
-            const { data: check } = await github.rest.checks.create({
-              owner,
-              repo,
-              name: '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}',
-              head_sha: '${{ steps.version.outputs.sha }}',
-              status: 'in_progress',
-              output: {
-                title: '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}',
-                summary: JSON.stringify(details)
-              }
-            });
-            await github.rest.checks.update({
-              owner,
-              repo,
-              check_run_id: check.id,
-              status: 'completed',
-              conclusion: 'success'
-            });
-
       - name: Login to RedHat Registry
         uses: docker/login-action@v2.0.0
         with:
@@ -146,3 +117,33 @@ jobs:
           ${{ env.PREFLIGHT_REPO }} \
           check container scan.connect.redhat.com/${{ secrets.REDHAT_MARKETPLACE_LS_OSPID }}/label-studio:${{ steps.version.outputs.image_version }} \
           --submit
+
+      - name: Create Docker image tag Check
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const details = {
+              "image_version": "${{ steps.version.outputs.image_version }}",
+              "ubi_image_version": "${{ steps.version.outputs.ubi_image_version }}",
+              "sha": "${{ steps.version.outputs.sha }}"
+            }
+            const { data: check } = await github.rest.checks.create({
+              owner,
+              repo,
+              name: '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}',
+              head_sha: '${{ steps.version.outputs.sha }}',
+              status: 'in_progress',
+              output: {
+                title: '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}',
+                summary: JSON.stringify(details)
+              }
+            });
+            await github.rest.checks.update({
+              owner,
+              repo,
+              check_run_id: check.id,
+              status: 'completed',
+              conclusion: 'success'
+            });
