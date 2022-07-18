@@ -5,7 +5,7 @@ on:
     branches:
       - develop
       - 'ls-release/**'
-  pull_request_target:
+  pull_request:
     types:
       - opened
       - synchronize
@@ -19,6 +19,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.pull_request.head.ref || github.ref }}
   cancel-in-progress: true
 
+permissions: read-all
+
 jobs:
   changed_files:
     name: "Changed files"
@@ -27,7 +29,7 @@ jobs:
       src: ${{ steps.changes.outputs.src }}
       frontend: ${{ steps.changes.outputs.frontend }}
       docker: ${{ steps.changes.outputs.docker }}
-      commit-message: ${{ steps.commit-details.outputs.message }}
+      commit-message: ${{ steps.commit-details.outputs.commit-message }}
     timeout-minutes: 5
     steps:
       - uses: hmarr/debug-action@v2.0.1
@@ -66,13 +68,14 @@ jobs:
                 repo,
                 ref: '${{ github.event.pull_request.head.sha || github.event.after }}'
             });
-            core.setOutput("message", commit.commit.message);
+            core.setOutput("commit-message", commit.commit.message);
 
   pr_labeler:
     name: "Validate"
-    if: github.event_name == 'pull_request_target'
+    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: write
     uses: heartexlabs/label-studio/.github/workflows/pr-labeler.yml@develop
-    secrets: inherit
 
   validate_submodules:
     name: "Validate"
@@ -81,16 +84,14 @@ jobs:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
       base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
       target_branch: ${{ github.event.pull_request.base.ref || github.event.ref }}
-    secrets: inherit
 
   gitleaks:
     name: "Linter"
-    if: github.event_name == 'pull_request_target'
+    if: github.event_name == 'pull_request'
     uses: heartexlabs/label-studio/.github/workflows/gitleaks.yml@develop
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
       base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
-    secrets: inherit
 
   bandit:
     name: "Linter"
@@ -100,20 +101,21 @@ jobs:
     uses: heartexlabs/label-studio/.github/workflows/bandit.yml@develop
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
-    secrets: inherit
 
   frontend-build:
     name: "Build"
     needs:
       - changed_files
     if: |
-      github.event_name == 'pull_request_target' &&
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.fork == false &&
       needs.changed_files.outputs.frontend == 'true' &&
       needs.changed_files.outputs.commit-message != 'Build frontend'
+    permissions:
+      contents: write
     uses: heartexlabs/label-studio/.github/workflows/frontend-build.yml@develop
     with:
       ref: ${{ github.event.pull_request.head.ref || github.ref }}
-    secrets: inherit
 
   build:
     name: "Build"
@@ -136,4 +138,3 @@ jobs:
     uses: heartexlabs/label-studio/.github/workflows/tests.yml@develop
     with:
       ref: ${{ github.event.pull_request.head.ref || github.ref }}
-    secrets: inherit
