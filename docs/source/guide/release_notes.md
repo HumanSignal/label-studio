@@ -13,10 +13,61 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
     The release notes for Label Studio Community Edition is available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
 
 
+## Label Studio Enterprise 2.2.11
+
+This section highlights the new features, enhancements, and bug fixes in Label Studio Enterprise 2.2.11. 
+
+### New features and enhancements 
+
+Label Studio Enterprise 2.2.11 introduces the following new features and enhancements.
+
+#### API 
+- Integrate project duplication of tasks and annotations with API [DEV-2539].
+
+#### Backend
+- Allow annotators and reviewers to filter the view of transcriptions by author name [DEV-2669].
+- Improve the load project list performance by adding two API requests [DEV-2575].
+- Introduce the project duplication interface that allows you to copy projects with settings, tasks, and annotations [DEV-2702].
+- Present the project pinning interface that allows you to pin projects for better visibility of commonly referenced projects [DEV-2629].
+
+
+#### Frontend 
+- Implement keyboard actions using arrow keys to navigate the Taxonomy project [DEV-2424]:
+  - Up/Down key: For navigation purposes.
+  - Right key: To open a subtree.
+  - Space bar: To select an item. 
+
+### Bug fixes
+
+Label Studio 2.2.11 includes the following bug fixes:
+
+- Allowed unfinished polygons to be saved as draft [DEV-2432].
+- Retained history on initial load of annotation review stream [DEV-2437].
+- Fixed workspace filter for project list API [DEV-2785].
+- Displayed source filename for tasks from storage in a separate column [DEV-2687].
+- Implemented **Tasks per page** field to sync with the number of tasks displayed [DEV-2170].
+- Fixed an issue where changing the label for one region did not change the legend for the other regions  [DEV-2462].
+- Resolved an issue where **Quick View** failed to open when the user attempted to copy-paste its URL to another tab [DEV-2526].
+- Fixed the behavior of the drop-down menu that failed to group when the organization was not activated [DEV-2639].
+- Implemented the pagination behavior to retain the current position or page whenever possible, at least until the user leaves the project [DEV-2153].
+- Fixed an issue where the anchor of the image moved outside the frame and the user was not able to rotate the bounding box [DEV-2671].
+- Prevented users from editing fields that were not editable [DEV-2365].
+- Resolved an issue where the relationship **Delete** button failed to work as expected [DEV-2806].
+- Ensured `review_settings` was included in the initial request [DEV-2575].
+- Added a tag for `<Date>`, `<DateTime>`, or `<Year>` that was conditionally rendered [DEV-117].
+- Allowed annotators and reviewers to filter the view of transcriptions by author name [DEV-2669].
+- Added the ability to delete points with an Alt-click button [DEV-2431].
+- Allowed users to pin or unpin projects to easily filter and find projects of interest [DEV-2069].
+- Fixed `PyJWT` vulnerability for users to sign up without any error in the Sign-Up flow [DEV-2793].
+- Implemented important fixes for multi-lines and interactions [DEV-2424].
+
+
 ## Label Studio Enterprise 2.2.10 
+
 This section highlights the bug fixes in Label Studio Enterprise 2.2.10.
 
 ### Bug fixes
+
 Label Studio 2.2.10 includes the following bug fixes:
 
 #### Backend 
@@ -30,14 +81,17 @@ Label Studio 2.2.10 includes the following bug fixes:
 
 
 ## Label Studio Enterprise 2.2.9
-This section highlights the breaking changes, new features and enhancements, and bug fixes in Label Studio Enterprise 2.2.9. 
+
+This section highlights the breaking changes, new features, enhancements, and bug fixes in Label Studio Enterprise 2.2.9. 
 
 ### Breaking changes
+
 Label Studio Enterprise 2.2.9 includes the following breaking change:
 
 - This release decommissions MinIO as a service [DEV-2600].
 
 ### New features and enhancements 
+
 Label Studio Enterprise 2.2.9 introduces the following new features and enhancements.
 
 #### Backend
@@ -45,13 +99,14 @@ Label Studio Enterprise 2.2.9 introduces the following new features and enhancem
 - Add API for project duplication [DEV-2538].
 
 #### Frontend
-- This release introduces the ability to select model version on model cards from the machine learning page >> **Settings** [DEV-1868].
+- This release introduces the ability to select the model version on model cards from the machine learning page >> **Settings** [DEV-1868].
 - Now, you can show the comments column in the Data Manager to reviewers [DEV-2598].
  
 #### Templates
-- This release introduces [Dynamic Labels templates](https://labelstud.io/templates/gallery_dynamic_labels.html#main). You can now show labels dynamically as a task input, either as a prediction from the model or from a database lookup. With a broader set of options, dynamic labeling saves time and increases the consistency of labeling the objects [DEV-2636]. 
+- This release introduces [Dynamic Labels templates](https://labelstud.io/templates/gallery_dynamic_labels.html#main). You can now show labels dynamically as a task input, either as a prediction from the model or a database lookup. With a broader set of options, dynamic labeling saves time and increases the consistency of labeling the objects [DEV-2636]. 
 
 ### Bug fixes
+
 Label Studio 2.2.9 includes the following bug fixes:
 
 #### Backend
@@ -86,7 +141,7 @@ Label Studio 2.2.9 includes the following bug fixes:
 - Fixed Annotation History when exiting **View All** [DEV-2302]. 
 - Added X-axis zoom threshold [DEV-1714].
 - Added guard with an error message for non-incremental, non-sequential datasets in Time Series [DEV-2510].
-- Disabled the delete **all region** button when an annotation is read-only [DEV-2309].
+- Disabled to delete **all region** button when an annotation is read-only [DEV-2309].
 - Fixed blind Server-side Request Forgery (SSRF) on add model and import [DEV-2235].
 - Deselected the ImageView bounding box before creating another [DEV-1422]. 
 - Fixed data in Search Engine Results Page (SERP) ranking in-app template [DEV-2604]. 
@@ -101,9 +156,11 @@ Label Studio 2.2.9 includes the following bug fixes:
 
 
 ## Label Studio Enterprise 2.2.8
-This section highlights the breaking changes, new features and enhancements, and bug fixes in Label Studio Enterprise 2.2.8. 
+
+This section highlights the breaking changes, new features, enhancements, and bug fixes in Label Studio Enterprise 2.2.8. 
 
 ### New features and enhancements
+
 Label Studio Enterprise 2.2.8 introduces the following new features and enhancements.
 
 - This release displays comments in **DM** to reviewers [DEV-2598].
@@ -117,6 +174,7 @@ Label Studio Enterprise 2.2.8 introduces the following new features and enhancem
 - Add the ability to pass a comment to APIs on skip [DEV-2458].
 
 ### Bugfixes
+
 Label Studio 2.2.8 includes the following bug fixes:
 
 - Per label score for Choices was calculated when no Choice was selected (hotfix-7) [DEV-2688].
@@ -129,7 +187,7 @@ Label Studio 2.2.8 includes the following bug fixes:
 - Annotation history fixes [DEV-2265], [DEV-2268], [DEV-2271].
 - Fixed an issue where the Annotation History was not loading because of string ID [DEV-2278].
 - Fixed validation in Labeling Interface preview with Dynamic Labels [DEV-2249].
-- Fixed history 404 on unskip in label stream [DEV-2262].
+- Fixed history `404` when the user canceled a skipped annotation in the label stream [DEV-2262].
 - Fixed **Annotation History** reset for predictions [DEV-2271].
 - Fixed job cancellation for `_update_tasks_states` [DEV-2294].
 - Fixed an issue to return `404` for `api/project/id/tasks` when the page was out of scope [DEV-2336]
@@ -159,13 +217,13 @@ Label Studio 2.2.8 includes the following bug fixes:
 - Fixed filter by empty reviewers [DEV-2390].
 - Fixed incorrect review card counters in the feedback loop for skipped annotations [DEV-2433].
 - Moved from signal to model delete method [DEV-2410].
-- Added new skip behavior for annotations that are requeued back to annotator [DEV-2617].
+- Added new skip behavior for annotations that are requeued back to the annotator [DEV-2617].
 - Fixed **Annotation History** drafts [DEV-2290].
 - Fixed regions for text span when it was out of bounding in the regions list and created horizontal scroll [DEV-2473].
 - Fixed in **Manage Members** modal (on project **Members** tab, on workspace members, on **Members** settings) header with search overlaps by the main list [DEV-2473].
 - Fixed `Textarea` for **Custom Function** on the **Quality** settings page [DEV-2473].
 - Fixed `startOffset` for empty nodes [DEV-2480].
-- Fixed the runtime error for users who deleted an annotation from Quickview',  switched to another task, and returned back to the same task [DEV-2306].
+- Fixed the runtime error for users who deleted an annotation from **QuickView**,  switched to another task, and returned to the same task [DEV-2306].
 - Added command for all orgs and optimize `update_tasks_counters` [DEV-2492].
 - After annotations from predictions `is_labeled` should be recalculated [DEV-2490].
-- Fixed 404 on skip [DEV-2416].
+- Fixed `404` on skip behavior [DEV-2416].
