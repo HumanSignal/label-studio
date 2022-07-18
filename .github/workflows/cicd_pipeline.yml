@@ -70,53 +70,62 @@ jobs:
             });
             core.setOutput("commit-message", commit.commit.message);
 
-  pr_labeler:
-    name: "Validate"
-    if: github.event_name == 'pull_request'
-    permissions:
-      pull-requests: write
-    uses: heartexlabs/label-studio/.github/workflows/pr-labeler.yml@develop
+#  pr_labeler:
+#    name: "Validate"
+#    if: github.event_name == 'pull_request'
+#    permissions:
+#      pull-requests: write
+#    uses: heartexlabs/label-studio/.github/workflows/pr-labeler.yml@develop
+#
+#  validate_submodules:
+#    name: "Validate"
+#    uses: heartexlabs/label-studio/.github/workflows/submodules-validator.yml@develop
+#    with:
+#      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+#      base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
+#      target_branch: ${{ github.event.pull_request.base.ref || github.event.ref }}
+#
+#  gitleaks:
+#    name: "Linter"
+#    if: github.event_name == 'pull_request'
+#    uses: heartexlabs/label-studio/.github/workflows/gitleaks.yml@develop
+#    with:
+#      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+#      base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
+#
+#  bandit:
+#    name: "Linter"
+#    needs:
+#      - changed_files
+#    if: needs.changed_files.outputs.src == 'true'
+#    uses: heartexlabs/label-studio/.github/workflows/bandit.yml@develop
+#    with:
+#      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+#
+#  frontend-build:
+#    name: "Build"
+#    needs:
+#      - changed_files
+#    if: |
+#      github.event_name == 'pull_request' &&
+#      github.event.pull_request.head.repo.fork == false &&
+#      needs.changed_files.outputs.frontend == 'true' &&
+#      needs.changed_files.outputs.commit-message != 'Build frontend'
+#    permissions:
+#      contents: write
+#    uses: heartexlabs/label-studio/.github/workflows/frontend-build.yml@develop
+#    with:
+#      ref: ${{ github.event.pull_request.head.ref || github.ref }}
 
-  validate_submodules:
-    name: "Validate"
-    uses: heartexlabs/label-studio/.github/workflows/submodules-validator.yml@develop
-    with:
-      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
-      base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
-      target_branch: ${{ github.event.pull_request.base.ref || github.event.ref }}
-
-  gitleaks:
-    name: "Linter"
-    if: github.event_name == 'pull_request'
-    uses: heartexlabs/label-studio/.github/workflows/gitleaks.yml@develop
-    with:
-      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
-      base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
-
-  bandit:
-    name: "Linter"
-    needs:
-      - changed_files
-    if: needs.changed_files.outputs.src == 'true'
-    uses: heartexlabs/label-studio/.github/workflows/bandit.yml@develop
-    with:
-      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
-
-  frontend-build:
-    name: "Build"
-    needs:
-      - changed_files
-    if: |
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.head.repo.fork == false &&
-      needs.changed_files.outputs.frontend == 'true' &&
-      needs.changed_files.outputs.commit-message != 'Build frontend'
-    permissions:
-      contents: write
-    uses: heartexlabs/label-studio/.github/workflows/frontend-build.yml@develop
-    with:
-      ref: ${{ github.event.pull_request.head.ref || github.ref }}
-
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo ${{ github.event_name }}
+          echo ${{ github.ref_name }}
+          echo ${{ needs.changed_files.outputs.docker }}
+          echo ${{ github.ref_name }}
+          
   build:
     name: "Build"
     needs:
@@ -125,16 +134,18 @@ jobs:
       github.event_name == 'push' &&
       ( ( github.ref_name == 'develop' && needs.changed_files.outputs.docker == 'true' )
         || startsWith(github.ref_name, 'ls-release/') )
-    uses: heartexlabs/label-studio/.github/workflows/docker-build.yml@develop
+    permissions:
+      checks: write
+    uses: nikitabelonogov/label-studio/.github/workflows/docker-build.yml@develop
     with:
       ref: ${{ github.ref_name }}
     secrets: inherit
 
-  pytest:
-    name: "Tests"
-    needs:
-      - changed_files
-    if: needs.changed_files.outputs.src == 'true'
-    uses: heartexlabs/label-studio/.github/workflows/tests.yml@develop
-    with:
-      ref: ${{ github.event.pull_request.head.ref || github.ref }}
+#  pytest:
+#    name: "Tests"
+#    needs:
+#      - changed_files
+#    if: needs.changed_files.outputs.src == 'true'
+#    uses: heartexlabs/label-studio/.github/workflows/tests.yml@develop
+#    with:
+#      ref: ${{ github.event.pull_request.head.ref || github.ref }}
