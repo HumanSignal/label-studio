@@ -21,17 +21,11 @@ This section highlights the new features, enhancements, and bug fixes in Label S
 
 Label Studio Enterprise 2.2.11 introduces the following new features and enhancements.
 
-#### API 
 - Integrate project duplication of tasks and annotations with API [DEV-2539].
-
-#### Backend
 - Allow annotators and reviewers to filter the view of transcriptions by author name [DEV-2669].
 - Improve the load project list performance by adding two API requests [DEV-2575].
 - Introduce the project duplication interface that allows you to copy projects with settings, tasks, and annotations [DEV-2702].
-- Present the project pinning interface that allows you to pin projects for better visibility of commonly referenced projects [DEV-2629].
-
-
-#### Frontend 
+- Present the project pinning interface that allows you to pin projects for better visibility of commonly referenced projects [DEV-2629]. 
 - Implement keyboard actions using arrow keys to navigate the Taxonomy project [DEV-2424]:
   - Up/Down key: For navigation purposes.
   - Right key: To open a subtree.
@@ -70,12 +64,9 @@ This section highlights the bug fixes in Label Studio Enterprise 2.2.10.
 
 Label Studio 2.2.10 includes the following bug fixes:
 
-#### Backend 
 - Per label score for `Choices` was calculated when `no Choice` was selected [DEV-2688].
 - Fixed an error for actions with ordering by **joined** field [DEV-2658].
 - Fixed auto-generated docs for `api/tasks` [DEV-2737].
-
-#### Frontend
 - Fixed an issue when the Safari browser stopped working [DEV-2777].
 - Fixed scrollable area in **Review** mode [DEV-2348].
 
@@ -94,22 +85,16 @@ Label Studio Enterprise 2.2.9 includes the following breaking change:
 
 Label Studio Enterprise 2.2.9 introduces the following new features and enhancements.
 
-#### Backend
 - This release provides proxy support for content-range HTTP responses [DEV-2496].
 - Add API for project duplication [DEV-2538].
-
-#### Frontend
 - This release introduces the ability to select the model version on model cards from the machine learning page >> **Settings** [DEV-1868].
 - Now, you can show the comments column in the Data Manager to reviewers [DEV-2598].
- 
-#### Templates
 - This release introduces [Dynamic Labels templates](https://labelstud.io/templates/gallery_dynamic_labels.html#main). You can now show labels dynamically as a task input, either as a prediction from the model or a database lookup. With a broader set of options, dynamic labeling saves time and increases the consistency of labeling the objects [DEV-2636]. 
 
 ### Bug fixes
 
 Label Studio 2.2.9 includes the following bug fixes:
 
-#### Backend
 - Optimized dashboard-members API performance for reviews [DEV-1669].
 - Enabled Query optimization for Uniform Sampling in the Labeling Stream [DEV-2184].
 - Fixed runtime error when duration was not extracted on `ASR_MANIFEST` export [DEV-2095].
@@ -119,9 +104,6 @@ Label Studio 2.2.9 includes the following bug fixes:
 - Recalculate stats when control weights were updated [DEV-2083].
 - Fixed empty agreement for taxonomy with extra labels [DEV-2440].
 - Fixed `is_labeled` calculation after task import [DEV-2389].
-
-#### Frontend 
-
 - Fixed the regions that disappeared from UI in **Annotation History** [DEV-2408]. 
 - Improved the **Annotation History** name/timestamp spacing [DEV-23640].
 - Fixed audio crashes in **View All** mode [DEV-2199].
