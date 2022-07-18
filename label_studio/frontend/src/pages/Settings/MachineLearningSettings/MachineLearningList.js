@@ -26,7 +26,7 @@ export const MachineLearningList = ({ backends, fetchBackends, onEdit }) => {
   const onStartTraining = useCallback(async (backend) => {
     console.log('training')
     await axios
-    .get('http://localhost:3535/can_press')
+    .get('http://127.0.0.1:3535/can_press')
         .then((response) => {
           console.log(response);
           let can_press = response.data.can_press;

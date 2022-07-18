@@ -247,7 +247,7 @@ DataManagerPage.context = ({ dmRef }) => {
       confirmButtonText: 'Yes, Import them!'
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.post('http://localhost:3535/import_annotations?id='+project.id)
+        axios.post('http://127.0.0.1:3535/import_annotations?id='+project.id)
           .then(response => {
             let number_of_annotations = response.data.annotations;
             let project_id = response.data.project_id;

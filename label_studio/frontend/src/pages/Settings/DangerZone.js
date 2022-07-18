@@ -7,6 +7,7 @@ import { Space } from "../../components/Space/Space";
 import { Spinner } from "../../components/Spinner/Spinner";
 import { useAPI } from "../../providers/ApiProvider";
 import { useProject } from "../../providers/ProjectProvider";
+import axios from 'axios'
 
 export const DangerZone = () => {
   const {project} = useProject();
@@ -34,12 +35,18 @@ export const DangerZone = () => {
               project: project.id,
             },
           });
-        } else if(type === 'project') {
+        } else if (type === 'project') {
+          await axios
+          .post('http://127.0.0.1:3535/delete_project?id='+project.id)
+              .then((response) => {
+                console.log(response)
+              })
           await api.callApi('deleteProject', {
             params: {
               pk: project.id,
             },
           });
+
           history.replace('/projects');
         }
         setProcessing(null);
