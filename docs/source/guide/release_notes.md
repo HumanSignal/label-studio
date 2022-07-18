@@ -155,7 +155,7 @@ Label Studio Enterprise 2.2.8 introduces the following new features and enhancem
 - Support for System for Cross-domain Identity Management (SCIM 2.0) user and group provisioning [DEV-1823].
 - Add the ability to pass a comment to APIs on skip [DEV-2458].
 
-### Bugfixes
+### Bug fixes
 
 Label Studio 2.2.8 includes the following bug fixes:
 
