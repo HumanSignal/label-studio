@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2366: User is able to edit taxonomy results imported as read-only",
-  "commit": "1050f292640411231548839fd7f53639c13b58e6",
-  "branch": "fb-dev-2366",
-  "date": "2022/07/13 10:52:20"
+  "commit": "982da8038e92d319e9722954352f47db73381575",
+  "branch": "master",
+  "date": "2022/07/18 12:33:07"
 }
