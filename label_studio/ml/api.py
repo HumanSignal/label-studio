@@ -276,6 +276,9 @@ class MLBackendVersionsAPI(generics.RetrieveAPIView):
         if versions_response.status_code == 200:
             result = {'versions': versions_response.response.get("versions", [])}
             return Response(data=result, status=200)
+        elif versions_response.status_code == 404:
+            result = {'versions': [ml_backend.model_version], 'message': 'Upgrade your ML backend version to latest.'}
+            return Response(data=result, status=200)
         else:
             result = {'error': str(versions_response.error_message)}
             status_code = versions_response.status_code if versions_response.status_code > 0 else 500
