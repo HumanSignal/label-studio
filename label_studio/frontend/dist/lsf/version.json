@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2696: 3point bbox tool remains selected but hidden, when user changes label configuration from Rectangle to RectangleLabels",
-  "commit": "88ba482f7ad798240fb4b36252b6a8db9fe760a7",
-  "branch": "fb-dev-2696",
-  "date": "2022/07/15 10:51:51"
+  "commit": "1baf832d73fe2d0d84c1e24e514654c55a22786d",
+  "branch": "master",
+  "date": "2022/07/18 07:31:24"
 }
