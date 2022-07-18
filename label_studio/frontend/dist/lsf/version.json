@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2146: Lock rect VideoRectangle",
-  "commit": "974f253c8e6f5ffad88fcb956b430ceb62877dd3",
-  "branch": "fb-dev-2146",
-  "date": "2022/07/18 13:46:41"
+  "message": "fix: DEV-2366: User is able to edit taxonomy results imported as read-only (#748)",
+  "commit": "982da8038e92d319e9722954352f47db73381575",
+  "branch": "master",
+  "date": "2022-07-18T16:33:07Z"
 }
