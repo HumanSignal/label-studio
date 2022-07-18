@@ -125,6 +125,8 @@ jobs:
       github.event_name == 'push' &&
       ( ( github.ref_name == 'develop' && needs.changed_files.outputs.docker == 'true' )
         || startsWith(github.ref_name, 'ls-release/') )
+    permissions:
+      checks: write
     uses: heartexlabs/label-studio/.github/workflows/docker-build.yml@develop
     with:
       ref: ${{ github.ref_name }}
