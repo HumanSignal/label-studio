@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2655: Hold to continuous draw image view shapes show immediately (#744)\n\n* fix: DEV-2655: Hold to continuous draw image region shapes shows immediately when dragged\r\n\r\n* fix: DEV-2655: Hold and drag should count as one continuous action and draw the next shape immediately\r\n\r\n* fix: DEV-2655: Ensure shape is not in drawing mode when deselecting\r\n\r\n* fix: DEV-2655: Ensure no other tools are affected by deselection when clicking on canvas.",
-  "commit": "169adcd0a057920ba2034327a681496d2487f4f6",
-  "branch": "master",
-  "date": "2022-07-14T14:20:40Z"
+  "message": "feat: DEV-2786: Adjustable draggable spans ",
+  "commit": "b1c8ce45ba5ded10e72209acac7b8d426475c346",
+  "branch": "fb-dev-2786/adjustable-draggable-spans",
+  "date": "2022/07/18 01:06:54"
 }
