@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2146: Lock rect VideoRectangle",
-  "commit": "974f253c8e6f5ffad88fcb956b430ceb62877dd3",
+  "commit": "01b02d722e176d9859058d3454719bafa6ed7281",
   "branch": "fb-dev-2146",
-  "date": "2022-07-18T16:46:41Z"
+  "date": "2022/07/19 09:56:18"
 }
