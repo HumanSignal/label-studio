@@ -133,12 +133,12 @@
   {% block bottomjs %}
   {% endblock %}
 
-  {% block storate-persistance %}
+  {% block storate-persistence %}
   <script>
-    {# storage persistance #}
+    {# storage persistence #}
     {% if not settings.STORAGE_PERSISTENCE %}
     new Toast({
-      message: 'Data persistance not configured',
+      message: 'Data persistence not configured',
       type: 'danger'
     });
     {% endif %}
