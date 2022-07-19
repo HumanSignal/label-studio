@@ -1,4 +1,4 @@
-name: "Upload to PYPI"
+name: "Build PYPI"
 
 on:
   workflow_call:
@@ -14,7 +14,11 @@ on:
       upload_to_pypi:
         description: "Upload to PyPi"
         type: boolean
-        required: true
+        required: false
+      release-id:
+        description: "Attach Artifact to Release"
+        type: string
+        required: false
   workflow_dispatch:
     inputs:
       version:
@@ -29,7 +33,11 @@ on:
         description: "Upload to PyPi"
         type: boolean
         default: false
-        required: true
+        required: false
+      release-id:
+        description: "Attach Artifact to Release"
+        type: string
+        required: false
 
 jobs:
   ReleaseNotification:
@@ -90,6 +98,10 @@ jobs:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_APIKEY }}
         run: twine upload dist/*
+
+      - name: Attach Artifact to release
+        if: inputs.release-id
+#        TODO: github script
 
       - name: Upload to artifacts
         if: always()

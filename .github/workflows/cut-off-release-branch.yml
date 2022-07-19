@@ -1,4 +1,4 @@
-name: "Draft new release/hotfix"
+name: "Cut off release branch"
 
 on:
   workflow_dispatch:
@@ -12,13 +12,10 @@ on:
         required: true
         default: 'develop'
         type: string
-      hotfix:
-        type: boolean
-        required: false
-        description: 'Draft hotfix'
 
 env:
-  PYTHON_VERSION_FILE: 'label_studio/__init__.py'
+  PYTHON_VERSION_FILE: "label_studio/__init__.py"
+  RELEASE_BRANCH_PREFIX: "ls-release"
 
 jobs:
   draft-new-release:
@@ -59,30 +56,15 @@ jobs:
               exit 0
           fi
           
-          if [ '${{ inputs.hotfix }}' = 'true' ]; then
-            if git tag -l | grep "${{ inputs.version }}" | grep post; then
-              latest_hotfix=$(git tag -l | grep "${{ inputs.version }}" | grep post | sort | tail -n1)
-              latest_hotfix_number=$(echo "${latest_hotfix}" | grep -o '[0-9]\{1,\}$')
-              hotfix_number=$(($latest_hotfix_number + 1))
-            else
-              hotfix_number=0
-            fi
-            next_hotfix_number=$(($hotfix_number + 1))
-            release_version="${first}.${second}.${third}.post${hotfix_number}"
-            release_branch="ls-release/${first}.${second}.${third}"
-            next_develop_version="${first}.${second}.${third}.post${next_hotfix_number}"
-          else
-            release_version="${first}.${second}.${third}"
-            release_branch="ls-release/${first}.${second}.${third}"
-            next_develop_version="${first}.${second}.$(($third + 1)).dev"
-          fi
+          release_version="${first}.${second}.${third}"
+          release_branch="${{ env.RELEASE_BRANCH_PREFIX }}/${first}.${second}.${third}"
+          next_develop_version="${first}.${second}.$(($third + 1)).dev"
           
           echo "::set-output name=release_branch::${release_branch}"
           echo "::set-output name=release_version::${release_version}"
           echo "::set-output name=next_develop_version::${next_develop_version}"
 
       - name: Cut dependencies release branches
-        if: github.event.inputs.hotfix != 'true'
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GIT_PAT }}
@@ -162,7 +144,6 @@ jobs:
 
       - name: Commit version files to release branch
         id: make-release-commit
-        if: github.event.inputs.hotfix != 'true'
         run: |
           set -euo pipefail
           
@@ -183,30 +164,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-gh-actions-
 
-      - name: Create release draft
-        uses: actions/github-script@v6
-        id: create-draft-release
-        with:
-          script: |
-            try {
-              const response = await github.rest.repos.createRelease({
-                draft: true,
-                name: '${{ steps.calculate_branch_name_and_version.outputs.release_version }}',
-                owner: context.repo.owner,
-                prerelease: false,
-                repo: context.repo.repo,
-                target_commitish: '${{ steps.calculate_branch_name_and_version.outputs.release_branch }}',
-                tag_name: '${{ steps.calculate_branch_name_and_version.outputs.release_version }}',
-                generate_release_notes: true 
-              });
-              return response;
-            } catch (error) {
-              core.setFailed(error.message);
-            }
-
       - name: Commit version files to 'develop'
         id: make-develop-commit
-        if: github.event.inputs.hotfix != 'true'
         run: |
           set -euo pipefail
           
@@ -225,7 +184,6 @@ jobs:
           git push origin HEAD:refs/heads/${branch}
 
       - name: Create PR to 'develop'
-        if: github.event.inputs.hotfix != 'true'
         uses: actions/github-script@v6
         id: create-pr
         with:
@@ -254,7 +212,6 @@ jobs:
 
       - name: Enable AutoMerge
         id: enable-pr-automerge
-        if: github.event.inputs.hotfix != 'true'
         shell: bash
         run: |
           echo ${{ secrets.GIT_PAT }} | gh auth login --with-token

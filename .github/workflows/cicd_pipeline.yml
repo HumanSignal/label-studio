@@ -102,7 +102,7 @@ jobs:
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
 
-  frontend-build:
+  build-frontend:
     name: "Build"
     needs:
       - changed_files
@@ -117,7 +117,7 @@ jobs:
     with:
       ref: ${{ github.event.pull_request.head.ref || github.ref }}
 
-  build:
+  build-docker:
     name: "Build"
     needs:
       - changed_files
@@ -140,3 +140,81 @@ jobs:
     uses: heartexlabs/label-studio/.github/workflows/tests.yml@develop
     with:
       ref: ${{ github.event.pull_request.head.ref || github.ref }}
+
+
+  draft-release:
+    name: "Draft Release"
+    if: |
+      github.event_name == 'push' &&
+      startsWith(github.ref_name, 'ls-release/'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      id: ${{ steps.create-draft-release.outputs.id }}
+    steps:
+      - name: Create release draft
+        uses: actions/github-script@v6
+        id: create-draft-release
+        with:
+          script: |
+            const {data: releases} = await github.rest.repos.listReleases({
+                owner,
+                repo,
+            });
+            
+            const matchedRelease = releases.find((e) => {
+                return target_commitish.endsWith(e.target_commitish) && e.draft
+            })
+            
+            if (matchedRelease) {
+                core.setOutput("id", matchedRelease.id);
+            } else {
+                const {data: tags} = await github.rest.repos.listTags({
+                    owner,
+                    repo,
+                    per_page: 100
+                });
+                let version = target_commitish.replace('ls-release/', '')
+                const matchedTags = tags.filter(e => e.name.indexOf(version) !== -1)
+                if (matchedTags) {
+                    let newHotfixNumber = 0
+                    for (let matchedTag of matchedTags) {
+                        console.log(matchedTag)
+                        const matchVersion = matchedTag.name.match('^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)(.post([0-9]+))?$')
+                        if (matchVersion[5]) {
+                            const hotfixNumber = parseInt(matchVersion[5])
+                            if (newHotfixNumber <= hotfixNumber) {
+                                newHotfixNumber = hotfixNumber + 1
+                            }
+                        }
+                    }
+                    version = `${version}.post${newHotfixNumber}`
+                }
+                const { data: release } = await github.rest.repos.createRelease({
+                    owner,
+                    repo,
+                    draft: true,
+                    name: version,
+                    prerelease: false,
+                    target_commitish: target_commitish,
+                    tag_name: version,
+                    generate_release_notes: true
+                });
+                console.log(release)
+                core.setOutput("id", release.id);
+            }
+
+  build-pypi:
+    name: "Build"
+    needs:
+      - draft-release
+    if: |
+      github.event_name == 'push' &&
+      startsWith(github.ref_name, 'ls-release/'
+    uses: heartexlabs/label-studio/.github/workflows/build_pypi.yml@develop
+    with:
+      version: ${{ TODO }}
+      ref: ${{ github.ref_name }}
+      release-id: ${{ needs.draft-release.outputs.id }}
+    secrets: inherit
