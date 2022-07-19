@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2207: sync speed between video and audio",
-  "commit": "5120811dcfe388a6e81fd94eaa71ad41d71fce82",
-  "branch": "fb-dev-2207",
-  "date": "2022-06-15T18:34:04Z"
+  "message": "fix: DEV-2696: 3point bbox tool remains selected but hidden, when user changes label configuration from Rectangle to RectangleLabels",
+  "commit": "1baf832d73fe2d0d84c1e24e514654c55a22786d",
+  "branch": "master",
+  "date": "2022/07/18 07:31:24"
 }

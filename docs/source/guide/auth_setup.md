@@ -22,6 +22,7 @@ The organization owner for Label Studio Enterprise can set up SSO & SAML for the
 - Microsoft Active Directory
 - Okta
 - OneLogin
+- [Ping Federate & Ping Identity & PingOne](pingone.html)
 - others that use SAML assertions
 
 After you set up SSO, you can no longer use native authentication to access the Label Studio UI unless you have the Owner role.
