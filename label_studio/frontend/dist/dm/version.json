@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2170: On project open set number of tasks defined by task per page",
-  "commit": "864b7d52db9ee07aa78a447b2512468970cca7f1",
-  "branch": "master",
-  "date": "2022/07/14 12:20:33"
+  "message": "Fb dev 2885/add new dm collumns",
+  "commit": "59e88bbebb653ca668417c611f5fc64f132fe932",
+  "branch": "fb-dev-2885/add-new-dm-collumns",
+  "date": "2022/07/19 14:46:37"
 }
