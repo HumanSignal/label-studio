@@ -110,7 +110,7 @@ Alternatively, you can push the changes immediately to Label Studio.
 1. Using Okta, navigate to the **application** page and open the **Push Groups** tab. 
 2. Click **Push Groups** and select **Find groups by name**. 
 3. Find the group you would like to sync to Label Studio. 
-4. 4. Choose either **Create Group** or **Link Group**, if you already have a workplace with the same name as specified on the **SCIM** >>**Settings** page.
+4. 4. Choose either **Create Group** or **Link Group**, if you already have a workplace with the same name as specified on the **SCIM** >> **Settings** page.
 
 ## Unassigning the application for groups
 
