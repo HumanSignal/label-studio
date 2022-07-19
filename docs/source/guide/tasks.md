@@ -188,7 +188,7 @@ If you import a file with a list of tasks, and every task in this list is a link
 
 **Use case**
 
-When you have a list of tasks, the field “remote-csv” of every task is a link to a CSV file in the storage. Every CSV file has a “text” column with text to be labeled. Every CSV file has a “text” column with text to be labeled. For example:
+There is a list of tasks, where the "remote-csv" field of every task is a link to a CSV file in the storage. Every CSV file has a “text” column with text to be labeled. Every CSV file has a “text” column with text to be labeled. For example:
 
 Tasks:
 ```json
