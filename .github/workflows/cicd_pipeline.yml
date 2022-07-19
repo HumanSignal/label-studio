@@ -90,7 +90,7 @@ jobs:
     if: github.event_name == 'pull_request'
     uses: heartexlabs/label-studio/.github/workflows/gitleaks.yml@develop
     with:
-      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+      head_sha: ${{ github.sha }}
       base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
 
   bandit:
