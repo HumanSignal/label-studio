@@ -31,12 +31,12 @@ Label Studio Enterprise 2.2 introduces the following new features and enhancemen
     - Third point click - Draw the height of the bounding box.
 
     <br>
-    <div style="margin:auto; text-align:center;"><img src="/images/two-point-click-rectangle.png" style="opacity: 0.8"/></div>
+    <div style="margin:auto; text-align:center;"><img src="/images/two-point-click.png" style="opacity: 0.8"/></div>
     <i>Figure 1: Two point click rectangle.</i>
 
     
     <br>
-    <div style="margin:auto; text-align:center;"><img src="/images/three-point-click-rectangle.png" style="opacity: 0.8"/></div>
+    <div style="margin:auto; text-align:center;"><img src="/images/three-point-click.png" style="opacity: 0.8"/></div>
     <i>Figure 2: Three point click rectangle.</i>
 
     After you create the bounding box, you can do the following: 
