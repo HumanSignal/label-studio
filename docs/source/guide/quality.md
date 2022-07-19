@@ -79,6 +79,9 @@ You can now navigate back through the review stream in the same path as moving f
 !!! note 
     Confirm that you are not taken through the same path that you have come through moving forward.
 
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/go-back-reviewstream.png" style="opacity: 0.8"/></div>
+<i>Figure 1: Go back to the previous task. </i>
 
 ### Assign reviewers to tasks
 As an administrator or project manager, you can assign reviewers to tasks, or people with access can review tasks on an ad hoc basis. Anyone who is assigned to a task or who completes a review of a task appears in the **Reviewers** column on the Data Manager. You must first [add a reviewer to the project](setup_project.html#Add-members-to-a-project) or [add members to the project workspace](manage_users.html#Add-or-remove-members-to-a-workspace) before you can assign them as a reviewer.
