@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2514: Polygon isn't finished when moved",
-  "commit": "7de292848629ebbe67478489a2579c302e424dfb",
-  "branch": "fb-dev-2514",
-  "date": "2022/07/19 10:02:59"
+  "message": "fix: DEV-2366: User is able to edit taxonomy results imported as read-only (#748)",
+  "commit": "982da8038e92d319e9722954352f47db73381575",
+  "branch": "master",
+  "date": "2022-07-18T16:33:07Z"
 }
