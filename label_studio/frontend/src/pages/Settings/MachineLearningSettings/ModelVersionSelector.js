@@ -38,7 +38,7 @@ export const ModelVersionSelector = ({
 
     setVersions(modelVersions.versions.map(version => ({
       value: version,
-      label: `${version} (${version} predictions)`,
+      label: version,
     })));
   }, [api, object?.id, apiName]);
 
