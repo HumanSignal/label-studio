@@ -1,4 +1,4 @@
-name: "Upload to PYPI"
+name: "Build PYPI"
 
 on:
   workflow_call:
@@ -14,7 +14,11 @@ on:
       upload_to_pypi:
         description: "Upload to PyPi"
         type: boolean
-        required: true
+        required: false
+      release-id:
+        description: "Attach Artifact to Release"
+        type: string
+        required: false
   workflow_dispatch:
     inputs:
       version:
@@ -29,7 +33,11 @@ on:
         description: "Upload to PyPi"
         type: boolean
         default: false
-        required: true
+        required: false
+      release-id:
+        description: "Attach Artifact to Release"
+        type: string
+        required: false
 
 jobs:
   ReleaseNotification:
@@ -91,7 +99,27 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_APIKEY }}
         run: twine upload dist/*
 
-      - name: Upload to artifacts
+      - name: Attach artifacts to release
+        if: inputs.release-id
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const fs = require('fs');
+            const release_id = '${{ inputs.release-id }}';
+            for (let file of await fs.readdirSync('./dist/')) {
+               console.log('uploadReleaseAsset', file);
+               await github.repos.uploadReleaseAsset({
+                  owner,
+                  repo,
+                  release_id: release_id,
+                  name: file,
+                  data: await fs.readFileSync(`./dist/${file}`)
+               });
+            }
+
+      - name: Upload to artifact
         if: always()
         uses: actions/upload-artifact@v3
         with:

@@ -17,11 +17,11 @@ jobs:
       release_tag: ${{ github.ref_name }}
     secrets: inherit
 
-  upload_to_pypi:
-    name: "Upload"
-    uses: heartexlabs/label-studio/.github/workflows/upload_to_pypi.yml@develop
+  build-pypi:
+    name: "Build"
+    uses: heartexlabs/label-studio/.github/workflows/build_pypi.yml@develop
     with:
       version: ${{ github.ref_name }}
       ref: ${{ github.ref_name }}
-      upload_to_pypi: true
+      release-id: ${{ github.event.release.id }}
     secrets: inherit
