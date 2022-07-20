@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2170: On project open set number of tasks defined by task per page",
-  "commit": "864b7d52db9ee07aa78a447b2512468970cca7f1",
+  "message": "fix: DEV-2851: Outliner updated collapse/expand UI",
+  "commit": "d573ed2964e2f9a7a651628df6c10e97d1b10c72",
   "branch": "master",
-  "date": "2022/07/14 12:20:33"
+  "date": "2022/07/20 18:32:38"
 }
