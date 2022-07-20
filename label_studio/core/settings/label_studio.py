@@ -60,5 +60,4 @@ try:
 except IOError:
     FEATURE_FLAGS_FROM_FILE = False
 
-
-
+STORAGE_PERSISTENCE = get_bool_env('STORAGE_PERSISTENCE', True)
