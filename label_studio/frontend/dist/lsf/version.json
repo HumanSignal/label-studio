@@ -1,6 +1,6 @@
 {
-  "message": "Fix typo: DEFAUL => DEFAULT",
-  "commit": "6b3f64022e9f27c65f016bac5d71d03428e27172",
-  "branch": "fb-dev-2851/outliner-collapsed-expanded-ui",
-  "date": "2022-07-20T11:18:50Z"
+  "message": "fix: DEV-2851: Outliner updated collapse/expand UI",
+  "commit": "7d6574a3f8e37d8356457ce050233da0e70f1d19",
+  "branch": "master",
+  "date": "2022/07/20 18:32:27"
 }
