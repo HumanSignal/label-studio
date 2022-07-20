@@ -99,11 +99,27 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_APIKEY }}
         run: twine upload dist/*
 
-      - name: Attach Artifact to release
+      - name: Attach artifacts to release
         if: inputs.release-id
-#        TODO: github script
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const fs = require('fs');
+            const release_id = '${{ inputs.release-id }}';
+            for (let file of await fs.readdirSync('./dist/')) {
+               console.log('uploadReleaseAsset', file);
+               await github.repos.uploadReleaseAsset({
+                  owner,
+                  repo,
+                  release_id: release_id,
+                  name: file,
+                  data: await fs.readFileSync(`./dist/${file}`)
+               });
+            }
 
-      - name: Upload to artifacts
+      - name: Upload to artifact
         if: always()
         uses: actions/upload-artifact@v3
         with:

@@ -158,6 +158,8 @@ jobs:
         id: create-draft-release
         with:
           script: |
+            const { repo, owner } = context.repo;
+            
             const {data: releases} = await github.rest.repos.listReleases({
                 owner,
                 repo,
