@@ -1,6 +1,6 @@
 {
-  "message": "Fb dev 2885/add new dm collumns",
-  "commit": "59e88bbebb653ca668417c611f5fc64f132fe932",
+  "message": "feat: DEV-2885: Add new dm columns",
+  "commit": "e546b74f0d9974ecec600ca4aaca90bc1b463d1e",
   "branch": "fb-dev-2885/add-new-dm-collumns",
-  "date": "2022/07/19 14:46:37"
+  "date": "2022/07/20 09:55:19"
 }
