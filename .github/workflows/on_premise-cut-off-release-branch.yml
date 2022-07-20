@@ -1,4 +1,4 @@
-name: "Cut off release branch"
+name: "On Premise: Cut off release branch"
 
 on:
   workflow_dispatch:
@@ -15,11 +15,11 @@ on:
 
 env:
   PYTHON_VERSION_FILE: "label_studio/__init__.py"
-  RELEASE_BRANCH_PREFIX: "ls-release"
+  RELEASE_BRANCH_PREFIX: "lse-release"
 
 jobs:
   draft-new-release:
-    name: "Draft new release/hotfix"
+    name: "On Premise: Cut off release branch"
     runs-on: ubuntu-latest
     steps:
       - uses: hmarr/debug-action@v2.0.1
@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GIT_PAT }}
-          ref: ${{ inputs.ref }}
+          ref: ${{ github.event.inputs.ref }}
           submodules: 'recursive'
           fetch-depth: 0
 
@@ -70,77 +70,57 @@ jobs:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
             const { repo, owner } = context.repo;
-            const ref = '${{ github.event.inputs.ref }}'
+            const ref = '${{ inputs.ref }}'
             const release = '${{ steps.calculate_branch_name_and_version.outputs.release_branch }}'
 
             let submodules = [
+                {owner: 'heartexlabs', repo: 'label-studio-private'},
                 {owner: 'heartexlabs', repo: 'label-studio-frontend'},
-                {owner: 'heartexlabs', repo: 'dm2'}
+                {owner: 'heartexlabs', repo: 'dm2'},
+                {owner: 'heartexlabs', repo: 'label-studio'},
+                {owner: 'heartexlabs', repo: 'label-studio-evalme'}
             ]
+
+#            async function getLSESubmoduleVersions(sha) {
+#                const {data: lseTreeData} = await github.rest.git.getTree({
+#                    owner,
+#                    repo,
+#                    tree_sha: sha
+#                })
+#                const {data: lseDeployTreeData} = await github.rest.git.getTree({
+#                    owner,
+#                    repo,
+#                    tree_sha: lseTreeData.tree.find(e => e.path === 'deploy' && e.type === 'tree').sha
+#                })
+#                const {data: requirementsLSBlobData} = await github.rest.git.getBlob({
+#                    owner,
+#                    repo,
+#                    file_sha: lseDeployTreeData.tree.find(e => e.path === 'requirements-ls.txt' && e.type === 'blob').sha
+#                })
+#                const requirementsLS = Buffer.from(requirementsLSBlobData.content, requirementsLSBlobData.encoding).toString("utf8")
+#                const matchLS = requirementsLS.match('https:\/\/github.com\/heartexlabs\/label-studio\/archive\/(.*)\.zip')
+#                const matchEVALME = requirementsLS.match('https:\/\/github\.com\/heartexlabs\/label-studio-evalme\/archive\/(.*)\.zip')
+#                return {
+#                    'label-studio-private': lseTreeData.tree.find(e => e.path === "label-studio-private").sha,
+#                    'label-studio-frontend': lseTreeData.tree.find(e => e.path === "editor").sha,
+#                    'dm2': lseTreeData.tree.find(e => e.path === "datamanager").sha,
+#                    'label-studio': matchLS[1],
+#                    'label-studio-evalme': matchEVALME[1],
+#                }
+#            }
+#
+#            const versions = await getLSESubmoduleVersions('${{ inputs.ref }}')
+#            console.log(`submodules versions: ${{ inputs.ref }}`)
+#            console.log(versions)
             
-            async function getLSSubmoduleVersions(sha) {
-                let {data: lsTreeData} = await github.rest.git.getTree({
-                    owner,
-                    repo,
-                    tree_sha: sha
-                })
-                lsTreeData = (await github.rest.git.getTree({
-                    owner,
-                    repo,
-                    tree_sha: lsTreeData.tree.find(e => e.path === 'label_studio' && e.type === 'tree').sha
-                })).data
-                lsTreeData = (await github.rest.git.getTree({
-                    owner,
-                    repo,
-                    tree_sha: lsTreeData.tree.find(e => e.path === 'frontend' && e.type === 'tree').sha
-                })).data
-                lsTreeData = (await github.rest.git.getTree({
-                    owner,
-                    repo,
-                    tree_sha: lsTreeData.tree.find(e => e.path === 'dist' && e.type === 'tree').sha
-                })).data
-                const {data: lsDMTreeData} = await github.rest.git.getTree({
-                    owner,
-                    repo,
-                    tree_sha: lsTreeData.tree.find(e => e.path === 'dm' && e.type === 'tree').sha
-                })
-                const {data: dmfVersion} = await github.rest.git.getBlob({
-                    owner,
-                    repo,
-                    file_sha: lsDMTreeData.tree.find(e => e.path === 'version.json' && e.type === 'blob').sha
-                })
-                const dmVersionContent = Buffer.from(dmfVersion.content, dmfVersion.encoding).toString("utf8")
-                const matchDM = dmVersionContent.match('"commit": "(.*)",')
-                const {data: lsLSFTreeData} = await github.rest.git.getTree({
-                    owner,
-                    repo,
-                    tree_sha: lsTreeData.tree.find(e => e.path === 'lsf' && e.type === 'tree').sha
-                })
-                const {data: lsfVersion} = await github.rest.git.getBlob({
-                    owner,
-                    repo,
-                    file_sha: lsLSFTreeData.tree.find(e => e.path === 'version.json' && e.type === 'blob').sha
-                })
-                const lsfVersionContent = Buffer.from(lsfVersion.content, lsfVersion.encoding).toString("utf8")
-                const matchLSF = lsfVersionContent.match('"commit": "(.*)",')
-                return {
-                    'label-studio-frontend': matchLSF[1],
-                    'dm2': matchDM[1],
-                }
-            }
-            
-            const versions = await getLSSubmoduleVersions('${{ inputs.ref }}')
-            console.log(`submodules versions: ${{ inputs.ref }}`)
-            console.log(versions)
-            
-            for (let submodule of submodules) {
-                const response = await github.rest.git.createRef({
-                    owner: submodule.owner,
-                    repo: submodule.repo,
-                    ref: `refs/heads/${release}`,
-                    sha: versions[submodule.repo],
-                });
-            }
+#            for (let submodule of submodules) {
+#                const response = await github.rest.git.createRef({
+#                    owner: submodule.owner,
+#                    repo: submodule.repo,
+#                    ref: `refs/heads/${release}`,
+#                    sha: versions[submodule.repo],
+#                });
+#            }
 
       - name: Commit version files to release branch
         id: make-release-commit
@@ -157,15 +137,6 @@ jobs:
           echo "::set-output name=commit::$(git rev-parse HEAD)"
           git push origin HEAD:refs/heads/${{ steps.calculate_branch_name_and_version.outputs.release_branch }}
 
-      - uses: actions/cache@v3
-        name: Configure pip cache
-        id: pip-cache
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-gh-actions-${{ hashFiles('.github/helpers/gh_jira_comparisonator/requirements.txt') }}-${{ hashFiles('.github/helpers/gh_changelog_generator/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-gh-actions-
-
       - name: Commit version files to 'develop'
         id: make-develop-commit
         run: |
@@ -173,14 +144,14 @@ jobs:
           
           git checkout '${{ github.event.repository.default_branch }}'
           
-          branch='bump-version-${{ steps.calculate_branch_name_and_version.outputs.next_develop_version }}'
+          branch='bump-version-${{ steps.calculate_branch_name_and_version.outputs.next_develop_version }}dev'
           echo "::set-output name=branch::${branch}"
           git checkout -b "${branch}"
           
-          sed -i "s/^__version__[ ]*=.*/__version__ = '${{ steps.calculate_branch_name_and_version.outputs.next_develop_version }}'/g" ${{ env.PYTHON_VERSION_FILE }}
+          sed -i "s/^__version__[  ]*=.*/__version__ = '${{ steps.calculate_branch_name_and_version.outputs.next_develop_version }}dev'/g" ${{ env.PYTHON_VERSION_FILE }}
           
           git add ${{ env.PYTHON_VERSION_FILE }}
-          git commit --message "chore: Bump version to ${{ steps.calculate_branch_name_and_version.outputs.next_develop_version }}"
+          git commit --message "chore: Bump version to ${{ steps.calculate_branch_name_and_version.outputs.next_develop_version }}dev"
 
           echo "::set-output name=commit::$(git rev-parse HEAD)"
           git push origin HEAD:refs/heads/${branch}
@@ -193,7 +164,7 @@ jobs:
           script: |
             const { repo, owner } = context.repo;
             const createPullResponse = await github.rest.pulls.create({
-              title: 'chore: Bump version to ${{ steps.calculate_branch_name_and_version.outputs.next_develop_version }}',
+              title: 'chore: Bump version to ${{ steps.calculate_branch_name_and_version.outputs.next_develop_version }}dev',
               owner,
               repo,
               head: '${{ steps.make-develop-commit.outputs.branch }}',
@@ -215,8 +186,10 @@ jobs:
       - name: Enable AutoMerge
         id: enable-pr-automerge
         shell: bash
+        env:
+          GIT_PAT: ${{ secrets.GIT_PAT }}
         run: |
-          echo ${{ secrets.GIT_PAT }} | gh auth login --with-token
+          echo "$GIT_PAT" | gh auth login --with-token
           gh api graphql -f pull='${{ fromJson(steps.create-pr.outputs.result).data.node_id }}' -f query='
             mutation($pull: ID!) {
               enablePullRequestAutoMerge(input: {pullRequestId: $pull, mergeMethod: SQUASH}) {
@@ -226,3 +199,19 @@ jobs:
                 }
               }
             }'
+#
+#      - name: Notify to Slack on draft release
+#        id: slack_notify_ops_release
+#        uses: slackapi/slack-github-action@v1.19
+#        with:
+#          channel-id: 'C03F181D2J2'
+#          slack-message: |
+#            On-Premise Release *${{ steps.calculate_branch_name_and_version.outputs.release_version }}* is coming!
+#
+#            *Draft Release:* ${{ fromJson(steps.create-draft-release.outputs.result).data.html_url }}
+#            *Release branch:* ${{ github.server_url }}/${{ github.repository }}/tree/${{ steps.calculate_branch_name_and_version.outputs.release_branch }}
+#            *Version Bump PR:* ${{ fromJson(steps.create-pr.outputs.result).data.html_url }}
+#
+#            ><https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|[Workflow run]>
+#        env:
+#          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}

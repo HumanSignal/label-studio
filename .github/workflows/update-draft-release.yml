@@ -1,0 +1,145 @@
+name: "Update Draft Release"
+
+on:
+  push:
+    branches:
+      - 'lse-release/**'
+
+jobs:
+  ReleaseNotification:
+    name: "Update Draft Release"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v2.0.1
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Create release draft
+        uses: actions/github-script@v6
+        id: create-draft-release
+        with:
+          script: |
+            const { repo, owner } = context.repo;
+            const target_commitish = '${{ github.ref_name }}';
+            let version = target_commitish.replace('lse-release/', '')
+            
+            const {data: releases} = await github.rest.repos.listReleases({
+                owner,
+                repo,
+            });
+            
+            let release = releases.find((e) => {
+                return target_commitish.endsWith(e.target_commitish) && e.draft
+            })
+            
+            if (release) {
+                console.log(`Draft release already exist ${release.html_url}`)
+            } else {
+                console.log(`Draft release is not found creating a new one`)
+                const {data: tags} = await github.rest.repos.listTags({
+                    owner,
+                    repo,
+                    per_page: 100
+                });
+                console.log(`Tags:`)
+                console.log(tags.map(e => e.name))
+                const matchedTags = tags.filter(e => e.name.indexOf(version) !== -1)
+                console.log(`Tags for ${version}:`)
+                console.log(matchedTags.map(e => e.name))
+                if (matchedTags.length !== 0) {
+                    let newHotfixNumber = 1
+                    for (let matchedTag of matchedTags) {
+                        const matchVersion = matchedTag.name.match('^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)(-([0-9]+))?$')
+                        if (matchVersion && matchVersion[5]) {
+                            const hotfixNumber = parseInt(matchVersion[5])
+                            if (newHotfixNumber <= hotfixNumber) {
+                                newHotfixNumber = hotfixNumber + 1
+                            }
+                        }
+                    }
+                    version = `${version}-${newHotfixNumber}`
+                }
+                console.log(`New version: ${version}`)
+                const {data: newDraftRelease} = await github.rest.repos.createRelease({
+                    owner,
+                    repo,
+                    draft: true,
+                    name: version,
+                    prerelease: false,
+                    target_commitish: target_commitish,
+                    tag_name: version,
+                });
+                console.log(`Draft release is created ${newDraftRelease.html_url}`)
+                release = newDraftRelease;
+            }
+            
+            core.setOutput("id", release.id);
+            core.setOutput("tag_name", release.tag_name);
+
+#      - uses: actions/cache@v3
+#        name: Configure pip cache
+#        id: pip-cache
+#        with:
+#          path: ~/.cache/pip
+#          key: ${{ runner.os }}-pip-gh-actions-${{ hashFiles('.github/helpers/gh_jira_comparisonator/requirements.txt') }}-${{ hashFiles('.github/helpers/gh_changelog_generator/requirements.txt') }}
+#          restore-keys: |
+#            ${{ runner.os }}-pip-gh-actions-
+#
+#      - name: Install tools and dependencies
+#        run: |
+#          pip3 install -r .github/helpers/gh_jira_comparisonator/requirements.txt
+#          pip3 install -r .github/helpers/gh_changelog_generator/requirements.txt
+
+#      - name: Generate release changelog
+#        id: changelog_md
+#        env:
+#          RELEASE_VERSION: ${{ steps.create-draft-release.outputs.tag_name }}
+#          CHANGELOG_SOURCE: "/tmp/changelog_md"
+#          JIRA_USERNAME: "${{ secrets.JIRA_USERNAME }}"
+#          JIRA_TOKEN: "${{ secrets.JIRA_TOKEN }}"
+#          GH_TOKEN: "${{ secrets.GIT_PAT }}"
+#        run: |
+#          set -eux
+#
+#          if grep -q '-' <<< '${{ env.RELEASE_VERSION }}'; then
+#            previous_ref=$(git rev-list --tags --max-count=1)
+#            previous_tag=$(git describe --tags $previous_ref)
+#          else
+#            previous_tag=$(git tag --sort=-committerdate | grep -v - | head -n1)
+#          fi
+#
+#          export PREVIOUS_REF=${previous_tag}
+#          python3 .github/helpers/gh_changelog_generator/gh_changelog_generator.py > /tmp/changelog_md
+#
+#          echo >> /tmp/changelog_md
+#          echo ">Choose actions you want to perform:" >> /tmp/changelog_md
+#          echo ">- [ ] DEPLOY_TO_APP_HEARTEX_COM" >> /tmp/changelog_md
+#          echo ">" >> /tmp/changelog_md
+#          echo ">**Full Changelog**: [${previous_tag}...${{ github.ref_name }}](${{ github.server_url }}/${{ github.repository }}/compare/${previous_tag}...${{ github.sha }})" >> /tmp/changelog_md
+#          echo ">This changelog was updated in response to a push of ${{ github.sha }} into ${{ github.ref_name }}. [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> /tmp/changelog_md
+#          echo ">" >> /tmp/changelog_md
+#          python3 .github/helpers/gh_jira_comparisonator/gh_jira_releases.py >> /tmp/changelog_md
+#          echo ">" >> /tmp/changelog_md
+#          echo ">Hint: option NOTIFY_CUSTOMERS" >> /tmp/changelog_md
+#          echo ">**ALL LINES STARTING FROM QUOTE WILL BE IGNORED**" >> /tmp/changelog_md
+#          echo "::set-output name=changelog_msg_b64::$(echo 'hello' | base64 -w 0)"
+
+      - name: Update Draft Release
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+
+            const { data: release } = await github.rest.repos.updateRelease({
+                owner,
+                repo,
+                release_id: release.id,
+                body: 'hi'
+            });
+            console.log(`Draft release is updated: ${release.html_url}`)
