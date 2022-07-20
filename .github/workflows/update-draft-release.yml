@@ -139,7 +139,7 @@ jobs:
             const { data: release } = await github.rest.repos.updateRelease({
                 owner,
                 repo,
-                release_id: release.id,
+                release_id: '${{ steps.create-draft-release.outputs.id }}',
                 body: 'hi'
             });
             console.log(`Draft release is updated: ${release.html_url}`)
