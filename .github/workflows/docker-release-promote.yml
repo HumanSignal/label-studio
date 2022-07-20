@@ -127,7 +127,7 @@ jobs:
 
       - name: Build and push Release UBI Docker image
         uses: docker/build-push-action@v3.0.0
-        id: docker_build_and_push
+        id: docker_build_and_push_ubi
         with:
           context: ${{ steps.ubi_release_dockerfile.outputs.release_dir }}
           file: ${{ steps.ubi_release_dockerfile.outputs.release_dir }}/${{ env.RELEASE_UBI_DOCKERFILE }}
