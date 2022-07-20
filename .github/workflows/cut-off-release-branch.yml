@@ -147,6 +147,8 @@ jobs:
         run: |
           set -euo pipefail
           
+          git checkout -b "${{ steps.calculate_branch_name_and_version.outputs.release_branch }}"
+          
           sed -i "s/^__version__[ ]*=.*/__version__ = '${{ steps.calculate_branch_name_and_version.outputs.release_version }}'/g" ${{ env.PYTHON_VERSION_FILE }}
           
           git add ${{ env.PYTHON_VERSION_FILE }}

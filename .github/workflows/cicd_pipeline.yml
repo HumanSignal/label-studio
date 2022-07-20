@@ -70,52 +70,52 @@ jobs:
             });
             core.setOutput("commit-message", commit.commit.message);
 
-  pr_labeler:
-    name: "Validate"
-    if: github.event_name == 'pull_request'
-    permissions:
-      pull-requests: write
-    uses: heartexlabs/label-studio/.github/workflows/pr-labeler.yml@develop
-
-  validate_submodules:
-    name: "Validate"
-    uses: heartexlabs/label-studio/.github/workflows/submodules-validator.yml@develop
-    with:
-      head_sha: ${{ github.sha }}
-      base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
-      target_branch: ${{ github.event.pull_request.base.ref || github.event.ref }}
-
-  gitleaks:
-    name: "Linter"
-    if: github.event_name == 'pull_request'
-    uses: heartexlabs/label-studio/.github/workflows/gitleaks.yml@develop
-    with:
-      head_sha: ${{ github.sha }}
-      base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
-
-  bandit:
-    name: "Linter"
-    needs:
-      - changed_files
-    if: needs.changed_files.outputs.src == 'true'
-    uses: heartexlabs/label-studio/.github/workflows/bandit.yml@develop
-    with:
-      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
-
-  build-frontend:
-    name: "Build"
-    needs:
-      - changed_files
-    if: |
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.head.repo.fork == false &&
-      needs.changed_files.outputs.frontend == 'true' &&
-      needs.changed_files.outputs.commit-message != 'Build frontend'
-    permissions:
-      contents: write
-    uses: heartexlabs/label-studio/.github/workflows/frontend-build.yml@develop
-    with:
-      ref: ${{ github.event.pull_request.head.ref || github.ref }}
+#  pr_labeler:
+#    name: "Validate"
+#    if: github.event_name == 'pull_request'
+#    permissions:
+#      pull-requests: write
+#    uses: heartexlabs/label-studio/.github/workflows/pr-labeler.yml@develop
+#
+#  validate_submodules:
+#    name: "Validate"
+#    uses: heartexlabs/label-studio/.github/workflows/submodules-validator.yml@develop
+#    with:
+#      head_sha: ${{ github.sha }}
+#      base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
+#      target_branch: ${{ github.event.pull_request.base.ref || github.event.ref }}
+#
+#  gitleaks:
+#    name: "Linter"
+#    if: github.event_name == 'pull_request'
+#    uses: heartexlabs/label-studio/.github/workflows/gitleaks.yml@develop
+#    with:
+#      head_sha: ${{ github.sha }}
+#      base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
+#
+#  bandit:
+#    name: "Linter"
+#    needs:
+#      - changed_files
+#    if: needs.changed_files.outputs.src == 'true'
+#    uses: heartexlabs/label-studio/.github/workflows/bandit.yml@develop
+#    with:
+#      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+#
+#  build-frontend:
+#    name: "Build"
+#    needs:
+#      - changed_files
+#    if: |
+#      github.event_name == 'pull_request' &&
+#      github.event.pull_request.head.repo.fork == false &&
+#      needs.changed_files.outputs.frontend == 'true' &&
+#      needs.changed_files.outputs.commit-message != 'Build frontend'
+#    permissions:
+#      contents: write
+#    uses: heartexlabs/label-studio/.github/workflows/frontend-build.yml@develop
+#    with:
+#      ref: ${{ github.event.pull_request.head.ref || github.ref }}
 
   build-docker:
     name: "Build"
@@ -127,26 +127,26 @@ jobs:
         || startsWith(github.ref_name, 'ls-release/') )
     permissions:
       checks: write
-    uses: heartexlabs/label-studio/.github/workflows/docker-build.yml@develop
+    uses: nikitabelonogov/label-studio/.github/workflows/docker-build.yml@develop
     with:
       ref: ${{ github.ref_name }}
     secrets: inherit
 
-  pytest:
-    name: "Tests"
-    needs:
-      - changed_files
-    if: needs.changed_files.outputs.src == 'true'
-    uses: heartexlabs/label-studio/.github/workflows/tests.yml@develop
-    with:
-      ref: ${{ github.event.pull_request.head.ref || github.ref }}
+#  pytest:
+#    name: "Tests"
+#    needs:
+#      - changed_files
+#    if: needs.changed_files.outputs.src == 'true'
+#    uses: heartexlabs/label-studio/.github/workflows/tests.yml@develop
+#    with:
+#      ref: ${{ github.event.pull_request.head.ref || github.ref }}
 
 
   draft-release:
     name: "Draft Release"
     if: |
       github.event_name == 'push' &&
-      startsWith(github.ref_name, 'ls-release/'
+      startsWith(github.ref_name, 'ls-release/')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -159,6 +159,7 @@ jobs:
         with:
           script: |
             const { repo, owner } = context.repo;
+            const target_commitish = '${{ github.ref_name }}';
             
             const {data: releases} = await github.rest.repos.listReleases({
                 owner,
@@ -170,16 +171,20 @@ jobs:
             })
             
             if (matchedRelease) {
+                console.log(`Draft release already exist ${matchedRelease.html_url}`)
                 core.setOutput("id", matchedRelease.id);
             } else {
+                console.log(`Draft release is not found creating a new one`)
                 const {data: tags} = await github.rest.repos.listTags({
                     owner,
                     repo,
                     per_page: 100
                 });
+                console.log(tags.map(e => e.name))
                 let version = target_commitish.replace('ls-release/', '')
                 const matchedTags = tags.filter(e => e.name.indexOf(version) !== -1)
-                if (matchedTags) {
+                console.log(matchedTags.map(e => e.name))
+                if (matchedTags.length !== 0) {
                     let newHotfixNumber = 0
                     for (let matchedTag of matchedTags) {
                         console.log(matchedTag)
@@ -193,6 +198,7 @@ jobs:
                     }
                     version = `${version}.post${newHotfixNumber}`
                 }
+                console.log(`New version: ${version}`)
                 const { data: release } = await github.rest.repos.createRelease({
                     owner,
                     repo,
@@ -203,7 +209,7 @@ jobs:
                     tag_name: version,
                     generate_release_notes: true
                 });
-                console.log(release)
+                console.log(`Draft release is created ${release.html_url}`)
                 core.setOutput("id", release.id);
             }
 
@@ -213,10 +219,10 @@ jobs:
       - draft-release
     if: |
       github.event_name == 'push' &&
-      startsWith(github.ref_name, 'ls-release/'
-    uses: heartexlabs/label-studio/.github/workflows/build_pypi.yml@develop
+      startsWith(github.ref_name, 'ls-release/')
+    uses: nikitabelonogov/label-studio/.github/workflows/build_pypi.yml@develop
     with:
-      version: ${{ TODO }}
+      version: ${{ needs.draft-release.outputs.id }}
       ref: ${{ github.ref_name }}
       release-id: ${{ needs.draft-release.outputs.id }}
     secrets: inherit

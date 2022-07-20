@@ -12,14 +12,14 @@ concurrency:
 jobs:
   promote_docker_image:
     name: "Promote"
-    uses: heartexlabs/label-studio/.github/workflows/docker-release-promote.yml@develop
+    uses: nikitabelonogov/label-studio/.github/workflows/docker-release-promote.yml@develop
     with:
       release_tag: ${{ github.ref_name }}
     secrets: inherit
 
   build-pypi:
     name: "Build"
-    uses: heartexlabs/label-studio/.github/workflows/build_pypi.yml@develop
+    uses: nikitabelonogov/label-studio/.github/workflows/build_pypi.yml@develop
     with:
       version: ${{ github.ref_name }}
       ref: ${{ github.ref_name }}
