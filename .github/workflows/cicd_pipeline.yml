@@ -146,12 +146,13 @@ jobs:
     name: "Draft Release"
     if: |
       github.event_name == 'push' &&
-      startsWith(github.ref_name, 'ls-release/'
+      startsWith(github.ref_name, 'ls-release/')
     runs-on: ubuntu-latest
     permissions:
       contents: write
     outputs:
       id: ${{ steps.create-draft-release.outputs.id }}
+      rc-version: ${{ steps.create-draft-release.outputs.rc-version }}
     steps:
       - name: Create release draft
         uses: actions/github-script@v6
@@ -159,6 +160,9 @@ jobs:
         with:
           script: |
             const { repo, owner } = context.repo;
+            const target_commitish = '${{ github.ref_name }}';
+            let version = target_commitish.replace('ls-release/', '')
+            core.setOutput("rc-version", `${version}rc${{ github.sha }}`);
             
             const {data: releases} = await github.rest.repos.listReleases({
                 owner,
@@ -170,16 +174,21 @@ jobs:
             })
             
             if (matchedRelease) {
+                console.log(`Draft release already exist ${matchedRelease.html_url}`)
                 core.setOutput("id", matchedRelease.id);
             } else {
+                console.log(`Draft release is not found creating a new one`)
                 const {data: tags} = await github.rest.repos.listTags({
                     owner,
                     repo,
                     per_page: 100
                 });
-                let version = target_commitish.replace('ls-release/', '')
+                console.log(`Tags:`)
+                console.log(tags.map(e => e.name))
                 const matchedTags = tags.filter(e => e.name.indexOf(version) !== -1)
-                if (matchedTags) {
+                console.log(`Tags for ${version}:`)
+                console.log(matchedTags.map(e => e.name))
+                if (matchedTags.length !== 0) {
                     let newHotfixNumber = 0
                     for (let matchedTag of matchedTags) {
                         console.log(matchedTag)
@@ -193,6 +202,7 @@ jobs:
                     }
                     version = `${version}.post${newHotfixNumber}`
                 }
+                console.log(`New version: ${version}`)
                 const { data: release } = await github.rest.repos.createRelease({
                     owner,
                     repo,
@@ -203,7 +213,7 @@ jobs:
                     tag_name: version,
                     generate_release_notes: true
                 });
-                console.log(release)
+                console.log(`Draft release is created ${release.html_url}`)
                 core.setOutput("id", release.id);
             }
 
@@ -213,10 +223,10 @@ jobs:
       - draft-release
     if: |
       github.event_name == 'push' &&
-      startsWith(github.ref_name, 'ls-release/'
+      startsWith(github.ref_name, 'ls-release/')
     uses: heartexlabs/label-studio/.github/workflows/build_pypi.yml@develop
     with:
-      version: ${{ TODO }}
+      version: ${{ needs.draft-release.outputs.rc-version }}
       ref: ${{ github.ref_name }}
       release-id: ${{ needs.draft-release.outputs.id }}
     secrets: inherit
