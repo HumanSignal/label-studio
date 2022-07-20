@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3077: Repeater performance improvement",
-  "commit": "2fc84638dc33c0c97bde2bd3e354a18d3dc07c35",
-  "branch": "master",
-  "date": "2022/08/11 10:42:52"
+  "message": "feat: DEV-2755: Regions list grouped by labels with persistent & ordered collapse",
+  "commit": "b5dfbf430a5f9167c8a4f613b6b731b1d5c2f31c",
+  "branch": "fb-dev-2755",
+  "date": "2022/07/20 10:01:56"
 }
