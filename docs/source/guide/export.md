@@ -34,7 +34,7 @@ Use the following steps to export data and annotations from the Label Studio UI.
     2. Cancelled annotated tasks will be included in the exported result too.
     3. If you want to apply tab filters to the export, try to use [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-API).
 
-#### Export timeout in Community Edition
+### Export timeout in Community Edition
 
 If the export times out, see how to [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-API).
 

@@ -6,10 +6,6 @@ on:
       ref:
         required: true
         type: string
-      repo:
-        required: true
-        type: string
-        default: heartexlabs/label-studio
 
 env:
   NODE: '14'
@@ -42,7 +38,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          repository: ${{ inputs.repo }}
           ref: ${{ inputs.ref }}
 
       - name: Set up Python ${{ matrix.python-version }}
@@ -88,7 +83,7 @@ jobs:
       - name: Install LSF & set version.py
         run: ./deploy/prebuild_wo_frontend.sh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Do migrations
         run: python label_studio/manage.py migrate
@@ -165,7 +160,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          repository: ${{ inputs.repo }}
           ref: ${{ inputs.ref }}
 
       - name: Set up Python ${{ matrix.python-version }}
@@ -214,7 +208,7 @@ jobs:
       - name: Install LSF & set version.py
         run: ./deploy/prebuild_wo_frontend.sh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Do migrations
         run: python label_studio/manage.py migrate
@@ -258,7 +252,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          repository: ${{ inputs.repo }}
           ref: ${{ inputs.ref }}
 
       - name: Set up Python ${{ matrix.python-version }}
