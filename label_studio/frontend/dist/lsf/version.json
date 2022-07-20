@@ -1,6 +1,6 @@
 {
   "message": "ci: DEV-2483: Migrate to Playwright",
-  "commit": "5a0f6a00ba722427dfb9adaf5dbb0c66fe10310a",
-  "branch": "fb-dev-2483/playwright-migration",
-  "date": "2022/07/18 22:27:57"
+  "commit": "b4bf8fb37e62075c5b3da6651759a2bff0e74819",
+  "branch": "master",
+  "date": "2022/07/20 17:05:18"
 }
