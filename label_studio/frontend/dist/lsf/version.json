@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2696: 3point bbox tool remains selected but hidden, when user changes label configuration from Rectangle to RectangleLabels",
-  "commit": "1baf832d73fe2d0d84c1e24e514654c55a22786d",
+  "message": "ci: DEV-2483: Migrate to Playwright",
+  "commit": "b4bf8fb37e62075c5b3da6651759a2bff0e74819",
   "branch": "master",
-  "date": "2022/07/18 07:31:24"
+  "date": "2022/07/20 17:05:18"
 }
