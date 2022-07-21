@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2170: On project open set number of tasks defined by task per page",
-  "commit": "864b7d52db9ee07aa78a447b2512468970cca7f1",
+  "message": "fix: Rename Tasks to Actions",
+  "commit": "b06f079e38624af6578728d83bbc27f18b6288e6",
   "branch": "master",
-  "date": "2022/07/14 12:20:33"
+  "date": "2022/07/21 00:27:19"
 }
