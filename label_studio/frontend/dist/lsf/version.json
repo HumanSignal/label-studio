@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2930: Fix collapsed texts for TextArea",
-  "commit": "f843cbd39428562762d1dccd5a017d555139f5a3",
+  "commit": "fee85f189edf7df16e674ddf823d171b80681bc2",
   "branch": "fb-dev-2930/textarea-texts-collapsed",
-  "date": "2022/07/21 23:01:38"
+  "date": "2022/07/21 23:15:04"
 }
