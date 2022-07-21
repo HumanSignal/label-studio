@@ -1,4 +1,4 @@
-import { format, isDate } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { useCallback, useContext } from 'react';
 import { FaEllipsisV } from 'react-icons/fa';
 import truncate from 'truncate-middle';
@@ -82,7 +82,7 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete }) => {
           />
         )}
         <DescriptionList.Item term="Version">
-          {backend.model_version && isDate(backend.model_version) ? format(new Date(backend.model_version), 'MMMM dd, yyyy ∙ HH:mm:ss') : backend.model_version || 'unknown'}
+          {backend.model_version && isValid(backend.model_version) ? format(new Date(backend.model_version), 'MMMM dd, yyyy ∙ HH:mm:ss') : backend.model_version || 'unknown'}
         </DescriptionList.Item>
       </DescriptionList>
 
