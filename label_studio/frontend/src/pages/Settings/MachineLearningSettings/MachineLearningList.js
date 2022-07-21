@@ -82,7 +82,9 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete }) => {
           />
         )}
         <DescriptionList.Item term="Version">
-          {backend.model_version && isValid(backend.model_version) ? format(new Date(backend.model_version), 'MMMM dd, yyyy ∙ HH:mm:ss') : backend.model_version || 'unknown'}
+          {backend.model_version && isValid(backend.model_version) ?
+            format(new Date(isNaN(backend.model_version) ? backend.model_version: Number(backend.model_version)), 'MMMM dd, yyyy ∙ HH:mm:ss')
+            : backend.model_version || 'unknown'}
         </DescriptionList.Item>
       </DescriptionList>
 
