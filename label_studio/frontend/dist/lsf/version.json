@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2851: Outliner updated collapse/expand UI (#752)\n\n* New collapsed/expanded view for the snapped panels\r\nFixing panels behavior when rearranging\r\n\r\n* Add new icons\r\nAdd new collaped-detached view\r\nFix boundaries check for better panels movement\r\n\r\n* Fix outliner z-index behavior\r\nAdd shadows to detached panels\r\nFix positioning\r\n\r\n* Tooltip and proper collapse/expand behavior\r\n\r\n* Move constant values to variables\r\n\r\n* Raw compare instead of switch-case\r\n\r\n* Fix issue with panels shrinkage\r\nFix issue with panels positioning\r\nFix issue with selection when resizing a panel\r\nFix UI issue with collapsed panel offset\r\n\r\n* Fixing issues with resizing and positioning\r\n\r\n* Disable detaching collapsed panel\r\n\r\n* Fix typo: DEFAUL => DEFAULT",
-  "commit": "7d6574a3f8e37d8356457ce050233da0e70f1d19",
+  "message": "fix: DEV-2146: Lock rect VideoRectangle",
+  "commit": "b1da3017b694704d5504fa3ca3607cab1f7a87ef",
   "branch": "master",
-  "date": "2022-07-20T14:32:27Z"
+  "date": "2022/07/21 18:07:51"
 }
