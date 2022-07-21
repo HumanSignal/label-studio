@@ -1,6 +1,6 @@
 {
-  "message": "add validation to readonly",
-  "commit": "14555b46707fc9eb861eb393bb1d633a363d36a2",
-  "branch": "fb-dev-2146",
-  "date": "2022-07-20T13:33:11Z"
+  "message": "fix: DEV-2146: Lock rect VideoRectangle",
+  "commit": "b1da3017b694704d5504fa3ca3607cab1f7a87ef",
+  "branch": "master",
+  "date": "2022/07/21 18:07:51"
 }
