@@ -30,9 +30,7 @@ export const ModelVersionSelector = ({
 
     if (modelVersions?.message) {
       setError(modelVersions.message);
-      return;
     }
-
 
     if (!modelVersions?.versions?.length) return;
 
