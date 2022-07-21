@@ -85,6 +85,9 @@ class Task(TaskMixin, models.Model):
     comment_authors = models.ManyToManyField(
         settings.AUTH_USER_MODEL, null=True, default=None,
         related_name='tasks_with_comments', help_text='Users who wrote comments')
+    last_comment_updated_at = models.DateTimeField(
+        _('last comment updated at'), default=None, null=True,
+        help_text='When the last comment was updated')
 
     objects = TaskManager()  # task manager by default
     prepared = PreparedTaskManager()  # task manager with filters, ordering, etc for data_manager app
