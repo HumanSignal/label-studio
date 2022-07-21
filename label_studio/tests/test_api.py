@@ -211,7 +211,8 @@ def test_get_task(client_and_token, configured_project, response, status_code):
         {"id": 0, "annotations": [], 'predictions': [],
          "data": {"text": "TEST1", "meta_info": "TEST2"}, "meta": {},
          "created_at": "", "updated_at": "", "updated_by": None, "is_labeled": False, "project": 0,
-         'overlap': 1, 'file_upload': None, "inner_id": 1},
+         'overlap': 1, 'file_upload': None, "inner_id": 1,
+         'comment_authors': [], 'comment_count': 0, 'last_comment_updated_at': None, 'unresolved_comment_count': 0},
         200
     )
 ])
