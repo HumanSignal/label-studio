@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2922: Selection box of rectangle region remains broken after hide/ unhide action (#767)\n\nDisable transform when the region is hidden",
-  "commit": "5875851b5acbfc287e676649a2d3f5f8d6dce65a",
-  "branch": "master",
-  "date": "2022-07-22T13:32:31Z"
+  "message": "fix: DEV-2942: Grouping regions without a label",
+  "commit": "16bef08f3b2532c46ad4fa307b6506917ad32e10",
+  "branch": "fb-dev-2942/fix-group-by-empty-label",
+  "date": "2022/07/22 20:58:50"
 }
