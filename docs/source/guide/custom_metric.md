@@ -238,7 +238,8 @@ To grant permissions to a specific user, role, or EKS node group used to manage 
             "lambda:InvokeFunction",
             "lambda:GetFunction",
             "lambda:DeleteFunction",
-            "lambda:TagResource"
+            "lambda:TagResource",
+            "lambda:ListTags"
          ],
          "Resource": [
             "arn:aws:lambda:*:YOUR_AWS_ACCOUNT:function:custom-metric-*"
