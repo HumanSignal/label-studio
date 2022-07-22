@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2926: Panels can obscure underlying content (#763)\n\nPanels now can only take up to 40% of the available width",
-  "commit": "a45a84883b04d96a79f1da51b20c33a462c18656",
+  "message": "fix: DEV-2930: Fix collapsed texts for TextArea (#765)\n\n* Fix collapsed texts for TextArea\r\n\r\n* Remove excess space in TextResult\r\n\r\nCo-authored-by: bmartel <brandonmartel@gmail.com>\r\n\r\n* Remove excess space in ChoicesResult\r\n\r\nCo-authored-by: bmartel <brandonmartel@gmail.com>\r\n\r\n* Fix typo\r\n\r\nCo-authored-by: bmartel <brandonmartel@gmail.com>",
+  "commit": "eafb76acdbe98a616bb047b945b197103bcb1866",
   "branch": "master",
-  "date": "2022-07-22T10:30:41Z"
+  "date": "2022-07-22T11:24:09Z"
 }
