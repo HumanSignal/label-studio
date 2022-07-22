@@ -14,6 +14,11 @@ export const ProjectModelVersionSelector = ({
   const api = useAPI();
   const { project, updateProject } = useContext(ProjectContext);
   const [versions, setVersions] = useState([]);
+  const [version, setVersion] = useState(project?.[valueName] || null);
+
+  useEffect(() => {
+    setVersion(project?.[valueName] || null);
+  }, [project?.[valueName]]);
 
   const resetMLVersion = useCallback(async (e) => {
     e.preventDefault();
@@ -52,10 +57,10 @@ export const ProjectModelVersionSelector = ({
         description={(
           <>
             Model version allows you to specify which prediction will be shown to the annotators.
-            {project.model_version && (
+            {version && (
               <>
                 <br />
-                <b>Current project model version: {project.model_version}</b>
+                <b>Current project model version: {version}</b>
               </>
             )}
           </>
@@ -69,7 +74,8 @@ export const ProjectModelVersionSelector = ({
           <Select
             name={name}
             disabled={!versions.length}
-            defaultValue={project?.[valueName] || null}
+            value={version}
+            onChange={e => setVersion(e.target.value)}
             options={versions}
             placeholder={placeholder}
             {...props}

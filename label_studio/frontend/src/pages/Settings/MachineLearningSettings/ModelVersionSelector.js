@@ -16,6 +16,11 @@ export const ModelVersionSelector = ({
   const api = useAPI();
   const [error, setError] = useState(null);
   const [versions, setVersions] = useState([]);
+  const [version, setVersion] = useState(object?.[valueName] || null);
+
+  useEffect(() => {
+    setVersion(object?.[valueName] || null);
+  }, [object?.[valueName]]);
 
   const fetchMLVersions = useCallback(async () => {
     const pk = object?.id;
@@ -47,7 +52,8 @@ export const ModelVersionSelector = ({
       <Select
         name={name}
         disabled={!versions.length}
-        value={object?.[valueName] || null}
+        value={version}
+        onChange={e => setVersion(e.target.value)}
         options={versions}
         placeholder={placeholder}
         {...props}
