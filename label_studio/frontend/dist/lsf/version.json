@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2926: Panels can obscure underlying content",
+  "message": "fix: DEV-2926: Panels can obscure underlying content (#763)\n\nPanels now can only take up to 40% of the available width",
   "commit": "a45a84883b04d96a79f1da51b20c33a462c18656",
   "branch": "master",
-  "date": "2022/07/22 14:30:41"
+  "date": "2022-07-22T10:30:41Z"
 }
