@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2931: Fix hiding NER regions with new outliner",
-  "commit": "41ba7f66638e423ee3910565a60613b5102ace51",
+  "commit": "b9d8edf6decbdc6bab48164a746cf889d3fe195d",
   "branch": "fb-dev-2931/fix-hiding-ner-regions",
-  "date": "2022/07/21 23:14:14"
+  "date": "2022/07/22 14:24:56"
 }
