@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2926: Panels can obscure underlying content",
-  "commit": "29edc627e28fefc294f93e5664b3ad516527c76f",
-  "branch": "fb-dev-2926/fix-max-panel-width",
-  "date": "2022/07/21 20:29:47"
+  "commit": "a45a84883b04d96a79f1da51b20c33a462c18656",
+  "branch": "master",
+  "date": "2022/07/22 14:30:41"
 }
