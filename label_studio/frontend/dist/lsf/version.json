@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2922: Selection box of rectangle region remains broken after hide/ unhide action",
-  "commit": "b6610aca8239c49f8aee86bc84e1789f66ec9a76",
-  "branch": "fb-dev-2922/fix-image-region-hiding",
-  "date": "2022/07/22 00:32:27"
+  "commit": "5875851b5acbfc287e676649a2d3f5f8d6dce65a",
+  "branch": "master",
+  "date": "2022/07/22 17:32:31"
 }
