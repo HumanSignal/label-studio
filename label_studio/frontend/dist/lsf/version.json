@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2922: Selection box of rectangle region remains broken after hide/ unhide action (#767)\n\nDisable transform when the region is hidden",
-  "commit": "5875851b5acbfc287e676649a2d3f5f8d6dce65a",
-  "branch": "master",
-  "date": "2022-07-22T13:32:31Z"
+  "message": "fix: DEV-2934: Fix Audio resizing behavior",
+  "commit": "76bce39c87d84445cbf9addaaf9f2213d01f01eb",
+  "branch": "fb-dev-2934/fix-audio-region-positioning",
+  "date": "2022/07/22 23:07:35"
 }
