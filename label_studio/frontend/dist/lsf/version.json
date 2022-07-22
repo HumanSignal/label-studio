@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2696: 3point bbox tool remains selected but hidden, when user changes label configuration from Rectangle to RectangleLabels",
-  "commit": "1baf832d73fe2d0d84c1e24e514654c55a22786d",
+  "message": "fix: DEV-2146: Lock rect VideoRectangle",
+  "commit": "b1da3017b694704d5504fa3ca3607cab1f7a87ef",
   "branch": "master",
-  "date": "2022/07/18 07:31:24"
+  "date": "2022/07/21 18:07:51"
 }

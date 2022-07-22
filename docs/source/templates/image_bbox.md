@@ -8,9 +8,59 @@ meta_title: Image Object Detection Data Labeling Template
 meta_description: Template for performing object detection with rectangular bounding boxes with Label Studio for your machine learning and data science projects.
 ---
 
+
+If you want to perform object detection, you need to create a labeled dataset. Use the following template to add rectangular bounding boxes to images, and label the contents of the bounding boxes.
+
+<br>
 <img src="/images/templates/object-detection-with-bounding-boxes.png" alt="" class="gif-border" width="552px" height="408px" />
 
-If you want to perform object detection, you need to create a labeled dataset. Use this template to add rectangular bounding boxes to images, and label the contents of the bounding boxes.
+<i>Figure 1: Object detection with bounding boxes.</i>
+
+## Create a rotated bounding box
+
+As an annotator, you can also create a rotated bounding box with the "three point click" or "two point click" feature to annotate images.  
+
+  - First point click - Starting point of the location to draw the bounding box.
+  - Second point click - Define the rotation and width of the bounding box.
+  - Third point click - Draw the height of the bounding box.
+
+The origin anchor `0,0` is placed with the first click, similar to the basic bounding box. The second anchor will indicate the angle of the edge for `0,1` and the width of the bounding box. The third and final anchor `1,1` will determine the height or final dimension of the bounding box. Three clicks is required to create a rotated bounding box.
+
+1. **Starting point of the location to draw the bounding box**: With a tag selected and mouse on canvas, on-click to place first anchor `0,0` anywhere on the canvas.
+
+
+!!! note 
+    - The Canvas guides will indicate the orientation and location for the x-axis and y-axis of the crosshair cursor.
+    - Bounding box label indicates the top and center of the box being created within the canvas. It does not indicate the orientation.
+
+2. **Define the rotation and width of the bounding box**: Move the mouse to the location to place the second anchor.
+
+!!! note 
+    The canvas guides will show you where the cursor is and also indicates the orientation.
+
+To complete the top edge of the box, `click` and `release` to place the second cursor.
+
+3. **Draw the height of the bounding box**: Again, move the cursor to place the final anchor of the bounding box and complete the creation flow. Now, the bottom edge of the bounding box will follow the cursor to illustrate the height.
+
+4. **Select and rotate the rectangle**: Now, you can select and rotate the rectangle without moving the cursor. 
+
+After the box has been completed it will remain in selected state, unless determined otherwise.
+
+
+  <br>
+  <div style="margin:auto; text-align:center;"><img src="/images/two-point-click.png" style="opacity: 0.8"/></div>
+  <i>Figure 2: Two point click rectangle.</i>
+
+    
+  <br>
+  <div style="margin:auto; text-align:center;"><img src="/images/three-point-click.png" style="opacity: 0.8"/></div>
+  <i>Figure 3: Three point click rectangle.</i>
+
+  After you create the bounding box, you can do the following: 
+    - Adjust it by moving the anchors or edges to the desired location on the canvas.
+    - Determine that the orientation of the bounding box is effected.
+    - See the orientation of the bounding box and determine the direction during the creation process.
+
 
 ## Interactive Template Preview
 
