@@ -13,6 +13,7 @@ export const ProjectModelVersionSelector = ({
 }) => {
   const api = useAPI();
   const { project, updateProject } = useContext(ProjectContext);
+  const [loading, setLoading] = useState(true);
   const [versions, setVersions] = useState([]);
   const [version, setVersion] = useState(project?.[valueName] || null);
 
@@ -40,12 +41,14 @@ export const ProjectModelVersionSelector = ({
       },
     });
 
-    if (!modelVersions) return;
+    if (modelVersions) {
+      setVersions(Object.entries(modelVersions).reduce((v, [key, value]) => [...v, {
+        value: key,
+        label: `${key} (${value} predictions)`,
+      }], []));
+    }
 
-    setVersions(Object.entries(modelVersions).reduce((v, [key, value]) => [...v, {
-      value: key,
-      label: key + " (" + value + " predictions)",
-    }], []));
+    setLoading(false);
   }, [api, project?.id, apiName]);
 
   useEffect(fetchMLVersions, [fetchMLVersions]);
@@ -71,15 +74,26 @@ export const ProjectModelVersionSelector = ({
 
       <div style={{ display: 'flex', alignItems: 'center', width: 400, paddingLeft: 16 }}>
         <div style={{ flex: 1, paddingRight: 16 }}>
-          <Select
-            name={name}
-            disabled={!versions.length}
-            value={version}
-            onChange={e => setVersion(e.target.value)}
-            options={versions}
-            placeholder={placeholder}
-            {...props}
-          />
+          {loading ? (
+            <Select
+              disabled={true}
+              value={null}
+              options={[]}
+              placeholder={"Loading ..."}
+              {...props}
+            />
+          )
+            : (
+              <Select
+                name={name}
+                disabled={!versions.length}
+                value={version}
+                onChange={e => setVersion(e.target.value)}
+                options={versions}
+                placeholder={placeholder}
+                {...props}
+              />
+            )}
         </div>
 
         <Button onClick={resetMLVersion}>

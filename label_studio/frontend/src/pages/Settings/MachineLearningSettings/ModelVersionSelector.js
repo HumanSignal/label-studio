@@ -15,6 +15,7 @@ export const ModelVersionSelector = ({
 }) => {
   const api = useAPI();
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [versions, setVersions] = useState([]);
   const [version, setVersion] = useState(object?.[valueName] || null);
 
@@ -33,31 +34,45 @@ export const ModelVersionSelector = ({
       },
     });
 
+    // handle possible error
     if (modelVersions?.message) {
       setError(modelVersions.message);
     }
 
-    if (!modelVersions?.versions?.length) return;
+    if (modelVersions?.versions?.length) {
+      setVersions(modelVersions.versions.map(version => ({
+        value: version,
+        label: version,
+      })));
+    }
 
-    setVersions(modelVersions.versions.map(version => ({
-      value: version,
-      label: version,
-    })));
+    setLoading(false);
   }, [api, object?.id, apiName]);
 
   useEffect(fetchMLVersions, []);
 
   return (
     <Block name="modelVersionSelector">
-      <Select
-        name={name}
-        disabled={!versions.length}
-        value={version}
-        onChange={e => setVersion(e.target.value)}
-        options={versions}
-        placeholder={placeholder}
-        {...props}
-      />
+      {loading ? (
+        <Select
+          disabled={true}
+          value={null}
+          options={[]}
+          placeholder={"Loading ..."}
+          {...props}
+        />
+      )
+        : (
+          <Select
+            name={name}
+            disabled={!versions.length}
+            value={version}
+            onChange={e => setVersion(e.target.value)}
+            options={versions}
+            placeholder={placeholder}
+            {...props}
+          />
+        )}
       {error && (
         <Elem name="message">
           {error}
