@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2146: Lock rect VideoRectangle",
-  "commit": "b1da3017b694704d5504fa3ca3607cab1f7a87ef",
-  "branch": "master",
-  "date": "2022/07/21 18:07:51"
+  "message": "DEV-2671: Simplify and fix rotation calculations",
+  "commit": "acd957b3f74c6cea44c843b0fc8603cc74654147",
+  "branch": "fb-dev-2671-fix-rotation",
+  "date": "2022/07/22 03:05:27"
 }
