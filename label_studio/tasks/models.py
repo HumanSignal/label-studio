@@ -83,7 +83,7 @@ class Task(TaskMixin, models.Model):
         _('unresolved comment count'), default=0, db_index=True,
         help_text='Number of unresolved comments in the task including all annotations')
     comment_authors = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, null=True, default=None,
+        settings.AUTH_USER_MODEL, blank=True, default=None,
         related_name='tasks_with_comments', help_text='Users who wrote comments')
     last_comment_updated_at = models.DateTimeField(
         _('last comment updated at'), default=None, null=True,
