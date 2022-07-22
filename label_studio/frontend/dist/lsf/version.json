@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2146: Lock rect VideoRectangle",
-  "commit": "b1da3017b694704d5504fa3ca3607cab1f7a87ef",
+  "message": "fix: DEV-2926: Panels can obscure underlying content (#763)\n\nPanels now can only take up to 40% of the available width",
+  "commit": "a45a84883b04d96a79f1da51b20c33a462c18656",
   "branch": "master",
-  "date": "2022/07/21 18:07:51"
+  "date": "2022-07-22T10:30:41Z"
 }
