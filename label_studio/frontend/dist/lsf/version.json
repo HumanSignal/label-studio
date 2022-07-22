@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2930: Fix collapsed texts for TextArea (#765)\n\n* Fix collapsed texts for TextArea\r\n\r\n* Remove excess space in TextResult\r\n\r\nCo-authored-by: bmartel <brandonmartel@gmail.com>\r\n\r\n* Remove excess space in ChoicesResult\r\n\r\nCo-authored-by: bmartel <brandonmartel@gmail.com>\r\n\r\n* Fix typo\r\n\r\nCo-authored-by: bmartel <brandonmartel@gmail.com>",
-  "commit": "eafb76acdbe98a616bb047b945b197103bcb1866",
+  "message": "fix: DEV-2922: Selection box of rectangle region remains broken after hide/ unhide action (#767)\n\nDisable transform when the region is hidden",
+  "commit": "5875851b5acbfc287e676649a2d3f5f8d6dce65a",
   "branch": "master",
-  "date": "2022-07-22T11:24:09Z"
+  "date": "2022-07-22T13:32:31Z"
 }
