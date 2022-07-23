@@ -1,6 +1,6 @@
 {
-  "message": "fix: Rename Tasks to Actions",
-  "commit": "b06f079e38624af6578728d83bbc27f18b6288e6",
-  "branch": "master",
-  "date": "2022/07/21 00:27:19"
+  "message": "feat: DEV-2887: Comments for annotation editor ui ",
+  "commit": "a9bdfd504d86bfa0223bf24788c8991c1947377a",
+  "branch": "fb-DEV-2896",
+  "date": "2022/07/22 15:20:50"
 }
