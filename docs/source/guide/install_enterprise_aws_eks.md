@@ -62,7 +62,11 @@ kubectl get all
     - Your infrastructure such as ingress must be configured.
 
 
-## 3. Prepare the Kubernetes cluster to install Label Studio Enterprise
+## 3. Set up Label Studio Enterprise Helm chart
+
+To set up Label Studio Enterprise Helm chart, see [Configure a `values.yaml` file for Label Studio Enterprise](install_enterprise_k8s.html#Configure-values-yaml).
+
+See [Deploy Label Studio Enterprise on Kubernetes](install_enterprise_k8s.html#Add-the-Helm-chart-repository-to-your-Kubernetes-cluster).
 
 Before installing Label Studio Enterprise, prepare the Kubernetes cluster with [`kubectl`](https://kubernetes.io/docs/reference/kubectl/). 
 
@@ -85,6 +89,4 @@ Before installing Label Studio Enterprise, prepare the Kubernetes cluster with [
    kubectl create secret generic lse-license --from-literal=license=https://lic.heartex.ai/db/<CUSTOMER_LICENSE_ID>
    ```
 
-## 4. Set up Label Studio Enterprise Helm chart
 
-To set up Label Studio Enterprise Helm chart, see [Configure a `values.yaml` file for Label Studio Enterprise](install_enterprise_k8s.html#Configure-values-yaml).

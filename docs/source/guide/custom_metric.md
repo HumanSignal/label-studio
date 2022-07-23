@@ -232,34 +232,46 @@ After you set up these permissions in your environment, you're ready to write yo
 To grant permissions to a specific user, role, or EKS node group used to manage Label Studio Enterprise access to interact with AWS Lambda, use the following IAM policy. Create an IAM policy called `LSE_AllowInteractLambda` and replace `YOUR_AWS_ACCOUNT` with your AWS account ID:
 ```json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "VisualEditor0",
-            "Effect": "Allow",
-            "Action": "iam:PassRole",
-            "Resource": "arn:aws:iam::YOUR_AWS_ACCOUNT:role/LSE_CustomMetricsExecuteRole"
-        },
-        {
-            "Sid": "VisualEditor1",
-            "Effect": "Allow",
-            "Action": [
-                "lambda:CreateFunction",
-                "lambda:UpdateFunctionCode",
-                "lambda:InvokeFunction",
-                "lambda:GetFunction",
-                "lambda:DeleteFunction"
-            ],
-            "Resource": [
-      "arn:aws:lambda:*:YOUR_AWS_ACCOUNT:function:custom-metric-*"
-            ]
-        },
-        {
-            "Sid": "VisualEditor2",
-            "Effect": "Allow",
-            "Action": "lambda:ListFunctions",
-            "Resource": "*"
-        }
-    ]
+   "Version": "2012-10-17",
+   "Statement": [
+      {
+         "Sid": "VisualEditor0",
+         "Effect": "Allow",
+         "Action": "iam:PassRole",
+         "Resource": "arn:aws:iam::YOUR_AWS_ACCOUNT:role/LSE_CustomMetricsExecuteRole"
+      },
+      {
+         "Sid": "VisualEditor1",
+         "Effect": "Allow",
+         "Action": [
+            "lambda:CreateFunction",
+            "lambda:UpdateFunctionCode",
+            "lambda:InvokeFunction",
+            "lambda:GetFunction",
+            "lambda:DeleteFunction",
+            "lambda:TagResource",
+            "lambda:ListTags"
+         ],
+         "Resource": [
+            "arn:aws:lambda:*:YOUR_AWS_ACCOUNT:function:custom-metric-*"
+         ]
+      },
+      {
+         "Sid": "VisualEditor2",
+         "Effect": "Allow",
+         "Action": "lambda:ListFunctions",
+         "Resource": "*"
+      },
+      {
+         "Action": [
+            "logs:StartQuery",
+            "logs:GetQueryResults"
+         ],
+         "Effect": "Allow",
+         "Resource": [
+            "arn:aws:logs:*:YOUR_AWS_ACCOUNT:log-group:/aws/lambda/custom-metric-*"
+         ]
+      }
+   ]
 }
 ```

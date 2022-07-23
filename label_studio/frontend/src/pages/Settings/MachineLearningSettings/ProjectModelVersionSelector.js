@@ -7,7 +7,7 @@ import { ProjectContext } from '../../../providers/ProjectProvider';
 export const ProjectModelVersionSelector = ({
   name = "model_version",
   valueName = "model_version",
-  apiName = "projecModelVersions",
+  apiName = "projectModelVersions",
   placeholder = "No model version selected",
   ...props
 }) => {
@@ -37,13 +37,13 @@ export const ProjectModelVersionSelector = ({
 
     if (!modelVersions) return;
 
-    setVersions(project.entries(modelVersions).reduce((v, [key, value]) => [...v, {
+    setVersions(Object.entries(modelVersions).reduce((v, [key, value]) => [...v, {
       value: key,
       label: key + " (" + value + " predictions)",
     }], []));
   }, [api, project?.id, apiName]);
 
-  useEffect(fetchMLVersions, []);
+  useEffect(fetchMLVersions, [fetchMLVersions]);
 
   return (
     <Form.Row columnCount={1}>

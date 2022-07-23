@@ -2,7 +2,7 @@
 
 Each annotation that you create when you label a task contains regions and results.
 
-- **Regions** refer to the selected area of the data, whether a text span, image area, audio segment, or something else.
+- **Regions** refer to the selected area of the data, whether a text span, image area, audio segment, or another entity.
 - **Results** refer to the labels assigned to the region. 
 
 Each region has a unique ID for each annotation, formed as a string with the characters `A-Za-z0-9_-`. Each result ID is the same as the region ID that it applies to. 

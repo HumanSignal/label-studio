@@ -41,6 +41,49 @@ You can review tasks in random order, or order tasks in the project data manager
 - Order tasks by agreement: To review annotations with more uncertainty among annotators first. 
 - Order tasks by model confidence score: To review the annotations that a machine learning model was less certain about first. 
 
+### Navigate between tasks or annotations
+
+You can now navigate back through the review stream in the same path as moving forward when `Mark task as reviewed after all annotations are processed` option is set. The go back (`<`)functionality takes you back through the same set of annotations as it had moving forward.
+
+1. As an **ADMINISTRATOR**, log in to https://qa01.dev.heartex.com/.
+
+2. Navigate to **All Projects** page, if needed.
+
+3. Open any project.
+
+4. Observe that you are taken to **Data Manager**.
+
+5. Navigate to **Settings** >> **Review**.
+
+6. Select `Mark task as reviewed after all annotations are processed` option.
+
+7. Click **SAVE** button.
+
+8. Navigate back to Data Manager.
+
+9. Make sure to have several tasks set up with exactly two annotations each, but no reviews.
+
+10. Click **REVIEW ALL TASKS** button.
+
+11. Observe that you are taken to Review Stream.
+
+12. Note the task or annotation that you are on.
+
+13. Complete review for this annotation.
+
+14. Observe that you are taken to same task (second annotation).
+
+15. Repeat steps 12 to 14 for couple more times.
+
+16. Navigate back through the Review Stream using the go back (`<`) button.
+
+!!! note 
+    Confirm that you are not taken through the same path that you have come through moving forward.
+
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/go-back-reviewstream.png" style="opacity: 0.8"/></div>
+<i>Figure 1: Go back to the previous task. </i>
+
 ### Assign reviewers to tasks
 
 As an administrator or project manager, you can assign reviewers to tasks, or people with access can review tasks on an ad hoc basis. Anyone who is assigned to a task or who completes a review of a task appears in the **Reviewers** column on the Data Manager. You must first [add a reviewer to the project](setup_project.html#Add-members-to-a-project) or [add members to the project workspace](manage_users.html#Add-or-remove-members-to-a-workspace) before you can assign them as a reviewer.

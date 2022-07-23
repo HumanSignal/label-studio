@@ -1,6 +1,6 @@
 {
-  "message": "docs: DEV-2578: examples for dynamic labels (#704)\n\n* docs: DEV-2578: examples for dynamic labels\r\n\r\n* Small fixes for Audio, Table, Video jsdoc\r\n\r\n* Fix documentation for Labels\r\n\r\nexamples, description, param\r\n\r\n* Documentation for Dynamic Choices",
-  "commit": "e7feefada567b6a757fc52fa8fb2814e93f7ab90",
+  "message": "fix: DEV-2922: Selection box of rectangle region remains broken after hide/ unhide action (#767)\n\nDisable transform when the region is hidden",
+  "commit": "5875851b5acbfc287e676649a2d3f5f8d6dce65a",
   "branch": "master",
-  "date": "2022-06-17T21:56:45Z"
+  "date": "2022-07-22T13:32:31Z"
 }
