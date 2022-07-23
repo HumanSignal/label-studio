@@ -100,7 +100,11 @@ def all_flags(user):
     logger.debug(f'State received: {state}')
     flags = state.to_json_dict()
     logger.debug(f'Flags received: {flags}')
+
     env_ff = get_all_env_with_prefix('ff_', is_bool=True)
+    env_fflag = get_all_env_with_prefix('fflag_', is_bool=True)
+    env_ff.update(env_fflag)
+
     logger.debug(f'Override by flags from env: {env_ff}')
     for env_flag_name, env_flag_on in env_ff.items():
         flags[env_flag_name] = env_flag_on
