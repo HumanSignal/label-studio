@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2942: Grouping regions without a label",
-  "commit": "c1dea16a617b6f8d77b062555b2347f5b7e8ac57",
+  "commit": "f37156c8ea5fb5e019868c6cd1f54fb30a3039ca",
   "branch": "fb-dev-2942/fix-group-by-empty-label",
-  "date": "2022/07/22 21:03:45"
+  "date": "2022/07/24 18:28:51"
 }
