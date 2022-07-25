@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3030: Fix paragraphs selection (#793)\n\nFix paragraphs",
-  "commit": "8b6991a36a6fc9477ec4483cca2ba8f1414c033d",
-  "branch": "master",
-  "date": "2022-08-09T08:54:43Z"
+  "message": "fix: DEV-2395: Quick view: Different size of working area is created for SMALL vertical/horizontal images",
+  "commit": "f3058868a1397cdd0f36cc21ab8b7eb68b3df905",
+  "branch": "fb-dev-2395",
+  "date": "2022/07/25 10:40:30"
 }
