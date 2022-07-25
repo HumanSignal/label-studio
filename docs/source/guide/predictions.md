@@ -78,9 +78,9 @@ Other types of annotation contain specific fields. You can review the [examples 
 
 > Note: If you're generating pre-annotations for a [custom ML backend](ml_create.html), you can use the `self.parsed_label_config` variable to retrieve the labeling configuration for a project and generate pre-annotations. See the [custom ML backend](ml_create.html) documentation for more details.
 
-## Import pre-annotations for images
+## Import bbox and choice pre-annotations for images
 
-For example, import predicted labels for tasks to determine whether an item in an image is an airplane or a car. 
+For example, import predicted **bounding box regions (rectangles)** and **choices** for tasks to determine whether an item in an image is an airplane or a car. 
 
 For image pre-annotations, Label Studio expects the x, y, width, and height of image annotations to be provided in percentages of overall image dimension. See [Units for image annotations](predictions.html#Units_for_image_annotations) on this page for more about how to convert formats.
 
@@ -110,9 +110,9 @@ After you set up an example project, create example tasks that match the followi
 Save this example JSON as a file to import it into Label Studio, for example, `example_prediction_task.json`.
 
 {% codeblock lang:json %}
-[{
+{
   "data": {
-    "image": "http://localhost:8080/static/samples/sample.jpg" 
+    "image": "/static/samples/sample.jpg" 
   },
 
   "predictions": [{
@@ -153,7 +153,7 @@ Save this example JSON as a file to import it into Label Studio, for example, `e
     }],
     "score": 0.95
   }]
-}]
+}
 {% endcodeblock %}
 
 In this example there are 3 results inside 1 prediction, or pre-annotation: 
@@ -170,21 +170,20 @@ Import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-da
 In the Label Studio UI, the imported prediction for this task looks like the following: 
 <center><img src="../images/predictions_loaded.png" alt="screenshot of the Label Studio UI showing an image of airplanes with bounding boxes covering each airplane." style="width: 100%; max-width: 700px"></center>
 
-## Import pre-annotated regions for images 
+## Import pre-annotated ellipse, keypoint, polygon & brush regions for images 
 
 If you want to import images with pre-annotated regions without labels assigned to them, follow this example.
 
 Use the following labeling configuration: 
 ```xml
 <View>
-  <View style="display:flex;align-items:start;gap:8px;flex-direction:row">
-    <Image name="image" value="$image" zoom="true" zoomControl="true" rotateControl="false"/>
-    <Rectangle name="rect" toName="image" showInline="false"/>
-  </View>
+  <Image name="image" value="$image" zoom="true" zoomControl="true" rotateControl="false"/>
+
+  <Rectangle name="rect" toName="image" showInline="false"/>
+  <Polygon name="polygon" toName="image"/>
   <Ellipse name="ellipse" toName="image"/>
   <KeyPoint name="kp" toName="image"/>
-  <Polygon name="polygon" toName="image"/>
-  <Brush name="brush" toName="image"/>
+
   <Labels name="labels" toName="image" fillOpacity="0.5" strokeWidth="5">
     <Label value="Vehicle" background="green"/>
     <Label value="Building" background="blue"/>
@@ -202,98 +201,93 @@ After you set up an example project, create example tasks that match the followi
 Save this example JSON as a file to import it into Label Studio, for example, `example_prediction_task.json`.
 
 {% codeblock lang:json %}
-[{
-    "id":8,
-    "predictions":[
+{
+  "data": {
+    "image": "/static/samples/sample.jpg"
+  },
+  
+  "predictions": [
+    {
+      "result": [
         {
-            "id":10,
-            "result":[
-               {
-                  "original_width":800,
-                  "original_height":450,
-                  "image_rotation":0,
-                  "value":{
-                     "x":55.46666666666667,
-                     "y":2.3696682464454977,
-                     "width":35.86666666666667,
-                     "height":46.91943127962085,
-                     "rotation":0
-                  },
-                  "id":"ABC",
-                  "from_name":"rect",
-                  "to_name":"image",
-                  "type":"rectangle"
-               },
-               {
-                  "original_width":800,
-                  "original_height":450,
-                  "image_rotation":0,
-                  "value":{
-                     "x":58.4,
-                     "y":64.21800947867298,
-                     "width":30.533333333333335,
-                     "height":19.90521327014218,
-                     "rotation":0
-                  },
-                  "id":"DEF",
-                  "from_name":"rect",
-                  "to_name":"image",
-                  "type":"rectangle"
-               },
-               {
-                  "original_width":800,
-                  "original_height":450,
-                  "image_rotation":0,
-                  "value":{
-                     "points":[
-                        [
-                           20.933333333333334,
-                           28.90995260663507
-                        ],
-                        [
-                           25.866666666666667,
-                           64.69194312796209
-                        ],
-                        [
-                           38.4,
-                           62.796208530805686
-                        ],
-                        [
-                           34.13333333333333,
-                           27.488151658767773
-                        ]
-                    ]
-                },
-                "id":"GHI",
-                "from_name":"polygon",
-                "to_name":"image",
-                "type":"polygon"
-                },
-                {
-                "original_width":800,
-                "original_height":450,
-                "image_rotation":0,
-                "value":{
-                    "x":8.4,
-                    "y":20.14218009478673,
-                    "radiusX":4,
-                    "radiusY":7.109004739336493,
-                    "rotation":0
-                    },
-                "id":"JKL",
-                "from_name":"ellipse",
-                "to_name":"image",
-                "type":"ellipse"
-                }
-            ],
-            "task":8
+          "original_width": 800,
+          "original_height": 450,
+          "image_rotation": 0,
+          "value": {
+            "x": 55.46,
+            "y": 2.36,
+            "width": 35.86,
+            "height": 46.9,
+            "rotation": 0
+          },
+          "id": "ABC",
+          "from_name": "rect",
+          "to_name": "image",
+          "type": "rectangle"
+        },
+        {
+          "original_width": 800,
+          "original_height": 450,
+          "image_rotation": 0,
+          "value": {
+            "points": [
+              [
+                20.93,
+                28.90
+              ],
+              [
+                25.86,
+                64.69
+              ],
+              [
+                38.40,
+                62.79
+              ],
+              [
+                34.13,
+                27.48
+              ]
+            ]
+          },
+          "id": "GHI",
+          "from_name": "polygon",
+          "to_name": "image",
+          "type": "polygon"
+        },
+        {
+          "original_width": 800,
+          "original_height": 450,
+          "image_rotation": 0,
+          "value": {
+            "x": 8.4,
+            "y": 20.14,
+            "radiusX": 4,
+            "radiusY": 7.10,
+            "rotation": 0
+          },
+          "id": "JKL",
+          "from_name": "ellipse",
+          "to_name": "image",
+          "type": "ellipse"
+        },
+        {
+          "original_width": 800,
+          "original_height": 450,
+          "image_rotation": 0,
+          "value": {
+            "x": 38.40,
+            "y": 34.21,
+            "width": 1.0
+          },
+          "id": "DEF",
+          "from_name": "rect",
+          "to_name": "image",
+          "type": "keypoint"
         }
-    ],
-    "data":{
-    "image":"/data/upload/31159626248_d0362d027c_c.jpg"
-    },
-    "project":4
-}]
+      ]
+    }
+  ]
+}
 {% endcodeblock %}
 
 In this example there are 3 regions inside 1 result field for a prediction, or pre-annotation: 
@@ -308,7 +302,7 @@ None of the regions have labels applied. The labeling configuration must use the
 
 <!-- md image_units.md -->
 
-## Import pre-annotations for text 
+## Import span pre-annotations for text 
 
 In this example, import pre-annotations for text using the [named entity recognition template](/templates/named_entity.html):
 ```xml
