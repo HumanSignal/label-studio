@@ -225,7 +225,7 @@ Save this example JSON as a file to import it into Label Studio, for example, `e
                   "type":"rectangle"
                },
                {
-                  "original_width":800,
+                  "otest_svg_upload_invalid_formatriginal_width":800,
                   "original_height":450,
                   "image_rotation":0,
                   "value":{
