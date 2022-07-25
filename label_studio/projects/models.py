@@ -10,10 +10,11 @@ from django.db.models import JSONField
 from django.core.validators import MinLengthValidator, MaxLengthValidator
 from django.db import transaction, models
 from annoying.fields import AutoOneToOneField
-from functools import lru_cache
 
+from core.redis import start_job_async_or_sync
+from data_manager.managers import TaskQuerySet
 from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks
-from core.utils.common import create_hash, sample_query, get_attr_or_item, load_func
+from core.utils.common import create_hash, get_attr_or_item, load_func
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.label_config import (
     validate_label_config,
