@@ -5,15 +5,14 @@ import logging
 import json
 import boto3
 
-from botocore.exceptions import NoCredentialsError, ClientError
-from django.db import models, transaction
+from core.redis import start_job_async_or_sync
+from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.dispatch import receiver
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, pre_delete
 
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
-from io_storages.utils import get_uri_via_regex
 from io_storages.s3.utils import get_client_and_resource, resolve_s3_url
 from tasks.validation import ValidationError as TaskValidationError
 from tasks.models import Annotation
@@ -21,7 +20,6 @@ from tasks.models import Annotation
 logger = logging.getLogger(__name__)
 logging.getLogger('botocore').setLevel(logging.CRITICAL)
 boto3.set_stream_logger(level=logging.INFO)
-url_scheme = 's3'
 
 clients_cache = {}
 
@@ -78,26 +76,22 @@ class S3StorageMixin(models.Model):
         return client, s3.Bucket(self.bucket)
 
     def validate_connection(self, client=None):
-        print('validate_connection')
+        logger.debug('validate_connection')
         if client is None:
             client = self.get_client()
         if self.prefix:
             logger.debug(f'Test connection to bucket {self.bucket} with prefix {self.prefix}')
             result = client.list_objects_v2(Bucket=self.bucket, Prefix=self.prefix, MaxKeys=1)
             if not result.get('KeyCount'):
-                raise KeyError(f'{url_scheme}://{self.bucket}/{self.prefix} not found.')
+                raise KeyError(f'{self.url_scheme}://{self.bucket}/{self.prefix} not found.')
         else:
             logger.debug(f'Test connection to bucket {self.bucket}')
             client.head_bucket(Bucket=self.bucket)
 
-    def can_resolve_url(self, url):
-        # TODO: later check to the full prefix like "url.startswith(self.path_full)"
-        return url.startswith(f'{url_scheme}://')
-
     @property
     def path_full(self):
         prefix = self.prefix or ''
-        return f'{url_scheme}://{self.bucket}/{prefix}'
+        return f'{self.url_scheme}://{self.bucket}/{prefix}'
 
     @property
     def type_full(self):
@@ -108,6 +102,8 @@ class S3StorageMixin(models.Model):
 
 
 class S3ImportStorage(S3StorageMixin, ImportStorage):
+
+    url_scheme = 's3'
 
     presign = models.BooleanField(
         _('presign'), default=True,
@@ -151,7 +147,7 @@ class S3ImportStorage(S3StorageMixin, ImportStorage):
         return parsed_data
 
     def get_data(self, key):
-        uri = f's3://{self.bucket}/{key}'
+        uri = f'{self.url_scheme}://{self.bucket}/{key}'
         if self.use_blob_urls:
             data_key = settings.DATA_UNDEFINED_NAME
             return {data_key: uri}
@@ -167,15 +163,8 @@ class S3ImportStorage(S3StorageMixin, ImportStorage):
         value = self._get_validated_task(value, key)
         return value
 
-    def resolve_uri(self, data):
-        try:
-            uri, storage = get_uri_via_regex(data, prefixes=(url_scheme,))
-            if not storage:
-                return
-            resolved_uri = resolve_s3_url(uri, self.get_client(), self.presign, expires_in=self.presign_ttl * 60)
-            return data.replace(uri, resolved_uri)
-        except NoCredentialsError:
-            logger.warning(f'No AWS credentials specified for {data}')
+    def generate_http_url(self, url):
+        return resolve_s3_url(url, self.get_client(), self.presign, expires_in=self.presign_ttl * 60)
 
 
 class S3ExportStorage(S3StorageMixin, ExportStorage):
@@ -210,23 +199,27 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
         S3ExportStorageLink.objects.filter(storage=self, annotation=annotation).delete()
 
 
+def async_export_annotation_to_s3_storages(annotation):
+    project = annotation.task.project
+    if hasattr(project, 'io_storages_s3exportstorages'):
+        for storage in project.io_storages_s3exportstorages.all():
+            logger.debug(f'Export {annotation} to S3 storage {storage}')
+            storage.save_annotation(annotation)
+
+
 @receiver(post_save, sender=Annotation)
 def export_annotation_to_s3_storages(sender, instance, **kwargs):
-    project = instance.task.project
-    if hasattr(project, 'io_storages_s3exportstorages'):
-        for storage in project.io_storages_s3exportstorages.all():
-            logger.debug(f'Export {instance} to S3 storage {storage}')
-            storage.save_annotation(instance)
+    start_job_async_or_sync(async_export_annotation_to_s3_storages, instance)
 
 
-@receiver(post_delete, sender=Annotation)
+@receiver(pre_delete, sender=Annotation)
 def delete_annotation_from_s3_storages(sender, instance, **kwargs):
-    project = instance.task.project
-    if hasattr(project, 'io_storages_s3exportstorages'):
-        for storage in project.io_storages_s3exportstorages.all():
-            if storage.can_delete_objects:
-                logger.debug(f'Delete {instance} from S3 storage {storage}')
-                storage.delete_annotation(instance)
+    links = S3ExportStorageLink.objects.filter(annotation=instance)
+    for link in links:
+        storage = link.storage
+        if storage.can_delete_objects:
+            logger.debug(f'Delete {instance} from S3 storage {storage}')
+            storage.delete_annotation(instance)
 
 
 class S3ImportStorageLink(ImportStorageLink):

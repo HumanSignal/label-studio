@@ -293,6 +293,11 @@ def main():
         call_command('shell_plus')
         return
 
+    if input_args.command == 'calculate_stats_all_orgs':
+        from tasks.functions import calculate_stats_all_orgs
+        calculate_stats_all_orgs(input_args.from_scratch, redis=True)
+        return
+
     # print version
     if input_args.command == 'version' or input_args.version:
         from label_studio import __version__
@@ -374,7 +379,7 @@ def main():
             return
 
         # internal port and internal host for server start
-        internal_host = input_args.internal_host or config.get('internal_host', '0.0.0.0')
+        internal_host = input_args.internal_host or config.get('internal_host', '0.0.0.0')  # nosec
         internal_port = input_args.port or get_env('PORT') or config.get('port', 8080)
         try:
             internal_port = int(internal_port)

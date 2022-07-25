@@ -43,6 +43,8 @@ def parse_input_args(input_args):
     root_parser.add_argument(
         '-l', '--label-config', dest='label_config', type=valid_filepath, help='Label config file path'
     )
+    root_parser.add_argument('--skip-long-migrations', dest='skip_long_migrations', action='store_true',
+                             help='Skip long migrations on start')
     root_parser.add_argument('--ml-backends', dest='ml_backends', nargs='+', help='Machine learning backends URLs')
     root_parser.add_argument(
         '--sampling',
@@ -62,7 +64,7 @@ def parse_input_args(input_args):
         '--internal-host',
         dest='internal_host',
         type=str,
-        default='0.0.0.0',
+        default='0.0.0.0',   # nosec
         help='Web server internal host, e.g.: "localhost" or "0.0.0.0"',
     )
     root_parser.add_argument(
@@ -123,6 +125,13 @@ def parse_input_args(input_args):
     parser_reset_password = subparsers.add_parser('reset_password', help='Reset password for a specific username', parents=[root_parser])
 
     parser_shell = subparsers.add_parser('shell', help='Run django shell', parents=[root_parser])
+
+    calculate_stats_all_orgs = subparsers.add_parser(
+        'calculate_stats_all_orgs', help='Calculate task counters and statistics', parents=[root_parser]
+    )
+    calculate_stats_all_orgs.add_argument(
+        '--from-scratch', dest='from_scratch', default=False, action='store_true', help='Recalculate from scratch'
+    )
 
     args = parser.parse_args(input_args)
 

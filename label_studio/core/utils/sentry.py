@@ -34,6 +34,15 @@ def event_processor(event, hint):
             if message in value:
                 return None
 
+    if last.get('type') == 'OSError':
+        value = last.get('value')
+        messages = [
+            'Too many open files: ',
+        ]
+        for message in messages:
+            if message in value:
+                return None
+
     # special flag inside of logger.error(..., extra={'sentry_skip': True}) to skip error message
     if event.get('extra', {}).get('sentry_skip', False):
         return None

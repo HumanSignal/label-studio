@@ -333,7 +333,7 @@
 
 
 <script data-template-pk="1" type="text"><View>
-  <HyperText name="pdf" value="$pdf"/>
+  <HyperText name="pdf" value="$pdf" inline="true"/>
 
   <Header value="Rate this article"/>
   <Rating name="rating" toName="pdf" maxRating="10" icon="star" size="medium" />
@@ -348,7 +348,7 @@
 
 
 <script data-template-pk="4" type="text"><View>
-  <HyperText name="website" value="$website"/>
+  <HyperText name="website" value="$website" inline="true"/>
 
   <Header value="Rate this website"/>
   <Rating name="rating" toName="website" maxRating="10" icon="star" size="medium" />
@@ -685,7 +685,7 @@ it will be marked as `"instant": true` in the results.
 
 
 <script data-template-pk="3" type="text"><View>
-  <View style="padding: 0 1em; margin: 1em 0; background: #f1f1f1; position: sticky; top: 0; border-radius: 3px">
+  <View style="padding: 0 1em; margin: 1em 0; background: #f1f1f1; position: sticky; top: 0; border-radius: 3px; z-index: 100">
     <Labels name="label" toName="text" showInline="true">
       <Label value="Person" />
       <Label value="Organization" />

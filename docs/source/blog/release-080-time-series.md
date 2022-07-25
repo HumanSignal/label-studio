@@ -21,7 +21,7 @@ or using [Docker](https://labelstud.io/guide/#Running-with-Docker), [Github sour
 3. Go to Setup page ([http://localhost:8080/setup](http://localhost:8080/setup)). On this page you need to configure a labeling scheme for your project using LS tags. Read more about LS tags [in the documentation](/tags/timeseries.html). The fastest way to do it is to use templates which are available on Setup page: 
   <img src="/images/release-080/ts-templates.png" class="gif-border" />
 
-4. Import your CSV/TSV/JSON via Import page ([http://localhost:8080/import](http://localhost:8080/import)).
+4. Import your CSV/TSV/JSON via Import page.
 
 5. Start Labeling ([http://localhost:8080/](http://localhost:8080/))
 
@@ -34,4 +34,4 @@ If you want to use multiple time series tags in one labeling config then you nee
 
 ### Video & audio sync with time series
 
-It's possible to synchronize TimeSeries with video and audio in Label Studio. Right now you can do it using HyperText tag with html objects `<audio src="path">`/`<video src="path">` and TimeSeries together. We have some solutions for this in testing stage and we can share it with you [by request in slack](https://join.slack.com/t/label-studio/shared_invite/zt-qy37y73p-CCfEaEZvDylyQf4oatK40A).
+It's possible to synchronize TimeSeries with video and audio in Label Studio. Right now you can do it using HyperText tag with html objects `<audio src="path">`/`<video src="path">` and TimeSeries together. We have some solutions for this in testing stage and we can share it with you [by request in slack](https://slack.labelstudio.heartex.com).

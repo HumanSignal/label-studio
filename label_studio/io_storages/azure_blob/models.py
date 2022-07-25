@@ -4,26 +4,23 @@ import logging
 import json
 import re
 
+from core.redis import start_job_async_or_sync
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
-from django.db import models, transaction
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from django.dispatch import receiver
 from django.db.models.signals import post_save
 
 from azure.storage.blob import BlobServiceClient, generate_blob_sas, BlobSasPermissions
 from django.dispatch import receiver
 from core.utils.params import get_env
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
-from io_storages.utils import get_uri_via_regex
-from io_storages.serializers import StorageAnnotationSerializer
 from tasks.models import Annotation
 
 
 logger = logging.getLogger(__name__)
 logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(logging.WARNING)
-url_scheme = 'azure-blob'
 
 
 class AzureBlobStorageMixin(models.Model):
@@ -70,6 +67,8 @@ class AzureBlobStorageMixin(models.Model):
 
 
 class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
+    url_scheme = 'azure-blob'
+
     presign = models.BooleanField(
         _('presign'), default=True,
         help_text='Generate presigned URLs')
@@ -97,7 +96,7 @@ class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
     def get_data(self, key):
         if self.use_blob_urls:
             data_key = settings.DATA_UNDEFINED_NAME
-            return {data_key: f'{url_scheme}://{self.container}/{key}'}
+            return {data_key: f'{self.url_scheme}://{self.container}/{key}'}
 
         container = self.get_container()
         blob = container.download_blob(key)
@@ -107,18 +106,10 @@ class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
             raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task")  # noqa
         return value
 
-    def resolve_uri(self, data):
-        uri, storage = get_uri_via_regex(data, prefixes=(url_scheme,))
-        if not storage:
-            return
-        logger.debug("Found matching storage uri in task data value: {uri}".format(uri=uri))
-        resolved_uri = self.resolve_azure_blob(uri)
-        return data.replace(uri, resolved_uri)
-
     def scan_and_create_links(self):
         return self._scan_and_create_links(AzureBlobImportStorageLink)
 
-    def resolve_azure_blob(self, url):
+    def generate_http_url(self, url):
         r = urlparse(url, allow_fragments=False)
         container = r.netloc
         blob = r.path.lstrip('/')
@@ -132,10 +123,6 @@ class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
                                       permission=BlobSasPermissions(read=True),
                                       expiry=expiry)
         return 'https://' + self.get_account_name() + '.blob.core.windows.net/' + container + '/' + blob + '?' + sas_token
-
-    def can_resolve_url(self, url):
-        # TODO: later check to the full prefix like url.startswith(url_scheme + "//" + self.container)
-        return url.startswith(f'{url_scheme}://')
 
 
 class AzureBlobExportStorage(ExportStorage, AzureBlobStorageMixin):
@@ -156,13 +143,17 @@ class AzureBlobExportStorage(ExportStorage, AzureBlobStorageMixin):
         AzureBlobExportStorageLink.create(annotation, self)
 
 
-@receiver(post_save, sender=Annotation)
-def export_annotation_to_azure_storages(sender, instance, **kwargs):
-    project = instance.task.project
+def async_export_annotation_to_azure_storages(annotation):
+    project = annotation.task.project
     if hasattr(project, 'io_storages_azureblobexportstorages'):
         for storage in project.io_storages_azureblobexportstorages.all():
-            logger.debug(f'Export {instance} to Azure Blob storage {storage}')
-            storage.save_annotation(instance)
+            logger.debug(f'Export {annotation} to Azure Blob storage {storage}')
+            storage.save_annotation(annotation)
+
+
+@receiver(post_save, sender=Annotation)
+def export_annotation_to_azure_storages(sender, instance, **kwargs):
+    start_job_async_or_sync(async_export_annotation_to_azure_storages, instance)
 
 
 class AzureBlobImportStorageLink(ImportStorageLink):

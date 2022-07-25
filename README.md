@@ -2,7 +2,7 @@
 
 ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) ![label-studio:build](https://github.com/heartexlabs/label-studio/workflows/label-studio:build/badge.svg) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases)
 
-[Website](https://labelstud.io/) • [Docs](https://labelstud.io/guide/) • [Twitter](https://twitter.com/heartexlabs) • [Join Slack Community <img src="https://app.heartex.ai/docs/images/slack-mini.png" width="18px"/>](http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=github-1)
+[Website](https://labelstud.io/) • [Docs](https://labelstud.io/guide/) • [Twitter](https://twitter.com/labelstudiohq) • [Join Slack Community <img src="https://app.heartex.ai/docs/images/slack-mini.png" width="18px"/>](https://slack.labelstudio.heartex.com/?source=github-1)
 
 
 ## What is Label Studio?
@@ -56,7 +56,7 @@ docker build -t heartexlabs/label-studio:latest .
 ```
 
 ### Run with Docker Compose
-Docker compose script provides production-ready stack consisting of the following components:
+Docker Compose script provides production-ready stack consisting of the following components:
 
 - Label Studio
 - [Nginx](https://www.nginx.com/) - proxy web server used to load various static data, including uploaded audio, images, etc.
@@ -70,7 +70,7 @@ docker-compose up
 ### Install locally with pip
 
 ```bash
-# Requires >=Python3.6, <3.9
+# Requires Python >=3.7 <=3.9
 pip install label-studio
 
 # Start the server at http://localhost:8080
@@ -80,7 +80,7 @@ label-studio
 ### Install locally with Anaconda
 
 ```bash
-conda create --name label-studio python=3.8
+conda create --name label-studio
 conda activate label-studio
 pip install label-studio
 ```
@@ -102,7 +102,8 @@ python label_studio/manage.py runserver
 
 You can deploy Label Studio with one click in Heroku, Microsoft Azure, or Google Cloud Platform: 
 
-[<img src="https://www.herokucdn.com/deploy/button.svg" height="30px">](https://heroku.com/deploy?template=https://github.com/heartexlabs/label-studio/tree/master)
+[<img src="https://www.herokucdn.com/deploy/button.svg" height="30px">](https://heroku.com/deploy?template=https://github.com/heartexlabs/label-studio/tree/heroku-persistent-pg)
+[<img src="https://aka.ms/deploytoazurebutton" height="30px">](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fheartexlabs%2Flabel-studio%2Fmaster%2Fazuredeploy.json)
 [<img src="https://deploy.cloud.run/button.svg" height="30px">](https://deploy.cloud.run)
 
 
@@ -139,6 +140,19 @@ pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl
 # Install label studio
 pip install label-studio
 ```
+
+#### Run test suite
+```bash
+pip install -r deploy/requirements-test.txt
+cd label_studio
+
+# postgres (assumes default postgres user,db,pass)
+DJANGO_DB=default DJANGO_SETTINGS_MODULE=core.settings.label_studio python -m pytest -vv -n auto
+
+# sqlite3
+DJANGO_DB=sqlite DJANGO_SETTINGS_MODULE=core.settings.label_studio python -m pytest -vv -n auto
+```
+
 
 ## What you get from Label Studio
 
@@ -203,10 +217,9 @@ Want to use **The Coolest Feature X** but Label Studio doesn't support it? Check
   author={
     Maxim Tkachenko and
     Mikhail Malyuk and
-    Nikita Shevchenko and
     Andrey Holmanyuk and
     Nikolai Liubimov},
-  year={2020-2021},
+  year={2020-2022},
 }
 ```
 

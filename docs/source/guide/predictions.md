@@ -11,15 +11,80 @@ If you have predictions generated for your dataset from a model, either as pre-a
 
 > To generate interactive pre-annotations with a machine learning model while labeling, see [Set up machine learning with Label Studio](ml.html).
 
+You can import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-data-from-the-Label-Studio-UI) or [using the API](/api#operation/projects_import_create). 
+
+## Format pre-annotations for Label Studio 
+
 To import predicted labels into Label Studio, you must use the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format) and set up your tasks with the `predictions` JSON key. The Label Studio ML backend also outputs tasks in this format. 
 
+### Specific examples for pre-annotations
+
+Refer to the following examples for sample pre-annotation formats:
+- [Image pre-annotations with semantic segmentation bounding boxes](#Import-pre-annotations-for-images)
+- [Image pre-annotations with unlabeled bounding boxes](#Import-pre-annotated-regions-for-images)
+- [Text pre-annotations with NER spans](#Import-pre-annotations-for-text)
+- [Brush pre-annotations for segmentation with masks](#Import-brush-segmentation-pre-annotations-in-RLE-format)
+- [OCR pre-annotations with bounding boxes, labels, and text transcriptions](#Import-OCR-pre-annotations)
+
+To format pre-annotations for Label Studio not represented in these examples, refer to the sample results JSON for the relevant object and control tags for your labeling configuration, such as the [Audio tag](/tags/audio.html) for audio classification tasks. Each tag must be represented in the JSON pre-annotations format to render predictions in the Label Studio UI. Not all object and control tags list sample results JSON. 
+
+You can also use the [Label Studio Playground](/playground) to preview the output JSON for a specific labeling configuration.
+
+### JSON format for pre-annotations
+
+Label Studio JSON format for pre-annotations must contain two sections:
+- A `data` object which references the source of the data that the pre-annotations apply to. This can be a URL to an audio file, a pre-signed cloud storage link to an image, plain text, a reference to a CSV file stored in Label Studio, or something else. See how to [specify the data object](#Specify-the-data-object).
+- A `predictions` array that contains the pre-annotation results for the different types of labeling. See how to [add results to the predictions array](#Add-results-to-the-predictions-array).
+
+The JSON format for pre-annotations must match the labeling configuration used for your data labeling project. 
+
+#### Specify the data object 
+Use the `data` object to reference the `value` of the data specified by the [Object tag](/tags) in your labeling configuration. For example, the following excerpt of a time series labeling configuration:
+```xml
+...
+    <TimeSeries name="ts" value="$csv" valueType="url">
+        <Channel column="first_column"/>
+    </TimeSeries>
+...
+```
+This excerpt specifies `value="$csv"` in the TimeSeries Object tag. As a result, the data object for the pre-annotations JSON file for this labeling configuration must use "csv" to specify the location of the CSV data for the time series pre-annotations, like in the following example:
+
+```json
+[
+  {
+    "data": {
+      "csv": "https://app.heartex.ai/samples/time-series.csv?time=None&values=first_column"    },
+    "predictions": []
+  }
+]
+```
+
+#### Add results to the predictions array 
+
+The `predictions` array also depends on the labeling configuration. Some pre-annotation fields are only relevant for certain types of labeling. The following table describes the JSON objects and arrays that exist for all pre-annotations: 
+
+| JSON key | type   | description                                                                                                                                      |
+| --- |--------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `predictions` | array  | Contains all pre-annotations for a specific task.                                                                                                | 
+| `predictions.model_version` | string | Specifies the model version that produced the prediction.                                                                                        |
+| `predictions.result` | array  | Contains all pre-annotated results for a specific task in a JSON object.                                                                         |
+| `result.value` | object | Contains details for a specific labeled region.                                                                                                  |
+| `result.id` | string | Arbitrary string used to identify a labeled region. Must match related regions, such as in [OCR pre-annotations](#Import-OCR-pre-annotations).   |
+| `result.from_name` | string | String used to reference the labeling configuration `from_name` for the type of labeling being performed. Must match the labeling configuration. |
+| `result.to_name` | string | String used to reference the labeling configuration `to_name` for the type of labeling being performed. Must match the labeling configuration.   |
+| `result.type` | string | Specify the labeling tag for the type of labeling being performed. For example, a named entity recognition task has a type of `labels`.          |
+| `result.readonly` | bool | readonly mode for a specific region | 
+| `result.hidden` |  bool | default visibility (eye icon) for a specific region |
+
+Other types of annotation contain specific fields. You can review the [examples on this page](#Specific-examples-for-pre-annotations), or review the [tag documentation for the Object and Control tags](/tags) in your labeling configuration labeling-specific `result` objects. For example, the [Audio tag](tags/audio.html), [HyperText tag](tags/hypertext.html), [Paragraphs tag](tags/paragraphs.html), [KeyPointLabels](/tags/keypointlabels.html) and more all contain sample `result` JSON examples.
+
+> Note: If you're generating pre-annotations for a [custom ML backend](ml_create.html), you can use the `self.parsed_label_config` variable to retrieve the labeling configuration for a project and generate pre-annotations. See the [custom ML backend](ml_create.html) documentation for more details.
+
+## Import bbox and choice pre-annotations for images
+
+For example, import predicted **bounding box regions (rectangles)** and **choices** for tasks to determine whether an item in an image is an airplane or a car. 
+
 For image pre-annotations, Label Studio expects the x, y, width, and height of image annotations to be provided in percentages of overall image dimension. See [Units for image annotations](predictions.html#Units_for_image_annotations) on this page for more about how to convert formats.
-
-Import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-data-from-the-Label-Studio-UI) or [using the API](/api#operation/projects_import_create). 
-
-## Import pre-annotations for images
-
-For example, import predicted labels for tasks to determine whether an item in an image is an airplane or a car. 
 
 Use the following labeling configuration: 
 ```xml
@@ -38,6 +103,8 @@ Use the following labeling configuration:
 </View>
 ```
 
+### Example JSON
+
 After you set up an example project, create example tasks that match the following format. 
 
 <br/>
@@ -47,10 +114,12 @@ Save this example JSON as a file to import it into Label Studio, for example, `e
 {% codeblock lang:json %}
 [{
   "data": {
-    "image": "http://localhost:8080/static/samples/sample.jpg" 
+    "image": "/static/samples/sample.jpg" 
   },
 
   "predictions": [{
+    "model_version": "one",
+    "score": 0.5,
     "result": [
       {
         "id": "result1",
@@ -85,8 +154,7 @@ Save this example JSON as a file to import it into Label Studio, for example, `e
         "value": {
           "choices": ["Airbus"]
       }
-    }],
-    "score": 0.95
+    }]
   }]
 }]
 {% endcodeblock %}
@@ -105,21 +173,20 @@ Import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-da
 In the Label Studio UI, the imported prediction for this task looks like the following: 
 <center><img src="../images/predictions_loaded.png" alt="screenshot of the Label Studio UI showing an image of airplanes with bounding boxes covering each airplane." style="width: 100%; max-width: 700px"></center>
 
-## Import pre-annotated regions for images 
+## Import pre-annotated rectangle, polygon, ellipse & keypoint regions without labels for images  
 
 If you want to import images with pre-annotated regions without labels assigned to them, follow this example.
 
 Use the following labeling configuration: 
 ```xml
 <View>
-  <View style="display:flex;align-items:start;gap:8px;flex-direction:row">
-    <Image name="image" value="$image" zoom="true" zoomControl="true" rotateControl="false"/>
-    <Rectangle name="rect" toName="image" showInline="false"/>
-  </View>
+  <Image name="image" value="$image" zoom="true" zoomControl="true" rotateControl="false"/>
+
+  <Rectangle name="rect" toName="image" showInline="false"/>
+  <Polygon name="polygon" toName="image"/>
   <Ellipse name="ellipse" toName="image"/>
   <KeyPoint name="kp" toName="image"/>
-  <Polygon name="polygon" toName="image"/>
-  <Brush name="brush" toName="image"/>
+
   <Labels name="labels" toName="image" fillOpacity="0.5" strokeWidth="5">
     <Label value="Vehicle" background="green"/>
     <Label value="Building" background="blue"/>
@@ -127,6 +194,8 @@ Use the following labeling configuration:
   </Labels>
 </View>
 ```
+
+### Example JSON
 
 After you set up an example project, create example tasks that match the following format. 
 
@@ -136,96 +205,93 @@ Save this example JSON as a file to import it into Label Studio, for example, `e
 
 {% codeblock lang:json %}
 [{
-    "id":8,
-    "predictions":[
+  "data": {
+    "image": "/static/samples/sample.jpg"
+  },
+  
+  "predictions": [
+    {
+      "model_version": "one",
+      "score": 0.5,
+      "result": [
         {
-            "id":10,
-            "result":[
-               {
-                  "original_width":800,
-                  "original_height":450,
-                  "image_rotation":0,
-                  "value":{
-                     "x":55.46666666666667,
-                     "y":2.3696682464454977,
-                     "width":35.86666666666667,
-                     "height":46.91943127962085,
-                     "rotation":0
-                  },
-                  "id":"ABC",
-                  "from_name":"rect",
-                  "to_name":"image",
-                  "type":"rectangle"
-               },
-               {
-                  "original_width":800,
-                  "original_height":450,
-                  "image_rotation":0,
-                  "value":{
-                     "x":58.4,
-                     "y":64.21800947867298,
-                     "width":30.533333333333335,
-                     "height":19.90521327014218,
-                     "rotation":0
-                  },
-                  "id":"DEF",
-                  "from_name":"rect",
-                  "to_name":"image",
-                  "type":"rectangle"
-               },
-               {
-                  "original_width":800,
-                  "original_height":450,
-                  "image_rotation":0,
-                  "value":{
-                     "points":[
-                        [
-                           20.933333333333334,
-                           28.90995260663507
-                        ],
-                        [
-                           25.866666666666667,
-                           64.69194312796209
-                        ],
-                        [
-                           38.4,
-                           62.796208530805686
-                        ],
-                        [
-                           34.13333333333333,
-                           27.488151658767773
-                        ]
-                    ]
-                },
-                "id":"GHI",
-                "from_name":"polygon",
-                "to_name":"image",
-                "type":"polygon"
-                },
-                {
-                "original_width":800,
-                "original_height":450,
-                "image_rotation":0,
-                "value":{
-                    "x":8.4,
-                    "y":20.14218009478673,
-                    "radiusX":4,
-                    "radiusY":7.109004739336493,
-                    "rotation":0
-                    },
-                "id":"JKL",
-                "from_name":"ellipse",
-                "to_name":"image",
-                "type":"ellipse"
-                }
-            ],
-            "task":8
+          "original_width": 800,
+          "original_height": 450,
+          "image_rotation": 0,
+          "value": {
+            "x": 55.46,
+            "y": 2.36,
+            "width": 35.86,
+            "height": 46.9,
+            "rotation": 0
+          },
+          "id": "ABC",
+          "from_name": "rect",
+          "to_name": "image",
+          "type": "rectangle"
+        },
+        {
+          "original_width": 800,
+          "original_height": 450,
+          "image_rotation": 0,
+          "value": {
+            "points": [
+              [
+                20.93,
+                28.90
+              ],
+              [
+                25.86,
+                64.69
+              ],
+              [
+                38.40,
+                62.79
+              ],
+              [
+                34.13,
+                27.48
+              ]
+            ]
+          },
+          "id": "GHI",
+          "from_name": "polygon",
+          "to_name": "image",
+          "type": "polygon"
+        },
+        {
+          "original_width": 800,
+          "original_height": 450,
+          "image_rotation": 0,
+          "value": {
+            "x": 8.4,
+            "y": 20.14,
+            "radiusX": 4,
+            "radiusY": 7.10,
+            "rotation": 0
+          },
+          "id": "JKL",
+          "from_name": "ellipse",
+          "to_name": "image",
+          "type": "ellipse"
+        },
+        {
+          "original_width": 800,
+          "original_height": 450,
+          "image_rotation": 0,
+          "value": {
+            "x": 38.40,
+            "y": 34.21,
+            "width": 1.0
+          },
+          "id": "DEF",
+          "from_name": "rect",
+          "to_name": "image",
+          "type": "keypoint"
         }
-    ],
-    "data":{
-    "image":"/data/upload/31159626248_d0362d027c_c.jpg"
-    },
-    "project":4
+      ]
+    }
+  ]
 }]
 {% endcodeblock %}
 
@@ -241,7 +307,7 @@ None of the regions have labels applied. The labeling configuration must use the
 
 <!-- md image_units.md -->
 
-## Import pre-annotations for text 
+## Import span pre-annotations for text 
 
 In this example, import pre-annotations for text using the [named entity recognition template](/templates/named_entity.html):
 ```xml
@@ -280,6 +346,7 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
     "predictions": [
       {
         "model_version": "one",
+        "score": 0.5,
         "result": [
           {
             "id": "abc",
@@ -345,6 +412,7 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
       },
       {
         "model_version": "two",
+        "score": 0.42,
         "result": [
           {
             "id": "mno",
@@ -610,7 +678,7 @@ You can sort the prediction scores for each labeled region using the **Regions**
 
 ## Import brush segmentation pre-annotations in RLE format
 
-If you want to import pre-annotations for brush mask image segmentation using the BrushLabels tag, you must convert the masks to RLE format first. The [Label Studio Converter](https://github.com/heartexlabs/label-studio-converter) package has some helper functions for this. See the following for common conversion cases and guidance.
+If you want to import pre-annotations for brush mask image segmentation using the [BrushLabels tag](/tags/brushlabels.html), you must convert the masks to RLE format first. The [Label Studio Converter](https://github.com/heartexlabs/label-studio-converter) package has some helper functions for this. See the following for common conversion cases and guidance.
 
 Install Label Studio Converter:
 ```
@@ -640,6 +708,109 @@ from label_studio_converter import brush
 
 For more assistance, review this [example code creating a Label Studio task with pre-annotations](https://github.com/heartexlabs/label-studio-converter/blob/master/tests/test_brush.py#L11) for brush labels.
 
+## Import OCR pre-annotations 
+
+Import pre-annotations for optical character recognition (OCR), such as output from [tesseract like in this example blog post](/blog/Improve-OCR-quality-with-Tesseract-and-Label-Studio.html). 
+
+In this example, import pre-annotations for OCR tasks using the [OCR template](/templates/optical_character_recognition.html):
+
+```xml
+<View>
+  <Image name="image" value="$ocr"/>
+  <Labels name="label" toName="image">
+    <Label value="Text" background="green"/>
+    <Label value="Handwriting" background="blue"/>
+  </Labels>
+  <Rectangle name="bbox" toName="image" strokeWidth="3"/>
+  <Polygon name="poly" toName="image" strokeWidth="3"/>
+  <TextArea name="transcription" toName="image" editable="true" perRegion="true" required="true" maxSubmissions="1" rows="5" placeholder="Recognized Text" displayMode="region-list"/>
+</View>
+```
+
+### Example JSON
+
+This example JSON contains one task with three results dictionaries, one for each type of tag in the labeling configuration: Rectangle, Labels, and TextArea. 
+
+<br/>
+{% details <b>Click to expand the example image JSON</b> %}
+Save this example JSON as a file to import it into Label Studio, for example, `example_prediction_task.json`.
+
+{% codeblock lang:json %}
+{
+   "data": {
+      "ocr": "/data/upload/receipt_00523.png"
+   },
+   "predictions": [
+      {
+         "model_version": "best_ocr_model_1_final",
+         "result": [
+            {
+               "original_width": 864,
+               "original_height": 1296,
+               "image_rotation": 0,
+               "value": {
+                  "x": 48.93333333333333,
+                  "y": 61.333333333333336,
+                  "width": 9.733333333333333,
+                  "height": 2.8444444444444446,
+                  "rotation": 0
+               },
+               "id": "bb1",
+               "from_name": "bbox",
+               "to_name": "image",
+               "type": "rectangle"
+            },
+            {
+               "original_width": 864,
+               "original_height": 1296,
+               "image_rotation": 0,
+               "value": {
+                  "x": 48.93333333333333,
+                  "y": 61.333333333333336,
+                  "width": 9.733333333333333,
+                  "height": 2.8444444444444446,
+                  "rotation": 0,
+                  "labels": [
+                     "Text"
+                  ]
+               },
+               "id": "bb1",
+               "from_name": "label",
+               "to_name": "image",
+               "type": "labels"
+            },
+            {
+               "original_width": 864,
+               "original_height": 1296,
+               "image_rotation": 0,
+               "value": {
+                  "x": 48.93333333333333,
+                  "y": 61.333333333333336,
+                  "width": 9.733333333333333,
+                  "height": 2.8444444444444446,
+                  "rotation": 0,
+                  "text": [
+                     "TOTAL"
+                  ]
+               },
+               "id": "bb1",
+               "from_name": "transcription",
+               "to_name": "image",
+               "type": "textarea"
+            }
+         ],
+         "score": 0.89
+      }
+   ]
+}
+{% endcodeblock %}
+{% enddetails %}
+
+This example JSON also includes a prediction score for the task. The IDs for each rectangle result match the label assigned to the region and the text area transcription for the region. 
+
+> The image data in this example task references an uploaded file, identified by the source_filename assigned by Label Studio after uploading the image. The best way to reference image data is using presigned URLs for images stored in cloud storage, or absolute paths to image data stored in local storage and added to Label Studio by [syncing storage](storage.html). 
+
+Import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-data-from-the-Label-Studio-UI) or [using the API](/api#operation/projects_import_create).
 
 ## Troubleshoot pre-annotations
 
@@ -737,3 +908,8 @@ If you wanted to add predicted text and suggested transcriptions for this labeli
 }
 ```
 Because the TextArea tag applies to each labeled region, the IDs for the label results and the textarea results must match. 
+
+
+### Read only and hidden regions
+
+In some situations it's very helpful to hide or to make `read-only` bounding boxes, text spans, audio segments, etc. You can put `"readonly": true` or `"hidden": true` in regions to achieve this (the dict inside of `annotations.result` list).  

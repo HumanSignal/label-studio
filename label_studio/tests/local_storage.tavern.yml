@@ -58,12 +58,12 @@ stages:
   response:
     json:
       data:
-        image_url: !re_match \/data\/local-files\/\?d=tmp[\/\\]files[\/\\]subdir[\/\\]test_image2.png
+        image_url: !re_match \/data\/local-files\/\?d=(tmp|var/folders/[A-Za-z0-9]+/[A-Za-z0-9]+/T)[\/\\]files[\/\\]subdir[\/\\]test_image2.png
     status_code: 200
 - name: stage
   request:
     method: GET
-    url: '{django_live_url}/data/local-files/?d=tmp/files/subdir/test_image2.png'
+    url: '{django_live_url}/data/local-files/?d={os_independent_path_tmpdir}/files/subdir/test_image2.png'
   response:
     status_code: 200
 - name: stage
@@ -80,12 +80,12 @@ stages:
 - name: stage
   request:
     method: GET
-    url: '{django_live_url}/api/dm/tasks?view={view_pk}'
+    url: '{django_live_url}/api/tasks?view={view_pk}'
   response:
     json:
       tasks:
         - data:
-            image_url: !re_match \/data\/local-files\/\?d=tmp[\/\\]files[\/\\]subdir[\/\\]test_image2.png
+            image_url: !re_match \/data\/local-files\/\?d=(tmp|var/folders/[A-Za-z0-9]+/[A-Za-z0-9]+/T)[\/\\]files[\/\\]subdir[\/\\]test_image2.png
     status_code: 200
 ---
 test_name: test_local_files_not_enabled
@@ -305,7 +305,7 @@ stages:
 - name: stage
   request:
     method: GET
-    url: '{django_live_url}/api/dm/tasks?view={view_pk}'
+    url: '{django_live_url}/api/tasks?view={view_pk}'
   response:
     json:
       tasks:

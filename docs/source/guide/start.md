@@ -12,7 +12,7 @@ After you install Label Studio, start the server to start using it.
 label-studio start
 ```
 
-By default, Label Studio starts with a SQLite database to store labeling tasks and annotations. You can specify different source and target storage for labeling tasks and annotations using Label Studio UI or the API. See [Database storage](storedata.html) for more.
+By default, Label Studio starts with an SQLite database to store labeling tasks and annotations. You can specify different sources and target storage for labeling tasks and annotations using Label Studio UI or the API. See [Database storage](storedata.html) for more.
 
 ## Command line arguments for starting Label Studio
 You can specify a machine learning backend and other options using the command line interface. Run `label-studio --help` to see all available options, or refer to the following tables.
@@ -62,8 +62,12 @@ In *nix operating systems, you can set environment variables from the command li
 ```bash
 export LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
 ```
-You can also use an `.env` file. 
 
+!!! note
+    If you are using docker, you can write all your [environment variables into the `.env`](https://docs.docker.com/compose/env-file/) file.
+    
+    
+    
 On Windows, you can use the following syntax:
 ```bash
 set LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
@@ -158,6 +162,14 @@ To run Label Studio with Heroku and use PostgreSQL as the [database storage](sto
 DATABASE_URL = postgres://username:password@hostname.compute.amazonaws.com:5432/dbname
 ```
 Then you can specify the required environment variables for a PostgreSQL connection as config variables. See [Database storage](storedata.html).
+
+Our Heroku manifest uses [postgresql addon](https://elements.heroku.com/addons/heroku-postgresql) out of the box.
+Please notice that the storage capacity is limited.
+
+[<img src="https://www.herokucdn.com/deploy/button.svg" height="30px">](https://heroku.com/deploy?template=https://github.com/heartexlabs/label-studio/tree/master)
+
+Please notice that all uploaded data via import will be lost after a dyno replace since [filesystem is ephemeral](https://devcenter.heroku.com/articles/dynos#ephemeral-filesystem).
+Using S3 storage is recommended.
 
 <!--
 ## Run Label Studio on the cloud using a different cloud provider

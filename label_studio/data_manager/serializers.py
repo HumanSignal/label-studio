@@ -2,6 +2,7 @@
 """
 import os
 import ujson as json
+from django.db.models import Avg
 
 from rest_framework import serializers
 from django.db import transaction
@@ -164,6 +165,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     drafts = serializers.SerializerMethodField(required=False, read_only=True)
     annotators = serializers.SerializerMethodField(required=False, read_only=True)
 
+    inner_id = serializers.IntegerField(required=False)
     cancelled_annotations = serializers.IntegerField(required=False)
     total_annotations = serializers.IntegerField(required=False)
     total_predictions = serializers.IntegerField(required=False)
@@ -172,35 +174,18 @@ class DataManagerTaskSerializer(TaskSerializer):
     predictions_results = serializers.SerializerMethodField(required=False)
     predictions_score = serializers.FloatField(required=False)
     file_upload = serializers.SerializerMethodField(required=False)
+    storage_filename = serializers.SerializerMethodField(required=False)
     annotations_ids = serializers.SerializerMethodField(required=False)
     predictions_model_versions = serializers.SerializerMethodField(required=False)
+    avg_lead_time = serializers.FloatField(required=False)
+    updated_by = serializers.SerializerMethodField(required=False, read_only=True)
 
     CHAR_LIMITS = 500
 
     class Meta:
         model = Task
         ref_name = 'data_manager_task_serializer'
-
-        fields = [
-            "cancelled_annotations",
-            "completed_at",
-            "created_at",
-            "annotations_results",
-            "data",
-            "id",
-            "predictions_results",
-            "predictions_score",
-            "total_annotations",
-            "total_predictions",
-            "annotations_ids",
-            "annotations",
-            "predictions",
-            "drafts",
-            "file_upload",
-            "annotators",
-            "project",
-            'predictions_model_versions'
-        ]
+        fields = '__all__'
 
     def to_representation(self, obj):
         """ Dynamically manage including of some fields in the API result
@@ -248,10 +233,18 @@ class DataManagerTaskSerializer(TaskSerializer):
 
     @staticmethod
     def get_file_upload(task):
-        if not hasattr(task, 'file_upload_field'):
-            return None
-        file_upload = task.file_upload_field
-        return os.path.basename(task.file_upload_field) if file_upload else None
+        if hasattr(task, 'file_upload_field'):
+            file_upload = task.file_upload_field
+            return os.path.basename(task.file_upload_field) if file_upload else None
+        return None
+
+    @staticmethod
+    def get_storage_filename(task):
+        return task.storage_filename
+
+    @staticmethod
+    def get_updated_by(obj):
+        return [{"user_id": obj.updated_by_id}] if obj.updated_by_id else []
 
     @staticmethod
     def get_annotators(obj):

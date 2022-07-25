@@ -17,7 +17,7 @@ As part of our ongoing efforts to provide value to our users and foster a health
 
 Now you can earn points towards fun and exclusive prizes such as custom swag, [Label Studio Teams](https://heartex.com/company/introducing-heartex-label-studio-teams) usage time and even a pair of solar-recharging headphones. We’ll be adding more Rewards and more Activities every week as well, so be sure to check back often!
 
-You will earn points for Activities as simple as liking our [Github repo](https://github.com/heartexlabs/label-studio), as complex as answering a technically difficult question [from the community](http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com/?source=ls-champ-blog), and everything in between.
+You will earn points for Activities as simple as liking our [Github repo](https://github.com/heartexlabs/label-studio), as complex as answering a technically difficult question [from the community](https://slack.labelstudio.heartex.com/?source=ls-champ-blog), and everything in between.
 
 In addition, we’ve got a global leaderboard to track your progress and points totals so you can both engage in friendly rivalry with fellow Champions and Label Studio users and easily check how many points you’ve earned.
 

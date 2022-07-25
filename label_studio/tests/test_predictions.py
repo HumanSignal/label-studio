@@ -6,7 +6,8 @@ import json
 
 from projects.models import Project
 from ml.models import MLBackend
-from tasks.models import Task, Prediction, Annotation
+from tasks.models import Task, Prediction, Annotation, AnnotationDraft
+from users.models import User
 from .utils import make_project
 from core.redis import redis_healthcheck
 
@@ -768,3 +769,51 @@ def test_interactive_annotating_failing(business_client, configured_project):
         result = r.json()
 
     assert 'errors' in result
+
+
+@pytest.mark.django_db
+def test_interactive_annotating_with_drafts(business_client, configured_project):
+    """
+    Test interactive annotating with drafts
+    :param business_client:
+    :param configured_project:
+    :return:
+    """
+    # create project with predefined task set
+    ml_backend = configured_project.ml_backends.first()
+    ml_backend.is_interactive = True
+    ml_backend.save()
+
+    users = list(User.objects.all())
+
+    task = configured_project.tasks.first()
+    AnnotationDraft.objects.create(task=task, user=users[0], result={}, lead_time=1)
+    AnnotationDraft.objects.create(task=task, user=users[1], result={}, lead_time=2)
+    # run prediction
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', f'{ml_backend.url}/predict', json={'results': [{'x': 'x'}]}, status_code=200)
+
+        r = business_client.post(
+            f'/api/ml/{ml_backend.pk}/interactive-annotating',
+            data=json.dumps(
+                {
+                    'task': task.id,
+                    'context': {'y': 'y'},
+                }
+            ),
+            content_type="application/json",
+        )
+        r.status_code = 200
+
+        result = r.json()
+
+        assert 'data' in result
+        assert 'x' in result['data']
+        assert result['data']['x'] == 'x'
+
+        history = [req for req in m.request_history if 'predict' in req.path][0]
+        assert history.text
+
+        js = json.loads(history.text)
+
+        assert len(js['tasks'][0]['drafts']) == 1

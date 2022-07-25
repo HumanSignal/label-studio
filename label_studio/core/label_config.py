@@ -11,7 +11,7 @@ import re
 
 from urllib.parse import urlencode
 from collections import OrderedDict
-from lxml import etree
+import defusedxml.ElementTree as etree
 from collections import defaultdict
 from django.conf import settings
 from label_studio.core.utils.io import find_file
@@ -73,10 +73,13 @@ def _fix_choices(config):
 
 
 def parse_config_to_json(config_string):
-    parser = etree.XMLParser(recover=False)
-    xml = etree.fromstring(config_string, parser)
+    parser = etree.XMLParser()
+    try:
+        xml = etree.fromstring(config_string, parser)
+    except TypeError as error:
+        raise etree.ParseError('can only parse strings')
     if xml is None:
-        raise etree.XMLSchemaParseError('xml is empty or incorrect')
+        raise etree.ParseError('xml is empty or incorrect')
     config = xmljson.badgerfish.data(xml)
     config = _fix_choices(config)
     return config
@@ -87,11 +90,11 @@ def validate_label_config(config_string):
     try:
         config = parse_config_to_json(config_string)
         jsonschema.validate(config, _LABEL_CONFIG_SCHEMA_DATA)
-    except (etree.XMLSyntaxError, etree.XMLSchemaParseError, ValueError) as exc:
+    except (etree.ParseError, ValueError) as exc:
         raise LabelStudioValidationErrorSentryIgnored(str(exc))
     except jsonschema.exceptions.ValidationError as exc:
         error_message = exc.context[-1].message if len(exc.context) else exc.message
-        error_message = 'Validation failed on {}: {}'.format('/'.join(exc.path), error_message.replace('@', ''))
+        error_message = 'Validation failed on {}: {}'.format('/'.join(map(str, exc.path)), error_message.replace('@', ''))
         raise LabelStudioValidationErrorSentryIgnored(error_message)
 
     # unique names in config # FIXME: 'name =' (with spaces) won't work
@@ -113,7 +116,7 @@ def extract_data_types(label_config):
     parser = etree.XMLParser()
     xml = etree.fromstring(label_config, parser)
     if xml is None:
-        raise etree.XMLSchemaParseError('Project config is empty or incorrect')
+        raise etree.ParseError('Project config is empty or incorrect')
 
     # take all tags with values attribute and fit them to tag types
     data_type = {}
@@ -132,10 +135,13 @@ def extract_data_types(label_config):
 def get_all_labels(label_config):
     outputs = parse_config(label_config)
     labels = defaultdict(list)
+    dynamic_labels = defaultdict(bool)
     for control_name in outputs:
         for label in outputs[control_name].get('labels', []):
             labels[control_name].append(label)
-    return labels
+        if outputs[control_name].get('dynamic_labels', False):
+            dynamic_labels[control_name] = True
+    return labels, dynamic_labels
 
 
 def get_annotation_tuple(from_name, to_name, type):
@@ -220,7 +226,7 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
     parser = etree.XMLParser()
     xml = etree.fromstring(label_config, parser)
     if xml is None:
-        raise etree.XMLSchemaParseError('Project config is empty or incorrect')
+        raise etree.ParseError('Project config is empty or incorrect')
 
     # make examples pretty
     examples = data_examples(mode=mode)
@@ -287,6 +293,14 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
                 task[value] = examples['HyperTextUrl']
             else:
                 task[value] = examples['HyperText']
+        elif p.tag.lower().endswith('labels'):
+            task[value] = examples['Labels']
+        elif p.tag.lower() == "choices":
+            allow_nested = p.get('allowNested') or p.get('allownested') or "false"
+            if allow_nested == "true":
+                task[value] = examples['NestedChoices']
+            else:
+                task[value] = examples['Choices']
         else:
             # patch for valueType="url"
             examples['Text'] = examples['TextUrl'] if only_urls else examples['TextRaw']

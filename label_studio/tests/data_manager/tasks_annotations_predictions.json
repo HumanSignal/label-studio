@@ -34,7 +34,8 @@
               ]
             }
           }
-        ]
+        ],
+        "lead_time": 3
       }
     ]
   },
@@ -75,7 +76,23 @@
               ]
             }
           }
-        ]
+        ],
+        "lead_time": 3
+      },
+      {
+        "result": [
+          {
+            "from_name": "text_class",
+            "to_name": "text",
+            "type": "choices",
+            "value": {
+              "choices": [
+                "class_A"
+              ]
+            }
+          }
+        ],
+        "lead_time": 5
       }
     ]
   },

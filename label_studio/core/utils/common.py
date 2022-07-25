@@ -23,7 +23,7 @@ import re
 
 from django.db import models, transaction
 from django.utils.module_loading import import_string
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from django.conf import settings
@@ -37,7 +37,6 @@ from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
 from collections import defaultdict
 
 from base64 import b64encode
-from lockfile import LockFile
 from datetime import datetime
 from appdirs import user_cache_dir
 from functools import wraps
@@ -126,13 +125,15 @@ def custom_exception_handler(exc, context):
 
 def create_hash():
     """This function generate 40 character long hash"""
-    h = hashlib.sha1()
+    h = hashlib.sha512()
     h.update(str(time.time()).encode('utf-8'))
     return h.hexdigest()[0:16]
 
-
 def paginator(objects, request, default_page=1, default_size=50):
-    """ Get from request page and page_size and return paginated objects
+    """ DEPRECATED
+    TODO: change to standard drf pagination class
+
+    Get from request page and page_size and return paginated objects
 
     :param objects: all queryset
     :param request: view request object
@@ -141,17 +142,27 @@ def paginator(objects, request, default_page=1, default_size=50):
     :return: paginated objects
     """
     page_size = request.GET.get('page_size', request.GET.get('length', default_size))
+    if settings.TASK_API_PAGE_SIZE_MAX and (int(page_size) > settings.TASK_API_PAGE_SIZE_MAX or page_size == '-1'):
+        page_size = settings.TASK_API_PAGE_SIZE_MAX
+
     if 'start' in request.GET:
         page = int_from_request(request.GET, 'start', default_page)
-        page = page / int(page_size) + 1
+        if page and int(page) > int(page_size) > 0:
+            page = int(page / int(page_size)) + 1
+        else:
+            page += 1
     else:
         page = int_from_request(request.GET, 'page', default_page)
 
     if page_size == '-1':
         return objects
-    else:
-        paginator = Paginator(objects, page_size)
-        return paginator.page(page).object_list
+
+    try:
+        return Paginator(objects, page_size).page(page).object_list
+    except ZeroDivisionError:
+        return []
+    except EmptyPage:
+        return []
 
 
 def paginator_help(objects_name, tag):
@@ -159,16 +170,20 @@ def paginator_help(objects_name, tag):
 
     :return: dict
     """
+    if settings.TASK_API_PAGE_SIZE_MAX:
+        page_size_description = f'[or "length"] {objects_name} per page. Max value {settings.TASK_API_PAGE_SIZE_MAX}'
+    else:
+        page_size_description = f'[or "length"] {objects_name} per page, use -1 to obtain all {objects_name} ' \
+                                 '(in this case "page" has no effect and this operation might be slow)'
     return dict(tags=[tag], manual_parameters=[
             openapi.Parameter(name='page', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY,
                               description='[or "start"] current page'),
             openapi.Parameter(name='page_size', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY,
-                              description=f'[or "length"] {objects_name} per page, use -1 to obtain all {objects_name} '
-                                          '(in this case "page" has no effect and this operation might be slow)')
+                              description=page_size_description)
         ],
         responses={
-            200: openapi.Response(title='OK', description=''),
-            404: openapi.Response(title='', description=f'No more {objects_name} found')
+            200: openapi.Response(title='OK', description='')
+            # 404: openapi.Response(title='', description=f'No more {objects_name} found')
         })
 
 
@@ -408,7 +423,7 @@ def collect_versions(force=False):
     :return: dict with sub-dicts of version descriptions
     """
     import label_studio
-    
+
     # prevent excess checks by time intervals
     current_time = time.time()
     need_check = current_time - settings.VERSIONS_CHECK_TIME > 300
@@ -606,3 +621,39 @@ def round_floats(o):
         return [round_floats(x) for x in o]
     return o
 
+
+class temporary_disconnect_list_signal:
+    """ Temporarily disconnect a list of signals
+        Each signal tuple: (signal_type, signal_method, object)
+        Example:
+            with temporary_disconnect_list_signal(
+                [(signals.post_delete, update_is_labeled_after_removing_annotation, Annotation)]
+                ):
+                do_something()
+    """
+    def __init__(self, signals):
+        self.signals = signals
+
+    def __enter__(self):
+        for signal in self.signals:
+            sig = signal[0]
+            receiver = signal[1]
+            sender = signal[2]
+            dispatch_uid = signal[3] if len(signal) > 3 else None
+            sig.disconnect(
+                receiver=receiver,
+                sender=sender,
+                dispatch_uid=dispatch_uid
+            )
+
+    def __exit__(self, type_, value, traceback):
+        for signal in self.signals:
+            sig = signal[0]
+            receiver = signal[1]
+            sender = signal[2]
+            dispatch_uid = signal[3] if len(signal) > 3 else None
+            sig.connect(
+                receiver=receiver,
+                sender=sender,
+                dispatch_uid=dispatch_uid
+            )

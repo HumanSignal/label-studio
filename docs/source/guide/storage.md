@@ -16,19 +16,25 @@ Set up the following cloud and other storage systems with Label Studio:
 - [Redis database](#Redis-database)
 - [Local storage](#Local-storage)
 
-## How external storage connections work
+If something goes wrong, check the [troubleshooting section](#Troubleshoot-CORS-and-access-problems). 
 
-Add source storage connections to sync data from an external source to a Label Studio project. Add target storage connections to sync annotations from Label Studio to external storage. Each source and target storage setup is project-specific. You can connect multiple buckets, containers, databases, or directories as source or target storage for a project. 
+## How external storage connections and sync work
 
-Data is not synced automatically from source storage to Label Studio. If you upload new data to a connected cloud storage bucket, sync the storage connection to add the new labeling tasks to Label Studio without restarting. 
+You can add source storage connections to sync data from an external source to a Label Studio project, and add target storage connections to sync annotations from Label Studio to external storage. Each source and target storage setup is project-specific. You can connect multiple buckets, containers, databases, or directories as source or target storage for a project. 
 
-After setting up target storage and performing annotations, manually sync annotations using the **Sync** button for the configured target storage. Annotations are still stored in the Label Studio database, and the target storage receives a JSON export of each annotation. 
+### Source storage
 
-If you're using Label Studio Enterprise with Amazon S3, you can also delete annotations in external storage if they are deleted in Label Studio. 
+Label Studio does not automatically sync data from source storage. If you upload new data to a connected cloud storage bucket, sync the storage connection using the UI to add the new labeling tasks to Label Studio without restarting. You can also use the API to set up or sync storage connections. See [Label Studio API](/api) and locate the relevant storage connection type. 
 
-You can also use the API to set up or sync storage connections. See [Label Studio API](/api) and locate the relevant storage connection type. 
+Task data synced from cloud storage is not stored in Label Studio. Instead, the data is accessed using a URL. You can also secure access to cloud storage using cloud storage credentials. For details, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
 
-Data synced from cloud storage is not stored in Label Studio. Instead, the data is accessed using a URL. You can also secure access to cloud storage using workspaces and cloud storage credentials. For details, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
+### Target storage
+
+When annotators click **Submit** or **Update** while labeling tasks, Label Studio saves annotations in the Label Studio database. 
+
+If you configure target storage, annotations are sent to target storage after you click **Sync** for the configured target storage connection. The target storage receives a JSON-formatted export of each annotation. See [Label Studio JSON format of annotated tasks](export.html#Label-Studio-JSON-format-of-annotated-tasks) for details about how exported tasks appear in  target storage.
+
+If you're using Label Studio Enterprise with Amazon S3, you can also delete annotations in target storage when they are deleted in Label Studio. See [Set up target storage connection in the Label Studio UI](storage.html#Set-up-target-storage-connection-in-the-Label-Studio-UI) for more details.
 
 ## Amazon S3
 
@@ -40,8 +46,10 @@ For details about how Label Studio secures access to cloud storage, see [Secure 
 Before you set up your S3 bucket or buckets with Label Studio, configure access and permissions. These steps assume that you're using the same AWS role to manage both source and target storage with Label Studio. If you only use S3 for source storage, Label Studio does not need PUT access to the bucket. 
 
 1. Enable programmatic access to your bucket. [See the Amazon Boto3 configuration documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html#configuration) for more on how to set up access to your S3 bucket. 
-2. You must get temporary security credentials to use to grant access to your S3 bucket. See the AWS Identity and Access Management documentation on [Requesting temporary security credentials](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html). 
-3. Assign the following role policy to an account you set up to retrieve source tasks and store annotations in S3, replacing `<your_bucket_name>` with your bucket name:
+
+> Note: A session token is only required in case of temporary security credentials. See the AWS Identity and Access Management documentation on [Requesting temporary security credentials](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html). 
+
+2. Assign the following role policy to an account you set up to retrieve source tasks and store annotations in S3, replacing `<your_bucket_name>` with your bucket name:
 ```json
 {
     "Version": "2012-10-17",
@@ -64,7 +72,7 @@ Before you set up your S3 bucket or buckets with Label Studio, configure access 
 }
 ```
 > `"s3:PutObject"` is only needed for target storage connections, and `"s3:DeleteObject` is only needed for target storage connections in Label Studio Enterprise where you want to allow deleted annotations in Label Studio to also be deleted in the target S3 bucket.  
-4. Set up cross-origin resource sharing (CORS) access to your bucket, using a policy that allows GET access from the same host name as your Label Studio deployment. See [Configuring cross-origin resource sharing (CORS)](https://docs.aws.amazon.com/AmazonS3/latest/userguide/enabling-cors-examples.html) in the Amazon S3 User Guide. Use or modify the following example:
+3. Set up cross-origin resource sharing (CORS) access to your bucket, using a policy that allows GET access from the same host name as your Label Studio deployment. See [Configuring cross-origin resource sharing (CORS)](https://docs.aws.amazon.com/AmazonS3/latest/userguide/enabling-cors-examples.html) in the Amazon S3 User Guide. Use or modify the following example:
 ```json
 [
     {

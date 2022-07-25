@@ -2,9 +2,14 @@
 """
 import logging
 
+from django.utils.timezone import now
+
 from core.permissions import AllPermissions
-from tasks.models import Prediction, Annotation
+from core.redis import start_job_async_or_sync
+from tasks.models import Prediction, Annotation, Task, bulk_update_stats_project_tasks
 from tasks.serializers import TaskSerializerBulk
+from webhooks.models import WebhookAction
+from webhooks.utils import emit_webhooks_for_instance
 
 all_permissions = AllPermissions()
 logger = logging.getLogger(__name__)
@@ -30,20 +35,32 @@ def predictions_to_annotations(project, queryset, **kwargs):
 
     # prepare annotations
     annotations = []
+    tasks_ids = []
     for result, model_version, task_id, prediction_id in predictions_values:
-        annotations.append({
+        tasks_ids.append(task_id)
+        body = {
             'result': result,
             'completed_by_id': user.pk,
             'task_id': task_id,
             'parent_prediction_id': prediction_id
-        })
+        }
+        body = TaskSerializerBulk.add_annotation_fields(body, user, 'prediction')
+        annotations.append(body)
 
     count = len(annotations)
     logger.debug(f'{count} predictions will be converter to annotations')
     db_annotations = [Annotation(**annotation) for annotation in annotations]
     db_annotations = Annotation.objects.bulk_create(db_annotations)
+    Task.objects.filter(id__in=tasks_ids).update(updated_at=now(), updated_by=request.user)
 
-    TaskSerializerBulk.post_process_annotations(db_annotations)
+    if db_annotations:
+        TaskSerializerBulk.post_process_annotations(user, db_annotations, 'prediction')
+        # Execute webhook for created annotations
+        emit_webhooks_for_instance(user.active_organization, project, WebhookAction.ANNOTATIONS_CREATED, db_annotations)
+        # recalculate tasks counters
+        start_job_async_or_sync(project.update_tasks_counters, Task.objects.filter(id__in=tasks_ids))
+        # recalculate is_labeled
+        start_job_async_or_sync(bulk_update_stats_project_tasks, Task.objects.filter(id__in=tasks_ids))
     return {'response_code': 200, 'detail': f'Created {count} annotations'}
 
 
