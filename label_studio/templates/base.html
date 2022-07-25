@@ -45,6 +45,11 @@
     <title>Label Studio</title>
   {% endblock %}
 
+  {% block head-toast %}
+    <script src="{{settings.HOSTNAME}}{% static 'js/Toast.min.js' %}"></script>
+    <link href="{{settings.HOSTNAME}}{% static 'css/Toast.min.css' %}" rel="stylesheet">
+  {% endblock %}
+
   {% get_current_language as LANGUAGE_CODE %}
   {% get_available_languages as LANGUAGES %}
 </head>
@@ -126,6 +131,18 @@
   </script>
 
   {% block bottomjs %}
+  {% endblock %}
+
+  {% block storate-persistence %}
+  <script>
+    {# storage persistence #}
+    {% if not settings.STORAGE_PERSISTENCE %}
+    new Toast({
+      message: 'Data persistence not configured',
+      type: 'danger'
+    });
+    {% endif %}
+  </script>
   {% endblock %}
 
   {% block billing-checks %}

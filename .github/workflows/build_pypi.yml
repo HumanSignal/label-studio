@@ -1,6 +1,24 @@
-name: "Upload to PYPI"
+name: "Build PYPI"
 
 on:
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version'
+        type: string
+        required: true
+      ref:
+        description: 'Ref'
+        type: string
+        required: true
+      upload_to_pypi:
+        description: "Upload to PyPi"
+        type: boolean
+        required: false
+      release-id:
+        description: "Attach Artifact to Release"
+        type: string
+        required: false
   workflow_dispatch:
     inputs:
       version:
@@ -11,13 +29,19 @@ on:
         description: 'Ref'
         type: string
         required: true
-  release:
-    types:
-      - released
+      upload_to_pypi:
+        description: "Upload to PyPi"
+        type: boolean
+        default: false
+        required: false
+      release-id:
+        description: "Attach Artifact to Release"
+        type: string
+        required: false
 
 jobs:
   ReleaseNotification:
-    name: "Build & Upload"
+    name: "PyPI"
     runs-on: ubuntu-latest
     steps:
       - uses: hmarr/debug-action@v2.0.1
@@ -25,12 +49,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.release.tag_name || inputs.ref }}
+          ref: ${{ inputs.ref }}
 
       - name: Manage version
         env:
-          PROVIDED_VERSION: ${{ github.event.release.tag_name || inputs.version }}
+          PROVIDED_VERSION: ${{ inputs.version }}
         run: |
+          set -x
           version=$(sed "s/^v//g" <<< ${PROVIDED_VERSION})
           sed -i "s/^__version__[ ]*=.*/__version__ = '${version}'/g" label_studio/__init__.py
 
@@ -68,13 +93,33 @@ jobs:
         run: python setup.py sdist bdist_wheel
 
       - name: Upload to PYPI
-        if: github.event_name == 'release'
+        if: inputs.upload_to_pypi
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_APIKEY }}
         run: twine upload dist/*
 
-      - name: Upload to artifacts
+      - name: Attach artifacts to release
+        if: inputs.release-id
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const fs = require('fs');
+            const release_id = '${{ inputs.release-id }}';
+            for (let file of await fs.readdirSync('./dist/')) {
+               console.log('uploadReleaseAsset', file);
+               await github.repos.uploadReleaseAsset({
+                  owner,
+                  repo,
+                  release_id: release_id,
+                  name: file,
+                  data: await fs.readFileSync(`./dist/${file}`)
+               });
+            }
+
+      - name: Upload to artifact
         if: always()
         uses: actions/upload-artifact@v3
         with:

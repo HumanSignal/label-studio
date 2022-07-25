@@ -1,7 +1,7 @@
 name: "Cancel PR CI/CD pipeline"
 
 on:
-  pull_request_target:
+  pull_request:
     types:
       - closed
       - converted_to_draft
