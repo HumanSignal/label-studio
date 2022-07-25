@@ -1,6 +1,6 @@
 {
-  "message": "fix: Rename Tasks to Actions",
-  "commit": "b06f079e38624af6578728d83bbc27f18b6288e6",
-  "branch": "master",
-  "date": "2022/07/21 00:27:19"
+  "message": "fix: DEV-2672: Comment author cell filter",
+  "commit": "98a678e6cd4707d786cc504c595294531420318e",
+  "branch": "fb-dev-2672/comment-author-cell-filter",
+  "date": "2022/07/25 13:47:40"
 }
