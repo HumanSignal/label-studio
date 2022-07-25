@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GIT_PAT }}
-          ref: develop
+          ref: ${{ github.event.repository.default_branch }}
 
       - name: Configure git
         shell: bash
