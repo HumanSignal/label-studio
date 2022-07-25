@@ -1,6 +1,6 @@
 {
-  "message": "fix: Rename Tasks to Actions",
-  "commit": "b06f079e38624af6578728d83bbc27f18b6288e6",
-  "branch": "master",
-  "date": "2022/07/21 00:27:19"
+  "message": "Fix: DEV-2672: Add comment authors as type of cell view",
+  "commit": "7cb6e0529bc45032171fac2c63072fc3632e9f45",
+  "branch": "fb-fix-dev-2672-comment-author-cell-view",
+  "date": "2022/07/24 09:49:33"
 }
