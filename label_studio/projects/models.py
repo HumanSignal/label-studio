@@ -214,6 +214,8 @@ class Project(ProjectMixin, models.Model):
     )
 
     sampling = models.CharField(max_length=100, choices=SAMPLING_CHOICES, null=True, default=SEQUENCE)
+    skip_queue = models.CharField(max_length=100, choices=SkipQueue.choices, null=True,
+                                  default=SkipQueue.REQUEUE_FOR_OTHERS)
     show_ground_truth_first = models.BooleanField(_('show ground truth first'), default=False)
     show_overlap_first = models.BooleanField(_('show overlap first'), default=False)
     overlap_cohort_percentage = models.IntegerField(_('overlap_cohort_percentage'), default=100)
