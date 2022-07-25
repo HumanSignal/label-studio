@@ -1,6 +1,6 @@
 {
-  "message": "Fix: DEV-2672: Add comment authors as type of cell view",
-  "commit": "7cb6e0529bc45032171fac2c63072fc3632e9f45",
-  "branch": "fb-fix-dev-2672-comment-author-cell-view",
-  "date": "2022/07/24 09:49:33"
+  "message": "fix: DEV-2672: Add comment authors as type of cell view",
+  "commit": "1d2c052b9842dda94d5c8b1bf6fec363823b9278",
+  "branch": "master",
+  "date": "2022/07/25 06:48:41"
 }
