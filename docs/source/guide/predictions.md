@@ -73,6 +73,8 @@ The `predictions` array also depends on the labeling configuration. Some pre-ann
 | `result.from_name` | string | String used to reference the labeling configuration `from_name` for the type of labeling being performed. Must match the labeling configuration. |
 | `result.to_name` | string | String used to reference the labeling configuration `to_name` for the type of labeling being performed. Must match the labeling configuration.   |
 | `result.type` | string | Specify the labeling tag for the type of labeling being performed. For example, a named entity recognition task has a type of `labels`.          |
+| `result.readonly` | bool | readonly mode for a specific region| 
+| `result.hidden` |  bool | default visibility (eye icon) for a specific region |
 
 Other types of annotation contain specific fields. You can review the [examples on this page](#Specific-examples-for-pre-annotations), or review the [tag documentation for the Object and Control tags](/tags) in your labeling configuration labeling-specific `result` objects. For example, the [Audio tag](tags/audio.html), [HyperText tag](tags/hypertext.html), [Paragraphs tag](tags/paragraphs.html), [KeyPointLabels](/tags/keypointlabels.html) and more all contain sample `result` JSON examples.
 
