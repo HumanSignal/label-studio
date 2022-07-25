@@ -8,6 +8,8 @@ from django.conf import settings
 @pytest.mark.django_db
 def test_svg_upload_sanitize(setup_project_dialog):
     """ Upload malicious SVG file - remove harmful content"""
+    settings.SVG_SECURITY_CLEANUP = True
+
     xml_dirty = """<?xml version="1.0" standalone="no"?>
                 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
                 <svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg">
@@ -37,6 +39,8 @@ def test_svg_upload_sanitize(setup_project_dialog):
 @pytest.mark.django_db
 def test_svg_upload_invalid_format(setup_project_dialog):
     """ Upload invalid SVG file - still accepted"""
+    settings.SVG_SECURITY_CLEANUP = True
+
     xml_dirty = """<?xml version="1.0" standalone="no"?>
                 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
                 <svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg">gibberish</svg>"""
