@@ -110,12 +110,14 @@ After you set up an example project, create example tasks that match the followi
 Save this example JSON as a file to import it into Label Studio, for example, `example_prediction_task.json`.
 
 {% codeblock lang:json %}
-{
+[{
   "data": {
     "image": "/static/samples/sample.jpg" 
   },
 
   "predictions": [{
+    "model_version": "one",
+    "score": 0.5,
     "result": [
       {
         "id": "result1",
@@ -150,10 +152,9 @@ Save this example JSON as a file to import it into Label Studio, for example, `e
         "value": {
           "choices": ["Airbus"]
       }
-    }],
-    "score": 0.95
+    }]
   }]
-}
+}]
 {% endcodeblock %}
 
 In this example there are 3 results inside 1 prediction, or pre-annotation: 
@@ -170,7 +171,7 @@ Import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-da
 In the Label Studio UI, the imported prediction for this task looks like the following: 
 <center><img src="../images/predictions_loaded.png" alt="screenshot of the Label Studio UI showing an image of airplanes with bounding boxes covering each airplane." style="width: 100%; max-width: 700px"></center>
 
-## Import pre-annotated ellipse, keypoint, polygon & brush regions for images 
+## Import pre-annotated rectangle, polygon, ellipse & keypoint regions without labels for images  
 
 If you want to import images with pre-annotated regions without labels assigned to them, follow this example.
 
@@ -201,13 +202,15 @@ After you set up an example project, create example tasks that match the followi
 Save this example JSON as a file to import it into Label Studio, for example, `example_prediction_task.json`.
 
 {% codeblock lang:json %}
-{
+[{
   "data": {
     "image": "/static/samples/sample.jpg"
   },
   
   "predictions": [
     {
+      "model_version": "one",
+      "score": 0.5,
       "result": [
         {
           "original_width": 800,
@@ -287,7 +290,7 @@ Save this example JSON as a file to import it into Label Studio, for example, `e
       ]
     }
   ]
-}
+}]
 {% endcodeblock %}
 
 In this example there are 3 regions inside 1 result field for a prediction, or pre-annotation: 
@@ -341,6 +344,7 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
     "predictions": [
       {
         "model_version": "one",
+        "score": 0.5,
         "result": [
           {
             "id": "abc",
@@ -406,6 +410,7 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
       },
       {
         "model_version": "two",
+        "score": 0.42,
         "result": [
           {
             "id": "mno",
