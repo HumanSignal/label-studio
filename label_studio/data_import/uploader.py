@@ -59,12 +59,13 @@ def check_file_sizes_and_number(files):
 
 def create_file_upload(request, project, file):
     instance = FileUpload(user=request.user, project=project, file=file)
-    content_type, encoding = mimetypes.guess_type(str(instance.file.name))
-    if settings.SVG_SECURITY_CLEANUP and content_type in ['image/svg+xml']:
-        clean_xml = allowlist_svg(instance.file.read())
-        instance.file.seek(0)
-        instance.file.write(clean_xml)
-        instance.file.truncate()
+    if settings.SVG_SECURITY_CLEANUP:
+        content_type, encoding = mimetypes.guess_type(str(instance.file.name))
+        if content_type in ['image/svg+xml']:
+            clean_xml = allowlist_svg(instance.file.read())
+            instance.file.seek(0)
+            instance.file.write(clean_xml)
+            instance.file.truncate()
     instance.save()
     return instance
 
