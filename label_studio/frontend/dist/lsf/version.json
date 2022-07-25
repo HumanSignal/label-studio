@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2504: Image Enhancements - Zoom, Pixelate, Center (#746)",
-  "commit": "3258d2574a62dcb39365abbac4bd1a48eabbe749",
-  "branch": "",
-  "date": "2022-07-22T17:42:41Z"
+  "message": "fix: DEV-2578: Undo keypoints when create new polygon",
+  "commit": "39709b3af8516e4902db66c1e724be65f48a15f5",
+  "branch": "fb-dev-2576/undo-keypoints",
+  "date": "2022/07/25 19:08:27"
 }
