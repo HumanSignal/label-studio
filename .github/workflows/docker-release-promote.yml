@@ -96,7 +96,7 @@ jobs:
           EOF
 
       - name: Build and push Release Ubuntu Docker image
-        uses: docker/build-push-action@v3.0.0
+        uses: docker/build-push-action@v3.1.0
         id: docker_build_and_push
         with:
           context: ${{ steps.release_dockerfile.outputs.release_dir }}
@@ -126,7 +126,7 @@ jobs:
           EOF
 
       - name: Build and push Release UBI Docker image
-        uses: docker/build-push-action@v3.0.0
+        uses: docker/build-push-action@v3.1.0
         id: docker_build_and_push_ubi
         with:
           context: ${{ steps.ubi_release_dockerfile.outputs.release_dir }}
