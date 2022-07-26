@@ -12,10 +12,70 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
     <i class='ent'></i> 
     The release notes for Label Studio Community Edition is available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
 
+
+## Label Studio Enterprise 2.3
+
+This section highlights the new features, enhancements, bug fixes, and security fixes in Label Studio Enterprise 2.3.
+
+### New features and enhancements 
+
+Label Studio Enterprise 2.3 introduces the following new features and enhancements.
+
+- Streamline your project creation workflow by duplicating projects: Enable users to [duplicate projects](manage_users.html#More-menu-to-Pin-or-Unpin-and-Duplicate-projects) to a target workspace optionally importing the settings, tasks, and annotations. This feature allows administrators and managers to quickly spin up new projects and ensure consistency by duplicating existing projects in their workspace. You can choose to duplicate a project by settings only, both settings and data, or settings, data and all annotations. If choosing the latter, users can also decide whether to make annotations **Ground Truth**. To duplicate a project, navigate to project's **Settings** >> **More** menu, choose a destination for the new project, decide which attributes you would like to duplicate, and update the new project name and description [DEV-1202].
+- Pin and create shared view of relevant projects in your workspace: Allow users to [pin or unpin projects](manage_users.html#More-menu-to-Pin-or-Unpin-and-Duplicate-projects) to more easily filter and find projects of interest. This feature allows you to pin and create a shared view of relevant projects in your workspace. Administrators now have the ability to pin and unpin projects for quicker reference by team members, whether they are projects the team is currently working on, or projects of interest. All team members will have a view of pinned projects to collaborate on in their workspace [DEV-2069].
+- Zoom, align, and pixelate images for annotation: Annotators can zoom and expand images they are labeling within the viewport of the task, set the image to be positioned vertically (top, center, bottom) and horizontally (left, center, right) to find the most convenient position. Once an image is zoomed in, they can also choose to pixelate the image if it is blurry for more precise annotations [DEV-2504].
+- Add the ability to sustain the collapse state of the label across tasks. This release provides consistent ordering of the label groups [DEV-2755], [DEV-2755].
+- Enforce the change in the rotate anchor of bounding boxes around image boundaries [DEV-2671].
+- Allow annotators and reviewers to filter view of transcriptions by **author name** [DEV-2669].
+- This release improves the polygon point removal when you create a new polygon. In addition to the double-click and alt-click, now you can use the undo hotkeys (`ctrl/cmd+z`) to remove the point you set or redo it by clicking the `ctrl/cmd+shift+z` hotkeys [DEV-2576].
+
+### Bug fixes
+
+Label Studio 2.3 includes the following bug fixes:
+
+- Fixed an issue when the text captured by a region was not displayed in the **Details** panel [DEV-2958].
+- Resized the left panels in **Quick View** mode to work consistently when expanded to the right in **Label** or **Review** stream, and stop after the maximum width was reached [DEV-2952], [DEV-2943].
+- Fixed an issue in the **Label** stream, where the region was displayed in the proper position [DEV-2934].
+- Fixed user's inability to hide regions within the **NER** scenario [DEV-2931]. 
+- The user resized a panel in such a way that it obscured all the underlying content [DEV-2926].
+- Fixed an issue when the selection was still active after hiding an **Image** region [DEV-2922].
+- Fixed an issue when the selection was broken after showing previously hidden selected region [DEV-2922].
+- Changed the model version selector API response handling and current upgrade error for out-of-date machine learning backend [DEV-2905].
+- **Skipped tasks** were placed at the beginning of the **Label** stream [DEV-2880]. 
+- Improved project duplication speed [DEV-2869].
+- One API request was not loaded on the **Load project list** [DEV-2811].
+- Fixed an issue where assigned reviewers got tasks from auto-queue instead of assigned tasks [DEV-2779].
+- Fixed the text display in the **Taxonomy choices** when long titles were used [DEV-2707].
+- Displayed source filename for tasks from storage in a separate column [DEV-2687].
+- [DEV-2639].
+- Fixed the behavior of the drop-down menu that failed to group when the organization was not activated [DEV-2639].
+- Updated annotation failed to display in the **Review Annotations** stream [DEV-2533].
+- Fixed an issue where **Quick View** failed to open when the user attempted to copy-paste its URL to another tab [DEV-2526].
+- Unfinished polygon region failed to auto-completed when the user moved it [DEV-2514].
+- Multiple labels failed to show within **Regions** [DEV-2503].
+- Unfinished polygons were saved as a draft and remained in an open state if left unclosed [DEV-2432].
+- Fixed broken default page number for non-admin accounts on **Projects** page [DEV-2335].
+- Fixed **Tasks per page** field to synchronize with the number of tasks displayed [DEV-2170].
+- **Members** page failed to display and did not work properly [DEV-2148].
+- The user cannot edit **VideoRectangle** when it was locked [DEV-2146].
+- In the **Datetime:** field, only the year data was not saved [DEV-1179].
+- Fixed UX and behavior when expanding or collapsing the panels and unsnapping or snapping to the sides [DEV-2851].
+
+### Security fixes
+
+Label Studio 2.3 includes the following security fixes:
+
+- Fixed the vulnerability issue 
+    - With JSON Web Token implementation in Python (PyJWT) [DEV-2793].
+    - Against blind server-side request forgery (SSRF) on data import [DEV-2234].
+
+
 ## Label Studio Enterprise 2.2
+
 This section highlights the new features and enhancements in Label Studio Enterprise 2.2.
 
 ### New features and enhancements 
+
 Label Studio Enterprise 2.2 introduces the following new features and enhancements.
 
 - Label Studio Enterprise 2.2 introduces the System for Cross-domain Identity Management (SCIM) version 2.0 standard. System for Cross-domain Identity Management (SCIM) is a popular protocol to manage access for services and applications across an organization. Use the [SCIM guide](scim_setup.html) to set up SCIM integration to manage access to Label Studio Enterprise in your organization.
@@ -65,9 +125,11 @@ Label Studio Enterprise 2.2 introduces the following new features and enhancemen
 
 
 ## Label Studio Enterprise 2.2.10 
+
 This section highlights the bug fixes in Label Studio Enterprise 2.2.10.
 
 ### Bug fixes
+
 Label Studio 2.2.10 includes the following bug fixes:
 
 #### Backend 
@@ -81,14 +143,17 @@ Label Studio 2.2.10 includes the following bug fixes:
 
 
 ## Label Studio Enterprise 2.2.9
+
 This section highlights the breaking changes, new features and enhancements, and bug fixes in Label Studio Enterprise 2.2.9. 
 
 ### Breaking changes
+
 Label Studio Enterprise 2.2.9 includes the following breaking change:
 
 - This release decommissions MinIO as a service [DEV-2600].
 
 ### New features and enhancements 
+
 Label Studio Enterprise 2.2.9 introduces the following new features and enhancements.
 
 #### Backend
@@ -103,6 +168,7 @@ Label Studio Enterprise 2.2.9 introduces the following new features and enhancem
 - This release introduces [Dynamic Labels templates](https://labelstud.io/templates/gallery_dynamic_labels.html#main). You can now show labels dynamically as a task input, either as a prediction from the model or from a database lookup. With a broader set of options, dynamic labeling saves time and increases the consistency of labeling the objects [DEV-2636]. 
 
 ### Bug fixes
+
 Label Studio 2.2.9 includes the following bug fixes:
 
 #### Backend
@@ -117,7 +183,6 @@ Label Studio 2.2.9 includes the following bug fixes:
 - Fixed `is_labeled` calculation after task import [DEV-2389].
 
 #### Frontend 
-
 - Fixed the regions that disappeared from UI in **Annotation History** [DEV-2408]. 
 - Improved the **Annotation History** name/timestamp spacing [DEV-23640].
 - Fixed audio crashes in **View All** mode [DEV-2199].
@@ -152,12 +217,14 @@ Label Studio 2.2.9 includes the following bug fixes:
 
 
 ## Label Studio Enterprise 2.2.8
+
 This section highlights the breaking changes, new features and enhancements, and bug fixes in Label Studio Enterprise 2.2.8. 
 
 ### New features and enhancements
+
 Label Studio Enterprise 2.2.8 introduces the following new features and enhancements.
 
-- This release displays comments in **DM** to reviewers [DEV-2598].
+- This release displays comments in **Data Manager** to reviewers [DEV-2598].
 - Support for [Redis Secure Sockets Layer (SSL)](security.html#Secure-access-to-Redis-storage) [DEV-1768].
 - Add tags and prefixes to [AWS metric parameters](custom_metric.html#How-to-write-your-custom-agreement-metric) [DEV-1917].
 - Change review API to take into account feedback loop [DEV-2198].
@@ -168,6 +235,7 @@ Label Studio Enterprise 2.2.8 introduces the following new features and enhancem
 - Add the ability to pass a comment to APIs on skip [DEV-2458].
 
 ### Bugfixes
+
 Label Studio 2.2.8 includes the following bug fixes:
 
 - Per label score for Choices was calculated when no Choice was selected (hotfix-7) [DEV-2688].
