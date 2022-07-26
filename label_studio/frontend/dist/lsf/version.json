@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2504: Image Enhancements - Zoom, Pixelate, Center (#746)",
-  "commit": "3258d2574a62dcb39365abbac4bd1a48eabbe749",
-  "branch": "",
-  "date": "2022-07-22T17:42:41Z"
+  "message": "fix: DEV-2949: Region locking should not persist",
+  "commit": "b7effcf3352b4744d8baa74bd97d7618201bd67b",
+  "branch": "fb-dev-2949",
+  "date": "2022/07/25 20:48:06"
 }
