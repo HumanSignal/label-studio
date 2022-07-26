@@ -13,7 +13,6 @@ RUN --mount=type=cache,target=$NPM_CACHE_LOCATION \
     npm ci \
  && npm run build:production
 
-
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -30,7 +29,7 @@ RUN set -eux \
  && apt-get update \
  && apt-get install --no-install-recommends --no-install-suggests -y \
     build-essential postgresql-client libmysqlclient-dev mysql-client python3.8 python3-pip python3.8-dev \
-    uwsgi git libxml2-dev libxslt-dev zlib1g-dev
+    git libxml2-dev libxslt-dev zlib1g-dev
 
 # Copy and install middleware dependencies
 COPY deploy/requirements-mw.txt .

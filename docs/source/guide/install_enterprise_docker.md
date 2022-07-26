@@ -168,7 +168,19 @@ services:
       - ./mydata:/label-studio/data:rw
       - ./license.txt:/label-studio-enterprise/license.txt:ro
     working_dir: /label-studio-enterprise
-    command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "default" ]
+    command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "critical", "high", "default", "low" ]
+
+  rqworkers_high:
+    image: heartexlabs/label-studio-enterprise:VERSION
+    depends_on:
+      - app
+    env_file:
+      - env.list
+    volumes:
+      - ./mydata:/label-studio/data:rw
+      - ./license.txt:/label-studio-enterprise/license.txt:ro
+    working_dir: /label-studio-enterprise
+    command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "high" ]
 ```
 
 3. Run Docker Compose:

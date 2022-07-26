@@ -1,0 +1,34 @@
+title: Inventory Tracking
+type: community
+group: Computer Vision
+image: /static/templates/inventory-tracking.png
+details: <h1>Label exact products on the shelves</h1>
+config: |
+  <View>
+    <View style="display:flex;justify-content:center">
+      <PolygonLabels name="objects" toName="image" value="$objects"/>
+    </View>
+    <Image name="image" value="$image"/>
+  </View>
+  <!-- {
+    "data": {
+      "image": "https://htx-pub.s3.amazonaws.com/templates/inventory-tracking/shelf.jpeg",
+      "objects": [{
+        "value": "CocaCola",
+        "html": "<img width='100' src='https://htx-pub.s3.amazonaws.com/templates/inventory-tracking/cocacola.png'/>"
+      }, {
+        "value": "RedBull",
+        "html": "<img width='100' src='https://htx-pub.s3.amazonaws.com/templates/inventory-tracking/redbull.png'/>"
+      }, {
+        "value": "Burn",
+        "html": "<img width='100' src='https://htx-pub.s3.amazonaws.com/templates/inventory-tracking/burn.png'/>"
+      }, {
+        "value": "Breezer",
+        "html": "<img width='100' src='https://htx-pub.s3.amazonaws.com/templates/inventory-tracking/breezer.png'/>"
+      }, {
+        "value": "Monster",
+        "html": "<img width='100' src='https://htx-pub.s3.amazonaws.com/templates/inventory-tracking/monster.png'/>"
+      }]
+    }
+  } -->
+

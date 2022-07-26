@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2309: don't show the delete all region button when annotation is readonly (#707)",
-  "commit": "ed8a5904c689db026aefd3a0e3507204479cd7d4",
-  "branch": "master",
-  "date": "2022-06-14T18:08:14Z"
+  "message": "feat: DEV-2504: Image Enhancements - Zoom, Pixelate, Center (#746)",
+  "commit": "3258d2574a62dcb39365abbac4bd1a48eabbe749",
+  "branch": "",
+  "date": "2022-07-22T17:42:41Z"
 }
