@@ -19,6 +19,10 @@ on:
         description: "Attach Artifact to Release"
         type: string
         required: false
+    outputs:
+      host:
+        pipy-artifact-url: ${{ jobs.pypi.outputs.pipy-artifact-url }}
+        pipy-artifact-digests-sha256: ${{ jobs.pypi.outputs.pipy-artifact-digests-sha256 }}
   workflow_dispatch:
     inputs:
       version:
@@ -40,9 +44,12 @@ on:
         required: false
 
 jobs:
-  ReleaseNotification:
+  pypi:
     name: "PyPI"
     runs-on: ubuntu-latest
+    outputs:
+      pipy-artifact-url: ${{ steps.pypi-package-details.outputs.pipy-artifact-url }}
+      pipy-artifact-digests-sha256: ${{ steps.pypi-package-details.outputs.pipy-artifact-digests-sha256 }}
     steps:
       - uses: hmarr/debug-action@v2.0.1
 
@@ -98,6 +105,20 @@ jobs:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_APIKEY }}
         run: twine upload dist/*
+
+      - name: Get PyPI package details
+        id: pypi-package-details
+        if: inputs.upload_to_pypi
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { data: pypiPackage } = await github.request('https://pypi.org/pypi/label-studio/json')
+            const release = pypiPackage.releases[version]
+            const artifact = release.find(e => e.packagetype === 'bdist_wheel')
+            console.log(artifact)
+            core.setOutput("pipy-artifact-url", artifact.url);
+            core.setOutput("pipy-artifact-digests-sha256", artifact.digests.sha256);
 
       - name: Attach artifacts to release
         if: inputs.release-id
