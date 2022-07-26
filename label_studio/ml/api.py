@@ -248,7 +248,7 @@ class MLBackendInteractiveAnnotating(APIView):
         task = get_object_with_check_and_log(request, Task, pk=validated_data['task'], project=ml_backend.project)
         context = validated_data.get('context')
 
-        result = ml_backend.interactive_annotating(task, context)
+        result = ml_backend.interactive_annotating(task, context, user=request.user)
 
         return Response(
             result,

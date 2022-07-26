@@ -1,6 +1,6 @@
 {
-  "message": "null block points reduce polygon (#544)\n\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "f29fcbd43520d931b3727c5e937045f7026b7ee3",
-  "branch": "master",
-  "date": "2022-04-12T16:55:45Z"
+  "message": "feat: DEV-2504: Image Enhancements - Zoom, Pixelate, Center (#746)",
+  "commit": "3258d2574a62dcb39365abbac4bd1a48eabbe749",
+  "branch": "",
+  "date": "2022-07-22T17:42:41Z"
 }

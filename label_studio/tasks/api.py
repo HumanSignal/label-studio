@@ -271,12 +271,17 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         annotation_id = self.kwargs['pk']
         annotation = get_object_with_check_and_log(request, Annotation, pk=annotation_id)
 
-        annotation.task.save()  # refresh task metrics
-
+        task = annotation.task
         if self.request.data.get('ground_truth'):
-            annotation.task.ensure_unique_groundtruth(annotation_id=annotation.id)
+            task.ensure_unique_groundtruth(annotation_id=annotation.id)
+        task.update_is_labeled()
+        task.save()  # refresh task metrics
 
-        return super(AnnotationAPI, self).update(request, *args, **kwargs)
+        result = super(AnnotationAPI, self).update(request, *args, **kwargs)
+
+        task.update_is_labeled()
+        task.save(update_fields=['updated_at'])  # refresh task metrics
+        return result
 
     def get(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).get(request, *args, **kwargs)

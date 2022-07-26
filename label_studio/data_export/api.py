@@ -107,9 +107,11 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
             ),
         ],
         tags=['Export'],
-        operation_summary='Export tasks and annotations',
+        operation_summary='Easy export of tasks and annotations',
         operation_description="""
-        Export annotated tasks as a file in a specific format.
+        <i>Note: if you have a large project it's recommended to use 
+        export snapshots, this easy export endpoint might have timeouts.</i><br/><br>
+        Export annotated tasks as a file in a specific format. 
         For example, to export JSON annotations for a project to a file called `annotations.json`,
         run the following from the command line:
         ```bash
@@ -145,7 +147,7 @@ class ExportAPI(generics.RetrieveAPIView):
         return Project.objects.filter(organization=self.request.user.active_organization)
 
     def get_task_queryset(self, queryset):
-        return queryset
+        return queryset.select_related('project').prefetch_related('annotations', 'predictions')
 
     def get(self, request, *args, **kwargs):
         project = self.get_object()
@@ -160,11 +162,10 @@ class ExportAPI(generics.RetrieveAPIView):
         tasks_ids = request.GET.getlist('ids[]')
 
         logger.debug('Get tasks')
-        tasks = Task.objects.filter(project=project)
+        query = Task.objects.filter(project=project)
         if tasks_ids and len(tasks_ids) > 0:
             logger.debug(f'Select only subset of {len(tasks_ids)} tasks')
-            tasks = tasks.filter(id__in=tasks_ids)
-        query = tasks.select_related('project').prefetch_related('annotations', 'predictions')
+            query = query.filter(id__in=tasks_ids)
         if only_finished:
             query = query.filter(annotations__isnull=False).distinct()
 
@@ -248,7 +249,7 @@ class ProjectExportFilesAuthCheck(APIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Export'],
-        operation_summary='List all export files',
+        operation_summary='List all export snapshots',
         operation_description="""
         Returns a list of exported files for a specific project by ID.
         """,
@@ -265,7 +266,7 @@ class ProjectExportFilesAuthCheck(APIView):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Export'],
-        operation_summary='Create new export',
+        operation_summary='Create new export snapshot',
         operation_description="""
         Create a new export request to start a background task and generate an export file for a specific project by ID.
         """,
@@ -323,7 +324,7 @@ class ExportListAPI(generics.ListCreateAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Export'],
-        operation_summary='Get export by ID',
+        operation_summary='Get export snapshot by ID',
         operation_description="""
         Retrieve information about an export file by export ID for a specific project.
         """,
@@ -345,7 +346,7 @@ class ExportListAPI(generics.ListCreateAPIView):
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Export'],
-        operation_summary='Delete export',
+        operation_summary='Delete export snapshot',
         operation_description="""
         Delete an export file by specified export ID.
         """,
@@ -387,7 +388,7 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Export'],
-        operation_summary='Download export file',
+        operation_summary='Download export snapshot as file in specified format',
         operation_description="""
         Download an export file in the specified format for a specific project. Specify the project ID with the `id` 
         parameter in the path and the ID of the export file you want to download using the `export_pk` parameter 
@@ -419,7 +420,7 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
 class ExportDownloadAPI(generics.RetrieveAPIView):
     queryset = Export.objects.all()
     project_model = Project
-    serializer_class = ExportSerializer
+    serializer_class = None
     lookup_url_kwarg = 'export_pk'
     permission_required = all_permissions.projects_change
 

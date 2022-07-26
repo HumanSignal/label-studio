@@ -13,6 +13,7 @@ from annoying.fields import AutoOneToOneField
 from functools import lru_cache
 
 from core.redis import start_job_async_or_sync
+from data_manager.managers import TaskQuerySet
 from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks
 from core.utils.common import create_hash, get_attr_or_item, load_func
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
@@ -28,6 +29,12 @@ from core.label_config import (
 )
 from core.bulk_update_utils import bulk_update
 from label_studio_tools.core.label_config import parse_config
+from projects.functions import (
+    annotate_task_number, annotate_finished_task_number, annotate_total_predictions_number,
+    annotate_total_annotations_number, annotate_num_tasks_with_annotations,
+    annotate_useful_annotation_number, annotate_ground_truth_number, annotate_skipped_annotations_number
+)
+from labels_manager.models import Label
 
 
 logger = logging.getLogger(__name__)
@@ -48,40 +55,30 @@ class ProjectManager(models.Manager):
         'skipped_annotations_number',
     ]
 
-    def with_counts(self):
-        return self.with_counts_annotate(self)
+    def with_counts(self, fields=None):
+        return self.with_counts_annotate(self, fields=fields)
 
     @staticmethod
-    def with_counts_annotate(queryset):
-        return queryset.annotate(
-            task_number=Count('tasks', distinct=True),
-            finished_task_number=Count('tasks', distinct=True, filter=Q(tasks__is_labeled=True)),
-            total_predictions_number=Count('tasks__predictions', distinct=True),
-            total_annotations_number=Count(
-                'tasks__annotations__id', distinct=True, filter=Q(tasks__annotations__was_cancelled=False)
-            ),
-            num_tasks_with_annotations=Count(
-                'tasks__id',
-                distinct=True,
-                filter=Q(tasks__annotations__isnull=False)
-                & Q(tasks__annotations__ground_truth=False)
-                & Q(tasks__annotations__was_cancelled=False)
-                & Q(tasks__annotations__result__isnull=False),
-            ),
-            useful_annotation_number=Count(
-                'tasks__annotations__id',
-                distinct=True,
-                filter=Q(tasks__annotations__was_cancelled=False)
-                & Q(tasks__annotations__ground_truth=False)
-                & Q(tasks__annotations__result__isnull=False),
-            ),
-            ground_truth_number=Count(
-                'tasks__annotations__id', distinct=True, filter=Q(tasks__annotations__ground_truth=True)
-            ),
-            skipped_annotations_number=Count(
-                'tasks__annotations__id', distinct=True, filter=Q(tasks__annotations__was_cancelled=True)
-            ),
-        )
+    def with_counts_annotate(queryset, fields=None):
+        available_fields = {
+            'task_number': annotate_task_number,
+            'finished_task_number': annotate_finished_task_number,
+            'total_predictions_number': annotate_total_predictions_number,
+            'total_annotations_number': annotate_total_annotations_number,
+            'num_tasks_with_annotations': annotate_num_tasks_with_annotations,
+            'useful_annotation_number': annotate_useful_annotation_number,
+            'ground_truth_number': annotate_ground_truth_number,
+            'skipped_annotations_number': annotate_skipped_annotations_number,
+        }
+        if fields is None:
+            to_annotate = available_fields
+        else:
+            to_annotate = {field: available_fields[field] for field in fields if field in available_fields}
+
+        for _, annotate_func in to_annotate.items():
+            queryset = annotate_func(queryset)
+
+        return queryset
 
 
 ProjectMixin = load_func(settings.PROJECT_MIXIN)
@@ -230,6 +227,8 @@ class Project(ProjectMixin, models.Model):
         _('task_data_password'), max_length=256, blank=True, null=True, help_text='Task data credentials: password'
     )
 
+    pinned_at = models.DateTimeField(_('pinned at'), null=True, default=None, help_text='Pinned date and time')
+
     def __init__(self, *args, **kwargs):
         super(Project, self).__init__(*args, **kwargs)
         self.__original_label_config = self.label_config
@@ -372,7 +371,7 @@ class Project(ProjectMixin, models.Model):
 
         if maximum_annotations_changed or overlap_cohort_percentage_changed or tasks_number_changed:
             bulk_update_stats_project_tasks(
-                self.tasks.filter(Q(annotations__isnull=False) & Q(annotations__ground_truth=False))
+                self.tasks.filter(Q(annotations__isnull=False))
             )
 
     def update_tasks_states(
@@ -380,6 +379,22 @@ class Project(ProjectMixin, models.Model):
     ):
         start_job_async_or_sync(self._update_tasks_states, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed)
 
+
+    def update_tasks_states_with_counters(
+        self, maximum_annotations_changed, overlap_cohort_percentage_changed,
+            tasks_number_changed, tasks_queryset
+    ):
+        start_job_async_or_sync(self._update_tasks_states_with_counters, maximum_annotations_changed,
+                                overlap_cohort_percentage_changed, tasks_number_changed, tasks_queryset)
+
+
+    def _update_tasks_states_with_counters(
+        self, maximum_annotations_changed, overlap_cohort_percentage_changed,
+            tasks_number_changed, tasks_queryset
+    ):
+        self._update_tasks_states(maximum_annotations_changed, overlap_cohort_percentage_changed,
+            tasks_number_changed)
+        self.update_tasks_counters(tasks_queryset)
 
     def _rearrange_overlap_cohort(self):
         """
@@ -509,22 +524,31 @@ class Project(ProjectMixin, models.Model):
                 f'Created annotations are incompatible with provided labeling schema, we found:\n{diff_str}'
             )
 
+
         # validate labels consistency
-        labels_from_config = get_all_labels(config_string)
+        labels_from_config, dynamic_label_from_config = get_all_labels(config_string)
         created_labels = self.summary.created_labels
         for control_tag_from_data, labels_from_data in created_labels.items():
             # Check if labels created in annotations, and their control tag has been removed
-            if labels_from_data and control_tag_from_data not in labels_from_config:
+            if labels_from_data and ((control_tag_from_data not in labels_from_config) and (
+                    control_tag_from_data not in dynamic_label_from_config)):
                 raise LabelStudioValidationErrorSentryIgnored(
                     f'There are {sum(labels_from_data.values(), 0)} annotation(s) created with tag '
                     f'"{control_tag_from_data}", you can\'t remove it'
                 )
             labels_from_config_by_tag = set(labels_from_config[control_tag_from_data])
+            parsed_config = parse_config(config_string)
+            tag_types = [tag_info['type'] for _, tag_info in parsed_config.items()]
+            if 'Taxonomy' in tag_types:
+                custom_tags = Label.objects.filter(links__project=self).values_list('value', flat=True)
+                flat_custom_tags = set([item for sublist in custom_tags for item in sublist])
+                labels_from_config_by_tag |= flat_custom_tags
             if not set(labels_from_data).issubset(set(labels_from_config_by_tag)):
                 different_labels = list(set(labels_from_data).difference(labels_from_config_by_tag))
                 diff_str = '\n'.join(f'{l} ({labels_from_data[l]} annotations)' for l in different_labels)
-                if strict is True:
-                    raise LabelStudioValidationErrorSentryIgnored(f'These labels still exist in annotations:\n{diff_str}')
+                if (strict is True) and (control_tag_from_data not in dynamic_label_from_config):
+                    raise LabelStudioValidationErrorSentryIgnored(
+                        f'These labels still exist in annotations:\n{diff_str}')
                 else:
                     logger.warning(f'project_id={self.id} inconsistent labels in config and annotations: {diff_str}')
 
@@ -753,6 +777,46 @@ class Project(ProjectMixin, models.Model):
 
         self._storage_objects = storage_objects
         return storage_objects
+
+    def update_tasks_counters(self, queryset, from_scratch=True):
+        objs = []
+
+        total_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
+        cancelled_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True))
+        total_predictions = Count("predictions", distinct=True)
+        # construct QuerySet in case of list of Tasks
+        if isinstance(queryset, list) and len(queryset) > 0 and isinstance(queryset[0], Task):
+            queryset = Task.objects.filter(id__in=[task.id for task in queryset])
+        # construct QuerySet in case annotated queryset
+        if isinstance(queryset, TaskQuerySet) and queryset.exists() and isinstance(queryset[0], int):
+            queryset = Task.objects.filter(id__in=queryset)
+
+        if not from_scratch:
+            queryset = queryset.exclude(
+                Q(total_annotations__gt=0) |
+                Q(cancelled_annotations__gt=0) |
+                Q(total_predictions__gt=0)
+            )
+
+        # filter our tasks with 0 annotations and 0 predictions and update them with 0
+        queryset.filter(annotations__isnull=True, predictions__isnull=True).\
+            update(total_annotations=0, cancelled_annotations=0, total_predictions=0)
+
+        # filter our tasks with 0 annotations and 0 predictions
+        queryset = queryset.filter(Q(annotations__isnull=False) | Q(predictions__isnull=False))
+        queryset = queryset.annotate(new_total_annotations=total_annotations,
+                                     new_cancelled_annotations=cancelled_annotations,
+                                     new_total_predictions=total_predictions)
+
+        for task in queryset.only('id', 'total_annotations', 'cancelled_annotations', 'total_predictions'):
+            task.total_annotations = task.new_total_annotations
+            task.cancelled_annotations = task.new_cancelled_annotations
+            task.total_predictions = task.new_total_predictions
+            objs.append(task)
+
+        with transaction.atomic():
+            bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
+        return len(objs)
 
     def __str__(self):
         return f'{self.title} (id={self.id})' or _("Business number %d") % self.pk

@@ -1,5 +1,5 @@
 ---
-title: Optical Character Recognition
+title: Optical Character Recognition (OCR)
 type: templates
 category: Computer Vision
 cat: computer-vision
