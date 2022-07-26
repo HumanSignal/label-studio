@@ -42,7 +42,7 @@ stages:
 
 test_name: test_overlap_change_to_1
 
-strict: True
+strict: False
 
 marks:
   - usefixtures:
