@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2504: Image Enhancements - Zoom, Pixelate, Center (#746)",
-  "commit": "3258d2574a62dcb39365abbac4bd1a48eabbe749",
-  "branch": "",
-  "date": "2022-07-22T17:42:41Z"
+  "message": "fix: DEV-2967: Duplicated polygon regions",
+  "commit": "3fe5893179480f73bc01d3f40235edd10669a99b",
+  "branch": "fb-dev-2967",
+  "date": "2022/07/26 11:46:01"
 }
