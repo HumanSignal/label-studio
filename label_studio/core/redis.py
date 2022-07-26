@@ -126,6 +126,6 @@ def rqworker_healthcheck():
     if workers_count * RATIO < total_jobs:
         error_text = f"Workers seems to be overloaded. {total_jobs} jobs in the queues."
     # check if workers in correct state
-    if all([worker for worker in workers if worker.state in ['started', 'busy', 'idle']]):
-        return False, "No workers found. Start several workers."
+    if all([worker.state not in ['started', 'idle'] for worker in workers]):
+        return False, "No free workers found. Start more workers."
     return True, error_text
