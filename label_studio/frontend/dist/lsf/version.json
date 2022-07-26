@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2504: Image Enhancements - Zoom, Pixelate, Center (#746)",
-  "commit": "3258d2574a62dcb39365abbac4bd1a48eabbe749",
-  "branch": "",
-  "date": "2022-07-22T17:42:41Z"
+  "message": "fix: DEV-2977: Locked polygons",
+  "commit": "51320f5117cff35f4302a535c7eb8109394f6c46",
+  "branch": "fb-dev-2977/locked-polygon",
+  "date": "2022/07/26 15:24:30"
 }
