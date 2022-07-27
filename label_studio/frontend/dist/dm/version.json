@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2887: Comments for annotation editor ui ",
-  "commit": "cfc5492ba5c64ccdb7b634e34fef10bd2de55e9f",
+  "message": "feat: DEV-2887: Comments for annotation editor ui  (#86)\n\n* feat: DEV-2887: Comments ui for editor enablement\r\n\r\n* feat: DEV-2887: Comment SDK\r\n\r\n* feat: DEV-2887: updating comments through api for toggling resolve state\r\n\r\n* feat: DEV-2887: ensure previous listeners are torn down when comments sdk is created\r\n\r\n* feat: DEV-2887: persist queued comments on annotation creation\r\n\r\n* fix: DEV-2991: Cancelling skip retains comments\r\n\r\n* fix: DEV-2986: Warn about comments being lost if the user has unpersisted comments\r\n\r\n* fix: DEV-2986: change commentStore method to hasUnsaved\r\n\r\n* fix: DEV-2986: update unsaved comments message\r\n\r\nCo-authored-by: makseq-ubnt <makseq@gmail.com>",
+  "commit": "5a6dd55a5b805bf47f4986994c0a3d3017ee4e2f",
   "branch": "master",
-  "date": "2022/07/26 19:09:07"
+  "date": "2022-07-27T00:57:31Z"
 }
