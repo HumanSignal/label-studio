@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='task',
             name='last_comment_updated_at',
-            field=models.DateTimeField(default=None, help_text='When the last comment was updated', null=True, verbose_name='last comment updated at'),
+            field=models.DateTimeField(db_index=True, default=None, help_text='When the last comment was updated', null=True, verbose_name='last comment updated at'),
         ),
         migrations.AddField(
             model_name='task',
