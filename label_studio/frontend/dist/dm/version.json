@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2887: Comments for annotation editor ui ",
-  "commit": "cfc5492ba5c64ccdb7b634e34fef10bd2de55e9f",
-  "branch": "fb-DEV-2896",
-  "date": "2022/07/26 19:09:07"
+  "message": "fix: DEV-2885: Fix new field with ff off",
+  "commit": "f6be24ab1db4cbe07769639d21d0eff30274e2c9",
+  "branch": "fb-dev-2885-fix-model",
+  "date": "2022/07/27 11:55:11"
 }
