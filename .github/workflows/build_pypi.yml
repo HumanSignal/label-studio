@@ -20,9 +20,12 @@ on:
         type: string
         required: false
     outputs:
-      host:
-        pipy-artifact-url: ${{ jobs.pypi.outputs.pipy-artifact-url }}
-        pipy-artifact-digests-sha256: ${{ jobs.pypi.outputs.pipy-artifact-digests-sha256 }}
+      pipy-artifact-url:
+        description: "PyPI Artifact URL"
+        value: ${{ jobs.pypi.outputs.pipy-artifact-url }}
+      pipy-artifact-digests-sha256:
+        description: "PyPI Artifact SHA256"
+        value: ${{ jobs.pypi.outputs.pipy-artifact-digests-sha256 }}
   workflow_dispatch:
     inputs:
       version:
