@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2887: Comments for annotation editor ui ",
-  "commit": "cfc5492ba5c64ccdb7b634e34fef10bd2de55e9f",
-  "branch": "fb-DEV-2896",
-  "date": "2022/07/26 19:09:07"
+  "message": "fix: DEV-2986: reverting confirm for unsaved comments",
+  "commit": "2da99fbbe33122fc090ca5217ae0b85173925c75",
+  "branch": "fb-DEV-2896-fix",
+  "date": "2022/07/26 23:07:05"
 }
