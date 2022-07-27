@@ -1,6 +1,6 @@
 {
-  "message": "Fix: DEV-2672: Column icon hot fix",
-  "commit": "153bc0b4814614cee6c3f79abf841abdade78224",
-  "branch": "fb-fix-dev-2672/column-icon-load",
-  "date": "2022/07/26 22:16:18"
+  "message": "fix: DEV-2672: Comment column icons hot fix",
+  "commit": "11d6f6d882ebe9f0e0b219f73854c16986fa5ce7",
+  "branch": "master",
+  "date": "2022/07/26 22:21:14"
 }
