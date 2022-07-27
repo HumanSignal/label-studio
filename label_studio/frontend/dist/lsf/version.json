@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2949: Region locking should not persist",
-  "commit": "b7effcf3352b4744d8baa74bd97d7618201bd67b",
+  "message": "fix: DEV-2949: Annotation region locking should not persist",
+  "commit": "5cb32b4a1d117e10f03019bf9b1a0efae27ef03c",
   "branch": "fb-dev-2949",
-  "date": "2022/07/25 20:48:06"
+  "date": "2022/07/27 07:49:44"
 }
