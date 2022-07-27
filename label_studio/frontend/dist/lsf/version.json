@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2504: Image Enhancements - Zoom, Pixelate, Center (#746)",
-  "commit": "3258d2574a62dcb39365abbac4bd1a48eabbe749",
-  "branch": "",
-  "date": "2022-07-22T17:42:41Z"
+  "message": "feat: DEV-2887: Comments for annotation editor ui",
+  "commit": "fa58397bec12ff79e9cf38e6acd73de4d8a5ef1e",
+  "branch": "master",
+  "date": "2022/07/26 19:57:17"
 }
