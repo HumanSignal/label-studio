@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2887: Comments for annotation editor ui ",
-  "commit": "cfc5492ba5c64ccdb7b634e34fef10bd2de55e9f",
-  "branch": "fb-DEV-2896",
-  "date": "2022/07/26 19:09:07"
+  "message": "Fix: DEV-2672: Column icon hot fix",
+  "commit": "153bc0b4814614cee6c3f79abf841abdade78224",
+  "branch": "fb-fix-dev-2672/column-icon-load",
+  "date": "2022/07/26 22:16:18"
 }
