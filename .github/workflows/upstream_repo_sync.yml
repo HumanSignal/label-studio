@@ -112,7 +112,7 @@ jobs:
           git checkout '${{ github.event.client_payload.branch_name }}' || true
           git checkout -b '${{ github.event.client_payload.branch_name }}' || true
           
-          git merge origin/develop --strategy=ours --message="Merge branch ${base_branch} into ${{ github.event.client_payload.branch_name }}"
+          git merge "${base_branch}" --strategy=ours --message="Merge branch ${base_branch} into ${{ github.event.client_payload.branch_name }}"
 
           if [[ "${{ github.event.client_payload.repo_name }}" == */dm2* ]]; then 
             module_dist="${{ env.STATIC_DIST }}/dm"
