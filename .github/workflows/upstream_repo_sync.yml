@@ -103,16 +103,13 @@ jobs:
           set -xeuo pipefail
           
           if grep -q '^ls-release/.*$' <<< '${{ github.event.client_payload.base_branch_name }}'; then
-            base_branch='${{ github.event.client_payload.base_branch_name }}'
+            git checkout '${{ github.event.client_payload.base_branch_name }}'
           else
-            base_branch='${{ github.event.repository.default_branch }}'
+            git checkout '${{ github.event.repository.default_branch }}'
           fi
           
-          git checkout "${base_branch}"
           git checkout '${{ github.event.client_payload.branch_name }}' || true
           git checkout -b '${{ github.event.client_payload.branch_name }}' || true
-          
-          git merge "${base_branch}" --strategy=ours --message="Merge branch ${base_branch} into ${{ github.event.client_payload.branch_name }}"
 
           if [[ "${{ github.event.client_payload.repo_name }}" == */dm2* ]]; then 
             module_dist="${{ env.STATIC_DIST }}/dm"
