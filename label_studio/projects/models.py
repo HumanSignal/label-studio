@@ -488,6 +488,16 @@ class Project(ProjectMixin, models.Model):
             logger.debug(f'Data fields not found in labeling config')
             return
 
+        #TODO Add validation for fields addition in label config
+        '''fields_from_config = {field.split('[')[0] for field in fields_from_config}  # Repeater tag support
+        fields_from_data = set(self.summary.common_data_columns)
+        fields_from_data.discard(settings.DATA_UNDEFINED_NAME)
+        if fields_from_data and not fields_from_config.issubset(fields_from_data):
+            different_fields = list(fields_from_config.difference(fields_from_data))
+            raise LabelStudioValidationErrorSentryIgnored(
+                f'These fields are not present in the data: {",".join(different_fields)}'
+            )'''
+
         if self.num_annotations == 0:
             logger.debug(
                 f'Project {self} has no annotations: nothing to validate here. '
