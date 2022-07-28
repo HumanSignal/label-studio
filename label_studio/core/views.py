@@ -96,7 +96,7 @@ def health(request):
     else:
         health_state = rqworker_healthcheck()
         result = {"status": "UP", "message": health_state[1]}
-        return JsonResponse(result, status=200 if health_state[0] else 500)
+        return HttpResponse(json.dumps(result), status=200 if health_state[0] else 500)
 
 
 def metrics(request):
