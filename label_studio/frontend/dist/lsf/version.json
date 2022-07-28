@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2395: Quick view: Different size of working area is created for SMALL vertical/horizontal images",
-  "commit": "11c0721135b5313aa4a5cd52ff8ab59a17fcdd75",
+  "commit": "cd6ff7b97bd7af13babfdbea777941b8bd94cf3a",
   "branch": "fb-dev-2395",
-  "date": "2022/07/28 09:59:42"
+  "date": "2022/07/28 10:22:32"
 }
