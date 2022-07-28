@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2672: Comment author cell filter",
-  "commit": "105027bb46b85f54ee81ee35c37a6b98406c37a1",
+  "message": "fix: DEV-2885: Fix new field with ff off",
+  "commit": "9666b6a6c3ca8ab8210552ca26e98485bef070ce",
   "branch": "master",
-  "date": "2022/07/25 20:04:28"
+  "date": "2022/07/27 12:56:09"
 }
