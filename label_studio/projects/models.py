@@ -488,7 +488,7 @@ class Project(ProjectMixin, models.Model):
             logger.debug(f'Data fields not found in labeling config')
             return
 
-        #TODO Add validation for fields addition in label config
+        #TODO: DEV-2939 Add validation for fields addition in label config
         '''fields_from_config = {field.split('[')[0] for field in fields_from_config}  # Repeater tag support
         fields_from_data = set(self.summary.common_data_columns)
         fields_from_data.discard(settings.DATA_UNDEFINED_NAME)
