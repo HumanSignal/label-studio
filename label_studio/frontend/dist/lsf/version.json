@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2977: Locked polygons",
-  "commit": "51320f5117cff35f4302a535c7eb8109394f6c46",
-  "branch": "fb-dev-2977/locked-polygon",
-  "date": "2022/07/26 15:24:30"
+  "commit": "22839e5dc5c4fdc15f51dcf351c8a3c0a0951d4e",
+  "branch": "master",
+  "date": "2022/07/29 11:01:07"
 }
