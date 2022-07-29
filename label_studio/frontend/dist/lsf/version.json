@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3018: Convert app store user to reference only if the incoming value is not already a reference",
-  "commit": "9244d81fa0e725de8b90384187d52b31f2071f02",
-  "branch": "fb-dev-3018",
-  "date": "2022/07/28 16:52:40"
+  "commit": "d6478d7bb6acd575eab8119c9b615dd3711b544b",
+  "branch": "master",
+  "date": "2022/07/29 08:51:29"
 }
