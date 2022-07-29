@@ -88,7 +88,6 @@ class TaskListAPI(DMTaskListAPI):
 
     def perform_create(self, serializer):
         project_id = self.request.data.get('project')
-        generics.get_object_or_404(Project, pk=project_id)
         project = generics.get_object_or_404(Project, pk=project_id)
         instance = serializer.save(project=project)
         emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])
