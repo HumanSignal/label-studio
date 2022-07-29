@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2977: Locked polygons",
-  "commit": "22839e5dc5c4fdc15f51dcf351c8a3c0a0951d4e",
-  "branch": "master",
-  "date": "2022/07/29 11:01:07"
+  "message": "fix: DEV-3049: visual bug with the Zoom To flyout menu on smaller screen sizes",
+  "commit": "3fd232433bf201a9b96d8f69355180389fe1a024",
+  "branch": "fb-dev-3049",
+  "date": "2022/07/29 16:13:44"
 }
