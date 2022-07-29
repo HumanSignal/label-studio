@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2576: Undo keypoints when create new polygon",
-  "commit": "d5603e7688eef0a4ff4114abdd49722adb105ad4",
+  "commit": "96625a65ce343f16eb0320afa3e345243367aa8f",
   "branch": "fb-dev-2576/undo-keypoints",
-  "date": "2022/07/29 17:39:35"
+  "date": "2022/07/29 17:53:16"
 }
