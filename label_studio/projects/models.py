@@ -549,10 +549,13 @@ class Project(ProjectMixin, models.Model):
                 custom_tags = Label.objects.filter(links__project=self).values_list('value', flat=True)
                 flat_custom_tags = set([item for sublist in custom_tags for item in sublist])
                 labels_from_config_by_tag |= flat_custom_tags
+            # check if labels from is subset if config labels
             if not set(labels_from_data).issubset(set(labels_from_config_by_tag)):
                 different_labels = list(set(labels_from_data).difference(labels_from_config_by_tag))
                 diff_str = '\n'.join(f'{l} ({labels_from_data[l]} annotations)' for l in different_labels)
-                if (strict is True) and (control_tag_from_data not in dynamic_label_from_config):
+                if (strict is True) and (control_tag_from_data not in dynamic_label_from_config) and \
+                        not check_control_in_config_by_regex(config_string, control_tag_from_data):
+                    # raise error if labels not dynamic and not in regex rules
                     raise LabelStudioValidationErrorSentryIgnored(
                         f'These labels still exist in annotations:\n{diff_str}')
                 else:
