@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2986: Adding guards to task loading to ensure users are warned of unsaved comments",
-  "commit": "aaead1f85dd97c9f78b5c120d658a4131a5bf26e",
-  "branch": "master",
-  "date": "2022/07/28 11:06:38"
+  "message": "feat: DEV-3034: Submit and list comments via annotation draft",
+  "commit": "2913df689a699bfdffca9b56aa62b8e06d086508",
+  "branch": "fb-dev-3034",
+  "date": "2022/07/29 13:13:02"
 }
