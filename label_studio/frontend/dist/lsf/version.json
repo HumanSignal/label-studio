@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3018: make all user references the same type so comments and other references are not made invalid (#783)\n\n* fix: DEV-3018: make all user references the same type so comments and other references are not made invalid\r\n\r\n* fix: DEV-3018: make sure appstore user is available as a reference\r\n\r\n* fix: DEV-3018: cut down the line length of restored comments handling\r\n\r\n* Update AppStore.js",
-  "commit": "7654a735bb30278a9969806e357aad7eea939ba6",
+  "message": "fix: DEV-3018: Convert app store user to reference only if the incoming value is not already a reference (#787)",
+  "commit": "d6478d7bb6acd575eab8119c9b615dd3711b544b",
   "branch": "master",
-  "date": "2022-07-28T19:16:10Z"
+  "date": "2022-07-29T13:51:29Z"
 }
