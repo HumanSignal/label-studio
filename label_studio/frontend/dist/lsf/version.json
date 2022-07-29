@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3018: Convert app store user to reference only if the incoming value is not already a reference",
+  "message": "fix: DEV-3018: Convert app store user to reference only if the incoming value is not already a reference (#787)",
   "commit": "d6478d7bb6acd575eab8119c9b615dd3711b544b",
   "branch": "master",
-  "date": "2022/07/29 08:51:29"
+  "date": "2022-07-29T13:51:29Z"
 }
