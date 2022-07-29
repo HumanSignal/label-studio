@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e ${DEBUG:+-x}
 
-NGINX_CONFIG=/etc/nginx/conf.d/${NGINX_FILE:-default.conf}
+NGINX_CONFIG=/etc/nginx/nginx.conf
 
 if [ -n "${NGINX_SSL_CERT:-}" ]; then
   echo >&3 "=> Replacing nginx certs..."

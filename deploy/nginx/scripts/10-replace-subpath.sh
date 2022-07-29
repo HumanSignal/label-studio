@@ -1,10 +1,15 @@
 #!/bin/sh
 set -e ${DEBUG:+-x}
 
+NGINX_CONFIG=/etc/nginx/nginx.conf
+
+echo >&3 "=> Copy nginx config file..."
+mkdir -p "$OPT_DIR/nginx"
+\cp -f /label-studio/deploy/nginx/default.conf $NGINX_CONFIG
+
 LABEL_STUDIO_HOST_NO_SCHEME=${LABEL_STUDIO_HOST#*//}
 LABEL_STUDIO_HOST_NO_TRAILING_SLASH=${LABEL_STUDIO_HOST_NO_SCHEME%/}
-LABEL_STUDIO_HOST_SUBPATH=$(echo $LABEL_STUDIO_HOST_NO_TRAILING_SLASH | cut -d'/' -f2- -s)
-NGINX_CONFIG=/etc/nginx/conf.d/${NGINX_FILE:-default.conf}
+LABEL_STUDIO_HOST_SUBPATH=$(echo "$LABEL_STUDIO_HOST_NO_TRAILING_SLASH" | cut -d'/' -f2- -s)
 
 if [ -n "${LABEL_STUDIO_HOST_SUBPATH:-}" ] && [ -w $NGINX_CONFIG ]; then
   echo >&3 "=> Adding subpath to nginx config $NGINX_CONFIG ..."
