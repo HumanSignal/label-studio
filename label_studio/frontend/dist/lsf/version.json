@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3018: Convert app store user to reference only if the incoming value is not already a reference (#787)",
-  "commit": "d6478d7bb6acd575eab8119c9b615dd3711b544b",
+  "message": "fix: DEV-2977: Locked polygons",
+  "commit": "22839e5dc5c4fdc15f51dcf351c8a3c0a0951d4e",
   "branch": "master",
-  "date": "2022-07-29T13:51:29Z"
+  "date": "2022/07/29 11:01:07"
 }
