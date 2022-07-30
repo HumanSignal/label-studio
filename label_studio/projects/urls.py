@@ -23,6 +23,8 @@ _api_urlpatterns = [
     path('', api.ProjectListAPI.as_view(), name='project-list'),
     path('<int:pk>/', api.ProjectAPI.as_view(), name='project-detail'),
 
+    path('<int:pk>/proxy', api.ProjectStorageProxy.as_view(), name='project-storage-proxy'),
+
     # Get next task
     path('<int:pk>/next/', api.ProjectNextTaskAPI.as_view(), name='project-next'),
 
