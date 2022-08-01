@@ -75,6 +75,20 @@ class Task(TaskMixin, models.Model):
                                                 help_text='Number of total cancelled annotations for the current task')
     total_predictions = models.IntegerField(_('total_predictions'), default=0, db_index=True,
                                   help_text='Number of total predictions for the current task')
+
+    comment_count = models.IntegerField(
+        _('comment count'), default=0, db_index=True,
+        help_text='Number of comments in the task including all annotations')
+    unresolved_comment_count = models.IntegerField(
+        _('unresolved comment count'), default=0, db_index=True,
+        help_text='Number of unresolved comments in the task including all annotations')
+    comment_authors = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, blank=True, default=None,
+        related_name='tasks_with_comments', help_text='Users who wrote comments')
+    last_comment_updated_at = models.DateTimeField(
+        _('last comment updated at'), default=None, null=True, db_index=True,
+        help_text='When the last comment was updated')
+
     objects = TaskManager()  # task manager by default
     prepared = PreparedTaskManager()  # task manager with filters, ordering, etc for data_manager app
 

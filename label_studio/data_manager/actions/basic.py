@@ -3,16 +3,14 @@
 import logging
 
 from datetime import datetime
-from django.db.models.signals import post_delete, pre_delete
-
+from django.conf import settings
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
-from core.utils.common import temporary_disconnect_list_signal
+from core.utils.common import load_func
 from projects.models import Project
 
 from tasks.models import (
-    Annotation, Prediction, Task, bulk_update_stats_project_tasks,
-    update_all_task_states_after_deleting_task, remove_data_columns,
+    Annotation, Prediction, Task, bulk_update_stats_project_tasks
 )
 from webhooks.utils import emit_webhooks_for_instance
 from webhooks.models import WebhookAction
@@ -90,7 +88,16 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     start_job_async_or_sync(bulk_update_stats_project_tasks, queryset.filter(is_labeled=True))
     start_job_async_or_sync(project.update_tasks_counters, task_ids)
     request = kwargs['request']
-    Task.objects.filter(id__in=real_task_ids).update(updated_at=datetime.now(), updated_by=request.user)
+
+    tasks = Task.objects.filter(id__in=real_task_ids)
+    tasks.update(updated_at=datetime.now(), updated_by=request.user)
+
+    # LSE postprocess
+    postprocess = load_func(settings.DELETE_TASKS_ANNOTATIONS_POSTPROCESS)
+    if postprocess is not None:
+        tasks = Task.objects.filter(id__in=task_ids)
+        postprocess(project, tasks, **kwargs)
+
     return {'processed_items': count,
             'detail': 'Deleted ' + str(count) + ' annotations'}
 
