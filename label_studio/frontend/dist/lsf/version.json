@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2927: Better UI for textarea inputs in the outliner",
-  "commit": "832a4532dcc8c2f9fe460fcfc7856434968b1c9e",
-  "branch": "fb-dev-2927/ocr-textarea-ui-fix",
-  "date": "2022/08/01 22:26:38"
+  "commit": "cadfdf72ad373c0d6745d60813156e5c8858d813",
+  "branch": "master",
+  "date": "2022/08/01 22:46:20"
 }
