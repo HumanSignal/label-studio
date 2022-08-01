@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2931: Fix hiding NER regions with new outliner (#764)\n\n* Fix hiding NER regions with new outliner\r\n\r\n* Remove console.log\r\n\r\n* Fix issues according to the review\r\n\r\n* Allow `locked` to be function\r\n\r\n* fix space\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
-  "commit": "682c273b21a482dafc46db085eadd8062bfe5f1a",
+  "message": "fix: DEV-2927: Better UI for textarea inputs in the outliner (#766)\n\nBetter UI for textarea inputs in the outliner",
+  "commit": "cadfdf72ad373c0d6745d60813156e5c8858d813",
   "branch": "master",
-  "date": "2022-08-01T16:30:33Z"
+  "date": "2022-08-01T18:46:20Z"
 }
