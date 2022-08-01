@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into fb-dev-2514",
-  "commit": "7de292848629ebbe67478489a2579c302e424dfb",
-  "branch": "fb-dev-2514",
-  "date": "2022-07-19T13:02:59Z"
+  "message": "fix: DEV-2942: Grouping regions without a label (#770)\n\n* Fix grouping regions without a label\r\n\r\n* Remove unnecessary changes\r\n\r\n* Some JS fixes; fix group/sort switcher\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
+  "commit": "eee3f53c986e4d5cd935415640997408b8c03f39",
+  "branch": "master",
+  "date": "2022-08-01T13:43:35Z"
 }
