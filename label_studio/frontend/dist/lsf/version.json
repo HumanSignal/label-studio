@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2934: Fix Audio resizing behavior (#772)\n\n* Properly react to the viewport resizing\r\n\r\n* Remove unused code",
-  "commit": "9eaa736639ce7fa2eab602ebc1af04e4c8a3c951",
+  "message": "fix: DEV-2943: Fix floating panels positioning and constraints (#775)\n\nIntroduce proper positioning on window resize\r\nIntroduce positioning constraints based on the viewport",
+  "commit": "cfdc0633e79f6b67782543f25ac221f3e2aaf609",
   "branch": "master",
-  "date": "2022-08-01T14:38:17Z"
+  "date": "2022-08-01T15:25:02Z"
 }
