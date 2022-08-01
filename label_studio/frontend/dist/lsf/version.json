@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2971: Disable trash button",
-  "commit": "125eff990b6172d52f864e346fe55e8abc841730",
+  "commit": "f4f37d80d1c87e3497be3d2e62706c56724ddb1c",
   "branch": "fb-dev-2971",
-  "date": "2022/08/01 19:46:57"
+  "date": "2022/08/01 19:47:24"
 }
