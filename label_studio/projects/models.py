@@ -352,7 +352,7 @@ class Project(ProjectMixin, models.Model):
         self, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed
     ):
         # if only maximum annotations parameter is tweaked
-        if maximum_annotations_changed and not overlap_cohort_percentage_changed:
+        if maximum_annotations_changed and (not overlap_cohort_percentage_changed or self.maximum_annotations == 1):
             tasks_with_overlap = self.tasks.filter(overlap__gt=1)
             if tasks_with_overlap.exists():
                 # if there is a part with overlaped tasks, affect only them
@@ -487,14 +487,16 @@ class Project(ProjectMixin, models.Model):
         if not fields_from_config:
             logger.debug(f'Data fields not found in labeling config')
             return
-        fields_from_config = {field.split('[')[0] for field in fields_from_config}  # Repeater tag support
+
+        #TODO: DEV-2939 Add validation for fields addition in label config
+        '''fields_from_config = {field.split('[')[0] for field in fields_from_config}  # Repeater tag support
         fields_from_data = set(self.summary.common_data_columns)
         fields_from_data.discard(settings.DATA_UNDEFINED_NAME)
         if fields_from_data and not fields_from_config.issubset(fields_from_data):
             different_fields = list(fields_from_config.difference(fields_from_data))
             raise LabelStudioValidationErrorSentryIgnored(
                 f'These fields are not present in the data: {",".join(different_fields)}'
-            )
+            )'''
 
         if self.num_annotations == 0:
             logger.debug(

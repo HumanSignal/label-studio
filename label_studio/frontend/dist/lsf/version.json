@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2927: Better UI for textarea inputs in the outliner",
+  "message": "fix: DEV-2927: Better UI for textarea inputs in the outliner (#766)\n\nBetter UI for textarea inputs in the outliner",
   "commit": "cadfdf72ad373c0d6745d60813156e5c8858d813",
   "branch": "master",
-  "date": "2022/08/01 22:46:20"
+  "date": "2022-08-01T18:46:20Z"
 }

@@ -40,7 +40,7 @@ stages:
     method: POST
     url: '{django_live_url}/api/projects/{pk}/validate'
   response:
-    status_code: 400
+    status_code: 200
 - name: stage
   request:
     headers:
@@ -50,7 +50,7 @@ stages:
     method: POST
     url: '{django_live_url}/api/projects/{pk}/validate'
   response:
-    status_code: 400
+    status_code: 200
 - name: stage
   request:
     headers:
