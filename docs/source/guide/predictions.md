@@ -15,7 +15,9 @@ You can import pre-annotated tasks into Label Studio [using the UI](tasks.html#I
 
 ## Format pre-annotations for Label Studio 
 
-To import predicted labels into Label Studio, you must use the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format) and set up your tasks with the `predictions` JSON key. The Label Studio ML backend also outputs tasks in this format. 
+To import predicted labels into Label Studio, you must use the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format) and set up your tasks with the `predictions` JSON key. The Label Studio ML backend also outputs tasks in this format. Check this common video tutorial showing how to convert a submitted annotation to a prediction:
+
+<iframe class="video-border" width="100%" height="400vh" src="https://www.youtube.com/embed/CyRe73VD4EE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ### Specific examples for pre-annotations
 
