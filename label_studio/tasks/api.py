@@ -359,6 +359,9 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         task = generics.get_object_or_404(Task.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
         return Annotation.objects.filter(Q(task=task) & Q(was_cancelled=False)).order_by('pk')
 
+    def delete_draft(self, draft_id, annotation_id):
+        return AnnotationDraft.objects.filter(id=draft_id).delete()
+
     def perform_create(self, ser):
         task = get_object_with_check_and_log(self.request, Task, pk=self.kwargs['pk'])
         # annotator has write access only to annotations and it can't be checked it after serializer.save()
@@ -404,7 +407,7 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         draft_id = self.request.data.get('draft_id')
         if draft_id is not None:
             logger.debug(f'Remove draft {draft_id} after creating annotation {annotation.id}')
-            AnnotationDraft.objects.filter(id=draft_id).delete()
+            self.delete_draft(draft_id, annotation.id)
 
         if self.request.data.get('ground_truth'):
             annotation.task.ensure_unique_groundtruth(annotation_id=annotation.id)
