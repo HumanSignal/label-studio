@@ -475,6 +475,12 @@ class AnnotationDraft(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='drafts', on_delete=models.CASCADE,
         help_text='User who created this draft')
+    was_postponed = models.BooleanField(
+        _('was postponed'),
+        default=False,
+        help_text='User postponed this draft (clicked a forward button) in the label stream',
+        db_index=True
+    )
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last update time')
