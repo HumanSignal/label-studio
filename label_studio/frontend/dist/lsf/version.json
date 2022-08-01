@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2934: Fix Audio resizing behavior",
-  "commit": "f5cd348f68c9a52fd1ef39ef4fc90fcdf682128f",
-  "branch": "fb-dev-2934/fix-audio-region-positioning",
-  "date": "2022/08/01 18:29:14"
+  "commit": "9eaa736639ce7fa2eab602ebc1af04e4c8a3c951",
+  "branch": "master",
+  "date": "2022/08/01 18:38:17"
 }
