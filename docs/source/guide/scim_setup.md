@@ -17,11 +17,11 @@ Using SCIM provider, you can manage access to Label Studio Enterprise workspaces
 SCIM interacts with your SSO integration. 
 
 !!! note
-Okta or similar SSO providers have SCIM integration based on SSO.
+    Okta or similar SSO providers have SCIM integration based on SSO.
 
 
 !!! attention "important"
-If you do not have SSO set up yet, then follow [Set up SSO](auth_setup.md).
+    If you do not have SSO set up yet, then follow [Set up SSO](auth_setup.md).
 
 Label Studio Enterprise uses SCIM Version 2.0 standard. As an example, this page uses integration with [Okta](https://www.okta.com/integrate/). However, Label Studio Enterprise follows [SCIM RFC 5741](https://datatracker.ietf.org/doc/html/rfc7644#section-3.2) and can be integrated with any access management services that support the standard.
 
@@ -103,7 +103,7 @@ The most convenient way to manage access to the application is via groups. You c
 After saving the group assignment, the update will be queued and sent to Label Studio. 
 
 !!! note
-Alternatively, you can push the changes immediately to Label Studio.
+    Alternatively, you can push the changes immediately to Label Studio.
 
 ### Sync groups to the application
 
