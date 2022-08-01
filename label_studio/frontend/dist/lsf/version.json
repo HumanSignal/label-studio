@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2943: Fix floating panels positioning and constraints",
-  "commit": "46cf4ba8b9bba21710d35f663a5a73bf97b023b1",
-  "branch": "fb-dev-2943/fix-panels-positioning",
-  "date": "2022/07/23 01:41:24"
+  "commit": "cfdc0633e79f6b67782543f25ac221f3e2aaf609",
+  "branch": "master",
+  "date": "2022/08/01 19:25:02"
 }
