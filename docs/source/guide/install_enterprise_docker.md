@@ -21,7 +21,7 @@ For more information about security and hardening for Label Studio Enterprise, s
 
 ## Install Label Studio Enterprise using Docker
 
-1. Pull the latest image.
+1. Log in to a Docker registry.
 2. Add the license file.
 3. Start the server using Docker Compose.
 
@@ -36,15 +36,16 @@ After you install Label Studio Enterprise, the app is automatically connected to
 - PostgreSQL (versions 11, 12, 13).
 - Redis (version 5).
 
-### Pull the latest image
+### Log in to a Docker registry
 
 You must be authorized to access Label Studio Enterprise images. 
 
-1. Set up the Docker login to retrieve the latest Docker image:
+Set up the Docker login to retrieve the latest Docker image:
 ```bash
 docker login --username heartexlabs
 ```
 When prompted to enter the password, enter the token. If login succeeds, a `~/.docker/config.json` file is created with the authorization settings. 
+
 
 !!! Note
     If you have default registries specified when logging into Docker, you must explicitly specify the registry: `docker  login --username heartexlabs docker.io`.
@@ -56,6 +57,7 @@ docker pull heartexlabs/label-studio-enterprise:latest
 
 !!! attention "Tip"
     Use `sudo` to log in or pull images.
+
 
 ### Add the license file 
 
@@ -204,6 +206,6 @@ To check the version of the Label Studio Enterprise Docker image, use the [`dock
 From the command line, run the following as root or using `sudo` and review the output:
 ```bash
 $ docker ps
-03b88eebdb65   heartexlabs/label-studio-enterprise:latest   "uwsgi --ini deploy/…"   36 hours ago   Up 36 hours   0.0.0.0:80->8000/tcp   label-studio-enterprise_app_1
+03b88eebdb65   heartexlabs/label-studio-enterprise:2.2.8-1   "uwsgi --ini deploy/…"   36 hours ago   Up 36 hours   0.0.0.0:80->8000/tcp   label-studio-enterprise_app_1
 ```
-In this example output, the image column displays the Docker image and version number. The image `heartexlabs/label-studio-enterprise:latest` is using the version `latest`.
+In this example output, the image column displays the Docker image and version number. The image `heartexlabs/label-studio-enterprise:2.2.8-1` is using the version `2.2.8-1`.

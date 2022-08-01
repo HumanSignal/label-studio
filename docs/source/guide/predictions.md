@@ -17,7 +17,9 @@ You can import pre-annotated tasks into Label Studio [using the UI](tasks.html#I
 
 ## Format pre-annotations for Label Studio 
 
-To import predicted labels into Label Studio, you must use the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format) and set up your tasks with the `predictions` JSON key. The Label Studio ML backend also outputs tasks in this format. 
+To import predicted labels into Label Studio, you must use the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format) and set up your tasks with the `predictions` JSON key. The Label Studio ML backend also outputs tasks in this format. Check this common video tutorial showing how to convert a submitted annotation to a prediction:
+
+<iframe class="video-border" width="100%" height="400vh" src="https://www.youtube.com/embed/CyRe73VD4EE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ### Specific examples for pre-annotations
 
@@ -78,6 +80,8 @@ The `predictions` array also depends on the labeling configuration. Some pre-ann
 | `result.from_name` | string | String used to reference the labeling configuration `from_name` for the type of labeling being performed. Must match the labeling configuration. |
 | `result.to_name` | string | String used to reference the labeling configuration `to_name` for the type of labeling being performed. Must match the labeling configuration.   |
 | `result.type` | string | Specify the labeling tag for the type of labeling being performed. For example, a named entity recognition task has a type of `labels`.          |
+| `result.readonly` | bool | readonly mode for a specific region | 
+| `result.hidden` |  bool | default visibility (eye icon) for a specific region |
 
 Other types of annotation contain specific fields. You can review the [examples on this page](#Specific-examples-for-pre-annotations), or review the [tag documentation for the Object and Control tags](/tags) in your labeling configuration labeling-specific `result` objects. For example, the [Audio tag](tags/audio.html), [HyperText tag](tags/hypertext.html), [Paragraphs tag](tags/paragraphs.html), [KeyPointLabels](/tags/keypointlabels.html) and more all contain sample `result` JSON examples.
 
@@ -85,9 +89,9 @@ Other types of annotation contain specific fields. You can review the [examples 
     If you are generating pre-annotations for a [custom ML backend](ml_create.html), you can use the `self.parsed_label_config` variable to retrieve the labeling configuration for a project and generate pre-annotations. For more information, see the [custom ML backend](ml_create.html) documentation.
 
 
-## Import pre-annotations for images
+## Import bbox and choice pre-annotations for images
 
-For example, import predicted labels for tasks to determine whether an item in an image is an airplane or a car. 
+For example, import predicted **bounding box regions (rectangles)** and **choices** for tasks to determine whether an item in an image is an airplane or a car. 
 
 For image pre-annotations, Label Studio expects the x, y, width, and height of image annotations to be provided in percentages of overall image dimension. For more information about how to convert formats, see [Units for image annotations](predictions.html#Units_for_image_annotations) on this page.
 
@@ -119,10 +123,12 @@ Save this example JSON as a file to import it into Label Studio, for example, `e
 {% codeblock lang:json %}
 [{
   "data": {
-    "image": "http://localhost:8080/static/samples/sample.jpg" 
+    "image": "/static/samples/sample.jpg" 
   },
 
   "predictions": [{
+    "model_version": "one",
+    "score": 0.5,
     "result": [
       {
         "id": "result1",
@@ -157,8 +163,7 @@ Save this example JSON as a file to import it into Label Studio, for example, `e
         "value": {
           "choices": ["Airbus"]
       }
-    }],
-    "score": 0.95
+    }]
   }]
 }]
 {% endcodeblock %}
@@ -179,21 +184,20 @@ In the Label Studio UI, the imported prediction for this task looks like the fol
 <center><i>Figure 1: An image of airplanes with bounding boxes covering each airplane.</i></center>
 
 
-## Import pre-annotated regions for images 
+## Import pre-annotated rectangle, polygon, ellipse & keypoint regions without labels for images  
 
 If you want to import images with pre-annotated regions without labels assigned to them, follow this example.
 
 Use the following labeling configuration: 
 ```xml
 <View>
-  <View style="display:flex;align-items:start;gap:8px;flex-direction:row">
-    <Image name="image" value="$image" zoom="true" zoomControl="true" rotateControl="false"/>
-    <Rectangle name="rect" toName="image" showInline="false"/>
-  </View>
+  <Image name="image" value="$image" zoom="true" zoomControl="true" rotateControl="false"/>
+
+  <Rectangle name="rect" toName="image" showInline="false"/>
+  <Polygon name="polygon" toName="image"/>
   <Ellipse name="ellipse" toName="image"/>
   <KeyPoint name="kp" toName="image"/>
-  <Polygon name="polygon" toName="image"/>
-  <Brush name="brush" toName="image"/>
+
   <Labels name="labels" toName="image" fillOpacity="0.5" strokeWidth="5">
     <Label value="Vehicle" background="green"/>
     <Label value="Building" background="blue"/>
@@ -212,96 +216,93 @@ Save this example JSON as a file to import it into Label Studio, for example, `e
 
 {% codeblock lang:json %}
 [{
-    "id":8,
-    "predictions":[
+  "data": {
+    "image": "/static/samples/sample.jpg"
+  },
+  
+  "predictions": [
+    {
+      "model_version": "one",
+      "score": 0.5,
+      "result": [
         {
-            "id":10,
-            "result":[
-               {
-                  "original_width":800,
-                  "original_height":450,
-                  "image_rotation":0,
-                  "value":{
-                     "x":55.46666666666667,
-                     "y":2.3696682464454977,
-                     "width":35.86666666666667,
-                     "height":46.91943127962085,
-                     "rotation":0
-                  },
-                  "id":"ABC",
-                  "from_name":"rect",
-                  "to_name":"image",
-                  "type":"rectangle"
-               },
-               {
-                  "original_width":800,
-                  "original_height":450,
-                  "image_rotation":0,
-                  "value":{
-                     "x":58.4,
-                     "y":64.21800947867298,
-                     "width":30.533333333333335,
-                     "height":19.90521327014218,
-                     "rotation":0
-                  },
-                  "id":"DEF",
-                  "from_name":"rect",
-                  "to_name":"image",
-                  "type":"rectangle"
-               },
-               {
-                  "original_width":800,
-                  "original_height":450,
-                  "image_rotation":0,
-                  "value":{
-                     "points":[
-                        [
-                           20.933333333333334,
-                           28.90995260663507
-                        ],
-                        [
-                           25.866666666666667,
-                           64.69194312796209
-                        ],
-                        [
-                           38.4,
-                           62.796208530805686
-                        ],
-                        [
-                           34.13333333333333,
-                           27.488151658767773
-                        ]
-                    ]
-                },
-                "id":"GHI",
-                "from_name":"polygon",
-                "to_name":"image",
-                "type":"polygon"
-                },
-                {
-                "original_width":800,
-                "original_height":450,
-                "image_rotation":0,
-                "value":{
-                    "x":8.4,
-                    "y":20.14218009478673,
-                    "radiusX":4,
-                    "radiusY":7.109004739336493,
-                    "rotation":0
-                    },
-                "id":"JKL",
-                "from_name":"ellipse",
-                "to_name":"image",
-                "type":"ellipse"
-                }
-            ],
-            "task":8
+          "original_width": 800,
+          "original_height": 450,
+          "image_rotation": 0,
+          "value": {
+            "x": 55.46,
+            "y": 2.36,
+            "width": 35.86,
+            "height": 46.9,
+            "rotation": 0
+          },
+          "id": "ABC",
+          "from_name": "rect",
+          "to_name": "image",
+          "type": "rectangle"
+        },
+        {
+          "original_width": 800,
+          "original_height": 450,
+          "image_rotation": 0,
+          "value": {
+            "points": [
+              [
+                20.93,
+                28.90
+              ],
+              [
+                25.86,
+                64.69
+              ],
+              [
+                38.40,
+                62.79
+              ],
+              [
+                34.13,
+                27.48
+              ]
+            ]
+          },
+          "id": "GHI",
+          "from_name": "polygon",
+          "to_name": "image",
+          "type": "polygon"
+        },
+        {
+          "original_width": 800,
+          "original_height": 450,
+          "image_rotation": 0,
+          "value": {
+            "x": 8.4,
+            "y": 20.14,
+            "radiusX": 4,
+            "radiusY": 7.10,
+            "rotation": 0
+          },
+          "id": "JKL",
+          "from_name": "ellipse",
+          "to_name": "image",
+          "type": "ellipse"
+        },
+        {
+          "original_width": 800,
+          "original_height": 450,
+          "image_rotation": 0,
+          "value": {
+            "x": 38.40,
+            "y": 34.21,
+            "width": 1.0
+          },
+          "id": "DEF",
+          "from_name": "rect",
+          "to_name": "image",
+          "type": "keypoint"
         }
-    ],
-    "data":{
-    "image":"/data/upload/31159626248_d0362d027c_c.jpg"
-    },
-    "project":4
+      ]
+    }
+  ]
 }]
 {% endcodeblock %}
 
@@ -319,6 +320,7 @@ None of the regions have labels applied. The labeling configuration must use the
 
 
 ## Import pre-annotations for text 
+
 
 In this example, import pre-annotations for text using the [named entity recognition template](/templates/named_entity.html):
 ```xml
@@ -357,6 +359,7 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
     "predictions": [
       {
         "model_version": "one",
+        "score": 0.5,
         "result": [
           {
             "id": "abc",
@@ -422,6 +425,7 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
       },
       {
         "model_version": "two",
+        "score": 0.42,
         "result": [
           {
             "id": "mno",
@@ -927,5 +931,6 @@ Because the TextArea tag applies to each labeled region, the IDs for the label r
 
 
 ### Read only and hidden regions
+
 
 In some situations, it's very helpful to hide or to make `read-only` bounding boxes, text spans, audio segments, and so on. You can put `"readonly": true` or `"hidden": true` in regions to achieve this (the dict inside of `annotations.result` list).  

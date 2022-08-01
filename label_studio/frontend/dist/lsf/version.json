@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2922: Selection box of rectangle region remains broken after hide/ unhide action (#767)\n\nDisable transform when the region is hidden",
-  "commit": "5875851b5acbfc287e676649a2d3f5f8d6dce65a",
+  "message": "fix: DEV-2927: Better UI for textarea inputs in the outliner (#766)\n\nBetter UI for textarea inputs in the outliner",
+  "commit": "cadfdf72ad373c0d6745d60813156e5c8858d813",
   "branch": "master",
-  "date": "2022-07-22T13:32:31Z"
+  "date": "2022-08-01T18:46:20Z"
 }
