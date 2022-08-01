@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2943: Fix floating panels positioning and constraints",
+  "message": "fix: DEV-2943: Fix floating panels positioning and constraints (#775)\n\nIntroduce proper positioning on window resize\r\nIntroduce positioning constraints based on the viewport",
   "commit": "cfdc0633e79f6b67782543f25ac221f3e2aaf609",
   "branch": "master",
-  "date": "2022/08/01 19:25:02"
+  "date": "2022-08-01T15:25:02Z"
 }
