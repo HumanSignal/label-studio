@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3049: visual bug with the Zoom To flyout menu on smaller screen sizes",
-  "commit": "0da007e2c42f83403d23e94f99ef99129c697117",
+  "message": "fix: DEV-2971: Disable trash button (#786)",
+  "commit": "cd6177cdb7fc9a3510f0fbc6e40a902afbb25f9b",
   "branch": "master",
-  "date": "2022/08/02 07:23:42"
+  "date": "2022-08-02T13:04:46Z"
 }
