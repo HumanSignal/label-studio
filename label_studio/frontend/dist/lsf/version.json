@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2514: Polygon isn't finished when moved (#755)\n\n* fix: DEV-2514: Polygon isn't finished when moved",
-  "commit": "24c37644c57a026d3efe9b956eb2852efaa09ebc",
+  "message": "fix: DEV-2949: Annotation region locking should not persist (#779)\n\nfix: DEV-2949: Region locking should not persist",
+  "commit": "9f06ff3f4baf755f6550265c713de2f93f86dcfd",
   "branch": "master",
-  "date": "2022-08-02T13:59:36Z"
+  "date": "2022-08-02T14:47:27Z"
 }
