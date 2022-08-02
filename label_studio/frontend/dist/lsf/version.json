@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2971: Disable trash button",
+  "message": "fix: DEV-2971: Disable trash button (#786)",
   "commit": "cd6177cdb7fc9a3510f0fbc6e40a902afbb25f9b",
   "branch": "master",
-  "date": "2022/08/02 10:04:46"
+  "date": "2022-08-02T13:04:46Z"
 }
