@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2958: Fix NER region text not displaying in Details",
-  "commit": "dc6d6a56838e38f5aefd0c7247e1a175574442d8",
-  "branch": "fb-dev-2958/fix-ner-text-not-displaying",
-  "date": "2022/07/23 00:59:17"
+  "commit": "f5a51fb6ce0e5dbb18ae9a71d58a6ab23e2e6c27",
+  "branch": "master",
+  "date": "2022/08/02 14:05:14"
 }
