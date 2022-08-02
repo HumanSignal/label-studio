@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2927: Better UI for textarea inputs in the outliner (#766)\n\nBetter UI for textarea inputs in the outliner",
-  "commit": "cadfdf72ad373c0d6745d60813156e5c8858d813",
+  "message": "fix: DEV-2958: Fix NER region text not displaying in Details (#771)\n\n* Fix NER text not displaying in Details\r\n\r\n* Remove trace",
+  "commit": "f5a51fb6ce0e5dbb18ae9a71d58a6ab23e2e6c27",
   "branch": "master",
-  "date": "2022-08-01T18:46:20Z"
+  "date": "2022-08-02T10:05:14Z"
 }
