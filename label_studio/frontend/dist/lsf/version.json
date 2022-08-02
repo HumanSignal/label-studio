@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3033: Fix AuthorFilter with valueType=url",
-  "commit": "b620842fafcaf33df8115bc5c13fe860cedc5c9b",
-  "branch": "fb-dev-3033/authors-reduce",
-  "date": "2022/07/29 13:16:09"
+  "commit": "6da2ba2f3ad0e5ef2e59be797575e13bbd00ef2e",
+  "branch": "master",
+  "date": "2022/08/02 09:57:20"
 }
