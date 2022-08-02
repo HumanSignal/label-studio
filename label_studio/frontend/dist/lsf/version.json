@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2971: Disable trash button (#786)",
-  "commit": "cd6177cdb7fc9a3510f0fbc6e40a902afbb25f9b",
+  "message": "fix: DEV-2514: Polygon isn't finished when moved (#755)\n\n* fix: DEV-2514: Polygon isn't finished when moved",
+  "commit": "24c37644c57a026d3efe9b956eb2852efaa09ebc",
   "branch": "master",
-  "date": "2022-08-02T13:04:46Z"
+  "date": "2022-08-02T13:59:36Z"
 }
