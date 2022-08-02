@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2885: Fix new field with ff off",
-  "commit": "9666b6a6c3ca8ab8210552ca26e98485bef070ce",
+  "message": "fix: DEV-2986: Adding guards to task loading to ensure users are warned of unsaved comments",
+  "commit": "aaead1f85dd97c9f78b5c120d658a4131a5bf26e",
   "branch": "master",
-  "date": "2022/07/27 12:56:09"
+  "date": "2022/07/28 11:06:38"
 }
