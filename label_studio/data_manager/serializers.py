@@ -267,6 +267,11 @@ class DataManagerTaskSerializer(TaskSerializer):
     def get_predictions_model_versions(self, task):
         return self._pretty_results(task, 'predictions_model_versions', unique=True)
 
+    def get_drafts_queryset(self, user, drafts):
+        """ Get all user's draft
+        """
+        return drafts.filter(user=user)
+
     def get_drafts(self, task):
         """Return drafts only for the current user"""
         # it's for swagger documentation
@@ -276,7 +281,7 @@ class DataManagerTaskSerializer(TaskSerializer):
         drafts = task.drafts
         if 'request' in self.context and hasattr(self.context['request'], 'user'):
             user = self.context['request'].user
-            drafts = drafts.filter(user=user)
+            drafts = self.get_drafts_queryset(user, drafts)
 
         return AnnotationDraftSerializer(drafts, many=True, read_only=True, default=True, context=self.context).data
 
