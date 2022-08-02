@@ -523,3 +523,5 @@ FEATURE_FLAGS_DEFAULT_VALUE = False
 
 # Strip harmful content from SVG files by default
 SVG_SECURITY_CLEANUP = get_bool_env('SVG_SECURITY_CLEANUP', False)
+
+ML_ALLOW_LOCAL_IP = get_bool_env('ML_ALLOW_LOCAL_IP', False)

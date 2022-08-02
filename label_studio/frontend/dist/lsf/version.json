@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2514: Polygon isn't finished when moved",
-  "commit": "f2c8ece3260c5810d312f022bab3b4bdb536db28",
-  "branch": "fb-dev-2514",
-  "date": "2022/08/01 12:50:19"
+  "message": "fix: DEV-2514: Polygon isn't finished when moved (#755)\n\n* fix: DEV-2514: Polygon isn't finished when moved",
+  "commit": "24c37644c57a026d3efe9b956eb2852efaa09ebc",
+  "branch": "master",
+  "date": "2022-08-02T13:59:36Z"
 }
