@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2949: Annotation region locking should not persist",
+  "message": "fix: DEV-2949: Annotation region locking should not persist (#779)\n\nfix: DEV-2949: Region locking should not persist",
   "commit": "9f06ff3f4baf755f6550265c713de2f93f86dcfd",
   "branch": "master",
-  "date": "2022/08/02 09:47:27"
+  "date": "2022-08-02T14:47:27Z"
 }
