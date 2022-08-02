@@ -2,13 +2,14 @@
 """
 import logging
 
+from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 import drf_yasg.openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, views
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
@@ -523,3 +524,42 @@ class PredictionAPI(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Prediction.objects.filter(task__project__organization=self.request.user.active_organization)
+
+
+@method_decorator(name='post', decorator=swagger_auto_schema(
+        tags=['Annotations'],
+        operation_summary='Convert annotation to draft',
+        operation_description='Convert annotation to draft',
+        ))
+class AnnotationConvertAPI(views.APIView):
+    permission_required = ViewClassPermission(
+        POST=all_permissions.annotations_change
+    )
+
+    def process_intermediate_state(self, annotation, draft):
+        pass
+
+    @swagger_auto_schema(auto_schema=None)
+    def post(self, request, *args, **kwargs):
+        annotation = get_object_with_check_and_log(request, Annotation, pk=self.kwargs['pk'])
+        organization = annotation.task.project.organization
+        project = annotation.task.project
+        pk = annotation.pk
+
+        with transaction.atomic():
+            draft = AnnotationDraft.objects.create(
+                result=annotation.result,
+                lead_time=annotation.lead_time,
+                task=annotation.task,
+                annotation=None,
+                user=request.user,
+            )
+
+            self.process_intermediate_state(annotation, draft)
+
+            annotation.delete()
+
+        emit_webhooks_for_instance(organization, project, WebhookAction.ANNOTATIONS_DELETED, [pk])
+        data = AnnotationDraftSerializer(instance=draft).data
+        return Response(status=201, data=data)
+

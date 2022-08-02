@@ -464,7 +464,7 @@ class AnnotationDraft(models.Model):
         _('result'),
         help_text='Draft result in JSON format')
     lead_time = models.FloatField(
-        _('lead time'),
+        _('lead time'), blank=True, null=True,
         help_text='How much time it took to annotate the task')
     task = models.ForeignKey(
         'tasks.Task', on_delete=models.CASCADE, related_name='drafts', blank=True, null=True,
@@ -761,6 +761,7 @@ def bulk_update_stats_project_tasks(tasks):
             update_task_stats(task, save=False)
         # start update query batches
         bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \
