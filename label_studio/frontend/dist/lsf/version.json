@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2949: Annotation region locking should not persist (#779)\n\nfix: DEV-2949: Region locking should not persist",
-  "commit": "9f06ff3f4baf755f6550265c713de2f93f86dcfd",
-  "branch": "master",
-  "date": "2022-08-02T14:47:27Z"
+  "message": "fix: DEV-2970: Fix history items rendering on the canvas",
+  "commit": "8afd2cc7486399765a749538f18c44a99b0d47cb",
+  "branch": "fb-dev-2970/fix-anno-history-outliner",
+  "date": "2022/08/03 17:55:20"
 }
