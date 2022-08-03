@@ -3,7 +3,7 @@
   "version": "1.1.0",
   "description": "",
   "main": "get-build.js",
-  "scripts": { 
+  "scripts": {
     "start": "npx webpack --watch",
     "test": "CSS_PREFIX='ls-' jest",
     "build": "npx webpack",
@@ -155,7 +155,9 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
+    "bootstrap": "^5.1.3",
     "lodash.clonedeep": "^4.5.0",
+    "react-select": "^5.4.0",
     "sweetalert": "^2.1.2",
     "sweetalert2": "^11.4.19"
   }

@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { Button } from '../../../components';
+import { Button, Card } from '../../../components';
 import { Description } from '../../../components/Description/Description';
 import { Divider } from '../../../components/Divider/Divider';
 import { ErrorWrapper } from '../../../components/Error/Error';
@@ -13,13 +13,58 @@ import { ProjectModelVersionSelector } from './ProjectModelVersionSelector';
 import { ModelVersionSelector } from './ModelVersionSelector';
 import { FF_DEV_1682, isFF } from '../../../utils/feature-flags';
 import './MachineLearningSettings.styl';
+import Select from 'react-select';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios'
 
 export const MachineLearningSettings = () => {
   const api = useAPI();
   const { project, fetchProject } = useContext(ProjectContext);
   const [mlError, setMLError] = useState();
   const [backends, setBackends] = useState([]);
-
+  const [fetchedModels, setFetchModels] = useState(false);
+  const [availableModels, setAvailableModels] = useState([]);
+  const [modelToPredictOn, setModelToPredictOn] = useState('');
+  const [modelsPrecisions, setModelsPrecisions] = useState([]);
+  const [fetchedPrecisions, setFetchPrecisions] = useState(false);
+  const mod = useCallback(async () => {
+    await axios
+      .get('http://127.0.0.1:3535/get_available_models?id=' + project.id)
+      .then((response) => {
+        console.log(response);
+        setAvailableModels(response.data.models);
+        setModelToPredictOn(response.data.model_path);
+        console.log(availableModels);
+        setFetchModels(true);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+      await axios
+      .get('http://127.0.0.1:3535/get_mean_average_precisions?id=' + project.id)
+        .then((response) => {
+          console.log(response);
+          setModelsPrecisions(response.data.models);
+          setFetchModels(true)
+          console.log(Object.keys(response.data.models))
+      })
+      .catch((error) => {
+        console.log(error);
+      });    
+  });
+  const saveInferencePath = useCallback(async () => {
+    await axios.post('http://127.0.0.1:3535/change_model_path_in_inference?id=' + project.id + '&model_path=' + modelToPredictOn)
+      .then((response) => {
+        console.log(response);
+    })
+  })
+  const evaluate = useCallback(async (param) => {
+    axios.post('http://127.0.0.1:3535/evaluate?id=' + project.id + '&model_path=' + param)
+      .then((response) => {
+        console.log(response);
+        setModelsPrecisions(response.data.models);
+      })
+  });
   const fetchBackends = useCallback(async () => {
     const models = await api.callApi('mlBackends', {
       params: {
@@ -120,6 +165,7 @@ export const MachineLearningSettings = () => {
 
   useEffect(() => {
     if (project.id) {
+      mod();
       fetchBackends();
     }
   }, [project]);
@@ -128,7 +174,7 @@ export const MachineLearningSettings = () => {
     <>
       <Description style={{ marginTop: 0, maxWidth: 680 }}>
         Add one or more machine learning models to predict labels for your data.
-        To import predictions without connecting a model,
+        To import predictions without connecting a model,ss
         {" "}
         <a href="https://labelstud.io/guide/predictions.html" target="_blank">
           see the documentation
@@ -174,12 +220,68 @@ export const MachineLearningSettings = () => {
         {!isFF(FF_DEV_1682) && (
           <ProjectModelVersionSelector />
         )}
+        {fetchedModels?
+          <div>
+          <div key={'models'}>
+          <h5 style={{paddingTop:20}}>You have {availableModels.length} model{availableModels.length==1?'':'s'} in your project directory{availableModels.length > 0 ? ', they are located in: ':'.'} </h5>
+          {availableModels.map(model => (
+            <li key={model.value}>
+            {model.label}
+          </li>
+        ))}
+            </div>
+        {modelToPredictOn.length >0 && availableModels.length>0?
+          <div className="row" style={{ paddingTop: 20 }} key={'chosenModel'}>
+          <h5>Choose the model you want to use when retrieving predictions:</h5>
+            <div className="">
+              <Select onChange={(model)=>setModelToPredictOn(model.label)} options={availableModels} placeholder={modelToPredictOn} />
+            </div>
+              </div> :
+              <div>
+          You have no specs file available, please set your classes in the labeling interface in order to create the specs for Tao Trainer
+          </div>}
+          </div>
+          : ''}
+        {modelsPrecisions != [] ?
+          <div>
+            <div className='row' style={{paddingTop:20}}>
+            {availableModels.map(model => (
+            // {model.}
+              <div className='col-6' key={model.value}>
+              <Card  key={model.value}>
+                  Model Path: {model.label}
+                  {Object.keys(modelsPrecisions).includes(model.label.split(project.title + "_id_" + project.id + "/")[1]) ?
+                    <div style={{paddingTop:15}}>
+                      Mean Average Precision <strong>(mAp)</strong>: {modelsPrecisions[model.label.split(project.title + "_id_" + project.id + "/")[1]]['mAp']}
+                    <table>
+                    <thead>
+                    <tr><th style={{paddingRight:50}}>Class Name</th>
+                      <th>Average Precision</th></tr>
+                        </thead>{Object.keys(modelsPrecisions[model.label.split(project.title + "_id_" + project.id + "/")[1]]['classes']).map((i) => (
+                          <tbody key={i}>
+                            <tr><td>{i}</td>
+                              <td>{modelsPrecisions[model.label.split(project.title + "_id_" + project.id + "/")[1]]['classes'][i]}</td></tr>
+                          </tbody>
 
+                        ))}
+                      </table>
+                      </div>
+                    : 
+                    <div style={{paddingTop: 15}}>
+                      You don't have any information regarding this model <br></br>
+                    <button onClick={() =>evaluate(model.label)} className='btn btn-outline-primary'>Evaluate</button></div>}
+
+          </Card>
+                </div>
+          // {modelsPrecisions[0]["'detectnet_v2/experiment_dir_unpruned/weights/unpruned.tlt"]}
+         ))}
+         </div> 
+          </div> : ""}
         <Form.Actions>
           <Form.Indicator>
             <span case="success">Saved!</span>
           </Form.Indicator>
-          <Button type="submit" look="primary" style={{ width: 120 }}>Save</Button>
+          <Button onClick={saveInferencePath} type="submit" look="primary" style={{ width: 120 }}>Save</Button>
         </Form.Actions>
       </Form>
 
