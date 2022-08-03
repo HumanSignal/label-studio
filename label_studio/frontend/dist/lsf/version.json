@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2949: Annotation region locking should not persist (#779)\n\nfix: DEV-2949: Region locking should not persist",
-  "commit": "9f06ff3f4baf755f6550265c713de2f93f86dcfd",
-  "branch": "master",
-  "date": "2022-08-02T14:47:27Z"
+  "message": "fix: DEV-3030: Fix paragraphs selection",
+  "commit": "6a043095f23d4503921eaa20465830e043150ce5",
+  "branch": "fb-dev-3030/fix-outliner-paragraphs",
+  "date": "2022/08/03 16:56:01"
 }
