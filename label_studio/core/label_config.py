@@ -161,7 +161,7 @@ def get_all_object_tag_names(label_config):
 
 
 def config_line_stipped(c):
-    tree = etree.fromstring(c)
+    tree = etree.fromstring(c, forbid_dtd=False)
     comments = tree.xpath('//comment()')
 
     for c in comments:
