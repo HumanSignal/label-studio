@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2949: Annotation region locking should not persist (#779)\n\nfix: DEV-2949: Region locking should not persist",
-  "commit": "9f06ff3f4baf755f6550265c713de2f93f86dcfd",
-  "branch": "master",
-  "date": "2022-08-02T14:47:27Z"
+  "message": "fix: DEV-2964: Wrap Annotation History with an interface toggle",
+  "commit": "8a08baf2fdec332b8af03a2380fd6fc5cc646478",
+  "branch": "fb-dev-2964/disable-annotation-history",
+  "date": "2022/08/03 17:12:18"
 }
