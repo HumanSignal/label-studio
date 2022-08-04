@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2949: Annotation region locking should not persist (#779)\n\nfix: DEV-2949: Region locking should not persist",
-  "commit": "9f06ff3f4baf755f6550265c713de2f93f86dcfd",
+  "message": "chore: DEV-2504: Retire the FF for the image zoom feature",
+  "commit": "257100a37d226a90be300197656c85daf7f331e3",
   "branch": "master",
-  "date": "2022-08-02T14:47:27Z"
+  "date": "2022/08/04 09:31:55"
 }
