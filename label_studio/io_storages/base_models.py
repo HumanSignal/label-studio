@@ -217,7 +217,7 @@ class ExportStorage(Storage):
     def sync(self):
         if redis_connected():
             queue = django_rq.get_queue('low')
-            job = queue.enqueue(export_sync_background, self.__class__, self.id)
+            job = queue.enqueue(export_sync_background, self.__class__, self.id, timeout=settings.RQ_LONG_JOB_TIMEOUT)
             logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
         else:
             logger.info(f'Start syncing storage {self}')
