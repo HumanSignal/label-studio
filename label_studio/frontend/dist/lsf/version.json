@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2576: Undo keypoints when create new polygon",
-  "commit": "0fd33eba9e81562f7b2726523a3eadc18ca73800",
-  "branch": "fb-dev-2576/undo-keypoints",
-  "date": "2022/08/05 16:07:39"
+  "message": "docs: DEV-3081: Improve Repeater docs (#800)",
+  "commit": "77ebb86303b144a78701673f527b7399b7671574",
+  "branch": "master",
+  "date": "2022-08-05T16:32:55Z"
 }
