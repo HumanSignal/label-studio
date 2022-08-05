@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3104: Can't upload data without annotation history",
-  "commit": "655691202dcca3164e6da033d0fd6f45ef6e175c",
-  "branch": "master",
-  "date": "2022/08/05 12:22:08"
+  "message": "docs: DEV-3081: Improve Repeater docs",
+  "commit": "f4d9f7a55ff1f5b17f58eea06f02259331b7d297",
+  "branch": "fb-dev-3081/repeater-docs",
+  "date": "2022/08/05 14:55:59"
 }
