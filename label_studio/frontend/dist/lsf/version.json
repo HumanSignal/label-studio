@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-3034: Submit and list comments via annotation draft",
-  "commit": "5aa4dd8698f006a0e03e7a6db344dd6be6a28690",
-  "branch": "fb-dev-3034",
-  "date": "2022/08/04 14:31:22"
+  "message": "feat: DEV-3034: Comments with drafts",
+  "commit": "89e9252387b6816a46471c044268594106c95a74",
+  "branch": "master",
+  "date": "2022/08/04 20:36:43"
 }
