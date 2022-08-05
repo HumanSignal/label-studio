@@ -389,11 +389,15 @@ def replace_task_data_undefined_with_config_field(data, project, first_key=None)
         del data[settings.DATA_UNDEFINED_NAME]
 
 
-def check_control_in_config_by_regex(config_string, control_type):
+def check_control_in_config_by_regex(config_string, control_type, filter=None):
     """
     Check if control type is in config including regex filter
     """
     c = parse_config(config_string)
+    if filter is not None and len(filter) == 0:
+        return False
+    if filter:
+        c = {key: c[key] for key in filter}
     for control in c:
         item = c[control].get('regex', {})
         expression = control
