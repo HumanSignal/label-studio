@@ -68,7 +68,6 @@ logger = logging.getLogger(__name__)
     ],
 ))
 class TaskListAPI(DMTaskListAPI):
-    serializer_class = TaskSerializer
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
         POST=all_permissions.tasks_create,
