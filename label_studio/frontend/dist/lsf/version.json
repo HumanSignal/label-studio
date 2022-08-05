@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-3034: Comments with drafts",
-  "commit": "89e9252387b6816a46471c044268594106c95a74",
-  "branch": "master",
-  "date": "2022/08/04 20:36:43"
+  "message": "fix: DEV-3104: Can't upload data without annotation history",
+  "commit": "fbddb1b5910a6a7b1b9b92fd54d7df7a31986b86",
+  "branch": "fb-dev-3104",
+  "date": "2022/08/05 11:53:44"
 }
