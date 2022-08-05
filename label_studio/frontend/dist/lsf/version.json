@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3104: Can't upload data without annotation history",
-  "commit": "fbddb1b5910a6a7b1b9b92fd54d7df7a31986b86",
-  "branch": "fb-dev-3104",
-  "date": "2022/08/05 11:53:44"
+  "commit": "655691202dcca3164e6da033d0fd6f45ef6e175c",
+  "branch": "master",
+  "date": "2022/08/05 12:22:08"
 }
