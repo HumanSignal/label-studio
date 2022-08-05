@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2986: Adding guards to task loading to ensure users are warned of unsaved comments (#92)\n\nfix: DEV-2986: adding guards to task loading to ensure users are warned of unsaved comments",
-  "commit": "aaead1f85dd97c9f78b5c120d658a4131a5bf26e",
+  "message": "feat: DEV-3034: Comments with drafts",
+  "commit": "0341f04ebceb8d011c2ea2c81efa7df29991b191",
   "branch": "master",
-  "date": "2022-07-28T16:06:38Z"
+  "date": "2022/08/04 20:34:21"
 }

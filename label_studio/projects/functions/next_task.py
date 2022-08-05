@@ -128,6 +128,11 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
     user_solved_tasks_array = user_solved_tasks_array.distinct().values_list('task__pk', flat=True)
     not_solved_tasks = prepared_tasks.exclude(pk__in=user_solved_tasks_array)
 
+    if user.drafts.filter(was_postponed=True).exists():
+        user_postponed_drafts = user.drafts.filter(was_postponed=True).distinct()
+        user_postponed_tasks = user_postponed_drafts.values_list('task__pk', flat=True)
+        not_solved_tasks = not_solved_tasks.exclude(pk__in=user_postponed_tasks)
+
     # if annotator is assigned for tasks, he must to solve it regardless of is_labeled=True
     if not assigned_flag:
         not_solved_tasks = not_solved_tasks.filter(is_labeled=False)

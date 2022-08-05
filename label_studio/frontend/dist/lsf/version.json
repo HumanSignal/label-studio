@@ -1,6 +1,6 @@
 {
-  "message": "chore: DEV-2504: Retire the FF for the image zoom feature",
-  "commit": "257100a37d226a90be300197656c85daf7f331e3",
+  "message": "feat: DEV-3034: Comments with drafts",
+  "commit": "89e9252387b6816a46471c044268594106c95a74",
   "branch": "master",
-  "date": "2022/08/04 09:31:55"
+  "date": "2022/08/04 20:36:43"
 }

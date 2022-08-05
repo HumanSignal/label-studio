@@ -320,7 +320,7 @@ def get_prepare_params(request, project):
         filters = data.get('filters', None)
         ordering = data.get('ordering', [])
         prepare_params = PrepareParams(project=project.id, selectedItems=selected, data=data,
-                                       filters=filters, ordering=ordering)
+                                       filters=filters, ordering=ordering, request=request)
     return prepare_params
 
 
