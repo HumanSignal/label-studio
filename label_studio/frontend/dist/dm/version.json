@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2672: Add new column decorators to old table",
-  "commit": "28bb29b678ce8c94f9cb0991a9854473750edb1c",
+  "commit": "bb1960f91269d776ca163aa9d922d5a9763093c1",
   "branch": "fb-dev-2672/colomn-icons-old-table",
-  "date": "2022/07/29 15:12:16"
+  "date": "2022/08/05 10:46:40"
 }
