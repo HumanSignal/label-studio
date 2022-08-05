@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2170: On project open set number of tasks defined by task per page",
-  "commit": "864b7d52db9ee07aa78a447b2512468970cca7f1",
+  "message": "feat: DEV-3034: Comments with drafts",
+  "commit": "0341f04ebceb8d011c2ea2c81efa7df29991b191",
   "branch": "master",
-  "date": "2022/07/14 12:20:33"
+  "date": "2022/08/04 20:34:21"
 }

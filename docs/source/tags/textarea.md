@@ -1,7 +1,7 @@
 ---
 title: TextArea
 type: tags
-order: 426
+order: 427
 meta_title: Textarea Tag for Text areas
 meta_description: Customize Label Studio with the TextArea tag to support audio transcription, image captioning, and OCR tasks for machine learning and data science projects.
 ---
