@@ -765,6 +765,13 @@ class Project(ProjectMixin, models.Model):
         return result
 
     def get_model_versions(self, with_counters=False):
+        """
+        Get model_versions from project predictions
+        :param with_counters: With count of predictions for each version
+        :return:
+        Dict or list
+        {model_version: count_predictions}, [model_versions]
+        """
         predictions = Prediction.objects.filter(task__project=self)
         # model_versions = set(predictions.values_list('model_version', flat=True).distinct())
         model_versions = predictions.values('model_version').annotate(count=Count('model_version'))
