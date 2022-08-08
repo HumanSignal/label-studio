@@ -2,6 +2,7 @@ import React from 'react';
 import { SidebarMenu } from '../../components/SidebarMenu/SidebarMenu';
 import { WebhookPage } from '../WebhookPage/WebhookPage';
 import { DangerZone } from './DangerZone';
+import { DisplayLogs } from './DisplayLogs';
 import { GeneralSettings } from './GeneralSettings';
 import { InstructionsSettings } from './InstructionsSettings';
 import { LabelingSettings } from './LabelingSettings';
@@ -19,6 +20,7 @@ export const MenuLayout = ({children, ...routeProps}) => {
         MachineLearningSettings,
         StorageSettings,
         WebhookPage,
+        DisplayLogs,
         DangerZone,
       ]}
       path={routeProps.match.url}
@@ -39,6 +41,7 @@ export const SettingsPage = {
     MachineLearningSettings,
     StorageSettings,
     WebhookPage,
+    DisplayLogs,
     DangerZone,
   },
 };
