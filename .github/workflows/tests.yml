@@ -30,6 +30,7 @@ jobs:
       SENTRY_ENVIRONMENT: tests-ubuntu-sqlite
       SENTRY_RATE: 0
       DJANGO_DB: sqlite
+      JSON_LOG: 0
       # SENTRY_DSN:
 
     steps:
@@ -117,6 +118,7 @@ jobs:
       collect_analytics: false
       SENTRY_ENVIRONMENT: tests-ubuntu-postgresql
       SENTRY_RATE: 0
+      JSON_LOG: 0
       # SENTRY_DSN:
 
     # Service containers to run with `container-job`
@@ -244,6 +246,7 @@ jobs:
       SENTRY_ENVIRONMENT: tests-windows-sqlite
       SENTRY_RATE: 0
       DJANGO_DB: sqlite
+      JSON_LOG: 0
       # SENTRY_DSN:
 
     steps:

@@ -464,7 +464,7 @@ class AnnotationDraft(models.Model):
         _('result'),
         help_text='Draft result in JSON format')
     lead_time = models.FloatField(
-        _('lead time'),
+        _('lead time'), blank=True, null=True,
         help_text='How much time it took to annotate the task')
     task = models.ForeignKey(
         'tasks.Task', on_delete=models.CASCADE, related_name='drafts', blank=True, null=True,
@@ -475,6 +475,12 @@ class AnnotationDraft(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='drafts', on_delete=models.CASCADE,
         help_text='User who created this draft')
+    was_postponed = models.BooleanField(
+        _('was postponed'),
+        default=False,
+        help_text='User postponed this draft (clicked a forward button) in the label stream',
+        db_index=True
+    )
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last update time')
@@ -755,6 +761,7 @@ def bulk_update_stats_project_tasks(tasks):
             update_task_stats(task, save=False)
         # start update query batches
         bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \
