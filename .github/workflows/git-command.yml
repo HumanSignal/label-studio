@@ -19,6 +19,7 @@ jobs:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.pull_request.head.repo.full_name }}
           ref: ${{ github.event.client_payload.pull_request.head.ref }}
+          fetch-depth: 0
 
       - name: Check for merge conflict
         id: check-conflict

@@ -116,7 +116,7 @@ class MLBackend(models.Model):
         return self.healthcheck_(self.url)
 
     def setup(self):
-        return self.setup_(self.url, self.project, self.model_version)
+        return self.setup_(self.url, self.project, None if self.auto_update else self.model_version)
 
     @property
     def api(self):
