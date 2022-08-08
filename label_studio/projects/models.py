@@ -581,9 +581,9 @@ class Project(ProjectMixin, models.Model):
             if control_type in exclude_control_types:
                 continue
             control_weights[control_name] = {
-                'overall': 1.0,
+                'overall': self.control_weights.get(control_name, {}).get('overall') or 1.0,
                 'type': control_type,
-                'labels': {label: 1.0 for label in outputs[control_name].get('labels', [])},
+                'labels': {label: self.control_weights.get(control_name, {}).get('labels', {}).get(label) or 1.0 for label in outputs[control_name].get('labels', [])},
             }
         return control_weights
 
