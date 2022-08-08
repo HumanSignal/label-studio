@@ -3,7 +3,10 @@ name: "Docker build & push"
 on:
   workflow_call:
     inputs:
-      ref:
+      sha:
+        required: true
+        type: string
+      branch_name:
         required: true
         type: string
     outputs:
@@ -35,7 +38,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.sha }}
 
       - name: Calculate version
         id: version
@@ -45,10 +48,10 @@ jobs:
           sha="$(git rev-parse HEAD)"
           echo "::set-output name=sha::$sha"
           regexp='^ls-release\/(.*)$'; 
-          if [[ '${{ inputs.ref }}' =~ $regexp ]]; then
+          if [[ '${{ inputs.branch_name }}' =~ $regexp ]]; then
             image_version="${BASH_REMATCH[1]}rc${sha}"
           else
-            image_version='${{ inputs.ref }}'
+            image_version='${{ inputs.branch_name }}'
           fi
           echo "::set-output name=image_version::${image_version}"
           echo "::set-output name=ubi_image_version::ubi_${image_version}"
