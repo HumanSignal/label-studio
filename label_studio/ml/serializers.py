@@ -9,7 +9,7 @@ from core.utils.exceptions import MLModelLocalIPError
 
 class MLBackendSerializer(serializers.ModelSerializer):
     def validate_url(self, value):
-        if settings.SSRF_PROTECTION_ENABLED and url_is_local(value):
+        if settings.ML_BLOCK_LOCAL_IP and url_is_local(value):
             raise MLModelLocalIPError
         return value
 

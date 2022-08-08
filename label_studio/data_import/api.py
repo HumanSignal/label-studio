@@ -452,6 +452,7 @@ class UploadedFileResponse(generics.RetrieveAPIView):
     def get(self, *args, **kwargs):
         request = self.request
         filename = kwargs['filename']
+        # XXX needed, on windows os.path.join generates '\' which breaks FileUpload
         file = settings.UPLOAD_DIR + ('/' if not settings.UPLOAD_DIR.endswith('/') else '') + filename
         logger.debug(f'Fetch uploaded file by user {request.user} => {file}')
         file_upload = FileUpload.objects.filter(file=file).last()

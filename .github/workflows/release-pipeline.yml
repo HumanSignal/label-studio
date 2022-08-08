@@ -1,0 +1,56 @@
+name: "Release Pipeline"
+
+on:
+  release:
+    types:
+      - released
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+  HOMEBREW_TAP_REPO_OWNER: "heartexlabs"
+  HOMEBREW_TAP_REPO: "homebrew-tap"
+
+jobs:
+  promote_docker_image:
+    name: "Promote"
+    uses: heartexlabs/label-studio/.github/workflows/docker-release-promote.yml@develop
+    with:
+      release_tag: ${{ github.ref_name }}
+    secrets: inherit
+
+  build-pypi:
+    name: "Build"
+    uses: heartexlabs/label-studio/.github/workflows/build_pypi.yml@develop
+    with:
+      version: ${{ github.ref_name }}
+      ref: ${{ github.ref_name }}
+      upload_to_pypi: true
+      release-id: ${{ github.event.release.id }}
+    secrets: inherit
+
+  update-homebrew-tap:
+    name: "Update Homebrew Tap"
+    runs-on: ubuntu-latest
+    needs:
+      - build-pypi
+    steps:
+      - uses: hmarr/debug-action@v2.0.1
+
+      - name: DispatchEvent
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            await github.rest.repos.createDispatchEvent({
+              owner: '${{ env.HOMEBREW_TAP_REPO_OWNER }}',
+              repo: '${{ env.HOMEBREW_TAP_REPO }}',
+              event_type: 'upstream_formula_update',
+              client_payload: {
+                formula: 'label-studio'
+                url: '${{ needs.build-pypi.outputs.pipy-artifact-url }}',
+                sha256: '${{ needs.build-pypi.outputs.pipy-artifact-digests-sha256 }}',
+              }
+            });

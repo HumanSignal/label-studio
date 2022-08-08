@@ -1,7 +1,7 @@
 ---
 title: Labels
 type: tags
-order: 411
+order: 412
 meta_title: Labels Tag for Labeling Regions
 meta_description: Customize Label Studio by using the Labels tag to provide a set of labels for labeling regions in tasks for machine learning and data science projects.
 ---
