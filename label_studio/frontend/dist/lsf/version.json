@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2970: Fix history items rendering on the canvas",
-  "commit": "e765e777bf817bb484155f9701c8ad8963608924",
-  "branch": "fb-dev-2970/fix-anno-history-outliner",
-  "date": "2022/08/03 18:17:09"
+  "commit": "29b044f0186b73be219570869cd8a039d835c918",
+  "branch": "master",
+  "date": "2022/08/08 16:05:29"
 }
