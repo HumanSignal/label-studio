@@ -154,6 +154,10 @@ def rename_labels(project, queryset, **kwargs):
             annotation.save(update_fields=['result'])
             annotation_count += 1
 
+    # update summaries
+    project.summary.reset()
+    project.summary.update_data_columns(project.tasks.all())
+
     return {'response_code': 200, 'detail': f'Updated {label_count} labels in {annotation_count}'}
 
 
