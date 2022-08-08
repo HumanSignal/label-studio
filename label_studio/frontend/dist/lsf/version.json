@@ -1,6 +1,6 @@
 {
-  "message": "docs: DEV-3081: Improve Repeater docs",
-  "commit": "77ebb86303b144a78701673f527b7399b7671574",
+  "message": "fix: DEV-2970: Fix history items rendering on the canvas (#795)\n\n* Fix history items rendering on the canvas\r\n\r\n* Remove leftover code",
+  "commit": "29b044f0186b73be219570869cd8a039d835c918",
   "branch": "master",
-  "date": "2022/08/05 17:32:55"
+  "date": "2022-08-08T12:05:29Z"
 }
