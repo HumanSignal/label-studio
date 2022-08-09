@@ -29,9 +29,6 @@ def project_list(request):
 def project_settings(request, pk, sub_path):
     return render(request, 'projects/settings.html')
 
-@login_required
-def display_logs(request):
-    return render(request, 'projects/display_logs.html')
 
 def playground_replacements(request, task_data):
     if request.GET.get('playground', '0') == '1':

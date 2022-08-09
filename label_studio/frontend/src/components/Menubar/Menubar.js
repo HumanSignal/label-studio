@@ -143,12 +143,6 @@ export const Menubar = ({
               />
               {/* <Menu.Item label="Dark Mode"/> */}
               <Menu.Item
-                icon={<IconTerminal/>}
-                label="Show Logs"
-                href={absoluteURL("/showLogs")}
-                data-external
-              />
-              <Menu.Item
                 icon={<LsDoor/>}
                 label="Log Out"
                 href={absoluteURL("/logout")}

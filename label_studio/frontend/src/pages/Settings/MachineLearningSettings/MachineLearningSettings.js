@@ -174,7 +174,7 @@ export const MachineLearningSettings = () => {
     <>
       <Description style={{ marginTop: 0, maxWidth: 680 }}>
         Add one or more machine learning models to predict labels for your data.
-        To import predictions without connecting a model,
+        To import predictions without connecting a model,ss
         {" "}
         <a href="https://labelstud.io/guide/predictions.html" target="_blank">
           see the documentation
