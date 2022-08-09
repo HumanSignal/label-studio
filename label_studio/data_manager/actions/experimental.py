@@ -157,6 +157,7 @@ def rename_labels(project, queryset, **kwargs):
     # update summaries
     project.summary.reset()
     project.summary.update_data_columns(project.tasks.all())
+    project.summary.update_created_annotations_and_labels(annotations)
 
     return {'response_code': 200, 'detail': f'Updated {label_count} labels in {annotation_count}'}
 
