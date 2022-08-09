@@ -147,7 +147,7 @@ stages:
   response:
     status_code: 200
     json:
-      model_version: 'Fri Feb 19 17:10:44 2021'
+      model_version: ''
 - name: chaneg_project_model_to_1
   request:
     method: PATCH
@@ -326,4 +326,4 @@ stages:
   response:
     status_code: 200
     json:
-      model_version: 'Fri Feb 19 17:10:44 2021'
+      model_version: '1'

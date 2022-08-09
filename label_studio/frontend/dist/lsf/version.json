@@ -1,6 +1,6 @@
 {
-  "message": "docs: DEV-3081: Improve Repeater docs",
-  "commit": "77ebb86303b144a78701673f527b7399b7671574",
+  "message": "fix: DEV-3030: Fix paragraphs selection (#793)\n\nFix paragraphs",
+  "commit": "8b6991a36a6fc9477ec4483cca2ba8f1414c033d",
   "branch": "master",
-  "date": "2022/08/05 17:32:55"
+  "date": "2022-08-09T08:54:43Z"
 }
