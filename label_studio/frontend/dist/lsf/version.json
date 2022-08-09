@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2970: Fix history items rendering on the canvas (#795)\n\n* Fix history items rendering on the canvas\r\n\r\n* Remove leftover code",
-  "commit": "29b044f0186b73be219570869cd8a039d835c918",
+  "message": "fix: DEV-3030: Fix paragraphs selection (#793)\n\nFix paragraphs",
+  "commit": "8b6991a36a6fc9477ec4483cca2ba8f1414c033d",
   "branch": "master",
-  "date": "2022-08-08T12:05:29Z"
+  "date": "2022-08-09T08:54:43Z"
 }
