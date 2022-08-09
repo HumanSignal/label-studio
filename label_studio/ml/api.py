@@ -254,3 +254,32 @@ class MLBackendInteractiveAnnotating(APIView):
             result,
             status=status.HTTP_200_OK,
         )
+
+
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
+        tags=['Machine Learning'],
+        operation_summary='Get model versions',
+        operation_description='Get available versions of the model.',
+        responses={"200": "List of available versions."},
+    ),
+)
+class MLBackendVersionsAPI(generics.RetrieveAPIView):
+
+    permission_required = all_permissions.projects_change
+
+    def get(self, request, *args, **kwargs):
+        ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
+        self.check_object_permissions(self.request, ml_backend)
+        versions_response = ml_backend.get_versions()
+        if versions_response.status_code == 200:
+            result = {'versions': versions_response.response.get("versions", [])}
+            return Response(data=result, status=200)
+        elif versions_response.status_code == 404:
+            result = {'versions': [ml_backend.model_version], 'message': 'Upgrade your ML backend version to latest.'}
+            return Response(data=result, status=200)
+        else:
+            result = {'error': str(versions_response.error_message)}
+            status_code = versions_response.status_code if versions_response.status_code > 0 else 500
+            return Response(data=result, status=status_code)

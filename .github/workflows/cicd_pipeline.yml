@@ -132,7 +132,8 @@ jobs:
       checks: write
     uses: heartexlabs/label-studio/.github/workflows/docker-build.yml@develop
     with:
-      ref: ${{ github.ref_name }}
+      sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+      branch_name: ${{ github.event.pull_request.head.ref || github.ref_name }}
     secrets: inherit
 
   pytest:

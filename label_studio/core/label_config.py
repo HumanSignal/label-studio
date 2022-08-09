@@ -387,3 +387,75 @@ def replace_task_data_undefined_with_config_field(data, project, first_key=None)
         key = first_key or list(project.data_types.keys())[0]
         data[key] = data[settings.DATA_UNDEFINED_NAME]
         del data[settings.DATA_UNDEFINED_NAME]
+
+
+def check_control_in_config_by_regex(config_string, control_type, filter=None):
+    """
+    Check if control type is in config including regex filter
+    """
+    c = parse_config(config_string)
+    if filter is not None and len(filter) == 0:
+        return False
+    if filter:
+        c = {key: c[key] for key in filter}
+    for control in c:
+        item = c[control].get('regex', {})
+        expression = control
+        for key in item:
+            expression = expression.replace(key, item[key])
+        pattern = re.compile(expression)
+        full_match = pattern.fullmatch(control_type)
+        if full_match:
+            return True
+    return False
+
+
+def check_toname_in_config_by_regex(config_string, to_name, control_type=None):
+    """
+    Check if to_name is in config including regex filter
+    :return: True if to_name is fullmatch to some pattern ion config
+    """
+    c = parse_config(config_string)
+    if control_type:
+        check_list = [control_type]
+    else:
+        check_list = list(c.keys())
+    for control in check_list:
+        item = c[control].get('regex', {})
+        for to_name_item in c[control]['to_name']:
+            expression = to_name_item
+            for key in item:
+                expression = expression.replace(key, item[key])
+            pattern = re.compile(expression)
+            full_match = pattern.fullmatch(to_name)
+            if full_match:
+                return True
+    return False
+
+
+def get_original_fromname_by_regex(config_string, fromname):
+    """
+    Get from_name from config on from_name key from data after applying regex search or original fromname
+    """
+    c = parse_config(config_string)
+    for control in c:
+        item = c[control].get('regex', {})
+        expression = control
+        for key in item:
+            expression = expression.replace(key, item[key])
+        pattern = re.compile(expression)
+        full_match = pattern.fullmatch(fromname)
+        if full_match:
+            return control
+    return fromname
+
+
+def get_all_types(label_config):
+    """
+    Get all types from label_config
+    """
+    outputs = parse_config(label_config)
+    out = []
+    for control_name, info in outputs.items():
+        out.append(info['type'].lower())
+    return out

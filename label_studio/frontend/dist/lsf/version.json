@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3030: Fix paragraphs selection",
+  "message": "fix: DEV-3030: Fix paragraphs selection (#793)\n\nFix paragraphs",
   "commit": "8b6991a36a6fc9477ec4483cca2ba8f1414c033d",
   "branch": "master",
-  "date": "2022/08/09 12:54:43"
+  "date": "2022-08-09T08:54:43Z"
 }
