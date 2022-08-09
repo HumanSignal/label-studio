@@ -30,6 +30,7 @@ jobs:
       SENTRY_ENVIRONMENT: tests-ubuntu-sqlite
       SENTRY_RATE: 0
       DJANGO_DB: sqlite
+      JSON_LOG: 0
       # SENTRY_DSN:
 
     steps:
@@ -38,7 +39,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GIT_PAT }}
           ref: ${{ inputs.ref }}
 
       - name: Set up Python ${{ matrix.python-version }}
@@ -84,7 +84,7 @@ jobs:
       - name: Install LSF & set version.py
         run: ./deploy/prebuild_wo_frontend.sh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Do migrations
         run: python label_studio/manage.py migrate
@@ -118,6 +118,7 @@ jobs:
       collect_analytics: false
       SENTRY_ENVIRONMENT: tests-ubuntu-postgresql
       SENTRY_RATE: 0
+      JSON_LOG: 0
       # SENTRY_DSN:
 
     # Service containers to run with `container-job`
@@ -161,7 +162,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GIT_PAT }}
           ref: ${{ inputs.ref }}
 
       - name: Set up Python ${{ matrix.python-version }}
@@ -210,7 +210,7 @@ jobs:
       - name: Install LSF & set version.py
         run: ./deploy/prebuild_wo_frontend.sh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Do migrations
         run: python label_studio/manage.py migrate
@@ -246,6 +246,7 @@ jobs:
       SENTRY_ENVIRONMENT: tests-windows-sqlite
       SENTRY_RATE: 0
       DJANGO_DB: sqlite
+      JSON_LOG: 0
       # SENTRY_DSN:
 
     steps:
@@ -254,7 +255,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GIT_PAT }}
           ref: ${{ inputs.ref }}
 
       - name: Set up Python ${{ matrix.python-version }}

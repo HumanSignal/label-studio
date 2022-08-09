@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2671: Change rotate anchor of bbox (#731)",
-  "commit": "510331fc8ff7fa6a0e47145c04048215637d0579",
+  "message": "fix: DEV-3030: Fix paragraphs selection (#793)\n\nFix paragraphs",
+  "commit": "8b6991a36a6fc9477ec4483cca2ba8f1414c033d",
   "branch": "master",
-  "date": "2022-07-05T22:49:08Z"
+  "date": "2022-08-09T08:54:43Z"
 }
