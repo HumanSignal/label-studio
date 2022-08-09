@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-3034: Comments with drafts",
-  "commit": "0341f04ebceb8d011c2ea2c81efa7df29991b191",
-  "branch": "master",
-  "date": "2022/08/04 20:34:21"
+  "message": "fix: DEV-2519: Choices selected by default",
+  "commit": "42ee7faccb62191a60e4a6d942d5d9ca53bc7208",
+  "branch": "fb-dev-2519/destructive-ff",
+  "date": "2022/08/09 02:31:11"
 }
