@@ -51,6 +51,55 @@ jobs:
         with:
           ref: ${{ inputs.release_tag }}
 
+      - name: Check is latest tag needs to be updated
+        uses: actions/github-script@v6
+        id: latest_tag
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+
+            const newTag = '${ inputs.release_tag }';
+            const regexp = '^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)(\.post([0-9]+))?$';
+            
+            function compareVersions(a, b) {
+                if (a[1] === b[1])
+                    if (a[2] === b[2])
+                        if (a[3] === b[3])
+                            return (+a[5] || -1) - (+b[5] || -1)
+                        else
+                            return +a[3] - b[3]
+                    else
+                        return +a[2] - b[2]
+                else
+                    return +a[1] - b[1]
+            }
+            
+            const {data: tags} = await github.rest.repos.listTags({
+                owner,
+                repo,
+                per_page: 100
+            });
+            const rawTags = tags.map(e => e.name)
+            const filteredTags = rawTags.filter(e => e.match(regexp))
+            const sortedTags = filteredTags
+                .map(e => e.match(regexp))
+                .sort(compareVersions)
+                .reverse()
+            console.log('Sorted tags:')
+            console.log(sortedTags.map(e => e[0]))
+            
+            const newestVersion = sortedTags[0];
+            console.log(`Newest tag: ${newestVersion[0]}`)
+            
+            if (compareVersions(newTag.match(regexp), newestVersion) >= 0) {
+                console.log(`new tag ${newTag} is higher that all existing tags`)
+                core.setOutput("latest", true);
+            } else {
+                console.log('not latest')
+                core.setOutput("latest", false);
+            }
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
