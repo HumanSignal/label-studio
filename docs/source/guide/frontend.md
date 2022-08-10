@@ -36,7 +36,7 @@ cd label-studio/scripts
 node get-lsf-build.js <branch-name-from-official-lsf-repo>
 ```
 
-### CDN width UNPKG.com
+### CDN with UNPKG.com
 
 ```xhtml
 <!-- Include Label Studio stylesheet -->
