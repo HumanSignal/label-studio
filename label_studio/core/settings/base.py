@@ -468,6 +468,7 @@ STORAGE_ANNOTATION_SERIALIZER = 'io_storages.serializers.StorageAnnotationSerial
 TASK_SERIALIZER_BULK = 'tasks.serializers.BaseTaskSerializerBulk'
 PREPROCESS_FIELD_NAME = 'data_manager.functions.preprocess_field_name'
 INTERACTIVE_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializerForInteractive'
+DELETE_TASKS_ANNOTATIONS_POSTPROCESS = None
 
 
 def project_delete(project):
@@ -520,3 +521,5 @@ FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)
 # default value for feature flags (if not overrided by environment or client)
 FEATURE_FLAGS_DEFAULT_VALUE = False
 
+# Strip harmful content from SVG files by default
+SVG_SECURITY_CLEANUP = get_bool_env('SVG_SECURITY_CLEANUP', False)

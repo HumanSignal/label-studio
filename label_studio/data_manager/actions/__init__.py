@@ -89,7 +89,10 @@ def register_actions_from_dir(base_module, action_dir):
 
         name = path[0:path.find('.py')]  # get only module name to read *.py and *.pyc
         try:
-            module_actions = import_module(f'{base_module}.{name}').actions
+            module = import_module(f'{base_module}.{name}')
+            if not hasattr(module, 'actions'):
+                continue
+            module_actions = module.actions
         except ModuleNotFoundError as e:
             logger.info(e)
             continue

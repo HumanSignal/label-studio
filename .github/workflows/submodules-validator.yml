@@ -12,10 +12,6 @@ on:
       target_branch:
         required: true
         type: string
-      repo:
-        required: true
-        type: string
-        default: heartexlabs/label-studio
 
 env:
   ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
@@ -30,9 +26,8 @@ jobs:
       - name: Validate
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GIT_PAT }}
           script: |
-            var [owner, repo] = '${{ inputs.repo }}'.split('/');
+            const {repo, owner} = context.repo;
             const head_sha = '${{ inputs.head_sha }}'
             const base_sha = '${{ inputs.base_sha }}'
             const targetBranch = '${{ inputs.target_branch }}'.replace('refs/heads/', '')
