@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3030: Fix paragraphs selection (#793)\n\nFix paragraphs",
-  "commit": "8b6991a36a6fc9477ec4483cca2ba8f1414c033d",
+  "message": "fix: DEV-3077: Repeater performance improvement",
+  "commit": "2fc84638dc33c0c97bde2bd3e354a18d3dc07c35",
   "branch": "master",
-  "date": "2022-08-09T08:54:43Z"
+  "date": "2022/08/11 10:42:52"
 }
