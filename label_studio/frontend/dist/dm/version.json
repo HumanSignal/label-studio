@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2986: Adding guards to task loading to ensure users are warned of unsaved comments (#92)\n\nfix: DEV-2986: adding guards to task loading to ensure users are warned of unsaved comments",
-  "commit": "aaead1f85dd97c9f78b5c120d658a4131a5bf26e",
+  "message": "fix: DEV-2519: Choices selected by default",
+  "commit": "dc03b7337518a3129677570127b44456420d4c6c",
   "branch": "master",
-  "date": "2022-07-28T16:06:38Z"
+  "date": "2022/08/10 15:51:21"
 }
