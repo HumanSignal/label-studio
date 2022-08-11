@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into fb-dev-2964/disable-annotation-history",
-  "commit": "4c46b0ee74aab1c539f68bb8324cc81026810378",
+  "message": "fix: DEV-2964: Wrap Annotation History with an interface toggle",
+  "commit": "3420d0a1c47ab9ac553c8cb33ced8ca4fa87103a",
   "branch": "fb-dev-2964/disable-annotation-history",
-  "date": "2022-08-11T15:17:25Z"
+  "date": "2022/08/11 22:37:49"
 }
