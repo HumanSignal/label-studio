@@ -1,6 +1,6 @@
 {
-  "message": "Fix tasks selection (#44)",
-  "commit": "97e33ac0a9b0ea09398b00d7916671ca76cf2a71",
+  "message": "fix: DEV-2519: Choices selected by default",
+  "commit": "dc03b7337518a3129677570127b44456420d4c6c",
   "branch": "master",
-  "date": "2022-04-13T13:55:17Z"
+  "date": "2022/08/10 15:51:21"
 }

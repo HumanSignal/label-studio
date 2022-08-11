@@ -3,18 +3,16 @@
 import logging
 
 from datetime import datetime
+from django.conf import settings
 from django.db.models.signals import post_delete, pre_delete
 from django.db import connection
-from django.conf import settings
-
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
-from core.utils.common import temporary_disconnect_list_signal
+from core.utils.common import load_func
 from projects.models import Project
 
 from tasks.models import (
-    Annotation, Prediction, Task, bulk_update_stats_project_tasks, update_is_labeled_after_removing_annotation,
-    update_all_task_states_after_deleting_task, remove_data_columns, remove_project_summary_annotations
+    Annotation, Prediction, Task, bulk_update_stats_project_tasks
 )
 from webhooks.utils import emit_webhooks_for_instance
 from webhooks.models import WebhookAction
@@ -71,8 +69,10 @@ def delete_tasks(project, queryset, **kwargs):
         overlap_cohort_percentage_changed=False,
         tasks_number_changed=True
     )
+
     # emit webhooks for project
     emit_webhooks_for_instance(project.organization, project, WebhookAction.TASKS_DELETED, tasks_ids)
+
     # remove all tabs if there are no tasks in project
     reload = False
     if not project.tasks.exists():
@@ -99,9 +99,18 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     annotations.delete()
     emit_webhooks_for_instance(project.organization, project, WebhookAction.ANNOTATIONS_DELETED, annotations_ids)
     start_job_async_or_sync(bulk_update_stats_project_tasks, queryset.filter(is_labeled=True))
-
+    start_job_async_or_sync(project.update_tasks_counters, task_ids)
     request = kwargs['request']
-    Task.objects.filter(id__in=real_task_ids).update(updated_at=datetime.now(), updated_by=request.user)
+
+    tasks = Task.objects.filter(id__in=real_task_ids)
+    tasks.update(updated_at=datetime.now(), updated_by=request.user)
+
+    # LSE postprocess
+    postprocess = load_func(settings.DELETE_TASKS_ANNOTATIONS_POSTPROCESS)
+    if postprocess is not None:
+        tasks = Task.objects.filter(id__in=task_ids)
+        postprocess(project, tasks, **kwargs)
+
     return {'processed_items': count,
             'detail': 'Deleted ' + str(count) + ' annotations'}
 
@@ -116,6 +125,7 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     predictions = Prediction.objects.filter(task__id__in=task_ids)
     count = predictions.count()
     predictions.delete()
+    start_job_async_or_sync(project.update_tasks_counters, task_ids)
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
 
 

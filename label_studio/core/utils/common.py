@@ -125,10 +125,9 @@ def custom_exception_handler(exc, context):
 
 def create_hash():
     """This function generate 40 character long hash"""
-    h = hashlib.sha1()
+    h = hashlib.sha512()
     h.update(str(time.time()).encode('utf-8'))
     return h.hexdigest()[0:16]
-
 
 def paginator(objects, request, default_page=1, default_size=50):
     """ DEPRECATED
@@ -148,7 +147,7 @@ def paginator(objects, request, default_page=1, default_size=50):
 
     if 'start' in request.GET:
         page = int_from_request(request.GET, 'start', default_page)
-        if page and int(page) > int(page_size) and int(page_size) > 0:
+        if page and int(page) > int(page_size) > 0:
             page = int(page / int(page_size)) + 1
         else:
             page += 1
@@ -164,6 +163,7 @@ def paginator(objects, request, default_page=1, default_size=50):
         return []
     except EmptyPage:
         return []
+
 
 def paginator_help(objects_name, tag):
     """ API help for paginator, use it with swagger_auto_schema
@@ -423,7 +423,7 @@ def collect_versions(force=False):
     :return: dict with sub-dicts of version descriptions
     """
     import label_studio
-    
+
     # prevent excess checks by time intervals
     current_time = time.time()
     need_check = current_time - settings.VERSIONS_CHECK_TIME > 300

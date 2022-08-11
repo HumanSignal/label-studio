@@ -1,7 +1,7 @@
 ---
 title: HyperTextLabels
 type: tags
-order: 407
+order: 408
 meta_title: Hypertext Label Tag to Create Labeled Hypertext (HTML)
 meta_description: Customize Label Studio with the HyperTextLabels tag to label hypertext (HTML) for machine learning and data science projects.
 ---

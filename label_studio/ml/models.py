@@ -3,13 +3,13 @@
 import logging
 from django.db import models
 
-# Create your models here.
 from django.utils.translation import gettext_lazy as _
 from django.dispatch import receiver
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import post_save
+from django.conf import settings
 
-from core.utils.common import safe_float, conditional_atomic
-from data_export.serializers import ExportDataSerializer
+from core.utils.common import safe_float, conditional_atomic, load_func
+
 from ml.api_connector import MLApi
 from projects.models import Project
 from tasks.models import Prediction
@@ -19,6 +19,8 @@ from webhooks.serializers import WebhookSerializer, Webhook
 logger = logging.getLogger(__name__)
 
 MAX_JOBS_PER_PROJECT = 1
+
+InteractiveAnnotatingDataSerializer = load_func(settings.INTERACTIVE_DATA_SERIALIZER)
 
 
 class MLBackendState(models.TextChoices):
@@ -87,6 +89,11 @@ class MLBackend(models.Model):
     )
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
+    auto_update = models.BooleanField(
+        _('auto_update'),
+        default=True,
+        help_text='If false, model version is set by the user, if true - getting latest version from backend.'
+    )
 
     def __str__(self):
         return f'{self.title} (id={self.id}, url={self.url})'
@@ -99,17 +106,17 @@ class MLBackend(models.Model):
         return self.project.has_permission(user)
 
     @staticmethod
-    def setup_(url, project):
+    def setup_(url, project, model_version=None):
         api = MLApi(url=url)
         if not isinstance(project, Project):
             project = Project.objects.get(pk=project)
-        return api.setup(project)
+        return api.setup(project, model_version=model_version)
 
     def healthcheck(self):
         return self.healthcheck_(self.url)
 
     def setup(self):
-        return self.setup_(self.url, self.project)
+        return self.setup_(self.url, self.project, None if self.auto_update else self.model_version)
 
     @property
     def api(self):
@@ -132,11 +139,9 @@ class MLBackend(models.Model):
                 self.state = MLBackendState.CONNECTED
                 model_version = setup_response.response.get('model_version')
                 logger.info(f'ML backend responds with success: {setup_response.response}')
-                self.model_version = model_version
-                if model_version != self.project.model_version:
-                    logger.debug(f'Changing project model version: {self.project.model_version} -> {model_version}')
-                    self.project.model_version = model_version
-                    self.project.save(update_fields=['model_version'])
+                if self.auto_update:
+                    self.model_version = model_version
+                    logger.debug(f'Changing model version: {self.model_version} -> {model_version}')
                 self.error_message = None
         self.save()
 
@@ -164,7 +169,7 @@ class MLBackend(models.Model):
             tasks = Task.objects.filter(id__in=[task.id for task in tasks])
 
         tasks_ser = TaskSimpleSerializer(tasks, many=True).data
-        ml_api_result = self.api.make_predictions(tasks_ser, self.project.model_version, self.project)
+        ml_api_result = self.api.make_predictions(tasks_ser, self.model_version, self.project)
         if ml_api_result.is_error:
             logger.warning(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return
@@ -207,7 +212,7 @@ class MLBackend(models.Model):
                     'task': task['id'],
                     'result': response['result'],
                     'score': response.get('score'),
-                    'model_version': self.model_version,
+                    'model_version': ml_api_result.response.get('model_version', self.model_version),
                 }
             )
         with conditional_atomic():
@@ -256,13 +261,16 @@ class MLBackend(models.Model):
 
         return prediction
 
-    def interactive_annotating(self, task, context=None):
+    def interactive_annotating(self, task, context=None, user=None):
         result = {}
+        options = {}
+        if user:
+            options = {'user': user}
         if not self.is_interactive:
             result['errors'] = ["Model is not set to be used for interactive preannotations"]
             return result
 
-        tasks_ser = ExportDataSerializer([task], many=True, expand=['drafts', 'predictions', 'annotations']).data
+        tasks_ser = InteractiveAnnotatingDataSerializer([task], many=True, expand=['drafts', 'predictions', 'annotations'], context=options).data
         ml_api_result = self.api.make_predictions(
             tasks=tasks_ser,
             model_version=self.model_version,
@@ -294,6 +302,16 @@ class MLBackend(models.Model):
 
         result['data'] = ml_results[0]
         return result
+
+    @staticmethod
+    def get_versions_(url, project):
+        api = MLApi(url=url)
+        if not isinstance(project, Project):
+            project = Project.objects.get(pk=project)
+        return api.get_versions(project)
+
+    def get_versions(self):
+        return self.get_versions_(self.url, self.project)
 
 
 class MLBackendPredictionJob(models.Model):
