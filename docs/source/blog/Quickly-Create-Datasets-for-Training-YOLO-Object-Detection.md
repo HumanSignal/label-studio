@@ -82,7 +82,8 @@ Use Label Studio to label the dataset with annotations. To accelerate your data 
 1. Click **Label All Tasks** to start labeling the dataset. 
 2. For each image, use a keyboard shortcut to select the relevant label class, then draw a bounding box around each relevant object in the image. 
 
-> Tip: Draw a bounding box in just two clicks by clicking once where you want one corner of the box, then click again where you want the opposite corner of the box.
+!!! info 
+    Tip: Draw a bounding box in just two clicks by clicking once where you want one corner of the box, then click again where you want the opposite corner of the box.
 
 ## Output the dataset in YOLO format
 

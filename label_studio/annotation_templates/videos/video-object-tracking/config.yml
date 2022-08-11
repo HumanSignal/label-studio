@@ -1,0 +1,23 @@
+title: Video Object Tracking
+type: enterprise
+group: Videos
+image: /static/templates/object-detection-with-bounding-boxes.png
+details: <h1>Object tracking in video with bounding boxes</h1>
+config: |
+  <View>
+     <Header>Label the video:</Header>
+
+     <!-- Please specify FPS carefully, it will be used for all project videos -->
+     <Video name="video" value="$video" framerate="25.0"/>
+     <VideoRectangle name="box" toName="video" />
+     <Labels name="videoLabels" toName="video" allowEmpty="true">
+       <Label value="Man" background="blue"/>
+       <Label value="Woman" background="red"/>
+       <Label value="Other" background="green"/>
+     </Labels>
+
+  </View>
+
+  <!--{
+   "video": "/static/samples/opossum_snow.mp4"
+  }-->

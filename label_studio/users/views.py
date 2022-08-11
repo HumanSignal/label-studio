@@ -11,6 +11,7 @@ from rest_framework.authtoken.models import Token
 
 from users import forms
 from core.utils.common import load_func
+from core.middleware import enforce_csrf_checks
 from users.functions import proceed_registration
 from organizations.models import Organization
 from organizations.forms import OrganizationSignupForm
@@ -30,6 +31,7 @@ def logout(request):
     return redirect('/')
 
 
+@enforce_csrf_checks
 def user_signup(request):
     """ Sign up page
     """
@@ -49,6 +51,9 @@ def user_signup(request):
         if settings.DISABLE_SIGNUP_WITHOUT_LINK is True:
             if not(token and organization and token == organization.token):
                 raise PermissionDenied()
+        else:
+            if token and organization and token != organization.token:
+                raise PermissionDenied()
 
         user_form = forms.UserSignupForm(request.POST)
         organization_form = OrganizationSignupForm(request.POST)
@@ -66,6 +71,7 @@ def user_signup(request):
     })
 
 
+@enforce_csrf_checks
 def user_login(request):
     """ Login page
     """
@@ -111,7 +117,7 @@ def user_account(request):
         if form.is_valid():
             form.save()
             return redirect(reverse('user-account'))
-
+        
     return render(request, 'users/user_account.html', {
         'settings': settings,
         'user': user,

@@ -8,6 +8,10 @@ recursive-include label_studio/frontend/dist/dm/ *
 # html template files
 recursive-include label_studio *.html
 
+# exclude node modules
+prune label_studio/frontend/node_modules
+prune label_studio/frontend/build-tmp
+
 # annotation templates
 recursive-include label_studio/annotation_templates *
 
@@ -29,3 +33,6 @@ recursive-include label_studio/tests/test_suites/samples *
 recursive-include label_studio/tests/test_suites *.yml
 
 include label_studio/pytest.ini
+
+# feature flags
+include label_studio/feature_flags.json

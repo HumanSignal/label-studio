@@ -27,6 +27,7 @@ const devtool = process.env.NODE_ENV === 'production' ? "source-map" : "cheap-mo
 const output = {
   path: path.resolve(__dirname, "dist", "react-app"),
   filename: 'index.js',
+  hashFunction: "sha256"
 };
 
 const plugins = [

@@ -4,29 +4,21 @@ import { Description } from '../../../components/Description/Description';
 import { Divider } from '../../../components/Divider/Divider';
 import { ErrorWrapper } from '../../../components/Error/Error';
 import { InlineError } from '../../../components/Error/InlineError';
-import { Form, Input, Label, Select, TextArea, Toggle } from '../../../components/Form';
-import { FormResponseContext } from '../../../components/Form/FormContext';
+import { Form, Input, Label, TextArea, Toggle } from '../../../components/Form';
 import { modal } from '../../../components/Modal/Modal';
 import { useAPI } from '../../../providers/ApiProvider';
 import { ProjectContext } from '../../../providers/ProjectProvider';
 import { MachineLearningList } from './MachineLearningList';
+import { ProjectModelVersionSelector } from './ProjectModelVersionSelector';
+import { ModelVersionSelector } from './ModelVersionSelector';
+import { FF_DEV_1682, isFF } from '../../../utils/feature-flags';
 import './MachineLearningSettings.styl';
 
 export const MachineLearningSettings = () => {
   const api = useAPI();
-  const {project, fetchProject, updateProject} = useContext(ProjectContext);
+  const { project, fetchProject } = useContext(ProjectContext);
   const [mlError, setMLError] = useState();
   const [backends, setBackends] = useState([]);
-  const [versions, setVersions] = useState([]);
-
-  const resetMLVersion = useCallback(async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    await updateProject({
-      model_version: null,
-    });
-  }, [api, project]);
 
   const fetchBackends = useCallback(async () => {
     const models = await api.callApi('mlBackends', {
@@ -35,23 +27,12 @@ export const MachineLearningSettings = () => {
       },
     });
 
-
     if (models) setBackends(models);
   }, [api, project, setBackends]);
 
-  const fetchMLVersions = useCallback(async () => {
-    const versions = await api.callApi("modelVersions", {
-      params: {
-        pk: project.id,
-      },
-    });
-
-    setVersions(versions);
-  }, [api, project.id]);
-
   const showMLFormModal = useCallback((backend) => {
     const action = backend ? "updateMLBackend" : "addMLBackend";
-    console.log({backend});
+
     const modalProps = {
       title: `${backend ? 'Edit' : 'Add'} model`,
       style: { width: 760 },
@@ -76,14 +57,37 @@ export const MachineLearningSettings = () => {
           </Form.Row>
 
           <Form.Row columnCount={1}>
-            <TextArea name="description" label="Description" style={{minHeight: 120}}/>
+            <TextArea name="description" label="Description" style={{ minHeight: 120 }}/>
           </Form.Row>
 
+          {isFF(FF_DEV_1682) && !!backend && (
+            <Form.Row columnCount={2}>
+              <ModelVersionSelector
+                object={backend}
+                apiName="modelVersions"
+                label="Version"
+              />
+            </Form.Row>
+          )}
+
+          {isFF(FF_DEV_1682) && (
+            <Form.Row columnCount={1}>
+              <div>
+                <Toggle
+                  name="auto_update"
+                  label="Allow version auto-update"
+                />
+              </div>
+            </Form.Row>
+          )}
+
           <Form.Row columnCount={1}>
-            <Toggle
-              name="is_interactive"
-              label="Use for interactive preannotations"
-            />
+            <div>
+              <Toggle
+                name="is_interactive"
+                label="Use for interactive preannotations"
+              />
+            </div>
           </Form.Row>
 
           <Form.Actions>
@@ -116,13 +120,12 @@ export const MachineLearningSettings = () => {
   useEffect(() => {
     if (project.id) {
       fetchBackends();
-      fetchMLVersions();
     }
   }, [project]);
 
   return (
     <>
-      <Description style={{marginTop: 0, maxWidth: 680}}>
+      <Description style={{ marginTop: 0, maxWidth: 680 }}>
         Add one or more machine learning models to predict labels for your data.
         To import predictions without connecting a model,
         {" "}
@@ -137,29 +140,29 @@ export const MachineLearningSettings = () => {
       <Divider height={32}/>
 
       <Form action="updateProject"
-        formData={{...project}}
-        params={{pk: project.id}}
+        formData={{ ...project }}
+        params={{ pk: project.id }}
         onSubmit={() => fetchProject()}
         autosubmit
       >
         <Form.Row columnCount={1}>
           <Label text="ML-Assisted Labeling" large/>
 
-          <div style={{paddingLeft: 16}}>
+          <div style={{ paddingLeft: 16 }}>
             <Toggle
               label="Start model training after any annotations are submitted or updated"
               name="start_training_on_annotation_update"
             />
           </div>
 
-          <div style={{paddingLeft: 16}}>
+          <div style={{ paddingLeft: 16 }}>
             <Toggle
               label="Retrieve predictions when loading a task automatically"
               name="evaluate_predictions_automatically"
             />
           </div>
 
-          <div style={{paddingLeft: 16}}>
+          <div style={{ paddingLeft: 16 }}>
             <Toggle
               label="Show predictions to annotators in the Label Stream and Quick View"
               name="show_collab_predictions"
@@ -167,34 +170,16 @@ export const MachineLearningSettings = () => {
           </div>
         </Form.Row>
 
-        {versions.length > 1 && (
-          <Form.Row columnCount={1}>
-            <Label
-              text="Model Version"
-              description="Model version allows you to specify which prediction will be shown to the annotators."
-              style={{marginTop: 16}}
-              large
-            />
-
-            <div style={{display: 'flex', alignItems: 'center', width: 400, paddingLeft: 16}}>
-              <div style={{flex: 1, paddingRight: 16}}>
-                <Select
-                  name="model_version"
-                  defaultValue={null}
-                  options={[
-                    ...versions,
-                  ]}
-                  placeholder="No model version selected"
-                />
-              </div>
-
-              <Button onClick={resetMLVersion}>
-                Reset
-              </Button>
-            </div>
-
-          </Form.Row>
+        {!isFF(FF_DEV_1682) && (
+          <ProjectModelVersionSelector />
         )}
+
+        <Form.Actions>
+          <Form.Indicator>
+            <span case="success">Saved!</span>
+          </Form.Indicator>
+          <Button type="submit" look="primary" style={{ width: 120 }}>Save</Button>
+        </Form.Actions>
       </Form>
 
       <MachineLearningList

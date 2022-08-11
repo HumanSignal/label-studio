@@ -18,6 +18,7 @@ When you annotate image regions with this tag, the annotations are saved as perc
 | --- | --- | --- | --- |
 | name | <code>string</code> |  | Name of the element |
 | value | <code>string</code> |  | Data field containing a path or URL to the image |
+| [smoothing] | <code>boolean</code> |  | Enable smoothing, by default it uses user settings |
 | [width] | <code>string</code> | <code>&quot;100%&quot;</code> | Image width |
 | [maxWidth] | <code>string</code> | <code>&quot;750px&quot;</code> | Maximum image width |
 | [zoom] | <code>boolean</code> | <code>false</code> | Enable zooming an image with the mouse wheel |
@@ -30,7 +31,7 @@ When you annotate image regions with this tag, the annotations are saved as perc
 | [brightnessControl] | <code>boolean</code> | <code>false</code> | Show brightness control in toolbar |
 | [contrastControl] | <code>boolean</code> | <code>false</code> | Show contrast control in toolbar |
 | [rotateControl] | <code>boolean</code> | <code>false</code> | Show rotate control in toolbar |
-| [crosshair] | <code>boolean</code> | <code>false</code> | – Show crosshair cursor |
+| [crosshair] | <code>boolean</code> | <code>false</code> | Show crosshair cursor |
 
 ### Example
 ```html

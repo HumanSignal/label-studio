@@ -18,13 +18,14 @@ from label_studio.core.utils.windows_sqlite_fix import windows_dll_fix
 windows_dll_fix()
 
 from django.core.management import call_command
-from django.db import IntegrityError
 from django.core.wsgi import get_wsgi_application
+from django.db import connections, DEFAULT_DB_ALIAS, IntegrityError
+from django.db.backends.signals import connection_created
 from django.db.migrations.executor import MigrationExecutor
-from django.db import connections, DEFAULT_DB_ALIAS
 
 from label_studio.core.argparser import parse_input_args
 from label_studio.core.utils.params import get_env
+
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +45,13 @@ def _app_run(host, port):
     call_command('runserver', '--noreload', http_socket)
 
 
+def _set_sqlite_fix_pragma(sender, connection, **kwargs):
+    """Enable integrity constraint with sqlite."""
+    if connection.vendor == 'sqlite' and get_env('AZURE_MOUNT_FIX'):
+        cursor = connection.cursor()
+        cursor.execute('PRAGMA journal_mode=wal;')
+
+
 def is_database_synchronized(database):
     connection = connections[database]
     connection.prepare_database()
@@ -53,6 +61,7 @@ def is_database_synchronized(database):
 
 
 def _apply_database_migrations():
+    connection_created.connect(_set_sqlite_fix_pragma)
     if not is_database_synchronized(DEFAULT_DB_ALIAS):
         print('Initializing database..')
         call_command('migrate', '--no-color', verbosity=0)
@@ -64,7 +73,7 @@ def _get_config(config_path):
     return config
 
 
-def _create_project(title, user, label_config=None, sampling=None, description=None):
+def _create_project(title, user, label_config=None, sampling=None, description=None, ml_backends=None):
     from projects.models import Project
     from organizations.models import Organization
 
@@ -86,6 +95,14 @@ def _create_project(title, user, label_config=None, sampling=None, description=N
 
     if description is not None:
         project.description = description
+
+    if ml_backends is not None:
+        from ml.models import MLBackend
+
+        # e.g.: localhost:8080,localhost:8081;localhost:8082
+        for url in ml_backends:
+            logger.info('Adding new ML backend %s', url)
+            MLBackend.objects.create(project=project, url=url)
 
     project.save()
     return project
@@ -132,7 +149,7 @@ def _create_user(input_args, config):
         if not username:
             username = DEFAULT_USERNAME
     if not password:
-        password = getpass.getpass(f'Default user password {DEFAULT_USERNAME}: ')
+        password = getpass.getpass(f'User password for {username}: ')
 
     try:
         user = User.objects.create_user(email=username, password=password)
@@ -173,7 +190,8 @@ def _init(input_args, config):
             user=user,
             label_config=input_args.label_config,
             description=input_args.project_desc,
-            sampling=sampling_map.get(input_args.sampling, 'sequential')
+            sampling=sampling_map.get(input_args.sampling, 'sequential'),
+            ml_backends=input_args.ml_backends
         )
     else:
         print('Project "{0}" already exists'.format(input_args.project_name))
@@ -283,8 +301,13 @@ def main():
         call_command('shell_plus')
         return
 
+    if input_args.command == 'calculate_stats_all_orgs':
+        from tasks.functions import calculate_stats_all_orgs
+        calculate_stats_all_orgs(input_args.from_scratch, redis=True)
+        return
+
     # print version
-    if input_args.command == 'version':
+    if input_args.command == 'version' or input_args.version:
         from label_studio import __version__
         print('\nLabel Studio version:', __version__, '\n')
         print(json.dumps(versions, indent=4))
@@ -364,7 +387,7 @@ def main():
             return
 
         # internal port and internal host for server start
-        internal_host = input_args.internal_host or config.get('internal_host', '0.0.0.0')
+        internal_host = input_args.internal_host or config.get('internal_host', '0.0.0.0')  # nosec
         internal_port = input_args.port or get_env('PORT') or config.get('port', 8080)
         try:
             internal_port = int(internal_port)

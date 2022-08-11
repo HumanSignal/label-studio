@@ -1,0 +1,52 @@
+name: "Bandit"
+
+on:
+  workflow_call:
+    inputs:
+      head_sha:
+        required: true
+        type: string
+
+env:
+  BANDIT_VERSION: 1.7.4
+  PROJECT_PATH: 'label_studio/'
+  REPORT_PATH: 'bandit_results/bandit_security_report.txt'
+  ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
+
+jobs:
+  bandit:
+    name: "Bandit"
+    timeout-minutes: 2
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v2.0.1
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.head_sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.7'
+
+      - name: Install Bandit
+        run: |
+          pip install bandit==$BANDIT_VERSION
+
+      - name: Run Bandit
+        run: |
+          mkdir -p bandit_results
+          touch ${{ env.REPORT_PATH }}
+          bandit -r $PROJECT_PATH -o ${{ env.REPORT_PATH }} -f 'txt' -ll
+
+      - name: Print scan results
+        if: always()
+        run: cat ${{ env.REPORT_PATH }}
+
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: Security check results
+          path: ${{ env.REPORT_PATH }}

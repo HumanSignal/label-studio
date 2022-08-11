@@ -10,6 +10,8 @@ export const FormField = forwardRef(({
   required,
   validate,
   skip,
+  allowEmpty,
+  skipAutofill,
   setValue,
   dependency,
   validators,
@@ -78,16 +80,22 @@ export const FormField = forwardRef(({
     }
 
     const evt = document.createEvent("HTMLEvents");
+
     evt.initEvent("change", false, true);
     input.dispatchEvent(evt);
   }, [field]);
 
   useEffect(() => {
+    const isProtected = skipAutofill && !allowEmpty && field.current.type === 'password';
+
     context?.registerField({
       label,
       name,
       validation,
       skip,
+      allowEmpty,
+      skipAutofill,
+      isProtected,
       field: field.current,
       setValue: setValueCallback,
     });

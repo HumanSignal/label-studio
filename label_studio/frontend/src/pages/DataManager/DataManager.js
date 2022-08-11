@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
+import { Spinner } from '../../components';
 import { Button } from '../../components/Button/Button';
 import { modal } from '../../components/Modal/Modal';
 import { Space } from '../../components/Space/Space';
@@ -29,6 +30,7 @@ const initializeDataManager = async (root, props, params) => {
     projectId: params.id,
     apiGateway: `${window.APP_SETTINGS.hostname}/api/dm`,
     apiVersion: 2,
+    project: params.project,
     polling: !window.APP_SETTINGS,
     showPreviews: false,
     apiEndpoints: APIConfig.endpoints,
@@ -38,6 +40,9 @@ const initializeDataManager = async (root, props, params) => {
       backButton: false,
       labelingHeader: false,
       autoAnnotation: params.autoAnnotation,
+    },
+    labelStudio: {
+      keymap: window.APP_SETTINGS.editor_keymap,
     },
     ...props,
     ...settings,
@@ -50,12 +55,12 @@ const buildLink = (path, params) => {
   return generatePath(`/projects/:id${path}`, params);
 };
 
-export const DataManagerPage = ({...props}) => {
+export const DataManagerPage = ({ ...props }) => {
   const root = useRef();
   const params = useParams();
   const history = useHistory();
   const api = useAPI();
-  const {project} = useProject();
+  const { project } = useProject();
   const LabelStudio = useLibrary('lsf');
   const DataManager = useLibrary('dm');
   const setContextProps = useContextProps();
@@ -74,13 +79,14 @@ export const DataManagerPage = ({...props}) => {
       params: { project: project.id },
     });
 
-    const interactiveBacked = (mlBackends ?? []).find(({is_interactive}) => is_interactive);
+    const interactiveBacked = (mlBackends ?? []).find(({ is_interactive }) => is_interactive);
 
     const dataManager = (dataManagerRef.current = dataManagerRef.current ?? await initializeDataManager(
       root.current,
       props,
       {
         ...params,
+        project,
         autoAnnotation: isDefined(interactiveBacked),
       },
     ));
@@ -90,15 +96,15 @@ export const DataManagerPage = ({...props}) => {
     dataManager.on("crash", () => setCrashed());
 
     dataManager.on("settingsClicked", () => {
-      history.push(buildLink("/settings/labeling", {id: params.id}));
+      history.push(buildLink("/settings/labeling", { id: params.id }));
     });
 
     dataManager.on("importClicked", () => {
-      history.push(buildLink("/data/import", {id: params.id}));
+      history.push(buildLink("/data/import", { id: params.id }));
     });
 
     dataManager.on("exportClicked", () => {
-      history.push(buildLink("/data/export", {id: params.id}));
+      history.push(buildLink("/data/export", { id: params.id }));
     });
 
     dataManager.on("error", response => {
@@ -129,7 +135,7 @@ export const DataManagerPage = ({...props}) => {
       });
     }
 
-    setContextProps({dmRef: dataManager});
+    setContextProps({ dmRef: dataManager });
   }, [LabelStudio, DataManager, projectId]);
 
   const destroyDM = useCallback(() => {
@@ -144,6 +150,22 @@ export const DataManagerPage = ({...props}) => {
 
     return () => destroyDM();
   }, [root, init]);
+
+
+  if (!DataManager || !LabelStudio) {
+    return (
+      <div style={{
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        display: "flex",
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        <Spinner size={64}/>
+      </div>
+    );
+  }
 
   return crashed ? (
     <Block name="crash">
@@ -163,9 +185,9 @@ DataManagerPage.pages = {
   ExportPage,
   ImportModal,
 };
-DataManagerPage.context = ({dmRef}) => {
+DataManagerPage.context = ({ dmRef }) => {
   const location = useFixedLocation();
-  const {project} = useProject();
+  const { project } = useProject();
   const [mode, setMode] = useState(dmRef?.mode ?? "explorer");
 
   const links = {
@@ -194,12 +216,12 @@ DataManagerPage.context = ({dmRef}) => {
 
   const showLabelingInstruction = (currentMode) => {
     const isLabelStream = currentMode === 'labelstream';
-    const {expert_instruction, show_instruction} = project;
+    const { expert_instruction, show_instruction } = project;
 
     if (isLabelStream && show_instruction && expert_instruction) {
       modal({
         title: "Labeling Instructions",
-        body: <div dangerouslySetInnerHTML={{__html: expert_instruction}}/>,
+        body: <div dangerouslySetInnerHTML={{ __html: expert_instruction }}/>,
         style: { width: 680 },
       });
     }
@@ -227,7 +249,7 @@ DataManagerPage.context = ({dmRef}) => {
         <Button size="compact" onClick={() => {
           modal({
             title: "Instructions",
-            body: () => <div dangerouslySetInnerHTML={{__html: project.expert_instruction}}/>,
+            body: () => <div dangerouslySetInnerHTML={{ __html: project.expert_instruction }}/>,
           });
         }}>
           Instructions

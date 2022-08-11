@@ -15,6 +15,7 @@ from rest_framework.authtoken.models import Token
 from organizations.models import OrganizationMember, Organization
 from users.functions import hash_upload
 from core.utils.common import load_func
+from projects.models import Project
 
 YEAR_START = 1980
 YEAR_CHOICES = []
@@ -100,7 +101,19 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
 
     activity_at = models.DateTimeField(_('last annotation activity'), auto_now=True)
 
-    active_organization = models.ForeignKey('organizations.Organization', on_delete=models.SET_NULL, related_name='active_users', null=True)
+    active_organization = models.ForeignKey(
+        'organizations.Organization',
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='active_users'
+    )
+
+    allow_newsletters = models.BooleanField(
+        _('allow newsletters'),
+        null=True,
+        default=None,
+        help_text=_('Allow sending newsletters to user')
+    )
 
     objects = UserManager()
 
@@ -123,10 +136,20 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     @property
     def avatar_url(self):
         if self.avatar:
-            return settings.HOSTNAME + self.avatar.url
+            if settings.CLOUD_FILE_STORAGE_ENABLED:
+                return self.avatar.url
+            else:
+                return settings.HOSTNAME + self.avatar.url
 
     def is_organization_admin(self, org_pk):
         return True
+
+    def active_organization_annotations(self):
+        return self.annotations.filter(task__project__organization=self.active_organization)
+
+    def active_organization_contributed_project_number(self):
+        annotations = self.active_organization_annotations()
+        return annotations.values_list('task__project').distinct().count()
 
     @property
     def own_organization(self):

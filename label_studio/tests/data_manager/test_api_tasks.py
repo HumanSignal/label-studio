@@ -21,7 +21,7 @@ def test_views_tasks_api(business_client, project_id):
     view_id = response.json()["id"]
 
     # no tasks
-    response = business_client.get(f"/api/dm/views/{view_id}/tasks?fields=all")
+    response = business_client.get(f"/api/tasks?fields=all&view={view_id}")
 
     assert response.status_code == 200, response.content
     assert response.json()["total"] == 0
@@ -48,7 +48,7 @@ def test_views_tasks_api(business_client, project_id):
         task_id,
     )
 
-    response = business_client.get(f"/api/dm/views/{view_id}/tasks?fields=all")
+    response = business_client.get(f"/api/tasks?fields=all&view={view_id}")
 
     assert response.status_code == 200, response.content
     response_data = response.json()
@@ -61,6 +61,31 @@ def test_views_tasks_api(business_client, project_id):
     assert response_data["tasks"][0]["cancelled_annotations"] == 1
     assert response_data["tasks"][0]["total_predictions"] == 1
     assert "predictions_results" in response_data["tasks"][0]
+
+    num_anno1 = response_data["tasks"][0]['annotations'][0]['id']
+    num_anno2 = response_data["tasks"][0]['annotations'][1]['id']
+    num_pred = response_data["tasks"][0]['predictions'][0]['id']
+
+    # delete annotations and check counters
+
+    business_client.delete(f"/api/annotations/{num_anno1}")
+    business_client.delete(f"/api/annotations/{num_anno2}")
+
+    response = business_client.get(f"/api/tasks?fields=all&view={view_id}")
+    assert response.status_code == 200, response.content
+    response_data = response.json()
+    assert response_data["tasks"][0]["cancelled_annotations"] == 0
+    assert response_data["tasks"][0]["total_annotations"] == 0
+
+    # delete prediction and check counters
+    business_client.delete(f"/api/predictions/{num_pred}")
+
+    response = business_client.get(f"/api/tasks?fields=all&view={view_id}")
+    assert response.status_code == 200, response.content
+    response_data = response.json()
+    assert response_data["tasks"][0]["cancelled_annotations"] == 0
+    assert response_data["tasks"][0]["total_annotations"] == 0
+    assert response_data["tasks"][0]["total_predictions"] == 0
 
 
 @pytest.mark.parametrize(
@@ -95,7 +120,7 @@ def test_views_total_counters(tasks_count, annotations_count, predictions_count,
         for _ in range(0, predictions_count):
             make_prediction({"result": []}, task_id)
 
-    response = business_client.get(f"/api/dm/views/{view_id}/tasks?fields=all")
+    response = business_client.get(f"/api/tasks?fields=all&view={view_id}")
 
     response_data = response.json()
 

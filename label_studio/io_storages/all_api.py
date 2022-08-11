@@ -22,7 +22,12 @@ get_storage_list = load_func(settings.GET_STORAGE_LIST)
 def _get_common_storage_list():
     storage_list = get_storage_list()
     if settings.ENABLE_LOCAL_FILES_STORAGE:
-        storage_list += [{'name': 'localfiles', 'title': 'Local files', 'import_list_api': LocalFilesImportStorageListAPI, 'export_list_api': LocalFilesExportStorageListAPI}]
+        storage_list += [{
+            'name': 'localfiles',
+            'title': 'Local files',
+            'import_list_api': LocalFilesImportStorageListAPI,
+            'export_list_api': LocalFilesExportStorageListAPI
+        }]
 
     return storage_list
 
@@ -67,8 +72,6 @@ class AllImportStorageListAPI(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         list_responses = sum([
             self._get_response(s['import_list_api'], request, *args, **kwargs) for s in _common_storage_list], [])
-        if settings.ENABLE_LOCAL_FILES_STORAGE:
-            list_responses.extend(self._get_response(LocalFilesImportStorageListAPI, request, *args, **kwargs))
         return Response(list_responses)
 
 
@@ -86,6 +89,4 @@ class AllExportStorageListAPI(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         list_responses = sum([
             self._get_response(s['export_list_api'], request, *args, **kwargs) for s in _common_storage_list], [])
-        if settings.ENABLE_LOCAL_FILES_STORAGE:
-            list_responses.extend(self._get_response(LocalFilesExportStorageListAPI, request, *args, **kwargs))
         return Response(list_responses)
