@@ -6,9 +6,12 @@ from datetime import datetime
 from django.conf import settings
 from django.db.models.signals import post_delete, pre_delete
 from django.db import connection
+from label_studio.tasks.models import update_all_task_states_after_deleting_task, \
+    remove_data_columns
+
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
-from core.utils.common import load_func
+from core.utils.common import load_func, temporary_disconnect_list_signal, temporary_disconnect_all_signals
 from projects.models import Project
 
 from tasks.models import (
@@ -41,22 +44,15 @@ def delete_tasks(project, queryset, **kwargs):
     tasks_ids = list(queryset.values('id'))
     count = len(tasks_ids)
     tasks_ids_list = [str(task['id']) for task in tasks_ids]
-    # signals to switch off
-    signals = [
-        (post_delete, update_is_labeled_after_removing_annotation, Annotation),
-        (post_delete, update_all_task_states_after_deleting_task, Task),
-        (pre_delete, remove_data_columns, Task),
-        (pre_delete, remove_project_summary_annotations, Annotation)
-    ]
 
     if count != project.tasks.count():
         # recalculate project summary if only specific tasks are deleted
         start_job_async_or_sync(async_project_summary_recalculation, tasks_ids_list, project.id)
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
-        with temporary_disconnect_list_signal(signals):
+        with temporary_disconnect_all_signals():
             Annotation.objects.filter(task__id__in=tasks_ids_list).delete()
             Prediction.objects.filter(task__id__in=tasks_ids_list).delete()
-            queryset.delete()
+        Task.delete_tasks_without_signals(queryset)
     else:
         with connection.cursor() as cursor:
             cursor.execute(f'DELETE FROM task WHERE id in ({",".join(tasks_ids_list)})')
