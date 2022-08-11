@@ -93,27 +93,27 @@ jobs:
             const newestVersion = sortedTags[0];
             console.log(`Newest tag: ${newestVersion[0]}`)
             
-            let dockerHubUbuntuTags = [newTag];
-            let dockerHubUbiTags = [`ubi_${newTag}`];
-            let redHatUbiTags = [newTag];
+            let dockerHubUbuntuRawTags = [newTag];
+            let dockerHubUbiRawTags = [`ubi_${newTag}`];
+            let redHatUbiRawTags = [newTag];
             
             
             if (compareVersions(newTag.match(regexp), newestVersion) >= 0) {
-              console.log(`The new tag ${newTag} is higher or match the newest one`)
-              console.log(dockerHubUbuntuTags)
-              dockerHubUbuntuTags.push('latest')
-              dockerHubUbiTags.push('ubi_latest')
-              redHatUbiTags.push('latest')
+              console.log(`new tag ${newTag} is higher that all existing tags`)
+              console.log(dockerHubUbuntuRawTags)
+              dockerHubUbuntuRawTags.push('latest')
+              dockerHubUbiRawTags.push('ubi_latest')
+              redHatUbiRawTags.push('latest')
               core.setOutput("latest", true);
             } else {
-              console.log('Not latest')
+              console.log('not latest')
               core.setOutput("latest", false);
             }
             
-            const ubuntuTags = dockerHubUbuntuTags.map(e => `${dockerHubImageName}:${e}`)
-            const ubiTags = [].concat(
-              dockerHubUbiTags.map(e => `${dockerHubImageName}:${e}`),
-              redHatUbiTags.map(e => `${redHatImageName}:${e}`),
+            const ubuntuTags = dockerHubUbuntuRawTags.map(e => `${dockerHubImageName}:${e}`)
+            const redHatTags = redHatUbiRawTags.map(e => `${redHatImageName}:${e}`)
+            const ubiTags = redHatTags.concat(
+              dockerHubUbiRawTags.map(e => `${dockerHubImageName}:${e}`)
             )
             
             console.log('Ubuntu tags:')
@@ -122,6 +122,7 @@ jobs:
             console.log(ubiTags)
             
             core.setOutput("ubuntu-tags", ubuntuTags.join(','));
+            core.setOutput("redhat-tags", redHatTags.join(','));
             core.setOutput("ubi-tags", ubiTags.join(','));
 
       - name: Set up Python
@@ -210,12 +211,15 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Run preflight and submit validation results to RedHat
+        shell: bash
         run: |
           docker pull ${{ env.PREFLIGHT_REPO }}
-          docker run --rm -v ${{ env.DOCKER_CONFIG_PATH }}:${{ env.DOCKER_CONFIG_PATH }} \
-          --env PFLT_DOCKERCONFIG=${{ env.DOCKER_CONFIG_PATH }} \
-          --env PFLT_PYXIS_API_TOKEN=${{ secrets.REDHAT_MARKETPLACE_LS_PYXIS_TOKEN }} \
-          --env PFLT_CERTIFICATION_PROJECT_ID=${{ secrets.REDHAT_MARKETPLACE_LS_PROJECT_ID }} \
-          ${{ env.PREFLIGHT_REPO }} \
-          check container scan.connect.redhat.com/${{ secrets.REDHAT_MARKETPLACE_LS_OSPID }}/label-studio:${{ inputs.release_tag }} \
-          --submit
+          while IFS= read -d ',' image; do
+            docker run --rm -v ${{ env.DOCKER_CONFIG_PATH }}:${{ env.DOCKER_CONFIG_PATH }} \
+              --env PFLT_DOCKERCONFIG=${{ env.DOCKER_CONFIG_PATH }} \
+              --env PFLT_PYXIS_API_TOKEN=${{ secrets.REDHAT_MARKETPLACE_LS_PYXIS_TOKEN }} \
+              --env PFLT_CERTIFICATION_PROJECT_ID=${{ secrets.REDHAT_MARKETPLACE_LS_PROJECT_ID }} \
+              ${{ env.PREFLIGHT_REPO }} \
+              check container "${image}" \
+              --submit
+          done <<< '${{ steps.generate-tags.outputs.redhat-tags }},'
