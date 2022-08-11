@@ -8,15 +8,21 @@ logger = logging.getLogger(__name__)
 
 
 def forwards(apps, schema_editor):
+    """
+    Add ON DELETE CASCADE action for predictions and annotations when deleting tasks
+    """
+    # Check if postgres db is used
     if not schema_editor.connection.vendor.startswith('postgres'):
         logger.info('Database vendor: {}'.format(schema_editor.connection.vendor))
         logger.info('Skipping migration without attempting to CREATE INDEX')
         return
+    # find indexes for prediction_task_id and annotation_task_id
     cursor = connection.cursor()
     cursor.execute("SELECT conname FROM pg_catalog.pg_constraint con INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace WHERE conname LIKE 'prediction_task_id%'")
     prediction_con = cursor.fetchone()
     cursor.execute("SELECT conname FROM pg_catalog.pg_constraint con INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace WHERE conname LIKE 'task_completion_task_id%'")
     task_completion_con = cursor.fetchone()
+    # alter indexes to casdade deletion on tasks deletion
     changes = [f'ALTER TABLE "prediction" DROP CONSTRAINT {prediction_con[0]}, ADD FOREIGN KEY ("task_id") REFERENCES "task" ("id") ON DELETE CASCADE ON UPDATE NO ACTION',
                f'ALTER TABLE "task_completion" DROP CONSTRAINT {task_completion_con[0]}, ADD FOREIGN KEY ("task_id") REFERENCES "task" ("id") ON DELETE CASCADE ON UPDATE NO ACTION']
     for change in changes:
@@ -24,6 +30,7 @@ def forwards(apps, schema_editor):
 
 
 def backwards(apps, schema_editor):
+    # Rollback ON DELETE CASCADE action for predictions and annotations
     if not schema_editor.connection.vendor.startswith('postgres'):
         logger.info('Database vendor: {}'.format(schema_editor.connection.vendor))
         logger.info('Skipping migration without attempting to DROP INDEX')
