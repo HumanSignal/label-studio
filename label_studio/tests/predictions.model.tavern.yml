@@ -1,0 +1,329 @@
+---
+test_name: model_change_after_ML_added
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+- id: create_task
+  type: ref
+- name: check_project_empty_model
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}'
+  response:
+    status_code: 200
+    json:
+      model_version: ""
+- id: create_prediction
+  name: create_prediction
+  request:
+    json:
+      result:
+        - value:
+            choices:
+            - Negative
+          id: qpQHs3Yy4K
+          from_name: sentiment
+          to_name: text
+          type: choices
+          model_version: 1
+      model_version: 'test'
+      task: '{task_pk}'
+    method: POST
+    url: '{django_live_url}/api/predictions'
+  response:
+    save:
+      json:
+        prediction_pk: id
+    status_code: 201
+- id: get_prediction_by_id
+  name: get_prediction_by_id
+  request:
+    method: GET
+    url: '{django_live_url}/api/predictions/{prediction_pk}/'
+  response:
+    json:
+      id: !int '{prediction_pk}'
+      result:
+        - value:
+            choices:
+            - Negative
+          id: qpQHs3Yy4K
+          from_name: sentiment
+          to_name: text
+          type: choices
+          model_version: 1
+    status_code: 200
+- name: check_project_1_model
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}'
+  response:
+    status_code: 200
+    json:
+      model_version: ""
+- id: get_prediction_for_task
+  name: get_prediction_for_task
+  request:
+    method: GET
+    url: '{django_live_url}/api/predictions/?task={task_pk}'
+  response:
+    json:
+      - id: !int '{prediction_pk}'
+        result:
+          - value:
+              choices:
+              - Negative
+            id: qpQHs3Yy4K
+            from_name: sentiment
+            to_name: text
+            type: choices
+    status_code: 200
+- id: update_prediction
+  name: update_prediction
+  request:
+    json:
+      model_version: '2'
+    method: PATCH
+    url: '{django_live_url}/api/predictions/{prediction_pk}/'
+  response:
+    status_code: 200
+- id: get_prediction_by_id_after_update
+  name: get_prediction_by_id_after_update
+  request:
+    method: GET
+    url: '{django_live_url}/api/predictions/{prediction_pk}/'
+  response:
+    json:
+      model_version: '2'
+    status_code: 200
+- name: check_project_1_model
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}'
+  response:
+    status_code: 200
+    json:
+      model_version: ""
+- id: delete_prediction
+  name: delete_prediction
+  request:
+    method: DELETE
+    url: '{django_live_url}/api/predictions/{prediction_pk}/'
+  response:
+    status_code: 204
+- id: prediction_not_found_after_delete
+  name: prediction_not_found_after_delete
+  request:
+    method: GET
+    url: '{django_live_url}/api/predictions/{prediction_pk}/'
+  response:
+    status_code: 404
+- name: check_project_model_after_prediction_change
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}'
+  response:
+    status_code: 200
+    json:
+      model_version: ""
+- name: add_ml_backend
+  request:
+    data:
+      project: '{project_pk}'
+      title: My Testing ML backend
+      url: https://test.heartex.mlbackend.com:9090
+    method: POST
+    url: '{django_live_url}/api/ml'
+- name: check_project_model_change_after_ml_added_to_empty
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}'
+  response:
+    status_code: 200
+    json:
+      model_version: ''
+- name: chaneg_project_model_to_1
+  request:
+    method: PATCH
+    url: '{django_live_url}/api/projects/{project_pk}'
+    data:
+      model_version: "1"
+  response:
+    status_code: 200
+    json:
+      model_version: "1"
+- name: check_project_model_after_project_change
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}'
+  response:
+    status_code: 200
+    json:
+      model_version: "1"
+
+---
+test_name: model_change_before_ML_added
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+- id: create_task
+  type: ref
+- name: check_project_empty_model
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}'
+  response:
+    status_code: 200
+    json:
+      model_version: ""
+- name: chaneg_project_model_to_1
+  request:
+    method: PATCH
+    url: '{django_live_url}/api/projects/{project_pk}'
+    data:
+      model_version: "1"
+  response:
+    status_code: 200
+    json:
+      model_version: "1"
+- id: create_prediction
+  name: create_prediction
+  request:
+    json:
+      result:
+        - value:
+            choices:
+            - Negative
+          id: qpQHs3Yy4K
+          from_name: sentiment
+          to_name: text
+          type: choices
+          model_version: 1
+      model_version: 'test'
+      task: '{task_pk}'
+    method: POST
+    url: '{django_live_url}/api/predictions'
+  response:
+    save:
+      json:
+        prediction_pk: id
+    status_code: 201
+- id: get_prediction_by_id
+  name: get_prediction_by_id
+  request:
+    method: GET
+    url: '{django_live_url}/api/predictions/{prediction_pk}/'
+  response:
+    json:
+      id: !int '{prediction_pk}'
+      result:
+        - value:
+            choices:
+            - Negative
+          id: qpQHs3Yy4K
+          from_name: sentiment
+          to_name: text
+          type: choices
+          model_version: 1
+    status_code: 200
+- name: check_project_1_model
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}'
+  response:
+    status_code: 200
+    json:
+      model_version: "1"
+- id: get_prediction_for_task
+  name: get_prediction_for_task
+  request:
+    method: GET
+    url: '{django_live_url}/api/predictions/?task={task_pk}'
+  response:
+    json:
+      - id: !int '{prediction_pk}'
+        result:
+          - value:
+              choices:
+              - Negative
+            id: qpQHs3Yy4K
+            from_name: sentiment
+            to_name: text
+            type: choices
+    status_code: 200
+- id: update_prediction
+  name: update_prediction
+  request:
+    json:
+      model_version: '2'
+    method: PATCH
+    url: '{django_live_url}/api/predictions/{prediction_pk}/'
+  response:
+    status_code: 200
+- id: get_prediction_by_id_after_update
+  name: get_prediction_by_id_after_update
+  request:
+    method: GET
+    url: '{django_live_url}/api/predictions/{prediction_pk}/'
+  response:
+    json:
+      model_version: '2'
+    status_code: 200
+- name: check_project_1_model
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}'
+  response:
+    status_code: 200
+    json:
+      model_version: "1"
+- id: delete_prediction
+  name: delete_prediction
+  request:
+    method: DELETE
+    url: '{django_live_url}/api/predictions/{prediction_pk}/'
+  response:
+    status_code: 204
+- id: prediction_not_found_after_delete
+  name: prediction_not_found_after_delete
+  request:
+    method: GET
+    url: '{django_live_url}/api/predictions/{prediction_pk}/'
+  response:
+    status_code: 404
+- name: check_project_model_after_prediction_change
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}'
+  response:
+    status_code: 200
+    json:
+      model_version: "1"
+- name: add_ml_backend
+  request:
+    data:
+      project: '{project_pk}'
+      title: My Testing ML backend
+      url: https://test.heartex.mlbackend.com:9090
+    method: POST
+    url: '{django_live_url}/api/ml'
+- name: check_project_model_not_change_after_ml_added_to_empty
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}'
+  response:
+    status_code: 200
+    json:
+      model_version: '1'

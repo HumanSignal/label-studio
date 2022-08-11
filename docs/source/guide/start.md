@@ -12,7 +12,7 @@ After you install Label Studio, start the server to start using it.
 label-studio start
 ```
 
-By default, Label Studio starts with a SQLite database to store labeling tasks and annotations. You can specify different source and target storage for labeling tasks and annotations using Label Studio UI or the API. See [Database storage](storedata.html) for more.
+By default, Label Studio starts with an SQLite database to store labeling tasks and annotations. You can specify different sources and target storage for labeling tasks and annotations using Label Studio UI or the API. See [Database storage](storedata.html) for more.
 
 ## Command line arguments for starting Label Studio
 You can specify a machine learning backend and other options using the command line interface. Run `label-studio --help` to see all available options, or refer to the following tables.
@@ -40,7 +40,7 @@ The following command line arguments are optional and must be specified with `la
 | `-d` `--debug` | N/A | `False` | Enable debug mode for troubleshooting Label Studio. |
 | `-c` `--config` | `CONFIG_PATH` | `default_config.json` | Deprecated, do not use. Specify the path to the server configuration for Label Studio. |
 | `-l` `--label-config` | `LABEL_STUDIO_LABEL_CONFIG` | `None` | Path to the label configuration file for a specific Label Studio project. See [Set up your labeling project](setup.html). |
-| `--ml-backends` | `LABEL_STUDIO_ML_BACKENDS` | `None` | Command line argument is deprecated. Specify the URLs for one or more machine learning backends. See [Set up machine learning with your labeling process](ml.html). |
+| `--ml-backends` | N/A | `None` | Command line argument is deprecated. Specify the URLs for one or more machine learning backends. See [Set up machine learning with your labeling process](ml.html). |
 | `--sampling` | N/A | `sequential` | Specify one of sequential or uniform to define the order for labeling tasks. See [Set up task sampling for your project](start.html#Set_up_task_sampling_for_your_project) on this page. |
 | `--log-level` | N/A | `ERROR` | One of DEBUG, INFO, WARNING, or ERROR. Use to specify the logging level for the Label Studio server. |
 | `-p` `--port` | `LABEL_STUDIO_PORT` | `8080` | Specify the web server port for Label Studio. Defaults to 8080. See [Run Label Studio on localhost with a different port](start.html#Run-Label-Studio-on-localhost-with-a-different-port) on this page. |
@@ -62,8 +62,12 @@ In *nix operating systems, you can set environment variables from the command li
 ```bash
 export LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
 ```
-You can also use an `.env` file. 
 
+!!! note
+    If you are using docker, you can write all your [environment variables into the `.env`](https://docs.docker.com/compose/env-file/) file.
+    
+    
+    
 On Windows, you can use the following syntax:
 ```bash
 set LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
@@ -116,7 +120,10 @@ nginx:
 
 ## Run Label Studio on Docker with a host and sub-path
 
-To run Label Studio on Docker with a host and sub-path, you can refer to the example `deploy/dockerfiles/subpath.example.yml` Docker YAML file. To customize it for your environment, manually modify the `nginx/subpath.example.simple.conf` NGINX configuration file, the relevant Label Studio environment variables, and the PostgreSQL database settings for your environment. 
+To run Label Studio on Docker with a host and sub-path, just pass `LABEL_STUDIO_HOST` env variable with sub-path to docker/docker-compose:
+```
+LABEL_STUDIO_HOST=http://localhost:8080/foo docker-compose up -d
+```
 
 ## Run Label Studio on Docker and use local storage
 To run Label Studio on Docker and reference persistent local storage directories, mount those directories as volumes when you start Label Studio and specify any environment variables you need.
@@ -155,6 +162,14 @@ To run Label Studio with Heroku and use PostgreSQL as the [database storage](sto
 DATABASE_URL = postgres://username:password@hostname.compute.amazonaws.com:5432/dbname
 ```
 Then you can specify the required environment variables for a PostgreSQL connection as config variables. See [Database storage](storedata.html).
+
+Our Heroku manifest uses [postgresql addon](https://elements.heroku.com/addons/heroku-postgresql) out of the box.
+Please notice that the storage capacity is limited.
+
+[<img src="https://www.herokucdn.com/deploy/button.svg" height="30px">](https://heroku.com/deploy?template=https://github.com/heartexlabs/label-studio/tree/master)
+
+Please notice that all uploaded data via import will be lost after a dyno replace since [filesystem is ephemeral](https://devcenter.heroku.com/articles/dynos#ephemeral-filesystem).
+Using S3 storage is recommended.
 
 <!--
 ## Run Label Studio on the cloud using a different cloud provider

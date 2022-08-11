@@ -10,19 +10,27 @@ import jsonschema
 import re
 
 from urllib.parse import urlencode
-from lxml import etree
+from collections import OrderedDict
+import defusedxml.ElementTree as etree
 from collections import defaultdict
 from django.conf import settings
 from label_studio.core.utils.io import find_file
 from label_studio.core.utils.exceptions import (
     LabelStudioValidationErrorSentryIgnored, LabelStudioXMLSyntaxErrorSentryIgnored
 )
+from label_studio_tools.core import label_config
 
 logger = logging.getLogger(__name__)
 
 
 _DATA_EXAMPLES = None
-_LABEL_TAGS = {'Label', 'Choice'}
+_LABEL_TAGS = {'Label', 'Choice', 'Relation'}
+SINGLE_VALUED_TAGS = {
+    'choices': str,
+    'rating': int,
+    'number': float,
+    'textarea': str
+}
 _NOT_CONTROL_TAGS = {'Filter',}
 # TODO: move configs in right place
 _LABEL_CONFIG_SCHEMA = find_file('label_config_schema.json')
@@ -45,80 +53,35 @@ def parse_config(config_string):
             "labels": ["Label1", "Label2", "Label3"] // taken from "alias" if exists or "value"
     }
     """
-    if not config_string:
-        return {}
+    logger.warning("Using deprecated method - switch to label_studio.tools.label_config.parse_config!")
+    return label_config.parse_config(config_string)
 
-    def _is_input_tag(tag):
-        return tag.attrib.get('name') and tag.attrib.get('value')
 
-    def _is_output_tag(tag):
-        return tag.attrib.get('name') and tag.attrib.get('toName') and tag.tag not in _NOT_CONTROL_TAGS
-
-    def _get_parent_output_tag_name(tag, outputs):
-        # Find parental <Choices> tag for nested tags like <Choices><View><View><Choice>...
-        parent = tag
-        while True:
-            parent = parent.getparent()
-            if parent is None:
-                return
-            name = parent.attrib.get('name')
-            if name in outputs:
-                return name
-
-    try:
-        xml_tree = etree.fromstring(config_string)
-    except etree.XMLSyntaxError as e:
-        raise LabelStudioXMLSyntaxErrorSentryIgnored(str(e))
-
-    inputs, outputs, labels = {}, {}, defaultdict(dict)
-    for tag in xml_tree.iter():
-        if _is_output_tag(tag):
-            tag_info = {'type': tag.tag, 'to_name': tag.attrib['toName'].split(',')}
-            # Grab conditionals if any
-            conditionals = {}
-            if tag.attrib.get('perRegion') == 'true':
-                if tag.attrib.get('whenTagName'):
-                    conditionals = {'type': 'tag', 'name': tag.attrib['whenTagName']}
-                elif tag.attrib.get('whenLabelValue'):
-                    conditionals = {'type': 'label', 'name': tag.attrib['whenLabelValue']}
-                elif tag.attrib.get('whenChoiceValue'):
-                    conditionals = {'type': 'choice', 'name': tag.attrib['whenChoiceValue']}
-            if conditionals:
-                tag_info['conditionals'] = conditionals
-            outputs[tag.attrib['name']] = tag_info
-        elif _is_input_tag(tag):
-            inputs[tag.attrib['name']] = {'type': tag.tag, 'value': tag.attrib['value'].lstrip('$')}
-        if tag.tag not in _LABEL_TAGS:
-            continue
-        parent_name = _get_parent_output_tag_name(tag, outputs)
-        if parent_name is not None:
-            actual_value = tag.attrib.get('alias') or tag.attrib.get('value')
-            if not actual_value:
-                logger.debug(
-                    'Inspecting tag {tag_name}... found no "value" or "alias" attributes.'.format(
-                        tag_name=etree.tostring(tag, encoding='unicode').strip()[:50]))
-            else:
-                labels[parent_name][actual_value] = dict(tag.attrib)
-    for output_tag, tag_info in outputs.items():
-        tag_info['inputs'] = []
-        for input_tag_name in tag_info['to_name']:
-            if input_tag_name not in inputs:
-                logger.warning(
-                    f'to_name={input_tag_name} is specified for output tag name={output_tag}, '
-                    'but we can\'t find it among input tags')
-                continue
-            tag_info['inputs'].append(inputs[input_tag_name])
-        tag_info['labels'] = list(labels[output_tag])
-        tag_info['labels_attrs'] = labels[output_tag]
-    return outputs
+def _fix_choices(config):
+    '''
+    workaround for single choice
+    https://github.com/heartexlabs/label-studio/issues/1259
+    '''
+    if 'Choices' in config and 'Choice' in config['Choices'] and not isinstance(config['Choices']['Choice'], list):
+        config['Choices']['Choice'] = [config['Choices']['Choice']]
+    if 'View' in config:
+        if isinstance(config['View'], OrderedDict):
+            config['View'] = _fix_choices(config['View'])
+        else:
+            config['View'] = [_fix_choices(view) for view in config['View']]
+    return config
 
 
 def parse_config_to_json(config_string):
-    parser = etree.XMLParser(recover=False)
-    xml = etree.fromstring(config_string, parser)
+    parser = etree.XMLParser()
+    try:
+        xml = etree.fromstring(config_string, parser)
+    except TypeError as error:
+        raise etree.ParseError('can only parse strings')
     if xml is None:
-        raise etree.XMLSchemaParseError('xml is empty or incorrect')
+        raise etree.ParseError('xml is empty or incorrect')
     config = xmljson.badgerfish.data(xml)
+    config = _fix_choices(config)
     return config
 
 
@@ -127,11 +90,11 @@ def validate_label_config(config_string):
     try:
         config = parse_config_to_json(config_string)
         jsonschema.validate(config, _LABEL_CONFIG_SCHEMA_DATA)
-    except (etree.XMLSyntaxError, etree.XMLSchemaParseError, ValueError) as exc:
+    except (etree.ParseError, ValueError) as exc:
         raise LabelStudioValidationErrorSentryIgnored(str(exc))
     except jsonschema.exceptions.ValidationError as exc:
         error_message = exc.context[-1].message if len(exc.context) else exc.message
-        error_message = 'Validation failed on {}: {}'.format('/'.join(exc.path), error_message.replace('@', ''))
+        error_message = 'Validation failed on {}: {}'.format('/'.join(map(str, exc.path)), error_message.replace('@', ''))
         raise LabelStudioValidationErrorSentryIgnored(error_message)
 
     # unique names in config # FIXME: 'name =' (with spaces) won't work
@@ -153,7 +116,7 @@ def extract_data_types(label_config):
     parser = etree.XMLParser()
     xml = etree.fromstring(label_config, parser)
     if xml is None:
-        raise etree.XMLSchemaParseError('Project config is empty or incorrect')
+        raise etree.ParseError('Project config is empty or incorrect')
 
     # take all tags with values attribute and fit them to tag types
     data_type = {}
@@ -172,10 +135,13 @@ def extract_data_types(label_config):
 def get_all_labels(label_config):
     outputs = parse_config(label_config)
     labels = defaultdict(list)
+    dynamic_labels = defaultdict(bool)
     for control_name in outputs:
         for label in outputs[control_name].get('labels', []):
             labels[control_name].append(label)
-    return labels
+        if outputs[control_name].get('dynamic_labels', False):
+            dynamic_labels[control_name] = True
+    return labels, dynamic_labels
 
 
 def get_annotation_tuple(from_name, to_name, type):
@@ -260,7 +226,7 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
     parser = etree.XMLParser()
     xml = etree.fromstring(label_config, parser)
     if xml is None:
-        raise etree.XMLSchemaParseError('Project config is empty or incorrect')
+        raise etree.ParseError('Project config is empty or incorrect')
 
     # make examples pretty
     examples = data_examples(mode=mode)
@@ -282,7 +248,7 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
 
         example_from_field_name = examples.get('$' + value)
         if example_from_field_name:
-            # try get example by variable name
+            # try to get example by variable name
             task[value] = example_from_field_name
 
         elif value == 'video' and p.tag == 'HyperText':
@@ -327,11 +293,35 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
                 task[value] = examples['HyperTextUrl']
             else:
                 task[value] = examples['HyperText']
+        elif p.tag.lower().endswith('labels'):
+            task[value] = examples['Labels']
+        elif p.tag.lower() == "choices":
+            allow_nested = p.get('allowNested') or p.get('allownested') or "false"
+            if allow_nested == "true":
+                task[value] = examples['NestedChoices']
+            else:
+                task[value] = examples['Choices']
         else:
             # patch for valueType="url"
             examples['Text'] = examples['TextUrl'] if only_urls else examples['TextRaw']
             # not found by name, try get example by type
             task[value] = examples.get(p.tag, 'Something')
+
+        # support for Repeater tag
+        if '[' in value:
+            base = value.split('[')[0]
+            child = value.split(']')[1]
+
+            # images[{{idx}}].url => { "images": [ {"url": "test.jpg"} ] }
+            if child.startswith('.'):
+                child_name = child[1:]
+                task[base] = [{child_name: task[value]}, {child_name: task[value]}]
+            # images[{{idx}}].url => { "images": [ "test.jpg", "test.jpg" ] }
+            else:
+                task[base] = [task[value], task[value]]
+
+            # remove unused "images[{{idx}}].url"
+            task.pop(value, None)
 
     return task
 
@@ -397,3 +387,75 @@ def replace_task_data_undefined_with_config_field(data, project, first_key=None)
         key = first_key or list(project.data_types.keys())[0]
         data[key] = data[settings.DATA_UNDEFINED_NAME]
         del data[settings.DATA_UNDEFINED_NAME]
+
+
+def check_control_in_config_by_regex(config_string, control_type, filter=None):
+    """
+    Check if control type is in config including regex filter
+    """
+    c = parse_config(config_string)
+    if filter is not None and len(filter) == 0:
+        return False
+    if filter:
+        c = {key: c[key] for key in filter}
+    for control in c:
+        item = c[control].get('regex', {})
+        expression = control
+        for key in item:
+            expression = expression.replace(key, item[key])
+        pattern = re.compile(expression)
+        full_match = pattern.fullmatch(control_type)
+        if full_match:
+            return True
+    return False
+
+
+def check_toname_in_config_by_regex(config_string, to_name, control_type=None):
+    """
+    Check if to_name is in config including regex filter
+    :return: True if to_name is fullmatch to some pattern ion config
+    """
+    c = parse_config(config_string)
+    if control_type:
+        check_list = [control_type]
+    else:
+        check_list = list(c.keys())
+    for control in check_list:
+        item = c[control].get('regex', {})
+        for to_name_item in c[control]['to_name']:
+            expression = to_name_item
+            for key in item:
+                expression = expression.replace(key, item[key])
+            pattern = re.compile(expression)
+            full_match = pattern.fullmatch(to_name)
+            if full_match:
+                return True
+    return False
+
+
+def get_original_fromname_by_regex(config_string, fromname):
+    """
+    Get from_name from config on from_name key from data after applying regex search or original fromname
+    """
+    c = parse_config(config_string)
+    for control in c:
+        item = c[control].get('regex', {})
+        expression = control
+        for key in item:
+            expression = expression.replace(key, item[key])
+        pattern = re.compile(expression)
+        full_match = pattern.fullmatch(fromname)
+        if full_match:
+            return control
+    return fromname
+
+
+def get_all_types(label_config):
+    """
+    Get all types from label_config
+    """
+    outputs = parse_config(label_config)
+    out = []
+    for control_name, info in outputs.items():
+        out.append(info['type'].lower())
+    return out

@@ -1,6 +1,6 @@
 {
-  "message": "Roll back to U instead of Alt+U",
-  "commit": "352c3e45c473a60dd13680a1ef30d9a60e42b15f",
+  "message": "fix: DEV-3030: Fix paragraphs selection (#793)\n\nFix paragraphs",
+  "commit": "8b6991a36a6fc9477ec4483cca2ba8f1414c033d",
   "branch": "master",
-  "date": "2021-09-21T07:47:50Z"
+  "date": "2022-08-09T08:54:43Z"
 }

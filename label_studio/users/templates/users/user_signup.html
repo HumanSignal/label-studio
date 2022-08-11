@@ -1,8 +1,12 @@
 {% extends 'users/user_base.html' %}
+{% load static %}
 
 {% block user_content %}
 
-  <form id="signup-form" action="{% url 'user-signup' %}?{% if next %}&next={{ next }}{% endif %}{% if token %}&token={{ token }}{% endif %}" method="post">
+  <form id="signup-form"
+        action="{% url 'user-signup' %}?{% if next %}&next={{ next }}{% endif %}{% if token %}&token={{ token }}{% endif %}"
+        method="post"
+  >
     {% csrf_token %}
     <div>
       <input type="text" class="ls-input" name="email" id="email" placeholder="Email" value="{{ form.data.email }}">
@@ -24,6 +28,21 @@
         </ul>
       {% endif %}
       </div>
+
+    <div>
+      <input name="allow_newsletters" id="allow_newsletters" type="hidden" value="true">
+      <label for="allow_newsletters_visual" style="display: inline-block; cursor: pointer;">
+
+        <input name="allow_newsletters_visual" id="allow_newsletters_visual"
+               type="checkbox" style="width: auto" checked="true"
+               onchange="document.getElementById('allow_newsletters').value=document.getElementById('allow_newsletters_visual').checked">
+        Get the latest news from Heidi
+        <img src="{{ settings.HOSTNAME }}{% static 'images/heidi.png' %}" alt="Heidi"
+             width="25" style="display: inline; margin: 0; position: relative; top: 5px; left: 0px">
+
+      </label>
+    </div>
+
     {% if form.non_field_errors %}
       {% for error in form.non_field_errors %}
         <p class="error">

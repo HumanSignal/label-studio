@@ -15,6 +15,14 @@ Webhooks sent from Label Studio include the following:
 | --- | --- |
 | action | Details the action that the event represents. |
 | project | Included only for task and annotation events. Details about the project. |
+| task_number | Total number of tasks in the project. |
+| finished_task_number | Total number of annotated tasks in the project. |
+| total_predictions_number | Total number of predictions for the project. |
+| total_annotations_number | Total number of annotations, skipped tasks, and ground truth annotations in the project. Can be different from the total number of annotated tasks. |
+| num_tasks_with_annotations | Total number of tasks with annotations in the project. Does not count skipped and ground truth annotations. |
+| useful_annotation_number | Total number of annotations in the project. Excludes skipped and ground truth annotations.  |
+| ground_truth_number | Total number of annotations marked as ground truth annotations in the project. |
+| skipped_annotations_number | Total number of skipped or cancelled annotations in the project. |
 
 The HTTP POST payloads that Label Studio sends to the configured webhook URLs include the headers that you set up when you [configure the webhook](webhooks.html).
 

@@ -1,3 +1,4 @@
 report.*.json
 .env*
 !.env.example
+!*.lock

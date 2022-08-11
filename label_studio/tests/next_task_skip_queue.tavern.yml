@@ -1,0 +1,287 @@
+---
+test_name: skip_queue_requeue_for_others
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+
+- &create_first_task
+  name: create_task
+  request:
+    json:
+      data:
+        text: 'Test text'
+      project: '{project_pk}'
+    method: POST
+    url: '{django_live_url}/api/tasks'
+  response:
+    save:
+      json:
+        first_task_pk: id
+    status_code: 201
+- &create_second_task
+  name: create_task
+  request:
+    json:
+      data:
+        text: 'Test text'
+      project: '{project_pk}'
+    method: POST
+    url: '{django_live_url}/api/tasks'
+  response:
+    save:
+      json:
+        second_task_pk: id
+    status_code: 201
+
+- &get_next_task_first
+  name: get_next_task
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      id: !int '{first_task_pk}'
+
+- &skip_first_task
+  name: skip_first_task
+  request:
+    headers:
+      content-type: application/json
+    json:
+      lead_time: 12.34
+    method: POST
+    url: '{django_live_url}/api/tasks/{first_task_pk}/annotations?was_cancelled=1'
+  response:
+    save:
+      json:
+        first_skipped_annotation_pk: id
+    status_code: 201
+
+- &get_next_task_second
+  name: get_next_task
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      id: !int '{second_task_pk}'
+
+- &create_annotation_second_task
+  name: create_annotation_second_task
+  request:
+    headers:
+      content-type: application/json
+    json:
+      lead_time: 12.34
+      result:
+      - from_name: label
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - pos
+    method: POST
+    url: '{django_live_url}/api/tasks/{second_task_pk}/annotations'
+  response:
+    save:
+      json:
+        annotation_pk: id
+    status_code: 201
+
+- &get_next_task_queue_is_empty
+  name: get_next_task_queue_is_empty
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    status_code: 404
+
+- &check_first_task_is_not_labeled
+  name: check_first_task_is_not_labeled
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks/{first_task_pk}'
+  response:
+    json:
+      is_labeled: false
+
+- &check_second_task_is_labeled
+  name: check_second_task_is_labeled
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks/{second_task_pk}'
+  response:
+    json:
+      is_labeled: true
+
+
+
+
+
+
+
+---
+test_name: skip_queue_requeue_for_me
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+
+- name: set_skip_queue_setting
+  request:
+    method: PATCH
+    url: '{django_live_url}/api/projects/{project_pk}'
+    headers:
+      content-type: application/json
+    json:
+      skip_queue: REQUEUE_FOR_ME
+  response:
+    status_code: 200
+
+- *create_first_task
+- *create_second_task
+- *get_next_task_first
+- *skip_first_task
+- *get_next_task_second
+- *create_annotation_second_task
+
+# retry skipped
+- *get_next_task_first
+
+- name: delete_skipped_annotation_first_task
+  request:
+    method: DELETE
+    url: '{django_live_url}/api/annotations/{first_skipped_annotation_pk}'
+  response:
+    status_code: 204
+
+- name: create_annotation_first_task
+  request:
+    headers:
+      content-type: application/json
+    json:
+      lead_time: 12.34
+      result:
+      - from_name: label
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - pos
+    method: POST
+    url: '{django_live_url}/api/tasks/{first_task_pk}/annotations'
+  response:
+    save:
+      json:
+        annotation_pk: id
+    status_code: 201
+
+- *get_next_task_queue_is_empty
+
+- &check_first_task_is_labeled
+  name: check_first_task_is_labeled
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks/{first_task_pk}'
+  response:
+    json:
+      is_labeled: true
+
+- *check_second_task_is_labeled
+
+
+
+
+
+
+---
+test_name: skip_queue_ignore_skipped
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+
+- name: set_skip_queue_setting
+  request:
+    method: PATCH
+    url: '{django_live_url}/api/projects/{project_pk}'
+    headers:
+      content-type: application/json
+    json:
+      skip_queue: IGNORE_SKIPPED
+  response:
+    status_code: 200
+
+- *create_first_task
+- *create_second_task
+
+- name: get_next_task
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      id: !int '{first_task_pk}'
+
+- name: skip_first_task
+  request:
+    headers:
+      content-type: application/json
+    json:
+      lead_time: 12.34
+    method: POST
+    url: '{django_live_url}/api/tasks/{first_task_pk}/annotations?was_cancelled=1'
+  response:
+    save:
+      json:
+        first_skipped_annotation_pk: id
+    status_code: 201
+
+- name: get_next_task
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      id: !int '{second_task_pk}'
+
+- name: create_annotation_second_task
+  request:
+    headers:
+      content-type: application/json
+    json:
+      lead_time: 12.34
+      result:
+      - from_name: label
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - pos
+    method: POST
+    url: '{django_live_url}/api/tasks/{second_task_pk}/annotations'
+  response:
+    save:
+      json:
+        annotation_pk: id
+    status_code: 201
+
+- *get_next_task_queue_is_empty
+- *check_first_task_is_labeled
+- *check_second_task_is_labeled

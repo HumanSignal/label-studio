@@ -1,6 +1,6 @@
 {
-  "message": "[fix] History ovrriding query option",
-  "commit": "8d8e0532f952d1eec873d8fd2320da1e913a7a4e",
+  "message": "fix: DEV-2519: Choices selected by default",
+  "commit": "dc03b7337518a3129677570127b44456420d4c6c",
   "branch": "master",
-  "date": "2021-09-21T08:34:07Z"
+  "date": "2022/08/10 15:51:21"
 }

@@ -2,15 +2,13 @@
 **
 
 # Except:
-!deploy
-!label_studio
+!deploy/docker-entrypoint.d/**
+!deploy/docker-entrypoint.sh
+!deploy/requirements-mw.txt
+!deploy/requirements.txt
+!deploy/heroku_run.sh
+!label_studio/**
 !setup.py
-!requirements.txt
 !README.md
-!wait-for-it.sh
-
-# but ignore:
-label_studio/frontend
-
-# except
-!label_studio/frontend/dist
+!licenses/**
+!LICENSE

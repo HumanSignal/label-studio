@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
+import ujson as json
 
 from collections import OrderedDict
 from django.conf import settings
@@ -10,7 +11,8 @@ from core.utils.common import int_from_request
 from data_manager.prepare_params import PrepareParams
 from data_manager.models import View
 from tasks.models import Task
-
+from urllib.parse import unquote
+from core.feature_flags import flag_set
 
 TASKS = 'tasks:'
 logger = logging.getLogger(__name__)
@@ -30,9 +32,16 @@ def get_all_columns(project, *_):
     i = 0
 
     data_types = OrderedDict()
+
     # add data types from config again
-    project_data_types = project.data_types
+    project_data_types = {}
+    for key, value in project.data_types.items():
+        # skip keys from Repeater tag, because we already have its base data,
+        # e.g.: skip 'image[{{idx}}]' because we have 'image' list already
+        if '[' not in key:
+            project_data_types[key] = value
     data_types.update(project_data_types.items())
+
     # all data types from import data
     all_data_columns = project.summary.all_data_columns
     if all_data_columns:
@@ -79,7 +88,23 @@ def get_all_columns(project, *_):
                 'explore': True,
                 'labeling': False
             }
-        },
+        }
+    ]
+
+    if flag_set('ff_back_2070_inner_id_12052022_short', user=project.organization.created_by):
+        result['columns'] += [{
+            'id': 'inner_id',
+            'title': "Inner ID",
+            'type': 'Number',
+            'help': 'Internal task ID starting from 1 for the current project',
+            'target': 'tasks',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        }]
+
+    result['columns'] += [
         {
             'id': 'completed_at',
             'title': 'Completed',
@@ -170,6 +195,18 @@ def get_all_columns(project, *_):
             }
         },
         {
+            'id': 'predictions_model_versions',
+            'title': "Prediction model versions",
+            'type': 'List',
+            'target': 'tasks',
+            'help': 'Model versions aggregated over all predictions',
+            'schema': {'items': project.get_model_versions()},
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        },
+        {
             'id': 'predictions_results',
             'title': "Prediction results",
             'type': "String",
@@ -182,10 +219,21 @@ def get_all_columns(project, *_):
         },
         {
             'id': 'file_upload',
-            'title': "Source filename",
+            'title': "Upload filename",
             'type': "String",
             'target': 'tasks',
-            'help': 'Source filename from import step',
+            'help': 'Filename of uploaded file',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        },
+        {
+            'id': 'storage_filename',
+            'title': "Storage filename",
+            'type': "String",
+            'target': 'tasks',
+            'help': 'Filename from import storage',
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
@@ -201,6 +249,40 @@ def get_all_columns(project, *_):
                 'explore': False,
                 'labeling': False
             }
+        },
+        {
+            'id': 'updated_at',
+            'title': 'Updated at',
+            'type': 'Datetime',
+            'target': 'tasks',
+            'help': 'Task update time',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        },
+        {
+            'id': 'updated_by',
+            'title': 'Updated by',
+            'type': 'List',
+            'target': 'tasks',
+            'help': 'User who did the last task update',
+            'schema': {'items': project.organization.members.values_list('user__id', flat=True)},
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        },
+        {
+            'id': 'avg_lead_time',
+            'title': "Lead Time",
+            'type': 'Number',
+            'help': 'Average lead time over all annotations (seconds)',
+            'target': 'tasks',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
         }
     ]
 
@@ -210,24 +292,35 @@ def get_all_columns(project, *_):
 
 
 def get_prepare_params(request, project):
+    """ This function extract prepare_params from
+        * view_id if it's inside of request data
+        * selectedItems, filters, ordering if they are in request and there is no view id
+    """
     # use filters and selected items from view
-    view_id = int_from_request(request.GET, 'view_id', 0)
+    view_id = int_from_request(request.GET, 'view', 0) or int_from_request(request.data, 'view', 0)
     if view_id > 0:
-        view = get_object_or_404(request, View, pk=view_id)
+        view = get_object_or_404(View, pk=view_id)
         if view.project.pk != project.pk:
             raise DataManagerException('Project and View mismatch')
         prepare_params = view.get_prepare_tasks_params(add_selected_items=True)
 
     # use filters and selected items from request if it's specified
     else:
-        selected = request.data.get('selectedItems', {"all": True, "excluded": []})
+        # query arguments from url
+        if 'query' in request.GET:
+            data = json.loads(unquote(request.GET['query']))
+        # data payload from body
+        else:
+            data = request.data
+
+        selected = data.get('selectedItems', {"all": True, "excluded": []})
         if not isinstance(selected, dict):
             raise DataManagerException('selectedItems must be dict: {"all": [true|false], '
                                        '"excluded | included": [...task_ids...]}')
-        filters = request.data.get('filters', None)
-        ordering = request.data.get('ordering', [])
-        prepare_params = PrepareParams(project=project.id, selectedItems=selected, data=request.data,
-                                       filters=filters, ordering=ordering)
+        filters = data.get('filters', None)
+        ordering = data.get('ordering', [])
+        prepare_params = PrepareParams(project=project.id, selectedItems=selected, data=data,
+                                       filters=filters, ordering=ordering, request=request)
     return prepare_params
 
 
@@ -247,8 +340,29 @@ def evaluate_predictions(tasks):
 
     for ml_backend in project.ml_backends.all():
         # tasks = tasks.filter(~Q(predictions__model_version=ml_backend.model_version))
-        ml_backend.predict_many_tasks(tasks)
+        ml_backend.predict_tasks(tasks)
 
 
 def filters_ordering_selected_items_exist(data):
     return data.get('filters') or data.get('ordering') or data.get('selectedItems')
+
+
+def custom_filter_expressions(*args, **kwargs):
+    pass
+
+
+def preprocess_filter(_filter, *_):
+    return _filter
+
+
+def preprocess_field_name(raw_field_name, only_undefined_field=False):
+    field_name = raw_field_name.replace("filter:", "")
+    field_name = field_name.replace("tasks:", "")
+    ascending = False if field_name[0] == '-' else True  # detect direction
+    field_name = field_name[1:] if field_name[0] == '-' else field_name  # remove direction
+    if field_name.startswith("data."):
+        if only_undefined_field:
+            field_name = f'data__{settings.DATA_UNDEFINED_NAME}'
+        else:
+            field_name = field_name.replace("data.", "data__")
+    return field_name, ascending

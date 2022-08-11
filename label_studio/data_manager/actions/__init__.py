@@ -6,6 +6,7 @@
     they are called by entry_points from settings.DATA_MANAGER_ACTIONS dict items.
 """
 import os
+import copy
 import logging
 import traceback as tb
 
@@ -15,6 +16,7 @@ from django.conf import settings
 from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 
 from data_manager.functions import DataManagerException
+from core.feature_flags import flag_set
 
 logger = logging.getLogger('django')
 
@@ -29,13 +31,15 @@ def check_permissions(user, action):
     return user.has_perm(action['permission'])
 
 
-def get_all_actions(user):
+def get_all_actions(user, project):
     """ Return dict with registered actions
 
     :param user: list with user permissions
+    :param project: current project
     """
     # copy and sort by order key
     actions = list(settings.DATA_MANAGER_ACTIONS.values())
+    actions = copy.deepcopy(actions)
     actions = sorted(actions, key=lambda x: x['order'])
     actions = [
         {key: action[key] for key in action if key != 'entry_point'}
@@ -43,8 +47,18 @@ def get_all_actions(user):
         and check_permissions(user, action)
     ]
     # remove experimental features if they are disabled
-    if not settings.EXPERIMENTAL_FEATURES:
+    if not (
+            flag_set('ff_back_experimental_features', user=project.organization.created_by)
+            or settings.EXPERIMENTAL_FEATURES
+    ):
         actions = [action for action in actions if not action.get('experimental', False)]
+
+    # generate form if function is passed
+    for action in actions:
+        form_generator = action.get('dialog', {}).get('form')
+        if callable(form_generator):
+            action['dialog']['form'] = form_generator(user, project)
+
     return actions
 
 
@@ -69,13 +83,23 @@ def register_actions_from_dir(base_module, action_dir):
     """ Find all python files nearby this file and try to load 'actions' from them
     """
     for path in os.listdir(action_dir):
-        if '.py' in path and '__init__' not in path:
-            name = path[0:path.find('.py')]  # get only module name to read *.py and *.pyc
-            module_actions = import_module(base_module + '.' + name).actions
+        # skip non module files
+        if '__init__' in path or path.startswith('.'):
+            continue
 
-            for action in module_actions:
-                register_action(**action)
-                logger.debug('Action registered: ' + str(action['entry_point'].__name__))
+        name = path[0:path.find('.py')]  # get only module name to read *.py and *.pyc
+        try:
+            module = import_module(f'{base_module}.{name}')
+            if not hasattr(module, 'actions'):
+                continue
+            module_actions = module.actions
+        except ModuleNotFoundError as e:
+            logger.info(e)
+            continue
+
+        for action in module_actions:
+            register_action(**action)
+            logger.debug('Action registered: ' + str(action['entry_point'].__name__))
 
 
 def perform_action(action_id, project, queryset, user, **kwargs):
@@ -89,6 +113,7 @@ def perform_action(action_id, project, queryset, user, **kwargs):
     # check user permissions for this action
     if not check_permissions(user, action):
         raise DRFPermissionDenied(f'Action is not allowed for the current user: {action["id"]}')
+
 
     try:
         result = action['entry_point'](project, queryset, **kwargs)

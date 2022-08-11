@@ -1,24 +1,26 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import django_rq
 import logging
-from django.db import models, transaction
+from django.db import models
 
-# Create your models here.
-from django.db.models import F, Count, Q
 from django.utils.translation import gettext_lazy as _
-from django_rq import job
-from rq import get_current_job
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+from django.conf import settings
 
-from core.utils.common import safe_float, conditional_atomic
+from core.utils.common import safe_float, conditional_atomic, load_func
+
 from ml.api_connector import MLApi
 from projects.models import Project
-from tasks.models import Annotation, Prediction
-from tasks.serializers import TaskSerializer, TaskSimpleSerializer, PredictionSerializer
+from tasks.models import Prediction
+from tasks.serializers import TaskSimpleSerializer, PredictionSerializer
+from webhooks.serializers import WebhookSerializer, Webhook
 
 logger = logging.getLogger(__name__)
 
 MAX_JOBS_PER_PROJECT = 1
+
+InteractiveAnnotatingDataSerializer = load_func(settings.INTERACTIVE_DATA_SERIALIZER)
 
 
 class MLBackendState(models.TextChoices):
@@ -40,8 +42,8 @@ class MLBackend(models.Model):
     is_interactive = models.BooleanField(
         _('is_interactive'),
         default=False,
-        help_text=("It's used for interactive annotating. "
-                   'If true, model has to return one-length list with results')
+        help_text=("Used to interactively annotate tasks. "
+                   'If true, model returns one list with results')
     )
     url = models.TextField(
         _('url'),
@@ -78,7 +80,7 @@ class MLBackend(models.Model):
         _('timeout'),
         blank=True,
         default=100.0,
-        help_text='Responce model timeout',
+        help_text='Response model timeout',
     )
     project = models.ForeignKey(
         Project,
@@ -87,6 +89,11 @@ class MLBackend(models.Model):
     )
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
+    auto_update = models.BooleanField(
+        _('auto_update'),
+        default=True,
+        help_text='If false, model version is set by the user, if true - getting latest version from backend.'
+    )
 
     def __str__(self):
         return f'{self.title} (id={self.id}, url={self.url})'
@@ -99,17 +106,17 @@ class MLBackend(models.Model):
         return self.project.has_permission(user)
 
     @staticmethod
-    def setup_(url, project):
+    def setup_(url, project, model_version=None):
         api = MLApi(url=url)
         if not isinstance(project, Project):
             project = Project.objects.get(pk=project)
-        return api.setup(project)
+        return api.setup(project, model_version=model_version)
 
     def healthcheck(self):
         return self.healthcheck_(self.url)
 
     def setup(self):
-        return self.setup_(self.url, self.project)
+        return self.setup_(self.url, self.project, None if self.auto_update else self.model_version)
 
     @property
     def api(self):
@@ -125,11 +132,16 @@ class MLBackend(models.Model):
         else:
             setup_response = self.setup()
             if setup_response.is_error:
+                logger.warning(f'ML backend responds with error: {setup_response.error_message}')
                 self.state = MLBackendState.ERROR
                 self.error_message = setup_response.error_message
             else:
                 self.state = MLBackendState.CONNECTED
-                self.model_version = setup_response.response.get('model_version')
+                model_version = setup_response.response.get('model_version')
+                logger.info(f'ML backend responds with success: {setup_response.response}')
+                if self.auto_update:
+                    self.model_version = model_version
+                    logger.debug(f'Changing model version: {self.model_version} -> {model_version}')
                 self.error_message = None
         self.save()
 
@@ -145,7 +157,7 @@ class MLBackend(models.Model):
                 MLBackendTrainJob.objects.create(job_id=current_train_job, ml_backend=self)
         self.save()
 
-    def predict_many_tasks(self, tasks):
+    def predict_tasks(self, tasks):
         self.update_state()
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready')
@@ -173,13 +185,13 @@ class MLBackend(models.Model):
             return
 
         # ML Backend doesn't support batch of tasks, do it one by one
-        elif len(responses) == 1:
+        elif len(responses) == 1 and len(tasks) != 1:
             logger.warning(
                 f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
-                f"switched to one-by-one task retrieving"
+                f"switched to one-by-one task retrieval"
             )
             for task in tasks:
-                self.predict_one_task(task)
+                self.__predict_one_task(task)
             return
 
         # wrong result number
@@ -200,7 +212,7 @@ class MLBackend(models.Model):
                     'task': task['id'],
                     'result': response['result'],
                     'score': response.get('score'),
-                    'model_version': self.model_version,
+                    'model_version': ml_api_result.response.get('model_version', self.model_version),
                 }
             )
         with conditional_atomic():
@@ -208,7 +220,7 @@ class MLBackend(models.Model):
             prediction_ser.is_valid(raise_exception=True)
             prediction_ser.save()
 
-    def predict_one_task(self, task):
+    def __predict_one_task(self, task):
         self.update_state()
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready to predict {task}')
@@ -249,13 +261,16 @@ class MLBackend(models.Model):
 
         return prediction
 
-    def interactive_annotating(self, task, context=None):
+    def interactive_annotating(self, task, context=None, user=None):
         result = {}
+        options = {}
+        if user:
+            options = {'user': user}
         if not self.is_interactive:
-            result['errors'] = ["You can't use not interactive model to interactive annotating"]
+            result['errors'] = ["Model is not set to be used for interactive preannotations"]
             return result
 
-        tasks_ser = TaskSimpleSerializer([task], many=True).data
+        tasks_ser = InteractiveAnnotatingDataSerializer([task], many=True, expand=['drafts', 'predictions', 'annotations'], context=options).data
         ml_api_result = self.api.make_predictions(
             tasks=tasks_ser,
             model_version=self.model_version,
@@ -268,9 +283,9 @@ class MLBackend(models.Model):
             return result
 
         if not (isinstance(ml_api_result.response, dict) and 'results' in ml_api_result.response):
-            logger.warning(f'ML backend returns an incorrect response, it should be a dict: {ml_api_result.response}')
+            logger.warning(f'ML backend returns an incorrect response, it must be a dict: {ml_api_result.response}')
             result['errors'] = ['Incorrect response from ML service: '
-                                'ML backend returns an incorrect response, it should be a dict.']
+                                'ML backend returns an incorrect response, it must be a dict.']
             return result
 
         ml_results = ml_api_result.response.get(
@@ -288,13 +303,23 @@ class MLBackend(models.Model):
         result['data'] = ml_results[0]
         return result
 
+    @staticmethod
+    def get_versions_(url, project):
+        api = MLApi(url=url)
+        if not isinstance(project, Project):
+            project = Project.objects.get(pk=project)
+        return api.get_versions(project)
+
+    def get_versions(self):
+        return self.get_versions_(self.url, self.project)
+
 
 class MLBackendPredictionJob(models.Model):
 
     job_id = models.CharField(max_length=128)
     ml_backend = models.ForeignKey(MLBackend, related_name='prediction_jobs', on_delete=models.CASCADE)
     model_version = models.TextField(
-        _('model version'), blank=True, null=True, help_text='Model version this job associated with'
+        _('model version'), blank=True, null=True, help_text='Model version this job is associated with'
     )
     batch_size = models.PositiveSmallIntegerField(
         _('batch size'), default=100, help_text='Number of tasks processed per batch'
@@ -353,20 +378,22 @@ def _validate_ml_api_result(ml_api_result, tasks, curr_logger):
     return True
 
 
-def _get_model_version(project, ml_api, curr_logger):
-    logger.debug(f'Get model version for project {project}')
-    model_version = None
-    ml_api_result = ml_api.setup(project)
-    if ml_api_result.is_error:
-        curr_logger.warning(
-            (
-                f'Project {project}: can\'t fetch last model version from {ml_api_result.url}, '
-                f'reason: {ml_api_result.error_message}.'
-            )
-        )
-    else:
-        if 'model_version' in ml_api_result.response:
-            model_version = ml_api_result.response['model_version']
-        else:
-            curr_logger.error(f'Project {project}: "model_version" field is not specified in response.')
-    return model_version
+@receiver(post_save, sender=MLBackend)
+def create_ml_webhook(sender, instance, created, **kwargs):
+    if not created:
+        return
+    ml_backend = instance
+    webhook_url = ml_backend.url.rstrip('/') + '/webhook'
+    project = ml_backend.project
+    if Webhook.objects.filter(project=project, url=webhook_url).exists():
+        logger.info(f'Webhook {webhook_url} already exists for project {project}: skip creating new one.')
+        return
+    logger.info(f'Create ML backend webhook {webhook_url}')
+    ser = WebhookSerializer(data=dict(
+        project=project.id,
+        url=webhook_url,
+        send_payload=True,
+        send_for_all_actions=True)
+    )
+    if ser.is_valid():
+        ser.save(organization=project.organization)

@@ -1,10 +1,10 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from core.label_config import generate_sample_task_without_check
-from drf_dynamic_fields import DynamicFieldsMixin
 from rest_framework import serializers
+from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework.serializers import SerializerMethodField
 from users.serializers import UserSimpleSerializer
+
 
 from projects.models import Project, ProjectOnboarding, ProjectSummary
 
@@ -16,19 +16,20 @@ class CreatedByFromContext:
         return serializer_field.context.get('created_by')
 
 
-class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+class ProjectSerializer(FlexFieldsModelSerializer):
     """ Serializer get numbers from project queryset annotation,
         make sure, that you use correct one(Project.objects.with_counts())
     """
 
     task_number = serializers.IntegerField(default=None, read_only=True,
-                                        help_text='Total task number in project')
+                                           help_text='Total task number in project')
     total_annotations_number = serializers.IntegerField(default=None, read_only=True,
                                                     help_text='Total annotations number in project including '
                                                               'skipped_annotations_number and ground_truth_number.')
     total_predictions_number = serializers.IntegerField(default=None, read_only=True,
                                                     help_text='Total predictions number in project including '
-                                                              'skipped_annotations_number and ground_truth_numberuseful_annotation_number.')
+                                                              'skipped_annotations_number, ground_truth_number, and '
+                                                              'useful_annotation_number.')
     useful_annotation_number = serializers.IntegerField(default=None, read_only=True,
                                                      help_text='Useful annotation number in project not including '
                                                                'skipped_annotations_number and ground_truth_number. '
@@ -39,7 +40,8 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     skipped_annotations_number = serializers.IntegerField(default=None, read_only=True,
                                                       help_text='Skipped by collaborators annotation number in project')
     num_tasks_with_annotations = serializers.IntegerField(default=None, read_only=True, help_text='Tasks with annotations count')
-    created_by = UserSimpleSerializer(default=CreatedByFromContext())
+
+    created_by = UserSimpleSerializer(default=CreatedByFromContext(), help_text='Project owner')
 
     parsed_label_config = SerializerMethodField(default=None, read_only=True,
                                                 help_text='JSON-formatted labeling configuration')
@@ -50,7 +52,7 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     @staticmethod
     def get_config_has_control_tags(project):
-        return len(project.get_control_tags_from_config()) > 0
+        return len(project.get_parsed_config()) > 0
 
     @staticmethod
     def get_parsed_label_config(project):
@@ -80,7 +82,7 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                   'total_annotations_number', 'total_predictions_number', 'sampling', 'show_ground_truth_first',
                   'show_overlap_first', 'overlap_cohort_percentage', 'task_data_login', 'task_data_password',
                   'control_weights', 'parsed_label_config', 'evaluate_predictions_automatically',
-                  'config_has_control_tags']
+                  'config_has_control_tags', 'skip_queue', 'reveal_preannotations_interactively', 'pinned_at']
 
     def validate_label_config(self, value):
         if self.instance is None:
@@ -99,7 +101,7 @@ class ProjectOnboardingSerializer(serializers.ModelSerializer):
 
 
 class ProjectLabelConfigSerializer(serializers.Serializer):
-    label_config = serializers.CharField()
+    label_config = serializers.CharField(help_text=Project.label_config.field.help_text)
 
     def validate_label_config(self, config):
         Project.validate_label_config(config)
@@ -111,3 +113,17 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectSummary
         fields = '__all__'
+
+
+class GetFieldsSerializer(serializers.Serializer):
+    include = serializers.CharField(required=False)
+    filter = serializers.CharField(required=False, default='all')
+
+    def validate_include(self, value):
+        if value is not None:
+            value = value.split(',')
+        return value
+
+    def validate_filter(self, value):
+        if value in ['all', 'pinned_only', 'exclude_pinned']:
+            return value

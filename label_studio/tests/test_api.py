@@ -174,15 +174,19 @@ def test_delete_annotations(business_client, configured_project):
     (
         {"annotations": [], 'predictions': [], 'drafts': [],
          "data": {"text": "text B", "meta_info": "meta info B"}, "meta": {},
-         "created_at": "", "updated_at": "", "is_labeled": False, "project": 0,
-         'overlap': 1, 'file_upload': None},
+         "created_at": "", "updated_at": "", 'updated_by': [], "is_labeled": False, "project": 0,
+         'overlap': 1, 'file_upload': None, 'annotations_ids': '', 'annotations_results': '',
+         'annotators': [], 'completed_at': None, 'predictions_model_versions': '',
+         'predictions_results': '', 'predictions_score': None, 'total_annotations': 0, 'total_predictions': 0,
+         'avg_lead_time': None, 'cancelled_annotations': 0, 'inner_id': 0,'storage_filename': None,
+         'comment_authors': [], 'comment_count': 0, 'last_comment_updated_at': None, 'unresolved_comment_count': 0},
         200
     )
 ])
 @pytest.mark.django_db
 def test_get_task(client_and_token, configured_project, response, status_code):
     client, token = client_and_token
-    task = configured_project.tasks.all()[0]
+    task = configured_project.tasks.order_by('-id').all()[0]
     response['project'] = configured_project.id
     response['created_at'] = task.created_at.isoformat().replace('+00:00', 'Z')
     response['updated_at'] = task.updated_at.isoformat().replace('+00:00', 'Z')
@@ -202,11 +206,13 @@ def test_get_task(client_and_token, configured_project, response, status_code):
     (
         {"annotations": [], 'predictions': [],
          "data": {"text": "TEST1", "meta_info": "TEST2"}, "meta": {},
-         "created_at": "", "updated_at": "", "is_labeled": False, "project": 0, 'file_upload': None},
+         "created_at": "", "updated_at": "", "updated_by": None, "is_labeled": False,
+         "project": 0, 'file_upload': None},
         {"id": 0, "annotations": [], 'predictions': [],
          "data": {"text": "TEST1", "meta_info": "TEST2"}, "meta": {},
-         "created_at": "", "updated_at": "", "is_labeled": False, "project": 0,
-         'overlap': 1, 'file_upload': None},
+         "created_at": "", "updated_at": "", "updated_by": None, "is_labeled": False, "project": 0,
+         'overlap': 1, 'file_upload': None, "inner_id": 1,
+         'comment_authors': [], 'comment_count': 0, 'last_comment_updated_at': None, 'unresolved_comment_count': 0},
         200
     )
 ])
@@ -228,6 +234,9 @@ def test_patch_task(client_and_token, configured_project, payload, response, sta
     response['created_at'] = task.created_at.isoformat().replace('+00:00', 'Z')
     response['updated_at'] = task.updated_at.isoformat().replace('+00:00', 'Z')
     response['id'] = task.id
+    response['total_annotations'] = 0
+    response['cancelled_annotations'] = 0
+    response['total_predictions'] = 0
 
     assert r.status_code == status_code
     if response:

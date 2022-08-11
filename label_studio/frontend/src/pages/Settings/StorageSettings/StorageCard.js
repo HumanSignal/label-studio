@@ -15,14 +15,14 @@ export const StorageCard = ({
 }) => {
   const [syncing, setSyncing] = useState(false);
   const api = useContext(ApiContext);
-  const [storageData, setStorageData] = useState({...storage});
+  const [storageData, setStorageData] = useState({ ...storage });
   const [synced, setSynced] = useState(null);
 
   const startSync = useCallback(async () => {
     setSyncing(true);
     setSynced(null);
 
-    
+
     const result = await api.callApi('syncStorage', {
       params: {
         target,
@@ -48,12 +48,12 @@ export const StorageCard = ({
       header={storageData.title ?? `Untitled ${storageData.type}`}
       extra={(
         <Dropdown.Trigger align="right" content={(
-          <Menu size="compact" style={{width: 110}}>
+          <Menu size="compact" style={{ width: 110 }}>
             <Menu.Item onClick={() => onEditStorage(storageData)}>Edit</Menu.Item>
             <Menu.Item onClick={() => onDeleteStorage(storageData)}>Delete</Menu.Item>
           </Menu>
         )}>
-          <Button type="link" style={{width: 32, height: 32, marginRight: -10}} icon={<FaEllipsisV/>}/>
+          <Button type="link" style={{ width: 32, height: 32, marginRight: -10 }} icon={<FaEllipsisV/>}/>
         </Dropdown.Trigger>
       )}
     >

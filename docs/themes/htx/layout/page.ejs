@@ -10,16 +10,6 @@
 <% } %>
 <div class="content <%- page.type ? page.type: '' %> <%- page.type && page.type !== 'blog' ? 'with-sidebar' : '' %> <%- page.type === 'guide' ? page.path.replace(/.+\//, '').replace('.html', '') + '-guide' : '' %>">
 
-  <div id="local-search-result-wrapper"></div>
-  <script>
-      var search_path = "<%= config.search.path %>";
-      if (search_path.length === 0) {
-        search_path = "search.xml";
-      }
-      var path = "<%= config.root %>" + search_path;
-      searchFunc(path, 'local-search-input', 'local-search-result-wrapper');
-  </script>
-
   <% if (page.type) { %>
     <% if (page.type === 'menu') { %>
       <form id="search-form">
@@ -48,12 +38,14 @@
     <% } %>
 
 <!--content for all the website pages-->
+<% if (!page.header_only) { %>
   <div class="footer-slack">
-      Couldn't find what you were looking for? Please <a href="http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=docs-footer">let us know on
+      Couldn't find what you were looking for? Please <a href="https://slack.labelstudio.heartex.com/?source=docs-footer">let us know on
       Slack&nbsp;<img style="height: 18px; position: absolute" src="/images/slack.png" />
     </a>
     <br/>If you found an error, you can <a href="https://github.com/heartexlabs/label-studio/issues">file an issue on GitHub</a>!
   </div>
+<% } %>
 </div>
 
 <div class="sub-toc"></div>

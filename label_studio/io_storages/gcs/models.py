@@ -6,24 +6,24 @@ import socket
 import google.auth
 import re
 
+from core.redis import start_job_async_or_sync
 from google.auth import compute_engine
 from google.cloud import storage as google_storage
+from google.cloud.storage.client import _marker
 from google.auth.transport import requests
 from google.oauth2 import service_account
 from urllib.parse import urlparse
 from datetime import datetime, timedelta
-from django.db import models, transaction
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
-from io_storages.utils import get_uri_via_regex
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
-url_scheme = 'gs'
 
 clients_cache = {}
 
@@ -47,6 +47,8 @@ class GCSStorageMixin(models.Model):
 
     def get_client(self, raise_on_error=False):
         credentials = None
+        project_id = _marker
+
         # gcs client initialization ~ 200 ms, for 30 tasks it's a 6 seconds, so we need to cache it
         cache_key = f'{self.google_application_credentials}'
         if self.google_application_credentials:
@@ -54,13 +56,16 @@ class GCSStorageMixin(models.Model):
                 return clients_cache[cache_key]
             try:
                 service_account_info = json.loads(self.google_application_credentials)
+                project_id = service_account_info.get('project_id', _marker)
                 credentials = service_account.Credentials.from_service_account_info(service_account_info)
             except Exception as exc:
                 if raise_on_error:
                     raise
                 logger.error(f"Can't create GCS credentials. Reason: {exc}", exc_info=True)
                 credentials = None
-        client = google_storage.Client(credentials=credentials)
+                project_id = _marker
+
+        client = google_storage.Client(project=project_id, credentials=credentials)
         if credentials is not None:
             clients_cache[cache_key] = client
         return client
@@ -78,6 +83,8 @@ class GCSStorageMixin(models.Model):
 
 
 class GCSImportStorage(GCSStorageMixin, ImportStorage):
+    url_scheme = 'gs'
+
     presign = models.BooleanField(
         _('presign'), default=True,
         help_text='Generate presigned URLs')
@@ -103,7 +110,7 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
 
     def get_data(self, key):
         if self.use_blob_urls:
-            return {settings.DATA_UNDEFINED_NAME: f'{url_scheme}://{self.bucket}/{key}'}
+            return {settings.DATA_UNDEFINED_NAME: f'{self.url_scheme}://{self.bucket}/{key}'}
         bucket = self.get_bucket()
         blob = bucket.blob(key)
         blob_str = blob.download_as_string()
@@ -121,11 +128,11 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
             return False
         return True
 
-    def resolve_gs(self, url, **kwargs):
+    def generate_http_url(self, url):
         r = urlparse(url, allow_fragments=False)
         bucket_name = r.netloc
         key = r.path.lstrip('/')
-        if self.is_gce_instance():
+        if self.is_gce_instance() and not self.google_application_credentials:
             logger.debug('Generate signed URL for GCE instance')
             return self.python_cloud_function_get_signed_url(bucket_name, key)
         else:
@@ -169,6 +176,7 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
         auth_request = requests.Request()
         credentials, project = google.auth.default()
         storage_client = google_storage.Client(project, credentials)
+        # storage_client = self.get_client()
         data_bucket = storage_client.lookup_bucket(bucket_name)
         signed_blob_path = data_bucket.blob(blob_name)
         expires_at_ms = datetime.now() + timedelta(minutes=self.presign_ttl)
@@ -177,18 +185,6 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
                                                                 service_account_email=None)
         signed_url = signed_blob_path.generate_signed_url(expires_at_ms, credentials=signing_credentials, version="v4")
         return signed_url
-
-    def resolve_uri(self, data):
-        uri, storage = get_uri_via_regex(data, prefixes=(url_scheme,))
-        if not storage:
-            return
-        logger.debug("Found matching storage uri in task data value: {uri}".format(uri=uri))
-        resolved_uri = self.resolve_gs(uri)
-        return data.replace(uri, resolved_uri)
-
-    def can_resolve_url(self, url):
-        # TODO: later check to the full prefix like url.startswith(url_scheme + "//" + self.bucket)
-        return url.startswith(f'{url_scheme}://')
 
     def scan_and_create_links(self):
         return self._scan_and_create_links(GCSImportStorageLink)
@@ -213,13 +209,17 @@ class GCSExportStorage(GCSStorageMixin, ExportStorage):
         GCSExportStorageLink.create(annotation, self)
 
 
-@receiver(post_save, sender=Annotation)
-def export_annotation_to_gcs_storages(sender, instance, **kwargs):
-    project = instance.task.project
+def async_export_annotation_to_gcs_storages(annotation):
+    project = annotation.task.project
     if hasattr(project, 'io_storages_gcsexportstorages'):
         for storage in project.io_storages_gcsexportstorages.all():
-            logger.debug(f'Export {instance} to GCS storage {storage}')
-            storage.save_annotation(instance)
+            logger.debug(f'Export {annotation} to GCS storage {storage}')
+            storage.save_annotation(annotation)
+
+
+@receiver(post_save, sender=Annotation)
+def export_annotation_to_s3_storages(sender, instance, **kwargs):
+    start_job_async_or_sync(async_export_annotation_to_gcs_storages, instance)
 
 
 class GCSImportStorageLink(ImportStorageLink):

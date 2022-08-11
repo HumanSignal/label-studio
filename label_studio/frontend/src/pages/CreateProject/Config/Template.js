@@ -43,7 +43,7 @@ export class Template {
 
   initRoot() {
     const tags = this.flatten(this.$root);
-    this.objects = tags.filter($tag => $tag.tagName in OBJECTS);
+    this.objects = tags.filter($tag => $tag.tagName in OBJECTS && $tag.getAttribute("value"));
     const names = this.objects.map($tag => $tag.getAttribute('name'));
     this.controls = tags.filter($tag => names.includes($tag.getAttribute('toName')));
 
@@ -52,10 +52,20 @@ export class Template {
       $object.$controls = this.controls.filter($tag => $tag.getAttribute('toName') === $object.getAttribute('name'));
       $object.$controls.forEach($control => $control.$object = $object);
 
+      for (let item in object.settings) {
+        object.settings[item].object = $object;
+      }
+
       let settings = { ...object.settings };
       $object.$controls.forEach($control => {
         let control = CONTROLS[$control.tagName];
+
         if (control) {
+          for (let item in control.settings) {
+            control.settings[item].control = $control;
+            control.settings[item].object = $object;
+          }
+          
           settings = { ...settings, ...control.settings };
         }
       });

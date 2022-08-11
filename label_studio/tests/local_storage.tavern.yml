@@ -1,0 +1,314 @@
+---
+test_name: test_import_from_localstorage
+strict: false
+marks:
+- skipif: '"Windows" in platform.system()'
+- usefixtures:
+  - django_live_url
+  - local_files_storage
+  - local_files_document_root_tempdir
+stages:
+- id: signup
+  name: Sign up
+  request:
+    url: "{django_live_url}/user/signup"
+    data:
+      email: test_suites_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+    save:
+      $ext:
+        function: tests.utils:os_independent_path
+        extra_kwargs:
+          path: 'files/subdir/test_image2.png'
+          add_tempdir: true
+- id: create_project_image
+  type: ref
+- &create_storage
+  name: stage
+  request:
+    json:
+      project: "{project_pk}"
+      title: test
+      regex_filter: ".*png"
+      # path: "/tmp/files/subdir"
+      path: "{os_independent_path_parent}"
+      use_blob_urls: true
+    method: POST
+    url: '{django_live_url}/api/storages/localfiles'
+  response:
+    save:
+      json:
+        storage_pk: id
+    status_code: 201
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/localfiles/{storage_pk}/sync'
+  response:
+    json:
+      last_sync_count: 1
+    status_code: 200
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      data:
+        image_url: !re_match \/data\/local-files\/\?d=(tmp|var/folders/[A-Za-z0-9]+/[A-Za-z0-9]+/T)[\/\\]files[\/\\]subdir[\/\\]test_image2.png
+    status_code: 200
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/data/local-files/?d={os_independent_path_tmpdir}/files/subdir/test_image2.png'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/dm/views?project={project_pk}'
+    json:
+      project: '{project_pk}'
+  response:
+    status_code: 201
+    save:
+      json:
+        view_pk: id
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks?view={view_pk}'
+  response:
+    json:
+      tasks:
+        - data:
+            image_url: !re_match \/data\/local-files\/\?d=(tmp|var/folders/[A-Za-z0-9]+/[A-Za-z0-9]+/T)[\/\\]files[\/\\]subdir[\/\\]test_image2.png
+    status_code: 200
+---
+test_name: test_local_files_not_enabled
+strict: false
+marks:
+- skipif: '"Windows" in platform.system()'
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  name: Sign up
+  request:
+    url: "{django_live_url}/user/signup"
+    data:
+      email: test_suites_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+    save:
+      $ext:
+        function: tests.utils:os_independent_path
+        extra_kwargs:
+          path: 'tmp/files/subdir/test_image2.png'
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/data/local-files/?d={os_independent_path}'
+  response:
+    status_code: 403
+---
+test_name: test_local_files_without_storage_not_available
+strict: false
+marks:
+- skipif: '"Windows" in platform.system()'
+- usefixtures:
+  - django_live_url
+  - local_files_storage
+  - local_files_document_root_tempdir
+stages:
+- id: signup
+  name: Sign up
+  request:
+    url: "{django_live_url}/user/signup"
+    data:
+      email: test_suites_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+    save:
+      $ext:
+        function: tests.utils:os_independent_path
+        extra_kwargs:
+          path: 'tmp/files/subdir/test_image2.png'
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/data/local-files/?d={os_independent_path}'
+  response:
+    status_code: 404
+---
+test_name: test_local_files_without_import
+strict: false
+marks:
+- skipif: '"Windows" in platform.system()'
+- usefixtures:
+  - django_live_url
+  - local_files_storage
+  - local_files_document_root_tempdir
+stages:
+- id: signup
+  name: Sign up
+  request:
+    url: "{django_live_url}/user/signup"
+    data:
+      email: test_suites_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+    save:
+      $ext:
+        function: tests.utils:os_independent_path
+        extra_kwargs:
+          path: 'files/subdir/test_image2.png'
+          add_tempdir: true
+- id: create_project_image
+  type: ref
+- *create_storage
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/data/local-files/?d={os_independent_path}'
+  response:
+    status_code: 200
+---
+test_name: test_local_files_without_import_document_root
+strict: false
+marks:
+- skipif: '"Windows" in platform.system()'
+- usefixtures:
+  - django_live_url
+  - local_files_storage
+  - local_files_document_root_subdir
+stages:
+- id: signup
+  name: Sign up
+  request:
+    url: "{django_live_url}/user/signup"
+    data:
+      email: test_suites_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+    save:
+      $ext:
+        function: tests.utils:os_independent_path
+        extra_kwargs:
+          path: 'files/subdir/test_image2.png'
+          add_tempdir: true
+- id: create_project_image
+  type: ref
+- *create_storage
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/data/local-files/?d={os_independent_path}'
+  response:
+    status_code: 404
+    save:
+      $ext:
+        function: tests.utils:os_independent_path
+        extra_kwargs:
+          path: 'subdir/test_image2.png'
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/data/local-files/?d={os_independent_path}'
+  response:
+    status_code: 200
+---
+test_name: test_import_from_localstorage_document_root
+strict: false
+marks:
+- skipif: '"Windows" in platform.system()'
+- usefixtures:
+  - django_live_url
+  - local_files_storage
+  - local_files_document_root_subdir
+stages:
+- id: signup
+  name: Sign up
+  request:
+    url: "{django_live_url}/user/signup"
+    data:
+      email: test_suites_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+    save:
+      $ext:
+        function: tests.utils:os_independent_path
+        extra_kwargs:
+          path: 'files/subdir/test_image2.png'
+          add_tempdir: true
+- id: create_project_image
+  type: ref
+- *create_storage
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/localfiles/{storage_pk}/sync'
+  response:
+    json:
+      last_sync_count: 1
+    status_code: 200
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      data:
+        image_url: !re_match \/data\/local-files\/\?d=subdir[\/\\]test_image2.png
+    status_code: 200
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/data/local-files/?d={os_independent_path}'
+  response:
+    status_code: 404
+    save:
+      $ext:
+        function: tests.utils:os_independent_path
+        extra_kwargs:
+          path: 'subdir/test_image2.png'
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/data/local-files/?d={os_independent_path}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/dm/views?project={project_pk}'
+    json:
+      project: '{project_pk}'
+  response:
+    status_code: 201
+    save:
+      json:
+        view_pk: id
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks?view={view_pk}'
+  response:
+    json:
+      tasks:
+        - data:
+            image_url: !re_match \/data\/local-files\/\?d=subdir[\/\\]test_image2.png
+    status_code: 200

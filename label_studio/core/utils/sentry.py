@@ -2,12 +2,16 @@ from django.conf import *
 
 
 def event_processor(event, hint):
+    # skip all transactions without errors
+    if 'exc_info' not in hint:
+        return None
+
     # skip specified exceptions
     exceptions = event.get('exception', {}).get('values', [{}])
     last = exceptions[-1]
     if last.get('type') in [
-        # 'Http404', 'NotAuthenticated', 'AuthenticationFailed', 'NotFound', 'XMLSyntaxError',
-        # 'FileUpload.DoesNotExist',
+        'Http404', 'NotAuthenticated', 'AuthenticationFailed', 'NotFound', 'XMLSyntaxError',
+        'FileUpload.DoesNotExist',
         'Forbidden', 'KeyboardInterrupt'
     ]:
         return None
@@ -25,6 +29,15 @@ def event_processor(event, hint):
             'the database system is shutting down',
             'remaining connection slots are reserved for non-replication superuser connections',
             'unable to open database file'
+        ]
+        for message in messages:
+            if message in value:
+                return None
+
+    if last.get('type') == 'OSError':
+        value = last.get('value')
+        messages = [
+            'Too many open files: ',
         ]
         for message in messages:
             if message in value:
