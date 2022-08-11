@@ -4,14 +4,11 @@ import logging
 
 from datetime import datetime
 from django.conf import settings
-from django.db.models.signals import post_delete, pre_delete
 from django.db import connection
-from label_studio.tasks.models import update_all_task_states_after_deleting_task, \
-    remove_data_columns
 
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
-from core.utils.common import load_func, temporary_disconnect_list_signal, temporary_disconnect_all_signals
+from core.utils.common import load_func, temporary_disconnect_all_signals
 from projects.models import Project
 
 from tasks.models import (
