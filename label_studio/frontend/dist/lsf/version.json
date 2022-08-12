@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3077: Repeater performance improvement",
-  "commit": "2fc84638dc33c0c97bde2bd3e354a18d3dc07c35",
+  "message": "fix: DEV-2964: Wrap Annotation History with an interface toggle",
+  "commit": "344841d16faa8fc7b9ded323e9cdc8f7f657ed65",
   "branch": "master",
-  "date": "2022/08/11 10:42:52"
+  "date": "2022/08/12 19:22:21"
 }
