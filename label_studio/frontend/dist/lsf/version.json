@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2576: Undo keypoints when create new polygon",
+  "message": "fix: DEV-2576: Undo keypoints when create new polygon (#778)\n\n* fix: DEV-2578: Undo and Redo keypoints when create new polygon\r\n\r\n* destroy hotkeys, split undo and redo method\r\n\r\n* ifs simplified\r\n\r\n* remove hotkeys import\r\n\r\n* validate if drawingRegion exists\r\n\r\n* move historyPoits to a var\r\n\r\n* add feature flag\r\n\r\n* change ff\r\n\r\n* change structure to delete last polygon point with undo",
   "commit": "9f8a8fa5adfcb54dbbabd04d484374a13b3412bc",
   "branch": "master",
-  "date": "2022/08/12 10:04:14"
+  "date": "2022-08-12T13:04:14Z"
 }

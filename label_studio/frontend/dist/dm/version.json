@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-3034: Comments with drafts",
-  "commit": "0341f04ebceb8d011c2ea2c81efa7df29991b191",
+  "message": "fix: DEV-2519: Choices selected by default",
+  "commit": "dc03b7337518a3129677570127b44456420d4c6c",
   "branch": "master",
-  "date": "2022/08/04 20:34:21"
+  "date": "2022/08/10 15:51:21"
 }
