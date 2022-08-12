@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2964: Wrap Annotation History with an interface toggle",
-  "commit": "344841d16faa8fc7b9ded323e9cdc8f7f657ed65",
-  "branch": "master",
-  "date": "2022/08/12 19:22:21"
+  "message": "fix: DEV-3077: Add new property to turn lazyload off",
+  "commit": "b322d7ef0afd1121385bf897642bfc8146e598bf",
+  "branch": "fb-dev-3077",
+  "date": "2022/08/12 20:04:08"
 }
