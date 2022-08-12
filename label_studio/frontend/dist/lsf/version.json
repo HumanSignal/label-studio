@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2964: Wrap Annotation History with an interface toggle",
-  "commit": "22be7087b868e02b160d4e9645b19b0af8776849",
-  "branch": "fb-dev-2964/disable-annotation-history",
-  "date": "2022/08/11 23:54:30"
+  "commit": "344841d16faa8fc7b9ded323e9cdc8f7f657ed65",
+  "branch": "master",
+  "date": "2022/08/12 19:22:21"
 }
