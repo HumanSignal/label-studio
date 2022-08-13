@@ -1,11 +1,17 @@
+import os
 import sys
 import logging
 
+from django.conf import settings
+
 from core.models import AsyncMigrationStatus
 from core.redis import start_job_async_or_sync
+from core.utils.common import batch
+from data_export.models import DataExport
+from data_export.serializers import ExportDataSerializer
 from organizations.models import Organization
 from projects.models import Project
-
+from tasks.models import Task
 
 def calculate_stats_all_orgs(from_scratch, redis):
     logger = logging.getLogger(__name__)
@@ -63,3 +69,46 @@ def redis_job_for_calculation(org, from_scratch):
             f"End processing counters for project <{project.title}> ({project.id}), "
             f"processed {str(task_count)} tasks"
         )
+
+def export_project(project_id, format):
+    logger = logging.getLogger(__name__)
+
+    try:
+        project = Project.objects.get(id=project_id)
+    except Project.DoesNotExist:
+        logger.error(f"Project with id {project_id} does not exist.")
+        return
+
+    task_ids = (
+        Task.objects.filter(project=project)
+        .select_related("project")
+        .prefetch_related("annotations", "predictions")
+    )
+
+    logger.debug(
+        f"Start exporting project <{project.title}> ({project.id}) with task count {task_ids.count()}."
+    )
+
+    tasks = []
+    for _task_ids in batch(task_ids, 1000):
+        tasks += ExportDataSerializer(
+            _task_ids,
+            many=True,
+            expand=["drafts"],
+            context={"interpolate_key_frames": settings.INTERPOLATE_KEY_FRAMES},
+        ).data
+
+    export_stream, _, filename = DataExport.generate_export_file(
+        project, tasks, format, settings.CONVERTER_DOWNLOAD_RESOURCES, {}
+    )
+
+    filepath = os.path.join(settings.EXPORT_DIR, filename)
+
+    with open(filepath, "wb") as file:
+        file.write(export_stream.read())
+
+    logger.debug(
+        f"End exporting project <{project.title}> ({project.id}) in {format} format."
+    )
+
+    return filepath
