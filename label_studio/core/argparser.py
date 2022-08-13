@@ -133,6 +133,11 @@ def parse_input_args(input_args):
         '--from-scratch', dest='from_scratch', default=False, action='store_true', help='Recalculate from scratch'
     )
 
+    # export_project sub-command parser
+    export_project = subparsers.add_parser('export', help='Export project in a specific format', parents=[root_parser])
+    export_project.add_argument('project_id', help='ID of the project')
+    export_project.add_argument('export_format', help='File format')
+
     args = parser.parse_args(input_args)
 
     if not hasattr(args, 'label_config'):
