@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2964: Wrap Annotation History with an interface toggle",
-  "commit": "344841d16faa8fc7b9ded323e9cdc8f7f657ed65",
-  "branch": "master",
-  "date": "2022/08/12 19:22:21"
+  "message": "feat: DEV-3132: improve Brush experience on iPad [test2]",
+  "commit": "b36e69c3ad510e9c22d9990c14f2f3f4c61afa7d",
+  "branch": "fb-dev-3132-brush-ipad",
+  "date": "2022/08/06 14:07:24"
 }
