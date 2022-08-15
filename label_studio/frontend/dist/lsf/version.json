@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3077: Add new property to turn lazyload off",
-  "commit": "79537bbd9c5da78d495eb52449cddb2f331c6906",
-  "branch": "fb-dev-3077",
-  "date": "2022/08/12 21:26:41"
+  "commit": "868cd9ab97cf0fd4da85dc36fe9a86b26bb8279b",
+  "branch": "master",
+  "date": "2022/08/15 09:21:15"
 }
