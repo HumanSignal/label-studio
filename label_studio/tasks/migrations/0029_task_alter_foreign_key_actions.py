@@ -31,7 +31,14 @@ CONSTRAINTS = [
     {"SQL": "SELECT conname FROM pg_catalog.pg_constraint con "
         "INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid "
         "INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace "
-        "WHERE conname LIKE 'tasks_annotationdraft_task_id%'",
+        "WHERE conname LIKE 'tasks_taskcompletiondraft_task_id%'",
+     "TABLE": "tasks_annotationdraft",
+     "KEY": "task_id",
+     "REF": '"task" ("id")'},
+    {"SQL": "SELECT conname FROM pg_catalog.pg_constraint con "
+            "INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid "
+            "INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace "
+            "WHERE conname LIKE 'tasks_annotationdraft_task_id%'",
      "TABLE": "tasks_annotationdraft",
      "KEY": "task_id",
      "REF": '"task" ("id")'}
@@ -66,8 +73,9 @@ def change_constraint(schema_editor, action='CASCADE'):
         logger.info(f'Starting update for table {c["TABLE"]}')
         cursor.execute(c['SQL'])
         con = cursor.fetchone()
-        if con and len(con) == 0:
+        if not con or len(con) == 0:
             logger.warning(f'No constraint for table {c["TABLE"]} with key {c["KEY"]}')
+            continue
         change = f'ALTER TABLE "{c["TABLE"]}" DROP CONSTRAINT {con[0]}, ADD FOREIGN KEY ("{c["KEY"]}") REFERENCES {c["REF"]} ON DELETE {action} ON UPDATE NO ACTION'
         schema_editor.execute(change)
 
