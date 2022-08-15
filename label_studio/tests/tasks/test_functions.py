@@ -30,7 +30,7 @@ class TestExportProject:
         ).data
 
         with mocker.patch("builtins.open"):
-            filepath = export_project(project.id, "JSON")
+            filepath = export_project(project.id, "JSON", settings.EXPORT_DIR)
 
         assert filepath == settings.EXPORT_DIR + "/project.json"
 
@@ -40,6 +40,6 @@ class TestExportProject:
 
     def test_project_does_not_exist(self, mocker, generate_export_file):
         with mocker.patch("builtins.open"):
-            export_project(1, "JSON")
+            export_project(1, "JSON", settings.EXPORT_DIR)
 
         generate_export_file.assert_not_called()
