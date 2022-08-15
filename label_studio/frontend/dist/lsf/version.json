@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3077: Add new property to turn lazyload off (#807)\n\n* fix: DEV-3077: add new property to turn lazyload off\r\n\r\n* logic adjustment",
-  "commit": "868cd9ab97cf0fd4da85dc36fe9a86b26bb8279b",
-  "branch": "master",
-  "date": "2022-08-15T12:21:15Z"
+  "message": "fix: DEV-3101: Fix sving text for paragraph regions",
+  "commit": "5d288d6881bd7914a57575c74aa993b135215072",
+  "branch": "fb-dev-3101/save-paragraphs-text",
+  "date": "2022/08/15 20:16:38"
 }
