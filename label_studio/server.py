@@ -18,10 +18,10 @@ from label_studio.core.utils.windows_sqlite_fix import windows_dll_fix
 windows_dll_fix()
 
 from django.core.management import call_command
-from django.db import IntegrityError
 from django.core.wsgi import get_wsgi_application
+from django.db import connections, DEFAULT_DB_ALIAS, IntegrityError
+from django.db.backends.signals import connection_created
 from django.db.migrations.executor import MigrationExecutor
-from django.db import connections, DEFAULT_DB_ALIAS
 
 from label_studio.core.argparser import parse_input_args
 from label_studio.core.utils.params import get_env
@@ -45,6 +45,13 @@ def _app_run(host, port):
     call_command('runserver', '--noreload', http_socket)
 
 
+def _set_sqlite_fix_pragma(sender, connection, **kwargs):
+    """Enable integrity constraint with sqlite."""
+    if connection.vendor == 'sqlite' and get_env('AZURE_MOUNT_FIX'):
+        cursor = connection.cursor()
+        cursor.execute('PRAGMA journal_mode=wal;')
+
+
 def is_database_synchronized(database):
     connection = connections[database]
     connection.prepare_database()
@@ -54,6 +61,7 @@ def is_database_synchronized(database):
 
 
 def _apply_database_migrations():
+    connection_created.connect(_set_sqlite_fix_pragma)
     if not is_database_synchronized(DEFAULT_DB_ALIAS):
         print('Initializing database..')
         call_command('migrate', '--no-color', verbosity=0)

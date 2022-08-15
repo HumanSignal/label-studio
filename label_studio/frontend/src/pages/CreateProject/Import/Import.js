@@ -282,7 +282,7 @@ export const ImportPage = ({
         <div className={importClass.elem("csv-handling").mod({ highlighted: highlightCsvHandling, hidden: !csvHandling })}>
           <span>Treat CSV/TSV as</span>
           <label><input {...csvProps} value="tasks" checked={csvHandling === "tasks"}/> List of tasks</label>
-          <label><input {...csvProps} value="ts" checked={csvHandling === "ts"}/> Time Series</label>
+          <label><input {...csvProps} value="ts" checked={csvHandling === "ts"}/> Time Series or Whole Text File</label>
         </div>
         <div className={importClass.elem("status")}>
           {files.uploaded.length

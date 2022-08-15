@@ -65,7 +65,6 @@ export const MachineLearningSettings = () => {
               <ModelVersionSelector
                 object={backend}
                 apiName="modelVersions"
-                valueName="version"
                 label="Version"
               />
             </Form.Row>

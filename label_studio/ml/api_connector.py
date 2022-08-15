@@ -213,12 +213,13 @@ class MLApi(BaseHTTPAPI):
     def validate(self, config):
         return self._request('validate', request={'config': config}, timeout=self._validate_request_timeout)
 
-    def setup(self, project):
+    def setup(self, project, model_version=None):
         return self._request('setup', request={
             'project': self._create_project_uid(project),
             'schema': project.label_config,
             'hostname': settings.HOSTNAME if settings.HOSTNAME else ('http://localhost:' + settings.INTERNAL_PORT),
-            'access_token': project.created_by.auth_token.key
+            'access_token': project.created_by.auth_token.key,
+            'model_version': model_version
         }, timeout=TIMEOUT_SETUP)
 
     def duplicate_model(self, project_src, project_dst):
@@ -232,6 +233,11 @@ class MLApi(BaseHTTPAPI):
 
     def get_train_job_status(self, train_job):
         return self._request('job_status', request={'job': train_job.job_id}, timeout=TIMEOUT_TRAIN_JOB_STATUS)
+
+    def get_versions(self, project):
+        return self._request('versions', request={
+            'project': self._create_project_uid(project)
+        }, timeout=TIMEOUT_SETUP, method='POST')
 
 
 def get_ml_api(project):

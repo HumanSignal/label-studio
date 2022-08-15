@@ -284,7 +284,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         tags=['Projects'],
         operation_summary='Validate label config',
         operation_description='Validate an arbitrary labeling configuration.',
-        responses={200: 'Validation success'},
+        responses={204: 'Validation success'},
         request_body=ProjectLabelConfigSerializer,
     ))
 class LabelConfigValidateAPI(generics.CreateAPIView):
