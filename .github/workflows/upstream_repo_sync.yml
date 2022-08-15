@@ -97,19 +97,57 @@ jobs:
           CI: false # on true webpack breaks on warnings, and we have them a lot
           NODE_ENV: 'production'
 
+      - name: Get PR
+        uses: actions/github-script@v6
+        id: get-pr
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const {repo, owner} = context.repo;
+            const branchName = '${{ github.event.client_payload.branch_name }}';
+            const branchNameLowerCase = branchName.toLowerCase();
+            const {data: listPullsResponse} = await github.rest.pulls.list({
+              owner,
+              repo,
+              head: `${owner}:${branchName}`,
+              per_page: 1
+            });
+            const {data: listPullsResponseLowerCase} = await github.rest.pulls.list({
+              owner,
+              repo,
+              head: `${owner}:${branchNameLowerCase}`,
+              per_page: 1
+            });
+            
+            if (listPullsResponse.length !== 0) {
+              console.log(`Found PR for branch '${branchName}'`)
+              core.setOutput("branch-name", branchName);
+              return listPullsResponse
+            } else if (listPullsResponseLowerCase.length !== 0) {
+              console.log(`Found PR for branch '${branchNameLowerCase}'`)
+              core.setOutput("branch-name", branchNameLowerCase);
+              return listPullsResponseLowerCase
+            } else {
+              console.log(`PR for branch '${branchNameLowerCase}' is not created yet`)
+              core.setOutput("branch-name", branchNameLowerCase);
+              return listPullsResponseLowerCase
+            }
+
       - name: Create branch
         shell: bash
         run: |
           set -xeuo pipefail
+          
+          branch_name='${{ steps.get-pr.outputs.branch-name }}'
           
           if grep -q '^ls-release/.*$' <<< '${{ github.event.client_payload.base_branch_name }}'; then
             git checkout '${{ github.event.client_payload.base_branch_name }}'
           else
             git checkout '${{ github.event.repository.default_branch }}'
           fi
-          
-          git checkout '${{ github.event.client_payload.branch_name }}' || true
-          git checkout -b '${{ github.event.client_payload.branch_name }}' || true
+
+          git checkout "${branch_name}" || true
+          git checkout -b "${branch_name}" || true
 
           if [[ "${{ github.event.client_payload.repo_name }}" == */dm2* ]]; then 
             module_dist="${{ env.STATIC_DIST }}/dm"
@@ -132,21 +170,6 @@ jobs:
           git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}'
           git push origin HEAD
 
-      - name: Get PRs
-        uses: actions/github-script@v6
-        id: get-pr
-        with:
-          github-token: ${{ secrets.GIT_PAT }}
-          script: |
-            const { repo, owner } = context.repo;
-            const listPullsResponse = await github.rest.pulls.list({
-              owner,
-              repo,
-              head: '${{ github.repository_owner }}:${{ github.event.client_payload.branch_name }}',
-              per_page: 100
-            });
-            return listPullsResponse
-
       - name: Create PR
         id: create-pr
         uses: actions/github-script@v6
@@ -156,20 +179,21 @@ jobs:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
             const { repo, owner } = context.repo;
-            listPullsResponse = ${{ steps.get-pr.outputs.result }}
-            if (listPullsResponse.data.length) {
-              core.info(`PR already exist ${ listPullsResponse.data[0].html_url }`)
-              if ( listPullsResponse.data[0].body.includes('${{ github.event.client_payload.html_url }}') ) {
+            const branchName = '${{ steps.get-pr.outputs.branch-name }}';
+            const listPullsResponse = ${{ steps.get-pr.outputs.result }}
+            if (listPullsResponse.length) {
+              core.info(`PR already exist ${ listPullsResponse[0].html_url }`)
+              if ( listPullsResponse[0].body.includes('${{ github.event.client_payload.html_url }}') ) {
                 core.info(`${{ github.event.client_payload.html_url }} already referenced in PR description`)
                 return listPullsResponse
               } else {
                 core.info(`Adding new ref on ${{ github.event.client_payload.html_url }} to PR`)
-                const newBody = listPullsResponse.data[0].body + `\n- ${{ github.event.client_payload.html_url }}`
+                const newBody = listPullsResponse[0].body + `\n- ${{ github.event.client_payload.html_url }}`
                 const updatePullResponse = await github.rest.pulls.update({
                   title: process.env.TITLE,
                   owner,
                   repo,
-                  pull_number: listPullsResponse.data[0].number,
+                  pull_number: listPullsResponse[0].number,
                   body: newBody
                 });
                 return updatePullResponse
@@ -183,7 +207,7 @@ jobs:
                 title: process.env.TITLE,
                 owner,
                 repo,
-                head: '${{ github.event.client_payload.branch_name }}',
+                head: branchName,
                 base: base,
                 draft: true,
                 body: [
@@ -204,22 +228,26 @@ jobs:
           github-token: ${{ secrets.GIT_PAT }}
           result-encoding: string
           script: |
-            submodules = [
+            const branchName = '${{ github.event.client_payload.branch_name }}';
+            const branchNameLowerCase = branchName.toLowerCase();
+
+            const submodules = [
               { owner: 'heartexlabs', repo: 'label-studio-frontend' },
               { owner: 'heartexlabs', repo: 'dm2' }
             ]
-            openPRs = []  
+            let openPRs = []  
             for (let submodule of submodules) {
               core.info(`Checking ${ submodule.owner }/${ submodule.repo }`)
-              const listPullsResponse = await github.rest.pulls.list({
+              const { data: listAllOpenPulls } = await github.rest.pulls.list({
                 owner: submodule.owner,
                 repo: submodule.repo,
-                head: `${ submodule.owner }:${{ github.event.client_payload.branch_name }}`,
                 status: 'open',
                 per_page: 100
               });
-            
-              for (let pr of listPullsResponse.data ) {
+              
+              const listOpenPulls = listAllOpenPulls.filter(e => e.head.ref.toLowerCase() === branchNameLowerCase)
+
+              for (let pr of listOpenPulls) {
                 if ( submodule.hasOwnProperty('paths-ignore') ) {
                   core.info(`Checking ${ submodule.owner }/${ submodule.repo } for ignore files`)
                   const getCommitResponse = await github.rest.repos.getCommit({
@@ -258,10 +286,11 @@ jobs:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
             const { repo, owner } = context.repo;
+            const listPullsResponse = ${{ steps.get-pr.outputs.result }}
             github.rest.issues.createComment({
               owner,
               repo,
-              issue_number: '${{ fromJson(steps.get-pr.outputs.result).data[0].number }}',
+              issue_number: listPullsResponse[0].number,
               body: `${{ steps.check-all-submodules.outputs.result }}`,
             });
 
@@ -275,7 +304,7 @@ jobs:
           GIT_PAT: ${{ secrets.GIT_PAT }}
         run: |
           echo "$GIT_PAT" | gh auth login --with-token
-          gh api graphql -F id='${{ fromJson(steps.get-pr.outputs.result).data[0].node_id }}' -f query='
+          gh api graphql -F id='${{ fromJson(steps.get-pr.outputs.result)[0].node_id }}' -f query='
             mutation($id: ID!) {
               markPullRequestReadyForReview(input: { pullRequestId: $id }) {
                 pullRequest {
@@ -295,7 +324,7 @@ jobs:
           GIT_PAT: ${{ secrets.GIT_PAT }}
         run: |
           echo "$GIT_PAT" | gh auth login --with-token
-          gh api graphql -f pull='${{ fromJson(steps.get-pr.outputs.result).data[0].node_id }}' -f query='
+          gh api graphql -f pull='${{ fromJson(steps.get-pr.outputs.result)[0].node_id }}' -f query='
             mutation($pull: ID!) {
               enablePullRequestAutoMerge(input: {pullRequestId: $pull, mergeMethod: SQUASH}) {
                 pullRequest {
@@ -317,20 +346,41 @@ jobs:
     steps:
       - uses: hmarr/debug-action@v2.0.1
 
-      - name: Get PRs
+      - name: Get PR
         uses: actions/github-script@v6
         id: get-pr
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
-            const { repo, owner } = context.repo;
-            const listPullsResponse = await github.rest.pulls.list({
+            const {repo, owner} = context.repo;
+            const branchName = '${{ github.event.client_payload.branch_name }}';
+            const branchNameLowerCase = branchName.toLowerCase();
+            const {data: listPullsResponse} = await github.rest.pulls.list({
               owner,
               repo,
-              head: '${{ github.repository_owner }}:${{ github.event.client_payload.branch_name }}',
-              per_page: 100
+              head: `${owner}:${branchName}`,
+              per_page: 1
             });
-            return listPullsResponse
+            const {data: listPullsResponseLowerCase} = await github.rest.pulls.list({
+              owner,
+              repo,
+              head: `${owner}:${branchNameLowerCase}`,
+              per_page: 1
+            });
+            
+            if (listPullsResponse.length !== 0) {
+              console.log(`Found PR for branch '${branchName}'`)
+              core.setOutput("branch-name", branchName);
+              return listPullsResponse
+            } else if (listPullsResponseLowerCase.length !== 0) {
+              console.log(`Found PR for branch '${branchNameLowerCase}'`)
+              core.setOutput("branch-name", branchNameLowerCase);
+              return listPullsResponseLowerCase
+            } else {
+              console.log(`PR for branch '${branchNameLowerCase}' is not created yet`)
+              core.setOutput("branch-name", branchNameLowerCase);
+              return listPullsResponseLowerCase
+            }
 
       - name: Close PR
         if: github.event.client_payload.event_action == 'closed'
@@ -341,7 +391,7 @@ jobs:
           script: |
             const { repo, owner } = context.repo;
             const listPullsResponse = ${{ steps.get-pr.outputs.result }}
-            for (let pr of listPullsResponse.data ) {
+            for (let pr of listPullsResponse ) {
               core.info(`Closing ${ pr.html_url }`)
               github.rest.pulls.update({
                 owner,
@@ -359,7 +409,7 @@ jobs:
           GIT_PAT: ${{ secrets.GIT_PAT }}
         run: |
           echo "$GIT_PAT" | gh auth login --with-token
-          gh api graphql -F id='${{ fromJson(steps.get-pr.outputs.result).data[0].node_id }}' -f query='
+          gh api graphql -F id='${{ fromJson(steps.get-pr.outputs.result)[0].node_id }}' -f query='
             mutation($id: ID!) {
               convertPullRequestToDraft(input: { pullRequestId: $id }) {
                 pullRequest {
@@ -378,7 +428,7 @@ jobs:
           GIT_PAT: ${{ secrets.GIT_PAT }}
         run: |
           echo "$GIT_PAT" | gh auth login --with-token
-          gh api graphql -F id='${{ fromJson(steps.get-pr.outputs.result).data[0].node_id }}' -f query='
+          gh api graphql -F id='${{ fromJson(steps.get-pr.outputs.result)[0].node_id }}' -f query='
             mutation($id: ID!) {
               markPullRequestReadyForReview(input: { pullRequestId: $id }) {
                 pullRequest {
