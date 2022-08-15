@@ -561,7 +561,7 @@ class Project(ProjectMixin, models.Model):
                     raise LabelStudioValidationErrorSentryIgnored(
                         f'These labels still exist in annotations:\n{diff_str}')
                 else:
-                    logger.warning(f'project_id={self.id} inconsistent labels in config and annotations: {diff_str}')
+                    logger.info(f'project_id={self.id} inconsistent labels in config and annotations: {diff_str}')
 
     def _label_config_has_changed(self):
         return self.label_config != self.__original_label_config
@@ -989,8 +989,7 @@ class ProjectSummary(models.Model):
             return None
         if 'from_name' not in result or 'to_name' not in result:
             logger.error(
-                'Unexpected annotation.result format: "from_name" or "to_name" not found in %r',
-                result,
+                'Unexpected annotation.result format: "from_name" or "to_name" not found',
                 extra={'sentry_skip': True},
             )
             return None
