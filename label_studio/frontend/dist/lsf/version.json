@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2576: Undo keypoints when create new polygon (#778)\n\n* fix: DEV-2578: Undo and Redo keypoints when create new polygon\r\n\r\n* destroy hotkeys, split undo and redo method\r\n\r\n* ifs simplified\r\n\r\n* remove hotkeys import\r\n\r\n* validate if drawingRegion exists\r\n\r\n* move historyPoits to a var\r\n\r\n* add feature flag\r\n\r\n* change ff\r\n\r\n* change structure to delete last polygon point with undo",
-  "commit": "9f8a8fa5adfcb54dbbabd04d484374a13b3412bc",
+  "message": "fix: DEV-3077: Add new property to turn lazyload off (#807)\n\n* fix: DEV-3077: add new property to turn lazyload off\r\n\r\n* logic adjustment",
+  "commit": "868cd9ab97cf0fd4da85dc36fe9a86b26bb8279b",
   "branch": "master",
-  "date": "2022-08-12T13:04:14Z"
+  "date": "2022-08-15T12:21:15Z"
 }
