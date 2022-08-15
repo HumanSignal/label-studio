@@ -25,7 +25,6 @@ class TestExportProject:
         data = ExportDataSerializer(
             project.tasks.all(),
             many=True,
-            expand=["drafts"],
             context={"interpolate_key_frames": settings.INTERPOLATE_KEY_FRAMES},
         ).data
 

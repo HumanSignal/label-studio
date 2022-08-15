@@ -92,10 +92,9 @@ def export_project(project_id, format, path):
     tasks = []
     for _task_ids in batch(task_ids, 1000):
         tasks += ExportDataSerializer(
-            _task_ids,
-            many=True,
-            expand=["drafts"],
-            context={"interpolate_key_frames": settings.INTERPOLATE_KEY_FRAMES},
+            _task_ids, 
+            many=True, 
+            context={"interpolate_key_frames": settings.INTERPOLATE_KEY_FRAMES}
         ).data
 
     export_stream, _, filename = DataExport.generate_export_file(
