@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2964: Wrap Annotation History with an interface toggle",
-  "commit": "344841d16faa8fc7b9ded323e9cdc8f7f657ed65",
-  "branch": "master",
-  "date": "2022/08/12 19:22:21"
+  "message": "fix: DEV-3073: Save prediction as draft on postpone",
+  "commit": "d0fc4577331e525f695951e5077cf850afdfa837",
+  "branch": "fb-dev-3073/postpone-prediction",
+  "date": "2022/08/15 12:40:44"
 }
