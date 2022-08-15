@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2964: Wrap Annotation History with an interface toggle",
-  "commit": "344841d16faa8fc7b9ded323e9cdc8f7f657ed65",
+  "message": "fix: DEV-3077: Add new property to turn lazyload off",
+  "commit": "868cd9ab97cf0fd4da85dc36fe9a86b26bb8279b",
   "branch": "master",
-  "date": "2022/08/12 19:22:21"
+  "date": "2022/08/15 09:21:15"
 }
