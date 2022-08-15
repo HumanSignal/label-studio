@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3077: Add new property to turn lazyload off",
+  "message": "fix: DEV-3077: Add new property to turn lazyload off (#807)\n\n* fix: DEV-3077: add new property to turn lazyload off\r\n\r\n* logic adjustment",
   "commit": "868cd9ab97cf0fd4da85dc36fe9a86b26bb8279b",
   "branch": "master",
-  "date": "2022/08/15 09:21:15"
+  "date": "2022-08-15T12:21:15Z"
 }
