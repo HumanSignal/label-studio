@@ -70,7 +70,7 @@ def redis_job_for_calculation(org, from_scratch):
             f"processed {str(task_count)} tasks"
         )
 
-def export_project(project_id, format):
+def export_project(project_id, format, path):
     logger = logging.getLogger(__name__)
 
     try:
@@ -102,7 +102,7 @@ def export_project(project_id, format):
         project, tasks, format, settings.CONVERTER_DOWNLOAD_RESOURCES, {}
     )
 
-    filepath = os.path.join(settings.EXPORT_DIR, filename)
+    filepath = os.path.join(path, filename)
 
     with open(filepath, "wb") as file:
         file.write(export_stream.read())

@@ -308,8 +308,10 @@ def main():
 
     if input_args.command == 'export':
         from tasks.functions import export_project
-        filename = export_project(input_args.project_id, input_args.export_format)
-        
+        filename = export_project(
+            input_args.project_id, input_args.export_format, input_args.path
+        )
+
         print(f'Project exported successfully: {filename}')
         return
 
