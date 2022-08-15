@@ -63,6 +63,7 @@ def change_constraint(schema_editor, action='CASCADE'):
     cursor = connection.cursor()
     # alter indexes to casdade deletion on tasks deletion
     for c in CONSTRAINTS:
+        logger.info(f'Starting update for table {c["TABLE"]}')
         cursor.execute(c['SQL'])
         con = cursor.fetchone()
         change = f'ALTER TABLE "{c["TABLE"]}" DROP CONSTRAINT {con[0]}, ADD FOREIGN KEY ("{c["KEY"]}") REFERENCES {c["REF"]} ON DELETE {action} ON UPDATE NO ACTION'
