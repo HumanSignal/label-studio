@@ -66,6 +66,8 @@ def change_constraint(schema_editor, action='CASCADE'):
         logger.info(f'Starting update for table {c["TABLE"]}')
         cursor.execute(c['SQL'])
         con = cursor.fetchone()
+        if len(con) == 0:
+            logger.warning(f'No constraint for table {c["TABLE"]} with key {c["KEY"]}')
         change = f'ALTER TABLE "{c["TABLE"]}" DROP CONSTRAINT {con[0]}, ADD FOREIGN KEY ("{c["KEY"]}") REFERENCES {c["REF"]} ON DELETE {action} ON UPDATE NO ACTION'
         schema_editor.execute(change)
 
