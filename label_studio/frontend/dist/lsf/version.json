@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3004: The Zoom setting changes "Accept" to "Fix + Accept" during Review Stream",
-  "commit": "a531ad76d9d8533324df7a3466cb37feef7245e1",
+  "commit": "d599da462c8193d93a2392e535ce0916a21f2397",
   "branch": "fb-dev-3004",
-  "date": "2022/08/11 17:08:10"
+  "date": "2022/08/15 11:23:25"
 }
