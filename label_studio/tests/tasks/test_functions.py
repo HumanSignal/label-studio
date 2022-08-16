@@ -1,4 +1,5 @@
 import io
+import os
 import pytest
 
 from django.conf import settings
@@ -31,7 +32,7 @@ class TestExportProject:
         with mocker.patch("builtins.open"):
             filepath = export_project(project.id, "JSON", settings.EXPORT_DIR)
 
-        assert filepath == settings.EXPORT_DIR + "/project.json"
+        assert filepath == os.path.join(settings.EXPORT_DIR, "project.json")
 
         generate_export_file.assert_called_once_with(
             project, data, "JSON", settings.CONVERTER_DOWNLOAD_RESOURCES, {}
