@@ -41,7 +41,14 @@ CONSTRAINTS = [
             "WHERE conname LIKE 'tasks_annotationdraft_task_id%'",
      "TABLE": "tasks_annotationdraft",
      "KEY": "task_id",
-     "REF": '"task" ("id")'}
+     "REF": '"task" ("id")'},
+    {"SQL": "SELECT conname FROM pg_catalog.pg_constraint con "
+            "INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid "
+            "INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace "
+            "WHERE conname LIKE 'task_comment_authors_task_id%'",
+     "TABLE": "task_comment_authors",
+     "KEY": "task_id",
+     "REF": '"task" ("id")'},
 ]
 
 
