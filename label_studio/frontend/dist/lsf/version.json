@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2432: Fix flag compatibility",
-  "commit": "6d9b9807916835d4e08877fe80e68b415e17fe55",
+  "message": "fix: DEV-2432: Allow polygon to save closed state as snapshot to retain state of unfinished polygon points",
+  "commit": "2cbc1d1d48b1b5a29c7110d33ab8fbb7026afdce",
   "branch": "fb-dev-2432-fix",
-  "date": "2022-08-15T06:25:36Z"
+  "date": "2022/08/16 17:35:38"
 }
