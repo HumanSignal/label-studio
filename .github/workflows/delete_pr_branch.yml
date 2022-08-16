@@ -1,0 +1,26 @@
+name: "Delete PR branch"
+
+on:
+  pull_request_target:
+    types:
+      - closed
+
+jobs:
+  delete-branch:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v2.0.1
+
+      - name: Delete branch
+        uses: actions/github-script@v6
+        if: startsWith(github.event.pull_request.head.ref, 'fb-')
+        with:
+          script: |
+            const { repo, owner } = context.repo;
+            await github.rest.git.deleteRef({
+              owner,
+              repo,
+              ref: 'heads/${{ github.event.pull_request.head.ref }}',
+            });
+            console.log(`Branch ${{ github.event.pull_request.head.ref }} is deleted`)

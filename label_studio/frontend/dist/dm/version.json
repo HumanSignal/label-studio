@@ -1,6 +1,6 @@
 {
-  "message": "ci: DEV-2445: Add Review/Merge Automation (#66)",
-  "commit": "3caaedb264407951f6f07adef76a51102bea64ab",
+  "message": "fix: DEV-2519: Choices selected by default",
+  "commit": "dc03b7337518a3129677570127b44456420d4c6c",
   "branch": "master",
-  "date": "2022-05-31T09:27:40Z"
+  "date": "2022/08/10 15:51:21"
 }

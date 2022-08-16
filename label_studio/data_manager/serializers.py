@@ -174,6 +174,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     predictions_results = serializers.SerializerMethodField(required=False)
     predictions_score = serializers.FloatField(required=False)
     file_upload = serializers.SerializerMethodField(required=False)
+    storage_filename = serializers.SerializerMethodField(required=False)
     annotations_ids = serializers.SerializerMethodField(required=False)
     predictions_model_versions = serializers.SerializerMethodField(required=False)
     avg_lead_time = serializers.FloatField(required=False)
@@ -232,10 +233,14 @@ class DataManagerTaskSerializer(TaskSerializer):
 
     @staticmethod
     def get_file_upload(task):
-        if not hasattr(task, 'file_upload_field'):
-            return None
-        file_upload = task.file_upload_field
-        return os.path.basename(task.file_upload_field) if file_upload else None
+        if hasattr(task, 'file_upload_field'):
+            file_upload = task.file_upload_field
+            return os.path.basename(task.file_upload_field) if file_upload else None
+        return None
+
+    @staticmethod
+    def get_storage_filename(task):
+        return task.storage_filename
 
     @staticmethod
     def get_updated_by(obj):
@@ -262,6 +267,11 @@ class DataManagerTaskSerializer(TaskSerializer):
     def get_predictions_model_versions(self, task):
         return self._pretty_results(task, 'predictions_model_versions', unique=True)
 
+    def get_drafts_queryset(self, user, drafts):
+        """ Get all user's draft
+        """
+        return drafts.filter(user=user)
+
     def get_drafts(self, task):
         """Return drafts only for the current user"""
         # it's for swagger documentation
@@ -271,7 +281,7 @@ class DataManagerTaskSerializer(TaskSerializer):
         drafts = task.drafts
         if 'request' in self.context and hasattr(self.context['request'], 'user'):
             user = self.context['request'].user
-            drafts = drafts.filter(user=user)
+            drafts = self.get_drafts_queryset(user, drafts)
 
         return AnnotationDraftSerializer(drafts, many=True, read_only=True, default=True, context=self.context).data
 

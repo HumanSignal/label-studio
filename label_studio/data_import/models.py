@@ -44,7 +44,7 @@ class FileUpload(models.Model):
         if settings.HOSTNAME and settings.CLOUD_FILE_STORAGE_ENABLED:
             return settings.HOSTNAME + self.file.url
         elif settings.FORCE_SCRIPT_NAME:
-            return settings.FORCE_SCRIPT_NAME + '/' + self.file.url
+            return settings.FORCE_SCRIPT_NAME + '/' + self.file.url.lstrip('/')
         else:
             return self.file.url
 

@@ -1,6 +1,6 @@
 {
-  "message": "docs: DEV-2578: examples for dynamic labels (#704)\n\n* docs: DEV-2578: examples for dynamic labels\r\n\r\n* Small fixes for Audio, Table, Video jsdoc\r\n\r\n* Fix documentation for Labels\r\n\r\nexamples, description, param\r\n\r\n* Documentation for Dynamic Choices",
-  "commit": "e7feefada567b6a757fc52fa8fb2814e93f7ab90",
+  "message": "fix: DEV-3077: Add new property to turn lazyload off (#807)\n\n* fix: DEV-3077: add new property to turn lazyload off\r\n\r\n* logic adjustment",
+  "commit": "868cd9ab97cf0fd4da85dc36fe9a86b26bb8279b",
   "branch": "master",
-  "date": "2022-06-17T21:56:45Z"
+  "date": "2022-08-15T12:21:15Z"
 }

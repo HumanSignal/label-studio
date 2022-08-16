@@ -100,6 +100,8 @@ DATABASES_ALL = {
 DATABASES_ALL['default'] = DATABASES_ALL[DJANGO_DB_POSTGRESQL]
 DATABASES = {'default': DATABASES_ALL.get(get_env('DJANGO_DB', 'default'))}
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -436,6 +438,14 @@ EXPERIMENTAL_FEATURES = get_bool_env('EXPERIMENTAL_FEATURES', False)
 USE_ENFORCE_CSRF_CHECKS = get_bool_env('USE_ENFORCE_CSRF_CHECKS', True)  # False is for tests
 CLOUD_FILE_STORAGE_ENABLED = False
 
+IO_STORAGES_IMPORT_LINK_NAMES = [
+    'io_storages_s3importstoragelink',
+    'io_storages_gcsimportstoragelink',
+    'io_storages_azureblobimportstoragelink',
+    'io_storages_localfilesimportstoragelink',
+    'io_storages_redisimportstoragelink',
+]
+
 CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and_log'
 SAVE_USER = 'users.functions.save_user'
@@ -458,6 +468,7 @@ STORAGE_ANNOTATION_SERIALIZER = 'io_storages.serializers.StorageAnnotationSerial
 TASK_SERIALIZER_BULK = 'tasks.serializers.BaseTaskSerializerBulk'
 PREPROCESS_FIELD_NAME = 'data_manager.functions.preprocess_field_name'
 INTERACTIVE_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializerForInteractive'
+DELETE_TASKS_ANNOTATIONS_POSTPROCESS = None
 
 
 def project_delete(project):
@@ -510,3 +521,9 @@ FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)
 # default value for feature flags (if not overrided by environment or client)
 FEATURE_FLAGS_DEFAULT_VALUE = False
 
+# Strip harmful content from SVG files by default
+SVG_SECURITY_CLEANUP = get_bool_env('SVG_SECURITY_CLEANUP', False)
+
+ML_BLOCK_LOCAL_IP = get_bool_env('ML_BLOCK_LOCAL_IP', False)
+
+RQ_LONG_JOB_TIMEOUT = int(get_env('RQ_LONG_JOB_TIMEOUT', 36000))
