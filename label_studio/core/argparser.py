@@ -3,8 +3,7 @@
 import os
 import json
 
-from django.conf import settings
-
+from .settings.base import EXPORT_DIR
 from .utils.io import find_file
 
 
@@ -139,7 +138,7 @@ def parse_input_args(input_args):
     export_project = subparsers.add_parser('export', help='Export project in a specific format', parents=[root_parser])
     export_project.add_argument('project_id', help='ID of the project')
     export_project.add_argument('export_format', help='Export format')
-    export_project.add_argument('--path', help='Path to place the exported project', required=False, default=settings.EXPORT_DIR)
+    export_project.add_argument('--path', help='Path to place the exported project', required=False, default=EXPORT_DIR)
 
     args = parser.parse_args(input_args)
 
