@@ -40,12 +40,12 @@ If the export times out, see how to [export snapshots using the SDK](https://lab
 
 ### Export all tasks including tasks without annotations
 
-Label Studio opensource exports tasks with annotations only by default. If you need to easily export all tasks including tasks without annotations, you can call this [Easy Export API](https://api.labelstud.io/#operation/api_projects_export_read) with query param `download_all_tasks=true`, e.g.:
+Label Studio open source exports tasks with annotations only by default. If you want to easily export all tasks including tasks without annotations, you can call  the [Easy Export API](https://api.labelstud.io/#operation/api_projects_export_read) with query param `download_all_tasks=true`. For example:
 ```
 curl -X GET https://localhost:8080/api/projects/{id}/export?exportType=JSON&download_all_tasks=true
 ``` 
 
-If your project is large, you need to use a [snapshot export](https://api.labelstud.io/#operation/api_projects_exports_create) (or [snapshot SDK](https://labelstud.io/sdk/project.html#create-new-export-snapshot)) to avoid timeouts in most cases. Snapshots include all tasks without annotations by default.
+If your project is large, you can use a [snapshot export](https://api.labelstud.io/#operation/api_projects_exports_create) (or [snapshot SDK](https://labelstud.io/sdk/project.html#create-new-export-snapshot)) to avoid timeouts in most cases. Snapshots include all tasks without annotations by default.
 
 
 ### <i class='ent'></i> Export snapshots using the UI
