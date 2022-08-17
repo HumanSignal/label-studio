@@ -76,7 +76,7 @@ class ImportStorage(Storage):
             http_url = self.generate_http_url(extracted_uri)
             return uri.replace(extracted_uri, http_url)
         except Exception as exc:
-            logger.error(f'Can\'t resolve URI={uri}. Reason: {exc}', exc_info=True)
+            logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
 
     def _scan_and_create_links(self, link_class):
         tasks_created = 0
@@ -96,7 +96,7 @@ class ImportStorage(Storage):
             try:
                 data = self.get_data(key)
             except (UnicodeDecodeError, json.decoder.JSONDecodeError) as exc:
-                logger.error(exc, exc_info=True)
+                logger.debug(exc, exc_info=True)
                 raise ValueError(
                     f'Error loading JSON from file "{key}".\nIf you\'re trying to import non-JSON data '
                     f'(images, audio, text, etc.), edit storage settings and enable '
@@ -217,7 +217,7 @@ class ExportStorage(Storage):
     def sync(self):
         if redis_connected():
             queue = django_rq.get_queue('low')
-            job = queue.enqueue(export_sync_background, self.__class__, self.id)
+            job = queue.enqueue(export_sync_background, self.__class__, self.id, job_timeout=settings.RQ_LONG_JOB_TIMEOUT)
             logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
         else:
             logger.info(f'Start syncing storage {self}')
@@ -227,7 +227,7 @@ class ExportStorage(Storage):
         abstract = True
 
 
-@job('low', timeout=3600)
+@job('low', timeout=settings.RQ_LONG_JOB_TIMEOUT)
 def export_sync_background(storage_class, storage_id):
     storage = storage_class.objects.get(id=storage_id)
     storage.save_all_annotations()

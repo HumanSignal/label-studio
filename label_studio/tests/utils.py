@@ -43,6 +43,7 @@ def register_ml_backend_mock(m, url='http://localhost:9090', predictions=None, h
     m.post(f'{url}/train', text=json.dumps({'status': 'ok', 'job_id': train_job_id}))
     m.post(f'{url}/predict', text=json.dumps(predictions or {}))
     m.post(f'{url}/webhook', text=json.dumps({}))
+    m.post(f'{url}/versions', text=json.dumps({'versions': ["1", "2"]}))
     return m
 
 

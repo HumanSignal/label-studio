@@ -20,7 +20,7 @@ To more easily [manage access to Label Studio Enterprise](manage_users.html), yo
 
 The organization owner for Label Studio Enterprise can set up SSO & SAML for the instance. Label Studio Enterprise supports the following IdPs:
 - Microsoft Active Directory
-- Okta
+- [Okta](https://www.youtube.com/watch?v=Dr-_hyWIw4M)
 - OneLogin
 - [Ping Federate & Ping Identity & PingOne](pingone.html)
 - others that use SAML assertions
@@ -58,6 +58,10 @@ Set up Label Studio Enterprise as a Service Provider (SP) with your Identity Pro
 10. Click **Save** to save your SAML and SSO settings. 
 
 Test the configuration by logging in to Label Studio Enterprise with your SSO account.
+
+### Setup SAML SSO with Okta video tutorial
+
+<iframe class="video-border" width="560" height="315" src="https://www.youtube.com/embed/Dr-_hyWIw4M" width="100%" height="400vh" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Set up LDAP authentication 
 

@@ -7,8 +7,9 @@ meta_title: Repeater Tag to duplicate annotation settings
 meta_description: Customize Label Studio with the Repeater tag to repeat similar data blocks to accelerate labeling for machine learning and data science projects.
 ---
 
-Repeater Tag for annotating multiple data objects in a dynamic range with the same semantics. You can loop through data items in a python-like for cycle in the labeling process.
-It repeats tags inside it for every item in a given data array from your dataset. Supports all tags except Labels.
+Repeater Tag for annotating multiple data objects in a dynamic range with the same semantics. You can loop through data items in a python-like `for` cycle in the labeling process.
+It repeats tags inside it for every item in a given data array from your dataset. All the occurences of `indexFlag` (default is `{{idx}}`) in parameter values will be replaced by the current index.
+Names should always be unique, so you can use this placeholder in tag names.
 
 ### Parameters
 
@@ -18,14 +19,47 @@ It repeats tags inside it for every item in a given data array from your dataset
 | [indexFlag] | <code>string</code> | <code>&quot;{{idx}}&quot;</code> | Placeholder for array index in params of underlying tags |
 
 ### Example
+
+How tags are repeated and placeholders are replaced internally.
+
 ```html
-<Repeater on="$utterances" indexFlag="{{idx}}">
-  <Text name="user_{{idx}}" value="$utterances[{{idx}}].text"/>
-  <Header value="Utterance Review"/>
-  <Choices name="utterance_action_{{idx}}" showInline="true" toName="user_{{idx}}">
-    <Choice value="No Action"/>
-    <Choice value="Training"/>
-    <Choice value="New Intent"/>
-  </Choices>
-</Repeater>
+<!-- original config -->
+<View>
+  <Repeater on="$images">
+    <Image name="image_{{idx}}" value="$images[{{idx}}]"/>
+  </Repeater>
+</View>
+<!-- data -->
+{
+  "images": [ "s3://images/01.jpg", "s3://images/02.jpg" ]
+}
+<!-- resulting config -->
+<View>
+  <Image name="image_0" value="$images[0]"/>
+  <Image name="image_1" value="$images[1]"/>
+</View>
+```
+### Example
+
+Real world application.
+
+```html
+<View>
+  <Repeater on="$utterances" indexFlag="{{idx}}">
+    <Text name="user_{{idx}}" value="$utterances[{{idx}}].text"/>
+    <Header value="Utterance Review"/>
+    <Choices name="utterance_action_{{idx}}" showInline="true" toName="user_{{idx}}">
+      <Choice value="No Action"/>
+      <Choice value="Training"/>
+      <Choice value="New Intent"/>
+    </Choices>
+  </Repeater>
+</View>
+<!-- data -->
+{
+  "utterances": [
+    { "text": "Data field object with array with similar data" },
+    { "text": "Placeholder for array index in params of underlying tags" }
+  ]
+}
 ```

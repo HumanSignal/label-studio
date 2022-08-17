@@ -10,7 +10,6 @@ from django.db.models import JSONField
 from django.core.validators import MinLengthValidator, MaxLengthValidator
 from django.db import transaction, models
 from annoying.fields import AutoOneToOneField
-from functools import lru_cache
 
 from core.redis import start_job_async_or_sync
 from data_manager.managers import TaskQuerySet
@@ -25,7 +24,8 @@ from core.label_config import (
     get_sample_task,
     get_all_labels,
     get_all_control_tag_tuples,
-    get_annotation_tuple,
+    get_annotation_tuple, check_control_in_config_by_regex, check_toname_in_config_by_regex,
+    get_original_fromname_by_regex, get_all_types,
 )
 from core.bulk_update_utils import bulk_update
 from label_studio_tools.core.label_config import parse_config
@@ -215,7 +215,8 @@ class Project(ProjectMixin, models.Model):
     )
 
     sampling = models.CharField(max_length=100, choices=SAMPLING_CHOICES, null=True, default=SEQUENCE)
-    skip_queue = models.CharField(max_length=100, choices=SkipQueue.choices, null=True, default=SkipQueue.REQUEUE_FOR_OTHERS)
+    skip_queue = models.CharField(max_length=100, choices=SkipQueue.choices, null=True,
+                                  default=SkipQueue.REQUEUE_FOR_OTHERS)
     show_ground_truth_first = models.BooleanField(_('show ground truth first'), default=False)
     show_overlap_first = models.BooleanField(_('show overlap first'), default=False)
     overlap_cohort_percentage = models.IntegerField(_('overlap_cohort_percentage'), default=100)
@@ -352,7 +353,7 @@ class Project(ProjectMixin, models.Model):
         self, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed
     ):
         # if only maximum annotations parameter is tweaked
-        if maximum_annotations_changed and not overlap_cohort_percentage_changed:
+        if maximum_annotations_changed and (not overlap_cohort_percentage_changed or self.maximum_annotations == 1):
             tasks_with_overlap = self.tasks.filter(overlap__gt=1)
             if tasks_with_overlap.exists():
                 # if there is a part with overlaped tasks, affect only them
@@ -487,14 +488,16 @@ class Project(ProjectMixin, models.Model):
         if not fields_from_config:
             logger.debug(f'Data fields not found in labeling config')
             return
-        fields_from_config = {field.split('[')[0] for field in fields_from_config}  # Repeater tag support
+
+        #TODO: DEV-2939 Add validation for fields addition in label config
+        '''fields_from_config = {field.split('[')[0] for field in fields_from_config}  # Repeater tag support
         fields_from_data = set(self.summary.common_data_columns)
         fields_from_data.discard(settings.DATA_UNDEFINED_NAME)
         if fields_from_data and not fields_from_config.issubset(fields_from_data):
             different_fields = list(fields_from_config.difference(fields_from_data))
             raise LabelStudioValidationErrorSentryIgnored(
                 f'These fields are not present in the data: {",".join(different_fields)}'
-            )
+            )'''
 
         if self.num_annotations == 0:
             logger.debug(
@@ -515,14 +518,18 @@ class Project(ProjectMixin, models.Model):
             diff_str = []
             for ann_tuple in different_annotations:
                 from_name, to_name, t = ann_tuple.split('|')
-                diff_str.append(
-                    f'{self.summary.created_annotations[ann_tuple]} '
-                    f'with from_name={from_name}, to_name={to_name}, type={t}'
+                if not check_control_in_config_by_regex(config_string, from_name) or \
+                not check_toname_in_config_by_regex(config_string, to_name) or \
+                t not in get_all_types(config_string):
+                    diff_str.append(
+                        f'{self.summary.created_annotations[ann_tuple]} '
+                        f'with from_name={from_name}, to_name={to_name}, type={t}'
+                    )
+            if len(diff_str) > 0:
+                diff_str = '\n'.join(diff_str)
+                raise LabelStudioValidationErrorSentryIgnored(
+                    f'Created annotations are incompatible with provided labeling schema, we found:\n{diff_str}'
                 )
-            diff_str = '\n'.join(diff_str)
-            raise LabelStudioValidationErrorSentryIgnored(
-                f'Created annotations are incompatible with provided labeling schema, we found:\n{diff_str}'
-            )
 
 
         # validate labels consistency
@@ -531,26 +538,30 @@ class Project(ProjectMixin, models.Model):
         for control_tag_from_data, labels_from_data in created_labels.items():
             # Check if labels created in annotations, and their control tag has been removed
             if labels_from_data and ((control_tag_from_data not in labels_from_config) and (
-                    control_tag_from_data not in dynamic_label_from_config)):
+                    control_tag_from_data not in dynamic_label_from_config)) and \
+                    not check_control_in_config_by_regex(config_string, control_tag_from_data):
                 raise LabelStudioValidationErrorSentryIgnored(
                     f'There are {sum(labels_from_data.values(), 0)} annotation(s) created with tag '
                     f'"{control_tag_from_data}", you can\'t remove it'
                 )
-            labels_from_config_by_tag = set(labels_from_config[control_tag_from_data])
+            labels_from_config_by_tag = set(labels_from_config[get_original_fromname_by_regex(config_string, control_tag_from_data)])
             parsed_config = parse_config(config_string)
             tag_types = [tag_info['type'] for _, tag_info in parsed_config.items()]
             if 'Taxonomy' in tag_types:
                 custom_tags = Label.objects.filter(links__project=self).values_list('value', flat=True)
                 flat_custom_tags = set([item for sublist in custom_tags for item in sublist])
                 labels_from_config_by_tag |= flat_custom_tags
+            # check if labels from is subset if config labels
             if not set(labels_from_data).issubset(set(labels_from_config_by_tag)):
                 different_labels = list(set(labels_from_data).difference(labels_from_config_by_tag))
                 diff_str = '\n'.join(f'{l} ({labels_from_data[l]} annotations)' for l in different_labels)
-                if (strict is True) and (control_tag_from_data not in dynamic_label_from_config):
+                if (strict is True) and ((control_tag_from_data not in dynamic_label_from_config) and
+                        (not check_control_in_config_by_regex(config_string, control_tag_from_data, filter=dynamic_label_from_config.keys()))):
+                    # raise error if labels not dynamic and not in regex rules
                     raise LabelStudioValidationErrorSentryIgnored(
                         f'These labels still exist in annotations:\n{diff_str}')
                 else:
-                    logger.warning(f'project_id={self.id} inconsistent labels in config and annotations: {diff_str}')
+                    logger.info(f'project_id={self.id} inconsistent labels in config and annotations: {diff_str}')
 
     def _label_config_has_changed(self):
         return self.label_config != self.__original_label_config
@@ -570,9 +581,9 @@ class Project(ProjectMixin, models.Model):
             if control_type in exclude_control_types:
                 continue
             control_weights[control_name] = {
-                'overall': 1.0,
+                'overall': self.control_weights.get(control_name, {}).get('overall') or 1.0,
                 'type': control_type,
-                'labels': {label: 1.0 for label in outputs[control_name].get('labels', [])},
+                'labels': {label: self.control_weights.get(control_name, {}).get('labels', {}).get(label) or 1.0 for label in outputs[control_name].get('labels', [])},
             }
         return control_weights
 
@@ -754,6 +765,13 @@ class Project(ProjectMixin, models.Model):
         return result
 
     def get_model_versions(self, with_counters=False):
+        """
+        Get model_versions from project predictions
+        :param with_counters: With count of predictions for each version
+        :return:
+        Dict or list
+        {model_version: count_predictions}, [model_versions]
+        """
         predictions = Prediction.objects.filter(task__project=self)
         # model_versions = set(predictions.values_list('model_version', flat=True).distinct())
         model_versions = predictions.values('model_version').annotate(count=Count('model_version'))
@@ -971,8 +989,7 @@ class ProjectSummary(models.Model):
             return None
         if 'from_name' not in result or 'to_name' not in result:
             logger.error(
-                'Unexpected annotation.result format: "from_name" or "to_name" not found in %r',
-                result,
+                'Unexpected annotation.result format: "from_name" or "to_name" not found',
                 extra={'sentry_skip': True},
             )
             return None

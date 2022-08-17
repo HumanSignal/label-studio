@@ -100,7 +100,7 @@ class ContextLog(object):
             try:
                 payload = self.create_payload(request, response, body)
             except Exception as exc:
-                logger.error(exc, exc_info=True)
+                logger.debug(exc, exc_info=True)
             else:
                 if get_bool_env('DEBUG_CONTEXTLOG', False):
                     logger.debug(json.dumps(payload, indent=2))

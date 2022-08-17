@@ -370,8 +370,8 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                             prediction_score = float(prediction_score)
                         except ValueError as exc:
                             logger.error(
-                                f'Can\'t upload prediction score: should be in float format. Reason: {exc}.'
-                                f'Fallback to score=None', exc_info=True)
+                                f'Can\'t upload prediction score: should be in float format.'
+                                f'Fallback to score=None')
                             prediction_score = None
 
                     last_model_version = prediction.get('model_version', 'undefined')
