@@ -1,6 +1,6 @@
 {
   "message": "feat: DEV-2755: Regions list grouped by labels with persistent & ordered collapse",
-  "commit": "66c6e9589b4cc9a6519af85de7c95d293fcfb4aa",
+  "commit": "686fba05fbd88ac14891c49c781b6796938faa4e",
   "branch": "fb-dev-2755",
-  "date": "2022/08/11 16:11:43"
+  "date": "2022/08/17 12:06:31"
 }
