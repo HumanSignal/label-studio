@@ -224,6 +224,12 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         result['data'] = task.resolve_uri(result['data'], project)
         return Response(result)
 
+    def update(self, request, *args, **kwargs):
+        result = super().update(request, args, kwargs)
+        instance = self.get_object()
+        instance.project.summary.update_data_columns([instance])
+        return result
+
     def patch(self, request, *args, **kwargs):
         return super(TaskAPI, self).patch(request, *args, **kwargs)
 
