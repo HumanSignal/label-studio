@@ -7,7 +7,7 @@ meta_title: Celebrating 10,000 GitHub Stars with the Top 10 Label Studio Feature
 meta_description: From time series to active learning to the Python SDK, check out the top 10 features on the path to 10,000 GitHub stars and growing!
 ---
 
-*Thank you for your contributions, participation and support of the Label Studio platform and community!*
+*Thank you for your contributions, participation, and support of the Label Studio platform and community!*
 
 Label Studio reached a huge milestone on our mission to democratize data labeling and advance data-centric AI!  Thanks to the amazing community, we now have 10,000 GitHub stars, only 2.5 years after the initial release! As data scientists and engineers, we created Label Studio to help our peers improve data quality and management, which we believe is the critical factor to achieving better ML/AI outcomes. We’re stoked Label Studio has been so widely adopted and provided value to the greater ML/AI community.
 
