@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3077: Add new property to turn lazyload off (#807)\n\n* fix: DEV-3077: add new property to turn lazyload off\r\n\r\n* logic adjustment",
-  "commit": "868cd9ab97cf0fd4da85dc36fe9a86b26bb8279b",
+  "message": "fix: DEV-3004: The Zoom setting changes \"Accept\" to \"Fix + Accept\" during Review Stream (#785)\n\n* fix: DEV-2365: User is able to edit choice results imported as read-only\r\n\r\n* resolving the same issue in a better spot to catch other zooming situations\r\n\r\n* cleaning up missing key error in console\r\n\r\n* change the freeze history place and make it async\r\n\r\n* fix freeze -> unfreeze\r\n\r\n* remove freeze and unfreeze and add reinitHistory if history.length is less than 1\r\n\r\n* add change reinitHistory place\r\n\r\n* zoom adjustment to stop creating new annotation histories\r\n\r\nCo-authored-by: Julio Sgarbi <julio.sgarbi@hotmail.com>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>",
+  "commit": "e47fa887ef66993c988c66c7086453ee34e1ab78",
   "branch": "master",
-  "date": "2022-08-15T12:21:15Z"
+  "date": "2022-08-17T14:37:46Z"
 }
