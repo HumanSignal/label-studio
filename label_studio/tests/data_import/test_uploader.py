@@ -28,7 +28,6 @@ class TestUploader:
         return configured_project
 
     class TestLoadTasks:
-
         @pytest.mark.parametrize("url", ("file:///etc/passwd", " file://etc/kernel "))
         def test_raises_for_local_files(self, url, project):
             request = MockedRequest(url=url)
