@@ -13,6 +13,7 @@ from organizations.models import Organization
 from projects.models import Project
 from tasks.models import Task
 
+
 def calculate_stats_all_orgs(from_scratch, redis):
     logger = logging.getLogger(__name__)
     organizations = Organization.objects.order_by('-id')
@@ -70,7 +71,8 @@ def redis_job_for_calculation(org, from_scratch):
             f"processed {str(task_count)} tasks"
         )
 
-def export_project(project_id, format, path):
+
+def export_project(project_id, export_format, path):
     logger = logging.getLogger(__name__)
 
     try:
@@ -78,6 +80,10 @@ def export_project(project_id, format, path):
     except Project.DoesNotExist:
         logger.error(f"Project with id {project_id} does not exist.")
         return
+
+    export_format = export_format.upper()
+    supported_formats = [s['name'] for s in DataExport.get_export_formats(project)]
+    assert export_format in supported_formats, f'Export format is not supported, please use {supported_formats}'
 
     task_ids = (
         Task.objects.filter(project=project)
@@ -98,7 +104,7 @@ def export_project(project_id, format, path):
         ).data
 
     export_stream, _, filename = DataExport.generate_export_file(
-        project, tasks, format, settings.CONVERTER_DOWNLOAD_RESOURCES, {}
+        project, tasks, export_format, settings.CONVERTER_DOWNLOAD_RESOURCES, {}
     )
 
     filepath = os.path.join(path, filename)
@@ -107,7 +113,7 @@ def export_project(project_id, format, path):
         file.write(export_stream.read())
 
     logger.debug(
-        f"End exporting project <{project.title}> ({project.id}) in {format} format."
+        f"End exporting project <{project.title}> ({project.id}) in {export_format} format."
     )
 
     return filepath

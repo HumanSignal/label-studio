@@ -44,7 +44,11 @@ Use the following command to export data and annotations.
 
 ```shell
 label-studio export <project-id> <export-format> --path=<output-path>
+```
 
+To enable logs: 
+```shell
+DEBUG=1 LOG_LEVEL=DEBUG label-studio export <project-id> <export-format> --path=<output-path>
 ```
 
 ### <i class='ent'></i> Export snapshots using the UI
