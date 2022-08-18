@@ -234,7 +234,7 @@ class Task(TaskMixin, models.Model):
                     try:
                         resolved_uri = storage.resolve_uri(task_data[field])
                     except Exception as exc:
-                        logger.error(exc, exc_info=True)
+                        logger.debug(exc, exc_info=True)
                         resolved_uri = None
                     if resolved_uri:
                         task_data[field] = resolved_uri
