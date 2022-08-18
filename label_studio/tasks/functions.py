@@ -75,11 +75,7 @@ def redis_job_for_calculation(org, from_scratch):
 def export_project(project_id, export_format, path):
     logger = logging.getLogger(__name__)
 
-    try:
-        project = Project.objects.get(id=project_id)
-    except Project.DoesNotExist:
-        logger.error(f"Project with id {project_id} does not exist.")
-        return
+    project = Project.objects.get(id=project_id)
 
     export_format = export_format.upper()
     supported_formats = [s['name'] for s in DataExport.get_export_formats(project)]
