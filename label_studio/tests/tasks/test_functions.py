@@ -40,6 +40,7 @@ class TestExportProject:
 
     def test_project_does_not_exist(self, mocker, generate_export_file):
         with mocker.patch("builtins.open"):
-            export_project(1, "JSON", settings.EXPORT_DIR)
+            with pytest.raises(Exception):
+                export_project(1, "JSON", settings.EXPORT_DIR)
 
         generate_export_file.assert_not_called()
