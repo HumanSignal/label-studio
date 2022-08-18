@@ -3,6 +3,7 @@ node_modules
 *.pyc
 *.ipynb
 __pycache__
+.local/
 
 # docs
 __generated__
