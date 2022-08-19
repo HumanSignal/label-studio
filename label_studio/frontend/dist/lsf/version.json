@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3101: Fix sving text for paragraph regions (#811)\n\nFix sving text for paragraph regions",
-  "commit": "bcb5a01a50f880b8109445173ca2a6dcab92b923",
-  "branch": "master",
-  "date": "2022-08-18T12:24:33Z"
+  "message": "fix: DEV-3061: Image scaling goes lover than 1 causing small images",
+  "commit": "12b6733b4ec68ad5d303b5cabf755ea93f4ad13e",
+  "branch": "fb-dev-3061/fix-image-scaling",
+  "date": "2022/08/19 17:40:52"
 }
