@@ -154,7 +154,7 @@ class TaskValidator:
             self.raise_if_wrong_class(task, 'annotations', list)
             for annotation in task.get('annotations', []):
                 if not isinstance(annotation, dict):
-                    logger.warning('Annotation must be dict, but "%s" found', str(annotation))
+                    logger.warning('Annotation must be dict, but "%s" found', str(type(annotation)))
                     continue
 
                 ok = 'result' in annotation
@@ -169,7 +169,7 @@ class TaskValidator:
             self.raise_if_wrong_class(task, 'predictions', list)
             for prediction in task.get('predictions', []):
                 if not isinstance(prediction, dict):
-                    logger.warning('Prediction must be dict, but "%s" found', str(prediction))
+                    logger.warning('Prediction must be dict, but "%s" found', str(type(prediction)))
                     continue
 
                 ok = 'result' in prediction
