@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3101: Fix sving text for paragraph regions (#811)\n\nFix sving text for paragraph regions",
-  "commit": "bcb5a01a50f880b8109445173ca2a6dcab92b923",
-  "branch": "master",
-  "date": "2022-08-18T12:24:33Z"
+  "message": "fix: DEV-2968: Show/ Hide/ Lock / Unlock actions break the Undo functionality for video labels",
+  "commit": "662b5c69e357f0f3ebe6954f3c1e2b87c62d938f",
+  "branch": "fb-dev-2968/video-history",
+  "date": "2022/08/23 01:43:18"
 }
