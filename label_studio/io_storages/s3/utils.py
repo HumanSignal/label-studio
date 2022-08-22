@@ -61,7 +61,7 @@ def resolve_s3_url(url, client, presign=True, expires_in=3600):
             Params={'Bucket': bucket_name, 'Key': key},
             ExpiresIn=expires_in)
     except ClientError as exc:
-        logger.warning(f'Can\'t generate presigned URL for {url}. Reason: {exc}')
+        logger.warning(f'Can\'t generate presigned URL. Reason: {exc}')
         return url
     else:
         logger.debug('Presigned URL {presigned_url} generated for {url}'.format(
