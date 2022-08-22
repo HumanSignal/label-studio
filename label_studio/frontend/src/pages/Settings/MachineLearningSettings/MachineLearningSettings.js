@@ -289,6 +289,7 @@ export const MachineLearningSettings = () => {
         onEdit={(backend) => showMLFormModal(backend)}
         fetchBackends={fetchBackends}
         backends={backends}
+        project = {project.id}
       />
     </>
   );

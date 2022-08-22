@@ -10,8 +10,10 @@ import { ApiContext } from '../../../providers/ApiProvider';
 import { cn } from '../../../utils/bem';
 import axios from 'axios'
 import Swal from 'sweetalert'
-export const MachineLearningList = ({ backends, fetchBackends, onEdit }) => {
+import { ProjectContext, useProject } from '../../../providers/ProjectProvider';
+export const MachineLearningList = ({ backends, fetchBackends, onEdit, project }) => {
   const rootClass = cn('ml');
+
   const api = useContext(ApiContext);
 
   const onDeleteModel = useCallback(async (backend) => {
@@ -51,6 +53,52 @@ export const MachineLearningList = ({ backends, fetchBackends, onEdit }) => {
     await fetchBackends();
   }, [fetchBackends, api]);
 
+  
+async function onExportModel(){
+  await axios
+  .get('http://127.0.0.1:3535/can_press')
+      .then((response) => {
+        console.log(response);
+        let can_press = response.data.can_press;
+        if (can_press == undefined) {
+          Swal('Someone has just trained or predicted, please wait for a moment');
+        }
+        else if (can_press == true) {
+          Swal('Exporting Model, it may take some time')
+          axios.post('http://127.0.0.1:3535/export?id=' + project)
+            .then((data) => {
+              console.log('export result');
+              console.log(data.data)
+              var binaryData = [];
+              binaryData.push(data.data);
+
+              const link = document.createElement('a');
+              
+
+              var zipFile = new Blob([atob(data.data)], {"type": "application/zip"})               
+            var url = window.URL.createObjectURL(zipFile)
+            link.href = "data:application/zip;base64," + data.data;
+      // const url = URL.createObjectURL(data.data);
+      console.log(url);
+      // link.href = url;
+      link.download = 'myfile.zip';
+      link.click();
+
+              // if (export_model) {
+              //   var model = response_2.data.model;
+              //   Swal('Exported model ' + model);
+              // }
+              // else {
+              //   var reason = response_2.data.reason;
+              //   Swal(reason);
+              // }
+           })
+        }
+        else {
+          Swal(`All Gpus are occupied, your training didn't start`)
+        }
+      })
+ }
   return (
     <div className={rootClass}>
       {backends.map(backend => (
@@ -60,13 +108,14 @@ export const MachineLearningList = ({ backends, fetchBackends, onEdit }) => {
           onStartTrain={onStartTraining}
           onDelete={onDeleteModel}
           onEdit={onEdit}
+          onExportModel={onExportModel}
         />
       ))}
     </div>
   );
 };
 
-const BackendCard = ({backend, onStartTrain, onEdit, onDelete}) => {
+const BackendCard = ({backend, onStartTrain, onEdit, onDelete, onExportModel}) => {
   const confirmDelete = useCallback((backend) => {
     confirm({
       title: "Delete ML Backend",
@@ -108,6 +157,9 @@ const BackendCard = ({backend, onStartTrain, onEdit, onDelete}) => {
 
       <Button disabled={backend.state !== "CO"} onClick={() => onStartTrain(backend)}>
         Start Training
+      </Button>
+      <Button onClick={() => onExportModel()}>
+        Export Model
       </Button>
     </Card>
   );
