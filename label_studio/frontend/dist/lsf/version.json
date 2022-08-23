@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3211: Parse all timeseries timestamps to utc to avoid improper calculations using possible daylight savings time",
-  "commit": "6783ec5b88a4aff6fe9ee7eebccf17eb61a11541",
+  "commit": "d70e2e396292fb68bd72c1cdde0223700199fa7f",
   "branch": "fb-dev-3211",
-  "date": "2022/08/19 11:16:02"
+  "date": "2022/08/23 18:24:51"
 }
