@@ -311,10 +311,11 @@ def main():
 
         try:
             filename = export_project(
-                input_args.project_id, input_args.export_format, input_args.path
+                input_args.project_id, input_args.export_format, input_args.export_path,
+                serializer_context=input_args.export_serializer_context
             )
         except Exception as e:
-            logger.error(f'Failed to export project: {e}')
+            logger.exception(f'Failed to export project: {e}')
         else:
             logger.info(f'Project exported successfully: {filename}')
 
