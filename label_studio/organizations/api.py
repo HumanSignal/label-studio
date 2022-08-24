@@ -19,9 +19,10 @@ from label_studio.core.utils.common import get_object_with_check_and_log, bool_f
 
 from organizations.models import Organization
 from organizations.serializers import (
-    OrganizationSerializer, OrganizationIdSerializer, OrganizationMemberUserSerializer, OrganizationInviteSerializer
+    OrganizationSerializer, OrganizationIdSerializer, OrganizationMemberUserSerializer, OrganizationInviteSerializer,
+    OrganizationsParamsSerializer
 )
-
+from core.feature_flags import flag_set
 
 logger = logging.getLogger(__name__)
 
@@ -103,11 +104,17 @@ class OrganizationMemberListAPI(generics.ListAPIView):
 
     def get_queryset(self):
         org = generics.get_object_or_404(self.request.user.organizations, pk=self.kwargs[self.lookup_field])
-        # organization page to show all members
-        if bool_from_request(self.request.GET, 'contributed_to_projects', False):
+        if flag_set('fix-backend-dev-3134-exclude-deactivated-users', self.request.user):
+            serializer = OrganizationsParamsSerializer(data=self.context['request'].GET)
+            serializer.is_valid(raise_exception=True)
+            active = serializer.validated_data.get('active')
+            if not active or bool_from_request(self.request.GET, 'contributed_to_projects', False):
+            # organization page to show all members
+                return org.members.order_by('user__username')
+            # return only active users (exclude DISABLED and NOT_ACTIVATED)
+            return org.active_members.order_by('user__username')
+        else:
             return org.members.order_by('user__username')
-        # return only active users (exclude DISABLED and NOT_ACTIVATED)
-        return org.active_members.order_by('user__username')
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(

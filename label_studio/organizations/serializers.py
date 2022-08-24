@@ -64,3 +64,7 @@ class OrganizationMemberUserSerializer(DynamicFieldsMixin, serializers.ModelSeri
 class OrganizationInviteSerializer(serializers.Serializer):
     token = serializers.CharField(required=False)
     invite_url = serializers.CharField(required=False)
+
+
+class OrganizationsParamsSerializer(serializers.Serializer):
+    active = serializers.BooleanField(required=False, default=False)
