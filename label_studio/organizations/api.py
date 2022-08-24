@@ -103,7 +103,7 @@ class OrganizationMemberListAPI(generics.ListAPIView):
 
     def get_queryset(self):
         org = generics.get_object_or_404(self.request.user.organizations, pk=self.kwargs[self.lookup_field])
-        return org.members.order_by('user__username')
+        return org.active_members.order_by('user__username')
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
