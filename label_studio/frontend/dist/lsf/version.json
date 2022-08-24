@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3101: Fix sving text for paragraph regions (#811)\n\nFix sving text for paragraph regions",
-  "commit": "bcb5a01a50f880b8109445173ca2a6dcab92b923",
+  "message": "fix: DEV-3211: Parse all timeseries timestamps to utc to avoid improper calculations using possible daylight savings time (#812)\n\n* fix: DEV-3211: Parse all timeseries timestamps to utc to avoid improper calculations using possible daylight savings time\r\n\r\n* fix: DEV-3211: parse and format timeseries data in UTC\r\n\r\n* fix: DEV-3211: ensure all of d3 is set to scale in UTC as well",
+  "commit": "408f571dd53092b158becbd01e2a4f8cd5552a3e",
   "branch": "master",
-  "date": "2022-08-18T12:24:33Z"
+  "date": "2022-08-24T13:49:35Z"
 }
