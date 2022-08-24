@@ -103,6 +103,10 @@ class OrganizationMemberListAPI(generics.ListAPIView):
 
     def get_queryset(self):
         org = generics.get_object_or_404(self.request.user.organizations, pk=self.kwargs[self.lookup_field])
+        # organization page to show all members
+        if bool_from_request(self.request.GET, 'contributed_to_projects', False):
+            return org.members.order_by('user__username')
+        # return only active users (exclude DISABLED and NOT_ACTIVATED)
         return org.active_members.order_by('user__username')
 
 
