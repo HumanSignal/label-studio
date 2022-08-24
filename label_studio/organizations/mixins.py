@@ -1,6 +1,4 @@
-from django.db import models
-
-class OrganizationMixin(models.Model):
+class OrganizationMixin:
     @property
     def active_members(self):
         return self.members
