@@ -108,11 +108,11 @@ class OrganizationMemberListAPI(generics.ListAPIView):
             serializer = OrganizationsParamsSerializer(data=self.context['request'].GET)
             serializer.is_valid(raise_exception=True)
             active = serializer.validated_data.get('active')
-            if not active or bool_from_request(self.request.GET, 'contributed_to_projects', False):
+            if active or not bool_from_request(self.request.GET, 'contributed_to_projects', False):
+                # return only active users (exclude DISABLED and NOT_ACTIVATED)
+                return org.active_members.order_by('user__username')
             # organization page to show all members
-                return org.members.order_by('user__username')
-            # return only active users (exclude DISABLED and NOT_ACTIVATED)
-            return org.active_members.order_by('user__username')
+            return org.members.order_by('user__username')
         else:
             return org.members.order_by('user__username')
 
