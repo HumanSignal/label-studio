@@ -16,7 +16,8 @@ import './MachineLearningSettings.styl';
 import Select from 'react-select';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios'
-
+import Swal from 'sweetalert'
+import webhook_url from '../../../webhooks';
 export const MachineLearningSettings = () => {
   const api = useAPI();
   const { project, fetchProject } = useContext(ProjectContext);
@@ -29,7 +30,7 @@ export const MachineLearningSettings = () => {
   const [fetchedPrecisions, setFetchPrecisions] = useState(false);
   const mod = useCallback(async () => {
     await axios
-      .get('http://127.0.0.1:3535/get_available_models?id=' + project.id)
+      .get(webhook_url + '/get_available_models?id=' + project.id)
       .then((response) => {
         console.log(response);
         setAvailableModels(response.data.models);
@@ -41,7 +42,7 @@ export const MachineLearningSettings = () => {
         console.log(error);
       });
       await axios
-      .get('http://127.0.0.1:3535/get_mean_average_precisions?id=' + project.id)
+      .get(webhook_url + '/get_mean_average_precisions?id=' + project.id)
         .then((response) => {
           console.log(response);
           setModelsPrecisions(response.data.models);
@@ -53,17 +54,33 @@ export const MachineLearningSettings = () => {
       });    
   });
   const saveInferencePath = useCallback(async () => {
-    await axios.post('http://127.0.0.1:3535/change_model_path_in_inference?id=' + project.id + '&model_path=' + modelToPredictOn)
+    await axios.post(webhook_url + '/change_model_path_in_inference?id=' + project.id + '&model_path=' + modelToPredictOn)
       .then((response) => {
         console.log(response);
     })
   })
   const evaluate = useCallback(async (param) => {
-    axios.post('http://127.0.0.1:3535/evaluate?id=' + project.id + '&model_path=' + param)
-      .then((response) => {
-        console.log(response);
-        setModelsPrecisions(response.data.models);
-      })
+    await axios.get(webhook_url + '/can_press').then((response_press) => {
+      var can_press = response_press.data.can_press;
+      if (can_press == undefined) {
+        Swal('Someone has just trained or predicted, please wait for a moment')
+      }
+      else if (can_press == true) {
+        Swal('Evaluation has started')
+        axios.post(webhook_url + '/evaluate?id=' + project.id + '&model_path=' + param)
+        .then((response) => {
+          console.log(response);
+          if (response.data.evaluation === false) {
+            Swal("Something went wrong while evaluating, please check the logs")
+          } else {
+                    setModelsPrecisions(response.data.models);
+          }
+        })
+      }
+      else {
+        Swal(`All Gpus are occupied, your evaluation didn't start`)
+      }
+    })
   });
   const fetchBackends = useCallback(async () => {
     const models = await api.callApi('mlBackends', {
@@ -74,6 +91,43 @@ export const MachineLearningSettings = () => {
 
     if (models) setBackends(models);
   }, [api, project, setBackends]);
+  async function onExportModel(){
+            Swal('Exporting Model, it may take some time')
+            axios.post(webhook_url + '/export?id=' + project.id)
+              .then((data) => {
+                console.log('export result');
+                if (data.data.export === false) {
+                  Swal("There is no exported model in the local directory")
+                }
+                const link = document.createElement('a');
+                var zipFile = new Blob([atob(data.data)], {"type": "application/zip"})               
+              var url = window.URL.createObjectURL(zipFile)
+              link.href = "data:application/zip;base64," + data.data;
+              console.log(url);
+              link.download = 'myfile.zip';
+              link.click();
+             })
+          }
+  const trainModel = useCallback(async () => {
+    await axios
+    .get(webhook_url + '/can_press')
+        .then((response) => {
+          console.log(response);
+          let can_press = response.data.can_press;
+          if (can_press == undefined) {
+            Swal('Someone has just trained or predicted, please wait for a moment')
+          }
+          else if (can_press == true) {
+            Swal('Training has started')
+            axios.post(webhook_url + '/train?id=' + project.id).then((response) => {
+              console.log(response);
+            })
+          }
+          else {
+            Swal(`All Gpus are occupied, your training didn't start`)
+          }
+        })
+  })
 
   const showMLFormModal = useCallback((backend) => {
     const action = backend ? "updateMLBackend" : "addMLBackend";
@@ -180,9 +234,9 @@ export const MachineLearningSettings = () => {
           see the documentation
         </a>.
       </Description>
-      <Button onClick={() => showMLFormModal()}>
+      {/* <Button onClick={() => showMLFormModal()}>
         Add Model
-      </Button>
+      </Button> */}
 
       <Divider height={32}/>
 
@@ -216,7 +270,10 @@ export const MachineLearningSettings = () => {
             />
           </div>
         </Form.Row>
-
+        <Button style={{ marginTop: 20 }} onClick={() => trainModel()}>Train New Model</Button>
+        <Button onClick={() => onExportModel()}>
+        Export Model
+      </Button>
         {!isFF(FF_DEV_1682) && (
           <ProjectModelVersionSelector />
         )}
@@ -285,12 +342,13 @@ export const MachineLearningSettings = () => {
         </Form.Actions>
       </Form>
 
-      <MachineLearningList
+      {/* <MachineLearningList
         onEdit={(backend) => showMLFormModal(backend)}
         fetchBackends={fetchBackends}
         backends={backends}
         project = {project.id}
-      />
+      /> */}
+
     </>
   );
 };

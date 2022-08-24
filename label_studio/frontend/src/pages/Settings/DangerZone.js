@@ -8,7 +8,7 @@ import { Spinner } from "../../components/Spinner/Spinner";
 import { useAPI } from "../../providers/ApiProvider";
 import { useProject } from "../../providers/ProjectProvider";
 import axios from 'axios'
-
+import webhook_url from "../../webhooks";
 export const DangerZone = () => {
   const {project} = useProject();
   const api = useAPI();
@@ -37,7 +37,7 @@ export const DangerZone = () => {
           });
         } else if (type === 'project') {
           await axios
-          .post('http://127.0.0.1:3535/delete_project?id='+project.id)
+          .post(webhook_url + '/delete_project?id='+project.id)
               .then((response) => {
                 console.log(response)
               })
