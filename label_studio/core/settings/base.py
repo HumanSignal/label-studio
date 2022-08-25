@@ -65,8 +65,6 @@ LOGGING = {
     },
 }
 
-logging.config.dictConfig(LOGGING)
-
 
 # for printing messages before main logging config applied
 if not logging.getLogger().hasHandlers():
