@@ -313,6 +313,11 @@ class Task(TaskMixin, models.Model):
         with temporary_disconnect_list_signal(signals):
             queryset.delete()
 
+    @staticmethod
+    def delete_tasks_without_signals_from_task_ids(task_ids):
+        queryset = Task.objects.filter(id__in=task_ids)
+        Task.delete_tasks_without_signals(queryset)
+
 pre_bulk_create = Signal(providing_args=["objs", "batch_size"])
 post_bulk_create = Signal(providing_args=["objs", "batch_size"])
 
