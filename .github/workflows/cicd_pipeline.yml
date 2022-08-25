@@ -21,6 +21,9 @@ concurrency:
 
 permissions: read-all
 
+env:
+  RELEASE_BRANCH_PREFIX: "ls-release/"
+
 jobs:
   changed_files:
     name: "Changed files"
@@ -129,7 +132,8 @@ jobs:
       checks: write
     uses: heartexlabs/label-studio/.github/workflows/docker-build.yml@develop
     with:
-      ref: ${{ github.ref_name }}
+      sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+      branch_name: ${{ github.event.pull_request.head.ref || github.ref_name }}
     secrets: inherit
 
   pytest:
@@ -161,21 +165,20 @@ jobs:
           script: |
             const { repo, owner } = context.repo;
             const target_commitish = '${{ github.ref_name }}';
-            let version = target_commitish.replace('ls-release/', '')
-            core.setOutput("rc-version", `${version}rc${{ github.sha }}`);
+            let version = target_commitish.replace('${{ env.RELEASE_BRANCH_PREFIX }}', '')
+            core.setOutput("rc-version", `${version}rc${{ github.run_id }}`);
             
             const {data: releases} = await github.rest.repos.listReleases({
                 owner,
                 repo,
             });
             
-            const matchedRelease = releases.find((e) => {
+            let release = releases.find((e) => {
                 return target_commitish.endsWith(e.target_commitish) && e.draft
             })
             
-            if (matchedRelease) {
-                console.log(`Draft release already exist ${matchedRelease.html_url}`)
-                core.setOutput("id", matchedRelease.id);
+            if (release) {
+                console.log(`Draft release already exist ${release.html_url}`)
             } else {
                 console.log(`Draft release is not found creating a new one`)
                 const {data: tags} = await github.rest.repos.listTags({
@@ -191,9 +194,8 @@ jobs:
                 if (matchedTags.length !== 0) {
                     let newHotfixNumber = 0
                     for (let matchedTag of matchedTags) {
-                        console.log(matchedTag)
                         const matchVersion = matchedTag.name.match('^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)(.post([0-9]+))?$')
-                        if (matchVersion[5]) {
+                        if (matchVersion && matchVersion[5]) {
                             const hotfixNumber = parseInt(matchVersion[5])
                             if (newHotfixNumber <= hotfixNumber) {
                                 newHotfixNumber = hotfixNumber + 1
@@ -203,19 +205,23 @@ jobs:
                     version = `${version}.post${newHotfixNumber}`
                 }
                 console.log(`New version: ${version}`)
-                const { data: release } = await github.rest.repos.createRelease({
+                const {data: newDraftRelease} = await github.rest.repos.createRelease({
                     owner,
                     repo,
                     draft: true,
-                    name: version,
                     prerelease: false,
-                    target_commitish: target_commitish,
+                    name: version,
                     tag_name: version,
-                    generate_release_notes: true
+                    target_commitish: target_commitish,
+                    generate_release_notes: true,
                 });
-                console.log(`Draft release is created ${release.html_url}`)
-                core.setOutput("id", release.id);
+                console.log(`Draft release is created ${newDraftRelease.html_url}`)
+                release = newDraftRelease;
+                core.setOutput("created", true);
             }
+            
+            core.setOutput("id", release.id);
+            core.setOutput("tag_name", release.tag_name);
 
   build-pypi:
     name: "Build"

@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2887: Comments for annotation editor ui ",
-  "commit": "cfc5492ba5c64ccdb7b634e34fef10bd2de55e9f",
-  "branch": "fb-DEV-2896",
-  "date": "2022/07/26 19:09:07"
+  "message": "fix: DEV-2519: Choices selected by default",
+  "commit": "dc03b7337518a3129677570127b44456420d4c6c",
+  "branch": "master",
+  "date": "2022/08/10 15:51:21"
 }

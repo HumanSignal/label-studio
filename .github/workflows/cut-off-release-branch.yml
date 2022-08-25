@@ -53,7 +53,7 @@ jobs:
               third="${BASH_REMATCH[3]}"
           else
               echo "${{ inputs.version }} does not mach the regexp ${regexp}"
-              exit 0
+              exit 1
           fi
           
           release_version="${first}.${second}.${third}"
