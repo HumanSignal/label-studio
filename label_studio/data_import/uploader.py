@@ -174,6 +174,10 @@ def load_tasks(request, project):
         else:
             if settings.SSRF_PROTECTION_ENABLED and url_is_local(url):
                 raise ImportFromLocalIPError
+
+            if url.strip().startswith('file://'):
+                raise ValidationError('"url" is not valid')
+
             data_keys, found_formats, tasks, file_upload_ids = tasks_from_url(
                 file_upload_ids, project, request, url
             )

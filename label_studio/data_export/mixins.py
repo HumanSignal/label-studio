@@ -115,7 +115,8 @@ class ExportMixin:
         q = reduce(lambda x, y: x | y, q_list)
         return queryset.filter(q)
 
-    def _get_export_serializer_option(self, serialization_options):
+    @staticmethod
+    def _get_export_serializer_option(serialization_options):
         options = {'expand': []}
         if isinstance(serialization_options, dict):
             if (
