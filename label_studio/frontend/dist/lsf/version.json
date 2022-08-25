@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3140: Selecting region corrupts the history",
-  "commit": "bd8032c76b872c4c2ab91c1fe62885f0a8f3a66c",
-  "branch": "fb-dev-3140/undo-on-region-select",
-  "date": "2022/08/19 17:59:27"
+  "commit": "e9a1ddbb221e7fdd6f3267936df590a5cbb76828",
+  "branch": "master",
+  "date": "2022/08/25 11:13:39"
 }
