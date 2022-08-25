@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3140: Selecting region corrupts the history (#813)\n\n* Fix regions selection in the outliner\r\n\r\n* Remove trace\r\nExtract variable from pros\r\n\r\n* Remove redundant code",
-  "commit": "e9a1ddbb221e7fdd6f3267936df590a5cbb76828",
-  "branch": "",
-  "date": "2022-08-25T10:13:39Z"
+  "message": "feat: DEV-2461: Add option to sync audio with paragraphs allowing playback of chunk position",
+  "commit": "17f3db8f564b1d04a35a7f6805954d838460f47f",
+  "branch": "fb-dev-2461",
+  "date": "2022/08/25 11:50:21"
 }
