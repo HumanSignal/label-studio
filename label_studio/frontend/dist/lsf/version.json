@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3140: Selecting region corrupts the history",
+  "message": "fix: DEV-3140: Selecting region corrupts the history (#813)\n\n* Fix regions selection in the outliner\r\n\r\n* Remove trace\r\nExtract variable from pros\r\n\r\n* Remove redundant code",
   "commit": "e9a1ddbb221e7fdd6f3267936df590a5cbb76828",
   "branch": "master",
-  "date": "2022/08/25 11:13:39"
+  "date": "2022-08-25T10:13:39Z"
 }
