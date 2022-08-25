@@ -36,7 +36,20 @@ Use the following steps to export data and annotations from the Label Studio UI.
 
 ### Export timeout in Community Edition
 
-If the export times out, see how to [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-API).
+If the export times out, see how to [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-API). You can also use a [console command](#Export-using-console-command) to export your project. For more information, see the following section.
+
+### Export using console command
+
+Use the following command to export data and annotations.
+
+```shell
+label-studio export <project-id> <export-format> --path=<output-path>
+```
+
+To enable logs: 
+```shell
+DEBUG=1 LOG_LEVEL=DEBUG label-studio export <project-id> <export-format> --path=<output-path>
+```
 
 ### Export all tasks including tasks without annotations
 

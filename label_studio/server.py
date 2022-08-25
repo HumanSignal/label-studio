@@ -306,6 +306,21 @@ def main():
         calculate_stats_all_orgs(input_args.from_scratch, redis=True)
         return
 
+    if input_args.command == 'export':
+        from tasks.functions import export_project
+
+        try:
+            filename = export_project(
+                input_args.project_id, input_args.export_format, input_args.export_path,
+                serializer_context=input_args.export_serializer_context
+            )
+        except Exception as e:
+            logger.exception(f'Failed to export project: {e}')
+        else:
+            logger.info(f'Project exported successfully: {filename}')
+
+        return
+
     # print version
     if input_args.command == 'version' or input_args.version:
         from label_studio import __version__
