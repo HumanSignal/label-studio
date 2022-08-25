@@ -68,3 +68,4 @@ class OrganizationInviteSerializer(serializers.Serializer):
 
 class OrganizationsParamsSerializer(serializers.Serializer):
     active = serializers.BooleanField(required=False, default=False)
+    contributed_to_projects = serializers.BooleanField(required=False, default=False)
