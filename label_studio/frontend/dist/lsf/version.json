@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3211: Parse all timeseries timestamps to utc to avoid improper calculations using possible daylight savings time (#812)\n\n* fix: DEV-3211: Parse all timeseries timestamps to utc to avoid improper calculations using possible daylight savings time\r\n\r\n* fix: DEV-3211: parse and format timeseries data in UTC\r\n\r\n* fix: DEV-3211: ensure all of d3 is set to scale in UTC as well",
-  "commit": "408f571dd53092b158becbd01e2a4f8cd5552a3e",
-  "branch": "master",
-  "date": "2022-08-24T13:49:35Z"
+  "message": "fix: DEV-3140: Selecting region corrupts the history (#813)\n\n* Fix regions selection in the outliner\r\n\r\n* Remove trace\r\nExtract variable from pros\r\n\r\n* Remove redundant code",
+  "commit": "e9a1ddbb221e7fdd6f3267936df590a5cbb76828",
+  "branch": "",
+  "date": "2022-08-25T10:13:39Z"
 }
