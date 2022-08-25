@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2968: Show/ Hide/ Lock / Unlock actions break the Undo functionality for video labels",
-  "commit": "662b5c69e357f0f3ebe6954f3c1e2b87c62d938f",
+  "commit": "0a2f01ce6503e35cefdec0ab4d7119a0c00552a7",
   "branch": "fb-dev-2968/video-history",
-  "date": "2022/08/23 01:43:18"
+  "date": "2022/08/26 01:39:23"
 }
