@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3140: Selecting region corrupts the history (#813)\n\n* Fix regions selection in the outliner\r\n\r\n* Remove trace\r\nExtract variable from pros\r\n\r\n* Remove redundant code",
-  "commit": "e9a1ddbb221e7fdd6f3267936df590a5cbb76828",
-  "branch": "",
-  "date": "2022-08-25T10:13:39Z"
+  "message": "fix: DEV-2918: Prevent annotating collapsed phrases in paragraphs",
+  "commit": "afbd4aef79303b76708e9d438b248f595826517d",
+  "branch": "fb-dev-2918/labeling-filtered-phrases",
+  "date": "2022/08/26 00:28:15"
 }
