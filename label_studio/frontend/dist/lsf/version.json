@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3140: Selecting region corrupts the history (#813)\n\n* Fix regions selection in the outliner\r\n\r\n* Remove trace\r\nExtract variable from pros\r\n\r\n* Remove redundant code",
-  "commit": "e9a1ddbb221e7fdd6f3267936df590a5cbb76828",
-  "branch": "",
-  "date": "2022-08-25T10:13:39Z"
+  "message": "fix: DEV-2968: Show/ Hide/ Lock / Unlock actions break the Undo functionality for video labels",
+  "commit": "3851de2ea0deceedaf8d8ed2aacdaa4978d10352",
+  "branch": "master",
+  "date": "2022/08/26 02:53:07"
 }
