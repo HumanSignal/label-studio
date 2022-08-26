@@ -1,6 +1,6 @@
 {
   "message": "feat: DEV-2461: Add option to sync audio with paragraphs allowing playback of chunk position",
-  "commit": "fb6e56f11cab92ad815c3e647173fc9885b11923",
+  "commit": "1962af329ea3f67135be695ca4548496c86df2e7",
   "branch": "fb-dev-2461",
-  "date": "2022/08/26 17:21:24"
+  "date": "2022/08/26 17:33:18"
 }
