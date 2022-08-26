@@ -13,7 +13,7 @@ RUN --mount=type=cache,target=$NPM_CACHE_LOCATION,uid=1001,gid=0 \
     npm ci \
  && npm run build:production
 
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
     LS_DIR=/label-studio \
@@ -29,7 +29,7 @@ WORKDIR $LS_DIR
 RUN set -eux \
  && apt-get update \
  && apt-get install --no-install-recommends --no-install-suggests -y \
-    build-essential postgresql-client libmysqlclient-dev mysql-client python3.8 python3-pip python3.8-dev \
+    build-essential postgresql-client libmysqlclient-dev mysql-client python3-pip python3-dev \
     git libxml2-dev libxslt-dev zlib1g-dev gnupg curl lsb-release && \
     apt-get purge --assume-yes --auto-remove --option APT::AutoRemove::RecommendsImportant=false \
      --option APT::AutoRemove::SuggestsImportant=false && rm -rf /var/lib/apt/lists/* /tmp/*
