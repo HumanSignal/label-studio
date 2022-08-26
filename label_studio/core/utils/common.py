@@ -414,7 +414,9 @@ def check_for_the_latest_version(print_message):
 
 
 # check version ASAP while package loading
-check_for_the_latest_version(print_message=True)
+# skip notification for uwsgi, as we're running in production ready mode
+if settings.APP_WEBSERVER != 'uwsgi':
+    check_for_the_latest_version(print_message=True)
 
 
 def collect_versions(force=False):
