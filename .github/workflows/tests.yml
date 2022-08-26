@@ -47,6 +47,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install OS dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install libsasl2-dev python3-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev
+
       - uses: actions/cache@v3
         name: Configure pip cache
         id: pip-cache
@@ -173,7 +178,7 @@ jobs:
       - name: Install OS dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev python-dev
+          sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev python-dev
 
       - uses: actions/cache@v3
         name: Configure pip cache
@@ -283,7 +288,7 @@ jobs:
           pip install -e .
 
       - name: Fix sqlite.dll for python < 3.9
-        if: ${{ matrix.python-version < '3.9' }}
+        if: ${{ contains(matrix.python-version, '3.7') || contains(matrix.python-version, '3.8') }}
         run: |
           set PYTHONIOENCODING=utf-8
           set PYTHONLEGACYWINDOWSSTDIO=utf-8
