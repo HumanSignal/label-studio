@@ -30,7 +30,7 @@ RUN set -eux \
  && apt-get update \
  && apt-get install --no-install-recommends --no-install-suggests -y \
     build-essential postgresql-client libmysqlclient-dev mysql-client python3-pip python3-dev \
-    git libxml2-dev libxslt-dev zlib1g-dev gnupg curl lsb-release && \
+    git libxml2-dev libxslt-dev zlib1g-dev gnupg curl lsb-release libpq-dev && \
     apt-get purge --assume-yes --auto-remove --option APT::AutoRemove::RecommendsImportant=false \
      --option APT::AutoRemove::SuggestsImportant=false && rm -rf /var/lib/apt/lists/* /tmp/*
 
@@ -41,7 +41,7 @@ RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
 RUN set -eux; \
     curl -sSL https://nginx.org/keys/nginx_signing.key | apt-key add - && \
     echo "deb https://nginx.org/packages/mainline/ubuntu/ $(lsb_release -cs) nginx" >> /etc/apt/sources.list && \
-    apt-get update && apt-get install nginx && \
+    apt-get update && apt-get install -y nginx && \
     apt-get purge --assume-yes --auto-remove --option APT::AutoRemove::RecommendsImportant=false \
      --option APT::AutoRemove::SuggestsImportant=false && rm -rf /var/lib/apt/lists/* /tmp/* && \
     nginx -v
