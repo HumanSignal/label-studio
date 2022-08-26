@@ -61,10 +61,6 @@ services:
     volumes:
       - ${POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql/data
       - ./deploy/pgsql/certs:/var/lib/postgresql/certs:ro
-      - type: tmpfs
-        target: /var/lib/postgresql/data/pg_stat_tmp
-        tmpfs:
-          size: 268435456  #256 Mb
 
 volumes:
   static: {}
