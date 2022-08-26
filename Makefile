@@ -26,6 +26,12 @@ frontend-watch:
 frontend-build:
 	cd label_studio/frontend && npm ci && npm run build:production
 
+frontend-install:
+	cd label_studio/frontend \
+	&& yarn install --frozen-lockfile \
+	&& npm run download:all \
+	&& npm run build:production
+
 # Run tests
 test:
 	cd label_studio && DJANGO_DB=sqlite pytest -v -m "not integration_tests"
