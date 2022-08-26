@@ -18,10 +18,10 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - 3.7
-          - 3.8
-          - 3.9
-          - 3.10
+          - '3.7'
+          - '3.8'
+          - '3.9'
+          - '3.10'
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
@@ -108,7 +108,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.10 ]
+        python-version: [ '3.10' ]
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
       DJANGO_DB: default
@@ -235,10 +235,10 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - 3.7
-          - 3.8
-          - 3.9
-          - 3.10
+          - '3.7'
+          - '3.8'
+          - '3.9'
+          - '3.10'
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
