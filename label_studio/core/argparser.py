@@ -3,6 +3,7 @@
 import os
 import json
 
+from .settings.base import EXPORT_DIR
 from .utils.io import find_file
 
 
@@ -131,6 +132,18 @@ def parse_input_args(input_args):
     )
     calculate_stats_all_orgs.add_argument(
         '--from-scratch', dest='from_scratch', default=False, action='store_true', help='Recalculate from scratch'
+    )
+
+    # export_project sub-command parser
+    export_project = subparsers.add_parser('export', help='Export project in a specific format', parents=[root_parser])
+    export_project.add_argument('project_id', help='Project ID')
+    export_project.add_argument('export_format', help='Export format (JSON, JSON_MIN, CSV, etc)')
+    export_project.add_argument('--export-path', help='Export file path or directory', default=EXPORT_DIR)
+    default_params = '{"annotations__completed_by": {"only_id": null}, "interpolate_key_frames": true}'
+    export_project.add_argument(
+        '--export-serializer-context',
+        help=f"Export serializer context, default value: '{default_params}'",
+        default=default_params
     )
 
     args = parser.parse_args(input_args)
