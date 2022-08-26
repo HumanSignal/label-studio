@@ -41,7 +41,6 @@ def test_action_delete_all_tasks(tasks_count, annotations_count, predictions_cou
     with transaction.atomic():
         business_client.post(f"/api/dm/actions?project={project_id}&id=delete_tasks",
                              json={'selectedItems': {"all": True, "excluded": []}})
-    project = Project.objects.get(pk=project_id)
     assert project.tasks.count() == 0
 
 

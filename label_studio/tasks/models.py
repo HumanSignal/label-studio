@@ -289,7 +289,7 @@ class Task(TaskMixin, models.Model):
         self.annotations.exclude(id=annotation_id).update(ground_truth=False)
 
     def save(self, *args, **kwargs):
-        if flag_set('ff_back_2070_inner_id_12052022_short', self.project.organization.created_by):
+        if flag_set('ff_back_2070_inner_id_12052022_short', AnonymousUser):
             if self.inner_id == 0:
                 task = Task.objects.filter(project=self.project).order_by("-inner_id").first()
                 max_inner_id = 1
