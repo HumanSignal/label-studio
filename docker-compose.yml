@@ -1,8 +1,9 @@
-version: "3.3"
+version: "3.9"
 
 services:
   nginx:
-    image: nginx:1.21
+    build: .
+    image: heartexlabs/label-studio:latest
     ports:
       - "8080:80"
       - "8081:443"
@@ -10,23 +11,16 @@ services:
       - app
     environment:
       - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
-      - NGINX_FILE=${NGINX_FILE:-default.conf}
 #   Optional: Specify SSL termination certificate & key
 #   Just drop your cert.pem and cert.key into folder 'deploy/nginx/certs'
 #      - NGINX_SSL_CERT=/certs/cert.pem
 #      - NGINX_SSL_CERT_KEY=/certs/cert.key
     volumes:
-      # keep in sync with deploy/docker-entrypoint.d/30-copy-static-data.sh
-      - source: static
-        target: /label-studio/label_studio
-        type: volume
-        volume:
-          nocopy: true
       - ./mydata:/label-studio/data:rw
-      - ./deploy/nginx/${NGINX_FILE:-default.conf}:/etc/nginx/templates/${NGINX_FILE:-default.conf}.template
-      - ./deploy/nginx/scripts:/docker-entrypoint.d/label-studio
       - ./deploy/nginx/certs:/certs:ro
-    command: nginx -g "daemon off;"
+#   Optional: Override nginx default conf
+#      - ./deploy/nginx/default.conf:/label-studio/deploy/nginx/default.conf
+    command: nginx
 
   app:
     stdin_open: true
@@ -45,15 +39,11 @@ services:
       - POSTGRE_PORT=5432
       - POSTGRE_HOST=db
       - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
-      - LABEL_STUDIO_COPY_STATIC_DATA=true
+      - JSON_LOG=1
+#      - LOG_LEVEL=DEBUG
     volumes:
       - ./mydata:/label-studio/data:rw
-      # keep in sync with deploy/docker-entrypoint.d/30-copy-static-data.sh
-      - source: static
-        target: /label-studio/static_volume
-        type: volume
-        volume:
-          nocopy: true
+    command: label-studio-uwsgi
 
   db:
     image: postgres:11.5

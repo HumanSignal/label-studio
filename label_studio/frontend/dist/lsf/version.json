@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3061: Image scaling goes lower than 1 causing small images",
+  "message": "fix: DEV-3061: Image scaling goes lower than 1 causing small images (#814)\n\nFix image scaling",
   "commit": "10dd11839b96d07f8978270896dcd76464c06cc4",
   "branch": "master",
-  "date": "2022/08/29 19:16:33"
+  "date": "2022-08-29T18:16:33Z"
 }
