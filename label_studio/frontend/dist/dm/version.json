@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3233: Tasks are not filtered on the filter field change",
-  "commit": "b8244ffc33b46a7bb28770f597a2f20d79f9d624",
-  "branch": "master",
-  "date": "2022/08/30 15:02:42"
+  "message": "feat: DEV-1752: Support links to drafts and annotations",
+  "commit": "df4b6efbb273fb8cd9d45079d7aaaac6908d58d2",
+  "branch": "fb-dev-1752/support-links",
+  "date": "2022/08/30 19:44:57"
 }
