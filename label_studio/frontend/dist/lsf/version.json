@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3061: Image scaling goes lower than 1 causing small images (#814)\n\nFix image scaling",
-  "commit": "10dd11839b96d07f8978270896dcd76464c06cc4",
+  "message": "feat: DEV-2461: Add option to sync audio with paragraphs allowing playback of chunk position (#821)\n\n* feat: DEV-2461: Add option to sync audio with paragraphs allowing chunked playback\r\n\r\n* feat: DEV-2461: refactor and put all changes behind FF\r\n\r\n* feat: DEV-2461: remove console\r\n\r\n* feat: DEV-2461: add tests\r\n\r\n* feat: DEV-2461: update test\r\n\r\n* feat: DEV-2461: update test wait\r\n\r\n* feat: DEV-2461: update test wait\r\n\r\n* feat: DEV-2461: update test wait\r\n\r\n* feat: DEV-2461: update test wait\r\n\r\n* feat: DEV-2461: update test wait message\r\n\r\n* feat: DEV-2461: remove console logs",
+  "commit": "777ac2fb38c7cce96da9b7631e29faa1d493a468",
   "branch": "master",
-  "date": "2022-08-29T18:16:33Z"
+  "date": "2022-08-30T13:54:08Z"
 }
