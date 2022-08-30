@@ -5,7 +5,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { EnvironmentPlugin } = require('webpack');
 const TerserPlugin = require("terser-webpack-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-const SentryWebpackPlugin = require('@sentry/webpack-plugin');
 
 const RELEASE = require('./release').getReleaseName();
 
@@ -46,20 +45,6 @@ if (process.env.NODE_ENV === 'production') {
       default: false,
     },
   };
-}
-
-if (process.env.BUILD_SENTRY && SENTRY.AUTH_TOKEN && SENTRY.RELEASE) {
-  plugins.push(new SentryWebpackPlugin({
-    authToken: SENTRY.AUTH_TOKEN,
-    org: SENTRY.ORG,
-    project: SENTRY.PROJECT,
-    release: SENTRY.RELEASE,
-    include: "./dist",
-    ignore: ["node_modules", "webpack.config.js"],
-    deploy: {
-      env: process.env.NODE_ENV,
-    }
-  }))
 }
 
 module.exports = {
