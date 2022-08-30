@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3233: Tasks are not filtered on the filter field change",
-  "commit": "a849dda844c3b3f2097ef6c96218226f9e0ebdc6",
-  "branch": "fb-dev-3233/tasks-not-filtered",
-  "date": "2022/08/30 15:00:54"
+  "commit": "b8244ffc33b46a7bb28770f597a2f20d79f9d624",
+  "branch": "master",
+  "date": "2022/08/30 15:02:42"
 }
