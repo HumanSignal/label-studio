@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3233: Tasks are not filtered on the filter field change",
-  "commit": "b8244ffc33b46a7bb28770f597a2f20d79f9d624",
-  "branch": "master",
-  "date": "2022/08/30 15:02:42"
+  "message": "feat: DEV-2984: Movable columns in DM",
+  "commit": "1c3ebe669f2529b5fe3e96af1f2cb8fcbb98a93a",
+  "branch": "fb-dev-2984",
+  "date": "2022/08/30 13:41:18"
 }
