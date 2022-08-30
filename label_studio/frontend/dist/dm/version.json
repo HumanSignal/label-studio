@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2519: Choices selected by default",
-  "commit": "dc03b7337518a3129677570127b44456420d4c6c",
+  "message": "fix: DEV-3233: Tasks are not filtered on the filter field change",
+  "commit": "b8244ffc33b46a7bb28770f597a2f20d79f9d624",
   "branch": "master",
-  "date": "2022/08/10 15:51:21"
+  "date": "2022/08/30 15:02:42"
 }
