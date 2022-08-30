@@ -39,24 +39,24 @@ def delete_tasks(project, queryset, **kwargs):
     tasks_ids = list(queryset.values('id'))
     count = len(tasks_ids)
     tasks_ids_list = [task['id'] for task in tasks_ids]
-
+    project_count = project.tasks.count()
+    # unlink tasks from project
+    queryset.update(project=None)
     # delete all project tasks
-    if count == project.tasks.count():
-        Task.delete_tasks_without_signals(queryset)
+    if count == project_count:
+        start_job_async_or_sync(Task.delete_tasks_without_signals_from_task_ids, tasks_ids_list)
         project.summary.reset()
 
     # delete only specific tasks
     else:
-        # update project summary
+        # update project summary and delete tasks
         start_job_async_or_sync(async_project_summary_recalculation, tasks_ids_list, project.id)
-        Task.delete_tasks_without_signals(queryset)
 
     project.update_tasks_states(
         maximum_annotations_changed=False,
         overlap_cohort_percentage_changed=False,
         tasks_number_changed=True
     )
-
     # emit webhooks for project
     emit_webhooks_for_instance(project.organization, project, WebhookAction.TASKS_DELETED, tasks_ids)
 
@@ -121,6 +121,7 @@ def async_project_summary_recalculation(tasks_ids_list, project_id):
     project = Project.objects.get(id=project_id)
     project.summary.remove_created_annotations_and_labels(Annotation.objects.filter(task__in=queryset))
     project.summary.remove_data_columns(queryset)
+    Task.delete_tasks_without_signals(queryset)
 
 
 actions = [
