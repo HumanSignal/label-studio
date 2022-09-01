@@ -5,12 +5,13 @@ import logging
 import os
 import datetime
 import numbers
+import time
 
 from urllib.parse import urljoin, quote
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.db import models, transaction
+from django.db import models, transaction, OperationalError
 from django.db.models import Q
 from django.db.models.signals import post_delete, pre_save, post_save, pre_delete
 from django.utils.translation import gettext_lazy as _
@@ -764,8 +765,14 @@ def bulk_update_stats_project_tasks(tasks):
         # update objects without saving
         for task in tasks:
             update_task_stats(task, save=False)
-        # start update query batches
-        bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+        try:
+            # start update query batches
+            bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+        except OperationalError as exp:
+            logger.debug("Operational error while updating task ")
+            time.sleep(settings.BATCH_JOB_RETRY_TIMEOUT)
+            # try to update query batches one more time
+            bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
 
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
