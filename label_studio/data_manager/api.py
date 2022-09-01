@@ -122,7 +122,7 @@ class ViewAPI(viewsets.ModelViewSet):
         return Response(status=204)
 
     def get_queryset(self):
-        return View.objects.filter(project__organization=self.request.user.active_organization)
+        return View.objects.filter(project__organization=self.request.user.active_organization).order_by('id')
 
 
 class TaskPagination(PageNumberPagination):
