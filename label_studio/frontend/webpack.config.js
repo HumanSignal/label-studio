@@ -14,13 +14,6 @@ const LOCAL_ENV = {
   RELEASE_NAME: RELEASE,
 };
 
-const SENTRY = {
-  AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
-  ORG: process.env.SENTRY_ORG,
-  PROJECT: process.env.SENTRY_PROJECT,
-  RELEASE,
-}
-
 const devtool = process.env.NODE_ENV === 'production' ? "source-map" : "cheap-module-source-map";
 
 const output = {
