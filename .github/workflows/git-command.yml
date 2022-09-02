@@ -30,7 +30,7 @@ jobs:
           set -xeuo pipefail
           git config --global user.name '${{ github.event.client_payload.github.actor }}'
           git config --global user.email '${{ github.event.client_payload.github.actor }}@users.noreply.github.com'
-          echo "::set-output name=merge_conflict::$(git merge-tree $(git merge-base HEAD origin/$SLASH_COMMAND_ARG_BRANCH) origin/$SLASH_COMMAND_ARG_BRANCH HEAD | egrep '<<')"
+          echo "::set-output name=merge_conflict::$(git merge-tree $(git merge-base HEAD origin/$SLASH_COMMAND_ARG_BRANCH) origin/$SLASH_COMMAND_ARG_BRANCH HEAD | egrep '<<<<<<<')"
 
       - name: Add reaction to command comment on merge conflict
         uses: peter-evans/create-or-update-comment@v2
