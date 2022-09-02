@@ -96,8 +96,24 @@ class FileUpload(models.Model):
             tasks = json.loads(raw_data.decode('utf8'))
         if isinstance(tasks, dict):
             tasks = [tasks]
+        
+        return self.normalize_json_tasks(tasks)
+
+    def read_tasks_list_from_jsonl(self):
+        logger.debug('Read tasks list from JSONL file {}'.format(self.file.name))
+
+        raw_data = self.content
+        json_objects = raw_data.split("\n")
+
+        tasks = (json.loads(value) for value in json_objects if value)
+
+        return self.normalize_json_tasks(tasks)
+
+    def normalize_json_tasks(self, tasks):
+        """Normalize tasks to be within data structure."""
+    
         tasks_formatted = []
-        for i, task in enumerate(tasks):
+        for task in tasks:
             if not task.get('data'):
                 task = {'data': task}
             if not isinstance(task['data'], dict):
@@ -136,6 +152,8 @@ class FileUpload(models.Model):
                 tasks = self.read_tasks_list_from_txt()
             elif file_format == '.json':
                 tasks = self.read_tasks_list_from_json()
+            elif file_format =='.jsonl':
+                tasks = self.read_tasks_list_from_jsonl()
 
             # otherwise - only one object tag should be presented in label config
             elif not self.project.one_object_in_label_config:
