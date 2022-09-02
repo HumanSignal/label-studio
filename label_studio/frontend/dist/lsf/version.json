@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2461: Add option to sync audio with paragraphs allowing playback of chunk position (#821)\n\n* feat: DEV-2461: Add option to sync audio with paragraphs allowing chunked playback\r\n\r\n* feat: DEV-2461: refactor and put all changes behind FF\r\n\r\n* feat: DEV-2461: remove console\r\n\r\n* feat: DEV-2461: add tests\r\n\r\n* feat: DEV-2461: update test\r\n\r\n* feat: DEV-2461: update test wait\r\n\r\n* feat: DEV-2461: update test wait\r\n\r\n* feat: DEV-2461: update test wait\r\n\r\n* feat: DEV-2461: update test wait\r\n\r\n* feat: DEV-2461: update test wait message\r\n\r\n* feat: DEV-2461: remove console logs",
-  "commit": "777ac2fb38c7cce96da9b7631e29faa1d493a468",
-  "branch": "master",
-  "date": "2022-08-30T13:54:08Z"
+  "message": "feat: DEV-2717: Audio Controls",
+  "commit": "4d42d6ae6bea23a6a349cc5a6c1fedcfe780ad2d",
+  "branch": "fb-dev-2717",
+  "date": "2022/09/02 14:07:17"
 }
