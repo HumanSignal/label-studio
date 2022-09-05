@@ -19,7 +19,7 @@ export const initSentry = (history: RouterHistory) => {
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
     tracesSampleRate: 0.25,
-    release: process.env.RELEASE_NAME,
+    release: getVersion(),
   });
 };
 
@@ -35,7 +35,7 @@ const setTags = () => {
 
   if (APP_SETTINGS.version) {
     Object.entries(APP_SETTINGS.version).forEach(([packageName, data]: [string, any]) => {
-      const {version, commit} = data ?? {};
+      const { version, commit } = data ?? {};
 
       if (version) {
         tags['version-' + packageName] = version;
@@ -47,6 +47,12 @@ const setTags = () => {
   }
 
   Sentry.setTags(tags);
+};
+
+const getVersion = () => {
+  const version = APP_SETTINGS.version?.["label-studio-os-package"]?.version;
+
+  return version ? version : process.env.RELEASE_NAME;
 };
 
 export const SentryRoute = ReactSentry.withSentryRouting(Route);

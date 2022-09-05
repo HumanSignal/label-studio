@@ -19,9 +19,10 @@ from label_studio.core.utils.common import get_object_with_check_and_log, bool_f
 
 from organizations.models import Organization
 from organizations.serializers import (
-    OrganizationSerializer, OrganizationIdSerializer, OrganizationMemberUserSerializer, OrganizationInviteSerializer
+    OrganizationSerializer, OrganizationIdSerializer, OrganizationMemberUserSerializer, OrganizationInviteSerializer,
+    OrganizationsParamsSerializer
 )
-
+from core.feature_flags import flag_set
 
 logger = logging.getLogger(__name__)
 
@@ -103,7 +104,18 @@ class OrganizationMemberListAPI(generics.ListAPIView):
 
     def get_queryset(self):
         org = generics.get_object_or_404(self.request.user.organizations, pk=self.kwargs[self.lookup_field])
-        return org.members.order_by('user__username')
+        if flag_set('fix-backend-dev-3134-exclude-deactivated-users', self.request.user):
+            serializer = OrganizationsParamsSerializer(data=self.request.GET)
+            serializer.is_valid(raise_exception=True)
+            active = serializer.validated_data.get('active')
+            contributed_to_projects = serializer.validated_data.get('contributed_to_projects')
+            if active or not contributed_to_projects:
+                # return only active users (exclude DISABLED and NOT_ACTIVATED)
+                return org.active_members.order_by('user__username')
+            # organization page to show all members
+            return org.members.order_by('user__username')
+        else:
+            return org.members.order_by('user__username')
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
