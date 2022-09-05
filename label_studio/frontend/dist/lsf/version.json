@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2461: Add option to sync audio with paragraphs allowing playback of chunk position (#821)\n\n* feat: DEV-2461: Add option to sync audio with paragraphs allowing chunked playback\r\n\r\n* feat: DEV-2461: refactor and put all changes behind FF\r\n\r\n* feat: DEV-2461: remove console\r\n\r\n* feat: DEV-2461: add tests\r\n\r\n* feat: DEV-2461: update test\r\n\r\n* feat: DEV-2461: update test wait\r\n\r\n* feat: DEV-2461: update test wait\r\n\r\n* feat: DEV-2461: update test wait\r\n\r\n* feat: DEV-2461: update test wait\r\n\r\n* feat: DEV-2461: update test wait message\r\n\r\n* feat: DEV-2461: remove console logs",
-  "commit": "777ac2fb38c7cce96da9b7631e29faa1d493a468",
+  "message": "fix: DEV-2918: Prevent annotating collapsed phrases in paragraphs",
+  "commit": "13be53425cdd6434d109512d5b2b54b7c38aef2e",
   "branch": "master",
-  "date": "2022-08-30T13:54:08Z"
+  "date": "2022/09/05 16:16:04"
 }
