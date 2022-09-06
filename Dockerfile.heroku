@@ -1,5 +1,8 @@
 FROM heartexlabs/label-studio:latest
 
+ENV LABEL_STUDIO_ONE_CLICK_DEPLOY=1 \
+    STORAGE_PERSISTENCE=0
+
 COPY deploy/heroku_run.sh /label-studio/deploy/
 
 ENTRYPOINT ["/bin/bash -c"]
