@@ -28,7 +28,6 @@ from data_manager.managers import get_fields_for_evaluation
 from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer, ViewResetSerializer
 from data_manager.actions import get_all_actions, perform_action
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -123,7 +122,7 @@ class ViewAPI(viewsets.ModelViewSet):
         return Response(status=204)
 
     def get_queryset(self):
-        return View.objects.filter(project__organization=self.request.user.active_organization)
+        return View.objects.filter(project__organization=self.request.user.active_organization).order_by('id')
 
 
 class TaskPagination(PageNumberPagination):
@@ -149,8 +148,6 @@ class TaskPagination(PageNumberPagination):
         )
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
-@method_decorator(name='post', decorator=swagger_auto_schema(auto_schema=None))
 class TaskListAPI(generics.ListCreateAPIView):
     task_serializer_class = DataManagerTaskSerializer
     permission_required = ViewClassPermission(
@@ -202,7 +199,6 @@ class TaskListAPI(generics.ListCreateAPIView):
             self.check_object_permissions(request, project)
         else:
             return Response({'detail': 'Neither project nor view id specified'}, status=404)
-
         # get prepare params (from view or from payload directly)
         prepare_params = get_prepare_params(request, project)
         queryset = self.get_task_queryset(request, prepare_params)
@@ -211,14 +207,15 @@ class TaskListAPI(generics.ListCreateAPIView):
         # paginated tasks
         self.pagination_class = TaskPagination
         page = self.paginate_queryset(queryset)
+
+        # get request params
         all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
         fields_for_evaluation = get_fields_for_evaluation(prepare_params, request.user)
-
         review = bool_from_request(self.request.GET, 'review', False)
+
         if review:
             fields_for_evaluation = ['annotators', 'reviewed']
             all_fields = None
-
         if page is not None:
             ids = [task.id for task in page]  # page is a list already
             tasks = list(
@@ -231,7 +228,6 @@ class TaskListAPI(generics.ListCreateAPIView):
                 )
             )
             tasks_by_ids = {task.id: task for task in tasks}
-
             # keep ids ordering
             page = [tasks_by_ids[_id] for _id in ids]
 
@@ -242,7 +238,6 @@ class TaskListAPI(generics.ListCreateAPIView):
 
             serializer = self.task_serializer_class(page, many=True, context=context)
             return self.get_paginated_response(serializer.data)
-
         # all tasks
         if project.evaluate_predictions_automatically:
             evaluate_predictions(queryset.filter(predictions__isnull=True))

@@ -7,6 +7,7 @@ from rest_framework import serializers
 
 from core.label_config import replace_task_data_undefined_with_config_field
 from core.utils.common import load_func
+from ml.mixins import InteractiveMixin
 from tasks.models import Annotation, Task
 from tasks.serializers import AnnotationDraftSerializer, PredictionSerializer
 from users.models import User
@@ -90,29 +91,61 @@ ONLY_OR_EXCLUDE_CHOICE = [
 
 
 class TaskFilterOptionsSerializer(serializers.Serializer):
-    view = serializers.IntegerField(required=False)
-    skipped = serializers.ChoiceField(choices=ONLY_OR_EXCLUDE_CHOICE, allow_null=True, required=False)
-    finished = serializers.ChoiceField(choices=ONLY_OR_EXCLUDE_CHOICE, allow_null=True, required=False)
-    annotated = serializers.ChoiceField(choices=ONLY_OR_EXCLUDE_CHOICE, allow_null=True, required=False)
-    only_with_annotations = serializers.BooleanField(default=False, required=False)
+    view = serializers.IntegerField(
+        required=False,
+        help_text='Apply filters from the view ID (a tab from the Data Manager)'
+    )
+    skipped = serializers.ChoiceField(
+        choices=ONLY_OR_EXCLUDE_CHOICE, allow_null=True, required=False,
+        help_text='`only` - include all tasks with skipped annotations<br>'
+                  '`exclude` - exclude all tasks with skipped annotations'
+    )
+    finished = serializers.ChoiceField(
+        choices=ONLY_OR_EXCLUDE_CHOICE, allow_null=True, required=False,
+        help_text='`only` - include all finished tasks (is_labeled = true)<br>'
+                  '`exclude` - exclude all finished tasks'
+    )
+    annotated = serializers.ChoiceField(
+        choices=ONLY_OR_EXCLUDE_CHOICE, allow_null=True, required=False,
+        help_text='`only` - include all tasks with at least one not skipped annotation<br>'
+                  '`exclude` - exclude all tasks with at least one not skipped annotation'
+    )
+    only_with_annotations = serializers.BooleanField(
+        default=False, required=False,
+        help_text=''
+    )
 
 
 class AnnotationFilterOptionsSerializer(serializers.Serializer):
-    usual = serializers.BooleanField(allow_null=True, required=False, default=True)
-    ground_truth = serializers.BooleanField(allow_null=True, required=False)
-    skipped = serializers.BooleanField(allow_null=True, required=False)
+    usual = serializers.BooleanField(
+        allow_null=True, required=False, default=True,
+        help_text='Include not skipped and not ground truth annotations'
+    )
+    ground_truth = serializers.BooleanField(
+        allow_null=True, required=False,
+        help_text='Include ground truth annotations'
+    )
+    skipped = serializers.BooleanField(
+        allow_null=True, required=False,
+        help_text='Include skipped annotations'
+    )
 
 
 class SerializationOptionsSerializer(serializers.Serializer):
     class SerializationOption(serializers.Serializer):
-        only_id = serializers.BooleanField(default=False, required=False)
+        only_id = serializers.BooleanField(
+            default=False, required=False,
+            help_text='Include a full json body or IDs only'
+        )
 
-    drafts = SerializationOption(required=False)
-    predictions = SerializationOption(required=False)
-    annotations__completed_by = SerializationOption(required=False)
-    interpolate_key_frames = serializers.BooleanField(default=settings.INTERPOLATE_KEY_FRAMES,
-                                                      help_text='Interpolate video key frames.',
-                                                      required=False)
+    drafts = SerializationOption(required=False, help_text='JSON dict with parameters')
+    predictions = SerializationOption(required=False, help_text='JSON dict with parameters')
+    annotations__completed_by = SerializationOption(required=False, help_text='JSON dict with parameters')
+    interpolate_key_frames = serializers.BooleanField(
+        default=settings.INTERPOLATE_KEY_FRAMES,
+        help_text='Interpolate video key frames',
+        required=False
+    )
 
 
 class ExportCreateSerializer(ExportSerializer):
@@ -144,6 +177,10 @@ class ExportParamSerializer(serializers.Serializer):
     download_all_tasks = serializers.BooleanField(default=False,
                                                   help_text='Download all tasks or only finished.',
                                                   required=False)
+
+
+class BaseExportDataSerializerForInteractive(InteractiveMixin, BaseExportDataSerializer):
+    pass
 
 
 ExportDataSerializer = load_func(settings.EXPORT_DATA_SERIALIZER)

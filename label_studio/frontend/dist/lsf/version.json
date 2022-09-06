@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1324: DEV-1233: fix undo/redo for Audio (#440)\n\n* fix: DEV-1324: fix undo/redo for Audio\r\n\r\n- undo doesn't work for audio\r\n  - if there was a draft, moved region will disappear after undo\r\n  - if there was no drafts, nothing happens\r\n- redo do nothing for audio (connected with previous)\r\n\r\n* Create only one history step on region create\r\n\r\n* Retry most failed test on fail (undo-redo)\r\n\r\n* wait after drawing a polygon in e2e\r\n\r\n* make pause before clicking on last point in e2e",
-  "commit": "dfd23d280da21d8aed097ca4934c5d05d406bb3f",
+  "message": "fix: DEV-2918: Prevent annotating collapsed phrases in paragraphs",
+  "commit": "13be53425cdd6434d109512d5b2b54b7c38aef2e",
   "branch": "master",
-  "date": "2022-04-04T09:03:35Z"
+  "date": "2022/09/05 16:16:04"
 }

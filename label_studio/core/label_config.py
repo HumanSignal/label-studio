@@ -11,7 +11,7 @@ import re
 
 from urllib.parse import urlencode
 from collections import OrderedDict
-from lxml import etree
+import defusedxml.ElementTree as etree
 from collections import defaultdict
 from django.conf import settings
 from label_studio.core.utils.io import find_file
@@ -73,10 +73,12 @@ def _fix_choices(config):
 
 
 def parse_config_to_json(config_string):
-    parser = etree.XMLParser(recover=False)
-    xml = etree.fromstring(config_string, parser)
+    try:
+        xml = etree.fromstring(config_string, forbid_dtd=False)
+    except TypeError as error:
+        raise etree.ParseError('can only parse strings')
     if xml is None:
-        raise etree.XMLSchemaParseError('xml is empty or incorrect')
+        raise etree.ParseError('xml is empty or incorrect')
     config = xmljson.badgerfish.data(xml)
     config = _fix_choices(config)
     return config
@@ -87,11 +89,11 @@ def validate_label_config(config_string):
     try:
         config = parse_config_to_json(config_string)
         jsonschema.validate(config, _LABEL_CONFIG_SCHEMA_DATA)
-    except (etree.XMLSyntaxError, etree.XMLSchemaParseError, ValueError) as exc:
+    except (etree.ParseError, ValueError) as exc:
         raise LabelStudioValidationErrorSentryIgnored(str(exc))
     except jsonschema.exceptions.ValidationError as exc:
         error_message = exc.context[-1].message if len(exc.context) else exc.message
-        error_message = 'Validation failed on {}: {}'.format('/'.join(exc.path), error_message.replace('@', ''))
+        error_message = 'Validation failed on {}: {}'.format('/'.join(map(str, exc.path)), error_message.replace('@', ''))
         raise LabelStudioValidationErrorSentryIgnored(error_message)
 
     # unique names in config # FIXME: 'name =' (with spaces) won't work
@@ -110,10 +112,9 @@ def validate_label_config(config_string):
 
 def extract_data_types(label_config):
     # load config
-    parser = etree.XMLParser()
-    xml = etree.fromstring(label_config, parser)
+    xml = etree.fromstring(label_config, forbid_dtd=False)
     if xml is None:
-        raise etree.XMLSchemaParseError('Project config is empty or incorrect')
+        raise etree.ParseError('Project config is empty or incorrect')
 
     # take all tags with values attribute and fit them to tag types
     data_type = {}
@@ -132,10 +133,13 @@ def extract_data_types(label_config):
 def get_all_labels(label_config):
     outputs = parse_config(label_config)
     labels = defaultdict(list)
+    dynamic_labels = defaultdict(bool)
     for control_name in outputs:
         for label in outputs[control_name].get('labels', []):
             labels[control_name].append(label)
-    return labels
+        if outputs[control_name].get('dynamic_labels', False):
+            dynamic_labels[control_name] = True
+    return labels, dynamic_labels
 
 
 def get_annotation_tuple(from_name, to_name, type):
@@ -157,7 +161,7 @@ def get_all_object_tag_names(label_config):
 
 
 def config_line_stipped(c):
-    tree = etree.fromstring(c)
+    tree = etree.fromstring(c, forbid_dtd=False)
     comments = tree.xpath('//comment()')
 
     for c in comments:
@@ -184,7 +188,7 @@ def get_task_from_labeling_config(config):
             logger.debug('Parse ' + config[start:start + end])
             body = json.loads(config[start:start + end])
         except Exception as exc:
-            logger.error(exc, exc_info=True)
+            logger.error("Can't parse task from labeling config", exc_info=True)
             pass
         else:
             logger.debug(json.dumps(body, indent=2))
@@ -217,10 +221,9 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
     """ Generate sample task only
     """
     # load config
-    parser = etree.XMLParser()
-    xml = etree.fromstring(label_config, parser)
+    xml = etree.fromstring(label_config, forbid_dtd=False)
     if xml is None:
-        raise etree.XMLSchemaParseError('Project config is empty or incorrect')
+        raise etree.ParseError('Project config is empty or incorrect')
 
     # make examples pretty
     examples = data_examples(mode=mode)
@@ -287,6 +290,14 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
                 task[value] = examples['HyperTextUrl']
             else:
                 task[value] = examples['HyperText']
+        elif p.tag.lower().endswith('labels'):
+            task[value] = examples['Labels']
+        elif p.tag.lower() == "choices":
+            allow_nested = p.get('allowNested') or p.get('allownested') or "false"
+            if allow_nested == "true":
+                task[value] = examples['NestedChoices']
+            else:
+                task[value] = examples['Choices']
         else:
             # patch for valueType="url"
             examples['Text'] = examples['TextUrl'] if only_urls else examples['TextRaw']
@@ -373,3 +384,75 @@ def replace_task_data_undefined_with_config_field(data, project, first_key=None)
         key = first_key or list(project.data_types.keys())[0]
         data[key] = data[settings.DATA_UNDEFINED_NAME]
         del data[settings.DATA_UNDEFINED_NAME]
+
+
+def check_control_in_config_by_regex(config_string, control_type, filter=None):
+    """
+    Check if control type is in config including regex filter
+    """
+    c = parse_config(config_string)
+    if filter is not None and len(filter) == 0:
+        return False
+    if filter:
+        c = {key: c[key] for key in filter}
+    for control in c:
+        item = c[control].get('regex', {})
+        expression = control
+        for key in item:
+            expression = expression.replace(key, item[key])
+        pattern = re.compile(expression)
+        full_match = pattern.fullmatch(control_type)
+        if full_match:
+            return True
+    return False
+
+
+def check_toname_in_config_by_regex(config_string, to_name, control_type=None):
+    """
+    Check if to_name is in config including regex filter
+    :return: True if to_name is fullmatch to some pattern ion config
+    """
+    c = parse_config(config_string)
+    if control_type:
+        check_list = [control_type]
+    else:
+        check_list = list(c.keys())
+    for control in check_list:
+        item = c[control].get('regex', {})
+        for to_name_item in c[control]['to_name']:
+            expression = to_name_item
+            for key in item:
+                expression = expression.replace(key, item[key])
+            pattern = re.compile(expression)
+            full_match = pattern.fullmatch(to_name)
+            if full_match:
+                return True
+    return False
+
+
+def get_original_fromname_by_regex(config_string, fromname):
+    """
+    Get from_name from config on from_name key from data after applying regex search or original fromname
+    """
+    c = parse_config(config_string)
+    for control in c:
+        item = c[control].get('regex', {})
+        expression = control
+        for key in item:
+            expression = expression.replace(key, item[key])
+        pattern = re.compile(expression)
+        full_match = pattern.fullmatch(fromname)
+        if full_match:
+            return control
+    return fromname
+
+
+def get_all_types(label_config):
+    """
+    Get all types from label_config
+    """
+    outputs = parse_config(label_config)
+    out = []
+    for control_name, info in outputs.items():
+        out.append(info['type'].lower())
+    return out

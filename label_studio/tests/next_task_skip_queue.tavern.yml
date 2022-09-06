@@ -60,7 +60,7 @@ stages:
   response:
     save:
       json:
-        annotation_pk: id
+        first_skipped_annotation_pk: id
     status_code: 201
 
 - &get_next_task_second
@@ -119,6 +119,13 @@ stages:
   response:
     json:
       is_labeled: true
+
+
+
+
+
+
+
 ---
 test_name: skip_queue_requeue_for_me
 strict: false
@@ -151,6 +158,13 @@ stages:
 
 # retry skipped
 - *get_next_task_first
+
+- name: delete_skipped_annotation_first_task
+  request:
+    method: DELETE
+    url: '{django_live_url}/api/annotations/{first_skipped_annotation_pk}'
+  response:
+    status_code: 204
 
 - name: create_annotation_first_task
   request:
@@ -185,6 +199,11 @@ stages:
       is_labeled: true
 
 - *check_second_task_is_labeled
+
+
+
+
+
 
 ---
 test_name: skip_queue_ignore_skipped
@@ -231,7 +250,7 @@ stages:
   response:
     save:
       json:
-        annotation_pk: id
+        first_skipped_annotation_pk: id
     status_code: 201
 
 - name: get_next_task

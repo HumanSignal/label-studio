@@ -1,6 +1,6 @@
 {
-  "message": "Fix: DEV-790: return column button quick-view (#37)\n\n* gear icon\r\n\r\n* detect scroll bar width\r\n\r\n* sticky columns button\r\n\r\n* calc width of scrollbar from ref\r\n\r\n* remove gear when not labeling\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>\r\nCo-authored-by: Sergey <Gondragos@gmail.com>",
-  "commit": "4e6b392ada45e7e7e614e5dec0c1a8e0e771016f",
+  "message": "feat: DEV-1752: Support links to drafts and annotations (#101)\n\n* Support links in Label Stream\r\n\r\n* Introduce FF\r\n\r\n* Fix FF name\r\n\r\n* Fix label stream loading when preload is empty",
+  "commit": "72105e4385620cf4a59b5bd3e68adca19287bf8b",
   "branch": "master",
-  "date": "2022-03-24T15:46:41Z"
+  "date": "2022-09-02T18:15:25Z"
 }

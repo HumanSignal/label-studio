@@ -43,6 +43,7 @@ def register_ml_backend_mock(m, url='http://localhost:9090', predictions=None, h
     m.post(f'{url}/train', text=json.dumps({'status': 'ok', 'job_id': train_job_id}))
     m.post(f'{url}/predict', text=json.dumps(predictions or {}))
     m.post(f'{url}/webhook', text=json.dumps({}))
+    m.post(f'{url}/versions', text=json.dumps({'versions': ["1", "2"]}))
     return m
 
 
@@ -274,9 +275,9 @@ def os_independent_path(_, path, add_tempdir=False):
         {
             'os_independent_path': str(os_independent_path),
             'os_independent_path_parent': str(os_independent_path_parent),
+            'os_independent_path_tmpdir': str(Path(tempfile.gettempdir())),
         }
     )
-
 
 def verify_docs(response):
     for _, path in response.json()['paths'].items():
@@ -285,3 +286,7 @@ def verify_docs(response):
             print(method)
             if isinstance(method, dict):
                 assert 'api' not in method['tags'], f'Need docs for API method {method}'
+
+
+def empty_list(response):
+    assert len(response.json()) == 0, f'Response should be empty, but is {response.json()}'

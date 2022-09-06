@@ -128,11 +128,24 @@ class UserAPI(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         return super(UserAPI, self).create(request, *args, **kwargs)
 
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        self.request.user.active_organization.add_user(instance)
+
     def retrieve(self, request, *args, **kwargs):
         return super(UserAPI, self).retrieve(request, *args, **kwargs)
 
     def partial_update(self, request, *args, **kwargs):
-        return super(UserAPI, self).partial_update(request, *args, **kwargs)
+        result = super(UserAPI, self).partial_update(request, *args, **kwargs)
+
+        # newsletters
+        if 'allow_newsletters' in request.data:
+            user = User.objects.get(id=request.user.id)  # we need an updated user
+            request.user.advanced_json = {  # request.user instance will be unchanged in request all the time
+                'email': user.email, 'allow_newsletters': user.allow_newsletters,
+                'update-notifications': 1, 'new-user': 0
+            }
+        return result
 
     def destroy(self, request, *args, **kwargs):
         return super(UserAPI, self).destroy(request, *args, **kwargs)

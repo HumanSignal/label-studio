@@ -22,7 +22,7 @@ To install Label Studio Community Edition, see <a href="install.html">Install an
 
 ## Install Label Studio Enterprise using Docker
 
-1. Pull the latest image.
+1. Log in to a Docker registry.
 2. Add the license file.
 3. Start the server using Docker Compose.
 
@@ -35,23 +35,17 @@ After you install Label Studio Enterprise, the app is automatically connected to
 - PostgresSQL (versions 11, 12, 13)
 - Redis (version 5)
 
-### Pull the latest image
+### Log in to a Docker registry
 
 You must be authorized to access Label Studio Enterprise images. 
 
-1. Set up the Docker login to retrieve the latest Docker image:
+Set up the Docker login to retrieve the latest Docker image:
 ```bash
 docker login --username heartexlabs
 ```
 When prompted to enter the password, enter the token. If login succeeds, a `~/.docker/config.json` file is created with the authorization settings.  
 
-> If you have default registries specified when logging into Docker, you might need to explicitly specify the registry: `docker  login --username heartexlabs docker.io`.
-
-2. Pull the latest Label Studio Enterprise image:
-```bash
-docker pull heartexlabs/label-studio-enterprise:latest
-```
-> Note: You might need to use `sudo` to log in or pull images.
+> If you have default registries specified when logging into Docker, you might need to explicitly specify the registry: `docker login --username heartexlabs docker.io`.
 
 ### Add the license file 
 After you retrieve the latest Label Studio Enterprise image, add the license file. You can't start the Docker image without a license file. 
@@ -103,8 +97,13 @@ POSTGRE_PORT=5432
 # Optional: Specify Postgre SSL certificate
 # POSTGRE_SSLROOTCERT=postgre-ca-bundle.pem
 
-# Redis location e.g. redis://[:password]@localhost:6379/1
-REDIS_LOCATION=redis:6379
+# Optional: Client-side certificate and key
+# POSTGRE_SSLCERT=client.crt
+# POSTGRE_SSLKEY=client.key
+
+# Redis location e.g. redis[s]://[:password]@localhost:6379/1
+# rediss:// scheme is mandatory to use SSL  
+REDIS_LOCATION=redis://redis:6379/1
 
 # Optional: Redis database
 # REDIS_DB=1
@@ -115,14 +114,15 @@ REDIS_LOCATION=redis:6379
 # Optional: Redis socket timeout
 # REDIS_SOCKET_TIMEOUT=3600
 
-# Optional: Use Redis SSL connection
-# REDIS_SSL=1
-
 # Optional: Require certificate
 # REDIS_SSL_CERTS_REQS=required
 
 # Optional: Specify Redis SSL certificate
 # REDIS_SSL_CA_CERTS=redis-ca-bundle.pem
+
+# Optional: Client-side certificate and key
+# REDIS_SSL_CERTFILE=client.crt
+# REDIS_SSL_KEYFILE=client.key
 
 # Optional: Specify SSL termination certificate & key
 # Files should be placed in the directory "certs" at the same directory as docker-compose.yml file
@@ -162,7 +162,19 @@ services:
       - ./mydata:/label-studio/data:rw
       - ./license.txt:/label-studio-enterprise/license.txt:ro
     working_dir: /label-studio-enterprise
-    command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "default" ]
+    command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "critical", "high", "default", "low" ]
+
+  rqworkers_high:
+    image: heartexlabs/label-studio-enterprise:VERSION
+    depends_on:
+      - app
+    env_file:
+      - env.list
+    volumes:
+      - ./mydata:/label-studio/data:rw
+      - ./license.txt:/label-studio-enterprise/license.txt:ro
+    working_dir: /label-studio-enterprise
+    command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "high" ]
 ```
 
 3. Run Docker Compose:
@@ -180,6 +192,6 @@ To check the version of the Label Studio Enterprise Docker image, use the [`dock
 From the command line, run the following as root or using `sudo` and review the output:
 ```bash
 $ docker ps
-03b88eebdb65   heartexlabs/label-studio-enterprise:latest   "uwsgi --ini deploy/…"   36 hours ago   Up 36 hours   0.0.0.0:80->8000/tcp   label-studio-enterprise_app_1
+03b88eebdb65   heartexlabs/label-studio-enterprise:2.2.8-1   "uwsgi --ini deploy/…"   36 hours ago   Up 36 hours   0.0.0.0:80->8000/tcp   label-studio-enterprise_app_1
 ```
-In this example output, the image column displays the Docker image and version number. The image `heartexlabs/label-studio-enterprise:latest` is using the version `latest`.
+In this example output, the image column displays the Docker image and version number. The image `heartexlabs/label-studio-enterprise:2.2.8-1` is using the version `2.2.8-1`.

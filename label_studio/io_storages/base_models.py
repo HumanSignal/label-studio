@@ -76,11 +76,13 @@ class ImportStorage(Storage):
             http_url = self.generate_http_url(extracted_uri)
             return uri.replace(extracted_uri, http_url)
         except Exception as exc:
-            logger.error(f'Can\'t resolve URI={uri}. Reason: {exc}', exc_info=True)
+            logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
 
     def _scan_and_create_links(self, link_class):
         tasks_created = 0
         maximum_annotations = self.project.maximum_annotations
+        task = self.project.tasks.order_by('-inner_id').first()
+        max_inner_id = (task.inner_id + 1) if task else 1
         
         for key in self.iterkeys():
             logger.debug(f'Scanning key {key}')
@@ -94,7 +96,7 @@ class ImportStorage(Storage):
             try:
                 data = self.get_data(key)
             except (UnicodeDecodeError, json.decoder.JSONDecodeError) as exc:
-                logger.error(exc, exc_info=True)
+                logger.debug(exc, exc_info=True)
                 raise ValueError(
                     f'Error loading JSON from file "{key}".\nIf you\'re trying to import non-JSON data '
                     f'(images, audio, text, etc.), edit storage settings and enable '
@@ -111,11 +113,13 @@ class ImportStorage(Storage):
 
             # annotations
             annotations = data.get('annotations', [])
+            cancelled_annotations = 0
             if annotations:
                 if 'data' not in data:
                     raise ValueError(
                         'If you use "annotations" field in the task, ' 'you must put "data" field in the task too'
                     )
+                cancelled_annotations = len([a for a in annotations if a['was_cancelled']])
 
             if 'data' in data and isinstance(data['data'], dict):
                 data = data['data']
@@ -123,8 +127,12 @@ class ImportStorage(Storage):
             with transaction.atomic():
                 task = Task.objects.create(
                     data=data, project=self.project, overlap=maximum_annotations,
-                    is_labeled=len(annotations) >= maximum_annotations
+                    is_labeled=len(annotations) >= maximum_annotations, total_predictions=len(predictions),
+                    total_annotations=len(annotations)-cancelled_annotations,
+                    cancelled_annotations=cancelled_annotations, inner_id=max_inner_id
                 )
+                max_inner_id += 1
+
                 link_class.create(task, key, self)
                 logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
                 tasks_created += 1
@@ -145,6 +153,8 @@ class ImportStorage(Storage):
                 annotation_ser.is_valid(raise_exception=True)
                 annotation_ser.save()
 
+                # FIXME: add_annotation_history / post_process_annotations should be here
+
         self.last_sync = timezone.now()
         self.last_sync_count = tasks_created
         self.save()
@@ -161,7 +171,7 @@ class ImportStorage(Storage):
 
     def sync(self):
         if redis_connected():
-            queue = django_rq.get_queue('default')
+            queue = django_rq.get_queue('low')
             job = queue.enqueue(sync_background, self.__class__, self.id)
             # job_id = sync_background.delay()  # TODO: @niklub: check this fix
             logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
@@ -173,7 +183,7 @@ class ImportStorage(Storage):
         abstract = True
 
 
-@job('default')
+@job('low')
 def sync_background(storage_class, storage_id):
     storage = storage_class.objects.get(id=storage_id)
     storage.scan_and_create_links()
@@ -206,8 +216,8 @@ class ExportStorage(Storage):
 
     def sync(self):
         if redis_connected():
-            queue = django_rq.get_queue('default')
-            job = queue.enqueue(export_sync_background, self.__class__, self.id)
+            queue = django_rq.get_queue('low')
+            job = queue.enqueue(export_sync_background, self.__class__, self.id, job_timeout=settings.RQ_LONG_JOB_TIMEOUT)
             logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
         else:
             logger.info(f'Start syncing storage {self}')
@@ -217,7 +227,7 @@ class ExportStorage(Storage):
         abstract = True
 
 
-@job('default', timeout=3600)
+@job('low', timeout=settings.RQ_LONG_JOB_TIMEOUT)
 def export_sync_background(storage_class, storage_id):
     storage = storage_class.objects.get(id=storage_id)
     storage.save_all_annotations()
@@ -259,6 +269,7 @@ class ExportStorageLink(models.Model):
         _('object exists'), help_text='Whether object under external link still exists', default=True
     )
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
+    updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Update time')
 
     @staticmethod
     def get_key(annotation):
@@ -277,6 +288,9 @@ class ExportStorageLink(models.Model):
     @classmethod
     def create(cls, annotation, storage):
         link, created = cls.objects.get_or_create(annotation=annotation, storage=storage, object_exists=True)
+        if not created:
+            # update updated_at field
+            link.save()
         return link
 
     def has_permission(self, user):

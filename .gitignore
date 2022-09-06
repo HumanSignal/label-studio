@@ -3,6 +3,7 @@ node_modules
 *.pyc
 *.ipynb
 __pycache__
+.local/
 
 # docs
 __generated__
@@ -48,7 +49,6 @@ archive
 *.idea/*
 .vscode/*
 pyrightconfig.json
-tags
 tags.temp
 mydatabase
 label_studio.sqlite3
@@ -62,3 +62,16 @@ deploy/nginx/certs/*
 mydata/
 deploy/pgsql/certs/*
 !deploy/pgsql/certs/.placeholder
+
+*.swp
+*.swo
+*.swn
+1/*
+*/*/1/*
+label_studio/tavern-output.json
+docker-compose.override.yml
+
+.config/*
+.python_history
+.viminfo
+.bash_history
