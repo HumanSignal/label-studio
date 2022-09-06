@@ -18,12 +18,12 @@
     "USERNAME": {
       "description": "Username(email) for default user",
       "value": "",
-      "required": true
+      "required": false
     },
     "PASSWORD": {
       "description": "Password for default user",
       "value": "",
-      "required": true
+      "required": false
     }
   },
   "build": {
