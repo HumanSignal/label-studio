@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2918: Prevent annotating collapsed phrases in paragraphs",
-  "commit": "13be53425cdd6434d109512d5b2b54b7c38aef2e",
-  "branch": "master",
-  "date": "2022/09/05 16:16:04"
+  "message": "fix: DEV-3298: Repeater performance improvement",
+  "commit": "764486dcd1336b72d5731bcd465dfefe0615c0ba",
+  "branch": "fb-dev-3298",
+  "date": "2022/09/08 20:25:10"
 }
