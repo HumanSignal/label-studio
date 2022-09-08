@@ -14,7 +14,7 @@ from tasks.models import Task, Annotation
 from tasks.serializers import PredictionSerializer, AnnotationSerializer
 from data_export.serializers import ExportDataSerializer
 
-from core.redis import redis_connected
+from core.redis import is_job_in_queue, redis_connected
 from core.utils.common import get_bool_env, load_func
 from io_storages.utils import get_uri_via_regex
 
@@ -172,9 +172,11 @@ class ImportStorage(Storage):
     def sync(self):
         if redis_connected():
             queue = django_rq.get_queue('low')
-            job = queue.enqueue(sync_background, self.__class__, self.id)
-            # job_id = sync_background.delay()  # TODO: @niklub: check this fix
-            logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
+
+            if not is_job_in_queue(queue, "sync_background", project_id=self.project_id):
+                job = queue.enqueue(sync_background, self.__class__, self.id, project_id=self.project_id)
+                # job_id = sync_background.delay()  # TODO: @niklub: check this fix
+                logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
         else:
             logger.info(f'Start syncing storage {self}')
             self.scan_and_create_links()
