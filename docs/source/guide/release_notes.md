@@ -12,6 +12,152 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
     <i class='ent'></i> 
     The release notes for Label Studio Community Edition is available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
 
+
+## Label Studio Enterprise 2.3
+This section highlights the new features and enhancements in Label Studio Enterprise 2.3.
+
+### New features and enhancements 
+Label Studio Enterprise 2.3 introduces the following new features and enhancements.
+
+- Allows annotators and reviewers to filter the view of transcriptions by author name [DEV-2669].
+- Improve project list performance by hydrating counters in a second request [DEV-2575].
+- Project duplication interface that allows users to copy projects with settings, tasks, and annotations [DEV-2702].
+- Add support for pinned projects to the backend model and API [DEV-2651].
+- Project pinning interface that allows users to pin projects for better visibility of commonly referenced projects [DEV-2629].
+- Introduce duplication of tasks and annotations in project duplication API [DEV-2539].
+- Navigate Taxonomy with arrow keys, Up/Down to navigate, Right to open subtree, Space to select item [DEV-2424].
+- Added user notification about Storage Persistence availability [DEV-1232]
+- Implement new columns for the commentary system: comment count, unresolved comment count, comment authors, and last comment date [DEV-2885].
+- Starting with this release, you can preset size to zoom an image to fit within the viewport or to have it at its natural size (up to available space in the viewport). 
+- Set the image to position vertically (top, center, bottom) and horizontally (left, center, right) [DEV-2504].
+- Introduce comments system for communication between Annotators and Reviewers. Allows a Reviewer to mark comments as resolved. Comments feature also introduces new columns in the Data Manager to be able to filter tasks by comments inside [DEV-2894].
+- Add workspace grouping for Annotators, displaying the Workspaces where they are the members [DEV-1278].
+- Display drop-down with model versions for each machine learning backend [DEV-1646].
+- Change in a rotated anchor that is no longer out of the bounding box and now close to all resize anchors [DEV-2671].
+- Add label weights settings section in **Settings** >> **Quality** [DEV-2982].
+- Add date and action filters for dashboard data [DEV-423].
+- Support `PosixGroupType` for LDAP [DEV-3053].
+- Add Paragraphs to `substring_matching` example [DEV-2362].
+- Update the invite people modal to include invite by email [DEV-3065]
+- Add **Resend** and **Revoke** invitation buttons to the **Organization** page when a user is selected [DEV-3066].
+- Update the organization role drop-down visuals to show an indicator for inactive users [DEV-3091].
+- This release updates welcome emails on signup verification and invites [DEV-3219].
+- Add the ability to sustain the collapse state of the label across tasks [DEV-2755]. 
+- Maintain consistency in the order of the label groups [DEV-2755].
+- Cleanup lambda custom-metrics if it is not required [DEV-851].
+- Add cron job to verify trial expiration [DEV-3138].
+-  Block the entire screen as a non-closable modal window only when the trial ends [DEV-399].
+- Add option to synchronize audio with paragraphs allowing playback of chunk position [DEV-2461].
+- Support a custom column order with draggable columns [DEV-2984].
+- This release enables a manual mode for assigning Reviewers to tasks [DEV-3078].
+
+
+### Bug Fixes
+Label Studio Enterprise 2.3 includes the following bug fixes:
+
+- Unfinished polygons were saved as drafts and remained in an open state when unclosed. [DEV-2432].
+- Retained history on initial load of annotation review stream [DEV-2437].
+- Fixed workspace filter for project list API [DEV-2785].
+- Displayed source filename for tasks from storage in a separate column [DEV-2687].
+- Fixed the "Tasks per page" field that should be in sync with the number of tasks displayed. [DEV-2170].
+- Changed the label for one region caused a change for the legend in another region. The user was able to select /switch between the labels efficiently. [DEV-2462].
+- Avoided a crash when the user opened a task with a direct link [DEV-2526].
+- Deselected the image region box with a short click [DEV-2379].
+- Fixed the behavior of the drop-down menu that was not grouping when the organization was not activated [DEV-2639].
+- Fixed ​​pagination to keep the current position (page) whenever possible, at least until the user leaves the project [DEV-2153].
+- Changed the rotated anchor that is no longer out of the bbox and now close to all resize anchors [DEV-2671]
+- Prevented users from being able to edit fields that are not meant to be editable [DEV-2365].
+- Multiple rendered labels in regions [DEV-2763].
+- Resolved an issue where the relationship delete button did not work as expected [DEV-2806].
+- Ensured `review_settings` was included in the initial request [DEV-2575].
+- Fixed the basic functionality related to `<DateTime>` tag that was conditionally rendered [DEV-117].
+- Allowed annotators and reviewers to filter the view of transcriptions by author name. [DEV-2669].
+- Added the ability to delete points with an alt-click. [DEV-2431].
+- Allowed users to pin or unpin projects to more easily filter and find projects of interest [DEV-2069].
+- Fixed `PyJWT` vulnerability [DEV-2793].
+- `get_local_path` does not work for local files in ML backends and converter [DEV-2827].
+-  Hold to continuously draw image view shapes worked with DEV-1442 enabled [DEV-2655].
+- Skipped tasks are placed at the beginning of the label stream, however, they should go at the end [DEV-2880].
+- Added agreement calculation for `Datetime` tag [DEV-2847].
+- Speed up the **Members** page in case of ample annotations [DEV-2148].
+- Resolved an issue where the 3-point bbox would remain usable after removing rectangles from the labeling configuration [DEV-2696].
+- Resolved an issue where the imported annotation is marked as read-only, but allowed users to make changes anyway [DEV-2366].
+- Fixed UX and behavior when expanding/collapsing the panels and unsnapping/snapping to the sides [DEV-2851].
+- Displayed drop-down with model versions for each machine learning backend [DEV-1682].
+- Updated Django to `3.2.14` [DEV-2936].
+- Fixed the broken default page number for non-admin accounts on the **Projects** page [DEV-2335].
+- Fixed an issue where the user won’t be able to edit VideoRectangle if it is locked [DEV-2146].
+- Fixed an issue where the user can resize a panel so that it obscured all the underlying content. [DEV-2926].
+- Fixed clashed text entries for multi-value TextArea [DEV-2930].
+- Fixed an issue where the selection was still active after hiding an image region [DEV-2922].
+- Fixed an issue where the selection was broken after showing a previously hidden selected region [DEV-2922].
+- Added new columns for comment management in the Data Manager: Comment count, unresolved comment count, comment authors, and last comment date [DEV-2672].
+- Prevented polygon from being duplicated when finishing drawing [DEV-2967]
+- Implemented new columns for the commentary system: comment count, unresolved comment count, comment authors, and last comment date [DEV-2885].
+- Locked polygons don't show the editable points anymore [DEV-2977].
+- Removed validation for new data fields in label config [DEV-2939]
+- Fixed the issue when grouping by empty label caused the app to crash completely [DEV-2942].
+- Fixed an issue when Audio regions were misplaced due to zoom/viewport size [DEV-2934].
+- Fixed an issue when panels can fall out of the viewport if the viewport's size changes. [DEV-2943].
+- Recalculated overlap when changing overlap to 1 and changing enforce overlap [DEV-2420].
+- Fixed the user's inability to hide regions within the NER scenario [DEV-2931].
+- Added unique constraint for workspace members [DEV-3052].
+- Fixed UX issue with an almost invisible text area in a region list when the region is selected [DEV-2927].
+- Fixed app crash with Author Filter for Paragraphs enabled [DEV-3033].
+- Fixed an issue where the text captured by a region was not displayed in the **Details** panel [DEV-2958].
+- Resolved an issue affecting the tooltip of the flyout menu tooltips on small screens [DEV-3049].
+- Disabled the delete button when previewing the historic item [DEV-2971].
+- Showed indeterminate loading when project duplication is in progress. [DEV-2892].
+- Unfinished polygon region was not auto-completed when the user moved it [DEV-2514].
+- Annotation region locking should not persist [DEV-2949].
+- Changed environment variable for enforcing local URL check for ML backend [DEV-3058].
+- Fixed an issue with uploading data without annotation history [DEV-3104].
+- Fixed a bug when the selected Annotation History item is not rendered on the canvas [DEV-2970].
+- Increased external storage sync job timeout [DEV-2298].
+- Label weight doesn't reset after Labels change [DEV-3090].
+- Fixed an issue where the Project list had several project duplicates [DEV-3126].
+- All “204 responses” was replaced with “200 with no response” [DEV-3014].
+- Broken "All Projects" pagination [DEV-3125].
+- Fixed an issue where the paragraph regions were not selectable within the new Outliner [DEV-3030].
+- Options with 'selected=true' was displayed as selected by default [DEV-2519].
+- Fixed configuration validation for Repeater tag [DEV-1462].
+- Lazyload was implemented on image to improve loading performance [DEV-3077].
+- Improved polygon point removal during drawing and allowed the option to remove the polygon point (set or redo using ctrl/cmd+shift+z) with the available undo hotkeys (ctrl/cmd+z) [DEV-2576].
+- Fixed an issue with displaying Annotation History in LSC [DEV-2964].
+- Details panel automatically updated on lock action [DEV-2978].
+- Disabled error for label configuration validation with <!DOCTYPE> tag [DEV-3089].
+- Showed list of new users created using API correctly [DEV-3131].
+- Added the Talk to an expert modal [DEV-3129].
+- Fixed a minor correction to invite/revoke button text [DEV-3189].
+- Cleaned up logging, excluding potential security concerns related to sensitive data exposure [DEV-3164].
+- Resolved and added an entry to the annotation history only when the zoom feature changed [DEV-3004].
+- Project list card requests were using the wrong FF [DEV-3222].
+- Fixed the issue when the text captured by a region was not displayed in the Details panel. [DEV-3101].
+- Fixed an issue to allow users to get or set their password [DEV-3190].
+- Inactive users were shown as  "Never" in the "Last Activity" column of the organization table instead of the date they were invited [DEV-3177].
+- Improved revoke invite UX, so it's consistent when used from the selected user section and the revoke invite button in the drop-down in the User list [DEV-3196].
+- Corrected an error where clearing the email field in Ask an expert modal would still allow a successful commit [DEV-3157].
+- Added validation to avoid users importing local files using URL [DEV-3212].
+- Invited modal when opened from ribbon refreshed the organization page for submitting if opened on that page [DEV-3167].
+- Fixed an issue when selecting the region that caused region updates and changes to the history to record new changes [DEV-3140].
+- Added updated_by to dashboard API [DEV-3232].
+- Show/ Hide/ Lock / Unlock actions broke the Undo functionality for video labels [DEV-2968].
+- Improved delete tasks action speed [DEV-2296].
+- Fixed an issue when locking UI disappears when "trial days" is negative. [DEV-3275].
+- Fixed an issue when the image shrinks in certain cases. [DEV-3061].
+- The logout menu was displayed on smaller screens [DEV-3204].
+- Turned off lambda prefix and tags for cloud instance [DEV-2761].
+- Fixed a bug where the loader would appear when the user list is empty [DEV-3290].
+- Tasks were not updated after the filter field changed in DM [DEV-3233].
+- Fixed the issue when Sentry cannot properly capture frontend exceptions [DEV-3251].
+- Excluded Deactivated / Not Activated users from project dashboards and member assignments lists [DEV-3134].
+- Checked user limit for invites [DEV-3194].
+- Deleted tasks were not working with some ordering (e.g. by annotators) [DEV-3313].
+- Prevented annotating collapsed phrases in paragraphs [DEV-2918].
+- Fixed tabs being randomly mixed after label stream [DEV-1947].
+- Helm: Fixed support for Google project IDs with only digits in the name [DEV-3332].
+
+
 ## Label Studio Enterprise 2.2
 This section highlights the new features and enhancements in Label Studio Enterprise 2.2.
 
