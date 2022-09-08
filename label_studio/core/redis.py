@@ -100,3 +100,16 @@ def start_job_async_or_sync(job, *args, **kwargs):
         return job
     else:
         return job(*args, **kwargs)
+
+
+def is_job_in_queue(queue, func_name, **kwargs):
+    jobs = (
+        job 
+        for job in queue.get_jobs() 
+        if job.func.__name__ == func_name
+    )
+
+    if kwargs:
+        return any(job for job in jobs if job.kwargs == kwargs)
+
+    return any(jobs)
