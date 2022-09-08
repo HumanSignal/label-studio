@@ -146,9 +146,13 @@ class MLApi(BaseHTTPAPI):
                 response = self.get(url=url, *args, **kwargs)
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
-            # logger.warning(f'Error getting response from {url}. ', exc_info=True)
+            # Extending error details in case of failed request
+            if flag_set('fix-back-dev-3351-ml-validation-error-extension-short', AnonymousUser):
+                error_string = str(e) + " " + str(response.content)
+            else:
+                error_string = str(e)
             status_code = response.status_code if response is not None else 0
-            return MLApiResult(url, request, {'error': str(e)}, headers, 'error', status_code=status_code)
+            return MLApiResult(url, request, {'error': error_string, 'response': response.content}, headers, 'error', status_code=status_code)
         status_code = response.status_code
         try:
             response = response.json()
