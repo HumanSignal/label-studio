@@ -286,7 +286,7 @@ If you make a mistake when labeling with the brush mask, you can erase it. You m
 If you want to completely remove a region and start over, delete the region instead of erasing it. Erasing a region does not delete it. 
 
 
-## Outliner
+## <i class='ent'/></i> Outliner 
 
 The **Outliner** is a replacement for the existing interface with a multiple-panel approach. This feature improves the user experience to fit more data in these two columns (**Outliner** and **Details**) and provides more options when working with regions. For example, Image segmentation is the only type of labeling that supports custom controls on the details panel. 
 
