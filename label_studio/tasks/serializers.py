@@ -15,13 +15,13 @@ from rest_framework.fields import SkipField
 from rest_framework.settings import api_settings
 from rest_flex_fields import FlexFieldsModelSerializer
 
-from core.feature_flags import flag_set
 from projects.models import Project
 from tasks.models import Task, Annotation, AnnotationDraft, Prediction
 from tasks.validation import TaskValidator
 from core.utils.common import get_object_with_check_and_log, retry_database_locked
 from core.label_config import replace_task_data_undefined_with_config_field
 from users.serializers import UserSerializer
+from users.models import User
 from core.utils.common import load_func
 
 logger = logging.getLogger(__name__)
@@ -45,22 +45,23 @@ class ListAnnotationSerializer(serializers.ListSerializer):
     pass
 
 
+class CompletedByDMSerializer(UserSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'avatar', 'email', 'initials']
+
+
 class AnnotationSerializer(ModelSerializer):
     """
     """
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
+    completed_by = CompletedByDMSerializer(required=False)
 
     @classmethod
     def many_init(cls, *args, **kwargs):
         kwargs['child'] = cls(*args, **kwargs)
         return ListAnnotationSerializer(*args, **kwargs)
-
-    def to_representation(self, instance):
-        annotation = super(AnnotationSerializer, self).to_representation(instance)
-        if self.context.get('completed_by', '') == 'full':
-            annotation['completed_by'] = UserSerializer(instance.completed_by).data
-        return annotation
 
     def get_fields(self):
         fields = super(AnnotationSerializer, self).get_fields()
