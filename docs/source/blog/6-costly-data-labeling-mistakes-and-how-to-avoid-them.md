@@ -4,7 +4,7 @@ type: blog
 image: /images/6-mistakes/6-costly-mistakes-thumbnail.png
 order: 99
 meta_title: 6 Costly Data Labeling Mistakes and How To Avoid Them
-meta_description: 
+meta_description: Learn six of the most common data labeling mistakes we see in ML projects and the fixes that can help you maintain consistent, accurate training data.
 ---
 
 In data-centric artificial intelligence (data-centric AI), the model is only as good as the data that trains it. And the secret to high-quality training data? High-quality data labeling. Before a model can make any sense of a raw dataset (videos, images, text files, etc.), human annotators must provide the layer of meaning that contextualizes the data.   
