@@ -148,11 +148,11 @@ class MLApi(BaseHTTPAPI):
         except requests.exceptions.RequestException as e:
             # Extending error details in case of failed request
             if flag_set('fix-back-dev-3351-ml-validation-error-extension-short', AnonymousUser):
-                error_string = str(e) + " " + str(response.content)
+                error_string = str(e) + " " + str(response.text)
             else:
                 error_string = str(e)
             status_code = response.status_code if response is not None else 0
-            return MLApiResult(url, request, {'error': error_string, 'response': response.content}, headers, 'error', status_code=status_code)
+            return MLApiResult(url, request, {'error': error_string}, headers, 'error', status_code=status_code)
         status_code = response.status_code
         try:
             response = response.json()
