@@ -11,12 +11,13 @@ import { cn } from '../../../utils/bem';
 import axios from 'axios'
 import Swal from 'sweetalert'
 import { ProjectContext, useProject } from '../../../providers/ProjectProvider';
-import webhook_url from '../../../webhooks';
+import getWebhookUrl from '../../../webhooks';
 
 export const MachineLearningList = ({ backends, fetchBackends, onEdit, project }) => {
   const rootClass = cn('ml');
 
   const api = useContext(ApiContext);
+  const webhook_url = getWebhookUrl();
 
   const onDeleteModel = useCallback(async (backend) => {
     await api.callApi('deleteMLBackend', {

@@ -8,7 +8,9 @@ import { Spinner } from "../../components/Spinner/Spinner";
 import { useAPI } from "../../providers/ApiProvider";
 import { useProject } from "../../providers/ProjectProvider";
 import axios from 'axios'
-import webhook_url from "../../webhooks";
+import getWebhookUrl from "../../webhooks";
+
+
 export const DangerZone = () => {
   const {project} = useProject();
   const api = useAPI();
@@ -23,6 +25,8 @@ export const DangerZone = () => {
       buttonLook: "destructive",
       onOk: async () => {
         setProcessing(type);
+        const webhook_url = getWebhookUrl();
+
         if(type === 'annotations') {
           // console.log('delete annotations');
         } else if(type === 'tasks') {
@@ -36,8 +40,9 @@ export const DangerZone = () => {
             },
           });
         } else if (type === 'project') {
+          console.log(webhook_url);
           await axios
-          .post(webhook_url + '/delete_project?id='+project.id)
+          .post(webhook_url+ '/delete_project?id='+project.id)
               .then((response) => {
                 console.log(response)
               })

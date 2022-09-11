@@ -8,8 +8,9 @@ import { Spinner } from "../../components/Spinner/Spinner";
 import { useAPI } from "../../providers/ApiProvider";
 import { useProject } from "../../providers/ProjectProvider";
 import axios from 'axios'
-import webhook_url from "../../webhooks";
+import getWebhookUrl from "../../webhooks";
 export const DisplayLogs = () => {
+  const webhook_url = getWebhookUrl();
   const {project} = useProject();
   const api = useAPI();
   const history = useHistory();

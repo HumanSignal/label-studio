@@ -18,7 +18,7 @@ import { APIConfig } from './api-config';
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import "./DataManager.styl";
-import webhook_url from '../../webhooks';
+import getWebhookUrl from '../../webhooks';
 
 const initializeDataManager = async (root, props, params) => {
   if (!window.LabelStudio) throw Error("Label Studio Frontend doesn't exist on the page");
@@ -59,6 +59,7 @@ const buildLink = (path, params) => {
 };
 
 export const DataManagerPage = ({ ...props }) => {
+
   const root = useRef();
   const params = useParams();
   const history = useHistory();
@@ -236,6 +237,8 @@ DataManagerPage.context = ({ dmRef }) => {
     showLabelingInstruction(currentMode);
   };
   const importAnnotations = () => {
+    const webhook_url = getWebhookUrl();
+
     console.log('Import Annotations')
 
     Swal.fire({

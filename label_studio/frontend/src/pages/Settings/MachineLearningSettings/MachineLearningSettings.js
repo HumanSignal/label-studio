@@ -17,7 +17,7 @@ import Select from 'react-select';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios'
 import Swal from 'sweetalert'
-import webhook_url from '../../../webhooks';
+import getWebhookUrl from '../../../webhooks';
 export const MachineLearningSettings = () => {
   const api = useAPI();
   const { project, fetchProject } = useContext(ProjectContext);
@@ -28,6 +28,8 @@ export const MachineLearningSettings = () => {
   const [modelToPredictOn, setModelToPredictOn] = useState('');
   const [modelsPrecisions, setModelsPrecisions] = useState([]);
   const [fetchedPrecisions, setFetchPrecisions] = useState(false);
+  const webhook_url = getWebhookUrl();
+
   const mod = useCallback(async () => {
     await axios
       .get(webhook_url + '/get_available_models?id=' + project.id)
@@ -91,13 +93,14 @@ export const MachineLearningSettings = () => {
 
     if (models) setBackends(models);
   }, [api, project, setBackends]);
+
   async function onExportModel(){
             Swal('Exporting Model, it may take some time')
             axios.post(webhook_url + '/export?id=' + project.id)
               .then((data) => {
                 console.log('export result');
-                if (data.data.export === false) {
-                  Swal("There is no exported model in the local directory")
+                if (data.data.message) {
+                  Swal(data.data.message)
                 }
                 const link = document.createElement('a');
                 var zipFile = new Blob([atob(data.data)], {"type": "application/zip"})               
@@ -307,17 +310,17 @@ export const MachineLearningSettings = () => {
               <div className='col-6' key={model.value}>
               <Card  key={model.value}>
                   Model Path: {model.label}
-                  {Object.keys(modelsPrecisions).includes(model.label.split(project.title + "_id_" + project.id + "/")[1]) ?
+                  {Object.keys(modelsPrecisions).includes(model.label.split((project.title + "_id_" + project.id + "/").replaceAll(" ", "_"))[1]) ?
                     <div style={{paddingTop:15}}>
-                      Mean Average Precision <strong>(mAp)</strong>: {modelsPrecisions[model.label.split(project.title + "_id_" + project.id + "/")[1]]['mAp']}
+                      Mean Average Precision <strong>(mAp)</strong>: {modelsPrecisions[model.label.split((project.title + "_id_" + project.id + "/").replaceAll(" ", "_"))[1]]['mAp']}
                     <table>
                     <thead>
                     <tr><th style={{paddingRight:50}}>Class Name</th>
                       <th>Average Precision</th></tr>
-                        </thead>{Object.keys(modelsPrecisions[model.label.split(project.title + "_id_" + project.id + "/")[1]]['classes']).map((i) => (
+                        </thead>{Object.keys(modelsPrecisions[model.label.split((project.title + "_id_" + project.id + "/").replaceAll(" ", "_"))[1]]['classes']).map((i) => (
                           <tbody key={i}>
                             <tr><td>{i}</td>
-                              <td>{modelsPrecisions[model.label.split(project.title + "_id_" + project.id + "/")[1]]['classes'][i]}</td></tr>
+                              <td>{modelsPrecisions[model.label.split((project.title + "_id_" + project.id + "/").replaceAll(" ", "_"))[1]]['classes'][i]}</td></tr>
                           </tbody>
 
                         ))}

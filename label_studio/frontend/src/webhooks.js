@@ -1,2 +1,6 @@
-const webhook_url = "http://127.0.0.1:3535"
-export default webhook_url;
+const getWebhookUrl = () => {
+    const webhook_url = new URL(window.location.toString());
+    webhook_url.port = 3535;
+    return webhook_url.origin;
+};
+export default getWebhookUrl;
