@@ -332,7 +332,7 @@ There are several ways of storing tasks resources (images, audio, texts, etc) in
 - Uploaded files
 - Local files directory
 
-Label Studio stores local files in Project level structure. Each project has it's own folder for files.
+Label Studio stores uploaded files in Project level structure. Each project has it's own folder for files.
 
 You can use `label_studio_tools.core.utils.io.get_local_path` from label-studio-tools package to get task data - it will transform path or URL from task data to local path.
 In case of local path it will return full local path and download resource in case of using `download_resources` parameter.
