@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2918: Prevent annotating collapsed phrases in paragraphs",
-  "commit": "13be53425cdd6434d109512d5b2b54b7c38aef2e",
+  "message": "feat: DEV-388: Introducing default attributes for AudioPlus (#818)\n\n* Introducing default attributes\r\n\r\n* Fix fallback values\r\n\r\n* Fix `defaultSpeed` typo in old audio view\r\n\r\n* Fix value tracker\r\n\r\n* Cleanup defaults mess\r\n\r\n* Fix typo\r\n\r\n* Remove default value props\r\n\r\n* Remove null coalecsion for default values",
+  "commit": "c0ff3e48032c3ab77c51835c632768b72730eecb",
   "branch": "master",
-  "date": "2022/09/05 16:16:04"
+  "date": "2022-09-12T15:24:05Z"
 }
