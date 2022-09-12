@@ -5,7 +5,6 @@ import ujson as json
 import numbers
 
 from django.db import transaction
-from drf_dynamic_fields import DynamicFieldsMixin
 from django.conf import settings
 
 from rest_framework import serializers
@@ -51,29 +50,12 @@ class CompletedByDMSerializer(UserSerializer):
         fields = ['id', 'first_name', 'last_name', 'avatar', 'email', 'initials']
 
 
-class AnnotationSerializer(ModelSerializer):
+class AnnotationSerializer(FlexFieldsModelSerializer):
     """
     """
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
-    completed_by = CompletedByDMSerializer(required=False)
-
-    @classmethod
-    def many_init(cls, *args, **kwargs):
-        kwargs['child'] = cls(*args, **kwargs)
-        return ListAnnotationSerializer(*args, **kwargs)
-
-    def get_fields(self):
-        fields = super(AnnotationSerializer, self).get_fields()
-        excluded = []
-
-        # serializer for export format
-        if self.context.get('export_mode', False):
-            excluded += ['created_username', 'created_ago', 'task',
-                         'was_cancelled', 'ground_truth', 'result_count']
-
-        [fields.pop(field, None) for field in excluded]
-        return fields
+    completed_by = serializers.PrimaryKeyRelatedField(required=False, queryset=User.objects.all())
 
     def validate_result(self, value):
         data = value
@@ -105,6 +87,7 @@ class AnnotationSerializer(ModelSerializer):
     class Meta:
         model = Annotation
         exclude = ['prediction', 'result_count']
+        expandable_fields = {'completed_by': (CompletedByDMSerializer,)}
 
 
 class TaskSimpleSerializer(ModelSerializer):
@@ -131,13 +114,6 @@ class TaskSimpleSerializer(ModelSerializer):
 class BaseTaskSerializer(FlexFieldsModelSerializer):
     """ Task Serializer with project scheme configs validation
     """
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.context.get('include_annotations', True) and 'annotations' not in self.fields:
-            self.fields['annotations'] = AnnotationSerializer(
-                many=True, read_only=False, required=False, context=self.context
-            )
-
     def project(self, task=None):
         """ Take the project from context
         """

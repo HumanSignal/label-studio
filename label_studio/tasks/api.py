@@ -177,7 +177,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
                 and not self.task.predictions.exists():
             evaluate_predictions([self.task])
 
-        serializer = self.get_serializer_class()(self.task, many=False, context=context)
+        serializer = self.get_serializer_class()(self.task, many=False, context=context, expand=['annotations.completed_by'])
         data = serializer.data
         return Response(data)
 
