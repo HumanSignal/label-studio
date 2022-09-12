@@ -322,7 +322,7 @@ Review the full list of JSON properties in the [API documentation](api.html).
 
 ## Access data outside of Label Studio
 
-### Accessing data from Label Studio box
+### Accessing data from Label Studio instance
 
 There are several ways of storing tasks data in Label Studio:
 - Cloud storages 
@@ -338,11 +338,11 @@ In case of local path it will return full local path and download resource in ca
 
 Provide `Hostname` and `access_token` for accessing external resource.
 
-### Accessing data outside of Label Studio box
+### Accessing data outside of Label Studio instance
 
 You can use label_studio_tools.core.utils.io.get_local_path method to get data from outside machine for external links and cloud storages. Don't forget to provide credentials.
 
-You can get data with label_studio_tools.core.utils.io.get_local_path in case if you mount same disk to your machine. If you mount same disk to external box 
+You can get data with label_studio_tools.core.utils.io.get_local_path in case if you mount same disk to your machine. If you mount same disk to external instance. 
 
 Another way of accessing data is to use link from task and ACCESS_TOKEN ([see documentation for authentication](api.html#Authenticate-to-the-API)). Concatenate Label Studio hostname and link from task data. Then add access token to your request:
 
