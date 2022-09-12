@@ -1,12 +1,15 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
 import json
+import pytest
+
+from rest_framework import status
 
 from ..utils import project_id
 
+pytestmark = pytest.mark.django_db
 
-@pytest.mark.django_db
+
 def test_views_api(business_client, project_id):
     # create
     payload = dict(project=project_id, data={"test": 1})
@@ -46,7 +49,9 @@ def test_views_api(business_client, project_id):
 
     # reset
     response = business_client.delete(
-        f"/api/dm/views/reset", data=json.dumps(dict(project=project_id)), content_type='application/json'
+        f"/api/dm/views/reset",
+        data=json.dumps(dict(project=project_id)),
+        content_type="application/json",
     )
 
     assert response.status_code == 204, response.content
@@ -54,20 +59,31 @@ def test_views_api(business_client, project_id):
     assert response.json() == []
 
 
-@pytest.mark.django_db
 def test_views_api_filter_project(business_client):
     # create project
     response = business_client.post(
-        "/api/projects/", data=json.dumps(dict(title="test_project1")), content_type="application/json"
+        "/api/projects/",
+        data=json.dumps(dict(title="test_project1")),
+        content_type="application/json",
     )
     project1_id = response.json()["id"]
-    business_client.post("/api/dm/views/", data=json.dumps(dict(project=project1_id)), content_type="application/json")
+    business_client.post(
+        "/api/dm/views/",
+        data=json.dumps(dict(project=project1_id)),
+        content_type="application/json",
+    )
 
     response = business_client.post(
-        "/api/projects/", data=json.dumps(dict(title="test_project2")), content_type="application/json"
+        "/api/projects/",
+        data=json.dumps(dict(title="test_project2")),
+        content_type="application/json",
     )
     project2_id = response.json()["id"]
-    business_client.post("/api/dm/views/", data=json.dumps(dict(project=project2_id)), content_type="application/json")
+    business_client.post(
+        "/api/dm/views/",
+        data=json.dumps(dict(project=project2_id)),
+        content_type="application/json",
+    )
 
     # list all
     response = business_client.get("/api/dm/views/")
@@ -81,7 +97,9 @@ def test_views_api_filter_project(business_client):
 
     # filtered reset
     response = business_client.delete(
-        f"/api/dm/views/reset/", data=json.dumps(dict(project=project1_id)), content_type="application/json"
+        f"/api/dm/views/reset/",
+        data=json.dumps(dict(project=project1_id)),
+        content_type="application/json",
     )
     assert response.status_code == 204, response.content
 
@@ -91,7 +109,6 @@ def test_views_api_filter_project(business_client):
     assert response.json()[0]["project"] == project2_id
 
 
-@pytest.mark.django_db
 def test_views_api_filters(business_client, project_id):
     # create
     payload = dict(
@@ -171,3 +188,23 @@ def test_views_api_filters(business_client, project_id):
 
     assert response.status_code == 200, response.content
     assert response.json()["data"] == updated_payload["data"]
+
+
+def test_views_ordered_by_id(business_client, project_id):
+    views = [{"view_data": 1}, {"view_data": 2}, {"view_data": 3}]
+
+    for view in views:
+        payload = dict(project=project_id, data=view)
+
+        business_client.post(
+            "/api/dm/views/",
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+
+    response = business_client.get("/api/dm/views/")
+    data = response.json()
+    assert response.status_code == status.HTTP_200_OK
+
+    ids = [view["id"] for view in data]
+    assert ids == sorted(ids)

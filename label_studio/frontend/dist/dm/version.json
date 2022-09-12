@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2519: Choices selected by default",
-  "commit": "dc03b7337518a3129677570127b44456420d4c6c",
+  "message": "feat: DEV-1752: Support links to drafts and annotations (#101)\n\n* Support links in Label Stream\r\n\r\n* Introduce FF\r\n\r\n* Fix FF name\r\n\r\n* Fix label stream loading when preload is empty",
+  "commit": "72105e4385620cf4a59b5bd3e68adca19287bf8b",
   "branch": "master",
-  "date": "2022/08/10 15:51:21"
+  "date": "2022-09-02T18:15:25Z"
 }

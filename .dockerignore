@@ -3,10 +3,12 @@
 
 # Except:
 !deploy/docker-entrypoint.d/**
+!deploy/nginx/**
 !deploy/docker-entrypoint.sh
 !deploy/requirements-mw.txt
 !deploy/requirements.txt
 !deploy/heroku_run.sh
+!deploy/uwsgi.ini
 !label_studio/**
 !setup.py
 !README.md
