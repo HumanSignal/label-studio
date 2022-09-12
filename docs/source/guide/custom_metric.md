@@ -104,7 +104,7 @@ Set up a custom agreement metric for a specific project in Label Studio Enterpri
 2. Click **Quality**.
 3. Under **Annotation Agreement**:
     - **Metric name**: Use the drop-down menu to select **Custom agreement metric**.
-    - **Lambda Tags**: Add tags to AWS Lambda function using the syntax `{tag_name:tag_value}`.
+    - **Lambda Tags**: Add tags to AWS Lambda function using the syntax `tag_name tag_value`.
     - **Lambda Prefix**: Select a Prefix.
 4. Write or paste code defining a custom agreement metric in the text box. 
 5. Click **Save & Deploy**.
