@@ -320,29 +320,30 @@ Review the full list of JSON properties in the [API documentation](api.html).
 
 <!-- md annotation_ids.md -->
 
-## Access data outside of Label Studio
+## Access task data (images, audio, texts) outside of Label Studio
 
-### Accessing data from Label Studio instance
+Machine Learning backend uses data from tasks for predictions and you need to download them on Machine Learning backend side. Label Studio provides tools for downloading of these resources and they are located in label-studio-tools python package. If you are using official Label Studio Machine Learning Backend, label-studio-tools package is installed automatically with other requirements.
 
-There are several ways of storing tasks data in Label Studio:
+### Accessing task data from Label Studio instance
+
+There are several ways of storing tasks resources (images, audio, texts, etc) in Label Studio:
 - Cloud storages 
 - External web links 
 - Uploaded files
 - Local files directory
 
-
 Label Studio stores local files in Project level structure. Each project has it's own folder for files.
 
-You can use label_studio_tools.core.utils.io.get_local_path to get task data - it will transform path or URL from task data to local path.
+You can use `label_studio_tools.core.utils.io.get_local_path` to get task data - it will transform path or URL from task data to local path.
 In case of local path it will return full local path and download resource in case of using `download_resources` parameter.
 
 Provide `Hostname` and `access_token` for accessing external resource.
 
-### Accessing data outside of Label Studio instance
+### Accessing task data outside of Label Studio instance
 
-You can use label_studio_tools.core.utils.io.get_local_path method to get data from outside machine for external links and cloud storages. Don't forget to provide credentials.
+You can use `label_studio_tools.core.utils.io.get_local_path` method to get data from outside machine for external links and cloud storages. Don't forget to provide credentials.
 
-You can get data with label_studio_tools.core.utils.io.get_local_path in case if you mount same disk to your machine. If you mount same disk to external instance. 
+You can get data with `label_studio_tools.core.utils.io.get_local_path` in case if you mount same disk to your machine. If you mount same disk to external instance. 
 
 Another way of accessing data is to use link from task and ACCESS_TOKEN ([see documentation for authentication](api.html#Authenticate-to-the-API)). Concatenate Label Studio hostname and link from task data. Then add access token to your request:
 
