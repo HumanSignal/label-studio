@@ -113,9 +113,3 @@ Simply finding a wealth of data isn’t enough to successfully train a program. 
 Label Studio is a data labeling platform that can be used for annotating large datasets consisting of all data types, including text (natural language processing, documents, chatbots, transcripts, and more). Use cases include document classification, named entity recognition, question answering and sentiment analysis. 
 
 Interested in learning more about how to get started with sentiment analysis? Check out [our article on building a sentiment analysis program](https://labelstud.io/blog/sentiment-analysis-get-started.html).
-<br/>
-#### Research Referenced
-- [Sentiment Analysis: Concept, Analysis and Applications - Towards Data Science](https://towardsdatascience.com/sentiment-analysis-concept-analysis-and-applications-6c94d6f58c17)
-- [Five Practical Use Cases Of Customer Sentiment Analysis For NPS - Towards Data Science](https://towardsdatascience.com/five-practical-use-cases-of-customer-sentiment-analysis-for-nps-a3167ac2caaa)
-- [Sentiment Analysis: A Definitive Guide - MonkeyLearn](https://monkeylearn.com/sentiment-analysis/)
-- [What is sentiment analysis and how can users leverage it? - Qualtrics](https://www.qualtrics.com/experience-management/research/sentiment-analysis/)
