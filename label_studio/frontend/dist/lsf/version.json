@@ -1,6 +1,6 @@
 {
   "message": "fix: dev-3055: Regions in 'Grouped by Label' section at Outliner tab should be ordered as they are ordered in labeling schema",
-  "commit": "65cb5edeac7a8c6f0d586f49590deb2f4604ac5b",
-  "branch": "fb-dev-3055",
-  "date": "2022/09/12 16:14:53"
+  "commit": "7857459345c79331dc51a085e53f874140803227",
+  "branch": "master",
+  "date": "2022/09/13 07:09:02"
 }
