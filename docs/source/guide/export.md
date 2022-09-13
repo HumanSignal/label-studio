@@ -333,16 +333,16 @@ There are several ways of storing tasks data in Label Studio:
 
 Label Studio stores local files in Project level structure. Each project has it's own folder for files.
 
-You can use label_studio_tools.core.utils.io.get_local_path to get task data - it will transform path or URL from task data to local path.
+You can use `label_studio_tools.core.utils.io.get_local_path` to get task data - it will transform path or URL from task data to local path.
 In case of local path it will return full local path and download resource in case of using `download_resources` parameter.
 
 Provide `Hostname` and `access_token` for accessing external resource.
 
 ### Accessing data outside of Label Studio box
 
-You can use label_studio_tools.core.utils.io.get_local_path method to get data from outside machine for external links and cloud storages. Don't forget to provide credentials.
+You can use `label_studio_tools.core.utils.io.get_local_path` method to get data from outside machine for external links and cloud storages. Don't forget to provide credentials.
 
-You can get data with label_studio_tools.core.utils.io.get_local_path in case if you mount same disk to your machine. If you mount same disk to external box 
+You can get data with `label_studio_tools.core.utils.io.get_local_path` in case if you mount same disk to your machine. If you mount same disk to external box 
 
 Another way of accessing data is to use link from task and ACCESS_TOKEN ([see documentation for authentication](api.html#Authenticate-to-the-API)). Concatenate Label Studio hostname and link from task data. Then add access token to your request:
 
@@ -350,13 +350,14 @@ Another way of accessing data is to use link from task and ACCESS_TOKEN ([see do
 curl -X GET http://localhost:8080/api/projects/ -H 'Authorization: Token {YOUR_TOKEN}'
 ```
 
-### FAQ and problems
+### Frequently asked questions 
 
-> I have made request - no data was provided, 404 or 403 error code
+#### I made a request and data was not provided, but a 404 or 403 error code was returned. 
 
-Please first check network access to your Label Studio instance in case of doing API requests. You can execute test curl request with sample data. 
+First check the network access to your Label Studio instance when you send API requests. You can execute test curl request with sample data. 
 
-> I was trying to access files and got FileNotFound error
+#### I tried to access files and received a `FileNotFound` error.
 
-Check that you have mounted same disk as your Label Studio instance. Check files existance in Label Studio instance first. 
-Check LOCAL_FILES_DOCUMENT_ROOT environment variable in your Label Studio instance and add it your accessing data script.
+1. Check that you have mounted the same disk as your Label Studio instance. Then check your files' existence in Label Studio instance first. 
+
+2. Check `LOCAL_FILES_DOCUMENT_ROOT` environment variable in your Label Studio instance and add it to your accessing data script.
