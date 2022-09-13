@@ -1,6 +1,6 @@
 {
-  "message": "fix: dev-3055: Regions in 'Grouped by Label' section at Outliner tab should be ordered as they are ordered in labeling schema",
-  "commit": "7857459345c79331dc51a085e53f874140803227",
-  "branch": "master",
-  "date": "2022/09/13 07:09:02"
+  "message": "fix: DEV-3402: Disable fullscreen mode",
+  "commit": "f835dd1c02ad43eaed85bbc94bfdefb4470f8c8c",
+  "branch": "fb-dev-3402/disable-video-fullscreen",
+  "date": "2022/09/13 19:19:09"
 }
