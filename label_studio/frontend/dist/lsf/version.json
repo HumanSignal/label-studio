@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-3260: Introduce simplified shortcuts (#828)\n\n* Prevent keyboard event propagation\r\n\r\n* Fix app <-> browser hotkeys conflicts",
-  "commit": "d8a5e07fc8b29b597713291d295e6ba5ad366fa6",
+  "message": "fix: DEV-3389: Display indices in the regions list (#843)\n\n* Display indices in the regions list\r\n\r\n* Cleanup",
+  "commit": "65a639c5d2a3164b4c8abdc2374f7c195e6cb9fd",
   "branch": "master",
-  "date": "2022-09-14T13:44:10Z"
+  "date": "2022-09-14T16:02:57Z"
 }
