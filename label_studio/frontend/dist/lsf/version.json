@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-1943: After awhile, shapes disappear",
-  "commit": "57233dbe4777e9d2ed522c903705fa1ec7467811",
+  "commit": "250c02c902059674df06ee1fcf46091291138d5a",
   "branch": "fb-dev-1943",
-  "date": "2022/09/14 16:26:03"
+  "date": "2022/09/14 17:01:27"
 }
