@@ -156,11 +156,10 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         )
 
     def get_retrieve_serializer_context(self, request):
-        fields = ['completed_by_full', 'drafts', 'predictions', 'annotations']
+        fields = ['drafts', 'predictions', 'annotations']
 
         return {
             'resolve_uri': True,
-            'completed_by': 'full' if 'completed_by_full' in fields else None,
             'predictions': 'predictions' in fields,
             'annotations': 'annotations' in fields,
             'drafts': 'drafts' in fields,
@@ -178,7 +177,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
                 and not self.task.predictions.exists():
             evaluate_predictions([self.task])
 
-        serializer = self.get_serializer_class()(self.task, many=False, context=context)
+        serializer = self.get_serializer_class()(self.task, many=False, context=context, expand=['annotations.completed_by'])
         data = serializer.data
         return Response(data)
 

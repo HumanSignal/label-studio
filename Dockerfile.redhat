@@ -18,13 +18,23 @@ FROM registry.access.redhat.com/ubi8/python-39
 ENV LS_DIR=/label-studio \
     PIP_CACHE_DIR=$HOME/.cache \
     DJANGO_SETTINGS_MODULE=core.settings.label_studio \
-    LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data
+    LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data \
+    OPT_DIR=/opt/heartex/instance-data/etc \
+    SETUPTOOLS_USE_DISTUTILS=stdlib
+
+USER 0
+RUN dnf -y install nginx && \
+    mkdir -p $OPT_DIR && \
+    chown -R 1001:0 $OPT_DIR /etc/nginx/nginx.conf && \
+    chmod -R g=u $OPT_DIR /etc/nginx/nginx.conf
+USER 1001
 
 WORKDIR $LS_DIR
 
 # Copy and install middleware dependencies
 COPY --chown=1001:0 deploy/requirements-mw.txt .
 RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
+    pip3 install uwsgi uwsgitop && \
     pip3 install -r requirements-mw.txt
 
 # Copy and install requirements.txt first for caching
@@ -53,6 +63,7 @@ LABEL name="LabelStudio" \
 
 COPY --chown=1001:0 licenses/ /licenses
 RUN cp $LS_DIR/LICENSE /licenses
+ENV HOME=/label-studio
 
 ENTRYPOINT ["./deploy/docker-entrypoint.sh"]
 CMD ["label-studio"]

@@ -1,5 +1,5 @@
 ---
-test_name: test_ml_backend_creation
+test_name: test_users
 strict: false
 marks:
 - usefixtures:
@@ -19,5 +19,27 @@ stages:
   request:
     method: GET
     url: '{django_live_url}/api/users/{user_pk}'
+  response:
+    status_code: 200
+    save:
+      json:
+        org_pk: active_organization
+- name: stage
+  request:
+    json:
+      email: test_user@heartextest.com
+      username: test user
+      active_organization: !int '{org_pk}'
+    method: POST
+    url: '{django_live_url}/api/users'
+  response:
+    save:
+      json:
+        new_user_pk: id
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/users/{new_user_pk}'
   response:
     status_code: 200

@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3030: Fix paragraphs selection (#793)\n\nFix paragraphs",
-  "commit": "8b6991a36a6fc9477ec4483cca2ba8f1414c033d",
+  "message": "feat: DEV-3260: Introduce simplified shortcuts (#828)\n\n* Prevent keyboard event propagation\r\n\r\n* Fix app <-> browser hotkeys conflicts",
+  "commit": "d8a5e07fc8b29b597713291d295e6ba5ad366fa6",
   "branch": "master",
-  "date": "2022-08-09T08:54:43Z"
+  "date": "2022-09-14T13:44:10Z"
 }
