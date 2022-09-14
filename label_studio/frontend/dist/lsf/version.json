@@ -1,6 +1,6 @@
 {
-  "message": "fix: dev-3055: Regions in 'Grouped by Label' section at Outliner tab should be ordered as they are ordered in labeling schema",
-  "commit": "7857459345c79331dc51a085e53f874140803227",
-  "branch": "master",
-  "date": "2022/09/13 07:09:02"
+  "message": "fix: DEV-3377: Scale image via size, not scale",
+  "commit": "c26651c752dd1eb23ae46569697fd1b584ee83e4",
+  "branch": "fb-dev-3377/shifted-regions",
+  "date": "2022/09/14 01:47:09"
 }
