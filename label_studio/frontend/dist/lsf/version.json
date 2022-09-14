@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3405: Move zoom buttons to video's control panel",
-  "commit": "25d2a97e8b2fe3a084e7b574097a7a280f1ee615",
+  "commit": "3624482bece6da3ef8f039c18e04c7eb5363324d",
   "branch": "fb-dev-3405/zoom-in-controls",
-  "date": "2022/09/14 14:40:45"
+  "date": "2022/09/14 12:29:10"
 }
