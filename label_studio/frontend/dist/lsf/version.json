@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3056: User selection of regions grouping section at Outliner tab is not persistent",
-  "commit": "98fa610ba4391e34a56b93406a1c37e712a1c24b",
+  "message": "feat: DEV-3260: Introduce simplified shortcuts (#828)\n\n* Prevent keyboard event propagation\r\n\r\n* Fix app <-> browser hotkeys conflicts",
+  "commit": "d8a5e07fc8b29b597713291d295e6ba5ad366fa6",
   "branch": "master",
-  "date": "2022/09/14 07:54:10"
+  "date": "2022-09-14T13:44:10Z"
 }
