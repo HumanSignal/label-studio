@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3402: Disable fullscreen mode",
+  "message": "fix: DEV-3402: Disable fullscreen mode (#846)\n\nDisable fullscreen mode",
   "commit": "e605b461ec878c4f5be78605e7e2333c004d5e8c",
   "branch": "master",
-  "date": "2022/09/14 19:10:39"
+  "date": "2022-09-14T18:10:39Z"
 }
