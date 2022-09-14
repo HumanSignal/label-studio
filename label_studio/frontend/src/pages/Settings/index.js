@@ -7,7 +7,7 @@ import { InstructionsSettings } from './InstructionsSettings';
 import { LabelingSettings } from './LabelingSettings';
 import { MachineLearningSettings } from './MachineLearningSettings/MachineLearningSettings';
 import { StorageSettings } from './StorageSettings/StorageSettings';
-
+import { DisplayLogs } from './DisplayLogs';
 
 export const MenuLayout = ({children, ...routeProps}) => {
   return (
@@ -20,6 +20,7 @@ export const MenuLayout = ({children, ...routeProps}) => {
         StorageSettings,
         WebhookPage,
         DangerZone,
+        DisplayLogs
       ]}
       path={routeProps.match.url}
       children={children}
@@ -40,5 +41,6 @@ export const SettingsPage = {
     StorageSettings,
     WebhookPage,
     DangerZone,
+    DisplayLogs
   },
 };

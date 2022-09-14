@@ -11,7 +11,7 @@ import { ImportPage } from './Import/Import';
 import { useImportPage } from './Import/useImportPage';
 import { useDraftProject } from './utils/useDraftProject';
 import axios from 'axios'
-
+import getWebhookUrl from '../../webhooks';
 
 const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true }) => !show ? null :(
   <form className={cn("project-name")} onSubmit={e => { e.preventDefault(); onSubmit(); }}>
@@ -37,6 +37,7 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
 export const CreateProject = ({ onClose }) => {
   const [step, setStep] = React.useState("name"); // name | import | config
   const [waiting, setWaitingStatus] = React.useState(false);
+  const webhook_url = getWebhookUrl();
 
   const project = useDraftProject();
   const history = useHistory();
@@ -86,7 +87,7 @@ export const CreateProject = ({ onClose }) => {
       history.push(`/projects/${response.id}/data`);
     }
     await axios
-    .post('http://127.0.0.1:3535/create_project?id='+project.id)
+    .post(webhook_url + '/create_project?id='+project.id)
         .then((response) => {
           console.log(response)
         })

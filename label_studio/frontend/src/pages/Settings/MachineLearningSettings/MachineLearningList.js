@@ -10,9 +10,14 @@ import { ApiContext } from '../../../providers/ApiProvider';
 import { cn } from '../../../utils/bem';
 import axios from 'axios'
 import Swal from 'sweetalert'
-export const MachineLearningList = ({ backends, fetchBackends, onEdit }) => {
+import { ProjectContext, useProject } from '../../../providers/ProjectProvider';
+import getWebhookUrl from '../../../webhooks';
+
+export const MachineLearningList = ({ backends, fetchBackends, onEdit, project }) => {
   const rootClass = cn('ml');
+
   const api = useContext(ApiContext);
+  const webhook_url = getWebhookUrl();
 
   const onDeleteModel = useCallback(async (backend) => {
     await api.callApi('deleteMLBackend', {
@@ -26,7 +31,7 @@ export const MachineLearningList = ({ backends, fetchBackends, onEdit }) => {
   const onStartTraining = useCallback(async (backend) => {
     console.log('training')
     await axios
-    .get('http://127.0.0.1:3535/can_press')
+    .get(webhook_url + '/can_press')
         .then((response) => {
           console.log(response);
           let can_press = response.data.can_press;
@@ -50,6 +55,8 @@ export const MachineLearningList = ({ backends, fetchBackends, onEdit }) => {
     });
     await fetchBackends();
   }, [fetchBackends, api]);
+
+  
 
   return (
     <div className={rootClass}>

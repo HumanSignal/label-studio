@@ -123,8 +123,10 @@ def get_fields_for_evaluation(prepare_params, user):
 def apply_ordering(queryset, ordering, project, request):
     if ordering:
         preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
+        logger.warning(project.only_undefined_field)
         field_name, ascending = preprocess_field_name(ordering[0], only_undefined_field=project.only_undefined_field)
-
+        if ordering[0].__contains__('tasks:data') and not ordering[0].__contains__('image'):
+            field_name = 'data__' + ordering[0].split('tasks:data.')[-1]
         if field_name.startswith('data__'):
             # annotate task with data field for float/int/bool ordering support
             json_field = field_name.replace('data__', '')
@@ -133,11 +135,9 @@ def apply_ordering(queryset, ordering, project, request):
 
         else:
             f = F(field_name).asc(nulls_last=True) if ascending else F(field_name).desc(nulls_last=True)
-
         queryset = queryset.order_by(f)
     else:
         queryset = queryset.order_by("id")
-
     return queryset
 
 
@@ -225,13 +225,11 @@ def add_user_filter(enabled, key, _filter, filter_expressions):
 def apply_filters(queryset, filters, project, request):
     if not filters:
         return queryset
-
     # convert conjunction to orm statement
     filter_expressions = []
     custom_filter_expressions = load_func(settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS)
 
     for _filter in filters.items:
-
         # we can also have annotations filters
         if not _filter.filter.startswith("filter:tasks:") or _filter.value is None:
             continue
@@ -259,7 +257,6 @@ def apply_filters(queryset, filters, project, request):
         result = add_user_filter(field_name == 'updated_by', 'updated_by', _filter, filter_expressions)
         if result == 'continue':
             continue
-
         # annotations results & predictions results
         if field_name in ['annotations_results', 'predictions_results']:
             result = add_result_filter(field_name, _filter, filter_expressions, project)
@@ -313,7 +310,6 @@ def apply_filters(queryset, filters, project, request):
             clean_field_name = f'filter_{json_field.replace("$undefined$", "undefined")}'
         else:
             clean_field_name = field_name
-
         # special case: predictions, annotations, cancelled --- for them 0 is equal to is_empty=True
         if clean_field_name in ('total_predictions', 'total_annotations', 'cancelled_annotations') and \
                 _filter.operator == 'empty':
@@ -362,7 +358,6 @@ def apply_filters(queryset, filters, project, request):
 
         # append operator
         field_name = f"{clean_field_name}{operators.get(_filter.operator, '')}"
-
         # in
         if _filter.operator == "in":
             cast_value(_filter)

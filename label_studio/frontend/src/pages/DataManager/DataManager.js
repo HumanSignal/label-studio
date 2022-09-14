@@ -18,6 +18,7 @@ import { APIConfig } from './api-config';
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import "./DataManager.styl";
+import getWebhookUrl from '../../webhooks';
 
 const initializeDataManager = async (root, props, params) => {
   if (!window.LabelStudio) throw Error("Label Studio Frontend doesn't exist on the page");
@@ -58,6 +59,7 @@ const buildLink = (path, params) => {
 };
 
 export const DataManagerPage = ({ ...props }) => {
+
   const root = useRef();
   const params = useParams();
   const history = useHistory();
@@ -235,6 +237,8 @@ DataManagerPage.context = ({ dmRef }) => {
     showLabelingInstruction(currentMode);
   };
   const importAnnotations = () => {
+    const webhook_url = getWebhookUrl();
+
     console.log('Import Annotations')
 
     Swal.fire({
@@ -247,7 +251,7 @@ DataManagerPage.context = ({ dmRef }) => {
       confirmButtonText: 'Yes, Import them!'
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.post('http://127.0.0.1:3535/import_annotations?id='+project.id)
+        axios.post(webhook_url + '/import_annotations?id='+project.id)
           .then(response => {
             let number_of_annotations = response.data.annotations;
             let project_id = response.data.project_id;
