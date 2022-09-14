@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3402: Disable fullscreen mode",
-  "commit": "f835dd1c02ad43eaed85bbc94bfdefb4470f8c8c",
-  "branch": "fb-dev-3402/disable-video-fullscreen",
-  "date": "2022/09/13 19:19:09"
+  "commit": "e605b461ec878c4f5be78605e7e2333c004d5e8c",
+  "branch": "master",
+  "date": "2022/09/14 19:10:39"
 }
