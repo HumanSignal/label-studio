@@ -186,7 +186,7 @@ class ImportStorage(Storage):
 
 
 @job('low')
-def sync_background(storage_class, storage_id):
+def sync_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.scan_and_create_links()
 
