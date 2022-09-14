@@ -75,9 +75,9 @@ class ExportMixin:
         if 'finished' in task_filter_options:
             value = task_filter_options['finished']
             if value == ONLY:
-                tasks = tasks.filter(is_labled=True)
+                tasks = tasks.filter(is_labeled=True)
             elif value == EXCLUDE:
-                tasks = tasks.exclude(is_labled=True)
+                tasks = tasks.exclude(is_labeled=True)
         if 'annotated' in task_filter_options:
             value = task_filter_options['annotated']
             # if any annotation exists and is not cancelled

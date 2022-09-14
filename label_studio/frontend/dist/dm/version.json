@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2984: Movable columns in DM",
-  "commit": "4d06f025960abda7ee06e19f717dcecfd57d7db4",
+  "message": "feat: DEV-1752: Support links to drafts and annotations (#101)\n\n* Support links in Label Stream\r\n\r\n* Introduce FF\r\n\r\n* Fix FF name\r\n\r\n* Fix label stream loading when preload is empty",
+  "commit": "72105e4385620cf4a59b5bd3e68adca19287bf8b",
   "branch": "master",
-  "date": "2022/09/01 06:38:51"
+  "date": "2022-09-02T18:15:25Z"
 }
