@@ -94,6 +94,21 @@ export const MachineLearningSettings = () => {
     if (models) setBackends(models);
   }, [api, project, setBackends]);
 
+  async function onPrune() {
+    Swal('Pruning model, this may take some time')
+    axios.post(webhook_url + '/prune?id=' + project.id)
+    .then((response) => {
+      if (response.data.unprune === false){
+        Swal("The unpruned model wasn't found in the project. Please train a model or add one first")
+      }
+      else if (response.data.prune == false) {
+        Swal("An error occured when running the prune_and_retrain_fixed function, please check the logs")
+      }
+      else{
+        Swal("The model was pruned, you can find it here: "+ response.data.pruned_path)
+      }
+    })
+  }
   async function onExportModel(){
             Swal('Exporting Model, it may take some time')
             axios.post(webhook_url + '/export?id=' + project.id)
@@ -274,8 +289,11 @@ export const MachineLearningSettings = () => {
           </div>
         </Form.Row>
         <Button style={{ marginTop: 20 }} onClick={() => trainModel()}>Train New Model</Button>
-        <Button onClick={() => onExportModel()}>
+        <Button style={{marginLeft: 20}} onClick={() => onExportModel()}>
         Export Model
+      </Button>
+      <Button style={{marginLeft: 20}} onClick={() => onPrune()}>
+      Prune/Re-train
       </Button>
         {!isFF(FF_DEV_1682) && (
           <ProjectModelVersionSelector />
