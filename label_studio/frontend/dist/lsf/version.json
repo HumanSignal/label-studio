@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3322: Scale image via size, not scale",
-  "commit": "3f78a112a21bd5c353354f12d6746f225ece3e96",
-  "branch": "fb-dev-3322/shifted-regions",
-  "date": "2022/09/14 13:25:42"
+  "commit": "e573a7865374ff311c9f3d27fbc5793040050fbf",
+  "branch": "master",
+  "date": "2022/09/14 13:32:56"
 }
