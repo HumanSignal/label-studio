@@ -1,6 +1,6 @@
 {
-  "message": "fix: dev-3055: Regions in 'Grouped by Label' section at Outliner tab should be ordered as they are ordered in labeling schema",
-  "commit": "7857459345c79331dc51a085e53f874140803227",
+  "message": "fix: DEV-3056: User selection of regions grouping section at Outliner tab is not persistent",
+  "commit": "98fa610ba4391e34a56b93406a1c37e712a1c24b",
   "branch": "master",
-  "date": "2022/09/13 07:09:02"
+  "date": "2022/09/14 07:54:10"
 }
