@@ -312,7 +312,7 @@ class ReImportAPI(ImportAPI):
                 'file_upload_ids': [],
                 'found_formats': {},
                 'data_columns': []
-            }, status=status.HTTP_204_NO_CONTENT)
+            }, status=status.HTTP_200_OK)
 
         tasks, found_formats, data_columns = FileUpload.load_tasks_from_uploaded_files(
             project, file_upload_ids,  files_as_tasks_list=files_as_tasks_list)

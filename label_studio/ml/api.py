@@ -12,6 +12,7 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from core.feature_flags import flag_set
 from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import get_object_with_check_and_log
 from projects.models import Project, Task
@@ -247,6 +248,10 @@ class MLBackendInteractiveAnnotating(APIView):
 
         task = get_object_with_check_and_log(request, Task, pk=validated_data['task'], project=ml_backend.project)
         context = validated_data.get('context')
+
+        if flag_set('ff_back_dev_2362_project_credentials_060722_short', request.user):
+            context['project_credentials_login'] = task.project.task_data_login
+            context['project_credentials_password'] = task.project.task_data_password
 
         result = ml_backend.interactive_annotating(task, context, user=request.user)
 
