@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3389: Display indices in the regions list",
-  "commit": "09a9b55846d7fe73ab950bed81e520aeaeda4f9e",
-  "branch": "fb-dev-3389/outliner-region-indices",
-  "date": "2022/09/13 13:34:37"
+  "commit": "65a639c5d2a3164b4c8abdc2374f7c195e6cb9fd",
+  "branch": "master",
+  "date": "2022/09/14 17:02:57"
 }
