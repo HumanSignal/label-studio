@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3403: Allow playhead scrubbing",
-  "commit": "d842560cc6ddde0206130d0db92389e10cf8244a",
-  "branch": "fb-dev-3404/playhead-scrubbing",
-  "date": "2022/09/13 20:28:01"
+  "message": "fix: DEV-3404: Allow playhead scrubbing",
+  "commit": "8d7eab3f47006d36cb4df9ca9394c93d595a60da",
+  "branch": "master",
+  "date": "2022/09/15 20:29:49"
 }
