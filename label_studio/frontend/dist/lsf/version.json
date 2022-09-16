@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3403: Allow frames scrubbing (#849)\n\n* Allow frames scrubbing\r\n\r\n* Limit frame scrubbing by a visible viewport",
-  "commit": "6fe0ef497d8609f0a82f1969b623c751ec528cd7",
+  "message": "fix: DEV-2992: Fix comments section stretching (#845)\n\nFix comments section stretched",
+  "commit": "d79683dcd9a38f8990605ae445d60f0e6a1719e3",
   "branch": "master",
-  "date": "2022-09-16T14:16:51Z"
+  "date": "2022-09-16T14:36:52Z"
 }
