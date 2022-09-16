@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2992: Fix comments section stretching (#845)\n\nFix comments section stretched",
-  "commit": "d79683dcd9a38f8990605ae445d60f0e6a1719e3",
-  "branch": "master",
-  "date": "2022-09-16T14:36:52Z"
+  "message": "fix: DEV-3428: Change to 1 item per page changing page by region",
+  "commit": "e062dbb02a03a03b1833d634a2483c29e1e3f206",
+  "branch": "fb-dev-3428",
+  "date": "2022/09/16 12:39:15"
 }
