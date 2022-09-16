@@ -29,7 +29,6 @@ class StorageTaskSerializer(TaskSerializer):
     def __init__(self, *args, **kwargs):
         # task is nested into the annotation, we don't need annotations in the task again
         kwargs['context'] = {
-            'include_annotations': False,
             'resolve_uri': False
         }
         super().__init__(*args, **kwargs)
@@ -46,5 +45,5 @@ class StorageCompletedBySerializer(serializers.ModelSerializer):
 
 
 class StorageAnnotationSerializer(AnnotationSerializer):
-    task = StorageTaskSerializer(read_only=True)
+    task = StorageTaskSerializer(read_only=True, omit=['annotations'])
     completed_by = StorageCompletedBySerializer(read_only=True)

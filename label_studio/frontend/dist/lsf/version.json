@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2992: Fix comments section stretching",
+  "message": "fix: DEV-2992: Fix comments section stretching (#845)\n\nFix comments section stretched",
   "commit": "d79683dcd9a38f8990605ae445d60f0e6a1719e3",
   "branch": "master",
-  "date": "2022/09/16 15:36:52"
+  "date": "2022-09-16T14:36:52Z"
 }
