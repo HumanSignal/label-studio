@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3405: Move zoom buttons to video's control panel (#847)\n\n* Move zoom buttons to video's control panel\r\n\r\n* Fixes as per the review\r\n\r\n* Update src/components/Timeline/Controls.tsx\r\n\r\nCo-authored-by: yyassi-heartex <104568407+yyassi-heartex@users.noreply.github.com>",
-  "commit": "ed027c579849e9c0f166fbd07b86cc25c412ed92",
-  "branch": "master",
-  "date": "2022-09-15T19:30:03Z"
+  "message": "fix: DEV-3074: Add line between draft and annotation on annotation list",
+  "commit": "7d7a1a2032334180ba5e0d1f9ae3339799e2ed3f",
+  "branch": "fb-dev-3074",
+  "date": "2022/09/15 20:05:24"
 }
