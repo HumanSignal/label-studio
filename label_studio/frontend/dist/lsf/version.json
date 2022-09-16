@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3405: Move zoom buttons to video's control panel (#847)\n\n* Move zoom buttons to video's control panel\r\n\r\n* Fixes as per the review\r\n\r\n* Update src/components/Timeline/Controls.tsx\r\n\r\nCo-authored-by: yyassi-heartex <104568407+yyassi-heartex@users.noreply.github.com>",
-  "commit": "ed027c579849e9c0f166fbd07b86cc25c412ed92",
-  "branch": "master",
-  "date": "2022-09-15T19:30:03Z"
+  "message": "fix: DEV-3429: Textarea placement in the config prevents OT",
+  "commit": "6e74f0769c8fc3fab8b0d87a96f36400ab75a5c1",
+  "branch": "fb-dev-3429/video-textarea",
+  "date": "2022/09/16 14:42:40"
 }
