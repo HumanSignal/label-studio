@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3403: Allow frames scrubbing",
-  "commit": "317b3a6b2ecc3edbb735cbb83a5c2162a05a0570",
+  "commit": "b8704213383d46cc0d25d78ed8ad70fdf22d1176",
   "branch": "fb-dev-3403/frames-scrubbing",
-  "date": "2022/09/15 20:31:14"
+  "date": "2022/09/16 14:18:06"
 }
