@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3404: Allow playhead scrubbing",
-  "commit": "8d7eab3f47006d36cb4df9ca9394c93d595a60da",
+  "message": "fix: DEV-3405: Move zoom buttons to video's control panel (#847)\n\n* Move zoom buttons to video's control panel\r\n\r\n* Fixes as per the review\r\n\r\n* Update src/components/Timeline/Controls.tsx\r\n\r\nCo-authored-by: yyassi-heartex <104568407+yyassi-heartex@users.noreply.github.com>",
+  "commit": "ed027c579849e9c0f166fbd07b86cc25c412ed92",
   "branch": "master",
-  "date": "2022/09/15 20:29:49"
+  "date": "2022-09-15T19:30:03Z"
 }
