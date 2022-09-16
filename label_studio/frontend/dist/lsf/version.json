@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3405: Move zoom buttons to video's control panel (#847)\n\n* Move zoom buttons to video's control panel\r\n\r\n* Fixes as per the review\r\n\r\n* Update src/components/Timeline/Controls.tsx\r\n\r\nCo-authored-by: yyassi-heartex <104568407+yyassi-heartex@users.noreply.github.com>",
-  "commit": "ed027c579849e9c0f166fbd07b86cc25c412ed92",
+  "message": "fix: DEV-3403: Allow frames scrubbing (#849)\n\n* Allow frames scrubbing\r\n\r\n* Limit frame scrubbing by a visible viewport",
+  "commit": "6fe0ef497d8609f0a82f1969b623c751ec528cd7",
   "branch": "master",
-  "date": "2022-09-15T19:30:03Z"
+  "date": "2022-09-16T14:16:51Z"
 }
