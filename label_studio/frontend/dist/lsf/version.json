@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3298: Repeater performance improvement (#840)\n\n* fix: DEV-3298: performance optimization on repeater\r\n\r\n* get performance better\r\n\r\n* add hotkey\r\n\r\n* edit documentation and remove some consoles\r\n\r\n* code improvements\r\n\r\n* scroll top after change page and ui adjustment on select\r\n\r\n* fix keymap description\r\n\r\n* spacing\r\n\r\n* add settimeout to stop running all pages when use hotkey\r\n\r\n* fix page selector and scroll top\r\n\r\n* now pages are switching when user clicks on region\r\n\r\n* add spacing\r\n\r\n* change documentation",
-  "commit": "b9e72fde992ff3df8e0659e3af3bb1fd34ca106b",
+  "message": "fix: DEV-3405: Move zoom buttons to video's control panel (#847)\n\n* Move zoom buttons to video's control panel\r\n\r\n* Fixes as per the review\r\n\r\n* Update src/components/Timeline/Controls.tsx\r\n\r\nCo-authored-by: yyassi-heartex <104568407+yyassi-heartex@users.noreply.github.com>",
+  "commit": "ed027c579849e9c0f166fbd07b86cc25c412ed92",
   "branch": "master",
-  "date": "2022-09-15T14:09:07Z"
+  "date": "2022-09-15T19:30:03Z"
 }
