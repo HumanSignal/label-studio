@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3074: Add line between draft and annotation on annotation list",
-  "commit": "7d7a1a2032334180ba5e0d1f9ae3339799e2ed3f",
+  "commit": "ca687b6792d7785c4b16b983c04b713296418553",
   "branch": "fb-dev-3074",
-  "date": "2022/09/15 20:05:24"
+  "date": "2022/09/16 09:37:27"
 }
