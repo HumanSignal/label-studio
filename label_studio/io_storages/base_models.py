@@ -138,7 +138,7 @@ class ImportStorage(Storage):
                 logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
                 tasks_created += 1
 
-                raise_exception = not flag_set('ff-fix-back-dev-3342-storage-scan-with-invalid-annotations', user=AnonymousUser())
+                raise_exception = not flag_set('ff_fix_back_dev_3342_storage_scan_with_invalid_annotations', user=AnonymousUser())
 
                 # add predictions
                 logger.debug(f'Create {len(predictions)} predictions for task={task}')
