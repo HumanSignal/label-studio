@@ -320,12 +320,14 @@ Review the full list of JSON properties in the [API documentation](api.html).
 
 <!-- md annotation_ids.md -->
 
-## Access data outside of Label Studio
+## Access task data (images, audio, texts) outside of Label Studio
+
+Machine Learning backend uses data from tasks for predictions, and you need to download them on Machine Learning backend side. Label Studio provides tools for downloading of these resources, and they are located in label-studio-tools Python package. If you are using official Label Studio Machine Learning backend, label-studio-tools package is installed automatically with other requirements.
 
 ### Accessing data from Label Studio box
 
 There are several ways of storing tasks data in Label Studio:
-- Cloud storages 
+- Cloud storages
 - External web links 
 - Uploaded files
 - Local files directory
@@ -340,7 +342,10 @@ Provide `Hostname` and `access_token` for accessing external resource.
 
 ### Accessing data outside of Label Studio box
 
-You can use `label_studio_tools.core.utils.io.get_local_path` method to get data from outside machine for external links and cloud storages. Don't forget to provide credentials.
+You can use `label_studio_tools.core.utils.io.get_local_path` method to get data from outside machine for external links and cloud storages. 
+
+!!! attention "important"
+    Don't forget to provide credentials.
 
 You can get data with `label_studio_tools.core.utils.io.get_local_path` in case if you mount same disk to your machine. If you mount same disk to external box 
 
@@ -352,12 +357,16 @@ curl -X GET http://localhost:8080/api/projects/ -H 'Authorization: Token {YOUR_T
 
 ### Frequently asked questions 
 
-#### I made a request and data was not provided, but a 404 or 403 error code was returned. 
+#### Question #1: I have made a request and received the following API responses: 
+- No data was provided.
+- 404 or 403 error code was returned. 
 
+**Answer:**
 First check the network access to your Label Studio instance when you send API requests. You can execute test curl request with sample data. 
 
-#### I tried to access files and received a `FileNotFound` error.
+#### Question #2: I tried to access files and received a `FileNotFound` error.
 
+**Answer:**
 1. Check that you have mounted the same disk as your Label Studio instance. Then check your files' existence in Label Studio instance first. 
 
 2. Check `LOCAL_FILES_DOCUMENT_ROOT` environment variable in your Label Studio instance and add it to your accessing data script.
