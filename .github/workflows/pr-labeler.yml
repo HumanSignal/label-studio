@@ -22,7 +22,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: "Set PR's label based on title"
-        uses: release-drafter/release-drafter@v5.20.1
+        uses: release-drafter/release-drafter@v5.21.0
         with:
           disable-releaser: true
           config-name: autolabeler.yml
