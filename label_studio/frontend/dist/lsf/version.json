@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2992: Fix comments section stretching (#845)\n\nFix comments section stretched",
-  "commit": "d79683dcd9a38f8990605ae445d60f0e6a1719e3",
+  "message": "fix: DEV-3429: Textarea placement in the config prevents OT (#855)\n\n* Fix issue when textarea placement prevents OT\r\n\r\n* Remove leftover console.log\r\n\r\nCo-authored-by: bmartel <brandonmartel@gmail.com>\r\n\r\nCo-authored-by: bmartel <brandonmartel@gmail.com>",
+  "commit": "98ba4f0c5950969c958a5133efef85d3e4940a2a",
   "branch": "master",
-  "date": "2022-09-16T14:36:52Z"
+  "date": "2022-09-19T12:50:05Z"
 }
