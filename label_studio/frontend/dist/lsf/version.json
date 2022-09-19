@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3428: Change to 1 item per page changing page by region",
-  "commit": "2b6e9be06a8098d29845116815755bba3386abe2",
+  "commit": "6929206736b463144bb305a0b3200136e7f50eda",
   "branch": "fb-dev-3428",
-  "date": "2022/09/19 09:42:57"
+  "date": "2022/09/19 09:45:48"
 }
