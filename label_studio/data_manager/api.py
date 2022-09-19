@@ -224,6 +224,7 @@ class TaskListAPI(generics.ListCreateAPIView):
                         Task.objects.filter(id__in=ids),
                         fields_for_evaluation=fields_for_evaluation,
                         all_fields=all_fields,
+                        request=request
                     )
                 )
             )
@@ -242,7 +243,7 @@ class TaskListAPI(generics.ListCreateAPIView):
         if project.evaluate_predictions_automatically:
             evaluate_predictions(queryset.filter(predictions__isnull=True))
         queryset = Task.prepared.annotate_queryset(
-            queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields
+            queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields, request=request
         )
         serializer = self.task_serializer_class(queryset, many=True, context=context)
         return Response(serializer.data)
