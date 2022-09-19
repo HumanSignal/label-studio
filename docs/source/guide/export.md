@@ -324,23 +324,22 @@ Review the full list of JSON properties in the [API documentation](api.html).
 
 Machine Learning backend uses data from tasks for predictions, and you need to download them on Machine Learning backend side. Label Studio provides tools for downloading of these resources, and they are located in label-studio-tools Python package. If you are using official Label Studio Machine Learning backend, label-studio-tools package is installed automatically with other requirements.
 
-### Accessing data from Label Studio box
+### Accessing task data from Label Studio instance
 
-There are several ways of storing tasks data in Label Studio:
-- Cloud storages
+There are several ways of storing tasks resources (images, audio, texts, etc) in Label Studio:
+- Cloud storages 
 - External web links 
 - Uploaded files
 - Local files directory
 
-
-Label Studio stores local files in Project level structure. Each project has it's own folder for files.
+Label Studio stores uploaded files in Project level structure. Each project has it's own folder for files.
 
 You can use `label_studio_tools.core.utils.io.get_local_path` to get task data - it will transform path or URL from task data to local path.
 In case of local path it will return full local path and download resource in case of using `download_resources` parameter.
 
 Provide `Hostname` and `access_token` for accessing external resource.
 
-### Accessing data outside of Label Studio box
+### Accessing task data outside of Label Studio instance
 
 You can use `label_studio_tools.core.utils.io.get_local_path` method to get data from outside machine for external links and cloud storages. 
 
