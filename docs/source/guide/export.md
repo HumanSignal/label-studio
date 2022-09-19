@@ -320,7 +320,7 @@ Review the full list of JSON properties in the [API documentation](api.html).
 
 <!-- md annotation_ids.md -->
 
-## Access task data (images, audio, texts) outside of Label Studio
+## Access task data (images, audio, texts) outside of Label Studio for ML backends
 
 Machine Learning backend uses data from tasks for predictions, and you need to download them on Machine Learning backend side. Label Studio provides tools for downloading of these resources, and they are located in label-studio-tools Python package. If you are using official Label Studio Machine Learning backend, label-studio-tools package is installed automatically with other requirements.
 
