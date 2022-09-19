@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3074: Add line between draft and annotation on annotation list (#857)\n\n* fix: DEV-3074: add line between draft and annotation on annotation list\r\n\r\n* Update src/components/TopBar/Annotations.js\r\n\r\n* add line between create annotation and drafts\r\n\r\nCo-authored-by: yyassi-heartex <104568407+yyassi-heartex@users.noreply.github.com>",
-  "commit": "cea560f9e19b3567b8381f168a53ab6ec9ed3ad2",
+  "message": "fix: DEV-3428: Change to 1 item per page changing page by region (#858)\n\n* fix: DEV-3428: Change to 1 item per page when you change page using region\r\n\r\n* revert changes\r\n\r\n* add paginated property on Pagination\r\n\r\n* change the parameter to paginated to pageSizeSelectable",
+  "commit": "fd6f305cfbef58194aed1dfba89950953175c589",
   "branch": "master",
-  "date": "2022-09-19T13:52:41Z"
+  "date": "2022-09-19T14:17:29Z"
 }
