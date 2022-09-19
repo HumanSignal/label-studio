@@ -55,7 +55,7 @@ export const ProjectsPage = () => {
 
     const data = await api.callApi("projects", {
       params: requestParams,
-      ...(isFF(FF_DEV_2575) ? {
+      ...!(isFF(FF_DEV_2575) ? {
         signal: abortController.controller.current.signal,
         errorFilter: (e) => e.error.includes('aborted'), 
       } : null),
