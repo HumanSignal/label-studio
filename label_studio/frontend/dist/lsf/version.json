@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3429: Textarea placement in the config prevents OT (#855)\n\n* Fix issue when textarea placement prevents OT\r\n\r\n* Remove leftover console.log\r\n\r\nCo-authored-by: bmartel <brandonmartel@gmail.com>\r\n\r\nCo-authored-by: bmartel <brandonmartel@gmail.com>",
-  "commit": "98ba4f0c5950969c958a5133efef85d3e4940a2a",
+  "message": "fix: DEV-3074: Add line between draft and annotation on annotation list (#857)\n\n* fix: DEV-3074: add line between draft and annotation on annotation list\r\n\r\n* Update src/components/TopBar/Annotations.js\r\n\r\n* add line between create annotation and drafts\r\n\r\nCo-authored-by: yyassi-heartex <104568407+yyassi-heartex@users.noreply.github.com>",
+  "commit": "cea560f9e19b3567b8381f168a53ab6ec9ed3ad2",
   "branch": "master",
-  "date": "2022-09-19T12:50:05Z"
+  "date": "2022-09-19T13:52:41Z"
 }
