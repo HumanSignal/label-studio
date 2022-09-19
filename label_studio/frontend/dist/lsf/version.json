@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3428: Change to 1 item per page changing page by region",
+  "message": "fix: DEV-3428: Change to 1 item per page changing page by region (#858)\n\n* fix: DEV-3428: Change to 1 item per page when you change page using region\r\n\r\n* revert changes\r\n\r\n* add paginated property on Pagination\r\n\r\n* change the parameter to paginated to pageSizeSelectable",
   "commit": "fd6f305cfbef58194aed1dfba89950953175c589",
   "branch": "master",
-  "date": "2022/09/19 11:17:29"
+  "date": "2022-09-19T14:17:29Z"
 }
