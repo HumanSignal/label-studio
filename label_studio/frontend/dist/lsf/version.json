@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3429: Textarea placement in the config prevents OT",
-  "commit": "17fe54741fc9c58f1f3b3d288cb686fb5611ab66",
-  "branch": "fb-dev-3429/video-textarea",
-  "date": "2022/09/16 15:08:41"
+  "commit": "98ba4f0c5950969c958a5133efef85d3e4940a2a",
+  "branch": "master",
+  "date": "2022/09/19 13:50:05"
 }
