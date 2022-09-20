@@ -1,6 +1,6 @@
 {
   "message": "feat: DEV-3283: New comment behaviour for Submit/Update/Skip/Accept/Reject buttons",
-  "commit": "8b60d71baa0fdd0fc64c55af7f188aa3e9d730d6",
+  "commit": "533e77b72f7e8a501cb73577f53f19fdde9d7659",
   "branch": "fb-dev-3283",
-  "date": "2022/09/20 12:28:56"
+  "date": "2022/09/20 12:35:26"
 }
