@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3436: Add comment icons in annotations dropdown",
-  "commit": "521f1f312fb2b70eb4cca1d16436699b410a059f",
+  "commit": "0ca1cf1201846a9d8aaf85eaa76ed286e044e91e",
   "branch": "fb-dev-3436/add-comment-icon",
-  "date": "2022/09/20 11:25:25"
+  "date": "2022/09/20 12:32:42"
 }
