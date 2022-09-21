@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-1752: Support links to drafts and annotations (#101)\n\n* Support links in Label Stream\r\n\r\n* Introduce FF\r\n\r\n* Fix FF name\r\n\r\n* Fix label stream loading when preload is empty",
-  "commit": "72105e4385620cf4a59b5bd3e68adca19287bf8b",
-  "branch": "master",
-  "date": "2022-09-02T18:15:25Z"
+  "message": "fix: DEV-3436: Add comment icons in annotations dropdown",
+  "commit": "20e3a8af18e0ee67591fc8bcef8e45e58ceed69c",
+  "branch": "fb-dev-3436/add-comment-icon",
+  "date": "2022/09/21 14:04:03"
 }
