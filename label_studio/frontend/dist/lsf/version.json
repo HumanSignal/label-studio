@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2208: Don't add  to textarea result",
-  "commit": "c952b56cb11529a06b5c6555e03fa27e4b1a786e",
-  "branch": "fb-dev-2208/video-textarea",
-  "date": "2022/09/20 18:59:23"
+  "commit": "a6ffdf0c07258f56a55b32a7636a9e51d47e3149",
+  "branch": "master",
+  "date": "2022/09/21 17:47:23"
 }
