@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2208: Don't add  to textarea result",
-  "commit": "a6ffdf0c07258f56a55b32a7636a9e51d47e3149",
-  "branch": "master",
-  "date": "2022/09/21 17:47:23"
+  "message": "fix: DEV-3350: Video object boundaries",
+  "commit": "70bc307ffae504ebaf4058b1e74c1baab5c9db92",
+  "branch": "fb-dev-3350/video-boundaries",
+  "date": "2022/09/21 19:13:52"
 }
