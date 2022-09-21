@@ -26,6 +26,9 @@ _api_urlpatterns = [
     # Get next task
     path('<int:pk>/next/', api.ProjectNextTaskAPI.as_view(), name='project-next'),
 
+    # Get previous task
+    path('<int:pk>/previous-task/', api.ProjectPreviousTaskAPI.as_view(), name='project-previous'),
+
     # Validate label config in general
     path('validate/', api.LabelConfigValidateAPI.as_view(), name='label-config-validate'),
 

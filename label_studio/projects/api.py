@@ -27,7 +27,8 @@ from projects.models import (
     Project, ProjectSummary, ProjectManager
 )
 from projects.serializers import (
-    ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer, GetFieldsSerializer
+    ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer, GetFieldsSerializer,
+    ProjectPreviousTaskQuerySerializer
 )
 from projects.functions.next_task import get_next_task
 from tasks.models import Task
@@ -278,6 +279,58 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
         response['queue'] = queue_info
         return Response(response)
+
+
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Projects'],
+    operation_summary='Get previous task and annotation or draft',
+    operation_description="""
+    Get the previous task that was labeled related to specified one
+    """,
+    ))
+class ProjectPreviousTaskAPI(generics.RetrieveAPIView):
+
+    permission_required = all_permissions.tasks_view
+    queryset = Project.objects.all()
+    swagger_schema = None  # this endpoint doesn't need to be in swagger API docs
+
+    def get(self, request, *args, **kwargs):
+        project = self.get_object()
+        query = ProjectPreviousTaskQuerySerializer(data=request.GET)
+        query.is_valid(raise_exception=True)
+        current_task, current_annotation, current_draft = \
+            query.data['task'], query.data['annotation'], query.data['draft']
+
+        annotations = request.user.annotations.filter(task__project=project)
+        annotations = annotations.values('task', 'id', 'created_at')
+        for annotation in annotations:
+            annotation['annotation'] = annotation.pop('id')
+
+        drafts = request.user.drafts.filter(task__project=project)
+        drafts = drafts.values('task', 'id', 'created_at')
+        for draft in drafts:
+            draft['draft'] = draft.pop('id')
+
+        mix = list(annotations) + list(drafts)
+        mix = sorted(mix, key=lambda x: x['created_at'])
+        
+        # find current task
+        prev_item = None
+        next_item = None
+        found = False
+        for i, item in enumerate(mix):
+            next_item = mix[i + 1] if i + 1 <= len(mix)-1 else None
+            prev_item = mix[i - 1] if i - 1 >= 0 else None
+
+            if item['task'] == current_task and \
+                    (item.get('annotation', -1) == current_annotation or item.get('draft', -1) == current_draft):
+                found = True
+                break
+
+        if not found:
+            prev_item = next_item = None
+
+        return Response([{'previous': prev_item, 'next': next_item}])
 
 
 @method_decorator(name='post', decorator=swagger_auto_schema(

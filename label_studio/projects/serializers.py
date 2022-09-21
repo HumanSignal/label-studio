@@ -127,3 +127,9 @@ class GetFieldsSerializer(serializers.Serializer):
     def validate_filter(self, value):
         if value in ['all', 'pinned_only', 'exclude_pinned']:
             return value
+
+
+class ProjectPreviousTaskQuerySerializer(serializers.Serializer):
+    task = serializers.IntegerField(required=True)
+    annotation = serializers.IntegerField(default=None)
+    draft = serializers.IntegerField(default=None)
