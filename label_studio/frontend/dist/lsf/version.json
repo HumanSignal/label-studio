@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3428: Change to 1 item per page changing page by region (#858)\n\n* fix: DEV-3428: Change to 1 item per page when you change page using region\r\n\r\n* revert changes\r\n\r\n* add paginated property on Pagination\r\n\r\n* change the parameter to paginated to pageSizeSelectable",
-  "commit": "fd6f305cfbef58194aed1dfba89950953175c589",
+  "message": "fix: DEV-2208: Don't add  to textarea result",
+  "commit": "a6ffdf0c07258f56a55b32a7636a9e51d47e3149",
   "branch": "master",
-  "date": "2022-09-19T14:17:29Z"
+  "date": "2022/09/21 17:47:23"
 }
