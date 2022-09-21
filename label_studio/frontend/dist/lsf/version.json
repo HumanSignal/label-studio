@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2208: Don't add  to textarea result",
-  "commit": "a6ffdf0c07258f56a55b32a7636a9e51d47e3149",
-  "branch": "master",
-  "date": "2022/09/21 17:47:23"
+  "message": "fix: DEV-2028: Keep the video sync times adjusted for floating point errors in audio",
+  "commit": "226df245f524c5ea634b067dc9b77c895d56542a",
+  "branch": "fb-dev-2028",
+  "date": "2022/09/21 15:24:59"
 }
