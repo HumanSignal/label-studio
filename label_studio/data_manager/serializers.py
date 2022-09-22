@@ -265,6 +265,9 @@ class DataManagerTaskSerializer(TaskSerializer):
     def get_predictions_model_versions(self, task):
         return self._pretty_results(task, 'predictions_model_versions', unique=True)
 
+    def get_drafts_serializer(self):
+        return AnnotationDraftSerializer
+
     def get_drafts_queryset(self, user, drafts):
         """ Get all user's draft
         """
@@ -281,7 +284,8 @@ class DataManagerTaskSerializer(TaskSerializer):
             user = self.context['request'].user
             drafts = self.get_drafts_queryset(user, drafts)
 
-        return AnnotationDraftSerializer(drafts, many=True, read_only=True, default=True, context=self.context).data
+        serializer_class = self.get_drafts_serializer()
+        return serializer_class(drafts, many=True, read_only=True, default=True, context=self.context).data
 
 
 class SelectedItemsSerializer(serializers.Serializer):

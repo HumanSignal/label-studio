@@ -150,6 +150,13 @@ jobs:
           username: heartexlabs
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Login to RedHat Registry
+        uses: docker/login-action@v2.0.0
+        with:
+          registry: scan.connect.redhat.com
+          username: unused
+          password: ${{ secrets.REDHAT_MARKETPLACE_LS_PASSWORD }}
+
       - name: Prepare Release Dockerfile
         id: release_dockerfile
         shell: bash

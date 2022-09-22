@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-3100: Interface "postpone" for button",
-  "commit": "f8897ff04e0659c5a9d7f0f2c43e9de213433cfa",
+  "message": "fix: DEV-2208: Don't add  to textarea result",
+  "commit": "a6ffdf0c07258f56a55b32a7636a9e51d47e3149",
   "branch": "master",
-  "date": "2022/09/22 02:12:48"
+  "date": "2022/09/21 17:47:23"
 }
