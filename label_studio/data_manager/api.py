@@ -196,7 +196,7 @@ class TaskListAPI(generics.ListCreateAPIView):
         elif view_pk:
             view = get_object_with_check_and_log(request, View, pk=view_pk)
             project = view.project
-            self.check_object_permissions(request, qproject)
+            self.check_object_permissions(request, project)
         else:
             return Response({'detail': 'Neither project nor view id specified'}, status=404)
         # get prepare params (from view or from payload directly)
