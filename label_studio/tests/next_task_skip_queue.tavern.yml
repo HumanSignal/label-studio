@@ -251,6 +251,7 @@ stages:
     save:
       json:
         first_skipped_annotation_pk: id
+        first_skipped_annotation_created_at: created_at
     status_code: 201
 
 - name: get_next_task
@@ -280,7 +281,23 @@ stages:
     save:
       json:
         annotation_pk: id
+        annotation_created_at: created_at
     status_code: 201
+
+
+# check previous task api
+- name: get_previous_task
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/previous-task/?task={second_task_pk}&annotation={annotation_pk}'
+  response:
+    status_code: 200
+    json:
+      - previous:
+          task: !int "{first_task_pk}"
+          annotation: !int "{first_skipped_annotation_pk}"
+          created_at: "{first_skipped_annotation_created_at}"
+        next: null
 
 - *get_next_task_queue_is_empty
 - *check_first_task_is_labeled
