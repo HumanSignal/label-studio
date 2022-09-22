@@ -606,15 +606,18 @@ class PreparedTaskManager(models.Manager):
 
         return queryset
 
-    def get_queryset(self, fields_for_evaluation=None, prepare_params=None, all_fields=False):
+    def get_queryset(self, fields_for_evaluation=None, prepare_params=None, all_fields=False, request=None):
         """
         :param fields_for_evaluation: list of annotated fields in task
         :param prepare_params: filters, ordering, selected items
         :param all_fields: evaluate all fields for task
+        :param request: request for user extraction
         :return: task queryset with annotated fields
         """
         queryset = self.only_filtered(prepare_params=prepare_params)
-        return self.annotate_queryset(queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields)
+        return self.annotate_queryset(
+            queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields, request=request
+        )
 
     def only_filtered(self, prepare_params=None):
         request = prepare_params.request
