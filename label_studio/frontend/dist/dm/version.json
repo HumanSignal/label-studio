@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3436: Add comment icons in annotations dropdown (#105)\n\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "118b7b784df6bbc90c3f5e1d2aec9b019b351976",
-  "branch": "master",
-  "date": "2022-09-22T10:35:33Z"
+  "message": "feat: DEV-3373: Enable video preview",
+  "commit": "190397a050f8fbc05ae753bd80e8bebf2d9514f6",
+  "branch": "fb-dev-3373/video-preview",
+  "date": "2022/09/22 17:01:40"
 }
