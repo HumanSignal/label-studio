@@ -182,15 +182,28 @@ def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_fla
     return next_task, use_task_lock, queue_info
 
 
-def skipped_queue(next_task, prepared_tasks, project, user):
+def skipped_queue(next_task, prepared_tasks, project, user, queue_info):
     if not next_task and project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
         q = Q(task__project=project, task__isnull=False, was_cancelled=True)
         skipped_tasks = user.annotations.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
         if skipped_tasks.exists():
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(skipped_tasks)])
             next_task = prepared_tasks.filter(pk__in=skipped_tasks).order_by(preserved_order).first()
+            queue_info = 'Skipped queue'
 
-    return next_task
+    return next_task, queue_info
+
+
+def postponed_queue(next_task, prepared_tasks, project, user, queue_info):
+    if not next_task:
+        q = Q(task__project=project, task__isnull=False, was_postponed=True)
+        postponed_tasks = user.drafts.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
+        if postponed_tasks.exists():
+            preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(postponed_tasks)])
+            next_task = prepared_tasks.filter(pk__in=postponed_tasks).order_by(preserved_order).first()
+            queue_info = f'Postponed queue'
+
+    return next_task, queue_info
 
 
 def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
@@ -237,7 +250,9 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
             # set lock for the task with TTL 3x time more then current average lead time (or 1 hour by default)
             next_task.set_lock(user)
 
-        next_task = skipped_queue(next_task, prepared_tasks, project, user)
+        next_task, queue_info = postponed_queue(next_task, prepared_tasks, project, user, queue_info)
+
+        next_task, queue_info = skipped_queue(next_task, prepared_tasks, project, user, queue_info)
 
         logger.debug(f'get_next_task finished. next_task: {next_task}, queue_info: {queue_info}')
         return next_task, queue_info
