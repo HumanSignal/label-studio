@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-1752: Support links to drafts and annotations (#101)\n\n* Support links in Label Stream\r\n\r\n* Introduce FF\r\n\r\n* Fix FF name\r\n\r\n* Fix label stream loading when preload is empty",
-  "commit": "72105e4385620cf4a59b5bd3e68adca19287bf8b",
-  "branch": "master",
-  "date": "2022-09-02T18:15:25Z"
+  "message": "fix: DEV-3346: Task history is stored on the backend for the label steam",
+  "commit": "55fdbb97e360d173d774d317b78b4ab3c4033bca",
+  "branch": "fb-dev-3346",
+  "date": "2022/09/23 20:49:19"
 }
