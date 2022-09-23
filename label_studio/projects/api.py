@@ -319,8 +319,8 @@ class ProjectPreviousTaskAPI(generics.RetrieveAPIView):
         next_item = None
         found = False
 
-        # only current task is sent
-        if current_annotation is None and current_draft is None:
+        # nothing sent
+        if current_task is None or (current_annotation is None and current_draft is None):
             prev_item = mix[-1] if len(mix) > 0 else None
             next_item = None
 

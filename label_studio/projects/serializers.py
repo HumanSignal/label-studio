@@ -130,6 +130,6 @@ class GetFieldsSerializer(serializers.Serializer):
 
 
 class ProjectPreviousTaskQuerySerializer(serializers.Serializer):
-    task = serializers.IntegerField(required=True)
+    task = serializers.IntegerField(default=None)
     annotation = serializers.IntegerField(default=None)
     draft = serializers.IntegerField(default=None)
