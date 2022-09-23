@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3494: Filters not working for Annotators in DM",
-  "commit": "1e185ced4e479024b78bfdaa1a5d16bd21871a39",
+  "commit": "acb623bf9fbe6b1c55d71467aef65a1faa66d252",
   "branch": "fb-dev-3494",
-  "date": "2022/09/22 20:06:51"
+  "date": "2022/09/22 20:44:38"
 }
