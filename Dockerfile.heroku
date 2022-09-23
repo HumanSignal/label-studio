@@ -1,4 +1,4 @@
-FROM heartexlabs/label-studio:latest
+FROM heartexlabs/label-studio:1.6.0rc2b496a5926dfb0365834407710baa73a93e5d3d2
 
 ENV LABEL_STUDIO_ONE_CLICK_DEPLOY=1 \
     STORAGE_PERSISTENCE=0
