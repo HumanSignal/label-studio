@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3436: Add comment icons in annotations dropdown (#105)\n\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "118b7b784df6bbc90c3f5e1d2aec9b019b351976",
-  "branch": "master",
-  "date": "2022-09-22T10:35:33Z"
+  "message": "fix: DEV-3494: Filters not working for Annotators in DM",
+  "commit": "1e185ced4e479024b78bfdaa1a5d16bd21871a39",
+  "branch": "fb-dev-3494",
+  "date": "2022/09/22 20:06:51"
 }
