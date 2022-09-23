@@ -318,17 +318,25 @@ class ProjectPreviousTaskAPI(generics.RetrieveAPIView):
         prev_item = None
         next_item = None
         found = False
-        for i, item in enumerate(mix):
-            next_item = mix[i + 1] if i + 1 <= len(mix)-1 else None
-            prev_item = mix[i - 1] if i - 1 >= 0 else None
 
-            if item['task'] == current_task and \
-                    (item.get('annotation', -1) == current_annotation or item.get('draft', -1) == current_draft):
-                found = True
-                break
+        # only current task is sent
+        if current_annotation is None and current_draft is None:
+            prev_item = mix[-1] if len(mix) > 0 else None
+            next_item = None
 
-        if not found:
-            prev_item = next_item = None
+        # task + annotation or draft are sent
+        else:
+            for i, item in enumerate(mix):
+                next_item = mix[i + 1] if i + 1 <= len(mix)-1 else None
+                prev_item = mix[i - 1] if i - 1 >= 0 else None
+
+                if item['task'] == current_task and \
+                        (item.get('annotation', -1) == current_annotation or item.get('draft', -1) == current_draft):
+                    found = True
+                    break
+
+            if not found:
+                prev_item = next_item = None
 
         return Response([{'previous': prev_item, 'next': next_item}])
 
