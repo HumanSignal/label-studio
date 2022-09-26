@@ -80,19 +80,6 @@ class ContextLog(object):
     def _get_timestamp_now(self):
         return calendar.timegm(datetime.now().utctimetuple())
 
-    def _prepare_json(self, payload, request):
-        j = payload['json']
-        view_name = payload['view_name']
-        if view_name in (
-            'tasks:api:task-annotations',
-            'tasks:api-annotations:annotation-detail',
-            'tasks:api-drafts:draft-detail'
-        ):
-            types = [r.get('type') for r in j.get('result', [])]
-            payload['json'] = {'result': types, 'lead_time': j.get('lead_time')}
-        if not payload['json']:
-            payload['json'] = None
-
     def _get_response_content(self, response):
         try:
             return json.loads(response.content)
@@ -188,47 +175,6 @@ class ContextLog(object):
             log_fields = log_payloads[payload_key].get(payload['method'])
             if log_fields is not None:
                 payload[payload_key] = self._get_fields(view_name, payload[payload_key], log_fields)
-
-    def _prepare_response(self, payload):
-        view_name = payload['view_name']
-        response = payload['response']
-        include_fields = self._log_payloads.get(view_name, {}).get('log_response')
-        if isinstance(include_fields, list):
-            payload['response'] = self._get_fields(view_name, response, include_fields)
-        elif isinstance(include_fields, bool) and not include_fields:
-            payload['response'] = None
-
-
-        # if payload['view_name'] not in (
-        #     'projects:api:project-summary',
-        #     'data_import:api-projects:project-file-upload-list'
-        #
-        # ):
-        #     payload['response'] = None
-        # view_name = payload['view_name']
-        # if view_name not in (
-        #     ''
-        # ):
-        #     payload['response'] = None
-        #     return
-        #
-        # if view_name in (
-        #     'data_export:api-projects:project-export',
-        #     'data_manager:api:view-tasks',
-        #     'tasks:api:task-list',
-        #     'data_manager:data_manager.api.ProjectActionsAPI',
-        #     'data_manager:data_manager.api.TaskAPI',
-        #     'projects:api-templates:template-list',
-        #     'data_import:api-projects:project-file-upload-list',
-        #     'tasks:api:task-annotations',
-        #     'tasks:api-annotations:annotation-detail',
-        #     'data_manager:data_manager.api.ProjectColumnsAPI',
-        #     'data_manager:data_manager.api.ProjectStateAPI'
-        # ) and payload['status_code'] in (200, 201):
-        #     payload['response'] = None
-        # if view_name == 'user-list':
-        #     if isinstance(payload.get('response'), list):
-        #         payload['response'] = {'count': len(payload['response'])}
 
     def _exclude_endpoint(self, request):
         if request.resolver_match and request.resolver_match.view_name:
