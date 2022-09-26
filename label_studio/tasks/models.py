@@ -221,7 +221,7 @@ class Task(TaskMixin, models.Model):
                     # permission check: resolve uploaded files to the project only
                     file_upload = FileUpload.objects.filter(project=project, file=task_data[field]).first()
                     if file_upload is not None:
-                        task_data[field] = settings.HOSTNAME + '/storage-data/uploaded/?filepath=' + file_upload.filepath
+                        task_data[field] = file_upload.url
                     # it's very rare case, e.g. user tried to reimport exported file from another project
                     # or user wrote his django storage path manually
                     else:
