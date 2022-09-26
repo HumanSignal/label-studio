@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2211: Retain history for AudioNext addRegion so init step of existing regions operates correctly (#871)",
-  "commit": "b441ee7bec9945a7d4b6d55b11f81102be3b6304",
+  "message": "fix: DEV-3502: attempting to scroll to field that doesnt exist",
+  "commit": "1d290382da7f5b9604fe39dcc5b5eb862386917c",
   "branch": "master",
-  "date": "2022-09-26T13:36:29Z"
+  "date": "2022/09/26 17:10:35"
 }
