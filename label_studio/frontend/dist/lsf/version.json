@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2028: Keep the video sync times adjusted for floating point errors in audio",
-  "commit": "7c7a36e63bb8a3b4f5a0c99b51aaec439bf7f329",
+  "commit": "dd8b616b73af0bd372bec01ebb5842de10b2999a",
   "branch": "fb-dev-2028",
-  "date": "2022/09/26 09:27:44"
+  "date": "2022/09/26 10:33:38"
 }
