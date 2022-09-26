@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3436: Add comment icons in annotations dropdown (#861)\n\n* fix: DEV-3436: Add comment icons in annotations dropdown\r\n\r\n* syntax fix\r\n\r\n* remove annotationList separate to a line\r\n\r\n* revert commit\r\n\r\n* update comment icon on change\r\n\r\n* change useffect parameters\r\n\r\n* change the what that the comments and unresolvedcomments is updated\r\n\r\n* remove consoles",
-  "commit": "6a0163656c2ff5c7436537c353a3bf4da71aaae8",
+  "message": "fix: DEV-1943: After awhile, shapes disappear",
+  "commit": "6cdfe35450317c3b50a9d2ca991883e070d49c13",
   "branch": "master",
-  "date": "2022-09-22T10:35:25Z"
+  "date": "2022/09/26 08:10:35"
 }
