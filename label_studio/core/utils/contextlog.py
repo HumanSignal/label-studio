@@ -11,9 +11,6 @@ import json
 import platform
 
 from datetime import datetime
-from django.conf import settings
-from collections import Iterable
-
 from uuid import uuid4
 from .common import get_app_version, get_client_ip
 from .params import get_bool_env
