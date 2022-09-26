@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2211: Retain history for AudioNext addRegion so init step of existing regions operates correctly (#871)",
-  "commit": "b441ee7bec9945a7d4b6d55b11f81102be3b6304",
-  "branch": "master",
-  "date": "2022-09-26T13:36:29Z"
+  "message": "fix: DEV-3504: Retain history for Audio addRegion so init step of existing regions operates correctly",
+  "commit": "4320d07607b57e4025339305fc52abc43d5b9b38",
+  "branch": "fb-dev-3504",
+  "date": "2022/09/26 15:00:15"
 }
