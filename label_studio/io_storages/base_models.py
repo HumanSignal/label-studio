@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django_rq import job
 
+from core.feature_flags import flag_set
 from tasks.models import Task, Annotation
 from tasks.serializers import PredictionSerializer, AnnotationSerializer
 from data_export.serializers import ExportDataSerializer
@@ -17,7 +18,7 @@ from data_export.serializers import ExportDataSerializer
 from core.redis import redis_connected
 from core.utils.common import get_bool_env, load_func
 from io_storages.utils import get_uri_via_regex
-
+from django.contrib.auth.models import AnonymousUser
 
 logger = logging.getLogger(__name__)
 
@@ -137,21 +138,23 @@ class ImportStorage(Storage):
                 logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
                 tasks_created += 1
 
+                raise_exception = not flag_set('ff_fix_back_dev_3342_storage_scan_with_invalid_annotations', user=AnonymousUser())
+
                 # add predictions
                 logger.debug(f'Create {len(predictions)} predictions for task={task}')
                 for prediction in predictions:
                     prediction['task'] = task.id
                 prediction_ser = PredictionSerializer(data=predictions, many=True)
-                prediction_ser.is_valid(raise_exception=True)
-                prediction_ser.save()
+                if prediction_ser.is_valid(raise_exception=raise_exception):
+                    prediction_ser.save()
 
                 # add annotations
                 logger.debug(f'Create {len(annotations)} annotations for task={task}')
                 for annotation in annotations:
                     annotation['task'] = task.id
                 annotation_ser = AnnotationSerializer(data=annotations, many=True)
-                annotation_ser.is_valid(raise_exception=True)
-                annotation_ser.save()
+                if annotation_ser.is_valid(raise_exception=raise_exception):
+                    annotation_ser.save()
 
                 # FIXME: add_annotation_history / post_process_annotations should be here
 
