@@ -303,6 +303,7 @@ def get_prepare_params(request, project):
         if view.project.pk != project.pk:
             raise DataManagerException('Project and View mismatch')
         prepare_params = view.get_prepare_tasks_params(add_selected_items=True)
+        prepare_params.request = request
 
     # use filters and selected items from request if it's specified
     else:
