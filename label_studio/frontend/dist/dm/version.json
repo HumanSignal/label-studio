@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3436: Add comment icons in annotations dropdown (#105)\n\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "118b7b784df6bbc90c3f5e1d2aec9b019b351976",
+  "message": "fix: DEV-3494: Filters not working for Annotators in DM",
+  "commit": "1d5338074307eb56917a271e406af43e87f3cf38",
   "branch": "master",
-  "date": "2022-09-22T10:35:33Z"
+  "date": "2022/09/23 04:37:22"
 }
