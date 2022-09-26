@@ -16,6 +16,7 @@ Label and annotate your data with the open source data labeling tool, Label Stud
 
 You can also [collaborate with other annotators](#Label-with-collaborators) to improve the quality of your labeled data. 
 
+
 ## Start labeling
 
 Some labeling tasks can be complicated to perform, for example, labeling that includes text, image, and audio data objects as part of one dataset and labeling task, or creating relations between annotations on a labeling task. This section includes guidance on how to perform more complex labeling tasks, such as labeling with relations, overlapping regions, selected tasks, or changing labels. 
@@ -46,7 +47,6 @@ When you label with bounding boxes and other image segmentation tasks, or when y
 7. Click **Submit** to submit the completed annotation and move on to the next task.
 
 ### Select multiple regions
-
 You can select multiple regions while labeling to make changes to them together. 
 
 1. After creating multiple regions, press `ctrl` and click each region that you want to select. You can select regions on the object that you're labeling or in the **Regions** sidebar. Select a range of regions in the **Regions** sidebar by clicking the first region in the list that you want to select and holding `Shift` while you click the last region in the list that you want to select. 
@@ -79,7 +79,6 @@ After labeling a task, you can delete the annotation by clicking the trash can b
 You can also delete all annotations on a task from the project page. See [Delete tasks or annotations](manage_data.html#Delete_tasks_or_annotations).
 
 ### Add relations between annotations
-
 You can create relations between two results with both directions and labels. To add labels to directions, you must set up a labeling config with the relations tag. See more about [relations with labels](/tags/relations.html) in the Tags documentation.
 
 1. Select the region for the annotation that you want to relate to another annotation. If you're creating a direction-based relation, select the first one first. 
@@ -87,7 +86,7 @@ You can create relations between two results with both directions and labels. To
 3. Select the second region for the annotation to complete the relation.
 
 <br>
-<img src="../images/relation.png">
+<img src="../images/relation.png" class="gif-border">
 <i>Figure 1: Add relations between annotations </i>
 
 After you relate two annotation regions, you can modify the relation in the **Relations** section of the **Results** sidebar. 
@@ -95,8 +94,8 @@ After you relate two annotation regions, you can modify the relation in the **Re
 - To add labels to the direction arrow indicating the relation between two annotations, click the vertical ellipsis button next to the two related regions to add your predefined labels. You must have a [label configuration that includes relations](/tags/relations.html) to do this.
 
 ### Skipping a task
-
 When annotators skip a task, the task no longer appears in the labeling queue for that annotator. Other annotators still see the task in their labeling queue. 
+
 
 ## Label with collaborators
 
@@ -115,14 +114,17 @@ To label tasks multiple times while the minimum annotations required is set to o
 4. Click **Submit** to save your annotation.
 5. Click the next task in the data manager to open the quick labeling view for that task and repeat steps 2-4.
 
+
 ## Perform ML-assisted labeling with interactive preannotations
 
 If you have a machine learning backend set up to [get interactive preannotations](ml.html#Get-interactive-preannotations), you can choose whether to use those predictions while you label. 
 
 1. After you start labeling, you can enable **Auto-Annotation** to see and use the smart option to assign a label to draw a shape, mask, or assign a keypoint. After using the smart option to draw on an image, or labeling a text or HTML span, the ML backend returns predictions.  
-2. For image labeling, you can choose whether to **Auto accept annotation suggestions** after you enable auto-annotation. If you automatically accept annotation suggestions, regions show up automatically and are immediately created. If you don't automatically accept suggestions, the regions appear but you can reject or approve them manually, either individually or all at once. Predicted text regions are automatically accepted.
+2. For image labeling, you can choose whether to **Auto accept annotation suggestions** after you enable auto-annotation. If you automatically accept annotation suggestions, regions show up automatically and are immediately created. If you don't automatically accept suggestions, the regions appear, but you can reject or approve them manually, either individually or all at once. Predicted text regions are automatically accepted.
+
 
 ## Use keyboard shortcuts to label regions faster
+
 Use keyboard shortcuts, or hotkeys, to improve your labeling performance. When performing a labeling task, click the gear icon to see more details about hotkeys or to enable or disable hotkeys. 
 
 This table describes the hotkeys for a standard keyboard. For a Mac keyboard, use return instead of enter, delete instead of backspace, and option instead of alt.
@@ -135,7 +137,7 @@ This table describes the hotkeys for a standard keyboard. For a Mac keyboard, us
 | `escape` | Exit relation mode or unselect a selected region. |
 | `backspace` | Delete a selected region. | 
 | `alt` + `r` | Create a relation between regions, when a region is selected. | 
-| `alt` + `.` | Cycle through all regions in the order listed on the regions sidebar. |
+| `alt` + `.` | Cycle through all regions in the order listed on the regions' sidebar. |
 | `alt` + `h` | Hide a selected region. | 
 | `ctrl` + `d` OR `cmd` + `d` | Duplicate a selected region. |
 | `u` | Unselect a selected region. | 
@@ -147,7 +149,6 @@ This table describes the hotkeys for a standard keyboard. For a Mac keyboard, us
 Other annotation types have labeling-specific shortcuts, such as numbers to select specific labels for named entity recognition tasks. 
 
 ### Image-specific hotkeys
-
 When labeling image data types with the `Rectangle`, `BrushLabels`, `Ellipse`, `Polygon`, or `KeyPoints` tags, you can use specific hotkeys to take image labeling-specific actions.
 
 | Key | Description |
@@ -165,7 +166,6 @@ When labeling image data types with the `Rectangle`, `BrushLabels`, `Ellipse`, `
 | `]` | When the brush or eraser option is selected, increase the size of the brush or eraser. |
 
 ### Audio-specific hotkeys
-
 When labeling audio data types with the `Audio` or `AudioPlus` tags, you can use specific hotkeys to take audio-specific actions.
 
 | Key | Description |
@@ -173,7 +173,6 @@ When labeling audio data types with the `Audio` or `AudioPlus` tags, you can use
 | `ctrl` + `b` OR `cmd` + `b` | Rewind audio 1 second. |
 
 ### Time series-specific hotkeys
-
 When labeling timeseries data with the `TimeSeries` tag, you can use specific hotkeys to take actions on a selected region on the time series data.
 
 | Key | Description |
@@ -188,7 +187,6 @@ When labeling timeseries data with the `TimeSeries` tag, you can use specific ho
 | `shift` + `alt` + `right arrow` | Decrease the region area by a larger amount on the right. |
 
 ### Video-specific hotkeys
-
 When labeling video data with the `Video` tag, you can use specific hotkeys to take video-specific actions.
 
 | Key | Description |
@@ -210,6 +208,7 @@ Refer to the full list of customizable hotkeys in the [`keymap.json` file of the
 
 You cannot use this environment variable to remove an existing or add a new keyboard shortcut. 
 
+
 ## Customize the labeling interface 
 
 Click the settings icon when labeling to configure the labeling interface to suit your labeling use case. 
@@ -217,18 +216,18 @@ Click the settings icon when labeling to configure the labeling interface to sui
 For example, keep a label selected after creating a region, display labels on bounding boxes, polygons and other regions while labeling, and show line numbers for text labeling.
 
 <center>
-  <img src='../images/lsf-settings.png'>
+  <img src='../images/lsf-settings.png' class="gif-border">
 </center>
 <i>Figure 2: Customize the labeling interface  </i>
 
 You can also modify the layout of the screen, hide or show predictions, annotations, or the results panel, and hide or show various controls and buttons.
+
 
 ## Advanced image labeling
 
 If you want to perform advanced image labeling, follow these examples and guidance for assistance. 
 
 ### Add multiple types of regions to image annotations
-
 You can add multiple types of regions to image annotations. You can add any of the following:
 - Rectangles
 - Ellipses
@@ -261,13 +260,11 @@ Create a custom template for your labeling interface using the following example
 This example makes rectangles, ellipses, polygons, keypoints, and brush masks available to the annotator, along with image classification choices of yes and no, and region labels of building and vehicle.
 
 ### Faster image labeling
-
 You can add a rectangle or an ellipse to your image with just two clicks, or double click to create a polygon, rectangle, or ellipse. 
 
 If you accidentally select a point on an image while creating a polygon, just double click to remove the erroneous point and continue creating the region. There must be at least three points on the polygon to be able to remove a point.
 
 ### Create regions without labels
-
 When you're annotating images, you can create regions without applying labels. 
 
 1. Create a region by double-clicking or clicking and dragging to create a bounding box, or click the points necessary to construct a polygon.
@@ -280,7 +277,6 @@ This can be helpful for two-step labeling, where you want one annotator to creat
 By default, regions without labels appear gray.
 
 ### Erase brush mask labels
-
 If you make a mistake when labeling with the brush mask, you can erase it. You must select a brush region in the sidebar before you can erase any part of it. 
 
 If you want to completely remove a region and start over, delete the region instead of erasing it. Erasing a region does not delete it. 
@@ -295,7 +291,7 @@ The **Outliner** is a replacement for the existing interface with a multiple-pan
 Outliner is the area where you can see all the details about annotation, regions, and labeling history. It is split into two panels, named **Outliner** and **Details**. Figure 3 shows the appearance of the **Outliner** panel on the left of the image and **Details** panel on the right of the image. 
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/outliner-details-panels-view.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/outliner-details-panels-view.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 3: View of Outliner and Details panels view </i>
  
 **Panel actions**
@@ -305,46 +301,46 @@ There are two panels which is the outliner for the regions list. These panels ca
 The **Outliner** and **Details** panels are collapsible and detachable, so you can arrange them the way you want. Figure 4 shows the **Collapse details** button which allows you to collapse the **Details** panel and use the remaining portion of the screen. 
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/collapse-details-button.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/collapse-details-button.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 4: Collapsed details button</i>
 
 Now, the **Details** panel is collapsed, and you can expand it by clicking the **Expand Details** icon.
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/details-collapsed-button-view.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/details-collapsed-button-view.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 5: Details panel in collapsed view</i>
 
 The details panel is displayed in expanded view to explore the feature. 
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/details-panel-expanded-view.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/details-panel-expanded-view.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 6: Details panel in expanded view</i>
 
 To collapse the **Outliner** panel, click on the **Collapse outliner** icon. 
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/collapse-outliner-button.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/collapse-outliner-button.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 7: Collapse outliner button</i>
 
 Now, the **Outliner** panel is collapsed, and you can expand it by clicking the **Expand Details** icon.
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/outliner-collapsed-view.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/outliner-collapsed-view.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 8: Outliner panel in collapsed view</i>
 
 The **Expand Details** icon expands the **Outliner** panel for further actions.
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/expand-outliner-button.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/expand-outliner-button.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 9: Outliner panel with expand outliner icon</i>
 
 The Outliner panel is displayed in expanded view to explore the feature. 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/outliner-expanded-view.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/outliner-expanded-view.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 10: Outliner panel in expanded view</i>
 
 These panels are detachable, so you can place them wherever you want on the screen, and you can resize them. 
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/details-floating-dock.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/details-floating-dock.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 11: Details panel in floating dock view</i>
  
 **Region editor** 
@@ -352,7 +348,7 @@ These panels are detachable, so you can place them wherever you want on the scre
 You can edit regions with a focus on labeling. You can zoom in and precise control over the numbers and dimensions of each region attribute. The image region details like height, rotation, and so on can be changed using the inputs in the **Details** panel. Now, you can collapse all panels and get the maximum working area. This feature design makes some actions clear in the product user interface.
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/region-editor.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/region-editor.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 12: Edit regions using different attributes</i>
 
 
@@ -363,7 +359,7 @@ You can edit regions with a focus on labeling. You can zoom in and precise contr
 <i class='ent'></i>The Comments box is available inside the outliner. 
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/comments-box.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/comments-box.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 13: Comments box </i>
 
 !!! info 
@@ -379,7 +375,7 @@ To add a region in the OCR transcription templates, draw a rectangle, and you ca
 - Hide or show a selected region.
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/text-inside-outliner.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/text-inside-outliner.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 13: Text inside outliner</i>
 
 **Regions grouping or sorting**
@@ -396,19 +392,19 @@ You can group or sort regions using the following functionality from the drop-do
 You can also order your regions by **Order by Score** or **Order by Time** options. 
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/group-by-label-sorted-by-score-expanded-dog-icon.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/group-by-label-sorted-by-score-expanded-dog-icon.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 14: Group by label using sorted by score</i>
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/group-by-tool-sorted-by-score.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/group-by-tool-sorted-by-score.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 15: Group by tool using sorted by score</i>
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/group-by-label-sorted-by-score.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/group-by-label-sorted-by-score.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 16: Group by label using sorted by score</i>
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/manual-grouping.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/manual-grouping.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 17: Manual grouping</i>
 
 **Prediction indication of the region**
