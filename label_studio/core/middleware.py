@@ -108,10 +108,14 @@ class ContextLogMiddleware(CommonMiddleware):
         self.log = ContextLog()
 
     def __call__(self, request):
+        body = None
         try:
             body = json.loads(request.body)
         except:
-            body = {}
+            try:
+                body = request.body.decode('utf-8')
+            except:
+                pass
         response = self.get_response(request)
         self.log.send(request=request, response=response, body=body)
         return response
