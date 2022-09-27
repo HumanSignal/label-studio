@@ -15,7 +15,8 @@ from drf_yasg import openapi
 from django.utils.decorators import method_decorator
 
 from label_studio.core.permissions import all_permissions, ViewClassPermission
-from label_studio.core.utils.common import get_object_with_check_and_log, bool_from_request
+from label_studio.core.utils.common import get_object_with_check_and_log
+from label_studio.core.utils.params import bool_from_request
 
 from organizations.models import Organization
 from organizations.serializers import (
