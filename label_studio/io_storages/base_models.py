@@ -16,7 +16,8 @@ from tasks.serializers import PredictionSerializer, AnnotationSerializer
 from data_export.serializers import ExportDataSerializer
 
 from core.redis import redis_connected
-from core.utils.common import get_bool_env, load_func
+from core.utils.common import load_func
+from core.utils.params import get_bool_env
 from io_storages.utils import get_uri_via_regex
 from django.contrib.auth.models import AnonymousUser
 

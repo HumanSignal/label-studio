@@ -16,7 +16,7 @@ _urlpatterns = [
 # API URLs
 _api_urlpattens = [
     # organization list viewset
-    path('', api.OrganizationListAPI.as_view(), name='organization-index'),
+    path('', api.OrganizationListAPI.as_view(), name='organization-list'),
     # organization detail viewset
     path('<int:pk>', api.OrganizationAPI.as_view(), name='organization-detail'),
     # organization memberships list viewset
@@ -26,12 +26,12 @@ _api_urlpattens = [
 # TODO: these urlpatterns should be moved in core/urls with include('organizations.urls')
 urlpatterns = [
     path('organization/', views.simple_view, name='organization-simple'),
-    path('organization/webhooks', views.simple_view, name='organization-simple'),
+    path('organization/webhooks', views.simple_view, name='organization-simple-webhooks'),
 
     path('people/', include(_urlpatterns)),
     path('api/organizations/', include((_api_urlpattens, app_name), namespace='api')),
 
     # invite
-    path('api/invite', api.OrganizationInviteAPI.as_view(), name='organization-reset-token'),
+    path('api/invite', api.OrganizationInviteAPI.as_view(), name='organization-invite'),
     path('api/invite/reset-token', api.OrganizationResetTokenAPI.as_view(), name='organization-reset-token'),
 ]
