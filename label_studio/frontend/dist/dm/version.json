@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-3373: Enable video preview",
+  "message": "feat: DEV-3373: Enable video preview (#106)\n\n* Enable video preview\r\n\r\n* Fix video column size",
   "commit": "8374cbfeceb5aa9870278fc5371f0585d452c111",
   "branch": "master",
-  "date": "2022/09/27 09:11:03"
+  "date": "2022-09-27T08:11:03Z"
 }
