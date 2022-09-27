@@ -11,21 +11,19 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from django.db.models import Sum, Count
 from django.conf import settings
-from ordered_set import OrderedSet
 
-from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, load_func
+from core.utils.common import get_object_with_check_and_log, int_from_request, load_func
+from core.utils.params import bool_from_request
 from core.permissions import all_permissions, ViewClassPermission
 from projects.models import Project
 from projects.serializers import ProjectSerializer
 from tasks.models import Task, Annotation, Prediction
-from tasks.serializers import TaskIDOnlySerializer
 
 from data_manager.functions import get_prepared_queryset, evaluate_predictions, get_prepare_params
-from data_manager.models import View, PrepareParams
+from data_manager.models import View
 from data_manager.managers import get_fields_for_evaluation
-from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer, ViewResetSerializer
+from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, ViewResetSerializer
 from data_manager.actions import get_all_actions, perform_action
 
 logger = logging.getLogger(__name__)

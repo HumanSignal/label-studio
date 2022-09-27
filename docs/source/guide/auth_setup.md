@@ -102,6 +102,11 @@ AUTH_LDAP_USER_ATTR_MAP_USERNAME=sAMAccountName
 # Query the authenticating user in Label Studio, it can be [email|username]
 AUTH_LDAP_USER_QUERY_FIELD=email
 
+# Group parameters
+AUTH_LDAP_GROUP_SEARCH_BASE_DN=ou=Users,o=group-id,dc=example,dc=com
+AUTH_LDAP_GROUP_SEARCH_FILTER_STR=(objectClass=groupOfNames)
+AUTH_LDAP_GROUP_TYPE=ou
+
 # Map LDAP groups to specific Label Studio Enterprise roles, using ';' to specify several groups
 AUTH_LDAP_ORGANIZATION_ROLE_ADMINISTRATOR=cn=admins,ou=users,o=123abc,dc=example,dc=com 
 AUTH_LDAP_ORGANIZATION_ROLE_MANAGER=cn=managers,ou=users,o=123abc,dc=example,dc=com 

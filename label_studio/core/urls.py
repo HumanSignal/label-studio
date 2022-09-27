@@ -81,7 +81,7 @@ urlpatterns = [
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 
     path('docs/api/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('docs/', RedirectView.as_view(url='/static/docs/public/guide/introduction.html', permanent=False)),
+    path('docs/', RedirectView.as_view(url='/static/docs/public/guide/introduction.html', permanent=False), name='docs-redirect'),
 
     path('admin/', admin.site.urls),
     path('django-rq/', include('django_rq.urls')),
