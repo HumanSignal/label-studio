@@ -1,7 +1,7 @@
 body , html{
   margin:0px;
   padding:0px;
-  background: #fafaf9;
+  background-color: var(--color-gray-900);
 }
 body *{
   box-sizing: border-box;
@@ -24,7 +24,18 @@ div.container{
   margin-left:auto;
   margin-right:auto;
 }
-
+.main__container {
+  background-color:var(--color-white);
+  position:relative;
+  z-index:1;
+  min-height:90vh;
+  transition:transform .2s;
+}
+@media (min-width: 75rem){
+  .js-enabled .main__container.footerActive{
+      transform:scale(.95)
+  }
+}
 .main__block{
   position: relative;
   background: wheat;
@@ -928,6 +939,7 @@ div.container{
   background: wheat;
   padding-top:180px;
   position: relative;
+  padding-bottom: 1em;
 }
 .head__articles{
   text-align:center;

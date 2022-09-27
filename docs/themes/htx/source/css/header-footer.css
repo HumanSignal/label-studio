@@ -29,7 +29,6 @@
   --max-size: 1rem;
   font-family:var(--font-family-monospace)
 }
-
 .Standard:where(.astro-O2YX5VCR){
   grid-column:standard
 }
