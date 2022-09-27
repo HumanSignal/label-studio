@@ -327,9 +327,9 @@
     var header = document.getElementById("header");
     var sidebar = document.querySelector(".sidebar");
     var content = document.querySelector(".content");
-
     // build sidebar
     var currentPageAnchor = sidebar.querySelector(".sidebar-link.current");
+
     var contentClasses = document.querySelector(".content").classList;
     var isAPIOrStyleGuide = contentClasses.contains("api") || contentClasses.contains("style-guide");
     if (currentPageAnchor || isAPIOrStyleGuide) {
@@ -417,6 +417,7 @@
       hoveredOverSidebar = false;
     });
 
+    const defaultTop = sidebar.offsetTop
     // listen for scroll event to do positioning & highlights
     window.addEventListener("scroll", updateSidebar);
     window.addEventListener("resize", updateSidebar);
@@ -424,6 +425,14 @@
     function updateSidebar() {
       var doc = document.documentElement;
       var top = (doc && doc.scrollTop) || document.body.scrollTop;
+      console.log(sidebar.offsetTop, defaultTop);
+
+      if (defaultTop - top > 0) sidebar.style.top = `${defaultTop - top || 0}px`;
+      // else sidebar.style.top = 1
+      //$header-height = $header-inner-height + $top-ribbon-height + $heading-padding-vertical * 2
+      
+      // root.style.setProperty('--header-height', sidebar.offsetTop - top );
+
       if (animating || !allHeaders) return;
       var last;
       for (var i = 0; i < allHeaders.length; i++) {
