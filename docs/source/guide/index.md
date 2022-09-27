@@ -81,8 +81,36 @@ The component parts of Label Studio are available as modular extensible packages
 | [Data Manager](https://github.com/heartexlabs/dm2) | JavaScript web app using [React](https://reactjs.org/) | Manage data and tasks for labeling. |
 | [Machine Learning Backends](https://github.com/heartexlabs/label-studio-ml-backend) | Python | Predict data labels at various parts of the labeling process. |
 
+The following figure shows the different components in Label Studio architecture.
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/ls-modules-scheme.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/ls-modules-scheme.png" style="opacity: 0.8" class="gif-border"/></div>
+<i>Figure 1: Overview of Label Studio architecture.</i>
+
+The Label Studio Enterprise-only features are:
+1. Security 
+2. Billing 
+3. User Management
+4. Quality Control
+
+
+Workspace view
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/workspace.png" style="opacity: 0.8" class="gif-border"/></div>
+<i>Figure 2: Workspace view.</i>
+
+
+Quick view
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/quick-view.png" style="opacity: 0.8" class="gif-border"/></div>
+<i>Figure 3. Quick view.</i>
+
+
+Data Manager view
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/data-manager.png" style="opacity: 0.8" class="gif-border"/></div>
+<i>Figure 4: Data Manager view.</i>
+
+
 <!--update to include data manager--> 
 
 ## Information collected by Label Studio
