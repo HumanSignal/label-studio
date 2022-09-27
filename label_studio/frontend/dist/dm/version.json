@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3346: Task history is stored on the backend for the label steam",
-  "commit": "dd5115411d9a0ebf61c11f5d4b0b03993cc15a1a",
+  "message": "feat: DEV-3346: Task history is stored on the backend for the label steam",
+  "commit": "646d94b92b03688793c78145c108c0a7bc9eb0a8",
   "branch": "fb-dev-3346",
-  "date": "2022/09/23 20:50:39"
+  "date": "2022/09/27 17:28:56"
 }
