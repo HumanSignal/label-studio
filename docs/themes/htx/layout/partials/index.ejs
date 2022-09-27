@@ -541,65 +541,6 @@ menu && menu.classList.add('main__page__header')
       </div>
     </div>
   </div>
-  <footer>
-    <div class="container">
-      <div class="outer__footer">
-        <div class="elem__footer">
-          <a href="#">
-            <img src="<%- url_for("/images/new/logofooter.svg") %>" alt="logofooter">
-          </a>
-          <ul class="social__list">
-            <li><a href="https://slack.labelstudio.heartex.com/?source=site-footer"><img src="<%- url_for("/images/new/foot3.svg") %>" alt="footerlogo"></a></li>
-            <li><a href="https://twitter.com/heartexlabs"><img src="<%- url_for("/images/new/foot2.svg") %>" alt="footerlogo"></a></li>
-	    <li><a href="https://www.linkedin.com/company/heartex/"><img src="<%- url_for("/images/new/foot5.svg") %>" alt="footerlogo"></a></li>            
-	    <li><a href="https://github.com/heartexlabs/"><img src="<%- url_for("/images/new/foot4.svg") %>" alt="footerlogo"></a></li>            
-          </ul>
-          <p class="copyright">© <%= new Date().getFullYear(); %> Heartex, Inc.</p>
-        </div>
-        <div class="inner__footer">
-          <div class="elem__footer">
-            <p>Products</p>
-            <ul>
-              <li><a href="https://labelstud.io">Community</a></li>
-              <li><a href="https://heartex.com/company/introducing-heartex-label-studio-teams">Teams</a></li>
-              <li><a href="https://heartex.com/">Enterprise</a></li>
-            </ul>
-          </div>
-          <div class="elem__footer">
-            <p>Community</p>
-            <ul>
-              <li><a href="/community/newsletter">Newsletter</a></li>
-              <li><a href="/community/slack">Slack</a></li>
-              <li><a href="/community/webinars">Webinars</a></li>
-              <li><a href="https://www.youtube.com/channel/UCbloiVAlCYzBatZXk-b5rFQ" target="_blank">YouTube</a></li>
-            </ul>
-          </div>
-          <div class="elem__footer">
-            <p>Documentation</p>
-            <ul>
-              <li><a href="/blog">Blog</a></li>
-              <li><a href="/guide">Quickstart</a></li>
-              <li><a href="/api">API&nbsp;Reference</a></li>
-              <li><a href="/tags">Customizable Tags</a></li>
-              <li><a href="/templates">Labeling Templates</a></li>
-            </ul>
-          </div>
-          <div class="elem__footer">
-            <p>Company</p>
-            <ul>
-              <li><a href="/blog">Blog</a></li>
-              <li><a href="https://heartex.com/company/about">About Us</a></li>
-              <li><a href="https://apply.workable.com/heartex">Careers</a></li>
-              <li><a href="mailto:hi@heartex.com">Contact Us</a></li>
-              <li><a href="https://heartex.com/company/privacy-policy">Privacy</a></li>
-            </ul>
-          </div>
-          <div class="small__copyright">
-            <p>© 2021 Heartex, Inc.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </footer>
+  <%- partial('partials/footer') %>
 </div>
 <script src="<%- url_for("/js/new-index.js") %>"></script>
