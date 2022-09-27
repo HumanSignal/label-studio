@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3284: If video load times out display error message (#870)\n\n* fix: DEV-3284: If video load times out display error message, reduce renders\r\n\r\n* Update VideoCanvas.tsx\r\n\r\nremove extra space\r\n\r\n* remove console, add descriptive var",
-  "commit": "b7ee31cdf4cda231e78b923c2dc5cde495276490",
+  "message": "fix: DEV-3510: fix video regions w/o label",
+  "commit": "5d4231c2a8b9703f8c43abdf62948ac892d6f742",
   "branch": "master",
-  "date": "2022-09-27T08:25:27Z"
+  "date": "2022/09/27 13:58:00"
 }
