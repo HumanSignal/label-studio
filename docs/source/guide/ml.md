@@ -111,6 +111,10 @@ Using the project ID and the URL for the machine learning backend, you can also 
 
 After you [connect a model to Label Studio as a machine learning backend](#Add-an-ML-backend-to-Label-Studio) and annotate at least one task, you can start training the model. 
 
+### Classical training approach
+
+Classical training approach is when you add annotations in your project and then train your model with this batch of annotations.
+
 You can prompt your model to train in several ways: 
 - Manually using the Label Studio UI. Click the **Start Training** button on the **Machine Learning** settings for your project.
 - Manually using the API, cURL the API from the command line. Specify the ID of the machine learning backend and run the following command: 
@@ -121,6 +125,25 @@ You can prompt your model to train in several ways:
 - (Deprecated in version 1.4.1) Automatically after any annotations are submitted or updated. Enable the option `Start model training after annotations submit or update` on the **Machine Learning** settings for your project. This option will be removed in a future version of Label Studio because you can [trigger training with webhooks](ml_create.html#Trigger-training-with-webhooks).
 
 In development mode, training logs appear in the web browser console. In production mode, you can find runtime logs in `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log` on the server running the ML backend, which might be different from the Label Studio server. To see more detailed logs, start the ML backend server with the `--debug` option. 
+
+### Active learning approach
+
+Active learning approach is training method with model finetuning  oppose to classical approach when you train model in batches.
+
+Check our [Webhooks section](/guide/webhooks.html#What-to-use-Label-Studio-webhooks-for) to identify  which events should trigger your model training. 
+
+### Train method specification
+Your Machine Learning train method signature:
+
+```python
+def fit(self, completions, workdir=None, **kwargs)
+```
+
+The **completions** param used in classical approach - list of annotations, can be a list or a single task in a list. Annotations format is common for Label Studio, check annotations key in task format in [guide](/guide/export.html#Label-Studio-JSON-format-of-annotated-tasks).
+The **completions** param will be empty for active learning approach. Instead of it use **kwargs** params.
+
+The **event** key in **kwargs** is Webhook event that called the fit method. Machine learning backend is checking these events to train your model: 'ANNOTATION_CREATED', 'ANNOTATION_UPDATED', 'ANNOTATION_DELETED', 'PROJECT_UPDATED'. To override this list set self.TRAIN_EVENTS in your model. Check available events in [webhooks guide.](/guide/webhooks.html#What-to-use-Label-Studio-webhooks-for)
+The **data** key in **kwargs** enriches your event with entities like project, task or annotation. Check [API description](/api#tag/Webhooks/) to understand event params.
 
 ## Get predictions from a model
 After you [connect a model to Label Studio as a machine learning backend](#Add-an-ML-backend-to-Label-Studio), you can see model predictions in the labeling interface if the model is pre-trained, or right after it finishes training. 
@@ -144,6 +167,20 @@ If you want to retrieve predictions manually for a list of tasks **using only an
   ]
 }
 ```
+
+Your Machine Learning prediction method signature:
+
+```python
+def predict(self, tasks, **kwargs)
+```
+
+The **tasks** param - list of task for prediction, can be a list or a single task in a list. Tasks format is common for Label Studio, check format in [guide](/guide/export.html#Label-Studio-JSON-format-of-annotated-tasks).
+
+Additional params in kwargs:
+
+**login** - proxy login in your project.
+**password** - proxy password in your project.
+**context** - interactive annotating context, contains selected data in interactive annotating mode. 
 
 ### Get interactive preannotations
 
