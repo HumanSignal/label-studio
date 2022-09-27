@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3284: If video load times out display error message (#870)\n\n* fix: DEV-3284: If video load times out display error message, reduce renders\r\n\r\n* Update VideoCanvas.tsx\r\n\r\nremove extra space\r\n\r\n* remove console, add descriptive var",
-  "commit": "b7ee31cdf4cda231e78b923c2dc5cde495276490",
-  "branch": "master",
-  "date": "2022-09-27T08:25:27Z"
+  "message": "Revert DEV-3284: If video load times out display error message (#870)",
+  "commit": "d5408cb34231adaee138f80ba69abe5ca0c494ae",
+  "branch": "fb-dev-3284/revert",
+  "date": "2022/09/27 13:30:22"
 }
