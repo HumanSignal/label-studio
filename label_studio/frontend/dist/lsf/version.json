@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3504: Revert skip to initial audio history",
-  "commit": "395bf6e8fb86938e4629a1ac6efd3c2d0aefffe2",
-  "branch": "fb-dev-3504/revert-audio-history-skip",
-  "date": "2022/09/27 10:58:39"
+  "commit": "f02ac2f0e4d2bf5dac4ba4d7894157738208a9a8",
+  "branch": "master",
+  "date": "2022/09/27 12:19:12"
 }
