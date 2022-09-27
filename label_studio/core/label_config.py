@@ -125,7 +125,10 @@ def extract_data_types(label_config):
         name = match.get('value')
         if len(name) > 1 and name[0] == '$':
             name = name[1:]
-            data_type[name] = match.tag
+            # video has highest priority, e.g.
+            # for <Video value="url"/> <Audio value="url"> it must be data_type[url] = Video
+            if data_type.get(name) != 'Video':
+                data_type[name] = match.tag
 
     return data_type
 
