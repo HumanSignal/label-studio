@@ -94,7 +94,7 @@ class ContextLog(object):
         out = {}
         for field in fields:
             self._assert_field_in_test(field, payload, view_name)
-            out[field] = payload[field]
+            out[field] = payload.get(field)
         if not out:
             return None
         return out
@@ -106,6 +106,8 @@ class ContextLog(object):
             payload['json'] = None
 
         if payload['status_code'] < 200 or payload['status_code'] > 299:
+            if payload['status_code'] >= 400:
+                payload['json'] = None
             return
 
         # ======== CUSTOM ======
