@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3510: fix video regions w/o label",
-  "commit": "5d4231c2a8b9703f8c43abdf62948ac892d6f742",
+  "message": "fix: DEV-3504: Retain history for Audio addRegion so init step of existing regions operates correctly (#877)",
+  "commit": "6e8680a678b84bd7c965665bd8da5ab7d868138e",
   "branch": "master",
-  "date": "2022/09/27 13:58:00"
+  "date": "2022-09-27T13:34:04Z"
 }
