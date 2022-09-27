@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3504: Retain history for Audio addRegion so init step of existing regions operates correctly (#877)",
-  "commit": "6e8680a678b84bd7c965665bd8da5ab7d868138e",
+  "message": "fix: DEV-3504: Revert skip to initial audio history",
+  "commit": "f02ac2f0e4d2bf5dac4ba4d7894157738208a9a8",
   "branch": "master",
-  "date": "2022-09-27T13:34:04Z"
+  "date": "2022/09/27 12:19:12"
 }
