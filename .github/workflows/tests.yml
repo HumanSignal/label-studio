@@ -28,6 +28,7 @@ jobs:
       COVERAGE_PROCESS_START: 1
       LOG_DIR: pytest_logs
       collect_analytics: true
+      DEBUG_CONTEXTLOG: true
       LABEL_STUDIO_TEST_ENVIRONMENT: true
       SENTRY_ENVIRONMENT: tests-ubuntu-sqlite
       SENTRY_RATE: 0
@@ -123,6 +124,7 @@ jobs:
       LOG_LEVEL: ERROR
       LOG_DIR: pytest_logs
       collect_analytics: true
+      DEBUG_CONTEXTLOG: true
       LABEL_STUDIO_TEST_ENVIRONMENT: true
       SENTRY_ENVIRONMENT: tests-ubuntu-postgresql
       SENTRY_RATE: 0
@@ -252,6 +254,7 @@ jobs:
       COVERAGE_PROCESS_START: 1
       LOG_DIR: pytest_logs
       collect_analytics: true
+      DEBUG_CONTEXTLOG: true
       LABEL_STUDIO_TEST_ENVIRONMENT: true
       SENTRY_ENVIRONMENT: tests-windows-sqlite
       SENTRY_RATE: 0

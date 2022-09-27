@@ -39,7 +39,6 @@ def _load_log_payloads():
 class ContextLog(object):
 
     _log_payloads = _load_log_payloads()
-    _json_payloads = ('json', 'response', 'values', 'env')
 
     def __init__(self):
         self.collect_analytics = get_bool_env('collect_analytics', True)
@@ -196,7 +195,9 @@ class ContextLog(object):
             if get_bool_env('TEST_ENVIRONMENT', False):
                 raise
         else:
-            if get_bool_env('DEBUG_CONTEXTLOG', False):
+            if get_bool_env('TEST_ENVIRONMENT', False):
+                pass
+            elif get_bool_env('DEBUG_CONTEXTLOG', False):
                 logger.debug(f'In DEBUG mode, contextlog is not sent.')
                 logger.debug(json.dumps(payload, indent=2))
             else:
