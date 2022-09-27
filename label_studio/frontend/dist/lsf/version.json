@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3502: attempting to scroll to field that doesnt exist",
-  "commit": "1d290382da7f5b9604fe39dcc5b5eb862386917c",
+  "message": "fix: DEV-3284: If video load times out display error message (#870)\n\n* fix: DEV-3284: If video load times out display error message, reduce renders\r\n\r\n* Update VideoCanvas.tsx\r\n\r\nremove extra space\r\n\r\n* remove console, add descriptive var",
+  "commit": "b7ee31cdf4cda231e78b923c2dc5cde495276490",
   "branch": "master",
-  "date": "2022/09/26 17:10:35"
+  "date": "2022-09-27T08:25:27Z"
 }
