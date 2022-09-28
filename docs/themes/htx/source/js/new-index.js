@@ -33,30 +33,6 @@ $(document).ready(function () {
     });
   })
 
-  let last_known_scroll_position = 0;
-  let ticking = false;
-  // function doSomething(scroll_pos) {
-  //   if (window.innerWidth > 991) {
-  //     if (window.scrollY > 70) {
-  //       document.querySelector(".head__main").classList.add("active__head");
-  //     } else {
-  //       document.querySelector(".head__main").classList.remove("active__head");
-  //     }
-  //   }
-  // }
-  document.addEventListener('scroll', function (e) {
-    console.log(e)
-
-    last_known_scroll_position = window.scrollY;
-    if (!ticking) {
-      window.requestAnimationFrame(function () {
-        doSomething(last_known_scroll_position);
-        ticking = false;
-      });
-
-      ticking = true;
-    }
-  });
 
   function activateSlider(slider) {
     if (!slider) return;
@@ -98,6 +74,7 @@ $(document).ready(function () {
   const footer = document.querySelector("#page-footer");
   const sentinalEl = document.querySelector("#footer-anim-el");
   const main = document.querySelector(".main__container");
+
 
   const handler = (entries) => {
     if (!entries[0].isIntersecting) {

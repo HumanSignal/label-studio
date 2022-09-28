@@ -104,15 +104,18 @@
 
     <% if (!isIndex) { %>
       <%- partial('partials/header') %>
-
-      <div id="main" <%- !isBlog ? 'class="fix-sidebar"': '' %>>
-          <%- body %>
+      <div class="main__container">
+        <div id="main" <%- !isBlog ? 'class="fix-sidebar"': '' %>>
+            <%- body %>
+        </div>
       </div>
-
+      <div id="footer-anim-el" style="position: relative; bottom: -50vh; width: 100px; height: 30px; visibility: hidden"></div>
+      <%- partial('partials/footer') %>
       <script src="<%- url_for("/js/css.escape.js") %>"></script>
       <script src="<%- url_for("/js/common.js") %>"></script>
     <% } else { %>
-        <%- partial('partials/index') %>
+      <%- partial('partials/header') %>
+      <%- partial('partials/index') %>
     <% } %>
 
   <script>
