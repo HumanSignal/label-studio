@@ -104,14 +104,15 @@ class OrganizationMemberListAPI(generics.ListAPIView):
 
     def get_queryset(self):
         org = generics.get_object_or_404(self.request.user.organizations, pk=self.kwargs[self.lookup_field])
-        if flag_set('fix-backend-dev-3134-exclude-deactivated-users', self.request.user):
+        if flag_set('fix_backend_dev_3134_exclude_deactivated_users', self.request.user):
             serializer = OrganizationsParamsSerializer(data=self.request.GET)
             serializer.is_valid(raise_exception=True)
             active = serializer.validated_data.get('active')
-            contributed_to_projects = serializer.validated_data.get('contributed_to_projects')
-            if active or not contributed_to_projects:
-                # return only active users (exclude DISABLED and NOT_ACTIVATED)
+            
+            # return only active users (exclude DISABLED and NOT_ACTIVATED)
+            if active:
                 return org.active_members.order_by('user__username')
+            
             # organization page to show all members
             return org.members.order_by('user__username')
         else:
