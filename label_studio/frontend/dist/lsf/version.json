@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3504: Revert skip to initial audio history",
-  "commit": "f02ac2f0e4d2bf5dac4ba4d7894157738208a9a8",
-  "branch": "master",
-  "date": "2022/09/27 12:19:12"
+  "message": "fix: DEV-3377: Region shift on resize",
+  "commit": "07ba8f87d4978cf36e65167e259166b93187d61e",
+  "branch": "fb-dev-3377/image-regions-shift",
+  "date": "2022/09/28 20:34:41"
 }
