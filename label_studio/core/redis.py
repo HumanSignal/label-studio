@@ -4,7 +4,9 @@ import redis
 import logging
 import django_rq
 
+from rq import Worker
 from django_rq import get_connection
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +46,25 @@ def redis_get(key):
     if not redis_healthcheck():
         return
     return _redis.get(key)
+
+
+def check_queue_is_empty():
+    """ Rqworker queue is empty"""
+
+    for queue_name in settings.RQ_QUEUES.keys():
+        queue = django_rq.get_queue(queue_name)
+        for worker in Worker.all(queue=queue):
+            if not worker.queues:
+                continue
+            state = worker.get_state()
+            if state not in ('started', 'idle'):
+                logger.info(f'Queue is not empty: worker in {state} state')
+                return False
+        if queue.count > 0:
+            logger.info(f'Queue is not empty: count {queue.count} > 0')
+            return False
+
+    return True
 
 
 def redis_hget(key1, key2):

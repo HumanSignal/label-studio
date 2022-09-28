@@ -71,6 +71,7 @@ urlpatterns = [
     re_path(r'api/version/', views.version_page, name="api-version"),  # json response
 
     re_path(r'health/', views.health, name="health"),
+    re_path(r'queue_empty/', views.queue_empty, name="queue_empty"),
     re_path(r'metrics/', views.metrics, name="metrics"),
     re_path(r'trigger500/', views.TriggerAPIError.as_view(), name="metrics"),
 

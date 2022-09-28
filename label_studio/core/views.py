@@ -25,6 +25,7 @@ from django.db.models import Value, F, CharField
 
 from core import utils
 from core.utils.io import find_file
+from core.redis import check_queue_is_empty
 from core.label_config import generate_time_series_json
 from core.utils.common import collect_versions
 from io_storages.localfiles.models import LocalFilesImportStorage
@@ -82,6 +83,14 @@ def health(request):
     return HttpResponse(json.dumps({
         "status": "UP"
     }))
+
+
+def queue_empty(request):
+    queue_is_empty = check_queue_is_empty()
+    if queue_is_empty:
+        return HttpResponse(status=200)
+
+    return HttpResponse(status=422)
 
 
 def metrics(request):
