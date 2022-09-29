@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2211: Don't skip history state after Audio loads so init step of existing regions operates correctly (#883)\n\n* fix: DEV-3504: Revert skip to initial audio history\r\n\r\n* fix: DEV-2211: Don't skip history state after Audio loads so init step of existing regions operates correctly",
-  "commit": "720970635f4d368cae62e8dac07363e534461fc9",
-  "branch": "master",
-  "date": "2022-09-29T14:22:00Z"
+  "message": "feat: DEV-3535: Allow negative timeseries data and additional customization options to visualization",
+  "commit": "a257ee71a0d71bd323710d312390a5e6ad47eae3",
+  "branch": "fb-dev-3535",
+  "date": "2022/09/29 13:57:51"
 }
