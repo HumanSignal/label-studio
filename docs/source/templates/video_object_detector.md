@@ -37,7 +37,7 @@ The prerequisites to use the video object detection feature are as follows:
 
 The following key features are supported by the video player.
 1. The video and object detection use case using the bounding box on the video. 
-2. Video segmentation for the video by creating polygons on the video.
+2. Video segmentation for the video by creating rectangles on the video.
 
 
 !!! attention "important"
