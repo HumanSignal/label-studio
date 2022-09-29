@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3304: RUNTIME ERROR occurs when user tries to change value of 'defaultZoom', 'defaultSpeed' or 'defaultVolume' attributes for '<Audio/>' tag in 'Video Timeline Segmentation' template on Safari browser",
-  "commit": "e3adef0aab97b0c4adae6a717ddebd51ed899f63",
-  "branch": "master",
-  "date": "2022/09/29 07:43:27"
+  "message": "fix: DEV-3284: to support safari we can't use networkState as its unreliable unfortunately",
+  "commit": "bb55465db464158e4cd91ff4e37467bd3105b1e0",
+  "branch": "fb-dev-3284",
+  "date": "2022-09-28T22:26:11Z"
 }
