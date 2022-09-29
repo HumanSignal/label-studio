@@ -18,7 +18,7 @@ env:
 jobs:
   docker_release_retag:
     name: "Docker image"
-    timeout-minutes: 5
+    timeout-minutes: 45
     runs-on: ubuntu-latest
     outputs:
       image_version: ${{ steps.get_info.outputs.image_version }}

@@ -33,7 +33,7 @@ jobs:
       frontend: ${{ steps.changes.outputs.frontend }}
       docker: ${{ steps.changes.outputs.docker }}
       commit-message: ${{ steps.commit-details.outputs.commit-message }}
-    timeout-minutes: 5
+    timeout-minutes: 25
     steps:
       - uses: hmarr/debug-action@v2.0.1
 
