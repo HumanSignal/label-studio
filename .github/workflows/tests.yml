@@ -29,7 +29,7 @@ jobs:
       LOG_DIR: pytest_logs
       collect_analytics: true
       DEBUG_CONTEXTLOG: true
-      LABEL_STUDIO_TEST_ENVIRONMENT: true
+      LABEL_STUDIO_TEST_ENVIRONMENT: false
       SENTRY_ENVIRONMENT: tests-ubuntu-sqlite
       SENTRY_RATE: 0
       DJANGO_DB: sqlite
@@ -125,7 +125,7 @@ jobs:
       LOG_DIR: pytest_logs
       collect_analytics: true
       DEBUG_CONTEXTLOG: true
-      LABEL_STUDIO_TEST_ENVIRONMENT: true
+      LABEL_STUDIO_TEST_ENVIRONMENT: false
       SENTRY_ENVIRONMENT: tests-ubuntu-postgresql
       SENTRY_RATE: 0
       JSON_LOG: 0
@@ -255,7 +255,7 @@ jobs:
       LOG_DIR: pytest_logs
       collect_analytics: true
       DEBUG_CONTEXTLOG: true
-      LABEL_STUDIO_TEST_ENVIRONMENT: true
+      LABEL_STUDIO_TEST_ENVIRONMENT: false
       SENTRY_ENVIRONMENT: tests-windows-sqlite
       SENTRY_RATE: 0
       DJANGO_DB: sqlite
