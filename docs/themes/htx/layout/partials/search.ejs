@@ -1,0 +1,154 @@
+
+<div class="AlgoliaSearch">
+    <svg viewBox="0 0 24 24" class="AlgoliaSearchIcon astro-OMIRC7UJ" astro-icon="ri:search-line"><path fill="currentColor" d="m18.031 16.617 4.283 4.282-1.415 1.415-4.282-4.283A8.96 8.96 0 0 1 11 20c-4.968 0-9-4.032-9-9s4.032-9 9-9 9 4.032 9 9a8.96 8.96 0 0 1-1.969 5.617zm-2.006-.742A6.977 6.977 0 0 0 18 11c0-3.868-3.133-7-7-7-3.868 0-7 3.132-7 7 0 3.867 3.132 7 7 7a6.977 6.977 0 0 0 4.875-1.975l.15-.15z"></path></svg>
+    <input id="docsearch-input" placeholder="Search" />
+</div>
+
+<style>
+  .algolia-autocomplete {
+    align-self: center;
+  }
+
+  .AlgoliaSearch {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .AlgoliaSearchIcon {
+    width: 1.35em;
+    height: 1.35em;
+    z-index: 1;
+    pointer-events: none;
+    margin-right: -2em;
+  }
+
+  #docsearch-input {
+    align-self: center;
+    border-radius: 2em;
+    background-color: var(--color-gray-100);
+    border: 0;
+    padding: 0.5em 1em 0.5em 2.5em;
+    font-size: 1rem;
+  }
+
+  #docsearch-input:focus {
+    outline-color: var(--color-orange-90);
+  }
+
+  html:not(.js-enabled .AlgoliaSearch  {
+    display: none;
+  }
+
+  .ds-dropdown-menu) {
+    background-color: white;
+    border: 1px black solid;
+    /* top: calc(100% + 4px)!important; Needed to overwrite Algolia’s default style */
+    top: calc(100% + 7.5px)!important;
+    padding: 1em;
+    width: 160%;
+  }
+
+  .algolia-docsearch-footer {
+    display: none;
+  }
+
+  .algolia-docsearch-suggestion {
+    text-decoration: none;
+    color: var(--color-gray-900);
+  }
+
+  .algolia-docsearch-suggestion:hover .algolia-docsearch-suggestion--wrapper {
+    border-color: var(--color-orange-90);
+  }
+
+  .algolia-docsearch-suggestion--category-header {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5em;
+    margin-top: 1em;
+    border-top: 1px var(--color-gray-200) solid;
+    padding-top: 1em;
+  }
+
+  .ds-suggestion:first-child .algolia-docsearch-suggestion--category-header {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .algolia-docsearch-suggestion--wrapper {
+    background-color: var(--color-gray-10);
+    border: 1px var(--color-gray-10) solid;
+  }
+
+  .algolia-docsearch-suggestion--subcategory-inline {
+    display: none;
+  }
+
+  .algolia-docsearch-suggestion--text {
+    font-size: 0.9em;
+    color: var(--color-gray-700);
+  }
+
+  .algolia-docsearch-suggestion--highlight {
+    color: var(--color-orange-90);
+    font-weight: 600;
+  }
+
+  .algolia-docsearch-suggestion--subcategory-column {
+    display: none;
+  }
+
+  .algolia-docsearch-suggestion--wrapper {
+    padding: 0.5em;
+  }
+  .algolia-docsearch-suggestion--category-header {
+    margin-bottom: 0.25em;
+  }
+
+  .algolia-docsearch-suggestion--content {
+    font-size: 0.875em;
+  }
+
+  .algolia-docsearch-suggestion__secondary:not(.algolia-docsearch-suggestion__main) .algolia-docsearch-suggestion--category-header {
+    display: none;
+  }
+
+  .algolia-docsearch-suggestion--title + .algolia-docsearch-suggestion--text {
+    margin-top: 0.5em;
+  }
+
+  @media (max-width: 84.375rem) { /* < 1350px */
+    .AlgoliaSearch {
+      display: none;
+    }
+  }
+</style>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js" defer></script>
+<script>
+
+window.addEventListener('load', (event) => {
+  window.docsearch({
+    container: '#docsearch-input',
+    inputSelector: '#docsearch-input',
+    appId: 'HELLEDAKPT',
+    apiKey: '1d0410ef855a968fbc40669df1c4a73e',
+    indexName: 'labelstud', // it does not change
+  });
+
+  const searchInput = document.querySelector("#docsearch-input");
+  const handleFocusSearch = (e) => {
+    if (document.activeElement.localName === 'body' && e.code !== "Space" && e.code !== "MetaLeft" && !e.altKey && !e.shiftKey && !e.ctrlKey) {
+      searchInput.focus();
+    }
+  }
+
+  window.addEventListener("keydown", handleFocusSearch);
+
+  
+});
+  
+
+</script>

@@ -91,9 +91,6 @@
     <!-- this needs to be loaded before guide's inline scripts -->
 
     <%- partial('partials/google_analytics') %>
-
-    <!-- docsearch -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
   </head>
   <body >
     <div id="mobile-bar" <%- isBlog ? 'style="display: none"' : '' %>>
@@ -145,18 +142,5 @@
       })
     });
   </script>
-
-  <!-- docsearch -->
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
-  <script type="text/javascript">docsearch({
-    container: '#docsearch-input',
-    inputSelector: '#docsearch-input',
-    appId: 'HELLEDAKPT',
-    apiKey: '1d0410ef855a968fbc40669df1c4a73e',
-    indexName: 'labelstud', // it does not change
-  });
-
-  </script>
-
   </body>
 </html>
