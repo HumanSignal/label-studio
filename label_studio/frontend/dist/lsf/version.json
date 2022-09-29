@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3504: Revert skip to initial audio history",
-  "commit": "f02ac2f0e4d2bf5dac4ba4d7894157738208a9a8",
+  "message": "fix: DEV-3304: RUNTIME ERROR occurs when user tries to change value of 'defaultZoom', 'defaultSpeed' or 'defaultVolume' attributes for '<Audio/>' tag in 'Video Timeline Segmentation' template on Safari browser",
+  "commit": "e3adef0aab97b0c4adae6a717ddebd51ed899f63",
   "branch": "master",
-  "date": "2022/09/27 12:19:12"
+  "date": "2022/09/29 07:43:27"
 }
