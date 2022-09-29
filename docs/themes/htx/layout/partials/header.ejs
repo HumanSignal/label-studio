@@ -21,10 +21,10 @@
     <nav class="astro-7IFFX3A3">
       <ul class="HeaderNav astro-7IFFX3A3">
         <li class="astro-7IFFX3A3">
-          <a href="/playground" class="astro-7IFFX3A3">Playground</a>
+          <a href="/playground" class="astro-7IFFX3A3 navigation">Playground</a>
         </li>
         <li class="astro-7IFFX3A3">
-          <a href="/learn" class=" astro-7IFFX3A3">
+          <a href="https://label-studio-website.netlify.app/learn" class=" astro-7IFFX3A3 navigation">
             Learn
             <svg aria-hidden="true" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" class="HeaderNavDropdownIcon astro-7IFFX3A3"><path d="M1 0.5L5 4.5L9 0.5" stroke="#131522" class="astro-7IFFX3A3"></path></svg>
           </a>
@@ -33,15 +33,15 @@
           </button>
           <ul class="HeaderSubNav astro-7IFFX3A3">
             <li class="astro-7IFFX3A3">
-              <a href="/blog" class="astro-7IFFX3A3">Blog</a>
+              <a href="/blog" class="astro-7IFFX3A3 navigation">Blog</a>
             </li>
             <li class="astro-7IFFX3A3">
-              <a href="/videos" class="astro-7IFFX3A3">Videos</a>
+              <a href="/videos" class="astro-7IFFX3A3 navigation">Videos</a>
             </li>
           </ul>
         </li>
         <li class="astro-7IFFX3A3">
-          <a href="/guide" class="astro-7IFFX3A3">
+          <a href="/guide" class="astro-7IFFX3A3 navigation">
             Docs
             <svg aria-hidden="true" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" class="HeaderNavDropdownIcon astro-7IFFX3A3"><path d="M1 0.5L5 4.5L9 0.5" stroke="#131522" class="astro-7IFFX3A3"></path></svg>
           </a>
@@ -50,7 +50,7 @@
           </button>
           <ul class="HeaderSubNav astro-7IFFX3A3">
             <li class="astro-7IFFX3A3">
-              <a href="/guide/index.html#Quick-start" class="astro-7IFFX3A3">Quickstart</a>
+              <a href="/guide/index.html#Quick-start" class="astro-7IFFX3A3 ">Quickstart</a>
             </li>
             <li class="astro-7IFFX3A3">
               <a href="/guide/install.html" class="astro-7IFFX3A3">Install</a>
@@ -59,7 +59,7 @@
               <a href="/guide/tasks.html" class="astro-7IFFX3A3">Import Data</a>
             </li>
             <li class="astro-7IFFX3A3">
-              <a href="/api" class="astro-7IFFX3A3">API Reference</a>
+              <a href="https://label-studio-website.netlify.app/api" class="astro-7IFFX3A3">API Reference</a>
             </li>
             <li class="astro-7IFFX3A3">
               <a href="https://label-studio-website.netlify.app/sdk" class="astro-7IFFX3A3">SDK Reference</a>
@@ -73,7 +73,7 @@
           </ul>
         </li>
         <li class="astro-7IFFX3A3">
-          <a href="https://label-studio-website.netlify.app/community/" class=" astro-7IFFX3A3">
+          <a href="https://label-studio-website.netlify.app/community/" class="astro-7IFFX3A3 navigation">
             Community
           </a>
         </li>
@@ -113,17 +113,12 @@
     headerMenu.classList.toggle("isOpen");
   });
 
-  const toggleButtons = document.querySelectorAll(".HeaderNavToggleButton");
+  const toggleButtons = document.querySelectorAll(".navigation");
 
-  const toggleSubMenu = (event) => {
-    const button = event.currentTarget;
-    const submenu = button.nextElementSibling;
-
-    button.classList.toggle("HeaderNavToggleButtonActive")
-    submenu.style.display = submenu.style.display === "flex" ? "none" : "flex";
-  }
-
-  toggleButtons.forEach(toggleButton => toggleButton.addEventListener("click", toggleSubMenu));
+  toggleButtons.forEach(toggleButton => {
+    if (window.location.href.includes(toggleButton.href)) toggleButton.classList.add("Active")
+    else toggleButton.classList.remove("Active")
+  })
 
 </script>
 </header>

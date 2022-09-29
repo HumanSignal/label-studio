@@ -31,7 +31,7 @@
 </style>
 
 <script>
-    window.addEventListener('load', async (event) => {
+    window.addEventListener('load', async () => {
     let starCount = 10688
 //  const response = await fetch("https://api.github.com/repos/heartexlabs/label-studio", {
 //     headers: {
@@ -42,7 +42,6 @@
 //   starCount = data.stargazers_count
   
   const countElement = document.querySelector('.GitHubStarsText')
-  console.log(countElement)
   countElement.innerText = starCount.toLocaleString('en-US');
 });
 </script>
