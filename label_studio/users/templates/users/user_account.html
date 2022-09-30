@@ -206,7 +206,7 @@
           .then(res => res.json())
           .then(res => {
             input.value = res.token;
-            example.value = `${CURL_TEMPLATE} ${res.token}'`
+            example.value = `curl -X GET ${hostname}/api/projects/ -H 'Authorization: Token ${res.token}'`
             button.classList.add('blink');
             setTimeout(() => button.classList.remove('blink'))
           });
