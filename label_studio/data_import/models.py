@@ -44,7 +44,7 @@ class FileUpload(models.Model):
     def url(self):
         if settings.HOSTNAME and settings.CLOUD_FILE_STORAGE_ENABLED:
             if flag_set('ff_back_dev_2915_storage_nginx_proxy_26092022_short', self.project.organization.created_by):
-                return f'{settings.HOSTNAME}/storage-data/uploaded/?filepath={self.filepath}'
+                return self.file.url
             else:
                 return settings.HOSTNAME + self.file.url
         elif settings.FORCE_SCRIPT_NAME:
