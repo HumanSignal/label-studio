@@ -23,6 +23,18 @@
   background-color: #AAA !important;
   border: 1px solid #999 !important;
 
+.main__container 
+  background-color:var(--color-white)
+  position:relative
+  z-index:1
+  min-height:90vh
+  transition:transform .2s
+  overflow: hidden
+
+@media (min-width: 75rem)
+  .js-enabled .main__container.footerActive
+    transform:scale(.95)
+
 .gif-border
   border: 1px solid #f1f1f1;
   max-width: 100% !important;
@@ -290,6 +302,7 @@
   position: static
   .sidebar
     position: fixed
+    z-index: 0
 
 @media (max-width: 991px)
   .sidebar
