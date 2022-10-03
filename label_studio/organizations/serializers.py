@@ -36,13 +36,15 @@ class UserSerializerWithProjects(UserSerializer):
         if not self.context.get('contributed_to_projects', False):
             return None
 
-        return user.created_projects.values('id', 'title')
+        return user.created_projects.filter(organization=user.active_organization).values('id', 'title')
 
     def get_contributed_to_projects(self, user):
         if not self.context.get('contributed_to_projects', False):
             return None
 
-        projects = user.annotations.values('task__project__id', 'task__project__title')
+        projects = user.annotations\
+            .filter(task__project__organization=user.active_organization)\
+            .values('task__project__id', 'task__project__title')
         contributed_to = [(json.dumps({'id': p['task__project__id'], 'title': p['task__project__title']}), 0)
                           for p in projects]
         contributed_to = OrderedDict(contributed_to)  # remove duplicates without ordering losing
@@ -64,3 +66,8 @@ class OrganizationMemberUserSerializer(DynamicFieldsMixin, serializers.ModelSeri
 class OrganizationInviteSerializer(serializers.Serializer):
     token = serializers.CharField(required=False)
     invite_url = serializers.CharField(required=False)
+
+
+class OrganizationsParamsSerializer(serializers.Serializer):
+    active = serializers.BooleanField(required=False, default=False)
+    contributed_to_projects = serializers.BooleanField(required=False, default=False)

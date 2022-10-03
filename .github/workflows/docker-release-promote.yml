@@ -1,6 +1,12 @@
 name: "Docker release promote"
 
 on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag for promotion"
+        required: true
+        type: string
   workflow_call:
     inputs:
       release_tag:
@@ -18,7 +24,7 @@ env:
 jobs:
   docker_release_retag:
     name: "Docker image"
-    timeout-minutes: 5
+    timeout-minutes: 45
     runs-on: ubuntu-latest
     outputs:
       image_version: ${{ steps.get_info.outputs.image_version }}
@@ -128,7 +134,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: '3.10'
 
       - name: Create version_.py
         run: |
@@ -150,6 +156,13 @@ jobs:
           username: heartexlabs
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Login to RedHat Registry
+        uses: docker/login-action@v2.0.0
+        with:
+          registry: scan.connect.redhat.com
+          username: unused
+          password: ${{ secrets.REDHAT_MARKETPLACE_LS_PASSWORD }}
+
       - name: Prepare Release Dockerfile
         id: release_dockerfile
         shell: bash
@@ -168,17 +181,6 @@ jobs:
           COPY --chown=54546:0 version_.py /label-studio/label_studio/core/version_.py
           COPY --chown=54546:0 feature_flags.json /label-studio/label_studio/feature_flags.json
           EOF
-
-      - name: Build and push Release Ubuntu Docker image
-        uses: docker/build-push-action@v3.1.1
-        id: docker_build_and_push
-        with:
-          context: ${{ steps.release_dockerfile.outputs.release_dir }}
-          file: ${{ steps.release_dockerfile.outputs.release_dir }}/${{ env.RELEASE_DOCKERFILE }}
-          push: true
-          tags: ${{ steps.generate-tags.outputs.ubuntu-tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: Prepare Release UBI Dockerfile
         id: ubi_release_dockerfile
@@ -223,3 +225,49 @@ jobs:
               check container "${image}" \
               --submit
           done <<< '${{ steps.generate-tags.outputs.redhat-tags }},'
+
+      - name: Build Release Ubuntu Docker image
+        uses: docker/build-push-action@v3.1.1
+        id: docker_build
+        with:
+          context: ${{ steps.release_dockerfile.outputs.release_dir }}
+          file: ${{ steps.release_dockerfile.outputs.release_dir }}/${{ env.RELEASE_DOCKERFILE }}
+          load: true
+          tags: ${{ steps.generate-tags.outputs.ubuntu-tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Copy compiled static from builded Docker image
+        run: docker run -v ${{ github.workspace }}:/workspace:rw -u root --rm ${{ env.IMAGE_NAME }}:${{ inputs.release_tag }} cp -r /label-studio/label_studio/frontend/ /workspace/label_studio/
+
+      - name: Push Release Ubuntu Docker image
+        uses: docker/build-push-action@v3.1.1
+        id: docker_push
+        with:
+          context: ${{ steps.release_dockerfile.outputs.release_dir }}
+          file: ${{ steps.release_dockerfile.outputs.release_dir }}/${{ env.RELEASE_DOCKERFILE }}
+          push: true
+          tags: ${{ steps.generate-tags.outputs.ubuntu-tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Create Sentry release @ backend
+        uses: getsentry/action-release@v1
+        continue-on-error: true
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+        with:
+          version: label-studio@${{ inputs.release_tag }}
+          projects: opensource-v1-backend
+
+      - name: Create Sentry release @ frontend
+        uses: getsentry/action-release@v1
+        continue-on-error: true
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+        with:
+          version: label-studio@${{ inputs.release_tag }}
+          projects: opensource-v1-frontend
+          sourcemaps: label_studio/frontend/dist

@@ -18,8 +18,6 @@ from core.utils.common import get_object_with_check_and_log
 from projects.models import Project, Task
 from ml.serializers import MLBackendSerializer, MLInteractiveAnnotatingRequest
 from ml.models import MLBackend
-from ml.api_connector import MLApi
-from core.utils.common import bool_from_request
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2519: Choices selected by default",
-  "commit": "dc03b7337518a3129677570127b44456420d4c6c",
+  "message": "feat: DEV-3373: Enable video preview (#106)\n\n* Enable video preview\r\n\r\n* Fix video column size",
+  "commit": "8374cbfeceb5aa9870278fc5371f0585d452c111",
   "branch": "master",
-  "date": "2022/08/10 15:51:21"
+  "date": "2022-09-27T08:11:03Z"
 }

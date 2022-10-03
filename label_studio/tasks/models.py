@@ -289,7 +289,7 @@ class Task(TaskMixin, models.Model):
         self.annotations.exclude(id=annotation_id).update(ground_truth=False)
 
     def save(self, *args, **kwargs):
-        if flag_set('ff_back_2070_inner_id_12052022_short', self.project.organization.created_by):
+        if flag_set('ff_back_2070_inner_id_12052022_short', AnonymousUser):
             if self.inner_id == 0:
                 task = Task.objects.filter(project=self.project).order_by("-inner_id").first()
                 max_inner_id = 1
@@ -312,6 +312,11 @@ class Task(TaskMixin, models.Model):
         ]
         with temporary_disconnect_list_signal(signals):
             queryset.delete()
+
+    @staticmethod
+    def delete_tasks_without_signals_from_task_ids(task_ids):
+        queryset = Task.objects.filter(id__in=task_ids)
+        Task.delete_tasks_without_signals(queryset)
 
 pre_bulk_create = Signal(providing_args=["objs", "batch_size"])
 post_bulk_create = Signal(providing_args=["objs", "batch_size"])

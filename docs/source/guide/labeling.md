@@ -88,6 +88,7 @@ You can create relations between two results with both directions and labels. To
 
 <br>
 <img src="../images/relation.png">
+<i>Figure 1: Add relations between annotations </i>
 
 After you relate two annotation regions, you can modify the relation in the **Relations** section of the **Results** sidebar. 
 - To change the direction of the relation, click the direction button between the two related regions.
@@ -218,6 +219,7 @@ For example, keep a label selected after creating a region, display labels on bo
 <center>
   <img src='../images/lsf-settings.png'>
 </center>
+<i>Figure 2: Customize the labeling interface  </i>
 
 You can also modify the layout of the screen, hide or show predictions, annotations, or the results panel, and hide or show various controls and buttons.
 
@@ -282,6 +284,157 @@ By default, regions without labels appear gray.
 If you make a mistake when labeling with the brush mask, you can erase it. You must select a brush region in the sidebar before you can erase any part of it. 
 
 If you want to completely remove a region and start over, delete the region instead of erasing it. Erasing a region does not delete it. 
+
+
+## <i class='ent'/></i> Outliner 
+
+The **Outliner** is a replacement for the existing interface with a multiple-panel approach. This feature improves the user experience to fit more data in these two columns (**Outliner** and **Details**) and provides more options when working with regions. For example, Image segmentation is the only type of labeling that supports custom controls on the details panel. 
+
+### Feature capabilities
+
+Outliner is the area where you can see all the details about annotation, regions, and labeling history. It is split into two panels, named **Outliner** and **Details**. Figure 3 shows the appearance of the **Outliner** panel on the left of the image and **Details** panel on the right of the image. 
+
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/outliner-details-panels-view.png" style="opacity: 0.8"/></div>
+<i>Figure 3: View of Outliner and Details panels view </i>
+ 
+**Panel actions**
+
+There are two panels which is the outliner for the regions list. These panels can be collapsed, moved, swapped to the sides, dragged, dropped, and expanded to provide a full-screen view. For example, if you navigate to label stream, you will have more space in this mode. 
+
+The **Outliner** and **Details** panels are collapsible and detachable, so you can arrange them the way you want. Figure 4 shows the **Collapse details** button which allows you to collapse the **Details** panel and use the remaining portion of the screen. 
+
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/collapse-details-button.png" style="opacity: 0.8"/></div>
+<i>Figure 4: Collapsed details button</i>
+
+Now, the **Details** panel is collapsed, and you can expand it by clicking the **Expand Details** icon.
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/details-collapsed-button-view.png" style="opacity: 0.8"/></div>
+<i>Figure 5: Details panel in collapsed view</i>
+
+The details panel is displayed in expanded view to explore the feature. 
+
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/details-panel-expanded-view.png" style="opacity: 0.8"/></div>
+<i>Figure 6: Details panel in expanded view</i>
+
+To collapse the **Outliner** panel, click on the **Collapse outliner** icon. 
+
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/collapse-outliner-button.png" style="opacity: 0.8"/></div>
+<i>Figure 7: Collapse outliner button</i>
+
+Now, the **Outliner** panel is collapsed, and you can expand it by clicking the **Expand Details** icon.
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/outliner-collapsed-view.png" style="opacity: 0.8"/></div>
+<i>Figure 8: Outliner panel in collapsed view</i>
+
+The **Expand Details** icon expands the **Outliner** panel for further actions.
+
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/expand-outliner-button.png" style="opacity: 0.8"/></div>
+<i>Figure 9: Outliner panel with expand outliner icon</i>
+
+The Outliner panel is displayed in expanded view to explore the feature. 
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/outliner-expanded-view.png" style="opacity: 0.8"/></div>
+<i>Figure 10: Outliner panel in expanded view</i>
+
+These panels are detachable, so you can place them wherever you want on the screen, and you can resize them. 
+
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/details-floating-dock.png" style="opacity: 0.8"/></div>
+<i>Figure 11: Details panel in floating dock view</i>
+ 
+**Region editor** 
+
+You can edit regions with a focus on labeling. You can zoom in and precise control over the numbers and dimensions of each region attribute. The image region details like height, rotation, and so on can be changed using the inputs in the **Details** panel. Now, you can collapse all panels and get the maximum working area. This feature design makes some actions clear in the product user interface.
+
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/region-editor.png" style="opacity: 0.8"/></div>
+<i>Figure 12: Edit regions using different attributes</i>
+
+
+!!! note 
+    In the upcoming releases, video segmentation will be available to control keyframes, animations, and custom metadata. 
+
+
+<i class='ent'></i>The Comments box is available inside the outliner. 
+
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/comments-box.png" style="opacity: 0.8"/></div>
+<i>Figure 13: Comments box </i>
+
+!!! info 
+    Use Outliner to work with larger annotation tasks (many bounding boxes in one image, larger videos, and so on).
+
+To add a region in the OCR transcription templates, draw a rectangle, and you can see a text box that appears in the **Outliner** panel to enter OCR text. The new functionality allows you to select a region and the **Details** panel changes. You can experience the following:
+
+- See a text that is attached to the OCR case.
+- Control the coordinates of the rectangle. For example, you can rotate, move, and resize the coordinates. 
+- Lock the region to prevent it from moving. 
+- Hiding/locking regions.
+- Use the move tool to prevent the movement of regions. 
+- Hide or show a selected region.
+
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/text-inside-outliner.png" style="opacity: 0.8"/></div>
+<i>Figure 13: Text inside outliner</i>
+
+**Regions grouping or sorting**
+
+You can group or sort regions using the following functionality from the drop-down list. 
+
+- **Group Manually**: Manual regions grouping (drag-and-drop). When you select this option, you can drag and drop regions inside each other, create a tree structure, and group the regions together. 
+- **Group by Tool**: When you select this option, the tools (rectangle, polygons) are added. You can use a template with all these tools to group regions by a tool that generates them.
+- **Group by Label**: When you select this option and draw a region, now you will see a text label, and you can expand it. The text label shows only the text related to this functionality. 
+
+!!! warning
+    **Group by Label** and **Group by Tool** options does not work for multiple image scenario or multiple labeled type scenario; only the **Group Manually** option is available for this mode.  
+    
+You can also order your regions by **Order by Score** or **Order by Time** options. 
+
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/group-by-label-sorted-by-score-expanded-dog-icon.png" style="opacity: 0.8"/></div>
+<i>Figure 14: Group by label using sorted by score</i>
+
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/group-by-tool-sorted-by-score.png" style="opacity: 0.8"/></div>
+<i>Figure 15: Group by tool using sorted by score</i>
+
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/group-by-label-sorted-by-score.png" style="opacity: 0.8"/></div>
+<i>Figure 16: Group by label using sorted by score</i>
+
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/manual-grouping.png" style="opacity: 0.8"/></div>
+<i>Figure 17: Manual grouping</i>
+
+**Prediction indication of the region**
+This capability shows whether an ML model created the region or not.  
+
+**Relations list**
+One region belongs to another one. It is typically done for NLP type of text. For example, consider the city name as region 1 and district name as region 2. Now, in the relations list hierarchy you will place the region 2 under region 1. Relation lists can be unidirectional or bidirectional between one region and another. You can snap one region into another region. 
+
+!!! note
+    The relations list does not support multi-level listing for regions. 
+
+**Draw bounding boxes over another**
+
+!!! attention "important"
+    When creating bounding box annotations for images, you must not start a bounding box inside another bounding box because it would just drag the first box. Instead, it would create a new bounding box in front of the image when the rectangle tool is selected.
+
+To create bounding boxes on top you can use two ways:
+
+1. Press the rectangle tool (R) (note: this option is not always visible).
+2. Label a bounding box, and then label another bounding box inside it.
+
+Now, you should be able to drag when the rectangle tool is not selected. Remember that when the rectangle tool is selected, you can make rectangles even if it is on top of another rectangle.
+
+OR 
+
+1. Press CTRL button and start drawing bounding box over another one. 
 
 
 <!-- md annotation_ids.md -->
