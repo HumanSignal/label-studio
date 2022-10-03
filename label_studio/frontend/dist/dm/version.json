@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3508: Paging error when refreshing the datamanager",
-  "commit": "35a1dfe461641e9a641f1cecc73aab9df00bc665",
-  "branch": "fb-dev-3508",
-  "date": "2022/09/29 09:53:37"
+  "commit": "c92a2c4ccfe5348f4caf0853f0c0e387d6055b0f",
+  "branch": "master",
+  "date": "2022/10/03 06:33:14"
 }
