@@ -50,9 +50,11 @@ stages:
     url: '{django_live_url}/api/users/{new_user_pk}'
     json:
       first_name: Changedname
+      username: changed username
       email: w@heartex.com
   response:
     status_code: 200
     json:
       first_name: Changedname
+      username: test user
       email: test_user@heartextest.com

@@ -50,6 +50,7 @@ class BaseUserSerializer(CreateOnlyFieldsMixin, FlexFieldsModelSerializer):
         )
 
         create_only_fields = [
+            'username',
             'email'
         ]
 
