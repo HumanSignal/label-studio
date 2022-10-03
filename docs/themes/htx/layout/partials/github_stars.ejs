@@ -5,7 +5,6 @@
 
 <style>
   .GitHubStars {
-    padding: 0 2em;
     display: flex;
     gap: 0.25em;
     align-items: center;
@@ -31,17 +30,20 @@
 </style>
 
 <script>
-    window.addEventListener('load', async () => {
-    let starCount = 10688
-//  const response = await fetch("https://api.github.com/repos/heartexlabs/label-studio", {
-//     headers: {
-//       Authorization: `token ${import.meta.env.GITHUB_TOKEN}`
-//     }
-//   })
-//   const data = response.json();
-//   starCount = data.stargazers_count
-  
-  const countElement = document.querySelector('.GitHubStarsText')
-  countElement.innerText = starCount.toLocaleString('en-US');
+  window.addEventListener('load', async () => {
+    const authToken = '<%= process.env %>';
+    if (authToken) try {
+      const response = await fetch("https://api.github.com/repos/heartexlabs/label-studio", {
+          headers: {
+            Authorization: `token  ${authToken}`
+          }
+        });
+      const data = await response.json();
+      starCount = data.stargazers_count;
+      const countElement = document.querySelector('.GitHubStarsText');
+      countElement.innerText = starCount.toLocaleString('en-US');
+    } catch (err) {
+      console.log(err);
+    }
 });
 </script>
