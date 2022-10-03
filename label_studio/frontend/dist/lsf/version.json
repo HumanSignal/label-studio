@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-3535: Allow negative timeseries data and additional customization options to visualization",
-  "commit": "c12b121e741eefb6646403cf6f8643e4be02ee0c",
-  "branch": "master",
-  "date": "2022/10/03 09:25:43"
+  "message": "fix: DEV-3551: Fix bug when zoom on large videos corrupts regions",
+  "commit": "35aa7b148941bb6f16c9f7e7c6922ac76201c5ad",
+  "branch": "fb-dev-3551/zoom-for-large-videos",
+  "date": "2022/10/03 20:24:34"
 }
