@@ -6,8 +6,10 @@ from rest_framework.serializers import SerializerMethodField
 import bleach
 from users.serializers import UserSimpleSerializer
 
+from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS
 
 from projects.models import Project, ProjectOnboarding, ProjectSummary
+
 
 
 class CreatedByFromContext:
@@ -71,7 +73,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             data['min_annotations_to_start_training'] = int(initial_data['start_training_on_annotation_update'])
 
         if 'expert_instruction' in initial_data:
-            data['expert_instruction'] = bleach.clean(initial_data['expert_instruction'])
+            data['expert_instruction'] = bleach.clean(initial_data['expert_instruction'], tags=SAFE_HTML_TAGS, attributes=SAFE_HTML_ATTRIBUTES)
 
         return data
 

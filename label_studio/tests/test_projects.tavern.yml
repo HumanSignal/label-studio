@@ -310,11 +310,11 @@ stages:
       save:
         json:
           project_pk: id
-  - name: update_project
+  - name: onerror
     request:
       url: "{django_live_url}/api/projects/{project_pk}"
       json:
-        expert_instruction: '<a href="#" onclick=alert(1)>'
+        expert_instruction: '<a href="#" onerror=alert(1)>'
       method: PATCH
       headers:
         content-type: application/json
@@ -322,3 +322,27 @@ stages:
       status_code: 200
       json:
         expert_instruction: '<a href="#"></a>'
+  - name: iframe
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}"
+      json:
+        expert_instruction: '<iframe src="somepath"></iframe>'
+      method: PATCH
+      headers:
+        content-type: application/json
+    response:
+      status_code: 200
+      json:
+        expert_instruction: '<iframe src="somepath"></iframe>'
+  - name: embed
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}"
+      json:
+        expert_instruction: '<embed type="video/webm" src="/media/cc0-videos/flower.mp4" width="250" height="200">'
+      method: PATCH
+      headers:
+        content-type: application/json
+    response:
+      status_code: 200
+      json:
+        expert_instruction: '<embed type="video/webm" src="/media/cc0-videos/flower.mp4" width="250" height="200">'
