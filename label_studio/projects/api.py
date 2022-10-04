@@ -224,9 +224,6 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
                 has_changes = config_essential_data_has_changed(label_config, project.label_config)
             except KeyError:
                 pass
-            else:
-                if has_changes:
-                    View.objects.filter(project=project).all().delete()
 
         return super(ProjectAPI, self).patch(request, *args, **kwargs)
 
