@@ -306,8 +306,7 @@ The disappeared badge in Figure 17 now reappears within the interpolation as you
 If you don’t want to play video by itself, but prefer to see the transition of the frames then you can drag the frame indicator to see how it transitions, how frames appear, how they disappear, and so on. You can also set positions for the video by dragging the overview window that shows the current visible viewport. 
 
 ### Reconfigure annotation workspaces 
-You can reconfigure the annotation workspaces to simplify labeling larger tasks, including large images and longer videos with many regions. This allows you to view more of the video portion, a wider space for the
-timeline, and the ability to see many keyframes and regions. 
+You can reconfigure the annotation workspaces to simplify labeling larger tasks, including large images and longer videos with many regions. This allows you to view more of the video portion, a wider space for the timeline, and the ability to see many keyframes and regions. 
 
 You can add key points by toggling the key points. For example, if you accidentally moved the bounding box, and it is not in the right place, then you must remove the key points to reset it to the initial position. You can add many bounding boxes for object detection. 
 
@@ -322,7 +321,23 @@ A mini map shows separate lines for each added label region. In Figure 22, the m
 <img src="../images/mini-map-upto-5bb.png" class="gif-border" />
 <i>Figure 22: Mini map for multiple regions.</i>
 
+### Additional examples 
+The following shows additional examples of the video object tracking feature. 
+<img src="../images/videoplayer.png" class="gif-border" />
+<i>Figure 23: Example 1 of video object tracking.</i>
+
+Example of video object tracking feature with timestamp.
+<video src="../images/video-1.mp4" controls="controls" style="max-width: 730px;" class="gif-border" />
+
+<i>Figure 24: Example 2 of video object tracking with timestamp.</i>
+
+Move the Outliner window in video player.
+<video src="../images/video-2.mp4" controls="controls" style="max-width: 730px;" class="gif-border" />
+
+<i>Figure 25: Example 3 of moving the outliner window in video player.</i>
+
 ## Related tags
+
 - [Video](/tags/video.html)
 - [VideoRectangle](/tags/videorectangle.html)
 - [Labels](/tags/labels.html)
