@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3485: Regions is selectable when annotation history is selected",
-  "commit": "49d3d143014e6812d7496bbb5a45fa84d4e16f2d",
+  "commit": "0a54191f40267acb46ceac194773f8f17b9b2f49",
   "branch": "fb-dev-3485",
-  "date": "2022/09/29 21:56:46"
+  "date": "2022/10/04 13:00:14"
 }
