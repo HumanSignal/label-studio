@@ -11,7 +11,7 @@ jobs:
   build:
     if: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 == 'build' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 10
     steps:
       - name: Checkout on chat command
         uses: actions/checkout@v3
