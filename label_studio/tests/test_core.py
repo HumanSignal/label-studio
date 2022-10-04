@@ -2,8 +2,8 @@
 """
 import pytest
 import types
-import sys
-from core.utils.common import bool_from_request, int_from_request
+from core.utils.common import int_from_request
+from core.utils.params import bool_from_request
 
 
 @pytest.mark.parametrize('param, result', [

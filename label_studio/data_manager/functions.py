@@ -55,7 +55,7 @@ def get_all_columns(project, *_):
         column = {
             'id': key,
             'title': key if key != settings.DATA_UNDEFINED_NAME else 'data',
-            'type': data_type if data_type in ['Image', 'Audio', 'AudioPlus', 'Unknown'] else 'String',
+            'type': data_type if data_type in ['Image', 'Audio', 'AudioPlus', 'Video', 'Unknown'] else 'String',
             'target': 'tasks',
             'parent': 'data',
             'visibility_defaults': {

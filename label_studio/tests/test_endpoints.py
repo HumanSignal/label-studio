@@ -2,9 +2,13 @@
 """
 import pytest
 import django
+import json
+import os
+from unittest import mock
 
 from django.urls import get_resolver
 from django.shortcuts import reverse
+from django.core.management import call_command
 from tasks.models import Annotation
 from tasks.models import Task
 
@@ -422,3 +426,37 @@ def test_all_urls_other_business(setup_project_choices, business_client):
     business_client.statuses = other_business_statuses
     business_client.statuses_name = 'other_business_statuses'
     run(setup_project_choices, business_client)
+
+
+@pytest.mark.django_db
+def test_urls_mismatch_with_registered(tmpdir):
+    from core.utils.io import find_file
+    from core.utils.params import get_bool_env
+
+    all_urls_file = find_file('all_urls.json')
+    with open(all_urls_file) as f:
+        all_urls = json.load(f)
+
+    instruction = f'If you created, removed or updated URLs, run the following command:\n./manage.py show_urls --format pretty-json > new_urls.json\n' \
+                  f'After creation, you should verify and correct mismatched data by updating {all_urls_file}.'
+
+    f = tmpdir.mkdir("subdir").join('show_urls.json')
+    call_command('show_urls', format='pretty-json', stdout=f)
+    filename = os.path.join(f.dirname, f.basename)
+    with open(filename) as f1:
+        all_current_urls = json.load(f1)
+
+    all_urls = sorted(str((d['url'], d['name'])) for d in all_urls)
+    all_current_urls = sorted(str((d['url'], d['name'])) for d in all_current_urls)
+
+    if len(all_urls) > len(all_current_urls):
+        urls_removed = '\n'.join(set(all_urls) - set(all_current_urls))
+        assert False, f'URLs number mismatch: {len(all_urls)} expected but new version contains {len(all_current_urls)}. ' \
+                      f'URLs removed:\n{urls_removed}.\n{instruction}'
+    elif len(all_urls) < len(all_current_urls):
+        urls_added = '\n'.join(set(all_current_urls) - set(all_urls))
+        assert False, f'URLs number mismatch: {len(all_urls)} expected but new version contains {len(all_current_urls)}. ' \
+                      f'New URLs added:\n{urls_added}.\n{instruction}'
+
+    for url, new_url in zip(all_urls, all_current_urls):
+        assert url == new_url, f'URL name mismatch found. {instruction}'

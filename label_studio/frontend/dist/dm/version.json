@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3494: Filters not working for Annotators in DM",
-  "commit": "1d5338074307eb56917a271e406af43e87f3cf38",
+  "message": "fix: DEV-3508: Paging error when refreshing the datamanager",
+  "commit": "c92a2c4ccfe5348f4caf0853f0c0e387d6055b0f",
   "branch": "master",
-  "date": "2022/09/23 04:37:22"
+  "date": "2022/10/03 06:33:14"
 }
