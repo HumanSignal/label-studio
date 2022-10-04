@@ -1,13 +1,6 @@
 {
-<<<<<<< HEAD
   "message": "fix: DEV-3492: Load virtual tab data from url key when present",
   "commit": "878c084adfabe0736ab2e9f5ca2d419cf009c7f9",
   "branch": "master",
-  "date": "2022/10/04 09:26:17"
-=======
-  "message": "fix: DEV-3508: Paging error when refreshing the datamanager",
-  "commit": "c92a2c4ccfe5348f4caf0853f0c0e387d6055b0f",
-  "branch": "master",
-  "date": "2022/10/03 06:33:14"
->>>>>>> origin/develop
+  "date": "2022-10-04T14:26:17Z"
 }
