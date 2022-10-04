@@ -3,6 +3,7 @@ node_modules
 *.pyc
 *.ipynb
 __pycache__
+.local/
 
 # docs
 __generated__
@@ -48,7 +49,6 @@ archive
 *.idea/*
 .vscode/*
 pyrightconfig.json
-tags
 tags.temp
 mydatabase
 label_studio.sqlite3
@@ -74,3 +74,4 @@ docker-compose.override.yml
 .config/*
 .python_history
 .viminfo
+.bash_history

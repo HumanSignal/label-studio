@@ -19,7 +19,7 @@ jobs:
           )
       - name: Notify to Slack
         if: ${{ failure() }}
-        uses: slackapi/slack-github-action@v1.19
+        uses: slackapi/slack-github-action@v1.22
         with:
           channel-id: '${{ secrets.SLACK_LS_MONITORING_CHANNEL }}'
           slack-message: "Our <${{ env.INVITE_LINK }}|public invite link> is down and needs to be manually updated:\n1. <https://slack.com/intl/en-es/help/articles/201330256-Invite-new-members-to-your-workspace#share-an-invite-link|Generate a new link> without expiry date; you may need to deactivate the previous one first.\n2. Update the permanent redirect link <https://s3.console.aws.amazon.com/s3/bucket/slack.labelstudio.heartex.com/property/website/edit?region=us-east-1|on the S3 dashboard> with newly generated link WITHOUT URL SCHEME."

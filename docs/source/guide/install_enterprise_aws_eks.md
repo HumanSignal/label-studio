@@ -53,29 +53,6 @@ kubectl get all
 
 After your cluster is up and running, and you configure your infrastructure such as ingress, you can prepare your cluster to install Label Studio Enterprise. 
 
-## 3. Prepare the Kubernetes cluster to install Label Studio Enterprise
+## Set up Label Studio Enterprise Helm chart
 
-Before installing Label Studio Enterprise, prepare the Kubernetes cluster with [kubectl](https://kubernetes.io/docs/reference/kubectl/). 
-
-### Retrieve Label Studio Enterprise and configure the license
-
-1. Create a key to pull the latest Label Studio Enterprise image from the Docker registry. From the command line of your cluster, run the following:
-    ```shell
-    kubectl create secret docker-registry heartex-pull-key \
-        --docker-server=https://index.docker.io/v2/ \
-        --docker-username=heartexlabs \
-        --docker-password=<CUSTOMER_PASSWORD>
-    ```
-2. Create the Label Studio Enterprise license as a Kubernetes secret. You can specify it as a file or as a specific URL. 
-   From the command line, specify the license as a file:
-   ```shell
-   kubectl create secret generic lse-license --from-file=license=path/to/lic
-   ```
-   Or from the command line, specify the license as a URL:
-   ```shell
-   kubectl create secret generic lse-license --from-literal=license=https://lic.heartex.ai/db/<CUSTOMER_LICENSE_ID>
-   ```
-
-## 4. Set up Label Studio Enterprise Helm chart
-
-See [Configure a values.yaml file for Label Studio Enterprise](install_enterprise_k8s.html#Configure-values-yaml).
+See [Deploy Label Studio Enterprise on Kubernetes](install_enterprise_k8s.html#Add-the-Helm-chart-repository-to-your-Kubernetes-cluster).

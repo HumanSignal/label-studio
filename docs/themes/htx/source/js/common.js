@@ -327,9 +327,9 @@
     var header = document.getElementById("header");
     var sidebar = document.querySelector(".sidebar");
     var content = document.querySelector(".content");
-
     // build sidebar
     var currentPageAnchor = sidebar.querySelector(".sidebar-link.current");
+
     var contentClasses = document.querySelector(".content").classList;
     var isAPIOrStyleGuide = contentClasses.contains("api") || contentClasses.contains("style-guide");
     if (currentPageAnchor || isAPIOrStyleGuide) {
@@ -423,12 +423,24 @@
 
     function updateSidebar() {
       var doc = document.documentElement;
-      var top = (doc && doc.scrollTop) || document.body.scrollTop;
+      var docTop = (doc && doc.scrollTop) || document.body.scrollTop;
+      const container = document.querySelector('.main__container').getBoundingClientRect();
+      const windowHeight = window.innerHeight
+      const { top, bottom } = container;
+
+      if (top > 0) {
+        sidebar.style.top = `${top}px`;
+      } else sidebar.style.top = `0px`;
+      
+      if (bottom < windowHeight) {
+        sidebar.style.bottom = `${windowHeight - bottom}px`;
+      } else sidebar.style.bottom = `0px`;
+        
       if (animating || !allHeaders) return;
       var last;
       for (var i = 0; i < allHeaders.length; i++) {
         var link = allHeaders[i];
-        if (link.offsetTop > top) {
+        if (link.offsetTop > docTop) {
           if (!last) last = link;
           break;
         } else {
@@ -579,4 +591,23 @@
         return result;
     }
   }
+    // footer fade and main content shrink effect 
+    document.documentElement.className = "js-enabled";
+
+    const footer = document.querySelector("#page-footer");
+    const sentinalEl = document.querySelector("#footer-anim-el");
+    const main = document.querySelector(".main__container");
+  
+    const handler = (entries) => {
+      if (!entries[0].isIntersecting) {
+        footer.style.opacity = "0.2";
+        main.classList.remove("footerActive")
+      } else {
+        footer.style.opacity = 1;
+        main.classList.add("footerActive")
+      }
+    }
+  
+    const observer = new window.IntersectionObserver(handler)
+    if(window.matchMedia("(min-width: 75rem)").matches) observer.observe(sentinalEl)
 })();

@@ -120,7 +120,7 @@ def get_fields_for_evaluation(prepare_params, user):
     return result
 
 
-def apply_ordering(queryset, ordering, project):
+def apply_ordering(queryset, ordering, project, request):
     if ordering:
         preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
         field_name, ascending = preprocess_field_name(ordering[0], only_undefined_field=project.only_undefined_field)
@@ -222,7 +222,7 @@ def add_user_filter(enabled, key, _filter, filter_expressions):
         return 'continue'
 
 
-def apply_filters(queryset, filters, project):
+def apply_filters(queryset, filters, project, request):
     if not filters:
         return queryset
 
@@ -240,12 +240,12 @@ def apply_filters(queryset, filters, project):
         preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
         field_name, _ = preprocess_field_name(_filter.filter, project.only_undefined_field)
 
-        # filter preprocessing, value type conversion, etc..
+        # filter pre-processing, value type conversion, etc..
         preprocess_filter = load_func(settings.DATA_MANAGER_PREPROCESS_FILTER)
         _filter = preprocess_filter(_filter, field_name)
 
         # custom expressions for enterprise
-        filter_expression = custom_filter_expressions(_filter, field_name, project)
+        filter_expression = custom_filter_expressions(_filter, field_name, project, request=request)
         if filter_expression:
             filter_expressions.append(filter_expression)
             continue
@@ -447,9 +447,9 @@ class TaskQuerySet(models.QuerySet):
             return queryset
 
         project = Project.objects.get(pk=prepare_params.project)
-
-        queryset = apply_filters(queryset, prepare_params.filters, project)
-        queryset = apply_ordering(queryset, prepare_params.ordering, project)
+        request = prepare_params.request
+        queryset = apply_filters(queryset, prepare_params.filters, project, request)
+        queryset = apply_ordering(queryset, prepare_params.ordering, project, request)
 
         if not prepare_params.selectedItems:
             return queryset
@@ -516,14 +516,25 @@ def annotate_predictions_score(queryset):
     if not first_task:
         return queryset
 
-    model_version = first_task.project.model_version
-    if model_version is None:
-        return queryset.annotate(predictions_score=Avg("predictions__score"))
+    # new approach with each ML backend contains it's version
+    if flag_set('ff_front_dev_1682_model_version_dropdown_070622_short', first_task.project.organization.created_by):
+        model_versions = list(first_task.project.ml_backends.filter(project=first_task.project).
+                              values_list("model_version", flat=True))
+        if len(model_versions) == 0:
+            return queryset.annotate(predictions_score=Avg("predictions__score"))
 
+        else:
+            return queryset.annotate(predictions_score=Avg(
+                "predictions__score", filter=Q(predictions__model_version__in=model_versions)
+            ))
     else:
-        return queryset.annotate(predictions_score=Avg(
-            "predictions__score", filter=Q(predictions__model_version=model_version)
-        ))
+        model_version = first_task.project.model_version
+        if model_version is None:
+            return queryset.annotate(predictions_score=Avg("predictions__score"))
+        else:
+            return queryset.annotate(predictions_score=Avg(
+                "predictions__score", filter=Q(predictions__model_version=model_version)
+            ))
 
 
 def annotate_annotations_ids(queryset):
@@ -576,7 +587,7 @@ def update_annotation_map(obj):
 
 class PreparedTaskManager(models.Manager):
     @staticmethod
-    def annotate_queryset(queryset, fields_for_evaluation=None, all_fields=False):
+    def annotate_queryset(queryset, fields_for_evaluation=None, all_fields=False, request=None):
         annotations_map = get_annotations_map()
 
         if fields_for_evaluation is None:
@@ -589,6 +600,7 @@ class PreparedTaskManager(models.Manager):
         for field in annotations_map.keys():
             if field in fields_for_evaluation or all_fields:
                 queryset.project = project
+                queryset.request = request
                 function = annotations_map[field]
                 queryset = function(queryset)
 
@@ -599,15 +611,22 @@ class PreparedTaskManager(models.Manager):
         :param fields_for_evaluation: list of annotated fields in task
         :param prepare_params: filters, ordering, selected items
         :param all_fields: evaluate all fields for task
+        :param request: request for user extraction
         :return: task queryset with annotated fields
         """
         queryset = self.only_filtered(prepare_params=prepare_params)
-        return self.annotate_queryset(queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields)
+        return self.annotate_queryset(
+            queryset,
+            fields_for_evaluation=fields_for_evaluation,
+            all_fields=all_fields,
+            request=prepare_params.request
+        )
 
     def only_filtered(self, prepare_params=None):
+        request = prepare_params.request
         queryset = TaskQuerySet(self.model).filter(project=prepare_params.project)
         fields_for_filter_ordering = get_fields_for_filter_ordering(prepare_params)
-        queryset = self.annotate_queryset(queryset, fields_for_evaluation=fields_for_filter_ordering)
+        queryset = self.annotate_queryset(queryset, fields_for_evaluation=fields_for_filter_ordering, request=request)
         return queryset.prepared(prepare_params=prepare_params)
 
 

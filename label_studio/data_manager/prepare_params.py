@@ -1,7 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from enum import Enum
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Any
 from pydantic import BaseModel, StrictInt, StrictFloat, StrictStr, StrictBool, ConstrainedList
 
 
@@ -39,3 +39,4 @@ class PrepareParams(BaseModel):
     selectedItems: Optional[SelectedItems] = None
     filters: Optional[Filters] = None
     data: Optional[dict] = None
+    request: Optional[Any] = None

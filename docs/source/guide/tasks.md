@@ -40,9 +40,10 @@ If you're importing audio, image, or video data, you must use URLs to refer to t
 
 If you're importing HTML, text, dialogue, or timeseries data using the `<HyperText>`, `<Text>`, `<Paragraphs>`, or `<TimeSeries>` tags in your labeling configuration, you can either load data directly, or load data from a URL. 
 - To load data from a URL, specify `valueType="url"` in your labeling configuration. 
-- To load data directly into the Label Studio database, specify `valueType="text"` for HyperText or Text data, or `valueType="json"` for Paragraph or TimeSeries data.
+- To load data directly into the Label Studio database, specify `valueType="text"` for `HyperText` or `Text` data, or `valueType="json"` for `Paragraph` or `TimeSeries` data.
 
-> Note: If you load data from a URL, the data is not saved in Label Studio. If you want an annotated task export to include the data that you annotated, you must import the data into the Label Studio database without using URL references, or combine the data with the annotations after exporting.
+!!! note
+    If you load data from a URL, the data is not saved in Label Studio. If you want an annotated task export to include the data that you annotated, you must import the data into the Label Studio database without using URL references, or combine the data with the annotations after exporting.
 
 <br/>
 {% details <b>Click to expand example configurations with each valueType</b> %}
@@ -102,6 +103,135 @@ http://example.com/text.txt
 
 {% enddetails %}
 
+
+## How to retrieve data
+
+There are several steps to retrieve the data to display in the `Object` tag. The data retrieval is also used in [dynamic choices](/templates/serp_ranking.html) and [labels](/templates/inventory_tracking.html). Use the following parameters in the `Object` tag.
+
+### `value` (required)
+
+The `value` parameter represents the source of the data. It can be plain text or a step of complex data retrieval system. It can be denoted using the following forms:
+`value` (required)
+
+#### Variables 
+
+In most cases, the `Object` tag has the value with one variable (prefixed with a $) in it.
+
+For example, `<Audio value="$audio" ... />` seeks the "audio" field in the imported JSON object:
+```json
+{
+  "data": {
+    "audio": "https://host.name/myaudio.wav"
+  }
+}
+```
+
+#### Plain text
+
+The value parameter can be a string. It is useful for `Header` and `Text`. 
+
+Also, you can use the content of the tag as value. It is useful for descriptive text tags and is applied for `Label` and `Choice`.
+
+For example:
+
+```xml
+<Header>Label audio:</Header>
+<Header value="Label only fully visible cars" />
+<Text name="instruction" value="Label only fully visible cars" />
+<Label>cat</Label>
+
+<Choice>other</Choice>
+```
+
+#### Other cases
+
+1. The `value` parameter can be a text containing variables prefixed by $.
+
+    For example:
+    ```xml
+    <Header value="url: $image"/>
+    ```
+
+2. The `value` parameter can also refer to nested data in arrays and dicts (`$texts[2]` and `$audio.url`). 
+
+    For example: 
+    ```xml
+    <Image name="image" value="$images[0]"/>
+    ```
+
+3. The `value` parameter can include [`Repeater`](/tags/repeater.html) tag substitution, by default `{{idx}}`.
+
+    For example:
+    ```xml
+    <Repeater on="$audios">
+      <Audio name="audio_{{idx}}" value="$audios[{{idx}}].url"/>
+    </Repeater>
+    ```
+
+
+### `valueType` (optional)
+
+The `valueType` parameter defines how to treat the data retrieved from the previous steps.
+There are two options such as the  "url" and raw data. Currently the raw data input can be  "text” or "json”. The  “text” is used for `HyperText` and `Text` tags and "json" is used for `TimeSeries` tag. 
+
+For example:
+
+- Using “url”: `<Text name="text1" value="$text" valueType="url"/>` displays the text loaded by the URL.
+
+- Using “text”: `<Text name="text" value="$text" valueType="text"/>` displays the URL without loading the text.
+
+### `resolver` (optional)
+    
+Use this parameter to retrieve data from multi-column csv on [S3 or other cloud storage](/guide/storage.html). Label Studio can retrieve it only in run-time, so it's secure.
+
+If you import a file with a list of tasks, and every task in this list is a link to another file in the storage. In this case, you can use the `resolver` parameter to retrieve the content of these files from a storage. 
+
+**Use case**
+
+There is a list of tasks, where the "remote-csv" field of every task is a link to a CSV file in the storage. Every CSV file has a “text” column with text to be labeled. Every CSV file has a “text” column with text to be labeled. For example:
+
+Tasks:
+```json
+[
+    { "remote-csv": "s3://bucket/text1.csv" },
+    { "remote-csv": "s3://bucket/text2.csv" }
+]
+```
+
+CSV file:
+```csv
+id;text
+12;The most flexible data annotation tool. Quickly installable. Build custom UIs or use pre-built labeling templates.
+```
+
+**Solution**
+
+To retrieve the file, use the following parameters:
+
+1. `value="$remote-csv"`: The URL to CSV on S3 is in "remote-csv" field of task data. If you use the `resolver` parameter the `value` is always treated as a URL, so you don't need to set `valueType`.
+
+2. `resolver="csv|separator=;|column=text"`: Load this file in run-time, parse it as CSV, and get the “text” column from the first row. 
+
+3. Display the result.
+
+**Syntax**
+
+The syntax for the `resolver` parameter consists of a list of options separated by a `|` symbol.
+
+The first option is the type of file.
+
+!!! note
+    Currently, only CSV files are supported.
+
+The remaining options are parameters of the specified file type with optional values. The parameters for CSV files are:
+
+- `headless`: A CSV file does not have headers (this parameter is boolean and can't have a value).
+- `separator=;`: CSV separator, usually can be detected automatically.
+- `column=1`: In `headless` mode use zero-based index, otherwise use column name.
+
+For example, `resolver="csv|headless|separator=;|column=1"`
+
+
 ## How to format your data to import it
 
 Label Studio treats different file types different ways. 
@@ -139,7 +269,7 @@ See [Relevant JSON property descriptions](export.html#Relevant-JSON-property-des
 ### Example JSON format
 
 For an example text classification project, you can set up a label config like the following:
-```html
+```xml
 <View>
   <Text name="message" value="$my_text"/>
   <Choices name="sentiment_class" toName="message">
@@ -291,7 +421,8 @@ this is a first task,123
 this is a second task,456
 ```
 
-> Note: If your labeling config has a TimeSeries tag, Label Studio interprets the CSV/TSV as time series data when you import it. This CSV/TSV is hosted as a resource file and Label Studio automatically creates a task with a link to the uploaded CSV/TSV.
+!!! note
+    If your labeling config has a `TimeSeries` tag, Label Studio interprets the CSV/TSV as time series data when you import it. This CSV/TSV is hosted as a resource file and Label Studio automatically creates a task with a link to the uploaded CSV/TSV.
 
 ### Plain text
 
@@ -308,11 +439,11 @@ If you want to import entire plain text files without each line becoming a new l
 
 ### Import HTML data
 
-You can import HyperText data in HTML-formatted files and annotate them in Label Studio. When you directly import HTML files, the content is minified the content is minified by compressing the text, removing whitespace and other nonfunctional data in the HTML code. Annotations that you create are applied to the minified version of the HTML. 
+You can import `HyperText` data in HTML-formatted files and annotate them in Label Studio. When you directly import HTML files, the content is minified by compressing the text, removing whitespace and other nonfunctional data in the HTML code. Annotations that you create are applied to the minified version of the HTML.
 
 If you want to label HTML files without minifying the data, you can do one of the following:
 - Import the HTML files as BLOB storage from [external cloud storage such as Amazon S3 or Google Cloud Storage](storage.html).
-- Update the HyperText tag in your labeling configuration to specify `valueType="url"` as described in [How to import your data](#How-to-import-your-data) on this page.
+- Update the `HyperText` tag in your labeling configuration to specify `valueType="url"` as described in [How to import your data](#How-to-import-your-data) on this page.
 
 ## Import data from a local directory
 
@@ -321,6 +452,7 @@ To import data from a local directory, you have two options:
 - Add the file directory as a source or target [local storage](storage.html#Local-storage) connection in the Label Studio UI.
 
 ### Run a web server to generate URLs to local files
+
 To run a web server to generate URLs for the files, you can refer to this provided [helper shell script in the Label Studio repository](https://github.com/heartexlabs/label-studio/blob/master/scripts/serve_local_files.sh) or write your own script. 
 Use that script to do the following:
 1. On the machine with the file directory that you want Label Studio to import, call the helper script and specify a regex pattern to match the files that you want to import. In this example, the script identifies files with the JPG file extension:
@@ -330,7 +462,8 @@ Use that script to do the following:
    The script collects the links to the files provided by that HTTP server and saves them to a `files.txt` file with one URL per line. 
 3. Import the file with URLs into Label Studio using the Label Studio UI. 
 
-> Note: You must keep the web server running while you perform your data labeling so that the URLs remain accessible to Label Studio.
+!!! note 
+    You must keep the web server running while you perform your data labeling so that the URLs remain accessible to Label Studio.
 
 If your labeling configuration supports HyperText or multiple data types, use the Label Studio JSON format to specify the local file locations instead of a `txt` file. See [an example of this format](storage.html#Tasks-with-local-storage-file-references).
 
@@ -341,7 +474,9 @@ http-server -p 3000 --cors
 ```
 
 ### Add the file directory as source storage in the Label Studio UI
+
 If you're running Label Studio on Docker and want to add local file storage, you need to mount the file directory and set up environment variables. See [Run Label Studio on Docker and use local storage](start.html#Run-Label-Studio-on-Docker-and-use-local-storage).
+
 
 ## Import data from the Label Studio UI
 
@@ -353,6 +488,7 @@ To import data from the Label Studio UI, do the following:
 Data that you import is project-specific.
 
 <img src="/images/screens/import-button.png" class="img-template-example" title="Import Button in Data Manager" /> 
+
 
 ## Import data using the API
 
@@ -373,7 +509,8 @@ You can use the `--input-path` argument to specify a file or directory with the 
 label-studio init my-project --input-path=my/audios/dir --input-format=audio-dir --label-config=config.xml --allow-serving-local-files
 ```
 
-> WARNING: the `--allow-serving-local-files` argument is intended for use only with locally-running instances of Label Studio. Avoid using it for remote servers unless you are sure what you're doing.
+!!! warning 
+    The `--allow-serving-local-files` argument is intended for use only with locally-running instances of Label Studio. Avoid using it for remote servers unless you are sure what you're doing.
 
 By default, Label Studio expects JSON-formatted tasks using the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format). 
 

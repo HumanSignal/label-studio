@@ -1,0 +1,228 @@
+name: "Cut off release branch"
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'
+        required: true
+        type: string
+      ref:
+        description: 'Commit SHA or ref name or tag'
+        required: true
+        default: 'develop'
+        type: string
+
+env:
+  PYTHON_VERSION_FILE: "label_studio/__init__.py"
+  RELEASE_BRANCH_PREFIX: "ls-release"
+
+jobs:
+  draft-new-release:
+    name: "Draft new release/hotfix"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v2.0.1
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          ref: ${{ inputs.ref }}
+          submodules: 'recursive'
+          fetch-depth: 0
+
+      - name: Configure git
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          git config --global user.name 'robot-ci-heartex'
+          git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
+
+      - name: Calculate branch name and version
+        id: calculate_branch_name_and_version
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          
+          regexp='^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)$';
+          
+          if [[ "${{ inputs.version }}" =~ $regexp ]]; then
+              first="${BASH_REMATCH[1]}"
+              second="${BASH_REMATCH[2]}"
+              third="${BASH_REMATCH[3]}"
+          else
+              echo "${{ inputs.version }} does not mach the regexp ${regexp}"
+              exit 1
+          fi
+          
+          release_version="${first}.${second}.${third}"
+          release_branch="${{ env.RELEASE_BRANCH_PREFIX }}/${first}.${second}.${third}"
+          next_develop_version="${first}.${second}.$(($third + 1))dev"
+          
+          echo "::set-output name=release_branch::${release_branch}"
+          echo "::set-output name=release_version::${release_version}"
+          echo "::set-output name=next_develop_version::${next_develop_version}"
+
+      - name: Cut dependencies release branches
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const ref = '${{ github.event.inputs.ref }}'
+            const release = '${{ steps.calculate_branch_name_and_version.outputs.release_branch }}'
+
+            let submodules = [
+                {owner: 'heartexlabs', repo: 'label-studio-frontend'},
+                {owner: 'heartexlabs', repo: 'dm2'}
+            ]
+            
+            async function getLSSubmoduleVersions(sha) {
+                let {data: lsTreeData} = await github.rest.git.getTree({
+                    owner,
+                    repo,
+                    tree_sha: sha
+                })
+                lsTreeData = (await github.rest.git.getTree({
+                    owner,
+                    repo,
+                    tree_sha: lsTreeData.tree.find(e => e.path === 'label_studio' && e.type === 'tree').sha
+                })).data
+                lsTreeData = (await github.rest.git.getTree({
+                    owner,
+                    repo,
+                    tree_sha: lsTreeData.tree.find(e => e.path === 'frontend' && e.type === 'tree').sha
+                })).data
+                lsTreeData = (await github.rest.git.getTree({
+                    owner,
+                    repo,
+                    tree_sha: lsTreeData.tree.find(e => e.path === 'dist' && e.type === 'tree').sha
+                })).data
+                const {data: lsDMTreeData} = await github.rest.git.getTree({
+                    owner,
+                    repo,
+                    tree_sha: lsTreeData.tree.find(e => e.path === 'dm' && e.type === 'tree').sha
+                })
+                const {data: dmfVersion} = await github.rest.git.getBlob({
+                    owner,
+                    repo,
+                    file_sha: lsDMTreeData.tree.find(e => e.path === 'version.json' && e.type === 'blob').sha
+                })
+                const dmVersionContent = Buffer.from(dmfVersion.content, dmfVersion.encoding).toString("utf8")
+                const matchDM = dmVersionContent.match('"commit": "(.*)",')
+                const {data: lsLSFTreeData} = await github.rest.git.getTree({
+                    owner,
+                    repo,
+                    tree_sha: lsTreeData.tree.find(e => e.path === 'lsf' && e.type === 'tree').sha
+                })
+                const {data: lsfVersion} = await github.rest.git.getBlob({
+                    owner,
+                    repo,
+                    file_sha: lsLSFTreeData.tree.find(e => e.path === 'version.json' && e.type === 'blob').sha
+                })
+                const lsfVersionContent = Buffer.from(lsfVersion.content, lsfVersion.encoding).toString("utf8")
+                const matchLSF = lsfVersionContent.match('"commit": "(.*)",')
+                return {
+                    'label-studio-frontend': matchLSF[1],
+                    'dm2': matchDM[1],
+                }
+            }
+            
+            const versions = await getLSSubmoduleVersions('${{ inputs.ref }}')
+            console.log(`submodules versions: ${{ inputs.ref }}`)
+            console.log(versions)
+            
+            for (let submodule of submodules) {
+                const response = await github.rest.git.createRef({
+                    owner: submodule.owner,
+                    repo: submodule.repo,
+                    ref: `refs/heads/${release}`,
+                    sha: versions[submodule.repo],
+                });
+            }
+
+      - name: Commit version files to release branch
+        id: make-release-commit
+        run: |
+          set -euo pipefail
+          
+          git checkout -b "${{ steps.calculate_branch_name_and_version.outputs.release_branch }}"
+          
+          sed -i "s/^__version__[ ]*=.*/__version__ = '${{ steps.calculate_branch_name_and_version.outputs.release_version }}'/g" ${{ env.PYTHON_VERSION_FILE }}
+          
+          git add ${{ env.PYTHON_VERSION_FILE }}
+          git commit --message "ci: cut release ${{ steps.calculate_branch_name_and_version.outputs.release_version }}"
+
+          echo "::set-output name=commit::$(git rev-parse HEAD)"
+          git push origin HEAD:refs/heads/${{ steps.calculate_branch_name_and_version.outputs.release_branch }}
+
+      - uses: actions/cache@v3
+        name: Configure pip cache
+        id: pip-cache
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-gh-actions-${{ hashFiles('.github/helpers/gh_jira_comparisonator/requirements.txt') }}-${{ hashFiles('.github/helpers/gh_changelog_generator/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-gh-actions-
+
+      - name: Commit version files to 'develop'
+        id: make-develop-commit
+        run: |
+          set -euo pipefail
+          
+          git checkout '${{ github.event.repository.default_branch }}'
+          
+          branch='bump-version-${{ steps.calculate_branch_name_and_version.outputs.next_develop_version }}'
+          echo "::set-output name=branch::${branch}"
+          git checkout -b "${branch}"
+          
+          sed -i "s/^__version__[ ]*=.*/__version__ = '${{ steps.calculate_branch_name_and_version.outputs.next_develop_version }}'/g" ${{ env.PYTHON_VERSION_FILE }}
+          
+          git add ${{ env.PYTHON_VERSION_FILE }}
+          git commit --message "chore: Bump version to ${{ steps.calculate_branch_name_and_version.outputs.next_develop_version }}"
+
+          echo "::set-output name=commit::$(git rev-parse HEAD)"
+          git push origin HEAD:refs/heads/${branch}
+
+      - name: Create PR to 'develop'
+        uses: actions/github-script@v6
+        id: create-pr
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const createPullResponse = await github.rest.pulls.create({
+              title: 'chore: Bump version to ${{ steps.calculate_branch_name_and_version.outputs.next_develop_version }}',
+              owner,
+              repo,
+              head: '${{ steps.make-develop-commit.outputs.branch }}',
+              base: '${{ github.event.repository.default_branch }}',
+              body: [
+                'Hi @${{ github.actor }}!',
+                '',
+                'This PR was created in response to a manual trigger of the release workflow here: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}.',
+              ].join('\n')
+            });
+            github.rest.pulls.requestReviewers({
+              owner,
+              repo,
+              pull_number: createPullResponse.data.number,
+               reviewers: [ '${{ github.actor }}' ]
+            });
+            return createPullResponse
+
+      - name: Enable AutoMerge
+        id: enable-pr-automerge
+        shell: bash
+        run: |
+          echo ${{ secrets.GIT_PAT }} | gh auth login --with-token
+          gh api graphql -f pull='${{ fromJson(steps.create-pr.outputs.result).data.node_id }}' -f query='
+            mutation($pull: ID!) {
+              enablePullRequestAutoMerge(input: {pullRequestId: $pull, mergeMethod: SQUASH}) {
+                pullRequest {
+                  id
+                  number
+                }
+              }
+            }'

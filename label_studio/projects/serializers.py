@@ -83,7 +83,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
                   'total_annotations_number', 'total_predictions_number', 'sampling', 'show_ground_truth_first',
                   'show_overlap_first', 'overlap_cohort_percentage', 'task_data_login', 'task_data_password',
                   'control_weights', 'parsed_label_config', 'evaluate_predictions_automatically',
-                  'config_has_control_tags', 'skip_queue', 'reveal_preannotations_interactively',
+                  'config_has_control_tags', 'skip_queue', 'reveal_preannotations_interactively', 'pinned_at',
                   'finished_task_number']
 
     def validate_label_config(self, value):
@@ -115,3 +115,17 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectSummary
         fields = '__all__'
+
+
+class GetFieldsSerializer(serializers.Serializer):
+    include = serializers.CharField(required=False)
+    filter = serializers.CharField(required=False, default='all')
+
+    def validate_include(self, value):
+        if value is not None:
+            value = value.split(',')
+        return value
+
+    def validate_filter(self, value):
+        if value in ['all', 'pinned_only', 'exclude_pinned']:
+            return value

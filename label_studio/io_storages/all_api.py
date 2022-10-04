@@ -66,7 +66,7 @@ class AllImportStorageListAPI(generics.ListAPIView):
                 raise ValueError(f'Response is not list')
             return response.data
         except Exception as exc:
-            logger.error(f"Can't process {api.__class__.__name__}. Reason: {exc}", exc_info=True)
+            logger.error(f"Can't process {api.__class__.__name__}", exc_info=True)
             return []
 
     def list(self, request, *args, **kwargs):

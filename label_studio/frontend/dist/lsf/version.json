@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2408: Regions disappearing from UI (#631)\n\n* fix: DEV-2408: Regions disappearing from UI\r\n\r\n* test: DEV-2408: Add test for wrong reordered results of per-region textarea and richtext",
-  "commit": "6ef0657ffa22fe4001129a84ef8aa21e430b2a0b",
-  "branch": "",
-  "date": "2022-05-20T16:49:57Z"
+  "message": "fix: DEV-3377: Region shift on resize (#886)\n\n* fix: DEV-3377: Region shift on resize\r\n\r\n* fix: DEV-3377: Fix zoom position restrictions\r\n\r\n* test: DEV-3377: Reanimate regression tests\r\n\r\n* test: DEV-3377: Add test for zoomed images displaying precision",
+  "commit": "003dfe97d0d639226811f129fb38f14971d1d3c3",
+  "branch": "master",
+  "date": "2022-10-04T08:33:53Z"
 }

@@ -205,6 +205,7 @@ class ImportAPI(generics.CreateAPIView):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
 
         # upload files from request, and parse all tasks
+        # TODO: Stop passing request to load_tasks function, make all validation before
         parsed_data, file_upload_ids, could_be_tasks_lists, found_formats, data_columns = load_tasks(request, project)
 
         if preannotated_from_fields:
@@ -311,7 +312,7 @@ class ReImportAPI(ImportAPI):
                 'file_upload_ids': [],
                 'found_formats': {},
                 'data_columns': []
-            }, status=status.HTTP_204_NO_CONTENT)
+            }, status=status.HTTP_200_OK)
 
         tasks, found_formats, data_columns = FileUpload.load_tasks_from_uploaded_files(
             project, file_upload_ids,  files_as_tasks_list=files_as_tasks_list)
@@ -451,6 +452,7 @@ class UploadedFileResponse(generics.RetrieveAPIView):
     def get(self, *args, **kwargs):
         request = self.request
         filename = kwargs['filename']
+        # XXX needed, on windows os.path.join generates '\' which breaks FileUpload
         file = settings.UPLOAD_DIR + ('/' if not settings.UPLOAD_DIR.endswith('/') else '') + filename
         logger.debug(f'Fetch uploaded file by user {request.user} => {file}')
         file_upload = FileUpload.objects.filter(file=file).last()

@@ -12,7 +12,7 @@ After you install Label Studio, start the server to start using it.
 label-studio start
 ```
 
-By default, Label Studio starts with a SQLite database to store labeling tasks and annotations. You can specify different source and target storage for labeling tasks and annotations using Label Studio UI or the API. See [Database storage](storedata.html) for more.
+By default, Label Studio starts with an SQLite database to store labeling tasks and annotations. You can specify different sources and target storage for labeling tasks and annotations using Label Studio UI or the API. See [Database storage](storedata.html) for more.
 
 ## Command line arguments for starting Label Studio
 You can specify a machine learning backend and other options using the command line interface. Run `label-studio --help` to see all available options, or refer to the following tables.
@@ -62,8 +62,12 @@ In *nix operating systems, you can set environment variables from the command li
 ```bash
 export LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
 ```
-You can also use an `.env` file. 
 
+!!! note
+    If you are using docker, you can write all your [environment variables into the `.env`](https://docs.docker.com/compose/env-file/) file.
+    
+    
+    
 On Windows, you can use the following syntax:
 ```bash
 set LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true

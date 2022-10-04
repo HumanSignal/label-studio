@@ -1,7 +1,7 @@
 ---
 title: KeyPointLabels
 type: tags
-order: 409
+order: 410
 meta_title: Keypoint Label Tag for Labeling Keypoints
 meta_description: Customize Label Studio with the KeyPointLabels tag to label keypoints for computer vision machine learning and data science projects.
 ---

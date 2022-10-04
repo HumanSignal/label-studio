@@ -1,0 +1,28 @@
+{
+  "LABEL": {
+    "name": "title needs formatting",
+    "color": "EEEEEE"
+  },
+  "CHECKS": {
+    "prefixes": [
+      "fix: ",
+      "feat: ",
+      "docs: ",
+      "chore: ",
+      "ci: ",
+      "perf: ",
+      "refactor: ",
+      "style: ",
+      "test: "
+    ],
+    "ignoreLabels": [
+      "skip-changelog",
+      "skip-ci"
+    ]
+  },
+  "MESSAGES": {
+    "success": "PR title is valid",
+    "failure": "PR title is invalid",
+    "notice": "Valid prefixes are: fix, feat, docs, chore, ci, perf, refactor, style, test."
+  }
+}

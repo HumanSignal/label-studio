@@ -1,7 +1,7 @@
 ---
 title: Ranker
 type: tags
-order: 418
+order: 419
 meta_title: Ranker Tag for Model Ranking
 meta_description: Customize Label Studio with the Ranker tag to rank the predictions from different models to rank model quality in your machine learning and data science projects.
 ---

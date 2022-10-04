@@ -30,7 +30,6 @@
     "@sentry/browser": "^6.8.0",
     "@sentry/react": "^6.8.0",
     "@sentry/tracing": "^6.8.0",
-    "@sentry/webpack-plugin": "^1.15.1",
     "@svgr/webpack": "^5.5.0",
     "@types/chroma-js": "^2.1.3",
     "@types/enzyme": "^3.10.8",

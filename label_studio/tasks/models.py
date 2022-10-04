@@ -10,9 +10,8 @@ from urllib.parse import urljoin, quote
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.db import models, connection, transaction
-from django.db.models import Q, F, When, Count, Case, Subquery, OuterRef, Value
-from django.db.models.functions import Coalesce
+from django.db import models, transaction
+from django.db.models import Q
 from django.db.models.signals import post_delete, pre_save, post_save, pre_delete
 from django.utils.translation import gettext_lazy as _
 from django.db.models import JSONField
@@ -46,6 +45,7 @@ class Task(TaskMixin, models.Model):
     data = JSONField('data', null=False, help_text='User imported or uploaded data for a task. Data is formatted according to '
                                                    'the project label config. You can find examples of data for your project '
                                                    'on the Import page in the Label Studio Data Manager UI.')
+
     meta = JSONField('meta', null=True, default=dict,
                      help_text='Meta is user imported (uploaded) data and can be useful as input for an ML '
                                'Backend for embeddings, advanced vectors, and other info. It is passed to '
@@ -66,7 +66,7 @@ class Task(TaskMixin, models.Model):
         'data_import.FileUpload', on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks',
         help_text='Uploaded file used as data source for this task'
     )
-    inner_id = models.BigIntegerField(_('inner id'), default=0, db_index=True, null=True,
+    inner_id = models.BigIntegerField(_('inner id'), default=0, null=True,
                                       help_text='Internal task ID in the project, starts with 1')
     updates = ['is_labeled']
     total_annotations = models.IntegerField(_('total_annotations'), default=0, db_index=True,
@@ -75,6 +75,20 @@ class Task(TaskMixin, models.Model):
                                                 help_text='Number of total cancelled annotations for the current task')
     total_predictions = models.IntegerField(_('total_predictions'), default=0, db_index=True,
                                   help_text='Number of total predictions for the current task')
+
+    comment_count = models.IntegerField(
+        _('comment count'), default=0, db_index=True,
+        help_text='Number of comments in the task including all annotations')
+    unresolved_comment_count = models.IntegerField(
+        _('unresolved comment count'), default=0, db_index=True,
+        help_text='Number of unresolved comments in the task including all annotations')
+    comment_authors = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, blank=True, default=None,
+        related_name='tasks_with_comments', help_text='Users who wrote comments')
+    last_comment_updated_at = models.DateTimeField(
+        _('last comment updated at'), default=None, null=True, db_index=True,
+        help_text='When the last comment was updated')
+
     objects = TaskManager()  # task manager by default
     prepared = PreparedTaskManager()  # task manager with filters, ordering, etc for data_manager app
 
@@ -83,6 +97,7 @@ class Task(TaskMixin, models.Model):
         ordering = ['-updated_at']
         indexes = [
             models.Index(fields=['project', 'is_labeled']),
+            models.Index(fields=['project', 'inner_id']),
             models.Index(fields=['id', 'project']),
             models.Index(fields=['id', 'overlap']),
             models.Index(fields=['overlap']),
@@ -135,6 +150,12 @@ class Task(TaskMixin, models.Model):
     @property
     def num_locks(self):
         return self.locks.filter(expire_at__gt=now()).count()
+
+    @property
+    def storage_filename(self):
+        for link_name in settings.IO_STORAGES_IMPORT_LINK_NAMES:
+            if hasattr(self, link_name):
+                return getattr(self, link_name).key
 
     def get_lock_ttl(self):
         if settings.TASK_LOCK_TTL is not None:
@@ -213,7 +234,7 @@ class Task(TaskMixin, models.Model):
                     try:
                         resolved_uri = storage.resolve_uri(task_data[field])
                     except Exception as exc:
-                        logger.error(exc, exc_info=True)
+                        logger.debug(exc, exc_info=True)
                         resolved_uri = None
                     if resolved_uri:
                         task_data[field] = resolved_uri
@@ -268,7 +289,7 @@ class Task(TaskMixin, models.Model):
         self.annotations.exclude(id=annotation_id).update(ground_truth=False)
 
     def save(self, *args, **kwargs):
-        if flag_set('ff_back_2070_inner_id_12052022_short', self.project.organization.created_by):
+        if flag_set('ff_back_2070_inner_id_12052022_short', AnonymousUser):
             if self.inner_id == 0:
                 task = Task.objects.filter(project=self.project).order_by("-inner_id").first()
                 max_inner_id = 1
@@ -286,13 +307,16 @@ class Task(TaskMixin, models.Model):
         :param queryset: Tasks queryset
         """
         signals = [
-            (post_delete, update_is_labeled_after_removing_annotation, Annotation),
             (post_delete, update_all_task_states_after_deleting_task, Task),
-            (pre_delete, remove_data_columns, Task),
-            (post_delete, remove_project_summary_annotations, Annotation)
+            (pre_delete, remove_data_columns, Task)
         ]
         with temporary_disconnect_list_signal(signals):
             queryset.delete()
+
+    @staticmethod
+    def delete_tasks_without_signals_from_task_ids(task_ids):
+        queryset = Task.objects.filter(id__in=task_ids)
+        Task.delete_tasks_without_signals(queryset)
 
 pre_bulk_create = Signal(providing_args=["objs", "batch_size"])
 post_bulk_create = Signal(providing_args=["objs", "batch_size"])
@@ -407,7 +431,28 @@ class Annotation(AnnotationMixin, models.Model):
     def delete(self, *args, **kwargs):
         result = super().delete(*args, **kwargs)
         self.update_task()
+        self.on_delete_update_counters()
         return result
+
+    def on_delete_update_counters(self):
+        task = self.task
+        logger.debug(f"Start updating counters for task {task.id}.")
+        if self.was_cancelled:
+            cancelled = task.annotations.all().filter(was_cancelled=True).count()
+            Task.objects.filter(id=task.id).update(cancelled_annotations=cancelled)
+            logger.debug(f"On delete updated cancelled_annotations for task {task.id}")
+        else:
+            total = task.annotations.all().filter(was_cancelled=False).count()
+            Task.objects.filter(id=task.id).update(total_annotations=total)
+            logger.debug(f"On delete updated total_annotations for task {task.id}")
+
+        logger.debug(f'Update task stats for task={task}')
+        task.update_is_labeled()
+        Task.objects.filter(id=task.id).update(is_labeled=task.is_labeled)
+
+        # remove annotation counters in project summary followed by deleting an annotation
+        logger.debug("Remove annotation counters in project summary followed by deleting an annotation")
+        self.decrease_project_summary_counters()
 
 
 class TaskLock(models.Model):
@@ -424,7 +469,7 @@ class AnnotationDraft(models.Model):
         _('result'),
         help_text='Draft result in JSON format')
     lead_time = models.FloatField(
-        _('lead time'),
+        _('lead time'), blank=True, null=True,
         help_text='How much time it took to annotate the task')
     task = models.ForeignKey(
         'tasks.Task', on_delete=models.CASCADE, related_name='drafts', blank=True, null=True,
@@ -435,6 +480,12 @@ class AnnotationDraft(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='drafts', on_delete=models.CASCADE,
         help_text='User who created this draft')
+    was_postponed = models.BooleanField(
+        _('was postponed'),
+        default=False,
+        help_text='User postponed this draft (clicked a forward button) in the label stream',
+        db_index=True
+    )
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last update time')
@@ -636,18 +687,7 @@ def update_project_summary_annotations_and_is_labeled(sender, instance, created,
             instance.task.total_annotations = instance.task.annotations.all().filter(was_cancelled=False).count()
         instance.task.update_is_labeled()
         instance.task.save(update_fields=['is_labeled', 'total_annotations', 'cancelled_annotations'])
-
-
-@receiver(post_delete, sender=Annotation)
-def remove_project_summary_annotations(sender, instance, **kwargs):
-    """Remove annotation counters in project summary followed by deleting an annotation"""
-    instance.decrease_project_summary_counters()
-    if instance.was_cancelled:
-        Task.objects.filter(id=instance.task.id).update(
-            cancelled_annotations=instance.task.annotations.all().filter(was_cancelled=True).count())
-    else:
-        Task.objects.filter(id=instance.task.id).update(
-            total_annotations=instance.task.annotations.all().filter(was_cancelled=False).count())
+        logger.debug(f"Updated total_annotations and cancelled_annotations for {instance.task.id}.")
 
 
 @receiver(pre_delete, sender=Prediction)
@@ -655,39 +695,23 @@ def remove_predictions_from_project(sender, instance, **kwargs):
     """Remove predictions counters"""
     instance.task.total_predictions = instance.task.predictions.all().count() - 1
     instance.task.save(update_fields=['total_predictions'])
+    logger.debug(f"Updated total_predictions for {instance.task.id}.")
+
 
 @receiver(post_save, sender=Prediction)
 def save_predictions_to_project(sender, instance, **kwargs):
     """Add predictions counters"""
     instance.task.total_predictions = instance.task.predictions.all().count()
     instance.task.save(update_fields=['total_predictions'])
-
+    logger.debug(f"Updated total_predictions for {instance.task.id}.")
 
 # =========== END OF PROJECT SUMMARY UPDATES ===========
-
-
-def _task_exists_in_db(task):
-    try:
-        Task.objects.get(id=task.id)
-    except Task.DoesNotExist:
-        return False
-    return True
-
-
-@receiver(post_delete, sender=Annotation)
-def update_is_labeled_after_removing_annotation(sender, instance, **kwargs):
-    # Update task.is_labeled state
-    task = instance.task
-    if _task_exists_in_db(task): # To prevent django.db.utils.DatabaseError: Save with update_fields did not affect any rows.
-        logger.debug(f'Update task stats for task={task}')
-        instance.task.update_is_labeled()
-        instance.task.save(update_fields=['is_labeled'])
 
 
 @receiver(post_save, sender=Annotation)
 def delete_draft(sender, instance, **kwargs):
     task = instance.task
-    query_args = {'task': instance.task, 'annotation': instance}
+    query_args = {'task': task, 'annotation': instance}
     drafts = AnnotationDraft.objects.filter(**query_args)
     num_drafts = drafts.count()
     drafts.delete()
@@ -714,7 +738,7 @@ def update_task_stats(task, stats=('is_labeled',), save=True):
     """Update single task statistics:
         accuracy
         is_labeled
-    :param task_id:
+    :param task: Task to update
     :param stats: to update separate stats
     :param save: to skip saving in some cases
     :return:
@@ -733,7 +757,6 @@ def bulk_update_stats_project_tasks(tasks):
        on updated Task objects
        in single transaction as execute sql
     :param tasks:
-    :param batch_size:
     :return:
     """
     # recalc accuracy
@@ -743,6 +766,7 @@ def bulk_update_stats_project_tasks(tasks):
             update_task_stats(task, save=False)
         # start update query batches
         bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \

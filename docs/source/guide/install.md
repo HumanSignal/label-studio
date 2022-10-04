@@ -83,6 +83,29 @@ docker-compose up -d
 
 This starts Label Studio with a PostgreSQL database backend. You can also use a PostgreSQL database without Docker Compose. See [Set up database storage](storedata.html).
 
+### Install Label Studio without internet access
+Download label-studio docker image (host with internet access and docker):
+```bash 
+docker pull heartexlabs/label-studio:latest
+```
+
+Export it as a tar archive: 
+```bash
+docker save heartexlabs/label-studio:latest | gzip > label_studio_latest.tar.gz
+```
+
+Transfer it to another VM:
+```bash
+scp label_studio_latest.tar.gz <ANOTHER_HOST>:/tmp
+```
+
+SSH into <ANOTHER_HOST> and import the archive:
+```bash
+docker image import /tmp/label_studio_latest.tar.gz
+```
+
+Follow steps from [Install and Upgrade to run LS](install.html#Install-with-Docker).
+
 ## Install on Ubuntu
 
 To install Label Studio on Ubuntu and run it in a virtual environment, run the following command:

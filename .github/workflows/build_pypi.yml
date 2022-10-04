@@ -1,0 +1,151 @@
+name: "Build PYPI"
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version'
+        type: string
+        required: true
+      ref:
+        description: 'Ref'
+        type: string
+        required: true
+      upload_to_pypi:
+        description: "Upload to PyPi"
+        type: boolean
+        required: false
+      release-id:
+        description: "Attach Artifact to Release"
+        type: string
+        required: false
+    outputs:
+      pipy-artifact-url:
+        description: "PyPI Artifact URL"
+        value: ${{ jobs.pypi.outputs.pipy-artifact-url }}
+      pipy-artifact-digests-sha256:
+        description: "PyPI Artifact SHA256"
+        value: ${{ jobs.pypi.outputs.pipy-artifact-digests-sha256 }}
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version'
+        type: string
+        required: true
+      ref:
+        description: 'Ref'
+        type: string
+        required: true
+      upload_to_pypi:
+        description: "Upload to PyPi"
+        type: boolean
+        default: false
+        required: false
+      release-id:
+        description: "Attach Artifact to Release"
+        type: string
+        required: false
+
+jobs:
+  pypi:
+    name: "PyPI"
+    runs-on: ubuntu-latest
+    outputs:
+      pipy-artifact-url: ${{ steps.pypi-package-details.outputs.pipy-artifact-url }}
+      pipy-artifact-digests-sha256: ${{ steps.pypi-package-details.outputs.pipy-artifact-digests-sha256 }}
+    steps:
+      - uses: hmarr/debug-action@v2.0.1
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Manage version
+        env:
+          PROVIDED_VERSION: ${{ inputs.version }}
+        run: |
+          set -x
+          version=$(sed "s/^v//g" <<< ${PROVIDED_VERSION})
+          sed -i "s/^__version__[ ]*=.*/__version__ = '${version}'/g" label_studio/__init__.py
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Configure pip cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('deploy/requirements-mw.txt') }}-${{ hashFiles('deploy/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          pip install -r deploy/requirements-mw.txt
+          pip install -r deploy/requirements.txt
+          pip install -e .
+          pip install twine
+
+      - name: Collect static
+        run: |
+          python label_studio/manage.py collectstatic
+
+      - name: Download feature flags
+        env:
+          LAUNCHDARKLY_COMMUNITY_SDK_KEY: ${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}
+        run: |
+          curl -H "Authorization: $LAUNCHDARKLY_COMMUNITY_SDK_KEY" https://app.launchdarkly.com/sdk/latest-all >label_studio/feature_flags.json
+
+      - name: Package
+        run: python setup.py sdist bdist_wheel
+
+      - name: Upload to PYPI
+        if: inputs.upload_to_pypi
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_APIKEY }}
+        run: twine upload dist/*
+
+      - name: Get PyPI package details
+        id: pypi-package-details
+        if: inputs.upload_to_pypi
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { data: pypiPackage } = await github.request('https://pypi.org/pypi/label-studio/json')
+            const release = pypiPackage.releases[version]
+            const artifact = release.find(e => e.packagetype === 'bdist_wheel')
+            console.log(artifact)
+            core.setOutput("pipy-artifact-url", artifact.url);
+            core.setOutput("pipy-artifact-digests-sha256", artifact.digests.sha256);
+
+      - name: Attach artifacts to release
+        if: inputs.release-id
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const fs = require('fs');
+            const release_id = '${{ inputs.release-id }}';
+            for (let file of await fs.readdirSync('./dist/')) {
+               console.log('uploadReleaseAsset', file);
+               await github.repos.uploadReleaseAsset({
+                  owner,
+                  repo,
+                  release_id: release_id,
+                  name: file,
+                  data: await fs.readFileSync(`./dist/${file}`)
+               });
+            }
+
+      - name: Upload to artifact
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: Dist
+          path: dist/
