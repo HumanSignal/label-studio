@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3377: Region shift on resize",
-  "commit": "1d8fcda53b5f113dc8bc2a21450aef816d2cea4c",
+  "commit": "dd28a5139921db368ab91fe62cfb304c15064797",
   "branch": "fb-dev-3377/image-regions-shift",
-  "date": "2022/10/03 04:33:43"
+  "date": "2022/10/04 10:10:24"
 }
