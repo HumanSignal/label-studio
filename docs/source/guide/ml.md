@@ -133,6 +133,8 @@ Active learning approach is training method with model finetuning  oppose to cla
 Check our [Webhooks section](/guide/webhooks.html#What-to-use-Label-Studio-webhooks-for) to identify  which events should trigger your model training. 
 
 ### Train method specification
+(Deprecated in version 1.4.1)
+
 Your Machine Learning train method signature:
 
 ```python
@@ -180,7 +182,31 @@ Additional params in kwargs:
 
 **login** - proxy login in your project.
 **password** - proxy password in your project.
-**context** - interactive annotating context, contains selected data in interactive annotating mode. 
+**context** - interactive annotating context, contains selected data in interactive annotating mode. It contains json with result like it's in your  annotations. Context example for rectanglelabels:
+```json
+{
+    'result': [{
+            'original_width': 768,
+            'original_height': 578,
+            'image_rotation': 0,
+            'value': {
+                'x': 22.52747252747253,
+                'y': 26.034063260340634,
+                'width': 26.007326007326014,
+                'height': 28.467153284671532,
+                'rotation': 0,
+                'rectanglelabels': ['Airplane']
+            },
+            'id': 'GjBJ6sESoI',
+            'from_name': 'label',
+            'to_name': 'image',
+            'type': 'rectanglelabels',
+            'origin': 'manual'
+        }
+    ]
+}
+
+```
 
 ### Get interactive preannotations
 
