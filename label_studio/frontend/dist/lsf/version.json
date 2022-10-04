@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3377: Region shift on resize (#886)\n\n* fix: DEV-3377: Region shift on resize\r\n\r\n* fix: DEV-3377: Fix zoom position restrictions\r\n\r\n* test: DEV-3377: Reanimate regression tests\r\n\r\n* test: DEV-3377: Add test for zoomed images displaying precision",
-  "commit": "003dfe97d0d639226811f129fb38f14971d1d3c3",
-  "branch": "master",
-  "date": "2022-10-04T08:33:53Z"
+  "message": "Fix: DEV-3550: Check if objects are ready to enable the update button",
+  "commit": "6715d600b946d74af578d44960d51bd530e8d86b",
+  "branch": "fb-DEV-3550/update-during-load",
+  "date": "2022/10/04 15:39:50"
 }
