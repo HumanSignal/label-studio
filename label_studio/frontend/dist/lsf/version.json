@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-3535: Allow negative timeseries data and additional customization options to visualization",
-  "commit": "c12b121e741eefb6646403cf6f8643e4be02ee0c",
+  "message": "fix: DEV-3377: Region shift on resize",
+  "commit": "003dfe97d0d639226811f129fb38f14971d1d3c3",
   "branch": "master",
-  "date": "2022/10/03 09:25:43"
+  "date": "2022/10/04 11:33:53"
 }
