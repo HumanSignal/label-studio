@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-3373: Enable video preview (#106)\n\n* Enable video preview\r\n\r\n* Fix video column size",
-  "commit": "8374cbfeceb5aa9870278fc5371f0585d452c111",
+  "message": "fix: DEV-3508: Paging error when refreshing the datamanager",
+  "commit": "c92a2c4ccfe5348f4caf0853f0c0e387d6055b0f",
   "branch": "master",
-  "date": "2022-09-27T08:11:03Z"
+  "date": "2022/10/03 06:33:14"
 }
