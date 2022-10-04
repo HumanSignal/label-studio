@@ -181,7 +181,7 @@ The **tasks** param - list of task for prediction, can be a list or a single tas
 Additional params in kwargs:
 
 **login** - proxy login in your project.
-**password** - proxy password in your project.
+**password** - proxy password in your project. Check [guide](/guide/security.html#Secure-database-access). 
 **context** - interactive annotating context, contains selected data in interactive annotating mode. It contains json with result like it's in your  annotations. Context example for rectanglelabels:
 ```json
 {
