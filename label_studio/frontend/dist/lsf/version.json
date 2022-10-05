@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3341: selected=true <Choice> attribute is not supported for Taxonomy",
-  "commit": "ad7be2f97313192d2cb5028d6cf43a576c1659fe",
+  "message": "fix: DEV-3284: Cleanup video unsupported error modal on component unmount (#894)\n\n* fix: DEV-3284: Cleanup video unsupported error modal on component unmount\r\n\r\n* fix: DEV-3284: ensure modal is returned to destroy it after component unmount\r\n\r\n* fix: DEV-3284: ensure modal is cleared in the test for regions\r\n\r\n* fix: DEV-3284: add clearModalIfPresent helper to tests",
+  "commit": "b6b87bfc7a4bc794db06becb22a735f19f8a1ef1",
   "branch": "master",
-  "date": "2022/10/05 06:58:14"
+  "date": "2022-10-05T20:13:40Z"
 }
