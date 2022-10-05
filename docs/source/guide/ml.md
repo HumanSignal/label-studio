@@ -113,7 +113,7 @@ After you [connect a model to Label Studio as a machine learning backend](#Add-a
 
 ### Classical training approach
 
-Classical training approach is when you add annotations in your project and then train your model with this batch of annotations.
+The classical training approach is applicable when you add annotations to your project and then train your model with this batch of annotations.
 
 You can prompt your model to train in several ways: 
 - Manually using the Label Studio UI. Click the **Start Training** button on the **Machine Learning** settings for your project.
@@ -128,9 +128,9 @@ In development mode, training logs appear in the web browser console. In product
 
 ### Active learning approach
 
-Active learning approach is training method with model finetuning  oppose to classical approach when you train model in batches.
+The active learning approach is a training method with model fine-tuning opposite to the classical approach when you train models in batches.
 
-Check our [Webhooks section](/guide/webhooks.html#What-to-use-Label-Studio-webhooks-for) to identify  which events should trigger your model training. 
+For more information, see [Webhooks section](/guide/webhooks.html#What-to-use-Label-Studio-webhooks-for) to identify which events should trigger your model training. 
 
 ### Train method specification
 (Deprecated in version 1.4.1)
@@ -141,11 +141,11 @@ Your Machine Learning train method signature:
 def fit(self, completions, workdir=None, **kwargs)
 ```
 
-The **completions** param used in classical approach - list of annotations, can be a list or a single task in a list. Annotations format is common for Label Studio, check annotations key in task format in [guide](/guide/export.html#Label-Studio-JSON-format-of-annotated-tasks).
-The **completions** param will be empty for active learning approach. Instead of it use **kwargs** params.
+The **completions** param used in the classical approach is a list of annotations, which can be a list or a single task in a list. Annotations format is common for Label Studio, check the annotations key in task format in [guide](/guide/export.html#Label-Studio-JSON-format-of-annotated-tasks).
+The **completions** param will be empty for the active learning approach. Instead of it use **kwargs** params.
 
-The **event** key in **kwargs** is Webhook event that called the fit method. Machine learning backend is checking these events to train your model: 'ANNOTATION_CREATED', 'ANNOTATION_UPDATED', 'ANNOTATION_DELETED', 'PROJECT_UPDATED'. To override this list set self.TRAIN_EVENTS in your model. Check available events in [webhooks guide.](/guide/webhooks.html#What-to-use-Label-Studio-webhooks-for)
-The **data** key in **kwargs** enriches your event with entities like project, task or annotation. Check [API description](/api#tag/Webhooks/) to understand event params.
+The **event** key in **kwargs** is a Webhook event called the fit method. Machine learning backend is checking these events to train your model: 'ANNOTATION_CREATED', 'ANNOTATION_UPDATED', 'ANNOTATION_DELETED', 'PROJECT_UPDATED'. To override this list set self.TRAIN_EVENTS in your model. Check available events in [webhooks guide.](/guide/webhooks.html#What-to-use-Label-Studio-webhooks-for)
+The **data** key in **kwargs** enriches your event with entities like a project, task, or annotation. Check [API description](/api#tag/Webhooks/) to understand event params.
 
 ## Get predictions from a model
 After you [connect a model to Label Studio as a machine learning backend](#Add-an-ML-backend-to-Label-Studio), you can see model predictions in the labeling interface if the model is pre-trained, or right after it finishes training. 
@@ -176,7 +176,7 @@ Your Machine Learning prediction method signature:
 def predict(self, tasks, **kwargs)
 ```
 
-The **tasks** param - list of task for prediction, can be a list or a single task in a list. Tasks format is common for Label Studio, check format in [guide](/guide/export.html#Label-Studio-JSON-format-of-annotated-tasks).
+The **tasks** param - list of task for prediction, can be a list or a single task in a list. Tasks format is common for Label Studio, check the format in [guide](/guide/export.html#Label-Studio-JSON-format-of-annotated-tasks).
 
 Additional params in kwargs:
 
