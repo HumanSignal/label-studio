@@ -284,13 +284,11 @@ body{
 }
 .mainHeader:where(.astro-7IFFX3A3){
   background-color:var(--color-white);
-  padding:1.5em 0;
   position:relative;
   z-index:2
 }
 .Header:where(.astro-7IFFX3A3){
   display:flex;
-  border:1px solid var(--color-gray-900);
   position:relative;
   min-height:52px;
   align-items:center
@@ -432,13 +430,12 @@ body{
       margin-left:initial;
       align-items:flex-start;
       position:absolute;
-      top:50px;
+      top:52px;
       left:-1px;
       z-index:2;
       width:calc(100% + 2px);
       background-color:var(--color-white);
       border:1px var(--color-gray-900) solid;
-      border-top-color:var(--color-white);
       padding:.5em 1em 1em;
       display:none
   }

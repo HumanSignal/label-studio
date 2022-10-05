@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3377: Region shift on resize (#886)\n\n* fix: DEV-3377: Region shift on resize\r\n\r\n* fix: DEV-3377: Fix zoom position restrictions\r\n\r\n* test: DEV-3377: Reanimate regression tests\r\n\r\n* test: DEV-3377: Add test for zoomed images displaying precision",
-  "commit": "003dfe97d0d639226811f129fb38f14971d1d3c3",
+  "message": "fix: DEV-3341: selected=true <Choice> attribute is not supported for Taxonomy",
+  "commit": "ad7be2f97313192d2cb5028d6cf43a576c1659fe",
   "branch": "master",
-  "date": "2022-10-04T08:33:53Z"
+  "date": "2022/10/05 06:58:14"
 }

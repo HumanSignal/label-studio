@@ -28,7 +28,6 @@ stages:
   request:
     json:
       email: test_user@heartextest.com
-      first_name: Testperson
       username: test user
       active_organization: !int '{org_pk}'
     method: POST
@@ -44,17 +43,3 @@ stages:
     url: '{django_live_url}/api/users/{new_user_pk}'
   response:
     status_code: 200
-- name: stage
-  request:
-    method: PATCH
-    url: '{django_live_url}/api/users/{new_user_pk}'
-    json:
-      first_name: Changedname
-      username: changed username
-      email: w@heartex.com
-  response:
-    status_code: 200
-    json:
-      first_name: Changedname
-      username: test user
-      email: test_user@heartextest.com

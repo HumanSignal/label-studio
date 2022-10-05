@@ -4,12 +4,11 @@ from rest_framework import serializers
 from rest_flex_fields import FlexFieldsModelSerializer
 from django.conf import settings
 
-from core.utils.common import load_func
-from core.mixins import CreateOnlyFieldsMixin
 from .models import User
+from core.utils.common import load_func
 
 
-class BaseUserSerializer(CreateOnlyFieldsMixin, FlexFieldsModelSerializer):
+class BaseUserSerializer(FlexFieldsModelSerializer):
     # short form for user presentation
     initials = serializers.SerializerMethodField(default='?', read_only=True)
     avatar = serializers.SerializerMethodField(read_only=True)
@@ -48,11 +47,6 @@ class BaseUserSerializer(CreateOnlyFieldsMixin, FlexFieldsModelSerializer):
             'active_organization',
             'allow_newsletters'
         )
-
-        create_only_fields = [
-            'username',
-            'email'
-        ]
 
 
 class UserSimpleSerializer(BaseUserSerializer):
