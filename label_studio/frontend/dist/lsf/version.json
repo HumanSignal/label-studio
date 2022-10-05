@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3284: If video fails to send a request and times out, display error message that it is not supported",
-  "commit": "edf44e89294981d48ffff336240757b7f9e360d4",
+  "message": "fix: DEV-3284: Cleanup video unsupported error modal on component unmount (#894)\n\n* fix: DEV-3284: Cleanup video unsupported error modal on component unmount\r\n\r\n* fix: DEV-3284: ensure modal is returned to destroy it after component unmount\r\n\r\n* fix: DEV-3284: ensure modal is cleared in the test for regions\r\n\r\n* fix: DEV-3284: add clearModalIfPresent helper to tests",
+  "commit": "b6b87bfc7a4bc794db06becb22a735f19f8a1ef1",
   "branch": "master",
-  "date": "2022/10/05 08:29:17"
+  "date": "2022-10-05T20:13:40Z"
 }
