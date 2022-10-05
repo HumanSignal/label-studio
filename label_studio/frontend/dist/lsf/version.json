@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3284: If video fails to send a request and times out, display error message that it is not supported",
-  "commit": "04683d36fe81f1866310d04b43a1b351fd194e64",
-  "branch": "fb-dev-3284",
-  "date": "2022/10/04 08:20:34"
+  "commit": "edf44e89294981d48ffff336240757b7f9e360d4",
+  "branch": "master",
+  "date": "2022/10/05 08:29:17"
 }
