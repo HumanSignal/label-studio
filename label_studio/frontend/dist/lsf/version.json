@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-1041: Add per-tag settings",
-  "commit": "92031f758974a81197250ad1a0ea75a6b0a90e20",
+  "message": "feat: DEV-1041: Configurable hop size in VOT",
+  "commit": "5cce01054a736954477b451c508ba14e2a289640",
   "branch": "fb-dev-1041/video-hop-settings",
-  "date": "2022/10/04 19:23:11"
+  "date": "2022/10/05 20:22:57"
 }
