@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3551: Fix bug when zoom on large videos corrupts regions",
-  "commit": "27b2b9205f9cae329fe20d606dcdec86e3d3d511",
+  "message": "ci: Copy static files before running the e2e server (#901)\n\nCopy static files before running the e2e server",
+  "commit": "86eac196f1a5ddaa97bb10870d8e455e24c4646f",
   "branch": "master",
-  "date": "2022/10/06 14:25:12"
+  "date": "2022-10-06T15:14:43Z"
 }
