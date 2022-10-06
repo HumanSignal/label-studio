@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3566: Revert DEV-3341",
-  "commit": "809cc2120bc1d5f46422cdfabf5bb242c9309aa5",
+  "message": "ci: Copy static files before running the e2e server (#901)\n\nCopy static files before running the e2e server",
+  "commit": "86eac196f1a5ddaa97bb10870d8e455e24c4646f",
   "branch": "master",
-  "date": "2022/10/06 14:27:44"
+  "date": "2022-10-06T15:14:43Z"
 }
