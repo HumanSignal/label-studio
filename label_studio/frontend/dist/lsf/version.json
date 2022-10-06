@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3566: Revert DEV-3341",
-  "commit": "7c9501f811c0154c2ea5f4a4848de380cd301c2f",
-  "branch": "fb-dev-3566-revert-dev-3341",
-  "date": "2022/10/06 10:56:34"
+  "commit": "809cc2120bc1d5f46422cdfabf5bb242c9309aa5",
+  "branch": "master",
+  "date": "2022/10/06 14:27:44"
 }
