@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3284: Cleanup video unsupported error modal on component unmount (#894)\n\n* fix: DEV-3284: Cleanup video unsupported error modal on component unmount\r\n\r\n* fix: DEV-3284: ensure modal is returned to destroy it after component unmount\r\n\r\n* fix: DEV-3284: ensure modal is cleared in the test for regions\r\n\r\n* fix: DEV-3284: add clearModalIfPresent helper to tests",
-  "commit": "b6b87bfc7a4bc794db06becb22a735f19f8a1ef1",
+  "message": "fix: DEV-3566: Revert DEV-3341",
+  "commit": "809cc2120bc1d5f46422cdfabf5bb242c9309aa5",
   "branch": "master",
-  "date": "2022-10-05T20:13:40Z"
+  "date": "2022/10/06 14:27:44"
 }
