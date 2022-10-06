@@ -1,6 +1,6 @@
 {
-  "message": "ci: Copy static files before running the e2e server (#901)\n\nCopy static files before running the e2e server",
-  "commit": "86eac196f1a5ddaa97bb10870d8e455e24c4646f",
+  "message": "fix: DEV-3485: Regions is selectable when annotation history is selected",
+  "commit": "23fda9630effeff74c6291fb3e20aed77675775e",
   "branch": "master",
-  "date": "2022-10-06T15:14:43Z"
+  "date": "2022/10/06 13:06:59"
 }
