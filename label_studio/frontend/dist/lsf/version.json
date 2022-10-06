@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3551: Fix bug when zoom on large videos corrupts regions",
-  "commit": "b777865e8f5f78ed3e94b58bd630205420b6bd7b",
-  "branch": "fb-dev-3551/zoom-for-large-videos",
-  "date": "2022/10/04 17:58:52"
+  "commit": "27b2b9205f9cae329fe20d606dcdec86e3d3d511",
+  "branch": "master",
+  "date": "2022/10/06 14:25:12"
 }
