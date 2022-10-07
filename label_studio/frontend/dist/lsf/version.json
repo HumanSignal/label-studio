@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3485: Regions is selectable when annotation history is selected",
-  "commit": "23fda9630effeff74c6291fb3e20aed77675775e",
-  "branch": "master",
-  "date": "2022/10/06 13:06:59"
+  "message": "fix: DEV-3559: Taxonomy annotations are not displayed after selection",
+  "commit": "5e1cb2e81ace1c9a4fc805b9131a7d180bbd2938",
+  "branch": "fb-dev-3559",
+  "date": "2022/10/07 17:16:50"
 }
