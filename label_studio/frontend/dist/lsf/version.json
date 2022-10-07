@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3284: Cleanup video unsupported error modal on component unmount (#894)\n\n* fix: DEV-3284: Cleanup video unsupported error modal on component unmount\r\n\r\n* fix: DEV-3284: ensure modal is returned to destroy it after component unmount\r\n\r\n* fix: DEV-3284: ensure modal is cleared in the test for regions\r\n\r\n* fix: DEV-3284: add clearModalIfPresent helper to tests",
-  "commit": "b6b87bfc7a4bc794db06becb22a735f19f8a1ef1",
+  "message": "fix: DEV-3485: Regions is selectable when annotation history is selected",
+  "commit": "23fda9630effeff74c6291fb3e20aed77675775e",
   "branch": "master",
-  "date": "2022-10-05T20:13:40Z"
+  "date": "2022/10/06 13:06:59"
 }
