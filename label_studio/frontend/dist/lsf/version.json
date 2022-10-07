@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2918: Prevent annotating collapsed phrases in paragraphs",
-  "commit": "13be53425cdd6434d109512d5b2b54b7c38aef2e",
+  "message": "fix: DEV-3485: Regions is selectable when annotation history is selected",
+  "commit": "23fda9630effeff74c6291fb3e20aed77675775e",
   "branch": "master",
-  "date": "2022/09/05 16:16:04"
+  "date": "2022/10/06 13:06:59"
 }
