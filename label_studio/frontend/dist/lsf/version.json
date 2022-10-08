@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3469: Enable alias for taxonomy choice",
-  "commit": "aeab7812b3457050eb09898cb5a206e0cabfa512",
+  "commit": "fbb420719667456adad8940c19546dc0c28d0ec7",
   "branch": "fb-dev-3239/taxonomy-alias",
-  "date": "2022/10/07 11:42:19"
+  "date": "2022/10/08 11:13:29"
 }
