@@ -4,13 +4,11 @@ import pytest
 import json
 import os
 import glob
-import logging
 
 from core.label_config import parse_config, validate_label_config, parse_config_to_json
 from label_studio.tests.utils import make_task, make_annotation, make_prediction, project_id
 from projects.models import Project
 
-logger = logging.getLogger(__name__)
 
 @pytest.mark.parametrize(
     "tasks_count, annotations_count, predictions_count",
@@ -80,7 +78,6 @@ def test_change_label_config_repeater(tasks_count, annotations_count, prediction
         data=json.dumps(payload),
         content_type="application/json",
     )
-    logger.debug(str(response))
     assert response.status_code == 200
 
     # delete unused labels
@@ -90,7 +87,6 @@ def test_change_label_config_repeater(tasks_count, annotations_count, prediction
         data=json.dumps(payload),
         content_type="application/json",
     )
-    logger.debug(str(response))
     assert response.status_code == 200
 
     # delete used labels - 400
@@ -100,7 +96,6 @@ def test_change_label_config_repeater(tasks_count, annotations_count, prediction
         data=json.dumps(payload),
         content_type="application/json",
     )
-    logger.debug(str(response))
     assert response.status_code == 400
 
 
