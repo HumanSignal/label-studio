@@ -319,3 +319,53 @@ Review the full list of JSON properties in the [API documentation](api.html).
 
 
 <!-- md annotation_ids.md -->
+
+## Access task data (images, audio, texts) outside of Label Studio for ML backends
+
+Machine Learning backend uses data from tasks for predictions, and you need to download them on Machine Learning backend side. Label Studio provides tools for downloading of these resources, and they are located in label-studio-tools Python package. If you are using official Label Studio Machine Learning backend, label-studio-tools package is installed automatically with other requirements.
+
+### Accessing task data from Label Studio instance
+
+There are several ways of storing tasks resources (images, audio, texts, etc) in Label Studio:
+- Cloud storages 
+- External web links 
+- Uploaded files
+- Local files directory
+
+Label Studio stores uploaded files in Project level structure. Each project has it's own folder for files.
+
+You can use `label_studio_tools.core.utils.io.get_local_path` to get task data - it will transform path or URL from task data to local path.
+In case of local path it will return full local path and download resource in case of using `download_resources` parameter.
+
+Provide `Hostname` and `access_token` for accessing external resource.
+
+### Accessing task data outside of Label Studio instance
+
+You can use `label_studio_tools.core.utils.io.get_local_path` method to get data from outside machine for external links and cloud storages. 
+
+!!! attention "important"
+    Don't forget to provide credentials.
+
+You can get data with `label_studio_tools.core.utils.io.get_local_path` in case if you mount same disk to your machine. If you mount same disk to external box 
+
+Another way of accessing data is to use link from task and ACCESS_TOKEN ([see documentation for authentication](api.html#Authenticate-to-the-API)). Concatenate Label Studio hostname and link from task data. Then add access token to your request:
+
+```json
+curl -X GET http://localhost:8080/api/projects/ -H 'Authorization: Token {YOUR_TOKEN}'
+```
+
+### Frequently asked questions 
+
+#### Question #1: I have made a request and received the following API responses: 
+- No data was provided.
+- 404 or 403 error code was returned. 
+
+**Answer:**
+First check the network access to your Label Studio instance when you send API requests. You can execute test curl request with sample data. 
+
+#### Question #2: I tried to access files and received a `FileNotFound` error.
+
+**Answer:**
+1. Check that you have mounted the same disk as your Label Studio instance. Then check your files' existence in Label Studio instance first. 
+
+2. Check `LOCAL_FILES_DOCUMENT_ROOT` environment variable in your Label Studio instance and add it to your accessing data script.

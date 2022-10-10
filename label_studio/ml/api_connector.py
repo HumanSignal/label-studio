@@ -1,6 +1,5 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import json
 import logging
 import os
 import requests
@@ -12,10 +11,8 @@ from django.db.models import Q, F, Count
 from django.conf import settings
 from requests.adapters import HTTPAdapter
 from core.version import get_git_version
-from core.utils.common import get_bool_env
 from data_export.serializers import ExportDataSerializer
 from label_studio.core.utils.params import get_env
-from users.models import Token
 from core.feature_flags import flag_set
 from core.utils.common import load_func
 
@@ -146,9 +143,13 @@ class MLApi(BaseHTTPAPI):
                 response = self.get(url=url, *args, **kwargs)
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
-            # logger.warning(f'Error getting response from {url}. ', exc_info=True)
+            # Extending error details in case of failed request
+            if flag_set('fix_back_dev_3351_ml_validation_error_extension_short', AnonymousUser):
+                error_string = str(e) + (" " + str(response.text) if response else "")
+            else:
+                error_string = str(e)
             status_code = response.status_code if response is not None else 0
-            return MLApiResult(url, request, {'error': str(e)}, headers, 'error', status_code=status_code)
+            return MLApiResult(url, request, {'error': error_string}, headers, 'error', status_code=status_code)
         status_code = response.status_code
         try:
             response = response.json()

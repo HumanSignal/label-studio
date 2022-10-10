@@ -1,6 +1,12 @@
 name: "Docker release promote"
 
 on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag for promotion"
+        required: true
+        type: string
   workflow_call:
     inputs:
       release_tag:
@@ -18,7 +24,7 @@ env:
 jobs:
   docker_release_retag:
     name: "Docker image"
-    timeout-minutes: 5
+    timeout-minutes: 45
     runs-on: ubuntu-latest
     outputs:
       image_version: ${{ steps.get_info.outputs.image_version }}
@@ -149,6 +155,13 @@ jobs:
         with:
           username: heartexlabs
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to RedHat Registry
+        uses: docker/login-action@v2.0.0
+        with:
+          registry: scan.connect.redhat.com
+          username: unused
+          password: ${{ secrets.REDHAT_MARKETPLACE_LS_PASSWORD }}
 
       - name: Prepare Release Dockerfile
         id: release_dockerfile

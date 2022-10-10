@@ -32,6 +32,9 @@ When you annotate image regions with this tag, the annotations are saved as perc
 | [contrastControl] | <code>boolean</code> | <code>false</code> | Show contrast control in toolbar |
 | [rotateControl] | <code>boolean</code> | <code>false</code> | Show rotate control in toolbar |
 | [crosshair] | <code>boolean</code> | <code>false</code> | Show crosshair cursor |
+| [horizontalAlignment] | <code>string</code> | <code>&quot;\&quot;left\&quot;&quot;</code> | Where to align image horizontally. Can be one of "left", "center" or "right" |
+| [verticalAlignment] | <code>string</code> | <code>&quot;\&quot;top\&quot;&quot;</code> | Where to align image vertically. Can be one of "top", "center" or "bottom" |
+| [defaultZoom] | <code>string</code> | <code>&quot;\&quot;fit\&quot;&quot;</code> | Specify the initial zoom of the image within the viewport while preserving it’s ratio. Can be one of "auto", "original" or "fit" |
 
 ### Example
 ```html
