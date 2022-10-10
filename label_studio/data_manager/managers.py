@@ -123,10 +123,7 @@ def get_fields_for_evaluation(prepare_params, user):
 def apply_ordering(queryset, ordering, project, request):
     if ordering:
         preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
-        logger.warning(project.only_undefined_field)
-        field_name, ascending = preprocess_field_name(ordering[0], only_undefined_field=project.only_undefined_field)
-        if ordering[0].__contains__('tasks:data') and not ordering[0].__contains__('image'):
-            field_name = 'data__' + ordering[0].split('tasks:data.')[-1]
+        field_name, ascending = preprocess_field_name(ordering[0], only_undefined_field=False)
         if field_name.startswith('data__'):
             # annotate task with data field for float/int/bool ordering support
             json_field = field_name.replace('data__', '')
@@ -223,6 +220,7 @@ def add_user_filter(enabled, key, _filter, filter_expressions):
 
 
 def apply_filters(queryset, filters, project, request):
+    logger.warning(queryset, filters, project, request)
     if not filters:
         return queryset
     # convert conjunction to orm statement
@@ -236,7 +234,7 @@ def apply_filters(queryset, filters, project, request):
 
         # django orm loop expression attached to column name
         preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
-        field_name, _ = preprocess_field_name(_filter.filter, project.only_undefined_field)
+        field_name, _ = preprocess_field_name(_filter.filter, False)
 
         # filter pre-processing, value type conversion, etc..
         preprocess_filter = load_func(settings.DATA_MANAGER_PREPROCESS_FILTER)
@@ -415,7 +413,6 @@ def apply_filters(queryset, filters, project, request):
             cast_value(_filter)
             filter_expressions.append(Q(**{field_name: _filter.value}))
 
-    logger.debug(f'Apply filter: {filter_expressions}')
     if filters.conjunction == ConjunctionEnum.OR:
         result_filter = Q()
         for filter_expression in filter_expressions:
