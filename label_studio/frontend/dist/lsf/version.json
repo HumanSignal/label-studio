@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3341: selected=true <Choice> attribute is not supported for Taxonomy",
-  "commit": "ad7be2f97313192d2cb5028d6cf43a576c1659fe",
+  "message": "fix: DEV-3485: Regions is selectable when annotation history is selected",
+  "commit": "23fda9630effeff74c6291fb3e20aed77675775e",
   "branch": "master",
-  "date": "2022/10/05 06:58:14"
+  "date": "2022/10/06 13:06:59"
 }
