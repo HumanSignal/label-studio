@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3550: Check if objects are ready to enable the update button (#893)\n\n* fix: dev-3550: check if objects are ready to enable the update button\r\n\r\n* Fix test to wait for Submit to be enabled\r\n\r\n* Helper for check annotation is submitted\r\n\r\n* Fix helper access to Playwright\r\n\r\n* Fix locator usage\r\n\r\n* Properly leverage Playwright api\r\n\r\n* Cleanup\r\n\r\n* account for undefined objects\r\n\r\nCo-authored-by: Travis1282 <Travis1282@users.noreply.github.com>\r\nCo-authored-by: Nick Skriabin <nr@fenelon.ru>",
-  "commit": "f0657e6100337889402905b752116ca000a666d3",
+  "message": "fix: DEV-2049: Removing interpolation hides the label, but not label selection box (#905)\n\n* fix: DEV-2049: Bounding box resize still showing after remove interpolation\r\n\r\n* fix: DEV-2049: Removing interpolation hides the label but not the selection box",
+  "commit": "bf1ec312a6dd504b8d597deba089b573b2239461",
   "branch": "master",
-  "date": "2022-10-11T12:38:24Z"
+  "date": "2022-10-11T13:29:32Z"
 }
