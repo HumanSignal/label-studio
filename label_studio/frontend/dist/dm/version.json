@@ -1,6 +1,6 @@
 {
-  "message": "minor cleanup",
-  "commit": "18310073de577dfa82e8e41587f3a0dedec8afb1",
-  "branch": "fb-dev-3329",
-  "date": "2022-10-07T17:12:12Z"
+  "message": "fix: DEV-3329: DM tabs disappear after editing taxonomy items",
+  "commit": "71885b82d9fdef1833444a415f23ef3a5cec0bf0",
+  "branch": "master",
+  "date": "2022/10/11 12:33:44"
 }
