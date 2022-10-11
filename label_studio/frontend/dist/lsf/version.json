@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3485: Regions is selectable when annotation history is selected",
-  "commit": "23fda9630effeff74c6291fb3e20aed77675775e",
+  "message": "fix: DEV-3550: Check if objects are ready to enable the update button (#893)\n\n* fix: dev-3550: check if objects are ready to enable the update button\r\n\r\n* Fix test to wait for Submit to be enabled\r\n\r\n* Helper for check annotation is submitted\r\n\r\n* Fix helper access to Playwright\r\n\r\n* Fix locator usage\r\n\r\n* Properly leverage Playwright api\r\n\r\n* Cleanup\r\n\r\n* account for undefined objects\r\n\r\nCo-authored-by: Travis1282 <Travis1282@users.noreply.github.com>\r\nCo-authored-by: Nick Skriabin <nr@fenelon.ru>",
+  "commit": "f0657e6100337889402905b752116ca000a666d3",
   "branch": "master",
-  "date": "2022/10/06 13:06:59"
+  "date": "2022-10-11T12:38:24Z"
 }
