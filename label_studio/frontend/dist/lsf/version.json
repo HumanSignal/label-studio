@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2049: Removing interpolation hides the label, but not label selection box",
-  "commit": "1ebb13197130f4151f09201eefba2d292aac3846",
-  "branch": "fb-dev-2049",
-  "date": "2022/10/11 11:19:14"
+  "commit": "bf1ec312a6dd504b8d597deba089b573b2239461",
+  "branch": "master",
+  "date": "2022/10/11 14:29:32"
 }
