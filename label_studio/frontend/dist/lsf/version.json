@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3590: Fix meta not saved in VOT scenario",
-  "commit": "a4ca68c51e3ffdf015a623d6bcd86509dabb2556",
+  "commit": "763302a59bab2793df0bd1940eb37a9d6c436899",
   "branch": "fb-dev-3590/meta-persistence-2",
-  "date": "2022/10/11 14:59:54"
+  "date": "2022/10/11 15:10:52"
 }
