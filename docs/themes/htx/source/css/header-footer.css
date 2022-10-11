@@ -305,6 +305,11 @@ body{
   font-size:1rem;
   height:3.125em
 }
+@media (max-width: 80rem) { /* < 1280px */
+  .HeaderCTA .ButtonText{
+    font-size: .875rem;
+  }
+}
 .HeaderSearch:where(.astro-7IFFX3A3){
   border-left:1px solid var(--color-gray-900);
   border-right:1px solid var(--color-gray-900);
@@ -663,6 +668,16 @@ html:not(.js-enabled) .AlgoliaSearch{
   display:grid;
   grid-template-columns:[full-start] minmax(var(--gutter),1fr) [standard-start] 5rem [narrow-start] minmax(1rem,73.5rem) [narrow-end] 5rem [standard-end] minmax(var(--gutter),1fr) [full-end]
 }
+.Grid.mainHeader {
+  --gutter: 1rem;
+}
+
+@media (max-width: 74rem) { /* < 1184px */
+  :global(#docsearch-input) {
+    width: 10em;
+  }
+}
+
 @media (max-width: 62.5em){
   .Grid:where(.astro-IYSTJHZO){
       --gutter: 2rem
