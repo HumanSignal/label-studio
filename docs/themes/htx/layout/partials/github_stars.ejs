@@ -32,13 +32,10 @@
 
 <script>
     window.addEventListener('load', async () => {
-    let starCount = 10688
-    window.addEventListener('load', async () => {
     try {
-      const response = await fetch("https://api.github.com/repos/heartexlabs/label-studio", {
-        });
+      const response = await fetch("https://api.github.com/repos/heartexlabs/label-studio", {});
       const data = await response.json();
-      starCount = data.stargazers_count;
+      const starCount = data.stargazers_count;
       const countElement = document.querySelector('.GitHubStarsText');
       countElement.innerText = starCount.toLocaleString('en-US');
     } catch (err) {
