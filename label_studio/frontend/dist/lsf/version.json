@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3550: Check if objects are ready to enable the update button",
-  "commit": "3a1497c6b356089edf8fba2ad633e539dffe47e9",
-  "branch": "fb-DEV-3550/update-during-load",
-  "date": "2022/10/11 13:27:21"
+  "commit": "f0657e6100337889402905b752116ca000a666d3",
+  "branch": "master",
+  "date": "2022/10/11 07:38:24"
 }
