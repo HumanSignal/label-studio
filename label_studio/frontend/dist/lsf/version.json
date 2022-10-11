@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3565: Fix region meta saving behavior",
-  "commit": "727d74e3f4f078696b21379d9d1074bda6ba0413",
+  "commit": "6a9459a300e243577f1ad5a5e97790d8ae328a11",
   "branch": "fb-dev-3565/meta-persistence",
-  "date": "2022/10/11 01:08:58"
+  "date": "2022/10/11 01:35:27"
 }
