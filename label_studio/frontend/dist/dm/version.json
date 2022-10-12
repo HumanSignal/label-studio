@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3557: Ensure all integer value ranges are correctly captured for packJSON",
+  "message": "fix: DEV-3557: Ensure all integer value ranges are correctly captured for packJSON (#114)",
   "commit": "cde224f477ea20575a870ea4f182c621b7bf676a",
   "branch": "master",
-  "date": "2022/10/12 13:56:48"
+  "date": "2022-10-12T12:56:48Z"
 }
