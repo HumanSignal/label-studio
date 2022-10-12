@@ -41,6 +41,7 @@ def delete_tasks(project, queryset, **kwargs):
     tasks_ids_list = [task['id'] for task in tasks_ids]
     project_count = project.tasks.count()
     # unlink tasks from project
+    queryset = Task.objects.filter(id__in=tasks_ids_list)
     queryset.update(project=None)
     # delete all project tasks
     if count == project_count:

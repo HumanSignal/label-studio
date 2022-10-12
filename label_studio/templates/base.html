@@ -134,12 +134,13 @@
   {% block bottomjs %}
   {% endblock %}
 
-  {% block storate-persistence %}
+  {% block storage-persistence %}
   <script>
     {# storage persistence #}
     {% if not settings.STORAGE_PERSISTENCE %}
     new Toast({
-      message: 'Data persistence not configured',
+      message: `Data will be persisted on the node running this container,<br>
+                but all data will be lost if this node goes away.<br>`,
       type: 'danger'
     });
     {% endif %}
