@@ -120,7 +120,7 @@ class ProjectFilterSet(FilterSet):
     
     ```bash
     curl -H Content-Type:application/json -H 'Authorization: Token abc123' -X POST '{}/api/projects' \
-    --data '{"label_config": "<View>[...]</View>"}'
+    --data '{{"label_config": "<View>[...]</View>"}}'
     ```
     """.format(settings.HOSTNAME or 'https://localhost:8080')
 ))
