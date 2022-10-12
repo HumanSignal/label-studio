@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2049: Removing interpolation hides the label, but not label selection box (#905)\n\n* fix: DEV-2049: Bounding box resize still showing after remove interpolation\r\n\r\n* fix: DEV-2049: Removing interpolation hides the label but not the selection box",
-  "commit": "bf1ec312a6dd504b8d597deba089b573b2239461",
+  "message": "fix: DEV-3590: Fix meta not saved in VOT scenario",
+  "commit": "5ed4e8ef818a741e40c26069eb22949e92526bd3",
   "branch": "master",
-  "date": "2022-10-11T13:29:32Z"
+  "date": "2022/10/12 11:32:55"
 }
