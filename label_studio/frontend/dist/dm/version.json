@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3492: Load virtual tab data from url key when present (#111)\n\n* fix: DEV-3492: Load virtual tab data from url key when present\r\n\r\n* include viewSnapshot in the newSnaphot for view tab data\r\n\r\n* include viewSnapshot in the newSnaphot for view tab data",
-  "commit": "878c084adfabe0736ab2e9f5ca2d419cf009c7f9",
+  "message": "fix: DEV-3560: Wait for task loading to complete before setting any lsf flags",
+  "commit": "3bd096aa52865d0e098dd1eb32f40164dfee1a76",
   "branch": "master",
-  "date": "2022-10-04T14:26:17Z"
+  "date": "2022/10/12 13:53:47"
 }
