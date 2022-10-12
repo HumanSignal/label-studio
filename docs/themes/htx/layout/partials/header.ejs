@@ -110,9 +110,9 @@
   });
 
   const toggleButtons = document.querySelectorAll(".HeaderNavToggleButton");
-  console.log(toggleButtons);
+  const navElem = document.querySelectorAll(".navigation");
 
-  toggleButtons.forEach(toggleButton => {
+  navElem.forEach(toggleButton => {
     if (window.location.href.includes(toggleButton.href)) toggleButton.classList.add("Active")
     else toggleButton.classList.remove("Active")
   })

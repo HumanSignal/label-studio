@@ -305,11 +305,6 @@ body{
   font-size:1rem;
   height:3.125em
 }
-@media (max-width: 80rem) { /* < 1280px */
-  .HeaderCTA .ButtonText{
-    font-size: .875rem;
-  }
-}
 .HeaderSearch:where(.astro-7IFFX3A3){
   border-left:1px solid var(--color-gray-900);
   border-right:1px solid var(--color-gray-900);
@@ -411,7 +406,7 @@ body{
   margin-top:.5em;
   padding-top:1em
 }
-@media (min-width: 84.4375rem){
+@media (min-width: 74rem){
   .HeaderNav:where(.astro-7IFFX3A3)>li:where(.astro-7IFFX3A3):hover>.HeaderSubNav:where(.astro-7IFFX3A3){
       display:flex
   }
@@ -422,7 +417,7 @@ body{
       display:none
   }
 }
-@media (max-width: 84.375rem){
+@media (max-width: 74rem){
   .Header:where(.astro-7IFFX3A3){
       align-items:flex-start;
       flex-direction:column;
@@ -669,15 +664,6 @@ html:not(.js-enabled) .AlgoliaSearch{
   display:grid;
   grid-template-columns:[full-start] minmax(var(--gutter),1fr) [standard-start] 5rem [narrow-start] minmax(1rem,73.5rem) [narrow-end] 5rem [standard-end] minmax(var(--gutter),1fr) [full-end]
 }
-.Grid.mainHeader {
-  --gutter: 1rem;
-}
-
-@media (max-width: 74rem) { /* < 1184px */
-  :global(#docsearch-input) {
-    width: 10em;
-  }
-}
 
 @media (max-width: 62.5em){
   .Grid:where(.astro-IYSTJHZO){
@@ -870,4 +856,19 @@ html:not(.js-enabled) .AlgoliaSearch{
 .search-container {
   display:flex;
   align-items: center;
+}
+.Grid.mainHeader {
+  --gutter: 1rem;
+}
+
+@media (max-width: 74rem) { /* < 1184px */
+  :global(#docsearch-input) {
+    width: 10em;
+  }
+}
+
+@media (max-width: 80rem) { /* < 1280px */
+  .HeaderCTA:where(.astro-7IFFX3A3) .ButtonText:where(.astro-NJHSWM7L){
+    font-size: .875rem;
+  }
 }
