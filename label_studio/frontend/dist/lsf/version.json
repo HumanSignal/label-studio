@@ -1,6 +1,6 @@
 {
   "message": "feat: DEV-1041: Configurable hop size in VOT",
-  "commit": "ecdf4b7256fd7b5fbdb9fb77b161d55823c222e4",
+  "commit": "d8b61acfe5e8abed3ddfa96b097600c2f81c8d9c",
   "branch": "fb-dev-1041/video-hop-settings",
-  "date": "2022/10/07 18:53:39"
+  "date": "2022/10/12 12:08:00"
 }
