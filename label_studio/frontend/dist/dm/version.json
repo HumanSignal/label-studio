@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3492: Load virtual tab data from url key when present (#111)\n\n* fix: DEV-3492: Load virtual tab data from url key when present\r\n\r\n* include viewSnapshot in the newSnaphot for view tab data\r\n\r\n* include viewSnapshot in the newSnaphot for view tab data",
-  "commit": "878c084adfabe0736ab2e9f5ca2d419cf009c7f9",
+  "message": "fix: DEV-3557: Ensure all integer value ranges are correctly captured for packJSON (#114)",
+  "commit": "cde224f477ea20575a870ea4f182c621b7bf676a",
   "branch": "master",
-  "date": "2022-10-04T14:26:17Z"
+  "date": "2022-10-12T12:56:48Z"
 }

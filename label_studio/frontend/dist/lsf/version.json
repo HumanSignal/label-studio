@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3485: Regions is selectable when annotation history is selected",
-  "commit": "23fda9630effeff74c6291fb3e20aed77675775e",
+  "message": "fix: DEV-3590: Fix meta not saved in VOT scenario",
+  "commit": "5ed4e8ef818a741e40c26069eb22949e92526bd3",
   "branch": "master",
-  "date": "2022/10/06 13:06:59"
+  "date": "2022/10/12 11:32:55"
 }
