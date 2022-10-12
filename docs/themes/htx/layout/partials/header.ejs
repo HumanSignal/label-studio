@@ -109,13 +109,23 @@
     headerMenu.classList.toggle("isOpen");
   });
 
-  const toggleButtons = document.querySelectorAll(".navigation");
+  const toggleButtons = document.querySelectorAll(".HeaderNavToggleButton");
+  console.log(toggleButtons);
 
   toggleButtons.forEach(toggleButton => {
     if (window.location.href.includes(toggleButton.href)) toggleButton.classList.add("Active")
     else toggleButton.classList.remove("Active")
   })
 
+  const toggleSubMenu = (event) => {
+    const button = event.currentTarget;
+    const submenu = button.nextElementSibling;
+
+    button.classList.toggle("HeaderNavToggleButtonActive")
+    submenu.style.display = submenu.style.display === "flex" ? "none" : "flex";
+  }
+
+  toggleButtons.forEach(toggleButton => toggleButton.addEventListener("click", toggleSubMenu ));
 </script>
 </header>
   

@@ -396,7 +396,8 @@ body{
   background-color:transparent;
   width:3rem;
   height:3rem;
-  margin-right:-.75rem
+  margin-right:-.75rem;
+  cursor: pointer
 }
 .HeaderNavToggleButton:where(.astro-7IFFX3A3) svg:where(.astro-7IFFX3A3){
   width:1em;
