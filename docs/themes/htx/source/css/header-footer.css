@@ -406,7 +406,7 @@ body{
   margin-top:.5em;
   padding-top:1em
 }
-@media (min-width: 74rem){
+@media (min-width: 1000px){
   .HeaderNav:where(.astro-7IFFX3A3)>li:where(.astro-7IFFX3A3):hover>.HeaderSubNav:where(.astro-7IFFX3A3){
       display:flex
   }
@@ -417,7 +417,7 @@ body{
       display:none
   }
 }
-@media (max-width: 74rem){
+@media (max-width: 1000px){
   .Header:where(.astro-7IFFX3A3){
       align-items:flex-start;
       flex-direction:column;
@@ -861,7 +861,7 @@ html:not(.js-enabled) .AlgoliaSearch{
   --gutter: 1rem;
 }
 
-@media (max-width: 74rem) { /* < 1184px */
+@media (max-width: 1000px) { /* < 1184px */
   :global(#docsearch-input) {
     width: 10em;
   }
