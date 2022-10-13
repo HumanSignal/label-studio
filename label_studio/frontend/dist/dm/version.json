@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3329: DM tabs disappear after editing taxonomy items",
-  "commit": "71885b82d9fdef1833444a415f23ef3a5cec0bf0",
+  "message": "fix: DEV-3557: Ensure all integer value ranges are correctly captured for packJSON (#114)",
+  "commit": "cde224f477ea20575a870ea4f182c621b7bf676a",
   "branch": "master",
-  "date": "2022/10/11 12:33:44"
+  "date": "2022-10-12T12:56:48Z"
 }
