@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3559: Taxonomy annotations are not displayed after selection",
+  "message": "fix: DEV-3559: Taxonomy annotations are not displayed after selection (#903)\n\n* fix: DEV-3559: Taxonomy annotations are not displayed after selection in paginated documents\r\n\r\n* remove lazyload\r\n\r\n* fix: DEV-3559: Retain region selection during Image resize history reinit update callbacks\r\n\r\nCo-authored-by: Brandon Martel <brandonmartel@gmail.com>",
   "commit": "9c4b69e10e1403b5551fefe97238ffbd81e5e23e",
   "branch": "master",
-  "date": "2022/10/13 12:51:28"
+  "date": "2022-10-13T11:51:28Z"
 }
