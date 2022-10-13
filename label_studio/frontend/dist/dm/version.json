@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3494: Filters not working for Annotators in DM",
-  "commit": "1d5338074307eb56917a271e406af43e87f3cf38",
+  "message": "fix: DEV-3557: Ensure all integer value ranges are correctly captured for packJSON (#114)",
+  "commit": "cde224f477ea20575a870ea4f182c621b7bf676a",
   "branch": "master",
-  "date": "2022/09/23 04:37:22"
+  "date": "2022-10-12T12:56:48Z"
 }
