@@ -11,7 +11,7 @@ on:
         type: string
 
 env:
-  GIT_GITLEAKS_VERSION: 8.8.7
+  GIT_GITLEAKS_VERSION: 8.14.1
   ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
 
 jobs:
