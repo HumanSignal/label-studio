@@ -5,6 +5,7 @@ import json
 import re
 
 from core.redis import start_job_async_or_sync
+from core.utils.io import parse_constant
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
 from django.db import models
@@ -101,7 +102,7 @@ class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
         container = self.get_container()
         blob = container.download_blob(key)
         blob_str = blob.content_as_text()
-        value = json.loads(blob_str)
+        value = json.loads(blob_str, parse_constant=parse_constant)
         if not isinstance(value, dict):
             raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task")  # noqa
         return value

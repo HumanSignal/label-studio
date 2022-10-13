@@ -190,3 +190,11 @@ def url_is_local(url):
             if ipaddress.ip_address(ip) in ipaddress.ip_network(subnet):
                 return True
         return False
+
+
+def parse_constant(value):
+    # NaN is not support by postgres JsonField
+    # https://www.postgresql.org/docs/current/datatype-json.html
+    if value == 'NaN':
+        return None
+    raise ValueError(f'Unknown constant value: {value}')

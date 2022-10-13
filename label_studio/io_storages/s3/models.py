@@ -6,6 +6,7 @@ import json
 import boto3
 
 from core.redis import start_job_async_or_sync
+from core.utils.io import parse_constant
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -156,7 +157,7 @@ class S3ImportStorage(S3StorageMixin, ImportStorage):
         _, s3 = self.get_client_and_resource()
         bucket = s3.Bucket(self.bucket)
         obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
-        value = json.loads(obj)
+        value = json.loads(obj, parse_constant=parse_constant)
         if not isinstance(value, dict):
             raise ValueError(f"Error on key {key}: For S3 your JSON file must be a dictionary with one task")
 
