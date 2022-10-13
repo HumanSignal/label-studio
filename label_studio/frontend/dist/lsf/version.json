@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3559: Taxonomy annotations are not displayed after selection",
-  "commit": "57fe57075822adf111084de1140e2311791c17cd",
-  "branch": "fb-dev-3559",
-  "date": "2022/10/07 15:23:44"
+  "commit": "9c4b69e10e1403b5551fefe97238ffbd81e5e23e",
+  "branch": "master",
+  "date": "2022/10/13 12:51:28"
 }
