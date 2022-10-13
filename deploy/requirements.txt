@@ -61,4 +61,4 @@ sentry-sdk>=1.1.0
 launchdarkly-server-sdk==7.5.0
 python-json-logger==2.0.4
 
-label-studio-converter==0.0.44
+label-studio-converter==0.0.45.rc1
