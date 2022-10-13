@@ -140,7 +140,8 @@ window.addEventListener('load', (event) => {
 
   const searchInput = document.querySelector("#docsearch-input");
   const handleFocusSearch = (e) => {
-    if (document.activeElement.localName === 'body' && e.code !== "Space" && e.code !== "MetaLeft" && !e.altKey && !e.shiftKey && !e.ctrlKey) {
+    const notCMDChromeFirefox = e.keyCode !== 91 && e.keyCode !== 93 && e.keyCode !== 224;
+    if (document.activeElement.localName === 'body' && e.code !== "Space" && e.code !== "MetaLeft" && !e.altKey && !e.shiftKey && !e.ctrlKey && notCMDChromeFirefox) {
       searchInput.focus();
     }
   }
