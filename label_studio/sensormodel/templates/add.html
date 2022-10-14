@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<style>
+input[type=text], select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type=submit] {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+</style>
+<head>
+    <title>Adding sensors, subjects, deployments</title>
+</head>
+<body>
+    <div class="buttons">
+        <form action="/sensormodel/">
+            <input type="submit" value="Go back to sensor model page" />
+        </form>
+    </div>
+    <div class="forms">
+        <form action="/sensormodel/add" method="post">
+            {{ deploymentform }}
+            <input type="submit" value="Create deployment">
+        </form>
+        <form action="/sensormodel/add" method="post">
+            {{ sensorform }}
+            <input type="submit" value="Create sensor">
+        </form>
+        <form action="/sensormodel/add" method="post">
+            {{ subjectform }}
+            <input type="submit" value="Create subject">
+        </form>
+    </div>
+
+</body>
+
+
+{% endblock %}
