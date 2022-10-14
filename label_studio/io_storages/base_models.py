@@ -39,6 +39,8 @@ class Storage(models.Model):
         _('last sync count'), null=True, blank=True, help_text='Count of tasks synced last time'
     )
 
+    #last_sync_job = models.CharField(_('last_sync_job'), null=True, blank=True, max_length=256, help_text='Last sync job ID')
+
     def validate_connection(self, client=None):
         pass
 
@@ -183,6 +185,8 @@ class ImportStorage(Storage):
                                                                                                  queue_name='default'):
                 job = queue.enqueue(sync_background, self.__class__, self.id,
                                     meta=meta)
+                #self.last_sync_job = job.id
+                #self.save()
                 # job_id = sync_background.delay()  # TODO: @niklub: check this fix
                 logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
         else:
@@ -195,6 +199,9 @@ class ImportStorage(Storage):
 
 @job('low')
 def sync_background(storage_class, storage_id, **kwargs):
+    # DELETE AFTER TEST
+    import time
+    time.sleep(3600)
     storage = storage_class.objects.get(id=storage_id)
     storage.scan_and_create_links()
 
@@ -239,9 +246,6 @@ class ExportStorage(Storage):
 
 @job('low', timeout=settings.RQ_LONG_JOB_TIMEOUT)
 def export_sync_background(storage_class, storage_id):
-    # DELETE AFTER TEST
-    import time
-    time.sleep(3600)
     storage = storage_class.objects.get(id=storage_id)
     storage.save_all_annotations()
 
