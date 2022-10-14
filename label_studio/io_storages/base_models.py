@@ -15,7 +15,7 @@ from tasks.models import Task, Annotation
 from tasks.serializers import PredictionSerializer, AnnotationSerializer
 from data_export.serializers import ExportDataSerializer
 
-from core.redis import is_job_in_queue, redis_connected
+from core.redis import is_job_in_queue, redis_connected, is_job_on_worker
 from core.utils.common import load_func
 from core.utils.params import get_bool_env
 from label_studio_tools.core.utils.params import get_bool_env
@@ -178,9 +178,11 @@ class ImportStorage(Storage):
     def sync(self):
         if redis_connected():
             queue = django_rq.get_queue('low')
-
-            if not is_job_in_queue(queue, "sync_background", project_id=self.project_id):
-                job = queue.enqueue(sync_background, self.__class__, self.id, project_id=self.project_id)
+            meta = {'project': self.project.id, 'storage': self.id}
+            if not is_job_in_queue(queue, "sync_background", meta=meta) and not is_job_on_worker(id='',
+                                                                                                 queue_name='default'):
+                job = queue.enqueue(sync_background, self.__class__, self.id,
+                                    meta=meta)
                 # job_id = sync_background.delay()  # TODO: @niklub: check this fix
                 logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
         else:
@@ -237,6 +239,9 @@ class ExportStorage(Storage):
 
 @job('low', timeout=settings.RQ_LONG_JOB_TIMEOUT)
 def export_sync_background(storage_class, storage_id):
+    # DELETE AFTER TEST
+    import time
+    time.sleep(3600)
     storage = storage_class.objects.get(id=storage_id)
     storage.save_all_annotations()
 
