@@ -24,7 +24,7 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Configure git
         shell: bash
@@ -344,7 +344,7 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Get PR
         uses: actions/github-script@v6

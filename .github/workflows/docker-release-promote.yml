@@ -30,7 +30,7 @@ jobs:
       image_version: ${{ steps.get_info.outputs.image_version }}
       ubi_image_version: ${{ steps.get_info.outputs.ubi_image_version }}
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Get an artifact from check suite
         uses: actions/github-script@v6

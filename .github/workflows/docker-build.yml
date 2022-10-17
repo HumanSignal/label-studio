@@ -33,7 +33,7 @@ jobs:
       image_version: ${{ steps.version.outputs.image_version }}
       ubi_image_version: ${{ steps.version.outputs.ubi_image_version }}
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
         uses: actions/checkout@v3
