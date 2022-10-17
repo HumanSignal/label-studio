@@ -11,7 +11,7 @@ jobs:
     name: "PR title"
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: "Validate PR's title"
         uses: thehanimo/pr-title-checker@v1.3.4
