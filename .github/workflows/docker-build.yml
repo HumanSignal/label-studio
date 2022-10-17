@@ -76,7 +76,7 @@ jobs:
           curl -H "Authorization: $LAUNCHDARKLY_COMMUNITY_SDK_KEY" https://app.launchdarkly.com/sdk/latest-all > label_studio/feature_flags.json
 
       - name: Login to DockerHub
-        uses: docker/login-action@v2.0.0
+        uses: docker/login-action@v2.1.0
         with:
           username: heartexlabs
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -93,7 +93,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Login to RedHat Registry
-        uses: docker/login-action@v2.0.0
+        uses: docker/login-action@v2.1.0
         with:
           registry: scan.connect.redhat.com
           username: unused
