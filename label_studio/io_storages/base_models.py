@@ -182,7 +182,7 @@ class ImportStorage(Storage):
             queue = django_rq.get_queue('low')
             meta = {'project': self.project.id, 'storage': self.id}
             if not is_job_in_queue(queue, "sync_background", meta=meta) and \
-                    not is_job_on_worker(id=self.last_sync_job, queue_name='default'):
+                    not is_job_on_worker(job_id=self.last_sync_job, queue_name='default'):
                 job = queue.enqueue(sync_background, self.__class__, self.id,
                                     meta=meta)
                 self.last_sync_job = job.id
