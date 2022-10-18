@@ -429,6 +429,11 @@ You can also create a storage connection using the Label Studio API.
 ### Set up local storage with Docker
 If you're using Label Studio in Docker, you need to mount the local directory that you want to access as a volume when you start the Docker container. See [Run Label Studio on Docker and use local storage](start.html#Run-Label-Studio-on-Docker-and-use-local-storage).
 
+### Local Storage with Custom Task Format
+This video tutorial demonstrates how to setup Local Storage from scratch and import json tasks in a complex task format that are linked to the Local Storage files.
+
+<iframe class="video-border" width="100%" height="400vh" src="https://www.youtube.com/embed/lo6ncQajbdUs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 ## Troubleshoot CORS and access problems
 
 Troubleshoot some common problems when using cloud or external storage with Label Studio. 
