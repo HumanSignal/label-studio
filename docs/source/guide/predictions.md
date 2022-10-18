@@ -9,7 +9,8 @@ meta_description: Import predicted labels, predictions, pre-annotations, or pre-
 
 If you have predictions generated for your dataset from a model, either as pre-annotated tasks or pre-labeled tasks, you can import the predictions with your dataset into Label Studio for review and correction. Label Studio automatically displays the pre-annotations that you import on the Labeling page for each task. 
 
-> To generate interactive pre-annotations with a machine learning model while labeling, see [Set up machine learning with Label Studio](ml.html).
+!!! note
+    To generate interactive pre-annotations with a machine learning model while labeling, see [Set up machine learning with Label Studio](ml.html).
 
 You can import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-data-from-the-Label-Studio-UI) or [using the API](/api#operation/projects_import_create). 
 
@@ -80,7 +81,8 @@ The `predictions` array also depends on the labeling configuration. Some pre-ann
 
 Other types of annotation contain specific fields. You can review the [examples on this page](#Specific-examples-for-pre-annotations), or review the [tag documentation for the Object and Control tags](/tags) in your labeling configuration labeling-specific `result` objects. For example, the [Audio tag](tags/audio.html), [HyperText tag](tags/hypertext.html), [Paragraphs tag](tags/paragraphs.html), [KeyPointLabels](/tags/keypointlabels.html) and more all contain sample `result` JSON examples.
 
-> Note: If you're generating pre-annotations for a [custom ML backend](ml_create.html), you can use the `self.parsed_label_config` variable to retrieve the labeling configuration for a project and generate pre-annotations. See the [custom ML backend](ml_create.html) documentation for more details.
+!!! note
+    If you're generating pre-annotations for a [custom ML backend](ml_create.html), you can use the `self.parsed_label_config` variable to retrieve the labeling configuration for a project and generate pre-annotations. For more details, see the [custom ML backend](ml_create.html).
 
 ## Import bbox and choice pre-annotations for images
 
@@ -810,7 +812,9 @@ Save this example JSON as a file to import it into Label Studio, for example, `e
 
 This example JSON also includes a prediction score for the task. The IDs for each rectangle result match the label assigned to the region and the text area transcription for the region. 
 
-> The image data in this example task references an uploaded file, identified by the source_filename assigned by Label Studio after uploading the image. The best way to reference image data is using presigned URLs for images stored in cloud storage, or absolute paths to image data stored in local storage and added to Label Studio by [syncing storage](storage.html). 
+
+!!! note
+    The image data in this example task references an uploaded file, identified by the source_filename assigned by Label Studio after uploading the image. The best way to reference image data is using presigned URLs for images stored in cloud storage, or absolute paths to image data stored in local storage and added to Label Studio by [syncing storage](storage.html). 
 
 Import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-data-from-the-Label-Studio-UI) or [using the API](/api#operation/projects_import_create).
 

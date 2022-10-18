@@ -94,10 +94,10 @@ def agreement(annotation_1, annotation_2, per_label=False) -> float:
 
 Set up a custom agreement metric for a specific project in Label Studio Enterprise. 
 
-> You must configure the labeling interface before you can add your custom agreement metric. 
-
 !!! attention "important"
-        [Using tags on Lambda functions](https://docs.aws.amazon.com/lambda/latest/dg/configuration-tags.html) is an on-premise only feature.
+    1. [Using tags on Lambda functions](https://docs.aws.amazon.com/lambda/latest/dg/configuration-tags.html) is an on-premise only feature.
+
+    2. You must configure the labeling interface before you can add your custom agreement metric. 
     
 
 1. Within a project on the Label Studio UI, click **Settings**.
@@ -179,7 +179,9 @@ If you deployed Label Studio Enterprise using Docker Compose in an AWS EC2 insta
 3. Select **Create policy** and attach the [`LSE_AllowInteractLambda` policy](#Create-an-IAM-policy-to-grant-AWS-Lambda-permissions).
 4. When you finish creating the user, save the username and access key somewhere secure.
 5. In the `docker-compose.yaml` file that you use to deploy Label Studio Enterprise, add the following environment variables in the `app` and `rqworkers` sections:
-> Update `YOUR_AWS_ACCESS_KEY_ID`, `YOUR_AWS_SECRET_ACCESS_KEY` and `YOUR_AWS_ACCOUNT` with the credentials for the account created in step one, and updating `YOUR_AWS_REGION` with the AWS region that your EC2 instance exists in:
+
+!!! attention "important"
+    Update `YOUR_AWS_ACCESS_KEY_ID`, `YOUR_AWS_SECRET_ACCESS_KEY` and `YOUR_AWS_ACCOUNT` with the credentials for the account created in step one, and updating `YOUR_AWS_REGION` with the AWS region that your EC2 instance exists in the following:
 ```
 AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
@@ -197,7 +199,9 @@ If you deployed Label Studio Enterprise in Amazon Elastic Kubernetes Service (EK
 1. Create an AWS IAM role named `LSE_ServiceAccountApp` following the steps to create a role to delegate permissions to an AWS service in the AWS Identity and Access Management documentation for [Creating a role for an AWS service (console)](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-service.html#roles-creatingrole-service-console).
 2. When relevant, attach the [`LSE_AllowInteractLambda` policy](#Create-an-IAM-policy-to-grant-AWS-Lambda-permissions) to the `LSE_ServiceAccountApp` role. 
 3. Update your helm `values.yaml` file to include the following map. 
-> Replace `YOUR_AWS_ACCOUNT` with your AWS account ID:
+
+!!! note 
+    Replace `YOUR_AWS_ACCOUNT` with your AWS account ID as follows:
 ```yaml
 app:
   serviceAccount:

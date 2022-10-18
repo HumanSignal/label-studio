@@ -163,13 +163,16 @@ DATABASE_URL = postgres://username:password@hostname.compute.amazonaws.com:5432/
 ```
 Then you can specify the required environment variables for a PostgreSQL connection as config variables. See [Database storage](storedata.html).
 
-Our Heroku manifest uses [postgresql addon](https://elements.heroku.com/addons/heroku-postgresql) out of the box.
-Please notice that the storage capacity is limited.
+!!! note 
+    Our Heroku manifest uses [postgresql addon](https://elements.heroku.com/addons/heroku-postgresql) out of the box. The storage capacity is limited.
 
 [<img src="https://www.herokucdn.com/deploy/button.svg" height="30px">](https://heroku.com/deploy?template=https://github.com/heartexlabs/label-studio/tree/master)
 
-Please notice that all uploaded data via import will be lost after a dyno replace since [filesystem is ephemeral](https://devcenter.heroku.com/articles/dynos#ephemeral-filesystem).
-Using S3 storage is recommended.
+
+!!! attention "important"
+    1. All uploaded data via import will be lost after a dyno replace since [filesystem is ephemeral](https://devcenter.heroku.com/articles/dynos#ephemeral-filesystem).
+    
+    2. Using S3 storage is recommended.
 
 <!--
 ## Run Label Studio on the cloud using a different cloud provider

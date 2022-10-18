@@ -20,7 +20,7 @@ Webhooks in Label Studio let you set up integrations that subscribe to certain e
 
 Your application or service can then respond to that event information however you want. 
 
-## What to use Label Studio webhooks for 
+## Use Label Studio webhooks 
 
 Some events that happen in Label Studio happen in response to an API call. For those, the API response is sufficient to know that the action has occurred. But other events happen inside the Label Studio UI, such as project changes and task annotation activities. To find out immediately when those changes occur, you can use webhooks to notify your application or machine learning pipeline to take specific actions. 
 
@@ -32,7 +32,9 @@ The actions your webhook takes in your application or pipeline can vary dependin
 
 Limit the number of requests to your server by subscribing only to the events relevant for your use case.
 
+
 ## Available Label Studio webhooks
+
 Label Studio makes two main types of events available to integrate with webhooks: project-level task events and organization events.
 
 <table>

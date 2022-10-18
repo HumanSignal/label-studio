@@ -28,27 +28,20 @@ There are five roles available in Label Studio Enterprise Edition. Organization 
 | Reviewer | Reviews annotated tasks. Can view projects with tasks assigned to them. Can review and update task annotations. |
 | Annotator | Labels tasks. Can view projects with tasks assigned to them and label tasks in those projects. |
 
-## Roles in Label Studio Teams
-
-There are two roles available in Label Studio Teams Edition. Organization members have different levels of access to projects and workspaces. Every member can label tasks.
-
-<i>Table 2:  Roles in Label Studio Teams</i>
-
-| Role | Description |
-| --- | --- |
-| Owner | Not an assignable role. Manages Label Studio. Can create and modify workspaces, create and modify projects, and view activity log. |
-| Manager | After being assigned to a workspace by an Owner, has full administrative access in the assigned workspaces. Can view any project and has full access to their own projects. |
 
 ## Roles and workspaces
 
 Use a combination of roles, to control what actions users can take, and project workspaces, to control what data and projects users have access to. 
 
 For example, a project annotator using Label Studio sees only the projects they have access to:
-<img src="/images/LSE/LSE-annotator-view.jpg" width=400 height=275 alt="Diagram showing that only Label Studio projects that they have been added to are visible to an annotator."/>
+<img src="/images/LSE/LSE-annotator-view.jpg" width=400 height=275 alt="Diagram showing that only Label Studio projects that they have been added to are visible to an annotator." class="gif-border"/>
+
 <i>Figure 1: Only Label Studio projects are added and visible to an annotator.</i>
 
 A Label Studio administrator sees all projects and workspaces that exist in the Label Studio instance:
-<img src="/images/LSE/LSE-admin-view.jpg" width=600 height=400 alt="Diagram showing that an administrator can view all projects and workspaces in a Label Studio instance."/>
+
+<img src="/images/LSE/LSE-admin-view.jpg" width=600 height=400 alt="Diagram showing that an administrator can view all projects and workspaces in a Label Studio instance." class="gif-border"/>
+
 <i>Figure 2: An administrator can view all projects and workspaces in a Label Studio instance.</i>
 
 
@@ -255,9 +248,31 @@ Only people with the Administrator and Owner roles can invite people to Label St
 ### Invite users to Label Studio Enterprise
 
 Invite users to your organization by doing the following:
-1. In the Label Studio UI, click the hamburger icon to expand the left-hand menu and click **Organization**. 
-2. On the Organization page, click **+ Add People**.
-3. In the dialog box that appears, click **Copy Link** and share the invitation link to your Label Studio instance with the people that you want to join your organization.
+
+1. In the Label Studio UI, click the three horizontal lines icon and navigate to **Organization**.
+
+<img src="../images/three-line-icon.png" class="gif-border" />
+<i>Figure 3: Three horizontal lines icon. </i>
+
+
+2. Click **Invite People**.
+3. Now, you will see a `Invite people to your organization` screen. 
+
+<img src="../images/invite-user.png" class="gif-border" />
+<i>Figure 4: Invite people. </i>
+
+4. Use one of the following ways to invite people to Label Studio:
+
+    - **Invite link**: Invite people to join your organization. People that you invite appear as "Not Activated" until you assign them a role. For more information, see [manage users](https://labelstud.io/guide/manage_users.html) page. Copy the invitation link by clicking the **Copy link** button and share it with those that you want to invite to Label Studio. If you need to update the link and deactivate the old one, return to this page and click **Reset Link**. The link only resets if the signup page is also disabled.
+
+    - **Invite via email**: Invite people to join your organization over email. The organization role selected will be assigned automatically. Inside the text box, enter email ids separately by spaces and commas.
+
+5. Select a role from the **Organization role** drop-down list.
+
+<img src="../images/select-role-user-invite.png" class="gif-border" />
+<i>Figure 5: Organization role. </i>
+
+6. Click **Send invite**. 
 
 ### Assign roles to invited users
 After a user that you invite clicks the link and signs up for an account, their account exists but must be activated by an organization owner or administrator. When you activate someone's account, you also assign them a role in Label Studio. 
@@ -301,12 +316,12 @@ If permitted by your Label Studio Enterprise plan, you can create organizations 
 
 For example, you might set up one of the following possible configurations:
 - One organization for your company, with one workspace for the support department and another for the development team, with specific projects in each workspace for different types of customer requests. 
-  <img src="/images/LSE/LSE-one-org-many-workspaces.jpg" alt="Diagram showing Label Studio with one organization with multiple workspaces and projects within each workspace."/>
-  <i>Figure 3: Label Studio with one organization with multiple workspaces and projects within each workspace.</i>
+  <img src="/images/LSE/LSE-one-org-many-workspaces.jpg" alt="Diagram showing Label Studio with one organization with multiple workspaces and projects within each workspace." class="gif-border"/>
+  <i>Figure 6: Label Studio with one organization with multiple workspaces and projects within each workspace.</i>
 
 - Multiple organizations, such as one for the customer claims department and another for the customer support department, with specific workspaces in each organization for specific types of insurance, such as home insurance claims and auto insurance claims, and specific projects in each workspace for types of claims, such as Accident Claims, Injury Claims, Natural Disaster Claims. The Customer support organization might have workspaces specific to the types of support queues, with projects for specific types of calls received.
-<img src="/images/LSE/LSE-multiple-orgs-workspaces.jpg" alt="Diagram showing Label Studio with three organizations, each one with multiple workspaces and projects within each workspace."/>
-<i>Figure 4: Label Studio with three organizations, each one with multiple workspaces and projects within each workspace.</i>
+<img src="/images/LSE/LSE-multiple-orgs-workspaces.jpg" alt="Diagram showing Label Studio with three organizations, each one with multiple workspaces and projects within each workspace." class="gif-border"/>
+<i>Figure 7: Label Studio with three organizations, each one with multiple workspaces and projects within each workspace.</i>
 
 When you assign a user role to an organization member, they hold that role for all workspaces and projects for that organization.
   
@@ -322,14 +337,14 @@ Create a workspace to organize projects by doing the following:
 
 1. In the Label Studio UI, click the `+` sign next to **Workspaces** in the menu.
   <br>
-  <div style="margin:auto; text-align:center;"><img src="/images/click-plus-sign.png" style="opacity: 0.8"/></div>
-  <i>Figure 5: Click the **+** sign.</i>
+  <div style="margin:auto; text-align:center;"><img src="/images/click-plus-sign.png" style="opacity: 0.8" class="gif-border" class="gif-border"/></div>
+  <i>Figure 8: Click the **+** sign.</i>
 
 2. Name the workspace, and if you want, select a color.
 3. Click **Save**.
   <br>
-  <div style="margin:auto; text-align:center;"><img src="/images/name-the-workspace.png" style="opacity: 0.8"/></div>
-  <i>Figure 6: Name the workspace.</i>
+  <div style="margin:auto; text-align:center;"><img src="/images/name-the-workspace.png" style="opacity: 0.8" class="gif-border"/></div>
+  <i>Figure 9: Name the workspace.</i>
 
 After creating a workspace, you can create projects for that workspace, or use the **Project Settings** page to move a project to the new workspace. Your private sandbox also functions as a workspace, but only you can see projects in your sandbox. 
 
@@ -342,8 +357,8 @@ From a specific workspace inside the Label Studio UI, do the following:
 4. Click **Save**.
    
   <br>
-  <div style="margin:auto; text-align:center;"><img src="/images/manage-members.png" style="opacity: 0.8"/></div>
-  <i>Figure 7: Manage members.</i>
+  <div style="margin:auto; text-align:center;"><img src="/images/manage-members.png" style="opacity: 0.8" class="gif-border"/></div>
+  <i>Figure 10: Manage members.</i>
 
 You can also remove yourself or other members from a workspace by following the same process and removing members with the `<` arrow. 
 
@@ -400,50 +415,50 @@ To pin or unpin projects:
 2. Click on the more menu (three dots **...** located in the bottom-right of each project card) to see the following options. 
 
   <br>
-  <div style="margin:auto; text-align:center;"><img src="/images/three-dots.png" style="opacity: 0.8"/></div>
-  <i>Figure 8: Click the three dots (**..**).</i>
+  <div style="margin:auto; text-align:center;"><img src="/images/three-dots.png" style="opacity: 0.8" class="gif-border"/></div>
+  <i>Figure 11: Click the three dots (**..**).</i>
 
 3. Click **Pin project** to pin your projects. 
     <br>
-    <div style="margin:auto; text-align:center;"><img src="/images/pin-project.png" style="opacity: 0.8"/></div>
-  <i>Figure 9: Pin projects.</i>
+    <div style="margin:auto; text-align:center;"><img src="/images/pin-project.png" style="opacity: 0.8" class="gif-border"/></div>
+  <i>Figure 12: Pin projects.</i>
 
 !!! note
     - When you pin a project, a message (for example, `New Project was pinned`) is displayed at the bottom of the page to confirm that your project is pinned.
     - Click **Undo** near the message to undo this action. 
   
   <br>
-  <div style="margin:auto; text-align:center;"><img src="/images/new-project-pinned.png" style="opacity: 0.8"/></div>
-  <i>Figure 10: A pinned message at the bottom of the projects page.</i>
+  <div style="margin:auto; text-align:center;"><img src="/images/new-project-pinned.png" style="opacity: 0.8" class="gif-border"/></div>
+  <i>Figure 13: A pinned message at the bottom of the projects page.</i>
 
 4. To filter and display only the pinned projects, click **Pinned projects** on the top-right side drop-down list. 
 
   <br>
-  <div style="margin:auto; text-align:center;"><img src="/images/filter-pinned-projects-only.png" style="opacity: 0.8"/></div>
-  <i>Figure 11: Filter only pinned projects.</i>
+  <div style="margin:auto; text-align:center;"><img src="/images/filter-pinned-projects-only.png" style="opacity: 0.8" class="gif-border"/></div>
+  <i>Figure 14: Filter only pinned projects.</i>
 
 Now, you can see all the pinned projects only. 
   <br>
-  <div style="margin:auto; text-align:center;"><img src="/images/view-pinned-projects-only.png" style="opacity: 0.8"/></div>
-  <i>Figure 12: View only the pinned projects.</i>
+  <div style="margin:auto; text-align:center;"><img src="/images/view-pinned-projects-only.png" style="opacity: 0.8" class="gif-border"/></div>
+  <i>Figure 15: View only the pinned projects.</i>
 
 
 5. To filter and display only the unpinned projects, click **Unpinned projects** on the top-right side drop-down list. 
 
   <br>
-  <div style="margin:auto; text-align:center;"><img src="/images/filter-unpinned-projects-only.png" style="opacity: 0.8"/></div>
-  <i>Figure 13: Filter only Unpinned projects.</i>
+  <div style="margin:auto; text-align:center;"><img src="/images/filter-unpinned-projects-only.png" style="opacity: 0.8" class="gif-border"/></div>
+  <i>Figure 16: Filter only Unpinned projects.</i>
 
 Now, you can see all the unpinned projects only.
   <br>
-  <div style="margin:auto; text-align:center;"><img src="/images/view-unpinned-projects-only.png" style="opacity: 0.8"/></div>
-  <i>Figure 14: View only the unpinned projects.</i>
+  <div style="margin:auto; text-align:center;"><img src="/images/view-unpinned-projects-only.png" style="opacity: 0.8" class="gif-border"/></div>
+  <i>Figure 17: View only the unpinned projects.</i>
 
 6. To view all the projects (both the **Pinned** and **Unpinned** projects), click **All projects** on the top-right side drop-down list.  
 
   <br>
-  <div style="margin:auto; text-align:center;"><img src="/images/view-all-projects.png" style="opacity: 0.8"/></div>
-  <i>Figure 15: View all (both pinned and unpinned) projects.</i>
+  <div style="margin:auto; text-align:center;"><img src="/images/view-all-projects.png" style="opacity: 0.8" class="gif-border"/></div>
+  <i>Figure 18: View all (both pinned and unpinned) projects.</i>
 
 
 #### Duplicate a project
@@ -455,8 +470,8 @@ To duplicate a project:
 - Navigate to your workspace page to see the project card with the three dots (**...**) and click **Duplicate project**.
       
   <br>
-  <div style="margin:auto; text-align:center;"><img src="/images/duplicate-project.png" style="opacity: 0.8"/></div>
-  <i>Figure 16: Duplicate project button.</i>
+  <div style="margin:auto; text-align:center;"><img src="/images/duplicate-project.png" style="opacity: 0.8" class="gif-border"/></div>
+  <i>Figure 19: Duplicate project button.</i>
    
 - When duplicating, a pop-up window appears. Now, you can choose a destination workspace for a newly duplicated project using the following options:
 
@@ -465,17 +480,17 @@ To duplicate a project:
   - Duplicate with settings, data, and all annotations.
 
     <br>
-    <div style="margin:auto; text-align:center;"><img src="/images/duplicate-options-settings.png" style="opacity: 0.8"/></div>
-    <i>Figure 17: Duplicate project options.</i>
+    <div style="margin:auto; text-align:center;"><img src="/images/duplicate-options-settings.png" style="opacity: 0.8" class="gif-border"/></div>
+    <i>Figure 20: Duplicate project options.</i>
 
 - When choosing the last option, you also can choose if you would like to make annotations **Ground Truth** or not. In the **Duplicate** window, you can also give duplicated project new name and description.
 
-    <div style="margin:auto; text-align:center;"><img src="/images/save-duplicate-project.png" style="opacity: 0.8"/></div>
-    <i>Figure 18: Select the location to save your duplicate project.</i>
+    <div style="margin:auto; text-align:center;"><img src="/images/save-duplicate-project.png" style="opacity: 0.8" class="gif-border"/></div>
+    <i>Figure 21: Select the location to save your duplicate project.</i>
 
 - Finally, the duplicated project is created. 
-    <div style="margin:auto; text-align:center;"><img src="/images/created-a-duplicated-project.png" style="opacity: 0.8"/></div>
-    <i>Figure 19: Create a duplicate project.</i>
+    <div style="margin:auto; text-align:center;"><img src="/images/created-a-duplicated-project.png" style="opacity: 0.8" class="gif-border"/></div>
+    <i>Figure 22: Create a duplicate project.</i>
 
 ### Delete a workspace
 
@@ -487,5 +502,5 @@ To delete a workspace, do the following:
 3. In the dialog box that appears, click **Delete Workspace**. If the button is not available to select, the workspace still contains projects. 
 
   <br>
-  <div style="margin:auto; text-align:center;"><img src="/images/delete-workspace.png" style="opacity: 0.8"/></div>
-  <i>Figure 10: Delete a workspace.</i>
+  <div style="margin:auto; text-align:center;"><img src="/images/delete-workspace.png" style="opacity: 0.8" class="gif-border"/></div>
+  <i>Figure 23: Delete a workspace.</i>

@@ -48,7 +48,7 @@ p.admonition-title {
   border-color: #ff9100;
 }
 
-.admonition.failure, .admonition.missing, .admonition.fail, .admonition.error {
+.admonition.failure, .admonition.missing, .admonition.fail, .admonition.error, .admonition.deprecated {
   border-color: #ff5252;
 }
 

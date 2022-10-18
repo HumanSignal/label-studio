@@ -97,7 +97,7 @@ For a large labeling project with hundreds of thousands of tasks, do the followi
 You can run the [Label Studio converter tool](https://github.com/heartexlabs/label-studio-converter) on a directory or file of completed JSON annotations using the command line or Python to convert the completed annotations from Label Studio JSON format into another format. 
 
 !!! note
-    If you use versions of Label Studio earlier than 1.0.0, then this is the only way to convert your Label Studio JSON format annotations into another labeling format. 
+    For earlier versions of Label Studio, use the manual way to convert your Label Studio JSON format annotations into another labeling format. 
 
 
 ## Export formats supported by Label Studio
@@ -353,19 +353,3 @@ Another way of accessing data is to use link from task and ACCESS_TOKEN ([see do
 ```json
 curl -X GET http://localhost:8080/api/projects/ -H 'Authorization: Token {YOUR_TOKEN}'
 ```
-
-### Frequently asked questions 
-
-#### Question #1: I have made a request and received the following API responses: 
-- No data was provided.
-- 404 or 403 error code was returned. 
-
-**Answer:**
-First check the network access to your Label Studio instance when you send API requests. You can execute test curl request with sample data. 
-
-#### Question #2: I tried to access files and received a `FileNotFound` error.
-
-**Answer:**
-1. Check that you have mounted the same disk as your Label Studio instance. Then check your files' existence in Label Studio instance first. 
-
-2. Check `LOCAL_FILES_DOCUMENT_ROOT` environment variable in your Label Studio instance and add it to your accessing data script.
