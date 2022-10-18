@@ -1,7 +1,7 @@
 title: Multi-page document annotation
 type: community
 group: Computer Vision
-image: /static/templates/pdf-classification.png
+image: /static/templates/multipage.png
 details: <h1>Classify PDF documents</h1>
 config: |
   <View>
