@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3607: Add validation if stage is ready (#915)\n\nfix: DEV-3607: add validation if stage is ready",
-  "commit": "760d5ad9d34574969c4f81386ac734e68273fa3f",
-  "branch": "master",
-  "date": "2022-10-18T20:30:14Z"
+  "message": "fix: DEV-2297: Large timeseries datasets not correctly displaying y values",
+  "commit": "751f79daa52bf749c04f26d4b1981a4a517240cf",
+  "branch": "fb-dev-2297",
+  "date": "2022/10/19 13:08:22"
 }
