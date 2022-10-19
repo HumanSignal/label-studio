@@ -15,5 +15,5 @@ class CreateSubject(forms.ModelForm):
 class CreateDeployment(forms.ModelForm):
     class Meta:
         model = models.Deployment
-        fields = ['begin_datetime','end_datetime','location','sensor','subject']
+        fields = ['name','begin_datetime','end_datetime','location','sensor','subject']
 

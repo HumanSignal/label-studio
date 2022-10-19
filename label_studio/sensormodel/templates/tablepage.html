@@ -54,6 +54,7 @@
         <h2>Deployments</h2>
         <table class="tables">
             <tr>
+                <th>Name</th>
                 <th>Begin Date Time</th>
                 <th>End Date Time</th>
                 <th>Location</th>
@@ -64,6 +65,7 @@
             </tr>
             {% for deployment in deployments %}
             <tr>
+                <td>{{ deployment.name }}</td>
                 <td>{{ deployment.begin_datetime }}</td>
                 <td>{{ deployment.end_datetime }}</td> 
                 <td>{{ deployment.location}} </td>
