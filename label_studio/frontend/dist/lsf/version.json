@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-1041: Configurable hop size in VOT (#892)\n\n* Add per-tag settings\r\nAdd Video hop setting\r\n\r\n* Adjust styles as per the review\r\n\r\n* Remove leftover code\r\n\r\n* Fix test to wait for Submit to be enabled\r\n\r\n* Remove unnecessary helper",
-  "commit": "b0177717f584d07ec851b85e72e0a6b6981d120e",
+  "message": "fix: DEV-3607: Add validation if stage is ready (#915)\n\nfix: DEV-3607: add validation if stage is ready",
+  "commit": "760d5ad9d34574969c4f81386ac734e68273fa3f",
   "branch": "master",
-  "date": "2022-10-12T13:28:10Z"
+  "date": "2022-10-18T20:30:14Z"
 }
