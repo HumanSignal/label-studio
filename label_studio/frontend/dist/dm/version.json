@@ -1,6 +1,6 @@
 {
   "message": "feat: DEV-3572: Persist and read virtual annotator filters from local storage as a fallback",
-  "commit": "64a387218a31f076c722d76e58240a20a59aa435",
+  "commit": "6d3b7d0f2f16d4251bffaa4a8dc4a95d2ba62355",
   "branch": "fb-dev-3572",
-  "date": "2022/10/16 05:04:28"
+  "date": "2022/10/19 13:09:00"
 }
