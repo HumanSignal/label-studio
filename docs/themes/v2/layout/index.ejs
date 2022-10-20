@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <link rel="preload" href="/fonts/SpaceGrotesk-Bold-subset.woff2" as="font" type="font/woff2" crossorigin>
+
+  <%- css("css/styles.css") %>
+</head>
+<body>
+  <%- partial("partials/header") %>
+
+  <main>
+    <aside class="sidebar">
+      Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>
+      Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>
+      Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>Sidebar<br><br>
+    </aside>
+    <div class="content">
+      <svg width="77" height="77" viewBox="0 0 77 77" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="content-decoration">
+        <rect x="75.875" y="26" width="25" height="25" transform="rotate(-180 75.875 26)" stroke="#ECEEFD" stroke-width="0.504975"/>
+        <rect x="50.875" y="51" width="25" height="25" transform="rotate(-180 50.875 51)" stroke="#ECEEFD" stroke-width="0.504975"/>
+        <rect x="50.875" y="26" width="25" height="25" transform="rotate(-180 50.875 26)" fill="#FF8267"/>
+        <rect x="26" y="76" width="25" height="25" transform="rotate(-180 26 76)" stroke="#ECEEFD" stroke-width="0.504975"/>
+        <rect x="26" y="51" width="25" height="25" transform="rotate(-180 26 51)" fill="#DD7DFF"/>
+        <rect x="26" y="26" width="25" height="25" transform="rotate(-180 26 26)" fill="#FFC27B"/>
+      </svg>
+      <div class="container">
+        <%- partial("component/heading", {text: "Label Studio Docs", size: "XLarge", tag: "h1"}) %>
+        <p class="Text Large">Some welcome text here lorem ipsum dolor. Some welcome text here lorem ipsum.</p>
+
+        <div class="columns">
+          <div class="card card-light">
+            <%- partial("component/heading", {text: "Getting Started", tag: "h2"}) %>
+            <p class="Text">Loremi psum dolor sit amet consectitur dolor sit maet consectitur dolor sit amet.</p>
+            <%- partial("component/link", { url: "#", label: "Learn How to install" }) %>
+          </div>
+          <div class="card card-light">
+            <%- partial("component/heading", {text: "Labeling Templates", tag: "h2"}) %>
+            <p class="Text">Loremi psum dolor sit amet consectitur dolor sit maet consectitur dolor sit amet.</p>
+            <%- partial("component/link", { url: "#", label: "See Templates" }) %>
+          </div>
+        </div>
+
+        <div class="columns">
+          <div class="card">
+            <%- partial("component/heading", {text: "Overview", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
+            <ul class="card-links-list">
+              <li>
+                <%- partial("component/link", { url: "#", label: "About Label Studio", size: "Full" }) %>
+              </li>
+            </ul>
+          </div>
+          <div class="card">
+            <%- partial("component/heading", {text: "Install", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
+            <ul class="card-links-list">
+              <li>
+                <%- partial("component/link", { url: "#", label: "Getting Started", size: "Full" }) %>
+              </li>
+              <li>
+                <%- partial("component/link", { url: "#", label: "Install and Deploy", size: "Full" }) %>
+              </li>
+            </ul>
+          </div>
+          <div class="card">
+            <%- partial("component/heading", {text: "Configuration", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
+            <ul class="card-links-list">
+              <li>
+                <%- partial("component/link", { url: "#", label: "User Management", size: "Full" }) %>
+              </li>
+              <li>
+                <%- partial("component/link", { url: "#", label: "Project Setup", size: "Full" }) %>
+              </li>
+            </ul>
+          </div>
+          <div class="card">
+            <%- partial("component/heading", {text: "Import and Export", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
+            <ul class="card-links-list">
+              <li>
+                <%- partial("component/link", { url: "#", label: "Import Data", size: "Full" }) %>
+              </li>
+              <li>
+                <%- partial("component/link", { url: "#", label: "Export Tasks with Annotations and Data", size: "Full" }) %>
+              </li>
+            </ul>
+          </div>
+          <div class="card">
+            <%- partial("component/heading", {text: "Labeling", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
+            <ul class="card-links-list">
+              <li>
+                <%- partial("component/link", { url: "#", label: "Data Manager", size: "Full" }) %>
+              </li>
+              <li>
+                <%- partial("component/link", { url: "#", label: "Annotators", size: "Full" }) %>
+              </li>
+            </ul>
+          </div>
+          <div class="card">
+            <%- partial("component/heading", {text: "Machine Learning", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
+            <ul class="card-links-list">
+              <li>
+                <%- partial("component/link", { url: "#", label: "Active Learning", size: "Full" }) %>
+              </li>
+              <li>
+                <%- partial("component/link", { url: "#", label: "Generate and Store Predictions", size: "Full" }) %>
+              </li>
+              <li>
+                <%- partial("component/link", { url: "#", label: "Apply Ready-To-Use Models", size: "Full" }) %>
+              </li>
+              <li>
+                <%- partial("component/link", { url: "#", label: "Write your own ML Model", size: "Full" }) %>
+              </li>
+              <li>
+                <%- partial("component/link", { url: "#", label: "ML Examples and Tutorials", size: "Full" }) %>
+              </li>
+              <li>
+                <%- partial("component/link", { url: "#", label: "Machine Learning Training", size: "Full" }) %>
+              </li>
+            </ul>
+          </div>
+          <div class="card">
+            <%- partial("component/heading", {text: "Integrations and Development", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
+            <ul class="card-links-list">
+              <li>
+                <%- partial("component/link", { url: "#", label: "Integrations", size: "Full" }) %>
+              </li>
+              <li>
+                <%- partial("component/link", { url: "#", label: "Advanced Development", size: "Full" }) %>
+              </li>
+            </ul>
+          </div>
+          <div class="card">
+            <%- partial("component/heading", {text: "Reference", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
+            <ul class="card-links-list">
+              <li>
+                <%- partial("component/link", { url: "#", label: "API and SDKs", size: "Full" }) %>
+              </li>
+              <li>
+                <%- partial("component/link", { url: "#", label: "Release Notes", size: "Full" }) %>
+              </li>
+              <li>
+                <%- partial("component/link", { url: "#", label: "Glossary", size: "Full" }) %>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <footer class="content-footer">
+          <div>
+            <h3>Was this useful?</h3>
+            Yes / no
+          </div>
+          <div>
+            <h3>Contribute to the docs</h3>
+            <p>Our docs are open source. See something that could be improved? Submit a pull request.</p>
+            <a href="https://github.com/heartexlabs/label-studio">Make a contribution</a>
+          </div>
+          <div>
+            <h3>Can’t find what you’re looking for?</h3>
+            <a href="https://github.com/heartexlabs/label-studio/issues">Submit a GitHub Issue</a>
+            <a href="https://slack.labelstudio.heartex.com/?source=docs-footer">Join Slack Community</a>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

@@ -94,7 +94,7 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: htx
+theme: v2
 
 # Deployment
 deploy:
