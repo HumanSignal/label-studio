@@ -33,9 +33,9 @@ jobs:
       frontend: ${{ steps.changes.outputs.frontend }}
       docker: ${{ steps.changes.outputs.docker }}
       commit-message: ${{ steps.commit-details.outputs.commit-message }}
-    timeout-minutes: 5
+    timeout-minutes: 25
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
         if: github.event_name == 'push'

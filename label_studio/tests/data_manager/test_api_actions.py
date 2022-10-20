@@ -3,6 +3,8 @@
 import pytest
 import json
 
+from django.db import transaction
+
 from ..utils import make_task, make_annotation, make_prediction, project_id
 from projects.models import Project
 
@@ -36,9 +38,9 @@ def test_action_delete_all_tasks(tasks_count, annotations_count, predictions_cou
 
         for _ in range(0, predictions_count):
             make_prediction({"result": []}, task_id)
-
-    business_client.post(f"/api/dm/actions?project={project_id}&id=delete_tasks",
-                         json={'selectedItems': {"all": True, "excluded": []}})
+    with transaction.atomic():
+        business_client.post(f"/api/dm/actions?project={project_id}&id=delete_tasks",
+                             json={'selectedItems': {"all": True, "excluded": []}})
     assert project.tasks.count() == 0
 
 

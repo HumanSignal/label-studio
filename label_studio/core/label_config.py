@@ -73,9 +73,8 @@ def _fix_choices(config):
 
 
 def parse_config_to_json(config_string):
-    parser = etree.XMLParser()
     try:
-        xml = etree.fromstring(config_string, parser)
+        xml = etree.fromstring(config_string, forbid_dtd=False)
     except TypeError as error:
         raise etree.ParseError('can only parse strings')
     if xml is None:
@@ -113,8 +112,7 @@ def validate_label_config(config_string):
 
 def extract_data_types(label_config):
     # load config
-    parser = etree.XMLParser()
-    xml = etree.fromstring(label_config, parser)
+    xml = etree.fromstring(label_config, forbid_dtd=False)
     if xml is None:
         raise etree.ParseError('Project config is empty or incorrect')
 
@@ -127,7 +125,10 @@ def extract_data_types(label_config):
         name = match.get('value')
         if len(name) > 1 and name[0] == '$':
             name = name[1:]
-            data_type[name] = match.tag
+            # video has highest priority, e.g.
+            # for <Video value="url"/> <Audio value="url"> it must be data_type[url] = Video
+            if data_type.get(name) != 'Video':
+                data_type[name] = match.tag
 
     return data_type
 
@@ -163,7 +164,7 @@ def get_all_object_tag_names(label_config):
 
 
 def config_line_stipped(c):
-    tree = etree.fromstring(c)
+    tree = etree.fromstring(c, forbid_dtd=False)
     comments = tree.xpath('//comment()')
 
     for c in comments:
@@ -190,7 +191,7 @@ def get_task_from_labeling_config(config):
             logger.debug('Parse ' + config[start:start + end])
             body = json.loads(config[start:start + end])
         except Exception as exc:
-            logger.error(exc, exc_info=True)
+            logger.error("Can't parse task from labeling config", exc_info=True)
             pass
         else:
             logger.debug(json.dumps(body, indent=2))
@@ -223,8 +224,7 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
     """ Generate sample task only
     """
     # load config
-    parser = etree.XMLParser()
-    xml = etree.fromstring(label_config, parser)
+    xml = etree.fromstring(label_config, forbid_dtd=False)
     if xml is None:
         raise etree.ParseError('Project config is empty or incorrect')
 

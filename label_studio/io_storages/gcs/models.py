@@ -61,7 +61,7 @@ class GCSStorageMixin(models.Model):
             except Exception as exc:
                 if raise_on_error:
                     raise
-                logger.error(f"Can't create GCS credentials. Reason: {exc}", exc_info=True)
+                logger.error(f"Can't create GCS credentials", exc_info=True)
                 credentials = None
                 project_id = _marker
 

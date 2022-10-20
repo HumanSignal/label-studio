@@ -429,11 +429,17 @@ You can also create a storage connection using the Label Studio API.
 ### Set up local storage with Docker
 If you're using Label Studio in Docker, you need to mount the local directory that you want to access as a volume when you start the Docker container. See [Run Label Studio on Docker and use local storage](start.html#Run-Label-Studio-on-Docker-and-use-local-storage).
 
+### Local Storage with Custom Task Format
+This video tutorial demonstrates how to setup Local Storage from scratch and import json tasks in a complex task format that are linked to the Local Storage files.
+
+<iframe class="video-border" width="100%" height="400vh" src="https://www.youtube.com/embed/lo6ncQajbdU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 ## Troubleshoot CORS and access problems
 
 Troubleshoot some common problems when using cloud or external storage with Label Studio. 
 
 ### I can't see the data in my tasks
+
 Check your web browser console for errors.
 
 - If you see CORS problems, make sure you have CORS set up properly. 
@@ -442,6 +448,12 @@ Check your web browser console for errors.
     - For Amazon S3, see [Configuring and using cross-origin resource sharing (CORS)](https://docs.aws.amazon.com/AmazonS3/latest/userguide/cors.html) in the Amazon S3 User Guide.
     - For GCS, see [Configuring cross-origin resource sharing (CORS)](https://cloud.google.com/storage/docs/configuring-cors) in the Google Cloud Storage documentation.
     - For Microsoft Azure, see [Cross-Origin Resource Sharing (CORS) support for Azure Storage](https://docs.microsoft.com/en-us/rest/api/storageservices/cross-origin-resource-sharing--cors--support-for-the-azure-storage-services) in the Microsoft Azure documentation. 
+
+!!! note
+    1. Make sure to apply the correct role and permissions for your Service Account. For example, Service Account Role "roles/iam.serviceAccountTokenCreator" to the Service Account.
+    
+    2. If the name of the Service Account `labelstudio` is using the error displayed in the DEBUG logs, then you can enable them using the `--log-level DEBUG` flag in the `label-studio start` command.
+
 - If you see 403 errors, make sure you configured the correct credentials. 
     - For Amazon S3, see [Configuration and credential file settings](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) in the Amazon AWS Command Line Interface User Guide.
     - For GCS, see [Setting up authentication](https://cloud.google.com/storage/docs/reference/libraries#setting_up_authentication) in the Google Cloud Storage documentation. Your account must have the `Service Account Token Creator` role. 

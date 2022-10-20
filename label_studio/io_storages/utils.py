@@ -18,11 +18,10 @@ def get_uri_via_regex(data, prefixes=('s3', 'gs')):
         uri_regex_prepared = uri_regex.format('|'.join(prefixes))
         r_match = re.search(uri_regex_prepared, data)
     except Exception as exc:
-        logger.error(f'{data} can\'t be processed. Reason: {exc}', exc_info=True)
+        logger.error(f"Can't parse task.data to match URI. Reason: {exc}", exc_info=True)
         return None, None
     else:
         if r_match is None:
-            logger.warning(
-                "{data} does not match uri regex {uri_regex}".format(data=data, uri_regex=uri_regex))
+            logger.warning("Can't parse task.data to match URI. Reason: Match is not found.")
             return None, None
     return r_match.group("uri"), r_match.group("storage")
