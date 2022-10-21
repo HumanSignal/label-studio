@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3607: Add validation if stage is ready (#915)\n\nfix: DEV-3607: add validation if stage is ready",
-  "commit": "760d5ad9d34574969c4f81386ac734e68273fa3f",
-  "branch": "master",
-  "date": "2022-10-18T20:30:14Z"
+  "message": "fix: DEV-3564: Annotations drawn for audio region should span all channels",
+  "commit": "c9a78bd35a00c20dff83f147b56bed505bd31121",
+  "branch": "fb-dev-3564",
+  "date": "2022/10/21 12:27:29"
 }
