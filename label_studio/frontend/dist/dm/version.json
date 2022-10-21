@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3492: Load virtual tab data from url key when present (#111)\n\n* fix: DEV-3492: Load virtual tab data from url key when present\r\n\r\n* include viewSnapshot in the newSnaphot for view tab data\r\n\r\n* include viewSnapshot in the newSnaphot for view tab data",
-  "commit": "878c084adfabe0736ab2e9f5ca2d419cf009c7f9",
+  "message": "feat: DEV-3572: Persist and read virtual annotator filters from local storage as a fallback (#116)",
+  "commit": "fa4559e82f69910ba7ce24c978c6a194aa58a7e8",
   "branch": "master",
-  "date": "2022-10-04T14:26:17Z"
+  "date": "2022-10-21T14:05:14Z"
 }

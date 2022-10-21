@@ -54,7 +54,7 @@ jobs:
       pipy-artifact-url: ${{ steps.pypi-package-details.outputs.pipy-artifact-url }}
       pipy-artifact-digests-sha256: ${{ steps.pypi-package-details.outputs.pipy-artifact-digests-sha256 }}
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -113,15 +113,30 @@ jobs:
         id: pypi-package-details
         if: inputs.upload_to_pypi
         uses: actions/github-script@v6
+        env:
+          VERSION: ${{ github.event.pull_request.title }}
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
-            const { data: pypiPackage } = await github.request('https://pypi.org/pypi/label-studio/json')
-            const release = pypiPackage.releases[version]
-            const artifact = release.find(e => e.packagetype === 'bdist_wheel')
-            console.log(artifact)
-            core.setOutput("pipy-artifact-url", artifact.url);
-            core.setOutput("pipy-artifact-digests-sha256", artifact.digests.sha256);
+            const version = process.env.VERSION
+            const MAX_ATTEMPTS = 10
+            let currentAttempt = 0
+            const intervalId = setInterval(async () => {
+              currentAttempt++
+              console.log(`Attempt ${currentAttempt}`)
+              const {data: pypiPackage} = await github.request('https://pypi.org/pypi/label-studio/json')
+              if ('releases' in pypiPackage && version in pypiPackage.releases) {
+                const release = pypiPackage.releases[version]
+                const artifact = release.find(e => e.packagetype === 'bdist_wheel')
+                console.log(artifact);
+                core.setOutput("pipy-artifact-url", artifact.url);
+                core.setOutput("pipy-artifact-digests-sha256", artifact.digests.sha256);
+                clearInterval(intervalId)
+              } else if (currentAttempt > MAX_ATTEMPTS) {
+                clearInterval(intervalId)
+                throw Error('Max attempts exceeded')
+              }
+            }, 6 * 1000)
 
       - name: Attach artifacts to release
         if: inputs.release-id
