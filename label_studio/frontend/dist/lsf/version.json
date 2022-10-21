@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2432: Allow polygon to save closed state as snapshot to retain state of unfinished polygon points",
+  "message": "fix: DEV-2432: Fix logic of Hotkeys namespaces",
   "commit": "f9ecc2c603556e7bcb0d3ba1331923a339f4a21c",
   "branch": "fb-dev-2432-fix",
-  "date": "2022/10/20 18:27:46"
+  "date": "2022-10-20T16:27:46Z"
 }
