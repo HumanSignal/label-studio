@@ -1,0 +1,7 @@
+<% if (page.title.trim()) { %>
+  <%- partial("component/heading", {text: page.title, size: "XLarge", tag: "h1", customClass: "home-page-title"}) %>
+<% } %>
+
+<div class="content-markdown">
+  <%- page.content %>
+</div>

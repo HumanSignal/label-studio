@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <link rel="preload" href="/fonts/SpaceGrotesk-Bold-subset.woff2" as="font" type="font/woff2" crossorigin>
+
+  <%- css("css/styles.css") %>
+</head>
+<body>
+  <%- partial("partials/header") %>
+
+  <main>
+    <aside class="page-sidebar">
+      <%- partial("partials/toc", { type: 'guide' }) %>
+    </aside>
+    <div class="content">
+      <svg width="77" height="77" viewBox="0 0 77 77" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="content-decoration">
+        <rect x="75.875" y="26" width="25" height="25" transform="rotate(-180 75.875 26)" stroke="#ECEEFD" stroke-width="0.504975"/>
+        <rect x="50.875" y="51" width="25" height="25" transform="rotate(-180 50.875 51)" stroke="#ECEEFD" stroke-width="0.504975"/>
+        <rect x="50.875" y="26" width="25" height="25" transform="rotate(-180 50.875 26)" fill="#FF8267"/>
+        <rect x="26" y="76" width="25" height="25" transform="rotate(-180 26 76)" stroke="#ECEEFD" stroke-width="0.504975"/>
+        <rect x="26" y="51" width="25" height="25" transform="rotate(-180 26 51)" fill="#DD7DFF"/>
+        <rect x="26" y="26" width="25" height="25" transform="rotate(-180 26 26)" fill="#FFC27B"/>
+      </svg>
+      <div class="container">
+        <%- body %>
+        <footer class="content-footer">
+          <div>
+            <%- partial("component/text", {text: "Was this useful?", tag: "h3", size: "Eyebrow"}) %>
+            Yes / no
+          </div>
+          <div>
+            <%- partial("component/text", {text: "Contribute to the docs", tag: "h3", size: "Eyebrow"}) %>
+            <%- partial("component/text", {text: "Our docs are open source. See something that could be improved? Submit a pull request.", tag: "h3", size: "Small"}) %>
+            <%- partial("component/button", { url: "https://github.com/heartexlabs/label-studio", label: "Make a contribution", }) %>
+          </div>
+          <div>
+            <%- partial("component/text", {text: "Can’t find what you’re looking for?", tag: "h3", size: "Eyebrow"}) %>
+            <%- partial("component/button", { url: "https://github.com/heartexlabs/label-studio/issues", label: "Submit a GitHub Issue", }) %>
+            <%- partial("component/button", { url: "https://slack.labelstudio.heartex.com/?source=docs-footer", label: "Join Slack Community", theme: "Secondary"}) %>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<%- partial("component/heading", {text: "Docs", size: "XXSmall", tag: "h2"}) %>
+
+  <ul class="page-sidebar-list">
+    <% site.pages.find({ type: type }).sort('order').each(function (p) { %>
+    <% var fileName = p.path.replace(/^.+?\/([\w-]+)\.html/, '$1') %>
+
+    <% if (type === 'guide') { %>
+      <% if (fileName === 'install') { %>
+        </ul><%- partial("component/text", {text: "Install and Upgrade", size: "Eyebrow", tag: "h3"}) %><ul>
+      <% } %>
+      <% if (fileName === 'install_enterprise') { %>
+        </ul><%- partial("component/text", {text: "Deploy and Install Enterprise", size: "Eyebrow", tag: "h3"}) %><ul>
+      <% } %>
+      <% if (fileName === 'security') { %>
+        </ul><%- partial("component/text", {text: "Security and Privacy", size: "Eyebrow", tag: "h3"}) %><ul>
+      <% } %>
+      <% if (fileName === 'signup') { %>
+        </ul><%- partial("component/text", {text: "Manage Users", size: "Eyebrow", tag: "h3"}) %><ul>
+      <% } %>
+      <% if (fileName === 'tasks') { %>
+        </ul><%- partial("component/text", {text: "Import Data", size: "Eyebrow", tag: "h3"}) %><ul>
+      <% } %>
+       <% if (fileName === 'setup_project') { %>
+        </ul><%- partial("component/text", {text: "Labeling and Projects", size: "Eyebrow", tag: "h3"}) %><ul>
+      <% } %>
+      <% if (fileName === 'quality') { %>
+        </ul><%- partial("component/text", {text: "Manage Annotations", size: "Eyebrow", tag: "h3"}) %><ul>
+      <% } %>
+      <% if (fileName === 'ml') { %>
+        </ul><%- partial("component/text", {text: "Machine Learning Setup", size: "Eyebrow", tag: "h3"}) %><ul>
+      <% } %>
+      <% if (fileName === 'webhooks') { %>
+        </ul><%- partial("component/text", {text: "Integrations", size: "Eyebrow", tag: "h3"}) %><ul>
+      <% } %>
+      <% if (fileName === 'frontend') { %>
+        </ul><%- partial("component/text", {text: "Advanced Development", size: "Eyebrow", tag: "h3"}) %><ul>
+      <% } %> %>
+
+    <% } %>
+
+      <% if (type === 'tags') { %>
+
+
+      <% if (fileName === 'audio') { %>
+          <li><h4>Object Tags</h4></li>
+      <% } %>
+
+      <% if (fileName === 'brush') { %>
+          <li><h4>Control Tags</h4></li>
+      <% } %>
+
+      <% if (fileName === 'collapse') { %>
+          <li><h4>Visual & Experience Tags</h4></li>
+      <% } %>
+
+      <% } %>
+
+      <% if (type==="templates") { %>
+
+        <% if (fileName === 'image_polygons') { %>
+          <li><h4>Computer Vision</h4></li>
+        <% } %>
+
+        <% if (fileName === 'question_answering') { %>
+          <li><h4>Natural Language Processing</h4></li>
+        <% } %>
+
+        <% if (fileName === 'transcribe_audio') { %>
+          <li><h4>Audio/Speech Processing</h4></li>
+        <% } %>
+
+        <% if (fileName === 'response_generation') { %>
+          <li><h4>Conversational AI</h4></li>
+        <% } %>
+
+        <% if (fileName === 'freeform_metadata') { %>
+          <li><h4>Structured Data Parsing</h4></li>
+        <% } %>
+
+        <% if (fileName === 'pairwise_regression') { %>
+          <li><h4>Ranking and Scoring</h4></li>
+        <% } %>
+
+        <% if (fileName === 'time_series_forecasting') { %>
+          <li><h4>Time Series Analysis</h4></li>
+        <% } %>
+
+        <% if (fileName === 'video_classification') { %>
+          <li><h4>Videos</h4></li>
+        <% } %>
+
+        <% if (fileName === 'gallery_cv') { %>
+          <li><h4>Template Galleries</h4></li>
+        <% } %>
+
+      <% } %>
+    <li>
+      <a href="<%- url_for(p.path) %>" class="<%- p.is_new ? ' new' : '' %>" <%- page.title === p.title ? 'aria-current="page"' : '' %>>
+        <%- p.short ? p.short: p.title %></a>
+    </li>
+    <% }) %>
+</ul>

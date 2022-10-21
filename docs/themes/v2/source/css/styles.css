@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 html {
   --color-purple-100: #D660FF;
   --color-purple-90: #DD7DFF;
@@ -42,7 +46,9 @@ body {
   border-bottom: 1px solid;
   height: 75px;
   z-index: 2;
-  position: relative;
+  position: sticky;
+  top: 0;
+  background-color: var(--color-white);
 }
 
 main {
@@ -61,7 +67,7 @@ main {
   left: 0;
 }
 
-.sidebar {
+.page-sidebar {
   position: fixed;
   width: var(--sidebar-size);
   left: 0;
@@ -69,6 +75,38 @@ main {
   height: 100%;
   overflow: auto;
   border-right: 1px black solid;
+  padding: 1.5em 1.5em 15em 1.5em;
+}
+
+.page-sidebar [aria-current="page"] {
+  color: var(--color-orange-90);
+  font-weight: bold;
+}
+
+.page-sidebar .Text {
+  color: var(--color-gray-600);
+  margin-top: 2rem;
+  margin-bottom: 0;
+}
+
+.page-sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.page-sidebar ul li + li {
+  margin-top: 0.25em;
+}
+
+.page-sidebar ul a {
+  font-size: 0.875rem;
+  text-decoration: none;
+  color: var(--color-gray-900);
+}
+
+.page-sidebar ul a:hover {
+  color: var(--color-orange-90);
 }
 
 .columns {
@@ -107,12 +145,16 @@ main {
   margin-top: 0.75em;
 }
 
-.card-title {
+.card-title.XSmall {
   margin-bottom: 0.75em;
 }
 
-h1 {
-  font-size: 4rem;
+.card-title.Medium {
+  margin-bottom: 0.25em;
+}
+
+.card-cta {
+  margin-top: 0.8em;
 }
 
 .content-footer {
@@ -122,6 +164,21 @@ h1 {
   grid-template-columns: repeat(auto-fit, minmax(10em, 1fr));
   gap: 4em;
   margin-top: 5em;
+}
+
+.container {
+  margin: 0 auto;
+  max-width: 1030px;
+}
+
+.home-page-title {
+  margin: 0 0 -0.1em 0;
+}
+
+.home-page-title-grid {
+  display: flex;
+  gap: 2em;
+  margin-bottom: 1em;
 }
 
 
@@ -136,7 +193,13 @@ h1 {
   Heading styles
 ****************************/
 
-.Heading {
+.Heading,
+.content-markdown h1,
+.content-markdown h2,
+.content-markdown h3,
+.content-markdown h4,
+.content-markdown h5,
+.content-markdown h6 {
   --min-size: 1.75rem; /* 28px */
   --max-size: 2.25rem; /* 36px */
   --breakpoint: 5vw;
@@ -153,49 +216,74 @@ h1 {
   --line-height: 98%;
 }
 
-.Heading.XLarge {
+.Heading.XLarge,
+.content-markdown h1 {
   --min-size: 2.375rem; /* 38px */
   --max-size: 4rem; /* 64px */
   --line-height: 106%;
 }
 
-.Heading.Large {
+.Heading.Large,
+.content-markdown h2 {
   --min-size: 2rem; /* 32px */
   --max-size: 3rem; /* 48px */
   --line-height: 106%;
 }
 
-.Heading.Small {
+.content-markdown h3 {
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid var(--color-gray-300);
+}
+
+.Heading.Small,
+.content-markdown h4 {
   --min-size: 1.25rem; /* 20px */
   --max-size: 1.75rem; /* 28px */
   --line-height: 1.07;
 }
 
-.Heading.XSmall {
+.Heading.XSmall,
+.content-markdown h5 {
   --min-size: 1rem; /* 16px */
   --max-size: 1.5rem; /* 24px */
   --line-height: 100%;
 }
 
-.Heading.XXSmall {
+.Heading.XXSmall,
+.content-markdown h6 {
   --min-size: 0.875rem; /* 14px */
   --max-size: 1.125rem; /* 18px */
   --breakpoint: 3vw;
   --line-height: 100%;
 }
 
+.content-markdown h2,
+.content-markdown h3,
+.content-markdown h4,
+.content-markdown h5,
+.content-markdown h6 {
+  margin-bottom: 0;
+  margin-top: 2em;
+}
+.content-markdown a {
+  color: var(--color-orange-90);
+}
+
 /****************************
   Paragraph styles
 ****************************/
 
-.Text {
+.Text,
+.content-markdown p,
+.content-markdown ul,
+.content-markdown ol {
   --min-size: 1rem; /* 16px */
   --max-size: 1.125rem; /* 18px */
   --line-height: 1.56;
 
   font-family: var(--font-family-secondary);
   font-size: clamp(var(--min-size), 7vw, var(--max-size));
-  color: var(--color-gray-600);
+  color: var(--color-gray-900);
   line-height: var(--line-height);
   font-weight: normal;
 }
@@ -278,4 +366,44 @@ h1 {
 .Link.Full {
   width: 100%;
   justify-content: space-between;
+}
+
+/****************************
+  Button styles
+****************************/
+
+.Button {
+  background-color: var(--color-gray-900);
+  padding: 0.95em 2em;
+  text-decoration: none;
+  border: 1px var(--color-gray-900) solid;
+  display: inline-flex;
+  align-items: center;
+  transition: background-color 200ms, border-color 200ms;
+  color: var(--color-white);
+  font-size: 1rem;
+  gap: 0.5em; 
+  font-family: var(--font-family-primary);
+}
+
+.Button:hover {
+  background-color: var(--color-orange-90);
+  border-color: var(--color-orange-90);
+}
+
+
+.Button svg {
+  width: 1.5em;
+  height: auto;
+}
+
+.Secondary {
+  background-color: transparent;
+  color: var(--color-gray-900);
+}
+
+.Secondary:hover {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-gray-900);
+  color: var(--color-white);
 }

@@ -32,6 +32,10 @@ skip_render:
     source/playground/render.html
 favicon: images/favicon.ico
 
+exclude:
+  # Exclude 'source/js/test.js'.
+  - "guide/enterprise/*"
+
 # Writing
 new_post_name: :title.md # File name of new posts
 default_layout: post
