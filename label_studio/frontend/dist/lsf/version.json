@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3341: selected=true <Choice> attribute is not supported for Taxonomy",
-  "commit": "cdfe792ad120098a3939e4e920759c845c8d8b12",
+  "commit": "0d41b7128ed08394a9df7c766f354661d801d15f",
   "branch": "fb-dev-3341-correct",
-  "date": "2022/10/20 14:36:09"
+  "date": "2022/10/21 15:48:52"
 }
