@@ -246,6 +246,10 @@ yarn download:lsf <branch-name-from-official-lsf-repo>
 
 LS Frontend (LSF) with Backend (LSB) integration is similar what is described in the [Frontend integration guide](#Frontend-integration-guide). The Javascript integration script is placed in [lsf-sdk.js](https://github.com/heartexlabs/label-studio/blob/master/label_studio/static/js/lsf-sdk.js) in the Label Studio Backend. The main idea of this integration based on LSF callbacks.
 
+Check out a quick guide on how to use custom LSF in Label Studio.
+
+<iframe width="800" height="500" src="https://www.youtube.com/embed/QSGgiXie2SE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 ### Prepare a custom LSF build
 1. Make your custom LSF build by following these [instructions](https://github.com/heartexlabs/label-studio-frontend#development).
 2. Finalize your development with `npm run build:module` to generate `main.css` and `main.js` files.
