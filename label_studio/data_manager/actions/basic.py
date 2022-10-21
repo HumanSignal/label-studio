@@ -84,6 +84,8 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     # take only tasks where annotations were deleted
     real_task_ids = set(list(annotations.values_list('task__id', flat=True)))
     annotations_ids = list(annotations.values('id'))
+    # remove deleted annotations from project.summary
+    project.summary.remove_created_annotations_and_labels(annotations)
     annotations.delete()
     emit_webhooks_for_instance(project.organization, project, WebhookAction.ANNOTATIONS_DELETED, annotations_ids)
     start_job_async_or_sync(bulk_update_stats_project_tasks, queryset.filter(is_labeled=True))
