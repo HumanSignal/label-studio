@@ -13,6 +13,7 @@ except:
     import json
 
 from django.db import models
+from core.feature_flags import flag_set
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
 
@@ -42,7 +43,10 @@ class FileUpload(models.Model):
     @property
     def url(self):
         if settings.HOSTNAME and settings.CLOUD_FILE_STORAGE_ENABLED:
-            return settings.HOSTNAME + self.file.url
+            if flag_set('ff_back_dev_2915_storage_nginx_proxy_26092022_short', self.project.organization.created_by):
+                return self.file.url
+            else:
+                return settings.HOSTNAME + self.file.url
         elif settings.FORCE_SCRIPT_NAME:
             return settings.FORCE_SCRIPT_NAME + '/' + self.file.url.lstrip('/')
         else:
