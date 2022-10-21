@@ -46,6 +46,8 @@ You can use the Label Studio Frontend separately in your own projects by includi
 
 To see all the available options for the initialization of LabelStudio object, see the [Label Studio Frontend](frontend_reference.html).
 
+{% collapse "Using modern JS techniques (recommended)" %}
+
 #### Using modern JS techniques (recommended)
 This guide assumes that you're using a bundler like Webpack or Rollup to assemble your JS bundles, and LSF is installed via a package manager.
 
@@ -107,7 +109,9 @@ labelStudio.on("submitAnnotation", (LS, annotation) => {
   console.log(annotation.serializeAnnotation())
 });
 ```
+{% endcollapse %}
 
+{% collapse "Using plain HTML and JS" %}
 #### Using plain HTML and JS
 This technique is useful if you're not using a bundler or if you want to use the LSF in a static HTML page.
 
@@ -121,34 +125,18 @@ This technique is useful if you're not using a bundler or if you want to use the
 <script src="https://unpkg.com/heartexlabs@label-studio@latest/build/static/js/main.js"></script>
 
 <script>
-const labelStudio = new LabelStudio('label-studio', {
+const root = document.querySelector('#label-studio');
+const labelStudio = new LabelStudio(root, {
   // all configuration options are the same
 });
 </script>
 ```
-
-#### Using plain HTML and JS
-This technique is useful if you're not using a bundler or if you want to use the LSF in a static HTML page.
-
-```xhtml
-<!-- Include Label Studio stylesheet -->
-<link href="https://unpkg.com/heartexlabs@label-studio@latest/build/static/css/main.css" rel="stylesheet">
-
-<div id="label-studio"></div>
-
-<!-- Include the Label Studio library -->
-<script src="https://unpkg.com/heartexlabs@label-studio@latest/build/static/js/main.js"></script>
-
-<script>
-const labelStudio = new LabelStudio('label-studio', {
-  // all configuration options are the same
-});
-</script>
-```
+{% endcollapse %}
 
 ### React integration
 LSF is flexible and can be used with a framework of choice. This guide covers the React integration but the same principles can be applied to other frameworks.
 
+{% collapse "LSF with React" %}
 Prepare new custom component:
 ```jsx
 // components/LabelStudio.js
@@ -231,6 +219,7 @@ const App = () => {
 
 render(<App />, document.getElementById('root'));
 ```
+{% endcollapse %}
 
 ## Frontend development
 
