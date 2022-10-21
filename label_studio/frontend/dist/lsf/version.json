@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3564: Annotations drawn for audio region should span all channels",
-  "commit": "c9a78bd35a00c20dff83f147b56bed505bd31121",
+  "commit": "892d33ccf0379cd15a606c5a4de19778c0f98d2f",
   "branch": "fb-dev-3564",
-  "date": "2022/10/21 12:27:29"
+  "date": "2022/10/21 12:43:27"
 }
