@@ -40,7 +40,7 @@ EDITOR_KEYMAP = json.dumps(get_env("EDITOR_KEYMAP"))
 
 from label_studio import __version__
 from label_studio.core.utils import sentry
-sentry.init_sentry(release_name='label-studio', release_version=__version__)
+#sentry.init_sentry(release_name='label-studio', release_version=__version__)
 
 # we should do it after sentry init
 from label_studio.core.utils.common import collect_versions
