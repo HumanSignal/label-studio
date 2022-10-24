@@ -82,7 +82,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push ubuntu
-        uses: docker/build-push-action@v3.1.1
+        uses: docker/build-push-action@v3.2.0
         id: docker_build_and_push_ubuntu
         with:
           context: .
@@ -100,7 +100,7 @@ jobs:
           password: ${{ secrets.REDHAT_MARKETPLACE_LS_PASSWORD }}
 
       - name: Build and push ubi
-        uses: docker/build-push-action@v3.1.1
+        uses: docker/build-push-action@v3.2.0
         id: docker_build_and_push_ubi
         with:
           context: .
