@@ -14,6 +14,58 @@ import re
 import logging
 import json
 
+from label_studio.core.utils.params import get_bool_env, get_env
+
+formatter = 'standard'
+JSON_LOG = get_bool_env('JSON_LOG', False)
+if JSON_LOG:
+    formatter = 'json'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'json': {
+            '()': 'label_studio.core.utils.formatter.CustomJsonFormatter',
+            'format': '[%(asctime)s] [%(name)s::%(funcName)s::%(lineno)d] [%(levelname)s] [%(user_id)s] %(message)s',
+            'datefmt': '%d/%b/%Y:%H:%M:%S %z',
+        },
+        'standard': {
+            'format': '[%(asctime)s] [%(name)s::%(funcName)s::%(lineno)d] [%(levelname)s] %(message)s',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': formatter,
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': os.environ.get('LOG_LEVEL', 'DEBUG'),
+    },
+    'loggers': {
+        'pykwalify': {'level': 'ERROR', 'propagate': False},
+        'tavern': {'level': 'ERROR', 'propagate': False},
+        'asyncio': {'level': 'WARNING'},
+        'rules': {'level': 'WARNING'},
+        'django': {
+            'handlers': ['console'],
+            # 'propagate': True,
+        },
+        'django_auth_ldap': {'level': os.environ.get('LOG_LEVEL', 'DEBUG')},
+        "rq.worker": {
+            "handlers": ["console"],
+            "level": os.environ.get('LOG_LEVEL', 'INFO'),
+        },
+        'ddtrace': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+        },
+    },
+}
+
+
 # for printing messages before main logging config applied
 if not logging.getLogger().hasHandlers():
     logging.basicConfig(level=logging.DEBUG, format='%(message)s')
@@ -102,43 +154,6 @@ DATABASES = {'default': DATABASES_ALL.get(get_env('DJANGO_DB', 'default'))}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'standard': {
-            'format': '[%(asctime)s] [%(name)s::%(funcName)s::%(lineno)d] [%(levelname)s] %(message)s',
-        },
-        'message_only': {
-            'format': '%(message)s',
-        },
-        'rq_console': {
-            'format': '%(asctime)s %(message)s',
-            'datefmt': '%H:%M:%S',
-        },
-    },
-    'handlers': {
-        'console_raw': {
-            'level': get_env('LOG_LEVEL', 'WARNING'),
-            'class': 'logging.StreamHandler',
-        },
-        'console': {
-            'level': get_env('LOG_LEVEL', 'WARNING'),
-            'class': 'logging.StreamHandler',
-            'formatter': 'standard',
-        },
-        'rq_console': {
-            'level': 'WARNING',
-            'class': 'rq.utils.ColorizingStreamHandler',
-            'formatter': 'rq_console',
-            'exclude': ['%(asctime)s'],
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': get_env('LOG_LEVEL', 'WARNING'),
-    },
-}
 
 if get_bool_env('GOOGLE_LOGGING_ENABLED', False):
     logging.info('Google Cloud Logging handler is enabled.')
@@ -461,13 +476,14 @@ USER_LOGIN_FORM = 'users.forms.LoginForm'
 PROJECT_MIXIN = 'core.mixins.DummyModelMixin'
 TASK_MIXIN = 'tasks.mixins.TaskMixin'
 ANNOTATION_MIXIN = 'tasks.mixins.AnnotationMixin'
-ORGANIZATION_MIXIN = 'core.mixins.DummyModelMixin'
+ORGANIZATION_MIXIN = 'organizations.mixins.OrganizationMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
 GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
 STORAGE_ANNOTATION_SERIALIZER = 'io_storages.serializers.StorageAnnotationSerializer'
 TASK_SERIALIZER_BULK = 'tasks.serializers.BaseTaskSerializerBulk'
 PREPROCESS_FIELD_NAME = 'data_manager.functions.preprocess_field_name'
 INTERACTIVE_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializerForInteractive'
+DELETE_TASKS_ANNOTATIONS_POSTPROCESS = None
 
 
 def project_delete(project):
@@ -520,3 +536,11 @@ FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)
 # default value for feature flags (if not overrided by environment or client)
 FEATURE_FLAGS_DEFAULT_VALUE = False
 
+# Strip harmful content from SVG files by default
+SVG_SECURITY_CLEANUP = get_bool_env('SVG_SECURITY_CLEANUP', False)
+
+ML_BLOCK_LOCAL_IP = get_bool_env('ML_BLOCK_LOCAL_IP', False)
+
+RQ_LONG_JOB_TIMEOUT = int(get_env('RQ_LONG_JOB_TIMEOUT', 36000))
+
+APP_WEBSERVER = get_env('APP_WEBSERVER', 'django')

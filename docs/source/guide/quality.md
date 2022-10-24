@@ -30,7 +30,8 @@ After you [assign reviewers to tasks](#Assign-reviewers-to-tasks), they can revi
 After you complete a review, the next task appears for your review.
 3. Continue reviewing annotated tasks until you've reviewed all annotated tasks. Click **Data Manager** to return to the list of tasks for the project.
 
-> If there are multiple annotations, you can select the tab of each annotation by annotator and result ID to view them separately. The [annotation result ID](labeling.html#How-Label-Studio-saves-results-in-annotations) is different from the task ID visible in the left menu. To see annotations side-by-side, you can click the task in the Data Manager and view a grid of annotations in the task preview mode.
+!!! note 
+    If there are multiple annotations, you can select the tab of each annotation by annotator and result ID to view them separately. The [annotation result ID](labeling.html#How-Label-Studio-saves-results-in-annotations) is different from the task ID visible in the left menu. To see annotations side-by-side, you can click the task in the Data Manager and view a grid of annotations in the task preview mode.
 
 ### Choose what to review
 
@@ -38,6 +39,49 @@ You can review tasks in random order, or order tasks in the project data manager
 - Order tasks by annotator, to review annotations and assess individual annotator performance at the same time.
 - Order tasks by agreement, to review annotations with more uncertainty among annotators first. 
 - Order tasks by model confidence score, to review the annotations that a machine learning model was less certain about first. 
+
+### Navigate between tasks or annotations
+
+You can now navigate back through the review stream in the same path as moving forward when `Mark task as reviewed after all annotations are processed` option is set. The go back (`<`)functionality takes you back through the same set of annotations as it had moving forward.
+
+1. As an **ADMINISTRATOR**, log in to the [Label Studio app](https://app.heartex.com/projects/?page=1).
+
+2. Navigate to **All Projects** page, if needed.
+
+3. Open any project.
+
+4. Observe that you are taken to **Data Manager**.
+
+5. Navigate to **Settings** >> **Review**.
+
+6. Select `Mark task as reviewed after all annotations are processed` option.
+
+7. Click **SAVE** button.
+
+8. Navigate back to Data Manager.
+
+9. Make sure to have several tasks set up with exactly two annotations each, but no reviews.
+
+10. Click **REVIEW ALL TASKS** button.
+
+11. Observe that you are taken to Review Stream.
+
+12. Note the task or annotation that you are on.
+
+13. Complete review for this annotation.
+
+14. Observe that you are taken to same task (second annotation).
+
+15. Repeat steps 12 to 14 for couple more times.
+
+16. Navigate back through the Review Stream using the go back (`<`) button.
+
+!!! note 
+    Confirm that you are not taken through the same path that you have come through moving forward.
+
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/go-back-reviewstream.png" style="opacity: 0.8"/></div>
+<i>Figure 1: Go back to the previous task. </i>
 
 ### Assign reviewers to tasks
 As an administrator or project manager, you can assign reviewers to tasks, or people with access can review tasks on an ad hoc basis. Anyone who is assigned to a task or who completes a review of a task appears in the **Reviewers** column on the Data Manager. You must first [add a reviewer to the project](setup_project.html#Add-members-to-a-project) or [add members to the project workspace](manage_users.html#Add-or-remove-members-to-a-workspace) before you can assign them as a reviewer.

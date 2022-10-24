@@ -2,13 +2,14 @@
 """
 import logging
 
+from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 import drf_yasg.openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, views
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
@@ -17,7 +18,7 @@ from core.utils.common import (
     DjangoFilterDescriptionInspector,
     get_object_with_check_and_log,
 )
-from core.utils.common import bool_from_request
+from core.utils.params import bool_from_request
 from data_manager.api import TaskListAPI as DMTaskListAPI
 from data_manager.functions import evaluate_predictions
 from data_manager.models import PrepareParams
@@ -88,7 +89,6 @@ class TaskListAPI(DMTaskListAPI):
 
     def perform_create(self, serializer):
         project_id = self.request.data.get('project')
-        generics.get_object_or_404(Project, pk=project_id)
         project = generics.get_object_or_404(Project, pk=project_id)
         instance = serializer.save(project=project)
         emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])
@@ -156,11 +156,10 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         )
 
     def get_retrieve_serializer_context(self, request):
-        fields = ['completed_by_full', 'drafts', 'predictions', 'annotations']
+        fields = ['drafts', 'predictions', 'annotations']
 
         return {
             'resolve_uri': True,
-            'completed_by': 'full' if 'completed_by_full' in fields else None,
             'predictions': 'predictions' in fields,
             'annotations': 'annotations' in fields,
             'drafts': 'drafts' in fields,
@@ -178,7 +177,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
                 and not self.task.predictions.exists():
             evaluate_predictions([self.task])
 
-        serializer = self.get_serializer_class()(self.task, many=False, context=context)
+        serializer = self.get_serializer_class()(self.task, many=False, context=context, expand=['annotations.completed_by'])
         data = serializer.data
         return Response(data)
 
@@ -196,8 +195,8 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             project = Task.objects.get(id=self.request.parser_context['kwargs'].get('pk')).project.id
         return self.prefetch(
             Task.prepared.get_queryset(
-                prepare_params=PrepareParams(project=project,
-                                             selectedItems=selected), **kwargs
+                prepare_params=PrepareParams(project=project, selectedItems=selected, request=self.request),
+                **kwargs
             ))
 
     def get_serializer_class(self):
@@ -271,12 +270,17 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         annotation_id = self.kwargs['pk']
         annotation = get_object_with_check_and_log(request, Annotation, pk=annotation_id)
 
-        annotation.task.save()  # refresh task metrics
-
+        task = annotation.task
         if self.request.data.get('ground_truth'):
-            annotation.task.ensure_unique_groundtruth(annotation_id=annotation.id)
+            task.ensure_unique_groundtruth(annotation_id=annotation.id)
+        task.update_is_labeled()
+        task.save()  # refresh task metrics
 
-        return super(AnnotationAPI, self).update(request, *args, **kwargs)
+        result = super(AnnotationAPI, self).update(request, *args, **kwargs)
+
+        task.update_is_labeled()
+        task.save(update_fields=['updated_at'])  # refresh task metrics
+        return result
 
     def get(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).get(request, *args, **kwargs)
@@ -355,6 +359,9 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         task = generics.get_object_or_404(Task.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
         return Annotation.objects.filter(Q(task=task) & Q(was_cancelled=False)).order_by('pk')
 
+    def delete_draft(self, draft_id, annotation_id):
+        return AnnotationDraft.objects.filter(id=draft_id).delete()
+
     def perform_create(self, ser):
         task = get_object_with_check_and_log(self.request, Task, pk=self.kwargs['pk'])
         # annotator has write access only to annotations and it can't be checked it after serializer.save()
@@ -400,7 +407,7 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         draft_id = self.request.data.get('draft_id')
         if draft_id is not None:
             logger.debug(f'Remove draft {draft_id} after creating annotation {annotation.id}')
-            AnnotationDraft.objects.filter(id=draft_id).delete()
+            self.delete_draft(draft_id, annotation.id)
 
         if self.request.data.get('ground_truth'):
             annotation.task.ensure_unique_groundtruth(annotation_id=annotation.id)
@@ -516,3 +523,42 @@ class PredictionAPI(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Prediction.objects.filter(task__project__organization=self.request.user.active_organization)
+
+
+@method_decorator(name='post', decorator=swagger_auto_schema(
+        tags=['Annotations'],
+        operation_summary='Convert annotation to draft',
+        operation_description='Convert annotation to draft',
+        ))
+class AnnotationConvertAPI(views.APIView):
+    permission_required = ViewClassPermission(
+        POST=all_permissions.annotations_change
+    )
+
+    def process_intermediate_state(self, annotation, draft):
+        pass
+
+    @swagger_auto_schema(auto_schema=None)
+    def post(self, request, *args, **kwargs):
+        annotation = get_object_with_check_and_log(request, Annotation, pk=self.kwargs['pk'])
+        organization = annotation.task.project.organization
+        project = annotation.task.project
+        pk = annotation.pk
+
+        with transaction.atomic():
+            draft = AnnotationDraft.objects.create(
+                result=annotation.result,
+                lead_time=annotation.lead_time,
+                task=annotation.task,
+                annotation=None,
+                user=request.user,
+            )
+
+            self.process_intermediate_state(annotation, draft)
+
+            annotation.delete()
+
+        emit_webhooks_for_instance(organization, project, WebhookAction.ANNOTATIONS_DELETED, [pk])
+        data = AnnotationDraftSerializer(instance=draft).data
+        return Response(status=201, data=data)
+

@@ -12,7 +12,7 @@ After you install Label Studio, start the server to start using it.
 label-studio start
 ```
 
-By default, Label Studio starts with a SQLite database to store labeling tasks and annotations. You can specify different source and target storage for labeling tasks and annotations using Label Studio UI or the API. See [Database storage](storedata.html) for more.
+By default, Label Studio starts with an SQLite database to store labeling tasks and annotations. You can specify different sources and target storage for labeling tasks and annotations using Label Studio UI or the API. See [Database storage](storedata.html) for more.
 
 ## Command line arguments for starting Label Studio
 You can specify a machine learning backend and other options using the command line interface. Run `label-studio --help` to see all available options, or refer to the following tables.
@@ -62,8 +62,12 @@ In *nix operating systems, you can set environment variables from the command li
 ```bash
 export LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
 ```
-You can also use an `.env` file. 
 
+!!! note
+    If you are using docker, you can write all your [environment variables into the `.env`](https://docs.docker.com/compose/env-file/) file.
+    
+    
+    
 On Windows, you can use the following syntax:
 ```bash
 set LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
@@ -99,7 +103,7 @@ LABEL_STUDIO_PORT = 9001
 
 To run Label Studio on Docker with a port other than the default of 8080, use the port argument when starting Label Studio on Docker. For example, to start Label Studio in a Docker container accessible with port 9001, run the following: 
 ```bash
-docker run -it -p 9001:8080 -v `pwd`/mydata:/label-studio/data heartexlabs/label-studio:latest label-studio
+docker run -it -p 9001:8080 -v $(pwd)/mydata:/label-studio/data heartexlabs/label-studio:latest label-studio
 ```
 
 Or, if you're using Docker Compose, update the `docker-compose.yml` file that you're using to expose a different port for the NGINX server used to proxy the connection to Label Studio. For example, this portion of the [`docker-compose.yml`](https://github.com/heartexlabs/label-studio/blob/master/docker-compose.yml) file exposes port 9001 instead of port 80 for proxying Label Studio:
@@ -126,10 +130,10 @@ To run Label Studio on Docker and reference persistent local storage directories
 
 The following command starts a Docker container with the latest image of Label Studio with port 8080 and an environment variable that allows Label Studio to access local files. In this example, a local directory `./myfiles` is mounted to the `/label-studio/files` location. 
 ```bash
-docker run -it -p 8080:8080 -v `pwd`/mydata:/label-studio/data \
+docker run -it -p 8080:8080 -v $(pwd)/mydata:/label-studio/data \
 --env LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true \ 
 --env LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/label-studio/files \ 
--v `pwd`/myfiles:/label-studio/files \
+-v $(pwd)/myfiles:/label-studio/files \
 heartexlabs/label-studio:latest label-studio
 ```
 

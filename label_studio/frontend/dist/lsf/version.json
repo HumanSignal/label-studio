@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2777: remove lookbehind in regex for Safari (#730)",
-  "commit": "ebb08ce18fbc7bd557497b5d26ef8cbc9600eb40",
+  "message": "fix: DEV-3607: Add validation if stage is ready (#915)\n\nfix: DEV-3607: add validation if stage is ready",
+  "commit": "760d5ad9d34574969c4f81386ac734e68273fa3f",
   "branch": "master",
-  "date": "2022-07-01T16:44:40Z"
+  "date": "2022-10-18T20:30:14Z"
 }

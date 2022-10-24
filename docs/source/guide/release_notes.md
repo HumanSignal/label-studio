@@ -9,8 +9,58 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
 ---
 
 !!! info 
-    <i class='ent'></i> 
     The release notes for Label Studio Community Edition is available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
+
+## Label Studio Enterprise 2.2
+This section highlights the new features and enhancements in Label Studio Enterprise 2.2.
+
+### New features and enhancements 
+Label Studio Enterprise 2.2 introduces the following new features and enhancements.
+
+- Label Studio Enterprise 2.2 introduces the System for Cross-domain Identity Management (SCIM) version 2.0 standard. System for Cross-domain Identity Management (SCIM) is a popular protocol to manage access for services and applications across an organization. Use the [SCIM guide](scim_setup.html) to set up SCIM integration to manage access to Label Studio Enterprise in your organization.
+
+
+   <i>Check the following video tutorial about SCIM and Okta setup.</i>
+   <iframe width="560" height="315" src="https://www.youtube.com/embed/MA3de3gu18A" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+- Starting with this release, as an annotator you can create a rotated bounding box with the "three point click" or "two point click" feature to annotate images.  
+
+    - First point click - Starting point of the location to draw the bounding box.
+    - Second point click - Define the rotation and width of the bounding box.
+    - Third point click - Draw the height of the bounding box.
+
+    <br>
+    <div style="margin:auto; text-align:center;"><img src="/images/two-point-click.png" style="opacity: 0.8"/></div>
+    <i>Figure 1: Two point click rectangle.</i>
+
+    
+    <br>
+    <div style="margin:auto; text-align:center;"><img src="/images/three-point-click.png" style="opacity: 0.8"/></div>
+    <i>Figure 2: Three point click rectangle.</i>
+
+    After you create the bounding box, you can do the following: 
+    - Adjust it by moving the anchors or edges to the desired location on the canvas.
+    - Determine that the orientation of the bounding box is effected.
+    - See the orientation of the bounding box and determine the direction during the creation process.
+
+- This release includes the `Last updated by` column in **Data Manager** with information of `updated_at` - `updated_by`, annotator/reviewer (the person who made the last modifications for any of the annotations in this task) at `updated_at` time.
+    
+    
+    <br>
+    <div style="margin:auto; text-align:center;"><img src="/images/last-updated-by-column.png" style="opacity: 0.8"/></div>
+    <i>Figure 3: "Last updated by" column in Data Manager.</i>
+
+- This release introduces the go-back functionality (`<` icon) that allows you to navigate back to the previous task through the review stream.
+
+    <br>
+    <div style="margin:auto; text-align:center;"><img src="/images/go-back-reviewstream.png" style="opacity: 0.8"/></div>
+    <i>Figure 4: Go back to the previous task. </i>
+
+- Starting with this release, you can create a **Lead Time** column in **Data Manager** with averaged lead time per task.
+
+    <br>
+    <div style="margin:auto; text-align:center;"><img src="/images/lead-time.png" style="opacity: 0.8"/></div>
+    <i>Figure 5: Lead Time column in Data Manager. </i>
 
 
 ## Label Studio Enterprise 2.2.10 
@@ -165,7 +215,7 @@ Label Studio 2.2.8 includes the following bug fixes:
 - Fixed in **Manage Members** modal (on project **Members** tab, on workspace members, on **Members** settings) header with search overlaps by the main list [DEV-2473].
 - Fixed `Textarea` for **Custom Function** on the **Quality** settings page [DEV-2473].
 - Fixed `startOffset` for empty nodes [DEV-2480].
-- Fixed the runtime error for users who deleted an annotation from Quickview',  switched to another task, and returned back to the same task [DEV-2306].
+- Fixed the runtime error for users who deleted an annotation from **Quick View**,  switched to another task, and returned back to the same task [DEV-2306].
 - Added command for all orgs and optimize `update_tasks_counters` [DEV-2492].
 - After annotations from predictions `is_labeled` should be recalculated [DEV-2490].
 - Fixed 404 on skip [DEV-2416].

@@ -7,6 +7,7 @@ import ssl
 import uuid
 import pickle
 import logging
+import mimetypes
 try:
     import ujson as json
 except:
@@ -60,8 +61,46 @@ def check_file_sizes_and_number(files):
 
 def create_file_upload(request, project, file):
     instance = FileUpload(user=request.user, project=project, file=file)
+    if settings.SVG_SECURITY_CLEANUP:
+        content_type, encoding = mimetypes.guess_type(str(instance.file.name))
+        if content_type in ['image/svg+xml']:
+            clean_xml = allowlist_svg(instance.file.read())
+            instance.file.seek(0)
+            instance.file.write(clean_xml)
+            instance.file.truncate()
     instance.save()
     return instance
+
+
+def allowlist_svg(dirty_xml):
+    """Filter out malicious/harmful content from SVG files
+    by defining allowed tags
+    """
+    from lxml.html import clean
+
+    allow_tags = [
+            'xml',
+            'svg',
+            'circle',
+            'ellipse',
+            'line',
+            'path',
+            'polygon',
+            'polyline',
+            'rect'
+    ]
+
+    cleaner = clean.Cleaner(
+            allow_tags=allow_tags,
+            style=True,
+            links=True,
+            add_nofollow=False,
+            page_structure=True,
+            safe_attrs_only=False,
+            remove_unknown_tags=False)
+
+    clean_xml = cleaner.clean_html(dirty_xml)
+    return clean_xml
 
 
 def str_to_json(data):
@@ -135,6 +174,10 @@ def load_tasks(request, project):
         else:
             if settings.SSRF_PROTECTION_ENABLED and url_is_local(url):
                 raise ImportFromLocalIPError
+
+            if url.strip().startswith('file://'):
+                raise ValidationError('"url" is not valid')
+
             data_keys, found_formats, tasks, file_upload_ids = tasks_from_url(
                 file_upload_ids, project, request, url
             )

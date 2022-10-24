@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { useCallback, useContext } from 'react';
 import { FaEllipsisV } from 'react-icons/fa';
 import truncate from 'truncate-middle';
@@ -46,7 +46,7 @@ export const MachineLearningList = ({ backends, fetchBackends, onEdit }) => {
   );
 };
 
-const BackendCard = ({backend, onStartTrain, onEdit, onDelete}) => {
+const BackendCard = ({ backend, onStartTrain, onEdit, onDelete }) => {
   const confirmDelete = useCallback((backend) => {
     confirm({
       title: "Delete ML Backend",
@@ -57,7 +57,7 @@ const BackendCard = ({backend, onStartTrain, onEdit, onDelete}) => {
   }, [backend, onDelete]);
 
   return (
-    <Card style={{marginTop: 0}} header={backend.title} extra={(
+    <Card style={{ marginTop: 0 }} header={backend.title} extra={(
       <div className={cn('ml').elem('info')}>
         <BackendState backend={backend}/>
 
@@ -72,7 +72,7 @@ const BackendCard = ({backend, onStartTrain, onEdit, onDelete}) => {
       </div>
     )}>
       <DescriptionList className={cn('ml').elem('summary')}>
-        <DescriptionList.Item term="URL" termStyle={{whiteSpace: 'nowrap'}}>
+        <DescriptionList.Item term="URL" termStyle={{ whiteSpace: 'nowrap' }}>
           {truncate(backend.url, 20, 10, '...')}
         </DescriptionList.Item>
         {backend.description && (
@@ -82,7 +82,9 @@ const BackendCard = ({backend, onStartTrain, onEdit, onDelete}) => {
           />
         )}
         <DescriptionList.Item term="Version">
-          {backend.version ? format(new Date(backend.version), 'MMMM dd, yyyy ∙ HH:mm:ss') : 'unknown'}
+          {backend.model_version && isValid(backend.model_version) ?
+            format(new Date(isNaN(backend.model_version) ? backend.model_version: Number(backend.model_version)), 'MMMM dd, yyyy ∙ HH:mm:ss')
+            : backend.model_version || 'unknown'}
         </DescriptionList.Item>
       </DescriptionList>
 
@@ -93,11 +95,12 @@ const BackendCard = ({backend, onStartTrain, onEdit, onDelete}) => {
   );
 };
 
-const BackendState = ({backend}) => {
+const BackendState = ({ backend }) => {
   const { state } = backend;
+
   return (
     <div className={cn('ml').elem('status')}>
-      <span className={cn('ml').elem('indicator').mod({state})}></span>
+      <span className={cn('ml').elem('indicator').mod({ state })}></span>
       <Oneof value={state} className={cn('ml').elem('status-label')}>
         <span case="DI">Disconnected</span>
         <span case="CO">Connected</span>

@@ -6,10 +6,15 @@ meta_title: Frontend Library Reference
 meta_description: Label Studio Frontend reference documentation for implementing the Label Studio Frontend into your own machine learning or data science application workflows.
 ---
 
-Label Studio Frontend (LSF) includes a number of UI options and callbacks that you can use when implementing the frontend with a custom labeling backend, or when customizing the Label Studio interface.
+Label Studio Frontend (LSF) includes several UI options and callbacks that you can use when implementing the frontend with a custom labeling backend, or when customizing the Label Studio interface.
+
 
 ## Updates to LSF in version 1.0.0 
-LSF version 1.0.0 is not compatible with earlier versions of Label Studio. If you use LSF with a custom backend, you must make changes to the API callbacks that you use as follows:
+
+!!! warning
+    LSF version 1.0.0 is not compatible with earlier versions of Label Studio.
+
+ If you use LSF with a custom backend, you must make changes to the API callbacks that you use as follows:
 
 | Callback in 0.9.1 and earlier | Renamed callback in 1.0.0 |
 | --- | --- |
@@ -47,30 +52,51 @@ Type data: `array`
 Collection of UI elements to show:
 
 ```javascript
-[
+
+  interfaces: [
+    "panel",
+    "update",
+    "submit",
+    "skip",
+    "controls",
+    "infobar",
+    "topbar",
+    "instruction",
+    "side-column",
+    "annotations:history",
+    "annotations:tabs",
+    "annotations:menu",
+    "annotations:current",
     "annotations:add-new",
     "annotations:delete",
-    "annotations:menu",
-    "controls",
-    "panel",
+    'annotations:view-all',
+    "predictions:tabs",
     "predictions:menu",
-    "side-column",
-    "skip",
-    "submit"
-    "update",
-]
+    "auto-annotation",
+    "edit-history",
+  ]
 ```
 
-- `annotations:add-new` - show add new annotations button
-- `annotations:delete` - show delete current annotation button
-- `annotations:menu` - show annotations menu
-- `controls` - enable panel with controls (submit, update, skip)
-- `panel` - navigation panel for current task with buttons: undo, redo and reset
-- `predictions:menu` - show predictions menu
-- `side-column` - enable panel with entities
-- `skip` - show button to skip current task
-- `submit` - show button to submit or update current annotation
-- `update` - show button to update current task after submitting
+- `panel` - A navigation panel for the current task with buttons: undo, redo and reset.
+- `update` - A show button to update the current task after submitting.
+- `submit` - A show button to submit or update the current annotation.
+- `skip` - A show button to skip the current task.
+- `controls` - Enable panel with controls (`submit`, `update`, `skip`).
+- `infobar` - A show button for information. 
+- `topbar` - A labeling interface that lists the top-level items in the Label Studio UI. 
+- `instruction` - A show button for instructions. 
+- `side-column` - Show a column on the left or right side of the Label Studio UI. 
+- `annotations:history` - A show button for annotation history.
+- `annotations:tabs` - A show button for annotation tabs. 
+- `annotations:menu` - A show button for the annotation menu.
+- `annotations:current` - A show button for the current annotation.
+- `annotations:add-new` - A show button to add new annotations.
+- `annotations:delete` - A show button to delete the current annotation.
+- `annotations:view-all` - A show button to view all annotations.
+- `predictions:tabs` - Show predictions tabs. 
+- `predictions:menu` - Show predictions menu.
+- `auto-annotation` - Show auto annotations. 
+- `edit-history` - Show edit history. 
 
 ### messages
 

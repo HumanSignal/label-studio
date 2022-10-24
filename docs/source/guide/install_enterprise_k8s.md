@@ -188,6 +188,9 @@ app:
 rqworker:
    # HA mode: adjust according to your resources
    replicas: 2
+
+minio:
+   enabled: false
 ```
 
 Adjust the included defaults to reflect your environment and copy these into a new file and save it as `lse-values.yaml`.
