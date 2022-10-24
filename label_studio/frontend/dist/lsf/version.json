@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2432: Fix logic of Hotkeys namespaces",
-  "commit": "ebfdd61fc02847dd393bde673b756cf554ada43e",
+  "commit": "fe5de7afe7a1bf0f21238a2f320640bc08f1df02",
   "branch": "fb-dev-3612-fix/history-state-namespace",
-  "date": "2022/10/20 18:27:46"
+  "date": "2022/10/24 10:04:47"
 }
