@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3543: Region navigation is not working in scrolling mode",
-  "commit": "ecf4c343c4aaa263db971a8e73b0c364b8556137",
-  "branch": "fb-dev-3543",
-  "date": "2022/10/21 13:43:33"
+  "commit": "20fadc40e59230ac7a0b7300e3a277f902942a3b",
+  "branch": "master",
+  "date": "2022/10/24 10:42:07"
 }
