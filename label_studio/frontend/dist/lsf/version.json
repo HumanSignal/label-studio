@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3607: Add validation if stage is ready (#915)\n\nfix: DEV-3607: add validation if stage is ready",
-  "commit": "760d5ad9d34574969c4f81386ac734e68273fa3f",
+  "message": "fix: DEV-3543: Region navigation is not working in scrolling mode",
+  "commit": "20fadc40e59230ac7a0b7300e3a277f902942a3b",
   "branch": "master",
-  "date": "2022-10-18T20:30:14Z"
+  "date": "2022/10/24 10:42:07"
 }
