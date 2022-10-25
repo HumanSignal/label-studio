@@ -14,13 +14,20 @@ export const GeneralSettings = () => {
 
   const colors = [
     '#FFFFFF',
+    '#800000',
+    '#FF00FF',
     '#F52B4F',
+    '#D55C9D',
     '#FA8C16',
     '#F6C549',
+    '#01E0D0',
     '#9ACA4F',
+    '#808000',
+    '#008000',
     '#51AAFD',
+    '#00008B',
     '#7F64FF',
-    '#D55C9D',
+    '#513B1C',
   ];
 
   const samplings = [
