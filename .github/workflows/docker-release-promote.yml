@@ -170,7 +170,7 @@ jobs:
           set -euo pipefail ${ACTIONS_STEP_DEBUG:+-x}
 
           release_dir=release_${{ inputs.release_tag }}
-          echo "::set-output name=release_dir::$release_dir"
+          echo "release_dir=$release_dir" >> $GITHUB_OUTPUT
           mkdir -p $release_dir
           cp label_studio/core/version_.py $release_dir/
           cp feature_flags.json $release_dir/
@@ -189,7 +189,7 @@ jobs:
           set -euo pipefail ${ACTIONS_STEP_DEBUG:+-x}
 
           release_dir=ubi_release_${{ inputs.release_tag }}
-          echo "::set-output name=release_dir::$release_dir"
+          echo "release_dir=$release_dir" >> $GITHUB_OUTPUT
           mkdir -p $release_dir
           cp label_studio/core/version_.py $release_dir/
           cp feature_flags.json $release_dir/

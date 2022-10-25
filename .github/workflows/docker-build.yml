@@ -46,15 +46,15 @@ jobs:
         run: |
           set -x
           sha="$(git rev-parse HEAD)"
-          echo "::set-output name=sha::$sha"
+          echo "sha=$sha" >> $GITHUB_OUTPUT
           regexp='^ls-release\/(.*)$'; 
           if [[ '${{ inputs.branch_name }}' =~ $regexp ]]; then
             image_version="${BASH_REMATCH[1]}rc${sha}"
           else
             image_version='${{ inputs.branch_name }}'
           fi
-          echo "::set-output name=image_version::${image_version}"
-          echo "::set-output name=ubi_image_version::ubi_${image_version}"
+          echo "image_version=${image_version}" >> $GITHUB_OUTPUT
+          echo "ubi_image_version=ubi_${image_version}" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2.2.1
