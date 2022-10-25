@@ -24,11 +24,11 @@ class Deployment(models.Model):
     location = models.TextField(max_length=50)
     position = models.TextField(max_length=50, blank=True)
     
-    sensor = models.ManyToManyField(Sensor)
-    subject = models.ManyToManyField(Subject)
+    sensor = models.ManyToManyField(Sensor,blank=True)
+    subject = models.ManyToManyField(Subject,blank=True)
 
-    sensorlist = models.TextField(max_length=500)
-    subjectlist = models.TextField(max_length=500)
+    sensorlist = models.TextField(max_length=500,blank=True)
+    subjectlist = models.TextField(max_length=500,blank =True)
 
     def CreateLists(self):
         sensList = self.sensor.all()

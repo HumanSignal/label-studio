@@ -13,57 +13,63 @@ def tablepage(request):
 
 def add(request):
     if request.method == 'POST':
-        sensorform = forms.CreateSensor(request.POST)
+        sensorform = forms.SensorForm(request.POST)
         if sensorform.is_valid():
             sensorform.save()
             return redirect('sensormodel:tablepage')
-        subjectform = forms.CreateSubject(request.POST)
+        subjectform = forms.SubjectForm(request.POST)
         if subjectform.is_valid():
             subjectform.save()
             return redirect('sensormodel:tablepage')
-        deploymentform = forms.CreateDeployment(request.POST)
+        deploymentform = forms.DeploymentForm(request.POST)
         if deploymentform.is_valid():
-            deploymentform.save()
+            post = deploymentform.save(commit= False)
+            post.save()
             return redirect('sensormodel:tablepage')
+        else:
+            sensorform = forms.SensorForm()
+            subjectform = forms.SubjectForm()
+            deploymentform = forms.DeploymentForm()
+            return render(request, 'add.html', {'sensorform':sensorform, 'subjectform':subjectform, 'deploymentform':deploymentform})
     else:
-        sensorform = forms.CreateSensor(request.POST)
-        subjectform = forms.CreateSubject(request.POST)
-        deploymentform = forms.CreateDeployment(request.POST)
+        sensorform = forms.SensorForm(request.POST)
+        subjectform = forms.SubjectForm(request.POST)
+        deploymentform = forms.DeploymentForm(request.POST)
     return render(request, 'add.html', {'sensorform':sensorform, 'subjectform':subjectform, 'deploymentform':deploymentform})
 
 
 def adjust_deployment(request, id):
     deployment = Deployment.objects.get(id=id)
     if request.method == 'POST':
-        deploymentform = forms.CreateDeployment(request.POST, instance=deployment)
+        deploymentform = forms.DeploymentForm(request.POST, instance=deployment)
         if deploymentform.is_valid():
             deploymentform.save()
             return redirect('sensormodel:tablepage')
     else:
-        deploymentform = forms.CreateDeployment(instance=deployment)
+        deploymentform = forms.DeploymentForm(instance=deployment)
     return render(request, 'deployment.html', {'deploymentform':deploymentform})
     
 def adjust_sensor(request, id):
     sensor = Sensor.objects.get(id=id)
     if request.method == 'POST':
-        sensorform = forms.CreateSensor(request.POST,instance=sensor)
+        sensorform = forms.SensorForm(request.POST,instance=sensor)
         if sensorform.is_valid():
             sensorform.save()
             return redirect('sensormodel:tablepage')
     else:
-        sensorform = forms.CreateSensor(instance=sensor)
+        sensorform = forms.SensorForm(instance=sensor)
     return render(request, 'sensor.html', {'sensorform':sensorform})
 
 
 def adjust_subject(request, id):
     subject = Subject.objects.get(id=id)
     if request.method == 'POST':
-        subjectform = forms.CreateSubject(request.POST, instance=subject)
+        subjectform = forms.SubjectForm(request.POST, instance=subject)
         if subjectform.is_valid():
             subjectform.save()
             return redirect('sensormodel:tablepage')
     else:
-        subjectform = forms.CreateSubject(instance=subject)
+        subjectform = forms.SubjectForm(instance=subject)
     return render(request, 'subject.html', {'subjectfrom':subjectform})
     
 def delete_deployment(request, id):

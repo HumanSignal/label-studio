@@ -44,4 +44,3 @@ class TestDeploymentModel(TestCase):
         deployment.CreateLists()
         self.assertEqual(deployment.sensorlist,'Sensor: 1234, Sensor: 1235')
         self.assertEqual(deployment.subjectlist,'Subject: Horse')
-
