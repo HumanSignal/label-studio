@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3612: Use annotation history reference for polygon points",
-  "commit": "2fabd47f11a29ce0ca8f3e69c14445add4b50343",
+  "message": "fix: DEV-3612: History state not working with hotkeys after saving unclosed polygons",
+  "commit": "552e11768a3ed4d1b3cb185f94d4f923e03e5c46",
   "branch": "fb-dev-3612",
-  "date": "2022/10/24 13:09:09"
+  "date": "2022/10/25 16:25:15"
 }
