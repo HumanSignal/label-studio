@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2519: Choices selected by default",
-  "commit": "dc03b7337518a3129677570127b44456420d4c6c",
+  "message": "feat: DEV-3572: Persist and read virtual annotator filters from local storage as a fallback (#116)",
+  "commit": "fa4559e82f69910ba7ce24c978c6a194aa58a7e8",
   "branch": "master",
-  "date": "2022/08/10 15:51:21"
+  "date": "2022-10-21T14:05:14Z"
 }

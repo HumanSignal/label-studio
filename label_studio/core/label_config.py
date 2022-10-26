@@ -125,7 +125,10 @@ def extract_data_types(label_config):
         name = match.get('value')
         if len(name) > 1 and name[0] == '$':
             name = name[1:]
-            data_type[name] = match.tag
+            # video has highest priority, e.g.
+            # for <Video value="url"/> <Audio value="url"> it must be data_type[url] = Video
+            if data_type.get(name) != 'Video':
+                data_type[name] = match.tag
 
     return data_type
 
@@ -188,7 +191,7 @@ def get_task_from_labeling_config(config):
             logger.debug('Parse ' + config[start:start + end])
             body = json.loads(config[start:start + end])
         except Exception as exc:
-            logger.error(exc, exc_info=True)
+            logger.error("Can't parse task from labeling config", exc_info=True)
             pass
         else:
             logger.debug(json.dumps(body, indent=2))

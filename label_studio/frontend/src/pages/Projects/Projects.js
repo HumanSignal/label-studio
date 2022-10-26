@@ -41,7 +41,7 @@ export const ProjectsPage = () => {
 
     const requestParams = { page, page_size: pageSize };
 
-    if (isFF(2575)) {
+    if (isFF(FF_DEV_2575)) {
       requestParams.include = [
         'id',
         'title',

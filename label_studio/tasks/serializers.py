@@ -5,7 +5,6 @@ import ujson as json
 import numbers
 
 from django.db import transaction
-from drf_dynamic_fields import DynamicFieldsMixin
 from django.conf import settings
 
 from rest_framework import serializers
@@ -15,13 +14,13 @@ from rest_framework.fields import SkipField
 from rest_framework.settings import api_settings
 from rest_flex_fields import FlexFieldsModelSerializer
 
-from core.feature_flags import flag_set
 from projects.models import Project
 from tasks.models import Task, Annotation, AnnotationDraft, Prediction
 from tasks.validation import TaskValidator
 from core.utils.common import get_object_with_check_and_log, retry_database_locked
 from core.label_config import replace_task_data_undefined_with_config_field
 from users.serializers import UserSerializer
+from users.models import User
 from core.utils.common import load_func
 
 logger = logging.getLogger(__name__)
@@ -45,34 +44,18 @@ class ListAnnotationSerializer(serializers.ListSerializer):
     pass
 
 
-class AnnotationSerializer(ModelSerializer):
+class CompletedByDMSerializer(UserSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'avatar', 'email', 'initials']
+
+
+class AnnotationSerializer(FlexFieldsModelSerializer):
     """
     """
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
-
-    @classmethod
-    def many_init(cls, *args, **kwargs):
-        kwargs['child'] = cls(*args, **kwargs)
-        return ListAnnotationSerializer(*args, **kwargs)
-
-    def to_representation(self, instance):
-        annotation = super(AnnotationSerializer, self).to_representation(instance)
-        if self.context.get('completed_by', '') == 'full':
-            annotation['completed_by'] = UserSerializer(instance.completed_by).data
-        return annotation
-
-    def get_fields(self):
-        fields = super(AnnotationSerializer, self).get_fields()
-        excluded = []
-
-        # serializer for export format
-        if self.context.get('export_mode', False):
-            excluded += ['created_username', 'created_ago', 'task',
-                         'was_cancelled', 'ground_truth', 'result_count']
-
-        [fields.pop(field, None) for field in excluded]
-        return fields
+    completed_by = serializers.PrimaryKeyRelatedField(required=False, queryset=User.objects.all())
 
     def validate_result(self, value):
         data = value
@@ -104,6 +87,7 @@ class AnnotationSerializer(ModelSerializer):
     class Meta:
         model = Annotation
         exclude = ['prediction', 'result_count']
+        expandable_fields = {'completed_by': (CompletedByDMSerializer,)}
 
 
 class TaskSimpleSerializer(ModelSerializer):
@@ -130,13 +114,6 @@ class TaskSimpleSerializer(ModelSerializer):
 class BaseTaskSerializer(FlexFieldsModelSerializer):
     """ Task Serializer with project scheme configs validation
     """
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.context.get('include_annotations', True) and 'annotations' not in self.fields:
-            self.fields['annotations'] = AnnotationSerializer(
-                many=True, read_only=False, required=False, context=self.context
-            )
-
     def project(self, task=None):
         """ Take the project from context
         """
@@ -370,8 +347,8 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                             prediction_score = float(prediction_score)
                         except ValueError as exc:
                             logger.error(
-                                f'Can\'t upload prediction score: should be in float format. Reason: {exc}.'
-                                f'Fallback to score=None', exc_info=True)
+                                f'Can\'t upload prediction score: should be in float format.'
+                                f'Fallback to score=None')
                             prediction_score = None
 
                     last_model_version = prediction.get('model_version', 'undefined')

@@ -16,10 +16,10 @@ env:
 jobs:
   build:
     name: "Frontend"
-    timeout-minutes: 10
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Configure git
         shell: bash
@@ -39,7 +39,7 @@ jobs:
 
       - name: Get npm cache directory path
         id: npm-cache
-        run: echo "::set-output name=dir::$(npm config get cache)"
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
 
       - name: Configure npm cache
         uses: actions/cache@v3

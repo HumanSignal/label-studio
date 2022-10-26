@@ -365,6 +365,8 @@ class Project(ProjectMixin, models.Model):
             if tasks_with_overlap.exists():
                 # if there is a part with overlaped tasks, affect only them
                 tasks_with_overlap.update(overlap=self.maximum_annotations)
+            elif self.overlap_cohort_percentage < 100:
+                self._rearrange_overlap_cohort()
             else:
                 # otherwise affect all tasks
                 self.tasks.update(overlap=self.maximum_annotations)
@@ -534,6 +536,10 @@ class Project(ProjectMixin, models.Model):
             labels_from_config_by_tag = set(labels_from_config[get_original_fromname_by_regex(config_string, control_tag_from_data)])
             parsed_config = parse_config(config_string)
             tag_types = [tag_info['type'] for _, tag_info in parsed_config.items()]
+            # DEV-1990 Workaround for Video labels as there are no labels in VideoRectangle tag
+            if 'VideoRectangle' in tag_types:
+                for key in labels_from_config:
+                    labels_from_config_by_tag |= set(labels_from_config[key])
             if 'Taxonomy' in tag_types:
                 custom_tags = Label.objects.filter(links__project=self).values_list('value', flat=True)
                 flat_custom_tags = set([item for sublist in custom_tags for item in sublist])
@@ -548,7 +554,7 @@ class Project(ProjectMixin, models.Model):
                     raise LabelStudioValidationErrorSentryIgnored(
                         f'These labels still exist in annotations:\n{diff_str}')
                 else:
-                    logger.warning(f'project_id={self.id} inconsistent labels in config and annotations: {diff_str}')
+                    logger.info(f'project_id={self.id} inconsistent labels in config and annotations: {diff_str}')
 
     def _label_config_has_changed(self):
         return self.label_config != self.__original_label_config
@@ -982,8 +988,7 @@ class ProjectSummary(models.Model):
             return None
         if 'from_name' not in result or 'to_name' not in result:
             logger.error(
-                'Unexpected annotation.result format: "from_name" or "to_name" not found in %r',
-                result,
+                'Unexpected annotation.result format: "from_name" or "to_name" not found',
                 extra={'sentry_skip': True},
             )
             return None
@@ -993,6 +998,9 @@ class ProjectSummary(models.Model):
 
     def _get_labels(self, result):
         result_type = result.get('type')
+        # DEV-1990 Workaround for Video labels as there are no labels in VideoRectangle tag
+        if result_type in ['videorectangle']:
+            result_type = 'labels'
         result_value = result['value'].get(result_type)
         if not result_value or not isinstance(result_value, list) or result_type == 'text':
             # Non-list values are not labels. TextArea list values (texts) are not labels too.
