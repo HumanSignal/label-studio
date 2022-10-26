@@ -298,4 +298,124 @@ Enterprise
 
 ## Custom components
 
+#### Tabs <span class="badge-design">* Need design</span>
+
+<div class="code-tabs">
+<div data-name="Workload Identity">
+
+> Make sure that Workload Identity is enabled on your GKE cluster and that you meet the necessary prerequisites. See [Using Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) in the Google Kubernetes Engine guide.
+
+1. Set up the following environment variables, specifying the service account you created as the `GCP_SA` variable, and replacing the other references in `<>` as needed:
+
+```shell
+GCP_SA=<Service-Account-You-Created>
+APP_SA="serviceAccount:<GCP_PROJECT_ID>.svc.id.goog[<K8S_NAMESPACE>/<HELM_RELEASE_NAME>-lse-app]"
+WORKER_SA="serviceAccount:<GCP_PROJECT_ID>.svc.id.goog[<K8S_NAMESPACE>/<HELM_RELEASE_NAME>-lse-rqworker]"
+```
+
+2. Create an IAM policy binding between the Kubernetes service account on your cluster and the GCS service account you created, allowing the K8s service account for the Label Studio Enterprise app and the related rqworkers to impersonate the other service account. From the command line, run the following:
+
+```shell
+gcloud iam service-accounts add-iam-policy-binding ${GCP_SA} \
+    --role roles/iam.workloadIdentityUser \
+    --member "${APP_SA}"
+gcloud iam service-accounts add-iam-policy-binding ${GCP_SA} \
+    --role roles/iam.workloadIdentityUser \
+    --member "${WORKER_SA}"
+```
+
+3. After binding the service accounts, update your `lse-values.yaml` file to include the values for the service account and other configurations. Update the `projectID`, `bucket`, and replace the`<GCP_SERVICE_ACCOUNT>` with the relevant values for your deployment.
+   Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
+
+```yaml
+global:
+  persistence:
+    enabled: true
+    type: gcs
+    config:
+      gcs:
+        projectID: "<YOUR_PROJECT_ID>"
+        bucket: "<YOUR_BUCKET_NAME>"
+        folder: ""
+app:
+  serviceAccount:
+    annotations:
+      iam.gke.io/gcp-service-account: "<GCP_SERVICE_ACCOUNT>"
+
+rqworker:
+  serviceAccount:
+    annotations:
+      iam.gke.io/gcp-service-account: "<GCP_SERVICE_ACCOUNT>"
+```
+
+</div>
+<div data-name="Service Account Key">
+
+You can use a service account key that you create, or if you already have a Kubernetes secret and key, follow [the steps below](#Use-an-existing-Kubernetes-secret-and-key) to use those.
+
+#### Create a new service account key
+1. Create a service account key from the UI and download the JSON. Follow the steps for [Creating and managing service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) in the Google Cloud Identity and Access Management guide. 
+2. After downloading the JSON for the service account key, update or create references to the JSON, your projectID, and your bucket in your `lse-values.yaml` file.
+   Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
+
+```yaml
+global:
+  persistence:
+    enabled: true
+    type: gcs
+    config:
+      gcs:
+        projectID: "<YOUR_PROJECT_ID>"
+        applicationCredentialsJSON: "<YOUR_JSON>"
+        bucket: "<YOUR_BUCKET_NAME>"
+        folder: ""
+```
+
+#### Use an existing Kubernetes secret and key
+
+1. Create a Kubernetes secret with your GCS service account JSON file, replacing `<PATH_TO_JSON>` with the path to the service account JSON file:
+
+```shell
+kubectl create secret generic <YOUR_SECRET_NAME> --from-file=key_json=<PATH_TO_JSON>
+```
+2. Update your `lse-values.yaml` file with your newly-created Kubernetes secret:
+
+```yaml
+global:
+   persistence:
+      enabled: true
+      type: gcs
+      config:
+         gcs:
+            projectID: "<YOUR_PROJECT_ID>"
+            applicationCredentialsJSONExistingSecret: "<YOUR_SECRET_NAME>"
+            applicationCredentialsJSONExistingSecretKey: "key_json"
+            bucket: "<YOUR_BUCKET_NAME>"
+```
+
+  </div>
+
+  <div data-name="Docker Compose">
+
+1. Create a service account key from the UI and download the JSON. Follow the steps for [Creating and managing service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) in the Google Cloud Identity and Access Management guide.
+2. After downloading the JSON for the service account key, update or create references to the JSON, your projectID, and your bucket in your `env.list` file.
+   Optionally, you can choose a folder by specifying `STORAGE_GCS_FOLDER` (default is `""` or omit this argument):
+
+```shell
+STORAGE_TYPE=gcs
+STORAGE_GCS_BUCKET_NAME="<YOUR_BUCKET_NAME>"
+STORAGE_GCS_PROJECT_ID="<YOUR_PROJECT_ID>"
+STORAGE_GCS_FOLDER=""
+GOOGLE_APPLICATION_CREDENTIALS="/opt/heartex/secrets/key.json"
+```
+
+3. Place the downloaded JSON file from step 1 in the same directory as your `env.list` file.
+4. Append the following entry in `docker-compose.yml` file as the path for `app.volumes`:
+
+```yaml
+- ./service-account-file.json:/opt/heartex/secrets/key.json:ro
+```
+  </div>
+</div>
+
 
