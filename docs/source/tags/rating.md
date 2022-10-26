@@ -1,7 +1,7 @@
 ---
 title: Rating
 type: tags
-order: 419
+order: 420
 meta_title: Rating Tag for Ratings
 meta_description: Customize Label Studio to add ratings to tasks with the Rating tag in your machine learning and data science projects.
 ---

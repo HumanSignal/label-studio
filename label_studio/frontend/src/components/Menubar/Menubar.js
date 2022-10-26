@@ -4,7 +4,7 @@ import { IconBook, IconFolder, IconPersonInCircle, IconPin, IconTerminal, LsDoor
 import { useConfig } from '../../providers/ConfigProvider';
 import { useContextComponent, useFixedLocation } from '../../providers/RoutesProvider';
 import { cn } from '../../utils/bem';
-import { absoluteURL } from '../../utils/helpers';
+import { absoluteURL, isDefined } from '../../utils/helpers';
 import { Breadcrumbs } from '../Breadcrumbs/Breadcrumbs';
 import { Dropdown } from "../Dropdown/Dropdown";
 import { Hamburger } from "../Hamburger/Hamburger";
@@ -64,6 +64,7 @@ export const Menubar = ({
   const sidebarClass = cn('sidebar');
   const contentClass = cn('content-wrapper');
   const contextItem = menubarClass.elem('context-item');
+  const showNewsletterDot = !isDefined(config.user.allow_newsletters);
 
   const sidebarPin = useCallback((e) => {
     e.preventDefault();
@@ -136,7 +137,7 @@ export const Menubar = ({
             <Menu>
               <Menu.Item
                 icon={<LsSettings/>}
-                label="Account & Settings"
+                label="Account &amp; Settings"
                 href="/user/account"
                 data-external
               />
@@ -147,10 +148,26 @@ export const Menubar = ({
                 href={absoluteURL("/logout")}
                 data-external
               />
+              {showNewsletterDot && (
+                <>
+                  <Menu.Divider />
+                  <Menu.Item
+                    className={cn("newsletter-menu-item")}
+                    href="/user/account"
+                    data-external
+                  >
+                    <span>Please check new notification settings in the Account & Settings page</span>
+                    <span className={cn("newsletter-menu-badge")} />
+                  </Menu.Item>
+                </>
+              )}
             </Menu>
           )}>
-            <div className={menubarClass.elem('user')}>
+            <div title={config.user.email} className={menubarClass.elem('user')}>
               <Userpic user={config.user}/>
+              {showNewsletterDot && (
+                <div className={menubarClass.elem('userpic-badge')} />
+              )}
             </div>
           </Dropdown.Trigger>
         </div>

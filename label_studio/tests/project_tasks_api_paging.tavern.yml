@@ -1,0 +1,190 @@
+---
+test_name: project_tasks_api_paging_test
+strict: false
+marks:
+- skipif: '"Windows" in platform.system()'
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+
+- name: create_2_tasks
+  request:
+    files:
+      json_file: tests/test_suites/samples/text_with_2_tasks.json
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/import'
+  response:
+    json:
+      annotation_count: 0
+      prediction_count: 0
+      task_count: 2
+    status_code: 201
+
+- name: get default list of tasks
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/tasks'
+  response:
+    json: [
+      {
+        "id": !anyint "",
+        "data": {
+          "text": "Example 2"
+        },
+        "meta": {},
+        "created_at": !anystr "",
+        "updated_at": !anystr "",
+        "updated_by": null,
+        "is_labeled": False,
+        "overlap": 1,
+        "project": !int "{project_pk}",
+        "file_upload": !anyint "",
+        "annotations": [],
+        "predictions": []
+      },
+      {
+        "id": !anyint "",
+        "data": {
+          "text": "Example 1"
+        },
+        "meta": {},
+        "created_at": !anystr "",
+        "updated_at": !anystr "",
+        "is_labeled": False,
+        "overlap": 1,
+        "project": !int "{project_pk}",
+        "updated_by": null,
+        "file_upload": !anyint "",
+        "annotations": [],
+        "predictions": []
+      }
+    ]
+    status_code: 200
+    headers:
+      content-type: application/json
+
+- name: get list one of tasks paging
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/tasks?start=0&page_size=1'
+  response:
+    json: [
+      {
+        "id": !anyint "",
+        "data": {
+          "text": "Example 2"
+        },
+        "meta": {},
+        "created_at": !anystr "",
+        "updated_at": !anystr "",
+        "updated_by": null,
+        "is_labeled": False,
+        "overlap": 1,
+        "project": !int "{project_pk}",
+        "file_upload": !anyint "",
+        "annotations": [],
+        "predictions": []
+      }
+    ]
+    status_code: 200
+    headers:
+      content-type: application/json
+
+- name: get list two of tasks paging
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/tasks?start=1&page_size=1'
+  response:
+    json: [
+      {
+        "id": !anyint "",
+        "data": {
+          "text": "Example 1"
+        },
+        "meta": {},
+        "created_at": !anystr "",
+        "updated_at": !anystr "",
+        "is_labeled": False,
+        "overlap": 1,
+        "project": !int "{project_pk}",
+        "updated_by": null,
+        "file_upload": !anyint "",
+        "annotations": [],
+        "predictions": []
+      }
+    ]
+    status_code: 200
+    headers:
+      content-type: application/json
+
+- name: get list all tasks paging
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/tasks?page_size=-1'
+  response:
+    json: [
+      {
+        "id": !anyint "",
+        "data": {
+          "text": "Example 2"
+        },
+        "meta": {},
+        "created_at": !anystr "",
+        "updated_at": !anystr "",
+        "updated_by": null,
+        "is_labeled": False,
+        "overlap": 1,
+        "project": !int "{project_pk}",
+        "updated_by": null,
+        "file_upload": !anyint "",
+        "annotations": [],
+        "predictions": []
+      },
+      {
+        "id": !anyint "",
+        "data": {
+          "text": "Example 1"
+        },
+        "meta": {},
+        "created_at": !anystr "",
+        "updated_at": !anystr "",
+        "updated_by": null,
+        "is_labeled": False,
+        "overlap": 1,
+        "project": !int "{project_pk}",
+        "updated_by": null,
+        "file_upload": !anyint "",
+        "annotations": [],
+        "predictions": []
+      }
+    ]
+    status_code: 200
+    headers:
+      content-type: application/json
+
+- name: get empty list of tasks invalid params
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/tasks?start=0&page_size=4'
+  response:
+    status_code: 200
+
+- name: get empty list of tasks invalid params page zero
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/tasks?start=1&page_size=0'
+  response:
+    status_code: 404
+
+- name: get empty list of tasks invalid params values
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/tasks?start=240000&page_size=100000000'
+  response:
+    status_code: 404

@@ -23,7 +23,7 @@ import re
 
 from django.db import models, transaction
 from django.utils.module_loading import import_string
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from django.conf import settings
@@ -36,11 +36,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
 from collections import defaultdict
 
-from base64 import b64encode
 from datetime import datetime
-from appdirs import user_cache_dir
 from functools import wraps
-from requests.auth import HTTPBasicAuth
 from pkg_resources import parse_version
 from colorama import Fore
 from boxing import boxing
@@ -56,9 +53,7 @@ from core.utils.exceptions import LabelStudioDatabaseLockedException
 
 
 # these functions will be included to another modules, don't remove them
-from core.utils.params import (
-    get_bool_env, bool_from_request, float_from_request, int_from_request
-)
+from core.utils.params import int_from_request
 
 logger = logging.getLogger(__name__)
 url_validator = URLValidator()
@@ -116,7 +111,7 @@ def custom_exception_handler(exc, context):
         logger.debug(exc_tb)
         response_data['detail'] = str(exc)
         if not settings.DEBUG_MODAL_EXCEPTIONS:
-            exc_tb = 'Tracebacks disabled in settings'
+            exc_tb = None
         response_data['exc_info'] = exc_tb
         response = Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=response_data)
 
@@ -125,10 +120,9 @@ def custom_exception_handler(exc, context):
 
 def create_hash():
     """This function generate 40 character long hash"""
-    h = hashlib.sha1()
+    h = hashlib.sha512()
     h.update(str(time.time()).encode('utf-8'))
     return h.hexdigest()[0:16]
-
 
 def paginator(objects, request, default_page=1, default_size=50):
     """ DEPRECATED
@@ -148,15 +142,22 @@ def paginator(objects, request, default_page=1, default_size=50):
 
     if 'start' in request.GET:
         page = int_from_request(request.GET, 'start', default_page)
-        page = page / int(page_size) + 1
+        if page and int(page) > int(page_size) > 0:
+            page = int(page / int(page_size)) + 1
+        else:
+            page += 1
     else:
         page = int_from_request(request.GET, 'page', default_page)
 
     if page_size == '-1':
         return objects
-    else:
-        paginator = Paginator(objects, page_size)
-        return paginator.page(page).object_list
+
+    try:
+        return Paginator(objects, page_size).page(page).object_list
+    except ZeroDivisionError:
+        return []
+    except EmptyPage:
+        return []
 
 
 def paginator_help(objects_name, tag):
@@ -176,8 +177,8 @@ def paginator_help(objects_name, tag):
                               description=page_size_description)
         ],
         responses={
-            200: openapi.Response(title='OK', description=''),
-            404: openapi.Response(title='', description=f'No more {objects_name} found')
+            200: openapi.Response(title='OK', description='')
+            # 404: openapi.Response(title='', description=f'No more {objects_name} found')
         })
 
 
@@ -345,7 +346,11 @@ def retry_database_locked():
 
 
 def get_app_version():
-    return pkg_resources.get_distribution('label-studio').version
+    version = pkg_resources.get_distribution('label-studio').version
+    if isinstance(version, str):
+        return version
+    elif isinstance(version, dict):
+        return version.get('version') or version.get('latest_version')
 
 
 def get_latest_version():
@@ -408,7 +413,9 @@ def check_for_the_latest_version(print_message):
 
 
 # check version ASAP while package loading
-check_for_the_latest_version(print_message=True)
+# skip notification for uwsgi, as we're running in production ready mode
+if settings.APP_WEBSERVER != 'uwsgi':
+    check_for_the_latest_version(print_message=True)
 
 
 def collect_versions(force=False):
@@ -417,7 +424,7 @@ def collect_versions(force=False):
     :return: dict with sub-dicts of version descriptions
     """
     import label_studio
-    
+
     # prevent excess checks by time intervals
     current_time = time.time()
     need_check = current_time - settings.VERSIONS_CHECK_TIME > 300

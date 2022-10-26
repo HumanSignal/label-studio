@@ -16,6 +16,7 @@ from django.conf import settings
 from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 
 from data_manager.functions import DataManagerException
+from core.feature_flags import flag_set
 
 logger = logging.getLogger('django')
 
@@ -46,7 +47,10 @@ def get_all_actions(user, project):
         and check_permissions(user, action)
     ]
     # remove experimental features if they are disabled
-    if not settings.EXPERIMENTAL_FEATURES:
+    if not (
+            flag_set('ff_back_experimental_features', user=project.organization.created_by)
+            or settings.EXPERIMENTAL_FEATURES
+    ):
         actions = [action for action in actions if not action.get('experimental', False)]
 
     # generate form if function is passed
@@ -79,13 +83,23 @@ def register_actions_from_dir(base_module, action_dir):
     """ Find all python files nearby this file and try to load 'actions' from them
     """
     for path in os.listdir(action_dir):
-        if '.py' in path and '__init__' not in path:
-            name = path[0:path.find('.py')]  # get only module name to read *.py and *.pyc
-            module_actions = import_module(base_module + '.' + name).actions
+        # skip non module files
+        if '__init__' in path or path.startswith('.'):
+            continue
 
-            for action in module_actions:
-                register_action(**action)
-                logger.debug('Action registered: ' + str(action['entry_point'].__name__))
+        name = path[0:path.find('.py')]  # get only module name to read *.py and *.pyc
+        try:
+            module = import_module(f'{base_module}.{name}')
+            if not hasattr(module, 'actions'):
+                continue
+            module_actions = module.actions
+        except ModuleNotFoundError as e:
+            logger.info(e)
+            continue
+
+        for action in module_actions:
+            register_action(**action)
+            logger.debug('Action registered: ' + str(action['entry_point'].__name__))
 
 
 def perform_action(action_id, project, queryset, user, **kwargs):

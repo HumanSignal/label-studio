@@ -2,7 +2,6 @@
 """
 import logging
 
-from projects.api import ProjectNextTaskAPI
 from rest_framework.exceptions import NotFound
 from data_manager.functions import filters_ordering_selected_items_exist
 from projects.functions.next_task import get_next_task
@@ -31,7 +30,7 @@ def next_task(project, queryset, **kwargs):
             f'but they seem to be locked by another user.')
 
     # serialize task
-    context = {'request': request, 'project': project, 'resolve_uri': True}
+    context = {'request': request, 'project': project, 'resolve_uri': True, 'annotations': False}
     serializer = NextTaskSerializer(next_task, context=context)
     response = serializer.data
     response['queue'] = queue_info

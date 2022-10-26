@@ -418,3 +418,92 @@ stages:
         task_pk: task
     status_code: 200
 
+---
+test_name: remove_other_users_draft_on_annotation_create
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+- id: import_task
+  type: ref
+- id: get_user_token
+  type: ref
+- id: create_annotation
+  type: ref
+
+- id: get_invite_url
+  type: ref
+- id: logout
+  type: ref
+
+# create second user
+- name: signup_other_user
+  request:
+    url: "{django_live_url}{invite_url}"
+    data:
+      email: other_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+- name: create_draft
+  request:
+    headers:
+      content-type: application/json
+    json:
+      lead_time: 12.34
+      result:
+      - from_name: text_class
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - class_A
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_pk}/annotations/{annotation_pk}/drafts'
+    # url: '{django_live_url}/api/tasks/{task_pk}/drafts'
+  response:
+    save:
+      json:
+        draft_pk: id
+    status_code: 201
+- name: get_drafts
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks/{task_pk}/drafts'
+  response:
+    status_code: 200
+    json:
+      - id: !int '{draft_pk}'
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+      - from_name: label
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - 1
+    method: PATCH
+    url: '{django_live_url}/api/annotations/{annotation_pk}'
+  response:
+    status_code: 200
+
+- name: get_drafts
+  request:
+    headers:
+      authorization: "Token {user_token}"
+    method: GET
+    url: '{django_live_url}/api/tasks/{task_pk}/drafts'
+  response:
+    verify_response_with:
+      function: tests.utils:empty_list
+    status_code: 200

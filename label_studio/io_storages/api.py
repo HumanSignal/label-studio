@@ -9,6 +9,7 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, PermissionDenied
 from drf_yasg import openapi as openapi
+from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
 
 from core.permissions import all_permissions
@@ -56,6 +57,11 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
         self.check_object_permissions(self.request, project)
         ImportStorageClass = self.serializer_class.Meta.model
         return ImportStorageClass.objects.filter(project_id=project.id)
+
+    def perform_create(self, serializer):
+        storage = serializer.save()
+        if settings.SYNC_ON_TARGET_STORAGE_CREATION:
+            storage.sync()
 
 
 class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):

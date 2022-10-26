@@ -1,7 +1,7 @@
 ---
 title: List
 type: tags
-order: 412
+order: 413
 meta_title: List Tag for Lists
 meta_description: Customize Label Studio with lists for machine learning and data science projects.
 ---

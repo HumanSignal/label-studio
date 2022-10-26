@@ -1,10 +1,10 @@
 ---
-title: Speaker Segmentation
+title: Speaker Diarization
 type: templates
 category: Audio/Speech Processing
 cat: audio-speech-processing
 order: 304
-meta_title: Speaker Segmentation Data Labeling Template
+meta_title: Speaker Diarization (Segmentation) Data Labeling Template
 meta_description: Template for segmenting an audio clip based on speaker with Label Studio for your machine learning and data science projects.
 ---
 

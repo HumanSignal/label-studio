@@ -42,10 +42,44 @@
 
   &__user
     display flex
-    min-width 68px
-    max-width 68px
+    margin 0 20px
+    align-self center
     cursor pointer
     position relative
     align-items center
     justify-content center
 
+  &__userpic-badge
+    position absolute
+    top 0
+    right 0
+    width 8px
+    height 8px
+    border-radius 50%
+    background #09f
+
+.newsletter-menu-item
+  width 200px
+  white-space normal
+  height auto
+  padding-bottom 8px
+  padding-top 8px
+  margin-top -8px
+  font-size 14px
+  position relative
+  background #09f2
+  line-height 1.4em
+  transition 0.2s all
+
+  .main-menu &:hover
+    background #09f3
+
+.newsletter-menu-badge
+  position absolute
+  display block
+  width 8px
+  height 8px
+  right 8px
+  top 8px
+  border-radius 50%
+  background #09f

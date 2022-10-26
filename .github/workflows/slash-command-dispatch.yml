@@ -1,0 +1,59 @@
+name: Slash Command Dispatch
+on:
+  issue_comment:
+    types: [created]
+
+env:
+  commands_list: |
+    help
+    frontend
+    git
+
+jobs:
+  slashCommandDispatch:
+    if: startsWith(github.event.comment.body, '/')
+    timeout-minutes: 1
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v2.1.0
+
+      - name: 'Validate command'
+        id: determine_command
+        uses: actions/github-script@v6
+        env:
+          COMMANDS_LIST: ${{ env.commands_list }}
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const body = context.payload.comment.body.toLowerCase().trim()
+            const commands_list = process.env.COMMANDS_LIST.split("\n")
+            console.log("Detected PR comment: " + body)
+            console.log("Commands list: " + commands_list)
+            commandArray = body.split(/\s+/)
+            const contextCommand = commandArray[0].split('/')[1].trim();
+            console.log("contextCommand: " + contextCommand)
+            core.setOutput('command_state', 'known')
+            if (! commands_list.includes(contextCommand)) {
+              core.setOutput('command_state', 'unknown')
+              core.setOutput('command', contextCommand)
+            }
+
+      - name: Slash Command Dispatch
+        id: scd
+        if: ${{ steps.determine_command.outputs.command_state != 'unknown' }}
+        uses: peter-evans/slash-command-dispatch@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          issue-type: "pull-request"
+          reactions: true
+          commands: ${{ env.commands_list }}
+
+      - name: Edit comment with error message
+        if: ${{ steps.determine_command.outputs.command_state == 'unknown' }}
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ github.event.comment.id }}
+          body: |
+            > '/${{ steps.determine_command.outputs.command }}' is unknown command.
+            > See '/help'
+          reactions: eyes, confused

@@ -1,0 +1,416 @@
+---
+test_name: create_project_for_dynamic_labels_and_import_data_polygonlabels
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: '<View><Header value="Select label and click the image to start"/><Image name="image" value="$image" zoom="true"/><PolygonLabels name="label" toName="image" strokeWidth="3" pointSize="small" opacity="0.9" value="$options"/></View>'
+    method: PATCH
+    url: '{django_live_url}/api/projects/{pk}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      data:
+        image: "https://develop.dev.heartex.com/static/samples/sample.jpg"
+        options:
+          - value: "a"
+          - value: "b"
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/summary'
+  response:
+    json:
+      all_data_columns:
+        options: 1
+        image: 1
+    status_code: 200
+---
+test_name: create_project_for_dynamic_labels_and_import_data_brushlabels
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: '<View><Header value="Select label and click the image to start"/><Image name="image" value="$image" zoom="true"/><BrushLabels name="label" toName="image" strokeWidth="3" pointSize="small" opacity="0.9" value="$options"/></View>'
+    method: PATCH
+    url: '{django_live_url}/api/projects/{pk}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      data:
+        image: "https://develop.dev.heartex.com/static/samples/sample.jpg"
+        options:
+          - value: "a"
+          - value: "b"
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/summary'
+  response:
+    json:
+      all_data_columns:
+        options: 1
+        image: 1
+    status_code: 200
+---
+test_name: create_project_for_dynamic_labels_and_import_data_ellipselabels
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: '<View><Header value="Select label and click the image to start"/><Image name="image" value="$image" zoom="true"/><EllipseLabels name="label" toName="image" strokeWidth="3" pointSize="small" opacity="0.9" value="$options"/></View>'
+    method: PATCH
+    url: '{django_live_url}/api/projects/{pk}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      data:
+        image: "https://develop.dev.heartex.com/static/samples/sample.jpg"
+        options:
+          - value: "a"
+          - value: "b"
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/summary'
+  response:
+    json:
+      all_data_columns:
+        options: 1
+        image: 1
+    status_code: 200
+---
+test_name: create_project_for_dynamic_labels_and_import_data_hypertextlabels
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: '<View><Header value="Select label and click the image to start"/><Image name="image" value="$image" zoom="true"/><HyperTextLabels name="label" toName="image" strokeWidth="3" pointSize="small" opacity="0.9" value="$options"/></View>'
+    method: PATCH
+    url: '{django_live_url}/api/projects/{pk}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      data:
+        image: "https://develop.dev.heartex.com/static/samples/sample.jpg"
+        options:
+          - value: "a"
+          - value: "b"
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/summary'
+  response:
+    json:
+      all_data_columns:
+        options: 1
+        image: 1
+    status_code: 200
+---
+test_name: create_project_for_dynamic_labels_and_import_data_keypointlabels
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: '<View><Header value="Select label and click the image to start"/><Image name="image" value="$image" zoom="true"/><KeyPointLabels name="label" toName="image" strokeWidth="3" pointSize="small" opacity="0.9" value="$options"/></View>'
+    method: PATCH
+    url: '{django_live_url}/api/projects/{pk}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      data:
+        image: "https://develop.dev.heartex.com/static/samples/sample.jpg"
+        options:
+          - value: "a"
+          - value: "b"
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/summary'
+  response:
+    json:
+      all_data_columns:
+        options: 1
+        image: 1
+    status_code: 200
+---
+test_name: create_project_for_dynamic_labels_and_import_data_paragraphlabels
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: '<View><Header value="Select label and click the image to start"/><Image name="image" value="$image" zoom="true"/><ParagraphLabels name="label" toName="image" strokeWidth="3" pointSize="small" opacity="0.9" value="$options"/></View>'
+    method: PATCH
+    url: '{django_live_url}/api/projects/{pk}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      data:
+        image: "https://develop.dev.heartex.com/static/samples/sample.jpg"
+        options:
+          - value: "a"
+          - value: "b"
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/summary'
+  response:
+    json:
+      all_data_columns:
+        options: 1
+        image: 1
+    status_code: 200
+---
+test_name: create_project_for_dynamic_labels_and_import_data_rectanglelabels
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: '<View><Header value="Select label and click the image to start"/><Image name="image" value="$image" zoom="true"/><RectangleLabels name="label" toName="image" strokeWidth="3" pointSize="small" opacity="0.9" value="$options"/></View>'
+    method: PATCH
+    url: '{django_live_url}/api/projects/{pk}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      data:
+        image: "https://develop.dev.heartex.com/static/samples/sample.jpg"
+        options:
+          - value: "a"
+          - value: "b"
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/summary'
+  response:
+    json:
+      all_data_columns:
+        options: 1
+        image: 1
+    status_code: 200
+---
+test_name: create_project_for_dynamic_labels_and_import_data_timeserieslabels
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: '<View><Header value="Select label and click the image to start"/><Image name="image" value="$image" zoom="true"/><TimeSeriesLabels name="label" toName="image" strokeWidth="3" pointSize="small" opacity="0.9" value="$options"/></View>'
+    method: PATCH
+    url: '{django_live_url}/api/projects/{pk}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      data:
+        image: "https://develop.dev.heartex.com/static/samples/sample.jpg"
+        options:
+          - value: "a"
+          - value: "b"
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/summary'
+  response:
+    json:
+      all_data_columns:
+        options: 1
+        image: 1
+    status_code: 200

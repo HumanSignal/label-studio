@@ -1,0 +1,122 @@
+name: "/git command"
+
+on:
+  repository_dispatch:
+    types: [ git-command ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.client_payload.github.payload.issue.number }}-${{ github.event.client_payload.slash_command.command }}-${{ github.event.client_payload.slash_command.args.unnamed.arg1 || github.event.client_payload.slash_command.args.all }}
+
+jobs:
+  merge:
+    if: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 == 'merge' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout on chat command
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.client_payload.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Check for merge conflict
+        id: check-conflict
+        env:
+          SLASH_COMMAND_ARG_BRANCH: ${{ github.event.client_payload.slash_command.args.unnamed.arg2 }}
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          git config --global user.name '${{ github.event.client_payload.github.actor }}'
+          git config --global user.email '${{ github.event.client_payload.github.actor }}@users.noreply.github.com'
+          echo "merge_conflict=$(git merge-tree $(git merge-base HEAD origin/$SLASH_COMMAND_ARG_BRANCH) origin/$SLASH_COMMAND_ARG_BRANCH HEAD | egrep '<<<<<<<')" >> $GITHUB_OUTPUT
+
+      - name: Add reaction to command comment on merge conflict
+        uses: peter-evans/create-or-update-comment@v2
+        if: ${{ steps.check-conflict.outputs.merge_conflict }}
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > **Error**: Merge conflict detected, please resolve it using the command line.
+            >
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          reactions: "-1"
+
+      - name: Merge branch into current branch
+        env:
+          SLASH_COMMAND_ARG_BRANCH: ${{ github.event.client_payload.slash_command.args.unnamed.arg2 }}
+        if: ${{ !steps.check-conflict.outputs.merge_conflict }}
+        id: commit_and_push
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          git merge origin/$SLASH_COMMAND_ARG_BRANCH
+          if [ $(git cherry -v | wc -l) -ge 1 ]; then
+            echo "changes=yes" >> $GITHUB_OUTPUT
+            echo "last_commit_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+            echo "last_commit_msg=$(git log -1 --pretty='%s')" >> $GITHUB_OUTPUT
+          else
+            echo "changes=no" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          git push origin HEAD
+
+      - name: Add reaction to command comment on nothing to do
+        if: ${{ !steps.check-conflict.outputs.merge_conflict && steps.commit_and_push.outputs.changes == 'no' }}
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > Already up-to-date. Nothing to commit.
+            >
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          reactions: "confused"
+
+      - name: Add reaction to command comment on success
+        if: ${{ !steps.check-conflict.outputs.merge_conflict && steps.commit_and_push.outputs.changes == 'yes' }}
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > Successfully pushed new changes:
+            > ${{ steps.commit_and_push.outputs.last_commit_msg }} (${{ steps.commit_and_push.outputs.last_commit_sha }})
+            >
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          reactions: "+1"
+
+      - name: Add reaction to command comment on failure
+        uses: peter-evans/create-or-update-comment@v2
+        if: failure()
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > **Error**: failed to execute "${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}" command
+            >
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          reactions: "-1"
+
+  help:
+    if: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 == 'help' || !contains(fromJson('["merge", "arg2"]'), github.event.client_payload.slash_command.args.unnamed.arg1) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Update comment
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > Command | Description
+            > --- | ---
+            > /git merge `branch` | Merge branch `branch` into current branch
+          reaction-type: hooray

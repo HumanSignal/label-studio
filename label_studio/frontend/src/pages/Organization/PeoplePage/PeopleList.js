@@ -7,6 +7,7 @@ import { Block, Elem } from "../../../utils/bem";
 import { isDefined } from "../../../utils/helpers";
 import { useUpdateEffect } from "../../../utils/hooks";
 import './PeopleList.styl';
+import { CopyableTooltip } from '../../../components/CopyableTooltip/CopyableTooltip'
 
 export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
   const api = useAPI();
@@ -73,7 +74,9 @@ export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
                   return (
                     <Elem key={`user-${user.id}`} name="user" mod={{ active }} onClick={() => selectUser(user)}>
                       <Elem name="field" mix="avatar">
-                        <Userpic user={user} style={{ width: 28, height: 28 }}/>
+                        <CopyableTooltip title={'User ID: ' + user.id} textForCopy={user.id}>
+                          <Userpic user={user} style={{ width: 28, height: 28 }}/>
+                        </CopyableTooltip>
                       </Elem>
                       <Elem name="field" mix="email">
                         {user.email}

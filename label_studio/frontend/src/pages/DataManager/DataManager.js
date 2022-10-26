@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
+import { Spinner } from '../../components';
 import { Button } from '../../components/Button/Button';
 import { modal } from '../../components/Modal/Modal';
 import { Space } from '../../components/Space/Space';
@@ -29,6 +30,7 @@ const initializeDataManager = async (root, props, params) => {
     projectId: params.id,
     apiGateway: `${window.APP_SETTINGS.hostname}/api/dm`,
     apiVersion: 2,
+    project: params.project,
     polling: !window.APP_SETTINGS,
     showPreviews: false,
     apiEndpoints: APIConfig.endpoints,
@@ -84,6 +86,7 @@ export const DataManagerPage = ({ ...props }) => {
       props,
       {
         ...params,
+        project,
         autoAnnotation: isDefined(interactiveBacked),
       },
     ));
@@ -147,6 +150,22 @@ export const DataManagerPage = ({ ...props }) => {
 
     return () => destroyDM();
   }, [root, init]);
+
+
+  if (!DataManager || !LabelStudio) {
+    return (
+      <div style={{
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        display: "flex",
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        <Spinner size={64}/>
+      </div>
+    );
+  }
 
   return crashed ? (
     <Block name="crash">

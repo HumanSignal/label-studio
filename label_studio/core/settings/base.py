@@ -14,6 +14,58 @@ import re
 import logging
 import json
 
+from label_studio.core.utils.params import get_bool_env, get_env
+
+formatter = 'standard'
+JSON_LOG = get_bool_env('JSON_LOG', False)
+if JSON_LOG:
+    formatter = 'json'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'json': {
+            '()': 'label_studio.core.utils.formatter.CustomJsonFormatter',
+            'format': '[%(asctime)s] [%(name)s::%(funcName)s::%(lineno)d] [%(levelname)s] [%(user_id)s] %(message)s',
+            'datefmt': '%d/%b/%Y:%H:%M:%S %z',
+        },
+        'standard': {
+            'format': '[%(asctime)s] [%(name)s::%(funcName)s::%(lineno)d] [%(levelname)s] %(message)s',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': formatter,
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': os.environ.get('LOG_LEVEL', 'DEBUG'),
+    },
+    'loggers': {
+        'pykwalify': {'level': 'ERROR', 'propagate': False},
+        'tavern': {'level': 'ERROR', 'propagate': False},
+        'asyncio': {'level': 'WARNING'},
+        'rules': {'level': 'WARNING'},
+        'django': {
+            'handlers': ['console'],
+            # 'propagate': True,
+        },
+        'django_auth_ldap': {'level': os.environ.get('LOG_LEVEL', 'DEBUG')},
+        "rq.worker": {
+            "handlers": ["console"],
+            "level": os.environ.get('LOG_LEVEL', 'INFO'),
+        },
+        'ddtrace': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+        },
+    },
+}
+
+
 # for printing messages before main logging config applied
 if not logging.getLogger().hasHandlers():
     logging.basicConfig(level=logging.DEBUG, format='%(message)s')
@@ -100,43 +152,8 @@ DATABASES_ALL = {
 DATABASES_ALL['default'] = DATABASES_ALL[DJANGO_DB_POSTGRESQL]
 DATABASES = {'default': DATABASES_ALL.get(get_env('DJANGO_DB', 'default'))}
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'standard': {
-            'format': '[%(asctime)s] [%(name)s::%(funcName)s::%(lineno)d] [%(levelname)s] %(message)s',
-        },
-        'message_only': {
-            'format': '%(message)s',
-        },
-        'rq_console': {
-            'format': '%(asctime)s %(message)s',
-            'datefmt': '%H:%M:%S',
-        },
-    },
-    'handlers': {
-        'console_raw': {
-            'level': get_env('LOG_LEVEL', 'WARNING'),
-            'class': 'logging.StreamHandler',
-        },
-        'console': {
-            'level': get_env('LOG_LEVEL', 'WARNING'),
-            'class': 'logging.StreamHandler',
-            'formatter': 'standard',
-        },
-        'rq_console': {
-            'level': 'WARNING',
-            'class': 'rq.utils.ColorizingStreamHandler',
-            'formatter': 'rq_console',
-            'exclude': ['%(asctime)s'],
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': get_env('LOG_LEVEL', 'WARNING'),
-    },
-}
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 
 if get_bool_env('GOOGLE_LOGGING_ENABLED', False):
     logging.info('Google Cloud Logging handler is enabled.')
@@ -280,7 +297,25 @@ TEMPLATES = [
 
 # RQ
 RQ_QUEUES = {
+    'critical': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 180,
+    },
+    'high': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 180,
+    },
     'default': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 180,
+    },
+    'low': {
         'HOST': 'localhost',
         'PORT': 6379,
         'DB': 0,
@@ -349,6 +384,8 @@ SESSION_COOKIE_SECURE = bool(int(get_env('SESSION_COOKIE_SECURE', False)))
 CSRF_COOKIE_SECURE = bool(int(get_env('CSRF_COOKIE_SECURE', SESSION_COOKIE_SECURE)))
 CSRF_COOKIE_HTTPONLY = bool(int(get_env('CSRF_COOKIE_HTTPONLY', SESSION_COOKIE_SECURE)))
 
+SSRF_PROTECTION_ENABLED = get_bool_env('SSRF_PROTECTION_ENABLED', False)
+
 # user media files
 MEDIA_ROOT = os.path.join(BASE_DATA_DIR, 'media')
 os.makedirs(MEDIA_ROOT, exist_ok=True)
@@ -375,6 +412,7 @@ TASK_LOCK_TTL = int(get_env('TASK_LOCK_TTL')) if get_env('TASK_LOCK_TTL') else N
 TASK_LOCK_DEFAULT_TTL = int(get_env('TASK_LOCK_DEFAULT_TTL', 3600))
 TASK_LOCK_MIN_TTL = int(get_env('TASK_LOCK_MIN_TTL', 120))
 
+RANDOM_NEXT_TASK_SAMPLE_SIZE = int(get_env('RANDOM_NEXT_TASK_SAMPLE_SIZE', 50))
 
 TASK_API_PAGE_SIZE_MAX = int(get_env('TASK_API_PAGE_SIZE_MAX', 0)) or None
 
@@ -385,6 +423,8 @@ EMAIL_BACKEND = get_env('EMAIL_BACKEND', 'django.core.mail.backends.dummy.EmailB
 ENABLE_LOCAL_FILES_STORAGE = get_bool_env('ENABLE_LOCAL_FILES_STORAGE', default=True)
 LOCAL_FILES_SERVING_ENABLED = get_bool_env('LOCAL_FILES_SERVING_ENABLED', default=False)
 LOCAL_FILES_DOCUMENT_ROOT = get_env('LOCAL_FILES_DOCUMENT_ROOT', default=os.path.abspath(os.sep))
+
+SYNC_ON_TARGET_STORAGE_CREATION = get_bool_env('SYNC_ON_TARGET_STORAGE_CREATION', default=True)
 
 """ React Libraries: do not forget to change this dir in /etc/nginx/nginx.conf """
 # EDITOR = label-studio-frontend repository
@@ -413,6 +453,14 @@ EXPERIMENTAL_FEATURES = get_bool_env('EXPERIMENTAL_FEATURES', False)
 USE_ENFORCE_CSRF_CHECKS = get_bool_env('USE_ENFORCE_CSRF_CHECKS', True)  # False is for tests
 CLOUD_FILE_STORAGE_ENABLED = False
 
+IO_STORAGES_IMPORT_LINK_NAMES = [
+    'io_storages_s3importstoragelink',
+    'io_storages_gcsimportstoragelink',
+    'io_storages_azureblobimportstoragelink',
+    'io_storages_localfilesimportstoragelink',
+    'io_storages_redisimportstoragelink',
+]
+
 CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and_log'
 SAVE_USER = 'users.functions.save_user'
@@ -427,13 +475,15 @@ DATA_MANAGER_PREPROCESS_FILTER = 'data_manager.functions.preprocess_filter'
 USER_LOGIN_FORM = 'users.forms.LoginForm'
 PROJECT_MIXIN = 'core.mixins.DummyModelMixin'
 TASK_MIXIN = 'tasks.mixins.TaskMixin'
-ANNOTATION_MIXIN = 'core.mixins.DummyModelMixin'
-ORGANIZATION_MIXIN = 'core.mixins.DummyModelMixin'
+ANNOTATION_MIXIN = 'tasks.mixins.AnnotationMixin'
+ORGANIZATION_MIXIN = 'organizations.mixins.OrganizationMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
 GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
 STORAGE_ANNOTATION_SERIALIZER = 'io_storages.serializers.StorageAnnotationSerializer'
 TASK_SERIALIZER_BULK = 'tasks.serializers.BaseTaskSerializerBulk'
 PREPROCESS_FIELD_NAME = 'data_manager.functions.preprocess_field_name'
+INTERACTIVE_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializerForInteractive'
+DELETE_TASKS_ANNOTATIONS_POSTPROCESS = None
 
 
 def project_delete(project):
@@ -480,9 +530,17 @@ FEATURE_FLAGS_API_KEY = get_env('FEATURE_FLAGS_API_KEY', default='any key')
 
 # we may set feature flags from file
 FEATURE_FLAGS_FROM_FILE = get_bool_env('FEATURE_FLAGS_FROM_FILE', False)
-FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE')
+FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE', 'feature_flags.json')
 # or if file is not set, default is using offline mode
 FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)
 # default value for feature flags (if not overrided by environment or client)
 FEATURE_FLAGS_DEFAULT_VALUE = False
 
+# Strip harmful content from SVG files by default
+SVG_SECURITY_CLEANUP = get_bool_env('SVG_SECURITY_CLEANUP', False)
+
+ML_BLOCK_LOCAL_IP = get_bool_env('ML_BLOCK_LOCAL_IP', False)
+
+RQ_LONG_JOB_TIMEOUT = int(get_env('RQ_LONG_JOB_TIMEOUT', 36000))
+
+APP_WEBSERVER = get_env('APP_WEBSERVER', 'django')

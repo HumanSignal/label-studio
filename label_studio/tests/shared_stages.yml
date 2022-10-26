@@ -149,3 +149,28 @@ stages:
       save:
         json:
           annotation_pk: id
+
+  - id: get_invite_url
+    name: Get invite link
+    request:
+      url: "{django_live_url}/api/invite"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        json:
+          invite_url: invite_url
+          invite_token: token
+
+
+# TODO: add teardown/clean up methods
+# - id: delete_task
+#   name: Delete task
+#   request:
+#     url: "{django_live_url}/api/projects/{project_pk}"
+#     method: DELETE
+#     headers:
+#       content-type: application/json
+#   response:
+#     status_code: 201
+

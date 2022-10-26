@@ -42,3 +42,13 @@ class LabelStudioValidationErrorSentryIgnored(ValidationError):
 
 class LabelStudioXMLSyntaxErrorSentryIgnored(Exception):
     pass
+
+
+class ImportFromLocalIPError(LabelStudioAPIException):
+    default_detail = 'Importing from local IP is not allowed'
+    status_code = status.HTTP_403_FORBIDDEN
+
+
+class MLModelLocalIPError(LabelStudioAPIException):
+    default_detail = 'Adding models with local IP is not allowed'
+    status_code = status.HTTP_403_FORBIDDEN

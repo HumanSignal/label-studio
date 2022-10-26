@@ -11,8 +11,9 @@ logger = logging.getLogger(__name__)
 try:
     _redis = get_connection()
     _redis.ping()
+    logger.debug('=> Redis is connected successfully.')
 except:
-    logger.debug('Redis is not connected.')
+    logger.debug('=> Redis is not connected.')
     _redis = None
 
 
@@ -77,16 +78,24 @@ def start_job_async_or_sync(job, *args, **kwargs):
     :param kwargs: Function keywords arguments
     :return: Job or function result
     """
-    redis = redis_connected()
+    redis = redis_connected() and kwargs.get('redis', True)
     queue_name = kwargs.get("queue_name", "default")
     if 'queue_name' in kwargs:
         del kwargs['queue_name']
+    if 'redis' in kwargs:
+        del kwargs['redis']
+    job_timeout = None
+    if 'job_timeout' in kwargs:
+        job_timeout = kwargs['job_timeout']
+        del kwargs['job_timeout']
+
     if redis:
         queue = django_rq.get_queue(queue_name)
         job = queue.enqueue(
             job,
             *args,
-            **kwargs
+            **kwargs,
+            job_timeout=job_timeout
         )
         return job
     else:

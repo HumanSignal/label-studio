@@ -4,7 +4,7 @@ import re
 import json
 from django import template
 from datetime import datetime
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 from django.conf import settings
 from django.template.loader_tags import do_include
 
@@ -102,8 +102,8 @@ def multiply(value, arg):
 def custom_autocomplete(key=''):
     if settings.LICENSE.get('disable_autocomplete', False):
         if key == 'password':
-            return mark_safe('autocomplete="new-password"')
-        return mark_safe('autocomplete="off"')
+            return format_html('autocomplete="new-password"')
+        return format_html('autocomplete="off"')
     else:
         return ''
 
@@ -116,26 +116,3 @@ def var_exists(context, name):
             if name in d:
                 return True
     return False
-
-
-class TryIncludeNode(template.Node):
-    """
-    A Node that instantiates an IncludeNode but wraps its render() in a
-    try/except in case the template doesn't exist.
-    """
-    def __init__(self, parser, token):
-        self.include_node = do_include(parser, token)
-
-    def render(self, context):
-        try:
-            return self.include_node.render(context)
-        except template.TemplateDoesNotExist:
-            return ''
-
-
-@register.tag('try_include')
-def try_include(parser, token):
-    """
-    Include the specified template but only if it exists.
-    """
-    return TryIncludeNode(parser, token)

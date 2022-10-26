@@ -51,6 +51,9 @@ def user_signup(request):
         if settings.DISABLE_SIGNUP_WITHOUT_LINK is True:
             if not(token and organization and token == organization.token):
                 raise PermissionDenied()
+        else:
+            if token and organization and token != organization.token:
+                raise PermissionDenied()
 
         user_form = forms.UserSignupForm(request.POST)
         organization_form = OrganizationSignupForm(request.POST)
@@ -114,7 +117,7 @@ def user_account(request):
         if form.is_valid():
             form.save()
             return redirect(reverse('user-account'))
-
+        
     return render(request, 'users/user_account.html', {
         'settings': settings,
         'user': user,

@@ -1,0 +1,147 @@
+name: "/frontend command"
+
+on:
+  repository_dispatch:
+    types: [ frontend-command ]
+
+env:
+  NODE: '14'
+
+jobs:
+  build:
+    if: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 == 'build' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout on chat command
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.client_payload.pull_request.head.ref }}
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "${{ env.NODE }}"
+
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Configure npm cache
+        id: npm-cache
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ env.NODE }}-
+
+      - name: Install node-fetch
+        run: |
+          npm install -g node-fetch@^2.6.1
+          npm link node-fetch
+
+      - name: Get build
+        id: get_build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_PAT }}
+          REPO: ${{ github.event.client_payload.slash_command.args.unnamed.arg2 || 'all' }}
+          SHA: ${{ github.event.client_payload.slash_command.args.unnamed.arg3 || 'master' }}
+        run: |
+          set -xeuo pipefail
+          if [ "${REPO}" = "all" ]; then
+            node label_studio/frontend/get-build.js lsf | tee -a /tmp/output
+            grep 'Build link:' /tmp/output | cut -d":" -f2- >> /tmp/info_commit_msg 
+            node label_studio/frontend/get-build.js dm | tee -a /tmp/output
+            grep 'Build link:' /tmp/output | cut -d":" -f2- >> /tmp/info_commit_msg 
+          else
+            node label_studio/frontend/get-build.js "${REPO}" "${SHA}" | tee -a /tmp/output
+            grep 'Build link:' /tmp/output | cut -d":" -f2- >> /tmp/info_commit_msg 
+          fi
+          
+          echo "commit_msg_file=$(cat /tmp/info_commit_msg)" >> $GITHUB_OUTPUT
+          echo "COMMIT_MSG_FILE<<EOF" >> $GITHUB_ENV
+          echo "$(cat /tmp/info_commit_msg)" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Commit and push
+        id: commit_and_push
+        shell: bash
+        env:
+          REPO: ${{ github.event.client_payload.slash_command.args.unnamed.arg2 || 'all' }}
+        run: |
+          set -xeuo pipefail
+          
+          git config --global user.name '${{ github.event.client_payload.github.actor }}'
+          git config --global user.email '${{ github.event.client_payload.github.actor }}@users.noreply.github.com'
+          
+          git add -A
+          git status -s
+          if git diff-index --quiet HEAD; then
+            echo "changes=no" >> $GITHUB_OUTPUT
+            exit 0
+          else 
+            git commit -m "[frontend] Get build ${REPO}"
+          fi
+          git push origin HEAD
+
+      - name: Add reaction to command comment on nothing to do
+        if: steps.commit_and_push.outputs.changes == 'no'
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > Already up-to-date. Nothing to commit.
+            >
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          reactions: "confused"
+
+      - name: Add reaction to command comment on success
+        if: steps.commit_and_push.outputs.changes != 'no'
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > Successfully pushed new changes
+            > ${{ env.COMMIT_MSG_FILE }}
+            >
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          reactions: "+1"
+
+      - name: Add reaction to command comment on failure
+        uses: peter-evans/create-or-update-comment@v2
+        if: failure()
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > **Error**: failed to get build
+            >
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          reactions: "-1"
+
+  help:
+    if: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 == 'help' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Update comment
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > Command | Description
+            > --- | ---
+            > /frontend build           | Get build frontend static for all repos
+            > /frontend build lsf [sha] | Get build frontend static for heartexlabs/label-studio-frontend only
+            > /frontend build dm [sha]  | Get build frontend static for heartexlabs/dm2 only
+          reaction-type: hooray

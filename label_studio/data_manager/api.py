@@ -11,23 +11,20 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from django.db.models import Sum, Count
 from django.conf import settings
-from ordered_set import OrderedSet
 
-from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, load_func
+from core.utils.common import get_object_with_check_and_log, int_from_request, load_func
+from core.utils.params import bool_from_request
 from core.permissions import all_permissions, ViewClassPermission
 from projects.models import Project
 from projects.serializers import ProjectSerializer
 from tasks.models import Task, Annotation, Prediction
-from tasks.serializers import TaskIDOnlySerializer
 
 from data_manager.functions import get_prepared_queryset, evaluate_predictions, get_prepare_params
-from data_manager.models import View, PrepareParams
+from data_manager.models import View
 from data_manager.managers import get_fields_for_evaluation
-from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer, ViewResetSerializer
+from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, ViewResetSerializer
 from data_manager.actions import get_all_actions, perform_action
-
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +120,7 @@ class ViewAPI(viewsets.ModelViewSet):
         return Response(status=204)
 
     def get_queryset(self):
-        return View.objects.filter(project__organization=self.request.user.active_organization)
+        return View.objects.filter(project__organization=self.request.user.active_organization).order_by('id')
 
 
 class TaskPagination(PageNumberPagination):
@@ -149,8 +146,6 @@ class TaskPagination(PageNumberPagination):
         )
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
-@method_decorator(name='post', decorator=swagger_auto_schema(auto_schema=None))
 class TaskListAPI(generics.ListCreateAPIView):
     task_serializer_class = DataManagerTaskSerializer
     permission_required = ViewClassPermission(
@@ -202,7 +197,6 @@ class TaskListAPI(generics.ListCreateAPIView):
             self.check_object_permissions(request, project)
         else:
             return Response({'detail': 'Neither project nor view id specified'}, status=404)
-
         # get prepare params (from view or from payload directly)
         prepare_params = get_prepare_params(request, project)
         queryset = self.get_task_queryset(request, prepare_params)
@@ -211,14 +205,15 @@ class TaskListAPI(generics.ListCreateAPIView):
         # paginated tasks
         self.pagination_class = TaskPagination
         page = self.paginate_queryset(queryset)
+
+        # get request params
         all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
         fields_for_evaluation = get_fields_for_evaluation(prepare_params, request.user)
-
         review = bool_from_request(self.request.GET, 'review', False)
+
         if review:
             fields_for_evaluation = ['annotators', 'reviewed']
             all_fields = None
-
         if page is not None:
             ids = [task.id for task in page]  # page is a list already
             tasks = list(
@@ -227,11 +222,11 @@ class TaskListAPI(generics.ListCreateAPIView):
                         Task.objects.filter(id__in=ids),
                         fields_for_evaluation=fields_for_evaluation,
                         all_fields=all_fields,
+                        request=request
                     )
                 )
             )
             tasks_by_ids = {task.id: task for task in tasks}
-
             # keep ids ordering
             page = [tasks_by_ids[_id] for _id in ids]
 
@@ -242,12 +237,11 @@ class TaskListAPI(generics.ListCreateAPIView):
 
             serializer = self.task_serializer_class(page, many=True, context=context)
             return self.get_paginated_response(serializer.data)
-
         # all tasks
         if project.evaluate_predictions_automatically:
             evaluate_predictions(queryset.filter(predictions__isnull=True))
         queryset = Task.prepared.annotate_queryset(
-            queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields
+            queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields, request=request
         )
         serializer = self.task_serializer_class(queryset, many=True, context=context)
         return Response(serializer.data)

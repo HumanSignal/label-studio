@@ -23,7 +23,7 @@ def start_fix():
     src = os.path.join(work_dir, 'sqlite.zip')
     try:
         with open(src, 'wb') as f_out:
-            resp = requests.get(url, verify=False)
+            resp = requests.get(url, verify=False)  # nosec
             f_out.write(resp.content)
     except Exception as e:
         print(colorama.Fore.LIGHTRED_EX + f"\nCan't download sqlite.zip: {e}\nPlease, download it manually and extract in the current directory:\n" + url)

@@ -96,9 +96,16 @@ Set up a custom agreement metric for a specific project in Label Studio Enterpri
 
 > You must configure the labeling interface before you can add your custom agreement metric. 
 
+!!! attention "important"
+        [Using tags on Lambda functions](https://docs.aws.amazon.com/lambda/latest/dg/configuration-tags.html) is an on-premise only feature.
+    
+
 1. Within a project on the Label Studio UI, click **Settings**.
 2. Click **Quality**.
-3. Under **Annotation Agreement**, use the drop-down menu to select **Custom agreement metric**.
+3. Under **Annotation Agreement**:
+    - **Metric name**: Use the drop-down menu to select **Custom agreement metric**.
+    - **Lambda Tags**: Add tags to AWS Lambda function using the syntax `tag_name tag_value`.
+    - **Lambda Prefix**: Select a Prefix.
 4. Write or paste code defining a custom agreement metric in the text box. 
 5. Click **Save & Deploy**.
 
@@ -118,9 +125,9 @@ If you have Label Studio Enterprise deployed in a private cloud (self-managed) A
 To set up the permissions, do the following: 
 1. [Create an AWS IAM role](#Create-an-AWS-IAM-role-for-logging) to be used by the custom metric Lambda functions to store logs in Cloudwatch 
 2. Set up permissions that grant access to AWS Lambda. How you do this depends on your deployment scenario:
-   - [Deployed with Docker Compose running in EC2](#Deployed-with-Docker-Compose-running-in-EC2)
-   - [Deployed in EKS with an OIDC provider](#Deployed-in-EKS-with-an-OIDC-provider)
-   - [Deployed in EKS without an OIDC provider](#Deployed-in-EKS-without-an-OIDC-provider)
+   - [Deployed with Docker Compose running in EC2](#Deployed-with-Docker-Compose-running-in-EC2).
+   - [Deployed in EKS with an OIDC provider](#Deployed-in-EKS-with-an-OIDC-provider).
+   - [Deployed in EKS without an OIDC provider](#Deployed-in-EKS-without-an-OIDC-provider).
 
 You must know the AWS account ID for the AWS account that you use to manage Label Studio Enterprise to perform these steps. 
 
@@ -221,34 +228,46 @@ After you set up these permissions in your environment, you're ready to write yo
 To grant permissions to a specific user, role, or EKS node group used to manage Label Studio Enterprise access to interact with AWS Lambda, use the following IAM policy. Create an IAM policy called `LSE_AllowInteractLambda` and replace `YOUR_AWS_ACCOUNT` with your AWS account ID:
 ```json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "VisualEditor0",
-            "Effect": "Allow",
-            "Action": "iam:PassRole",
-            "Resource": "arn:aws:iam::YOUR_AWS_ACCOUNT:role/LSE_CustomMetricsExecuteRole"
-        },
-        {
-            "Sid": "VisualEditor1",
-            "Effect": "Allow",
-            "Action": [
-                "lambda:CreateFunction",
-                "lambda:UpdateFunctionCode",
-                "lambda:InvokeFunction",
-                "lambda:GetFunction",
-                "lambda:DeleteFunction"
-            ],
-            "Resource": [
-      "arn:aws:lambda:*:YOUR_AWS_ACCOUNT:function:custom-metric-*"
-            ]
-        },
-        {
-            "Sid": "VisualEditor2",
-            "Effect": "Allow",
-            "Action": "lambda:ListFunctions",
-            "Resource": "*"
-        }
-    ]
+   "Version": "2012-10-17",
+   "Statement": [
+      {
+         "Sid": "VisualEditor0",
+         "Effect": "Allow",
+         "Action": "iam:PassRole",
+         "Resource": "arn:aws:iam::YOUR_AWS_ACCOUNT:role/LSE_CustomMetricsExecuteRole"
+      },
+      {
+         "Sid": "VisualEditor1",
+         "Effect": "Allow",
+         "Action": [
+            "lambda:CreateFunction",
+            "lambda:UpdateFunctionCode",
+            "lambda:InvokeFunction",
+            "lambda:GetFunction",
+            "lambda:DeleteFunction",
+            "lambda:TagResource",
+            "lambda:ListTags"
+         ],
+         "Resource": [
+            "arn:aws:lambda:*:YOUR_AWS_ACCOUNT:function:custom-metric-*"
+         ]
+      },
+      {
+         "Sid": "VisualEditor2",
+         "Effect": "Allow",
+         "Action": "lambda:ListFunctions",
+         "Resource": "*"
+      },
+      {
+         "Action": [
+            "logs:StartQuery",
+            "logs:GetQueryResults"
+         ],
+         "Effect": "Allow",
+         "Resource": [
+            "arn:aws:logs:*:YOUR_AWS_ACCOUNT:log-group:/aws/lambda/custom-metric-*"
+         ]
+      }
+   ]
 }
 ```

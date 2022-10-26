@@ -45,6 +45,11 @@
     <title>Label Studio</title>
   {% endblock %}
 
+  {% block head-toast %}
+    <script src="{{settings.HOSTNAME}}{% static 'js/Toast.min.js' %}"></script>
+    <link href="{{settings.HOSTNAME}}{% static 'css/Toast.min.css' %}" rel="stylesheet">
+  {% endblock %}
+
   {% get_current_language as LANGUAGE_CODE %}
   {% get_available_languages as LANGUAGES %}
 </head>
@@ -85,11 +90,13 @@
 <script id="app-settings">
   window.APP_SETTINGS = Object.assign({
     user: {
+      id: {{ user.pk }},
       username: "{{user.username}}",
       firstName: "{{user.first_name}}",
       lastName: "{{user.last_name}}",
       initials: "{{user.get_initials}}",
       email: "{{user.email}}",
+      allow_newsletters: {% if user.allow_newsletters is None %}null{% else %}{{user.allow_newsletters|yesno:"true,false"}}{% endif %},
       {% if user.avatar %}
       avatar: "{{user.avatar_url|safe}}",
       {% endif %}
@@ -127,7 +134,21 @@
   {% block bottomjs %}
   {% endblock %}
 
-  {% try_include 'checks.html' %}
+  {% block storage-persistence %}
+  <script>
+    {# storage persistence #}
+    {% if not settings.STORAGE_PERSISTENCE %}
+    new Toast({
+      message: `Data will be persisted on the node running this container,<br>
+                but all data will be lost if this node goes away.<br>`,
+      type: 'danger'
+    });
+    {% endif %}
+  </script>
+  {% endblock %}
+
+  {% block billing-checks %}
+  {% endblock %}
 
 </div>
 

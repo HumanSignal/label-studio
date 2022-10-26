@@ -190,7 +190,7 @@ def bulk_update(objs, meta=None, update_fields=None, exclude_fields=None,
             pks=', '.join(itertools.repeat('%s', n_pks)),
         )
 
-        sql = 'UPDATE {dbtable} SET {values} WHERE {in_clause}'.format(
+        sql = 'UPDATE {dbtable} SET {values} WHERE {in_clause}'.format(   # nosec
             dbtable=dbtable,
             values=values,
             in_clause=in_clause,

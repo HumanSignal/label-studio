@@ -22,10 +22,12 @@ const formatXML = (xml) => {
   }
 
   let depth = 0;
+
   try {
     return xml.replace(/<(\/)?.*?(\/)?>[\s\n]*/g, (tag, close1, close2) => {
       if (!close1) {
         const res = "  ".repeat(depth) + tag.trim() + "\n";
+
         if (!close2) depth++;
         return res;
       } else {
@@ -78,6 +80,7 @@ const Label = ({ label, template, color }) => {
 const ConfigureControl = ({ control, template }) => {
   const refLabels = React.useRef();
   const tagname = control.tagName;
+
   if (tagname !== "Choices" && !tagname.endsWith("Labels")) return null;
   const palette = Palette();
 
@@ -119,6 +122,7 @@ const ConfigureControl = ({ control, template }) => {
 
 const ConfigureSettings = ({ template }) => {
   const { settings } = template;
+
   if (!settings) return null;
   const keys = Object.keys(settings);
 
@@ -127,15 +131,18 @@ const ConfigureSettings = ({ template }) => {
     const type = Array.isArray(options.type) ? Array : options.type;
     const $object = options.object;
     const $tag = options.control ? options.control : $object;
+
     if (!$tag) return null;
     if (options.when && !options.when($tag)) return;
     let value = false;
+
     if (options.value) value = options.value($tag);
     else if (typeof options.param === "string") value = $tag.getAttribute(options.param);
     if (value === "true") value = true;
     if (value === "false") value = false;
     let onChange;
     let size;
+
     switch (type) {
       case Array:
         onChange = e => {
@@ -198,6 +205,7 @@ const ConfigureSettings = ({ template }) => {
 const ConfigureColumns = ({ columns, template }) => {
   const updateValue = obj => e => {
     const attrName = e.target.value.replace(/^\$/, "");
+
     obj.setAttribute("value", "$" + attrName);
     template.render();
   };
@@ -241,6 +249,7 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
   const [configure, setConfigure] = React.useState(isEmptyConfig(config) ? "code" : "visual");
   const [visualLoaded, loadVisual] = React.useState(configure === "visual");
   const [waiting, setWaiting] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState();
   const [configToCheck, setConfigToCheck] = React.useState();
   const [data, setData] = React.useState();
@@ -256,6 +265,8 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
   React.useEffect(async () => {
     if (!configToCheck) return;
 
+    setLoading(true);
+
     const validation = await api.callApi(`validateConfig`, {
       params: { pk: project.id },
       body: { label_config: configToCheck },
@@ -264,6 +275,7 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
 
     if (validation?.error) {
       setError(validation.response);
+      setLoading(false);
       return;
     }
 
@@ -271,11 +283,12 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
     onValidate?.(validation);
 
     const sample = await api.callApi("createSampleTask", {
-      params: {pk: project.id },
+      params: { pk: project.id },
       body: { label_config: configToCheck },
       errorFilter: () => true,
     });
 
+    setLoading(false);
     if (sample && !sample.error) {
       setData(sample.sample_task);
     } else {
@@ -299,6 +312,7 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
     setError(null);
     setWaiting(true);
     const res = await onSaveClick();
+
     setWaiting(false);
     if (res !== true) {
       setError(res);
@@ -345,13 +359,13 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
         </div>
         {disableSaveButton !== true && onSaveClick && (
           <Form.Actions size="small" extra={configure === "code" && extra} valid>
-            <Button look="primary" size="compact" style={{width: 120}} onClick={onSave} waiting={waiting}>
+            <Button look="primary" size="compact" style={{ width: 120 }} onClick={onSave} waiting={waiting}>
               Save
             </Button>
           </Form.Actions>
         )}
       </div>
-      <Preview config={config} data={data} error={error} />
+      <Preview config={config} data={data} error={error} loading={loading} />
     </div>
   );
 };
@@ -371,12 +385,14 @@ export const ConfigPage = ({ config: initialConfig = "", columns: externalColumn
 
   const setTemplate = React.useCallback(config => {
     const tpl = new Template({ config });
+
     tpl.onConfigUpdate = setConfig;
     setConfig(config);
     setCurrentTemplate(tpl);
   }, [setConfig, setCurrentTemplate]);
 
   const [columns, setColumns] = React.useState();
+
   React.useEffect(() => { if (externalColumns?.length) setColumns(externalColumns); }, [externalColumns]);
 
   React.useEffect(async () => {
@@ -386,6 +402,7 @@ export const ConfigPage = ({ config: initialConfig = "", columns: externalColumn
       // 404 is ok, and errors here don't matter
       errorFilter: () => true,
     });
+
     if (res?.common_data_columns) {
       setColumns(res.common_data_columns);
     }
