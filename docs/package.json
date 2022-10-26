@@ -7,11 +7,11 @@
   },
   "private": true,
   "hexo": {
-    "version": "5.4.0"
+    "version": "6.3.0"
   },
   "dependencies": {
     "co": "^4.6.0",
-    "hexo": "^5.4.0",
+    "hexo": "^6.3.0",
     "hexo-admonition": "^1.1.2",
     "hexo-cli": "^4.3.0",
     "hexo-deployer-git": "^3.0.0",
