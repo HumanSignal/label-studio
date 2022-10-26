@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3645: Timeseries brush to end of timeline error",
-  "commit": "957b6c1c1c297d7dd501508d87785ba746363e9f",
-  "branch": "fb-dev-3645-fix/timeseries-brush-to-end",
-  "date": "2022/10/26 11:56:54"
+  "commit": "8f61da01930e890fc8b2427c540878d2f2a30be3",
+  "branch": "master",
+  "date": "2022/10/26 14:58:21"
 }
