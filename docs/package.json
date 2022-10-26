@@ -35,6 +35,7 @@
     "start": "hexo clean && touch db.json && hexo serve",
     "server": "hexo clean && touch db.json && hexo serve",
     "publish": "hexo clean && touch db.json && hexo generate && hexo deploy",
+    "build": "hexo generate",
     "new": "hexo new"
   },
   "devDependencies": {
