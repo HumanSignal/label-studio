@@ -8,7 +8,7 @@ meta_description: Configure the database storage used by Label Studio in your da
 Label Studio uses a database to store project data and configuration information.
 
 ## Labeling performance
-The SQLite database works well for projects with tens of thousands of labeling tasks. If you want to annotate millions of tasks or anticipate a lot of concurrent users, use a PostgreSQL database. See [Install and upgrade Label Studio](install.html#PostgreSQL-database) for more.  
+The SQLite database might work well for projects with tens of thousands of labeling tasks, as long as you don't plan on using complex filters in the data manager and other complex multi-user pipelines. If you want to annotate millions of tasks or anticipate a lot of concurrent users or your plan to work on real life projects, use a PostgreSQL database. See [Install and upgrade Label Studio](install.html#PostgreSQL-database) for more.  
 
 For example, if you import data while labeling is being performed, labeling tasks can take more than 10 seconds to load and annotations can take more than 10 seconds to perform. If you want to label more than 100,000 tasks with 5 or more concurrent users, consider using PostgreSQL or another database with Label Studio. 
 

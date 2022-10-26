@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3607: Add validation if stage is ready (#915)\n\nfix: DEV-3607: add validation if stage is ready",
-  "commit": "760d5ad9d34574969c4f81386ac734e68273fa3f",
+  "message": "ci: Bump release-drafter/release-drafter from 5.21.0 to 5.21.1 (#923)\n\nBumps [release-drafter/release-drafter](https://github.com/release-drafter/release-drafter) from 5.21.0 to 5.21.1.\r\n- [Release notes](https://github.com/release-drafter/release-drafter/releases)\r\n- [Commits](https://github.com/release-drafter/release-drafter/compare/v5.21.0...v5.21.1)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: release-drafter/release-drafter\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+  "commit": "149f32e24953ea4fdffaffb4760cd5e0ee385450",
   "branch": "master",
-  "date": "2022-10-18T20:30:14Z"
+  "date": "2022-10-24T16:17:39Z"
 }
