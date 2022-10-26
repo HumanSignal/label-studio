@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { UnControlled as CodeMirror } from 'react-codemirror2';
 import { Button, ToggleItems } from '../../../components';
 import { Form } from '../../../components/Form';
-import { Oneof } from '../../../components/Oneof/Oneof';
 import { cn } from '../../../utils/bem';
 import { Palette } from '../../../utils/colors';
 import { colorNames } from './colors';
@@ -358,7 +357,6 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
     }
   }, [configToCheck]);
 
-  // React.useEffect(() => { setError(null); }, [template.config]);
 
   // code should be reloaded on every render because of uncontrolled codemirror
   // visuals should be always rendered after first render
