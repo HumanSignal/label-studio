@@ -35,7 +35,9 @@ After you save a project, any other collaborator with access to the Label Studio
 
 Set up annotation settings to configure how you want annotators to perform labeling for your project.
 
-<div class="enterprise"><p>
+<div class="admonition enterprise">
+    <p class="admonition-title">enterprise</p>
+    <p>
 Some annotation settings are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
 </p></div>
 
@@ -126,7 +128,9 @@ Your changes save automatically.
 
 Set up review settings to guide reviewers when they review annotated tasks. For more about reviewing annotations, see [Review annotations in Label Studio](quality.html)
 
-<div class="enterprise"><p>
+<div class="admonition enterprise">
+    <p class="admonition-title">enterprise</p>
+    <p>
 Review settings and the review stream are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
 </p></div>
 

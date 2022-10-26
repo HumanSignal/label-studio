@@ -37,7 +37,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec lobortis nibh et 
 
 ---
 
-# Blockquote
+## Blockquote <span class="badge-design">* Need design</span>
 
 > Blockquotes are very handy in email to emulate reply text.
 > This line is part of the same quote.
@@ -50,21 +50,21 @@ Quote break.
 
 ## Lists
 
-### Ordered List
+#### Ordered List
 
 1. First ordered list item
 2. Second ordered list item
 3. Third ordered list item
 4. Fourth ordered list item
 
-### Unordered List
+#### Unordered List
 
 - Item One
 - Item Two
 - Item Three
 - Item Four
 
-### Ordered List with children
+#### Ordered List with children
 
 1. Item one
     1. Ordered list child 1
@@ -79,7 +79,7 @@ Quote break.
     - One
     - Two
 
-### Unordered List with children
+#### Unordered List with children
 
 - Item One
 - Item Two
@@ -100,7 +100,7 @@ Quote break.
       - grandchild two
 - Last item
 
-### Nested Mixed List
+#### Nested Mixed List
 
 - Item
   1. First Sub-item
@@ -124,15 +124,16 @@ Quote break.
 
 ## Tables
 
-### Markdown Table
+#### Markdown Table
 
-| Tables        | Are           | Cool  |
-| ------------- |:-------------:| -----:|
-| col 3 is      | right-aligned | $1600 |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>string</code> |  | Name of group |
+| [axis] | <code>y</code> \| <code>x</code> | <code>y</code> | Whether to use a vertical or horizantal axis direction for ranking |
+| lockAxis | <code>x</code> \| <code>y</code> |  | Lock axis |
+| sortedHighlightColor | <code>string</code> |  | Sorted color in HTML color name |
 
-### HTML Table
+#### HTML Table
 
 <table>
   <tr>
@@ -188,13 +189,11 @@ Quote break.
 
 Below are different examples of how to use code and syntax highlighting.
 
-### Inline Code
+#### Inline Code
 
-For inline code blocks, wrap your code in backticks: \`const myCode = "isGreat"\`. This will be rendered as follows: `const myCode = "isGreat"`.
+`const myCode = "isGreat"`
 
-### Code blocks
-
-For code blocks that allows multiple lines, syntax highlighting, line numbers and line highlighting, use triple backticks for code fencing: ```.
+#### Code blocks <span class="badge-design">* Need design</span>
 
 Javascript example:
 
@@ -221,57 +220,28 @@ import json
 from urllib.parse import urlparse
 {% endcodeblock %}
 
-## Code Tutorial Example
-
-Install the pakcage via npm
-
-```bash
-npm install analytics --save
-```
-
-Or include as a script tag:
+Using playground
 
 ```html
-<script src="https://unpkg.com/analytics/dist/analytics.min.js"></script>
+<!--Labeling configuration for ranking predicted text output from a model -->
+<View>
+  <Text name="txt-1" value="$text"></Text>
+  <Ranker name="ranker-1" toName="txt-1" ranked="true" sortedHighlightColor="red"></Ranker>
+</View>
 ```
 
-Then in your application, use the package like this:
-
-```js
-import Analytics from 'analytics'
-import googleAnalyticsPlugin from '@analytics/google-analytics'
-import customerIOPlugin from '@analytics/customerio'
-
-/* Initialize analytics */
-const analytics = Analytics({
-  app: 'my-app-name',
-  version: 100,
-  plugins: [
-    googleAnalyticsPlugin({
-      trackingId: 'UA-121991291',
-    }),
-    customerIOPlugin({
-      siteId: '123-xyz'
-    })
-  ]
-})
-
-/* Track a page view */
-analytics.page()
-```
 ---
 
 ## Images
 
-### With captions
+#### With captions
 
 <div style="margin:auto; text-align:center;"><img src="/images/last-updated-by-column.png" style="opacity: 0.8"/></div>
     <i>Figure 3: "Last updated by" column in Data Manager.</i>
+
 ---
 
-# Collapsable Details
-
-Using the `<details>` tag to collapse contents.
+## Collapsible Details
 
 <details>
   <summary>Preview text of details</summary>
@@ -281,7 +251,9 @@ Using the `<details>` tag to collapse contents.
 
 ---
 
-## Alerts
+## Alerts <span class="badge-design">* Need design</span>
+
+Info
 
 !!! info 
     Use Outliner to work with larger annotation tasks (many bounding boxes in one image, larger videos, and so on).
@@ -306,9 +278,14 @@ Warning
 
 Enterprise
 
-<div class="enterprise"><p>
-Label Studio Enterprise Edition includes various annotation and labeling statistics and the ability to add your own. The open source Community Edition of Label Studio does not contain these calculations. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
-</p></div>
+<div class="admonition enterprise">
+    <p class="admonition-title">enterprise</p>
+    <p>The Label Studio Enterprise API shares many endpoints with the Label Studio Community Edition API, but includes extra payload options and additional endpoints specific to Enterprise features. Access the full Label Studio Enterprise API reference documentation by doing the following:</p>
+    <ol>
+        <li>Log in to Label Studio Enterprise</li>
+        <li>Open the menu and click <b>API</b></li>
+    </ol>
+</div>
 
 ---
 

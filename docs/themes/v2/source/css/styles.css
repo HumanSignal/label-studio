@@ -11,8 +11,10 @@ html {
   --color-orange-30: #FFDAD1;
   --color-orange-10: #FFF3F0;
 
+  --color-yellow-100: #FFB156;
   --color-yellow-90: #FFC27B;
   --color-yellow-30: #FFEDD8;
+  --color-yellow-5: #FFF9F2;
 
   --color-blue-90: #4AA0F1;
 
@@ -452,15 +454,12 @@ main {
   margin: 2em 0; /* Temp */
 }
 
-.content-markdown table tbody tr:first-child {
+.content-markdown table tr th {
   background-color: var(--color-gray-200);
   font-family: var(--font-family-primary);
   font-size: 0.9em;
   color: var(--color-gray-900);
-}
-
-.content-markdown table tbody tr th {
-  padding: 0.6em 0.2em;
+  padding: 0.6em;
 }
 
 .content-markdown table tbody tr:nth-child(even) {
@@ -473,13 +472,64 @@ main {
   padding: 0.6em;
 }
 
+.content-markdown img {
+  max-width: 100%;
+  height: auto;
+  margin: 1em 0;
+}
+
+.content-markdown hr {
+  margin: 3em 0;
+  border: 1px var(--color-gray-100) solid;
+}
+
+.content-markdown .admonition {
+  --color-border: var(--color-gray-200);
+  --color-title: var(--color-gray-500);
+  --color-background: var(--color-gray-50);
+
+  border: 1px var(--color-border) solid;
+  padding: 1em;
+  background-color: var(--color-background);
+}
+
+.content-markdown .admonition-title {
+  --min-size: 0.75rem; /* 12px */
+  --max-size: 0.75rem; /* 12px */
+
+  font-family: var(--font-family-monospace);
+  text-transform: uppercase;
+  padding: 0.25em 0.5em;
+  background-color: var(--color-title);
+  display: inline-block;
+  color: white;
+  margin: 0;
+}
+
+.content-markdown .admonition.enterprise {
+  --color-border: var(--color-yellow-100);
+  --color-title: var(--color-yellow-100);
+  --color-background: var(--color-yellow-5);
+}
+
+.content-markdown iframe {
+  margin: 3em 0;
+}
 
 
 
+/****************************
+  Temporary styles
+****************************/
 
-
-
-
+.badge-design {
+  background-color: red;
+  color: white;
+  padding: 0.25em;
+  font-size: 1rem;
+  font-family: var(--font-family-secondary);
+  vertical-align: middle;
+}
 
 
 
@@ -491,7 +541,7 @@ main {
 
 pre code.hljs {
   font-family: var(--font-family-monospace);
-  font-size: 1em;
+  font-size: 0.9rem;
   line-height: 1.25;
   border-radius: 8px;
   background: #131522;

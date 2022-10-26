@@ -10,7 +10,9 @@ meta_description: Set up an end-to-end active learning loop with Label Studio us
 
 Follow this tutorial to set up an active learning loop with Label Studio. 
 
-<div class="enterprise"><p>
+<div class="admonition enterprise">
+    <p class="admonition-title">enterprise</p>
+    <p>
 Use Label Studio Enterprise Edition to build an automated active learning loop with a machine learning model backend. If you use the open source Community Edition of Label Studio, you can manually sort tasks and retrieve predictions to mimic an active learning process. If you're using Label Studio Community Edition, see <a href="#Customize-your-active-learning-loop">how to customize your active learning loop</a>.
 </p></div>
 

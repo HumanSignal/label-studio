@@ -8,7 +8,9 @@ meta_title: Data Labeling Statistics
 meta_description: Label Studio Enterprise documentation about task agreement, annotator consensus, and other data annotation statistics for data labeling and machine learning projects.
 ---
 
-<div class="enterprise"><p>
+<div class="admonition enterprise">
+    <p class="admonition-title">enterprise</p>
+    <p>
 Label Studio Enterprise Edition includes various annotation and labeling statistics. The open source Community Edition of Label Studio does not perform these statistical calculations. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
 </p></div>
 

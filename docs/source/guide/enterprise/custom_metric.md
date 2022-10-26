@@ -12,7 +12,9 @@ Write a custom agreement metric to assess the quality of the predictions and ann
 
 This functionality is only available for Label Studio Enterprise Cloud customers, or for [customers running Label Studio Enterprise in a private cloud](#Set-up-permissions-for-a-private-cloud-custom-agreement-metric) with Amazon Web Services Elastic Compute Cluster [(AWS EC2)](https://aws.amazon.com/ec2/) or Amazon Elastic Kubernetes Service [(EKS)](https://aws.amazon.com/eks/).
 
-<div class="enterprise"><p>
+<div class="admonition enterprise">
+    <p class="admonition-title">enterprise</p>
+    <p>
 Label Studio Enterprise Edition includes various annotation and labeling statistics and the ability to add your own. The open source Community Edition of Label Studio does not contain these calculations. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
 </p></div>
 

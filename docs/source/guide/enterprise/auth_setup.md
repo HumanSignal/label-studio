@@ -10,7 +10,9 @@ meta_description: Label Studio Enterprise documentation for setting up SSO and L
 
 Set up single sign-on using SAML to manage access to Label Studio using your existing Identity Provider (IdP), or use LDAP authentication.
 
-<div class="enterprise"><p>
+<div class="admonition enterprise">
+    <p class="admonition-title">enterprise</p>
+    <p>
 SSO and LDAP authentication are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
 </p></div>
 
