@@ -24,6 +24,7 @@ from django.core.files.storage import default_storage
 from rest_framework.exceptions import ValidationError
 
 from core.feature_flags import flag_set
+from core.redis import start_job_async_or_sync
 from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func, \
     temporary_disconnect_list_signal
 from core.utils.params import get_env
@@ -770,10 +771,8 @@ def bulk_update_stats_project_tasks(tasks):
             bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
         except OperationalError as exp:
             logger.debug("Operational error while updating task ")
-            time.sleep(settings.BATCH_JOB_RETRY_TIMEOUT)
             # try to update query batches one more time
-            bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
-
+            start_job_async_or_sync(bulk_update, tasks, in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \
