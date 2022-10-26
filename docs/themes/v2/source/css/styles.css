@@ -407,3 +407,94 @@ main {
   border-color: var(--color-gray-900);
   color: var(--color-white);
 }
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 82ch 1fr;
+  align-items: flex-start;
+  gap: 3em;
+}
+
+.toc {
+  background-color: var(--color-gray-10);
+  padding: 2em;
+}
+
+/****************************
+  Markdown styles
+****************************/
+
+.content-markdown li::marker {
+  color: var(--color-purple-90);
+  font-family: var(--font-family-primary);
+  font-weight: bold;
+}
+
+.content-markdown p,
+.content-markdown ol,
+.content-markdown ul {
+  color: var(--color-gray-700);
+}
+
+.content-markdown code:not(.hljs) {
+  font-family: var(--font-family-monospace);
+  font-size: 0.85em;
+  font-weight: bold;
+  color: var(--color-purple-90);
+  background-color: var(--color-gray-50);
+  padding: 0.25em;
+  border-radius: 6px;
+}
+
+.content-markdown table {
+  border: 1px var(--color-gray-200) solid;
+  border-collapse: collapse;
+  margin: 2em 0; /* Temp */
+}
+
+.content-markdown table tbody tr:first-child {
+  background-color: var(--color-gray-200);
+  font-family: var(--font-family-primary);
+  font-size: 0.9em;
+  color: var(--color-gray-900);
+}
+
+.content-markdown table tbody tr th {
+  padding: 0.6em 0.2em;
+}
+
+.content-markdown table tbody tr:nth-child(even) {
+  background-color: var(--color-gray-10);
+}
+
+.content-markdown table tbody tr td {
+  border-right: 1px var(--color-gray-200) solid;
+  border-bottom: 1px var(--color-gray-200) solid;
+  padding: 0.6em;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/****************************
+  Code theme
+****************************/
+
+pre code.hljs {
+  font-family: var(--font-family-monospace);
+  font-size: 1em;
+  line-height: 1.25;
+  border-radius: 8px;
+  background: #131522;
+}
+
+pre code.hljs{display:block;overflow-x:auto;padding:1em}code.hljs{padding:3px 5px}.hljs{background:#26233a}.hljs,.hljs-subst{color:#e0def4}.hljs-selector-tag{color:#9ccfd8}.hljs-selector-id{color:#c4a7e7;font-weight:700}.hljs-selector-attr,.hljs-selector-class{color:#c4a7e7}.hljs-property,.hljs-selector-pseudo{color:#ebbcba}.hljs-addition{background-color:rgba(156,207,216,.5)}.hljs-deletion{background-color:rgba(235,111,146,.5)}.hljs-built_in,.hljs-class,.hljs-type{color:#c4a7e7}.hljs-function,.hljs-function>.hljs-title,.hljs-title.hljs-function{color:#ebbcba}.hljs-keyword,.hljs-literal,.hljs-symbol{color:#9ccfd8}.hljs-number{color:#f6c177}.hljs-regexp{color:#f6c177}.hljs-string{color:#9ccfd8}.hljs-title{color:#c4a7e7}.hljs-params{color:#e0def4}.hljs-bullet{color:#9ccfd8}.hljs-code{color:#c4a7e7}.hljs-emphasis{font-style:italic}.hljs-formula{color:#c4a7e7}.hljs-strong{font-weight:700}.hljs-link:hover{text-decoration:underline}.hljs-comment,.hljs-quote{color:#6e6a86}.hljs-doctag{color:#c4a7e7}.hljs-meta,.hljs-meta .hljs-keyword{color:#31748f}.hljs-meta .hljs-string{color:#9ccfd8}.hljs-attr{color:#c4a7e7}.hljs-attribute{color:#e0def4}.hljs-name{color:#9ccfd8}.hljs-section{color:#ebbcba}.hljs-tag{color:#9ccfd8}.hljs-template-variable,.hljs-variable{color:#e0def4}.hljs-template-tag{color:#31748f}.language-abnf .hljs-attribute{color:#ebbcba}.language-abnf .hljs-symbol{color:#f6c177}.language-apache .hljs-attribute{color:#ebbcba}.language-apache .hljs-section{color:#9ccfd8}.language-arduino .hljs-built_in{color:#ebbcba}.language-aspectj .hljs-meta{color:#eb6f92}.language-aspectj>.hljs-title{color:#ebbcba}.language-bnf .hljs-attribute{color:#c4a7e7}.language-clojure .hljs-name{color:#ebbcba}.language-clojure .hljs-symbol{color:#f6c177}.language-coq .hljs-built_in{color:#ebbcba}.language-cpp .hljs-meta .hljs-string{color:#c4a7e7}.language-css .hljs-built_in{color:#ebbcba}.language-css .hljs-keyword{color:#eb6f92}.language-diff .hljs-meta,.language-ebnf .hljs-attribute{color:#c4a7e7}.language-glsl .hljs-built_in{color:#ebbcba}.language-groovy .hljs-meta:not(:first-child),.language-haxe .hljs-meta,.language-java .hljs-meta{color:#eb6f92}.language-ldif .hljs-attribute{color:#c4a7e7}.language-lisp .hljs-name,.language-lua .hljs-built_in,.language-moonscript .hljs-built_in,.language-nginx .hljs-attribute{color:#ebbcba}.language-nginx .hljs-section{color:#31748f}.language-pf .hljs-built_in,.language-processing .hljs-built_in{color:#ebbcba}.language-scss .hljs-keyword,.language-stylus .hljs-keyword{color:#9ccfd8}.language-swift .hljs-meta{color:#eb6f92}.language-vim .hljs-built_in{color:#ebbcba;font-style:italic}.language-yaml .hljs-meta{color:#eb6f92}
