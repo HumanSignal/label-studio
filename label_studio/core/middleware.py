@@ -159,6 +159,8 @@ class InactivitySessionTimeoutMiddleWare(CommonMiddleware):
     """Log the user out if they have been logged in for too long
      or inactive for too long"""
 
+    # paths that don't count as user activity
+    NOT_USER_ACTIVITY_PATHS = []
     def process_request(self, request) -> None:
         if not hasattr(request, "session") or request.session.is_empty():
             return
@@ -170,5 +172,6 @@ class InactivitySessionTimeoutMiddleWare(CommonMiddleware):
         if (current_time - last_login) > settings.MAX_SESSION_AGE:
             logout(request)
 
-        # Push the expiry to the max every time we make a new request
-        request.session.set_expiry(settings.MAX_TIME_BETWEEN_ACTIVITY)
+        # Push the expiry to the max every time a new request is made to a url that indicates user activity
+        if str(request.path_info) not in self.NOT_USER_ACTIVITY_PATHS:
+            request.session.set_expiry(settings.MAX_TIME_BETWEEN_ACTIVITY)
