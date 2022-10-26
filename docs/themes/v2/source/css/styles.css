@@ -51,6 +51,33 @@ body {
   position: sticky;
   top: 0;
   background-color: var(--color-white);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1em;
+  gap: 2em;
+}
+
+.page-header nav > ul {
+  display: flex;
+  align-items: center;
+  gap: 2em;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.page-header nav a:not(.Button) {
+  color: var(--color-gray-900);
+  text-decoration: none;
+}
+
+.page-header nav a:not(.Button):hover {
+  color: var(--color-orange-90);
+}
+
+.page-header nav > ul li > ul {
+  display: none;
 }
 
 main {
@@ -271,6 +298,10 @@ main {
   color: var(--color-orange-90);
 }
 
+.content-markdown a:hover {
+  text-decoration: none;
+}
+
 /****************************
   Paragraph styles
 ****************************/
@@ -460,6 +491,10 @@ main {
 .content-markdown ol,
 .content-markdown ul {
   color: var(--color-gray-700);
+}
+
+.content-markdown li + li {
+  margin-top: 1em;
 }
 
 .content-markdown code:not(.hljs) {
