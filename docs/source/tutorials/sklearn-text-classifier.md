@@ -1,13 +1,11 @@
 ---
-title:
+title: Text classification with Scikit-Learn
 type: blog
 order: 20
 meta_title: Text Classification with Scikit-Learn Tutorial
 meta_description: Label Studio tutorial for text classification using Scikit-Learn and Label Studio.
 
 ---
-
-## Text classification with Scikit-Learn
 
 This tutorial explains the basics of using a Machine Learning (ML) backend with Label Studio using a simple text classification model powered by the [scikit-learn](https://scikit-learn.org/stable/) library.
 

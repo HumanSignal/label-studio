@@ -442,6 +442,9 @@ main {
 }
 
 .content-grid {
+}
+
+.content-grid.content-grid-with-toc {
   display: grid;
   grid-template-columns: 82ch 1fr;
   align-items: flex-start;
@@ -607,6 +610,22 @@ main {
 .code-tabs > div:not(first-child) {
   display: none;
 }
+
+/****************************
+  Templates
+****************************/
+
+.templates-grid {
+  display: grid;
+  gap: 1em;
+  grid-template-columns: repeat(auto-fit, minmax(16em, 1fr));
+  margin-top: 3em;
+}
+
+
+
+
+
 
 /****************************
   Temporary styles
