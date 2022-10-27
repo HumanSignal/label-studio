@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3617: Memory leaks in Taxonomy + Repeater cases",
-  "commit": "85a0a874fcf1f8f1c6a57d0d4d95ebb2a4e5016e",
+  "commit": "f23512a5e9db0ec951db45ec2fb522b81f971e67",
   "branch": "fb-dev-3617",
-  "date": "2022/10/27 20:25:47"
+  "date": "2022/10/27 22:54:56"
 }
