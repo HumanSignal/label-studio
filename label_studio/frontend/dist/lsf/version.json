@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3645: Timeseries brush to end of timeline error",
-  "commit": "8f61da01930e890fc8b2427c540878d2f2a30be3",
-  "branch": "master",
-  "date": "2022/10/26 14:58:21"
+  "message": "fix: DEV-3651: If region is selected pagination doesn't work",
+  "commit": "85a278266e0c93fdeaad3ab4f9a0dfaea43fd656",
+  "branch": "fb-dev-3651",
+  "date": "2022/10/27 17:23:32"
 }
