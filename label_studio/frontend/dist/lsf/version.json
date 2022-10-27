@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3645: Timeseries brush to end of timeline error",
-  "commit": "8f61da01930e890fc8b2427c540878d2f2a30be3",
-  "branch": "master",
-  "date": "2022/10/26 14:58:21"
+  "message": "fix: DEV-3617: Memory leaks in Taxonomy + Repeater cases",
+  "commit": "85a0a874fcf1f8f1c6a57d0d4d95ebb2a4e5016e",
+  "branch": "fb-dev-3617",
+  "date": "2022/10/27 20:25:47"
 }
