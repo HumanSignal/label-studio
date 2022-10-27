@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3612: History state not working with hotkeys after saving unclosed polygons",
-  "commit": "a8c535adc32b28099a8311125be728ba71cbd788",
+  "commit": "912551d9b449f10f4f32a75cfb1942d028833558",
   "branch": "fb-dev-3612",
-  "date": "2022/10/26 11:11:43"
+  "date": "2022/10/27 07:11:49"
 }
