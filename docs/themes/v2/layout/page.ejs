@@ -1,11 +1,11 @@
-<div class="content-grid<% if (page.type === "guide" || page.type === "blog") { %> content-grid-with-toc<% } %>">
+<div class="content-grid<% if (page.type === "guide" || page.type === "blog" || page.type === "templates" || page.type === "tags") { %> content-grid-with-toc<% } %>">
   <div class="content-markdown">
     <% if (page.title.trim()) { %>
       <%- partial("component/heading", {text: page.title, size: "XLarge", tag: "h1", customClass: "home-page-title"}) %>
     <% } %>
     <%- page.content %>
   </div>
-  <% if (page.type === "guide" || page.type === "blog") { %>
+  <% if (page.type === "guide" || page.type === "blog" || page.type === "templates" || page.type === "tags") { %>
     <div class="toc">
       <%- partial("component/text", {text: "In this article", tag: "h3", size: "Eyebrow"}) %>
       <%- toc(page.content, {max_depth: 2, list_number: false, class: "toc-list"}) %>

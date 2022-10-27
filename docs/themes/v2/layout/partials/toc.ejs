@@ -42,15 +42,15 @@
 
 
       <% if (fileName === 'audio') { %>
-          <li><h4>Object Tags</h4></li>
+        </ul><%- partial("component/text", {text: "Object Tags", size: "Eyebrow", tag: "h3"}) %><ul>
       <% } %>
 
       <% if (fileName === 'brush') { %>
-          <li><h4>Control Tags</h4></li>
+        </ul><%- partial("component/text", {text: "Control Tags", size: "Eyebrow", tag: "h3"}) %><ul>
       <% } %>
 
       <% if (fileName === 'collapse') { %>
-          <li><h4>Visual & Experience Tags</h4></li>
+      </ul><%- partial("component/text", {text: "Visual & Experience Tags", size: "Eyebrow", tag: "h3"}) %><ul>
       <% } %>
 
       <% } %>
@@ -58,39 +58,39 @@
       <% if (type==="templates") { %>
 
         <% if (fileName === 'image_polygons') { %>
-          <li><h4>Computer Vision</h4></li>
+          </ul><%- partial("component/text", {text: "Computer Vision", size: "Eyebrow", tag: "h3"}) %><ul>
         <% } %>
 
         <% if (fileName === 'question_answering') { %>
-          <li><h4>Natural Language Processing</h4></li>
+          </ul><%- partial("component/text", {text: "Natural Language Processing", size: "Eyebrow", tag: "h3"}) %><ul>
         <% } %>
 
         <% if (fileName === 'transcribe_audio') { %>
-          <li><h4>Audio/Speech Processing</h4></li>
+          </ul><%- partial("component/text", {text: "Audio/Speech Processing", size: "Eyebrow", tag: "h3"}) %><ul>
         <% } %>
 
         <% if (fileName === 'response_generation') { %>
-          <li><h4>Conversational AI</h4></li>
+          </ul><%- partial("component/text", {text: "Conversational AI", size: "Eyebrow", tag: "h3"}) %><ul>
         <% } %>
 
         <% if (fileName === 'freeform_metadata') { %>
-          <li><h4>Structured Data Parsing</h4></li>
+          </ul><%- partial("component/text", {text: "Structured Data Parsing", size: "Eyebrow", tag: "h3"}) %><ul>
         <% } %>
 
         <% if (fileName === 'pairwise_regression') { %>
-          <li><h4>Ranking and Scoring</h4></li>
+          </ul><%- partial("component/text", {text: "Ranking and Scoring", size: "Eyebrow", tag: "h3"}) %><ul>
         <% } %>
 
         <% if (fileName === 'time_series_forecasting') { %>
-          <li><h4>Time Series Analysis</h4></li>
+          </ul><%- partial("component/text", {text: "Time Series Analysis", size: "Eyebrow", tag: "h3"}) %><ul>
         <% } %>
 
         <% if (fileName === 'video_classification') { %>
-          <li><h4>Videos</h4></li>
+          </ul><%- partial("component/text", {text: "Videos", size: "Eyebrow", tag: "h3"}) %><ul>
         <% } %>
 
         <% if (fileName === 'gallery_cv') { %>
-          <li><h4>Template Galleries</h4></li>
+          </ul><%- partial("component/text", {text: "Template Galleries", size: "Eyebrow", tag: "h3"}) %><ul>
         <% } %>
 
       <% } %>

@@ -1,3 +1,4 @@
 ---
+type: guide
 layout: home
 ---
