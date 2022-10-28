@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3651: If region is selected pagination doesn't work (#934)",
-  "commit": "846bda25e21990a70197b952946fe221a0f3d69a",
-  "branch": "master",
-  "date": "2022-10-28T13:14:25Z"
+  "message": "fix: DEV-3661: Use correct FF for resuming unfinished polygon",
+  "commit": "3d5f988e2a359ab7d90291ff892fe70f21cc1ba4",
+  "branch": "fb-dev-3661",
+  "date": "2022/10/28 16:40:52"
 }
