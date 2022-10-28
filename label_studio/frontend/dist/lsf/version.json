@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3612: current region is the tail of the list not the head",
-  "commit": "459bfd7a75e862cb7137dc1af052d3ea79aa5ffa",
-  "branch": "fb-dev-3612",
-  "date": "2022-10-27T13:57:18Z"
+  "message": "fix: DEV-3612: History state not working with hotkeys after saving unclosed polygons",
+  "commit": "d1124ac55d2066c65784404592ea1ec7cfa872ae",
+  "branch": "master",
+  "date": "2022/10/28 06:12:18"
 }
