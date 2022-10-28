@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2505: 'Update' button is displayed instead of 'Cancel skip' button in label stream if user navigates to canceled task",
-  "commit": "26c443d5f9e77e6f412041e58f4c55f7362c250e",
-  "branch": "fb-dev-2505/annotation-history",
-  "date": "2022/10/27 14:46:35"
+  "commit": "2537c88df87035529e85308d77cfd36e7432f435",
+  "branch": "master",
+  "date": "2022/10/28 07:41:20"
 }
