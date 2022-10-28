@@ -45,8 +45,10 @@ Use with the following data types: HTML
 ```
 
 ### Example
+
+Basic semantic text labeling configuration
+
 ```html
-<!--Basic semantic text labeling configuration-->
 <View>
   <HyperTextLabels name="labels" toName="ht">
     <Label value="Header" />

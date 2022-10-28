@@ -25,8 +25,10 @@ Use with the following data types: image
 | [smartOnly] | <code>boolean</code> |  | Only show smart tool for interactive pre-annotations |
 
 ### Example
+
+Basic labeling configuration for adding rectangular bounding box regions to an image
+
 ```html
-<!--Basic labeling configuration for adding rectangular bounding box regions to an image -->
 <View>
   <Rectangle name="rect-1" toName="img-1" />
   <Image name="img-1" value="$img" />
