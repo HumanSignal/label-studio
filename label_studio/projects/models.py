@@ -419,11 +419,11 @@ class Project(ProjectMixin, models.Model):
                 objs.append(item)
             with transaction.atomic():
                 bulk_update(objs, update_fields=['overlap'], batch_size=settings.BATCH_SIZE)
-            bulk_update_stats_project_tasks(objs)
         else:
             tasks_with_max_annotations.update(overlap=max_annotations)
             tasks_with_min_annotations.update(overlap=1)
-            bulk_update_stats_project_tasks(tasks_with_max_annotations | tasks_with_min_annotations)
+        # update is labeled after tasks rearrange overlap
+        bulk_update_stats_project_tasks(all_project_tasks)
 
     def remove_tasks_by_file_uploads(self, file_upload_ids):
         self.tasks.filter(file_upload_id__in=file_upload_ids).delete()
