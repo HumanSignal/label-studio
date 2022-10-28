@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3612: History state not working with hotkeys after saving unclosed polygons",
-  "commit": "d1124ac55d2066c65784404592ea1ec7cfa872ae",
-  "branch": "master",
-  "date": "2022/10/28 06:12:18"
+  "message": "fix: DEV-2647: Eraser brush not erasing stroke",
+  "commit": "941a675a27920d271ded1c8cdcb7fcd06e28327a",
+  "branch": "fb-dev-3647/eraser-fix",
+  "date": "2022/10/28 10:19:39"
 }
