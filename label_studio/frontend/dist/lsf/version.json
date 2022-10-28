@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3645: Timeseries brush to end of timeline error",
-  "commit": "8f61da01930e890fc8b2427c540878d2f2a30be3",
+  "message": "fix: DEV-3612: History state not working with hotkeys after saving unclosed polygons",
+  "commit": "d1124ac55d2066c65784404592ea1ec7cfa872ae",
   "branch": "master",
-  "date": "2022/10/26 14:58:21"
+  "date": "2022/10/28 06:12:18"
 }
