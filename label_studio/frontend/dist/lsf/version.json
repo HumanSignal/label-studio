@@ -1,6 +1,6 @@
 {
-  "message": "ci: Bump release-drafter/release-drafter from 5.21.0 to 5.21.1 (#923)\n\nBumps [release-drafter/release-drafter](https://github.com/release-drafter/release-drafter) from 5.21.0 to 5.21.1.\r\n- [Release notes](https://github.com/release-drafter/release-drafter/releases)\r\n- [Commits](https://github.com/release-drafter/release-drafter/compare/v5.21.0...v5.21.1)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: release-drafter/release-drafter\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
-  "commit": "149f32e24953ea4fdffaffb4760cd5e0ee385450",
+  "message": "fix: DEV-3645: Timeseries brush to end of timeline error",
+  "commit": "8f61da01930e890fc8b2427c540878d2f2a30be3",
   "branch": "master",
-  "date": "2022-10-24T16:17:39Z"
+  "date": "2022/10/26 14:58:21"
 }
