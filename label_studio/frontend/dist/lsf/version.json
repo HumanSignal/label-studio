@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3651: If region is selected pagination doesn't work",
-  "commit": "85a278266e0c93fdeaad3ab4f9a0dfaea43fd656",
-  "branch": "fb-dev-3651",
-  "date": "2022/10/27 17:23:32"
+  "commit": "846bda25e21990a70197b952946fe221a0f3d69a",
+  "branch": "master",
+  "date": "2022/10/28 15:14:25"
 }
