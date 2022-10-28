@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-1598: Fix for empty toname in control tag",
-  "commit": "8b5cd86e3e194ad1cf5092056af91edf6caa9819",
+  "commit": "321a7b4248fd54cdb9d356f70e3a79112afadd37",
   "branch": "fb-dev-1598/empty-toname",
-  "date": "2022/10/28 17:01:55"
+  "date": "2022/10/28 18:09:56"
 }
