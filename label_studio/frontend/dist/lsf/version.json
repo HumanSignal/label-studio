@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2647: Eraser brush not erasing stroke",
-  "commit": "941a675a27920d271ded1c8cdcb7fcd06e28327a",
+  "commit": "003cb169302a0c189ba1bd076c7fefdaa937681e",
   "branch": "fb-dev-3647/eraser-fix",
-  "date": "2022/10/28 10:19:39"
+  "date": "2022/10/28 11:56:13"
 }
