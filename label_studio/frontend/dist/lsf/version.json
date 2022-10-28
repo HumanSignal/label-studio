@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3651: If region is selected pagination doesn't work (#934)",
-  "commit": "846bda25e21990a70197b952946fe221a0f3d69a",
-  "branch": "master",
-  "date": "2022-10-28T13:14:25Z"
+  "message": "docs: DEV-3632: Add example output for HyperTextLabels",
+  "commit": "866ca36bbbdd68a501cd6b0f01ad71b2299fac82",
+  "branch": "fb-dev-3632",
+  "date": "2022/10/28 21:35:13"
 }
