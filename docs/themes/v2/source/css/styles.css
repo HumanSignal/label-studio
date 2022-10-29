@@ -424,7 +424,6 @@ main {
   border-color: var(--color-orange-90);
 }
 
-
 .Button svg {
   width: 1.5em;
   height: auto;
@@ -442,9 +441,6 @@ main {
 }
 
 .content-grid {
-}
-
-.content-grid.content-grid-with-toc {
   display: grid;
   grid-template-columns: 82ch 1fr;
   align-items: flex-start;
@@ -513,7 +509,8 @@ main {
 .content-markdown table {
   border: 1px var(--color-gray-200) solid;
   border-collapse: collapse;
-  margin: 2em 0; /* Temp */
+  margin: 2em 0;
+  overflow: auto;
 }
 
 .content-markdown table tr th {

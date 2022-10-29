@@ -13,10 +13,16 @@
 <body>
   <%- partial("partials/header") %>
 
-  <main>
-    <aside class="page-sidebar">
-      <%- partial("partials/toc", { type: page.type }) %>
-    </aside>
+  <% console.log('page-type-' + page.type) %>
+
+  <% const mainClass = 'page-type-' + page.type %>
+
+  <main class="<%- 'page-type-' + page.type %>">
+    <% if(page.type !== "playground") { %>
+      <aside class="page-sidebar">
+        <%- partial("partials/toc", { type: page.type }) %>
+      </aside>
+    <% } %>
     <div class="content">
       <svg width="77" height="77" viewBox="0 0 77 77" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="content-decoration">
         <rect x="75.875" y="26" width="25" height="25" transform="rotate(-180 75.875 26)" stroke="#ECEEFD" stroke-width="0.504975"/>
