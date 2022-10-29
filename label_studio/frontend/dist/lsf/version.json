@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3612: History state not working with hotkeys after saving unclosed polygons",
-  "commit": "d1124ac55d2066c65784404592ea1ec7cfa872ae",
+  "message": "fix: DEV-3651: If region is selected pagination doesn't work (#934)",
+  "commit": "846bda25e21990a70197b952946fe221a0f3d69a",
   "branch": "master",
-  "date": "2022/10/28 06:12:18"
+  "date": "2022-10-28T13:14:25Z"
 }
