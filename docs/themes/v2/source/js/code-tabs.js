@@ -74,6 +74,7 @@ function openCodeTab(id, event) {
 
       buttons += '<a ' +
               'id="'+ id +'-anchor" ' +
+              'class="Heading XXSmall"' +
               'onclick="openCodeTab(\'' + id + '\', event)" ' +
               'href="#' + id + '-anchor">' +
               name +

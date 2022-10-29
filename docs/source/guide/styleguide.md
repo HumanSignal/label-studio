@@ -193,7 +193,7 @@ Below are different examples of how to use code and syntax highlighting.
 
 `const myCode = "isGreat"`
 
-#### Code blocks <span class="badge-design">* Need design</span>
+#### Code blocks
 
 Javascript example:
 
@@ -251,7 +251,7 @@ Using playground
 
 ---
 
-## Alerts <span class="badge-design">* Need design</span>
+## Alerts
 
 Info
 
@@ -298,7 +298,7 @@ Enterprise
 
 ## Custom components
 
-#### Tabs <span class="badge-design">* Need design</span>
+#### Tabs
 
 <div class="code-tabs">
 <div data-name="Workload Identity">
