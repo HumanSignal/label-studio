@@ -10,12 +10,10 @@
 
   <%- css("css/styles.css") %>
 </head>
-<body class="<%- 'page-tier-' + page.tier %>">
-  <% const tier = page.tier || "all" %>
-  <% const isEnterpriseTheme = page.tier === "enterprise" %>
+<body class="<%- 'page-tier-' + theme.tier %>">
+  <% const tier = theme.tier || "all" %>
+  <% const isEnterpriseTheme = theme.tier === "enterprise" %>
   <%- partial("partials/header") %>
-
-  <%- console.log(url) %>
 
   <main class="<%- 'page-type-' + page.type %>">
     <% if(page.type !== "playground") { %>

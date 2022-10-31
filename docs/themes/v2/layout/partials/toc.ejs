@@ -1,4 +1,4 @@
-<% const isEnterpriseTheme = page.tier === "enterprise" %>
+<% const isEnterpriseTheme = theme.tier === "enterprise" %>
 
 <% const pages = isEnterpriseTheme ? site.pages.filter(page => page.type === type && (page.tier === "enterprise" || page.tier === "all")) : site.pages.filter(page => page.type === type && (page.tier === "opensource" || page.tier === "all")) %>
 

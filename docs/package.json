@@ -34,9 +34,12 @@
   },
   "scripts": {
     "start": "hexo clean && touch db.json && hexo serve",
+    "start:enterprise": "hexo clean && touch db.json && hexo serve --config enterprise.yml,_config.yml",
     "server": "hexo clean && touch db.json && hexo serve",
+    "server:enterprise": "hexo clean && touch db.json && hexo serve --config enterprise.yml,_config.yml",
     "publish": "hexo clean && touch db.json && hexo generate && hexo deploy",
     "build": "hexo clean && touch db.json && hexo generate",
+    "build:enterprise": "hexo clean && touch db.json && hexo generate --config enterprise.yml,_config.yml",
     "new": "hexo new"
   },
   "devDependencies": {

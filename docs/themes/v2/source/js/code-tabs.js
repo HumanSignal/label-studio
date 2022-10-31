@@ -62,8 +62,6 @@ function openCodeTab(id, event) {
 
   tabs.forEach(function (codeTab, o1) {
 
-    console.log("o1", o1);
-    console.log("codeTab", codeTab);
     var buttons = '<div class="close-tabs buttons">';
     const panels = codeTab.querySelectorAll("* > div");
     panels.forEach(function (tab, o2) {

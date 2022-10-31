@@ -106,7 +106,6 @@ deploy:
   region: us-east-1
   bucket: labelstud.io
 
-
 search:
   path: search.xml
   field: all
@@ -115,3 +114,6 @@ search:
 # plugin to include md into md: https://github.com/tea3/hexo-include-markdown
 include_markdown:
   dir: source/includes
+
+theme_config:
+  mycity: ${env.SITE_TIER}
