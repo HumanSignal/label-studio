@@ -240,6 +240,21 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
         next_task = skipped_queue(next_task, prepared_tasks, project, user)
 
         logger.debug(f'get_next_task finished. next_task: {next_task}, queue_info: {queue_info}')
+
+        # debug for critical overlap issue
+        if next_task:
+            try:
+                task_overlap_reached = next_task.annotations.count() >= next_task.overlap
+                global_overlap_reached = next_task.annotations.count() >= project.maximum_annotations
+                if next_task.is_labeled or task_overlap_reached or global_overlap_reached:
+                    from tasks.serializers import TaskSimpleSerializer
+                    logger.error(f'get_next_task is_labeled/overlap issue: '
+                                 f'LOCALS ==> {locals()} :: '
+                                 f'NEXT_TASK ==> {TaskSimpleSerializer(next_task).data}')
+            except Exception as e:
+                logger.error(f'get_next_task is_labeled/overlap try/except: {str(e)}')
+                pass
+
         return next_task, queue_info
 
 

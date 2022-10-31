@@ -30,7 +30,7 @@ jobs:
           set -xeuo pipefail
           git config --global user.name '${{ github.event.client_payload.github.actor }}'
           git config --global user.email '${{ github.event.client_payload.github.actor }}@users.noreply.github.com'
-          echo "::set-output name=merge_conflict::$(git merge-tree $(git merge-base HEAD origin/$SLASH_COMMAND_ARG_BRANCH) origin/$SLASH_COMMAND_ARG_BRANCH HEAD | egrep '<<<<<<<')"
+          echo "merge_conflict=$(git merge-tree $(git merge-base HEAD origin/$SLASH_COMMAND_ARG_BRANCH) origin/$SLASH_COMMAND_ARG_BRANCH HEAD | egrep '<<<<<<<')" >> $GITHUB_OUTPUT
 
       - name: Add reaction to command comment on merge conflict
         uses: peter-evans/create-or-update-comment@v2
@@ -55,11 +55,11 @@ jobs:
           set -xeuo pipefail
           git merge origin/$SLASH_COMMAND_ARG_BRANCH
           if [ $(git cherry -v | wc -l) -ge 1 ]; then
-            echo "::set-output name=changes::yes"
-            echo "::set-output name=last_commit_sha::$(git rev-parse HEAD)"
-            echo "::set-output name=last_commit_msg::$(git log -1 --pretty='%s')"
+            echo "changes=yes" >> $GITHUB_OUTPUT
+            echo "last_commit_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+            echo "last_commit_msg=$(git log -1 --pretty='%s')" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=changes::no"
+            echo "changes=no" >> $GITHUB_OUTPUT
             exit 0
           fi
           git push origin HEAD

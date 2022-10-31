@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2297: Large timeseries datasets not correctly displaying y values",
-  "commit": "06506e0fc406fae2a2e94dc23cec7e02a35615dd",
+  "message": "fix: DEV-2301: Fix classification type tags render on anno history change (#700)\n\nFix classification type tags render on anno history change",
+  "commit": "c2c9c2620b820a05a2fa982ad4385f534ef6f48e",
   "branch": "master",
-  "date": "2022/10/31 10:07:46"
+  "date": "2022-10-31T15:26:44Z"
 }
