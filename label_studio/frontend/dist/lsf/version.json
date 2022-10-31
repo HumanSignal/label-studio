@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3651: If region is selected pagination doesn't work (#934)",
-  "commit": "846bda25e21990a70197b952946fe221a0f3d69a",
+  "message": "fix: DEV-2301: Fix classification type tags render on anno history change (#700)\n\nFix classification type tags render on anno history change",
+  "commit": "c2c9c2620b820a05a2fa982ad4385f534ef6f48e",
   "branch": "master",
-  "date": "2022-10-28T13:14:25Z"
+  "date": "2022-10-31T15:26:44Z"
 }
