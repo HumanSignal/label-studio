@@ -44,6 +44,7 @@ class Task(TaskMixin, models.Model):
     data = JSONField('data', null=False, help_text='User imported or uploaded data for a task. Data is formatted according to '
                                                    'the project label config. You can find examples of data for your project '
                                                    'on the Import page in the Label Studio Data Manager UI.')
+
     meta = JSONField('meta', null=True, default=dict,
                      help_text='Meta is user imported (uploaded) data and can be useful as input for an ML '
                                'Backend for embeddings, advanced vectors, and other info. It is passed to '
@@ -64,7 +65,7 @@ class Task(TaskMixin, models.Model):
         'data_import.FileUpload', on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks',
         help_text='Uploaded file used as data source for this task'
     )
-    inner_id = models.BigIntegerField(_('inner id'), default=0, db_index=True, null=True,
+    inner_id = models.BigIntegerField(_('inner id'), default=0, null=True,
                                       help_text='Internal task ID in the project, starts with 1')
     updates = ['is_labeled']
     total_annotations = models.IntegerField(_('total_annotations'), default=0, db_index=True,
@@ -73,6 +74,20 @@ class Task(TaskMixin, models.Model):
                                                 help_text='Number of total cancelled annotations for the current task')
     total_predictions = models.IntegerField(_('total_predictions'), default=0, db_index=True,
                                   help_text='Number of total predictions for the current task')
+
+    comment_count = models.IntegerField(
+        _('comment count'), default=0, db_index=True,
+        help_text='Number of comments in the task including all annotations')
+    unresolved_comment_count = models.IntegerField(
+        _('unresolved comment count'), default=0, db_index=True,
+        help_text='Number of unresolved comments in the task including all annotations')
+    comment_authors = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, blank=True, default=None,
+        related_name='tasks_with_comments', help_text='Users who wrote comments')
+    last_comment_updated_at = models.DateTimeField(
+        _('last comment updated at'), default=None, null=True, db_index=True,
+        help_text='When the last comment was updated')
+
     objects = TaskManager()  # task manager by default
     prepared = PreparedTaskManager()  # task manager with filters, ordering, etc for data_manager app
 
@@ -81,6 +96,7 @@ class Task(TaskMixin, models.Model):
         ordering = ['-updated_at']
         indexes = [
             models.Index(fields=['project', 'is_labeled']),
+            models.Index(fields=['project', 'inner_id']),
             models.Index(fields=['id', 'project']),
             models.Index(fields=['id', 'overlap']),
             models.Index(fields=['overlap']),
@@ -133,6 +149,12 @@ class Task(TaskMixin, models.Model):
     @property
     def num_locks(self):
         return self.locks.filter(expire_at__gt=now()).count()
+
+    @property
+    def storage_filename(self):
+        for link_name in settings.IO_STORAGES_IMPORT_LINK_NAMES:
+            if hasattr(self, link_name):
+                return getattr(self, link_name).key
 
     def get_lock_ttl(self):
         if settings.TASK_LOCK_TTL is not None:
@@ -196,9 +218,13 @@ class Task(TaskMixin, models.Model):
                 # file saved in django file storage
                 if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(task_data[field]):
                     # permission check: resolve uploaded files to the project only
-                    file_upload = FileUpload.objects.filter(project=project, file=task_data[field])
-                    if file_upload.exists():
-                        task_data[field] = default_storage.url(name=task_data[field])
+                    file_upload = None
+                    file_upload = FileUpload.objects.filter(project=project, file=task_data[field]).first()
+                    if file_upload is not None:
+                        if flag_set('ff_back_dev_2915_storage_nginx_proxy_26092022_short', self.project.organization.created_by):
+                            task_data[field] = file_upload.url
+                        else:
+                            task_data[field] = default_storage.url(name=task_data[field])
                     # it's very rare case, e.g. user tried to reimport exported file from another project
                     # or user wrote his django storage path manually
                     else:
@@ -211,7 +237,7 @@ class Task(TaskMixin, models.Model):
                     try:
                         resolved_uri = storage.resolve_uri(task_data[field])
                     except Exception as exc:
-                        logger.error(exc, exc_info=True)
+                        logger.debug(exc, exc_info=True)
                         resolved_uri = None
                     if resolved_uri:
                         task_data[field] = resolved_uri
@@ -267,7 +293,7 @@ class Task(TaskMixin, models.Model):
 
     def save(self, *args, **kwargs):
         exists = True if self.pk else False
-        if flag_set('ff_back_2070_inner_id_12052022_short', self.project.organization.created_by):
+        if flag_set('ff_back_2070_inner_id_12052022_short', AnonymousUser):
             if self.inner_id == 0:
                 task = Task.objects.filter(project=self.project).order_by("-inner_id").first()
                 max_inner_id = 1
@@ -307,6 +333,11 @@ class Task(TaskMixin, models.Model):
         except Exception as exc:
             logger.error('Error in update_all_task_states_after_deleting_task: ' + str(exc))
 
+
+    @staticmethod
+    def delete_tasks_without_signals_from_task_ids(task_ids):
+        queryset = Task.objects.filter(id__in=task_ids)
+        Task.delete_tasks_without_signals(queryset)
 
 pre_bulk_create = Signal(providing_args=["objs", "batch_size"])
 post_bulk_create = Signal(providing_args=["objs", "batch_size"])
@@ -525,7 +556,7 @@ class AnnotationDraft(models.Model):
         _('result'),
         help_text='Draft result in JSON format')
     lead_time = models.FloatField(
-        _('lead time'),
+        _('lead time'), blank=True, null=True,
         help_text='How much time it took to annotate the task')
     task = models.ForeignKey(
         'tasks.Task', on_delete=models.CASCADE, related_name='drafts', blank=True, null=True,
@@ -536,6 +567,12 @@ class AnnotationDraft(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='drafts', on_delete=models.CASCADE,
         help_text='User who created this draft')
+    was_postponed = models.BooleanField(
+        _('was postponed'),
+        default=False,
+        help_text='User postponed this draft (clicked a forward button) in the label stream',
+        db_index=True
+    )
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last update time')
@@ -697,6 +734,7 @@ def bulk_update_stats_project_tasks(tasks):
             update_task_stats(task, save=False)
         # start update query batches
         bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \

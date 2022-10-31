@@ -6,9 +6,11 @@ meta_title: Choices Tag for Multiple Choice Labels
 meta_description: Customize Label Studio with multiple choice labels for machine learning and data science projects.
 ---
 
-Use the Choices tag to create a group of choices, with radio buttons or checkboxes. Can be used for single or multi-class classification. Use for advanced classification tasks where annotators can choose one or multiple answers.
+Use the Choices tag to create a group of choices, with radio buttons, or checkboxes. Can be used for single or multi-class classification. Use for advanced classification tasks where annotators can choose one or multiple answers.
 
-Use with the following data types: audio, image, HTML, paragraphs, text, time series, video
+Choices can have dynamic value to load labels from task. This task data should contain a list of options to create underlying <Choice>s. All the parameters from options will be transferred to corresponding tags.
+
+The Choices tag can be used with any data types.
 
 ### Parameters
 
@@ -25,6 +27,8 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [whenLabelValue] | <code>string</code> |  | Narrow down visibility by label value |
 | [whenChoiceValue] | <code>string</code> |  | Narrow down visibility by choice value |
 | [perRegion] | <code>boolean</code> |  | Use this tag to select a choice for a specific region instead of the entire task |
+| [value] | <code>string</code> |  | Task data field containing a list of dynamically loaded choices (see example below) |
+| [allowNested] | <code>boolean</code> |  | Allow to use `children` field in dynamic choices to nest them. Submitted result will contain array of arrays, every item is a list of values from topmost parent choice down to selected one. |
 
 ### Example
 ```html
@@ -37,5 +41,34 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
     <Choice alias="X" value="Other" />
   </Choices>
   <Text name="txt-1" value="John went to see Mary" />
+</View>
+```
+**Example** *(This config with dynamic labels)*  
+```html
+<View>
+  <Audio name="audio" value="$audio" />
+  <Choices name="transcription" toName="audio" value="$variants" />
+</View>
+<!-- {
+  "data": {
+    "variants": [
+      { "value": "Do or doughnut. There is no try." },
+      { "value": "Do or do not. There is no trial." },
+      { "value": "Do or do not. There is no try." },
+      { "value": "Duo do not. There is no try." }
+    ]
+  }
+} -->
+```
+**Example** *(is equivalent to this config)*  
+```html
+<View>
+  <Audio name="audio" value="$audio" />
+  <Choices name="transcription" toName="audio" value="$variants">
+    <Choice value="Do or doughnut. There is no try." />
+    <Choice value="Do or do not. There is no trial." />
+    <Choice value="Do or do not. There is no try." />
+    <Choice value="Duo do not. There is no try." />
+  </Choices>
 </View>
 ```

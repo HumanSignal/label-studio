@@ -287,7 +287,7 @@ button.blinking-status.blink::after {
 }
 
 
-#organization table td {
+.block-info table td {
   font-size: 100%;
   padding: 5px 0;
 }

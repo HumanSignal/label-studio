@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1703: add scroll to view when focus changes to stickyList in table component (#35)\n\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
-  "commit": "172c8eeb252a2bfef81133a87fdcbca146781d04",
+  "message": "feat: DEV-3572: Persist and read virtual annotator filters from local storage as a fallback (#116)",
+  "commit": "fa4559e82f69910ba7ce24c978c6a194aa58a7e8",
   "branch": "master",
-  "date": "2022-05-12T18:31:27Z"
+  "date": "2022-10-21T14:05:14Z"
 }

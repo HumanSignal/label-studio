@@ -17,6 +17,7 @@ _api_urlpatterns = [
         api.MLBackendInteractiveAnnotating.as_view(),
         name='ml-interactive-annotating',
     ),
+    path('<int:pk>/versions', api.MLBackendVersionsAPI.as_view(), name='ml-versions'),
 ]
 
 urlpatterns = [

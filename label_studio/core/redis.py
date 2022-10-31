@@ -5,6 +5,7 @@ import logging
 import django_rq
 
 from django_rq import get_connection
+from rq.registry import StartedJobRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -78,17 +79,58 @@ def start_job_async_or_sync(job, *args, **kwargs):
     :param kwargs: Function keywords arguments
     :return: Job or function result
     """
-    redis = redis_connected()
+    redis = redis_connected() and kwargs.get('redis', True)
     queue_name = kwargs.get("queue_name", "default")
     if 'queue_name' in kwargs:
         del kwargs['queue_name']
+    if 'redis' in kwargs:
+        del kwargs['redis']
+    job_timeout = None
+    if 'job_timeout' in kwargs:
+        job_timeout = kwargs['job_timeout']
+        del kwargs['job_timeout']
+
     if redis:
         queue = django_rq.get_queue(queue_name)
         job = queue.enqueue(
             job,
             *args,
-            **kwargs
+            **kwargs,
+            job_timeout=job_timeout
         )
         return job
     else:
         return job(*args, **kwargs)
+
+
+def is_job_in_queue(queue, func_name, meta):
+    """
+    Checks if func_name with kwargs[meta] is in queue (doesn't check workers)
+    :param queue: queue object
+    :param func_name: function name
+    :param meta: job meta information
+    :return: True if job in queue
+    """
+    # get all jobs from Queue
+    jobs = (
+        job 
+        for job in queue.get_jobs() 
+        if job.func.__name__ == func_name
+    )
+    # check if there is job with meta in list
+    if meta:
+        return any(job for job in jobs if hasattr(job, 'meta') and job.meta == meta)
+
+    return any(jobs)
+
+
+def is_job_on_worker(job_id, queue_name):
+    """
+    Checks if job id is on workers
+    :param job_id: Job ID
+    :param queue_name: Queue name
+    :return: True if job on worker
+    """
+    registry = StartedJobRegistry(queue_name, connection=_redis)
+    ids = registry.get_job_ids()
+    return job_id in ids

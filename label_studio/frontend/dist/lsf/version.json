@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2068: Pan does not finish polygon (#626)\n\ncheck if is pan on toolswich from polygon, igonre if true\r\n\r\nCo-authored-by: Travis Clark <“travisjosephclark@gmail.com”>",
-  "commit": "9f06a9113c68f31b4f859acb2c872e47bf4351ad",
+  "message": "fix: DEV-2301: Fix classification type tags render on anno history change (#700)\n\nFix classification type tags render on anno history change",
+  "commit": "c2c9c2620b820a05a2fa982ad4385f534ef6f48e",
   "branch": "master",
-  "date": "2022-06-02T01:24:07Z"
+  "date": "2022-10-31T15:26:44Z"
 }

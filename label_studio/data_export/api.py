@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.permissions import all_permissions
-from core.utils.common import get_object_with_check_and_log, bool_from_request, batch
+from core.utils.common import get_object_with_check_and_log, batch
 from projects.models import Project
 from tasks.models import Task
 from .models import DataExport, Export
@@ -107,9 +107,11 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
             ),
         ],
         tags=['Export'],
-        operation_summary='Export tasks and annotations',
+        operation_summary='Easy export of tasks and annotations',
         operation_description="""
-        Export annotated tasks as a file in a specific format.
+        <i>Note: if you have a large project it's recommended to use 
+        export snapshots, this easy export endpoint might have timeouts.</i><br/><br>
+        Export annotated tasks as a file in a specific format. 
         For example, to export JSON annotations for a project to a file called `annotations.json`,
         run the following from the command line:
         ```bash
@@ -247,7 +249,7 @@ class ProjectExportFilesAuthCheck(APIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Export'],
-        operation_summary='List all export files',
+        operation_summary='List all export snapshots',
         operation_description="""
         Returns a list of exported files for a specific project by ID.
         """,
@@ -264,7 +266,7 @@ class ProjectExportFilesAuthCheck(APIView):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Export'],
-        operation_summary='Create new export',
+        operation_summary='Create new export snapshot',
         operation_description="""
         Create a new export request to start a background task and generate an export file for a specific project by ID.
         """,
@@ -322,7 +324,7 @@ class ExportListAPI(generics.ListCreateAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Export'],
-        operation_summary='Get export by ID',
+        operation_summary='Get export snapshot by ID',
         operation_description="""
         Retrieve information about an export file by export ID for a specific project.
         """,
@@ -344,7 +346,7 @@ class ExportListAPI(generics.ListCreateAPIView):
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Export'],
-        operation_summary='Delete export',
+        operation_summary='Delete export snapshot',
         operation_description="""
         Delete an export file by specified export ID.
         """,
@@ -386,7 +388,7 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Export'],
-        operation_summary='Download export file',
+        operation_summary='Download export snapshot as file in specified format',
         operation_description="""
         Download an export file in the specified format for a specific project. Specify the project ID with the `id` 
         parameter in the path and the ID of the export file you want to download using the `export_pk` parameter 

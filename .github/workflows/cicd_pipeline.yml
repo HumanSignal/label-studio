@@ -1,0 +1,238 @@
+name: "CI/CD Pipeline"
+
+on:
+  push:
+    branches:
+      - develop
+      - 'ls-release/**'
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+    branches:
+      - develop
+      - 'ls-release/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
+
+permissions: read-all
+
+env:
+  RELEASE_BRANCH_PREFIX: "ls-release/"
+
+jobs:
+  changed_files:
+    name: "Changed files"
+    runs-on: ubuntu-latest
+    outputs:
+      src: ${{ steps.changes.outputs.src }}
+      frontend: ${{ steps.changes.outputs.frontend }}
+      docker: ${{ steps.changes.outputs.docker }}
+      commit-message: ${{ steps.commit-details.outputs.commit-message }}
+    timeout-minutes: 25
+    steps:
+      - uses: hmarr/debug-action@v2.1.0
+
+      - name: Checkout
+        if: github.event_name == 'push'
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            src:
+              - 'label_studio/!(frontend)/**'
+              - 'deploy/requirements**'
+              - 'setup.py'
+            frontend:
+              - 'label_studio/frontend/**'
+            docker:
+              - 'label_studio/**'
+              - 'deploy/**'
+              - 'Dockerfile**'
+              - 'setup.py'
+              - '.github/workflows/cicd_pipeline.yml'
+              - '.github/workflows/docker-build.yml'
+
+      - uses: actions/github-script@v6
+        id: commit-details
+        with:
+          script: |
+            const { repo, owner } = context.repo;
+            const { data: commit } = await github.rest.repos.getCommit({
+                owner,
+                repo,
+                ref: '${{ github.event.pull_request.head.sha || github.event.after }}'
+            });
+            core.setOutput("commit-message", commit.commit.message);
+
+  pr_labeler:
+    name: "Validate"
+    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: write
+    uses: heartexlabs/label-studio/.github/workflows/pr-labeler.yml@develop
+
+  validate_submodules:
+    name: "Validate"
+    uses: heartexlabs/label-studio/.github/workflows/submodules-validator.yml@develop
+    with:
+      head_sha: ${{ github.sha }}
+      base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
+      target_branch: ${{ github.event.pull_request.base.ref || github.event.ref }}
+
+  gitleaks:
+    name: "Linter"
+    if: github.event_name == 'pull_request'
+    uses: heartexlabs/label-studio/.github/workflows/gitleaks.yml@develop
+    with:
+      head_sha: ${{ github.sha }}
+      base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
+
+  bandit:
+    name: "Linter"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.src == 'true'
+    uses: heartexlabs/label-studio/.github/workflows/bandit.yml@develop
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+
+  build-frontend:
+    name: "Build"
+    needs:
+      - changed_files
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.fork == false &&
+      needs.changed_files.outputs.frontend == 'true' &&
+      needs.changed_files.outputs.commit-message != 'Build frontend'
+    permissions:
+      contents: write
+    uses: heartexlabs/label-studio/.github/workflows/frontend-build.yml@develop
+    with:
+      ref: ${{ github.event.pull_request.head.ref || github.ref }}
+
+  build-docker:
+    name: "Build"
+    needs:
+      - changed_files
+    if: |
+      github.event_name == 'push' &&
+      ( ( github.ref_name == 'develop' && needs.changed_files.outputs.docker == 'true' )
+        || startsWith(github.ref_name, 'ls-release/') )
+    permissions:
+      checks: write
+    uses: heartexlabs/label-studio/.github/workflows/docker-build.yml@develop
+    with:
+      sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+      branch_name: ${{ github.event.pull_request.head.ref || github.ref_name }}
+    secrets: inherit
+
+  pytest:
+    name: "Tests"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.src == 'true'
+    uses: heartexlabs/label-studio/.github/workflows/tests.yml@develop
+    with:
+      ref: ${{ github.event.pull_request.head.ref || github.ref }}
+
+
+  draft-release:
+    name: "Draft Release"
+    if: |
+      github.event_name == 'push' &&
+      startsWith(github.ref_name, 'ls-release/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      id: ${{ steps.create-draft-release.outputs.id }}
+      rc-version: ${{ steps.create-draft-release.outputs.rc-version }}
+    steps:
+      - name: Create release draft
+        uses: actions/github-script@v6
+        id: create-draft-release
+        with:
+          script: |
+            const { repo, owner } = context.repo;
+            const target_commitish = '${{ github.ref_name }}';
+            let version = target_commitish.replace('${{ env.RELEASE_BRANCH_PREFIX }}', '')
+            core.setOutput("rc-version", `${version}rc${{ github.run_id }}`);
+            
+            const {data: releases} = await github.rest.repos.listReleases({
+                owner,
+                repo,
+            });
+            
+            let release = releases.find((e) => {
+                return target_commitish.endsWith(e.target_commitish) && e.draft
+            })
+            
+            if (release) {
+                console.log(`Draft release already exist ${release.html_url}`)
+            } else {
+                console.log(`Draft release is not found creating a new one`)
+                const {data: tags} = await github.rest.repos.listTags({
+                    owner,
+                    repo,
+                    per_page: 100
+                });
+                console.log(`Tags:`)
+                console.log(tags.map(e => e.name))
+                const matchedTags = tags.filter(e => e.name.indexOf(version) !== -1)
+                console.log(`Tags for ${version}:`)
+                console.log(matchedTags.map(e => e.name))
+                if (matchedTags.length !== 0) {
+                    let newHotfixNumber = 0
+                    for (let matchedTag of matchedTags) {
+                        const matchVersion = matchedTag.name.match('^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)(.post([0-9]+))?$')
+                        if (matchVersion && matchVersion[5]) {
+                            const hotfixNumber = parseInt(matchVersion[5])
+                            if (newHotfixNumber <= hotfixNumber) {
+                                newHotfixNumber = hotfixNumber + 1
+                            }
+                        }
+                    }
+                    version = `${version}.post${newHotfixNumber}`
+                }
+                console.log(`New version: ${version}`)
+                const {data: newDraftRelease} = await github.rest.repos.createRelease({
+                    owner,
+                    repo,
+                    draft: true,
+                    prerelease: false,
+                    name: version,
+                    tag_name: version,
+                    target_commitish: target_commitish,
+                    generate_release_notes: true,
+                });
+                console.log(`Draft release is created ${newDraftRelease.html_url}`)
+                release = newDraftRelease;
+                core.setOutput("created", true);
+            }
+            
+            core.setOutput("id", release.id);
+            core.setOutput("tag_name", release.tag_name);
+
+  build-pypi:
+    name: "Build"
+    needs:
+      - draft-release
+    if: |
+      github.event_name == 'push' &&
+      startsWith(github.ref_name, 'ls-release/')
+    uses: heartexlabs/label-studio/.github/workflows/build_pypi.yml@develop
+    with:
+      version: ${{ needs.draft-release.outputs.rc-version }}
+      ref: ${{ github.ref_name }}
+      release-id: ${{ needs.draft-release.outputs.id }}
+    secrets: inherit

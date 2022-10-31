@@ -14,6 +14,9 @@ This high-level architecture diagram that outlines the main components of a Labe
 
 <img src="/images/LSE_k8s_scheme.png"/>
 
+!!! warning
+    Label Studio Enterprise 2.2.9 decommissioned MinIO as a service.
+    
 Label Studio runs on Python and uses rqworkers to perform additional tasks. Metadata and annotations are stored in a bundled version of PostgreSQL that functions as persistent storage. If you host Label Studio in the cloud, use [persistent storage in the cloud](persistent_storage.html) instead of MinIO.
 
 ## Before you install

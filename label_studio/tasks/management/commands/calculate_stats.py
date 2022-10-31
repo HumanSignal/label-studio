@@ -6,6 +6,7 @@ from projects.models import Project
 
 logger = logging.getLogger(__name__)
 
+
 class Command(BaseCommand):
     help = 'Recalculate organization project stats (total_annotations, etc)'
 

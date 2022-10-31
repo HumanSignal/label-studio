@@ -1,7 +1,7 @@
 ---
 title: RectangleLabels
 type: tags
-order: 421
+order: 422
 meta_title: Rectangle Label Tag to Label Rectangle Bounding Box in Images
 meta_description: Customize Label Studio with the RectangleLabels tag and add labeled rectangle bounding boxes in images for semantic segmentation and object detection machine learning and data science projects.
 ---

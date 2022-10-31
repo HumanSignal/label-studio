@@ -10,8 +10,13 @@ on:
       - synchronize
     branches:
       - develop
+      - 'lse-release/**'
     paths-ignore:
       - 'label_studio/frontend/**'
+      - 'docs/**'
+
+concurrency:
+  group: ${{ github.head_ref }}
 
 env:
   DOWNSTREAM_REPO_OWNER: heartexlabs
@@ -23,7 +28,7 @@ jobs:
     if: startsWith(github.head_ref, 'fb-')
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Check user's membership
         uses: actions/github-script@v6
@@ -64,20 +69,31 @@ jobs:
           steps.check-membership.outputs.result == 'true' &&
           github.event.pull_request.merged == true
         id: sync-merge-pr
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
+            const { repo, owner } = context.repo;
+            const getCommitResponse = await github.rest.repos.getCommit({
+              owner,
+              repo,
+              ref: '${{ github.sha }}'
+            });
             const result = await github.rest.repos.createDispatchEvent({
               owner: '${{ env.DOWNSTREAM_REPO_OWNER }}',
               repo: '${{ env.DOWNSTREAM_REPO }}',
               event_type: 'upstream_repo_update',
               client_payload: {
                 branch_name: '${{ github.head_ref }}',
+                base_branch_name: '${{ github.base_ref }}',
                 repo_name: '${{ github.repository }}',
                 commit_sha : '${{ github.sha }}',
-                title: '${{ github.event.pull_request.title }}',
+                title: process.env.TITLE,
                 html_url: '${{ github.event.pull_request.html_url }}',
                 actor: '${{ github.actor }}',
+                author_username: getCommitResponse.data.commit.author.name,
+                author_email: getCommitResponse.data.commit.author.email,
                 event_action: 'merged'
               }
             });
@@ -89,20 +105,31 @@ jobs:
           steps.check-membership.outputs.result == 'true' &&
           github.event.pull_request.merged != true
         id: sync-pr
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
+            const { repo, owner } = context.repo;
+            const getCommitResponse = await github.rest.repos.getCommit({
+              owner,
+              repo,
+              ref: '${{ github.event.pull_request.head.sha }}'
+            });
             const result = await github.rest.repos.createDispatchEvent({
               owner: '${{ env.DOWNSTREAM_REPO_OWNER }}',
               repo: '${{ env.DOWNSTREAM_REPO }}',
               event_type: 'upstream_repo_update',
               client_payload: {
                 branch_name: '${{ github.head_ref }}',
+                base_branch_name: '${{ github.base_ref }}',
                 repo_name: '${{ github.repository }}',
                 commit_sha : '${{ github.event.pull_request.head.sha }}',
-                title: '${{ github.event.pull_request.title }}',
+                title: process.env.TITLE,
                 html_url: '${{ github.event.pull_request.html_url }}',
                 actor: '${{ github.actor }}',
+                author_username: getCommitResponse.data.commit.author.name,
+                author_email: getCommitResponse.data.commit.author.email,
                 event_action: '${{ github.event.action }}'
               }
             });

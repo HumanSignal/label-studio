@@ -117,7 +117,7 @@ def user_account(request):
         if form.is_valid():
             form.save()
             return redirect(reverse('user-account'))
-
+        
     return render(request, 'users/user_account.html', {
         'settings': settings,
         'user': user,

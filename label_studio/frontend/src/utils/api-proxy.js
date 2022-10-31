@@ -145,7 +145,7 @@ export class APIProxy {
     * @private
     */
   createApiCallExecutor(methodSettings, parentPath, raw = false) {
-    return async (urlParams, { headers, body } = {}) => {
+    return async (urlParams, { headers, signal, body } = {}) => {
       let responseResult, responseMeta;
 
       try {
@@ -178,6 +178,10 @@ export class APIProxy {
           mode: this.requestMode,
           credentials: this.requestMode === "cors" ? "omit" : "same-origin",
         };
+
+        if (signal) {
+          requestParams.signal = signal;
+        }
 
         if (requestMethod !== "GET") {
           const contentType = requestHeaders.get("Content-Type");

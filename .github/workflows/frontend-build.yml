@@ -1,0 +1,64 @@
+name: "Frontend build"
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+
+env:
+  NODE: 14
+  CACHE_NAME_PREFIX: v1
+  FRONTEND_DIR: label_studio/frontend
+  FRONTEND_BUILD_COMMIT_MESSAGE: Build frontend
+
+jobs:
+  build:
+    name: "Frontend"
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v2.1.0
+
+      - name: Configure git
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          git config --global user.name 'robot-ci-heartex'
+          git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "${{ env.NODE }}"
+
+      - name: Get npm cache directory path
+        id: npm-cache
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
+
+      - name: Configure npm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.npm-cache.outputs.dir }}
+          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-${{ hashFiles('**/package.json') }}-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Print Yarn cache size
+        run: du -d 0 -h ${{ steps.npm-cache.outputs.dir }} || true
+
+      - name: Build
+        run: |
+          npm ci
+          npm run build:production
+        working-directory: ${{ env.FRONTEND_DIR }}
+
+      - name: Commit and Push
+        run: |
+          git add "${{ env.FRONTEND_DIR }}"
+          git status -s
+          git commit -m '${{ env.FRONTEND_BUILD_COMMIT_MESSAGE }}' || true
+          git push origin HEAD

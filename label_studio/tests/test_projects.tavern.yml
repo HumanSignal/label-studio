@@ -1,0 +1,348 @@
+---
+
+test_name: test_project_id
+
+strict: True
+
+marks:
+  - usefixtures:
+       - django_live_url
+
+stages:
+  - id: signup
+    type: ref
+  - id: get_user_token
+    type: ref
+  - id: create_project
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: create_batch_tasks_assignments
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk: id
+  - name: get_only_id
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects/{project_pk}?include=id'
+    response:
+      status_code: 200
+      json:
+        id: !int "{project_pk}"
+---
+
+test_name: test_project_ids_filter
+
+strict: False
+
+marks:
+  - usefixtures:
+       - django_live_url
+
+stages:
+  - id: signup
+    type: ref
+  - id: get_user_token
+    type: ref
+  - id: create_project1
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: create_batch_tasks_assignments
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk1: id
+  - id: create_project2
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: create_batch_tasks_assignments
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk2: id
+  - name: get_first
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects?ids={project_pk1}'
+    response:
+      status_code: 200
+      json:
+        results:
+          - id: !int "{project_pk1}"
+  - name: get_both
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects?ids={project_pk1},{project_pk2}&ordering=created_at'
+    response:
+      status_code: 200
+      json:
+        results:
+          - id: !int "{project_pk1}"
+          - id: !int "{project_pk2}"
+---
+
+test_name: test_project_pinned_at
+
+strict: False
+
+marks:
+  - usefixtures:
+       - django_live_url
+
+stages:
+  - id: signup
+    type: ref
+  - id: get_user_token
+    type: ref
+  - id: create_project1
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: create_batch_tasks_assignments
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        is_published: true
+        pinned_at: '2022-06-17T18:20:09.707589Z'
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk1: id
+  - id: create_project2
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: create_batch_tasks_assignments
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk2: id
+  - name: get_first
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects?filter=pinned_only'
+    response:
+      status_code: 200
+      json:
+        results:
+          - id: !int "{project_pk1}"
+  - name: get_second
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects?filter=exclude_pinned'
+    response:
+      status_code: 200
+      json:
+        results:
+          - id: !int "{project_pk2}"
+  - name: get_both
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects?filter=all'
+    response:
+      status_code: 200
+      json:
+        results:
+          - id: !int "{project_pk1}"
+          - id: !int "{project_pk2}"
+  - name: get_both_without_params
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects'
+    response:
+      status_code: 200
+      json:
+        results:
+          - id: !int "{project_pk1}"
+          - id: !int "{project_pk2}"
+
+---
+
+test_name: test_overlap_change_to_1
+
+strict: False
+
+marks:
+  - usefixtures:
+       - django_live_url
+
+stages:
+  - id: signup
+    type: ref
+  - id: get_user_token
+    type: ref
+  - id: create_project
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: create_batch_tasks_assignments
+        label_config: <View><Image name="image" value="$image"/><RectangleLabels name="objects" toName="image" choices="multiple"><Label
+          value="Cat"/><Label value="Dog"/></RectangleLabels></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk: id
+  - name: update_project
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}"
+      json:
+        maximum_annotations: 3
+        overlap_cohort_percentage: 50
+      method: PATCH
+      headers:
+        content-type: application/json
+    response:
+      status_code: 200
+  - name: Import tasks
+    request:
+      files:
+        csv: tests/test_suites/samples/image_urls_with_bboxes.json
+      headers:
+        content-type: multipart/form-data
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/import?return_task_ids=true&preannotated_from_fields=bbox'
+    response:
+      status_code: 201
+      save:
+        json:
+          first_task: "task_ids[0]"
+          second_task: "task_ids[1]"
+  - name: update_project_to_1
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}"
+      json:
+        maximum_annotations: 1
+        overlap_cohort_percentage: 0
+      method: PATCH
+      headers:
+        content-type: application/json
+    response:
+      status_code: 200
+  - name: get default list of tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/projects/{project_pk}/tasks'
+    response:
+      json: [
+      {
+        "id": !anyint "",
+        "overlap": 1,
+        "project": !int "{project_pk}"
+      },
+      {
+        "id": !anyint "",
+        "overlap": 1,
+        "project": !int "{project_pk}"
+      }
+      ]
+      status_code: 200
+      headers:
+        content-type: application/json
+
+---
+
+test_name: test_project_config_safe_html
+
+strict: False
+
+marks:
+  - usefixtures:
+       - django_live_url
+
+stages:
+  - id: signup
+    type: ref
+  - id: get_user_token
+    type: ref
+  - id: create_project
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: create_batch_tasks_assignments
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk: id
+  - name: onerror
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}"
+      json:
+        expert_instruction: '<a href="#" onerror=alert(1)>'
+      method: PATCH
+      headers:
+        content-type: application/json
+    response:
+      status_code: 200
+      json:
+        expert_instruction: '<a href="#"></a>'
+  - name: iframe
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}"
+      json:
+        expert_instruction: '<iframe src="somepath"></iframe>'
+      method: PATCH
+      headers:
+        content-type: application/json
+    response:
+      status_code: 200
+      json:
+        expert_instruction: '<iframe src="somepath"></iframe>'
+  - name: embed
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}"
+      json:
+        expert_instruction: '<embed type="video/webm" src="/media/cc0-videos/flower.mp4" width="250" height="200">'
+      method: PATCH
+      headers:
+        content-type: application/json
+    response:
+      status_code: 200
+      json:
+        expert_instruction: '<embed type="video/webm" src="/media/cc0-videos/flower.mp4" width="250" height="200">'

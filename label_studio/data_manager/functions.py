@@ -55,7 +55,7 @@ def get_all_columns(project, *_):
         column = {
             'id': key,
             'title': key if key != settings.DATA_UNDEFINED_NAME else 'data',
-            'type': data_type if data_type in ['Image', 'Audio', 'AudioPlus', 'Unknown'] else 'String',
+            'type': data_type if data_type in ['Image', 'Audio', 'AudioPlus', 'Video', 'Unknown'] else 'String',
             'target': 'tasks',
             'parent': 'data',
             'visibility_defaults': {
@@ -219,10 +219,21 @@ def get_all_columns(project, *_):
         },
         {
             'id': 'file_upload',
-            'title': "Source filename",
+            'title': "Upload filename",
             'type': "String",
             'target': 'tasks',
-            'help': 'Source filename from import step',
+            'help': 'Filename of uploaded file',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        },
+        {
+            'id': 'storage_filename',
+            'title': "Storage filename",
+            'type': "String",
+            'target': 'tasks',
+            'help': 'Filename from import storage',
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
@@ -292,6 +303,7 @@ def get_prepare_params(request, project):
         if view.project.pk != project.pk:
             raise DataManagerException('Project and View mismatch')
         prepare_params = view.get_prepare_tasks_params(add_selected_items=True)
+        prepare_params.request = request
 
     # use filters and selected items from request if it's specified
     else:
@@ -309,7 +321,7 @@ def get_prepare_params(request, project):
         filters = data.get('filters', None)
         ordering = data.get('ordering', [])
         prepare_params = PrepareParams(project=project.id, selectedItems=selected, data=data,
-                                       filters=filters, ordering=ordering)
+                                       filters=filters, ordering=ordering, request=request)
     return prepare_params
 
 

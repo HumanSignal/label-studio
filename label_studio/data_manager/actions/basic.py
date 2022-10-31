@@ -3,11 +3,10 @@
 import logging
 
 from datetime import datetime
-from django.db.models.signals import post_delete, pre_delete
-
+from django.conf import settings
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
-from core.utils.common import temporary_disconnect_list_signal
+from core.utils.common import load_func
 from projects.models import Project
 
 from tasks.models import (
@@ -40,24 +39,25 @@ def delete_tasks(project, queryset, **kwargs):
     tasks_ids = list(queryset.values('id'))
     count = len(tasks_ids)
     tasks_ids_list = [task['id'] for task in tasks_ids]
-
+    project_count = project.tasks.count()
+    # unlink tasks from project
+    queryset = Task.objects.filter(id__in=tasks_ids_list)
+    queryset.update(project=None)
     # delete all project tasks
-    if count == project.tasks.count():
-        queryset.delete()
+    if count == project_count:
+        start_job_async_or_sync(Task.delete_tasks_without_signals_from_task_ids, tasks_ids_list)
         project.summary.reset()
 
     # delete only specific tasks
     else:
-        # update project summary
+        # update project summary and delete tasks
         start_job_async_or_sync(async_project_summary_recalculation, tasks_ids_list, project.id)
-        queryset.delete()
 
     project.update_tasks_states(
         maximum_annotations_changed=False,
         overlap_cohort_percentage_changed=False,
         tasks_number_changed=True
     )
-
     # emit webhooks for project
     emit_webhooks_for_instance(project.organization, project, WebhookAction.TASKS_DELETED, tasks_ids)
 
@@ -85,14 +85,24 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     # take only tasks where annotations were deleted
     real_task_ids = set(list(annotations.values_list('task__id', flat=True)))
     annotations_ids = list(annotations.values('id'))
+    # remove deleted annotations from project.summary
+    project.summary.remove_created_annotations_and_labels(annotations)
     annotations.delete()
     emit_webhooks_for_instance(project.organization, project, WebhookAction.ANNOTATIONS_DELETED, annotations_ids)
     # recalculate is_labeled
     start_job_async_or_sync(bulk_update_stats_project_tasks, queryset.filter(is_labeled=True))
-    # recalculate tasks counters
-    start_job_async_or_sync(project.update_tasks_counters, queryset)
+    start_job_async_or_sync(project.update_tasks_counters, task_ids)
     request = kwargs['request']
-    Task.objects.filter(id__in=real_task_ids).update(updated_at=datetime.now(), updated_by=request.user)
+
+    tasks = Task.objects.filter(id__in=real_task_ids)
+    tasks.update(updated_at=datetime.now(), updated_by=request.user)
+
+    # LSE postprocess
+    postprocess = load_func(settings.DELETE_TASKS_ANNOTATIONS_POSTPROCESS)
+    if postprocess is not None:
+        tasks = Task.objects.filter(id__in=task_ids)
+        postprocess(project, tasks, **kwargs)
+
     return {'processed_items': count,
             'detail': 'Deleted ' + str(count) + ' annotations'}
 
@@ -107,7 +117,7 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     predictions = Prediction.objects.filter(task__id__in=task_ids)
     count = predictions.count()
     predictions.delete()
-    start_job_async_or_sync(project.update_tasks_counters, queryset)
+    start_job_async_or_sync(project.update_tasks_counters, task_ids)
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
 
 
@@ -116,6 +126,7 @@ def async_project_summary_recalculation(tasks_ids_list, project_id):
     project = Project.objects.get(id=project_id)
     project.summary.remove_created_annotations_and_labels(Annotation.objects.filter(task__in=queryset))
     project.summary.remove_data_columns(queryset)
+    Task.delete_tasks_without_signals(queryset)
 
 
 actions = [

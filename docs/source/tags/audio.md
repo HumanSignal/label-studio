@@ -1,7 +1,7 @@
 ---
 title: Audio
 type: tags
-order: 301
+order: 302
 meta_title: Audio Tag for Labeling Audio
 meta_description: Customize Label Studio to label audio data for machine learning and data science projects.
 ---
@@ -12,11 +12,13 @@ Use with the following data types: audio
 
 ### Parameters
 
-| Param | Type | Description |
-| --- | --- | --- |
-| name | <code>string</code> | Name of the element |
-| value | <code>string</code> | Data field containing path or a URL to the audio |
-| hotkey | <code>string</code> | Hotkey used to play or pause audio |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>string</code> |  | Name of the element |
+| value | <code>string</code> |  | Data field containing path or a URL to the audio |
+| hotkey | <code>string</code> |  | Hotkey used to play or pause audio |
+| [cursorwidth] | <code>string</code> | <code>1</code> | Audio pane cursor width. It is measured in pixels. |
+| [cursorcolor] | <code>string</code> | <code>&quot;#333&quot;</code> | Audio pane cursor color. The color should be specified in hex decimal string |
 
 ### Sample Results JSON
 
