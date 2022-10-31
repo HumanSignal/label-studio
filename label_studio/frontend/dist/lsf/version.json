@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3350: Video object boundaries",
-  "commit": "626ce3bced0ff4ed11332b5c0a4d0a341fbf3595",
+  "commit": "8494fd90e8208d26c1a23f8ef28fb637eed87838",
   "branch": "fb-dev-3350/video-boundaries",
-  "date": "2022/10/31 14:11:10"
+  "date": "2022/10/31 16:38:34"
 }
