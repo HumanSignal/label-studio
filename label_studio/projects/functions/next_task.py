@@ -243,12 +243,16 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
 
         # debug for critical overlap issue
         if next_task:
-            overlap_reached = next_task.annotations.count() >= next_task.overlap
-            if next_task.is_labeled or overlap_reached:
-                from tasks.serializers import TaskSimpleSerializer
-                logger.error(f'get_next_task is_labeled/overlap issue: '
-                             f'LOCALS ==> {locals()} :: '
-                             f'NEXT_TASK ==> {TaskSimpleSerializer(next_task).data}')
+            try:
+                overlap_reached = next_task.annotations.count() >= next_task.overlap
+                if next_task.is_labeled or overlap_reached:
+                    from tasks.serializers import TaskSimpleSerializer
+                    logger.error(f'get_next_task is_labeled/overlap issue: '
+                                 f'LOCALS ==> {locals()} :: '
+                                 f'NEXT_TASK ==> {TaskSimpleSerializer(next_task).data}')
+            except Exception as e:
+                logger.error(f'get_next_task is_labeled/overlap try/except: {str(e)}')
+                pass
 
         return next_task, queue_info
 
