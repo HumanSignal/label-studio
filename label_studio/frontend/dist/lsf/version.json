@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2301: Fix classification type tags render on anno history change (#700)\n\nFix classification type tags render on anno history change",
-  "commit": "c2c9c2620b820a05a2fa982ad4385f534ef6f48e",
-  "branch": "master",
-  "date": "2022-10-31T15:26:44Z"
+  "message": "RegionEditor input for numbers must be recast to Number as it is a String",
+  "commit": "907949368be2de0b09fe8f512e305501a7652987",
+  "branch": "fb-dev-3636",
+  "date": "2022/10/31 13:56:04"
 }
