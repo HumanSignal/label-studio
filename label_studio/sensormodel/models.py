@@ -11,7 +11,7 @@ class Sensor(models.Model):
     version = models.CharField(max_length=50, blank=True)
 
    
-    relpath = r".\sensormodel\parser_templates"
+    relpath = r".\label_studio\sensormodel\parser_templates"
     
     PARSER_CHOICES = parser.get_parser_templates(relpath)
     parser_template = models.IntegerField(choices = PARSER_CHOICES, default= 1)

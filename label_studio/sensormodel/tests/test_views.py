@@ -42,7 +42,7 @@ class TestAdd(TestCase):
 
     def test_add_sensor(self):
         data = {
-            'sensor_id': 1234, 'description': 'test'
+            'sensor_id': 1234, 'description': 'test', 'parser_template': 1
         }
         self.client.post(reverse('sensormodel:add'),data)
         self.assertTrue(Sensor.objects.filter(sensor_id= 1234).exists())
@@ -78,7 +78,7 @@ class TestAdjust(TestCase):
 
     def test_adjust_sensor(self):
         changed_data = {
-            'sensor_id': 1235, 'description': 'test'
+            'sensor_id': 1235, 'description': 'test', 'parser_template': 1
             }
         self.client.post(reverse('sensormodel:adjust_sensor',kwargs={'id':1}),changed_data)
         sensor = Sensor.objects.get(id=1)
