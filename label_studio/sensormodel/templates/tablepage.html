@@ -84,7 +84,11 @@
         <table class=" tables">
             <tr>
                 <th>Sensor ID</th>
-                <th>Sensor Name</th>
+                <th>Description</th>
+                <th>Manufacturer</th>
+                <th>Name</th>
+                <th>Version</th>
+                <th>Parser Template</th>
                 <th></th>
                 <th></th>
             </tr>
@@ -92,6 +96,10 @@
             <tr>
                 <td>{{ sensor.sensor_id }}</td>
                 <td>{{ sensor.description }}</td> 
+                <td>{{ sensor.manufacturer }}</td>
+                <td>{{ sensor.name }}</td>
+                <td>{{ sensor.version }}</td>
+                <td>{{ sensor.get_parser_template_display }}</td>
                 <td><a href="{% url 'sensormodel:adjust_sensor' sensor.id %}"> [Edit] </a></td>
                 <td><a href="{% url 'sensormodel:delete_sensor' sensor.id %}">[Delete]</a></td>
             </tr> 

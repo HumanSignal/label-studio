@@ -1,9 +1,20 @@
+from email.policy import default
 from django.db import models
+from sensormodel.utils import parser_templates_files as parser
 
 class Sensor(models.Model):
     sensor_id = models.IntegerField()
     description = models.TextField(max_length=100)
 
+    manufacturer = models.CharField(max_length=50, blank=True)
+    name = models.CharField(max_length=50, blank=True)
+    version = models.CharField(max_length=50, blank=True)
+
+   
+    relpath = r".\sensormodel\parser_templates"
+    
+    PARSER_CHOICES = parser.get_parser_templates(relpath)
+    parser_template = models.IntegerField(choices = PARSER_CHOICES, default= 1)
     def __str__(self):
         return 'Sensor: ' + str(self.sensor_id)
 
@@ -39,7 +50,7 @@ class Deployment(models.Model):
         for subj in subjlist:
             self.subjectlist += str(subj)+ ', '
         self.subjectlist = self.subjectlist[:-2]
-        return 
+        
 
     def __str__(self):
         return 'Deployment: ' + self.name

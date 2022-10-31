@@ -1,11 +1,10 @@
-from socket import fromshare
 from django import forms
 from . import models
 
 class SensorForm(forms.ModelForm):
     class Meta:
         model = models.Sensor
-        fields = ['sensor_id','description']
+        fields = ['sensor_id','description','manufacturer','name','version','parser_template']
 
 class SubjectForm(forms.ModelForm):
     class Meta:
@@ -19,7 +18,6 @@ class DeploymentForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(DeploymentForm, self).clean()
-
          
         begin_datetime = cleaned_data.get('begin_datetime')
         end_datetime = cleaned_data.get('end_datetime')

@@ -1,5 +1,4 @@
-from ast import Sub
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.urls import reverse
 from sensormodel.models import Deployment, Sensor 
 from sensormodel.views import *
@@ -12,8 +11,6 @@ class TestTablePage(TestCase):
         self.assertTemplateUsed(response, 'tablepage.html','base.html')
 
 class TestAdd(TestCase):
-
-
     def test_add_valid_deployment(self):
         data = {
             'name': 'depl. 1 valid', 
@@ -99,17 +96,20 @@ class TestDeltete(TestCase):
         self.assertTemplateUsed(response, 'deleteconfirmation.html')
 
     def test_delete_deployemnt(self):
+        self.assertTrue(Deployment.objects.filter(id=1).exists())
         response = self.client.post(reverse('sensormodel:delete_deployment',kwargs={'id':1}))
         self.assertEqual(response.status_code,302) #redirect
         self.assertFalse(Deployment.objects.filter(id=1).exists())
 
     def test_delete_subject(self):
+        self.assertTrue(Subject.objects.filter(id=1).exists())
         response = self.client.post(reverse('sensormodel:delete_subject',kwargs={'id':1}))
         self.assertEqual(response.status_code,302) #redirect
         self.assertFalse(Subject.objects.filter(id=1).exists())
 
 
     def test_delete_sensor(self):
+        self.assertTrue(Sensor.objects.filter(id=1).exists())
         response = self.client.post(reverse('sensormodel:delete_sensor',kwargs={'id':1}))
         self.assertEqual(response.status_code,302) #redirect
         self.assertFalse(Sensor.objects.filter(id=1).exists())
