@@ -1,7 +1,7 @@
 ---
 title: Install Label Studio Enterprise on Amazon Elastic Kubernetes Service (EKS)
 short: Install on Amazon EKS
-badge: <i class='ent'></i>
+tier: enterprise
 type: guide
 order: 218
 meta_title: Install Label Studio Enterprise on Amazon Elastic Kubernetes Service (EKS)

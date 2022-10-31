@@ -1,7 +1,7 @@
 ---
 title: Set up active learning with Label Studio
 short: Active learning loop
-badge: <i class='ent'></i>
+tier: enterprise
 type: guide
 order: 609
 meta_title: Set up an active learning loop with Label Studio

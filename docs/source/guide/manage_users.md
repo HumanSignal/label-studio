@@ -1,7 +1,7 @@
 ---
 title: Manage access to Label Studio
 short: Manage access
-badge: <i class='ent'></i>
+tier: enterprise
 type: guide
 order: 251
 meta_title: Manage Role-Based Access Control in Label Studio

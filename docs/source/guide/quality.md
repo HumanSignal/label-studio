@@ -1,7 +1,7 @@
 ---
 title: Review annotations in Label Studio
 short: Review annotations
-badge: <i class='ent'></i>
+tier: enterprise
 type: guide
 order: 410
 meta_title: Review annotation quality in Label Studio

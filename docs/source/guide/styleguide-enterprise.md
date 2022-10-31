@@ -1,8 +1,8 @@
 ---
-title: Styleguide
-short: Styleguide
+title: Styleguide for Enterprise
+short: Styleguide-Enterprise
+tier: enterprise
 type: guide
-tier: opensource
 order: 50
 meta_title: Get Started with Label Studio
 meta_description: Get started with Label Studio by creating projects to label and annotate data for machine learning and data science models.

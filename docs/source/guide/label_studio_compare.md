@@ -1,6 +1,7 @@
 ---
 title: Label Studio features
 type: guide
+tier: all
 order: 108
 meta_title: Label Studio Community and Enterprise Features
 meta_description: Compare the features of Label Studio Community Edition with the paid Label Studio Enterprise Edition so that you can choose the best option for your data labeling and annotation projects. 

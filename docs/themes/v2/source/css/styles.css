@@ -98,6 +98,8 @@ main {
 }
 
 .page-sidebar {
+  --color-accent: var(--color-orange-90);
+
   position: sticky;
   width: var(--sidebar-size);
   top: 75px;
@@ -108,7 +110,7 @@ main {
 }
 
 .page-sidebar [aria-current="page"] {
-  color: var(--color-orange-90);
+  color: var(--color-accent);
   font-weight: 600;
 }
 
@@ -135,7 +137,7 @@ main {
 }
 
 .page-sidebar ul a:hover {
-  color: var(--color-orange-90);
+  color: var(--color-accent);
 }
 
 .columns {
@@ -910,3 +912,58 @@ pre code.hljs{display:block;overflow-x:auto;padding:1em}code.hljs{padding:3px 5p
   License: see project LICENSE
   Touched: 2022
 */.hljs-comment,.hljs-meta{color:#565f89}.hljs-deletion,.hljs-doctag,.hljs-regexp,.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-selector-pseudo,.hljs-tag,.hljs-template-tag,.hljs-variable.language_{color:#f7768e}.hljs-link,.hljs-literal,.hljs-number,.hljs-params,.hljs-template-variable,.hljs-type,.hljs-variable{color:#ff9e64}.hljs-attribute,.hljs-built_in{color:#e0af68}.hljs-keyword,.hljs-property,.hljs-subst,.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#7dcfff}.hljs-selector-tag{color:#73daca}.hljs-addition,.hljs-bullet,.hljs-quote,.hljs-string,.hljs-symbol{color:#9ece6a}.hljs-code,.hljs-formula,.hljs-section{color:#7aa2f7}.hljs-attr,.hljs-char.escape_,.hljs-keyword,.hljs-name,.hljs-operator{color:#bb9af7}.hljs-punctuation{color:#c0caf5}.hljs{background:#1a1b26;color:#9aa5ce}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:700}
+
+
+
+/****************************
+  Enterprise theme
+****************************/
+
+.page-tier-enterprise .page-header {
+  background-color: var(--color-gray-900);
+}
+
+.page-tier-enterprise .page-header nav a:not(.Button) {
+  color: var(--color-white);
+}
+
+.page-tier-enterprise .page-header nav a:not(.Button):hover {
+  color: var(--color-yellow-90);
+}
+
+.page-tier-enterprise .page-header .Button {
+  background-color: var(--color-yellow-90);
+  color: var(--color-gray-900);
+}
+
+.page-tier-enterprise .page-header .Button:hover {
+
+}
+
+.page-tier-enterprise .page-sidebar {
+  --color-accent: var(--color-yellow-100);
+}
+
+.page-tier-enterprise .content-markdown a {
+  color: var(--color-yellow-100);
+}
+
+.page-tier-enterprise .content-markdown li::marker {
+  color: var(--color-gray-900);
+}
+
+.page-tier-enterprise .content-markdown code:not(.hljs) {
+  color: var(--color-yellow-100);
+}
+
+.page-tier-enterprise .code-tabs > .buttons a {
+  color: var(--color-gray-500);
+}
+
+.page-tier-enterprise .code-tabs > .buttons a:hover {
+  color: var(--color-yellow-100);
+}
+
+.page-tier-enterprise .code-tabs > .buttons a.active {
+  color: var(--color-yellow-100);
+}

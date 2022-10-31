@@ -1,7 +1,7 @@
 ---
 title: Set up SCIM2 for Label Studio
 short: Set up SCIM2
-badge: <i class='ent'></i>
+tier: enterprise
 type: guide
 order: 253
 meta_title: System for Cross-domain Identity Management (SCIM) for Label Studio Enterprise

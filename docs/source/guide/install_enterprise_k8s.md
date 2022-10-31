@@ -1,7 +1,7 @@
 ---
 title: Deploy Label Studio Enterprise on Kubernetes
 short: Deploy on Kubernetes
-badge: <i class='ent'></i>
+tier: enterprise
 type: guide
 order: 216
 meta_title: Deploy Label Studio Enterprise on Kubernetes

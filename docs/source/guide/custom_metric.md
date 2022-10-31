@@ -1,7 +1,7 @@
 ---
 title: Add a custom agreement metric to Label Studio
 short: Custom agreement metric
-badge: <i class='ent'></i>
+tier: enterprise
 type: guide
 order: 414
 meta_title: Add a Custom Agreement Metric for Labeling

@@ -10,28 +10,40 @@
 
   <%- css("css/styles.css") %>
 </head>
-<body>
+<body class="<%- 'page-tier-' + page.tier %>">
+  <% const tier = page.tier || "all" %>
+  <% const isEnterpriseTheme = page.tier === "enterprise" %>
   <%- partial("partials/header") %>
 
-  <% console.log('page-type-' + page.type) %>
-
-  <% const mainClass = 'page-type-' + page.type %>
+  <%- console.log(url) %>
 
   <main class="<%- 'page-type-' + page.type %>">
     <% if(page.type !== "playground") { %>
       <aside class="page-sidebar">
-        <%- partial("partials/toc", { type: page.type }) %>
+        <%- partial("partials/toc", { type: page.type, tier: tier }) %>
       </aside>
     <% } %>
     <div class="content">
-      <svg width="77" height="77" viewBox="0 0 77 77" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="content-decoration">
-        <rect x="75.875" y="26" width="25" height="25" transform="rotate(-180 75.875 26)" stroke="#ECEEFD" stroke-width="0.504975"/>
-        <rect x="50.875" y="51" width="25" height="25" transform="rotate(-180 50.875 51)" stroke="#ECEEFD" stroke-width="0.504975"/>
-        <rect x="50.875" y="26" width="25" height="25" transform="rotate(-180 50.875 26)" fill="#FF8267"/>
-        <rect x="26" y="76" width="25" height="25" transform="rotate(-180 26 76)" stroke="#ECEEFD" stroke-width="0.504975"/>
-        <rect x="26" y="51" width="25" height="25" transform="rotate(-180 26 51)" fill="#DD7DFF"/>
-        <rect x="26" y="26" width="25" height="25" transform="rotate(-180 26 26)" fill="#FFC27B"/>
-      </svg>
+      <% if(isEnterpriseTheme) { %>
+        <svg width="77" height="77" viewBox="0 0 77 77" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="content-decoration">
+          <rect x="75.875" y="26" width="25" height="25" transform="rotate(-180 75.875 26)" stroke="#ECEEFD" stroke-width="0.504975"/>
+          <rect x="50.875" y="51" width="25" height="25" transform="rotate(-180 50.875 51)" stroke="#ECEEFD" stroke-width="0.504975"/>
+          <rect x="50.875" y="26" width="25" height="25" transform="rotate(-180 50.875 26)" fill="#FFDBB0"/>
+          <rect x="26" y="76" width="25" height="25" transform="rotate(-180 26 76)" stroke="#ECEEFD" stroke-width="0.504975"/>
+          <rect x="26" y="51" width="25" height="25" transform="rotate(-180 26 51)" fill="#FFEDD8"/>
+          <rect x="26" y="26" width="25" height="25" transform="rotate(-180 26 26)" fill="#FFC27B"/>
+        </svg>
+      <% } else { %>
+        <svg width="77" height="77" viewBox="0 0 77 77" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="content-decoration">
+          <rect x="75.875" y="26" width="25" height="25" transform="rotate(-180 75.875 26)" stroke="#ECEEFD" stroke-width="0.504975"/>
+          <rect x="50.875" y="51" width="25" height="25" transform="rotate(-180 50.875 51)" stroke="#ECEEFD" stroke-width="0.504975"/>
+          <rect x="50.875" y="26" width="25" height="25" transform="rotate(-180 50.875 26)" fill="#FF8267"/>
+          <rect x="26" y="76" width="25" height="25" transform="rotate(-180 26 76)" stroke="#ECEEFD" stroke-width="0.504975"/>
+          <rect x="26" y="51" width="25" height="25" transform="rotate(-180 26 51)" fill="#DD7DFF"/>
+          <rect x="26" y="26" width="25" height="25" transform="rotate(-180 26 26)" fill="#FFC27B"/>
+        </svg>
+      <% } %>
+        
       <div class="container">
         <%- body %>
         <footer class="content-footer">

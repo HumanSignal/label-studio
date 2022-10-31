@@ -1,7 +1,7 @@
 ---
 title: Annotation statistics
 short: Annotation statistics
-badge: <i class='ent'></i>
+tier: enterprise
 type: guide
 order: 413
 meta_title: Data Labeling Statistics

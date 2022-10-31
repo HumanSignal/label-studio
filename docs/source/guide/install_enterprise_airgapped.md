@@ -1,7 +1,7 @@
 ---
 title: Install Label Studio Enterprise without public internet access
 short: Install on airgapped server
-badge: <i class='ent'></i>
+tier: enterprise
 type: guide
 order: 217
 meta_title: Install Label Studio Enterprise without public internet access

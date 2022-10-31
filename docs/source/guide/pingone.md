@@ -1,7 +1,7 @@
 ---
 title: Ping Federate & Ping Identity SAML SSO Setup Example
 short: Ping Federate & Ping Identity & PingOne SAML SSO Setup
-badge: <i class='ent'></i>
+tier: enterprise
 meta_title: Ping Federate & Ping Identity & PingOne SAML SSO Setup Example
 meta_description: Label Studio Enterprise documentation for setting up Ping Federate & Ping Identity & PingOne SAML SSO Setup Example.
 ---

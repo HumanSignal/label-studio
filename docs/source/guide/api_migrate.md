@@ -1,7 +1,7 @@
 ---
 title: Update scripts and API calls in Label Studio Enterprise
 short: Update scripts and API calls
-badge: <i class='ent'></i>
+tier: enterprise
 type: guide
 order: 910
 meta_title: Update scripts and API calls to new version

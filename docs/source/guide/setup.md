@@ -1,6 +1,7 @@
 ---
 title: Set up your labeling interface
 type: guide
+tier: all
 order: 401
 meta_title: Set up labeling config interface
 meta_description: Customize and configure your data labeling and annotation interface with templates or custom tag combinations in the Label Studio UI for your machine learning and data science projects.

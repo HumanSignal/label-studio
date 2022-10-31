@@ -1,7 +1,7 @@
 ---
 title: Available Helm values for Label Studio Enterprise Kubernetes deployments
 short: Available Helm values
-badge: <i class='ent'></i>
+tier: enterprise
 type: guide
 order: 220
 meta_title: Available Helm values for Label Studio Enterprise Kubernetes deployments

@@ -1,6 +1,7 @@
 ---
 title: Label and annotate data 
 type: guide
+tier: all
 order: 402
 meta_title: Label and annotate data
 meta_description: Label and annotate data using the Label Studio UI to create bounding boxes, label text spans, set up relations, and filter and sort project data for your machine learning dataset creation.

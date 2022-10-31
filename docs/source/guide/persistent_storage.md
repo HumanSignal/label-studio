@@ -2,6 +2,7 @@
 title: Set up persistent storage 
 badge: <i class='ent'/></i>
 type: guide
+tier: all
 order: 211
 meta_title: Set up persistent storage with Label Studio Enterprise
 meta_description: Configure persistent storage with Label Studio Enterprise hosted in the cloud to store uploaded data such as task data, user images, and more. 

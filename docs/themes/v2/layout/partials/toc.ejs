@@ -1,7 +1,11 @@
+<% const isEnterpriseTheme = page.tier === "enterprise" %>
+
+<% const pages = isEnterpriseTheme ? site.pages.filter(page => page.type === type && (page.tier === "enterprise" || page.tier === "all")) : site.pages.filter(page => page.type === type && (page.tier === "opensource" || page.tier === "all")) %>
+
 <%- partial("component/heading", {text: "Docs", size: "XXSmall", tag: "h2"}) %>
 
   <ul class="page-sidebar-list">
-    <% site.pages.find({ type: type }).sort('order').each(function (p) { %>
+    <% pages.sort('order').each(function (p) { %>
     <% var fileName = p.path.replace(/^.+?\/([\w-]+)\.html/, '$1') %>
 
     <% if (type === 'guide') { %>

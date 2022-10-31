@@ -1,7 +1,7 @@
 ---
 title: Set up authentication for Label Studio
 short: Set up authentication
-badge: <i class='ent'></i>
+tier: enterprise
 type: guide
 order: 252
 meta_title: Authentication for Label Studio Enterprise

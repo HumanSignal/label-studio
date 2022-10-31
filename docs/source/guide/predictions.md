@@ -2,6 +2,7 @@
 title: Import pre-annotated data into Label Studio
 short: Import pre-annotations
 type: guide
+tier: all
 order: 301
 meta_title: Import pre-annotated data into Label Studio
 meta_description: Import predicted labels, predictions, pre-annotations, or pre-labels into Label Studio for your data labeling, machine learning, and data science projects.
