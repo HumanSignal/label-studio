@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2301: Fix classification type tags render on anno history change",
-  "commit": "cac277db02e478db1420e6ab3c8268f2de515b56",
-  "branch": "fb-dev-2301/anno-history-classification",
-  "date": "2022/10/28 16:04:49"
+  "commit": "c2c9c2620b820a05a2fa982ad4385f534ef6f48e",
+  "branch": "master",
+  "date": "2022/10/31 15:26:44"
 }
