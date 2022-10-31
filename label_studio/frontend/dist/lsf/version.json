@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2301: Fix classification type tags render on anno history change",
+  "message": "fix: DEV-2301: Fix classification type tags render on anno history change (#700)\n\nFix classification type tags render on anno history change",
   "commit": "c2c9c2620b820a05a2fa982ad4385f534ef6f48e",
   "branch": "master",
-  "date": "2022/10/31 15:26:44"
+  "date": "2022-10-31T15:26:44Z"
 }
