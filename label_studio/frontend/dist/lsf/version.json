@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3647: Eraser brush not erasing stroke (#938)",
-  "commit": "2af5bd3b58b3102d513cc57733b650c41c3db728",
+  "message": "fix: DEV-3636: RegionEditor input for numbers must be recast to Number as it is a String (#942)",
+  "commit": "07059650bd4669d8f16aea3a3b35e1ead93ecb94",
   "branch": "master",
-  "date": "2022-11-01T11:07:58Z"
+  "date": "2022-11-01T13:36:41Z"
 }
