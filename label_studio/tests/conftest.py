@@ -13,6 +13,7 @@ import tempfile
 from moto import mock_s3
 from copy import deepcopy
 from pathlib import Path
+from datetime import timedelta
 
 from django.conf import settings
 from projects.models import Project
@@ -20,6 +21,8 @@ from tasks.models import Task
 from users.models import User
 from organizations.models import Organization
 from types import SimpleNamespace
+
+from label_studio.core.utils.params import get_bool_env, get_env
 
 # if we haven't this package, pytest.ini::env doesn't work 
 try:
@@ -419,3 +422,9 @@ def local_files_document_root_tempdir(settings):
 def local_files_document_root_subdir(settings):
     tempdir = Path(tempfile.gettempdir()) / Path('files')
     settings.LOCAL_FILES_DOCUMENT_ROOT = str(tempdir)
+
+
+@pytest.fixture(name="testing_session_timeouts")
+def set_testing_session_timeouts(settings):
+    settings.MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(seconds=5).total_seconds()))
+    settings.MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(seconds=2).total_seconds()))
