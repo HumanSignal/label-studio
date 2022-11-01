@@ -520,6 +520,8 @@ class Project(ProjectMixin, models.Model):
             diff_str = []
             for ann_tuple in different_annotations:
                 from_name, to_name, t = ann_tuple.split('|')
+                if t.lower() == 'textarea':  # avoid textarea to_name check (see DEV-1598)
+                    continue
                 if not check_control_in_config_by_regex(config_string, from_name) or \
                 not check_toname_in_config_by_regex(config_string, to_name) or \
                 t not in get_all_types(config_string):
