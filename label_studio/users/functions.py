@@ -69,7 +69,7 @@ def save_user(request, next_page, user_form):
         'update-notifications': 1, 'new-user': 1
     }
     redirect_url = next_page if next_page else reverse('projects:project-index')
-    auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
     return redirect(redirect_url)
 
 
@@ -79,6 +79,10 @@ def proceed_registration(request, user_form, organization_form, next_page):
     # save user to db
     save_user = load_func(settings.SAVE_USER)
     response = save_user(request, next_page, user_form)
-    request.session['last_login'] = time()
 
     return response
+
+
+def login(request, *args, **kwargs):
+    request.session['last_login'] = time()
+    return auth.login(request, *args, **kwargs)
