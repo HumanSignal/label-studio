@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2993: Edit and Delete options are missing for Comments section",
-  "commit": "ad599dafbd91d54959f39139f3991348e3b34aab",
+  "commit": "ad22eb824805fe74609f77a04992ef1221a719f3",
   "branch": "fb-dev-2993",
-  "date": "2022/10/03 12:40:26"
+  "date": "2022/11/01 07:22:59"
 }
