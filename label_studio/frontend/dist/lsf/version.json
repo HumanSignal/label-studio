@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3661: Use correct FF for resuming unfinished polygon",
-  "commit": "53de53d8fbb4db9333eae4d20e3952499305ebee",
+  "message": "fix: DEV-3636: RegionEditor input for numbers must be recast to Number as it is a String (#942)",
+  "commit": "07059650bd4669d8f16aea3a3b35e1ead93ecb94",
   "branch": "master",
-  "date": "2022/11/01 08:35:05"
+  "date": "2022-11-01T13:36:41Z"
 }

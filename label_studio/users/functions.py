@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import uuid
+from time import time
 
 from django import forms
 from django.conf import settings
@@ -78,5 +79,6 @@ def proceed_registration(request, user_form, organization_form, next_page):
     # save user to db
     save_user = load_func(settings.SAVE_USER)
     response = save_user(request, next_page, user_form)
+    request.session['last_login'] = time()
 
     return response
