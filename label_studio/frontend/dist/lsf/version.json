@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2301: Fix classification type tags render on anno history change (#700)\n\nFix classification type tags render on anno history change",
-  "commit": "c2c9c2620b820a05a2fa982ad4385f534ef6f48e",
+  "message": "fix: DEV-3647: Eraser brush not erasing stroke (#938)",
+  "commit": "2af5bd3b58b3102d513cc57733b650c41c3db728",
   "branch": "master",
-  "date": "2022-10-31T15:26:44Z"
+  "date": "2022-11-01T11:07:58Z"
 }
