@@ -21,6 +21,7 @@ recursive-include label_studio/core/static_build *
 include label_studio/core/utils/schema/*.json
 include label_studio/core/templatetags/*.py
 include label_studio/core/version_.py
+include label_studio/core/all_urls.json
 
 # io storages
 recursive-include label_studio/io_storages *.yml

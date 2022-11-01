@@ -45,7 +45,7 @@ You can review tasks in random order, or order tasks in the project data manager
 
 You can now navigate back through the review stream in the same path as moving forward when `Mark task as reviewed after all annotations are processed` option is set. The go back (`<`)functionality takes you back through the same set of annotations as it had moving forward.
 
-1. As an **ADMINISTRATOR**, log in to https://qa01.dev.heartex.com/.
+1. As an **ADMINISTRATOR**, log in to the [Label Studio app](https://app.heartex.com/projects/?page=1).
 
 2. Navigate to **All Projects** page, if needed.
 

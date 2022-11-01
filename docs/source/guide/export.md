@@ -38,9 +38,40 @@ Use the following steps to export data and annotations from the Label Studio UI.
     3. If you want to apply tab filters to the export, try to use [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-API).
     4. If the export times out, see how to [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-API).
 
+### Export timeout in Community Edition
+
+If the export times out, see how to [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-API). You can also use a [console command](#Export-using-console-command) to export your project. For more information, see the following section.
+
+### Export using console command
+
+Use the following command to export data and annotations.
+
+```shell
+label-studio export <project-id> <export-format> --path=<output-path>
+```
+
+To enable logs: 
+```shell
+DEBUG=1 LOG_LEVEL=DEBUG label-studio export <project-id> <export-format> --path=<output-path>
+```
+
+### Export all tasks including tasks without annotations
+
+Label Studio open source exports tasks with annotations only by default. If you want to easily export all tasks including tasks without annotations, you can call  the [Easy Export API](https://api.labelstud.io/#operation/api_projects_export_read) with query param `download_all_tasks=true`. For example:
+```
+curl -X GET https://localhost:8080/api/projects/{id}/export?exportType=JSON&download_all_tasks=true
+``` 
+
+If your project is large, you can use a [snapshot export](https://api.labelstud.io/#operation/api_projects_exports_create) (or [snapshot SDK](https://labelstud.io/sdk/project.html#create-new-export-snapshot)) to avoid timeouts in most cases. Snapshots include all tasks without annotations by default.
+
+
 ### <i class='ent'></i> Export snapshots using the UI
 
+<img src="/images/lse-export-snapshots-ui.png" alt="" class="gif-border" />
+<br>
+
 In Label Studio Enterprise, create a snapshot of your data and annotations. Create a snapshot to export exactly what you want from your data labeling project. This delayed export method makes it easier to export large labeling projects from the Label Studio UI.  
+
 
 1. Within a project in the Label Studio UI, click **Export**.
 2. Click **Create New Snapshot**.
@@ -299,3 +330,53 @@ Review the full list of JSON properties in the [API documentation](api.html).
 
 
 <!-- md annotation_ids.md -->
+
+## Access task data (images, audio, texts) outside of Label Studio for ML backends
+
+Machine Learning backend uses data from tasks for predictions, and you need to download them on Machine Learning backend side. Label Studio provides tools for downloading of these resources, and they are located in label-studio-tools Python package. If you are using official Label Studio Machine Learning backend, label-studio-tools package is installed automatically with other requirements.
+
+### Accessing task data from Label Studio instance
+
+There are several ways of storing tasks resources (images, audio, texts, etc) in Label Studio:
+- Cloud storages 
+- External web links 
+- Uploaded files
+- Local files directory
+
+Label Studio stores uploaded files in Project level structure. Each project has it's own folder for files.
+
+You can use `label_studio_tools.core.utils.io.get_local_path` to get task data - it will transform path or URL from task data to local path.
+In case of local path it will return full local path and download resource in case of using `download_resources` parameter.
+
+Provide `Hostname` and `access_token` for accessing external resource.
+
+### Accessing task data outside of Label Studio instance
+
+You can use `label_studio_tools.core.utils.io.get_local_path` method to get data from outside machine for external links and cloud storages. 
+
+!!! attention "important"
+    Don't forget to provide credentials.
+
+You can get data with `label_studio_tools.core.utils.io.get_local_path` in case if you mount same disk to your machine. If you mount same disk to external box 
+
+Another way of accessing data is to use link from task and ACCESS_TOKEN ([see documentation for authentication](api.html#Authenticate-to-the-API)). Concatenate Label Studio hostname and link from task data. Then add access token to your request:
+
+```json
+curl -X GET http://localhost:8080/api/projects/ -H 'Authorization: Token {YOUR_TOKEN}'
+```
+
+### Frequently asked questions 
+
+#### Question #1: I have made a request and received the following API responses: 
+- No data was provided.
+- 404 or 403 error code was returned. 
+
+**Answer:**
+First check the network access to your Label Studio instance when you send API requests. You can execute test curl request with sample data. 
+
+#### Question #2: I tried to access files and received a `FileNotFound` error.
+
+**Answer:**
+1. Check that you have mounted the same disk as your Label Studio instance. Then check your files' existence in Label Studio instance first. 
+
+2. Check `LOCAL_FILES_DOCUMENT_ROOT` environment variable in your Label Studio instance and add it to your accessing data script.

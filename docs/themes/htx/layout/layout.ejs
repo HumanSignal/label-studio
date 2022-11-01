@@ -91,28 +91,28 @@
     <!-- this needs to be loaded before guide's inline scripts -->
 
     <%- partial('partials/google_analytics') %>
-
-    <!-- docsearch -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
   </head>
   <body >
     <div id="mobile-bar" <%- isBlog ? 'style="display: none"' : '' %>>
         <a class="menu-button"></a>
     </div>
 
-    <%- partial('partials/heartex_header') %>
+    <%- partial('partials/ribbon') %>
 
     <% if (!isIndex) { %>
       <%- partial('partials/header') %>
-
-      <div id="main" <%- !isBlog ? 'class="fix-sidebar"': '' %>>
-          <%- body %>
+      <div class="main__container">
+        <div id="main" <%- !isBlog ? 'class="fix-sidebar"': '' %>>
+            <%- body %>
+        </div>
       </div>
-
+      <div id="footer-anim-el" style="position: relative; bottom: -50vh; width: 100px; height: 30px; visibility: hidden"></div>
+      <%- partial('partials/footer') %>
       <script src="<%- url_for("/js/css.escape.js") %>"></script>
       <script src="<%- url_for("/js/common.js") %>"></script>
     <% } else { %>
-        <%- partial('partials/index') %>
+      <%- partial('partials/header') %>
+      <%- partial('partials/index') %>
     <% } %>
 
   <script>
@@ -142,16 +142,5 @@
       })
     });
   </script>
-
-  <!-- docsearch -->
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
-  <script type="text/javascript"> docsearch({
-    apiKey: 'e5286d9454e04e9d10c9e927b4a4a205',
-    indexName: 'labelstud',
-    inputSelector: '#docsearch-input',
-    debug: false // Set debug to true if you want to inspect the dropdown
-    });
-  </script>
-
   </body>
 </html>

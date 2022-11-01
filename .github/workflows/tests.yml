@@ -18,22 +18,26 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - 3.7
-          - 3.8
-          - 3.9
+          - '3.7'
+          - '3.8'
+          - '3.9'
+          - '3.10'
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
       COVERAGE_PROCESS_START: 1
       LOG_DIR: pytest_logs
-      collect_analytics: false
+      collect_analytics: true
+      DEBUG_CONTEXTLOG: true
+      LABEL_STUDIO_TEST_ENVIRONMENT: false
       SENTRY_ENVIRONMENT: tests-ubuntu-sqlite
       SENTRY_RATE: 0
       DJANGO_DB: sqlite
+      JSON_LOG: 0
       # SENTRY_DSN:
 
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -44,6 +48,11 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Install OS dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install libsasl2-dev python3-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev
 
       - uses: actions/cache@v3
         name: Configure pip cache
@@ -69,7 +78,7 @@ jobs:
 
       - name: Get npm cache directory
         id: npm-cache-dir
-        run: echo "::set-output name=dir::$(npm config get cache)"
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
 
       - uses: actions/cache@v3
         name: Configure npm cache
@@ -94,7 +103,7 @@ jobs:
           pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.0
+        uses: codecov/codecov-action@v3.1.1
         with:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
@@ -106,7 +115,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.8 ]
+        python-version: [ '3.10' ]
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
       DJANGO_DB: default
@@ -114,9 +123,12 @@ jobs:
       PYTHONPATH: .
       LOG_LEVEL: ERROR
       LOG_DIR: pytest_logs
-      collect_analytics: false
+      collect_analytics: true
+      DEBUG_CONTEXTLOG: true
+      LABEL_STUDIO_TEST_ENVIRONMENT: false
       SENTRY_ENVIRONMENT: tests-ubuntu-postgresql
       SENTRY_RATE: 0
+      JSON_LOG: 0
       # SENTRY_DSN:
 
     # Service containers to run with `container-job`
@@ -124,7 +136,7 @@ jobs:
       # Label used to access the service container
       postgres:
         # Docker Hub image
-        image: postgres:11.5
+        image: postgres:13.8
         # Provide the password for postgres
         env:
           POSTGRES_PASSWORD: postgres
@@ -155,7 +167,7 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -170,7 +182,7 @@ jobs:
       - name: Install OS dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev python-dev
+          sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev python-dev
 
       - uses: actions/cache@v3
         name: Configure pip cache
@@ -194,7 +206,7 @@ jobs:
 
       - name: Get npm cache directory
         id: npm-cache-dir
-        run: echo "::set-output name=dir::$(npm config get cache)"
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
 
       - uses: actions/cache@v3
         name: Configure npm cache
@@ -219,7 +231,7 @@ jobs:
           pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.0
+        uses: codecov/codecov-action@v3.1.1
         with:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
@@ -232,22 +244,26 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - 3.7
-          - 3.8
-          - 3.9
+          - '3.7'
+          - '3.8'
+          - '3.9'
+          - '3.10'
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
       COVERAGE_PROCESS_START: 1
       LOG_DIR: pytest_logs
-      collect_analytics: false
+      collect_analytics: true
+      DEBUG_CONTEXTLOG: true
+      LABEL_STUDIO_TEST_ENVIRONMENT: false
       SENTRY_ENVIRONMENT: tests-windows-sqlite
       SENTRY_RATE: 0
       DJANGO_DB: sqlite
+      JSON_LOG: 0
       # SENTRY_DSN:
 
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -278,7 +294,7 @@ jobs:
           pip install -e .
 
       - name: Fix sqlite.dll for python < 3.9
-        if: ${{ matrix.python-version < '3.9' }}
+        if: ${{ contains(matrix.python-version, '3.7') || contains(matrix.python-version, '3.8') }}
         run: |
           set PYTHONIOENCODING=utf-8
           set PYTHONLEGACYWINDOWSSTDIO=utf-8

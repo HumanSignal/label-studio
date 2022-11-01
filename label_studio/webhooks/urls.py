@@ -2,7 +2,6 @@ from django.urls import path, include
 
 from . import api
 
-
 app_name = 'webhooks'
 
 _api_urlpatterns = [

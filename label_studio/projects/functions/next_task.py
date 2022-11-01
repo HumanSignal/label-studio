@@ -128,6 +128,11 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
     user_solved_tasks_array = user_solved_tasks_array.distinct().values_list('task__pk', flat=True)
     not_solved_tasks = prepared_tasks.exclude(pk__in=user_solved_tasks_array)
 
+    if user.drafts.filter(was_postponed=True).exists():
+        user_postponed_drafts = user.drafts.filter(was_postponed=True).distinct()
+        user_postponed_tasks = user_postponed_drafts.values_list('task__pk', flat=True)
+        not_solved_tasks = not_solved_tasks.exclude(pk__in=user_postponed_tasks)
+
     # if annotator is assigned for tasks, he must to solve it regardless of is_labeled=True
     if not assigned_flag:
         not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
@@ -235,6 +240,21 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
         next_task = skipped_queue(next_task, prepared_tasks, project, user)
 
         logger.debug(f'get_next_task finished. next_task: {next_task}, queue_info: {queue_info}')
+
+        # debug for critical overlap issue
+        if next_task:
+            try:
+                task_overlap_reached = next_task.annotations.count() >= next_task.overlap
+                global_overlap_reached = next_task.annotations.count() >= project.maximum_annotations
+                if next_task.is_labeled or task_overlap_reached or global_overlap_reached:
+                    from tasks.serializers import TaskSimpleSerializer
+                    logger.error(f'get_next_task is_labeled/overlap issue: '
+                                 f'LOCALS ==> {locals()} :: '
+                                 f'NEXT_TASK ==> {TaskSimpleSerializer(next_task).data}')
+            except Exception as e:
+                logger.error(f'get_next_task is_labeled/overlap try/except: {str(e)}')
+                pass
+
         return next_task, queue_info
 
 

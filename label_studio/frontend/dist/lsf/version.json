@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2927: Better UI for textarea inputs in the outliner (#766)\n\nBetter UI for textarea inputs in the outliner",
-  "commit": "cadfdf72ad373c0d6745d60813156e5c8858d813",
+  "message": "fix: DEV-3636: RegionEditor input for numbers must be recast to Number as it is a String (#942)",
+  "commit": "07059650bd4669d8f16aea3a3b35e1ead93ecb94",
   "branch": "master",
-  "date": "2022-08-01T18:46:20Z"
+  "date": "2022-11-01T13:36:41Z"
 }

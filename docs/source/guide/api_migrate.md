@@ -102,7 +102,7 @@ The content of the response also has some changes:
 #### Previous version response
 
 ```json
-"annotations": [ 
+"completions": [ 
  {
    "aggregated": true,
    "aggregated_completed_by": [
