@@ -1,7 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
-from time import time
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, reverse
@@ -90,10 +89,6 @@ def user_login(request):
         if form.is_valid():
             user = form.cleaned_data['user']
             auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            request.session['last_login'] = time()
-            if form.cleaned_data['persist_session'] is not True:
-                # Set the session to expire when the browser is closed
-                request.session.set_expiry(0)
 
             # user is organization member
             org_pk = Organization.find_by_user(user).pk

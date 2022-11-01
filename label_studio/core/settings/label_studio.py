@@ -10,7 +10,6 @@ DATABASES = {'default': DATABASES_ALL[DJANGO_DB]}
 
 MIDDLEWARE.append('organizations.middleware.DummyGetSessionMiddleware')
 MIDDLEWARE.append('core.middleware.UpdateLastActivityMiddleware')
-MIDDLEWARE.append('core.middleware.InactivitySessionTimeoutMiddleWare')
 
 ADD_DEFAULT_ML_BACKENDS = False
 
