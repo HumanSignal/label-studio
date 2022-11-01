@@ -1,6 +1,6 @@
 {
   "message": "fix: dev-3673: Navigation using task links is broken",
-  "commit": "74b3ad73036f26dd0a5e0005cbf29f78a2cb3c25",
-  "branch": "fb-dev-3673/find-task",
-  "date": "2022/11/01 13:48:07"
+  "commit": "93a439a1b81cc9d1217a500afe3b72ab23ef24e6",
+  "branch": "master",
+  "date": "2022/11/01 09:37:28"
 }
