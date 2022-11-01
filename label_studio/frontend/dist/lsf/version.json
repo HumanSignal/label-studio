@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3636: RegionEditor input for numbers must be recast to Number as it is a String (#942)",
-  "commit": "07059650bd4669d8f16aea3a3b35e1ead93ecb94",
-  "branch": "master",
-  "date": "2022-11-01T13:36:41Z"
+  "message": "fix: DEV-3487 Align comment icons into the same columns with annotation and drafts in dropdown selector",
+  "commit": "192cfcafb7e73a6502fcac3420a454c227a88ee0",
+  "branch": "fb-dev-3487",
+  "date": "2022/11/01 17:26:16"
 }
