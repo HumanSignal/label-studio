@@ -9,6 +9,7 @@ from django.utils.deprecation import MiddlewareMixin
 from django.core.handlers.base import BaseHandler
 from django.core.exceptions import MiddlewareNotUsed
 from django.middleware.common import CommonMiddleware
+from django.contrib.auth import logout
 from django.conf import settings
 
 from django.utils.http import escape_leading_slashes
@@ -153,3 +154,24 @@ class UpdateLastActivityMiddleware(CommonMiddleware):
         if hasattr(request, 'user') and request.method not in SAFE_METHODS:
             if request.user.is_authenticated:
                 request.user.update_last_activity()
+
+class InactivitySessionTimeoutMiddleWare(CommonMiddleware):
+    """Log the user out if they have been logged in for too long
+     or inactive for too long"""
+
+    # paths that don't count as user activity
+    NOT_USER_ACTIVITY_PATHS = []
+    def process_request(self, request) -> None:
+        if not hasattr(request, "session") or request.session.is_empty():
+            return
+
+        current_time = time.time()
+        last_login = request.session['last_login'] if 'last_login' in request.session else 0
+
+        # Check if this request is too far from when the login happened
+        if (current_time - last_login) > settings.MAX_SESSION_AGE:
+            logout(request)
+
+        # Push the expiry to the max every time a new request is made to a url that indicates user activity
+        if str(request.path_info) not in self.NOT_USER_ACTIVITY_PATHS:
+            request.session.set_expiry(settings.MAX_TIME_BETWEEN_ACTIVITY)
