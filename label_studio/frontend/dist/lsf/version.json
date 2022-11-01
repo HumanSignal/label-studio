@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3661: Use correct FF for resuming unfinished polygon",
-  "commit": "3d5f988e2a359ab7d90291ff892fe70f21cc1ba4",
-  "branch": "fb-dev-3661",
-  "date": "2022/10/28 16:40:52"
+  "commit": "53de53d8fbb4db9333eae4d20e3952499305ebee",
+  "branch": "master",
+  "date": "2022/11/01 08:35:05"
 }
