@@ -1,6 +1,6 @@
 {
-  "message": "fix: dev-3673: Navigation using task links is broken",
-  "commit": "93a439a1b81cc9d1217a500afe3b72ab23ef24e6",
-  "branch": "master",
-  "date": "2022/11/01 09:37:28"
+  "message": "fix: DEV-3673: Navigation using task links is broken",
+  "commit": "9597674dce83c8f998d67dfa5fc6ccbb9ebac3a1",
+  "branch": "fb-dev-3673/annotator-link-fix",
+  "date": "2022/11/01 11:49:16"
 }
