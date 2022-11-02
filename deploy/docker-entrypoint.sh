@@ -5,7 +5,7 @@ set -e ${DEBUG:+-x}
 # Redirect all scripts output + leaving stdout to container payload.
 exec 3>&1
 
-ENTRYPOINT_PATH=/label-studio/deploy
+ENTRYPOINT_PATH=/label-studio/deploy/docker-entrypoint.d
 
 uid_entrypoint() {
   if ! whoami 2>/dev/null; then
@@ -44,12 +44,14 @@ exec_entrypoint() {
 uid_entrypoint
 
 if [ "$1" = "nginx" ]; then
-  exec_entrypoint "$ENTRYPOINT_PATH/nginx/scripts/"
+  exec_entrypoint "$ENTRYPOINT_PATH/nginx/"
   exec nginx -c /etc/nginx/nginx.conf
 elif [ "$1" = "label-studio-uwsgi" ]; then
-  exec_entrypoint "$ENTRYPOINT_PATH/docker-entrypoint.d/"
+  exec_entrypoint "$ENTRYPOINT_PATH/app/"
   exec uwsgi --ini /label-studio/deploy/uwsgi.ini
+elif [ "$1" = "label-studio-migrate" ]; then
+  exec_entrypoint "$ENTRYPOINT_PATH/app-init/"
+  exec python3 /label-studio/label_studio/manage.py migrate >&3
 else
-  exec_entrypoint "$ENTRYPOINT_PATH/docker-entrypoint.d/"
   exec "$@"
 fi
