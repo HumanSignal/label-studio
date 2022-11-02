@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1598: Fix for empty toname in control tag (#937)\n\n* fix: DEV-1598: Fix getter of all object tags\r\n\r\n* fix: DEV-1598: Fix creating result from control tag without setted toname parameter\r\n\r\n* fix: DEV-1598: Make tag type detection easier\r\n\r\n* fix: DEV-1598: Make fix work only for textarea\r\n\r\n* validation if value is null\r\n\r\n* remove alert\r\n\r\n* validate arearaw\r\n\r\n* remove alert\r\n\r\n* check if area exist\r\n\r\n* switch back feature-flags\r\n\r\n* Delete feature-flags.js\r\n\r\nRemote feature flag.js\r\n\r\n* add comments about the problem\r\n\r\nCo-authored-by: Koshevarov Sergey <gondragos@gmail.com>\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>\r\nCo-authored-by: hlomzik <hlomzik@users.noreply.github.com>",
-  "commit": "68e96855ad07e024f9fb66c7eb61010a71622247",
+  "message": "fix: DEV-1284: Fix undo with Auto Detect tool",
+  "commit": "3de42ed0e7c601fcf08e5bfbb6d119d81c404ce3",
   "branch": "master",
-  "date": "2022-11-01T20:19:36Z"
+  "date": "2022/11/02 15:47:26"
 }
