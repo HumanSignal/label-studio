@@ -49,8 +49,8 @@ RUN set -eux; \
 COPY --chown=1001:0 deploy/default.conf /etc/nginx/nginx.conf
 
 RUN set -eux; \
-    mkdir -p $OPT_DIR && \
-    chown -R 1001:0 $OPT_DIR
+    mkdir -p $OPT_DIR /var/log/nginx /var/cache/nginx /etc/nginx && \
+    chown -R 1001:0 $OPT_DIR /var/log/nginx /var/cache/nginx /etc/nginx
 
 # Copy and install middleware dependencies
 COPY --chown=1001:0 deploy/requirements-mw.txt .
