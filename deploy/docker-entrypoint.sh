@@ -45,7 +45,7 @@ uid_entrypoint
 
 if [ "$1" = "nginx" ]; then
   exec_entrypoint "$ENTRYPOINT_PATH/nginx/"
-  exec nginx -c /etc/nginx/nginx.conf
+  exec nginx -c $OPT_DIR/nginx/nginx.conf
 elif [ "$1" = "label-studio-uwsgi" ]; then
   exec_entrypoint "$ENTRYPOINT_PATH/app/"
   exec uwsgi --ini /label-studio/deploy/uwsgi.ini

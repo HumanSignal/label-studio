@@ -1,11 +1,11 @@
 #!/bin/sh
 set -e ${DEBUG:+-x}
 
-NGINX_CONFIG=/etc/nginx/nginx.conf
+NGINX_CONFIG=$OPT_DIR/nginx/nginx.conf
 
 echo >&3 "=> Copy nginx config file..."
 mkdir -p "$OPT_DIR/nginx"
-\cp -f /label-studio/deploy/default.conf $NGINX_CONFIG
+\cp -f /etc/nginx/nginx.conf $NGINX_CONFIG
 
 LABEL_STUDIO_HOST_NO_SCHEME=${LABEL_STUDIO_HOST#*//}
 LABEL_STUDIO_HOST_NO_TRAILING_SLASH=${LABEL_STUDIO_HOST_NO_SCHEME%/}

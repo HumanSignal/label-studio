@@ -46,6 +46,12 @@ RUN set -eux; \
      --option APT::AutoRemove::SuggestsImportant=false && rm -rf /var/lib/apt/lists/* /tmp/* && \
     nginx -v
 
+COPY --chown=1001:0 deploy/default.conf /etc/nginx/nginx.conf
+
+RUN set -eux; \
+    mkdir -p $OPT_DIR && \
+    chown -R 1001:0 $OPT_DIR
+
 # Copy and install middleware dependencies
 COPY --chown=1001:0 deploy/requirements-mw.txt .
 RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
