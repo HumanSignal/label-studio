@@ -7,6 +7,9 @@ echo >&3 "=> Copy nginx config file..."
 mkdir -p "$OPT_DIR/nginx"
 \cp -f /etc/nginx/nginx.conf $NGINX_CONFIG
 
+echo >&3 "=> Configure system resolver..."
+echo resolver $(awk 'BEGIN{ORS=" "} $1=="nameserver" {print $2}' /etc/resolv.conf) ";" > $OPT_DIR/nginx/resolv.conf
+
 LABEL_STUDIO_HOST_NO_SCHEME=${LABEL_STUDIO_HOST#*//}
 LABEL_STUDIO_HOST_NO_TRAILING_SLASH=${LABEL_STUDIO_HOST_NO_SCHEME%/}
 LABEL_STUDIO_HOST_SUBPATH=$(echo "$LABEL_STUDIO_HOST_NO_TRAILING_SLASH" | cut -d'/' -f2- -s)
@@ -21,7 +24,7 @@ fi
 
 if [ -n "${NGINX_SSL_CERT:-}" ]; then
   echo >&3 "=> Replacing nginx certs..."
-  sed -i "s|^\(\s*\)#\(listen 443.*\)$|\1\2|g" $NGINX_CONFIG
+  sed -i "s|^\(\s*\)#\(listen 8086.*\)$|\1\2|g" $NGINX_CONFIG
   sed -i "s|^\(\s*\)#\(ssl_certificate .*\)@cert@;$|\1\2$NGINX_SSL_CERT;|g" $NGINX_CONFIG
   sed -i "s|^\(\s*\)#\(ssl_certificate_key .*\)@certkey@;$|\1\2$NGINX_SSL_CERT_KEY;|g" $NGINX_CONFIG
   echo >&3 "=> Successfully replaced nginx certs."
