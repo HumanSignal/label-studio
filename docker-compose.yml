@@ -28,7 +28,7 @@ services:
     build: .
     image: heartexlabs/label-studio:latest
     expose:
-      - "8080"
+      - "8000"
     depends_on:
       - db
     environment:
