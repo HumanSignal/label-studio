@@ -11,6 +11,7 @@ from django.core.exceptions import PermissionDenied
 from rest_framework.authtoken.models import Token
 
 from users import forms
+from core.utils.common import load_func
 from users.functions import login
 from core.middleware import enforce_csrf_checks
 from users.functions import proceed_registration
