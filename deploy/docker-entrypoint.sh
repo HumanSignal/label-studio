@@ -44,6 +44,8 @@ exec_entrypoint() {
 uid_entrypoint
 
 if [ "$1" = "nginx" ]; then
+  # in this mode we're running in a separate container
+  export APP_HOST=${APP_HOST:=app}
   exec_entrypoint "$ENTRYPOINT_PATH/nginx/"
   exec nginx -c $OPT_DIR/nginx/nginx.conf
 elif [ "$1" = "label-studio-uwsgi" ]; then
