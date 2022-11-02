@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1284: Fix undo with Auto Detect tool",
-  "commit": "3de42ed0e7c601fcf08e5bfbb6d119d81c404ce3",
-  "branch": "master",
-  "date": "2022/11/02 15:47:26"
+  "message": "fix: DEV-3467: Change border color to being visible when item is selected",
+  "commit": "e1f073f34b112157805d0f10435d840f5075b4a1",
+  "branch": "fb-dev-3467",
+  "date": "2022/11/02 15:37:49"
 }
