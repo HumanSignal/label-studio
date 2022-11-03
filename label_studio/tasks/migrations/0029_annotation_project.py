@@ -7,7 +7,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0018_alter_project_control_weights'),
         ('tasks', '0028_auto_20220802_2220'),
     ]
 
