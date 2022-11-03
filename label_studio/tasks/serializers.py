@@ -57,10 +57,6 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
     created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
     completed_by = serializers.PrimaryKeyRelatedField(required=False, queryset=User.objects.all())
 
-    def create(self, validated_data):
-        validated_data['project'] = validated_data['task'].project
-        return Annotation(**validated_data)
-
     def validate_result(self, value):
         data = value
         # convert from str to json if need
