@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1284: Fix undo with Auto Detect tool",
-  "commit": "3de42ed0e7c601fcf08e5bfbb6d119d81c404ce3",
+  "message": "fix: DEV-2993: Edit and Delete options are missing for Comments section (#889)\n\n* fix: DEV-2993: Edit and Delete options are missing for Comments section\r\n\r\n* Update src/components/Comments/CommentFormBase.tsx\r\n\r\nCo-authored-by: bmartel <brandonmartel@gmail.com>\r\n\r\n* Update src/stores/Comment/Comment.js\r\n\r\nCo-authored-by: bmartel <brandonmartel@gmail.com>\r\n\r\n* clean up for readability\r\n\r\n* fix onsubmit handling of comment edit form to work with hotkey submit\r\n\r\n* improvements to update and delete comment flow\r\n\r\nCo-authored-by: yyassi-heartex <yyassi-heartex@users.noreply.github.com>\r\nCo-authored-by: bmartel <brandonmartel@gmail.com>",
+  "commit": "660fccce25a8cf37526457cd2480cf700ec2c89b",
   "branch": "master",
-  "date": "2022/11/02 15:47:26"
+  "date": "2022-11-03T12:49:10Z"
 }
