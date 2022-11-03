@@ -1,6 +1,6 @@
 {
-  "message": "fix: dev-3673: Navigation using task links is broken",
-  "commit": "93a439a1b81cc9d1217a500afe3b72ab23ef24e6",
+  "message": "fix: DEV-2993: Edit and Delete options are missing for Comments section (#112)",
+  "commit": "ac2b3f8c76b83ec0ae97cd98f6cebe7653ab5edf",
   "branch": "master",
-  "date": "2022/11/01 09:37:28"
+  "date": "2022-11-03T13:31:07Z"
 }
