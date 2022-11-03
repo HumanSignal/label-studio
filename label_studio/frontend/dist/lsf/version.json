@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3701: Fix value updating for dynamic children",
-  "commit": "a193774b782eab29b44da93e2ece0ea11bcbfee0",
-  "branch": "fb-dev-3701/incorrect-dynamic-children-values",
-  "date": "2022/11/03 21:12:56"
+  "commit": "74be06ab6a0233190f590dca273eb80e8ab66ede",
+  "branch": "master",
+  "date": "2022/11/03 21:34:56"
 }
