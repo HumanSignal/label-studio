@@ -93,6 +93,7 @@ def user_login(request):
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             if form.cleaned_data['persist_session'] is not True:
                 # Set the session to expire when the browser is closed
+                request.session['keep_me_logged_in'] = False
                 request.session.set_expiry(0)
 
             # user is organization member

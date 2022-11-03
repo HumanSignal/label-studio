@@ -182,4 +182,6 @@ class InactivitySessionTimeoutMiddleWare(CommonMiddleware):
                 if len(parts) == 2 and path['query'] in parts[1]:
                     return
 
-        request.session.set_expiry(settings.MAX_TIME_BETWEEN_ACTIVITY)
+        request.session.set_expiry(
+            settings.MAX_TIME_BETWEEN_ACTIVITY if request.session.get('keep_me_logged_in', True) else 0
+        )
