@@ -57,6 +57,10 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
     created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
     completed_by = serializers.PrimaryKeyRelatedField(required=False, queryset=User.objects.all())
 
+    def create(self, validated_data):
+        validated_data['project'] = validated_data['task'].project
+        return Annotation(**validated_data)
+
     def validate_result(self, value):
         data = value
         # convert from str to json if need
@@ -323,6 +327,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
                     body = {
                         'task': self.db_tasks[i],
+                        'project': self.project,
                         'ground_truth': ground_truth,
                         'was_cancelled': was_cancelled,
                         'completed_by_id': annotation['completed_by_id'],

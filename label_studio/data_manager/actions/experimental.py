@@ -42,7 +42,8 @@ def propagate_annotations(project, queryset, **kwargs):
             'completed_by_id': user.id,
             'result': source_annotation.result,
             'result_count': source_annotation.result_count,
-            'parent_annotation_id': source_annotation.id
+            'parent_annotation_id': source_annotation.id,
+            'project': project,
         }
         body = TaskSerializerBulk.add_annotation_fields(body, user, 'propagated_annotation')
         db_annotations.append(Annotation(**body))

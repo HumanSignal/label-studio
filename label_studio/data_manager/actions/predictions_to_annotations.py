@@ -42,7 +42,8 @@ def predictions_to_annotations(project, queryset, **kwargs):
             'result': result,
             'completed_by_id': user.pk,
             'task_id': task_id,
-            'parent_prediction_id': prediction_id
+            'parent_prediction_id': prediction_id,
+            'project': project,
         }
         body = TaskSerializerBulk.add_annotation_fields(body, user, 'prediction')
         annotations.append(body)
