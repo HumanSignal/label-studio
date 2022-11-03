@@ -173,5 +173,13 @@ class InactivitySessionTimeoutMiddleWare(CommonMiddleware):
             logout(request)
 
         # Push the expiry to the max every time a new request is made to a url that indicates user activity
-        if str(request.path_info) not in self.NOT_USER_ACTIVITY_PATHS:
-            request.session.set_expiry(settings.MAX_TIME_BETWEEN_ACTIVITY)
+        # but only if it's not a URL we want to ignore
+        for path in self.NOT_USER_ACTIVITY_PATHS:
+            if isinstance(path, str) and path == str(request.path_info):
+                return
+            elif 'query' in path:
+                parts = str(request.path_info).split('?')
+                if len(parts) == 2 and path['query'] in parts[1]:
+                    return
+
+        request.session.set_expiry(settings.MAX_TIME_BETWEEN_ACTIVITY)
