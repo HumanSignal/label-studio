@@ -75,8 +75,6 @@ If you want the classification choices to appear to the left of the image, you c
 
 ```
 
-<!-- md nested-classification.md -->
-
 ## Related tags
 
 - [Image](/tags/image.html)
