@@ -11,7 +11,7 @@ Repeater Tag for annotating multiple data objects in a dynamic range with the sa
 It repeats tags inside it for every item in a given data array from your dataset. All the occurrences of `indexFlag` (default is `{{idx}}`) in parameter values will be replaced by the current index.
 Names should always be unique, so you can use this placeholder in tag names.
 
-The Repeater Tag supports the `mode` property. This creates the possibility to enable pagination in repeater for performance improvement. You can add a parameter `<Repeater mode="pagination" ...>`  to show only one page at a time, shrinking memory used to one tag set.
+The Repeater Tag supports the `mode` property. This creates the possibility to enable pagination in repeater for performance improvement. You can add a parameter `<Repeater mode="pagination" ...>` to show only one page at a time, shrinking memory used to one tag set.
 
 ### Parameters
 

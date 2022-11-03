@@ -55,16 +55,23 @@ Label Studio is also available as a Docker container. Make sure you have [Docker
 ### Install with Docker on *nix
 To install and start Label Studio at [http://localhost:8080](http://localhost:8080), storing all labeling data in `./my_project` directory, run the following:
 ```bash
-docker run -it -p 8080:8080 -v `pwd`/mydata:/label-studio/data heartexlabs/label-studio:latest
+docker run -it -p 8080:8080 -v $(pwd)/mydata:/label-studio/data heartexlabs/label-studio:latest
 ```
 
 ### Install with Docker on Windows
 Or for Windows, you have to modify the volumes paths set by `-v` option.
 
 #### Override the default Docker install
-You can override the default Docker install by appending new arguments: 
+You can override the default Docker install by appending new arguments.
+
+In Windows Command Line (cmd):
 ```bash
-docker run -it -p 8080:8080 -v `pwd`/mydata:/label-studio/data heartexlabs/label-studio:latest label-studio --log-level DEBUG
+docker run -it -p 8080:8080 -v %cd%/mydata:/label-studio/data heartexlabs/label-studio:latest label-studio --log-level DEBUG
+```
+
+In PowerShell:
+```bash
+docker run -it -p 8080:8080 -v ${PWD}/mydata:/label-studio/data heartexlabs/label-studio:latest label-studio --log-level DEBUG
 ```
 
 ### Build a local image with Docker
@@ -162,6 +169,9 @@ If you see any other errors during installation, try to rerun the installation.
 pip install --ignore-installed label-studio
 ```
 
+### OpenBLAS blas_thread_init: pthread_create failed for thread X of Y: Operation not permitted
+
+Upgrade Docker Engine to the latest available version(>= [20.10.12](https://docs.docker.com/engine/release-notes/#201012)).
 
 ## Upgrade Label Studio
 To upgrade to the latest version of Label Studio, reinstall or upgrade using pip. 

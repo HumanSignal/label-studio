@@ -80,7 +80,7 @@ const ProjectCard = ({ project }) => {
           <Elem name="summary">
             <Elem name="annotation">
               <Elem name="total">
-                {project.num_tasks_with_annotations} / {project.task_number}
+                {project.finished_task_number} / {project.task_number}
               </Elem>
               <Elem name="detail">
                 <Elem name="detail-item" mod={{ type: "completed" }}>
