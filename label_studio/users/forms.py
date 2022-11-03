@@ -31,6 +31,7 @@ class LoginForm(forms.Form):
     email = forms.CharField(label='User') if settings.USE_USERNAME_FOR_LOGIN\
         else forms.EmailField(label='Email')
     password = forms.CharField(widget=forms.PasswordInput())
+    persist_session = forms.BooleanField(widget=forms.CheckboxInput(), required=False)
 
     def clean(self, *args, **kwargs):
         cleaned = super(LoginForm, self).clean()
@@ -47,7 +48,8 @@ class LoginForm(forms.Form):
             user = auth.authenticate(email=email, password=password)
 
         if user and user.is_active:
-            return {'user': user}
+            persist_session = cleaned.get('persist_session', False)
+            return {'user': user, 'persist_session': persist_session}
         else:
             raise forms.ValidationError(INVALID_USER_ERROR)
 
