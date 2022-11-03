@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1284: Fix undo with Auto Detect tool",
-  "commit": "3de42ed0e7c601fcf08e5bfbb6d119d81c404ce3",
-  "branch": "master",
-  "date": "2022/11/02 15:47:26"
+  "message": "feat: DEV-3391: Render real Annotations in View All",
+  "commit": "919dc9dc61b9f3b78cd36b2d64617f9952fdce13",
+  "branch": "fb-dev-3391/view",
+  "date": "2022/11/03 11:01:23"
 }
