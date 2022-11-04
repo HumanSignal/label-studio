@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1284: Fix undo with Auto Detect tool",
-  "commit": "3de42ed0e7c601fcf08e5bfbb6d119d81c404ce3",
+  "message": "fix: DEV-3701: Fix value updating for dynamic children (#950)",
+  "commit": "74be06ab6a0233190f590dca273eb80e8ab66ede",
   "branch": "master",
-  "date": "2022/11/02 15:47:26"
+  "date": "2022-11-03T21:34:56Z"
 }

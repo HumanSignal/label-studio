@@ -17,8 +17,10 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [choice] | <code>single</code> \| <code>multiple</code> | <code>single</code> | Configure whether you can select one or multiple labels |
 
 ### Example
+
+Basic labeling configuration to apply the label "similar" or "dissimilar" to a relation identified between two labeled regions of text
+
 ```html
-<!--Basic labeling configuration to apply the label "similar" or "dissimilar" to a relation identified between two labeled regions of text -->
 <View>
   <Relations>
     <Relation value="similar" />
