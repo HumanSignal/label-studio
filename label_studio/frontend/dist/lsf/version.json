@@ -1,6 +1,6 @@
 {
-  "message": "docs: DEV-3632: Add example output for HyperTextLabels",
-  "commit": "5973d375684b91866b290f79fc1f99ad9e9ad999",
+  "message": "fix: DEV-3701: Fix value updating for dynamic children (#950)\n\nFix value updating for dynamic children",
+  "commit": "74be06ab6a0233190f590dca273eb80e8ab66ede",
   "branch": "master",
-  "date": "2022/11/02 20:23:34"
+  "date": "2022-11-03T21:34:56Z"
 }
