@@ -28,8 +28,10 @@ The Labels tag can be used with audio and text data types. Other data types have
 | [value] | <code>string</code> |  | Task data field containing a list of dynamically loaded labels (see example below) |
 
 ### Example
+
+Basic labeling configuration to apply labels to a passage of text
+
 ```html
-<!--Basic labeling configuration to apply labels to a passage of text -->
 <View>
   <Labels name="type" toName="txt-1">
     <Label alias="B" value="Brand" />

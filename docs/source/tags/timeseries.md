@@ -47,8 +47,10 @@ Channel tag can be used to label time series data
 
 
 ### Example
+
+Labeling configuration for time series data stored in a CSV loaded from a URL containing 3 columns: time, sensor1, and sensor2. The time column stores time as a number.
+
 ```html
-<!--Labeling configuration for time series data stored in a CSV loaded from a URL containing 3 columns: time, sensor1, and sensor2. The time column stores time as a number. -->
 <View>
   <TimeSeries name="device" value="$timeseries" valueType="url" timeColumn="time">
      <Channel column="sensor1" />
@@ -61,8 +63,10 @@ Channel tag can be used to label time series data
 </View>
 ```
 ### Example
+
+Labeling configuration for time series data stored in the task field `ts` in Label Studio JSON format. The time field is stored as a date in the `timeformat` field and formatted as a full date on the plot (by default).
+
 ```html
-<!--Labeling configuration for time series data stored in the task field `ts` in Label Studio JSON format. The time field is stored as a date in the `timeformat` field and formatted as a full date on the plot (by default). -->
 <View>
   <TimeSeries name="device" value="$ts" timeColumn="time" timeFormat="%m/%d/%Y %H:%M:%S">
      <Channel column="sensor1" />

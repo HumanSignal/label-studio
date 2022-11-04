@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3701: Fix value updating for dynamic children",
+  "message": "fix: DEV-3701: Fix value updating for dynamic children (#950)",
   "commit": "74be06ab6a0233190f590dca273eb80e8ab66ede",
   "branch": "master",
-  "date": "2022/11/03 21:34:56"
+  "date": "2022-11-03T21:34:56Z"
 }

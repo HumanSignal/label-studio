@@ -46,8 +46,10 @@ Use with the following data types: image
 ```
 
 ### Example
+
+Basic image segmentation labeling configuration
+
 ```html
-<!--Basic image segmentation labeling configuration-->
 <View>
   <BrushLabels name="labels" toName="image">
     <Label value="Person" />

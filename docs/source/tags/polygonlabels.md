@@ -50,8 +50,10 @@ Use with the following data types: image
 ```
 
 ### Example
+
+Basic labeling configuration for polygonal semantic segmentation of images
+
 ```html
-<!--Basic labeling configuration for polygonal semantic segmentation of images -->
 <View>
   <Image name="image" value="$image" />
   <PolygonLabels name="labels" toName="image">

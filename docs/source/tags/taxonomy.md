@@ -27,8 +27,10 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [placeholder=] | <code>string</code> |  | What to display as prompt on the input |
 
 ### Example
+
+Labeling configuration for providing a taxonomy of choices in response to a passage of text
+
 ```html
-<!--Labeling configuration for providing a taxonomy of choices in response to a passage of text -->
 <View>
   <Taxonomy name="media" toName="text">
     <Choice value="Online">
