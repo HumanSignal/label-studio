@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3704: Fix auto-annotations not being revealed",
-  "commit": "009adc35b88798a1a92db386d909be2452147c19",
-  "branch": "master",
-  "date": "2022/11/04 15:28:17"
+  "message": "fix: DEV-3688: Start select current area when create or resume drawing",
+  "commit": "df24a03539d2a0276119b6c09b62b8f7de70b326",
+  "branch": "fb-dev-3688",
+  "date": "2022/11/04 18:00:48"
 }
