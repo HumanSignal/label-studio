@@ -61,6 +61,14 @@
   <link rel="preload" href="/fonts/SpaceGrotesk-Bold-subset.woff2" as="font" type="font/woff2" crossorigin>
 
   <%- css("css/styles.css") %>
+
+  <% if (page.type === "playground") { %>
+    <%- css('css/codemirror') %>
+    <script src="<%- url_for("/js/jquery.min.js") %>"></script>
+    <script src="<%- url_for("/js/jquery-ui.min.js") %>"></script>
+    <script src="<%- url_for("/js/codemirror.js") %>"></script>
+    <script src="<%- url_for("/js/xml.js") %>"></script>
+  <% } %>
 </head>
 <body class="<%- 'page-tier-' + theme.tier %>">
   <% const tier = theme.tier || "all" %>
