@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3704: Fix auto-annotations not being revealed",
-  "commit": "d8ec0d93812b4177734b45746d43ef75430a7feb",
-  "branch": "fb-dev-3704/auto-annotation-history",
-  "date": "2022/11/04 13:44:18"
+  "commit": "009adc35b88798a1a92db386d909be2452147c19",
+  "branch": "master",
+  "date": "2022/11/04 15:28:17"
 }
