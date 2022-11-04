@@ -6,11 +6,12 @@ meta_title: Audio Tag for Labeling Audio
 meta_description: Customize Label Studio to label audio data for machine learning and data science projects.
 ---
 
-The Audio tag plays a simple audio file. Use this tag for basic audio annotation tasks such as classification or transcription.
+The `Audio` tag plays a simple audio file. Use this tag for basic audio annotation tasks such as classification or transcription.
 
-Use with the following data types: audio
+Use with the following data types: audio.
 
 ### Parameters
+<i> Table 1: Parameters used in `Audio` tag. </i>
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -19,6 +20,7 @@ Use with the following data types: audio
 | hotkey | <code>string</code> |  | Hotkey used to play or pause audio |
 | [cursorwidth] | <code>string</code> | <code>1</code> | Audio pane cursor width. It is measured in pixels. |
 | [cursorcolor] | <code>string</code> | <code>&quot;#333&quot;</code> | Audio pane cursor color. The color should be specified in hex decimal string |
+
 
 ### Sample Results JSON
 
@@ -30,6 +32,7 @@ Use with the following data types: audio
 | value.end | <code>number</code> | end time of the fragment (seconds) |
 
 ### Example JSON
+JSON code:
 ```json
 {
   "original_length": 18,
@@ -42,15 +45,16 @@ Use with the following data types: audio
 ```
 
 ### Example
+Play audio on the labeling interface:
+
 ```html
-<!--Play audio on the labeling interface-->
 <View>
   <Audio name="audio" value="$audio" />
 </View>
 ```
-### Example
 
-Audio classification
+### Example
+Audio classification:
 
 ```html
 <View>
@@ -61,9 +65,8 @@ Audio classification
   </Choices>
 </View>
 ```
-### Example
 
-Audio transcription
+Audio transcription:
 
 ```html
 <View>

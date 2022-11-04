@@ -6,11 +6,12 @@ meta_title: Video Tag for Video Labeling
 meta_description: Customize Label Studio with the Video tag for basic video annotation tasks for machine learning and data science projects.
 ---
 
-Video tag plays a simple video file. Use for video annotation tasks such as classification and transcription.
+The `Video` tag plays a simple video file. Use for video annotation tasks such as classification and transcription.
 
-Use with the following data types: video
+Use with the following data types: video.
 
 ### Parameters
+<i> Table 1: Parameters used in `Video` tag. </i>
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -22,6 +23,8 @@ Use with the following data types: video
 | [height] | <code>number</code> | <code>600</code> | height of the video |
 
 ### Example
+Labeling configuration to display a video on the labeling interface:
+
 ```html
 <!--Labeling configuration to display a video on the labeling interface-->
 <View>
@@ -30,7 +33,7 @@ Use with the following data types: video
 ```
 ### Example
 
-Video classification
+Video classification:
 
 ```html
 <View>
@@ -43,7 +46,7 @@ Video classification
 ```
 ### Example
 
-Video transcription
+Video transcription:
 
 ```html
 <View>

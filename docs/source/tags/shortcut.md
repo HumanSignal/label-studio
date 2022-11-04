@@ -6,7 +6,7 @@ meta_title: Shortcut Tag to Define Shortcuts
 meta_description: Customize Label Studio to define keyboard shortcuts and hotkeys to accelerate labeling for machine learning and data science projects.
 ---
 
-Use the Shortcut tag to define a shortcut that annotators can use to add a predefined object, such as a specific label value, with a hotkey or keyboard shortcut.
+The `Shortcut` tag is used to define a shortcut that annotators can use to add a predefined object, such as a specific label value, with a hotkey or keyboard shortcut.
 
 Use with the following data types:
 - Audio
@@ -18,6 +18,7 @@ Use with the following data types:
 - Video
 
 ### Parameters
+<i> Table 1: Parameters used in `Shortcut` tag. </i>
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -27,6 +28,12 @@ Use with the following data types:
 | [background] | <code>string</code> | <code>&quot;#333333&quot;</code> | Background color in hexadecimal |
 
 ### Example
+Basic labeling configuration to add a shortcut that places the text SILENCE in a given Text Area while doing transcription.
+
+!!! note
+    1. The default background color for the `Shortcut` tag is gray color.
+    2. You can change the background color using text or hexadecimal format in the `background` parameter.
+
 ```html
 <!--
 Basic labeling configuration to add a shortcut that places the text SILENCE in a given Text Area while doing transcription.

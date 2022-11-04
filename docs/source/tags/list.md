@@ -6,11 +6,12 @@ meta_title: List Tag for Lists
 meta_description: Customize Label Studio with lists for machine learning and data science projects.
 ---
 
-Use the List tag to rank results, for example for recommendation systems.
+The `List` tag is used to rank results, for example for recommendation systems.
 
-Use with the following data types: audio, image, HTML, paragraphs, text
+Use with the following data types: audio, image, HTML, paragraphs, text.
 
 ### Parameters
+<i> Table 1: Parameters used in `List` tag. </i>
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -23,6 +24,8 @@ Use with the following data types: audio, image, HTML, paragraphs, text
 | lockAxis | <code>x</code> \| <code>y</code> |  | Whether to lock the axis |
 
 ### Example
+Labeling configuration for a list of possible reply options that can be ranked:
+
 ```html
 <!--Labeling configuration for a list of possible reply options that can be ranked-->
 <View>

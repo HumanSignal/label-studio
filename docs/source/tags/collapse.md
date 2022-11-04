@@ -5,9 +5,10 @@ order: 501
 is_new: t
 ---
 
-Collapse tag, a content area which can be collapsed and expanded.
+The `Collapse` tag is used for the content area which can be collapsed and expanded.
 
 ### Parameters
+<i> Table 1: Parameters used in `Collapse` tag. </i>
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |

@@ -7,11 +7,12 @@ meta_title: Video Tag for Video Labeling
 meta_description: Customize Label Studio with the Video tag for basic video annotation tasks for machine learning and data science projects.
 ---
 
-VideoRectangle tag brings Object Tracking capabilities to videos. It works in combination with the `<Video/>` and the `<Labels/>` tags.
+The `VideoRectangle` tag brings Object Tracking capabilities to videos. It works in combination with the `<Video/>` and the `<Labels/>` tags.
 
-Use with the following data types: video
+Use with the following data types: video.
 
 ### Parameters
+<i> Table 1: Parameters used in `VideoRectangle` tag. </i>
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -19,6 +20,8 @@ Use with the following data types: video
 | toName | <code>string</code> | Name of the element to control (video) |
 
 ### Example
+Video Object Tracking:
+
 ```html
 <!--Video Object Tracking-->
 <View>

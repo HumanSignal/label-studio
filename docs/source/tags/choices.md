@@ -6,13 +6,14 @@ meta_title: Choices Tag for Multiple Choice Labels
 meta_description: Customize Label Studio with multiple choice labels for machine learning and data science projects.
 ---
 
-Use the Choices tag to create a group of choices, with radio buttons, or checkboxes. Can be used for single or multi-class classification. Use for advanced classification tasks where annotators can choose one or multiple answers.
+The `Choices` tag is used to create a group of choices, with radio buttons, or checkboxes. Can be used for single or multi-class classification. Use for advanced classification tasks where annotators can choose one or multiple answers.
 
 Choices can have dynamic value to load labels from task. This task data should contain a list of options to create underlying <Choice>s. All the parameters from options will be transferred to corresponding tags.
 
-The Choices tag can be used with any data types.
+The `Choices` tag can be used with any data types.
 
 ### Parameters
+<i> Table 1: Parameters used in `Choices` tag. </i>
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -31,8 +32,10 @@ The Choices tag can be used with any data types.
 | [allowNested] | <code>boolean</code> |  | Allow to use `children` field in dynamic choices to nest them. Submitted result will contain array of arrays, every item is a list of values from topmost parent choice down to selected one. |
 
 ### Example
+
+Basic text classification labeling configuration:
+
 ```html
-<!--Basic text classification labeling configuration-->
 <View>
   <Choices name="gender" toName="txt-1" choice="single-radio">
     <Choice alias="M" value="Male" />
@@ -43,7 +46,9 @@ The Choices tag can be used with any data types.
   <Text name="txt-1" value="John went to see Mary" />
 </View>
 ```
-**Example** *(This config with dynamic labels)*  
+ 
+Configuration with dynamic labels:
+
 ```html
 <View>
   <Audio name="audio" value="$audio" />
@@ -60,7 +65,7 @@ The Choices tag can be used with any data types.
   }
 } -->
 ```
-**Example** *(is equivalent to this config)*  
+ <b><font color =red> <b>&rarr;</b> One line description required.</b>
 ```html
 <View>
   <Audio name="audio" value="$audio" />

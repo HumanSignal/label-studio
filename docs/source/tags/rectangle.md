@@ -6,11 +6,12 @@ meta_title: Rectangle Tag for Adding Rectangle Bounding Box to Images
 meta_description: Customize Label Studio with the Rectangle tag to add rectangle bounding boxes to images for machine learning and data science projects.
 ---
 
-Use the Rectangle tag to add a rectangle (Bounding Box) to an image without selecting a label. This can be useful when you have only one label to assign to a rectangle.
+Use the `Rectangle` tag to add a rectangle (Bounding Box) to an image without selecting a label. This can be useful when you have only one label to assign to a rectangle.
 
 Use with the following data types: image
 
 ### Parameters
+<i> Table 1: Parameters used in `Rectangle` tag. </i>
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -25,6 +26,8 @@ Use with the following data types: image
 | [smartOnly] | <code>boolean</code> |  | Only show smart tool for interactive pre-annotations |
 
 ### Example
+Basic labeling configuration for adding rectangular bounding box regions to an image:
+
 ```html
 <!--Basic labeling configuration for adding rectangular bounding box regions to an image -->
 <View>

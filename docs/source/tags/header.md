@@ -6,9 +6,10 @@ meta_title: Header Tag to Show Headers
 meta_description: Customize Label Studio with the Header tag to display a header for a labeling task for machine learning and data science projects.
 ---
 
-Use the Header tag to show a header on the labeling interface.
+The `Header` tag is used to show a header on the labeling interface.
 
 ### Parameters
+<i> Table 1: Parameters used in `Header` tag. </i>
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -19,7 +20,7 @@ Use the Header tag to show a header on the labeling interface.
 
 ### Example
 
-Display a header on the labeling interface based on a field in the data
+Display a header on the labeling interface based on a field in the data:
 
 ```html
 <View>
@@ -28,7 +29,7 @@ Display a header on the labeling interface based on a field in the data
 ```
 ### Example
 
-Display a static header on the labeling interface
+Display a static header on the labeling interface:
 
 ```html
 <View>

@@ -6,17 +6,18 @@ meta_title: Ranker Tag for Model Ranking
 meta_description: Customize Label Studio with the Ranker tag to rank the predictions from different models to rank model quality in your machine learning and data science projects.
 ---
 
-Use the Ranker tag to rank the results from models. This tag uses the "prediction" field from a labeling task instead of the "data" field to display content for labeling on the interface. Carefully structure your labeling tasks to work with this tag. See [import pre-annotated data](../guide/predictions.html).
+The `Ranker` tag is used to rank the results from models. This tag uses the "prediction" field from a labeling task instead of the "data" field to display content for labeling on the interface. Carefully structure your labeling tasks to work with this tag. See [import pre-annotated data](../guide/predictions.html).
 
-Use with the following data types: text
+Use with the following data types: text.
 
-The Ranker tag renders a given list of strings and allows you to drag and reorder them.
+The `Ranker` tag renders a given list of strings and allows you to drag and reorder them.
 To see this tag in action:
 1. Save the example JSON below as a file called <code>example_ranker_tag.json</code>.
 2. Upload it as a task on the Label Studio UI.
 3. Set up a project with the given labeling configuration.
 
 ### Parameters
+<i> Table 1: Parameters used in `Ranker` tag. </i>
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -26,6 +27,8 @@ To see this tag in action:
 | sortedHighlightColor | <code>string</code> |  | Sorted color in HTML color name |
 
 ### Example
+Labeling configuration for ranking predicted text output from a model:
+
 ```html
 <!--Labeling configuration for ranking predicted text output from a model -->
 <View>
@@ -34,6 +37,8 @@ To see this tag in action:
 </View>
 ```
 ### Example
+Example JSON task to use to see the Ranker tag in action:
+
 ```html
 <!--Example JSON task to use to see the Ranker tag in action -->
 [{

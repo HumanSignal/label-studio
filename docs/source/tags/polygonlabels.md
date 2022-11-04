@@ -6,11 +6,12 @@ meta_title: Polygon Label Tag for Labeling Polygons in Images
 meta_description: Customize Label Studio with the PolygonLabels tag and label polygons in images for semantic segmentation machine learning and data science projects.
 ---
 
-Use the PolygonLabels tag to create labeled polygons. Use to apply labels to polygons in semantic segmentation tasks.
+The `PolygonLabels` tag to create labeled polygons. Use to apply labels to polygons in semantic segmentation tasks.
 
-Use with the following data types: image
+Use with the following data types: image.
 
 ### Parameters
+<i> Table 1: Parameters used in `PolygonLabels` tag. </i>
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -50,6 +51,8 @@ Use with the following data types: image
 ```
 
 ### Example
+Basic labeling configuration for polygonal semantic segmentation of images:
+
 ```html
 <!--Basic labeling configuration for polygonal semantic segmentation of images -->
 <View>

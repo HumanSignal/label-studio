@@ -6,11 +6,12 @@ meta_title: Hypertext Tags for Hypertext Markup (HTML)
 meta_description: Label Studio Hypertext Tags customize Label Studio for hypertext markup (HTML) for machine learning and data science projects.
 ---
 
-The HyperText tag displays hypertext markup for labeling. Use for labeling HTML-encoded text and webpages for NER and NLP projects.
+The `HyperText` tag displays hypertext markup for labeling. Use for labeling HTML-encoded text and webpages for NER and NLP projects.
 
 Use with the following data types: HTML
 
 ### Parameters
+<i> Table 1: Parameters used in `HyperText` tag. </i>
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -27,6 +28,7 @@ Use with the following data types: HTML
 | [granularity] | <code>symbol</code> \| <code>word</code> \| <code>sentence</code> \| <code>paragraph</code> |  | Control region selection granularity |
 
 ### Sample Results JSON
+<i>Table 2: Results structure. </i>
 
 | Name | Type | Description |
 | --- | --- | --- |
@@ -38,6 +40,7 @@ Use with the following data types: HTML
 | [value.text] | <code>string</code> | text content of the region, can be skipped |
 
 ### Example JSON
+JSON code:
 ```json
 {
   "value": {
@@ -50,9 +53,8 @@ Use with the following data types: HTML
 }
 ```
 
-### Example
+Labeling configuration to label HTML content:
 ```html
-<!--Labeling configuration to label HTML content -->
 <View>
   <HyperText name="text-1" value="$text" />
   <Labels name="parts" toName="text-1">
@@ -62,7 +64,8 @@ Use with the following data types: HTML
   </Labels>
 </View>
 ```
-### Example
+
+<b><font color =red> <b>&rarr;</b> One line description required.</b>
 ```html
 <View>
   <HyperText name="p1">

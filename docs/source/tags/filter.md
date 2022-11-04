@@ -6,9 +6,10 @@ meta_title: Filter Tag for Filter Search
 meta_description: Customize Label Studio with the Filter tag to filter labels to accelerate labeling for machine learning and data science projects.
 ---
 
-Use the Filter tag to add a filter search for a large number of labels or choices. Use with the Labels tag or Choices tag.
+The `Filter` tag is used to add a filter search for a large number of labels or choices. Use with the `Labels` tag or `Choices` tag.
 
 ### Parameters
+<i> Table 1: Parameters used in `Filter` tag. </i>
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -19,7 +20,7 @@ Use the Filter tag to add a filter search for a large number of labels or choice
 
 ### Example
 
-Add a filter to labels for a named entity recognition task
+Add a filter to labels for a named entity recognition task:
 
 ```html
 <View>

@@ -6,13 +6,14 @@ meta_title: Paragraph Tags for Paragraphs
 meta_description: Customize Label Studio with the Paragraphs tag to annotate paragraphs for NLP and NER machine learning and data science projects.
 ---
 
-The Paragraphs tag displays paragraphs of text on the labeling interface. Use to label dialogue transcripts for NLP and NER projects.
+The `Paragraphs` tag displays paragraphs of text on the labeling interface. Use to label dialogue transcripts for NLP and NER projects.
 The Paragraphs tag expects task data formatted as an array of objects like the following:
 [{ $nameKey: "Author name", $textKey: "Text" }, ... ]
 
 Use with the following data types: text
 
 ### Parameters
+<i> Table 1: Parameters used in `Paragraphs` tag. </i>
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -52,6 +53,8 @@ Use with the following data types: text
 ```
 
 ### Example
+Labeling configuration to label paragraph regions of text containing dialogue.
+
 ```html
 <!--Labeling configuration to label paragraph regions of text containing dialogue-->
 <View>

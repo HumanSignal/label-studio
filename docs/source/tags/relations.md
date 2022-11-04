@@ -6,17 +6,20 @@ meta_title: Relations Tag for Multiple Relations
 meta_description: Customize Label Studio by adding labels to relationships between labeled regions for machine learning and data science projects.
 ---
 
-Use the Relations tag to create label relations between regions. Use to provide many values to apply to the relationship between two labeled regions.
+The `Relations` tag is used to create label relations between regions. Use to provide many values to apply to the relationship between two labeled regions.
 
-Use with the following data types: audio, image, HTML, paragraphs, text, time series, video
+Use with the following data types: audio, image, HTML, paragraphs, text, time series, video.
 
 ### Parameters
+<i> Table 1: Parameters used in `Relations` tag. </i>
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | [choice] | <code>single</code> \| <code>multiple</code> | <code>single</code> | Configure whether you can select one or multiple labels |
 
 ### Example
+asic labeling configuration to apply the label "similar" or "dissimilar" to a relation identified between two labeled regions of text:
+
 ```html
 <!--Basic labeling configuration to apply the label "similar" or "dissimilar" to a relation identified between two labeled regions of text -->
 <View>

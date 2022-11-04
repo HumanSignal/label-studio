@@ -6,9 +6,10 @@ meta_title: Style Tag to use CSS Styles
 meta_description: Customize Label Studio with CSS styles to modify the labeling interface for machine learning and data science projects.
 ---
 
-Use the Style tag in combination with the View tag to apply custom CSS properties to the labeling interface. See the [CSS Reference](https://www.w3schools.com/cssref/default.asp) on the W3Schools page for a full list of available properties that you can reference. You can also adjust default Label Studio CSS classes. Use the browser developer tools to inspect the element on the UI and locate the class name, then specify that class name in the Style tag.
+The `Style` tag is used in combination with the `View` tag to apply custom CSS properties to the labeling interface. See the [CSS Reference](https://www.w3schools.com/cssref/default.asp) on the W3Schools page for a full list of available properties that you can reference. You can also adjust default Label Studio CSS classes. Use the browser developer tools to inspect the element on the UI and locate the class name, then specify that class name in the `Style` tag.
 
 ### Parameters
+<i> Table 1: Parameters used in `Style` tag. </i>
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -17,7 +18,7 @@ Use the Style tag in combination with the View tag to apply custom CSS propertie
 
 ### Example
 
-Use CSS styling to make a header appear with a red background on the labeling interface
+Use CSS styling to make a header appear with a red background on the labeling interface.
 
 ```html
 <View>
@@ -29,7 +30,7 @@ Use CSS styling to make a header appear with a red background on the labeling in
 ```
 ### Example
 
-Use CSS styling to make a header appear centered with a dotted blue border while the task is unstyled
+Use CSS styling to make a header appear centered with a dotted blue border while the task is not customized.
 
 ```html
 <View>
@@ -48,7 +49,7 @@ Use CSS styling to make a header appear centered with a dotted blue border while
 ```
 ### Example
 
-Use CSS styling to wrap a text classification task with a green dotted border with 35px of padding, apply a green shadow to all text, align all text in the center
+Use CSS styling to wrap a text classification task with a green dotted border with 35px of padding, apply a green shadow to all text, align all text in the center.
 
 ```html
 <View>
@@ -64,7 +65,7 @@ Use CSS styling to wrap a text classification task with a green dotted border wi
 ```
 ### Example
 
-Adjust the default CSS styling in Label Studio to surround each radio button choice with a solid green border
+Adjust the default CSS styling in Label Studio to surround each radio button choice with a solid green border.
 
 ```html
 <View>
