@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3701: Fix value updating for dynamic children (#950)",
-  "commit": "74be06ab6a0233190f590dca273eb80e8ab66ede",
+  "message": "fix: DEV-3704: Fix auto-annotations not being revealed",
+  "commit": "009adc35b88798a1a92db386d909be2452147c19",
   "branch": "master",
-  "date": "2022-11-03T21:34:56Z"
+  "date": "2022/11/04 15:28:17"
 }
