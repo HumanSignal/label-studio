@@ -140,9 +140,11 @@
           </div>
           <div>
             <%- partial("component/text", {text: "Can’t find what you’re looking for?", tag: "h3", size: "Eyebrow"}) %>
-            <%- partial("component/button", { url: "https://github.com/heartexlabs/label-studio/issues", label: "Submit a GitHub Issue", }) %>
-            <%- partial("component/button", { url: "https://slack.labelstudio.heartex.com/?source=docs-footer", label: "Join Slack Community", theme: "Secondary"}) %>
-          </div>
+            <div class="content-footer-button-group">
+              <%- partial("component/button", { url: "https://github.com/heartexlabs/label-studio/issues", label: "Submit a GitHub Issue", }) %>
+              <%- partial("component/button", { url: "https://slack.labelstudio.heartex.com/?source=docs-footer", label: "Join Slack Community", theme: "Secondary", icon: "Slack"}) %>
+            </div>
+            </div>
         </footer>
       </div>
     </div>

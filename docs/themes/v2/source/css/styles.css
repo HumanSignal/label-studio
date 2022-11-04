@@ -222,6 +222,12 @@ main {
   margin-top: 5em;
 }
 
+.content-footer-button-group {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
 .container {
   margin: 0 auto;
   max-width: 1030px;
@@ -451,11 +457,6 @@ main {
   border-color: var(--color-orange-90);
 }
 
-.Button svg {
-  width: 1.5em;
-  height: auto;
-}
-
 .Secondary {
   background-color: transparent;
   color: var(--color-gray-900);
@@ -465,6 +466,10 @@ main {
   background-color: var(--color-gray-900);
   border-color: var(--color-gray-900);
   color: var(--color-white);
+}
+
+.WithIcon {
+  padding: 0.65em 1em;
 }
 
 .content-grid {
