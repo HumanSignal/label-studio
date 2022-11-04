@@ -5,7 +5,7 @@ type: guide
 tier: all
 order: 704
 meta_title: API Endpoints
-meta_description: API documentation for authenticating, listing data science projects, importing predictions and raw data and exporting annotated data, and user management in Label Studio.
+meta_description: API documentation for authenticating, listing data science projects, importing predictions and raw data and exporting annotated data, and user management.
 ---
 
 You can use the Label Studio API to import data for labeling, export annotations, set up machine learning with Label Studio, and sync tasks with cloud storage. 

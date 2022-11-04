@@ -60,16 +60,41 @@ body {
 
 .page-header nav > ul {
   display: flex;
-  align-items: center;
   gap: 2em;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
+.page-header nav > ul > li {
+  position: relative;
+}
+
+.page-header nav > ul > li > ul {
+  display: none;
+  padding: 0.75em;
+  flex-direction: column;
+  gap: 0.5em;
+  list-style: none;
+  position: absolute;
+  top: calc(100% - 5px);
+  left: -0.5em;
+  border: 1px solid var(--color-gray-900);
+  background-color: var(--color-white);
+  z-index: 2;
+}
+
+.page-header nav > ul > li:hover > ul {
+  display: flex;
+}
+
 .page-header nav a:not(.Button) {
   color: var(--color-gray-900);
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+  height: 100%;
 }
 
 .page-header nav a:not(.Button):hover {
@@ -868,6 +893,102 @@ Footer
   transition:opacity .1s
 }
 
+/****************************
+  Was it helpful form
+****************************/
+.helpful-container {
+
+}
+
+.helpful-button-group {
+  display: flex;
+  gap: 1em;
+  flex-wrap: wrap;
+}
+
+.helpful-form,
+.helpful-form fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.helpful-form .helpful-radio-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.helpful-form input[type="radio"] {
+  appearance: none;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.helpful-form .helpful-form-label {
+  --min-size: 0.75rem; /* 12px */
+  --max-size: 0.875rem; /* 14px */
+  --line-height: 1.41;
+
+  font-family: var(--font-family-secondary);
+  font-size: clamp(var(--min-size), 7vw, var(--max-size));
+  color: var(--color-gray-900);
+  line-height: var(--line-height);
+  font-weight: normal;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.helpful-form-textarea {
+  font-family: var(--font-family-secondary);
+  resize: none;
+  border: 1px var(--color-gray-300) solid;
+  padding: 0.5em;
+  min-height: 4rem;
+  width: 100%;
+}
+
+.helpful-form-textarea + .helpful-form-label {
+  margin-top: 1rem;
+}
+
+.helpful-form-submit-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+  margin-top: 1em;
+}
+
+.helpful-form-input {
+  border: 1px var(--color-gray-300) solid;
+  padding: 0.5em;
+  width: 100%;
+}
+
+.helpful-form-more {
+  display: none;
+  padding-top: 2em;
+}
+
+.helpful-form input[type="radio"]:checked + .helpful-button {
+  background-color: var(--color-orange-90);
+  color: var(--color-white);
+}
+
+.helpful-button {
+  appearance: none;
+  background-color: var(--color-orange-10);
+  border: 1px var(--color-orange-90) solid;
+  color: var(--color-orange-90);
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+  padding: 0.5em;
+}
 
 
 

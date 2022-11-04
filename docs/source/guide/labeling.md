@@ -4,7 +4,7 @@ type: guide
 tier: all
 order: 402
 meta_title: Label and annotate data
-meta_description: Label and annotate data using the Label Studio UI to create bounding boxes, label text spans, set up relations, and filter and sort project data for your machine learning dataset creation.
+meta_description: "Label and annotate data to create bounding boxes, label text spans, set up relations. Filter and sort project data for machine learning dataset creation."
 ---
 
 Label and annotate your data with the open source data labeling tool, Label Studio. After you [set up your project](setup_project.html) and [labeling interface](setup.html) and [import your data](tasks.html), you can start labeling and annotating your data.

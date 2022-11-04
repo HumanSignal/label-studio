@@ -5,7 +5,7 @@ type: guide
 tier: all
 order: 300
 meta_title: Import Data into Label Studio
-meta_description: Import and upload data labeling tasks from audio, HTML, image, CSV, text, and time series datasets using common file formats or the Label Studio JSON format to label and annotate that data for your machine learning and data science projects. 
+meta_description: Label and annotate data for your machine learning and data science projects using common file formats or the Label Studio JSON format.
 ---
 
 Get data into Label Studio by importing files, referencing URLs, or syncing with cloud or database storage. 

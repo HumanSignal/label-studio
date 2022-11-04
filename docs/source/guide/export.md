@@ -5,7 +5,7 @@ type: guide
 tier: all
 order: 415
 meta_title: Export Annotations
-meta_description: Label Studio documentation for exporting data labeling annotations in multiple formats that you can use in machine learning models and data science projects.
+meta_description: Label Studio documentation for exporting data labeling annotations to use in machine learning models and data science projects.
 ---
 
 At any point in your labeling project, you can export the annotations from Label Studio. 
