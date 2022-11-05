@@ -318,7 +318,7 @@ export const ImportPage = ({
                   <dt>Time Series</dt><dd>csv, tsv</dd>
                   <dt>Common Formats</dt><dd>csv, tsv, txt, json</dd>
                 </dl>
-                <b style="text-align:center">
+                <b>
                    * – Support depends on the browser<br/>
                    * – Use <a href="https://labelstud.io/guide/storage.html" target="_blank">
                   Cloud Storages</a> if you want to import a large number of files
