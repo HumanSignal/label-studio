@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3651: If region is selected pagination doesn't work (#934)",
-  "commit": "846bda25e21990a70197b952946fe221a0f3d69a",
+  "message": "fix: DEV-3704: Fix auto-annotations not being revealed",
+  "commit": "009adc35b88798a1a92db386d909be2452147c19",
   "branch": "master",
-  "date": "2022-10-28T13:14:25Z"
+  "date": "2022/11/04 15:28:17"
 }

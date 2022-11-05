@@ -14,6 +14,7 @@ import re
 import logging
 import json
 
+from datetime import timedelta
 from label_studio.core.utils.params import get_bool_env, get_env
 
 formatter = 'standard'
@@ -383,6 +384,13 @@ STATICFILES_STORAGE = 'core.storage.SkipMissedManifestStaticFilesStorage'
 SESSION_COOKIE_SECURE = bool(int(get_env('SESSION_COOKIE_SECURE', False)))
 CSRF_COOKIE_SECURE = bool(int(get_env('CSRF_COOKIE_SECURE', SESSION_COOKIE_SECURE)))
 CSRF_COOKIE_HTTPONLY = bool(int(get_env('CSRF_COOKIE_HTTPONLY', SESSION_COOKIE_SECURE)))
+
+# Inactivity user sessions
+INACTIVITY_SESSION_TIMEOUT_ENABLED = bool(int(get_env('INACTIVITY_SESSION_TIMEOUT_ENABLED', True)))
+# The most time a login will last, regardless of activity
+MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(days=14).total_seconds()))
+# The most time that can elapse between activity with the server before the user is logged out
+MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(days=5).total_seconds()))
 
 SSRF_PROTECTION_ENABLED = get_bool_env('SSRF_PROTECTION_ENABLED', False)
 

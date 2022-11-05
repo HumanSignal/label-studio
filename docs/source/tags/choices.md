@@ -31,8 +31,10 @@ The Choices tag can be used with any data types.
 | [allowNested] | <code>boolean</code> |  | Allow to use `children` field in dynamic choices to nest them. Submitted result will contain array of arrays, every item is a list of values from topmost parent choice down to selected one. |
 
 ### Example
+
+Basic text classification labeling configuration
+
 ```html
-<!--Basic text classification labeling configuration-->
 <View>
   <Choices name="gender" toName="txt-1" choice="single-radio">
     <Choice alias="M" value="Male" />
