@@ -520,6 +520,8 @@ class Project(ProjectMixin, models.Model):
             diff_str = []
             for ann_tuple in different_annotations:
                 from_name, to_name, t = ann_tuple.split('|')
+                if t.lower() == 'textarea':  # avoid textarea to_name check (see DEV-1598)
+                    continue
                 if not check_control_in_config_by_regex(config_string, from_name) or \
                 not check_toname_in_config_by_regex(config_string, to_name) or \
                 t not in get_all_types(config_string):
@@ -549,6 +551,10 @@ class Project(ProjectMixin, models.Model):
             labels_from_config_by_tag = set(labels_from_config[get_original_fromname_by_regex(config_string, control_tag_from_data)])
             parsed_config = parse_config(config_string)
             tag_types = [tag_info['type'] for _, tag_info in parsed_config.items()]
+            # DEV-1990 Workaround for Video labels as there are no labels in VideoRectangle tag
+            if 'VideoRectangle' in tag_types:
+                for key in labels_from_config:
+                    labels_from_config_by_tag |= set(labels_from_config[key])
             if 'Taxonomy' in tag_types:
                 custom_tags = Label.objects.filter(links__project=self).values_list('value', flat=True)
                 flat_custom_tags = set([item for sublist in custom_tags for item in sublist])
@@ -1001,6 +1007,9 @@ class ProjectSummary(models.Model):
 
     def _get_labels(self, result):
         result_type = result.get('type')
+        # DEV-1990 Workaround for Video labels as there are no labels in VideoRectangle tag
+        if result_type in ['videorectangle']:
+            result_type = 'labels'
         result_value = result['value'].get(result_type)
         if not result_value or not isinstance(result_value, list) or result_type == 'text':
             # Non-list values are not labels. TextArea list values (texts) are not labels too.

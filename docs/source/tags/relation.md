@@ -16,8 +16,10 @@ The Relation tag represents a single relation label. Use with the Relations tag 
 | [background] | <code>string</code> | Background color of the active label in hexadecimal |
 
 ### Example
+
+Basic labeling configuration to apply the label "similar" to a relation identified between two labeled regions of text
+
 ```html
-<!--Basic labeling configuration to apply the label "similar" to a relation identified between two labeled regions of text -->
 <View>
   <Relations>
     <Relation value="similar" />

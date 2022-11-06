@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3436: Add comment icons in annotations dropdown (#105)\n\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "118b7b784df6bbc90c3f5e1d2aec9b019b351976",
+  "message": "fix: DEV-3673: Navigation using task links is broken (#124)",
+  "commit": "11b5975d499f63e96eae988be7bca7aa7bb31557",
   "branch": "master",
-  "date": "2022-09-22T10:35:33Z"
+  "date": "2022-11-03T15:53:51Z"
 }

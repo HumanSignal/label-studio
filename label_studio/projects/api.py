@@ -120,7 +120,7 @@ class ProjectFilterSet(FilterSet):
     
     ```bash
     curl -H Content-Type:application/json -H 'Authorization: Token abc123' -X POST '{}/api/projects' \
-    --data "{{\"label_config\": \"<View>[...]</View>\"}}"
+    --data '{{"label_config": "<View>[...]</View>"}}'
     ```
     """.format(settings.HOSTNAME or 'https://localhost:8080')
 ))
@@ -224,9 +224,6 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
                 has_changes = config_essential_data_has_changed(label_config, project.label_config)
             except KeyError:
                 pass
-            else:
-                if has_changes:
-                    View.objects.filter(project=project).all().delete()
 
         return super(ProjectAPI, self).patch(request, *args, **kwargs)
 
