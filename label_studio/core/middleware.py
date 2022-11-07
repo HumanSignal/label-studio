@@ -162,7 +162,10 @@ class InactivitySessionTimeoutMiddleWare(CommonMiddleware):
     # paths that don't count as user activity
     NOT_USER_ACTIVITY_PATHS = []
     def process_request(self, request) -> None:
-        if not hasattr(request, "session") or request.session.is_empty():
+        if (not hasattr(request, 'session') or
+            request.session.is_empty() or
+            not hasattr(request, 'user') or
+            not request.user.is_authenticated):
             return
 
         current_time = time.time()
