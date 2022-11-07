@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-3572: Persist and read virtual annotator filters from local storage as a fallback (#116)",
-  "commit": "fa4559e82f69910ba7ce24c978c6a194aa58a7e8",
+  "message": "fix: DEV-3673: Navigation using task links is broken (#124)",
+  "commit": "11b5975d499f63e96eae988be7bca7aa7bb31557",
   "branch": "master",
-  "date": "2022-10-21T14:05:14Z"
+  "date": "2022-11-03T15:53:51Z"
 }
