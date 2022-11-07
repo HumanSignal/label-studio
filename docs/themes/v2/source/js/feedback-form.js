@@ -19,6 +19,5 @@
 
   cancelButton.addEventListener("click", closeForm);
 
-
 })();
 

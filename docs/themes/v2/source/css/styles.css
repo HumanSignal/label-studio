@@ -55,19 +55,56 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 0 1em;
-  gap: 2em;
+  column-gap: 2em;
 }
 
 .page-header nav > ul {
   display: flex;
-  gap: 2em;
+  column-gap: 2em;
+  row-gap: 1em;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
+.page-header nav button + ul {
+  display: none;
+  padding: 1em 1em 1em 1em;
+  background-color: var(--color-gray-50);
+  margin-left: -1em;
+  margin-right: -1em;
+  margin-top: 0.5em;
+  padding-left: 2em;
+}
+
+.page-header nav > button {
+  appearance: none;
+  background-color: transparent;
+  border: 0;
+  padding: 1em 0 0 0;
+  width: 100%;
+  font-size: 1em;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.page-header nav > button.active svg {
+  transform: rotate(180deg);
+}
+
 .page-header nav > ul > li {
   position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-header nav > ul > li button {
+  appearance: none;
+  background-color: transparent;
+  border: 0;
 }
 
 .page-header nav > ul > li > ul {
@@ -82,10 +119,6 @@ body {
   border: 1px solid var(--color-gray-900);
   background-color: var(--color-white);
   z-index: 2;
-}
-
-.page-header nav > ul > li:hover > ul {
-  display: flex;
 }
 
 .page-header nav a:not(.Button) {
@@ -105,6 +138,89 @@ body {
   display: none;
 }
 
+.page-header nav h2 {
+  display: none;
+}
+
+@media (min-width: 1001px) {
+  .page-header nav > ul > li:hover > ul {
+    display: flex;
+  }
+}
+
+@media (max-width: 1000px) {
+
+  .page-header nav {
+    display: none;
+    width: 100%;
+    background-color: var(--color-white);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    padding: 0 1em 1em 1em;
+    border-bottom: 1px var(--color-gray-900) solid;
+    flex-direction: column;
+  }
+
+  .page-header nav a.Button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .page-header nav ul {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .page-header nav a svg {
+    display: none;
+  }
+
+  .page-header nav .page-header-main-nav {
+    border-top: 1px var(--color-gray-300) solid;
+    padding-top: 2em;
+  }
+}
+
+@media (max-width: 800px) {
+  .page-header nav .page-header-main-nav {
+    margin-top: 2em;
+  }
+}
+
+@media (min-width: 801px) {
+  .page-header nav ul:not(.page-header-main-nav) {
+    display: none;
+  }
+
+  .page-header nav > button {
+    display: none;
+  }
+}
+
+.hamburger-button {
+  display: none;
+  appearance: none;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 1rem;
+  background-color: transparent;
+  border: 0;
+  margin-right: 0.7rem;
+}
+
+.hamburger-button span {
+  width: 1.25rem;
+  height: 1.5px;
+  background-color: var(--color-gray-900);
+}
+
+@media (max-width: 1000px) {
+  .hamburger-button {
+    display: flex;
+  }
+}
+
 main {
   --sidebar-size: 308px;
   display: flex;
@@ -112,7 +228,7 @@ main {
 
 .content {
   position: relative;
-  padding: 75px 50px;
+  padding: 75px clamp(25px, 4vw, 50px);
   width: 100%;
 }
 
@@ -132,6 +248,7 @@ main {
   overflow: auto;
   border-right: 1px black solid;
   padding: 1.5em 1.5em 3em 1.5em;
+  flex-shrink: 0;
 }
 
 .page-sidebar [aria-current="page"] {
@@ -142,7 +259,7 @@ main {
 .page-sidebar .Text {
   color: var(--color-gray-600);
   margin-top: 2rem;
-  margin-bottom: 0;
+  margin-bottom: 0.25rem;
 }
 
 .page-sidebar ul {
@@ -163,6 +280,12 @@ main {
 
 .page-sidebar ul a:hover {
   color: var(--color-accent);
+}
+
+@media (max-width: 800px) {
+  .page-sidebar {
+    display: none;
+  }
 }
 
 .columns {
@@ -226,6 +349,12 @@ main {
   display: inline-flex;
   flex-direction: column;
   gap: 1em;
+}
+
+@media (max-width: 800px) {
+  .content-footer {
+    grid-template-columns: 1fr;
+  }
 }
 
 .container {
@@ -475,10 +604,9 @@ main {
 }
 
 .content-grid {
-  display: grid;
-  grid-template-columns: 82ch 1fr;
   align-items: flex-start;
   gap: 3em;
+  display: flex;
 }
 
 .toc {
@@ -506,9 +634,19 @@ main {
   margin-top: 1em;
 }
 
+@media (max-width: 1000px) {
+  .toc {
+    display: none;
+  }
+}
+
 /****************************
   Markdown styles
 ****************************/
+
+.content-markdown {
+  flex-basis: 82ch;
+}
 
 .content-markdown * {
   scroll-margin-top: 3em;
@@ -634,6 +772,9 @@ main {
 
 .content-markdown iframe {
   margin: 3em 0;
+  aspect-ratio: 16/9;
+  width: 100%;
+  height: auto;
 }
 
 .content-markdown blockquote {

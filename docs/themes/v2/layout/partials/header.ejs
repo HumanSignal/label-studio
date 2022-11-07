@@ -1,4 +1,5 @@
-<% const isEnterpriseTheme = theme.tier === "enterprise" %>
+<% const tier = theme.tier || "all" %>
+<% const isEnterpriseTheme = tier === "enterprise" %>
 
 <header class="page-header">
   <a href="/" class="HeaderLogo astro-7IFFX3A3" arial-label="Homepage">
@@ -33,8 +34,16 @@
       </svg>
     <% } %>
   </a>
+  <button class="hamburger-button" aria-label="Toggle Menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
   <nav>
-    <ul>
+    <% if(page.type !== "playground" && page.type !== "blog") { %>
+      <%- partial("partials/toc", { type: page.type, tier: tier, component: "nav" }) %>
+    <% } %>
+    <ul class="page-header-main-nav">
       <% if(isEnterpriseTheme) { %>
         <li>
           <a href="https://heartex.com/">Home</a>
@@ -63,9 +72,11 @@
             Learn
             <svg aria-hidden="true" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" class="HeaderNavDropdownIcon astro-XQZS7VED"><path d="M1 0.5L5 4.5L9 0.5" stroke="#131522"></path></svg>
           </a>
-          <!-- <button>
-            <svg aria-hidden="true" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 0.5L5 4.5L9 0.5" stroke="#131522"></path></svg>
-          </button> -->
+          <button>
+            <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 0.628174L7 6.62817L13 0.628174" stroke="#131522"/>
+            </svg>
+          </button>
           <ul>
             <li>
               <a href="/blog/">Blog</a>
