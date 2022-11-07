@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3644: Readonly regions should always be selectable",
-  "commit": "fed1952c8cea4908edfa539a1c3567e49c870647",
+  "commit": "ba5bebeaf63a6f6394bf0cceb9dd57014e239eb4",
   "branch": "fb-dev-3644",
-  "date": "2022/11/07 15:52:21"
+  "date": "2022/11/07 17:12:39"
 }
