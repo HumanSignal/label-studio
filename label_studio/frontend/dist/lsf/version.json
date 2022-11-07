@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3704: Fix auto-annotations not being revealed",
-  "commit": "009adc35b88798a1a92db386d909be2452147c19",
-  "branch": "master",
-  "date": "2022/11/04 15:28:17"
+  "message": "fix: DEV-3224: Assign task history from outside",
+  "commit": "fb875f96a437a0f4842a9dd79acefd116b27c77f",
+  "branch": "fb-dev-3224",
+  "date": "2022/11/07 20:38:23"
 }
