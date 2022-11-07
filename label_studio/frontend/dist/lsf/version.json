@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3645: Timeseries brush to end of timeline error",
-  "commit": "8f61da01930e890fc8b2427c540878d2f2a30be3",
+  "message": "fix: DEV-3636: RegionEditor input for numbers must be recast to Number as it is a String (#942)",
+  "commit": "07059650bd4669d8f16aea3a3b35e1ead93ecb94",
   "branch": "master",
-  "date": "2022/10/26 14:58:21"
+  "date": "2022-11-01T13:36:41Z"
 }
