@@ -20,6 +20,7 @@ env:
   RELEASE_UBI_DOCKERFILE: "Dockerfile.redhat.release"
   PREFLIGHT_REPO: "quay.io/opdev/preflight:stable"
   DOCKER_CONFIG_PATH: "/home/runner/.docker/config.json"
+  LAUNCHDARKLY_DOWNLOAD_PATH: "feature_flags.json"
 
 jobs:
   docker_release_retag:
@@ -144,7 +145,6 @@ jobs:
       - name: Download feature flags
         env:
           LAUNCHDARKLY_COMMUNITY_SDK_KEY: ${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}
-          LAUNCHDARKLY_DOWNLOAD_PATH: "label_studio/feature_flags.json"
         run: |
           set -xeuo pipefail
           curl \
@@ -152,12 +152,12 @@ jobs:
             --retry 5 \
             --retry-delay 10 \
             -H "Authorization: $LAUNCHDARKLY_COMMUNITY_SDK_KEY" \
-            "https://sdk.launchdarkly.com/sdk/latest-all" >"$LAUNCHDARKLY_DOWNLOAD_PATH"
-          if [ "$(jq 'has("flags")' <<< cat $LAUNCHDARKLY_DOWNLOAD_PATH)" = "true" ]; then 
+            "https://sdk.launchdarkly.com/sdk/latest-all" >"${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }}"
+          if [ "$(jq 'has("flags")' <<< cat ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }})" = "true" ]; then 
             echo "feature_flags.json is valid"
           else
             echo "feature_flags.json is invalid"
-            cat $LAUNCHDARKLY_DOWNLOAD_PATH
+            cat ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }}
             exit 1
           fi
 
@@ -187,13 +187,13 @@ jobs:
           echo "release_dir=$release_dir" >> $GITHUB_OUTPUT
           mkdir -p $release_dir
           cp label_studio/core/version_.py $release_dir/
-          cp feature_flags.json $release_dir/
+          cp ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }} $release_dir/
           cd $release_dir
 
           cat <<EOF > "${{ env.RELEASE_DOCKERFILE }}"
           FROM ${{ env.IMAGE_NAME }}:${{ steps.get_info.outputs.image_version }}
           COPY --chown=54546:0 version_.py /label-studio/label_studio/core/version_.py
-          COPY --chown=54546:0 feature_flags.json /label-studio/label_studio/feature_flags.json
+          COPY --chown=54546:0 ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }} /label-studio/label_studio/feature_flags.json
           EOF
 
       - name: Build Release Ubuntu Docker image

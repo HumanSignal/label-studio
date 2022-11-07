@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3487 Align comment icons into the same columns with annotation and drafts in dropdown selector",
+  "message": "fix: DEV-3487 Align comment icons into the same columns with annotation and drafts in dropdown selector (#943)\n\n* fix: DEV-3487 Align comment icons into the same columns with annotation and drafts in dropdown selector\r\n\r\n* more idiomatic way to style without breaking original structure",
   "commit": "1470390776ba9aa89b1b4cdc23fef0e76a9907a3",
   "branch": "master",
-  "date": "2022/11/07 09:04:49"
+  "date": "2022-11-07T15:04:49Z"
 }
