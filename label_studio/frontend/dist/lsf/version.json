@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3496: Multiple clicks on 'Skip' button creates multiple skipped annotations",
-  "commit": "2c29113aa5d9dafe9f52b34dd517844cdbf13d28",
+  "commit": "8c16a15e75127149353838e984ecd77e408ef832",
   "branch": "fb-dev-3496/multiple-clicks",
-  "date": "2022/11/07 11:09:26"
+  "date": "2022/11/07 11:33:49"
 }
