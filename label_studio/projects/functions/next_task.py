@@ -260,13 +260,38 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
         # debug for critical overlap issue
         if next_task:
             try:
-                task_overlap_reached = next_task.annotations.count() >= next_task.overlap
-                global_overlap_reached = next_task.annotations.count() >= project.maximum_annotations
-                if next_task.is_labeled or task_overlap_reached or global_overlap_reached:
+                count = next_task.annotations.filter(was_cancelled=False).count()
+                task_overlap_reached = count >= next_task.overlap
+                global_overlap_reached = count >= project.maximum_annotations
+                if next_task.is_labeled or not task_overlap_reached or global_overlap_reached:
                     from tasks.serializers import TaskSimpleSerializer
+
+                    local = dict(locals())
+                    local.pop('prepared_tasks', None)
+                    local.pop('user_solved_tasks_array', None)
+                    local.pop('not_solved_tasks', None)
+
+                    task = TaskSimpleSerializer(next_task).data
+                    task.pop('data', None)
+                    task.pop('predictions', None)
+                    for i, a in enumerate(task['annotations']):
+                        task['annotations'][i] = dict(task['annotations'][i])
+                        task['annotations'][i].pop('result', None)
+
+                    project = next_task.project
+                    project_data = {
+                        'maximum_annotations': project.maximum_annotations,
+                        'skip_queue': project.skip_queue,
+                        'sampling': project.sampling,
+                        'show_ground_truth_first': project.show_ground_truth_first,
+                        'show_overlap_first': project.show_overlap_first,
+                        'overlap_cohort_percentage': project.overlap_cohort_percentage,
+                        'project_id': project.id,
+                        'title': project.title
+                    }
                     logger.error(f'get_next_task is_labeled/overlap issue: '
-                                 f'LOCALS ==> {locals()} :: '
-                                 f'NEXT_TASK ==> {TaskSimpleSerializer(next_task).data}')
+                                 f'LOCALS ==> {local} :: PROJECT ==> {project_data} :: '
+                                 f'NEXT_TASK ==> {task}')
             except Exception as e:
                 logger.error(f'get_next_task is_labeled/overlap try/except: {str(e)}')
                 pass
