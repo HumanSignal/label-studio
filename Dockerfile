@@ -30,7 +30,7 @@ RUN set -eux \
  && apt-get update \
  && apt-get install --no-install-recommends --no-install-suggests -y \
     build-essential postgresql-client libmysqlclient-dev mysql-client python3-pip python3-dev \
-    git libxml2-dev libxslt-dev zlib1g-dev gnupg curl lsb-release libpq-dev && \
+    git libxml2-dev libxslt-dev zlib1g-dev gnupg curl lsb-release libpq-dev dnsutils vim && \
     apt-get purge --assume-yes --auto-remove --option APT::AutoRemove::RecommendsImportant=false \
      --option APT::AutoRemove::SuggestsImportant=false && rm -rf /var/lib/apt/lists/* /tmp/*
 
@@ -45,6 +45,12 @@ RUN set -eux; \
     apt-get purge --assume-yes --auto-remove --option APT::AutoRemove::RecommendsImportant=false \
      --option APT::AutoRemove::SuggestsImportant=false && rm -rf /var/lib/apt/lists/* /tmp/* && \
     nginx -v
+
+COPY --chown=1001:0 deploy/default.conf /etc/nginx/nginx.conf
+
+RUN set -eux; \
+    mkdir -p $OPT_DIR /var/log/nginx /var/cache/nginx /etc/nginx && \
+    chown -R 1001:0 $OPT_DIR /var/log/nginx /var/cache/nginx /etc/nginx
 
 # Copy and install middleware dependencies
 COPY --chown=1001:0 deploy/requirements-mw.txt .

@@ -12,6 +12,7 @@ from rest_framework.authtoken.models import Token
 
 from users import forms
 from core.utils.common import load_func
+from users.functions import login
 from core.middleware import enforce_csrf_checks
 from users.functions import proceed_registration
 from organizations.models import Organization
@@ -89,10 +90,10 @@ def user_login(request):
         form = login_form(request.POST)
         if form.is_valid():
             user = form.cleaned_data['user']
-            auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            request.session['last_login'] = time()
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             if form.cleaned_data['persist_session'] is not True:
                 # Set the session to expire when the browser is closed
+                request.session['keep_me_logged_in'] = False
                 request.session.set_expiry(0)
 
             # user is organization member
