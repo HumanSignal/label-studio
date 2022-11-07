@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3673: Navigation using task links is broken (#124)",
-  "commit": "11b5975d499f63e96eae988be7bca7aa7bb31557",
-  "branch": "master",
-  "date": "2022-11-03T15:53:51Z"
+  "message": "fix: DEV-3224: Move task to the end on next task",
+  "commit": "cc12e59a686c42f3a08f9bd5d810e2ea05b6c35a",
+  "branch": "fb-dev-3224",
+  "date": "2022/11/07 16:27:44"
 }
