@@ -3,7 +3,7 @@
 <%- partial("component/heading", {text: "Docs", size: "XXSmall", tag: "h2"}) %>
 
   <ul class="page-sidebar-list">
-    <% site.pages.filter(page => page.type === type && (page.tier === theme.tier || page.tier === "all")).sort('order').each(function (p) { %>
+    <% site.pages.filter(page => page.type === type && (page.tier === theme.tier || page.tier === "all" || page.type === "tags" || page.type === "playground" || page.type === "templates")).sort('order').each(function (p) { %>
     <% var fileName = p.path.replace(/^.+?\/([\w-]+)\.html/, '$1') %>
 
     <% if (type === 'guide') { %>

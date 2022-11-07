@@ -76,7 +76,7 @@
   <%- partial("partials/header") %>
 
   <main class="<%- 'page-type-' + page.type %>">
-    <% if(page.type !== "playground") { %>
+    <% if(page.type !== "playground" && page.type !== "blog") { %>
       <aside class="page-sidebar">
         <%- partial("partials/toc", { type: page.type, tier: tier }) %>
       </aside>

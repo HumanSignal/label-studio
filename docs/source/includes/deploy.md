@@ -1,3 +1,6 @@
+---
+sitemap: false
+---
 ## System requirements
 You can install Label Studio on a Linux, Windows, or MacOSX machine running Python 3.6 or later.
 

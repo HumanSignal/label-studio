@@ -114,6 +114,3 @@ search:
 # plugin to include md into md: https://github.com/tea3/hexo-include-markdown
 include_markdown:
   dir: source/includes
-
-theme_config:
-  mycity: ${env.SITE_TIER}

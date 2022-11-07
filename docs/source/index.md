@@ -6,3 +6,4 @@ index: true
 <a href="/templates">Templates</a>
 <a href="/tags">Tags</a>
 <a href="/playground">Playground</a>
+<a href="/tutorials/sklearn-text-classifier.html">Tutorial example</a>

@@ -38,10 +38,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec lobortis nibh et 
 
 ---
 
-## Blockquote <span class="badge-design">* Need design</span>
+## Blockquote
 
 > Blockquotes are very handy in email to emulate reply text.
-> This line is part of the same quote.
 
 Quote break.
 
@@ -303,8 +302,6 @@ Enterprise
 
 <div class="code-tabs">
 <div data-name="Workload Identity">
-
-> Make sure that Workload Identity is enabled on your GKE cluster and that you meet the necessary prerequisites. See [Using Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) in the Google Kubernetes Engine guide.
 
 1. Set up the following environment variables, specifying the service account you created as the `GCP_SA` variable, and replacing the other references in `<>` as needed:
 

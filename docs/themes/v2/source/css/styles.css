@@ -261,7 +261,8 @@ main {
 .content-markdown h3,
 .content-markdown h4,
 .content-markdown h5,
-.content-markdown h6 {
+.content-markdown h6,
+.content-markdown blockquote p {
   --min-size: 1.75rem; /* 28px */
   --max-size: 2.25rem; /* 36px */
   --breakpoint: 5vw;
@@ -305,7 +306,8 @@ main {
 }
 
 .Heading.XSmall,
-.content-markdown h5 {
+.content-markdown h5,
+.content-markdown blockquote p {
   --min-size: 1rem; /* 16px */
   --max-size: 1.5rem; /* 24px */
   --line-height: 100%;
@@ -616,7 +618,6 @@ main {
   --color-background: #FF676705;
 }
 
-
 .content-markdown .admonition.warning {
   --color-border: var(--color-yellow-100);
   --color-title: var(--color-white);
@@ -633,6 +634,20 @@ main {
 
 .content-markdown iframe {
   margin: 3em 0;
+}
+
+.content-markdown blockquote {
+  border-left: 2px var(--color-purple-90) solid;
+  margin-left: 0;
+  padding-left: 1em;
+}
+
+.content-markdown blockquote p {
+  color: var(--color-gray-900);
+}
+
+.content-markdown blockquote p + p {
+  margin-top: 1em;
 }
 
 .code-tabs > div:not(.buttons) {
@@ -978,16 +993,24 @@ Footer
   padding-top: 2em;
 }
 
+.helpful-form input[type="radio"]:hover + .helpful-button,
 .helpful-form input[type="radio"]:checked + .helpful-button {
-  background-color: var(--color-orange-90);
-  color: var(--color-white);
+  background-color: var(--background-hover);
+  color: var(--color-hover);
+
+  cursor: pointer;
 }
 
 .helpful-button {
+  --color: var(--color-orange-90);
+  --color-hover: var(--color-white);
+  --background-hover: var(--color);
+  --background: var(--color-orange-10);
+
   appearance: none;
-  background-color: var(--color-orange-10);
-  border: 1px var(--color-orange-90) solid;
-  color: var(--color-orange-90);
+  background-color: var(--background);
+  border: 1px var(--color) solid;
+  color: var(--color);
   font-size: 0.875rem;
   display: flex;
   align-items: center;
@@ -1092,4 +1115,11 @@ pre code.hljs{display:block;overflow-x:auto;padding:1em}code.hljs{padding:3px 5p
 
 .page-tier-enterprise .code-tabs > .buttons a.active {
   color: var(--color-yellow-100);
+}
+
+.page-tier-enterprise .helpful-button {
+  --color: var(--color-yellow-100);
+  --color-hover: var(--color-gray-900);
+  --background: var(--color-yellow-5);
+  --background-hover: var(--color-yellow-90);
 }
