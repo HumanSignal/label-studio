@@ -120,7 +120,8 @@ body {
   height: 100%;
 }
 
-.page-header nav a:not(.Button):hover {
+.page-header nav a:not(.Button):hover,
+.page-header nav a:not(.Button):hover span {
   color: var(--color-orange-90);
 }
 
@@ -182,7 +183,7 @@ body {
     width: 100%;
   }
 
-  .page-header nav a svg {
+  .page-header nav a svg:not(.github-icon) {
     display: none;
   }
 
