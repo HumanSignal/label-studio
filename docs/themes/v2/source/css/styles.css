@@ -46,9 +46,9 @@ body {
 
 .page-header {
   border-bottom: 1px solid;
-  height: 75px;
   z-index: 2;
   position: sticky;
+  height: 76px;
   top: 0;
   background-color: var(--color-white);
   display: flex;
@@ -75,6 +75,9 @@ body {
   margin-right: -1em;
   margin-top: 0.5em;
   padding-left: 2em;
+  width: calc(100% + 2em);
+  list-style: none;
+  row-gap: 1em;
 }
 
 .page-header nav > button {
@@ -99,26 +102,13 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .page-header nav > ul > li button {
   appearance: none;
   background-color: transparent;
   border: 0;
-}
-
-.page-header nav > ul > li > ul {
-  display: none;
-  padding: 0.75em;
-  flex-direction: column;
-  gap: 0.5em;
-  list-style: none;
-  position: absolute;
-  top: calc(100% - 5px);
-  left: -0.5em;
-  border: 1px solid var(--color-gray-900);
-  background-color: var(--color-white);
-  z-index: 2;
 }
 
 .page-header nav a:not(.Button) {
@@ -145,6 +135,26 @@ body {
 @media (min-width: 1001px) {
   .page-header nav > ul > li:hover > ul {
     display: flex;
+  }
+  .page-header nav > ul > li button {
+    display: none;
+  }
+  .page-header nav > ul > li {
+    padding: 0.7em 0;
+  }
+  .page-header nav > ul > li > ul {
+    display: none;
+    padding: 0.75em;
+    flex-direction: column;
+    gap: 0.5em;
+    list-style: none;
+    position: absolute;
+    top: 100%;
+    left: 0.25em;
+    border: 1px solid var(--color-gray-900);
+    background-color: var(--color-white);
+    z-index: 2;
+    margin-top: 0;
   }
 }
 
