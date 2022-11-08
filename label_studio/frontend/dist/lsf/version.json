@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3496: Multiple clicks on 'Skip' button creates multiple skipped annotations",
-  "commit": "7b44874964fe3609b8291c364054aeb66729e0e1",
+  "message": "fix: DEV-3720: Fix large config validation",
+  "commit": "594c8fd64d16090af9ed41a320d03fc706360e71",
   "branch": "master",
-  "date": "2022/11/08 06:19:10"
+  "date": "2022/11/08 14:08:57"
 }
