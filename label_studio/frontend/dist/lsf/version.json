@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3720: Fix large config validation",
+  "message": "fix: DEV-3720: Fix large config validation (#957)\n\n* Fix large config validation\r\n\r\n* Remove console.log\r\n\r\n* Use simpler example",
   "commit": "594c8fd64d16090af9ed41a320d03fc706360e71",
   "branch": "master",
-  "date": "2022/11/08 14:08:57"
+  "date": "2022-11-08T14:08:57Z"
 }
