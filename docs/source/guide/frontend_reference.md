@@ -11,10 +11,12 @@ Label Studio Frontend (LSF) includes several UI options and callbacks that you c
 
 ## Updates to LSF in version 1.0.0 
 
-!!! warning
-    LSF version 1.0.0 is not compatible with earlier versions of Label Studio.
+!!! warning 
+    LSF version 1.0.0 is not compatible with earlier versions of Label Studio. 
 
- If you use LSF with a custom backend, you must make changes to the API callbacks that you use as follows:
+If you use LSF with a custom backend, you must make changes to the API callbacks that you use as follows:
+
+<i>Table 1: API callback.</i>
 
 | Callback in 0.9.1 and earlier | Renamed callback in 1.0.0 |
 | --- | --- |
@@ -24,8 +26,8 @@ Label Studio Frontend (LSF) includes several UI options and callbacks that you c
 
 If you rely on specific formatting of Label Studio completed tasks, [Label Studio's annotation format](export.html#Raw-JSON-format-of-completed-tasks) has also been updated. 
 
-## Implement the Label Studio Frontend
 
+## Implement the Label Studio Frontend
 
 ```javascript
 var labelStudio = new LabelStudio('editor', options);
@@ -76,7 +78,6 @@ Collection of UI elements to show:
     "edit-history",
   ]
 ```
-
 - `panel` - A navigation panel for the current task with buttons: undo, redo and reset.
 - `update` - A show button to update the current task after submitting.
 - `submit` - A show button to submit or update the current annotation.
@@ -98,6 +99,7 @@ Collection of UI elements to show:
 - `auto-annotation` - Show auto annotations. 
 - `edit-history` - Show edit history. 
 
+
 ### messages
 
 Default: `null`
@@ -115,10 +117,10 @@ Messaging used for different actions
 }
 ```
 
-- `DONE` - Shown after the task is submitted to the server
-- `NO_COMP_LEFT` - Shown if there are no more annotations
-- `NO_NEXT_TASK` - No next task to load
-- `NO_ACCESS` - Can't access the provided task
+- `DONE` - Shown after the task is submitted to the server.
+- `NO_COMP_LEFT` - Shown if there are no more annotations.
+- `NO_NEXT_TASK` - No next task to load.
+- `NO_ACCESS` - Can't access the provided task.
 
 ### description
 
@@ -161,13 +163,13 @@ Default: `null`
 
 Type data: `array`
 
-Array of annotations. See the [annotation documentation](export.html#Raw-JSON-format-of-completed-tasks) for more information.
+Array of annotations. For more information, see the [annotation documentation](export.html#Raw-JSON-format-of-completed-tasks).
 
 #### predictions
 
 Type data: `array`
 
-Array of predictions. Similar structure as completions or annotations. See the [annotation documentation](export.html#Raw-JSON-format-of-completed-tasks) and [guidance for importing predicted labels](predictions.html) for more information.
+Array of predictions. Similar structure as completions or annotations. For more information, see the [annotation documentation](export.html#Raw-JSON-format-of-completed-tasks) and [guidance for importing predicted labels](predictions.html).
 
 ### user
 

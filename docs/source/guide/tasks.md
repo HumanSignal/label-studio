@@ -1,4 +1,4 @@
----
+  ---
 title: Get data into Label Studio
 short: Import data
 type: guide
@@ -15,9 +15,10 @@ Get data into Label Studio by importing files, referencing URLs, or syncing with
 - If your data is stored locally, [import it into Label Studio](#Import-data-from-a-local-directory).
 - If your data contains predictions or pre-annotations, see [Import pre-annotated data into Label Studio](predictions.html).
 
+
 ## Types of data you can import into Label Studio
 
-You can import many types of data, including text, timeseries, audio, and image data. The file types supported depend on the type of data. 
+You can import many types of data, including text, time series, audio, and image data. The file types supported depend on the type of data. 
 
 | Data type | Supported file types |
 | --- | --- |
@@ -30,15 +31,16 @@ You can import many types of data, including text, timeseries, audio, and image 
 | [Time series](#Import-CSV-or-TSV-data) | .csv, .tsv, .json |
 | [Tasks with multiple data types](#Basic-Label-Studio-JSON-format) | .csv, .tsv, .json |
 
-If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](https://slack.labelstudio.heartex.com/?source=docs-gdi). 
+If you don't see a supported data or file type that you want to import, contact the [Label Studio Slack community](https://slack.labelstudio.heartex.com/?source=docs-gdi). 
 
 ### How to import your data
 
 The most secure and reliable method to import your data is to store the data outside of Label Studio and import references to the data using URLs. You can import a list of URLs in a TXT, CSV, or TSV file, or reference the URLs in [JSON task format](#Basic-Label-Studio-JSON-format).
 
-If you're importing audio, image, or video data, you must use URLs to refer to those data types. 
+If you are importing audio, image, or video data, you must use URLs to refer to those data types. 
 
-If you're importing HTML, text, dialogue, or timeseries data using the `<HyperText>`, `<Text>`, `<Paragraphs>`, or `<TimeSeries>` tags in your labeling configuration, you can either load data directly, or load data from a URL. 
+If you are importing HTML, text, dialogue, or timeseries data using the `<HyperText>`, `<Text>`, `<Paragraphs>`, or `<TimeSeries>` tags in your labeling configuration, you can either load data directly, or load data from a URL. 
+
 - To load data from a URL, specify `valueType="url"` in your labeling configuration. 
 - To load data directly into the Label Studio database, specify `valueType="text"` for `HyperText` or `Text` data, or `valueType="json"` for `Paragraph` or `TimeSeries` data.
 
@@ -231,16 +233,16 @@ The remaining options are parameters of the specified file type with optional va
 
 For example, `resolver="csv|headless|separator=;|column=1"`
 
-
+  
 ## How to format your data to import it
 
-Label Studio treats different file types different ways. 
+Label Studio treats various file types in different ways. 
 
 If you want to import multiple types of data to label at the same time, for example, images with captions or audio recordings with transcripts, you must use the [basic Label Studio JSON format](#Basic-Label-Studio-JSON-format). 
 
 [You can also use a CSV file or a JSON list of tasks to point to URLs with the data](#How-to-import-your-data), rather than directly importing the data if you need to import thousands of files. You can import files containing up to 250,000 tasks or up to 50MB in size into Label Studio.
 
-If you're specifying data in a cloud storage bucket or container, and you don't want to [sync cloud storage](storage.html), create and specify [presigned URLs for Amazon S3 storage](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html), [signed URLs for Google Cloud Storage](https://cloud.google.com/storage/docs/access-control/signed-urls), or [shared access signatures for Microsoft Azure](https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview) in a JSON, CSV, TSV or TXT file. 
+If you are specifying data in a cloud storage bucket or container, and you don't want to [sync cloud storage](storage.html), create and specify [presigned URLs for Amazon S3 storage](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html), [signed URLs for Google Cloud Storage](https://cloud.google.com/storage/docs/access-control/signed-urls), or [shared access signatures for Microsoft Azure](https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview) in a JSON, CSV, TSV, or TXT file. 
 
 ### Basic Label Studio JSON format
 
@@ -268,8 +270,9 @@ See [Relevant JSON property descriptions](export.html#Relevant-JSON-property-des
 
 ### Example JSON format
 
-For an example text classification project, you can set up a label config like the following:
-```xml
+
+For an example text classification project, you can set up the following label configuration
+```html
 <View>
   <Text name="message" value="$my_text"/>
   <Choices name="sentiment_class" toName="message">
@@ -445,6 +448,7 @@ If you want to label HTML files without minifying the data, you can do one of th
 - Import the HTML files as BLOB storage from [external cloud storage such as Amazon S3 or Google Cloud Storage](storage.html).
 - Update the `HyperText` tag in your labeling configuration to specify `valueType="url"` as described in [How to import your data](#How-to-import-your-data) on this page.
 
+
 ## Import data from a local directory
 
 To import data from a local directory, you have two options:
@@ -455,12 +459,13 @@ To import data from a local directory, you have two options:
 
 To run a web server to generate URLs for the files, you can refer to this provided [helper shell script in the Label Studio repository](https://github.com/heartexlabs/label-studio/blob/master/scripts/serve_local_files.sh) or write your own script. 
 Use that script to do the following:
+
 1. On the machine with the file directory that you want Label Studio to import, call the helper script and specify a regex pattern to match the files that you want to import. In this example, the script identifies files with the JPG file extension:
    ```bash
    ./script/serve_local_files.sh <directory/with/files> *.jpg
    ```
-   The script collects the links to the files provided by that HTTP server and saves them to a `files.txt` file with one URL per line. 
-3. Import the file with URLs into Label Studio using the Label Studio UI. 
+  The script collects the links to the files provided by that HTTP server and saves them to a `files.txt` file with one URL per line. 
+2. Import the file with URLs into Label Studio using the Label Studio UI. 
 
 !!! note 
     You must keep the web server running while you perform your data labeling so that the URLs remain accessible to Label Studio.
@@ -515,3 +520,4 @@ label-studio init my-project --input-path=my/audios/dir --input-format=audio-dir
 By default, Label Studio expects JSON-formatted tasks using the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format). 
 
 If you add more files to a local directory after Label Studio starts, you must restart Label Studio to import the tasks in the additional files.
+

@@ -6,9 +6,10 @@ order: 40
 
 ## OpenMMLab Image object detector or MMDetection
 
-This [Machine Learning backend](/guide/ml.html) lets you to automatically pre-annotate your images with bounding boxes. It's powered by the amazing [OpenMMLab MMDetection library](https://github.com/open-mmlab/mmdetection), which gives you access to many existing state-of-the-art models like FasterRCNN, RetinaNet, YOLO and others. 
+This [Machine Learning backend](/guide/ml.html) allows you to automatically pre-annotate your images with bounding boxes. It is powered by the amazing [OpenMMLab MMDetection library](https://github.com/open-mmlab/mmdetection), which gives you access to many existing state-of-the-art models like FasterRCNN, RetinaNet, YOLO, and others. 
 
 Follow this installation guide and then play around with them, picking the best model that suits your current dataset!
+
 
 ## Start using it
 
@@ -29,7 +30,8 @@ Follow this installation guide and then play around with them, picking the best 
     - If the COCO object detector predicts a bbox with label `"airplane"`, you see the label `"Airplane"`.
     - if it predicts `"car"` or `"truck"`, either of those predictions are squashed to show the `"Car"` label on the task.
 
-See [the full list of COCO labels](#The-full-list-of-COCO-labels) for reference.
+!!! attention "Tip"
+    [The full list of COCO labels](#The-full-list-of-COCO-labels) are available for reference. 
 
 
 ## Installation
@@ -45,6 +47,7 @@ See [the full list of COCO labels](#The-full-list-of-COCO-labels) for reference.
 3. Download the `config_file` and `checkpoint_file` from MMDetection model zoo (use the [recommended Faster RCNN for a quickstart](https://mmdetection.readthedocs.io/en/latest/1_exist_data_model.html#inference-with-existing-models)). Place the `config_file` within the cloned [mmdetection repo](https://github.com/open-mmlab/mmdetection).
 
 Depending on your specific use case, there are different settings for how to run this ML backend:
+
 
 ## Run ML backend on the same machine as Label Studio
 
@@ -85,11 +88,13 @@ In this case, you must provide the Label Studio hostname before running ML backe
    checkpoint_file=/absolute/path/to/downloaded/checkpoint.pth
    ```
 
+
 ## Other parameters
 
 You can also specify other parameters when you start this ML backend to fit your use case or environment.
 
 #### GPU support
+
 If you have a GPU available, you can specify that with `device=gpu:0` when you start the ML backend to significantly speed up pre-annotation of images. For example:
 
  ```bash
@@ -99,7 +104,7 @@ If you have a GPU available, you can specify that with `device=gpu:0` when you s
    device=gpu:0
    ```
 
-#### Bounding box thresholding
+#### Bounding box threshold
 
 You can also tune the `score_threshold`. Lower values increase sensitivity but produce more noise.
 
@@ -112,6 +117,7 @@ You can also tune the `score_threshold`. Lower values increase sensitivity but p
      
 
 ## The full list of COCO labels
+
 ```text
 airplane
 apple

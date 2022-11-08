@@ -27,14 +27,12 @@ Follow this tutorial with a text classification project, where the labeling inte
 
 ### Create a model script
 
-
 If you create an ML backend using [Label Studio's ML SDK](/guide/ml_create.html), make sure your ML backend script does the following:
 
 - Inherit the created model class from `label_studio_ml.LabelStudioMLBase`
-- Override the 2 methods:
+- Override the following two methods:
     - `predict()`, which takes [input tasks](/guide/tasks.html#Basic-Label-Studio-JSON-format) and outputs [predictions](/guide/predictions.html) in the Label Studio JSON format.
     - `fit()`, which receives [annotations](/guide/export.html#Label-Studio-JSON-format-of-annotated-tasks) iterable and returns a dictionary with created links and resources. This dictionary is used later to load models with the `self.train_output` field.
-
 
 Create a file `model.py` with the following content:
 
@@ -53,16 +51,16 @@ from label_studio_ml.model import LabelStudioMLBase
 class SimpleTextClassifier(LabelStudioMLBase):
 
     def __init__(self, **kwargs):
-        # don't forget to initialize base class...
+        # Don't forget to initialize base class...
         super(SimpleTextClassifier, self).__init__(**kwargs)
 
-        # then collect all keys from config which will be used to extract data from task and to form prediction
+        # Then collect all keys from config which will be used to extract data from task and to form prediction
         # Parsed label config contains only one output of <Choices> type
         assert len(self.parsed_label_config) == 1
         self.from_name, self.info = list(self.parsed_label_config.items())[0]
         assert self.info['type'] == 'Choices'
 
-        # the model has only one textual input
+        # The model has only one textual input
         assert len(self.info['to_name']) == 1
         assert len(self.info['inputs']) == 1
         assert self.info['inputs'][0]['type'] == 'Text'
@@ -74,17 +72,17 @@ class SimpleTextClassifier(LabelStudioMLBase):
             self.reset_model()
             # This is an array of <Choice> labels
             self.labels = self.info['labels']
-            # make some dummy initialization
+            # Make some dummy initialization
             self.model.fit(X=self.labels, y=list(range(len(self.labels))))
             print('Initialized with from_name={from_name}, to_name={to_name}, labels={labels}'.format(
                 from_name=self.from_name, to_name=self.to_name, labels=str(self.labels)
             ))
         else:
-            # otherwise load the model from the latest training results
+            # Otherwise load the model from the latest training results
             self.model_file = self.train_output['model_file']
             with open(self.model_file, mode='rb') as f:
                 self.model = pickle.load(f)
-            # and use the labels from training outputs
+            # Use the labels from training outputs
             self.labels = self.train_output['labels']
             print('Loaded from train output with from_name={from_name}, to_name={to_name}, labels={labels}'.format(
                 from_name=self.from_name, to_name=self.to_name, labels=str(self.labels)
@@ -94,19 +92,19 @@ class SimpleTextClassifier(LabelStudioMLBase):
         self.model = make_pipeline(TfidfVectorizer(ngram_range=(1, 3)), LogisticRegression(C=10, verbose=True))
 
     def predict(self, tasks, **kwargs):
-        # collect input texts
+        # Collect input texts
         input_texts = []
         for task in tasks:
             input_texts.append(task['data'][self.value])
 
-        # get model predictions
+        # Get model predictions
         probabilities = self.model.predict_proba(input_texts)
         predicted_label_indices = np.argmax(probabilities, axis=1)
         predicted_scores = probabilities[np.arange(len(predicted_label_indices)), predicted_label_indices]
         predictions = []
         for idx, score in zip(predicted_label_indices, predicted_scores):
             predicted_label = self.labels[idx]
-            # prediction result for the single task
+            # Prediction result for the single task
             result = [{
                 'from_name': self.from_name,
                 'to_name': self.to_name,
@@ -114,7 +112,7 @@ class SimpleTextClassifier(LabelStudioMLBase):
                 'value': {'choices': [predicted_label]}
             }]
 
-            # expand predictions with their scores for all tasks
+            # Expand predictions with their scores for all tasks
             predictions.append({'result': result, 'score': score})
 
         return predictions
@@ -125,7 +123,7 @@ class SimpleTextClassifier(LabelStudioMLBase):
         label2idx = {l: i for i, l in enumerate(self.labels)}
 
         for completion in completions:
-            # get input text from task data
+            # Get input text from task data
             print(completion)
             if completion['annotations'][0].get('skipped') or completion['annotations'][0].get('was_cancelled'):
                 continue
@@ -133,7 +131,7 @@ class SimpleTextClassifier(LabelStudioMLBase):
             input_text = completion['data'][self.value]
             input_texts.append(input_text)
 
-            # get an annotation
+            # Get an annotation
             output_label = completion['annotations'][0]['result'][0]['value']['choices'][0]
             output_labels.append(output_label)
             output_label_idx = label2idx[output_label]
@@ -146,11 +144,11 @@ class SimpleTextClassifier(LabelStudioMLBase):
             label2idx = {l: i for i, l in enumerate(self.labels)}
             output_labels_idx = [label2idx[label] for label in output_labels]
 
-        # train the model
+        # Train the model
         self.reset_model()
         self.model.fit(input_texts, output_labels_idx)
 
-        # save output resources
+        # Save output resources
         model_file = os.path.join(workdir, 'model.pkl')
         with open(model_file, mode='wb') as fout:
             pickle.dump(self.model, fout)
@@ -164,7 +162,7 @@ class SimpleTextClassifier(LabelStudioMLBase):
 
 ### Create ML backend configs & scripts
 
-Label Studio can automatically create all necessary configs and scripts needed to run ML backend from your newly created model.
+Label Studio can automatically create all necessary configurations and scripts needed to run ML backend from your newly created model.
 
 Call your ML backend `my_backend` and from the command line, initialize the ML backend directory `./my_backend`:
 
@@ -172,9 +170,10 @@ Call your ML backend `my_backend` and from the command line, initialize the ML b
 label-studio-ml init my_backend
 ```
 
-The last command takes your script `./model.py` and creates an `./my_backend` directory at the same level, copying the configs and scripts needed to launch the ML backend in either development or production modes.
+The last command takes your script `./model.py` and creates a `./my_backend` directory at the same level, copying the configs and scripts needed to launch the ML backend in either development or production modes.
 
-> Note: You can specify different location for your model script, for example: `label-studio-ml init my_backend --script /path/to/my/script.py`
+!!! note 
+    You can specify different location for your model script, for example: `label-studio-ml init my_backend --script /path/to/my/script.py`
 
 ### Launch ML backend server
 
@@ -195,7 +194,7 @@ The server started on `http://localhost:9090` and outputs logs in console.
 Production mode is powered by a Redis server and RQ jobs that take care of background training processes. This means that you can start training your model and continue making requests for predictions from the current model state. 
 After the model finishes the training process, the new model version updates automatically.
 
-For production mode, please make sure you have Docker and docker-compose installed on your system. Then run the following from the command line:
+For production mode, make sure you have Docker and docker-compose installed on your system. Then run the following from the command line:
 
 ```bash
 cd my_backend/
@@ -223,3 +222,4 @@ Trigger model training manually by pressing the `Start training` button the Mach
 ```bash
 curl -X POST http://localhost:8080/api/models/train
 ```
+

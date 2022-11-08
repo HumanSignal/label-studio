@@ -8,16 +8,19 @@ meta_title: Install Label Studio Enterprise without public internet access
 meta_description: Install Label Studio Enterprise without public internet access to create machine learning and data science projects in an airgapped environment. 
 ---
 
-If you need to install Label Studio Enterprise on a server that blocks access to the internet using a proxy, or an airgapped server that does not allow outgoing connections to the internet, follow these steps:
+If you need to install Label Studio Enterprise on a server that blocks access to the internet using a proxy, or an airgapped server that does not allow outgoing connections to the internet, do the following steps:
 
 - If you access the internet from your server using an HTTPS proxy, see [Install behind an HTTPS proxy](#Install-behind-an-HTTPS-proxy).
 - If you do not have access to the internet from your server, or use a different proxy, see [Install without internet access or HTTPS proxy](#Install-without-internet-access-or-HTTPS-proxy).
 
 ### Install behind an HTTPS proxy
-If your organization uses an HTTPS proxy to manage access to the internet, do the following.
-> If you're using a SOCKS proxy, Helm 3 does not support SOCKS proxies. See [Install without internet access or HTTPS proxy](#Install-without-internet-access-or-HTTPS-proxy).
 
-1. Work with your network security team to whitelist `https://charts.heartex.com` so that you can access the Helm charts for deploymnet.
+If your organization uses an HTTPS proxy to manage access to the internet, do the following.
+
+!!! warning
+    If you are using a SOCKS proxy, Helm 3 does not support SOCKS proxies. See [Install without internet access or HTTPS proxy](#Install-without-internet-access-or-HTTPS-proxy).
+
+1. Work with your network security team to whitelist `https://charts.heartex.com` so that you can access the Helm charts for deployment.
 2. On the Label Studio Enterprise server, set an environment variable with the HTTPS proxy address:
 ```shell
 export HTTPS_PROXY=<your_proxy>
@@ -28,7 +31,8 @@ export HTTPS_PROXY=<your_proxy>
 
 If you can't access the internet using a proxy supported by Helm or at all, follow these steps to download the Helm charts necessary to deploy Label Studio Enterprise on an airgapped Kubernetes cluster. 
 
-> You need the Label Studio Enterprise credentials provided to you by your account manager to download the Helm charts.
+!!! attention "important"
+    You need the Label Studio Enterprise credentials provided to you by your account manager to download the Helm charts.
 
 1. Download the latest version of Label Studio Enterprise. From the command line, run the following, replacing `<USERNAME>` and `<PASSWORD>` with the credentials provided to you by your account manager:
    ```shell

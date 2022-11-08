@@ -14,6 +14,8 @@ Label Studio stores your annotations in a raw JSON format in the SQLite database
 Image annotations exported in JSON format use percentages of overall image size, not pixels, to describe the size and location of the bounding boxes. For more information, see [how to convert the image annotation units](#Units-of-image-annotations).
 
 
+
+
 ## Export data from Label Studio
 
 Export your completed annotations from Label Studio. 
@@ -21,7 +23,8 @@ Export your completed annotations from Label Studio.
 !!! note
     Some export formats export only the annotations and not the data from the task. For more information, see the [export formats supported by Label Studio](#Export-formats-supported-by-Label-Studio).
 
-### Export using the UI in Community Edition of Label Studio
+
+### Export using the UI in Community edition of Label Studio
 
 Use the following steps to export data and annotations from the Label Studio UI. 
 
@@ -33,6 +36,7 @@ Use the following steps to export data and annotations from the Label Studio UI.
     1. The export will always include the annotated tasks, regardless of filters set on the tab. 
     2. Cancelled annotated tasks will be included in the exported result too.
     3. If you want to apply tab filters to the export, try to use [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-API).
+    4. If the export times out, see how to [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-API).
 
 ### Export timeout in Community Edition
 
@@ -93,11 +97,16 @@ For a large labeling project with hundreds of thousands of tasks, do the followi
 2. [Check the status of the export file created](/api#operation/api_projects_exports_read) using the `id` as the `export_pk`. 
 3. Using the `id` from the created snapshot as the export primary key, or `export_pk`, make a GET request to [download the export file](/api#operation/api_projects_exports_download_read).
 
+
 ## Manually convert JSON annotations to another format
+
+
 You can run the [Label Studio converter tool](https://github.com/heartexlabs/label-studio-converter) on a directory or file of completed JSON annotations using the command line or Python to convert the completed annotations from Label Studio JSON format into another format. 
 
-!!! note
-    If you use versions of Label Studio earlier than 1.0.0, then this is the only way to convert your Label Studio JSON format annotations into another labeling format. 
+!!! note 
+    If you use versions of Label Studio earlier than 1.0.0, use the manual way to convert your Label Studio JSON format annotations into another labeling format. 
+
+You can run the [Label Studio converter tool](https://github.com/heartexlabs/label-studio-converter) on a directory or file of completed JSON annotations using the command line or Python to convert the completed annotations from Label Studio JSON format into another format. 
 
 
 ## Export formats supported by Label Studio
@@ -155,7 +164,7 @@ For example:
 
 ### Pascal VOC XML
 
-A popular XML-formatted task data is used for object detection and image segmentation tasks. Supports bounding box image labeling projects that use the `RectangleLabels` tag.
+Popular XML-formatted task data is used for object detection and image segmentation tasks. Supports bounding box image labeling projects that use the `RectangleLabels` tag.
 
 ### spaCy 
 
@@ -290,6 +299,8 @@ When you annotate data, Label Studio stores the output in JSON format. The raw J
 ### Relevant JSON property descriptions
 
 Review the full list of JSON properties in the [API documentation](api.html).
+
+<i> Table 1: JSON properties in the API documentation.</i>
 
 | JSON property name | Description |
 | --- | --- | 

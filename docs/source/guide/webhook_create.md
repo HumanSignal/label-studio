@@ -9,6 +9,7 @@ meta_description: Label Studio documentation for creating custom webhook event t
 
 If you want to trigger custom events for webhooks in Label Studio, you can extend the webhook event model.
 
+
 ## Create a custom webhook event
 
 To create a custom webhook event, add your own action to the `WebhookActions` model.
@@ -30,7 +31,9 @@ class WebhookAction(models.Model):
     ...
 ```
 
-After declaring the action and the associated properties and payload details in the `WebhookAction` class, call the event action in the code where it occurs. For example:
+After declaring the action and the associated properties and payload details in the `WebhookAction` class, call the event action in the code where it occurs. 
+
+For example:
 
 ```
 ...python
@@ -42,19 +45,24 @@ emit_webhooks(organization, WebhookAction.SOMETHING_HAPPENED, {'something': [res
 You can retrieve the organization details using `Organization.objects.first()`.
 
 ### Call event actions with Python functions
+
 There are several functions you can use to call event actions. Refer to the following table:
+
+<i>Table 1: Call event actions with Python functions.</i>
 
 | Python function | When to use | Additional details |
 | --- | --- | --- | 
 | `get_active_webhooks()` | Get all active webhooks. | |
 | `run_webhook()` | Run one webhook and pass some payload. | | 
 | `emit_webhooks()` | Send requests for all webhooks for an action. | | 
-| `emit_webhooks_for_instances()` | Send serialized instances with webhook requests. | You must declare a `serializer` in the `WebhookAction.ACTIONS` model.|
- 
+| `emit_webhooks_for_instances()` | Send serialized instances with webhook requests. | You must declare a `serializer` in the `WebhookAction.ACTIONS` model. |
 
+ 
 ### Call event actions with decorators in API source code 
 
 You can use decorators with the CRUD REST methods to send event actions to webhooks. You can use the following: 
+
+<i>Table 2: Call event actions with decorators in API source code.</i>
 
 | Decorator syntax | When to use | Details |
 | --- | --- | --- | 

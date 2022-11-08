@@ -63,10 +63,10 @@ Label Studio displays fields from both the data and system fields from Label Stu
 The system fields used by Label Studio are as follows:
 - **ID** - An ID is automatically generated for each item uploaded to Label Studio. You can use this ID when using the Label Studio API.
 - **Completed** - The date and time that the item was annotated.
-- **Completions** - The number of annotations associated with an item.
+- **Annotations** - The number of annotations associated with an item.
 - **Cancelled** - The number of times that this item was skipped during labeling.
 - **Predictions** - The number of predictions for this item.
-- **Completions results** - The raw JSON of the annotation results. You can use this to filter by specific labels or classes provided inside an annotation.
+- **Annotations results** - The raw JSON of the annotation results. You can use this to filter by specific labels or classes provided inside an annotation.
 - **Predictions score** - The score returned by the model when giving its prediction. You can use this for Active Learning scenarios.
 - **Predictions results** - The raw JSON of the prediction object.
 

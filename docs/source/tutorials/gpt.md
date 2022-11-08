@@ -6,14 +6,15 @@ order: 50
 
 ## Chatbot response generation with HuggingFace's GPT2 model
 
-If you want to build a new chatbot, or just experiment with GPT-based text generators, this [Machine Learning backend](/guide/ml.html) example is for you! Powered by [HuggingFace's Transformers library](https://github.com/huggingface/transformers), 
-it connects a GPT2-like language model to the Label Studio UI, giving you an opportunity to explore different text responses based on the chat history.
+If you want to build a new chatbot, or experiment with GPT-based text generators, use the [Machine Learning backend](/guide/ml.html) example. This example is powered by [HuggingFace's Transformers library](https://github.com/huggingface/transformers). It connects a GPT2-like language model to the Label Studio UI, and gives you an opportunity to explore different text responses based on the chat history.
 
 
-Follow this installation guide and then play around with the results. Generate your next superpowered chatbot dataset by editing, removing, or adding new phrases!
+Follow this installation guide and then play around with the results. Generate your next superpower chatbot dataset by editing, removing, or adding new phrases.
 
 
 <div style="margin:auto; text-align:center; width:100%"><img src="/images/ml-backend-chatbot.png" style="opacity: 0.7"/></div>
+<i>Figure 1: Superpower chatbot dataset.</i>
+
 
 ## Start using it
 
@@ -37,7 +38,8 @@ Follow this installation guide and then play around with the results. Generate y
 
 You can import your chat dialogs in the input format of [`<Paragraphs>` object tag](/tags/paragraphs.html), or use a sample task import just to give it a try.
 
-After you import data, you'll see text boxes with generated answers. 
+After you import data, you will see text boxes with generated answers. 
+
 
 ## Tweaking parameters
 
@@ -51,7 +53,9 @@ num_responses=5
 ```
 
 #### model
+
 Model name from [HuggingFace model hub](https://huggingface.co/models?filter=gpt2)
 
 #### num_responses
+
 Number of generated responses
