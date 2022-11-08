@@ -223,6 +223,9 @@ body {
 
 main {
   --sidebar-size: 308px;
+  --toc-size: 16em;
+  --page-padding: 50px;
+
   display: flex;
 }
 
@@ -341,7 +344,8 @@ main {
   padding-top: 2em;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10em, 1fr));
-  gap: 4em;
+  column-gap: 4em;
+  row-gap: 1.5em;
   margin-top: 5em;
 }
 
@@ -371,12 +375,6 @@ main {
   gap: 2em;
   margin-bottom: 1em;
 }
-
-
-
-
-
-
 
 
 
@@ -612,6 +610,7 @@ main {
 .toc {
   background-color: var(--color-gray-10);
   padding: 2em;
+  width: var(--toc-size);
 }
 
 .toc-list {
@@ -644,8 +643,15 @@ main {
   Markdown styles
 ****************************/
 
+/**
+ * Hmm unfortunately, flexbox doesn’t play will we page where there’s code samples
+ * We have to do this weird maths to make sure it works
+**/
+
 .content-markdown {
+  width: calc(100vw - var(--sidebar-size) - var(--toc-size) - calc(2 * var(--page-padding)) - 5em);
   flex-basis: 82ch;
+  max-width: 82ch;
 }
 
 .content-markdown * {
