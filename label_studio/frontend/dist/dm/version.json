@@ -1,6 +1,6 @@
 {
-  "message": "fix: dev-3673: Navigation using task links is broken",
-  "commit": "93a439a1b81cc9d1217a500afe3b72ab23ef24e6",
+  "message": "fix: DEV-3673: Navigation using task links is broken (#124)",
+  "commit": "11b5975d499f63e96eae988be7bca7aa7bb31557",
   "branch": "master",
-  "date": "2022/11/01 09:37:28"
+  "date": "2022-11-03T15:53:51Z"
 }
