@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3720: Fix large config validation (#957)\n\n* Fix large config validation\r\n\r\n* Remove console.log\r\n\r\n* Use simpler example",
-  "commit": "594c8fd64d16090af9ed41a320d03fc706360e71",
+  "message": "fix: DEV-3224: Assign task history from outside",
+  "commit": "cc3048a955d293612c30071d6e88a91606c85ae0",
   "branch": "master",
-  "date": "2022-11-08T14:08:57Z"
+  "date": "2022/11/08 18:21:45"
 }
