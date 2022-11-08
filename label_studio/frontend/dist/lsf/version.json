@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3720: Fix large config validation",
-  "commit": "bb0edb4de93dde1081face8d3f4fb20c71f57945",
-  "branch": "fb-dev-3720/large-config-validation",
-  "date": "2022/11/08 13:59:35"
+  "commit": "594c8fd64d16090af9ed41a320d03fc706360e71",
+  "branch": "master",
+  "date": "2022/11/08 14:08:57"
 }
