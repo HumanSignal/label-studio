@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3224: Assign task history from outside",
-  "commit": "fb875f96a437a0f4842a9dd79acefd116b27c77f",
+  "commit": "b152685a6213a467e35822c750f9c5d073f8321c",
   "branch": "fb-dev-3224",
-  "date": "2022/11/07 20:38:23"
+  "date": "2022/11/08 05:33:58"
 }
