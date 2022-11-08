@@ -251,9 +251,9 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
             # set lock for the task with TTL 3x time more then current average lead time (or 1 hour by default)
             next_task.set_lock(user)
 
-        next_task, queue_info = skipped_queue(next_task, prepared_tasks, project, user, queue_info)
-
         next_task, queue_info = postponed_queue(next_task, prepared_tasks, project, user, queue_info)
+
+        next_task, queue_info = skipped_queue(next_task, prepared_tasks, project, user, queue_info)
 
         logger.debug(f'get_next_task finished. next_task: {next_task}, queue_info: {queue_info}')
 
