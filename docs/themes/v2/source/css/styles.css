@@ -306,7 +306,7 @@ main {
   --gap: 2rem;
 
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20em, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 25em), 1fr));
   grid-gap: var(--gap);
 }
 
@@ -467,11 +467,11 @@ main {
   margin-bottom: 0;
   margin-top: 2em;
 }
-.content-markdown a {
+.content-markdown a:not(.Button) {
   color: var(--color-orange-90);
 }
 
-.content-markdown a:hover {
+.content-markdown a:not(.Button):hover {
   text-decoration: none;
 }
 
@@ -696,10 +696,12 @@ main {
 }
 
 .content-markdown table {
-  border: 1px var(--color-gray-200) solid;
+  border-top: 1px var(--color-gray-200) solid;
+  border-left: 1px var(--color-gray-200) solid;
   border-collapse: collapse;
   margin: 2em 0;
   overflow: auto;
+  display: block;
 }
 
 .content-markdown table tr th {
@@ -1202,16 +1204,22 @@ Footer
   Code theme
 ****************************/
 
+pre {
+  position: relative;
+  white-space: normal;
+}
+
 pre code.hljs {
   font-family: var(--font-family-monospace);
   font-size: 0.9rem;
   line-height: 1.25;
   border-radius: 8px;
   background: #131522;
+  position: relative;
+  white-space: pre;
 }
 
-/* pre code.hljs{display:block;overflow-x:auto;padding:1em}code.hljs{padding:3px 5px}.hljs{background:#26233a}.hljs,.hljs-subst{color:#e0def4}.hljs-selector-tag{color:#9ccfd8}.hljs-selector-id{color:#c4a7e7;font-weight:700}.hljs-selector-attr,.hljs-selector-class{color:#c4a7e7}.hljs-property,.hljs-selector-pseudo{color:#ebbcba}.hljs-addition{background-color:rgba(156,207,216,.5)}.hljs-deletion{background-color:rgba(235,111,146,.5)}.hljs-built_in,.hljs-class,.hljs-type{color:#c4a7e7}.hljs-function,.hljs-function>.hljs-title,.hljs-title.hljs-function{color:#ebbcba}.hljs-keyword,.hljs-literal,.hljs-symbol{color:#9ccfd8}.hljs-number{color:#f6c177}.hljs-regexp{color:#f6c177}.hljs-string{color:#9ccfd8}.hljs-title{color:#c4a7e7}.hljs-params{color:#e0def4}.hljs-bullet{color:#9ccfd8}.hljs-code{color:#c4a7e7}.hljs-emphasis{font-style:italic}.hljs-formula{color:#c4a7e7}.hljs-strong{font-weight:700}.hljs-link:hover{text-decoration:underline}.hljs-comment,.hljs-quote{color:#6e6a86}.hljs-doctag{color:#c4a7e7}.hljs-meta,.hljs-meta .hljs-keyword{color:#31748f}.hljs-meta .hljs-string{color:#9ccfd8}.hljs-attr{color:#c4a7e7}.hljs-attribute{color:#e0def4}.hljs-name{color:#9ccfd8}.hljs-section{color:#ebbcba}.hljs-tag{color:#9ccfd8}.hljs-template-variable,.hljs-variable{color:#e0def4}.hljs-template-tag{color:#31748f}.language-abnf .hljs-attribute{color:#ebbcba}.language-abnf .hljs-symbol{color:#f6c177}.language-apache .hljs-attribute{color:#ebbcba}.language-apache .hljs-section{color:#9ccfd8}.language-arduino .hljs-built_in{color:#ebbcba}.language-aspectj .hljs-meta{color:#eb6f92}.language-aspectj>.hljs-title{color:#ebbcba}.language-bnf .hljs-attribute{color:#c4a7e7}.language-clojure .hljs-name{color:#ebbcba}.language-clojure .hljs-symbol{color:#f6c177}.language-coq .hljs-built_in{color:#ebbcba}.language-cpp .hljs-meta .hljs-string{color:#c4a7e7}.language-css .hljs-built_in{color:#ebbcba}.language-css .hljs-keyword{color:#eb6f92}.language-diff .hljs-meta,.language-ebnf .hljs-attribute{color:#c4a7e7}.language-glsl .hljs-built_in{color:#ebbcba}.language-groovy .hljs-meta:not(:first-child),.language-haxe .hljs-meta,.language-java .hljs-meta{color:#eb6f92}.language-ldif .hljs-attribute{color:#c4a7e7}.language-lisp .hljs-name,.language-lua .hljs-built_in,.language-moonscript .hljs-built_in,.language-nginx .hljs-attribute{color:#ebbcba}.language-nginx .hljs-section{color:#31748f}.language-pf .hljs-built_in,.language-processing .hljs-built_in{color:#ebbcba}.language-scss .hljs-keyword,.language-stylus .hljs-keyword{color:#9ccfd8}.language-swift .hljs-meta{color:#eb6f92}.language-vim .hljs-built_in{color:#ebbcba;font-style:italic}.language-yaml .hljs-meta{color:#eb6f92} */
-pre code.hljs{display:block;overflow-x:auto;padding:1em}code.hljs{padding:3px 5px}/*!
+pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3px 5px}/*!
   Theme: Tokyo-night-Dark
   origin: https://github.com/enkia/tokyo-night-vscode-theme
   Description: Original highlight.js style
@@ -1220,6 +1228,87 @@ pre code.hljs{display:block;overflow-x:auto;padding:1em}code.hljs{padding:3px 5p
   Touched: 2022
 */.hljs-comment,.hljs-meta{color:#565f89}.hljs-deletion,.hljs-doctag,.hljs-regexp,.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-selector-pseudo,.hljs-tag,.hljs-template-tag,.hljs-variable.language_{color:#f7768e}.hljs-link,.hljs-literal,.hljs-number,.hljs-params,.hljs-template-variable,.hljs-type,.hljs-variable{color:#ff9e64}.hljs-attribute,.hljs-built_in{color:#e0af68}.hljs-keyword,.hljs-property,.hljs-subst,.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#7dcfff}.hljs-selector-tag{color:#73daca}.hljs-addition,.hljs-bullet,.hljs-quote,.hljs-string,.hljs-symbol{color:#9ece6a}.hljs-code,.hljs-formula,.hljs-section{color:#7aa2f7}.hljs-attr,.hljs-char.escape_,.hljs-keyword,.hljs-name,.hljs-operator{color:#bb9af7}.hljs-punctuation{color:#c0caf5}.hljs{background:#1a1b26;color:#9aa5ce}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:700}
 
+
+.code-block-copy-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  appearance: none;
+  background-color: #fff3;
+  color: #fff;
+  opacity: .5;
+  border: 0;
+  border-bottom-left-radius: 0.5em;
+  padding: 0.5em;
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+  z-index: 2;
+  white-space: normal;
+}
+
+.code-block-copy-button svg {
+  width: 1em;
+  height: 1em;
+}
+
+.code-block-copy-check-icon {
+  display: none;
+}
+
+
+
+
+
+
+
+
+#preview-wrapper {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  position: fixed;
+  z-index: 100000;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 100vh;
+}
+
+#render-editor-loader {
+  max-width: 1200px;
+  background: #fff;
+  padding: 3%;
+  width: 500px;
+  height: 500px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+#render-editor {
+  max-width: 1200px;
+  border: none;
+  background: #fff;
+  padding: 3%;
+  width: 500px;
+  height: 500px;
+  border-radius: 10px;
+}
+
+#main-preview iframe#render-editor {
+  width: 100%;
+  padding: 5px;
+  margin: 1em 0;
+  margin-left: -20px;
+}
 
 
 /****************************

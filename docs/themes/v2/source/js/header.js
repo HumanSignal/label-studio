@@ -11,7 +11,6 @@
 
   mobileHeaderButtons.forEach(button => button.addEventListener("click", toggleMenu));
 
-
   const githubstarsContainer  = document.querySelector(".github-stars-count");
 
   fetch("https://api.github.com/repos/heartexlabs/label-studio")
