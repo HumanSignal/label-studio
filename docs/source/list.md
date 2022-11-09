@@ -1,6 +1,3 @@
-index: true
----
-
 <a href="/sitemap-docs.xml">Sitemap</a>
 <a href="/guide">Guide</a>
 <a href="/templates">Templates</a>
