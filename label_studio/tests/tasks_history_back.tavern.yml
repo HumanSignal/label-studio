@@ -170,3 +170,155 @@ stages:
           annotation: !int "{second_annotation_pk}"
           created_at: "{second_annotation_created_at}"
         next: null
+
+---
+test_name: postpone_skip
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+
+- name: create_task
+  request:
+    json:
+      data:
+        text: 'Test text'
+      project: '{project_pk}'
+    method: POST
+    url: '{django_live_url}/api/tasks'
+  response:
+    save:
+      json:
+        first_task_pk: id
+    status_code: 201
+- name: create_task
+  request:
+    json:
+      data:
+        text: 'Test text'
+      project: '{project_pk}'
+    method: POST
+    url: '{django_live_url}/api/tasks'
+  response:
+    save:
+      json:
+        second_task_pk: id
+    status_code: 201
+- name: create_task
+  request:
+    json:
+      data:
+        text: 'Test text'
+      project: '{project_pk}'
+    method: POST
+    url: '{django_live_url}/api/tasks'
+  response:
+    save:
+      json:
+        third_task_pk: id
+    status_code: 201
+
+- name: postpone_first_task
+  request:
+    method: POST
+    url: '{django_live_url}/api/tasks/{first_task_pk}/drafts'
+    json:
+      was_postponed: true
+      project: '{project_pk}'
+      result: []
+  response:
+    status_code: 201
+    save:
+      json:
+        first_draft_pk: id
+    json:
+      task: !int '{first_task_pk}'
+
+- name: get_next_task
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      id: !int '{second_task_pk}'
+
+- name: create_skip_annotation_second_task
+  request:
+    headers:
+      content-type: application/json
+    json:
+      was_postponed: true
+      result: []
+    method: POST
+    url: '{django_live_url}/api/tasks/{second_task_pk}/annotations'
+  response:
+    save:
+      json:
+        annotation_pk: id
+        annotation_created_at: created_at
+    status_code: 201
+
+- name: get_next_task
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      id: !int '{third_task_pk}'
+
+- name: get_previous_task_no_anno_or_draft_for3
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/previous-task/?task={third_task_pk}'
+  response:
+    status_code: 200
+    json:
+      - previous:
+          task: !int "{second_task_pk}"
+          annotation: !int "{annotation_pk}"
+          created_at: "{annotation_created_at}"
+        next: null
+
+- name: get_previous_task_no_anno_or_draft_for2
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/previous-task/?task={second_task_pk}&annotation={annotation_pk}'
+  response:
+    status_code: 200
+    json:
+      - previous:
+          task: !int "{first_task_pk}"
+          draft: !int "{first_draft_pk}"
+        next: null
+
+- &unskip_task
+  name: unskip_task
+  request:
+    headers:
+      content-type: application/json
+    method: POST
+    url: '{django_live_url}/api/annotations/{annotation_pk}/convert-to-draft?project={project_pk}'
+  response:
+    save:
+      json:
+        second_draft_pk: id
+        second_draft_created_at: created_at
+    status_code: 201
+
+- name: get_previous_task_no_anno_or_draft_for3
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/previous-task/?task={third_task_pk}'
+  response:
+    status_code: 200
+    json:
+      - previous:
+          task: !int "{second_task_pk}"
+          draft: !int "{second_draft_pk}"
+          created_at: "{second_draft_created_at}"
+        next: null
