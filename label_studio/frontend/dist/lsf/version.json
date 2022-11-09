@@ -1,6 +1,6 @@
 {
   "message": "feat: DEV-3391: Render real Annotations in View All",
-  "commit": "75667105947f0ca8d79d723ecfee61558875ca39",
+  "commit": "b4bdbdfed909d5b292411c74abc5327f1024a4af",
   "branch": "fb-dev-3391/view-all",
-  "date": "2022/11/08 20:50:57"
+  "date": "2022/11/08 20:53:59"
 }
