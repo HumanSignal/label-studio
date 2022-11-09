@@ -1,0 +1,146 @@
+---
+test_name: ensure_counts_are_correct
+strict: False
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+  - id: signup
+    type: ref
+  - id: create_project
+    name: Create project
+    request:
+      url: "{django_live_url}/api/projects"
+      json:
+        title: create_batch_tasks_assignments
+        label_config: <View><Image name="image" value="$image"/><RectangleLabels name="objects" toName="image" choices="multiple"><Label
+          value="Cat"/><Label value="Dog"/></RectangleLabels></View>
+        is_published: true
+      method: POST
+      headers:
+        content-type: application/json
+    response:
+      status_code: 201
+      save:
+        json:
+          project_pk: id
+  - name: update_project
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}"
+      json:
+        maximum_annotations: 3
+        overlap_cohort_percentage: 50
+      method: PATCH
+      headers:
+        content-type: application/json
+    response:
+      status_code: 200
+  - name: Import tasks
+    request:
+      files:
+        csv: tests/test_suites/samples/image_urls_with_bboxes.json
+      headers:
+        content-type: multipart/form-data
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/import?return_task_ids=true&preannotated_from_fields=bbox'
+    response:
+      status_code: 201
+      save:
+        json:
+          first_task_id: "task_ids[0]"
+          second_task_id: "task_ids[1]"
+  # Check count
+  - id: check_count
+    name: check_count
+    request:
+      method: GET
+      url: '{django_live_url}/api/dm/project?project={project_pk}'
+    response:
+      json:
+        task_count: 2
+      status_code: 200
+  # Check is_labeled calculation
+
+  # Delete task and check that overlap is rearranged and is_labeled is calculated
+  - name: delete task
+    request:
+      method: DELETE
+      url: '{django_live_url}/api/tasks/{first_task_id}'
+    response:
+      status_code: 204
+
+  # Check counters
+  - name: check_count_again
+    request:
+      method: GET
+      url: '{django_live_url}/api/dm/project?project={project_pk}'
+    response:
+      json:
+        task_count: 1
+      status_code: 200
+  # Check is_labeled calculation
+
+  # Delete annotation:
+  - name: stage
+    request:
+      headers:
+        content-type: application/json
+      method: DELETE
+      url: '{django_live_url}/api/annotations/2'
+  # Check that total_annotations counter is changed
+  - name: check_annotation_count
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks/{second_task_id}'
+    response:
+      #json:
+      #  total_annotations: 0
+      save:
+        prediction_id: 'predictions[0].id'
+      status_code: 200
+
+  # Delete predictions
+  - id: delete_prediction
+    name: delete_prediction
+    request:
+      method: DELETE
+      url: '{django_live_url}/api/predictions/2/'
+    response:
+      status_code: 204
+  
+  # Check that total_predictions counter are changed
+  - name: check_prediction_count
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks/{second_task_id}'
+    response:
+      json:
+        total_predictions: 0
+      status_code: 200
+
+  # Import tasks with annotations and predictions:
+  - name: Import again
+    request:
+      files:
+        csv: tests/test_suites/samples/image_urls_with_bboxes.json
+      headers:
+        content-type: multipart/form-data
+      method: POST
+      url: '{django_live_url}/api/projects/{project_pk}/import?return_task_ids=true&preannotated_from_fields=bbox'
+    response:
+      status_code: 201
+      save:
+        json:
+          first_task_id: "task_ids[0]"
+          second_task_id: "task_ids[1]"
+
+  # Check counters
+  - id: check_count_again
+    name: check_count_again
+    request:
+      method: GET
+      url: '{django_live_url}/api/dm/project?project={project_pk}'
+    response:
+      json:
+        task_count: 3
+      status_code: 200
