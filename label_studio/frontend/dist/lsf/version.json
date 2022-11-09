@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3224: Assign task history from outside",
-  "commit": "cc3048a955d293612c30071d6e88a91606c85ae0",
-  "branch": "master",
-  "date": "2022/11/08 18:21:45"
+  "message": "fix: DEV-3706: Fix undo with ML backend",
+  "commit": "601c7a101d95a12c76e44e532a3c5603237f1002",
+  "branch": "fb-dev-3706",
+  "date": "2022/11/09 04:12:24"
 }
