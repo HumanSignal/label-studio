@@ -1,6 +1,6 @@
-from email.policy import default
 from django.db import models
 from sensormodel.utils import parser_templates_files as parser
+import os
 
 class Sensor(models.Model):
     sensor_id = models.IntegerField()
@@ -10,10 +10,9 @@ class Sensor(models.Model):
     name = models.CharField(max_length=50, blank=True)
     version = models.CharField(max_length=50, blank=True)
 
-   
-    relpath = r".\label_studio\sensormodel\parser_templates"
-    
-    PARSER_CHOICES = parser.get_parser_templates(relpath)
+    path = os.path.abspath(r'sensormodel\parser_templates')
+
+    PARSER_CHOICES = parser.get_parser_templates(path)
     parser_template = models.IntegerField(choices = PARSER_CHOICES, default= 1)
     def __str__(self):
         return 'Sensor: ' + str(self.sensor_id)
