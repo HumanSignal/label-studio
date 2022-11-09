@@ -192,7 +192,8 @@ stages:
 - *postpone_task_first
 - *get_next_task_second
 
-- name: create_skip_annotation_second_task
+- &create_skip_annotation_second_task
+  name: create_skip_annotation_second_task
   request:
     headers:
       content-type: application/json
@@ -228,7 +229,8 @@ stages:
         second_draft_created_at: created_at
     status_code: 201
 
-- name: get_previous_task_no_anno_or_draft_for3
+- &get_previous_task_with_draft_for3
+  name: get_previous_task_no_anno_or_draft_for3
   request:
     method: GET
     url: '{django_live_url}/api/projects/{project_pk}/previous-task/?task={third_task_pk}'
@@ -239,4 +241,56 @@ stages:
           task: !int "{second_task_pk}"
           draft: !int "{second_draft_pk}"
           created_at: "{second_draft_created_at}"
+        next: null
+
+---
+test_name: postpone_skip_submit
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+
+- *create_first_task
+- *create_second_task
+- *create_third_task
+- *postpone_task_first
+- *get_next_task_second
+- *create_skip_annotation_second_task
+- *get_next_task_third
+- *get_previous_task_no_anno_or_draft_for3
+- *get_previous_task_no_anno_or_draft_for2
+- *unskip_task
+- *get_previous_task_with_draft_for3
+- name: create_annotation_second_task_from_draft
+  request:
+    headers:
+      content-type: application/json
+    json:
+      draft_id: !int "{second_draft_pk}"
+      result: []
+      project: !int '{project_pk}'
+    method: POST
+    url: '{django_live_url}/api/tasks/{second_task_pk}/annotations'
+  response:
+    save:
+      json:
+        annotation_pk_from_draft: id
+        annotation_created_at_from_draft: created_at
+    status_code: 201
+- *get_next_task_third
+- name: get_previous_task_no_anno_or_draft_for2
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/previous-task/?task={second_task_pk}&annotation={annotation_pk_from_draft}'
+  response:
+    status_code: 200
+    json:
+      - previous:
+          task: !int "{first_task_pk}"
+          draft: !int "{first_draft_pk}"
         next: null
