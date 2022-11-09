@@ -355,3 +355,25 @@ stages:
           task: !int "{first_task_pk}"
           annotation: !int "{first_annotation_pk}"
         next: null
+- name: patch_first_annotation
+  request:
+    method: PATCH
+    url: '{django_live_url}/api/annotations/{first_annotation_pk}?taskID={first_task_pk}&project={project_pk}'
+    json:
+      project: '{project_pk}'
+      result:
+      - from_name: label
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - pos1
+  response:
+    status_code: 200
+    save:
+      json:
+        first_annotation_pk: id
+        first_annotation_created_at: created_at
+    json:
+      task: !int '{first_task_pk}'
+- *get_previous_task_no_anno_or_draft_for3
