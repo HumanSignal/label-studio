@@ -10,6 +10,15 @@ meta_description: Get started with Label Studio by creating projects to label an
 
 This post includes the markdown needed for various styles/layouts.
 
+## Templates
+
+<a href="/sitemap-docs.xml">Sitemap</a>
+<a href="/guide">Guide</a>
+<a href="/templates">Templates</a>
+<a href="/tags">Tags</a>
+<a href="/playground">Playground</a>
+<a href="/tutorials/sklearn-text-classifier.html">Tutorial example</a>
+
 ## Typography
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. **Bold integer vitae mauris arcu**, eu pretium nisi. Praesent fringilla ornare ullamcorper. Pellentesque diam orci, italics sodales in blandit ut, placerat quis felis. *Italics vestibulum at sem massa*, in tempus nisi. Vivamus ut fermentum odio. Etiam porttitor faucibus volutpat. [Clickable link](https://google.com) mi ligula, non hendrerit urna. Suspendisse potenti. Quisque eget massa a massa semper mollis.
