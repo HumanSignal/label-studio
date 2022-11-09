@@ -16,7 +16,10 @@ LSF is located as a separate GitHub repository: https://github.com/heartexlabs/l
 <div style="margin:auto; text-align:center;"><img src="/images/frontend/lsf-in-ls.jpg" style="opacity: 0.9"/></div>
 
 ## Installation
-There are two ways to install the LSF: via package manager or via Unpkg CDN.
+There are two ways to install the LSF as follows:
+
+1. Using the package manager
+2. Using the Unpkg CDN
 
 ### Using a package manager (recommended)
 You can either use `npm` or `yarn` to install the LSF.
