@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-3572: Persist and read virtual annotator filters from local storage as a fallback (#116)",
-  "commit": "fa4559e82f69910ba7ce24c978c6a194aa58a7e8",
+  "message": "fix: DEV-3224: Move task to the end on next task",
+  "commit": "0fe0f6ff2b5ee16b11bab78731bb1c117b7a43f7",
   "branch": "master",
-  "date": "2022-10-21T14:05:14Z"
+  "date": "2022/11/08 18:10:40"
 }

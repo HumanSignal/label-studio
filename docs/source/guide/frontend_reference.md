@@ -9,20 +9,20 @@ meta_description: Label Studio Frontend reference documentation for implementing
 Label Studio Frontend (LSF) includes several UI options and callbacks that you can use when implementing the frontend with a custom labeling backend, or when customizing the Label Studio interface.
 
 
-## Updates to LSF in version 1.0.0 
+## Updates to LSF in version 1.0.0
 
 !!! warning
     LSF version 1.0.0 is not compatible with earlier versions of Label Studio.
 
- If you use LSF with a custom backend, you must make changes to the API callbacks that you use as follows:
+If you use LSF with a custom backend, you must make changes to the API callbacks that you use as follows:
 
 | Callback in 0.9.1 and earlier | Renamed callback in 1.0.0 |
 | --- | --- |
 | onSubmitCompletion | onSubmitAnnotation |
 | onUpdateCompletion | onUpdateAnnotation |
-| onDeleteCompletion | onDeleteAnnotation | 
+| onDeleteCompletion | onDeleteAnnotation |
 
-If you rely on specific formatting of Label Studio completed tasks, [Label Studio's annotation format](export.html#Raw-JSON-format-of-completed-tasks) has also been updated. 
+If you rely on specific formatting of Label Studio completed tasks, [Label Studio's annotation format](export.html#Raw-JSON-format-of-completed-tasks) has also been updated.
 
 ## Implement the Label Studio Frontend
 
@@ -41,7 +41,8 @@ Default: `null`
 
 Type data: `string`
 
-XML configuration of task. List of formats to allow in the editor.
+XML-based configuration of the labeling interface. This configuration relies on the `data` field of the task.
+See [Customizable Tags](/tags) for more information.
 
 ### interfaces
 
@@ -49,54 +50,28 @@ Default: `null`
 
 Type data: `array`
 
-Collection of UI elements to show:
+Collection of UI elements to show. Available interfaces:
 
-```javascript
-
-  interfaces: [
-    "panel",
-    "update",
-    "submit",
-    "skip",
-    "controls",
-    "infobar",
-    "topbar",
-    "instruction",
-    "side-column",
-    "annotations:history",
-    "annotations:tabs",
-    "annotations:menu",
-    "annotations:current",
-    "annotations:add-new",
-    "annotations:delete",
-    'annotations:view-all',
-    "predictions:tabs",
-    "predictions:menu",
-    "auto-annotation",
-    "edit-history",
-  ]
-```
-
-- `panel` - A navigation panel for the current task with buttons: undo, redo and reset.
-- `update` - A show button to update the current task after submitting.
-- `submit` - A show button to submit or update the current annotation.
-- `skip` - A show button to skip the current task.
+- `panel` - Enable navigaion panel for the current task with buttons: undo, redo and reset.
+- `update` - Show a button to update the current task after submitting.
+- `submit` - Show a button to submit or update the current annotation.
+- `skip` - Show a button to skip the current task.
 - `controls` - Enable panel with controls (`submit`, `update`, `skip`).
-- `infobar` - A show button for information. 
-- `topbar` - A labeling interface that lists the top-level items in the Label Studio UI. 
-- `instruction` - A show button for instructions. 
-- `side-column` - Show a column on the left or right side of the Label Studio UI. 
+- `infobar` - A show button for information.
+- `topbar` - A labeling interface that lists the top-level items in the Label Studio UI.
+- `instruction` - A button for the [instructions](#description).
+- `side-column` - Show a column on the left or right side of the Label Studio UI.
 - `annotations:history` - A show button for annotation history.
-- `annotations:tabs` - A show button for annotation tabs. 
+- `annotations:tabs` - A show button for annotation tabs.
 - `annotations:menu` - A show button for the annotation menu.
 - `annotations:current` - A show button for the current annotation.
 - `annotations:add-new` - A show button to add new annotations.
 - `annotations:delete` - A show button to delete the current annotation.
 - `annotations:view-all` - A show button to view all annotations.
-- `predictions:tabs` - Show predictions tabs. 
+- `predictions:tabs` - Show predictions tabs.
 - `predictions:menu` - Show predictions menu.
-- `auto-annotation` - Show auto annotations. 
-- `edit-history` - Show edit history. 
+- `auto-annotation` - Show auto annotations.
+- `edit-history` - Show edit history.
 
 ### messages
 
@@ -195,104 +170,271 @@ Type data: `string`
 
 Type data: `string`
 
-## Callbacks
+## Event system
+LSF has a built-in event system that allows you to listen to events and trigger custom actions. You can subscribe to or unsubscribe from event at any time after the Label Studio instance is initialized.
 
-Callbacks can be used to execute actions based on user interaction with the interface. For example, label-studio server uses callbacks to communicate with an API. Pass them along with other options when initiating the instance.
-
-### onSubmitAnnotation
-
-Type data: `function`
-
-Called when the `submit` button is pressed. `ls` is label studio instance, `annotation` is the value of the current annotation.
-
-#### Example
+### Using events
+#### Subscribe to an event
 
 ```javascript
-onSubmitAnnotation: function(ls, annotation) {
-  console.log(annotation)
-}
+const callback = () => {
+  console.log('Event triggered');
+};
+labelStudio.on('event', callback);
 ```
 
-### onUpdateAnnotation
-
-Type data: `function`
-
-Called when the `update` button is pressed. `ls` is label studio instance, `annotation` is the value of the current annotation.
-
-#### Example
+#### Unsubscribe from an event
 
 ```javascript
-onUpdateAnnotation: function(ls, annotation) {
-  console.log(result)
-}
+const callback = () => {
+  console.log('Event triggered');
+};
+labelStudio.off('event', callback);
 ```
 
-### onDeleteAnnotation
+!!! info
+    To be able to unsubscribe from an event, you must pass the same callback function reference to the `off` method.
 
-Type data: `function`
+## Available events
 
-Called when the `delete` button is pressed. `ls` is label studio instance, `annotation` is value of current annotation.
+#### Top-level events
 
-#### Example
+This events group contains top-level events. Those events are not related to any internal entities of the LSF.
 
-```javascript
-onDeleteAnnotation: function(ls, annotation) {
-  console.log(result)
-}
-```
+### `labelStudioLoad`
+Label Studio instance is loaded.
 
-### onEntityCreate
+**Event handler arguments**
 
-Type data: `function`
+| Argument | Type | Description |
+| --- | --- | --- |
+| `labelStudio` | `Object` | Instance of Label Studio |
 
-Called when a new region gets labeled, for example, a new bbox is created. `region` is the object that was created.
 
-#### Example
+### `storageInitialized`
+The internal storage is initialized.
 
-```javascript
-onEntityCreate: function(region) {
-  console.log(region)
-}
-```
+**Event handler arguments**
 
-### onEntityDelete
+| Argument | Type | Description |
+| --- | --- | --- |
+| `labelStudio` | `Object` | Instance of Label Studio |
 
-Type data: `function`
+#### Task events
 
-Called when an existing region gets deleted. `region` is the object itself.
+This events group contains events related to the task.
 
-#### Example
+### `skipTask`
+User clicked the "Skip" button.
 
-```javascript
-onEntityDelete: function(region) {
-  console.log(region)
-}
-```
+**Event handler arguments**
 
-### onSkipTask
+| Argument | Type | Description |
+| --- | --- | --- |
+| `labelStudio` | `Object` | Instance of Label Studio |
+| `payload` | `Object` | Additional data sent during the skip action |
 
-Type data: `function`
+### `unskipTask`
+User clicked the "Cancel Skip" button.
 
-Called when the `skip` button is pressed. `ls` is label studio instance.
+| Argument | Type | Description |
+| --- | --- | --- |
+| `labelStudio` | `Object` | Instance of Label Studio |
 
-#### Example
+### `nextTask`
+User clicked the "Next" (chevron right) button.
 
-```javascript
-onSkipTask: function(ls) {
-  console.log(result)
-}
-```
+| Argument | Type | Description |
+| --- | --- | --- |
+| `labelStudio` | `Object` | Instance of Label Studio |
+| `taskId` | `Number?` | ID of the next task in history |
+| `annotationId` | `Number?` | ID of the annotation to select within the task |
 
-### onLabelStudioLoad
+### `prevTask`
+User clicked the "Previous" (chevron left) button.
 
-Type data: `function`
+| Argument | Type | Description |
+| --- | --- | --- |
+| `labelStudio` | `Object` | Instance of Label Studio |
+| `taskId` | `Number?` | ID of the previous task in history |
+| `annotationId` | `Number?` | ID of the annotation to select within the task |
 
-Called when Label Studio has fully loaded and is ready for labeling. `ls` is the label studio instance
+### `submitDraft`
+Draft is sent to the server.
 
-#### Example
+| Argument | Type | Description |
+| --- | --- | --- |
+| `labelStudio` | `Object` | Instance of Label Studio |
+| `annotation` | `Object` | Current annotation |
+| `params` | `Object?` | Extra params sent with the draft |
 
-```javascript
-onLabelStudioLoad: function(ls) {
-  console.log(result)
-}
-```
+#### Annotation events
+This events group contains events related to the annotation.
+
+### `submitAnnotation`
+Annotation is submitted.
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| `labelStudio` | `Object` | Instance of Label Studio |
+| `annotation` | `Object` | Current annotation |
+
+### `updateAnnotation`
+Annotation is updated.
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| `labelStudio` | `Object` | Instance of Label Studio |
+| `annotation` | `Object` | Current annotation |
+
+### `selectAnnotation`
+Annotation is selected.
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| `labelStudio` | `Object` | Instance of Label Studio |
+| `annotation` | `Object` | Current annotation |
+
+
+### `deleteAnnotation`
+Annotation is deleted.
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| `labelStudio` | `Object` | Instance of Label Studio |
+| `annotation` | `Object` | Current annotation |
+
+
+### `groundTruth`
+Annotation is set as Ground Truth (the star button clicked).
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| `store` | `Object` | Instance of Label Studio |
+| `labelStudio` | `Object` | Instance of Label Studio |
+| `params` | `Object` | |
+| `params.isDirty` | `Boolean` | `true` if annotation was changed |
+| `params.entity` | `Object` | Current annotation |
+
+#### Region events
+
+This events group contains events related to the regions. Regions are the special entities used in segmentation tasks like image segmentation, audio segmentation, etc.
+
+### `entityCreate`
+Region is created.
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| `region` | `Object` | Newly created region |
+
+### `entityDelete`
+Region is deleted.
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| `region` | `Object` | Newly created region |
+
+
+{% collapse "Callbacks (deprecated)" %}
+  ## Callbacks (deprecated)
+
+  Callbacks can be used to execute actions based on user interaction with the interface. For example, label-studio server uses callbacks to communicate with an API. Pass them along with other options when initiating the instance.
+
+  ### onSubmitAnnotation
+
+  Type data: `function`
+
+  Called when the `submit` button is pressed. `ls` is label studio instance, `annotation` is the value of the current annotation.
+
+  #### Example
+
+  ```javascript
+  onSubmitAnnotation: function(ls, annotation) {
+    console.log(annotation)
+  }
+  ```
+
+  ### onUpdateAnnotation
+
+  Type data: `function`
+
+  Called when the `update` button is pressed. `ls` is label studio instance, `annotation` is the value of the current annotation.
+
+  #### Example
+
+  ```javascript
+  onUpdateAnnotation: function(ls, annotation) {
+    console.log(result)
+  }
+  ```
+
+  ### onDeleteAnnotation
+
+  Type data: `function`
+
+  Called when the `delete` button is pressed. `ls` is label studio instance, `annotation` is value of current annotation.
+
+  #### Example
+
+  ```javascript
+  onDeleteAnnotation: function(ls, annotation) {
+    console.log(result)
+  }
+  ```
+
+  ### onEntityCreate
+
+  Type data: `function`
+
+  Called when a new region gets labeled, for example, a new bbox is created. `region` is the object that was created.
+
+  #### Example
+
+  ```javascript
+  onEntityCreate: function(region) {
+    console.log(region)
+  }
+  ```
+
+  ### onEntityDelete
+
+  Type data: `function`
+
+  Called when an existing region gets deleted. `region` is the object itself.
+
+  #### Example
+
+  ```javascript
+  onEntityDelete: function(region) {
+    console.log(region)
+  }
+  ```
+
+  ### onSkipTask
+
+  Type data: `function`
+
+  Called when the `skip` button is pressed. `ls` is label studio instance.
+
+  #### Example
+
+  ```javascript
+  onSkipTask: function(ls) {
+    console.log(result)
+  }
+  ```
+
+  ### onLabelStudioLoad
+
+  Type data: `function`
+
+  Called when Label Studio has fully loaded and is ready for labeling. `ls` is the label studio instance
+
+  #### Example
+
+  ```javascript
+  onLabelStudioLoad: function(ls) {
+    console.log(result)
+  }
+  ```
+{% endcollapse %}
