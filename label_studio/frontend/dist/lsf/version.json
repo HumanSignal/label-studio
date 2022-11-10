@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3224: Assign task history from outside",
-  "commit": "cc3048a955d293612c30071d6e88a91606c85ae0",
-  "branch": "master",
-  "date": "2022/11/08 18:21:45"
+  "message": "fix: DEV-1852: Fix missing labels on video regions",
+  "commit": "a517454dc61b8b6072dcbf238744dc349ad73f9c",
+  "branch": "fb-dev-1852/label-on-video-region",
+  "date": "2022/11/10 06:42:19"
 }
