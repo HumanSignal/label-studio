@@ -302,17 +302,17 @@ class ProjectPreviousTaskAPI(generics.RetrieveAPIView):
             query.data['task'], query.data['annotation'], query.data['draft']
 
         annotations = request.user.annotations.filter(task__project=project)
-        annotations = annotations.values('task', 'id', 'created_at')
+        annotations = annotations.values('task', 'id', 'updated_at')
         for annotation in annotations:
             annotation['annotation'] = annotation.pop('id')
 
         drafts = request.user.drafts.filter(task__project=project)
-        drafts = drafts.values('task', 'id', 'created_at')
+        drafts = drafts.values('task', 'id', 'updated_at')
         for draft in drafts:
             draft['draft'] = draft.pop('id')
 
         mix = list(annotations) + list(drafts)
-        mix = sorted(mix, key=lambda x: x['created_at'])
+        mix = sorted(mix, key=lambda x: x['updated_at'])
         
         # find current task
         prev_item = None
