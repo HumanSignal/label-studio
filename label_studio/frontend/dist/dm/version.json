@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3736: Keep task if URL is from notification",
-  "commit": "2f1180d01901166d713f93d8f4e049b245a9c393",
+  "commit": "8f0ef7ae395a8572e9757115d8614927fa530de7",
   "branch": "fb-dev-3736",
-  "date": "2022/11/10 16:18:41"
+  "date": "2022/11/10 16:20:36"
 }
