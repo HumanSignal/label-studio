@@ -122,7 +122,7 @@ stages:
       - previous:
           task: !int "{second_task_pk}"
           annotation: !int "{annotation_pk}"
-          created_at: "{annotation_created_at}"
+          updated_at: "{annotation_created_at}"
         next: null
 
 - &get_previous_task_no_anno_or_draft_for2
@@ -171,7 +171,7 @@ stages:
       - previous:
           task: !int "{first_task_pk}"
           annotation: !int "{second_annotation_pk}"
-          created_at: "{second_annotation_created_at}"
+          updated_at: "{second_annotation_created_at}"
         next: null
 
 ---
@@ -240,7 +240,7 @@ stages:
       - previous:
           task: !int "{second_task_pk}"
           draft: !int "{second_draft_pk}"
-          created_at: "{second_draft_created_at}"
+          updated_at: "{second_draft_created_at}"
         next: null
 
 ---
@@ -376,4 +376,14 @@ stages:
         first_annotation_created_at: created_at
     json:
       task: !int '{first_task_pk}'
-- *get_previous_task_no_anno_or_draft_for3
+- name: get_previous_task_no_anno_or_draft_for3_after_patch
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/previous-task/?task={third_task_pk}'
+  response:
+    status_code: 200
+    json:
+      - previous:
+          task: !int "{first_task_pk}"
+          annotation: !int "{first_annotation_pk}"
+        next: null
