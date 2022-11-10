@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3224: Assign task history from outside",
-  "commit": "cc3048a955d293612c30071d6e88a91606c85ae0",
-  "branch": "master",
-  "date": "2022/11/08 18:21:45"
+  "message": "fix: DEV-3742: Toggling textrange visibility works in outliner",
+  "commit": "c141f3e1ef09577ede6607416b479629daf1e2e9",
+  "branch": "fb-dev-3742",
+  "date": "2022/11/10 10:39:18"
 }
