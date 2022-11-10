@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3224: Assign task history from outside",
-  "commit": "cc3048a955d293612c30071d6e88a91606c85ae0",
-  "branch": "master",
-  "date": "2022/11/08 18:21:45"
+  "message": "fix: DEV-3672: I can't reassign label to bounding box with a hotkey",
+  "commit": "0fa218d8e4be0ff5e2f31614c24895724aa25e6a",
+  "branch": "fb-dev-3672/hotkey-inconsistency",
+  "date": "2022/11/10 10:55:32"
 }
