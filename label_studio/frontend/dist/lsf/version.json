@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3742: Toggling textrange visibility works in outliner",
-  "commit": "c141f3e1ef09577ede6607416b479629daf1e2e9",
-  "branch": "fb-dev-3742",
-  "date": "2022/11/10 10:39:18"
+  "commit": "1e33c4ba0785817c2bdbfeadd5f2a2a21f0b9243",
+  "branch": "master",
+  "date": "2022/11/10 12:54:50"
 }
