@@ -155,14 +155,19 @@ class UpdateLastActivityMiddleware(CommonMiddleware):
             if request.user.is_authenticated:
                 request.user.update_last_activity()
 
+
 class InactivitySessionTimeoutMiddleWare(CommonMiddleware):
     """Log the user out if they have been logged in for too long
      or inactive for too long"""
 
     # paths that don't count as user activity
     NOT_USER_ACTIVITY_PATHS = []
+
     def process_request(self, request) -> None:
-        if not hasattr(request, "session") or request.session.is_empty():
+        if (not hasattr(request, 'session') or
+            request.session.is_empty() or
+            not hasattr(request, 'user') or
+            not request.user.is_authenticated):
             return
 
         current_time = time.time()

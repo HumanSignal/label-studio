@@ -349,9 +349,16 @@ class Project(ProjectMixin, models.Model):
         membership = ProjectMember.objects.filter(user=user, project=self)
         return membership.exists() and membership.first().enabled
 
-    def _update_tasks_states(
-        self, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed
-    ):
+    def _update_tasks_states(self,
+                             maximum_annotations_changed,
+                             overlap_cohort_percentage_changed,
+                             tasks_number_changed):
+        """
+        Update tasks states after settings change
+        :param maximum_annotations_changed: If maximum_annotations param changed
+        :param overlap_cohort_percentage_changed: If cohort_percentage param changed
+        :param tasks_number_changed: If tasks number changed in project
+        """
         # if only maximum annotations parameter is tweaked
         if maximum_annotations_changed and (not overlap_cohort_percentage_changed or self.maximum_annotations == 1):
             tasks_with_overlap = self.tasks.filter(overlap__gt=1)
@@ -363,6 +370,11 @@ class Project(ProjectMixin, models.Model):
             else:
                 # otherwise affect all tasks
                 self.tasks.update(overlap=self.maximum_annotations)
+                tasks_with_overlap = self.tasks.all()
+            # update is_labeled after change
+            bulk_update_stats_project_tasks(
+                tasks_with_overlap
+            )
 
         # if cohort slider is tweaked
         elif overlap_cohort_percentage_changed and self.maximum_annotations > 1:
@@ -370,7 +382,12 @@ class Project(ProjectMixin, models.Model):
             bulk_update_stats_project_tasks(
                 tasks
             )
+            self.rearrange_overlap_cohort()
 
+        # if adding/deleting tasks and cohort settings are applied
+        elif tasks_number_changed and self.overlap_cohort_percentage < 100 and self.maximum_annotations > 1:
+            self.rearrange_overlap_cohort()
+    
         # if adding/deleting tasks and cohort settings are applied
         elif tasks_number_changed and self.overlap_cohort_percentage < 100 and self.maximum_annotations > 1:
             tasks = self._rearrange_overlap_cohort()
@@ -440,11 +457,16 @@ class Project(ProjectMixin, models.Model):
                 objs.append(item)
             with transaction.atomic():
                 bulk_update(objs, update_fields=['overlap'], batch_size=settings.BATCH_SIZE)
+            # update is labeled after tasks rearrange overlap
+            bulk_update_stats_project_tasks(all_project_tasks)
             return objs
         else:
             tasks_with_max_annotations.update(overlap=max_annotations)
             tasks_with_min_annotations.update(overlap=1)
+            # update is labeled after tasks rearrange overlap
+            bulk_update_stats_project_tasks(all_project_tasks)
             return tasks_with_max_annotations | tasks_with_min_annotations
+
 
     def remove_tasks_by_file_uploads(self, file_upload_ids):
         self.tasks.filter(file_upload_id__in=file_upload_ids).delete()
@@ -626,7 +648,7 @@ class Project(ProjectMixin, models.Model):
 
         # argument for recalculate project task stats
         if recalc:
-            self.update_tasks_states(
+            self._update_tasks_states(
                 maximum_annotations_changed=self.__maximum_annotations != self.maximum_annotations,
                 overlap_cohort_percentage_changed=self.__overlap_cohort_percentage != self.overlap_cohort_percentage,
                 tasks_number_changed=False,
@@ -812,7 +834,13 @@ class Project(ProjectMixin, models.Model):
         self._storage_objects = storage_objects
         return storage_objects
 
-    def update_tasks_counters(self, queryset, from_scratch=True):
+    def _update_tasks_counters(self, queryset, from_scratch=True):
+        """
+        Update tasks counters
+        :param queryset: Tasks to update queryset
+        :param from_scratch: Skip calculated tasks
+        :return: Count of updated tasks
+        """
         objs = []
 
         total_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))

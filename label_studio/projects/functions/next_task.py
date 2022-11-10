@@ -182,15 +182,29 @@ def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_fla
     return next_task, use_task_lock, queue_info
 
 
-def skipped_queue(next_task, prepared_tasks, project, user):
+def skipped_queue(next_task, prepared_tasks, project, user, queue_info):
     if not next_task and project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
         q = Q(task__project=project, task__isnull=False, was_cancelled=True)
         skipped_tasks = user.annotations.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
         if skipped_tasks.exists():
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(skipped_tasks)])
             next_task = prepared_tasks.filter(pk__in=skipped_tasks).order_by(preserved_order).first()
+            queue_info = 'Skipped queue'
 
-    return next_task
+    return next_task, queue_info
+
+
+def postponed_queue(next_task, prepared_tasks, project, user, queue_info):
+    if not next_task:
+        q = Q(task__project=project, task__isnull=False, task__is_labeled=False, was_postponed=True)
+        postponed_tasks = user.drafts.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
+        if postponed_tasks.exists():
+            preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(postponed_tasks)])
+            next_task = prepared_tasks.filter(pk__in=postponed_tasks).order_by(preserved_order).first()
+            next_task.allow_postpone = False
+            queue_info = f'Postponed draft queue'
+
+    return next_task, queue_info
 
 
 def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
@@ -237,20 +251,47 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
             # set lock for the task with TTL 3x time more then current average lead time (or 1 hour by default)
             next_task.set_lock(user)
 
-        next_task = skipped_queue(next_task, prepared_tasks, project, user)
+        next_task, queue_info = postponed_queue(next_task, prepared_tasks, project, user, queue_info)
+
+        next_task, queue_info = skipped_queue(next_task, prepared_tasks, project, user, queue_info)
 
         logger.debug(f'get_next_task finished. next_task: {next_task}, queue_info: {queue_info}')
 
         # debug for critical overlap issue
         if next_task:
             try:
-                task_overlap_reached = next_task.annotations.count() >= next_task.overlap
-                global_overlap_reached = next_task.annotations.count() >= project.maximum_annotations
-                if next_task.is_labeled or task_overlap_reached or global_overlap_reached:
+                count = next_task.annotations.filter(was_cancelled=False).count()
+                task_overlap_reached = count >= next_task.overlap
+                global_overlap_reached = count >= project.maximum_annotations
+                if next_task.is_labeled or not task_overlap_reached or global_overlap_reached:
                     from tasks.serializers import TaskSimpleSerializer
-                    logger.error(f'get_next_task is_labeled/overlap issue: '
-                                 f'LOCALS ==> {locals()} :: '
-                                 f'NEXT_TASK ==> {TaskSimpleSerializer(next_task).data}')
+
+                    local = dict(locals())
+                    local.pop('prepared_tasks', None)
+                    local.pop('user_solved_tasks_array', None)
+                    local.pop('not_solved_tasks', None)
+
+                    task = TaskSimpleSerializer(next_task).data
+                    task.pop('data', None)
+                    task.pop('predictions', None)
+                    for i, a in enumerate(task['annotations']):
+                        task['annotations'][i] = dict(task['annotations'][i])
+                        task['annotations'][i].pop('result', None)
+
+                    project = next_task.project
+                    project_data = {
+                        'maximum_annotations': project.maximum_annotations,
+                        'skip_queue': project.skip_queue,
+                        'sampling': project.sampling,
+                        'show_ground_truth_first': project.show_ground_truth_first,
+                        'show_overlap_first': project.show_overlap_first,
+                        'overlap_cohort_percentage': project.overlap_cohort_percentage,
+                        'project_id': project.id,
+                        'title': project.title
+                    }
+                    logger.error(f'DEBUG INFO: get_next_task is_labeled/overlap: '
+                                 f'LOCALS ==> {local} :: PROJECT ==> {project_data} :: '
+                                 f'NEXT_TASK ==> {task}')
             except Exception as e:
                 logger.error(f'get_next_task is_labeled/overlap try/except: {str(e)}')
                 pass

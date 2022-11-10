@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3487 Align comment icons into the same columns with annotation and drafts in dropdown selector (#943)\n\n* fix: DEV-3487 Align comment icons into the same columns with annotation and drafts in dropdown selector\r\n\r\n* more idiomatic way to style without breaking original structure",
-  "commit": "1470390776ba9aa89b1b4cdc23fef0e76a9907a3",
+  "message": "fix: DEV-3224: Assign task history from outside",
+  "commit": "cc3048a955d293612c30071d6e88a91606c85ae0",
   "branch": "master",
-  "date": "2022-11-07T15:04:49Z"
+  "date": "2022/11/08 18:21:45"
 }
