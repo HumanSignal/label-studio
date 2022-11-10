@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3224: Assign task history from outside",
-  "commit": "cc3048a955d293612c30071d6e88a91606c85ae0",
-  "branch": "master",
-  "date": "2022/11/08 18:21:45"
+  "message": "fix: DEV-3644: Ensure draft is saved correctly and remains editable",
+  "commit": "22e73a2d036e92c19582bf55ec434b9585b4e762",
+  "branch": "fb-dev-3644/save-draft-editable",
+  "date": "2022/11/10 08:16:13"
 }
