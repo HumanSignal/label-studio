@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3738: Editable textarea in region list",
-  "commit": "8b23a402547a6fc5c9f0475c9ca8d399135a6176",
+  "commit": "d4c527821e0015ac215607d91508d3b4231fbeb1",
   "branch": "fb-dev-3562/editable-textarea",
   "date": "2022/11/10 13:43:20"
 }
