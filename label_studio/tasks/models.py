@@ -12,12 +12,13 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.db import models, transaction
 from django.db.models import Q
+from django.db.models.signals import post_delete, pre_delete
 from django.utils.translation import gettext_lazy as _
 from django.db.models import JSONField
 from django.urls import reverse
 from django.utils.timesince import timesince
 from django.utils.timezone import now
-from django.dispatch import Signal
+from django.dispatch import receiver, Signal
 from django.core.files.storage import default_storage
 from rest_framework.exceptions import ValidationError
 
@@ -333,6 +334,18 @@ class Task(TaskMixin, models.Model):
         except Exception as exc:
             logger.error('Error in update_all_task_states_after_deleting_task: ' + str(exc))
 
+    @staticmethod
+    def delete_tasks_without_signals(queryset):
+        """
+        Delete Tasks queryset with switched off signals
+        :param queryset: Tasks queryset
+        """
+        signals = [
+            (post_delete, update_all_task_states_after_deleting_task, Task),
+            (pre_delete, remove_data_columns, Task)
+        ]
+        with temporary_disconnect_list_signal(signals):
+            queryset.delete()
 
     @staticmethod
     def delete_tasks_without_signals_from_task_ids(task_ids):
@@ -693,8 +706,27 @@ class Prediction(models.Model):
     class Meta:
         db_table = 'prediction'
 
+@receiver(post_delete, sender=Task)
+def update_all_task_states_after_deleting_task(sender, instance, **kwargs):
+    """ after deleting_task
+        use update_tasks_states for all project
+        but call only tasks_number_changed section
+    """
+    try:
+        instance.project.update_tasks_states(
+            maximum_annotations_changed=False,
+            overlap_cohort_percentage_changed=False,
+            tasks_number_changed=True
+        )
+    except Exception as exc:
+        logger.error('Error in update_all_task_states_after_deleting_task: ' + str(exc))
 
 # =========== PROJECT SUMMARY UPDATES ===========
+
+@receiver(pre_delete, sender=Task)
+def remove_data_columns(sender, instance, **kwargs):
+    """Reduce data column counters afer removing task"""
+    instance.decrease_project_summary_counters()
 
 def _task_data_is_not_updated(update_fields):
     if update_fields and list(update_fields) == ['is_labeled']:

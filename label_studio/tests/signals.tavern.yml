@@ -87,16 +87,18 @@ stages:
         content-type: application/json
       method: DELETE
       url: '{django_live_url}/api/annotations/2'
+
   # Check that total_annotations counter is changed
   - name: check_annotation_count
     request:
       method: GET
       url: '{django_live_url}/api/tasks/{second_task_id}'
     response:
-      #json:
-      #  total_annotations: 0
+      json:
+        total_annotations: 0
       save:
-        prediction_id: 'predictions[0].id'
+        json:
+          prediction_id: "predictions[0].id"
       status_code: 200
 
   # Delete predictions
@@ -104,7 +106,7 @@ stages:
     name: delete_prediction
     request:
       method: DELETE
-      url: '{django_live_url}/api/predictions/2/'
+      url: '{django_live_url}/api/predictions/{prediction_id}/'
     response:
       status_code: 204
   
@@ -129,10 +131,6 @@ stages:
       url: '{django_live_url}/api/projects/{project_pk}/import?return_task_ids=true&preannotated_from_fields=bbox'
     response:
       status_code: 201
-      save:
-        json:
-          first_task_id: "task_ids[0]"
-          second_task_id: "task_ids[1]"
 
   # Check counters
   - id: check_count_again
