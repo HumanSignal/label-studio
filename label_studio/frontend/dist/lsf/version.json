@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3224: Assign task history from outside",
-  "commit": "cc3048a955d293612c30071d6e88a91606c85ae0",
-  "branch": "master",
-  "date": "2022/11/08 18:21:45"
+  "message": "fix: DEV-3562: Remove styles after region unselected",
+  "commit": "6bea422961b5fd529999d6549f7ff41ef0800faa",
+  "branch": "fb-dev-3562/unselect-region",
+  "date": "2022/11/09 16:30:18"
 }
