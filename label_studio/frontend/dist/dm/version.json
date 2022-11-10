@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3224: Move task to the end on next task",
-  "commit": "0fe0f6ff2b5ee16b11bab78731bb1c117b7a43f7",
-  "branch": "master",
-  "date": "2022/11/08 18:10:40"
+  "message": "fix: DEV-3736: Keep task if URL is from notification",
+  "commit": "ce91d2f0fd1af13691cf289aa1cc69caf929a2fb",
+  "branch": "fb-dev-3736",
+  "date": "2022/11/10 12:44:17"
 }
