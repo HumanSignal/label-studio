@@ -37,6 +37,7 @@ html {
 
   color: var(--color-gray-900);
   font-family: var(--font-family-secondary);
+  scroll-behavior: smooth;
 }
 
 body {
@@ -673,6 +674,7 @@ main {
   background-color: var(--color-gray-10);
   padding: 2em;
   width: var(--toc-size);
+  flex-shrink: 0;
 }
 
 .toc-list {
@@ -1157,6 +1159,7 @@ Footer
   position: absolute;
   right: 0;
   top: 0;
+  cursor: pointer;
 }
 
 .helpful-form .helpful-form-label {
