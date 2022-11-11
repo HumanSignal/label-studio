@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3562: Remove styles after region unselected",
-  "commit": "93e2e909e26920f9c2b6ba99915eba978d8c9399",
-  "branch": "fb-dev-3562/unselect-region",
-  "date": "2022/11/11 15:35:11"
+  "commit": "2b9156c5a61722c16d7bb6af2353c2287a425a39",
+  "branch": "master",
+  "date": "2022/11/11 21:43:01"
 }
