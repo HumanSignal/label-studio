@@ -70,6 +70,8 @@
     <script src="<%- url_for("/js/codemirror.js") %>"></script>
     <script src="<%- url_for("/js/xml.js") %>"></script>
   <% } %>
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js" defer></script>
 </head>
 <body class="<%- 'page-tier-' + theme.tier %>">
   <% const tier = theme.tier || "all" %>

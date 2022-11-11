@@ -65,6 +65,7 @@ body {
   list-style: none;
   margin: 0;
   padding: 0;
+  white-space: nowrap;
 }
 
 .page-header nav button + ul {
@@ -159,7 +160,7 @@ body {
   }
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1150px) {
 
   .page-header nav {
     display: none;
@@ -197,6 +198,14 @@ body {
   .page-header nav .page-header-main-nav {
     margin-top: 2em;
   }
+  .page-header {
+    border-bottom: 0;
+    flex-wrap: wrap;
+    row-gap: 1em;
+    padding-bottom: 1em;
+    padding-top: 1em;
+    height: auto;
+  }
 }
 
 @media (min-width: 801px) {
@@ -226,7 +235,7 @@ body {
   background-color: var(--color-gray-900);
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1150px) {
   .hamburger-button {
     display: flex;
   }
@@ -644,7 +653,7 @@ main {
   margin-top: 1em;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1150px) {
   .toc {
     display: none;
   }
@@ -1256,12 +1265,9 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
   display: none;
 }
 
-
-
-
-
-
-
+/****************************
+  Playground
+****************************/
 
 #preview-wrapper {
   width: 100%;
@@ -1310,6 +1316,136 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
   margin-left: -20px;
 }
 
+/****************************
+  Search
+****************************/
+
+.algolia-autocomplete {
+  width: 100%;
+}
+
+.AlgoliaSearch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-basis: 325px;
+  margin-left: auto;
+}
+
+@media (max-width: 800px) {
+  .AlgoliaSearch {
+    width: 100%;
+    flex-grow: 1;
+    flex-basis: 500px;
+    margin-left: 0.5rem;
+    order: 2;
+  }
+}
+
+.AlgoliaSearchIcon {
+  width: 1.35em;
+  height: 1.35em;
+  z-index: 1;
+  pointer-events: none;
+  margin-right: -2em;
+}
+
+#docsearch-input {
+  align-self: center;
+  border-radius: 2em;
+  background-color: var(--color-gray-50);
+  border: 0;
+  padding: 0.5em 1em 0.5em 2.5em;
+  font-size: 1rem;
+  width: 100%;
+}
+
+#docsearch-input::placeholder {
+  color: var(--color-gray-500);
+}
+
+#docsearch-input:focus {
+  outline-color: var(--color-orange-90);
+}
+
+.ds-dropdown-menu {
+  background-color: white;
+  border: 1px black solid;
+  /* top: calc(100% + 4px)!important; Needed to overwrite Algolia’s default style */
+  top: calc(100% + 7.5px)!important;
+  padding: 1em;
+  width: 160%;
+}
+
+.algolia-docsearch-footer {
+  display: none;
+}
+
+.algolia-docsearch-suggestion {
+  text-decoration: none;
+  color: var(--color-gray-900);
+}
+
+.algolia-docsearch-suggestion:hover .algolia-docsearch-suggestion--wrapper {
+  border-color: var(--color-orange-90);
+}
+
+.algolia-docsearch-suggestion--category-header {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5em;
+  margin-top: 1em;
+  border-top: 1px var(--color-gray-200) solid;
+  padding-top: 1em;
+}
+
+.ds-suggestion:first-child .algolia-docsearch-suggestion--category-header {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.algolia-docsearch-suggestion--wrapper {
+  background-color: var(--color-gray-10);
+  border: 1px var(--color-gray-10) solid;
+}
+
+.algolia-docsearch-suggestion--subcategory-inline {
+  display: none;
+}
+
+.algolia-docsearch-suggestion--text {
+  font-size: 0.9em;
+  color: var(--color-gray-700);
+}
+
+.algolia-docsearch-suggestion--highlight {
+  color: var(--color-orange-90);
+  font-weight: 600;
+}
+
+.algolia-docsearch-suggestion--subcategory-column {
+  display: none;
+}
+
+.algolia-docsearch-suggestion--wrapper {
+  padding: 0.5em;
+}
+.algolia-docsearch-suggestion--category-header {
+  margin-bottom: 0.25em;
+}
+
+.algolia-docsearch-suggestion--content {
+  font-size: 0.875em;
+}
+
+.algolia-docsearch-suggestion__secondary:not(.algolia-docsearch-suggestion__main) .algolia-docsearch-suggestion--category-header {
+  display: none;
+}
+
+.algolia-docsearch-suggestion--title + .algolia-docsearch-suggestion--text {
+  margin-top: 0.5em;
+}
 
 /****************************
   Enterprise theme

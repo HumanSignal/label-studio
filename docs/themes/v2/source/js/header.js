@@ -22,5 +22,24 @@
   .catch((err) => {
     console.log(err)
   });
+
+  window.addEventListener('load', (event) => {
+    window.docsearch({
+      container: '#docsearch-input',
+      inputSelector: '#docsearch-input',
+      appId: 'HELLEDAKPT',
+      apiKey: '1d0410ef855a968fbc40669df1c4a73e',
+      indexName: 'labelstud', // it does not change
+    });
+  
+    const searchInput = document.querySelector("#docsearch-input");
+    const handleFocusSearch = (e) => {
+      if (document.activeElement.localName === 'body' && e.code !== "Space" && e.code !== "MetaLeft" && !e.altKey && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+        searchInput.focus();
+      }
+    }
+  
+    window.addEventListener("keydown", handleFocusSearch);
+  });
 })();
 
