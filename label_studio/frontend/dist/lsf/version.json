@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3224: Assign task history from outside",
-  "commit": "cc3048a955d293612c30071d6e88a91606c85ae0",
+  "message": "fix: DEV-3738: Editable textarea in region list",
+  "commit": "229fd843414296f025b4e088c8df984302e2704d",
   "branch": "master",
-  "date": "2022/11/08 18:21:45"
+  "date": "2022/11/10 16:47:32"
 }
