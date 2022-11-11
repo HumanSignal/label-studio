@@ -1,15 +1,19 @@
 (function() {
   const pageHeader = document.querySelector(".page-header");
-  const mobileHeaderButtons = pageHeader.querySelectorAll(".page-header button");
+  const pageSidebar = document.querySelector(".page-sidebar");
+  const navToggleButtons = pageHeader.querySelectorAll("button");
+  const sideBarToggleButtons = pageSidebar.querySelectorAll("button");
 
   const toggleMenu = (e) => {
+    console.log('toggle');
     const button = e.currentTarget;
     const menu = button.nextElementSibling;
     menu.style.display = menu.style.display === "flex" ? "none" : "flex";
     button.classList.toggle("active");
   }
 
-  mobileHeaderButtons.forEach(button => button.addEventListener("click", toggleMenu));
+  navToggleButtons.forEach(button => button.addEventListener("click", toggleMenu));
+  sideBarToggleButtons.forEach(button => button.addEventListener("click", toggleMenu));
 
   const githubstarsContainer  = document.querySelector(".github-stars-count");
 
