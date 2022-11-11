@@ -1545,6 +1545,13 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
   color: var(--color-yellow-100);
 }
 
+.page-sidebar .page-sidebar-children-list [aria-current="page"] {
+  color: var(--color-yellow-100);
+  background-color: var(--color-yellow-5);
+  font-weight: 400;
+  border-color: var(--color-yellow-100);
+}
+
 .page-tier-enterprise .helpful-button {
   --color: var(--color-yellow-100);
   --color-hover: var(--color-gray-900);
