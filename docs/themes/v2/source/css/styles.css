@@ -32,7 +32,7 @@ html {
   --color-white: #ffffff;
 
   --font-family-primary: "SpaceGrotesk-Bold", sans-serif;
-  --font-family-secondary: "Inter-Regular", sans-serif;
+  --font-family-secondary: "Inter", sans-serif;
   --font-family-monospace: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
 
   color: var(--color-gray-900);
@@ -274,7 +274,7 @@ main {
   flex-shrink: 0;
 }
 
-.page-sidebar [aria-current="page"] {
+.page-sidebar .page-sidebar-list [aria-current="page"] {
   color: var(--color-accent);
   font-weight: 600;
 }
@@ -291,7 +291,7 @@ main {
   padding: 0;
 }
 
-.page-sidebar ul li + li {
+.page-sidebar .page-sidebar-list li + li {
   margin-top: 0.25em;
 }
 
@@ -303,6 +303,28 @@ main {
 
 .page-sidebar ul a:hover {
   color: var(--color-accent);
+}
+
+.page-sidebar .page-sidebar-children-list {
+  margin: 0.5rem 0;
+}
+
+.page-sidebar .page-sidebar-children-list a {
+  display: block;
+  width: 100%;
+  padding: 0.5em 1rem;
+  border-left: 1px var(--color-gray-300) solid;
+}
+
+.page-sidebar .page-sidebar-children-list li + li {
+  margin-top: 0;
+}
+
+.page-sidebar .page-sidebar-children-list [aria-current="page"] {
+  color: var(--color-accent);
+  background-color: var(--color-orange-10);
+  font-weight: 400;
+  border-color: var(--color-orange-90);
 }
 
 @media (max-width: 800px) {

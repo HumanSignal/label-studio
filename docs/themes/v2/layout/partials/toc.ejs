@@ -3,10 +3,26 @@
 <%- partial("component/heading", {text: "Docs", size: "XXSmall", tag: "h2"}) %>
 
   <ul class="page-sidebar-list">
-    <% site.pages.filter(page => page.type === type && (page.tier === theme.tier || page.tier === "all" || page.type === "tags" || page.type === "playground" || page.type === "templates")).sort('order').each(function (p) { %>
-    <% var fileName = p.path.replace(/^.+?\/([\w-]+)\.html/, '$1') %>
+    <% const pages = site.pages.filter(page => page.type === type && (page.tier === theme.tier || page.tier === "all" || page.type === "tags" || page.type === "playground" || page.type === "templates")).sort('order'); %>
+    <% const parentPages = pages.filter(page => page.parent === undefined) %>
+    <% const childrenPages = pages.filter(page => page.parent !== undefined) %>
+
+    <% const pagesArray = parentPages.map(page => {
+      var fileName = page.path.replace(/^.+?\/([\w-]+)\.html/, '$1')
+      let childPages = childrenPages.filter(child => {
+        
+        return child.parent === fileName
+      });
+
+      return {
+        page: page,
+        fileName: fileName,
+        childPages: childPages
+      }
+    }) %>
+
     <%
-      const headers = [
+      const headers = [
         {
           type: "guide",
           headers: {
@@ -44,23 +60,34 @@
             "gallery_cv": "Template Galleries"
           }
         }
-    ]
+      ]
     %>
 
-    <% const tocHeader = headers.find(headerType => headerType.type === type).headers[fileName] %>
-    <% if(tocHeader) { %>
-      </ul>
-        <% if(locals.component === "nav") { %>
-          <button><%- tocHeader %> <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 0.628174L7 6.62817L13 0.628174" stroke="#131522"/></svg></button>
-        <% } else { %>
-          <%- partial("component/text", {text: tocHeader, size: "Eyebrow", tag: "h3"}) %>
+    <% pagesArray.forEach(function (p) { %>
+      <% const tocHeader = headers.find(headerType => headerType.type === type).headers[p.fileName] %>
+      <% if(tocHeader) { %>
+        </ul>
+          <% if(locals.component === "nav") { %>
+            <button><%- tocHeader %> <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 0.628174L7 6.62817L13 0.628174" stroke="#131522"/></svg></button>
+          <% } else { %>
+            <%- partial("component/text", {text: tocHeader, size: "Eyebrow", tag: "h3"}) %>
+          <% } %>
+        <ul class="page-sidebar-list">
+      <% } %>
+      <li>
+        <a href="<%- url_for(p.page.path) %>" class="<%- p.page.is_new ? ' new' : '' %>" <%- page.title === p.page.title ? 'aria-current="page"' : '' %>>
+        <%- p.page.short ? p.page.short: p.page.title %></a>
+
+        <% if(p.childPages.length > 0) {%>
+          <ul class="page-sidebar-children-list">
+          <% p.childPages.forEach(child => { %>
+            <li>
+              <a href="<%- url_for(child.path) %>" class="<%- child.is_new ? ' new' : '' %>" <%- page.title === child.title ? 'aria-current="page"' : '' %>>
+              <%- child.short ? child.short: child.title %></a>
+            </li>
+          <% }) %>
+          </ul>
         <% } %>
-      <ul>
-    <% } %>
-    <li>
-      <a href="<%- url_for(p.path) %>" class="<%- p.is_new ? ' new' : '' %>" <%- page.title === p.title ? 'aria-current="page"' : '' %>>
-        <%- p.short ? p.short: p.title %></a>
-    </li>
-    
+      </li>
     <% }) %>
 </ul>
