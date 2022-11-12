@@ -76,9 +76,7 @@
         <%- p.page.short ? p.page.short: p.page.title %></a>
         <% if(p.childPages.length > 0) {%>
           <button class="page-sidebar-toggle-children-list">
-            <svg width="10" height="13" viewBox="0 0 10 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M1 8L5 12L9 8" stroke="#646676"/>
-            </svg>
+            <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 0.628174L7 6.62817L13 0.628174" stroke="#131522"></path></svg>
           </button>
           <% const activeChildPage = p.childPages.filter(child => page.title === child.title || page.title === p.page.title) %>
           <ul class="page-sidebar-children-list<%- activeChildPage.length > 0 ? ' page-sidebar-children-list-active' : ''%>">
