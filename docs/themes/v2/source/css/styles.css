@@ -902,6 +902,21 @@ main {
   display: none;
 }
 
+.breadcrumb {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+  margin-bottom: 1em;
+}
+
+.breadcrumb a {
+  text-decoration: none;
+}
+
+.breadcrumb span {
+  color: var(--color-gray-700);
+}
+
 /****************************
   Templates
 ****************************/
