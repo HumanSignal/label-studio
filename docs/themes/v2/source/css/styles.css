@@ -913,6 +913,10 @@ main {
   text-decoration: none;
 }
 
+.breadcrumb a:not(.Button):hover {
+  text-decoration: underline;
+}
+
 .breadcrumb span {
   color: var(--color-gray-700);
 }
@@ -1382,6 +1386,11 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
   padding: 5px;
   margin: 1em 0;
   margin-left: -20px;
+}
+
+.page-type-playground .content-markdown {
+  width: 100%;
+  max-width: none;
 }
 
 /****************************

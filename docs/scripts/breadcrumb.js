@@ -17,13 +17,13 @@ module.exports = function(ctx) {
     const frontmatter = fm(data)
 
     return `
-      <div class="breadcrumb">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="/${pageType}/${parentPage}.html">${frontmatter.attributes.short || frontmatter.attributes.title}</a>
         <svg width="6" height="9" viewBox="0 0 6 9" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M1 8.5L5 4.5L1 0.5" stroke="#646676"/>
         </svg>
         <span>${currentPage}</span>
-      </div>
+      </nav>
     `
   };
 };

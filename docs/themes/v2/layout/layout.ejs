@@ -65,10 +65,10 @@
 
   <% if (page.type === "playground") { %>
     <%- css('css/codemirror') %>
-    <script src="<%- url_for("/js/jquery.min.js") %>"></script>
-    <script src="<%- url_for("/js/jquery-ui.min.js") %>"></script>
-    <script src="<%- url_for("/js/codemirror.js") %>"></script>
-    <script src="<%- url_for("/js/xml.js") %>"></script>
+    <script src="<%- url_for("/js/playground/jquery.min.js") %>"></script>
+    <script src="<%- url_for("/js/playground/jquery-ui.min.js") %>"></script>
+    <script src="<%- url_for("/js/playground/codemirror.js") %>"></script>
+    <script src="<%- url_for("/js/playground/xml.js") %>"></script>
   <% } %>
 
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js" defer></script>
