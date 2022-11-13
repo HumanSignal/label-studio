@@ -65,7 +65,12 @@
       <% if(tocHeader) { %>
         </ul>
           <% if(locals.component === "nav") { %>
-            <button><%- tocHeader %> <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 0.628174L7 6.62817L13 0.628174" stroke="#131522"/></svg></button>
+            <button>
+              <%- tocHeader %>
+              <svg width="13" height="8" viewBox="0 0 13 8" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292969 0.805007L1.00008 0.0979004L6.64652 5.74435L12.293 0.0979004L13.0001 0.805007L6.64652 7.15856L0.292969 0.805007Z" />
+              </svg>
+            </button>
           <% } else { %>
             <%- partial("component/text", {text: tocHeader, size: "Eyebrow", tag: "h3"}) %>
           <% } %>
@@ -76,7 +81,9 @@
         <%- p.page.short ? p.page.short: p.page.title %></a>
         <% if(p.childPages.length > 0) {%>
           <button class="page-sidebar-toggle-children-list">
-            <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 0.628174L7 6.62817L13 0.628174" stroke="#131522"></path></svg>
+            <svg width="13" height="8" viewBox="0 0 13 8" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292969 0.805007L1.00008 0.0979004L6.64652 5.74435L12.293 0.0979004L13.0001 0.805007L6.64652 7.15856L0.292969 0.805007Z" />
+            </svg>
           </button>
           <% const activeChildPage = p.childPages.filter(child => page.title === child.title || page.title === p.page.title) %>
           <ul class="page-sidebar-children-list<%- activeChildPage.length > 0 ? ' page-sidebar-children-list-active' : ''%>">

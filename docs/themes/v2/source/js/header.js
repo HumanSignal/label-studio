@@ -2,18 +2,17 @@
   const pageHeader = document.querySelector(".page-header");
   const pageSidebar = document.querySelector(".page-sidebar");
   const navToggleButtons = pageHeader.querySelectorAll("button");
-  const sideBarToggleButtons = pageSidebar.querySelectorAll("button");
+  const sideBarToggleButtons = pageSidebar && pageSidebar.querySelectorAll("button");
 
   const toggleMenu = (e) => {
-    console.log('toggle');
     const button = e.currentTarget;
     const menu = button.nextElementSibling;
     menu.style.display = menu.style.display === "flex" ? "none" : "flex";
     button.classList.toggle("active");
   }
 
-  navToggleButtons.forEach(button => button.addEventListener("click", toggleMenu));
-  sideBarToggleButtons.forEach(button => button.addEventListener("click", toggleMenu));
+  navToggleButtons && navToggleButtons.forEach(button => button.addEventListener("click", toggleMenu));
+  sideBarToggleButtons && sideBarToggleButtons.forEach(button => button.addEventListener("click", toggleMenu));
 
   const githubstarsContainer  = document.querySelector(".github-stars-count");
 

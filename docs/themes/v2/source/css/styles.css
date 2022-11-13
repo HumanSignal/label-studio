@@ -45,6 +45,10 @@ body {
   padding: 0;
 }
 
+.page-tier-opensource {
+  --color-main-accent: var(--color-orange-90);
+}
+
 .page-header {
   border-bottom: 1px solid;
   position: sticky;
@@ -123,7 +127,7 @@ body {
 
 .page-header nav a:not(.Button):hover,
 .page-header nav a:not(.Button):hover span {
-  color: var(--color-orange-90);
+  color: var(--color-main-accent);
 }
 
 .page-header nav > ul li > ul {
@@ -244,6 +248,16 @@ body {
   background-color: var(--color-gray-900);
 }
 
+.hamburger-button.active span:first-child {
+  transform: rotate(45deg) translate(5px, 4px);
+}
+.hamburger-button.active span:nth-child(2) {
+  opacity: 0;
+}
+.hamburger-button.active span:last-child {
+  transform: rotate(-45deg) translate(4px, -4px);
+}
+
 @media (max-width: 1150px) {
   .hamburger-button {
     display: flex;
@@ -271,7 +285,7 @@ main {
 }
 
 .page-sidebar {
-  --color-accent: var(--color-orange-90);
+  --color-accent: var(--color-main-accent);
 
   position: sticky;
   width: var(--sidebar-size);
@@ -346,7 +360,7 @@ main {
   color: var(--color-accent);
   background-color: var(--color-orange-10);
   font-weight: 400;
-  border-color: var(--color-orange-90);
+  border-color: var(--color-main-accent);
 }
 
 .page-sidebar-toggle-children-list {
@@ -528,7 +542,7 @@ main {
   margin-top: 2em;
 }
 .content-markdown a:not(.Button) {
-  color: var(--color-orange-90);
+  color: var(--color-main-accent);
 }
 
 .content-markdown a:not(.Button):hover {
@@ -626,7 +640,7 @@ main {
 }
 
 .Link:hover {
-  color: var(--color-orange-90);
+  color: var(--color-main-accent);
 }
 
 .Link.Full {
@@ -653,8 +667,8 @@ main {
 }
 
 .Button:hover {
-  background-color: var(--color-orange-90);
-  border-color: var(--color-orange-90);
+  background-color: var(--color-main-accent);
+  border-color: var(--color-main-accent);
 }
 
 .Secondary {
@@ -698,7 +712,7 @@ main {
 }
 
 .toc-list a:hover {
-  color: var(--color-orange-90);
+  color: var(--color-main-accent);
 }
 
 .toc-list li + li {
@@ -890,11 +904,11 @@ main {
 }
 
 .code-tabs > .buttons a:hover {
-  color: var(--color-orange-90);
+  color: var(--color-main-accent);
 }
 
 .code-tabs > .buttons a.active {
-  color: var(--color-orange-90);
+  color: var(--color-main-accent);
   border-bottom: 3px currentColor solid;
 }
 
@@ -943,12 +957,12 @@ main {
 }
 
 .templates-card:hover {
-  border-color: var(--color-orange-90);
+  border-color: var(--color-main-accent);
   border-radius: 16px;
 }
 
 .templates-card:hover a {
-  color: var(--color-orange-90);
+  color: var(--color-main-accent);
 }
 
 .templates-card:hover img {
@@ -1036,7 +1050,7 @@ Footer
   transition:color .2s
 }
 .FooterNav a:hover{
-  color:var(--color-orange-90)
+  color:var(--color-main-accent)
 }
 .FooterLogo {
   width:100%;
@@ -1047,7 +1061,7 @@ Footer
   background-color:var(--color-white)
 }
 .FooterCTAButton:hover{
-  background-color:var(--color-orange-90)
+  background-color:var(--color-main-accent)
 }
 .FooterCTASquares {
   position:absolute;
@@ -1100,7 +1114,7 @@ Footer
   --icon-color: var(--color-white);
   --background-color: var(--color-gray-700);
   --hover-icon-color: var(--color-white);
-  --hover-background-color: var(--color-orange-90)
+  --hover-background-color: var(--color-main-accent)
 }
 .SocialIcons.Secondary{
   --border-color: var(--color-gray-900);
@@ -1243,7 +1257,7 @@ Footer
 }
 
 .helpful-button {
-  --color: var(--color-orange-90);
+  --color: var(--color-main-accent);
   --color-hover: var(--color-white);
   --background-hover: var(--color);
   --background: var(--color-orange-10);
@@ -1426,6 +1440,7 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
   z-index: 1;
   pointer-events: none;
   margin-right: -2em;
+  fill: var(--color-gray-900);
 }
 
 #docsearch-input {
@@ -1443,7 +1458,7 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
 }
 
 #docsearch-input:focus {
-  outline-color: var(--color-orange-90);
+  outline-color: var(--color-main-accent);
 }
 
 .ds-dropdown-menu {
@@ -1465,7 +1480,7 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
 }
 
 .algolia-docsearch-suggestion:hover .algolia-docsearch-suggestion--wrapper {
-  border-color: var(--color-orange-90);
+  border-color: var(--color-main-accent);
 }
 
 .algolia-docsearch-suggestion--category-header {
@@ -1498,7 +1513,7 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
 }
 
 .algolia-docsearch-suggestion--highlight {
-  color: var(--color-orange-90);
+  color: var(--color-main-accent);
   font-weight: 600;
 }
 
@@ -1535,6 +1550,10 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
   Enterprise theme
 ****************************/
 
+.page-tier-enterprise {
+  --color-main-accent: var(--color-yellow-100);
+}
+
 .page-tier-enterprise .page-header {
   background-color: var(--color-gray-900);
 }
@@ -1552,48 +1571,66 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
   color: var(--color-gray-900);
 }
 
-.page-tier-enterprise .page-header .Button:hover {
-
-}
-
-.page-tier-enterprise .page-sidebar {
-  --color-accent: var(--color-yellow-100);
-}
-
-.page-tier-enterprise .content-markdown a {
-  color: var(--color-yellow-100);
-}
-
 .page-tier-enterprise .content-markdown li::marker {
   color: var(--color-gray-900);
-}
-
-.page-tier-enterprise .content-markdown code:not(.hljs) {
-  color: var(--color-yellow-100);
 }
 
 .page-tier-enterprise .code-tabs > .buttons a {
   color: var(--color-gray-500);
 }
 
-.page-tier-enterprise .code-tabs > .buttons a:hover {
-  color: var(--color-yellow-100);
-}
-
-.page-tier-enterprise .code-tabs > .buttons a.active {
-  color: var(--color-yellow-100);
-}
-
 .page-tier-enterprise .page-sidebar .page-sidebar-children-list [aria-current="page"] {
-  color: var(--color-yellow-100);
   background-color: var(--color-yellow-5);
   font-weight: 400;
   border-color: var(--color-yellow-100);
 }
 
+.page-tier-enterprise .heidi {
+  display: none;
+}
+
 .page-tier-enterprise .helpful-button {
-  --color: var(--color-yellow-100);
   --color-hover: var(--color-gray-900);
   --background: var(--color-yellow-5);
   --background-hover: var(--color-yellow-90);
+}
+
+.page-tier-enterprise .content-markdown code:not(.hljs) {
+  color: var(--color-yellow-100);
+}
+
+.page-tier-enterprise .hamburger-button span {
+  background-color: var(--color-white);
+}
+
+.page-tier-enterprise .page-header nav {
+  background-color: var(--color-gray-900);
+}
+
+.page-tier-enterprise .page-header nav > button {
+  color: var(--color-white);
+}
+
+.page-tier-enterprise .page-header nav button + ul {
+  background-color: var(--color-gray-800);
+}
+
+.page-tier-enterprise #docsearch-input {
+  color: var(--color-white);
+  background-color: var(--color-gray-800);
+  border: 1px var(--color-gray-600) solid;
+}
+
+.page-tier-enterprise .AlgoliaSearchIcon {
+  fill: var(--color-white);
+}
+
+.page-tier-enterprise #docsearch-input:focus {
+  outline-color: var(--color-gray-500);
+}
+
+@media (max-width: 1150px) {
+  .page-header nav .page-header-main-nav {
+    border-color: var(--color-gray-700);
+  }
 }
