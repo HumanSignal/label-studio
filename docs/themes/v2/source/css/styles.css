@@ -370,6 +370,15 @@ main {
   padding: 0;
 }
 
+.page-sidebar .page-sidebar-toggle-children-list svg {
+  width: 10px;
+  height: auto;
+}
+
+.page-sidebar-toggle-children-list.active svg {
+  transform: rotate(180deg);
+}
+
 @media (max-width: 800px) {
   .page-sidebar {
     display: none;

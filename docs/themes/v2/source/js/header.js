@@ -7,7 +7,9 @@
   const toggleMenu = (e) => {
     const button = e.currentTarget;
     const menu = button.nextElementSibling;
-    menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+    const menuStyles = getComputedStyle(menu);
+
+    menu.style.setProperty('display', menuStyles.display=== "flex" ? "none" : "flex");
     button.classList.toggle("active");
   }
 
