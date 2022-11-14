@@ -263,7 +263,7 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
                 count = next_task.annotations.filter(was_cancelled=False).count()
                 task_overlap_reached = count >= next_task.overlap
                 global_overlap_reached = count >= project.maximum_annotations
-                if next_task.is_labeled or not task_overlap_reached or global_overlap_reached:
+                if next_task.is_labeled or task_overlap_reached or global_overlap_reached:
                     from tasks.serializers import TaskSimpleSerializer
 
                     local = dict(locals())
