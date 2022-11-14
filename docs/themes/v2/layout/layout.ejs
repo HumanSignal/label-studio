@@ -1,6 +1,7 @@
 <% var isIndex = page.path === 'index.html' %>
 <% var isBlog = page.type === 'blog' %>
 <% var isGuide = page.type === 'guide' %>
+<% const isEnterpriseTheme = theme.tier === "enterprise" %>
 
 <% var defaultSeo = {
   description: "Get started with Label Studio by creating projects to label and annotate data for machine learning and data science models."
@@ -57,7 +58,12 @@
 
   <meta name="msapplication-TileColor" content="#4fc08d">
   <meta name="theme-color" content="#4fc08d">
-  <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+  
+  <% if (isEnterpriseTheme) { %>
+    <link rel="icon" type="image/svg+xml" href="/images/favicon-enterprise.svg" />
+  <% } else { %>
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+  <% } %>
 
   <link rel="preload" href="/fonts/SpaceGrotesk-Bold-subset.woff2" as="font" type="font/woff2" crossorigin>
 
@@ -75,7 +81,6 @@
 </head>
 <body class="<%- 'page-tier-' + theme.tier %>">
   <% const tier = theme.tier || "all" %>
-  <% const isEnterpriseTheme = theme.tier === "enterprise" %>
   <%- partial("partials/header") %>
 
   <main class="<%- 'page-type-' + page.type %>">

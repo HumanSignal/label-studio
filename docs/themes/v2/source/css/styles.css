@@ -1407,6 +1407,34 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
   max-width: none;
 }
 
+.playground-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1em;
+  margin-top: 1em;
+}
+
+.playground-buttons a,
+.playground-buttons button {
+  font-family: var(--font-family-secondary);
+  font-size: 1rem;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.playground-buttons a:hover,
+.playground-buttons button:hover {
+  color: var(--color-gray-900);
+}
+
+.playground-buttons button {
+  appearance: none;
+  border: 0;
+  background-color: transparent;
+  color: var(--color-main-accent);
+}
+
 /****************************
   Search
 ****************************/

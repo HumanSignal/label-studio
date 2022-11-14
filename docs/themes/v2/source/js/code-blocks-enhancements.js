@@ -84,7 +84,7 @@ function insert_render_editor(config, modal, full) {
     const CheckIcon = event.currentTarget.querySelector(".code-block-copy-check-icon");
     const CopyIcon = event.currentTarget.querySelector(".code-block-copy-copy-icon");
 
-    const text = event.target.parentNode.textContent;
+    const text = event.target.nextSibling;
 
     navigator.clipboard.writeText(text).then(() => {
       CopyIcon.style.display = "none"
@@ -117,8 +117,10 @@ function insert_render_editor(config, modal, full) {
     var pre = codeBlock.parentElement;
     const code = codeBlock.textContent;
     const htmlTemplate = `
-    <a class="Button Secondary" href="https://labelstud.io/playground/?config=${encodeURI(code)}" target="_blank" rel="noreferrer noopener">Launch in Playground</a>
-    <button class="Button Secondary code-block-open-preview">Open preview</button>
+    <div class="playground-buttons">
+      <button class="code-block-open-preview">Open Preview</button>
+      <a href="/playground?config=${encodeURI(code)}" target="_blank" rel="noreferrer noopener">Launch in Playground</a>
+    </div>
     `
     pre.insertAdjacentHTML("beforeend", htmlTemplate);
 
