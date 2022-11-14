@@ -1613,10 +1613,6 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
   color: var(--color-gray-900);
 }
 
-.page-tier-enterprise .code-tabs > .buttons a {
-  color: var(--color-gray-500);
-}
-
 .page-tier-enterprise .page-sidebar .page-sidebar-children-list [aria-current="page"] {
   background-color: var(--color-yellow-5);
   font-weight: 400;
