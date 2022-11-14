@@ -927,6 +927,7 @@ main {
 
 .breadcrumb {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5em;
   align-items: center;
   margin-bottom: 1em;
