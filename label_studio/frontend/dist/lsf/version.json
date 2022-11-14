@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3742: Toggling textrange visibility works in outliner",
-  "commit": "1e33c4ba0785817c2bdbfeadd5f2a2a21f0b9243",
+  "message": "fix: DEV-3562: Remove styles after region unselected (#1009)\n\nCo-authored-by: hlomzik <hlomzik@users.noreply.github.com>",
+  "commit": "2b9156c5a61722c16d7bb6af2353c2287a425a39",
   "branch": "master",
-  "date": "2022/11/10 12:54:50"
+  "date": "2022-11-11T21:43:01Z"
 }
