@@ -115,7 +115,7 @@ To label tasks multiple times while the minimum annotations required is set to o
 5. Click the next task in the data manager to open the quick labeling view for that task and repeat steps 2-4.
 
 
-## Perform ML-assisted labeling with interactive preannotations
+## ML-assisted labeling
 
 If you have a machine learning backend set up to [get interactive preannotations](ml.html#Get-interactive-preannotations), you can choose whether to use those predictions while you label. 
 
@@ -282,7 +282,7 @@ If you make a mistake when labeling with the brush mask, you can erase it. You m
 If you want to completely remove a region and start over, delete the region instead of erasing it. Erasing a region does not delete it. 
 
 
-## <i class='ent'/></i> Outliner 
+## Outliner 
 
 The **Outliner** is a replacement for the existing interface with a multiple-panel approach. This feature improves the user experience to fit more data in these two columns (**Outliner** and **Details**) and provides more options when working with regions. For example, Image segmentation is the only type of labeling that supports custom controls on the details panel. 
 
@@ -355,8 +355,7 @@ You can edit regions with a focus on labeling. You can zoom in and precise contr
 !!! note 
     In the upcoming releases, video segmentation will be available to control keyframes, animations, and custom metadata. 
 
-
-<i class='ent'></i>The Comments box is available inside the outliner. 
+The Comments box is available inside the outliner. 
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/comments-box.png" style="opacity: 0.8" class="gif-border"/></div>

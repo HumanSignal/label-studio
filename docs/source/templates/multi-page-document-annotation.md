@@ -183,25 +183,25 @@ To find a page or a specific page number, use the navigation buttons in the pagi
 
 <img src="../images/button-to-navigate-to-first-page.png" class="gif-border" />
 
-<i>Figure 11: Button to navigate to the first page. </i>
+<i>Figure 8: Button to navigate to the first page. </i>
 
 
 View of the first page using the navigation button.
 <img src="../images/navigate-to-first-page.png" class="gif-border" />
 
-<i>Figure 12: Navigated to the first page. </i>
+<i>Figure 9: Navigated to the first page. </i>
 
 
 2. Click the `>>` button to navigate to the last page and click the `>` button to navigate to the next page in a multi-page document.
 
 <img src="../images/button-to-navigate-to-last-page.png" class="gif-border" />
 
-<i>Figure 13: Button to navigate to the last page. </i>
+<i>Figure 10: Button to navigate to the last page. </i>
 
 View of the last page using the navigation button.
 <img src="../images/navigate-to-last-page.png" class="gif-border" />
 
-<i>Figure 14: Navigated to the first page. </i>
+<i>Figure 11: Navigated to the first page. </i>
 
 
 ### Page navigation with Outliner
@@ -211,7 +211,7 @@ To find a page or a specific page number, use the outliner feature.
 Example of using outliner document title:
 
 <img src="../images/navigate-to-pages-using-outliner-document-title.png" class="gif-border" />
-<i>Figure 9: Navigate using outliner document title. </i>
+<i>Figure 12: Navigate using outliner document title. </i>
 
 
 ## Related tags
