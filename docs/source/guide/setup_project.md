@@ -53,7 +53,9 @@ In the project settings, you can add instructions and choose whether to show the
 
 Annotators can view instructions at any time when labeling by clicking the (i) button from the labeling interface.
 
-### <i class='ent'></i> Set up task distribution for labeling
+<div class="enterprise-only">
+
+### Set up task distribution for labeling
 Select how you want to distribute tasks to annotators for labeling. Different from task sampling, use this setting to choose whether you need to [assign annotators](manage_data.html##Assign-annotators-to-tasks) before they can start labeling.
 
 1. Within a project on the Label Studio UI, click **Settings**.
@@ -66,7 +68,11 @@ Your changes save automatically.
 
 > You can't assign annotators to tasks unless you select the **Manual** option. 
 
-### <i class='ent'></i> Set minimum annotations per task
+</div>
+
+<div class="enterprise-only">
+
+### Set minimum annotations per task
 
 By default, each task only needs to be annotated by one annotator. If you want multiple annotators to be able to annotate tasks, set the Overlap of Annotations for a project in the project settings.
 
@@ -76,6 +82,8 @@ By default, each task only needs to be annotated by one annotator. If you want m
 4. Choose whether to enforce the overlap for the default of 100% of tasks, or a smaller percentage. 
 5. Choose whether to show tasks that require multiple annotations, **tasks with overlap**, before other tasks that need to be annotated. 
 6. Your changes save automatically. Return to the **Data Manager** and assign annotators to the tasks so that they can annotate the tasks. 
+
+</div>
 
 #### How task overlap works
 
