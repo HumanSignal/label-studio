@@ -41,7 +41,7 @@ var iframeTimer = null;
 function show_render_editor(config) {
   const body = document.querySelector("body");
   const modal = `
-  <div id="preview-wrapper">
+  <div id="preview-wrapper" onclick="this.remove()">
     <div id="render-editor-loader"><img width="50px" src="/images/loading.gif"></div>
   </div>
   `
