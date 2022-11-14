@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3738: Editable textarea in region list",
-  "commit": "229fd843414296f025b4e088c8df984302e2704d",
+  "message": "fix: DEV-3562: Remove styles after region unselected (#1009)\n\nCo-authored-by: hlomzik <hlomzik@users.noreply.github.com>",
+  "commit": "2b9156c5a61722c16d7bb6af2353c2287a425a39",
   "branch": "master",
-  "date": "2022/11/10 16:47:32"
+  "date": "2022-11-11T21:43:01Z"
 }
