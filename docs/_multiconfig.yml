@@ -1,5 +1,5 @@
 theme_config:
-  tier: opensource
+  tier: enterprise
 title: Label Studio
 subtitle: Data labeling, annotation and exploration tool
 description: >-

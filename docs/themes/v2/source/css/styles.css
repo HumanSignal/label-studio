@@ -1645,12 +1645,16 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
   background-color: var(--color-gray-900);
 }
 
-.page-tier-enterprise .page-header nav > button {
+.page-tier-enterprise .page-header nav button {
   color: var(--color-white);
 }
 
 .page-tier-enterprise .page-header nav button + ul {
   background-color: var(--color-gray-800);
+}
+
+.page-tier-enterprise .page-header nav > button + ul ul {
+  background-color: var(--color-gray-700);
 }
 
 .page-tier-enterprise #docsearch-input {
