@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3562: Remove styles after region unselected (#1009)\n\nCo-authored-by: hlomzik <hlomzik@users.noreply.github.com>",
-  "commit": "2b9156c5a61722c16d7bb6af2353c2287a425a39",
-  "branch": "master",
-  "date": "2022-11-11T21:43:01Z"
+  "message": "fix: DEV-3603: Fix serialization calculation for regions so that exact values remain an exact match when compared",
+  "commit": "c9f34ca5690f736d4e4e0564f65ff97c8d449b56",
+  "branch": "fb-dev-3603",
+  "date": "2022/11/14 17:56:48"
 }
