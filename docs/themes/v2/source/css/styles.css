@@ -457,7 +457,7 @@ main {
 
 .container {
   margin: 0 auto;
-  max-width: 1030px;
+  max-width: 80em;
 }
 
 .home-page-title {
@@ -503,14 +503,14 @@ main {
 .Heading.XLarge,
 .content-markdown h1 {
   --min-size: 2.375rem; /* 38px */
-  --max-size: 4rem; /* 64px */
+  --max-size: 3.5rem; /* 56px */
   --line-height: 106%;
 }
 
 .Heading.Large,
 .content-markdown h2 {
   --min-size: 2rem; /* 32px */
-  --max-size: 3rem; /* 48px */
+  --max-size: 2.75rem; /* 44px */
   --line-height: 106%;
 }
 
@@ -567,7 +567,7 @@ main {
 .content-markdown ul,
 .content-markdown ol {
   --min-size: 1rem; /* 16px */
-  --max-size: 1.125rem; /* 18px */
+  --max-size: 1rem; /* 16px */
   --line-height: 1.56;
 
   font-family: var(--font-family-secondary);
@@ -706,6 +706,8 @@ main {
   padding: 2em;
   width: var(--toc-size);
   flex-shrink: 0;
+  position: sticky;
+  top: 100px;
 }
 
 .toc-list {
@@ -746,7 +748,7 @@ main {
 .content-markdown {
   width: calc(100vw - var(--sidebar-size) - var(--toc-size) - calc(2 * var(--page-padding)) - 5em);
   flex-basis: 82ch;
-  max-width: 82ch;
+  max-width: 97ch;
 }
 
 .content-markdown * {
@@ -773,19 +775,19 @@ main {
   font-family: var(--font-family-monospace);
   font-size: 0.85em;
   font-weight: bold;
-  color: var(--color-purple-90);
+  color: var(--color-gray-900);
   background-color: var(--color-gray-50);
   padding: 0.25em;
   border-radius: 6px;
 }
 
 .content-markdown table {
-  border-top: 1px var(--color-gray-200) solid;
   border-left: 1px var(--color-gray-200) solid;
   border-collapse: collapse;
   margin: 2em 0;
   overflow: auto;
   display: block;
+  width: 100%;
 }
 
 .content-markdown table tr th {
@@ -826,6 +828,10 @@ main {
   border: 1px var(--color-border) solid;
   padding: 1em;
   background-color: var(--color-background);
+}
+
+.content-markdown .admonition *:last-child {
+  margin-bottom: 0;
 }
 
 .content-markdown .admonition-title {
@@ -1331,7 +1337,7 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
   Author: (c) Henri Vandersleyen <hvandersleyen@gmail.com>
   License: see project LICENSE
   Touched: 2022
-*/.hljs-comment,.hljs-meta{color:#565f89}.hljs-deletion,.hljs-doctag,.hljs-regexp,.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-selector-pseudo,.hljs-tag,.hljs-template-tag,.hljs-variable.language_{color:#f7768e}.hljs-link,.hljs-literal,.hljs-number,.hljs-params,.hljs-template-variable,.hljs-type,.hljs-variable{color:#ff9e64}.hljs-attribute,.hljs-built_in{color:#e0af68}.hljs-keyword,.hljs-property,.hljs-subst,.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#7dcfff}.hljs-selector-tag{color:#73daca}.hljs-addition,.hljs-bullet,.hljs-quote,.hljs-string,.hljs-symbol{color:#9ece6a}.hljs-code,.hljs-formula,.hljs-section{color:#7aa2f7}.hljs-attr,.hljs-char.escape_,.hljs-keyword,.hljs-name,.hljs-operator{color:#bb9af7}.hljs-punctuation{color:#c0caf5}.hljs{background:#1a1b26;color:#9aa5ce}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:700}
+*/.hljs-comment,.hljs-meta{color:#565f89}.hljs-deletion,.hljs-doctag,.hljs-regexp,.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-selector-pseudo,.hljs-tag,.hljs-template-tag,.hljs-variable.language_{color:#f7768e}.hljs-link,.hljs-literal,.hljs-number,.hljs-params,.hljs-template-variable,.hljs-type,.hljs-variable{color:#ff9e64}.hljs-attribute,.hljs-built_in{color:#e0af68}.hljs-keyword,.hljs-property,.hljs-subst,.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#7dcfff}.hljs-selector-tag{color:#73daca}.hljs-addition,.hljs-bullet,.hljs-quote,.hljs-string,.hljs-symbol{color:#9ece6a}.hljs-code,.hljs-formula,.hljs-section{color:#7aa2f7}.hljs-attr,.hljs-char.escape_,.hljs-keyword,.hljs-name,.hljs-operator{color:#bb9af7}.hljs-punctuation{color:#c0caf5}.hljs{background:#1a1b26;color:#fff}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:700}
 
 
 .code-block-copy-button {
@@ -1415,6 +1421,15 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
 .page-type-playground .content-markdown {
   width: 100%;
   max-width: none;
+}
+
+.page-type-playground .content-markdown a {
+  text-decoration: none;
+}
+
+.page-type-playground #basic-templates a {
+  margin-bottom: 0.25rem;
+  display: block;
 }
 
 .playground-buttons {
@@ -1629,10 +1644,6 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
   --background-hover: var(--color-yellow-90);
 }
 
-.page-tier-enterprise .content-markdown code:not(.hljs) {
-  color: var(--color-yellow-100);
-}
-
 .page-tier-enterprise .hamburger-button span {
   background-color: var(--color-white);
 }
@@ -1665,6 +1676,14 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
 
 .page-tier-enterprise #docsearch-input:focus {
   outline-color: var(--color-gray-500);
+}
+
+.enterprise-only {
+  display: none;
+}
+
+.page-tier-enterprise .enterprise-only {
+  display: block;
 }
 
 @media (max-width: 1150px) {
