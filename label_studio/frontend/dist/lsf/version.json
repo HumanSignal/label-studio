@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1852: Fix missing labels on video regions",
-  "commit": "81d187d2c4147111167abd2a75a71db95f1b9d2e",
-  "branch": "master",
-  "date": "2022/11/15 21:25:30"
+  "message": "fix: DEV-3733: Persist and use the pending draft to attach added comments",
+  "commit": "f8dd16da5ff92b36c93d5db7b73cd9bfd9f995d8",
+  "branch": "fb-dev-3733",
+  "date": "2022/11/15 15:00:09"
 }
