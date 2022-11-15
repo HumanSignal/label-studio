@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3562: Remove styles after region unselected (#1009)\n\nCo-authored-by: hlomzik <hlomzik@users.noreply.github.com>",
-  "commit": "2b9156c5a61722c16d7bb6af2353c2287a425a39",
-  "branch": "master",
-  "date": "2022-11-11T21:43:01Z"
+  "message": "feat: DEV-2715: Audio v3",
+  "commit": "d291f68522e135fb51945bc7f9de6184908c20ea",
+  "branch": "fb-dev-2715",
+  "date": "2022/11/15 08:01:21"
 }
