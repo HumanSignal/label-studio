@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3672: I can't reassign label to bounding box with a hotkey",
-  "commit": "5e6a4c68ac935b5ab85f7179d6c4b62ceb2f2e3e",
+  "commit": "3bb1cbe88c4b61d7d562ee788db6d7cf4f3f3ea3",
   "branch": "fb-dev-3672/hotkey-inconsistency",
-  "date": "2022/11/14 12:59:38"
+  "date": "2022/11/15 07:02:33"
 }
