@@ -22,7 +22,7 @@ stages:
 - name: import_small_file
   request:
     files:
-      json: label_studio/tests/test_suites/samples/example_repeater.json
+      json: tests/test_suites/samples/example_repeater.json
     headers:
       content-type: multipart/form-data
     method: POST
