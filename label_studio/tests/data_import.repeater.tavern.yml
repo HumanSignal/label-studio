@@ -1,0 +1,49 @@
+---
+test_name: import_repeater_with_nested_fields
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      label_config: <View><Repeater name="i2_repeater" on="$work_2.i"><Text name="i_2_{{idx}}" value="$work_2.i[{{idx}}].value"/></Repeater></View>
+      title: Repeater Project
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: import_small_file
+  request:
+    files:
+      json: tests/test_suites/samples/example_repeater.json
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/import'
+  response:
+    status_code: 201
+    save:
+      json:
+        file_upload_ids: file_upload_ids
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      file_upload_ids: !force_format_include '{file_upload_ids}'
+      files_as_tasks_list: false
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/reimport'
+  response:
+    json:
+      task_count: 1
+    status_code: 201
+
+

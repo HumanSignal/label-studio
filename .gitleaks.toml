@@ -1,0 +1,10 @@
+title = "LS"
+
+[extend]
+useDefault = true
+
+[allowlist]
+stopwords = [
+    '''keyEntities''',
+    '''shiftKey''',
+]

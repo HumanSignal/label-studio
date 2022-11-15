@@ -111,7 +111,7 @@ def custom_exception_handler(exc, context):
         logger.debug(exc_tb)
         response_data['detail'] = str(exc)
         if not settings.DEBUG_MODAL_EXCEPTIONS:
-            exc_tb = 'Tracebacks disabled in settings'
+            exc_tb = None
         response_data['exc_info'] = exc_tb
         response = Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=response_data)
 
