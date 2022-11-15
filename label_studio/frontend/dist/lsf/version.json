@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-1852: Fix missing labels on video regions",
-  "commit": "d936a20749b8800dbd772360f294d7c7ebc21ca3",
-  "branch": "fb-dev-1852/label-on-video-region",
-  "date": "2022/11/15 18:34:09"
+  "commit": "81d187d2c4147111167abd2a75a71db95f1b9d2e",
+  "branch": "master",
+  "date": "2022/11/15 21:25:30"
 }
