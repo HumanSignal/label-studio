@@ -1,6 +1,7 @@
 ---
 title:
 type: blog
+tier: all
 order: 60
 ---
 
@@ -57,9 +58,13 @@ label-studio start my_project --init
 </View>
 ```
 10. In your project settings, open the Machine Learning page in the Label Studio UI. 
-    > Note: It takes some time to download models from the NeMo engine. The Label Studio UI might hang until the models finish automatically downloading.
 
-10. Click **Add Model** and add the ML backend using this URL: `http://localhost:9090`
 
-11. Import audio data and start reviewing pre-annotations.
+!!! note 
+    It takes some time to download models from the NeMo engine. The Label Studio UI might hang until the models finish automatically downloading.
+
+
+11. Click **Add Model** and add the ML backend using this URL: `http://localhost:9090`.
+
+12. Import audio data and start reviewing pre-annotations.
 

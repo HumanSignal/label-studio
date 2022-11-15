@@ -1,10 +1,9 @@
 ---
 title: Label and annotate data 
 type: guide
-tier: all
 order: 402
 meta_title: Label and annotate data
-meta_description: "Label and annotate data to create bounding boxes, label text spans, set up relations. Filter and sort project data for machine learning dataset creation."
+meta_description: Label and annotate data to create bounding boxes, label text spans, set up relations. Filter and sort project data for machine learning dataset creation.
 ---
 
 Label and annotate your data with the open source data labeling tool, Label Studio. After you [set up your project](setup_project.html) and [labeling interface](setup.html) and [import your data](tasks.html), you can start labeling and annotating your data.
@@ -102,9 +101,7 @@ When annotators skip a task, the task no longer appears in the labeling queue fo
 
 In both Label Studio and Label Studio Enterprise, you can label tasks with collaborators. Tasks are locked while someone performs annotations so that you don't accidentally overwrite the annotations of another annotator. After the other annotator finishes with the task, it can appear in your queue for labeling if the minimum annotations per task is set to more than one. By default, tasks only need to be annotated by one annotator. 
 
-<div class="admonition enterprise">
-    <p class="admonition-title">enterprise</p>
-    <p>
+<div class="enterprise-only"><p>
 If you're using Label Studio Enterprise and want more than one annotator to annotate tasks, <a href="setup_project.html">update the project settings</a>. After you update the minimum annotations required per task, annotators can use the Label Stream workflow to label their tasks.  
 </p></div>
 
@@ -118,7 +115,7 @@ To label tasks multiple times while the minimum annotations required is set to o
 5. Click the next task in the data manager to open the quick labeling view for that task and repeat steps 2-4.
 
 
-## Perform ML-assisted labeling with interactive preannotations
+## ML-assisted labeling
 
 If you have a machine learning backend set up to [get interactive preannotations](ml.html#Get-interactive-preannotations), you can choose whether to use those predictions while you label. 
 
@@ -126,7 +123,7 @@ If you have a machine learning backend set up to [get interactive preannotations
 2. For image labeling, you can choose whether to **Auto accept annotation suggestions** after you enable auto-annotation. If you automatically accept annotation suggestions, regions show up automatically and are immediately created. If you don't automatically accept suggestions, the regions appear, but you can reject or approve them manually, either individually or all at once. Predicted text regions are automatically accepted.
 
 
-## Use keyboard shortcuts to label regions faster
+## Use keyboard shortcuts
 
 Use keyboard shortcuts, or hotkeys, to improve your labeling performance. When performing a labeling task, click the gear icon to see more details about hotkeys or to enable or disable hotkeys. 
 
@@ -285,7 +282,7 @@ If you make a mistake when labeling with the brush mask, you can erase it. You m
 If you want to completely remove a region and start over, delete the region instead of erasing it. Erasing a region does not delete it. 
 
 
-## <i class='ent'/></i> Outliner 
+## Outliner 
 
 The **Outliner** is a replacement for the existing interface with a multiple-panel approach. This feature improves the user experience to fit more data in these two columns (**Outliner** and **Details**) and provides more options when working with regions. For example, Image segmentation is the only type of labeling that supports custom controls on the details panel. 
 
@@ -358,8 +355,7 @@ You can edit regions with a focus on labeling. You can zoom in and precise contr
 !!! note 
     In the upcoming releases, video segmentation will be available to control keyframes, animations, and custom metadata. 
 
-
-<i class='ent'></i>The Comments box is available inside the outliner. 
+The **Comments** box is available inside the outliner. 
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/comments-box.png" style="opacity: 0.8" class="gif-border"/></div>

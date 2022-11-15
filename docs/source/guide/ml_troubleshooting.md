@@ -9,7 +9,9 @@ meta_description: Troubleshoot Label Studio connections with machine learning fr
 
 After you [set up machine learning with Label Studio](ml.html) or [create your own machine learning backend](ml_create.html) to use with Label Studio, you can troubleshoot any issues you encounter by reviewing the possible causes on this page.
 
+
 ## Troubleshoot by reviewing the ML server logs
+
 You can investigate most problems using the server console log. The machine learning backend runs as a separate server from Label Studio, so make sure you check the correct server console logs while troubleshooting. To see more detailed logs, start the ML backend server with the `--debug` option. 
 
 If you're running an ML backend: 
@@ -20,6 +22,7 @@ In development mode, training logs appear in the web browser console.
 If you're running an ML backend using Docker Compose:
 - Training logs are located in `logs/rq.log`
 - Main process and inference logs are located in `logs/uwsgi.log`
+
 
 ## I launched the ML backend, but it appears as **Disconnected** after adding it in the Label Studio UI
 
@@ -36,6 +39,7 @@ Click the error message to review the traceback. Common errors that you might se
 - Memory issues on the server. 
 If you can't resolve the traceback issues by yourself, <a href="https://slack.labelstudio.heartex.com/?source=docs-ML">contact us on Slack</a>.
 
+
 ## My predictions are wrong or I don't see the model prediction results on the labeling page
 
 Your ML backend might be producing predictions in the wrong format. 
@@ -43,13 +47,17 @@ Your ML backend might be producing predictions in the wrong format.
 - Check to see whether the ML backend predictions format follows the same structure as [predictions in imported pre-annotations](predictions.html).
 - Confirm that your project's label configuration matches the output produced by your ML backend. For example, use the Choices tag to create a class of predictions for text. See more [Label Studio tags](/tags.html). 
 
+
 ## The model backend fails to start or run properly
+
 If you see errors about missing packages in the terminal after starting your ML backend server, or in the logs, you might need to specify additional packages in the `requirements.txt` file for your ML backend.
 
 ## ML backend is unable to access tasks
+
 Because the ML backend and Label Studio are different services, the assets (images, audio, etc.) that you label must be hosted and be accessible with URLs by the machine learning backend, otherwise it might fail to create predictions.
 
 ## I get a validation error when adding the ML backend
+
 If you get a validation error when adding the ML backend URL to your Label Studio project, check the following:
 - Is the labeling interface set up with a valid configuration?
 - Is the machine learning backend running? Run the following health check:<br/> `curl -X GET http://localhost:9090/health`

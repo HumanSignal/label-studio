@@ -12,7 +12,9 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
 !!! info 
     The release notes for Label Studio Community Edition is available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
 
+
 ## Label Studio Enterprise 2.2
+
 This section highlights the new features and enhancements in Label Studio Enterprise 2.2.
 
 ### New features and enhancements 
@@ -65,6 +67,7 @@ Label Studio Enterprise 2.2 introduces the following new features and enhancemen
 
 
 ## Label Studio Enterprise 2.2.10 
+
 This section highlights the bug fixes in Label Studio Enterprise 2.2.10.
 
 ### Bug fixes
@@ -81,6 +84,7 @@ Label Studio 2.2.10 includes the following bug fixes:
 
 
 ## Label Studio Enterprise 2.2.9
+
 This section highlights the breaking changes, new features and enhancements, and bug fixes in Label Studio Enterprise 2.2.9. 
 
 ### Breaking changes
@@ -152,6 +156,7 @@ Label Studio 2.2.9 includes the following bug fixes:
 
 
 ## Label Studio Enterprise 2.2.8
+
 This section highlights the breaking changes, new features and enhancements, and bug fixes in Label Studio Enterprise 2.2.8. 
 
 ### New features and enhancements

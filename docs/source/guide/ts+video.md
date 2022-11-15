@@ -4,11 +4,12 @@ short: Time series plus Video or Audio
 meta_title: Time series video audio labeling 
 ---
 
-> Note: This feature is not officially supported, experimental and has a tricky setup way.
 
-> Note: To use audio instead of video you should replace .mp4 file to mp3/wav/other browser supported audio format.      
+!!! note
+    - This feature is not officially supported, experimental, and has a tricky setup way.
+    - To use audio instead of video you should replace `.mp4` file to mp3/wav/other browser supported audio format.      
+    - This approach works with Label Studio <b>1.4.1 and lower</b>.
 
-> Note: This approach works with Label Studio <b>1.4.1 and lower</b>
 
 ## Step 1: Media hosting
 
@@ -16,11 +17,12 @@ You have to host your CSV and MP4 somewhere (or another video formats supporting
 or another clouds. If you want to host data from your hard drive, please use 
 [Label Studio Local Storage](http://localhost:4000/guide/storage.html#Local-storage).
 
-As the result of this step you will have two URLs: one for CSV and one for video, e.g.:
+As the result of this step you will have two URLs: one for CSV and one for video. For example, 
 ```
 http://localhost:8080/samples/time-series.csv?time=time_column&values=first_column
 http://localhost:8080/static/samples/opossum_snow.mp4
 ```
+
 
 ## Step 2: Labeling config with example task data
 
@@ -45,6 +47,7 @@ ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_
   } -->
 ```
 
+
 ## Step 3: Prepare and import tasks
 
 > Note: It is the most important step, because the main trick is in task data, it uses some Javascript injection.        
@@ -65,9 +68,9 @@ ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_
 2. It's <b>very important</b> to wait about 3 seconds (it depends on video size), until video is loaded.
 3. Drag the handle on the time series overview channel, you video must be synchronized with the time series.
 
-> Note 1: This trick suggests that time series length is equal to the video length, so the scroll between time series and video works proportionally.
-
-> Note 2: The sync works only in one direction: from time series to video, you can control the time position only using the time series scroll. 
+!!! note
+    - This trick suggests that time series length is equal to the video length, so the scroll between time series and video works proportionally.
+    - The sync works only in one direction: from time series to video, you can control the time position only using the time series scroll. 
 
 
 ## Video tutorial

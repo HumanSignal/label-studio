@@ -11,7 +11,7 @@ meta_description: Tutorial documentation for the Label Studio Python SDK. How an
 You can use the Label Studio Python SDK to make annotating data a more integrated part of your data science and machine learning pipelines. This software development kit (SDK) lets you call the Label Studio API directly from scripts using predefined classes and methods. 
 
 With the Label Studio Python SDK, you can perform the following tasks in a Python script:
-- [Authenticate to the Label Studio API](#Start-using-the-Label-Studio-Python-SDK)
+- [Authenticate to the Label Studio API](#Start-using-the-Label-Studio-Python-SDK).
 - [Create a Label Studio project](#Create-a-project-with-the-Label-Studio-Python-SDK), including setting up a labeling configuration. 
 - [Import tasks](#Import-tasks-with-the-Label-Studio-Python-SDK).
 - [Manage pre-annotated tasks and model predictions](#Add-predictions-to-existing-tasks-with-the-Label-Studio-Python-SDK).

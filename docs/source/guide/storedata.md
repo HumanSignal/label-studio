@@ -8,14 +8,18 @@ meta_description: Configure the database storage used by Label Studio to ensure 
 ---
 Label Studio uses a database to store project data and configuration information.
 
+
 ## Labeling performance
+
 The SQLite database works well for projects with tens of thousands of labeling tasks. If you want to annotate millions of tasks or anticipate a lot of concurrent users, use a PostgreSQL database. See [Install and upgrade Label Studio](install.html#PostgreSQL-database) for more.  
 
 For example, if you import data while labeling is being performed, labeling tasks can take more than 10 seconds to load and annotations can take more than 10 seconds to perform. If you want to label more than 100,000 tasks with 5 or more concurrent users, consider using PostgreSQL or another database with Label Studio. 
 
+
 ## SQLite database
 
 Label Studio uses SQLite by default. You don't need to configure anything. Label Studio stores all data in a single file in the specified directory of the admin user. After you [start Label Studio](start.html), the directory used is printed in the terminal. 
+
 
 ## PostgreSQL database
 
@@ -46,6 +50,7 @@ When you start Label Studio using Docker Compose, you start it using a PostgreSQ
 ```bash
 docker-compose up -d
 ```
+
 
 ## Data persistence
 
@@ -79,5 +84,3 @@ For more about specifying volumes in Docker Compose, see the volumes section of 
 
 ### Persist data with a cloud provider
 Host a PostgreSQL server that you manage and set up the PostgreSQL environment variables with Label Studio to persist data from a cloud provider such as Heroku, Amazon Web Services, Google Cloud Services, or Microsoft Azure. 
-
-

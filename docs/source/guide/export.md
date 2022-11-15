@@ -61,14 +61,14 @@ curl -X GET https://localhost:8080/api/projects/{id}/export?exportType=JSON&down
 
 If your project is large, you can use a [snapshot export](https://api.labelstud.io/#operation/api_projects_exports_create) (or [snapshot SDK](https://labelstud.io/sdk/project.html#create-new-export-snapshot)) to avoid timeouts in most cases. Snapshots include all tasks without annotations by default.
 
+<div class="enterprise-only">
 
-### <i class='ent'></i> Export snapshots using the UI
+### Export snapshots using the UI
 
 <img src="/images/lse-export-snapshots-ui.png" alt="" class="gif-border" />
 <br>
 
 In Label Studio Enterprise, create a snapshot of your data and annotations. Create a snapshot to export exactly what you want from your data labeling project. This delayed export method makes it easier to export large labeling projects from the Label Studio UI.  
-
 
 1. Within a project in the Label Studio UI, click **Export**.
 2. Click **Create New Snapshot**.
@@ -82,6 +82,8 @@ In Label Studio Enterprise, create a snapshot of your data and annotations. Crea
 10. Click **Create a Snapshot** to start the export process.
 11. You see the list of snapshots available to download, with details about what is included in the snapshot, when it was created, and who created it. 
 12. Click **Download** and select the export format that you want to use. Now, the snapshot file downloads to your computer. 
+
+</p></div>
 
 ### Export using the API
 
@@ -308,10 +310,10 @@ Review the full list of JSON properties in the [API documentation](api.html).
 | result.value | Tag-specific value that includes details of the result of labeling the task. The value structure depends on the tag for the label. For more information, see [Explore each tag](/tags). |
 | annotations.completed_by | User ID of the user that created the annotation. Matches the list order of users on the People page on the Label Studio UI. |
 | annotations.was_cancelled | Boolean. Details about whether or not the annotation was skipped, or cancelled. | 
-| annotations.reviews | <i class='ent'></i> Array containing the details of reviews for this annotation.  |
-| reviews.id | Enterprise only. ID of the specific annotation review. |
-| reviews.created_by |  <i class='ent'></i> Dictionary containing user ID, email, first name and last name of the user performing the review. |
-| reviews.accepted |  <i class='ent'></i> Boolean. Whether the reviewer accepted the annotation as part of their review. |  
+| annotations.reviews | <div class="enterprise-only"> Array containing the details of reviews for this annotation.</div>  |
+| reviews.id | <div class="enterprise-only">ID of the specific annotation review.</div>|
+| reviews.created_by |  <div class="enterprise-only">Dictionary containing user ID, email, first name and last name of the user performing the review.</div> |
+| reviews.accepted |  <div class="enterprise-only"> Boolean. Whether the reviewer accepted the annotation as part of their review.</div> |  
 | drafts | Array of draft annotations. Follows similar format as the annotations array. Included only for tasks exported as a snapshot [from the UI](#Export-snapshots-using-the-UI) or [using the API](#Export-snapshots-using-the-API).
 | predictions | Array of machine learning predictions. Follows the same format as the annotations array, with one additional parameter. |
 | predictions.score | The overall score of the result, based on the probabilistic output, confidence level, or other. | 

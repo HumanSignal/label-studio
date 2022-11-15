@@ -8,13 +8,13 @@ meta_title: Data Labeling Statistics
 meta_description: Label Studio Enterprise documentation about task agreement, annotator consensus, and other data annotation statistics for data labeling and machine learning projects.
 ---
 
-<div class="admonition enterprise">
-    <p class="admonition-title">enterprise</p>
-    <p>
+
+<div class="enterprise-only"><p>
 Label Studio Enterprise Edition includes various annotation and labeling statistics. The open source Community Edition of Label Studio does not perform these statistical calculations. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
 </p></div>
 
 Annotation statistics help you determine the quality of your dataset, its readiness to be used to train models, and assess the performance of your annotators and reviewers.
+
 
 ## Task agreement
 
@@ -25,6 +25,7 @@ Task agreement shows the consensus between multiple annotators when labeling the
 You can also see how the annotations from a specific annotator compare to the prediction scores for a task, or how they compare to the ground truth labels for a task.
 
 For more about viewing agreement in Label Studio Enterprise, see [Verify model and annotator performance](quality.html#Verify-model-and-annotator-performance).
+
 
 ## Agreement method
 

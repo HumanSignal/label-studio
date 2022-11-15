@@ -1,9 +1,8 @@
 ---
 title: Set up an ingress controller for Label Studio Enterprise Kubernetes deployments
 short: Set up an ingress controller
-badge: <i class='ent'/></i>
 type: guide
-tier: all
+tier: enterprise
 order: 212
 meta_title: Set up an ingress controller for Label Studio Enterprise Kubernetes Deployments
 meta_description: Set up an ingress controller to manage load balancing and access to Label Studio Enterprise Kubernetes deployments for your data science and machine learning projects.
@@ -19,7 +18,8 @@ Select the best option for your deployment:
 
 Configure ingress before or after setting up [persistent storage](persistent_storage.html), but before you [deploy Label Studio Enterprise](install_enterprise.html).
 
-> You only need to set up an ingress controller if you plan to deploy Label Studio Enterprise on Kubernetes. 
+!!! note 
+    You only need to set up an ingress controller if you plan to deploy Label Studio Enterprise on Kubernetes. 
 
 ## Configure ingress for Amazon EKS
 

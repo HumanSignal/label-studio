@@ -28,7 +28,8 @@ export HTTPS_PROXY=<your_proxy>
 
 If you can't access the internet using a proxy supported by Helm or at all, follow these steps to download the Helm charts necessary to deploy Label Studio Enterprise on an airgapped Kubernetes cluster. 
 
-> You need the Label Studio Enterprise credentials provided to you by your account manager to download the Helm charts.
+!!! note
+    You need the Label Studio Enterprise credentials provided to you by your account manager to download the Helm charts.
 
 1. Download the latest version of Label Studio Enterprise. From the command line, run the following, replacing `<USERNAME>` and `<PASSWORD>` with the credentials provided to you by your account manager:
    ```shell

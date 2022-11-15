@@ -1,6 +1,7 @@
 ---
 title: 
 type: blog
+tier: all
 order: 50
 ---
 

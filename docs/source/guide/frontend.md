@@ -123,7 +123,7 @@ To see all the available options for the initialization of LabelStudio object, s
 
 ## Custom LSF + LSB integration
 
-LS Frontend (LSF) with Backend (LSB) integration is similar what is described in the [Frontend integration guide](#Frontend-integration-guide). The Javascript integration script is placed in [lsf-sdk.js](https://github.com/heartexlabs/label-studio/blob/master/label_studio/static/js/lsf-sdk.js) in the Label Studio Backend. The main idea of this integration based on LSF callbacks.
+LS Frontend (LSF) with Backend (LSB) integration is similar what is described in the [Frontend integration guide](#Frontend-integration-guide). The JavaScript integration script is placed in [lsf-sdk.js](https://github.com/heartexlabs/label-studio/blob/master/label_studio/static/js/lsf-sdk.js) in the Label Studio Backend. The main idea of this integration based on LSF callbacks.
 
 1. Make your custom LSF build by following these [instructions](https://github.com/heartexlabs/label-studio-frontend#development). Finalize your development with `npm run build-bundle` to generate `main.<hash>.css` and `main.<hash>.js` files.
 

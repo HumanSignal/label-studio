@@ -1,6 +1,7 @@
 ---
 title: Text classification with Scikit-Learn
 type: blog
+tier: all
 order: 20
 meta_title: Text Classification with Scikit-Learn Tutorial
 meta_description: Label Studio tutorial for text classification using Scikit-Learn and Label Studio.
@@ -172,7 +173,8 @@ label-studio-ml init my_backend
 
 The last command takes your script `./model.py` and creates an `./my_backend` directory at the same level, copying the configs and scripts needed to launch the ML backend in either development or production modes.
 
-> Note: You can specify different location for your model script, for example: `label-studio-ml init my_backend --script /path/to/my/script.py`
+!!! note
+    You can specify different location for your model script, for example: `label-studio-ml init my_backend --script /path/to/my/script.py`.
 
 ### Launch ML backend server
 

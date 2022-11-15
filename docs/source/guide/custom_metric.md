@@ -12,15 +12,16 @@ Write a custom agreement metric to assess the quality of the predictions and ann
 
 This functionality is only available for Label Studio Enterprise Cloud customers, or for [customers running Label Studio Enterprise in a private cloud](#Set-up-permissions-for-a-private-cloud-custom-agreement-metric) with Amazon Web Services Elastic Compute Cluster [(AWS EC2)](https://aws.amazon.com/ec2/) or Amazon Elastic Kubernetes Service [(EKS)](https://aws.amazon.com/eks/).
 
-<div class="admonition enterprise">
-    <p class="admonition-title">enterprise</p>
-    <p>
+
+<div class="enterprise-only"><p>
+
 Label Studio Enterprise Edition includes various annotation and labeling statistics and the ability to add your own. The open source Community Edition of Label Studio does not contain these calculations. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
 </p></div>
 
 1. Review the [prerequisites](#Prerequisites).
 2. [Write your custom agreement metric](#How-to-write-your-custom-agreement-metric).
 3. [Add your custom agreement metric to Label Studio Enterprise](#Add-your-custom-agreement-metric-to-Label-Studio-Enterprise).
+
 
 ## Prerequisites
 
@@ -96,7 +97,8 @@ def agreement(annotation_1, annotation_2, per_label=False) -> float:
 
 Set up a custom agreement metric for a specific project in Label Studio Enterprise. 
 
-> You must configure the labeling interface before you can add your custom agreement metric. 
+!!! note 
+    You must configure the labeling interface before you can add your custom agreement metric. 
 
 !!! attention "important"
         [Using tags on Lambda functions](https://docs.aws.amazon.com/lambda/latest/dg/configuration-tags.html) is an on-premise only feature.
@@ -181,6 +183,7 @@ If you deployed Label Studio Enterprise using Docker Compose in an AWS EC2 insta
 3. Select **Create policy** and attach the [`LSE_AllowInteractLambda` policy](#Create-an-IAM-policy-to-grant-AWS-Lambda-permissions).
 4. When you finish creating the user, save the username and access key somewhere secure.
 5. In the `docker-compose.yaml` file that you use to deploy Label Studio Enterprise, add the following environment variables in the `app` and `rqworkers` sections:
+
 > Update `YOUR_AWS_ACCESS_KEY_ID`, `YOUR_AWS_SECRET_ACCESS_KEY` and `YOUR_AWS_ACCOUNT` with the credentials for the account created in step one, and updating `YOUR_AWS_REGION` with the AWS region that your EC2 instance exists in:
 ```
 AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY_ID
