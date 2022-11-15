@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3672: I can't reassign label to bounding box with a hotkey (#1012)\n\n* fix: DEV-3672: I can't reassign label to bounding box with a hotkey\n\n* some refactoring and enforcing hotkey and onClick work the same way\n\n* making sure hotkey gets toggleSelected return value instead of explicit false like onClick\n\n* if( to if (\n\nCo-authored-by: yyassi-heartex <yyassi-heartex@users.noreply.github.com>",
-  "commit": "a7973cf7c84ee4703ad82776e56f262e5979653c",
+  "message": "fix: DEV-1852: Fix missing labels on video regions",
+  "commit": "81d187d2c4147111167abd2a75a71db95f1b9d2e",
   "branch": "master",
-  "date": "2022-11-15T13:10:47Z"
+  "date": "2022/11/15 21:25:30"
 }
