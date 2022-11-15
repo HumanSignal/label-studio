@@ -747,7 +747,7 @@ main {
 
 .content-markdown {
   width: calc(100vw - var(--sidebar-size) - var(--toc-size) - calc(2 * var(--page-padding)) - 5em);
-  flex-basis: 82ch;
+  flex-basis: 97ch;
   max-width: 97ch;
 }
 
