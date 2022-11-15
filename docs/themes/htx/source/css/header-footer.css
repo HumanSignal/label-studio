@@ -284,13 +284,11 @@ body{
 }
 .mainHeader:where(.astro-7IFFX3A3){
   background-color:var(--color-white);
-  padding:1.5em 0;
   position:relative;
   z-index:2
 }
 .Header:where(.astro-7IFFX3A3){
   display:flex;
-  border:1px solid var(--color-gray-900);
   position:relative;
   min-height:52px;
   align-items:center
@@ -393,7 +391,8 @@ body{
   background-color:transparent;
   width:3rem;
   height:3rem;
-  margin-right:-.75rem
+  margin-right:-.75rem;
+  cursor: pointer
 }
 .HeaderNavToggleButton:where(.astro-7IFFX3A3) svg:where(.astro-7IFFX3A3){
   width:1em;
@@ -407,7 +406,7 @@ body{
   margin-top:.5em;
   padding-top:1em
 }
-@media (min-width: 84.4375rem){
+@media (min-width: 1000px){
   .HeaderNav:where(.astro-7IFFX3A3)>li:where(.astro-7IFFX3A3):hover>.HeaderSubNav:where(.astro-7IFFX3A3){
       display:flex
   }
@@ -418,7 +417,7 @@ body{
       display:none
   }
 }
-@media (max-width: 84.375rem){
+@media (max-width: 1000px){
   .Header:where(.astro-7IFFX3A3){
       align-items:flex-start;
       flex-direction:column;
@@ -432,13 +431,12 @@ body{
       margin-left:initial;
       align-items:flex-start;
       position:absolute;
-      top:50px;
+      top:52px;
       left:-1px;
       z-index:2;
       width:calc(100% + 2px);
       background-color:var(--color-white);
       border:1px var(--color-gray-900) solid;
-      border-top-color:var(--color-white);
       padding:.5em 1em 1em;
       display:none
   }
@@ -666,6 +664,7 @@ html:not(.js-enabled) .AlgoliaSearch{
   display:grid;
   grid-template-columns:[full-start] minmax(var(--gutter),1fr) [standard-start] 5rem [narrow-start] minmax(1rem,73.5rem) [narrow-end] 5rem [standard-end] minmax(var(--gutter),1fr) [full-end]
 }
+
 @media (max-width: 62.5em){
   .Grid:where(.astro-IYSTJHZO){
       --gutter: 2rem
@@ -857,4 +856,19 @@ html:not(.js-enabled) .AlgoliaSearch{
 .search-container {
   display:flex;
   align-items: center;
+}
+.Grid.mainHeader {
+  --gutter: 1rem;
+}
+
+@media (max-width: 1000px) { /* < 1184px */
+  :global(#docsearch-input) {
+    width: 10em;
+  }
+}
+
+@media (max-width: 80rem) { /* < 1280px */
+  .HeaderCTA:where(.astro-7IFFX3A3) .ButtonText:where(.astro-NJHSWM7L){
+    font-size: .875rem;
+  }
 }

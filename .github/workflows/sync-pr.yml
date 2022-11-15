@@ -28,7 +28,7 @@ jobs:
     if: startsWith(github.head_ref, 'fb-')
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Check user's membership
         uses: actions/github-script@v6
