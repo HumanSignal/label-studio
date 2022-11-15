@@ -19,8 +19,10 @@ The Choice tag represents a single choice for annotations. Use with the Choices 
 | [hotkey] | <code>string</code> | Hotkey for the selection |
 
 ### Example
+
+Basic text classification labeling configuration
+
 ```html
-<!--Basic text classification labeling configuration-->
 <View>
   <Choices name="gender" toName="txt-1" choice="single">
     <Choice value="Man" />

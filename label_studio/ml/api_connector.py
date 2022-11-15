@@ -1,6 +1,5 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import json
 import logging
 import os
 import requests
@@ -12,10 +11,8 @@ from django.db.models import Q, F, Count
 from django.conf import settings
 from requests.adapters import HTTPAdapter
 from core.version import get_git_version
-from core.utils.common import get_bool_env
 from data_export.serializers import ExportDataSerializer
 from label_studio.core.utils.params import get_env
-from users.models import Token
 from core.feature_flags import flag_set
 from core.utils.common import load_func
 

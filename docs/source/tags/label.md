@@ -27,8 +27,10 @@ Label tag represents a single label. Use with the Labels tag, including BrushLab
 | [html] | <code>string</code> |  | HTML code is used to display label button instead of raw text provided by `value` (should be properly escaped) |
 
 ### Example
+
+Basic named entity recognition labeling configuration for text
+
 ```html
-<!--Basic named entity recognition labeling configuration for text-->
 <View>
   <Labels name="type" toName="txt-1">
     <Label alias="B" value="Brand" />

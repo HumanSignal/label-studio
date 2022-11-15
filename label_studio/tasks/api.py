@@ -18,7 +18,7 @@ from core.utils.common import (
     DjangoFilterDescriptionInspector,
     get_object_with_check_and_log,
 )
-from core.utils.common import bool_from_request
+from core.utils.params import bool_from_request
 from data_manager.api import TaskListAPI as DMTaskListAPI
 from data_manager.functions import evaluate_predictions
 from data_manager.models import PrepareParams

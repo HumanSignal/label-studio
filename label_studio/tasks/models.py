@@ -219,9 +219,13 @@ class Task(TaskMixin, models.Model):
                 # file saved in django file storage
                 if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(task_data[field]):
                     # permission check: resolve uploaded files to the project only
-                    file_upload = FileUpload.objects.filter(project=project, file=task_data[field])
-                    if file_upload.exists():
-                        task_data[field] = default_storage.url(name=task_data[field])
+                    file_upload = None
+                    file_upload = FileUpload.objects.filter(project=project, file=task_data[field]).first()
+                    if file_upload is not None:
+                        if flag_set('ff_back_dev_2915_storage_nginx_proxy_26092022_short', self.project.organization.created_by):
+                            task_data[field] = file_upload.url
+                        else:
+                            task_data[field] = default_storage.url(name=task_data[field])
                     # it's very rare case, e.g. user tried to reimport exported file from another project
                     # or user wrote his django storage path manually
                     else:
