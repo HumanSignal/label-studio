@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3562: Remove styles after region unselected (#1009)\n\nCo-authored-by: hlomzik <hlomzik@users.noreply.github.com>",
-  "commit": "2b9156c5a61722c16d7bb6af2353c2287a425a39",
+  "message": "fix: DEV-3672: I can't reassign label to bounding box with a hotkey (#1012)\n\n* fix: DEV-3672: I can't reassign label to bounding box with a hotkey\n\n* some refactoring and enforcing hotkey and onClick work the same way\n\n* making sure hotkey gets toggleSelected return value instead of explicit false like onClick\n\n* if( to if (\n\nCo-authored-by: yyassi-heartex <yyassi-heartex@users.noreply.github.com>",
+  "commit": "a7973cf7c84ee4703ad82776e56f262e5979653c",
   "branch": "master",
-  "date": "2022-11-11T21:43:01Z"
+  "date": "2022-11-15T13:10:47Z"
 }
