@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3733: Persist and use the pending draft to attach added comments",
-  "commit": "f8dd16da5ff92b36c93d5db7b73cd9bfd9f995d8",
+  "commit": "d76818a01697feb8965367d025e9ab309dccc11b",
   "branch": "fb-dev-3733",
-  "date": "2022/11/15 15:00:09"
+  "date": "2022/11/16 09:18:52"
 }
