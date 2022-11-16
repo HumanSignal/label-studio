@@ -27,14 +27,14 @@ Use with the following data types:
 | [background] | <code>string</code> | <code>&quot;#333333&quot;</code> | Background color in hexadecimal |
 
 ### Example
-```html
-<!--
+
 Basic labeling configuration to add a shortcut that places the text SILENCE in a given Text Area while doing transcription.
 
 Note: The default background color for the Shortcut tag is grey color.
 
 You can change the background color using text or hexadecimal format in the `background` parameter.
--->
+
+```html
 <View>
   <TextArea name="txt-1">
     <Shortcut alias="Silence" value="SILENCE" hotkey="ctrl+1" background="#3333333" />

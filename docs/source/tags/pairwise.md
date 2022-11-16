@@ -19,8 +19,10 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [selectionStyle] | <code>string</code> | Style for the selection |
 
 ### Example
+
+Basic labeling configuration to compare two passages of text
+
 ```html
-<!--Basic labeling configuration to compare two passages of text -->
 <View>
   <Header value="Select the more accurate summary"/>
   <Pairwise name="pairwise" leftClass="text1" rightClass="text2" toName="txt-1,txt-2"></Pairwise>

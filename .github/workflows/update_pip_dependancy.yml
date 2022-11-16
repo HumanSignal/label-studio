@@ -39,7 +39,7 @@ jobs:
           git checkout develop
 
           branch='fb-bump-${{ github.event.client_payload.dependency_name }}-version-${{ github.event.client_payload.version }}'
-          echo "::set-output name=branch::${branch}"
+          echo "branch=${branch}" >> $GITHUB_OUTPUT
           git checkout -b "${branch}"
 
           sed -i "s/^${{ github.event.client_payload.dependency_name }}==.*/${{ github.event.client_payload.dependency_name }}==${{ github.event.client_payload.version }}/g" ${{ env.PYTHON_VERSION_FILE }}
@@ -47,7 +47,7 @@ jobs:
           git add ${{ env.PYTHON_VERSION_FILE }}
           git commit --message "chore: Bump ${{ github.event.client_payload.dependency_name }} version to ${{ github.event.client_payload.version }}"
 
-          echo "::set-output name=commit::$(git rev-parse HEAD)"
+          echo "commit=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
           git push origin HEAD:refs/heads/${branch}
 
       - name: Create PR to 'develop'

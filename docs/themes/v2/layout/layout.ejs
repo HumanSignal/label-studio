@@ -1,6 +1,7 @@
 <% var isIndex = page.path === 'index.html' %>
 <% var isBlog = page.type === 'blog' %>
 <% var isGuide = page.type === 'guide' %>
+<% const isEnterpriseTheme = theme.tier === "enterprise" %>
 
 <% var defaultSeo = {
   description: "Get started with Label Studio by creating projects to label and annotate data for machine learning and data science models."
@@ -57,6 +58,12 @@
 
   <meta name="msapplication-TileColor" content="#4fc08d">
   <meta name="theme-color" content="#4fc08d">
+  
+  <% if (isEnterpriseTheme) { %>
+    <link rel="icon" type="image/svg+xml" href="/images/favicon-enterprise.svg" />
+  <% } else { %>
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+  <% } %>
 
   <link rel="preload" href="/fonts/SpaceGrotesk-Bold-subset.woff2" as="font" type="font/woff2" crossorigin>
 
@@ -64,15 +71,16 @@
 
   <% if (page.type === "playground") { %>
     <%- css('css/codemirror') %>
-    <script src="<%- url_for("/js/jquery.min.js") %>"></script>
-    <script src="<%- url_for("/js/jquery-ui.min.js") %>"></script>
-    <script src="<%- url_for("/js/codemirror.js") %>"></script>
-    <script src="<%- url_for("/js/xml.js") %>"></script>
+    <script src="<%- url_for("/js/playground/jquery.min.js") %>"></script>
+    <script src="<%- url_for("/js/playground/jquery-ui.min.js") %>"></script>
+    <script src="<%- url_for("/js/playground/codemirror.js") %>"></script>
+    <script src="<%- url_for("/js/playground/xml.js") %>"></script>
   <% } %>
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js" defer></script>
 </head>
 <body class="<%- 'page-tier-' + theme.tier %>">
   <% const tier = theme.tier || "all" %>
-  <% const isEnterpriseTheme = theme.tier === "enterprise" %>
   <%- partial("partials/header") %>
 
   <main class="<%- 'page-type-' + page.type %>">
@@ -161,6 +169,8 @@
   <%- partial("partials/footer") %>
 
   <%- js('js/code-tabs.js') %>
+  <%- js('js/code-blocks-enhancements.js') %>
   <%- js('js/feedback-form.js') %>
+  <%- js('js/header.js') %>
 </body>
 </html>

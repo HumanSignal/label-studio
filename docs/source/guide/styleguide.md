@@ -2,13 +2,22 @@
 title: Styleguide
 short: Styleguide
 type: guide
-tier: opensource
+tier: all
 order: 50
 meta_title: Get Started with Label Studio
 meta_description: Get started with Label Studio by creating projects to label and annotate data for machine learning and data science models.
 ---
 
 This post includes the markdown needed for various styles/layouts.
+
+## Templates
+
+<a href="/sitemap-docs.xml">Sitemap</a>
+<a href="/guide">Guide</a>
+<a href="/templates">Templates</a>
+<a href="/tags">Tags</a>
+<a href="/playground">Playground</a>
+<a href="/tutorials/sklearn-text-classifier.html">Tutorial example</a>
 
 ## Typography
 

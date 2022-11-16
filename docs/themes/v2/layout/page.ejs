@@ -5,6 +5,9 @@
 
 <div class="content-grid">
   <div class="content-markdown">
+    <% if(page.parent !== undefined) { %>
+      <%- breadcrumb({pageType: page.type, parentPage: page.parent, currentPage: page.title }) %>
+    <% } %>
     <% if (page.title.trim()) { %>
       <%- partial("component/heading", {text: page.title, size: "XLarge", tag: "h1", customClass: "home-page-title"}) %>
     <% } %>
