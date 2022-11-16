@@ -238,7 +238,6 @@ stages:
       - previous:
           task: !int "{second_task_pk}"
           draft: !int "{second_draft_pk}"
-          updated_at: "{second_draft_created_at}"
         next: null
 
 ---
