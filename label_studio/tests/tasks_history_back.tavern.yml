@@ -122,7 +122,6 @@ stages:
       - previous:
           task: !int "{second_task_pk}"
           annotation: !int "{annotation_pk}"
-          updated_at: "{annotation_created_at}"
         next: null
 
 - &get_previous_task_no_anno_or_draft_for2
@@ -171,7 +170,6 @@ stages:
       - previous:
           task: !int "{first_task_pk}"
           annotation: !int "{second_annotation_pk}"
-          updated_at: "{second_annotation_created_at}"
         next: null
 
 ---
