@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3688: Start select current area when create or resume drawing",
-  "commit": "1923a685952a859b13b5dc396f0ac2d78fb59cd6",
+  "commit": "1b3fe97daeb241eb95cca393fa06a2983efa0bf0",
   "branch": "fb-dev-3688",
-  "date": "2022/11/16 11:26:40"
+  "date": "2022/11/16 11:28:44"
 }
