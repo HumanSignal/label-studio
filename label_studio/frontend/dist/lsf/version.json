@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3627: Video type unsupported modal misfires fix",
-  "commit": "8ff8452c0d6db8c9feb314800c7fe2ee011cf3c9",
+  "commit": "f1d1b0112840b39ba53e6cac7877184ca8990d9e",
   "branch": "fb-dev-3627-fix/valadation-message-misfire",
-  "date": "2022/11/04 14:22:55"
+  "date": "2022/11/16 13:00:11"
 }
