@@ -172,6 +172,12 @@
     "decorators": ""
   },
   {
+    "url": "/api/projects/<int:pk>/previous-task/",
+    "module": "projects.api.ProjectPreviousTaskAPI",
+    "name": "projects:api:project-previous",
+    "decorators": ""
+  },
+  {
     "url": "/api/projects/validate/",
     "module": "projects.api.LabelConfigValidateAPI",
     "name": "projects:api:label-config-validate",
