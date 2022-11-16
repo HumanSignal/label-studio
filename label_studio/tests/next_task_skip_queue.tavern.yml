@@ -296,7 +296,6 @@ stages:
       - previous:
           task: !int "{first_task_pk}"
           annotation: !int "{first_skipped_annotation_pk}"
-          updated_at: "{first_skipped_annotation_created_at}"
         next: null
 
 # check previous task api
@@ -310,7 +309,6 @@ stages:
       - previous:
           task: !int "{second_task_pk}"
           annotation: !int "{annotation_pk}"
-          updated_at: "{annotation_created_at}"
         next: null
 
 - *get_next_task_queue_is_empty
