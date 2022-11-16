@@ -1,6 +1,6 @@
 from django.db import models
 from sensormodel.utils import parser_templates_files as parser
-import os
+from pathlib import Path
 
 class Sensor(models.Model):
     sensor_id = models.IntegerField()
@@ -10,7 +10,8 @@ class Sensor(models.Model):
     name = models.CharField(max_length=50, blank=True)
     version = models.CharField(max_length=50, blank=True)
 
-    path = os.path.abspath(r'sensormodel\parser_templates')
+    p = Path(__file__).parents[2]
+    path  = p / 'sensortypes'
 
     PARSER_CHOICES = parser.get_parser_templates(path)
     parser_template = models.IntegerField(choices = PARSER_CHOICES, default= 1)
