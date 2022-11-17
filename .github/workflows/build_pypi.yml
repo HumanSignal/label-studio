@@ -96,8 +96,22 @@ jobs:
       - name: Download feature flags
         env:
           LAUNCHDARKLY_COMMUNITY_SDK_KEY: ${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}
+          LAUNCHDARKLY_DOWNLOAD_PATH: "label_studio/feature_flags.json"
         run: |
-          curl -H "Authorization: $LAUNCHDARKLY_COMMUNITY_SDK_KEY" https://app.launchdarkly.com/sdk/latest-all >label_studio/feature_flags.json
+          set -xeuo pipefail
+          curl \
+            --connect-timeout 30 \
+            --retry 5 \
+            --retry-delay 10 \
+            -H "Authorization: $LAUNCHDARKLY_COMMUNITY_SDK_KEY" \
+            "https://sdk.launchdarkly.com/sdk/latest-all" >"$LAUNCHDARKLY_DOWNLOAD_PATH"
+          if [ "$(jq 'has("flags")' <<< cat $LAUNCHDARKLY_DOWNLOAD_PATH)" = "true" ]; then 
+            echo "feature_flags.json is valid"
+          else
+            echo "feature_flags.json is invalid"
+            cat $LAUNCHDARKLY_DOWNLOAD_PATH
+            exit 1
+          fi
 
       - name: Package
         run: python setup.py sdist bdist_wheel

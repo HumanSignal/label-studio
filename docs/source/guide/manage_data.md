@@ -55,9 +55,12 @@ You can create tabs on the data manager to [split your dataset](#Example-Split-a
 
 Tabs that you create depend on your [labeling configuration setup](setup.html), because the labeling configuration defines the data fields available for filtering and sorting. 
 
-> If you make changes to the labeling configuration, any tabs in your data manager are removed. Finish project setup before setting up complex tabs in the Data Manager.
+!!! note 
+    If you make changes to the labeling configuration, any tabs in your data manager are removed. Make sure to finish the project setup before setting up complex tabs in the Data Manager.
 
-## <i class='ent'></i> Assign annotators to tasks
+<div class="enterprise-only">
+
+## Assign annotators to tasks
 
 In Label Studio Enterprise, if you're an administrator or project manager, you can assign annotators to tasks in a specific project. After you [add the annotator to the project or workspace](setup_project.html#Add-members-to-a-project), assign the annotator to specific tasks. You must assign annotators to tasks if you're using [manual task distribution](setup_project.html#Set-up-task-distribution-for-labeling).
 
@@ -67,6 +70,9 @@ In Label Studio Enterprise, if you're an administrator or project manager, you c
 4. Click **Assign**. 
 
 If you want to bulk assign tasks, you can use filters to identify exactly the tasks that you want to assign, then select the top checkbox on the data manager to select all tasks shown and assign them to an annotator.
+
+</div>
+
 
 ## Delete tasks or annotations
 If you have duplicate tasks, or want to remove annotations, you can delete tasks and annotations from Label Studio.

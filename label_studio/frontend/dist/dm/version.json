@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3606: Trying to save something that doesn't exist",
-  "commit": "c9f2f97231d543962dcaadf93877ae09a852d6a9",
+  "message": "fix: DEV-3224: Move task to the end on next task",
+  "commit": "0fe0f6ff2b5ee16b11bab78731bb1c117b7a43f7",
   "branch": "master",
-  "date": "2022/10/17 13:41:52"
+  "date": "2022/11/08 18:10:40"
 }

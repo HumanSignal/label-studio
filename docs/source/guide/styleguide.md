@@ -1,14 +1,22 @@
 ---
 title: Styleguide
 short: Styleguide
-type: guide
-tier: opensource
+tier: all
 order: 50
 meta_title: Get Started with Label Studio
 meta_description: Get started with Label Studio by creating projects to label and annotate data for machine learning and data science models.
 ---
 
 This post includes the markdown needed for various styles/layouts.
+
+## Templates
+
+<a href="/sitemap-docs.xml">Sitemap</a>
+<a href="/guide">Guide</a>
+<a href="/templates">Templates</a>
+<a href="/tags">Tags</a>
+<a href="/playground">Playground</a>
+<a href="/tutorials/sklearn-text-classifier.html">Tutorial example</a>
 
 ## Typography
 
@@ -243,11 +251,15 @@ Using playground
 
 ## Collapsible Details
 
-<details>
-  <summary>Preview text of details</summary>
+This can be created using the &lcub;% collapse %&rcub; tag
 
+{% collapse "Preview text of details" %}
   Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae mauris arcu, eu pretium nisi. Praesent fringilla ornare ullamcorper. Pellentesque diam orci, sodales in blandit ut, placerat quis felis. Vestibulum at sem massa, in tempus nisi. Vivamus ut fermentum odio. Etiam porttitor faucibus volutpat. Vivamus vitae mi ligula, non hendrerit urna. Suspendisse potenti. Quisque eget massa a massa semper mollis.
-</details>
+{% endcollapse %}
+
+{% collapse "Another accordion row goes here" %}
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae mauris arcu, eu pretium nisi. Praesent fringilla ornare ullamcorper. Pellentesque diam orci, sodales in blandit ut, placerat quis felis. Vestibulum at sem massa, in tempus nisi. Vivamus ut fermentum odio. Etiam porttitor faucibus volutpat. Vivamus vitae mi ligula, non hendrerit urna. Suspendisse potenti. Quisque eget massa a massa semper mollis.
+{% endcollapse %}
 
 ---
 
@@ -285,6 +297,12 @@ Enterprise
         <li>Log in to Label Studio Enterprise</li>
         <li>Open the menu and click <b>API</b></li>
     </ol>
+</div>
+
+To hide all the Enterprise text under <div class="enterprise-only">, use the following code:
+
+<div class="enterprise-only">
+The annotation review workflow is only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
 </div>
 
 ---

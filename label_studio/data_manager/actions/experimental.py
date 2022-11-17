@@ -50,7 +50,7 @@ def propagate_annotations(project, queryset, **kwargs):
     db_annotations = Annotation.objects.bulk_create(db_annotations, batch_size=settings.BATCH_SIZE)
     TaskSerializerBulk.post_process_annotations(user, db_annotations, 'propagated_annotation')
 
-    start_job_async_or_sync(project.update_tasks_counters, Task.objects.filter(id__in=tasks))
+    project.update_tasks_counters(Task.objects.filter(id__in=tasks))
     return {'response_code': 200, 'detail': f'Created {len(db_annotations)} annotations'}
 
 

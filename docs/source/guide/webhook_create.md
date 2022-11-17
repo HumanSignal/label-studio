@@ -10,6 +10,7 @@ meta_description: Label Studio documentation for creating custom webhook event t
 
 If you want to trigger custom events for webhooks in Label Studio, you can extend the webhook event model.
 
+
 ## Create a custom webhook event
 
 To create a custom webhook event, add your own action to the `WebhookActions` model.

@@ -10,9 +10,11 @@ meta_description: Import predicted labels, predictions, pre-annotations, or pre-
 
 If you have predictions generated for your dataset from a model, either as pre-annotated tasks or pre-labeled tasks, you can import the predictions with your dataset into Label Studio for review and correction. Label Studio automatically displays the pre-annotations that you import on the Labeling page for each task. 
 
-> To generate interactive pre-annotations with a machine learning model while labeling, see [Set up machine learning with Label Studio](ml.html).
+!!! note 
+    To generate interactive pre-annotations with a machine learning model while labeling, see [Set up machine learning with Label Studio](ml.html).
 
 You can import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-data-from-the-Label-Studio-UI) or [using the API](/api#operation/projects_import_create). 
+
 
 ## Format pre-annotations for Label Studio 
 
@@ -823,7 +825,7 @@ If annotators can't see predictions or if you encounter unexpected behavior afte
 In the **Settings > Machine Learning** section for your project, make sure that the following settings are configured:
 - Enable **Show predictions to annotators in the Label Stream and Quick View**
 - Select the relevant **Model Version** in the drop-down. If there is no drop-down menu visible, there might not be a model version listed for the pre-annotations, or there might be another issue happening. 
-- <i class='ent'></i> Disable the option to **Reveal pre-annotations interactively**, which requires manual action from annotators to display pre-annotated regions. (Label Studio Enterprise only)  
+- <div class="enterprise-only"> Disable the option to <b>Reveal pre-annotations interactively</b>, which requires manual action from annotators to display pre-annotated regions.</div>
 
 ### Check the configuration values of your labeling configuration and tasks
 The `from_name` of the pre-annotation task JSON must match the value of the name in the `<Labels name="label" toName="text">` portion of the labeling configuration. The `to_name` must match the `toName` value. 

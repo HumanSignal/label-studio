@@ -10,11 +10,9 @@ meta_description: In data labeling projects, start evaluating annotator performa
 
 After multiple labelers have annotated tasks, review their output to validate the quality of the results. You can also perform this task after a model has predicted labels for tasks in your dataset. To configure the settings for reviewing annotations, see [Set up review settings for your project](setup_project.html#Set-up-review-settings-for-your-project).
 
-<div class="admonition enterprise">
-    <p class="admonition-title">enterprise</p>
-    <p>
+<div class="enterprise-only">
 The annotation review workflow is only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
-</p></div>
+</div>
 
 ## Why review annotations?
 
@@ -145,13 +143,16 @@ To see the specific annotations contributing to the agreement, do the following:
 ### Review agreement distribution across tasks
 You can also review the distribution of agreement percentages across project tasks. A bar chart depicts the number of tasks with a specific agreement percentage. The more tasks with higher agreement, the higher quality your dataset is likely to be. Clusters of agreement percentages for specific tasks might mean that some tasks are easier to label than others, while other tasks are more confusing and difficult to label consistently. 
 
+
 ## Review annotations against ground truth annotations 
 
 Define ground truth annotations in a Label Studio project. Use ground truth annotations to assess the quality of your annotated dataset. Review ground truths to make sure that annotators are accurately labeling data at the start of the project, and continually throughout the lifecycle of the training dataset creation.
 
 Label Studio Enterprise compares annotations from annotators and model predictions against the ground truth annotations for a task to calculate an accuracy score between 0 and 1.
 
-> Ground truth annotations are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Label Studio Features](label_studio_compare.html) to learn more.
+!!! note 
+    Ground truth annotations are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Label Studio Features](label_studio_compare.html) to learn more.
+
 
 ## Define ground truth annotations for a project
 
@@ -162,6 +163,7 @@ Set specific task annotations as ground truth annotations from the **Data Manage
 3. In the annotation sidebar for the task, click the star icon next to the annotation ID to set the annotation result as a ground truth.
 
 A task can only have one annotation set as the ground truth annotation for the task. If you set a new annotation for a task as a ground truth, the previous annotation for that task set as a ground truth is updated to no longer be a ground truth annotation. 
+
 
 ## Manage ground truth annotations for a project
 

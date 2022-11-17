@@ -32,10 +32,10 @@ jobs:
             commandArray = body.split(/\s+/)
             const contextCommand = commandArray[0].split('/')[1].trim();
             console.log("contextCommand: " + contextCommand)
-            console.log("::set-output name=command_state::known")
+            core.setOutput('command_state', 'known')
             if (! commands_list.includes(contextCommand)) {
-              console.log("::set-output name=command_state::unknown")
-              console.log(`::set-output name=command::${contextCommand}`)
+              core.setOutput('command_state', 'unknown')
+              core.setOutput('command', contextCommand)
             }
 
       - name: Slash Command Dispatch

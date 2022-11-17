@@ -1,8 +1,7 @@
 ---
 title: Install Label Studio Enterprise
-badge: <i class='ent'/></i>
 type: guide
-tier: all
+tier: enterprise
 order: 210
 meta_title: Install Label Studio Enterprise
 meta_description: Install, back up, and upgrade Label Studio Enterprise to create machine learning and data science projects on-premises.
@@ -42,8 +41,6 @@ Select the deployment scenario that best fits your labeling use case.
 - See [Secure Label Studio](security.html) for more details about security and hardening for Label Studio Enterprise. 
 - Instead of installing, you can also use [Label Studio Enterprise as a cloud offering](https://heartex.com/product). 
 
-<div class="admonition enterprise">
-    <p class="admonition-title">enterprise</p>
-    <p>
-To install Label Studio Community Edition, see <a href="install.html">Install and Upgrade Label Studio</a>. This page is specific to the Enterprise version of Label Studio.
-</p></div>
+<div class="enterprise-only">
+To install Label Studio Community Edition, see <a href="install.html">Install and Upgrade Label Studio</a> page which is specific to the Enterprise version of Label Studio.
+</div>

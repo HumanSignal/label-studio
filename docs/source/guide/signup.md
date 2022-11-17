@@ -25,7 +25,8 @@ If you want, you can create an account from the command line when you start Labe
 label-studio start --username <username> --password <password> [--user-token <token-at-least-5-chars>]
 ```
 
-> Note: The `--user-token` argument is optional. If you don't set the user token, one is automatically generated for the user. Use the user token for API access. The minimum token length is 5 characters. 
+!!! note 
+    The `--user-token` argument is optional. If you don't set the user token, one is automatically generated for the user. Use the user token for API access. The minimum token length is 5 characters. 
 
 ### Retrieve user info from the command line
 

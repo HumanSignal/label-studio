@@ -12,9 +12,8 @@ You can use the Label Studio API to import data for labeling, export annotations
 
 See the [API reference documentation](/api) for further guidance and interactive examples. If you want to write Python scripts using the API, use the [Label Studio Python SDK](sdk.html). 
 
-<div class="admonition enterprise">
-    <p class="admonition-title">enterprise</p>
-    <p>
+<div class="enterprise-only">
+<p>
 The Label Studio Enterprise API shares many endpoints with the Label Studio Community Edition API, but includes extra payload options and additional endpoints specific to Enterprise features. Access the full Label Studio Enterprise API reference documentation by doing the following:</p>
 <ol>
 <li>Log in to Label Studio Enterprise</li>

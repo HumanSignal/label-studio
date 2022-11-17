@@ -36,11 +36,10 @@ After you save a project, any other collaborator with access to the Label Studio
 
 Set up annotation settings to configure how you want annotators to perform labeling for your project.
 
-<div class="admonition enterprise">
-    <p class="admonition-title">enterprise</p>
-    <p>
+<div class="enterprise-only">
 Some annotation settings are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
-</p></div>
+</div>
+
 
 ### Set up instructions for data labelers 
 
@@ -53,7 +52,9 @@ In the project settings, you can add instructions and choose whether to show the
 
 Annotators can view instructions at any time when labeling by clicking the (i) button from the labeling interface.
 
-### <i class='ent'></i> Set up task distribution for labeling
+<div class="enterprise-only">
+
+### Set up task distribution for labeling
 Select how you want to distribute tasks to annotators for labeling. Different from task sampling, use this setting to choose whether you need to [assign annotators](manage_data.html##Assign-annotators-to-tasks) before they can start labeling.
 
 1. Within a project on the Label Studio UI, click **Settings**.
@@ -64,9 +65,14 @@ Select how you want to distribute tasks to annotators for labeling. Different fr
 
 Your changes save automatically. 
 
-> You can't assign annotators to tasks unless you select the **Manual** option. 
+!!! note
+    You can't assign annotators to tasks unless you select the **Manual** option. 
 
-### <i class='ent'></i> Set minimum annotations per task
+</div>
+
+<div class="enterprise-only">
+
+### Set minimum annotations per task
 
 By default, each task only needs to be annotated by one annotator. If you want multiple annotators to be able to annotate tasks, set the Overlap of Annotations for a project in the project settings.
 
@@ -76,6 +82,8 @@ By default, each task only needs to be annotated by one annotator. If you want m
 4. Choose whether to enforce the overlap for the default of 100% of tasks, or a smaller percentage. 
 5. Choose whether to show tasks that require multiple annotations, **tasks with overlap**, before other tasks that need to be annotated. 
 6. Your changes save automatically. Return to the **Data Manager** and assign annotators to the tasks so that they can annotate the tasks. 
+
+</div>
 
 #### How task overlap works
 
@@ -105,7 +113,8 @@ In Label Studio Community Edition, you can set up task sampling from the command
     2. On the **General** settings tab, under **Task Sampling**, choose between `Sequential sampling` and `Random sampling`. 
     3. Click **Save**. 
     
-<i class='ent'></i> In Label Studio Enterprise, you can set up task sampling in the annotation settings for a project.
+<div class="enterprise-only">
+In Label Studio Enterprise, you can set up task sampling in the annotation settings for a project.
 1. Within a project on the Label Studio UI, click **Settings**.
 2. Click **Annotation Settings**.
 3. Select your preferred method of task sampling:
@@ -115,7 +124,11 @@ In Label Studio Community Edition, you can set up task sampling from the command
 4. You can also choose whether to show tasks with ground truth labels first. 
    Your changes save automatically. 
 
-### <i class='ent'></i> Define the agreement metrics for annotation statistics
+</div>
+
+<div class="enterprise-only">
+
+### Define the agreement metrics for annotation statistics
 Annotation statistics such as annotator consensus are calculated using an agreement metric. If you want the agreement metric to calculate annotation or prediction agreement by requiring exact matching choices, choose that option in the annotation settings. For more about agreement metrics in Label Studio Enterprise, see [Annotation statistics](stats.html).
 
 1. Within a project on the Label Studio UI, click **Settings**.
@@ -125,15 +138,16 @@ Annotation statistics such as annotator consensus are calculated using an agreem
 
 Your changes save automatically. 
 
-## <i class='ent'></i> Set up review settings for your project
+</div>
+
+<div class="enterprise-only">
+## Set up review settings for your project
 
 Set up review settings to guide reviewers when they review annotated tasks. For more about reviewing annotations, see [Review annotations in Label Studio](quality.html)
 
-<div class="admonition enterprise">
-    <p class="admonition-title">enterprise</p>
-    <p>
 Review settings and the review stream are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
-</p></div>
+</div>
+
 
 ### Set up instructions for task reviewers 
 
@@ -154,7 +168,9 @@ Configure the reviewing settings for your project.
 4. Under **Reviewing Options**, choose whether to anonymize annotators when reviewing tasks. 
 Your changes save automatically.
    
-## <i class='ent'></i> Add members to a project
+<div class="enterprise-only">
+
+## Add members to a project
 
 In Label Studio Enterprise, you can [add members to a specific workspace](manage_users.html#Add-or-remove-members-to-a-workspace) or add members to a specific project within a workspace. 
 
@@ -165,8 +181,12 @@ To add members to a specific project, do the following:
 4. Click **Save**.
 
 After adding a member to a project, you can [assign them as a reviewer](quality.html#Assign-reviewers-to-tasks) or [assign them as an annotator](manage_data.html#Assign-annotators-to-tasks) to tasks in the project. 
-   
-## <i class='ent'></i> Publish project to annotators
+
+</div>
+
+<div class="enterprise-only">
+
+## Publish project to annotators
 
 In Label Studio Enterprise, you can hide projects from annotators so that you can fully configure the project before annotators can start labeling. When you're ready for annotators to start labeling, publish the project to annotators.
 
@@ -179,7 +199,11 @@ To publish a project, do the following:
 1. Open a project and navigate to the project **Dashboard**.
 2. Click **Publish**. <br/>After the project is published, annotators can view the project and start being assigned tasks according to the method that you use to [distribute tasks for labeling](#Set-up-task-distribution-for-labeling).
 
-## <i class='ent'></i> Create a project template
+</div>
+
+<div class="enterprise-only">
+
+## Create a project template
 
 If you want to easily create a project with the same labeling interface as an existing project in Label Studio Enterprise, create and use a project template.
 
@@ -196,6 +220,7 @@ After you create a project template, you can use the template when you create a 
     - Click **Import** to import data.
     - Click **Data Manager** to start annotating.
     
+</div>
 
 ## Where Label Studio stores your project data and configurations
 
@@ -221,6 +246,5 @@ In versions of Label Studio earlier than 1.0.0, the project directory is structu
 │   │   ├── 2020-03-06-15-23-47.zip
 ```
 
-> Warning: Modifying any of the internal project files is not recommended and can lead to unexpected behavior. Use the Label Studio UI or command line arguments (run `label-studio start --help`) to import tasks, export completed annotations, or to change label configurations. 
-
-
+!!! Warning
+    Modifying any of the internal project files is not recommended and can lead to unexpected behavior. Use the Label Studio UI or command line arguments (run `label-studio start --help`) to import tasks, export completed annotations, or to change label configurations. 

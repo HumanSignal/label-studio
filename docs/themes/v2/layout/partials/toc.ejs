@@ -1,104 +1,102 @@
 <% const isEnterpriseTheme = theme.tier === "enterprise" %>
 
-<%- partial("component/heading", {text: "Docs", size: "XXSmall", tag: "h2"}) %>
+<%- partial("component/heading", {text: "Docs", size: "XXSmall", tag: "h2", href: "/guide/"}) %>
 
   <ul class="page-sidebar-list">
-    <% site.pages.filter(page => page.type === type && (page.tier === theme.tier || page.tier === "all" || page.type === "tags" || page.type === "playground" || page.type === "templates")).sort('order').each(function (p) { %>
-    <% var fileName = p.path.replace(/^.+?\/([\w-]+)\.html/, '$1') %>
+    <% const pages = site.pages.filter(page => page.type === type && (page.tier === theme.tier || page.tier === "all" || page.type === "tags" || page.type === "playground" || page.type === "templates")).sort('order'); %>
+    <% const parentPages = pages.filter(page => page.parent === undefined) %>
+    <% const childrenPages = pages.filter(page => page.parent !== undefined) %>
 
-    <% if (type === 'guide') { %>
-      <% if (fileName === 'install') { %>
-        </ul><%- partial("component/text", {text: "Install and Upgrade", size: "Eyebrow", tag: "h3"}) %><ul>
-      <% } %>
-      <% if (fileName === 'install_enterprise') { %>
-        </ul><%- partial("component/text", {text: "Deploy and Install Enterprise", size: "Eyebrow", tag: "h3"}) %><ul>
-      <% } %>
-      <% if (fileName === 'security') { %>
-        </ul><%- partial("component/text", {text: "Security and Privacy", size: "Eyebrow", tag: "h3"}) %><ul>
-      <% } %>
-      <% if (fileName === 'signup') { %>
-        </ul><%- partial("component/text", {text: "Manage Users", size: "Eyebrow", tag: "h3"}) %><ul>
-      <% } %>
-      <% if (fileName === 'tasks') { %>
-        </ul><%- partial("component/text", {text: "Import Data", size: "Eyebrow", tag: "h3"}) %><ul>
-      <% } %>
-       <% if (fileName === 'setup_project') { %>
-        </ul><%- partial("component/text", {text: "Labeling and Projects", size: "Eyebrow", tag: "h3"}) %><ul>
-      <% } %>
-      <% if (fileName === 'quality') { %>
-        </ul><%- partial("component/text", {text: "Manage Annotations", size: "Eyebrow", tag: "h3"}) %><ul>
-      <% } %>
-      <% if (fileName === 'ml') { %>
-        </ul><%- partial("component/text", {text: "Machine Learning Setup", size: "Eyebrow", tag: "h3"}) %><ul>
-      <% } %>
-      <% if (fileName === 'webhooks') { %>
-        </ul><%- partial("component/text", {text: "Integrations", size: "Eyebrow", tag: "h3"}) %><ul>
-      <% } %>
-      <% if (fileName === 'frontend') { %>
-        </ul><%- partial("component/text", {text: "Advanced Development", size: "Eyebrow", tag: "h3"}) %><ul>
-      <% } %> %>
+    <% const pagesArray = parentPages.map(page => {
+      var fileName = page.path.replace(/^.+?\/([\w-]+)\.html/, '$1')
+      let childPages = childrenPages.filter(child => child.parent === fileName);
 
-    <% } %>
+      return {
+        page: page,
+        fileName: fileName,
+        childPages: childPages
+      }
+    }) %>
 
-      <% if (type === 'tags') { %>
+    <%
+      const headers = [
+        {
+          type: "guide",
+          headers: {
+            'install': 'Install and Upgrade',
+            'install_enterprise': 'Deploy and Install Enterprise',
+            'security': 'Security and Privacy',
+            'signup': 'Manage Users',
+            'tasks': 'Import Data',
+            'setup_project': 'Labeling and Projects',
+            'quality': 'Manage Annotations',
+            'ml': 'Machine Learning Setup',
+            'webhooks': 'Integrations',
+            'frontend': 'Advanced Development'
+          }
+        },
+        {
+          type: "tags",
+          headers: {
+            "audio": "Object Tags",
+            "brush": "Control Tags",
+            "collapse": "Visual & Experience Tags"
+          }
+        },
+        {
+          type: "templates",
+          headers: {
+            "image_polygons": "Computer Vision",
+            "question_answering": "Natural Language Processing",
+            "transcribe_audio": "Audio/Speech Processing",
+            "response_generation": "Conversational AI",
+            "freeform_metadata": "Structured Data Parsing",
+            "pairwise_regression": "Ranking and Scoring",
+            "time_series_forecasting": "Time Series Analysis",
+            "video_classification": "Videos",
+            "gallery_cv": "Template Galleries"
+          }
+        }
+      ]
+    %>
 
-
-      <% if (fileName === 'audio') { %>
-        </ul><%- partial("component/text", {text: "Object Tags", size: "Eyebrow", tag: "h3"}) %><ul>
-      <% } %>
-
-      <% if (fileName === 'brush') { %>
-        </ul><%- partial("component/text", {text: "Control Tags", size: "Eyebrow", tag: "h3"}) %><ul>
-      <% } %>
-
-      <% if (fileName === 'collapse') { %>
-      </ul><%- partial("component/text", {text: "Visual & Experience Tags", size: "Eyebrow", tag: "h3"}) %><ul>
-      <% } %>
-
-      <% } %>
-
-      <% if (type==="templates") { %>
-
-        <% if (fileName === 'image_polygons') { %>
-          </ul><%- partial("component/text", {text: "Computer Vision", size: "Eyebrow", tag: "h3"}) %><ul>
+    <% var tocHeader = pagesArray[0].page.section %>
+    <% pagesArray.forEach(function (p, index) { %>
+      <% if((index === 0 || tocHeader !== p.page.section)) { %>
+        </ul>
+          <% if(locals.component === "nav") { %>
+            <button>
+              <%- p.page.section %>
+              <svg width="13" height="8" viewBox="0 0 13 8" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292969 0.805007L1.00008 0.0979004L6.64652 5.74435L12.293 0.0979004L13.0001 0.805007L6.64652 7.15856L0.292969 0.805007Z" />
+              </svg>
+            </button>
+          <% } else { %>
+            <%- partial("component/text", {text: p.page.section, size: "Eyebrow", tag: "h3"}) %>
+          <% } %>
+        <ul class="page-sidebar-list">
+      <% }
+      tocHeader = p.page.section;
+      %>
+      <li>
+        <a href="<%- url_for(p.page.path) %>" class="<%- p.page.is_new ? ' new' : '' %>" <%- page.title === p.page.title ? 'aria-current="page"' : '' %>>
+        <%- p.page.short ? p.page.short: p.page.title %></a>
+        <% if(p.childPages.length > 0) {%>
+          <% const activeChildPage = p.childPages.filter(child => page.title === child.title || page.title === p.page.title) %>
+          <button class="page-sidebar-toggle-children-list<%- activeChildPage.length > 0 ? ' active' : ''%>">
+            <svg width="13" height="8" viewBox="0 0 13 8" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292969 0.805007L1.00008 0.0979004L6.64652 5.74435L12.293 0.0979004L13.0001 0.805007L6.64652 7.15856L0.292969 0.805007Z" />
+            </svg>
+          </button>
+          <ul class="page-sidebar-children-list<%- activeChildPage.length > 0 ? ' page-sidebar-children-list-active' : ''%>">
+          <% p.childPages.forEach(child => { %>
+            <li>
+              <a href="<%- url_for(child.path) %>" class="<%- child.is_new ? ' new' : '' %>" <%- page.title === child.title ? 'aria-current="page"' : '' %>>
+              <%- child.short ? child.short: child.title %></a>
+            </li>
+          <% }) %>
+          </ul>
         <% } %>
-
-        <% if (fileName === 'question_answering') { %>
-          </ul><%- partial("component/text", {text: "Natural Language Processing", size: "Eyebrow", tag: "h3"}) %><ul>
-        <% } %>
-
-        <% if (fileName === 'transcribe_audio') { %>
-          </ul><%- partial("component/text", {text: "Audio/Speech Processing", size: "Eyebrow", tag: "h3"}) %><ul>
-        <% } %>
-
-        <% if (fileName === 'response_generation') { %>
-          </ul><%- partial("component/text", {text: "Conversational AI", size: "Eyebrow", tag: "h3"}) %><ul>
-        <% } %>
-
-        <% if (fileName === 'freeform_metadata') { %>
-          </ul><%- partial("component/text", {text: "Structured Data Parsing", size: "Eyebrow", tag: "h3"}) %><ul>
-        <% } %>
-
-        <% if (fileName === 'pairwise_regression') { %>
-          </ul><%- partial("component/text", {text: "Ranking and Scoring", size: "Eyebrow", tag: "h3"}) %><ul>
-        <% } %>
-
-        <% if (fileName === 'time_series_forecasting') { %>
-          </ul><%- partial("component/text", {text: "Time Series Analysis", size: "Eyebrow", tag: "h3"}) %><ul>
-        <% } %>
-
-        <% if (fileName === 'video_classification') { %>
-          </ul><%- partial("component/text", {text: "Videos", size: "Eyebrow", tag: "h3"}) %><ul>
-        <% } %>
-
-        <% if (fileName === 'gallery_cv') { %>
-          </ul><%- partial("component/text", {text: "Template Galleries", size: "Eyebrow", tag: "h3"}) %><ul>
-        <% } %>
-
-      <% } %>
-    <li>
-      <a href="<%- url_for(p.path) %>" class="<%- p.is_new ? ' new' : '' %>" <%- page.title === p.title ? 'aria-current="page"' : '' %>>
-        <%- p.short ? p.short: p.title %></a>
-    </li>
+      </li>
     <% }) %>
 </ul>
