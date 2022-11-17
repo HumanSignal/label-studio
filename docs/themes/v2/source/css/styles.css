@@ -143,6 +143,10 @@ body {
   display: none;
 }
 
+.page-header-chevron-icon path {
+  stroke: var(--color-gray-900);
+}
+
 .page-header nav > button + ul ul {
   background-color: var(--color-gray-100);
   margin-left: -2em;
@@ -497,7 +501,7 @@ main {
 .content-markdown blockquote p,
 .collapse summary {
   --min-size: 1.75rem; /* 28px */
-  --max-size: 2.25rem; /* 36px */
+  --max-size: 1.75rem; /* 28px */
   --breakpoint: 5vw;
   --line-height: 100%;
 
@@ -531,7 +535,7 @@ main {
 .Heading.Large,
 .content-markdown h2 {
   --min-size: 2rem; /* 32px */
-  --max-size: 2.75rem; /* 44px */
+  --max-size: 2.25rem; /* 36px */
   --line-height: 106%;
 }
 
@@ -742,6 +746,7 @@ main {
 .toc-list a {
   color: var(--color-gray-900);
   text-decoration: none;
+  font-size: 0.875rem;
 }
 
 .toc-list a:hover {
@@ -867,17 +872,6 @@ main {
   display: inline-block;
   color: var(--color-title);
   margin: 0;
-}
-
-.content-markdown .admonition.note {
-  --color-border: transparent;
-  padding-left: 0;
-  padding-right: 0;
-  font-style: italic;
-}
-
-.content-markdown .admonition.note .admonition-title {
-  font-style: normal;
 }
 
 .content-markdown .admonition.attention {
@@ -1733,6 +1727,19 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
 
 .page-tier-enterprise .enterprise-only {
   display: block;
+}
+
+.page-tier-enterprise .page-header-chevron-icon path {
+  stroke: var(--color-white);
+}
+
+.page-tier-enterprise .HeaderLogo {
+  flex-basis: 12em;
+  flex-grow: 1;
+}
+
+.page-tier-enterprise .HeaderLogo svg {
+  max-width: 100%;
 }
 
 @media (max-width: 1150px) {
