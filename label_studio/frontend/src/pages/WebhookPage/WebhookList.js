@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
 import { LsCross, LsPencil, LsPlus } from '../../assets/icons';
 import { Button } from '../../components';
-import { Form, Label, Input, Toggle } from '../../components/Form';
+import { Form, Input, Label, Toggle } from '../../components/Form';
 import { modal } from '../../components/Modal/Modal';
-import { Elem, Block } from '../../utils/bem';
+import { Block, Elem } from '../../utils/bem';
 import "./WebhookPage.styl";
 import { format } from 'date-fns';
 import { useAPI } from '../../providers/ApiProvider';
@@ -19,6 +19,7 @@ const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) 
 
   const onActiveChange = useCallback( async (event) => {
     let value = event.target.checked;
+
     await api.callApi('updateWebhook', {
       params: {
         pk: event.target.name,
@@ -28,57 +29,62 @@ const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) 
       },
     });
     await fetchWebhooks();
-  }, [api]);
+  }, []);
 
-  return <Block name='webhook'>
-    <Elem name='controls'>
-      <Button onClick={onAddWebhook}>
+  return (
+    <Block name='webhook'>
+      <Elem name='controls'>
+        <Button onClick={onAddWebhook}>
         Add Webhook
-      </Button>
-    </Elem>
-    <Elem>
-      {webhooks.length === 0? 
-        null
-        :
-        <Block name='webhook-list'>
-          {
-            webhooks.map(
-              (obj) => <Elem key={obj.id} name='item'>
-                <Elem name='item-active'>
-                  <Toggle
-                    name={obj.id}
-                    checked={obj.is_active}
-                    onChange={onActiveChange} 
-                  />
-                </Elem>
-                <Elem name='item-url' onClick={() => onSelectActive(obj.id)}>
-                  {obj.url}
-                </Elem>
-                <Elem name='item-date'>
+        </Button>
+      </Elem>
+      <Elem>
+        {webhooks.length === 0?
+          null
+          : (
+            <Block name='webhook-list'>
+              {
+                webhooks.map(
+                  (obj) => (
+                    <Elem key={obj.id} name='item'>
+                      <Elem name='item-active'>
+                        <Toggle
+                          name={obj.id}
+                          checked={obj.is_active}
+                          onChange={onActiveChange}
+                        />
+                      </Elem>
+                      <Elem name='item-url' onClick={() => onSelectActive(obj.id)}>
+                        {obj.url}
+                      </Elem>
+                      <Elem name='item-date'>
                   Created {format(new Date(obj.created_at), 'dd MMM yyyy, HH:mm')}
-                </Elem>
-                <Elem name='item-control'>
-                  <Button
-                    onClick={() => onSelectActive(obj.id)}
-                    icon={<LsPencil />}
-                  >Edit</Button>
-                  <Button
-                    onClick={()=> WebhookDeleteModal({ 
-                      onDelete: async ()=>{
-                        await api.callApi('deleteWebhook', {params:{pk:obj.id}});
-                        await fetchWebhooks();
-                      },
-                    })}
-                    look='danger'
-                    icon={<LsCross />}
-                  >Delete</Button>
-                </Elem>
-              </Elem>,
-            )
-          }
-        </Block>}
-    </Elem>
-  </Block>;
+                      </Elem>
+                      <Elem name='item-control'>
+                        <Button
+                          onClick={() => onSelectActive(obj.id)}
+                          icon={<LsPencil />}
+                        >Edit</Button>
+                        <Button
+                          onClick={()=> WebhookDeleteModal({
+                            onDelete: async ()=>{
+                              await api.callApi('deleteWebhook', { params:{ pk:obj.id } });
+                              await fetchWebhooks();
+                            },
+                          })}
+                          look='danger'
+                          icon={<LsCross />}
+                        >Delete</Button>
+                      </Elem>
+                    </Elem>
+                  ),
+                )
+              }
+            </Block>
+          )}
+      </Elem>
+    </Block>
+  );
 };
 
 
