@@ -5,6 +5,7 @@ badge: <i class='ent'/></i>
 type: guide
 tier: all
 order: 120
+section: "Install"
 meta_title: Release notes for Label Studio Enterprise
 meta_description: Discover what's new and improved, and review bug fixes, in the release notes and changelog for Label Studio Enterprise.
 ---

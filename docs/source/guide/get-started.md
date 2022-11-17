@@ -6,6 +6,7 @@ tier: all
 order: 100
 meta_title: Get Started with Label Studio
 meta_description: Get started with Label Studio by creating projects to label and annotate data for machine learning and data science models.
+section: "Overview"
 ---
 
 ## What is Label Studio?
