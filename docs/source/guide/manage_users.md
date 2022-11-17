@@ -10,9 +10,9 @@ meta_description: Manage access and set up permissions with user roles, organiza
 
 Manage access to projects, organizations, and workspaces in Label Studio to restrict who can view data, annotations, and predictions in your data labeling projects. 
 
-<div class="enterprise-only"><p>
+<div class="enterprise-only">
 Role-based access control, organizations, and workspaces are available only in Label Studio Enterprise Edition. For information about users in the open source Label Studio Community Edition, see <a href="signup.html">Set up user accounts for Label Studio</a>.
-</p></div>
+</div>
 
 ## Roles in Label Studio Enterprise
 

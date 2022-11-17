@@ -315,7 +315,7 @@ Review the full list of JSON properties in the [API documentation](api.html).
 | predictions.score | The overall score of the result, based on the probabilistic output, confidence level, or other. | 
 
 
-<div class="enterprise-only"><p>
+<div class="enterprise-only">
 Enterprise fields are presented in export:
 
 | JSON property name | Description |
@@ -324,7 +324,7 @@ Enterprise fields are presented in export:
 | reviews.id | ID of the specific annotation review. |
 | reviews.created_by |  Dictionary containing user ID, email, first name and last name of the user performing the review. |
 | reviews.accepted |  Boolean. Whether the reviewer accepted the annotation as part of their review. | 
-</p></div>
+</div>
 
 <!-- md image_units.md -->
 

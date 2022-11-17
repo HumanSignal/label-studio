@@ -41,6 +41,6 @@ Select the deployment scenario that best fits your labeling use case.
 - See [Secure Label Studio](security.html) for more details about security and hardening for Label Studio Enterprise. 
 - Instead of installing, you can also use [Label Studio Enterprise as a cloud offering](https://heartex.com/product). 
 
-<div class="enterprise-only"><p>
+<div class="enterprise-only">
 To install Label Studio Community Edition, see <a href="install.html">Install and Upgrade Label Studio</a> page which is specific to the Enterprise version of Label Studio.
-</p></div>
+</div>
