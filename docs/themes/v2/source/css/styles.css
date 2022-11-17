@@ -378,6 +378,7 @@ main {
   background-color: transparent;
   border: 0;
   padding: 0;
+  cursor: pointer;
 }
 
 .page-sidebar .page-sidebar-toggle-children-list svg {
@@ -493,7 +494,8 @@ main {
 .content-markdown h4,
 .content-markdown h5,
 .content-markdown h6,
-.content-markdown blockquote p {
+.content-markdown blockquote p,
+.collapse summary {
   --min-size: 1.75rem; /* 28px */
   --max-size: 2.25rem; /* 36px */
   --breakpoint: 5vw;
@@ -547,7 +549,8 @@ main {
 
 .Heading.XSmall,
 .content-markdown h5,
-.content-markdown blockquote p {
+.content-markdown blockquote p,
+.collapse summary {
   --min-size: 1rem; /* 16px */
   --max-size: 1.5rem; /* 24px */
   --line-height: 100%;
@@ -950,6 +953,46 @@ main {
   display: none;
 }
 
+.collapse {
+  margin-top: 2rem;
+}
+
+.collapse summary {
+ border-bottom: 1px solid var(--color-gray-300);
+ padding: 0 1rem 1rem 1rem;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+}
+
+.collapse + .collapse {
+  margin-top: 1.5rem;
+}
+
+.collapse summary::marker {
+  content: "";
+}
+
+.collapse-plus-icon {
+  display: block;
+}
+
+.collapse-minus-icon {
+  display: none;
+}
+
+.collapse[open] .collapse-plus-icon {
+  display: none;
+}
+
+.collapse[open] .collapse-minus-icon {
+  display: block;
+}
+
+.collapse-content {
+  padding: 0 1rem 1rem 1rem;
+}
+
 .breadcrumb {
   display: flex;
   flex-wrap: wrap;
@@ -1311,28 +1354,6 @@ Footer
   gap: 0.25em;
   padding: 0.5em;
 }
-
-
-
-
-
-
-/****************************
-  Temporary styles
-****************************/
-
-.badge-design {
-  background-color: red;
-  color: white;
-  padding: 0.25em;
-  font-size: 1rem;
-  font-family: var(--font-family-secondary);
-  vertical-align: middle;
-}
-
-
-
-
 
 /****************************
   Code theme

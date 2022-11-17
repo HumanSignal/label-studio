@@ -52,7 +52,6 @@ To see all the available options for the initialization of LabelStudio object, s
 
 {% collapse "Using modern JS techniques (recommended)" %}
 
-#### Using modern JS techniques (recommended)
 This guide assumes that you're using a bundler like Webpack or Rollup to assemble your JS bundles, and LSF is installed via a package manager.
 
 In your HTML add the following code:
@@ -116,7 +115,7 @@ labelStudio.on("submitAnnotation", (LS, annotation) => {
 {% endcollapse %}
 
 {% collapse "Using plain HTML and JS" %}
-#### Using plain HTML and JS
+
 This technique is useful if you're not using a bundler or if you want to use the LSF in a static HTML page.
 
 ```xhtml

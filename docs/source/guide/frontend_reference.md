@@ -337,7 +337,6 @@ Region is deleted.
 
 
 {% collapse "Callbacks (deprecated)" %}
-  ## Callbacks (deprecated)
 
   Callbacks can be used to execute actions based on user interaction with the interface. For example, label-studio server uses callbacks to communicate with an API. Pass them along with other options when initiating the instance.
 
