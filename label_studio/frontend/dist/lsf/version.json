@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-1852: Fix missing labels on video regions",
-  "commit": "81d187d2c4147111167abd2a75a71db95f1b9d2e",
-  "branch": "master",
-  "date": "2022/11/15 21:25:30"
+  "message": "fix: DEV-3666: Fix maxUsages on regions creation",
+  "commit": "1979626f773517e0dea6f82134c09d10373367c3",
+  "branch": "fb-dev-3666/max-usages",
+  "date": "2022/11/17 05:42:01"
 }
