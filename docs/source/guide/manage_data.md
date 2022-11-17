@@ -58,7 +58,7 @@ Tabs that you create depend on your [labeling configuration setup](setup.html), 
 !!! note 
     If you make changes to the labeling configuration, any tabs in your data manager are removed. Make sure to finish the project setup before setting up complex tabs in the Data Manager.
 
-<div class="enterprise-only"><p>
+<div class="enterprise-only">
 
 ## Assign annotators to tasks
 
@@ -71,7 +71,7 @@ In Label Studio Enterprise, if you're an administrator or project manager, you c
 
 If you want to bulk assign tasks, you can use filters to identify exactly the tasks that you want to assign, then select the top checkbox on the data manager to select all tasks shown and assign them to an annotator.
 
-</p> </div>
+</div>
 
 
 ## Delete tasks or annotations
