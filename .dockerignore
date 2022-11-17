@@ -7,6 +7,8 @@
 !deploy/requirements-mw.txt
 !deploy/requirements.txt
 !deploy/heroku_run.sh
+!deploy/uwsgi.ini
+!deploy/default.conf
 !label_studio/**
 !setup.py
 !README.md

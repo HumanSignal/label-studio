@@ -51,8 +51,10 @@ Use with the following data types: HTML
 ```
 
 ### Example
+
+Labeling configuration to label HTML content
+
 ```html
-<!--Labeling configuration to label HTML content -->
 <View>
   <HyperText name="text-1" value="$text" />
   <Labels name="parts" toName="text-1">

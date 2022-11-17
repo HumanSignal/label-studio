@@ -10,14 +10,18 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django_rq import job
 
+from core.feature_flags import flag_set
 from tasks.models import Task, Annotation
 from tasks.serializers import PredictionSerializer, AnnotationSerializer
 from data_export.serializers import ExportDataSerializer
 
-from core.redis import redis_connected
-from core.utils.common import get_bool_env, load_func
-from io_storages.utils import get_uri_via_regex
+from core.redis import is_job_in_queue, redis_connected, is_job_on_worker
+from core.utils.common import load_func
+from core.utils.params import get_bool_env
+from label_studio_tools.core.utils.params import get_bool_env
 
+from io_storages.utils import get_uri_via_regex
+from django.contrib.auth.models import AnonymousUser
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +38,8 @@ class Storage(models.Model):
     last_sync_count = models.PositiveIntegerField(
         _('last sync count'), null=True, blank=True, help_text='Count of tasks synced last time'
     )
+
+    last_sync_job = models.CharField(_('last_sync_job'), null=True, blank=True, max_length=256, help_text='Last sync job ID')
 
     def validate_connection(self, client=None):
         pass
@@ -76,7 +82,7 @@ class ImportStorage(Storage):
             http_url = self.generate_http_url(extracted_uri)
             return uri.replace(extracted_uri, http_url)
         except Exception as exc:
-            logger.error(f'Can\'t resolve URI={uri}. Reason: {exc}', exc_info=True)
+            logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
 
     def _scan_and_create_links(self, link_class):
         tasks_created = 0
@@ -96,7 +102,7 @@ class ImportStorage(Storage):
             try:
                 data = self.get_data(key)
             except (UnicodeDecodeError, json.decoder.JSONDecodeError) as exc:
-                logger.error(exc, exc_info=True)
+                logger.debug(exc, exc_info=True)
                 raise ValueError(
                     f'Error loading JSON from file "{key}".\nIf you\'re trying to import non-JSON data '
                     f'(images, audio, text, etc.), edit storage settings and enable '
@@ -137,21 +143,23 @@ class ImportStorage(Storage):
                 logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
                 tasks_created += 1
 
+                raise_exception = not flag_set('ff_fix_back_dev_3342_storage_scan_with_invalid_annotations', user=AnonymousUser())
+
                 # add predictions
                 logger.debug(f'Create {len(predictions)} predictions for task={task}')
                 for prediction in predictions:
                     prediction['task'] = task.id
                 prediction_ser = PredictionSerializer(data=predictions, many=True)
-                prediction_ser.is_valid(raise_exception=True)
-                prediction_ser.save()
+                if prediction_ser.is_valid(raise_exception=raise_exception):
+                    prediction_ser.save()
 
                 # add annotations
                 logger.debug(f'Create {len(annotations)} annotations for task={task}')
                 for annotation in annotations:
                     annotation['task'] = task.id
                 annotation_ser = AnnotationSerializer(data=annotations, many=True)
-                annotation_ser.is_valid(raise_exception=True)
-                annotation_ser.save()
+                if annotation_ser.is_valid(raise_exception=raise_exception):
+                    annotation_ser.save()
 
                 # FIXME: add_annotation_history / post_process_annotations should be here
 
@@ -172,9 +180,15 @@ class ImportStorage(Storage):
     def sync(self):
         if redis_connected():
             queue = django_rq.get_queue('low')
-            job = queue.enqueue(sync_background, self.__class__, self.id)
-            # job_id = sync_background.delay()  # TODO: @niklub: check this fix
-            logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
+            meta = {'project': self.project.id, 'storage': self.id}
+            if not is_job_in_queue(queue, "sync_background", meta=meta) and \
+                    not is_job_on_worker(job_id=self.last_sync_job, queue_name='default'):
+                job = queue.enqueue(sync_background, self.__class__, self.id,
+                                    meta=meta)
+                self.last_sync_job = job.id
+                self.save()
+                # job_id = sync_background.delay()  # TODO: @niklub: check this fix
+                logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
         else:
             logger.info(f'Start syncing storage {self}')
             self.scan_and_create_links()
@@ -184,7 +198,7 @@ class ImportStorage(Storage):
 
 
 @job('low')
-def sync_background(storage_class, storage_id):
+def sync_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.scan_and_create_links()
 
@@ -217,7 +231,7 @@ class ExportStorage(Storage):
     def sync(self):
         if redis_connected():
             queue = django_rq.get_queue('low')
-            job = queue.enqueue(export_sync_background, self.__class__, self.id)
+            job = queue.enqueue(export_sync_background, self.__class__, self.id, job_timeout=settings.RQ_LONG_JOB_TIMEOUT)
             logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
         else:
             logger.info(f'Start syncing storage {self}')
@@ -227,7 +241,7 @@ class ExportStorage(Storage):
         abstract = True
 
 
-@job('low', timeout=3600)
+@job('low', timeout=settings.RQ_LONG_JOB_TIMEOUT)
 def export_sync_background(storage_class, storage_id):
     storage = storage_class.objects.get(id=storage_id)
     storage.save_all_annotations()

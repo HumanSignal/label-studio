@@ -5,12 +5,13 @@ import logging
 import os
 import datetime
 import numbers
+import time
 
 from urllib.parse import urljoin, quote
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.db import models, transaction
+from django.db import models, transaction, OperationalError
 from django.db.models import Q
 from django.db.models.signals import post_delete, pre_save, post_save, pre_delete
 from django.utils.translation import gettext_lazy as _
@@ -23,6 +24,7 @@ from django.core.files.storage import default_storage
 from rest_framework.exceptions import ValidationError
 
 from core.feature_flags import flag_set
+from core.redis import start_job_async_or_sync
 from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func, \
     temporary_disconnect_list_signal
 from core.utils.params import get_env
@@ -75,6 +77,20 @@ class Task(TaskMixin, models.Model):
                                                 help_text='Number of total cancelled annotations for the current task')
     total_predictions = models.IntegerField(_('total_predictions'), default=0, db_index=True,
                                   help_text='Number of total predictions for the current task')
+
+    comment_count = models.IntegerField(
+        _('comment count'), default=0, db_index=True,
+        help_text='Number of comments in the task including all annotations')
+    unresolved_comment_count = models.IntegerField(
+        _('unresolved comment count'), default=0, db_index=True,
+        help_text='Number of unresolved comments in the task including all annotations')
+    comment_authors = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, blank=True, default=None,
+        related_name='tasks_with_comments', help_text='Users who wrote comments')
+    last_comment_updated_at = models.DateTimeField(
+        _('last comment updated at'), default=None, null=True, db_index=True,
+        help_text='When the last comment was updated')
+
     objects = TaskManager()  # task manager by default
     prepared = PreparedTaskManager()  # task manager with filters, ordering, etc for data_manager app
 
@@ -205,9 +221,13 @@ class Task(TaskMixin, models.Model):
                 # file saved in django file storage
                 if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(task_data[field]):
                     # permission check: resolve uploaded files to the project only
-                    file_upload = FileUpload.objects.filter(project=project, file=task_data[field])
-                    if file_upload.exists():
-                        task_data[field] = default_storage.url(name=task_data[field])
+                    file_upload = None
+                    file_upload = FileUpload.objects.filter(project=project, file=task_data[field]).first()
+                    if file_upload is not None:
+                        if flag_set('ff_back_dev_2915_storage_nginx_proxy_26092022_short', self.project.organization.created_by):
+                            task_data[field] = file_upload.url
+                        else:
+                            task_data[field] = default_storage.url(name=task_data[field])
                     # it's very rare case, e.g. user tried to reimport exported file from another project
                     # or user wrote his django storage path manually
                     else:
@@ -220,7 +240,7 @@ class Task(TaskMixin, models.Model):
                     try:
                         resolved_uri = storage.resolve_uri(task_data[field])
                     except Exception as exc:
-                        logger.error(exc, exc_info=True)
+                        logger.debug(exc, exc_info=True)
                         resolved_uri = None
                     if resolved_uri:
                         task_data[field] = resolved_uri
@@ -275,7 +295,7 @@ class Task(TaskMixin, models.Model):
         self.annotations.exclude(id=annotation_id).update(ground_truth=False)
 
     def save(self, *args, **kwargs):
-        if flag_set('ff_back_2070_inner_id_12052022_short', self.project.organization.created_by):
+        if flag_set('ff_back_2070_inner_id_12052022_short', AnonymousUser):
             if self.inner_id == 0:
                 task = Task.objects.filter(project=self.project).order_by("-inner_id").first()
                 max_inner_id = 1
@@ -298,6 +318,11 @@ class Task(TaskMixin, models.Model):
         ]
         with temporary_disconnect_list_signal(signals):
             queryset.delete()
+
+    @staticmethod
+    def delete_tasks_without_signals_from_task_ids(task_ids):
+        queryset = Task.objects.filter(id__in=task_ids)
+        Task.delete_tasks_without_signals(queryset)
 
 pre_bulk_create = Signal(providing_args=["objs", "batch_size"])
 post_bulk_create = Signal(providing_args=["objs", "batch_size"])
@@ -450,7 +475,7 @@ class AnnotationDraft(models.Model):
         _('result'),
         help_text='Draft result in JSON format')
     lead_time = models.FloatField(
-        _('lead time'),
+        _('lead time'), blank=True, null=True,
         help_text='How much time it took to annotate the task')
     task = models.ForeignKey(
         'tasks.Task', on_delete=models.CASCADE, related_name='drafts', blank=True, null=True,
@@ -461,6 +486,12 @@ class AnnotationDraft(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='drafts', on_delete=models.CASCADE,
         help_text='User who created this draft')
+    was_postponed = models.BooleanField(
+        _('was postponed'),
+        default=False,
+        help_text='User postponed this draft (clicked a forward button) in the label stream',
+        db_index=True
+    )
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last update time')
@@ -739,8 +770,13 @@ def bulk_update_stats_project_tasks(tasks):
         # update objects without saving
         for task in tasks:
             update_task_stats(task, save=False)
-        # start update query batches
-        bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+        try:
+            # start update query batches
+            bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+        except OperationalError as exp:
+            logger.debug("Operational error while updating task ")
+            # try to update query batches one more time
+            start_job_async_or_sync(bulk_update, tasks, in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \

@@ -219,13 +219,12 @@ class ImportAPI(generics.CreateAPIView):
             annotation_count = len(serializer.db_annotations)
             prediction_count = len(serializer.db_predictions)
             # Update tasks states if there are related settings in project
-            # after bulk create we can bulk update tasks stats with
-            # flag_update_stats=True but they are already updated with signal in same transaction
-            # so just update tasks_number_changed
-            project.update_tasks_states_with_counters(
-                maximum_annotations_changed=False,
-                overlap_cohort_percentage_changed=False,
-                tasks_number_changed=True,
+            # after bulk create we can bulk update tasks stats
+            project.update_tasks_states(maximum_annotations_changed=False,
+                                        overlap_cohort_percentage_changed=False,
+                                        tasks_number_changed=True)
+            # Update counters (like total_annotations) for new tasks
+            project.update_tasks_counters(
                 tasks_queryset=tasks
             )
             logger.info('Tasks bulk_update finished')
@@ -312,7 +311,7 @@ class ReImportAPI(ImportAPI):
                 'file_upload_ids': [],
                 'found_formats': {},
                 'data_columns': []
-            }, status=status.HTTP_204_NO_CONTENT)
+            }, status=status.HTTP_200_OK)
 
         tasks, found_formats, data_columns = FileUpload.load_tasks_from_uploaded_files(
             project, file_upload_ids,  files_as_tasks_list=files_as_tasks_list)
@@ -323,13 +322,12 @@ class ReImportAPI(ImportAPI):
         duration = time.time() - start
 
         # Update task states if there are related settings in project
-        # after bulk create we can bulk update task stats with
-        # flag_update_stats=True but they are already updated with signal in same transaction
-        # so just update tasks_number_changed
-        project.update_tasks_states_with_counters(
-            maximum_annotations_changed=False,
-            overlap_cohort_percentage_changed=False,
-            tasks_number_changed=True,
+        # after bulk create we can bulk update task stats
+        project.update_tasks_states(maximum_annotations_changed=False,
+                                    overlap_cohort_percentage_changed=False,
+                                    tasks_number_changed=True)
+        # Update counters (like total_annotations) for new tasks
+        project.update_tasks_counters(
             tasks_queryset=tasks
         )
         logger.info('Tasks bulk_update finished')

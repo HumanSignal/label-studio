@@ -50,7 +50,7 @@ def propagate_annotations(project, queryset, **kwargs):
     db_annotations = Annotation.objects.bulk_create(db_annotations, batch_size=settings.BATCH_SIZE)
     TaskSerializerBulk.post_process_annotations(user, db_annotations, 'propagated_annotation')
 
-    start_job_async_or_sync(project.update_tasks_counters, Task.objects.filter(id__in=tasks))
+    project.update_tasks_counters(Task.objects.filter(id__in=tasks))
     return {'response_code': 200, 'detail': f'Created {len(db_annotations)} annotations'}
 
 
@@ -153,6 +153,12 @@ def rename_labels(project, queryset, **kwargs):
         if changed:
             annotation.save(update_fields=['result'])
             annotation_count += 1
+
+    # update summaries
+    project.summary.reset()
+    project.summary.update_data_columns(project.tasks.all())
+    annotations = Annotation.objects.filter(task__project=project)
+    project.summary.update_created_annotations_and_labels(annotations)
 
     return {'response_code': 200, 'detail': f'Updated {label_count} labels in {annotation_count}'}
 

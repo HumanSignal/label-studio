@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-2504: Image Enhancements - Zoom, Pixelate, Center (#746)",
-  "commit": "3258d2574a62dcb39365abbac4bd1a48eabbe749",
-  "branch": "",
-  "date": "2022-07-22T17:42:41Z"
+  "message": "fix: DEV-3733: Persist and use the pending draft to attach added comments",
+  "commit": "4b082ba9d7a48216267742f14c0c548beb456f90",
+  "branch": "master",
+  "date": "2022/11/17 08:06:22"
 }

@@ -161,7 +161,7 @@ class ViewSerializer(serializers.ModelSerializer):
 
 class DataManagerTaskSerializer(TaskSerializer):
     predictions = serializers.SerializerMethodField(required=False, read_only=True)
-    annotations = serializers.SerializerMethodField(required=False, read_only=True)
+    annotations = AnnotationSerializer(required=False, many=True, default=[], read_only=True)
     drafts = serializers.SerializerMethodField(required=False, read_only=True)
     annotators = serializers.SerializerMethodField(required=False, read_only=True)
 
@@ -186,6 +186,7 @@ class DataManagerTaskSerializer(TaskSerializer):
         model = Task
         ref_name = 'data_manager_task_serializer'
         fields = '__all__'
+        expandable_fields = {'annotations': (AnnotationSerializer, {'many': True})}
 
     def to_representation(self, obj):
         """ Dynamically manage including of some fields in the API result
@@ -224,9 +225,6 @@ class DataManagerTaskSerializer(TaskSerializer):
 
     def get_predictions_results(self, task):
         return self._pretty_results(task, 'predictions_results')
-
-    def get_annotations(self, task):
-        return AnnotationSerializer(task.annotations, many=True, default=[], read_only=True).data
 
     def get_predictions(self, task):
         return PredictionSerializer(task.predictions, many=True, default=[], read_only=True).data
@@ -267,6 +265,14 @@ class DataManagerTaskSerializer(TaskSerializer):
     def get_predictions_model_versions(self, task):
         return self._pretty_results(task, 'predictions_model_versions', unique=True)
 
+    def get_drafts_serializer(self):
+        return AnnotationDraftSerializer
+
+    def get_drafts_queryset(self, user, drafts):
+        """ Get all user's draft
+        """
+        return drafts.filter(user=user)
+
     def get_drafts(self, task):
         """Return drafts only for the current user"""
         # it's for swagger documentation
@@ -276,9 +282,10 @@ class DataManagerTaskSerializer(TaskSerializer):
         drafts = task.drafts
         if 'request' in self.context and hasattr(self.context['request'], 'user'):
             user = self.context['request'].user
-            drafts = drafts.filter(user=user)
+            drafts = self.get_drafts_queryset(user, drafts)
 
-        return AnnotationDraftSerializer(drafts, many=True, read_only=True, default=True, context=self.context).data
+        serializer_class = self.get_drafts_serializer()
+        return serializer_class(drafts, many=True, read_only=True, default=True, context=self.context).data
 
 
 class SelectedItemsSerializer(serializers.Serializer):
