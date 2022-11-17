@@ -51,7 +51,6 @@ body {
 
 .page-header {
   border-bottom: 1px solid;
-  position: sticky;
   height: 76px;
   top: 0;
   background-color: var(--color-white);
@@ -65,7 +64,7 @@ body {
 
 .page-header nav > ul {
   display: flex;
-  column-gap: 2em;
+  column-gap: clamp(1em, 1.5vw, 2em);
   row-gap: 1em;
   list-style: none;
   margin: 0;
@@ -134,6 +133,12 @@ body {
   display: none;
 }
 
+.page-header li.headerSeparator {
+  border-top: 1px var(--color-gray-300) solid;
+  margin-top: 0.5em;
+  padding-top: 1em;
+}
+
 .page-header nav h2 {
   display: none;
 }
@@ -168,6 +173,7 @@ body {
     background-color: var(--color-white);
     z-index: 2;
     margin-top: 0;
+    width: auto;
   }
 }
 
@@ -178,14 +184,15 @@ body {
     width: 100%;
     background-color: var(--color-white);
     position: absolute;
-    top: 100%;
+    top: 75px;
     left: 0;
     padding: 0 1em 1em 1em;
     border-bottom: 1px var(--color-gray-900) solid;
     flex-direction: column;
-    max-height: calc(100vh - 100%);
+    max-height: calc(100vh - 2em);
     overflow: auto;
     -webkit-overflow-scrolling: touch;
+    z-index: 22;
   }
 
   .page-header nav a.Button {
@@ -219,6 +226,9 @@ body {
     padding-bottom: 1em;
     padding-top: 1em;
     height: auto;
+  }
+  .page-header nav {
+    top: 110px;
   }
 }
 
@@ -289,7 +299,7 @@ main {
 
   position: sticky;
   width: var(--sidebar-size);
-  top: 75px;
+  top: 0;
   height: calc(100vh - 75px);
   overflow: auto;
   border-right: 1px black solid;
@@ -492,6 +502,15 @@ main {
   font-size: clamp(var(--min-size), var(--breakpoint), var(--max-size));
   line-height: var(--line-height);
   font-family: var(--font-family-primary);
+}
+
+.Heading a {
+  text-decoration: none;
+  color: currentColor;
+}
+
+.Heading a:hover {
+  text-decoration: underline;
 }
 
 .Heading.XXLarge {
@@ -949,6 +968,10 @@ main {
 
 .breadcrumb span {
   color: var(--color-gray-700);
+}
+
+.video-border {
+  border: 1px #f1f1f1 solid;
 }
 
 /****************************
@@ -1429,7 +1452,12 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
 
 .page-type-playground #basic-templates a {
   margin-bottom: 0.25rem;
-  display: block;
+  display: inline-block;
+  border-bottom: 1px solid transparent;
+}
+
+.page-type-playground #basic-templates a:hover {
+  border-bottom: 1px dashed currentColor;
 }
 
 .playground-buttons {
