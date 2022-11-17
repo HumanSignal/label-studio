@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3693: Explore reviews module show buggs",
-  "commit": "80924aa80aa203cc1168ebf5b72c780e3c25f3cb",
+  "commit": "2bd27fc2ea44742c0136479d2bcdbb6ae4147b27",
   "branch": "fb-dev-3693/visualizing-unfinished-items",
-  "date": "2022/11/17 08:01:24"
+  "date": "2022/11/17 11:11:21"
 }
