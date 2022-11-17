@@ -23,7 +23,7 @@ Start and finish a labeling project with Label Studio by following these steps:
 1. [Install Label Studio](install.html).
 2. [Start Label Studio](start.html).
 2. [Create accounts for Label Studio](signup.html). Create an account to manage and set up labeling projects.
-3. <i class='ent'></i> [Restrict access to the project](manage_users.html). Set up role-based access control. Only available in Label Studio Enterprise Edition.
+<div class="enterprise-only"> 3. [Restrict access to the project](manage_users.html). Set up role-based access control. Only available in Label Studio Enterprise Edition.</div>
 4. [Set up the labeling project](setup_project.html). Define the type of labeling to perform on the dataset and configure project settings.
 5. [Set up the labeling interface](setup.html). Add the labels that you want annotators to apply and customize the labeling interface. 
 6. [Import data as labeling tasks](tasks.html).
