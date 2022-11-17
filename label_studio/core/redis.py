@@ -1,5 +1,8 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from datetime import timedelta
+from functools import partial
+
 import redis
 import logging
 import django_rq
@@ -73,7 +76,7 @@ def redis_delete(key):
     return _redis.delete(key)
 
 
-def start_job_async_or_sync(job, *args, **kwargs):
+def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
     """
     Start job async with redis or sync if redis is not connected
     :param job: Job function
@@ -94,7 +97,10 @@ def start_job_async_or_sync(job, *args, **kwargs):
 
     if redis:
         queue = django_rq.get_queue(queue_name)
-        job = queue.enqueue(
+        enqueue_method = queue.enqueue
+        if in_seconds > 0:
+            enqueue_method = partial(queue.enqueue_in, time_delta=timedelta(in_seconds))
+        job = enqueue_method(
             job,
             *args,
             **kwargs,

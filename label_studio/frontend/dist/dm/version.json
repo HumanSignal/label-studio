@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3224: Move task to the end on next task",
-  "commit": "0fe0f6ff2b5ee16b11bab78731bb1c117b7a43f7",
+  "message": "fix: DEV-3773: Fix Update behavior in Label Stream",
+  "commit": "7d7a817f6dcaa2cf5fd125bde81d8ec2c9fdf8e3",
   "branch": "master",
-  "date": "2022/11/08 18:10:40"
+  "date": "2022/11/17 12:57:36"
 }
