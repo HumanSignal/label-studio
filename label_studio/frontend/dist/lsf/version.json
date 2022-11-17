@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3562: Remove styles after region unselected (#1009)\n\nCo-authored-by: hlomzik <hlomzik@users.noreply.github.com>",
-  "commit": "2b9156c5a61722c16d7bb6af2353c2287a425a39",
+  "message": "fix: DEV-3733: Persist and use the pending draft to attach added comments",
+  "commit": "4b082ba9d7a48216267742f14c0c548beb456f90",
   "branch": "master",
-  "date": "2022-11-11T21:43:01Z"
+  "date": "2022/11/17 08:06:22"
 }
