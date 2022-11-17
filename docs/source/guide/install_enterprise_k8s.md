@@ -12,9 +12,7 @@ Deploy Label Studio Enterprise on a Kubernetes Cluster using Helm 3. You can use
 
 Your Kubernetes cluster can be self-hosted or installed somewhere such as Amazon EKS. See the Amazon tutorial on how to [Deploy a Kubernetes Application with Amazon Elastic Container Service for Kubernetes](https://aws.amazon.com/getting-started/hands-on/deploy-kubernetes-app-amazon-eks/) for more about deploying an app on Amazon EKS.
 
-<div class="admonition enterprise">
-    <p class="admonition-title">enterprise</p>
-    <p>
+<div class="enterprise-only"><p>
 To install Label Studio Community Edition, see <a href="install.html">Install and Upgrade Label Studio</a>. This page is specific to the Enterprise version of Label Studio.
 </p></div>
 
@@ -197,7 +195,10 @@ minio:
 
 Adjust the included defaults to reflect your environment and copy these into a new file and save it as `lse-values.yaml`.
 
-> For more complex configurations, you can create your own file based on the [list of all available Helm values](helm_values.html).
+
+!!! note 
+    For more complex configurations, you can create your own file based on the [list of all available Helm values](helm_values.html).
+
 
 ## Set up TLS for PostgreSQL
 To configure Label Studio Enterprise to use TLS for end-client connections with PostgreSQL, do the following:
@@ -210,7 +211,8 @@ kubectl create secret generic <YOUR_SECRET_NAME> --from-file=ca.crt=<PATH_TO_CA>
 ```
 3. Update your `lse-values.yaml` file with your newly-created Kubernetes secret:
 
-> If `POSTGRE_SSL_MODE: verify-ca`, the server is verified by checking the certificate chain up to the root certificate stored on the client. If `POSTGRE_SSL_MODE: verify-full`, the server host name will be verified to make sure it matches the name stored in the server certificate. The SSL connection will fail if the server certificate cannot be verified. `verify-full` is recommended in most security-sensitive environments.
+!!! note 
+    If `POSTGRE_SSL_MODE: verify-ca`, the server is verified by checking the certificate chain up to the root certificate stored on the client. If `POSTGRE_SSL_MODE: verify-full`, the server host name will be verified to make sure it matches the name stored in the server certificate. The SSL connection will fail if the server certificate cannot be verified. `verify-full` is recommended in most security-sensitive environments.
 
 ```yaml
 global:
@@ -236,7 +238,8 @@ kubectl create secret generic <YOUR_SECRET_NAME> --from-file=ca.crt=<PATH_TO_CA>
 ```
 3. Update your `lse-values.yaml` file with your newly-created Kubernetes secret:
 
-> In the case if you're using self signed certificates that host cannot verify you have to set `redisSslCertReqs` to `None`
+!!! note 
+    In the case if you are using self-signed certificates that host cannot verify you have to set `redisSslCertReqs` to `None`
 
 ```yaml
 global:

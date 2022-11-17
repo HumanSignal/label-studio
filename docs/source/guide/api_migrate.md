@@ -9,10 +9,11 @@ meta_description: Label Studio Enterprise documentation about updates and change
 ---
  
  With the new version of Label Studio Enterprise, you must update your scripts and API calls to match new API endpoints and formats. Some endpoints are new, some arguments for existing endpoints are deprecated and removed, and some payloads have changed for POST requests.
-  
-> Throughout the new version, `completions` have been renamed `annotations`. In addition, "Teams" are now called "Workspaces", to better reflect the fact that they are a way to organize projects, rather than people. 
 
-> If you rely on existing object IDs (like project_id, task_id, annotation_id, etc.), these were likely changed due to database migration.
+!!! note 
+    - Throughout the new version, `completions` have been renamed `annotations`. In addition, "Teams" are now called "Workspaces", to better reflect the fact that they are a way to organize projects, rather than people. 
+
+    - If you rely on existing object IDs (like `project_id`, `task_id`, `annotation_id`, and so on), these were likely changed due to database migration.
 
 
 ## Import data

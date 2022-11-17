@@ -19,12 +19,15 @@ This example tutorial outlines how to wrap a simple text classifier based on the
 
 If you want to create an ML backend that you can use for dynamic ML-assisted labeling with interactive pre-annotations, see [Support interactive preannotations in your ML backend](#Support-interactive-preannotations-in-your-ML-backend).
 
+
 ## Prerequisites 
+
 Before you start integrating your custom model code with the Label Studio ML SDK to use it as an ML backend with Label Studio, determine the following:
 1. The expected inputs and outputs for your model. In other words, the type of labeling that your model supports in Label Studio, which informs the [Label Studio labeling config](setup.html#Set-up-the-labeling-interface-for-your-project). For example, text classification labels of "Dog", "Cat", or "Opossum" could be possible inputs and outputs. 
 2. Whether you want to create an ML backend that predicts labels, is trained by annotated tasks, or both. 
 3. If creating an ML backend that predicts labels, determine the [prediction format](predictions.html) that your predictions must be outputted as.
 4. The required packages and dependencies necessary to run your machine learning model.
+
 
 ## Declare and initialize a class
 
@@ -158,7 +161,8 @@ If you want to train a model, use the training call to update your model based o
 
 Write your own code to override the `fit()` method, which takes [JSON-formatted Label Studio annotations](/export.html#Raw-JSON-format-of-completed-labeled-tasks) and returns an arbitrary JSON dictionary where information about the created model can be stored. 
 
-> Note: The `completions` field is deprecated as of Label Studio 1.0.x. In version 1.5.0 it will be removed. Instead, use the SDK or the API to retrieve annotation and task data using annotation and task IDs. See [trigger training with webhooks](#Trigger-training-with-webhooks) for more details.
+!!! note
+    The `completions` field is deprecated as of Label Studio 1.0.x. In version 1.5.0 it will be removed. Instead, use the SDK or the API to retrieve annotation and task data using annotation and task IDs. See [trigger training with webhooks](#Trigger-training-with-webhooks) for more details.
 
 ### Trigger training with webhooks
 

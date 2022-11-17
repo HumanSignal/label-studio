@@ -1,22 +1,13 @@
 ---
-title: Styleguide
-short: Styleguide
-tier: all
+title: Styleguide for Enterprise
+short: Styleguide-Enterprise
+tier: enterprise
 order: 50
 meta_title: Get Started with Label Studio
 meta_description: Get started with Label Studio by creating projects to label and annotate data for machine learning and data science models.
 ---
 
 This post includes the markdown needed for various styles/layouts.
-
-## Templates
-
-<a href="/sitemap-docs.xml">Sitemap</a>
-<a href="/guide">Guide</a>
-<a href="/templates">Templates</a>
-<a href="/tags">Tags</a>
-<a href="/playground">Playground</a>
-<a href="/tutorials/sklearn-text-classifier.html">Tutorial example</a>
 
 ## Typography
 
@@ -46,9 +37,10 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec lobortis nibh et 
 
 ---
 
-## Blockquote
+## Blockquote <span class="badge-design">* Need design</span>
 
 > Blockquotes are very handy in email to emulate reply text.
+> This line is part of the same quote.
 
 Quote break.
 
@@ -295,6 +287,7 @@ Enterprise
     </ol>
 </div>
 
+
 To hide all the Enterprise text under <div class="enterprise-only">, use the following code:
 
 <div class="enterprise-only"><p>
@@ -307,6 +300,7 @@ The annotation review workflow is only available in Label Studio Enterprise Edit
 
 <iframe class="video-border" width="100%" height="400vh" src="https://www.youtube.com/embed/CyRe73VD4EE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
+
 ---
 
 
@@ -316,6 +310,8 @@ The annotation review workflow is only available in Label Studio Enterprise Edit
 
 <div class="code-tabs">
 <div data-name="Workload Identity">
+
+> Make sure that Workload Identity is enabled on your GKE cluster and that you meet the necessary prerequisites. See [Using Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) in the Google Kubernetes Engine guide.
 
 1. Set up the following environment variables, specifying the service account you created as the `GCP_SA` variable, and replacing the other references in `<>` as needed:
 

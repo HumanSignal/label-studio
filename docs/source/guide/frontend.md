@@ -248,7 +248,7 @@ yarn download:lsf <branch-name-from-official-lsf-repo>
 
 ## Custom LSF in Label Studio
 
-LS Frontend (LSF) with Backend (LSB) integration is similar what is described in the [Frontend integration guide](#Frontend-integration-guide). The Javascript integration script is placed in [lsf-sdk.js](https://github.com/heartexlabs/label-studio/blob/master/label_studio/static/js/lsf-sdk.js) in the Label Studio Backend. The main idea of this integration based on LSF callbacks.
+LS Frontend (LSF) with Backend (LSB) integration is similar what is described in the [Frontend integration guide](#Frontend-integration-guide). The JavaScript integration script is placed in [lsf-sdk.js](https://github.com/heartexlabs/label-studio/blob/master/label_studio/static/js/lsf-sdk.js) in the Label Studio Backend. The main idea of this integration based on LSF callbacks.
 
 Check out a quick guide on how to use custom LSF in Label Studio.
 
@@ -278,7 +278,7 @@ Under `dist/` folder locate the `lsf/` folder and replace its contents with your
 
     If you installed LS as a pip package, replace `<env-path>/lib/python<version>/site-packages/label_studio/frontend/dist/lsf/`
 
-3. Run the LS instance as usual. It is now uses the new LSF build:
+3. Run the LS instance as usual. It is now using the new LSF build:
     ```bash
     label-studio start <your-project>
     ```

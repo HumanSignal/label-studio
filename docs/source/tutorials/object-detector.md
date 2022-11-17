@@ -1,6 +1,7 @@
 ---
 title:
 type: blog
+tier: all
 order: 40
 ---
 
@@ -27,9 +28,9 @@ Follow this installation guide and then play around with them, picking the best 
     ```
    For a specific task, the following occurs:
     - If the COCO object detector predicts a bbox with label `"airplane"`, you see the label `"Airplane"`.
-    - if it predicts `"car"` or `"truck"`, either of those predictions are squashed to show the `"Car"` label on the task.
+    - If it predicts `"car"` or `"truck"`, either of those predictions are squashed to show the `"Car"` label on the task.
 
-See [the full list of COCO labels](#The-full-list-of-COCO-labels) for reference.
+   For more information, see [the full list of COCO labels](#The-full-list-of-COCO-labels). 
 
 
 ## Installation
@@ -44,7 +45,7 @@ See [the full list of COCO labels](#The-full-list-of-COCO-labels) for reference.
 
 3. Download the `config_file` and `checkpoint_file` from MMDetection model zoo (use the [recommended Faster RCNN for a quickstart](https://mmdetection.readthedocs.io/en/latest/1_exist_data_model.html#inference-with-existing-models)). Place the `config_file` within the cloned [mmdetection repo](https://github.com/open-mmlab/mmdetection).
 
-Depending on your specific use case, there are different settings for how to run this ML backend:
+The following sections present the different settings for how to run this ML backend based on a specific use case. 
 
 ## Run ML backend on the same machine as Label Studio
 

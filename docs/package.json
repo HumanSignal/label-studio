@@ -7,7 +7,7 @@
   },
   "private": true,
   "hexo": {
-    "version": "6.3.0"
+    "version": "5.4.0"
   },
   "dependencies": {
     "co": "^4.6.0",
