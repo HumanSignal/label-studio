@@ -39,7 +39,8 @@ app:
       alb.ingress.kubernetes.io/target-type: ip
 ```
 
-> Note: If you want to configure a certificate that you create in the ACM for the load balancer, add this annotation (updated for your certificate) to your `lse-values.yaml` file:  
+!!! note
+    If you want to configure a certificate that you create in the ACM for the load balancer, add this annotation (updated for your certificate) to your `lse-values.yaml` file:  
 ```
 alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:region:account-id:certificate/aaaa-bbbb-cccc
 ```
@@ -65,7 +66,8 @@ app:
     className: gce
 ```
 
-> Note: You can also request Google-managed SSL certificates to use on the load balancer. See the details on [Using Google-managed SSL certificates](https://cloud.google.com/kubernetes-engine/docs/how-to/managed-certs) in the Google Kubernetes Engine how-to guide. If you use a managed certificate, add an annotation to your `lse-values.yaml` file like the following example, replacing `"managed-cert"` with your ManagedCertificate object name:
+!!! note 
+    You can also request Google-managed SSL certificates to use on the load balancer. See the details on [Using Google-managed SSL certificates](https://cloud.google.com/kubernetes-engine/docs/how-to/managed-certs) in the Google Kubernetes Engine how-to guide. If you use a managed certificate, add an annotation to your `lse-values.yaml` file like the following example, replacing `"managed-cert"` with your ManagedCertificate object name:
 ```yaml
 ​​"networking.gke.io/managed-certificates": "managed-cert"
 ```
@@ -85,7 +87,8 @@ app:
     className: azure/application-gateway
 ```
 
-> Note: You can create a self-signed certificate to use in AGIC. Follow the steps to [Create a self-signed certificate](https://docs.microsoft.com/en-us/azure/application-gateway/create-ssl-portal#create-a-self-signed-certificate) in the Microsoft Azure Networking Tutorial: Configure an application gateway with TLS termination using the Azure portal. 
+!!! note 
+    You can create a self-signed certificate to use in AGIC. Follow the steps to [Create a self-signed certificate](https://docs.microsoft.com/en-us/azure/application-gateway/create-ssl-portal#create-a-self-signed-certificate) in the Microsoft Azure Networking Tutorial: Configure an application gateway with TLS termination using the Azure portal. 
 
 For more details about using AGIC with Microsoft Azure, see [What is Application Gateway Ingress Controller?](https://docs.microsoft.com/en-us/azure/application-gateway/ingress-controller-overview) and [Annotations for Application Gateway Ingress Controller](https://docs.microsoft.com/en-us/azure/application-gateway/ingress-controller-annotations) in the Microsoft Azure Application Gateway documentation.
 

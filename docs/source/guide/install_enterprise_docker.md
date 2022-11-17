@@ -45,7 +45,8 @@ docker login --username heartexlabs
 ```
 When prompted to enter the password, enter the token. If login succeeds, a `~/.docker/config.json` file is created with the authorization settings.  
 
-> If you have default registries specified when logging into Docker, you might need to explicitly specify the registry: `docker login --username heartexlabs docker.io`.
+!!! note 
+    If you have default registries specified when logging into Docker, you might need to explicitly specify the registry: `docker login --username heartexlabs docker.io`.
 
 ### Add the license file 
 After you retrieve the latest Label Studio Enterprise image, add the license file. You can't start the Docker image without a license file. 
@@ -183,7 +184,8 @@ services:
 docker-compose up
 ```
 
-> Note: If you expose port 80, you must start Docker with `sudo`.
+!!! note 
+    If you expose port 80, you must start Docker with `sudo`.
 
 ### Get the Docker image version
 

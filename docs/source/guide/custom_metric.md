@@ -184,7 +184,10 @@ If you deployed Label Studio Enterprise using Docker Compose in an AWS EC2 insta
 4. When you finish creating the user, save the username and access key somewhere secure.
 5. In the `docker-compose.yaml` file that you use to deploy Label Studio Enterprise, add the following environment variables in the `app` and `rqworkers` sections:
 
-> Update `YOUR_AWS_ACCESS_KEY_ID`, `YOUR_AWS_SECRET_ACCESS_KEY` and `YOUR_AWS_ACCOUNT` with the credentials for the account created in step one, and updating `YOUR_AWS_REGION` with the AWS region that your EC2 instance exists in:
+!!! attention "important" 
+    Update:
+    - `YOUR_AWS_ACCESS_KEY_ID`, `YOUR_AWS_SECRET_ACCESS_KEY` and `YOUR_AWS_ACCOUNT` with the credentials for the account created in step 1. 
+    - `YOUR_AWS_REGION` with the AWS region that your EC2 instance exists in the following:
 ```
 AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
@@ -201,8 +204,7 @@ After you set up these permissions in your environment, you're ready to write yo
 If you deployed Label Studio Enterprise in Amazon Elastic Kubernetes Service (EKS) with OpenID Connect (OIDC) for identity and access management (IAM), do the following to finish setting up permissions for the custom agreement metric functionality:
 1. Create an AWS IAM role named `LSE_ServiceAccountApp` following the steps to create a role to delegate permissions to an AWS service in the AWS Identity and Access Management documentation for [Creating a role for an AWS service (console)](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-service.html#roles-creatingrole-service-console).
 2. When relevant, attach the [`LSE_AllowInteractLambda` policy](#Create-an-IAM-policy-to-grant-AWS-Lambda-permissions) to the `LSE_ServiceAccountApp` role. 
-3. Update your helm `values.yaml` file to include the following map. 
-> Replace `YOUR_AWS_ACCOUNT` with your AWS account ID:
+3. Update your helm `values.yaml` file to include the following map. Replace `YOUR_AWS_ACCOUNT` with your AWS account ID:
 ```yaml
 app:
   serviceAccount:

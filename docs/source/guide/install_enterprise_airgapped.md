@@ -14,10 +14,13 @@ If you need to install Label Studio Enterprise on a server that blocks access to
 - If you do not have access to the internet from your server, or use a different proxy, see [Install without internet access or HTTPS proxy](#Install-without-internet-access-or-HTTPS-proxy).
 
 ### Install behind an HTTPS proxy
-If your organization uses an HTTPS proxy to manage access to the internet, do the following.
-> If you're using a SOCKS proxy, Helm 3 does not support SOCKS proxies. See [Install without internet access or HTTPS proxy](#Install-without-internet-access-or-HTTPS-proxy).
 
-1. Work with your network security team to whitelist `https://charts.heartex.com` so that you can access the Helm charts for deploymnet.
+!!! note 
+    If you are using a SOCKS proxy, Helm 3 does not support SOCKS proxies. See [Install without internet access or HTTPS proxy](#Install-without-internet-access-or-HTTPS-proxy).
+
+If your organization uses an HTTPS proxy to manage access to the internet, do the following.
+
+1. Work with your network security team to whitelist `https://charts.heartex.com` so that you can access the Helm charts for deployment.
 2. On the Label Studio Enterprise server, set an environment variable with the HTTPS proxy address:
 ```shell
 export HTTPS_PROXY=<your_proxy>

@@ -310,13 +310,21 @@ Review the full list of JSON properties in the [API documentation](api.html).
 | result.value | Tag-specific value that includes details of the result of labeling the task. The value structure depends on the tag for the label. For more information, see [Explore each tag](/tags). |
 | annotations.completed_by | User ID of the user that created the annotation. Matches the list order of users on the People page on the Label Studio UI. |
 | annotations.was_cancelled | Boolean. Details about whether or not the annotation was skipped, or cancelled. | 
-| annotations.reviews | <div class="enterprise-only"> Array containing the details of reviews for this annotation.</div>  |
-| reviews.id | <div class="enterprise-only">ID of the specific annotation review.</div>|
-| reviews.created_by |  <div class="enterprise-only">Dictionary containing user ID, email, first name and last name of the user performing the review.</div> |
-| reviews.accepted |  <div class="enterprise-only"> Boolean. Whether the reviewer accepted the annotation as part of their review.</div> |  
 | drafts | Array of draft annotations. Follows similar format as the annotations array. Included only for tasks exported as a snapshot [from the UI](#Export-snapshots-using-the-UI) or [using the API](#Export-snapshots-using-the-API).
 | predictions | Array of machine learning predictions. Follows the same format as the annotations array, with one additional parameter. |
 | predictions.score | The overall score of the result, based on the probabilistic output, confidence level, or other. | 
+
+
+<div class="enterprise-only"><p>
+Enterprise fields are presented in export:
+
+| JSON property name | Description |
+| --- | --- | 
+| annotations.reviews | Array containing the details of reviews for this annotation.  |
+| reviews.id | ID of the specific annotation review. |
+| reviews.created_by |  Dictionary containing user ID, email, first name and last name of the user performing the review. |
+| reviews.accepted |  Boolean. Whether the reviewer accepted the annotation as part of their review. | 
+</p></div>
 
 <!-- md image_units.md -->
 

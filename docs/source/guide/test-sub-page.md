@@ -2,7 +2,6 @@
 title: Sub page
 short: Sub page test
 parent: get-started
-type: guide
 tier: all
 order: 100
 meta_title: Get Started with Label Studio

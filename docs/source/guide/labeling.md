@@ -115,7 +115,7 @@ To label tasks multiple times while the minimum annotations required is set to o
 5. Click the next task in the data manager to open the quick labeling view for that task and repeat steps 2-4.
 
 
-## ML-assisted labeling
+## Perform ML-assisted labeling with interactive preannotations
 
 If you have a machine learning backend set up to [get interactive preannotations](ml.html#Get-interactive-preannotations), you can choose whether to use those predictions while you label. 
 
@@ -355,7 +355,7 @@ You can edit regions with a focus on labeling. You can zoom in and precise contr
 !!! note 
     In the upcoming releases, video segmentation will be available to control keyframes, animations, and custom metadata. 
 
-The **Comments** box is available inside the outliner. 
+<div class="enterprise-only"> <p>The <b>Comments</b> box is available inside the outliner. </p></div>
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/comments-box.png" style="opacity: 0.8" class="gif-border"/></div>
@@ -422,7 +422,11 @@ One region belongs to another one. It is typically done for NLP type of text. Fo
 
 To create bounding boxes on top you can use two ways:
 
-1. Press the rectangle tool (R) (note: this option is not always visible).
+1. Press the rectangle tool (R). 
+
+!!! note 
+    This option is not always visible.
+
 2. Label a bounding box, and then label another bounding box inside it.
 
 Now, you should be able to drag when the rectangle tool is not selected. Remember that when the rectangle tool is selected, you can make rectangles even if it is on top of another rectangle.

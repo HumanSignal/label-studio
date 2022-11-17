@@ -1,7 +1,6 @@
 ---
 title: Styleguide
 short: Styleguide
-type: guide
 tier: all
 order: 50
 meta_title: Get Started with Label Studio

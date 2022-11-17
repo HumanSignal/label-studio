@@ -34,7 +34,8 @@ Before you can install Label Studio Enterprise on an EKS cluster, make sure that
 
 Use the eksctl tool to deploy an EKS cluster in your Amazon AWS environment. The eksctl create cluster command creates a virtual private cloud (VPC), a security group, and an IAM role for Kubernetes to create resources. For detailed instructions, see [Getting started with Amazon EKS](https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html) in the Amazon EKS User Guide. 
 
-> Note: The Amazon user that creates the cluster is the one managing the cluster. See [Managing users or IAM roles for your cluster](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html) in the Amazon EKS User Guide.
+!!! note 
+    The Amazon user that creates the cluster is the one managing the cluster. See [Managing users or IAM roles for your cluster](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html) in the Amazon EKS User Guide.
 
 1. To deploy an EKS cluster, run the following:
 ```shell

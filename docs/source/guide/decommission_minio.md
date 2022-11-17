@@ -4,8 +4,9 @@ short: Decommission minio
 meta_title: Decommission minio
 ---
 
-> WARNING: Decommissioning Minio is a hazardous action because you may lose all your data uploaded using direct file upload. 
-For more information or support, contact the [Heartex team](hi@heartex.com).
+
+!!! warning
+    Decommissioning Minio is a hazardous action because you may lose all your data uploaded using direct file upload. For more information or support, contact the [Heartex team](hi@heartex.com).
 
 To decommission Minio, do the following:
 
@@ -38,12 +39,16 @@ JSON_LOG=0 python3 $LSE_DIR/label_studio_enterprise/manage.py minio-migrate
 
 ## Ensure a successful data migration
 
-> Warning: Minio service will be deleted in the next step. 
+
+!!! warning 
+    Minio service will be deleted in the next step. 
+
 
 - Try to run `Export` in your project.
 - Ensure that this data appears in your `bucket/volume` by `project_id/export`.
 
-> Note: For more information or support, contact the [Heartex team](hi@heartex.com).
+!!! note 
+    For more information or support, contact the [Heartex team](hi@heartex.com).
 
 ## Completely remove Minio service
 

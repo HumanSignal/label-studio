@@ -28,16 +28,6 @@ There are five roles available in Label Studio Enterprise Edition. Organization 
 | Reviewer | Reviews annotated tasks. Can view projects with tasks assigned to them. Can review and update task annotations. |
 | Annotator | Labels tasks. Can view projects with tasks assigned to them and label tasks in those projects. |
 
-## Roles in Label Studio Teams
-
-There are two roles available in Label Studio Teams Edition. Organization members have different levels of access to projects and workspaces. Every member can label tasks.
-
-<i>Table 2: Roles in Label Studio Teams</i>
-
-| Role | Description |
-| --- | --- |
-| Owner | Not an assignable role. Manages Label Studio. Can create and modify workspaces, create and modify projects, and view activity log. |
-| Manager | After being assigned to a workspace by an Owner, has full administrative access in the assigned workspaces. Can view any project and has full access to their own projects. |
 
 ## Roles and workspaces
 

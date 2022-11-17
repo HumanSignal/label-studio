@@ -1,7 +1,6 @@
 ---
 title: Another subpage
 parent: get-started
-type: guide
 tier: all
 order: 101
 meta_title: Get Started with Label Studio

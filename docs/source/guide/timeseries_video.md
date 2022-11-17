@@ -1,6 +1,6 @@
 ---
-title: Time series plus Video or Audio
-short: Time series plus Video or Audio
+title: Time series and Video or Audio
+short: Time series and Video or Audio
 meta_title: Time series video audio labeling 
 ---
 
@@ -8,7 +8,7 @@ meta_title: Time series video audio labeling
 !!! note
     - This feature is not officially supported, experimental, and has a tricky setup way.
     - To use audio instead of video you should replace `.mp4` file to mp3/wav/other browser supported audio format.      
-    - This approach works with Label Studio <b>1.4.1 and lower</b>.
+    - This approach works with Label Studio **1.4.1 and lower**.
 
 
 ## Step 1: Media hosting
@@ -50,7 +50,8 @@ ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_
 
 ## Step 3: Prepare and import tasks
 
-> Note: It is the most important step, because the main trick is in task data, it uses some Javascript injection.        
+!!! note 
+    It is the most important step, because the main trick is in task data, it uses a JavaScript injection.        
 
 Save this code to `import.json` and then import this file to LS.   
 ```
@@ -65,7 +66,7 @@ ts.brushRange.map(n=>(+n).toFixed(2));_=r();setInterval($=>r().some((n,i)=>n!==_
 ## Step 4: Explore imported task
 
 1. Go to the Data manager and click on the task row.
-2. It's <b>very important</b> to wait about 3 seconds (it depends on video size), until video is loaded.
+2. It is very important to wait for about 3 seconds (it depends on video size), until video is loaded.
 3. Drag the handle on the time series overview channel, you video must be synchronized with the time series.
 
 !!! note

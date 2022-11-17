@@ -278,7 +278,7 @@ Under `dist/` folder locate the `lsf/` folder and replace its contents with your
 
     If you installed LS as a pip package, replace `<env-path>/lib/python<version>/site-packages/label_studio/frontend/dist/lsf/`
 
-3. Run the LS instance as usual. It is now uses the new LSF build:
+3. Run the LS instance as usual. It is now using the new LSF build:
     ```bash
     label-studio start <your-project>
     ```
