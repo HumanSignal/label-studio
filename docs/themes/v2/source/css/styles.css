@@ -966,7 +966,7 @@ main {
 }
 
 .collapse + .collapse {
-  margin-top: 1.5rem;
+  margin-top: 1rem;
 }
 
 .collapse summary::marker {
