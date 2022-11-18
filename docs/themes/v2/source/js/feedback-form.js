@@ -32,6 +32,7 @@
 
     fetch('https://label-studio-docs-new-theme.netlify.app/.netlify/functions/gather-feedback', { method: 'POST', body: JSON.stringify(data) }).then(response => {
       if(response.status === 200) {
+        console.log("success");
         moreDetails.style.display = "none"
         confirmation.style.display = "block"
       }
