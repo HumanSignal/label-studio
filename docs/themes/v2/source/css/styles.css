@@ -1426,6 +1426,11 @@ Footer
   padding-top: 2em;
 }
 
+.helpful-form-confirmation {
+  display: none;
+  padding-top: 2em;
+}
+
 .helpful-form input[type="radio"]:hover + .helpful-button,
 .helpful-form input[type="radio"]:checked + .helpful-button {
   background-color: var(--background-hover);

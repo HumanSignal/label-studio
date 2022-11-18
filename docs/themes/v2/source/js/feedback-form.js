@@ -4,6 +4,7 @@
   const yesNoButtons = feedbackForm.querySelectorAll("[type='radio']");
   const moreDetails = feedbackForm.querySelector("#helpful-more");
   const cancelButton = feedbackForm.querySelector("#helpful-form-cancel-button");
+  const confirmation = feedbackForm.querySelector("#helpful-more-confirmation");
 
   const closeForm = () => {
     yesNoButtons.forEach(button => button.checked = false)
@@ -30,8 +31,10 @@
 
 
     fetch('https://label-studio-docs-new-theme.netlify.app/.netlify/functions/gather-feedback', { method: 'POST', body: JSON.stringify(data) }).then(response => {
-      /* if(response.status === 200) setFeedback({submitted: true, helpful: data.helpful}) */
-      console.log(response)
+      if(response.status === 200) {
+        moreDetails.style.display = "none"
+        confirmation.style.display = "block"
+      }
     })
   }
 
