@@ -409,16 +409,13 @@ class Project(ProjectMixin, models.Model):
             tasks_with_min_annotations = tasks_with_min_annotations.annotate(
                 anno=Count('annotations')
             ).order_by('-anno')
-            objs = []
             # assign overlap depending on annotation count
-            for item in tasks_with_min_annotations[:left_must_tasks]:
-                item.overlap = max_annotations
-                objs.append(item)
-            for item in tasks_with_min_annotations[left_must_tasks:]:
-                item.overlap = 1
-                objs.append(item)
-            with transaction.atomic():
-                bulk_update(objs, update_fields=['overlap'], batch_size=settings.BATCH_SIZE)
+            # assign max_annotations
+            ids = tasks_with_min_annotations[:left_must_tasks].values_list('id', flat=True)
+            all_project_tasks.filter(id__in=ids).update(overlap=max_annotations)
+            # assign 1 to left
+            ids = tasks_with_min_annotations[left_must_tasks:].values_list('id', flat=True)
+            all_project_tasks.filter(id__in=ids).update(overlap=1)
         else:
             tasks_with_max_annotations.update(overlap=max_annotations)
             tasks_with_min_annotations.update(overlap=1)
