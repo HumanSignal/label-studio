@@ -565,10 +565,13 @@ main {
 .home-page-title-grid {
   display: flex;
   gap: 2em;
+  justify-content: space-between;
   margin-bottom: 1em;
 }
 
-
+.home-page-title-grid div {
+  max-width: 74%;
+}
 
 /****************************
   Heading styles
@@ -615,7 +618,6 @@ main {
   --min-size: 2.375rem; /* 38px */
   --max-size: 3.5rem; /* 56px */
   --line-height: 106%;
-  margin-bottom: 0.75em;
 }
 
 .Heading.Large,
@@ -663,6 +665,11 @@ main {
   margin-bottom: 0;
   margin-top: 2em;
 }
+
+.content-markdown h1 + * {
+  margin-top: 2rem;
+}
+
 .content-markdown a:not(.Button) {
   color: var(--color-main-accent);
 }

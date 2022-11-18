@@ -6,7 +6,7 @@ tier: all
 order: 100
 section: "Get started"
 meta_title: Troubleshoot Label Studio
-meta_description: Troubleshoot common issues with Label Studio configuration and performance so that you can return to your machine learning and data science projects.
+meta_description: Troubleshoot common issuesTroubleshoot machine learning with Label Studio configuration and performance so that you can return to your machine learning and data science projects.
 ---
 
 If you encounter an issue using Label Studio, use this page to troubleshoot it. 

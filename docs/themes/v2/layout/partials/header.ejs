@@ -57,8 +57,8 @@
     %>
     <div class="page-header-content-switcher">
       <div>
-        <a href="<%- currentQuickLink.href %>">
-          <%- currentQuickLink.label %>
+        <a href="<%- currentQuickLink ? currentQuickLink.href : quickLinks[0].href %>">
+          <%- currentQuickLink ? currentQuickLink.label : quickLinks[0].label %>
         </a>
         <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 1L6 6L1 1" stroke="#8B8D9E"/></svg>
       </div>

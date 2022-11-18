@@ -1,5 +1,6 @@
 ---
 title: Troubleshoot machine learning
+short: Troubleshoot
 type: guide
 tier: all
 order: 304
