@@ -10,6 +10,7 @@
     "version": "6.3.0"
   },
   "dependencies": {
+    "@sanity/client": "^3.4.1",
     "co": "^4.6.0",
     "front-matter": "^4.0.2",
     "hexo": "^6.3.0",
