@@ -3,9 +3,11 @@ title: Python SDK Tutorial for Label Studio
 short: Python SDK Tutorial 
 type: guide
 tier: all
-order: 675
+order: 140
 meta_title: Label Studio Python SDK Tutorial
 meta_description: Tutorial documentation for the Label Studio Python SDK. How and why to use the SDK for data labeling project creation and annotated task parsing.
+section: "Integration and Development"
+
 ---
 
 You can use the Label Studio Python SDK to make annotating data a more integrated part of your data science and machine learning pipelines. This software development kit (SDK) lets you call the Label Studio API directly from scripts using predefined classes and methods. 

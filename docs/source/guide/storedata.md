@@ -8,6 +8,7 @@ meta_description: Configure the database storage used by Label Studio to ensure 
 section: "Install"
 
 ---
+
 Label Studio uses a database to store project data and configuration information.
 
 ## Labeling performance

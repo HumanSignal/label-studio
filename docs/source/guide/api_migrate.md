@@ -3,9 +3,11 @@ title: Update scripts and API calls in Label Studio Enterprise
 short: Update scripts and API calls
 tier: enterprise
 type: guide
-order: 910
+order: 143
 meta_title: Update scripts and API calls to new version
 meta_description: Label Studio Enterprise documentation about updates and changes to the API endpoints in version 2.0. 
+section: "Advanced Development"
+
 ---
  
  With the new version of Label Studio Enterprise, you must update your scripts and API calls to match new API endpoints and formats. Some endpoints are new, some arguments for existing endpoints are deprecated and removed, and some payloads have changed for POST requests.
