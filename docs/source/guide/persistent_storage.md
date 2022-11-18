@@ -74,6 +74,7 @@ Select the relevant tab and follow the steps for your desired option:
 !!! note 
     To set up an IAM role using this method, you must have a configured and provisioned OIDC provider for your cluster. See [Create an IAM OIDC provider for your cluster](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html) in the Amazon EKS User Guide.
 
+
 1. Follow the steps to [create an IAM role and policy for your service account](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html) in the Amazon EKS User Guide.
 2. Use the following IAM Policy, replacing `<YOUR_S3_BUCKET>` with the name of your bucket:
 

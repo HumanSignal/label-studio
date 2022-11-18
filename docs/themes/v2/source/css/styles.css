@@ -143,6 +143,10 @@ body {
   display: none;
 }
 
+.page-header-chevron-icon path {
+  stroke: var(--color-gray-900);
+}
+
 .page-header nav > button + ul ul {
   background-color: var(--color-gray-100);
   margin-left: -2em;
@@ -228,7 +232,7 @@ body {
     height: auto;
   }
   .page-header nav {
-    top: 110px;
+    top: 119px;
   }
 }
 
@@ -300,7 +304,7 @@ main {
   position: sticky;
   width: var(--sidebar-size);
   top: 0;
-  height: calc(100vh - 75px);
+  height: 100vh;
   overflow: auto;
   border-right: 1px black solid;
   padding: 1.5em 1.5em 3em 1.5em;
@@ -378,6 +382,7 @@ main {
   background-color: transparent;
   border: 0;
   padding: 0;
+  cursor: pointer;
 }
 
 .page-sidebar .page-sidebar-toggle-children-list svg {
@@ -493,15 +498,17 @@ main {
 .content-markdown h4,
 .content-markdown h5,
 .content-markdown h6,
-.content-markdown blockquote p {
+.content-markdown blockquote p,
+.collapse summary {
   --min-size: 1.75rem; /* 28px */
-  --max-size: 2.25rem; /* 36px */
+  --max-size: 1.75rem; /* 28px */
   --breakpoint: 5vw;
   --line-height: 100%;
 
   font-size: clamp(var(--min-size), var(--breakpoint), var(--max-size));
   line-height: var(--line-height);
   font-family: var(--font-family-primary);
+  position: relative;
 }
 
 .Heading a {
@@ -530,7 +537,7 @@ main {
 .Heading.Large,
 .content-markdown h2 {
   --min-size: 2rem; /* 32px */
-  --max-size: 2.75rem; /* 44px */
+  --max-size: 2.25rem; /* 36px */
   --line-height: 106%;
 }
 
@@ -548,7 +555,8 @@ main {
 
 .Heading.XSmall,
 .content-markdown h5,
-.content-markdown blockquote p {
+.content-markdown blockquote p,
+.collapse summary {
   --min-size: 1rem; /* 16px */
   --max-size: 1.5rem; /* 24px */
   --line-height: 100%;
@@ -576,6 +584,14 @@ main {
 
 .content-markdown a:not(.Button):hover {
   text-decoration: none;
+}
+
+.content-markdown .headerlink {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
 }
 
 /****************************
@@ -740,6 +756,7 @@ main {
 .toc-list a {
   color: var(--color-gray-900);
   text-decoration: none;
+  font-size: 0.875rem;
 }
 
 .toc-list a:hover {
@@ -867,17 +884,6 @@ main {
   margin: 0;
 }
 
-.content-markdown .admonition.note {
-  --color-border: transparent;
-  padding-left: 0;
-  padding-right: 0;
-  font-style: italic;
-}
-
-.content-markdown .admonition.note .admonition-title {
-  font-style: normal;
-}
-
 .content-markdown .admonition.attention {
   --color-border: #FF6767;
   --color-title: var(--color-white);
@@ -907,7 +913,7 @@ main {
 }
 
 .content-markdown blockquote {
-  border-left: 2px var(--color-purple-90) solid;
+  border-left: 2px var(--color-main-accent) solid;
   margin-left: 0;
   padding-left: 1em;
 }
@@ -949,6 +955,46 @@ main {
 
 .code-tabs > div:not(first-child) {
   display: none;
+}
+
+.collapse {
+  margin-top: 2rem;
+}
+
+.collapse summary {
+ border-bottom: 1px solid var(--color-gray-300);
+ padding: 0 1rem 1rem 1rem;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+}
+
+.collapse + .collapse {
+  margin-top: 1rem;
+}
+
+.collapse summary::marker {
+  content: "";
+}
+
+.collapse-plus-icon {
+  display: block;
+}
+
+.collapse-minus-icon {
+  display: none;
+}
+
+.collapse[open] .collapse-plus-icon {
+  display: none;
+}
+
+.collapse[open] .collapse-minus-icon {
+  display: block;
+}
+
+.collapse-content {
+  padding: 0 1rem 1rem 1rem;
 }
 
 .breadcrumb {
@@ -1312,28 +1358,6 @@ Footer
   gap: 0.25em;
   padding: 0.5em;
 }
-
-
-
-
-
-
-/****************************
-  Temporary styles
-****************************/
-
-.badge-design {
-  background-color: red;
-  color: white;
-  padding: 0.25em;
-  font-size: 1rem;
-  font-family: var(--font-family-secondary);
-  vertical-align: middle;
-}
-
-
-
-
 
 /****************************
   Code theme
@@ -1717,6 +1741,19 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
 
 .page-tier-enterprise .enterprise-only {
   display: block;
+}
+
+.page-tier-enterprise .page-header-chevron-icon path {
+  stroke: var(--color-white);
+}
+
+.page-tier-enterprise .HeaderLogo {
+  flex-basis: 12em;
+  flex-grow: 1;
+}
+
+.page-tier-enterprise .HeaderLogo svg {
+  max-width: 100%;
 }
 
 @media (max-width: 1150px) {
