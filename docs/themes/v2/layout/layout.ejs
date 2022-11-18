@@ -36,7 +36,7 @@
     } else if (isGuide) {
       titlePrefix = 'Label Studio Documentation';
     } else {
-      titlePrefix = 'Label Studio';
+      titlePrefix = isEnterpriseTheme ? "Label Studio Enterprise" : "Label Studio";
     }
   %>
   <% if (page.meta_title) { %>

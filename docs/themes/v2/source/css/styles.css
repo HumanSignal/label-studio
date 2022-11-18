@@ -232,7 +232,7 @@ body {
     height: auto;
   }
   .page-header nav {
-    top: 110px;
+    top: 119px;
   }
 }
 
@@ -304,7 +304,7 @@ main {
   position: sticky;
   width: var(--sidebar-size);
   top: 0;
-  height: calc(100vh - 75px);
+  height: 100vh;
   overflow: auto;
   border-right: 1px black solid;
   padding: 1.5em 1.5em 3em 1.5em;
@@ -903,7 +903,7 @@ main {
 }
 
 .content-markdown blockquote {
-  border-left: 2px var(--color-purple-90) solid;
+  border-left: 2px var(--color-main-accent) solid;
   margin-left: 0;
   padding-left: 1em;
 }
