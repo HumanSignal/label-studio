@@ -85,7 +85,7 @@ In Label Studio Enterprise, create a snapshot of your data and annotations. Crea
 11. You see the list of snapshots available to download, with details about what is included in the snapshot, when it was created, and who created it. 
 12. Click **Download** and select the export format that you want to use. Now, the snapshot file downloads to your computer. 
 
-</p></div>
+</div>
 
 ### Export using the API
 
@@ -318,6 +318,7 @@ Review the full list of JSON properties in the [API documentation](api.html).
 
 
 <div class="enterprise-only">
+
 Enterprise fields are presented in export:
 
 | JSON property name | Description |
@@ -326,6 +327,7 @@ Enterprise fields are presented in export:
 | reviews.id | ID of the specific annotation review. |
 | reviews.created_by |  Dictionary containing user ID, email, first name and last name of the user performing the review. |
 | reviews.accepted |  Boolean. Whether the reviewer accepted the annotation as part of their review. | 
+
 </div>
 
 <!-- md image_units.md -->

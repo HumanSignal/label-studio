@@ -106,7 +106,9 @@ When annotators skip a task, the task no longer appears in the labeling queue fo
 In both Label Studio and Label Studio Enterprise, you can label tasks with collaborators. Tasks are locked while someone performs annotations so that you don't accidentally overwrite the annotations of another annotator. After the other annotator finishes with the task, it can appear in your queue for labeling if the minimum annotations per task is set to more than one. By default, tasks only need to be annotated by one annotator. 
 
 <div class="enterprise-only">
+
 If you're using Label Studio Enterprise and want more than one annotator to annotate tasks, <a href="setup_project.html">update the project settings</a>. After you update the minimum annotations required per task, annotators can use the Label Stream workflow to label their tasks.  
+
 </div>
 
 If you want to label tasks more than once, even if the minimum annotations required is set to one, do the following:

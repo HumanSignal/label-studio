@@ -1,6 +1,6 @@
 ---
 title: Python SDK Tutorial for Label Studio
-short: Python SDK Tutorial 
+short: Backend SDK Python Tutorial 
 type: guide
 tier: all
 order: 140

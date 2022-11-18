@@ -1,6 +1,6 @@
 ---
 title: Webhook event format reference 
-short: Webhooks Event Reference
+short: Webhook Event Reference
 type: guide
 tier: all
 order: 137

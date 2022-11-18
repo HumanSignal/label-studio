@@ -1,6 +1,6 @@
 ---
 title: Create custom events for webhooks in Label Studio
-short: Custom Webhooks
+short: Webhook Development
 type: guide
 tier: all
 order: 138

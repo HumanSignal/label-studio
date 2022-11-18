@@ -3,7 +3,7 @@ title: Available Helm values for Label Studio Enterprise Kubernetes deployments
 short: Available Helm values
 tier: enterprise
 type: guide
-order: 113
+order: 114
 meta_title: Available Helm values for Label Studio Enterprise Kubernetes deployments
 meta_description: For cases when you want to customize your Label Studio Enterprise Kubernetes deployment, review these available Helm values that you can set in your Helm chart.
 section: "Install"

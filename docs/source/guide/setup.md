@@ -1,5 +1,5 @@
 ---
-title: Project configuration
+title: Labeling configuration
 type: guide
 tier: all
 order: 119
@@ -79,9 +79,7 @@ If you want to customize this example, such as to allow labelers to select both 
 </View>
 ```
 
-## Use the CLI or API
-
-If you want to specify a labeling configuration for your project without using the Label Studio UI, you can use the command line or the API. 
+<div class="opensource-only">
 
 ### Add a labeling config from the command line
 You can define the labeling configuration in a `config.xml` file and initialize a specific project in Label Studio with that file. 
@@ -89,6 +87,8 @@ You can define the labeling configuration in a `config.xml` file and initialize 
 ```bash
 label-studio my_new_project start --label-config config.xml
 ```
+
+</div>
 
 ### Add a labeling config with the API
 You can configure your labeling configuration with the server API. See the [Backend API](api.html) documentation for more details.

@@ -9,12 +9,15 @@ section: "Security and Privacy"
 
 ---
 
+
 Label Studio provides many ways to secure access to your data and your deployment architecture. 
 
 All application component interactions are encrypted using the TLS protocol. 
 
 <div class="enterprise-only">
+
 Role-based access control is only available in Label Studio Enterprise deployments. Label Studio Enterprise is available as on-premises software that you manage, or as a Software-as-a-Service (SaaS) offering.
+
 </div>
 
 <!--If you need to meet strong privacy regulations, legal requirements, or you want to make a custom installation within your infrastructure or any public cloud (AWS, Google, Azure, etc.), Label Studio Enterprise works on-premises. It is a self-contained version (no Internet connection is required) of the Platform, no data will leave your infrastructure. To make the installation the most accessible, we offer a Docker image.-->

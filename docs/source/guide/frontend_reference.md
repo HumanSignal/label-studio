@@ -1,5 +1,6 @@
 ---
 title: Frontend reference
+short: Frontend reference
 type: guide
 tier: all
 order: 142
