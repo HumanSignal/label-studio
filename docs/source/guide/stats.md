@@ -3,11 +3,10 @@ title: Annotation statistics
 short: Dashboard management
 tier: enterprise
 type: guide
-order: 129
+order: 300
 meta_title: Data Labeling Statistics
 meta_description: Label Studio Enterprise documentation about task agreement, annotator consensus, and other data annotation statistics for data labeling and machine learning projects.
 section: "Quality control"
-
 ---
 
 

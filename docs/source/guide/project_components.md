@@ -7,7 +7,6 @@ order: 118
 meta_title: Project components 
 meta_description: "Label Studio Documentation for Project components."
 section: "Configuration"
-
 ---
 
 

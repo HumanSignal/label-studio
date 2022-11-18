@@ -6,7 +6,6 @@ order: 101
 meta_title: Secure Label Studio
 meta_description: About the security and hardening processes used by various Label Studio editions, and how you can configure a more secure data labeling project.
 section: "Security and Privacy"
-
 ---
 
 

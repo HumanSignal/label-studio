@@ -3,11 +3,10 @@ title: Set up webhooks in Label Studio
 short: Webhook Setup
 type: guide
 tier: all
-order: 136
+order: 910
+section: "Integration and Development"
 meta_title: Configure Webhooks in Label Studio
 meta_description: Label Studio documentation for setting up and configuring webhooks to integrate Label Studio with your machine learning pipeline.
-section: "Integration and Development"
-
 ---
 
 Webhooks in Label Studio let you set up integrations that subscribe to certain events that occur inside Label Studio. When an event is triggered, Label Studio sends an HTTP POST request to the configured webhook URL. For example:

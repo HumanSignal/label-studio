@@ -3,11 +3,10 @@ title: API Reference for Label Studio
 short: Backend API
 type: guide
 tier: all
-order: 139
+order: 900
+section: "Integration and Development"
 meta_title: API Endpoints
 meta_description: API documentation for authenticating, listing data science projects, importing predictions and raw data and exporting annotated data, and user management.
-section: "Integration and Development"
-
 ---
 
 You can use the Label Studio API to import data for labeling, export annotations, set up machine learning with Label Studio, and sync tasks with cloud storage. 

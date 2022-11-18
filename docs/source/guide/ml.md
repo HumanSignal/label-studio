@@ -3,11 +3,10 @@ title: Integrate Label Studio into your machine learning pipeline
 short: Machine learning integration
 type: guide
 tier: all
-order: 131
+order: 302
 meta_title: Integrate Label Studio into your machine learning pipeline
 meta_description: Machine learning frameworks for integrating your model development pipeline seamlessly with your data labeling workflow.
 section: "Machine learning"
-
 ---
 
 Integrate your model development pipeline with your data labeling workflow by adding a machine learning (ML) backend to Label Studio. You can set up your favorite machine learning frameworks to do the following:

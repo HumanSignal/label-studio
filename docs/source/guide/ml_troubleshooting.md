@@ -2,11 +2,10 @@
 title: Troubleshoot machine learning
 type: guide
 tier: all
-order: 135
+order: 304
+section: "Machine learning"
 meta_title: Troubleshoot Machine Learning
 meta_description: Troubleshoot Label Studio connections with machine learning frameworks using the Label Studio ML backend SDK.
-section: "Machine learning"
-
 ---
 
 After you [set up machine learning with Label Studio](ml.html) or [create your own machine learning backend](ml_create.html) to use with Label Studio, you can troubleshoot any issues you encounter by reviewing the possible causes on this page.

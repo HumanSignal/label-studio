@@ -3,11 +3,10 @@ title: Project setup
 short: Project setup
 type: guide
 tier: all
-order: 125
+order: 116
+section: "Configuration"
 meta_title: Set up your labeling project
 meta_description: Set up data labeling and annotation projects in Label Studio to produce high-quality data for your machine learning and data science projects. 
-section: "Configuration"
-
 ---
 
 All labeling activities in Label Studio occur in the context of a project. 

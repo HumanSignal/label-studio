@@ -1,14 +1,12 @@
 ---
 title: Sync data from external storage
 short: Cloud storage setup 
-parent: "tasks"
 type: guide
 tier: all
-order: 123
+order: 125
+section: "Import and Export"
 meta_title: Cloud and External Storage Integration
 meta_description: "Label Studio Documentation for integrating Amazon AWS S3, Google Cloud Storage, Microsoft Azure, Redis, and local file directories with Label Studio."
-section: "Import and Export"
-
 ---
 
 Integrate popular cloud and external storage systems with Label Studio to collect new items uploaded to the buckets, containers, databases, or directories and return the annotation results so that you can use them in your machine learning pipelines.

@@ -3,11 +3,10 @@ title: Set up active learning with Label Studio
 short: Active learning loop
 tier: enterprise
 type: guide
-order: 134
+order: 304
+section: "Machine learning"
 meta_title: Set up an active learning loop with Label Studio
 meta_description: Set up an end-to-end active learning loop with Label Studio using the ML backend SDK and webhooks to perform model training and predictions and labeling.
-section: "Machine learning"
-
 ---
 
 Follow this tutorial to set up an active learning loop with Label Studio. 

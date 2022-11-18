@@ -7,7 +7,6 @@ order: 109
 meta_title: Install Label Studio Enterprise on-premises using Docker
 meta_description: Install, back up, and upgrade Label Studio Enterprise with Docker to create machine learning and data science projects on-premises.
 section: "Install"
-
 ---
 
 Install Label Studio Enterprise on-premises if you need to meet strong privacy regulations, legal requirements, or want to manage a custom installation on your own infrastructure using Docker or public cloud. If you want to use a different installation method:
