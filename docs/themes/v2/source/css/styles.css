@@ -276,7 +276,6 @@ body {
     padding: 0 1em 1em 1em;
     border-bottom: 1px var(--color-gray-900) solid;
     flex-direction: column;
-    max-height: calc(100vh - 2em);
     overflow: auto;
     -webkit-overflow-scrolling: touch;
     z-index: 22;
