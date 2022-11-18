@@ -555,7 +555,7 @@ class Project(ProjectMixin, models.Model):
                     # raise error if labels not dynamic and not in regex rules
                     raise LabelStudioValidationErrorSentryIgnored(
                         f'These labels still exist in annotations:\n{diff_str}.'
-                        f'Please add label to {str(control_tag_from_data)} or change/delete annotations.')
+                        f'Please add labels to {str(control_tag_from_data)} or change/delete annotations.')
                 else:
                     logger.info(f'project_id={self.id} inconsistent labels in config and annotations: {diff_str}')
 
