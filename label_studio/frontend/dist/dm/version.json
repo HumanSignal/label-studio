@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3673: Navigation using task links is broken (#124)",
-  "commit": "11b5975d499f63e96eae988be7bca7aa7bb31557",
+  "message": "fix: DEV-3773: Fix Update behavior in Label Stream",
+  "commit": "7d7a817f6dcaa2cf5fd125bde81d8ec2c9fdf8e3",
   "branch": "master",
-  "date": "2022-11-03T15:53:51Z"
+  "date": "2022/11/17 12:57:36"
 }

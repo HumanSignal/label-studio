@@ -108,6 +108,8 @@ jobs:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
           verbose: true
+          name: codecov-python-${{ matrix.python-version }}
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   run_pytest_postgresql:
     name: LS PostgreSQL Ubuntu
@@ -236,6 +238,8 @@ jobs:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
           verbose: true
+          name: codecov-python-${{ matrix.python-version }}-postgresql
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   windows_label_studio:
     name: LS SQLite Windows

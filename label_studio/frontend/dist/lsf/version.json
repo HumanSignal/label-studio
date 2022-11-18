@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3701: Fix value updating for dynamic children (#950)",
-  "commit": "74be06ab6a0233190f590dca273eb80e8ab66ede",
+  "message": "fix: DEV-3733: Persist and use the pending draft to attach added comments",
+  "commit": "4b082ba9d7a48216267742f14c0c548beb456f90",
   "branch": "master",
-  "date": "2022-11-03T21:34:56Z"
+  "date": "2022/11/17 08:06:22"
 }

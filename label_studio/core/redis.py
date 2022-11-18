@@ -1,11 +1,16 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from datetime import timedelta
+from functools import partial
+
 import redis
 import logging
 import django_rq
 
 from django_rq import get_connection
 from rq.registry import StartedJobRegistry
+from rq.command import send_stop_job_command
+from rq.exceptions import InvalidJobOperation
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +76,7 @@ def redis_delete(key):
     return _redis.delete(key)
 
 
-def start_job_async_or_sync(job, *args, **kwargs):
+def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
     """
     Start job async with redis or sync if redis is not connected
     :param job: Job function
@@ -92,7 +97,10 @@ def start_job_async_or_sync(job, *args, **kwargs):
 
     if redis:
         queue = django_rq.get_queue(queue_name)
-        job = queue.enqueue(
+        enqueue_method = queue.enqueue
+        if in_seconds > 0:
+            enqueue_method = partial(queue.enqueue_in, time_delta=timedelta(in_seconds))
+        job = enqueue_method(
             job,
             *args,
             **kwargs,
@@ -112,15 +120,8 @@ def is_job_in_queue(queue, func_name, meta):
     :return: True if job in queue
     """
     # get all jobs from Queue
-    jobs = (
-        job 
-        for job in queue.get_jobs() 
-        if job.func.__name__ == func_name
-    )
+    jobs = get_jobs_by_meta(queue, func_name, meta)
     # check if there is job with meta in list
-    if meta:
-        return any(job for job in jobs if hasattr(job, 'meta') and job.meta == meta)
-
     return any(jobs)
 
 
@@ -134,3 +135,46 @@ def is_job_on_worker(job_id, queue_name):
     registry = StartedJobRegistry(queue_name, connection=_redis)
     ids = registry.get_job_ids()
     return job_id in ids
+
+
+def delete_job_by_id(queue, id):
+    """
+    Delete job by id from queue
+    @param queue: Queue on redis to delete from
+    @param id: Job id
+    """
+    logger.debug(f"Stopping job {id}.")
+    job = queue.fetch_job(id)
+    if job is not None:
+        # stop job if it is in master redis node (in the queue)
+        try:
+            job.cancel()
+            job.delete()
+            logger.debug(f"Fetched job {id} and stopped.")
+        except InvalidJobOperation:
+            logger.debug(f"Job {id} was already cancelled.")
+    else:
+        # try to stop job on worker (job started)
+        try:
+            send_stop_job_command(_redis, id)
+            logger.debug(f"Send stop job {id} to redis worker.")
+        except Exception as e:
+            logger.debug(f"Redis job {id} was not found: {str(e)}")
+
+
+def get_jobs_by_meta(queue, func_name, meta):
+    """
+    Get jobs from queue by func_name and meta data
+    :param queue: Queue on redis to check in
+    :param func_name: Started function name
+    :param meta: meta dict
+    :return: Job list
+    """
+    # get all jobs from Queue
+    jobs = (job
+            for job in queue.get_jobs()
+            if job.func.__name__ == func_name
+            )
+    # return only with same meta data
+    return [job for job in jobs if hasattr(job, 'meta') and job.meta == meta]
+
