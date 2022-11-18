@@ -188,9 +188,10 @@ def create_business(user):
 
 
 def make_annotation(config, task_id):
-    from tasks.models import Annotation
+    from tasks.models import Annotation, Task
+    task = Task.objects.get(pk=task_id)
 
-    return Annotation.objects.create(task_id=task_id, **config)
+    return Annotation.objects.create(project_id=task.project_id, task_id=task_id, **config)
 
 
 def make_prediction(config, task_id):
