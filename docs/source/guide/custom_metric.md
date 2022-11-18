@@ -18,6 +18,7 @@ This functionality is only available for Label Studio Enterprise Cloud customers
 <div class="enterprise-only">
 
 Label Studio Enterprise Edition includes various annotation and labeling statistics and the ability to add your own. The open source Community Edition of Label Studio does not contain these calculations. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
+
 </div>
 
 1. Review the [prerequisites](#Prerequisites).

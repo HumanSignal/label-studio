@@ -1,9 +1,9 @@
 ---
 title: Troubleshooting Install and upgrade Label Studio
 short: Troubleshoot Install 
-parent: "install"
-tier: all
+tier: opensource
 order: 103
+section: "Install"
 meta_title: Troubleshoot Install and Upgrade
 meta_description: "Label Studio documentation: Troubleshoot Install and upgrade Label Studio." 
 ---

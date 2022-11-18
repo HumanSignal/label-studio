@@ -2,7 +2,8 @@
 title: Frontend library
 type: guide
 tier: all
-order: 705
+order: 950
+section: "Integration & Development"
 meta_title: Customize User Interface
 meta_description: Label Studio documentation for integrating the Label Studio frontend interface into your own machine learning or data labeling application workflow.
 ---
@@ -264,7 +265,8 @@ All frontend-related files are stored under `label-studio/frontend` directory. Y
 
 Under `dist/` folder locate the `lsf/` folder and replace its contents with your custom LSF build.
 
-> Inside every folder under `dist/` you will find a `version.json` file. Do not modify or remove it. Its presence is required for the Label Studio to operate.
+!!! info
+    Inside every folder under `dist/` you will find a `version.json` file. Do not modify or remove it. Its presence is required for the Label Studio to operate.
 
 1. **Do not forget** to remove the old build from LSB:
     ```bash

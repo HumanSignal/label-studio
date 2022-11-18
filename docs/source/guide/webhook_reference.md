@@ -1,9 +1,10 @@
 ---
 title: Webhook event format reference 
-short: Webhooks Event Reference
+short: Webhook Event Reference
 type: guide
 tier: all
-order: 653
+order: 912
+section: "Integration & Development"
 meta_title: Label Studio Webhook Event Reference 
 meta_description: Label Studio reference documentation for webhook event fields and payloads sent from Label Studio for integration with your machine learning pipeline. 
 ---

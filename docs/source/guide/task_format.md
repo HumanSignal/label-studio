@@ -1,11 +1,10 @@
 ---
-title: JSON format of annotated tasks
+title: Label Studio Task Format
 short: Task format 
-parent: "tasks"
 type: guide
 tier: all
-order: 121
-meta_title: Export Annotations
+order: 119
+meta_title: Label Studio Task Format
 meta_description: Label Studio documentation for exporting data labeling annotations to use in machine learning models and data science projects.
 section: "Import and Export"
 
@@ -135,6 +134,7 @@ Review the full list of JSON properties in the [API documentation](api.html).
 
 
 <div class="enterprise-only">
+
 Enterprise fields are presented in export:
 
 | JSON property name | Description |
@@ -143,6 +143,7 @@ Enterprise fields are presented in export:
 | reviews.id | ID of the specific annotation review. |
 | reviews.created_by |  Dictionary containing user ID, email, first name and last name of the user performing the review. |
 | reviews.accepted |  Boolean. Whether the reviewer accepted the annotation as part of their review. | 
+
 </div>
 
 

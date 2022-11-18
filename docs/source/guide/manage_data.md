@@ -3,7 +3,7 @@ title: Manage data for your labeling project
 short: Data manager
 type: guide
 tier: all
-order: 304
+order: 250
 meta_title: Manage data for your labeling project
 meta_description: Manage, filter, and sort project data for your machine learning data science labeling project.
 section: "Labeling"

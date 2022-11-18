@@ -3,7 +3,8 @@ title: API Reference for Label Studio
 short: Backend API
 type: guide
 tier: all
-order: 704
+order: 900
+section: "Integration & Development"
 meta_title: API Endpoints
 meta_description: API documentation for authenticating, listing data science projects, importing predictions and raw data and exporting annotated data, and user management.
 ---
@@ -13,12 +14,14 @@ You can use the Label Studio API to import data for labeling, export annotations
 See the [API reference documentation](/api) for further guidance and interactive examples. If you want to write Python scripts using the API, use the [Label Studio Python SDK](sdk.html). 
 
 <div class="enterprise-only">
+
 <p>
 The Label Studio Enterprise API shares many endpoints with the Label Studio Community Edition API, but includes extra payload options and additional endpoints specific to Enterprise features. Access the full Label Studio Enterprise API reference documentation by doing the following:</p>
 <ol>
 <li>Log in to Label Studio Enterprise</li>
 <li>Open the menu and click <b>API</b></li>
 </ol>
+
 </div>
 
 ### Authenticate to the API

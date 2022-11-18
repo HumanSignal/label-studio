@@ -1,12 +1,12 @@
 ---
-title: Set up your labeling project
+title: Project setup
 short: Project setup
 type: guide
 tier: all
-order: 210
+order: 116
 meta_title: Set up your labeling project
 meta_description: Set up data labeling and annotation projects in Label Studio to produce high-quality data for your machine learning and data science projects. 
-section: "Labeling"
+section: "Configuration"
 
 ---
 
@@ -39,7 +39,9 @@ After you save a project, any other collaborator with access to the Label Studio
 Set up annotation settings to configure how you want annotators to perform labeling for your project.
 
 <div class="enterprise-only">
+
 Some annotation settings are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
+
 </div>
 
 
@@ -116,6 +118,7 @@ In Label Studio Community Edition, you can set up task sampling from the command
     3. Click **Save**. 
     
 <div class="enterprise-only">
+
 In Label Studio Enterprise, you can set up task sampling in the annotation settings for a project.
 1. Within a project on the Label Studio UI, click **Settings**.
 2. Click **Annotation Settings**.
@@ -131,6 +134,7 @@ In Label Studio Enterprise, you can set up task sampling in the annotation setti
 <div class="enterprise-only">
 
 ### Define the agreement metrics for annotation statistics
+
 Annotation statistics such as annotator consensus are calculated using an agreement metric. If you want the agreement metric to calculate annotation or prediction agreement by requiring exact matching choices, choose that option in the annotation settings. For more about agreement metrics in Label Studio Enterprise, see [Annotation statistics](stats.html).
 
 1. Within a project on the Label Studio UI, click **Settings**.
@@ -143,6 +147,7 @@ Your changes save automatically.
 </div>
 
 <div class="enterprise-only">
+
 ## Set up review settings for your project
 
 Set up review settings to guide reviewers when they review annotated tasks. For more about reviewing annotations, see [Review annotations in Label Studio](quality.html)

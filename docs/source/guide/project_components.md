@@ -2,7 +2,7 @@
 title: Project components 
 short: Project components 
 type: guide
-tier: all
+tier: 
 order: 118
 meta_title: Project components 
 meta_description: "Label Studio Documentation for Project components."

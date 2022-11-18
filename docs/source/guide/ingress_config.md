@@ -3,7 +3,7 @@ title: Set up an ingress controller for Label Studio Enterprise Kubernetes deplo
 short: Set up an ingress controller
 type: guide
 tier: enterprise
-order: 108
+order: 112
 meta_title: Set up an ingress controller for Label Studio Enterprise Kubernetes Deployments
 meta_description: Set up an ingress controller to manage load balancing and access to Label Studio Enterprise Kubernetes deployments for your data science and machine learning projects.
 section: "Install"

@@ -1,8 +1,9 @@
 ---
-title: Overview of Label Studio
+title: Label Studio Enterprise
+short: Overview
 type: guide
 tier: all
-order: 100
+order: 99
 meta_title: Overview of Label Studio
 meta_description: Get started with Label Studio by creating projects to label and annotate data for machine learning and data science models.
 section: "Get Started"
