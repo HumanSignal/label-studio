@@ -30,7 +30,7 @@
     });
   }
 
-  window.addEventListener('load', (event) => {
+  /* window.addEventListener('load', (event) => {
     window.docsearch({
       container: '#docsearch-input',
       inputSelector: '#docsearch-input',
@@ -47,7 +47,7 @@
     }
   
     window.addEventListener("keydown", handleFocusSearch);
-  });
+  }); */
 
   if (window.matchMedia( "(hover: none)" ).matches) {
     const toggleQuickNav = (e) => {
