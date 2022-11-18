@@ -1,34 +1,19 @@
 ---
-title: Install and upgrade 
-type: guide
+title: Requirements to Install and upgrade Label Studio
+short: Requirements
+parent: "install"
 tier: all
 order: 103
-meta_title: Install and Upgrade Label Studio 
-meta_description: "Label Studio documentation: install and upgrade Label Studio with Docker, pip, and anaconda for your machine learning and data science projects." 
-section: "Install"
+meta_title: Requirements to Install and Upgrade
+meta_description: "Label Studio documentation: Requirements to install and upgrade Label Studio." 
 ---
-
-Install Label Studio on premises or in the cloud. Choose the installation method that works best for your environment:
-- [Install with pip](#Install-with-pip)
-- [Install with Docker](#Install-with-Docker)
-- [Install on Ubuntu](#Install-on-Ubuntu)
-- [Install from source](#Install-from-source)
-- [Install with Anaconda](#Install-with-Anaconda)
-- [Upgrade Label Studio](#Upgrade-Label-Studio)
 
 <!-- md deploy.md -->
 
-### Web browser support
-Label Studio is tested with the latest version of Google Chrome and is expected to work in the latest versions of:
-- Google Chrome
-- Apple Safari
-- Mozilla Firefox
-
-If using other web browsers, or older versions of supported web browsers, unexpected behavior could occur. 
 
 ## Install prerequisite
 
-Install Label Studio in a clean Python environment. We highly recommend using a virtual environment (venv or conda) to reduce the likelihood of package conflicts or missing packages.
+Install Label Studio in a clean Python environment. Heartex highly recommends using a virtual environment (venv or conda) to reduce the likelihood of package conflicts or missing packages.
 
 
 ## Install with pip
@@ -117,6 +102,7 @@ docker image import /tmp/label_studio_latest.tar.gz
 
 Follow steps from [Install and Upgrade to run LS](install.html#Install-with-Docker).
 
+
 ## Install on Ubuntu
 
 To install Label Studio on Ubuntu and run it in a virtual environment, run the following command:
@@ -151,32 +137,9 @@ conda activate label-studio
 pip install label-studio
 ```
 
-## Troubleshoot installation
-
-You might see errors when installing Label Studio. Follow these steps to resolve them.
-
-### Run the latest version of Label Studio
-Many bugs might be fixed in patch releases or maintenance releases. Make sure you're running the latest version of Label Studio by upgrading your installation before you start Label Studio. 
-
-### Errors about missing packages
-
-If you see errors about missing packages, install those packages and try to install Label Studio again. Make sure that you run Label Studio in a clean Python environment, such as a virtual environment.
-
-For Windows users the default installation might fail to build the `lxml` package. Consider manually installing it from [the unofficial Windows binaries](https://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml). If you are running Windows 64-bit with Python 3.8 or later, run `pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl` to install it. 
-
-
-### Errors from Label Studio 
-If you see any other errors during installation, try to rerun the installation.
-
-```bash
-pip install --ignore-installed label-studio
-```
-
-### OpenBLAS blas_thread_init: pthread_create failed for thread X of Y: Operation not permitted
-Upgrade Docker Engine to the latest available version(>= [20.10.12](https://docs.docker.com/engine/release-notes/#201012)).
-
 
 ## Upgrade Label Studio
+
 To upgrade to the latest version of Label Studio, reinstall or upgrade using pip. 
 
 

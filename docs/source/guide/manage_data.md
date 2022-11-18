@@ -1,11 +1,12 @@
 ---
 title: Manage data for your labeling project
-short: Manage data
+short: Data manager
 type: guide
 tier: all
-order: 401
+order: 304
 meta_title: Manage data for your labeling project
 meta_description: Manage, filter, and sort project data for your machine learning data science labeling project.
+section: "Labeling"
 ---
 
 After you [set up your project](setup_project.html) and [labeling interface](setup.html) and [import your data](tasks.html), you can filter and sort your data to prepare it for [labeling](labeling.html).

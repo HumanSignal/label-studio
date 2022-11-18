@@ -3,9 +3,11 @@ title: Manage access to Label Studio
 short: Manage access
 tier: enterprise
 type: guide
-order: 251
+order: 115
 meta_title: Manage Role-Based Access Control in Label Studio
 meta_description: Manage access and set up permissions with user roles, organizations, and project workspaces for your projects in Label Studio Enterprise.
+section: "Configuration"
+
 ---
 
 Manage access to projects, organizations, and workspaces in Label Studio to restrict who can view data, annotations, and predictions in your data labeling projects. 

@@ -3,9 +3,11 @@ title: Install Label Studio Enterprise without public internet access
 short: Install on airgapped server
 tier: enterprise
 type: guide
-order: 217
+order: 111
 meta_title: Install Label Studio Enterprise without public internet access
 meta_description: Install Label Studio Enterprise without public internet access to create machine learning and data science projects in an airgapped environment. 
+section: "Install"
+
 ---
 
 If you need to install Label Studio Enterprise on a server that blocks access to the internet using a proxy, or an airgapped server that does not allow outgoing connections to the internet, follow these steps:

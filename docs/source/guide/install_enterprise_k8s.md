@@ -3,9 +3,11 @@ title: Deploy Label Studio Enterprise on Kubernetes
 short: Deploy on Kubernetes
 tier: enterprise
 type: guide
-order: 216
+order: 110
 meta_title: Deploy Label Studio Enterprise on Kubernetes
 meta_description: Deploy Label Studio Enterprise on Kubernetes, such as on Amazon Elastic Container Service for Kubernetes, to create machine learning and data science projects in a scalable containerized environment. 
+section: "Install"
+
 ---
 
 Deploy Label Studio Enterprise on a Kubernetes Cluster using Helm 3. You can use this Helm chart to set up Label Studio Enterprise for deployment onto a Kubernetes cluster and install, upgrade, and manage the application. 

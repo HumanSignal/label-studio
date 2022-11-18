@@ -3,9 +3,10 @@ title: Get data into Label Studio
 short: Import data
 type: guide
 tier: all
-order: 300
+order: 120
 meta_title: Import Data into Label Studio
 meta_description: Label and annotate data for your machine learning and data science projects using common file formats or the Label Studio JSON format.
+section: "Import and Export"
 ---
 
 Get data into Label Studio by importing files, referencing URLs, or syncing with cloud or database storage. 
@@ -15,7 +16,6 @@ Get data into Label Studio by importing files, referencing URLs, or syncing with
 - If your data is stored at internet-accessible URLs, in files, or directories, [import it from the Label Studio UI](#Import-data-from-the-Label-Studio-UI).
 - If your data is stored locally, [import it into Label Studio](#Import-data-from-a-local-directory).
 - If your data contains predictions or pre-annotations, see [Import pre-annotated data into Label Studio](predictions.html).
-
 
 ## Types of data you can import into Label Studio
 

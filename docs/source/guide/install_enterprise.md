@@ -1,10 +1,13 @@
 ---
 title: Install Label Studio Enterprise
+short: Install and deploy
 type: guide
 tier: enterprise
-order: 210
+order: 106
 meta_title: Install Label Studio Enterprise
 meta_description: Install, back up, and upgrade Label Studio Enterprise to create machine learning and data science projects on-premises.
+section: "Install"
+
 ---
 
 Install Label Studio Enterprise on-premises if you need to meet strong privacy regulations, legal requirements, or want to manage a custom installation on your own infrastructure. You can run Label Studio Enterprise in an airgapped environment, and no data leaves your infrastructure.
