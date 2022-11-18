@@ -1,10 +1,13 @@
 ---
 title: Install Label Studio Enterprise
+short: Overview
 type: guide
 tier: enterprise
-order: 210
+order: 106
 meta_title: Install Label Studio Enterprise
 meta_description: Install, back up, and upgrade Label Studio Enterprise to create machine learning and data science projects on-premises.
+section: "Install"
+
 ---
 
 Install Label Studio Enterprise on-premises if you need to meet strong privacy regulations, legal requirements, or want to manage a custom installation on your own infrastructure. You can run Label Studio Enterprise in an airgapped environment, and no data leaves your infrastructure.
@@ -26,8 +29,6 @@ Before you deploy Label Studio Enterprise, prepare your environment.
 1. Set up [persistent storage](persistent_storage.html).
 2. For Kubernetes deployments, configure [ingress](ingress_config.html).
 
-## Install Label Studio Enterprise
-
 Select the deployment scenario that best fits your labeling use case. 
 
 | How | Who |
@@ -42,5 +43,7 @@ Select the deployment scenario that best fits your labeling use case.
 - Instead of installing, you can also use [Label Studio Enterprise as a cloud offering](https://heartex.com/product). 
 
 <div class="enterprise-only">
-To install Label Studio Community Edition, see <a href="install.html">Install and Upgrade Label Studio</a> page which is specific to the Enterprise version of Label Studio.
+
+- To install Label Studio Community Edition, see <a href="install.html">Install and Upgrade Label Studio</a> page which is specific to the Enterprise version of Label Studio.
+
 </div>

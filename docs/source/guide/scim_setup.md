@@ -3,9 +3,11 @@ title: Set up SCIM2 for Label Studio
 short: Set up SCIM2
 tier: enterprise
 type: guide
-order: 254
+order: 113
 meta_title: System for Cross-domain Identity Management (SCIM) for Label Studio Enterprise
 meta_description: Label Studio Enterprise documentation for setting up SCIM2
+section: "Install"
+
 ---
 
 System for Cross-domain Identity Management (SCIM) is a popular protocol to manage access for services and applications across an organization. This guide helps to set up SCIM integration to manage access to Label Studio Enterprise in your organization. 

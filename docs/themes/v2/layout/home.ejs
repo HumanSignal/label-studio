@@ -5,7 +5,8 @@ meta_description: Get started with Label Studio by creating projects to label an
 <div class="home-page-title-grid">
   <div>
     <%- partial("component/heading", {text: "Label Studio Docs", size: "XLarge", tag: "h1", customClass: "home-page-title"}) %>
-    <p class="Text Large">The most flexible data annotation tool. Quickly installable. Build custom UIs or use pre-built labeling templates.</p>
+    <p class="Text Large">Welcome the Label Studio documentation home page! Learn and try out the most flexible data annotation tool which is quickly installable. Build custom UIs or use pre-built labeling templates during your adventure.</p>
+
   </div>
   <svg width="222" height="175" viewBox="0 0 222 175" fill="none" xmlns="http://www.w3.org/2000/svg" class="heidi">
     <path d="M30.5306 149.907C22.7354 149.907 15.2455 147.878 7.60347 147.878C5.4288 147.878 5.50798 147.371 3.24879 147.371C1.60902 147.371 0.676208 149.668 1.90891 150.414C3.19313 151.192 4.53897 151.601 5.74251 152.33C7.08504 153.143 9.44725 152.748 10.8043 153.57C13.0725 154.944 18.4253 155.486 21.3374 155.486C24.9634 155.486 29.1233 157.515 32.7266 157.515C42.5557 157.515 51.0519 160.927 59.5617 163.855C64.5911 165.586 68.9166 167.791 74.0773 169.294C77.6242 170.327 82.5148 170.831 85.4664 172.619C87.8135 174.041 93.4699 173.871 96.3717 174.253C98.9368 174.591 101.131 174.761 103.741 174.761H116.135C121.062 174.761 126.598 173.957 131.209 174.732C133.675 175.147 136.13 174.253 138.578 174.253C141.554 174.253 144.373 173.746 147.288 173.746C152.406 173.746 157.19 171.717 162.362 171.717C167.257 171.717 172.144 169.828 176.952 169.688C184.902 169.457 193.067 168.167 200.884 168.167C207.041 168.167 219.166 169.429 221.28 163.827C222.461 160.697 222.437 157.995 219.307 155.486C216.518 153.25 207.714 152.95 203.899 152.95C185.776 152.95 168.048 152.443 149.968 152.443C144.197 152.443 138.293 152.744 132.735 151.541C129.095 150.754 125.092 151.51 121.532 150.668C119.638 150.22 116.432 149.907 114.46 149.907C109.564 149.907 105.196 148.892 100.205 148.892H84.1265H50.1452C43.6178 148.892 37.0611 149.907 30.5306 149.907Z" fill="#F5F7FE"/>
@@ -68,13 +69,11 @@ meta_description: Get started with Label Studio by creating projects to label an
 <div class="columns">
   <div class="card card-light">
     <%- partial("component/heading", {text: "Getting Started", tag: "h2", customClass: "card-title" }) %>
-    <p class="Text">Loremi psum dolor sit amet consectitur dolor sit maet consectitur dolor sit amet.</p>
-    <%- partial("component/link", { url: "#", label: "Learn How to install", customClass: "card-cta" }) %>
+    <%- partial("component/link", { url: "/guide/install.html", label: "Learn how to install", customClass: "card-cta" }) %>
   </div>
   <div class="card card-light">
     <%- partial("component/heading", {text: "Labeling Templates", tag: "h2", customClass: "card-title" }) %>
-    <p class="Text">Loremi psum dolor sit amet consectitur dolor sit maet consectitur dolor sit amet.</p>
-    <%- partial("component/link", { url: "#", label: "See Templates", customClass: "card-cta" }) %>
+    <%- partial("component/link", { url: "/templates", label: "Explore Templates", customClass: "card-cta" }) %>
   </div>
 </div>
 
@@ -83,7 +82,23 @@ meta_description: Get started with Label Studio by creating projects to label an
     <%- partial("component/heading", {text: "Overview", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
     <ul class="card-links-list">
       <li>
-        <%- partial("component/link", { url: "/guide/get_started.html", label: "About Label Studio", size: "Full" }) %>
+        <%- partial("component/link", { url: "/guide/get-started.html", label: "About Label Studio", size: "Full" }) %>
+      </li>
+    </ul>
+  </div>
+  <div class="card enterprise-only">
+    <%- partial("component/heading", {text: "Security and Privacy", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
+    <ul class="card-links-list">
+      <li>
+        <%- partial("component/link", { url: "/guide/security.html", label: "Secure Label Studio", size: "Full" }) %>
+      </li>
+    </ul>
+  </div>
+  <div class="card enterprise-only">
+    <%- partial("component/heading", {text: "Billing and Usage", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
+    <ul class="card-links-list">
+      <li>
+        <%- partial("component/link", { url: "/guide/billing.html", label: "Manage billing", size: "Full" }) %>
       </li>
     </ul>
   </div>
@@ -91,21 +106,21 @@ meta_description: Get started with Label Studio by creating projects to label an
     <%- partial("component/heading", {text: "Install", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
     <ul class="card-links-list">
       <li>
-        <%- partial("component/link", { url: "#", label: "Getting Started", size: "Full" }) %>
+        <%- partial("component/link", { url: "/guide/install.html", label: "Install and Upgrade", size: "Full" }) %>
       </li>
-      <li>
-        <%- partial("component/link", { url: "#", label: "Install and Deploy", size: "Full" }) %>
+      <li class="enterprise-only">
+        <%- partial("component/link", { url: "/guide/install_enterprise.html", label: "Install and Deploy", size: "Full" }) %>
       </li>
     </ul>
   </div>
   <div class="card">
     <%- partial("component/heading", {text: "Configuration", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
     <ul class="card-links-list">
-      <li>
-        <%- partial("component/link", { url: "#", label: "User Management", size: "Full" }) %>
+      <li class="enterprise-only">
+        <%- partial("component/link", { url: "/guide/signup.html", label: "User Management", size: "Full" }) %>
       </li>
       <li>
-        <%- partial("component/link", { url: "#", label: "Project Setup", size: "Full" }) %>
+        <%- partial("component/link", { url: "/guide/setup.html", label: "Project Configuration", size: "Full" }) %>
       </li>
     </ul>
   </div>
@@ -113,10 +128,10 @@ meta_description: Get started with Label Studio by creating projects to label an
     <%- partial("component/heading", {text: "Import and Export", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
     <ul class="card-links-list">
       <li>
-        <%- partial("component/link", { url: "#", label: "Import Data", size: "Full" }) %>
+        <%- partial("component/link", { url: "/guide/tasks.html", label: "Import Data", size: "Full" }) %>
       </li>
       <li>
-        <%- partial("component/link", { url: "#", label: "Export Tasks with Annotations and Data", size: "Full" }) %>
+        <%- partial("component/link", { url: "/guide/export.html", label: "Export Tasks with Annotations and Data", size: "Full" }) %>
       </li>
     </ul>
   </div>
@@ -124,10 +139,21 @@ meta_description: Get started with Label Studio by creating projects to label an
     <%- partial("component/heading", {text: "Labeling", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
     <ul class="card-links-list">
       <li>
-        <%- partial("component/link", { url: "#", label: "Data Manager", size: "Full" }) %>
+        <%- partial("component/link", { url: "/guide/manage_data.html", label: "Data Manager", size: "Full" }) %>
       </li>
       <li>
-        <%- partial("component/link", { url: "#", label: "Annotators", size: "Full" }) %>
+        <%- partial("component/link", { url: "/guide/labeling.html", label: "Annotators", size: "Full" }) %>
+      </li>
+    </ul>
+  </div>
+  <div class="card enterprise-only">
+    <%- partial("component/heading", {text: "Quality Control", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
+    <ul class="card-links-list">
+      <li>
+        <%- partial("component/link", { url: "/guide/quality.html", label: "Reviewers", size: "Full" }) %>
+      </li>
+      <li>
+        <%- partial("component/link", { url: "/guide/stats.html", label: "Dashboard Management", size: "Full" }) %>
       </li>
     </ul>
   </div>
@@ -135,22 +161,22 @@ meta_description: Get started with Label Studio by creating projects to label an
     <%- partial("component/heading", {text: "Machine Learning", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
     <ul class="card-links-list">
       <li>
-        <%- partial("component/link", { url: "#", label: "Active Learning", size: "Full" }) %>
+        <%- partial("component/link", { url: "/guide/active_learning.html", label: "Active Learning", size: "Full" }) %>
       </li>
       <li>
-        <%- partial("component/link", { url: "#", label: "Generate and Store Predictions", size: "Full" }) %>
+        <%- partial("component/link", { url: "/guide/predictions.html", label: "Generate and Store Predictions", size: "Full" }) %>
       </li>
       <li>
-        <%- partial("component/link", { url: "#", label: "Apply Ready-To-Use Models", size: "Full" }) %>
+        <%- partial("component/link", { url: "/guide/ml.html", label: "Run ML models with Label Studio", size: "Full" }) %>
       </li>
       <li>
-        <%- partial("component/link", { url: "#", label: "Write your own ML Model", size: "Full" }) %>
+        <%- partial("component/link", { url: "/guide/ml_create.html", label: "Write your own ML Model", size: "Full" }) %>
       </li>
       <li>
-        <%- partial("component/link", { url: "#", label: "ML Examples and Tutorials", size: "Full" }) %>
+        <%- partial("component/link", { url: "/guide/ml_tutorials.html", label: "ML Examples and Tutorials", size: "Full" }) %>
       </li>
       <li>
-        <%- partial("component/link", { url: "#", label: "Machine Learning Training", size: "Full" }) %>
+        <%- partial("component/link", { url: "/guide/ml.html#Train-a-model", label: "Set up ML with Label Studio", size: "Full" }) %>
       </li>
     </ul>
   </div>
@@ -158,24 +184,27 @@ meta_description: Get started with Label Studio by creating projects to label an
     <%- partial("component/heading", {text: "Integrations and Development", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
     <ul class="card-links-list">
       <li>
-        <%- partial("component/link", { url: "#", label: "Integrations", size: "Full" }) %>
+        <%- partial("component/link", { url: "/guide/webhooks.html", label: "Integrations", size: "Full" }) %>
       </li>
       <li>
-        <%- partial("component/link", { url: "#", label: "Advanced Development", size: "Full" }) %>
+        <%- partial("component/link", { url: "/guide/frontend.html", label: "Advanced Development", size: "Full" }) %>
       </li>
     </ul>
   </div>
   <div class="card">
     <%- partial("component/heading", {text: "Reference", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
     <ul class="card-links-list">
-      <li>
-        <%- partial("component/link", { url: "#", label: "API and SDKs", size: "Full" }) %>
+      <li class="enterprise-only">
+        <%- partial("component/link", { url: "/app.heartex.com/docs/api", label: "API and SDKs", size: "Full" }) %>
       </li>
       <li>
-        <%- partial("component/link", { url: "#", label: "Release Notes", size: "Full" }) %>
+        <%- partial("component/link", { url: "/api", label: "API and SDKs", size: "Full" }) %>
       </li>
       <li>
-        <%- partial("component/link", { url: "#", label: "Glossary", size: "Full" }) %>
+        <%- partial("component/link", { url: "/guide/release_notes.html", label: "Release Notes", size: "Full" }) %>
+      </li>
+      <li>
+        <%- partial("component/link", { url: "/guide/get-started.html#Terminology", label: "Glossary", size: "Full" }) %>
       </li>
     </ul>
   </div>

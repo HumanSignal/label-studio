@@ -3,20 +3,25 @@ title: Set up active learning with Label Studio
 short: Active learning loop
 tier: enterprise
 type: guide
-order: 609
+order: 134
 meta_title: Set up an active learning loop with Label Studio
 meta_description: Set up an end-to-end active learning loop with Label Studio using the ML backend SDK and webhooks to perform model training and predictions and labeling.
+section: "Machine learning"
+
 ---
 
 Follow this tutorial to set up an active learning loop with Label Studio. 
 
 <div class="enterprise-only">
+
 <p>
 Use Label Studio Enterprise Edition to build an automated active learning loop with a machine learning model backend. If you use the open source Community Edition of Label Studio, you can manually sort tasks and retrieve predictions to mimic an active learning process. If you're using Label Studio Community Edition, see <a href="#Customize-your-active-learning-loop">how to customize your active learning loop</a>.
 </p>
+
 </div>
 
 ## About Active Learning
+
 To create annotated training data for supervised machine learning models can be expensive and time-consuming. Active Learning is a branch of machine learning that seeks to **minimize the total amount of data required for labeling by strategically sampling observations** that provide new insight into the problem. In particular, Active Learning algorithms aim to select diverse and informative data for annotation, rather than random observations, from a pool of unlabeled data using **prediction scores**. For more about the practice of active learning, read [this article written by Heartex CTO on Towards Data Science](https://towardsdatascience.com/learn-faster-with-smarter-data-labeling-15d0272614c4).
 
 ## Set up an automated active learning loop

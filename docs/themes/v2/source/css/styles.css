@@ -615,6 +615,7 @@ main {
   --min-size: 2.375rem; /* 38px */
   --max-size: 3.5rem; /* 56px */
   --line-height: 106%;
+  margin-bottom: 0.75em;
 }
 
 .Heading.Large,

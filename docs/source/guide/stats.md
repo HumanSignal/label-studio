@@ -1,16 +1,20 @@
 ---
 title: Annotation statistics
-short: Annotation statistics
+short: Dashboard management
 tier: enterprise
 type: guide
-order: 413
+order: 129
 meta_title: Data Labeling Statistics
 meta_description: Label Studio Enterprise documentation about task agreement, annotator consensus, and other data annotation statistics for data labeling and machine learning projects.
+section: "Quality control"
+
 ---
 
 
 <div class="enterprise-only">
+
 Label Studio Enterprise Edition includes various annotation and labeling statistics. The open source Community Edition of Label Studio does not perform these statistical calculations. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
+
 </div>
 
 Annotation statistics help you determine the quality of your dataset, its readiness to be used to train models, and assess the performance of your annotators and reviewers.

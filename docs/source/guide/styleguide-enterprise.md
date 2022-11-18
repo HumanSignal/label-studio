@@ -291,7 +291,9 @@ Enterprise
 To hide all the Enterprise text under <div class="enterprise-only">, use the following code:
 
 <div class="enterprise-only">
+
 The annotation review workflow is only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
+
 </div>
 
 ---

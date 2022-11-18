@@ -1,10 +1,12 @@
 ---
-title: Set up your labeling interface
+title: Labeling configuration
 type: guide
 tier: all
-order: 401
-meta_title: Set up labeling config interface
+order: 119
+meta_title: Set up labeling configuration interface
 meta_description: Customize your data labeling and annotation interface with templates or custom tag combinations for your machine learning and data science projects.
+section: "Configuration"
+
 ---
 
 All labeling activities in Label Studio occur in the context of a project. After you [create a project](setup_project.html#Create-a-project) and [import data](tasks.html), set up the labeling interface and labeling configuration for your project. This setup process is essential to your labeling project. 
@@ -77,9 +79,7 @@ If you want to customize this example, such as to allow labelers to select both 
 </View>
 ```
 
-## Set up labeling config in other ways
-
-If you want to specify a labeling configuration for your project without using the Label Studio UI, you can use the command line or the API. 
+<div class="opensource-only">
 
 ### Add a labeling config from the command line
 You can define the labeling configuration in a `config.xml` file and initialize a specific project in Label Studio with that file. 
@@ -87,6 +87,8 @@ You can define the labeling configuration in a `config.xml` file and initialize 
 ```bash
 label-studio my_new_project start --label-config config.xml
 ```
+
+</div>
 
 ### Add a labeling config with the API
 You can configure your labeling configuration with the server API. See the [Backend API](api.html) documentation for more details.

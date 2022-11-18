@@ -2,9 +2,11 @@
 title: Write your own ML backend
 type: guide
 tier: all
-order: 607
+order: 132
 meta_title: Machine Learning SDK
 meta_description: Set up your machine learning model to output and consume predictions in your data science and data labeling projects. 
+section: "Machine learning"
+
 ---
 
 Set up a machine learning model as a backend to Label Studio so that you can dynamically output and consume predictions as labeling occurs. You can follow this tutorial to wrap custom machine learning model code with the Label Studio ML SDK, or refer to [example ML backend tutorials](ml_tutorials.html) to integrate with popular machine learning frameworks such as PyTorch, GPT2, and others. 

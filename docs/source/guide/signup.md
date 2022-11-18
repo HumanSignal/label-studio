@@ -1,10 +1,12 @@
 ---
-title: Set up user accounts
+title: User management
 type: guide
 tier: all
-order: 250
-meta_title: User Accounts
+order: 114
+meta_title: User Management
 meta_description: Sign up for Label Studio and invite users to collaborate on your data labeling, machine learning, and data science projects.
+section: "Configuration"
+
 ---
 
 Sign up and create an account for Label Studio to start labeling data and setting up projects. 
