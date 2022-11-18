@@ -56,6 +56,8 @@ function insert_render_editor(config, modal, full) {
     url += '&full_editor=t';
   }
 
+  console.log(config);
+
   fetch(url, {
     method: 'POST',
     credentials: 'include',
@@ -67,7 +69,8 @@ function insert_render_editor(config, modal, full) {
   .then((response) => {
     editor_iframe(response, modal, full)
   })
-  .catch(() => {
+  .catch((error) => {
+    console.log(error);
     console.log("=> Can't load preview, demo server error");
   });
 }
