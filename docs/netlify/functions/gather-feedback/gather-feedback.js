@@ -28,8 +28,11 @@ const handler = async (event) => {
     pageURL,
     submittedOn,
     helpful,
-    email,
+    email
   }
+
+  console.log(doc);
+  console.log(client);
 
   return client
     .create(doc)
