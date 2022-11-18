@@ -67,9 +67,13 @@ meta_description: Get started with Label Studio by creating projects to label an
 </div>
 
 <div class="columns">
-  <div class="card card-light">
+  <div class="card-light card opensource-only">
     <%- partial("component/heading", {text: "Getting Started", tag: "h2", customClass: "card-title" }) %>
     <%- partial("component/link", { url: "/guide/install.html", label: "Learn how to install", customClass: "card-cta" }) %>
+  </div>
+  <div class="card-light card enterprise-only">
+    <%- partial("component/heading", {text: "Getting Started", tag: "h2", customClass: "card-title" }) %>
+    <%- partial("component/link", { url: "/guide/install_enterprise.html", label: "Learn how to install", customClass: "card-cta" }) %>
   </div>
   <div class="card card-light">
     <%- partial("component/heading", {text: "Labeling Templates", tag: "h2", customClass: "card-title" }) %>
@@ -197,7 +201,7 @@ meta_description: Get started with Label Studio by creating projects to label an
       <li class="enterprise-only">
         <%- partial("component/link", { url: "/app.heartex.com/docs/api", label: "API and SDKs", size: "Full" }) %>
       </li>
-      <li>
+      <li class="opensource-only">
         <%- partial("component/link", { url: "/api", label: "API and SDKs", size: "Full" }) %>
       </li>
       <li>
