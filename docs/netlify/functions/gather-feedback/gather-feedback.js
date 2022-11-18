@@ -19,7 +19,7 @@ const handler = async (event) => {
     "Access-Control-Allow-Methods": "POST",
   };
 
-  const {feedback, pageURL, helpful, pageTitle, submittedOn} = JSON.parse(event.body);
+  const {feedback, pageURL, helpful, pageTitle, submittedOn, email} = JSON.parse(event.body);
 
   const doc = {
     "_type": "docsFeedback",
@@ -29,7 +29,6 @@ const handler = async (event) => {
     submittedOn,
     helpful,
     email,
-    site
   }
 
   return client
