@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3733: Persist and use the pending draft to attach added comments",
-  "commit": "4b082ba9d7a48216267742f14c0c548beb456f90",
-  "branch": "master",
-  "date": "2022/11/17 08:06:22"
+  "message": "fix: DEV-2706: Fix the misalignment between frame numbers",
+  "commit": "a90c30f328b0855c78a3ae7529802a90628eefd6",
+  "branch": "fb-dev-2706/frames-misalingment",
+  "date": "2022/11/18 17:39:40"
 }
