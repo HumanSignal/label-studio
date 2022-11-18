@@ -63,7 +63,7 @@ function openCodeTab(id, event) {
   tabs.forEach(function (codeTab, o1) {
 
     var buttons = '<div class="close-tabs buttons">';
-    const panels = codeTab.querySelectorAll("* > div");
+    const panels = codeTab.querySelectorAll("[data-name]");
     panels.forEach(function (tab, o2) {
       const name = tab.dataset.name;
       const id = 'code-tab-' + o1 + '-' + o2;
