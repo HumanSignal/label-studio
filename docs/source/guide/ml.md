@@ -55,7 +55,8 @@ The machine learning backend server starts becomes available at `http://localhos
 
 After you [create your own machine learning backend](ml_create.html), you can start the ML backend server by following these instructions.
 
-> Use a virtual environment with `venv`, `virtualenv` or `conda` Python environments to run your ML backend. You can use the same environment as Label Studio. For more information, see the [Python documentation about creating virtual environments](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments).
+!!! note 
+    Use a virtual environment with `venv`, `virtualenv` or `conda` Python environments to run your ML backend. You can use the same environment as Label Studio. For more information, see the [Python documentation about creating virtual environments](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments).
 
 1. Clone the Label Studio Machine Learning Backend git repository. From the command line, run the following:
   ```bash
