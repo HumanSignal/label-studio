@@ -1,7 +1,5 @@
 <% const isEnterpriseTheme = theme.tier === "enterprise" %>
 
-<%- partial("component/heading", {text: "Docs", size: "XXSmall", tag: "h2", href: "/guide/"}) %>
-
   <ul class="page-sidebar-list">
     <% const pages = site.pages.filter(page => page.type === type && (page.tier === theme.tier || page.tier === "all" || page.type === "tags" || page.type === "playground" || page.type === "templates")).sort('order'); %>
     <% const parentPages = pages.filter(page => page.parent === undefined) %>

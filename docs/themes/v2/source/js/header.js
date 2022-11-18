@@ -46,5 +46,20 @@
   
     window.addEventListener("keydown", handleFocusSearch);
   });
+
+  if (window.matchMedia( "(hover: none)" ).matches) {
+    const toggleQuickNav = (e) => {
+      if (e.target.tagName.toLowerCase() !== 'a') {
+        const component = e.currentTarget;
+        const menu = component.querySelector("ul");
+        const menuStyles = getComputedStyle(menu);
+
+        menu.style.setProperty('display', menuStyles.display=== "flex" ? "none" : "flex");
+      }
+    }
+  
+    const toggleQuicNavButton = document.querySelector(".page-header-content-switcher");
+    toggleQuicNavButton.addEventListener("click", toggleQuickNav)
+ }
 })();
 
