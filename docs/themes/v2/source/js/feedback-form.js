@@ -29,9 +29,9 @@
     }
 
 
-    fetch('/.netlify/functions/gather-feedback', { method: 'POST', body: JSON.stringify(data) }).then(response => {
-      if(response.status === 200) setFeedback({submitted: true, helpful: data.helpful})
-      console.log(response.status)
+    fetch('https://label-studio-docs-new-theme.netlify.app/.netlify/functions/gather-feedback', { method: 'POST', body: JSON.stringify(data) }).then(response => {
+      /* if(response.status === 200) setFeedback({submitted: true, helpful: data.helpful}) */
+      console.log(response)
     })
   }
 
