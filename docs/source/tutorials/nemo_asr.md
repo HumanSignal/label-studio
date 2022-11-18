@@ -1,11 +1,13 @@
 ---
-title:
+title: Automatic Speech Recognition with NVIDIA NeMo
 type: blog
 tier: all
 order: 60
+meta_title: Automatic Speech Recognition with NVIDIA NeMo
+meta_description: Label Studio tutorial for Automatic Speech Recognition with NVIDIA NeMo
+
 ---
 
-## Automatic Speech Recognition with NVIDIA NeMo
 
 This an example of using [Nvidia's NeMo toolkit](https://github.com/NVIDIA/NeMo) for creating Automatic Speech Recognition (ASR), Natural Language Understanding (NLU) or Text-to-Speech (TTS) pre-annotations.
 

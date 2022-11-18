@@ -107,11 +107,11 @@ Select the relevant tab and follow the steps for your desired option:
 ```
 
 3. Create an **IAM role as a Web Identity** using the cluster OIDC provider as the identity provider:
-   1. Create a new **Role** from your IAM Console.
-   2. Select the **Web identity** Tab.
-   3. In the **Identity Provider** drop-down, select the OpenID Connect provider URL of your EKS and `sts.amazonaws.com` as the Audience.
-   4. Attach the newly created permission to the Role and name it.
-   5. Retrieve the Role arn for the next step.
+   - Create a new **Role** from your IAM Console.
+   - Select the **Web identity** Tab.
+   - In the **Identity Provider** drop-down, select the OpenID Connect provider URL of your EKS and `sts.amazonaws.com` as the Audience.
+   - Attach the newly created permission to the Role and name it.
+   - Retrieve the Role arn for the next step.
 4. After you create an IAM role, add it as an annotation in your `lse-values.yaml` file.
    Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 

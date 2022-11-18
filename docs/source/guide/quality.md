@@ -28,9 +28,9 @@ After you [assign reviewers to tasks](#Assign-reviewers-to-tasks), they can revi
 
 1. Reviewers can click **Review Annotations** for a specific project, then click **Review All Tasks** on the Data Manager to start reviewing tasks. Administrators and project managers can click **Explore All Reviews** from the Data Manager or **Explore Review** from the Dashboard to review tasks.
 2. Review the first task and annotation. By default, you view the tasks in numeric order. If you want to change the order that you review tasks, see [Choose what to review](#Choose-what-to-review). You can see the annotator and their annotation. 
-- If the annotation is correct, click **Accept**.
-- If the annotation is mostly correct, you can correct it by selecting a different option, changing the selected region, moving the bounding box, or whichever makes sense for the type of label you're reviewing. After correcting the annotation, click **Fix & Accept**. 
-- If the annotation is completely incorrect, or you don't want to attempt to correct it at all, click **Reject** to reject the annotation. To place a rejected task back in the Label Stream for annotation, you must delete the annotation. Rejecting an annotation does not return it to annotators to re-label.
+    - If the annotation is correct, click **Accept**.
+    - If the annotation is mostly correct, you can correct it by selecting a different option, changing the selected region, moving the bounding box, or whichever makes sense for the type of label you're reviewing. After correcting the annotation, click **Fix & Accept**. 
+    - If the annotation is completely incorrect, or you don't want to attempt to correct it at all, click **Reject** to reject the annotation. To place a rejected task back in the Label Stream for annotation, you must delete the annotation. Rejecting an annotation does not return it to annotators to re-label.
 After you complete a review, the next task appears for your review.
 3. Continue reviewing annotated tasks until you've reviewed all annotated tasks. Click **Data Manager** to return to the list of tasks for the project.
 

@@ -27,8 +27,8 @@ For example, for an image classification task, the model pre-selects an image cl
 
 At a high level, do the following: 
 1. Set up an ML backend. You can either:
-   1. [Start an example ML backend](#Quickstart-with-an-example-ML-backend) or 
-   2. [Create your own machine learning backend](ml_create.html) and then [Start your custom ML backend](#Start-your-custom-ML-backend-with-Label-Studio).
+   - [Start an example ML backend](#Quickstart-with-an-example-ML-backend) or 
+   - [Create your own machine learning backend](ml_create.html) and then [Start your custom ML backend](#Start-your-custom-ML-backend-with-Label-Studio).
 2. [Connect Label Studio to the ML backend](#Add-an-ML-backend-to-Label-Studio).
 
 ## Quickstart with an example ML backend

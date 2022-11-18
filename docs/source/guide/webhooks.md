@@ -1,6 +1,6 @@
 ---
 title: Set up webhooks in Label Studio
-short: Webhook Setup
+short: Webhook setup
 type: guide
 tier: all
 order: 910

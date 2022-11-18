@@ -8,6 +8,7 @@ meta_description: Label Studio tutorial for text classification using Scikit-Lea
 
 ---
 
+
 This tutorial explains the basics of using a Machine Learning (ML) backend with Label Studio using a simple text classification model powered by the [scikit-learn](https://scikit-learn.org/stable/) library.
 
 Follow this tutorial with a text classification project, where the labeling interface uses the `<Choices>` control tag with the `<Text>` object tag. The following is an example label config that you can use:
