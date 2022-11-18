@@ -46,7 +46,7 @@
     <% var tocHeader = pagesArray[0].page.section %>
     <% pagesArray.forEach(function (p, index) { %>
       <% const tocHeaderFileName = headers.find(headerType => headerType.type === type)?.headers[p.fileName] %>
-      <% if(((p.type === "guide" && index === 0) || tocHeader !== p.page.section || tocHeaderFileName)) { %>
+      <% if(((p.page.type === "guide" && index === 0) || tocHeader !== p.page.section || tocHeaderFileName)) { %>
         </ul>
           <% if(locals.component === "nav") { %>
             <button>
