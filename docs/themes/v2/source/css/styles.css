@@ -219,7 +219,9 @@ body {
 }
 
 .HeaderLogo {
-  border-right: 1px var(--color-gray-700) solid;
+  --border-color: var(--color-gray-300);
+
+  border-right: 1px var(--border-color) solid;
   padding-right: 1rem;
   margin-right: 1rem;
 }
@@ -1854,6 +1856,10 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
 
 .page-tier-enterprise .page-header-content-switcher ul a:hover {
   color: var(--color-yellow-100);
+}
+
+.page-tier-enterprise .HeaderLogo {
+  --border-color: var(--color-gray-700);
 }
 
 @media (max-width: 1150px) {
