@@ -1,5 +1,6 @@
 ---
 title: Frontend builds
+short: Frontend builds
 type: guide
 tier: all
 order: 950
