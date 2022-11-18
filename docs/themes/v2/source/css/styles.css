@@ -160,7 +160,7 @@ body {
 
 @media (max-width: 550px) {
   .page-header-logo {
-    flex-basis: 15em;
+    flex-basis: 14em;
     flex-grow: 1;
   }
 }
@@ -1845,8 +1845,14 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
 }
 
 .page-tier-enterprise .HeaderLogo {
-  flex-basis: 12em;
-  flex-grow: 1;
+  --border-color: var(--color-gray-700);
+}
+
+@media (max-width: 500px) {
+  .page-tier-enterprise .HeaderLogo {
+    flex-basis: 12em;
+    flex-grow: 1;
+  }
 }
 
 .page-tier-enterprise .HeaderLogo svg {
@@ -1869,10 +1875,6 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
 
 .page-tier-enterprise .page-header-content-switcher ul a:hover {
   color: var(--color-yellow-100);
-}
-
-.page-tier-enterprise .HeaderLogo {
-  --border-color: var(--color-gray-700);
 }
 
 @media (max-width: 1150px) {
