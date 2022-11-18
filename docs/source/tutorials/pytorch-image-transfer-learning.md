@@ -1,13 +1,13 @@
 ---
-title:
+title: Transfer learning for images with PyTorch
 type: blog
 tier: all
 order: 30
 meta_title: Computer Vision PyTorch Tutorial
 meta_description: Label Studio tutorial for computer vision that showcases transfer learning for images using PyTorch and Label Studio.
+
 ---
 
-## Transfer learning for images with PyTorch
 
 This example explains the basics of computer vision with Label Studio and [PyTorch](https://pytorch.org/).
 The proposed model uses transfer learning from the popular ResNet image classifier and can be fine-tuned to your own data.

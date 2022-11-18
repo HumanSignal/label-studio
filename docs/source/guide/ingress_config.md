@@ -100,7 +100,7 @@ For advanced Kubernetes administrators, you can use the NGINX Ingress Controller
 1. Deploy NGINX Ingress Controller following the relevant steps for your cloud deployment. See [Cloud deployments](https://kubernetes.github.io/ingress-nginx/deploy/#cloud-deployments) in the NGINX Ingress Controller Installation Guide. 
 2. In order to terminate SSL certificates in the ingress controller, install cert-manager. See [Installation](https://cert-manager.io/docs/installation/) on the cert-manager documentation site.  
 3. You must synchronize the ingress hosts with DNS. Install [ExternalDNS](https://github.com/kubernetes-sigs/external-dns#readme) and choose the relevant cloud provider for your deployment.
-   1. Finally, update your `lse-values.yaml` file with the ingress details like the following example. Replace `"your_domain_name"` with your hostname and `<CERTIFICATE_NAME>` with the name of the resource that you created with ExternalDNS.
+4. Finally, update your `lse-values.yaml` file with the ingress details like the following example. Replace `"your_domain_name"` with your hostname and `<CERTIFICATE_NAME>` with the name of the resource that you created with ExternalDNS.
 ```yaml
 app:
   ingress:

@@ -15,9 +15,13 @@ LSF can be customized and extended to fit your needs, and you can use a custom v
 LSF is located as a separate GitHub repository: https://github.com/heartexlabs/label-studio-frontend
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/frontend/lsf-in-ls.jpg" style="opacity: 0.9"/></div>
+<img src="/images/frontend/lsf-in-ls.jpg" class="gif-border">
+
+<i>Figure 1: Label Studio Frontend </i>
+
 
 ## Installation
+
 There are two ways to install the LSF as follows:
 
 1. Using the package manager
@@ -44,6 +48,7 @@ yarn add heartexlabs@label-studio@latest
 ```
 
 ## Frontend integration guide
+
 The LSF can be used with Vanilla JS or with the framework of your choice. The following examples cover basic integration with Vanilla and React.
 
 ### Vanilla JS integration
@@ -224,6 +229,7 @@ const App = () => {
 render(<App />, document.getElementById('root'));
 ```
 {% endcollapse %}
+
 
 ## Frontend development
 

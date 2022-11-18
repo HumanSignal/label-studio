@@ -29,7 +29,7 @@ Label Studio Enterprise uses SCIM Version 2.0 standard. As an example, this page
 
 ## Set up SCIM integration
 
-<i>Check this video tutorial about SCIM and Okta setup</i>
+<i>Check this video tutorial about SCIM and Okta setup.</i>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/MA3de3gu18A" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 To manage access to Label Studio Enterprise, add the application to your SCIM provider (Okta). Okta uses OAuth token to interact with REST API endpoints of the application to provision and deprovision access.

@@ -1,13 +1,13 @@
 ---
-title:
+title: Create the simplest Machine Learning backend
 type: blog
 tier: all
 order: 10
 meta_title: Integrating with Machine Learning Backend Tutorial
 meta_description: Label Studio tutorial for creating and integrating your Machine Learning backend with Label Studio.
+
 ---
 
-## Create the simplest Machine Learning backend
 
 This tutorial explains the basics of using a Machine Learning (ML) backend with Label Studio. For the sake of simplicity, this tutorial relies on a _dummy model_ that just produces random predictions.
 This model is compatible with any classification task, such as those projects where the `<Choices>` tag is used.
