@@ -1,27 +1,31 @@
 ---
-title: Communicate with Annotators and Reviewers 
-badge: <i class='ent'></i>
+title: Comments and notifications 
+short: Comments and notifications
+tier: enterprise
 type: guide
-order: 411
-meta_title: Communicate with Annotators and Reviewers in Label Studio
-meta_description: The Comments feature defines how annotators and reviewers communicate and receive updates on projects and tasks.
-
-
+section: 
+order: 150
+meta_title: Comment and notification systems in Label Studio
+meta_description: The Comments and Notifications feature defines how annotators, reviewers and administrators communicate and receive updates on projects and tasks.
 ---
 
-Annotators and Reviewers need a single place where they can access and manage their workflow and results. This location must facilitate basic conversation associated to task outcome, management (navigation), and investigation (history). This page explains the following features to communicate with Annotators and Reviewers.  
+Annotators, reviewers, and administrators can use comments to do the following:
+
+- Speed up the labeling process
+- Increase the annotation quality
+- Build more solid labeling and review processes
+
+Users can discuss task issues and other problems that happen during labeling and reviewing processes using Comments and Notifications in Label Studio Enterprise.
 
 - [Comments](#comments).
 - [Notifications](#notifications).
 
 ## Comments 
 
-The **Comments** feature allows the Annotators and Reviewers to communicate and discuss queries on Label Studio UI. Users will be notified of comments if they are tagged or associated with the task, and new comments will show up in the **Notifications** panel for quick reference. Users can also filter and sort tasks by **Comments** status in the **Data Manager** view, such as finding tasks with unresolved comments from a particular user.
+The **Comments** feature allows the Annotators and Reviewers to communicate and discuss queries on Label Studio Enterprise. Users will be notified of comments if they are associated with the task, and new comments will show up in the **Notifications** panel for a quick reference. Users can also filter and sort tasks by **Comments** status in the **Data Manager** view, such as finding tasks with unresolved comments from a particular user.
 
 
 ### Roles and Capabilities
-
-This section describes the user roles and capable actions on the **Comments** feature by using the Label studio UI. 
 
 #### All users
 
@@ -31,23 +35,17 @@ All users with access to Label Studio UI can do the following:
 - By default, you can see the comment section while annotating tasks.
 - Add a comment by clicking on the input field and then typing your comment.
 - Send the comment by clicking on the send (>) icon. 
-- When you select a region, you cannot see the **Annotation History** or **Comments** sections in the **Details** panel.
-
-!!! note
-    Your comment will be displayed with the timestamp and avatar.
 
 #### Annotators 
 
-As an **Annotator** in Label Studio UI, you can do the following:
+As an **Annotator**, you can do the following:
 
-- See when your comment has been resolved by others.
-- See comments by others that have been resolved.
-- Unable to resolve any comments.
-- See other people’s comments on your annotation if you have the required permission.
+- See comments from your annotations and drafts. 
+- Resolve your own comments.
 
 #### Reviewers
 
-As a **Reviewer** in Label Studio UI, you can do the following:
+As a **Reviewer**, you can do the following:
 
 - See comments added by **Annotators** and other **Reviewers**.
 - Resolve your comments.
@@ -154,19 +152,19 @@ To unresolve comments, click the three dots (**...**) >> **Unresolve** button.
 <i>Figure 11: Unresolved comments</i>
 
 
-## Notifications
 
-Notifications are a way to let you know that something new has happened, so you don't miss anything that might be worth your attention and appears whether you are using the Label Studio UI or not. 
+
+
+
+## Notifications 
 
 To see the notifications, navigate and click the user profile icon on the top-right of the Label Studio UI.  The **Notifications** pane opens with a bell icon next to it. The blue color bell icon indicates unread notifications and the grey color bell icon indicates read notifications.
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/notifications.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/notifications.png" style="opacity: 0.8" class="gif-border"/></div>
 <i>Figure 12: Notifications pane.</i>
 
 ### Roles and Capabilities
-
-This section describes the user roles and capable actions on the **Notifications** feature by using the Label studio UI. 
 
 All users with access to Label Studio UI can do the following:
 
