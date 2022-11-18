@@ -1735,7 +1735,7 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
 }
 
 .page-tier-enterprise .enterprise-only {
-  display: block;
+  display: revert;
 }
 
 .page-tier-enterprise .page-header-chevron-icon path {
