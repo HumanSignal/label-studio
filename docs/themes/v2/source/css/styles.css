@@ -665,6 +665,11 @@ main {
   margin-bottom: 0;
   margin-top: 2em;
 }
+
+.content-markdown h1 + * {
+  margin-top: 2rem;
+}
+
 .content-markdown a:not(.Button) {
   color: var(--color-main-accent);
 }
