@@ -10,7 +10,6 @@ section: "Overview"
 
 Label Studio is available as a Community edition open source data labeling tool. It is also available as a paid version with extended functionality and support. Smaller organizations might want to consider the SaaS option and larger teams with robust data labeling needs can get the Enterprise edition. To get started with Label Studio Enterprise edition, contact the [Heartex team](https://heartex.com/). 
 
-
 <table>
   <tr>
     <th>Functionality</th>
