@@ -21,21 +21,6 @@
     <%
       const headers = [
         {
-          type: "guide",
-          headers: {
-            'install': 'Install and Upgrade',
-            'install_enterprise': 'Deploy and Install Enterprise',
-            'security': 'Security and Privacy',
-            'signup': 'Manage Users',
-            'tasks': 'Import Data',
-            'setup_project': 'Labeling and Projects',
-            'quality': 'Manage Annotations',
-            'ml': 'Machine Learning Setup',
-            'webhooks': 'Integrations',
-            'frontend': 'Advanced Development'
-          }
-        },
-        {
           type: "tags",
           headers: {
             "audio": "Object Tags",
@@ -62,17 +47,18 @@
 
     <% var tocHeader = pagesArray[0].page.section %>
     <% pagesArray.forEach(function (p, index) { %>
-      <% if((index === 0 || tocHeader !== p.page.section)) { %>
+      <% const tocHeaderFileName = headers.find(headerType => headerType.type === type)?.headers[p.fileName] %>
+      <% if(((p.type === "guide" && index === 0) || tocHeader !== p.page.section || tocHeaderFileName)) { %>
         </ul>
           <% if(locals.component === "nav") { %>
             <button>
-              <%- p.page.section %>
+              <%- p.page.section || tocHeaderFileName %>
               <svg width="13" height="8" viewBox="0 0 13 8" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292969 0.805007L1.00008 0.0979004L6.64652 5.74435L12.293 0.0979004L13.0001 0.805007L6.64652 7.15856L0.292969 0.805007Z" />
               </svg>
             </button>
           <% } else { %>
-            <%- partial("component/text", {text: p.page.section, size: "Eyebrow", tag: "h3"}) %>
+            <%- partial("component/text", {text: p.page.section || tocHeaderFileName, size: "Eyebrow", tag: "h3"}) %>
           <% } %>
         <ul class="page-sidebar-list">
       <% }
