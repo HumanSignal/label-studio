@@ -508,6 +508,7 @@ main {
   font-size: clamp(var(--min-size), var(--breakpoint), var(--max-size));
   line-height: var(--line-height);
   font-family: var(--font-family-primary);
+  position: relative;
 }
 
 .Heading a {
@@ -582,6 +583,14 @@ main {
 
 .content-markdown a:not(.Button):hover {
   text-decoration: none;
+}
+
+.content-markdown .headerlink {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
 }
 
 /****************************
