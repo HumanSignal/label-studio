@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3666: Fix maxUsages on regions creation",
-  "commit": "64df4404092af9bbbfeb2d0c41dbb2dd7ebec235",
+  "commit": "a6598a96afa59e41db2a81cf5a96bf89927446ee",
   "branch": "fb-dev-3666/max-usages",
-  "date": "2022/11/17 06:23:28"
+  "date": "2022/11/19 13:43:18"
 }
