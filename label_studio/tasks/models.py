@@ -96,7 +96,6 @@ class Task(TaskMixin, models.Model):
 
     class Meta:
         db_table = 'task'
-        ordering = ['-updated_at']
         indexes = [
             models.Index(fields=['project', 'is_labeled']),
             models.Index(fields=['project', 'inner_id']),
@@ -358,6 +357,9 @@ class Annotation(AnnotationMixin, models.Model):
 
     task = models.ForeignKey('tasks.Task', on_delete=models.CASCADE, related_name='annotations', null=True,
                              help_text='Corresponding task for this annotation')
+    # duplicate relation to project for performance reasons
+    project = models.ForeignKey('projects.Project', related_name='annotations', on_delete=models.CASCADE, null=True,
+                                help_text='Project ID for this annotation')
     completed_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="annotations", on_delete=models.SET_NULL,
                                      null=True, help_text='User ID of the person who created this annotation')
     was_cancelled = models.BooleanField(_('was cancelled'), default=False, help_text='User skipped the task', db_index=True)

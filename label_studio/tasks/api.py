@@ -369,7 +369,7 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
 
         # updates history
         result = ser.validated_data.get('result')
-        extra_args = {'task_id': self.kwargs['pk']}
+        extra_args = {'task_id': self.kwargs['pk'], 'project_id': task.project_id}
 
         # save stats about how well annotator annotations coincide with current prediction
         # only for finished task annotations
