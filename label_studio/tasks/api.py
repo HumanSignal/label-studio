@@ -18,7 +18,7 @@ from core.utils.common import (
     DjangoFilterDescriptionInspector,
     get_object_with_check_and_log,
 )
-from core.utils.common import bool_from_request
+from core.utils.params import bool_from_request
 from data_manager.api import TaskListAPI as DMTaskListAPI
 from data_manager.functions import evaluate_predictions
 from data_manager.models import PrepareParams
@@ -195,8 +195,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             project = Task.objects.get(id=self.request.parser_context['kwargs'].get('pk')).project.id
         return self.prefetch(
             Task.prepared.get_queryset(
-                prepare_params=PrepareParams(project=project, selectedItems=selected),
-                request=self.request,
+                prepare_params=PrepareParams(project=project, selectedItems=selected, request=self.request),
                 **kwargs
             ))
 
@@ -370,7 +369,7 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
 
         # updates history
         result = ser.validated_data.get('result')
-        extra_args = {'task_id': self.kwargs['pk']}
+        extra_args = {'task_id': self.kwargs['pk'], 'project_id': task.project_id}
 
         # save stats about how well annotator annotations coincide with current prediction
         # only for finished task annotations

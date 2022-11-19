@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3436: Add comment icons in annotations dropdown (#105)\n\nCo-authored-by: Max Tkachenko <makseq@gmail.com>",
-  "commit": "118b7b784df6bbc90c3f5e1d2aec9b019b351976",
+  "message": "feat: DEV-3750: Load task with given comment",
+  "commit": "8d2ddf8825e98156ea15e8695412be434399a13c",
   "branch": "master",
-  "date": "2022-09-22T10:35:33Z"
+  "date": "2022/11/18 16:46:59"
 }

@@ -349,9 +349,16 @@ class Project(ProjectMixin, models.Model):
         membership = ProjectMember.objects.filter(user=user, project=self)
         return membership.exists() and membership.first().enabled
 
-    def _update_tasks_states(
-        self, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed
-    ):
+    def _update_tasks_states(self,
+                             maximum_annotations_changed,
+                             overlap_cohort_percentage_changed,
+                             tasks_number_changed):
+        """
+        Update tasks states after settings change
+        :param maximum_annotations_changed: If maximum_annotations param changed
+        :param overlap_cohort_percentage_changed: If cohort_percentage param changed
+        :param tasks_number_changed: If tasks number changed in project
+        """
         # if only maximum annotations parameter is tweaked
         if maximum_annotations_changed and (not overlap_cohort_percentage_changed or self.maximum_annotations == 1):
             tasks_with_overlap = self.tasks.filter(overlap__gt=1)
@@ -363,41 +370,19 @@ class Project(ProjectMixin, models.Model):
             else:
                 # otherwise affect all tasks
                 self.tasks.update(overlap=self.maximum_annotations)
+                tasks_with_overlap = self.tasks.all()
+            # update is_labeled after change
+            bulk_update_stats_project_tasks(
+                tasks_with_overlap
+            )
 
         # if cohort slider is tweaked
         elif overlap_cohort_percentage_changed and self.maximum_annotations > 1:
-            self._rearrange_overlap_cohort()
+            self.rearrange_overlap_cohort()
 
         # if adding/deleting tasks and cohort settings are applied
         elif tasks_number_changed and self.overlap_cohort_percentage < 100 and self.maximum_annotations > 1:
-            self._rearrange_overlap_cohort()
-
-        if maximum_annotations_changed or overlap_cohort_percentage_changed or tasks_number_changed:
-            bulk_update_stats_project_tasks(
-                self.tasks.filter(Q(annotations__isnull=False))
-            )
-
-    def update_tasks_states(
-        self, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed
-    ):
-        start_job_async_or_sync(self._update_tasks_states, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed)
-
-
-    def update_tasks_states_with_counters(
-        self, maximum_annotations_changed, overlap_cohort_percentage_changed,
-            tasks_number_changed, tasks_queryset
-    ):
-        start_job_async_or_sync(self._update_tasks_states_with_counters, maximum_annotations_changed,
-                                overlap_cohort_percentage_changed, tasks_number_changed, tasks_queryset)
-
-
-    def _update_tasks_states_with_counters(
-        self, maximum_annotations_changed, overlap_cohort_percentage_changed,
-            tasks_number_changed, tasks_queryset
-    ):
-        self._update_tasks_states(maximum_annotations_changed, overlap_cohort_percentage_changed,
-            tasks_number_changed)
-        self.update_tasks_counters(tasks_queryset)
+            self.rearrange_overlap_cohort()
 
     def _rearrange_overlap_cohort(self):
         """
@@ -437,6 +422,8 @@ class Project(ProjectMixin, models.Model):
         else:
             tasks_with_max_annotations.update(overlap=max_annotations)
             tasks_with_min_annotations.update(overlap=1)
+        # update is labeled after tasks rearrange overlap
+        bulk_update_stats_project_tasks(all_project_tasks)
 
     def remove_tasks_by_file_uploads(self, file_upload_ids):
         self.tasks.filter(file_upload_id__in=file_upload_ids).delete()
@@ -520,6 +507,8 @@ class Project(ProjectMixin, models.Model):
             diff_str = []
             for ann_tuple in different_annotations:
                 from_name, to_name, t = ann_tuple.split('|')
+                if t.lower() == 'textarea':  # avoid textarea to_name check (see DEV-1598)
+                    continue
                 if not check_control_in_config_by_regex(config_string, from_name) or \
                 not check_toname_in_config_by_regex(config_string, to_name) or \
                 t not in get_all_types(config_string):
@@ -549,6 +538,10 @@ class Project(ProjectMixin, models.Model):
             labels_from_config_by_tag = set(labels_from_config[get_original_fromname_by_regex(config_string, control_tag_from_data)])
             parsed_config = parse_config(config_string)
             tag_types = [tag_info['type'] for _, tag_info in parsed_config.items()]
+            # DEV-1990 Workaround for Video labels as there are no labels in VideoRectangle tag
+            if 'VideoRectangle' in tag_types:
+                for key in labels_from_config:
+                    labels_from_config_by_tag |= set(labels_from_config[key])
             if 'Taxonomy' in tag_types:
                 custom_tags = Label.objects.filter(links__project=self).values_list('value', flat=True)
                 flat_custom_tags = set([item for sublist in custom_tags for item in sublist])
@@ -612,7 +605,7 @@ class Project(ProjectMixin, models.Model):
 
         # argument for recalculate project task stats
         if recalc:
-            self.update_tasks_states(
+            self._update_tasks_states(
                 maximum_annotations_changed=self.__maximum_annotations != self.maximum_annotations,
                 overlap_cohort_percentage_changed=self.__overlap_cohort_percentage != self.overlap_cohort_percentage,
                 tasks_number_changed=False,
@@ -798,7 +791,13 @@ class Project(ProjectMixin, models.Model):
         self._storage_objects = storage_objects
         return storage_objects
 
-    def update_tasks_counters(self, queryset, from_scratch=True):
+    def _update_tasks_counters(self, queryset, from_scratch=True):
+        """
+        Update tasks counters
+        :param queryset: Tasks to update queryset
+        :param from_scratch: Skip calculated tasks
+        :return: Count of updated tasks
+        """
         objs = []
 
         total_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
@@ -1001,6 +1000,9 @@ class ProjectSummary(models.Model):
 
     def _get_labels(self, result):
         result_type = result.get('type')
+        # DEV-1990 Workaround for Video labels as there are no labels in VideoRectangle tag
+        if result_type in ['videorectangle']:
+            result_type = 'labels'
         result_value = result['value'].get(result_type)
         if not result_value or not isinstance(result_value, list) or result_type == 'text':
             # Non-list values are not labels. TextArea list values (texts) are not labels too.

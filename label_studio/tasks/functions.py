@@ -12,8 +12,11 @@ from data_export.models import DataExport
 from data_export.serializers import ExportDataSerializer
 from organizations.models import Organization
 from projects.models import Project
-from tasks.models import Task
+from tasks.models import Task, Annotation
 from data_export.mixins import ExportMixin
+
+
+logger = logging.getLogger(__name__)
 
 
 def calculate_stats_all_orgs(from_scratch, redis):
@@ -118,3 +121,17 @@ def export_project(project_id, export_format, path, serializer_context=None):
     logger.debug(f"End exporting project <{project.title}> ({project.id}) in {export_format} format.")
 
     return filepath
+
+
+def _fill_annotations_project(project_id):
+    Annotation.objects.filter(task__project_id=project_id).update(project_id=project_id)
+
+
+def fill_annotations_project():
+    logger.info('Start filling project field for Annotation model')
+
+    projects = Project.objects.all()
+    for project in projects:
+        start_job_async_or_sync(_fill_annotations_project, project.id)
+
+    logger.info('Finished filling project field for Annotation model')
