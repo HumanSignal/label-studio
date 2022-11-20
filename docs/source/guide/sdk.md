@@ -24,9 +24,9 @@ See the [full SDK reference documentation for all available modules](/sdk/index.
 1. Install the SDK:
    `pip install label-studio-sdk`
 2. In your Python script, do the following:
-   1. Import the SDK.
-   2. Define your API key and Label Studio URL (API key is available at _Account_ page).
-   3. Connect to the API.
+   - Import the SDK.
+   - Define your API key and Label Studio URL (API key is available at _Account_ page).
+   - Connect to the API.
 ```python
 # Define the URL where Label Studio is accessible and the API key for your user account
 LABEL_STUDIO_URL = 'http://localhost:8080'

@@ -10,6 +10,7 @@ Sign up and create an account for Label Studio to start labeling data and settin
 
 Everyone with an account in Label Studio has access to the same functionality. If you're using Label Studio Enterprise, see [Manage access to Label Studio](manage_users.html) for details about what role-based access control is available. 
 
+
 ## Create an account
 
 When you first [start Label Studio](start.html), you see the sign up screen. 
@@ -71,13 +72,36 @@ LABEL_STUDIO_USER_TOKEN=<token-at-least-5-chars>
 ```
 Then, start Label Studio and log in with the username and password that you set as environment variables and start [inviting collaborators](#Invite-collaborators-to-a-project).
 
+
 ## Invite collaborators to a project
 
 After you [set up a labeling project](setup.html), invite annotators to the project to start collaborating on labeling tasks. Inviting people to your Label Studio instance with a link does not restrict access to the signup page unless you also set an environment variable. See how to [Restrict signup for local deployments](#Restrict-signup-for-local-deployments) and [Restrict signup for cloud deployments](#Restrict-signup-for-cloud-deployments) on this page.
 
-1. In the Label Studio UI, click the hamburger icon and click **People**.
-2. Click **+ Add People**.
-3. Copy the invitation link and share it with those that you want to invite to Label Studio. If you need to update the link and deactivate the old one, return to this page and click **Reset Link**. The link only resets if the signup page is also disabled.
+1. In the Label Studio UI, click the three horizontal lines icon and navigate to **Organization**.
+
+<img src="../images/three-line-icon.png" class="gif-border" />
+<i>Figure 1: Three horizontal lines icon. </i>
+
+
+2. Click **Invite People**.
+3. Now, you will see a `Invite people to your organization` screen. 
+
+<img src="../images/invite-user.png" class="gif-border" />
+<i>Figure 2: Invite people. </i>
+
+4. Use one of the following ways to invite people to Label Studio:
+
+    - **Invite link**: Invite people to join your organization. People that you invite appear as "Not Activated" until you assign them a role. For more information, see [manage users](https://labelstud.io/guide/manage_users.html) page. Copy the invitation link by clicking the **Copy link** button and share it with those that you want to invite to Label Studio. If you need to update the link and deactivate the old one, return to this page and click **Reset Link**. The link only resets if the signup page is also disabled.
+
+    - **Invite via email**: Invite people to join your organization over email. The organization role selected will be assigned automatically. Inside the text box, enter email ids separately by spaces and commas.
+
+5. Select a role from the **Organization role** drop-down list.
+
+<img src="../images/select-role-user-invite.png" class="gif-border" />
+<i>Figure 3: Organization role. </i>
+
+6. Click **Send invite**. 
+
 
 ## Manage your account in Label Studio
 After you create an account in Label Studio, you can make changes to it as needed.

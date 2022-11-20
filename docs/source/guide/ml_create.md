@@ -157,7 +157,8 @@ If you want to train a model, use the training call to update your model based o
 
 Write your own code to override the `fit()` method, which takes [JSON-formatted Label Studio annotations](/export.html#Raw-JSON-format-of-completed-labeled-tasks) and returns an arbitrary JSON dictionary where information about the created model can be stored. 
 
-> Note: The `completions` field is deprecated as of Label Studio 1.0.x. In version 1.5.0 it will be removed. Instead, use the SDK or the API to retrieve annotation and task data using annotation and task IDs. See [trigger training with webhooks](#Trigger-training-with-webhooks) for more details.
+!!! attention "deprecated"
+    The `completions` field is deprecated as of Label Studio 1.0.x. In version 1.5.0, it will be removed. Instead, use the SDK or the API to retrieve annotation and task data using annotation and task IDs. For more information, see [trigger training with webhooks](#Trigger-training-with-webhooks).
 
 ### Trigger training with webhooks
 

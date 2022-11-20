@@ -61,7 +61,8 @@ Select how you want to distribute tasks to annotators for labeling. Different fr
 
 Your changes save automatically. 
 
-> You can't assign annotators to tasks unless you select the **Manual** option. 
+!!! note
+    You can't assign annotators to tasks unless you select the **Manual** option. 
 
 ### <i class='ent'></i> Set minimum annotations per task
 
@@ -96,11 +97,11 @@ If you want, you can allow empty annotations.
 ### Set up task sampling
 
 In Label Studio Community Edition, you can set up task sampling from the command line when you start Label Studio or from the Label Studio UI. 
-- To start a project with specific task sampling, see [Set up task sampling for your project](start.html#Set-up-task-sampling-for-your-project).
-- To change task sampling settings from the Label Studio UI, do the following:
-    1. Within a project on the Label Studio UI, click **Settings**.
-    2. On the **General** settings tab, under **Task Sampling**, choose between `Sequential sampling` and `Random sampling`. 
-    3. Click **Save**. 
+1. To start a project with specific task sampling, see [Set up task sampling for your project](start.html#Set-up-task-sampling-for-your-project).
+2. To change task sampling settings from the Label Studio UI, do the following:
+    - Within a project on the Label Studio UI, click **Settings**.
+    - On the **General** settings tab, under **Task Sampling**, choose between `Sequential sampling` and `Random sampling`. 
+    - Click **Save**. 
     
 <i class='ent'></i> In Label Studio Enterprise, you can set up task sampling in the annotation settings for a project.
 1. Within a project on the Label Studio UI, click **Settings**.
@@ -201,21 +202,3 @@ Starting in version 1.0.0, Label Studio stores your project data and configurati
 In versions of Label Studio earlier than 1.0.0, when you start Label Studio for the first time, it launches from a project directory that Label Studio creates, called `./my_project` by default. 
 
 `label-studio start ./my_project --init`
-
-### Project directory structure
-
-In versions of Label Studio earlier than 1.0.0, the project directory is structured as follows: 
-```
-├── my_project
-│   ├── config.json     // project settings
-│   ├── tasks.json      // all imported tasks in a JSON dictionary: {task_id: task}
-│   ├── config.xml      // labeling config for the current project
-│   ├── completions     // directory with all completed annotations stored in one file for each task_id 
-│   │   ├── <task_id>.json
-│   ├── export          // stores archives with all results exported from Label Studio UI 
-│   │   ├── 2020-03-06-15-23-47.zip
-```
-
-> Warning: Modifying any of the internal project files is not recommended and can lead to unexpected behavior. Use the Label Studio UI or command line arguments (run `label-studio start --help`) to import tasks, export completed annotations, or to change label configurations. 
-
-
