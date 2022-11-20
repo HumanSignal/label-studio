@@ -488,4 +488,4 @@ To delete a workspace, do the following:
 
   <br>
   <div style="margin:auto; text-align:center;"><img src="/images/delete-workspace.png" style="opacity: 0.8"/></div>
-  <i>Figure 10: Delete a workspace.</i>
+  <i>Figure 20: Delete a workspace.</i>
