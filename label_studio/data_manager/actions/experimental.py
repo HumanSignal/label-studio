@@ -42,7 +42,8 @@ def propagate_annotations(project, queryset, **kwargs):
             'completed_by_id': user.id,
             'result': source_annotation.result,
             'result_count': source_annotation.result_count,
-            'parent_annotation_id': source_annotation.id
+            'parent_annotation_id': source_annotation.id,
+            'project': project,
         }
         body = TaskSerializerBulk.add_annotation_fields(body, user, 'propagated_annotation')
         db_annotations.append(Annotation(**body))
@@ -50,7 +51,7 @@ def propagate_annotations(project, queryset, **kwargs):
     db_annotations = Annotation.objects.bulk_create(db_annotations, batch_size=settings.BATCH_SIZE)
     TaskSerializerBulk.post_process_annotations(user, db_annotations, 'propagated_annotation')
 
-    start_job_async_or_sync(project.update_tasks_counters, Task.objects.filter(id__in=tasks))
+    project.update_tasks_counters(Task.objects.filter(id__in=tasks))
     return {'response_code': 200, 'detail': f'Created {len(db_annotations)} annotations'}
 
 

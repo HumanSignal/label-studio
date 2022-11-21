@@ -37,7 +37,7 @@ jobs:
       # SENTRY_DSN:
 
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -78,7 +78,7 @@ jobs:
 
       - name: Get npm cache directory
         id: npm-cache-dir
-        run: echo "::set-output name=dir::$(npm config get cache)"
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
 
       - uses: actions/cache@v3
         name: Configure npm cache
@@ -108,6 +108,8 @@ jobs:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
           verbose: true
+          name: codecov-python-${{ matrix.python-version }}
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   run_pytest_postgresql:
     name: LS PostgreSQL Ubuntu
@@ -167,7 +169,7 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -206,7 +208,7 @@ jobs:
 
       - name: Get npm cache directory
         id: npm-cache-dir
-        run: echo "::set-output name=dir::$(npm config get cache)"
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
 
       - uses: actions/cache@v3
         name: Configure npm cache
@@ -236,6 +238,8 @@ jobs:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
           verbose: true
+          name: codecov-python-${{ matrix.python-version }}-postgresql
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   windows_label_studio:
     name: LS SQLite Windows
@@ -263,7 +267,7 @@ jobs:
       # SENTRY_DSN:
 
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Checkout
         uses: actions/checkout@v3

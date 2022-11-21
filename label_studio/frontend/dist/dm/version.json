@@ -1,6 +1,6 @@
 {
-  "message": "ci: DEV-2445: Add Review/Merge Automation (#66)",
-  "commit": "3caaedb264407951f6f07adef76a51102bea64ab",
+  "message": "feat: DEV-3750: Load task with given comment",
+  "commit": "8d2ddf8825e98156ea15e8695412be434399a13c",
   "branch": "master",
-  "date": "2022-05-31T09:27:40Z"
+  "date": "2022/11/18 16:46:59"
 }

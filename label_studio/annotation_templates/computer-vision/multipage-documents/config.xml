@@ -1,0 +1,31 @@
+  <View>
+    <Repeater on="$document" indexFlag="{{idx}}" mode="pagination">
+        <Image name="page_{{idx}}" value="$document[{{idx}}].page" inline="true"/>
+        <RectangleLabels name="labels_{{idx}}" toName="page_{{idx}}">
+          <Label value="Title" background="green" />
+          <Label value="Date" background="blue" />
+          <Label value="Author" background="yellow"/>
+          <Label value="Organization" background="orange"/>
+          <Label value="Amount" background="red"/>
+        </RectangleLabels>
+        <View style="display: flex; justify-content: center;">
+          <Header value="Rate this page:"/>
+          <Rating name="rating_{{idx}}" toName="page_{{idx}}"/>
+        </View>
+    </Repeater>
+  </View>
+
+
+  <!-- {
+  "document": [
+      {
+        "page": "https://htx-pub.s3.amazonaws.com/demo/images/demo_stock_purchase_agreement/0001.jpg"
+      },
+      {
+        "page": "https://htx-pub.s3.amazonaws.com/demo/images/demo_stock_purchase_agreement/0002.jpg"
+      },
+      {
+        "page": "https://htx-pub.s3.amazonaws.com/demo/images/demo_stock_purchase_agreement/0003.jpg"
+      }
+    ]
+  } -->

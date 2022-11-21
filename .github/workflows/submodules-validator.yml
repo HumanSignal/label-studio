@@ -21,7 +21,7 @@ jobs:
     name: "Submodules/deps"
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Validate
         uses: actions/github-script@v6

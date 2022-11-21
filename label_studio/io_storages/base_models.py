@@ -15,9 +15,11 @@ from tasks.models import Task, Annotation
 from tasks.serializers import PredictionSerializer, AnnotationSerializer
 from data_export.serializers import ExportDataSerializer
 
-from core.redis import redis_connected
+from core.redis import is_job_in_queue, redis_connected, is_job_on_worker
 from core.utils.common import load_func
 from core.utils.params import get_bool_env
+from label_studio_tools.core.utils.params import get_bool_env
+
 from io_storages.utils import get_uri_via_regex
 from django.contrib.auth.models import AnonymousUser
 
@@ -36,6 +38,8 @@ class Storage(models.Model):
     last_sync_count = models.PositiveIntegerField(
         _('last sync count'), null=True, blank=True, help_text='Count of tasks synced last time'
     )
+
+    last_sync_job = models.CharField(_('last_sync_job'), null=True, blank=True, max_length=256, help_text='Last sync job ID')
 
     def validate_connection(self, client=None):
         pass
@@ -176,9 +180,15 @@ class ImportStorage(Storage):
     def sync(self):
         if redis_connected():
             queue = django_rq.get_queue('low')
-            job = queue.enqueue(sync_background, self.__class__, self.id)
-            # job_id = sync_background.delay()  # TODO: @niklub: check this fix
-            logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
+            meta = {'project': self.project.id, 'storage': self.id}
+            if not is_job_in_queue(queue, "sync_background", meta=meta) and \
+                    not is_job_on_worker(job_id=self.last_sync_job, queue_name='default'):
+                job = queue.enqueue(sync_background, self.__class__, self.id,
+                                    meta=meta)
+                self.last_sync_job = job.id
+                self.save()
+                # job_id = sync_background.delay()  # TODO: @niklub: check this fix
+                logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
         else:
             logger.info(f'Start syncing storage {self}')
             self.scan_and_create_links()
@@ -188,7 +198,7 @@ class ImportStorage(Storage):
 
 
 @job('low')
-def sync_background(storage_class, storage_id):
+def sync_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.scan_and_create_links()
 
