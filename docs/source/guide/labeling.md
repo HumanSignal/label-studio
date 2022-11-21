@@ -420,6 +420,21 @@ One region belongs to another one. It is typically done for NLP type of text. Fo
 !!! note
     The relations list does not support multi-level listing for regions. 
 
+**Draw bounding boxes over another**
+
+!!! attention "important"
+    When creating bounding box annotations for images, you must not start a bounding box inside another bounding box because it would just drag the first box. Instead, it would create a new bounding box in front of the image when the rectangle tool is selected.
+
+To create bounding boxes on top you can use two ways:
+
+1. Press the rectangle tool (R) (note: this option is not always visible).
+2. Label a bounding box, and then label another bounding box inside it.
+
+Now, you should be able to drag when the rectangle tool is not selected. Remember that when the rectangle tool is selected, you can make rectangles even if it is on top of another rectangle.
+
+OR 
+
+1. Press CTRL button and start drawing bounding box over another one. 
 
 
 <!-- md annotation_ids.md -->

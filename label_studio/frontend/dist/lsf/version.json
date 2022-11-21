@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-3260: Introduce simplified shortcuts (#828)\n\n* Prevent keyboard event propagation\r\n\r\n* Fix app <-> browser hotkeys conflicts",
-  "commit": "d8a5e07fc8b29b597713291d295e6ba5ad366fa6",
+  "message": "fix: DEV-3485: Regions is selectable when annotation history is selected",
+  "commit": "23fda9630effeff74c6291fb3e20aed77675775e",
   "branch": "master",
-  "date": "2022-09-14T13:44:10Z"
+  "date": "2022/10/06 13:06:59"
 }
