@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-3750: Load task with given comment",
-  "commit": "8d2ddf8825e98156ea15e8695412be434399a13c",
-  "branch": "master",
-  "date": "2022/11/18 16:46:59"
+  "message": "fix: DEV-3802: Trigger preload only with  parameter",
+  "commit": "d018b3df56c52061d49eca6ace10c94837fc7f33",
+  "branch": "fb-dev-3802/cant-find-task",
+  "date": "2022/11/21 12:29:14"
 }
