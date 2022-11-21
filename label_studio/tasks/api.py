@@ -51,20 +51,40 @@ logger = logging.getLogger(__name__)
 @method_decorator(name='get', decorator=swagger_auto_schema(
     tags=['Tasks'],
     operation_summary='Get tasks list',
-    operation_description="""
+    operation_description='Retrieve a subset of tasks from the Data Manager based on a filter, ordering mechanism, or a predefined view ID.'
     Retrieve a list of tasks with pagination for a specific view or project, by using filters and ordering.
     """,
     manual_parameters=[
+        openapi.Parameter(
+            name='project',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_QUERY,
+            description='Project ID'),
+        openapi.Parameter(
+            name='page',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_QUERY,
+            description='Page'),
+        openapi.Parameter(
+            name='page_size',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_QUERY,
+            description='Page Size'),
         openapi.Parameter(
             name='view',
             type=openapi.TYPE_INTEGER,
             in_=openapi.IN_QUERY,
             description='View ID'),
         openapi.Parameter(
-            name='project',
+            name='query',
             type=openapi.TYPE_INTEGER,
             in_=openapi.IN_QUERY,
-            description='Project ID'),
+            description='json.dumps(query)'),
+        openapi.Parameter(
+            name='fields',
+            type=openapi.TYPE_INTEGER,
+            in_=openapi.IN_QUERY,
+            description='all'),
     ],
 ))
 class TaskListAPI(DMTaskListAPI):
