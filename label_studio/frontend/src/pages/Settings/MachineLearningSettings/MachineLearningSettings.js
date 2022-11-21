@@ -53,10 +53,17 @@ export const MachineLearningSettings = () => {
       })
       .catch((error) => {
         console.log(error);
-      });    
+      });
+    await axios.get(webhook_url+ '/get_available_model_versions?id=' + project.id)
+      .then((response) => {
+        console.log(response)
+        setModelToPredictOn(response.data.current_model_version)
+        setAvailableModels(response.data.model_versions)
+        const current_model_version = []
+    })
   });
   const saveInferencePath = useCallback(async () => {
-    await axios.post(webhook_url + '/change_model_path_in_inference?id=' + project.id + '&model_path=' + modelToPredictOn)
+    await axios.post(webhook_url + '/change_current_model_version?id=' + project.id + '&model_version=' + modelToPredictOn)
       .then((response) => {
         console.log(response);
     })
@@ -94,9 +101,9 @@ export const MachineLearningSettings = () => {
     if (models) setBackends(models);
   }, [api, project, setBackends]);
 
-  async function onPrune() {
+  async function onPrune(model_version) {
     Swal('Pruning model, this may take some time')
-    axios.post(webhook_url + '/prune?id=' + project.id)
+    axios.post(webhook_url + '/prune?id=' + project.id+"&model_version="+model_version)
     .then((response) => {
       if (response.data.unprune === false){
         Swal("The unpruned model wasn't found in the project. Please train a model or add one first")
@@ -109,9 +116,10 @@ export const MachineLearningSettings = () => {
       }
     })
   }
-  async function onExportModel(){
+  async function onExportModel(model_version) {
+            console.log(model_version)
             Swal('Exporting Model, it may take some time')
-            axios.post(webhook_url + '/export?id=' + project.id)
+            axios.post(webhook_url + '/export?id=' + project.id +'&model_version=' + model_version)
               .then((data) => {
                 console.log('export result');
                 if (data.data.message) {
@@ -122,7 +130,7 @@ export const MachineLearningSettings = () => {
               var url = window.URL.createObjectURL(zipFile)
               link.href = "data:application/zip;base64," + data.data;
               console.log(url);
-              link.download = 'myfile.zip';
+              link.download = model_version+'.zip';
               link.click();
              })
           }
@@ -288,26 +296,32 @@ export const MachineLearningSettings = () => {
           </div>
         </Form.Row>
         <Button style={{ marginTop: 20 }} onClick={() => trainModel()}>Train New Model</Button>
-        <Button style={{marginLeft: 20}} onClick={() => onExportModel()}>
+        {/* <Button style={{marginLeft: 20}} onClick={() => onExportModel()}>
         Export Model
       </Button>
       <Button style={{marginLeft: 20}} onClick={() => onPrune()}>
       Prune/Re-train
-      </Button>
-        {!isFF(FF_DEV_1682) && (
+      </Button> */}
+        {/* {!isFF(FF_DEV_1682) && (
           <ProjectModelVersionSelector />
-        )}
+        )} */}
+          <div className="row" style={{ paddingTop: 20 }} key={'chosenModel'}>
+          <h5>Choose the model version you want to use when retrieving predictions:</h5>
+            <div className="">
+              <Select onChange={(model)=>setModelToPredictOn(model.value)} options={availableModels} placeholder={modelToPredictOn} />
+            </div>
+              </div>
         {fetchedModels?
           <div>
           <div key={'models'}>
-          <h5 style={{paddingTop:20}}>You have {availableModels.length} model{availableModels.length==1?'':'s'} in your project directory{availableModels.length > 0 ? ', they are located in: ':'.'} </h5>
+          <h5 style={{paddingTop:20}}>You have {availableModels.length} model{availableModels.length==1?'':'s'} in your project directory{availableModels.length > 0 ? ', they are: ':'.'} </h5>
           {availableModels.map(model => (
             <li key={model.value}>
-            {model.label}
+            {model.value}
           </li>
         ))}
             </div>
-        {modelToPredictOn.length >0 && availableModels.length>0?
+        {/* {modelToPredictOn.length >0 && availableModels.length>0?
           <div className="row" style={{ paddingTop: 20 }} key={'chosenModel'}>
           <h5>Choose the model you want to use when retrieving predictions:</h5>
             <div className="">
@@ -316,7 +330,7 @@ export const MachineLearningSettings = () => {
               </div> :
               <div>
           You have no specs file available, please set your classes in the labeling interface in order to create the specs for Tao Trainer
-          </div>}
+          </div>} */}
           </div>
           : ''}
         {modelsPrecisions != [] ?
@@ -324,24 +338,26 @@ export const MachineLearningSettings = () => {
             <div className='row' style={{paddingTop:20}}>
             {availableModels.map(model => (
             // {model.}
-              <div className='col-6' key={model.value}>
+              <div className='col-6' key={model.value} style={{marginBottom: 10}}>
               <Card  key={model.value}>
-                  Model Path: {model.label}
-                  {Object.keys(modelsPrecisions).includes(model.label.split((project.title + "_id_" + project.id + "/").replaceAll(" ", "_"))[1]) ?
+                  Model Version: {model.label}
+                  {Object.keys(modelsPrecisions).includes(model.label) ?
                     <div style={{paddingTop:15}}>
-                      Mean Average Precision <strong>(mAp)</strong>: {modelsPrecisions[model.label.split((project.title + "_id_" + project.id + "/").replaceAll(" ", "_"))[1]]['mAp']}
+                      Mean Average Precision <strong>(mAp)</strong>: {modelsPrecisions[model.label]['mAp']}
                     <table>
                     <thead>
                     <tr><th style={{paddingRight:50}}>Class Name</th>
                       <th>Average Precision</th></tr>
-                        </thead>{Object.keys(modelsPrecisions[model.label.split((project.title + "_id_" + project.id + "/").replaceAll(" ", "_"))[1]]['classes']).map((i) => (
+                        </thead>{Object.keys(modelsPrecisions[model.label]['classes']).map((i) => (
                           <tbody key={i}>
                             <tr><td>{i}</td>
-                              <td>{modelsPrecisions[model.label.split((project.title + "_id_" + project.id + "/").replaceAll(" ", "_"))[1]]['classes'][i]}</td></tr>
+                              <td>{modelsPrecisions[model.label]['classes'][i]}</td></tr>
                           </tbody>
 
                         ))}
                       </table>
+                      <button style={{marginRight: 10}} onClick={() =>onExportModel(model.value)} className='btn btn-outline-primary'>Export Model</button>
+                      <button onClick={() =>onPrune(model.value)} className='btn btn-outline-danger'>Prune/Re-train</button>
                       </div>
                     : 
                     <div style={{paddingTop: 15}}>
@@ -350,7 +366,6 @@ export const MachineLearningSettings = () => {
 
           </Card>
                 </div>
-          // {modelsPrecisions[0]["'detectnet_v2/experiment_dir_unpruned/weights/unpruned.tlt"]}
          ))}
          </div> 
           </div> : ""}
