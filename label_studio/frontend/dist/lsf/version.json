@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3733: Persist and use the pending draft to attach added comments",
-  "commit": "4b082ba9d7a48216267742f14c0c548beb456f90",
-  "branch": "master",
-  "date": "2022/11/17 08:06:22"
+  "message": "Fix: DEV-3748: Fix truncated timeseries rendering",
+  "commit": "5c5b4e5b0c2d612e8ee91cfa086f672f5273c044",
+  "branch": "fb-dev-3748-fix/time-series-truncate",
+  "date": "2022/11/21 10:53:25"
 }
