@@ -1,28 +1,32 @@
 from django.db import models
-from sensormodel.utils import parser_templates_files as parser
-from pathlib import Path
 
-class Sensor(models.Model):
-    sensor_id = models.IntegerField()
-    description = models.TextField(max_length=100)
 
+
+class SensorType(models.Model):
     manufacturer = models.CharField(max_length=50, blank=True)
     name = models.CharField(max_length=50, blank=True)
     version = models.CharField(max_length=50, blank=True)
 
-    p = Path(__file__).parents[2]
-    path  = p / 'sensortypes'
+    def __str__(self):
+        return 'Manu: ' + self.manufacturer + '| name: ' + self.name + '| version: ' + self.version
 
-    PARSER_CHOICES = parser.get_parser_templates(path)
-    parser_template = models.IntegerField(choices = PARSER_CHOICES, default= 1)
+class Sensor(models.Model):
+    sensor_id = models.IntegerField()
+    description = models.TextField(max_length=100, blank=True)
+
+    sensortype = models.ForeignKey(SensorType,on_delete=models.RESTRICT,blank=True, null=True)
+
     def __str__(self):
         return 'Sensor: ' + str(self.sensor_id)
+
 
 class Subject(models.Model):
     name = models.CharField(max_length=50)
     color = models.CharField(max_length=50)
     size = models.CharField(max_length=50)
     extra_info = models.TextField(max_length=100, blank=True)
+
+    sensors = models.ForeignKey(Sensor,on_delete=models.RESTRICT,blank=True, null=True)
 
     def __str__(self):
         return 'Subject: ' + self.name
@@ -54,5 +58,6 @@ class Deployment(models.Model):
 
     def __str__(self):
         return 'Deployment: ' + self.name
+
 
 

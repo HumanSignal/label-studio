@@ -1,15 +1,19 @@
 from django.shortcuts import render, redirect
-from .models import Sensor, Deployment,  Subject
+from .models import Sensor, Deployment,  Subject, SensorType
 from . import forms
+from pathlib import Path
+from sensormodel.utils import parser_templates_files as parser
+
 
 # Create your views here.
 def tablepage(request):
     sensors = Sensor.objects.all().order_by('sensor_id')
     subjects = Subject.objects.all().order_by('name')
     deployments = Deployment.objects.all().order_by('begin_datetime')
+    sensortypes = SensorType.objects.all().order_by('manufacturer')
     for deployment in deployments:
         deployment.CreateLists()
-    return render(request, 'tablepage.html', {'sensors': sensors, 'subjects': subjects, 'deployments': deployments})
+    return render(request, 'tablepage.html', {'sensors': sensors, 'subjects': subjects, 'deployments': deployments, sensortypes:'sensortypes'})
 
 def add(request):
     if request.method == 'POST':
@@ -97,4 +101,18 @@ def delete_subject(request, id):
     else:
         return render(request, 'deleteconfirmation.html')
 
+def sync_sensor_parser_templates(request):
+    if request.method == 'POST':
+        path = Path(__file__).parents[2] / 'sensortypes'
+        parser_templates = parser.get_parser_templates(path)
 
+        for parser_template in parser_templates:
+            manufacturer, name, version = parser_template.split('_')
+            if not SensorType.objects.filter(manufacturer=manufacturer,name=name, version=version).exists():
+                SensorType.objects.create(manufacturer=manufacturer,name=name, version=version).save()
+    sensors = Sensor.objects.all().order_by('sensor_id')
+    subjects = Subject.objects.all().order_by('name')
+    deployments = Deployment.objects.all().order_by('begin_datetime')
+    sensortypes = SensorType.objects.all().order_by('manufacturer')
+    return render(request, 'tablepage.html',{'sensors': sensors, 'subjects': subjects, 'deployments': deployments, sensortypes:'sensortypes'})
+        
