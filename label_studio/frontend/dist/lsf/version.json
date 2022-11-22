@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3733: Persist and use the pending draft to attach added comments",
-  "commit": "4b082ba9d7a48216267742f14c0c548beb456f90",
-  "branch": "master",
-  "date": "2022/11/17 08:06:22"
+  "message": "fix: DEV-3754: Memory usage of repeater initialization causing crashes",
+  "commit": "bf9ce8529410d7ad75a7f3f7beff369e0f6751dc",
+  "branch": "fb-dev-3754",
+  "date": "2022/11/21 18:56:13"
 }
