@@ -219,7 +219,7 @@ def test_get_task(client_and_token, configured_project, response, status_code):
 @pytest.mark.django_db
 def test_patch_task(client_and_token, configured_project, payload, response, status_code):
     client, token = client_and_token
-    task = configured_project.tasks.all()[0]
+    task = configured_project.tasks.order_by('-updated_at').all()[0]
     payload['project'] = configured_project.id
 
     r = client.patch(
@@ -229,7 +229,7 @@ def test_patch_task(client_and_token, configured_project, payload, response, sta
         headers={'Authorization': f'Token {token}'}
     )
 
-    task = configured_project.tasks.all()[0]  # call DB again after update
+    task = configured_project.tasks.order_by('-updated_at').all()[0]  # call DB again after update
     response['project'] = configured_project.id
     response['created_at'] = task.created_at.isoformat().replace('+00:00', 'Z')
     response['updated_at'] = task.updated_at.isoformat().replace('+00:00', 'Z')

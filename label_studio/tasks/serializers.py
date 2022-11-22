@@ -323,6 +323,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
                     body = {
                         'task': self.db_tasks[i],
+                        'project': self.project,
                         'ground_truth': ground_truth,
                         'was_cancelled': was_cancelled,
                         'completed_by_id': annotation['completed_by_id'],
