@@ -5,4 +5,4 @@ theme_config:
 deploy:
   type: aws-s3
   region: us-east-1
-  bucket: labelstud.io
+  bucket: docs.heartex.com
