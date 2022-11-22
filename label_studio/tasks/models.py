@@ -772,13 +772,8 @@ def bulk_update_stats_project_tasks(tasks):
         # update objects without saving
         for task in tasks:
             update_task_stats(task, save=False)
-        try:
-            # start update query batches
-            bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
-        except OperationalError as exp:
-            logger.debug("Operational error while updating task ")
-            # try to update query batches one more time
-            start_job_async_or_sync(bulk_update, tasks, in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+        # start update query batches
+        bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \
