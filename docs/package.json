@@ -42,6 +42,7 @@
     "server": "hexo clean && touch db.json && hexo serve --config opensource.yml,_config.yml",
     "server:enterprise": "hexo clean && touch db.json && hexo serve --config enterprise.yml,_config.yml",
     "publish": "hexo clean && touch db.json && hexo generate && hexo deploy --config opensource.yml,_config.yml",
+    "publish:enterprise": "hexo clean && touch db.json && hexo generate && hexo deploy --config enterprise.yml,_config.yml",
     "build": "hexo clean && touch db.json && hexo generate --config opensource.yml,_config.yml",
     "build:enterprise": "hexo clean && touch db.json && hexo generate --config enterprise.yml,_config.yml",
     "new": "hexo new"

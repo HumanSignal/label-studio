@@ -100,12 +100,6 @@ sitemap:
   path: 
     - sitemap-docs.xml
 
-# Deployment
-deploy:
-  type: aws-s3
-  region: us-east-1
-  bucket: labelstud.io
-
 search:
   path: search.xml
   field: all
