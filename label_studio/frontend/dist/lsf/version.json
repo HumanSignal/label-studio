@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3754: Memory usage of repeater initialization causing crashes",
-  "commit": "bf9ce8529410d7ad75a7f3f7beff369e0f6751dc",
+  "commit": "f5d4a5a17e556a15783ecaeb362d7e99d580385b",
   "branch": "fb-dev-3754",
-  "date": "2022/11/21 18:56:13"
+  "date": "2022/11/22 08:07:58"
 }
