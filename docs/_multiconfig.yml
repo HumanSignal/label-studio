@@ -1,5 +1,9 @@
 theme_config:
-  tier: enterprise
+  tier: opensource
+deploy:
+  type: aws-s3
+  region: us-east-1
+  bucket: labelstud.io
 title: Label Studio
 subtitle: Data labeling, annotation and exploration tool
 description: >-
@@ -67,10 +71,6 @@ theme: v2
 sitemap:
   path:
     - sitemap-docs.xml
-deploy:
-  type: aws-s3
-  region: us-east-1
-  bucket: labelstud.io
 search:
   path: search.xml
   field: all
