@@ -3,6 +3,7 @@ title: User management
 type: guide
 tier: all
 order: 114
+order_enterprise: 101
 meta_title: User Management
 meta_description: Sign up for Label Studio and invite users to collaborate on your data labeling, machine learning, and data science projects.
 section: "Configuration"

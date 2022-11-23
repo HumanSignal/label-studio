@@ -3,7 +3,8 @@ title: API Reference for Label Studio
 short: Backend API
 type: guide
 tier: all
-order: 900
+order: 214
+order_enterprise: 120
 section: "Integration and Development"
 meta_title: API Endpoints
 meta_description: API documentation for authenticating, listing data science projects, importing predictions and raw data and exporting annotated data, and user management.

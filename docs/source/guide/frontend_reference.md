@@ -3,8 +3,9 @@ title: Frontend reference
 short: Frontend reference
 type: guide
 tier: all
-order: 950
-section: "Advanced Development"
+order: 220
+order_enterprise: 137
+section: "Integration and Development"
 meta_title: Frontend Library Reference
 meta_description: Reference documentation for implementing the Label Studio Frontend into your own machine learning or data science application workflows.
 ---

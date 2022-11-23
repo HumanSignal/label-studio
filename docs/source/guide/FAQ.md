@@ -4,6 +4,7 @@ short: Troubleshooting
 type: guide
 tier: all
 order: 100
+order_enterprise: 100
 section: "Get started"
 meta_title: Troubleshoot Label Studio
 meta_description: Troubleshoot common issuesTroubleshoot machine learning with Label Studio configuration and performance so that you can return to your machine learning and data science projects.

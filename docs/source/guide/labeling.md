@@ -2,7 +2,8 @@
 title: Label and annotate data
 tier: all 
 type: guide
-order: 250
+order: 208
+order_enterprise: 111
 section: "Labeling"
 meta_title: Label and annotate data
 meta_description: Label and annotate data to create bounding boxes, label text spans, set up relations. Filter and sort project data for machine learning dataset creation.
