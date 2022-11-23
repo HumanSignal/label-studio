@@ -36,3 +36,10 @@ class ProjectMixin:
         Dummy stub for has_permission
         """
         return True
+
+    def _can_use_overlap(self):
+        """
+        Returns if we can use overlap for is_labeled calculation
+        :return:
+        """
+        return True

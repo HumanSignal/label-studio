@@ -373,7 +373,7 @@ class Project(ProjectMixin, models.Model):
                 tasks_with_overlap = self.tasks.all()
             # update is_labeled after change
             bulk_update_stats_project_tasks(
-                tasks_with_overlap
+                tasks_with_overlap, project=self
             )
 
         # if cohort slider is tweaked
@@ -399,7 +399,6 @@ class Project(ProjectMixin, models.Model):
         tasks_with_min_annotations = all_project_tasks.exclude(
             id__in=tasks_with_max_annotations
         )
-
         # check how many tasks left to finish
         left_must_tasks = max(must_tasks - tasks_with_max_annotations.count(), 0)
         if left_must_tasks > 0:
@@ -417,13 +416,11 @@ class Project(ProjectMixin, models.Model):
             ids = tasks_with_min_annotations[left_must_tasks:].values_list('id', flat=True)
             min_tasks_to_update = all_project_tasks.filter(id__in=ids)
             min_tasks_to_update.update(overlap=1)
-            # update is labeled after tasks rearrange overlap
-            bulk_update_stats_project_tasks(min_tasks_to_update)
         else:
-            tasks_with_max_annotations.update(overlap=max_annotations, is_labeled=True)
+            tasks_with_max_annotations.update(overlap=max_annotations)
             tasks_with_min_annotations.update(overlap=1)
-            # update is labeled after tasks rearrange overlap
-            bulk_update_stats_project_tasks(tasks_with_min_annotations)
+        # update is labeled after tasks rearrange overlap
+        bulk_update_stats_project_tasks(all_project_tasks, project=self)
 
     def remove_tasks_by_file_uploads(self, file_upload_ids):
         self.tasks.filter(file_upload_id__in=file_upload_ids).delete()
