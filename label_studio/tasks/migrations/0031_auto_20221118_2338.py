@@ -11,9 +11,6 @@ def set_updated_by(apps, _):
         obj.updated_by = obj.task.updated_by
         obj.save()
 
-def revert(apps, _):
-    pass
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -27,5 +24,5 @@ class Migration(migrations.Migration):
             name='updated_by',
             field=models.ForeignKey(help_text='Last user who updated this annotation', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='updated_annotations', to=settings.AUTH_USER_MODEL, verbose_name='updated by'),
         ),
-        migrations.RunPython(set_updated_by, revert)
+        migrations.RunPython(set_updated_by)
     ]
