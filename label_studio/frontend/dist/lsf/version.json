@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3733: Persist and use the pending draft to attach added comments",
-  "commit": "4b082ba9d7a48216267742f14c0c548beb456f90",
-  "branch": "master",
-  "date": "2022/11/17 08:06:22"
+  "message": "fix: DEV-3490: Change color when user changes label",
+  "commit": "ec39b468092eb5d2d3ca5d6bfc5f377d99990adf",
+  "branch": "fb-dev-3490/region-color",
+  "date": "2022/11/23 15:05:32"
 }
