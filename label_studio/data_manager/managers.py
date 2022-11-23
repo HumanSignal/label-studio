@@ -492,7 +492,7 @@ def annotate_annotations_results(queryset):
         return queryset.annotate(annotations_results=Coalesce(
             GroupConcat("annotations__result"), Value(''), output_field=models.CharField()))
     else:
-        return queryset.annotate(annotations_results=ArrayAgg("annotations__result", distinct=True))
+        return queryset.annotate(annotations_results=ArrayAgg("annotations__result", distinct=True, default=Value([])))
 
 
 def annotate_predictions_results(queryset):
