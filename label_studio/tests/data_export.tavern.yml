@@ -255,8 +255,7 @@ stages:
         json:
           project_pk: id
       status_code: 201
-  - &create_first_task
-    name: create_task
+  - name: create_task
     request:
       json:
         data:
@@ -269,8 +268,7 @@ stages:
         json:
           first_task_pk: id
       status_code: 201
-  - &create_second_task
-    name: create_task
+  - name: create_task
     request:
       json:
         data:
@@ -283,8 +281,7 @@ stages:
         json:
           second_task_pk: id
       status_code: 201
-  - &create_annotation_second_task
-    name: create_annotation_second_task
+  - name: create_annotation_second_task
     request:
       headers:
         content-type: application/json
@@ -301,8 +298,7 @@ stages:
       url: '{django_live_url}/api/tasks/{first_task_pk}/annotations'
     response:
       status_code: 201
-  - &create_annotation_second_task
-    name: create_annotation_second_task
+  - name: create_annotation_second_task
     request:
       headers:
         content-type: application/json
