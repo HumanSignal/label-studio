@@ -63,10 +63,16 @@ class UserManager(BaseUserManager):
 class UserLastActivityMixin(models.Model):
     last_activity = models.DateTimeField(
         _('last activity'), default=timezone.now, editable=False)
+    last_activity_per_org = models.JSONField(
+        _('last activity per org'), default=dict, editable=False)
 
-    def update_last_activity(self):
+    def update_last_activity(self, active_org=None):
+        update_fields = ["last_activity"]
         self.last_activity = timezone.now()
-        self.save(update_fields=["last_activity"])
+        if active_org:
+            self.last_activity_per_org[active_org] = timezone.now().isoformat()
+            update_fields.append("last_activity_per_org")
+        self.save(update_fields=update_fields)
 
     class Meta:
         abstract = True

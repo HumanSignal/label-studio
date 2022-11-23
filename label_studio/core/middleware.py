@@ -153,7 +153,7 @@ class UpdateLastActivityMiddleware(CommonMiddleware):
     def process_view(self, request, view_func, view_args, view_kwargs):
         if hasattr(request, 'user') and request.method not in SAFE_METHODS:
             if request.user.is_authenticated:
-                request.user.update_last_activity()
+                request.user.update_last_activity(request.user.active_organization.id)
 
 
 class InactivitySessionTimeoutMiddleWare(CommonMiddleware):

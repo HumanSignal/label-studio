@@ -41,6 +41,7 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
             'username',
             'email',
             'last_activity',
+            'last_activity_per_org',
             'avatar',
             'initials',
             'phone',
