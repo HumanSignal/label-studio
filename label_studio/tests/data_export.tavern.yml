@@ -319,7 +319,7 @@ stages:
     request:
       headers:
         content-type: application/json
-      method: POST
+      method: GET
       url: '{django_live_url}/api/projects/{project_pk}/export?exportType=CSV'
     response:
       status_code: 200
@@ -327,7 +327,7 @@ stages:
     request:
       headers:
         content-type: application/json
-      method: POST
+      method: GET
       url: '{django_live_url}/api/projects/{project_pk}/export?exportType=TSV'
     response:
       status_code: 200
@@ -335,7 +335,7 @@ stages:
     request:
       headers:
         content-type: application/json
-      method: POST
+      method: GET
       url: '{django_live_url}/api/projects/{project_pk}/export?exportType=JSON_MIN'
     response:
       status_code: 200
