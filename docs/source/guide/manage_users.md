@@ -4,6 +4,7 @@ short: Manage access
 tier: enterprise
 type: guide
 order: 115
+order_enterprise: 102
 meta_title: Manage Role-Based Access Control in Label Studio
 meta_description: Manage access and set up permissions with user roles, organizations, and project workspaces for your projects in Label Studio Enterprise.
 section: "Configuration"
