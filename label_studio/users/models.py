@@ -64,7 +64,7 @@ class UserLastActivityMixin(models.Model):
     last_activity = models.DateTimeField(
         _('last activity'), default=timezone.now, editable=False)
     last_activity_per_org = models.JSONField(
-        _('last activity per org'), default=dict, editable=False)
+        _('last activity per org'), default=dict)
 
     def update_last_activity(self, active_org=None):
         update_fields = ["last_activity"]
