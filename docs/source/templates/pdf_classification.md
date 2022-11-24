@@ -63,7 +63,7 @@ Use the [HyperText](/tags/hypertext.html) tag to render an inline version of the
 
 ### Input data
 
-Label Studio does not support labeling PDF-formatted files directly. You should use the <embed> tag inside of your data for pdf loading:
+Label Studio does not support labeling PDF-formatted files directly. You should use the `embed` tag inside of your data for pdf loading:
 
 ```
 {
