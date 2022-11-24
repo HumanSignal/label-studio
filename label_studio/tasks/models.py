@@ -203,6 +203,12 @@ class Task(TaskMixin, models.Model):
             return False
         return filename.startswith(settings.UPLOAD_DIR + '/')
 
+    @staticmethod
+    def prepare_filename(filename):
+        if isinstance(filename, str):
+            return filename.replace(settings.MEDIA_URL, '')
+        return filename
+
     def resolve_uri(self, task_data, project):
         if project.task_data_login and project.task_data_password:
             protected_data = {}
@@ -218,7 +224,7 @@ class Task(TaskMixin, models.Model):
             # try resolve URLs via storage associated with that task
             for field in task_data:
                 # file saved in django file storage
-                prepared_filename = task_data[field].replace(settings.MEDIA_URL, '')
+                prepared_filename = self.prepare_filename(task_data[field])
                 if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(prepared_filename):
                     # permission check: resolve uploaded files to the project only
                     file_upload = None
