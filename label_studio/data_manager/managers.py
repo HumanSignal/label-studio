@@ -4,12 +4,11 @@ import re
 import ujson as json
 import logging
 
-
 from pydantic import BaseModel
 
 from django.db import models
 from django.db.models import Aggregate, OuterRef, Subquery, Avg, Q, F, Value, Exists, When, Case
-from django.contrib.postgres.aggregates import ArrayAgg
+from data_manager.aggregates import ArrayAgg
 from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from django.db.models.functions import Coalesce
 from django.conf import settings
@@ -486,13 +485,12 @@ def annotate_completed_at(queryset):
         )
     )
 
-
 def annotate_annotations_results(queryset):
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
         return queryset.annotate(annotations_results=Coalesce(
             GroupConcat("annotations__result"), Value(''), output_field=models.CharField()))
     else:
-        return queryset.annotate(annotations_results=ArrayAgg("annotations__result", distinct=True, default=Value([])))
+        return queryset.annotate(annotations_results=ArrayAgg("annotations__result", distinct=True))
 
 
 def annotate_predictions_results(queryset):
