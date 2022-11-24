@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3490: Change color when user changes label",
-  "commit": "ec39b468092eb5d2d3ca5d6bfc5f377d99990adf",
-  "branch": "fb-dev-3490/region-color",
-  "date": "2022/11/23 15:05:32"
+  "commit": "9f7f68c5568892e949e4444184dad61654828d69",
+  "branch": "master",
+  "date": "2022/11/24 16:49:20"
 }
