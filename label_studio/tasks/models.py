@@ -790,7 +790,7 @@ def bulk_update_stats_project_tasks(tasks, project=None):
                 # start update query batches
                 bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
             except OperationalError as exp:
-                logger.debug("Operational error while updating task ")
+                logger.error("Operational error while updating tasks: {exc}", exc_info=True)
                 # try to update query batches one more time
                 start_job_async_or_sync(bulk_update, tasks, in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
 
