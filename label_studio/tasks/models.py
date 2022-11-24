@@ -102,7 +102,8 @@ class Task(TaskMixin, models.Model):
             models.Index(fields=['id', 'project']),
             models.Index(fields=['id', 'overlap']),
             models.Index(fields=['overlap']),
-            models.Index(fields=['is_labeled'])
+            models.Index(fields=['is_labeled']),
+            models.Index(fields=['total_annotations'])
         ]
 
     @property
