@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3693: Explore reviews module show buggs",
-  "commit": "ad9e656a0446fd324fd8ab3ad2b644a7acb6a6d4",
-  "branch": "master",
-  "date": "2022/11/24 10:07:07"
+  "message": "fix: DEV-3825: select region in the waveform is selecting outliner",
+  "commit": "4123dd5e5e3066f619a96c42c82605533d90ebbb",
+  "branch": "fb-dev-3825/select-waveform",
+  "date": "2022/11/24 14:20:04"
 }
