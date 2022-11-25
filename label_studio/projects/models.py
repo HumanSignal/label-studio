@@ -378,49 +378,12 @@ class Project(ProjectMixin, models.Model):
 
         # if cohort slider is tweaked
         elif overlap_cohort_percentage_changed and self.maximum_annotations > 1:
-            tasks = self._rearrange_overlap_cohort()
-            bulk_update_stats_project_tasks(
-                tasks
-            )
             self.rearrange_overlap_cohort()
 
         # if adding/deleting tasks and cohort settings are applied
         elif tasks_number_changed and self.overlap_cohort_percentage < 100 and self.maximum_annotations > 1:
             self.rearrange_overlap_cohort()
-    
-        # if adding/deleting tasks and cohort settings are applied
-        elif tasks_number_changed and self.overlap_cohort_percentage < 100 and self.maximum_annotations > 1:
-            tasks = self._rearrange_overlap_cohort()
-            bulk_update_stats_project_tasks(
-                tasks
-            )
 
-        if maximum_annotations_changed or overlap_cohort_percentage_changed:
-            bulk_update_stats_project_tasks(
-                self.tasks.filter(Q(annotations__isnull=False))
-            )
-
-    def update_tasks_states(
-        self, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed
-    ):
-        start_job_async_or_sync(self._update_tasks_states, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed)
-
-
-    def update_tasks_states_with_counters(
-        self, maximum_annotations_changed, overlap_cohort_percentage_changed,
-            tasks_number_changed, tasks_queryset
-    ):
-        start_job_async_or_sync(self._update_tasks_states_with_counters, maximum_annotations_changed,
-                                overlap_cohort_percentage_changed, tasks_number_changed, tasks_queryset)
-
-
-    def _update_tasks_states_with_counters(
-        self, maximum_annotations_changed, overlap_cohort_percentage_changed,
-            tasks_number_changed, tasks_queryset
-    ):
-        self._update_tasks_states(maximum_annotations_changed, overlap_cohort_percentage_changed,
-            tasks_number_changed)
-        self.update_tasks_counters(tasks_queryset)
 
     def _rearrange_overlap_cohort(self):
         """
