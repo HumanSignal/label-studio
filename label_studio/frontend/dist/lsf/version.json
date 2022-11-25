@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3733: Persist and use the pending draft to attach added comments",
-  "commit": "4b082ba9d7a48216267742f14c0c548beb456f90",
+  "message": "fix: DEV-3693: Explore reviews module show buggs",
+  "commit": "ad9e656a0446fd324fd8ab3ad2b644a7acb6a6d4",
   "branch": "master",
-  "date": "2022/11/17 08:06:22"
+  "date": "2022/11/24 10:07:07"
 }
