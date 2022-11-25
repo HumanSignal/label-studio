@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3224: Move task to the end on next task",
-  "commit": "0fe0f6ff2b5ee16b11bab78731bb1c117b7a43f7",
+  "message": "feat: DEV-3750: Load task with given comment",
+  "commit": "8d2ddf8825e98156ea15e8695412be434399a13c",
   "branch": "master",
-  "date": "2022/11/08 18:10:40"
+  "date": "2022/11/18 16:46:59"
 }
