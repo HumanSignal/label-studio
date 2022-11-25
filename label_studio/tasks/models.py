@@ -284,9 +284,6 @@ class Task(TaskMixin, models.Model):
         else:
             return self.annotations.filter(Q_finished_annotations)
 
-    def update_is_labeled(self):
-        self.is_labeled = self._get_is_labeled_value()
-
     def increase_project_summary_counters(self):
         if hasattr(self.project, 'summary'):
             summary = self.project.summary
