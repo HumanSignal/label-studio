@@ -5,12 +5,13 @@ import logging
 import os
 import datetime
 import numbers
+import time
 
 from urllib.parse import urljoin, quote
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.db import models, transaction
+from django.db import models, transaction, OperationalError
 from django.db.models import Q
 from django.db.models.signals import post_delete, pre_delete
 from django.utils.translation import gettext_lazy as _
@@ -23,6 +24,7 @@ from django.core.files.storage import default_storage
 from rest_framework.exceptions import ValidationError
 
 from core.feature_flags import flag_set
+from core.redis import start_job_async_or_sync
 from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func, \
     temporary_disconnect_list_signal
 from core.utils.params import get_env
@@ -94,7 +96,6 @@ class Task(TaskMixin, models.Model):
 
     class Meta:
         db_table = 'task'
-        ordering = ['-updated_at']
         indexes = [
             models.Index(fields=['project', 'is_labeled']),
             models.Index(fields=['project', 'inner_id']),
@@ -386,6 +387,9 @@ class Annotation(AnnotationMixin, models.Model):
 
     task = models.ForeignKey('tasks.Task', on_delete=models.CASCADE, related_name='annotations', null=True,
                              help_text='Corresponding task for this annotation')
+    # duplicate relation to project for performance reasons
+    project = models.ForeignKey('projects.Project', related_name='annotations', on_delete=models.CASCADE, null=True,
+                                help_text='Project ID for this annotation')
     completed_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="annotations", on_delete=models.SET_NULL,
                                      null=True, help_text='User ID of the person who created this annotation')
     was_cancelled = models.BooleanField(_('was cancelled'), default=False, help_text='User skipped the task', db_index=True)
@@ -766,7 +770,6 @@ def bulk_update_stats_project_tasks(tasks):
             update_task_stats(task, save=False)
         # start update query batches
         bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
-
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \

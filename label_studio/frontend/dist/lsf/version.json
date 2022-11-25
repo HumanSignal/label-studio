@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3224: Assign task history from outside",
-  "commit": "cc3048a955d293612c30071d6e88a91606c85ae0",
+  "message": "fix: DEV-3733: Persist and use the pending draft to attach added comments",
+  "commit": "4b082ba9d7a48216267742f14c0c548beb456f90",
   "branch": "master",
-  "date": "2022/11/08 18:21:45"
+  "date": "2022/11/17 08:06:22"
 }
