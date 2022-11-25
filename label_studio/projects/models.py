@@ -425,7 +425,6 @@ class Project(ProjectMixin, models.Model):
         # update is labeled after tasks rearrange overlap
         bulk_update_stats_project_tasks(all_project_tasks)
 
-
     def remove_tasks_by_file_uploads(self, file_upload_ids):
         self.tasks.filter(file_upload_id__in=file_upload_ids).delete()
 
