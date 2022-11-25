@@ -384,7 +384,6 @@ class Project(ProjectMixin, models.Model):
         elif tasks_number_changed and self.overlap_cohort_percentage < 100 and self.maximum_annotations > 1:
             self.rearrange_overlap_cohort()
 
-
     def _rearrange_overlap_cohort(self):
         """
         Rearrange overlap depending on annotation count in tasks
@@ -420,15 +419,11 @@ class Project(ProjectMixin, models.Model):
                 objs.append(item)
             with transaction.atomic():
                 bulk_update(objs, update_fields=['overlap'], batch_size=settings.BATCH_SIZE)
-            # update is labeled after tasks rearrange overlap
-            bulk_update_stats_project_tasks(all_project_tasks)
-            return objs
         else:
             tasks_with_max_annotations.update(overlap=max_annotations)
             tasks_with_min_annotations.update(overlap=1)
-            # update is labeled after tasks rearrange overlap
-            bulk_update_stats_project_tasks(all_project_tasks)
-            return tasks_with_max_annotations | tasks_with_min_annotations
+        # update is labeled after tasks rearrange overlap
+        bulk_update_stats_project_tasks(all_project_tasks)
 
 
     def remove_tasks_by_file_uploads(self, file_upload_ids):
