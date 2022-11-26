@@ -164,6 +164,7 @@ class DataExport(object):
             if len(os.listdir(tmp_dir)) == 1:
                 output_file = files[0]
                 ext = os.path.splitext(output_file)[-1]
+                ext = ext.split('.')[-1]
                 content_type = f'application/{ext}'
                 out = read_bytes_stream(output_file)
                 filename = name + os.path.splitext(output_file)[-1]
