@@ -82,6 +82,12 @@ task_create_response_scheme = {
                     description='The list of found data columns',
                     type=openapi.TYPE_ARRAY,
                     items=openapi.Schema(title="Data column name", type=openapi.TYPE_STRING)
+                ),
+                'unique_ids': openapi.Schema(
+                    title='unique_ids',
+                    description='The list of unique ids for each task',
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(title="Unique ID", type=openapi.TYPE_STRING)
                 )
             })
     ),
@@ -207,7 +213,7 @@ class ImportAPI(generics.CreateAPIView):
         # upload files from request, and parse all tasks
         # TODO: Stop passing request to load_tasks function, make all validation before
         parsed_data, file_upload_ids, could_be_tasks_lists, found_formats, data_columns = load_tasks(request, project)
-
+        unique_ids = []
         if preannotated_from_fields:
             # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]  # noqa
             parsed_data = self._reformat_predictions(parsed_data, preannotated_from_fields)
@@ -216,6 +222,7 @@ class ImportAPI(generics.CreateAPIView):
             # Immediately create project tasks and update project states and counters
             tasks, serializer = self._save(parsed_data)
             task_count = len(tasks)
+            unique_ids = [task.unique_id for task in tasks]
             annotation_count = len(serializer.db_annotations)
             prediction_count = len(serializer.db_predictions)
             # Update tasks states if there are related settings in project
@@ -248,7 +255,8 @@ class ImportAPI(generics.CreateAPIView):
             'file_upload_ids': file_upload_ids,
             'could_be_tasks_list': could_be_tasks_lists,
             'found_formats': found_formats,
-            'data_columns': data_columns
+            'data_columns': data_columns,
+            'unique_ids': unique_ids
         }
         if return_task_ids:
             response['task_ids'] = [task.id for task in tasks]
@@ -311,7 +319,8 @@ class ReImportAPI(ImportAPI):
                 'duration': 0,
                 'file_upload_ids': [],
                 'found_formats': {},
-                'data_columns': []
+                'data_columns': [],
+                'unique_ids': []
             }, status=status.HTTP_200_OK)
 
         tasks, found_formats, data_columns = FileUpload.load_tasks_from_uploaded_files(
@@ -320,6 +329,7 @@ class ReImportAPI(ImportAPI):
         with transaction.atomic():
             project.remove_tasks_by_file_uploads(file_upload_ids)
             tasks, serializer = self._save(tasks)
+            unique_ids = [task.unique_id for task in tasks]
         duration = time.time() - start
 
         # Update task states if there are related settings in project
@@ -343,7 +353,8 @@ class ReImportAPI(ImportAPI):
             'duration': duration,
             'file_upload_ids': file_upload_ids,
             'found_formats': found_formats,
-            'data_columns': data_columns
+            'data_columns': data_columns,
+            'unique_ids': unique_ids
         }, status=status.HTTP_201_CREATED)
 
     @swagger_auto_schema(

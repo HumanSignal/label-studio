@@ -6,6 +6,7 @@ import os
 import datetime
 import numbers
 import time
+import uuid
 
 from urllib.parse import urljoin, quote
 
@@ -306,6 +307,8 @@ class Task(TaskMixin, models.Model):
 
                 # max_inner_id might be None in the old projects
                 self.inner_id = None if max_inner_id is None else (max_inner_id + 1)
+        if self.unique_id == '':
+            self.unique_id = uuid.uuid4()
         super().save(*args, **kwargs)
 
     @staticmethod
