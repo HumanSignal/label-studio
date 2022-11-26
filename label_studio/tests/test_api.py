@@ -178,7 +178,7 @@ def test_delete_annotations(business_client, configured_project):
          'overlap': 1, 'file_upload': None, 'annotations_ids': '', 'annotations_results': '',
          'annotators': [], 'completed_at': None, 'predictions_model_versions': '',
          'predictions_results': '', 'predictions_score': None, 'total_annotations': 0, 'total_predictions': 0,
-         'avg_lead_time': None, 'cancelled_annotations': 0, 'inner_id': 0,'storage_filename': None,
+         'avg_lead_time': None, 'cancelled_annotations': 0, 'inner_id': 0, 'unique_id': '', 'storage_filename': None,
          'comment_authors': [], 'comment_count': 0, 'last_comment_updated_at': None, 'unresolved_comment_count': 0},
         200
     )
@@ -211,7 +211,7 @@ def test_get_task(client_and_token, configured_project, response, status_code):
         {"id": 0, "annotations": [], 'predictions': [],
          "data": {"text": "TEST1", "meta_info": "TEST2"}, "meta": {},
          "created_at": "", "updated_at": "", "updated_by": None, "is_labeled": False, "project": 0,
-         'overlap': 1, 'file_upload': None, "inner_id": 1,
+         'overlap': 1, 'file_upload': None, "inner_id": 1, "unique_id": '22edc22c-0cf3-4f4a-bd46-a907f2748359',
          'comment_authors': [], 'comment_count': 0, 'last_comment_updated_at': None, 'unresolved_comment_count': 0},
         200
     )
@@ -240,4 +240,7 @@ def test_patch_task(client_and_token, configured_project, payload, response, sta
 
     assert r.status_code == status_code
     if response:
+        assert len(r.json()['unique_id']) == len(response['unique_id'])
+        del r.json()['unique_id']
+        del response['unique_id']
         assert r.json() == response

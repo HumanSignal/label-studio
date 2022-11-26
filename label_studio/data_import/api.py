@@ -220,14 +220,15 @@ class ImportAPI(generics.CreateAPIView):
             prediction_count = len(serializer.db_predictions)
             # Update tasks states if there are related settings in project
             # after bulk create we can bulk update tasks stats
-            project.update_tasks_states(maximum_annotations_changed=False,
-                                        overlap_cohort_percentage_changed=False,
-                                        tasks_number_changed=True)
-            # Update counters (like total_annotations) for new tasks
-            project.update_tasks_counters(
-                tasks_queryset=tasks
-            )
-            logger.info('Tasks bulk_update finished')
+            if len(tasks) > 0:
+                project.update_tasks_states(maximum_annotations_changed=False,
+                                            overlap_cohort_percentage_changed=False,
+                                            tasks_number_changed=True)
+                # Update counters (like total_annotations) for new tasks
+                project.update_tasks_counters(
+                    tasks_queryset=tasks
+                )
+                logger.info('Tasks bulk_update finished')
 
             project.summary.update_data_columns(parsed_data)
             # TODO: project.summary.update_created_annotations_and_labels
@@ -301,7 +302,7 @@ class ReImportAPI(ImportAPI):
 
         # check project permissions
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
-        
+
         if not file_upload_ids:
             return Response({
                 'task_count': 0,
