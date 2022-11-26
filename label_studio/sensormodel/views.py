@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import Sensor, Deployment,  Subject, SensorType
 from . import forms
-from pathlib import Path
-from sensormodel.utils import parser_templates_files as parser
+from sensormodel.utils import get_git_repo_file_names as repofiles
 
 
 # Create your views here.
@@ -13,7 +12,7 @@ def tablepage(request):
     sensortypes = SensorType.objects.all().order_by('manufacturer')
     for deployment in deployments:
         deployment.CreateLists()
-    return render(request, 'tablepage.html', {'sensors': sensors, 'subjects': subjects, 'deployments': deployments, sensortypes:'sensortypes'})
+    return render(request, 'tablepage.html', {'sensors': sensors, 'subjects': subjects, 'deployments': deployments, 'sensortypes': sensortypes})
 
 def add(request):
     if request.method == 'POST':
@@ -27,13 +26,11 @@ def add(request):
             return redirect('sensormodel:tablepage')
         deploymentform = forms.DeploymentForm(request.POST)
         if deploymentform.is_valid():
-            post = deploymentform.save(commit= False)
-            post.save()
+            deploymentform.save()
             return redirect('sensormodel:tablepage')
         else:
             sensorform = forms.SensorForm()
             subjectform = forms.SubjectForm()
-            deploymentform = forms.DeploymentForm()
             return render(request, 'add.html', {'sensorform':sensorform, 'subjectform':subjectform, 'deploymentform':deploymentform})
     else:
         sensorform = forms.SensorForm(request.POST)
@@ -103,16 +100,12 @@ def delete_subject(request, id):
 
 def sync_sensor_parser_templates(request):
     if request.method == 'POST':
-        path = Path(__file__).parents[2] / 'sensortypes'
-        parser_templates = parser.get_parser_templates(path)
+        repo = 'AI-Sensus/sensortypes'
+        parser_templates = repofiles.get_git_repo_file_names(repo,'yaml')
 
         for parser_template in parser_templates:
             manufacturer, name, version = parser_template.split('_')
             if not SensorType.objects.filter(manufacturer=manufacturer,name=name, version=version).exists():
                 SensorType.objects.create(manufacturer=manufacturer,name=name, version=version).save()
-    sensors = Sensor.objects.all().order_by('sensor_id')
-    subjects = Subject.objects.all().order_by('name')
-    deployments = Deployment.objects.all().order_by('begin_datetime')
-    sensortypes = SensorType.objects.all().order_by('manufacturer')
-    return render(request, 'tablepage.html',{'sensors': sensors, 'subjects': subjects, 'deployments': deployments, sensortypes:'sensortypes'})
+    return redirect('sensormodel:tablepage')
         
