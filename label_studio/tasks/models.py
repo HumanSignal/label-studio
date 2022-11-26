@@ -70,6 +70,8 @@ class Task(TaskMixin, models.Model):
     )
     inner_id = models.BigIntegerField(_('inner id'), default=0, null=True,
                                       help_text='Internal task ID in the project, starts with 1')
+    unique_id = models.CharField(_('unique id'), default='', max_length=50, null=True,
+                                 help_text='Unique task ID in the project')
     updates = ['is_labeled']
     total_annotations = models.IntegerField(_('total_annotations'), default=0, db_index=True,
                                   help_text='Number of total annotations for the current task except cancelled annotations')
@@ -98,6 +100,7 @@ class Task(TaskMixin, models.Model):
         db_table = 'task'
         indexes = [
             models.Index(fields=['project', 'is_labeled']),
+            models.Index(fields=['project', 'unique_id']),
             models.Index(fields=['project', 'inner_id']),
             models.Index(fields=['id', 'project']),
             models.Index(fields=['id', 'overlap']),

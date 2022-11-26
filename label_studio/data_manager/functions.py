@@ -104,6 +104,18 @@ def get_all_columns(project, *_):
             }
         }]
 
+    result['columns'] += [{
+            'id': 'unique_id',
+            'title': "Unique ID",
+            'type': 'String',
+            'help': 'Unique task ID in the project',
+            'target': 'tasks',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        }]
+
     result['columns'] += [
         {
             'id': 'completed_at',

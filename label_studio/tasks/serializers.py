@@ -1,6 +1,8 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
+import uuid
+
 import ujson as json
 import numbers
 
@@ -288,6 +290,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                     is_labeled=len(task_annotations[i]) >= max_overlap,
                     file_upload_id=task.get('file_upload_id'),
                     inner_id=None if prev_inner_id is None else max_inner_id + i,
+                    unique_id=str(uuid.uuid4()) if 'unique_id' not in task or task['unique_id'] == '' else task['unique_id'],
                     total_predictions=len(task_predictions[i]),
                     total_annotations=total_annotations,
                     cancelled_annotations=cancelled_annotations
