@@ -6,8 +6,12 @@ class TaskMixin:
         n = self.completed_annotations.count()
         return n >= self.overlap
 
-    def update_is_labeled(self):
+    def update_is_labeled(self, *args, **kwargs):
         self.is_labeled = self._get_is_labeled_value()
+
+    @classmethod
+    def post_process_bulk_update_stats(cls, tasks):
+        pass
 
 
 class AnnotationMixin(models.Model):

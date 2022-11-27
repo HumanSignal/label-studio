@@ -757,7 +757,7 @@ def update_task_stats(task, stats=('is_labeled',), save=True):
     """
     logger.debug(f'Update stats {stats} for task {task}')
     if 'is_labeled' in stats:
-        task.update_is_labeled()
+        task.update_is_labeled(save=save)
     if save:
         task.save()
 
@@ -778,6 +778,7 @@ def bulk_update_stats_project_tasks(tasks):
             update_task_stats(task, save=False)
         # start update query batches
         bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+    Task.post_process_bulk_update_stats(tasks)
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \
