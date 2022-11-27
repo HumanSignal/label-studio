@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3688: Start select current area when create or resume drawing",
+  "message": "hotkey unselect can't work when isDrawing is true",
   "commit": "cbf5aeb580a60b2d1630970ae8afcdab00502cce",
   "branch": "fb-dev-3688",
-  "date": "2022/11/22 17:21:38"
+  "date": "2022-11-22T20:21:38Z"
 }

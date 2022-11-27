@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3673: Navigation using task links is broken (#124)",
-  "commit": "11b5975d499f63e96eae988be7bca7aa7bb31557",
+  "message": "feat: DEV-3750: Load task with given comment",
+  "commit": "8d2ddf8825e98156ea15e8695412be434399a13c",
   "branch": "master",
-  "date": "2022-11-03T15:53:51Z"
+  "date": "2022/11/18 16:46:59"
 }
