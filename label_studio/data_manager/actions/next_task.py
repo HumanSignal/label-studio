@@ -22,7 +22,8 @@ def next_task(project, queryset, **kwargs):
 
     request = kwargs['request']
     dm_queue = filters_ordering_selected_items_exist(request.data)
-    next_task, queue_info = get_next_task(request.user, queryset, project, dm_queue)
+    is_ordering_applied = bool(request.data.get('ordering'))
+    next_task, queue_info = get_next_task(request.user, queryset, project, dm_queue, is_ordering_applied=is_ordering_applied)
 
     if next_task is None:
         raise NotFound(

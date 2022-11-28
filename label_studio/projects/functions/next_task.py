@@ -123,7 +123,7 @@ def _try_uncertainty_sampling(tasks, project, user_solved_tasks_array, user, pre
     return next_task
 
 
-def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_info):
+def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_info, is_ordering_applied=False):
     user_solved_tasks_array = user.annotations.filter(task__project=project, task__isnull=False)
     user_solved_tasks_array = user_solved_tasks_array.distinct().values_list('task__pk', flat=True)
     not_solved_tasks = prepared_tasks.exclude(pk__in=user_solved_tasks_array)
@@ -145,7 +145,9 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
         else:
             overlap = 1
         # filter tasks that should be annotated
-        not_solved_tasks = not_solved_tasks.filter(total_annotations__lt=overlap).order_by("-total_annotations")
+        not_solved_tasks = not_solved_tasks.filter(total_annotations__lt=overlap)
+        if not is_ordering_applied:
+            not_solved_tasks = not_solved_tasks.order_by("-total_annotations")
 
     # show tasks with overlap > 1 first
     if project.show_overlap_first:
@@ -217,7 +219,7 @@ def postponed_queue(next_task, prepared_tasks, project, user, queue_info):
     return next_task, queue_info
 
 
-def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
+def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None, is_ordering_applied=False):
     logger.debug(f'get_next_task called. user: {user}, project: {project}, dm_queue: {dm_queue}')
 
     with conditional_atomic():
@@ -226,7 +228,7 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
         queue_info = ''
 
         not_solved_tasks, user_solved_tasks_array, queue_info = get_not_solved_tasks_qs(
-            user, project, prepared_tasks, assigned_flag, queue_info
+            user, project, prepared_tasks, assigned_flag, queue_info, is_ordering_applied=is_ordering_applied
         )
 
         if not dm_queue:
