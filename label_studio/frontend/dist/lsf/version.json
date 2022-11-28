@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3693: Explore reviews module show buggs",
-  "commit": "ad9e656a0446fd324fd8ab3ad2b644a7acb6a6d4",
+  "message": "fix: DEV-3754: Memory usage of repeater initialization causing crashes (#1025)\n\n* fix: DEV-3754: Fix performance issues with repeater and memory intensive tag structures\r\n\r\n* make repeater tag creation as lazy as possible\r\n\r\n* lazy eval repeater pages with time slicing\r\n\r\n* cleanup the hydration cache\r\n\r\n* more lazy repeater work\r\n\r\n* fix annotation reset so that the store does not double initialize\r\n\r\n* fix the tests\r\n\r\n* fix spacing/imports\r\n\r\n* this should fix the tests, cleanup a previous attempt of freeing memory\r\n\r\n* put back the instances Set\r\n\r\n* reset repeater page between task changes\r\n\r\n* fix resetting repeater page between clientside transitions, retaining page reloads placement\r\n\r\n* fix reseting page on label steam and review steam\r\n\r\nCo-authored-by: Julio Sgarbi <julio.sgarbi@hotmail.com>",
+  "commit": "c15c84d986be9a92b7e0ec27acacbc6a9af7df43",
   "branch": "master",
-  "date": "2022/11/24 10:07:07"
+  "date": "2022-11-28T14:50:54Z"
 }
