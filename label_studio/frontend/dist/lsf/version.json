@@ -1,6 +1,6 @@
 {
   "message": "Fix: DEV-3748: Fix truncated timeseries rendering",
-  "commit": "5c5b4e5b0c2d612e8ee91cfa086f672f5273c044",
-  "branch": "fb-dev-3748-fix/time-series-truncate",
-  "date": "2022/11/21 10:53:25"
+  "commit": "34e07d27881dcd1c87cea1f3c560b403c5472c1f",
+  "branch": "master",
+  "date": "2022/11/28 08:37:46"
 }
