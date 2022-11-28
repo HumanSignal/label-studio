@@ -135,3 +135,12 @@ def fill_annotations_project():
         start_job_async_or_sync(_fill_annotations_project, project.id)
 
     logger.info('Finished filling project field for Annotation model')
+
+def _fill_annotations_updated_by(completed_by):
+    Annotation.objects.filter(completed_by=completed_by).update(updated_by=completed_by)
+
+def fill_annotations_updated_by():
+    logger.info('Start populating updated_by field for Annotation model')
+    annotations = Annotation.objects.all()
+    for annotation in annotations:
+        start_job_async_or_sync(_fill_annotations_updated_by, annotation.completed_by)

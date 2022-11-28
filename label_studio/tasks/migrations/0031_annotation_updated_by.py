@@ -5,12 +5,6 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
-def set_updated_by(apps, _):
-    Annotation = apps.get_model('tasks', 'Annotation')
-    for obj in Annotation.objects.all().iterator():
-        obj.updated_by = obj.task.updated_by
-        obj.save()
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -24,5 +18,4 @@ class Migration(migrations.Migration):
             name='updated_by',
             field=models.ForeignKey(help_text='Last user who updated this annotation', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='updated_annotations', to=settings.AUTH_USER_MODEL, verbose_name='updated by'),
         ),
-        migrations.RunPython(set_updated_by)
     ]
