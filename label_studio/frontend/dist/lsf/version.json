@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3745: unselecting all itens in history instead just the selected item",
-  "commit": "d4c9170da3d3cf4db7ae2c6b08666354e5007bc0",
+  "commit": "1daca740770394a8cb1e6f6cb7ba7438fc9ce373",
   "branch": "fb-dev-3745",
-  "date": "2022/11/29 12:19:59"
+  "date": "2022/11/29 23:33:55"
 }
