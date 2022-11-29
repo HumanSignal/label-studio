@@ -9,10 +9,23 @@ from django.db.models import F
 from projects.models import Project
 from tasks.models import Annotation
 
+
 def _fill_annotations_updated_by(project):
     Annotation.objects.filter(project=project).update(updated_by=F('completed_by'))
 
 def forward(apps, _):
+    annotations = Annotation.objects.all()
+
+    if settings.VERSION_EDITION == 'Community':
+        if annotations.count() > 100000:
+            command = 'label-studio annotations_fill_updated_by'
+            logger = logging.getLogger(__name__)
+            logger.error(
+                "There are over 100,000 annotations in this label studio instance, please run this "
+                f"migration manually using {command}"
+            )
+            return
+
     projects = Project.objects.all()
     for project in projects:
         migration = AsyncMigrationStatus.objects.create(
