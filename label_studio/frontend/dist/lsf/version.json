@@ -1,6 +1,6 @@
 {
-  "message": "ci: Fix Run Server condition in e2e tests (#1046)",
-  "commit": "f310c0d0f2cd200ba60735b22833c3a40d3deab0",
-  "branch": "master",
-  "date": "2022-11-29T17:29:52Z"
+  "message": "chore: DEV-3856: Setup ESLint CI",
+  "commit": "ef5fee82acc73d07a69977c9faf6dfe1f3135be9",
+  "branch": "fb-dev-3856/eslint-ci-setup",
+  "date": "2022/11/29 18:21:17"
 }
