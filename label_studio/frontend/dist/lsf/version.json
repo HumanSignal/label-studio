@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3835: Manual editing keypoints coordinates causes data corruption",
-  "commit": "3f21e9da3cc2e41d7a7176688de43b1f324a6c18",
-  "branch": "fb-dev-3835/manual-edit",
-  "date": "2022/11/24 11:51:16"
+  "commit": "196cd17068e917f127e51dca484d3c7c12169105",
+  "branch": "master",
+  "date": "2022/11/29 08:37:37"
 }
