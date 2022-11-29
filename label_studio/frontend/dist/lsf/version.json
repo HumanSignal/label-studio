@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3835: Manual editing keypoints coordinates causes data corruption",
-  "commit": "196cd17068e917f127e51dca484d3c7c12169105",
-  "branch": "master",
-  "date": "2022/11/29 08:37:37"
+  "message": "fix: DEV-2113: Fix annotation disappear on unto",
+  "commit": "41b72c88375d6981670ba115a8a05eb8a11690cb",
+  "branch": "fb-dev-2113-fix/undo-redo-audio",
+  "date": "2022/11/28 18:17:07"
 }
