@@ -4,7 +4,7 @@ short: Machine learning integration
 type: guide
 tier: all
 order: 209
-order_enterprise: 115
+order_enterprise: 116
 meta_title: Integrate Label Studio into your machine learning pipeline
 meta_description: Machine learning frameworks for integrating your model development pipeline seamlessly with your data labeling workflow.
 section: "Machine learning"
