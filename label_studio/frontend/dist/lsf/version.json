@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2706: Fix the misalignment between frame numbers (#1022)\n\n* Fix the misalignment between frame numbers\r\n\r\n* Remove console.log\r\n\r\n* Fix seeker position clamping",
-  "commit": "4c27f2673c8024b475262778037389883daa07cf",
-  "branch": "master",
-  "date": "2022-11-28T22:42:54Z"
+  "message": "fix: DEV-3867: Fix RelationsOverlay with 3391 ff on",
+  "commit": "c36f5c92787bb7b168e10fe5baef0275cfeaf9ae",
+  "branch": "fb-dev-3867/broken-tags",
+  "date": "2022/11/29 12:20:50"
 }
