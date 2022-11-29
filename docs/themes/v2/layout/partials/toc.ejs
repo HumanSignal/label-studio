@@ -2,7 +2,7 @@
 
   <ul class="page-sidebar-list">
     <% const pages = site.pages.filter(page => page.type === type && (page.tier === theme.tier || page.tier === "all" || page.type === "tags" || page.type === "playground" || page.type === "templates")); %>
-    <% if(isEnterpriseTheme) pages.map(page => page.order = page.order_enterprise ? page.order_enterprise : page.order) %>
+    <% if(isEnterpriseTheme) pages.forEach(page => page.order = page.order_enterprise ? page.order_enterprise : page.order) %>
     <% const orderedPages = pages.sort('order') %>
     <% const parentPages = orderedPages.filter(page => page.parent === undefined) %>
     <% const childrenPages = orderedPages.filter(page => page.parent !== undefined) %>
