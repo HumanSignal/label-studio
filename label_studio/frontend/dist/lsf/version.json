@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3835: Manual editing keypoints coordinates causes data corruption",
-  "commit": "196cd17068e917f127e51dca484d3c7c12169105",
+  "message": "ci: Fix Run Server condition in e2e tests (#1046)",
+  "commit": "f310c0d0f2cd200ba60735b22833c3a40d3deab0",
   "branch": "master",
-  "date": "2022/11/29 08:37:37"
+  "date": "2022-11-29T17:29:52Z"
 }
