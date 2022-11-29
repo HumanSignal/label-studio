@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2706: Fix the misalignment between frame numbers (#1022)\n\n* Fix the misalignment between frame numbers\r\n\r\n* Remove console.log\r\n\r\n* Fix seeker position clamping",
-  "commit": "4c27f2673c8024b475262778037389883daa07cf",
+  "message": "fix: DEV-3835: Manual editing keypoints coordinates causes data corruption",
+  "commit": "196cd17068e917f127e51dca484d3c7c12169105",
   "branch": "master",
-  "date": "2022-11-28T22:42:54Z"
+  "date": "2022/11/29 08:37:37"
 }
