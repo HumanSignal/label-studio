@@ -84,6 +84,7 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
     :param kwargs: Function keywords arguments
     :return: Job or function result
     """
+
     redis = redis_connected() and kwargs.get('redis', True)
     queue_name = kwargs.get("queue_name", "default")
     if 'queue_name' in kwargs:
@@ -94,8 +95,8 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
     if 'job_timeout' in kwargs:
         job_timeout = kwargs['job_timeout']
         del kwargs['job_timeout']
-
     if redis:
+        logger.info(f"Start async job {job.func.__name__} on queue {queue_name}.")
         queue = django_rq.get_queue(queue_name)
         enqueue_method = queue.enqueue
         if in_seconds > 0:
@@ -143,10 +144,10 @@ def delete_job_by_id(queue, id):
     @param queue: Queue on redis to delete from
     @param id: Job id
     """
-    logger.debug(f"Stopping job {id}.")
     job = queue.fetch_job(id)
     if job is not None:
         # stop job if it is in master redis node (in the queue)
+        logger.info(f"Stopping job {id} from queue {queue.name}.")
         try:
             job.cancel()
             job.delete()
@@ -155,6 +156,7 @@ def delete_job_by_id(queue, id):
             logger.debug(f"Job {id} was already cancelled.")
     else:
         # try to stop job on worker (job started)
+        logger.info(f"Stopping job {id} on worker from queue {queue.name}.")
         try:
             send_stop_job_command(_redis, id)
             logger.debug(f"Send stop job {id} to redis worker.")
