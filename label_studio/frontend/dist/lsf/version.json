@@ -1,6 +1,6 @@
 {
-  "message": "ci: Fix Run Server condition in e2e tests (#1046)",
-  "commit": "f310c0d0f2cd200ba60735b22833c3a40d3deab0",
+  "message": "fix: DEV-3745: unselecting all itens in history instead just the selected item (#1042)\n\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
+  "commit": "88f9ce5555fc87099a6db43a3c64fb9d810159cc",
   "branch": "master",
-  "date": "2022-11-29T17:29:52Z"
+  "date": "2022-11-30T13:13:50Z"
 }
