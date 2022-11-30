@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from .models import Sensor, Deployment,  Subject, SensorType
 from . import forms
-from sensormodel.utils import get_git_repo_file_names as repofiles
+import os
+from pathlib import Path
 
 
 # Create your views here.
@@ -100,8 +101,13 @@ def delete_subject(request, id):
 
 def sync_sensor_parser_templates(request):
     if request.method == 'POST':
-        repo = 'AI-Sensus/sensortypes'
-        parser_templates = repofiles.get_git_repo_file_names(repo,'yaml')
+        path = Path(__file__).parents[2]/ 'sensortypes'
+        parser_templates = []
+        files = os.listdir(path)
+        for file in files:
+            name, ext = os.path.splitext(file)
+            if ext == '.yaml':
+                parser_templates.append((name))
 
         for parser_template in parser_templates:
             manufacturer, name, version = parser_template.split('_')
