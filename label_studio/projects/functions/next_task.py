@@ -149,7 +149,7 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
             # filter tasks that should be annotated
             not_solved_tasks = not_solved_tasks.filter(total_annotations__lt=overlap)
             if not is_ordering_applied:
-                not_solved_tasks = not_solved_tasks.order_by("-total_annotations")
+                not_solved_tasks = not_solved_tasks.order_by("-total_annotations", "id")
         else:
             not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
 
