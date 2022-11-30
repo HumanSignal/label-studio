@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3754: Memory usage of repeater initialization causing crashes",
-  "commit": "c4025e010d5db20a725a51f8a5da50c3c938d3ed",
-  "branch": "master",
-  "date": "2022/11/28 08:50:05"
+  "message": "fix: DEV-3874: Fix polling overflow",
+  "commit": "bcaedacf7ec85af608bdb2b44f7ad7e67d84671c",
+  "branch": "fb-dev-3874/fix-polling",
+  "date": "2022/11/30 11:41:13"
 }
