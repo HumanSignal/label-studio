@@ -279,6 +279,8 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None, i
                 count = next_task.annotations.filter(was_cancelled=False).count()
                 task_overlap_reached = count >= next_task.overlap
                 global_overlap_reached = count >= project.maximum_annotations
+                next_task.overlap = project.maximum_annotations if global_overlap_reached else 1
+                next_task.save(update_fields=['overlap'])
                 if next_task.is_labeled or task_overlap_reached or global_overlap_reached:
                     from tasks.serializers import TaskSimpleSerializer
 
