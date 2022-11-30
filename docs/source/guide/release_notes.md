@@ -4,7 +4,7 @@ short: Release notes
 type: guide
 tier: enterprise
 order: 850
-order_enterprise: 130
+order_enterprise: 142
 section: "Reference"
 meta_title: Release notes for Label Studio Enterprise
 meta_description: Discover what's new and improved, and review bug fixes, in the release notes and changelog for Label Studio Enterprise.
