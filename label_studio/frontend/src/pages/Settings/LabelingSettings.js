@@ -8,7 +8,7 @@ import { ConfigPage } from '../CreateProject/Config/Config';
 
 export const LabelingSettings = () => {
   const history = useHistory();
-  const {project, fetchProject} = useProject();
+  const { project, fetchProject } = useProject();
   const [config, setConfig] = useState("");
   const [essentialDataChanged, setEssentialDataChanged] = useState(false);
   const api = useAPI();
@@ -29,6 +29,7 @@ export const LabelingSettings = () => {
     }
 
     const error = await res.json();
+
     fetchProject();
     return error;
   }, [project, config]);
@@ -39,7 +40,7 @@ export const LabelingSettings = () => {
       const configIsEmpty = project.label_config.replace(/\s/g, '') === '<View></View>';
       const hasTasks = project.task_number > 0;
 
-      console.log({hasConfig, configIsEmpty, hasTasks, project});
+      console.log({ hasConfig, configIsEmpty, hasTasks, project });
       return (hasConfig && !configIsEmpty) && hasTasks;
     }
     return false;
