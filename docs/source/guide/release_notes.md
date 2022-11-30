@@ -3,7 +3,7 @@ title: Release notes for Label Studio Enterprise
 short: Release notes
 type: guide
 tier: enterprise
-order: 850
+order: 221
 order_enterprise: 142
 section: "Reference"
 meta_title: Release notes for Label Studio Enterprise
