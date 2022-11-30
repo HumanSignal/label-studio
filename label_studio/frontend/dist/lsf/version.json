@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3745: unselecting all itens in history instead just the selected item (#1042)\n\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
-  "commit": "88f9ce5555fc87099a6db43a3c64fb9d810159cc",
-  "branch": "master",
-  "date": "2022-11-30T13:13:50Z"
+  "message": "fix: DEV-3646: Fix regions copying in the Outliner",
+  "commit": "7cead90c39a6d0096f04c5c1057ec14893e5bdc3",
+  "branch": "fb-dev-3646/fix-regions-copying",
+  "date": "2022/11/30 15:02:40"
 }
