@@ -4,9 +4,9 @@ import logging
 from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Value, When, Q
 from django.db.models.fields import DecimalField
 from django.conf import settings
-import numpy as np
 
 from core.utils.common import conditional_atomic
+from core.feature_flags import flag_set
 from tasks.models import Annotation, Task
 
 logger = logging.getLogger(__name__)
@@ -135,19 +135,23 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
 
     # if annotator is assigned for tasks, he must to solve it regardless of is_labeled=True
     if not assigned_flag:
-        # get project params for tasks that should have maximum_annotations
-        required_tasks = int(project.tasks.count() * project.overlap_cohort_percentage / 100 + 0.5)
-        # get tasks count with maximum_annotations or greater
-        tasks_with_max_annotations = project.tasks.filter(total_annotations__gte=project.maximum_annotations).count()
-        # identify what overlap should be for next task
-        if required_tasks > tasks_with_max_annotations:
-            overlap = project.maximum_annotations
+        if flag_set('fflag_feat_back_dev_3792_add_sync_update_is_labeled_301122_short',
+                    project.organization.created_by):
+            # get project params for tasks that should have maximum_annotations
+            required_tasks = int(project.tasks.count() * project.overlap_cohort_percentage / 100 + 0.5)
+            # get tasks count with maximum_annotations or greater
+            tasks_with_max_annotations = project.tasks.filter(total_annotations__gte=project.maximum_annotations).count()
+            # identify what overlap should be for next task
+            if required_tasks > tasks_with_max_annotations:
+                overlap = project.maximum_annotations
+            else:
+                overlap = 1
+            # filter tasks that should be annotated
+            not_solved_tasks = not_solved_tasks.filter(total_annotations__lt=overlap)
+            if not is_ordering_applied:
+                not_solved_tasks = not_solved_tasks.order_by("-total_annotations")
         else:
-            overlap = 1
-        # filter tasks that should be annotated
-        not_solved_tasks = not_solved_tasks.filter(total_annotations__lt=overlap)
-        if not is_ordering_applied:
-            not_solved_tasks = not_solved_tasks.order_by("-total_annotations")
+            not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
 
     # show tasks with overlap > 1 first
     if project.show_overlap_first:

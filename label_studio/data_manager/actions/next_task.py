@@ -7,7 +7,7 @@ from data_manager.functions import filters_ordering_selected_items_exist
 from projects.functions.next_task import get_next_task
 from core.permissions import all_permissions
 from tasks.serializers import NextTaskSerializer
-
+from core.feature_flags import flag_set
 
 logger = logging.getLogger(__name__)
 
@@ -22,8 +22,11 @@ def next_task(project, queryset, **kwargs):
 
     request = kwargs['request']
     dm_queue = filters_ordering_selected_items_exist(request.data)
-    is_ordering_applied = bool(request.data.get('ordering'))
-    next_task, queue_info = get_next_task(request.user, queryset, project, dm_queue, is_ordering_applied=is_ordering_applied)
+    if flag_set('fflag_feat_back_dev_3792_add_sync_update_is_labeled_301122_short', project.organization.created_by):
+        is_ordering_applied = bool(request.data.get('ordering'))
+        next_task, queue_info = get_next_task(request.user, queryset, project, dm_queue, is_ordering_applied=is_ordering_applied)
+    else:
+        next_task, queue_info = get_next_task(request.user, queryset, project, dm_queue)
 
     if next_task is None:
         raise NotFound(
