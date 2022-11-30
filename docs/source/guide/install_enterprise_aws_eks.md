@@ -4,6 +4,7 @@ short: Amazon EKS
 tier: enterprise
 type: guide
 order: 111
+order_enterprise: 136
 meta_title: Install Label Studio Enterprise on Amazon Elastic Kubernetes Service (EKS)
 meta_description: Deploy Label Studio Enterprise on Kubernetes, such as on Amazon Elastic Container Service for Kubernetes, to create machine learning and data science projects in a scalable containerized environment. 
 section: "Install"

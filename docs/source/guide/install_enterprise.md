@@ -4,6 +4,7 @@ short: Overview
 type: guide
 tier: enterprise
 order: 106
+order_enterprise: 132
 meta_title: Install Label Studio Enterprise
 meta_description: Install, back up, and upgrade Label Studio Enterprise to create machine learning and data science projects on-premises.
 section: "Install"

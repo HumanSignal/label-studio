@@ -4,6 +4,7 @@ short: Custom agreement metric
 tier: enterprise
 type: guide
 order: 301
+order_enterprise: 115
 meta_title: Add a Custom Agreement Metric for Labeling
 meta_description: Label Studio Enterprise documentation about how to add a custom agreement metric to use for assessing annotator agreement or the quality of your annotation and prediction results for data labeling and machine learning projects.
 section: "Quality control"

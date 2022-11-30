@@ -4,6 +4,7 @@ short: Airgapped Server
 tier: enterprise
 type: guide
 order: 111
+order_enterprise: 135
 meta_title: Install Label Studio Enterprise without public internet access
 meta_description: Install Label Studio Enterprise without public internet access to create machine learning and data science projects in an airgapped environment. 
 section: "Install"

@@ -3,10 +3,12 @@ title: Frontend builds
 short: Frontend builds
 type: guide
 tier: all
-order: 950
-section: "Advanced Development"
+order: 219
+order_enterprise: 126
 meta_title: Customize User Interface
 meta_description: Label Studio documentation for integrating the Label Studio frontend interface into your own machine learning or data labeling application workflow.
+section: "Integration and Development"
+
 ---
 
 The [Label Studio Frontend](https://github.com/heartexlabs/label-studio-frontend) (LSF) is the main labeling interface distributed within Label Studio and as a separate package via NPM and Unpkg. You can integrate the LSF into your projects without Label Studio to provide data labeling capabilities to your users.

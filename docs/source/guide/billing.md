@@ -3,9 +3,11 @@ title: Manage billing
 type: guide
 tier: enterprise
 order: 102
+order_enterprise: 129
 meta_title: Manage billing
 meta_description: Manage billing for the plans for Label Studio Enterprise and Teams, monitor your license usage, and explore the small business options with Label Studio Teams and the larger organization options with Label Studio Enterprise.  
 section: "Billing and Usage"
+
 ---
 
 Manage the billing and usage settings for your Label Studio Teams or Label Studio Enterprise accounts. For details about Label Studio plan pricing, see [Label Studio Editions & Pricing](https://heartex.com/pricing) on the Heartex website. 

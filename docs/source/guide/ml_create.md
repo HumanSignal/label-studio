@@ -1,8 +1,10 @@
 ---
 title: Write your own ML backend
+short: Write your own ML backend
 type: guide
 tier: all
-order: 303
+order: 210
+order_enterprise: 117
 meta_title: Machine Learning SDK
 meta_description: Set up your machine learning model to output and consume predictions in your data science and data labeling projects. 
 section: "Machine learning"

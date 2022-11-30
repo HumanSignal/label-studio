@@ -3,6 +3,7 @@ title: Labeling configuration
 type: guide
 tier: all
 order: 119
+order_enterprise: 104
 meta_title: Set up labeling configuration interface
 meta_description: Customize your data labeling and annotation interface with templates or custom tag combinations for your machine learning and data science projects.
 section: "Configuration"
