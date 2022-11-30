@@ -19,7 +19,7 @@ from data_export.mixins import ExportMixin
 logger = logging.getLogger(__name__)
 
 
-def calculate_stats_all_orgs(from_scratch, redis, migration_name=''):
+def calculate_stats_all_orgs(from_scratch, redis, migration_name='0018_manual_migrate_counters'):
     logger = logging.getLogger(__name__)
     organizations = Organization.objects.order_by('-id')
 
@@ -40,7 +40,7 @@ def calculate_stats_all_orgs(from_scratch, redis, migration_name=''):
     logger.debug("All organizations were recalculated")
 
 
-def redis_job_for_calculation(org, from_scratch, migration_name=''):
+def redis_job_for_calculation(org, from_scratch, migration_name='0018_manual_migrate_counters'):
     """
     Recalculate counters for projects list
     :param org: Organization to recalculate
