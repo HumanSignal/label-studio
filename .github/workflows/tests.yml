@@ -51,6 +51,7 @@ jobs:
 
       - name: Install OS dependencies
         run: |
+          sudo sed -i 's/azure\.//' /etc/apt/sources.list
           sudo apt-get update
           sudo apt-get install libsasl2-dev python3-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev
 
@@ -191,6 +192,7 @@ jobs:
 
       - name: Install OS dependencies
         run: |
+          sudo sed -i 's/azure\.//' /etc/apt/sources.list
           sudo apt-get update
           sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev python-dev
 
