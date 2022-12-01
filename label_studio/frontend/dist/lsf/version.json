@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3733: Persist and use the pending draft to attach added comments",
-  "commit": "4b082ba9d7a48216267742f14c0c548beb456f90",
+  "message": "fix: DEV-3745: unselecting all itens in history instead just the selected item (#1042)\n\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
+  "commit": "88f9ce5555fc87099a6db43a3c64fb9d810159cc",
   "branch": "master",
-  "date": "2022/11/17 08:06:22"
+  "date": "2022-11-30T13:13:50Z"
 }
