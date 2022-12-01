@@ -12,6 +12,14 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
     # short form for user presentation
     initials = serializers.SerializerMethodField(default='?', read_only=True)
     avatar = serializers.SerializerMethodField(read_only=True)
+    last_activity = serializers.SerializerMethodField(read_only=True)
+
+    def get_last_activity(self, user):
+        active_org = str(user.active_organization.id)
+        if active_org in user.last_activity_per_org:
+            return user.last_activity_per_org[active_org]
+        else:
+            return user.last_activity
 
     def get_avatar(self, user):
         return user.avatar_url
@@ -41,7 +49,6 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
             'username',
             'email',
             'last_activity',
-            'last_activity_per_org',
             'avatar',
             'initials',
             'phone',
