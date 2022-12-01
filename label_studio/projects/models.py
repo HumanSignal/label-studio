@@ -843,6 +843,12 @@ class Project(ProjectMixin, models.Model):
     class Meta:
         db_table = 'project'
 
+    @property
+    def overlapped_tasks_reached(self):
+        required_tasks = int(self.tasks.count() * self.overlap_cohort_percentage / 100 + 0.5)
+        tasks_with_max_annotations = self.tasks.filter(total_annotations__gte=self.maximum_annotations).count()
+        return tasks_with_max_annotations >= required_tasks
+
 
 class ProjectOnboardingSteps(models.Model):
     """ """

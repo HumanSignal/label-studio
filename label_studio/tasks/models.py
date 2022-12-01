@@ -135,17 +135,19 @@ class Task(TaskMixin, models.Model):
         else:
             num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) & ~Q(completed_by=user)).count()
 
+        overlap = 1 if self.project.overlapped_tasks_reached else self.project.maximum_annotations
+
         num = num_locks + num_annotations
-        if num > self.overlap:
+        if num > overlap:
             logger.error(
-                f"Num takes={num} > overlap={self.overlap} for task={self.id} - it's a bug",
+                f"Num takes={num} > required overlap={overlap} for task={self.id} - it's a bug",
                 extra=dict(
                     lock_ttl=self.get_lock_ttl(),
                     num_locks=num_locks,
                     num_annotations=num_annotations,
                 )
             )
-        result = bool(num >= self.overlap)
+        result = bool(num >= overlap)
         logger.debug(f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations}')
         return result
 
