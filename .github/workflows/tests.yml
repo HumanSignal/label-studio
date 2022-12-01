@@ -69,7 +69,7 @@ jobs:
             !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
           key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+            ${{ runner.os }}-pip-${{ env.pythonLocation }}-
 
       - name: Install dependencies
         run: |
@@ -207,7 +207,7 @@ jobs:
             !${{ env.pythonLocation }}/bin/pip*
             !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
             !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          key: ${{ runner.os }}-pip-${{ env.pythonLocation }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
