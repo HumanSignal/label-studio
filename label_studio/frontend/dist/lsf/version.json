@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2113: Fix annotation disappear on undo",
-  "commit": "185d15f2e95429c692163a49168cb54f09d7e538",
+  "commit": "bbe71ceb9d1b58ff3b5503aa2d41f00e609e260e",
   "branch": "fb-dev-2113-fix/undo-redo-audio",
-  "date": "2022/11/29 23:06:39"
+  "date": "2022/12/01 09:06:13"
 }
