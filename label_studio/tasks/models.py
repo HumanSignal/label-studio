@@ -772,7 +772,7 @@ def bulk_update_stats_project_tasks(tasks, project=None):
     if project is None:
         project = tasks[0].project
     with transaction.atomic():
-        use_overlap = project._can_use_overlap
+        use_overlap = project._can_use_overlap()
         maximum_annotations = project.maximum_annotations
         # update filters if we can use overlap
         if use_overlap:
@@ -780,8 +780,8 @@ def bulk_update_stats_project_tasks(tasks, project=None):
             tasks.filter(total_annotations__gte=maximum_annotations).update(is_labeled=True)
             tasks.filter(total_annotations__gte=1, overlap=1).update(is_labeled=True)
             # unfinished tasks
-            tasks.filter(total_annotations__lt=maximum_annotations, overlap=maximum_annotations).update(is_labeled=False)
-            tasks.filter(total_annotations__lt=1, overlap=1).update(is_labeled=False)
+            tasks.filter(~Q(total_annotations__gte=maximum_annotations) | ~Q(total_annotations__gte=1, overlap=1)).\
+                update(is_labeled=False)
         else:
             # update objects without saving if we can't use overlap
             for task in tasks:
