@@ -142,7 +142,7 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
             # get tasks count with maximum_annotations or greater
             tasks_with_max_annotations = project.tasks.filter(total_annotations__gte=project.maximum_annotations).count()
             # identify what overlap should be for next task
-            if required_tasks > tasks_with_max_annotations:
+            if required_tasks > tasks_with_max_annotations and required_tasks > user_solved_tasks_array.count():
                 overlap = project.maximum_annotations
             else:
                 overlap = 1
