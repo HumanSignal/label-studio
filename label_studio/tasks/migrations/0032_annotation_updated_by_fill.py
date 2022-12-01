@@ -10,8 +10,10 @@ from projects.models import Project
 from tasks.models import Annotation
 
 
-def _fill_annotations_updated_by(project):
+def _fill_annotations_updated_by(project, migration):
     Annotation.objects.filter(project=project).update(updated_by=F('completed_by'))
+    migration.status = AsyncMigrationStatus.STATUS_FINISHED
+    migration.save()
 
 def forward(apps, _):
     annotations = Annotation.objects.all()
@@ -34,9 +36,7 @@ def forward(apps, _):
                 status=AsyncMigrationStatus.STATUS_STARTED,
         )
 
-        start_job_async_or_sync(_fill_annotations_updated_by, project)
-        migration.status = AsyncMigrationStatus.STATUS_FINISHED
-        migration.save()
+        start_job_async_or_sync(_fill_annotations_updated_by, project, migration)
 
 def backward(apps, _):
     pass
