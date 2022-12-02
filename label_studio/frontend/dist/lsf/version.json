@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3745: unselecting all itens in history instead just the selected item (#1042)\n\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
-  "commit": "88f9ce5555fc87099a6db43a3c64fb9d810159cc",
-  "branch": "master",
-  "date": "2022-11-30T13:13:50Z"
+  "message": "fix: DEV-3901: Paragraph overflow text issue when outliner disabled",
+  "commit": "9e6259ab4dea6cb44d1e0f7c72af0f66d491bad4",
+  "branch": "fb-dev-3901/overflow-error",
+  "date": "2022/12/02 16:06:50"
 }
