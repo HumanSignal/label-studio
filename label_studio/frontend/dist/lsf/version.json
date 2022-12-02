@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3745: unselecting all itens in history instead just the selected item (#1042)\n\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
-  "commit": "88f9ce5555fc87099a6db43a3c64fb9d810159cc",
-  "branch": "master",
-  "date": "2022-11-30T13:13:50Z"
+  "message": "fix: DEV-3892: Get showSubmitButton=false to work",
+  "commit": "85f1362489912a5dc797390ffc3fad089bd21282",
+  "branch": "fb-dev-3892/show-submit-button",
+  "date": "2022/12/01 23:40:38"
 }
