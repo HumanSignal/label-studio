@@ -51,8 +51,11 @@ jobs:
               - 'label_studio/!(frontend)/**'
               - 'deploy/requirements**'
               - 'setup.py'
+              - '.github/workflows/bandit.yml'
+              - '.github/workflows/tests.yml'
             frontend:
               - 'label_studio/frontend/**'
+              - '.github/workflows/frontend-build.yml'
             docker:
               - 'label_studio/**'
               - 'deploy/**'
@@ -161,50 +164,82 @@ jobs:
       - name: Create release draft
         uses: actions/github-script@v6
         id: create-draft-release
+        env:
+          TARGET_COMMITISH: "${{ github.ref_name }}"
+          RELEASE_BRANCH_PREFIX: "${{ env.RELEASE_BRANCH_PREFIX }}"
         with:
           script: |
             const { repo, owner } = context.repo;
-            const target_commitish = '${{ github.ref_name }}';
-            let version = target_commitish.replace('${{ env.RELEASE_BRANCH_PREFIX }}', '')
+            const target_commitish = process.env.TARGET_COMMITISH;
+            let version = target_commitish.replace(process.env.RELEASE_BRANCH_PREFIX, '')
             core.setOutput("rc-version", `${version}rc${{ github.run_id }}`);
+            const regexp = '^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)(\.post([0-9]+))?$';
             
+            function compareVersions(a, b) {
+              if (a[1] === b[1])
+                if (a[2] === b[2])
+                  if (a[3] === b[3])
+                    return (+a[5] || -1) - (+b[5] || -1)
+                  else
+                    return +a[3] - b[3]
+                else
+                  return +a[2] - b[2]
+              else
+                return +a[1] - b[1]
+            }
+            
+            const versionMatch = version.match(regexp)
+            if (!versionMatch) {
+              core.setFailed(`Version "${version}" from branch "${target_commitish}" does not match the regexp ${regexp}`)
+              process.exit()
+            }
+
+            const {data: tags} = await github.rest.repos.listTags({
+                owner,
+                repo,
+                per_page: 100
+            });
+            console.log(`Tags:`)
+            console.log(tags.map(e => e.name))
+            const matchedTags = tags.filter(e => e.name.indexOf(version) !== -1)
+            console.log(`Tags for ${version}:`)
+            console.log(matchedTags.map(e => e.name))
+            if (matchedTags.length !== 0) {
+                let newHotfixNumber = 0
+                for (let matchedTag of matchedTags) {
+                    const matchVersion = matchedTag.name.match('^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)(.post([0-9]+))?$')
+                    if (matchVersion && matchVersion[5]) {
+                        const hotfixNumber = parseInt(matchVersion[5])
+                        if (newHotfixNumber <= hotfixNumber) {
+                            newHotfixNumber = hotfixNumber + 1
+                        }
+                    }
+                }
+                version = `${version}.post${newHotfixNumber}`
+            }
+            console.log(`New version: ${version}`)
+
+            const rawTags = tags.map(e => e.name) 
+            const tagsWithNew = [...rawTags, version]
+            const sortedTags = tagsWithNew
+              .filter(e => e.match(regexp))
+              .map((e => e.match(regexp)))
+              .sort(compareVersions)
+              .reverse()
+              .map(e => e[0])
+            const previousTag = sortedTags[sortedTags.indexOf(version)+1]
+            console.log(`Previous version: ${previousTag}`)
+
+            console.log('Find or Create a Draft release')
             const {data: releases} = await github.rest.repos.listReleases({
                 owner,
                 repo,
             });
-            
-            let release = releases.find((e) => {
-                return target_commitish.endsWith(e.target_commitish) && e.draft
-            })
-            
+            let release = releases.find(e => target_commitish.endsWith(e.target_commitish) && e.draft)
             if (release) {
                 console.log(`Draft release already exist ${release.html_url}`)
             } else {
-                console.log(`Draft release is not found creating a new one`)
-                const {data: tags} = await github.rest.repos.listTags({
-                    owner,
-                    repo,
-                    per_page: 100
-                });
-                console.log(`Tags:`)
-                console.log(tags.map(e => e.name))
-                const matchedTags = tags.filter(e => e.name.indexOf(version) !== -1)
-                console.log(`Tags for ${version}:`)
-                console.log(matchedTags.map(e => e.name))
-                if (matchedTags.length !== 0) {
-                    let newHotfixNumber = 0
-                    for (let matchedTag of matchedTags) {
-                        const matchVersion = matchedTag.name.match('^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)(.post([0-9]+))?$')
-                        if (matchVersion && matchVersion[5]) {
-                            const hotfixNumber = parseInt(matchVersion[5])
-                            if (newHotfixNumber <= hotfixNumber) {
-                                newHotfixNumber = hotfixNumber + 1
-                            }
-                        }
-                    }
-                    version = `${version}.post${newHotfixNumber}`
-                }
-                console.log(`New version: ${version}`)
+                console.log(`Draft release is not found creating a new one`)                
                 const {data: newDraftRelease} = await github.rest.repos.createRelease({
                     owner,
                     repo,
@@ -213,14 +248,34 @@ jobs:
                     name: version,
                     tag_name: version,
                     target_commitish: target_commitish,
-                    generate_release_notes: true,
                 });
                 console.log(`Draft release is created ${newDraftRelease.html_url}`)
                 release = newDraftRelease;
                 core.setOutput("created", true);
             }
             
-            core.setOutput("id", release.id);
+            console.log('Updating release with new release notes')
+            const {data: release_notes} = await github.rest.repos.generateReleaseNotes({
+              owner,
+              repo,
+              tag_name: version,
+              previous_tag_name: previousTag,
+              target_commitish: target_commitish,
+            });
+            const {data: updated_release} = await github.rest.repos.updateRelease({
+              owner,
+              repo,
+              release_id: release.id,
+              draft: true,
+              prerelease: false,
+              name: version,
+              tag_name: version,
+              target_commitish: target_commitish,
+              body: release_notes.body
+            });
+            console.log(`Draft release is updated ${updated_release.html_url}`)
+
+            core.setOutput("id", updated_release.id);
             core.setOutput("tag_name", release.tag_name);
 
   build-pypi:

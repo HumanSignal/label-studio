@@ -66,7 +66,7 @@ async function get(projectName, ref = 'master') {
   res = await fetch(artifactsUrl, { headers: { Authorization: `token ${TOKEN}` }});
   json = await res.json();
 
-  const artifact = json.artifacts.find(art => art.name.match(sha) !== null && art.name.match('build') !== null);
+  const artifact = json.artifacts.find(art => art.name.match(sha) !== null && art.name.startsWith('LSF'));
   if (!artifact) throw new Error(`Artifact for commit ${sha} was not found. Build failed?`);
   const buildUrl = artifact.archive_download_url;
   console.info('Found an artifact:', buildUrl);

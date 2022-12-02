@@ -203,6 +203,12 @@ class Task(TaskMixin, models.Model):
             return False
         return filename.startswith(settings.UPLOAD_DIR + '/')
 
+    @staticmethod
+    def prepare_filename(filename):
+        if isinstance(filename, str):
+            return filename.replace(settings.MEDIA_URL, '')
+        return filename
+
     def resolve_uri(self, task_data, project):
         if project.task_data_login and project.task_data_password:
             protected_data = {}
@@ -218,15 +224,16 @@ class Task(TaskMixin, models.Model):
             # try resolve URLs via storage associated with that task
             for field in task_data:
                 # file saved in django file storage
-                if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(task_data[field]):
+                prepared_filename = self.prepare_filename(task_data[field])
+                if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(prepared_filename):
                     # permission check: resolve uploaded files to the project only
                     file_upload = None
-                    file_upload = FileUpload.objects.filter(project=project, file=task_data[field]).first()
+                    file_upload = FileUpload.objects.filter(project=project, file=prepared_filename).first()
                     if file_upload is not None:
                         if flag_set('ff_back_dev_2915_storage_nginx_proxy_26092022_short', self.project.organization.created_by):
                             task_data[field] = file_upload.url
                         else:
-                            task_data[field] = default_storage.url(name=task_data[field])
+                            task_data[field] = default_storage.url(name=prepared_filename)
                     # it's very rare case, e.g. user tried to reimport exported file from another project
                     # or user wrote his django storage path manually
                     else:
