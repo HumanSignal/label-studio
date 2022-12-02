@@ -844,6 +844,58 @@ class Project(ProjectMixin, models.Model):
     class Meta:
         db_table = 'project'
 
+    def has_errors_project_state_overlap(self, update_to_actual=False):
+        """
+        Check if overlap is calculated wrong
+        :param update_to_actual: Should we update on error
+        :return:
+        """
+        project_tasks_count = self.tasks.count()
+        # get project params for tasks that should have maximum_annotations
+        required_tasks = int(project_tasks_count * self.overlap_cohort_percentage / 100 + 0.5)
+        # check that overlap is calculated correctly
+        tasks_with_max_annotations = self.tasks.filter(overlap=self.maximum_annotations).count()
+        tasks_with_min_annotations = self.tasks.filter(overlap=1).count()
+        if tasks_with_max_annotations != required_tasks or ((tasks_with_max_annotations+tasks_with_min_annotations)
+                                                            != project_tasks_count and self.maximum_annotations > 1):
+            # need to rearrange
+            if update_to_actual:
+                self.rearrange_overlap_cohort()
+            return True
+        return False
+
+    def has_errors_project_state_is_labeled(self, update_to_actual=False, async_start=True, tasks=None, sync_border=0):
+        """
+        Check if is_labeled is calculated wrong
+        :param update_to_actual: Should we update on error
+        :param async_start: Async start recalculation
+        :param tasks: Tasks quesryset to update
+        :param sync_border: Border of sync calculation
+        :return: True if there are errors in is_label
+        """
+        def process_tasks(tasks, update_to_actual, async_start, sync_border):
+            """
+            Process tasks queryset
+            """
+            if update_to_actual and sync_border != 0 and tasks.count() < sync_border:
+                bulk_update_stats_project_tasks(tasks)
+            elif update_to_actual and async_start:
+                start_job_async_or_sync(bulk_update_stats_project_tasks, tasks)
+
+        # use tasks queryset or all tasks
+        tasks = tasks or self.tasks
+        # check that is_labeled is calculated correctly
+        tasks_with_max_annotations = tasks.filter(total_annotations__gte=self.maximum_annotations, is_labeled=False)
+        tasks_with_min_annotations = tasks.filter(total_annotations__gte=1,
+                                                  total_annotations__lt=self.maximum_annotations, is_labeled=False)
+        if tasks_with_max_annotations.exists():
+            process_tasks(tasks_with_max_annotations, update_to_actual, async_start, sync_border)
+            return True
+        if tasks_with_min_annotations.exists():
+            process_tasks(tasks_with_min_annotations, update_to_actual, async_start, sync_border)
+            return True
+        return False
+
 
 class ProjectOnboardingSteps(models.Model):
     """ """
