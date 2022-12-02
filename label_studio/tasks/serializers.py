@@ -226,7 +226,10 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
                 email = completed_by['email']
                 if email not in members_email_to_id:
-                    annotation['completed_by_id'] = default_user.id
+                    if settings.ALLOW_IMPORT_TASKS_WITH_UNKNOWN_EMAILS:
+                        annotation['completed_by_id'] = default_user.id
+                    else:
+                        raise ValidationError(f"Unknown annotator's email {email}")
                 else:
                     # overwrite an actual member ID
                     annotation['completed_by_id'] = members_email_to_id[email]
