@@ -15,11 +15,13 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
     last_activity = serializers.SerializerMethodField(read_only=True)
 
     def get_last_activity(self, user):
-        active_org = str(user.active_organization.id)
-        if active_org in user.last_activity_per_org:
-            return user.last_activity_per_org[active_org]
-        else:
-            return user.last_activity
+        if 'request' in self.context and hasattr(self.context['request'], 'user'):
+            current_user = self.context['request'].user
+            active_org = str(current_user.active_organization.id)
+            if active_org in user.last_activity_per_org:
+                return user.last_activity_per_org[active_org]
+            else:
+                return user.last_activity
 
     def get_avatar(self, user):
         return user.avatar_url
