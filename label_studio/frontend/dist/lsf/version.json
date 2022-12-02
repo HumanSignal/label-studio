@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3693: Explore reviews module show buggs",
-  "commit": "ad9e656a0446fd324fd8ab3ad2b644a7acb6a6d4",
+  "message": "fix: DEV-3745: unselecting all itens in history instead just the selected item (#1042)\n\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
+  "commit": "88f9ce5555fc87099a6db43a3c64fb9d810159cc",
   "branch": "master",
-  "date": "2022/11/24 10:07:07"
+  "date": "2022-11-30T13:13:50Z"
 }

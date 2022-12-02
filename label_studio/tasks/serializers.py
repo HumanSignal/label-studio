@@ -223,11 +223,16 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             elif isinstance(completed_by, dict):
                 if 'email' not in completed_by:
                     raise ValidationError(f"It's expected to have 'email' field in 'completed_by' data in annotations")
+
                 email = completed_by['email']
                 if email not in members_email_to_id:
-                    raise ValidationError(f"Unknown annotator's email {email}")
-                # overwrite an actual member ID
-                annotation['completed_by_id'] = members_email_to_id[email]
+                    if settings.ALLOW_IMPORT_TASKS_WITH_UNKNOWN_EMAILS:
+                        annotation['completed_by_id'] = default_user.id
+                    else:
+                        raise ValidationError(f"Unknown annotator's email {email}")
+                else:
+                    # overwrite an actual member ID
+                    annotation['completed_by_id'] = members_email_to_id[email]
 
             # old style annotators specification - try to find them by ID
             elif isinstance(completed_by, int) and completed_by in members_ids:

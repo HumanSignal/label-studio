@@ -51,8 +51,11 @@ jobs:
               - 'label_studio/!(frontend)/**'
               - 'deploy/requirements**'
               - 'setup.py'
+              - '.github/workflows/bandit.yml'
+              - '.github/workflows/tests.yml'
             frontend:
               - 'label_studio/frontend/**'
+              - '.github/workflows/frontend-build.yml'
             docker:
               - 'label_studio/**'
               - 'deploy/**'
