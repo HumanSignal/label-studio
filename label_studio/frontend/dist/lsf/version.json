@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3901: Paragraph overflow text issue when outliner disabled",
-  "commit": "8b45238a98180f3358876043425772f53510cc52",
-  "branch": "master",
-  "date": "2022/12/02 17:09:35"
+  "message": "feat: DEV-2723: Editable regions time in the Outliner's Details panel",
+  "commit": "7b90439978de7d29f4d068ace63d6585efb5f75d",
+  "branch": "fb-dev-2723/editable-regions-time",
+  "date": "2022/12/02 17:50:12"
 }
