@@ -268,6 +268,14 @@ To activate a user account and assign a role, do the following:
 3. Select the drop-down under **Role** and select the relevant role for the user.
 Your changes save automatically. Repeat these steps for any additional users. 
 
+### Status of user account
+!!! warning 
+    `NOT_ACTIVATED` status is not available for users in Label Studio, but they are assigned to `Pending` status. 
+
+If a user is in `Pending` status then it means he is invited by his role which is not defined by the admin. 
+
+If you assign `Deactivate` to a role then it means you free one seat in license.
+
 ### Programmatically assign roles
 To programmatically activate and assign roles to users, you can use the following API endpoints. 
 
