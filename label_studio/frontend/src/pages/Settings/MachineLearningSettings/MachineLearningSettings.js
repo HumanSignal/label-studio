@@ -343,7 +343,7 @@ export const MachineLearningSettings = () => {
                   Model Version: {model.label}
                   {Object.keys(modelsPrecisions).includes(model.label) ?
                     <div style={{paddingTop:15}}>
-                      Mean Average Precision <strong>(mAp)</strong>: {modelsPrecisions[model.label]['mAp']}
+                      <h5>Mean Average Precision <strong>(mAp)</strong>: {modelsPrecisions[model.label]['mAp']}</h5>
                     <table>
                     <thead>
                     <tr><th style={{paddingRight:50}}>Class Name</th>
@@ -356,8 +356,28 @@ export const MachineLearningSettings = () => {
 
                         ))}
                       </table>
+                      {Object.keys(modelsPrecisions[model.label]['score']).length > 0 ?
+                        <div>
+                      <h5 style={{marginTop: 20}}>Beta Score</h5>
+                      <table>
+                    <thead>
+                    <tr><th style={{paddingRight:50}}>Class Name</th>
+                      <th>Score</th></tr>
+                        </thead>{Object.keys(modelsPrecisions[model.label]['score']).map((i) => (
+                          <tbody key={i}>
+                            <tr><td>{i}</td>
+                              <td>{modelsPrecisions[model.label]['classes'][i]}</td></tr>
+                          </tbody>
+
+                        ))}
+                          </table>
+                          </div>
+                        : ''}
+                      <div style={{marginTop: 20}}>
                       <button style={{marginRight: 10}} onClick={() =>onExportModel(model.value)} className='btn btn-outline-primary'>Export Model</button>
                       <button onClick={() =>onPrune(model.value)} className='btn btn-outline-danger'>Prune/Re-train</button>
+
+                      </div>
                       </div>
                     : 
                     <div style={{paddingTop: 15}}>
@@ -369,6 +389,7 @@ export const MachineLearningSettings = () => {
          ))}
          </div> 
           </div> : ""}
+
         <Form.Actions>
           <Form.Indicator>
             <span case="success">Saved!</span>
