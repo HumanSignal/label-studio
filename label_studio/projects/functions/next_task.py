@@ -145,16 +145,18 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
             # start overlap recalculation
             project.has_errors_project_state_overlap(update_to_actual=True)
         elif project.has_errors_project_state_is_labeled():
-            # if is_labeled is wrong and overlap is right: take only tasks with less than maximum_annotations
-            not_solved_tasks = not_solved_tasks.filter(total_annotations__lt=project.maximum_annotations)
+            # if is_labeled is wrong and overlap is right: take only tasks with less than maximum_annotations and
+            # tasks without annotations
+            not_solved_tasks = not_solved_tasks.filter(Q(total_annotations__lt=project.maximum_annotations,
+                                                         overlap=project.maximum_annotations) |
+                                                       Q(total_annotations__lt=1, overlap=1))
             if not_solved_tasks.count() < 1:
                 # if no tasks left - recalculate is_labeled in sync mode
                 project.has_errors_project_state_is_labeled(update_to_actual=True, async_start=False,
                                                             tasks=not_solved_tasks, sync_border=50)
             else:
                 # if there are tasks left - recalculate is_labeled in async mode
-                project.has_errors_project_state_is_labeled(update_to_actual=True, async_start=True,
-                                                            tasks=not_solved_tasks, sync_border=0)
+                project.has_errors_project_state_is_labeled(update_to_actual=True, async_start=True, sync_border=0)
 
     # show tasks with overlap > 1 first
     if project.show_overlap_first:
