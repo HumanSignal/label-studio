@@ -1,6 +1,6 @@
 {
-  "message": "Revert "fix: DEV-3901: Paragraph overflow text issue when outliner disabled (#1059)",
-  "commit": "34bda5442032f82d7b0c96469cb2929fd73ba762",
-  "branch": "fb-dev-3901/revert",
-  "date": "2022/12/03 16:46:56"
+  "message": "fix: DEV-1020: Validation error about unknown tag",
+  "commit": "b2396ed77647cfd684748f5b2d3b35b48c955b31",
+  "branch": "fb-dev-1020/unknown-tag",
+  "date": "2022/12/05 14:48:54"
 }
