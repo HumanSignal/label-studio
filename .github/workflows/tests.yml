@@ -58,10 +58,18 @@ jobs:
         name: Configure pip cache
         id: pip-cache
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          # Cache the Python package environment, excluding pip and setuptools installed by setup-python
+          path: |
+            ~/.cache/pip
+            ${{ env.pythonLocation }}/bin/*
+            ${{ env.pythonLocation }}/include
+            ${{ env.pythonLocation }}/lib/python*/site-packages/*
+            !${{ env.pythonLocation }}/bin/pip*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
+          key: ${{ runner.os }}-pip-${{ env.pythonLocation }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+            ${{ runner.os }}-pip-${{ env.pythonLocation }}-
 
       - name: Install dependencies
         run: |
@@ -190,10 +198,18 @@ jobs:
         name: Configure pip cache
         id: pip-cache
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          # Cache the Python package environment, excluding pip and setuptools installed by setup-python
+          path: |
+            ~/.cache/pip
+            ${{ env.pythonLocation }}/bin/*
+            ${{ env.pythonLocation }}/include
+            ${{ env.pythonLocation }}/lib/python*/site-packages/*
+            !${{ env.pythonLocation }}/bin/pip*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
+          key: ${{ runner.os }}-pip-${{ env.pythonLocation }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+            ${{ runner.os }}-pip-${{ env.pythonLocation }}-
 
       - name: Install pip dependencies
         run: |

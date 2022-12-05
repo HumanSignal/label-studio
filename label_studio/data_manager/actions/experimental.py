@@ -128,9 +128,14 @@ def rename_labels(project, queryset, **kwargs):
     label_type = labels[control_tag]['type'].lower()
 
     annotations = Annotation.objects.filter(task__project=project)
-    annotations = annotations \
-        .filter(result__contains=[{'from_name': control_tag}]) \
-        .filter(result__contains=[{'value': {label_type: [old_label_name]}}])
+    if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
+        annotations = annotations \
+            .filter(result__icontains=control_tag) \
+            .filter(result__icontains=old_label_name)
+    else:
+        annotations = annotations \
+            .filter(result__contains=[{'from_name': control_tag}]) \
+            .filter(result__contains=[{'value': {label_type: [old_label_name]}}])
 
     label_count = 0
     annotation_count = 0
