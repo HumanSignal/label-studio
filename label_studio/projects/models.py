@@ -411,7 +411,7 @@ class Project(ProjectMixin, models.Model):
             # assign overlap depending on annotation count
             # assign max_annotations and update is_labeled
             ids = tasks_with_min_annotations[:left_must_tasks].values_list('id', flat=True)
-            all_project_tasks.filter(id__in=ids).update(overlap=max_annotations, is_labeled=False)
+            all_project_tasks.filter(id__in=ids).update(overlap=max_annotations)
             # assign 1 to left
             ids = tasks_with_min_annotations[left_must_tasks:].values_list('id', flat=True)
             min_tasks_to_update = all_project_tasks.filter(id__in=ids)
