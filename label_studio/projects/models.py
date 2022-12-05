@@ -886,7 +886,7 @@ class Project(ProjectMixin, models.Model):
         tasks = tasks or self.tasks
         # check that is_labeled is calculated correctly
         tasks_with_max_annotations = tasks.filter(total_annotations__gte=self.maximum_annotations, is_labeled=False)
-        tasks_with_min_annotations = tasks.filter(total_annotations__gte=1,
+        tasks_with_min_annotations = tasks.filter(total_annotations__gte=1, overlap__lt=self.maximum_annotations,
                                                   total_annotations__lt=self.maximum_annotations, is_labeled=False)
         if tasks_with_max_annotations.exists():
             process_tasks(tasks_with_max_annotations, update_to_actual, async_start, sync_border)
