@@ -407,7 +407,7 @@ class Project(ProjectMixin, models.Model):
             # order other tasks by count(annotations)
             tasks_with_min_annotations = tasks_with_min_annotations.annotate(
                 anno=Count('annotations')
-            ).order_by('-anno')
+            ).order_by('-anno').distinct()
             # assign overlap depending on annotation count
             # assign max_annotations and update is_labeled
             ids = tasks_with_min_annotations[:left_must_tasks].values_list('id', flat=True)
