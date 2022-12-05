@@ -1,6 +1,6 @@
 {
-  "message": "Revert "fix: DEV-3901: Paragraph overflow text issue when outliner disabled (#1059)",
-  "commit": "34bda5442032f82d7b0c96469cb2929fd73ba762",
-  "branch": "fb-dev-3901/revert",
-  "date": "2022/12/03 16:46:56"
+  "message": "Fix: DEV-3759: Region changes position on scroll + zoom",
+  "commit": "886a7d5cbb501becc730585b7ea0afcfdf52a3aa",
+  "branch": "fb-dev-3759-fix/video-pan-offset",
+  "date": "2022/12/05 09:06:02"
 }
