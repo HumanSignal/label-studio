@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3719: Pan wasn't working in images from history",
-  "commit": "6296e41d6adc9f53ef431c481ae40814f6a7f51f",
+  "commit": "a8f4cfd49c8897e1b729098c2d452ad60daff848",
   "branch": "fb-dev-3719",
-  "date": "2022/12/05 12:50:21"
+  "date": "2022/12/05 12:52:01"
 }
