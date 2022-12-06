@@ -380,11 +380,11 @@ class Project(ProjectMixin, models.Model):
 
         # if cohort slider is tweaked
         elif overlap_cohort_percentage_changed and self.maximum_annotations > 1:
-            self.rearrange_overlap_cohort()
+            self._rearrange_overlap_cohort()
 
         # if adding/deleting tasks and cohort settings are applied
         elif tasks_number_changed and self.overlap_cohort_percentage < 100 and self.maximum_annotations > 1:
-            self.rearrange_overlap_cohort()
+            self._rearrange_overlap_cohort()
 
     def _rearrange_overlap_cohort(self):
         """
@@ -607,7 +607,7 @@ class Project(ProjectMixin, models.Model):
 
         # argument for recalculate project task stats
         if recalc:
-            self._update_tasks_states(
+            self.update_tasks_states(
                 maximum_annotations_changed=self.__maximum_annotations != self.maximum_annotations,
                 overlap_cohort_percentage_changed=self.__overlap_cohort_percentage != self.overlap_cohort_percentage,
                 tasks_number_changed=False,
