@@ -359,6 +359,8 @@ class Project(ProjectMixin, models.Model):
         :param overlap_cohort_percentage_changed: If cohort_percentage param changed
         :param tasks_number_changed: If tasks number changed in project
         """
+        logger.info(f"Starting _update_tasks_states with params: Project {str(self)} maximum_annotations "
+                    f"{self.maximum_annotations} and percentage {self.overlap_cohort_percentage}")
         # if only maximum annotations parameter is tweaked
         if maximum_annotations_changed and (not overlap_cohort_percentage_changed or self.maximum_annotations == 1):
             tasks_with_overlap = self.tasks.filter(overlap__gt=1)
@@ -391,7 +393,8 @@ class Project(ProjectMixin, models.Model):
         all_project_tasks = Task.objects.filter(project=self)
         max_annotations = self.maximum_annotations
         must_tasks = int(self.tasks.count() * self.overlap_cohort_percentage / 100 + 0.5)
-
+        logger.info(f"Starting _update_tasks_states with params: Project {str(self)} maximum_annotations "
+                    f"{max_annotations} and percentage {self.overlap_cohort_percentage}")
         tasks_with_max_annotations = all_project_tasks.annotate(
             anno=Count('annotations', filter=Q_task_finished_annotations & Q(annotations__ground_truth=False))
         ).filter(anno__gte=max_annotations)
@@ -401,6 +404,7 @@ class Project(ProjectMixin, models.Model):
         )
         # check how many tasks left to finish
         left_must_tasks = max(must_tasks - tasks_with_max_annotations.count(), 0)
+        logger.info(f"Required tasks {must_tasks} and left required tasks {left_must_tasks}")
         if left_must_tasks > 0:
             # if there are unfinished tasks update tasks with count(annotations) >= overlap
             tasks_with_max_annotations.update(overlap=max_annotations, is_labeled=True)
