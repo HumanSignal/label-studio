@@ -572,7 +572,7 @@ if get_env('MINIO_STORAGE_ENDPOINT') and not get_bool_env('MINIO_SKIP', False):
 
 if get_env('STORAGE_TYPE') == "s3":
     CLOUD_FILE_STORAGE_ENABLED = True
-    DEFAULT_FILE_STORAGE = 'htx.storage.CustomS3Boto3Storage'
+    DEFAULT_FILE_STORAGE = 'core.storage.CustomS3Boto3Storage'
     if get_env('STORAGE_AWS_ACCESS_KEY_ID'):
         AWS_ACCESS_KEY_ID = get_env('STORAGE_AWS_ACCESS_KEY_ID')
     if get_env('STORAGE_AWS_SECRET_ACCESS_KEY'):
@@ -584,7 +584,7 @@ if get_env('STORAGE_TYPE') == "s3":
 
 if get_env('STORAGE_TYPE') == "azure":
     CLOUD_FILE_STORAGE_ENABLED = True
-    DEFAULT_FILE_STORAGE = 'htx.storage.CustomAzureStorage'
+    DEFAULT_FILE_STORAGE = 'core.storage.CustomAzureStorage'
     AZURE_ACCOUNT_NAME = get_env('STORAGE_AZURE_ACCOUNT_NAME')
     AZURE_ACCOUNT_KEY = get_env('STORAGE_AZURE_ACCOUNT_KEY')
     AZURE_CONTAINER = get_env('STORAGE_AZURE_CONTAINER_NAME')

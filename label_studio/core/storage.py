@@ -1,8 +1,11 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
 import os
 from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
+from django.conf import settings
 from urllib.parse import unquote, urldefrag, urlsplit, urlunsplit
+
+from core.feature_flags import flag_set
+from storages.backends.s3boto3 import S3Boto3Storage
+from storages.backends.azure_storage import AzureStorage
 
 
 class SkipMissedManifestStaticFilesStorage(ManifestStaticFilesStorage):
@@ -47,3 +50,21 @@ class SkipMissedManifestStaticFilesStorage(ManifestStaticFilesStorage):
         if '?#' in name and not unparsed_name[3]:
             unparsed_name[2] += '?'
         return urlunsplit(unparsed_name)
+
+
+class StorageProxyMixin:
+    def url(self, name, storage_url=False, *args, **kwargs):
+        if flag_set('ff_back_dev_2915_storage_nginx_proxy_26092022_short'):
+            if storage_url is True:
+                return super().url(name, *args, **kwargs)
+            return f'{settings.HOSTNAME}/storage-data/uploaded/?filepath={name}'
+        else:
+            return super().url(name, *args, **kwargs)
+
+
+class CustomS3Boto3Storage(StorageProxyMixin, S3Boto3Storage):
+    pass
+
+
+class CustomAzureStorage(StorageProxyMixin, AzureStorage):
+    pass
