@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3759: Region changes position on scroll + zoom",
-  "commit": "f4e127437d22ac645d5d8028e2d56150fcea5e47",
+  "commit": "062a7887f9fce8904fdde975bd5bfd70c0a46463",
   "branch": "fb-dev-3759-fix/video-pan-offset",
-  "date": "2022/12/05 10:41:57"
+  "date": "2022/12/06 09:31:47"
 }
