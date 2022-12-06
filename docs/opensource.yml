@@ -1,5 +1,7 @@
 theme_config:
   tier: opensource
+  root_domain: "labelstud.io"
+
 
 # Deployment
 deploy:

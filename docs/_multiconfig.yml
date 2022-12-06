@@ -1,5 +1,6 @@
 theme_config:
   tier: opensource
+  root_domain: labelstud.io
 deploy:
   type: aws-s3
   region: us-east-1

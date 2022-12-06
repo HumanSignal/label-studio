@@ -1,5 +1,6 @@
 theme_config:
   tier: enterprise
+  root_domain: "heartex.com"
 
 # Deployment
 deploy:

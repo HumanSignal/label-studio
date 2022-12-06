@@ -4,7 +4,8 @@
 <% const isEnterpriseTheme = theme.tier === "enterprise" %>
 
 <% var defaultSeo = {
-  description: "Get started with Label Studio by creating projects to label and annotate data for machine learning and data science models."
+  description: "Get started with Label Studio by creating projects to label and annotate data for machine learning and data science models.",
+  ogImage: isEnterpriseTheme ? "enterprise-OG-default.png" : "docs-OG-default.png"
 } %>
 
 <!DOCTYPE html>
@@ -64,13 +65,13 @@
   <meta name="twitter:description" content="<%- page.meta_description ? page.meta_description : defaultSeo.description %>">
 
   <% if (page.image) { %>
-    <meta property="og:image" content="https://<%- theme.root_domain %><%- page.image %>" />
-    <meta name="thumbnail" content="https://<%- theme.root_domain %><%- page.image %>"/>
-    <meta name="twitter:image" content="https://<%- theme.root_domain %><%- page.image %>"/>
+    <meta property="og:image" content="https://<%- config.theme_config.root_domain %><%- page.image %>" />
+    <meta name="thumbnail" content="https://<%- config.theme_config.root_domain %><%- page.image %>"/>
+    <meta name="twitter:image" content="https://<%- config.theme_config.root_domain %><%- page.image %>"/>
   <% } else { %>
-    <meta name="twitter:image" content="https://<%- theme.root_domain %>/images/opossum/heartex_icon_opossum_green@2x.png"/>
-    <meta name="thumbnail" content="https://<%- theme.root_domain %>/images/opossum/heartex_icon_opossum_green@2x.png"/>
-    <meta property="og:image" content="https://repository-images.githubusercontent.com/192640529/6b34d180-dd95-11e9-8016-fddd7751cb2c" />
+    <meta name="twitter:image" content="https://<%- config.theme_config.root_domain %>/images/<%- defaultSeo.ogImage %>"/>
+    <meta name="thumbnail" content="https://<%- config.theme_config.root_domain %>/images/opossum/heartex_icon_opossum_green@2x.png"/>
+    <meta property="og:image" content="https://<%- config.theme_config.root_domain %>/images/<%- defaultSeo.ogImage %>" />
   <% } %>
 
   <meta name="msapplication-TileColor" content="#4fc08d">
