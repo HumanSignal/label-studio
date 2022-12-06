@@ -390,10 +390,15 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 self.project.save()
 
         self.post_process_annotations(user, self.db_annotations, 'imported')
+        self.post_process_tasks(self.project.id, [t.id for t in self.db_tasks])
         return db_tasks
 
     @staticmethod
     def post_process_annotations(user, db_annotations, action):
+        pass
+
+    @staticmethod
+    def post_process_tasks(user, db_tasks):
         pass
 
     @staticmethod
