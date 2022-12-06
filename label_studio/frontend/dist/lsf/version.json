@@ -1,6 +1,6 @@
 {
-  "message": "Revert "fix: DEV-3901: Paragraph overflow text issue when outliner disabled (#1059)",
-  "commit": "34bda5442032f82d7b0c96469cb2929fd73ba762",
-  "branch": "fb-dev-3901/revert",
-  "date": "2022/12/03 16:46:56"
+  "message": "fix: DEV-3427: View slider follows the playhead",
+  "commit": "f8d90cc763f070b59183d51c3af501e731adb04b",
+  "branch": "fb-dev-3427-fix/view-follows-indicator-bidirectional",
+  "date": "2022/12/06 00:13:22"
 }
