@@ -310,7 +310,8 @@ class ProjectPreviousTaskAPI(generics.RetrieveAPIView):
 
         mix = list(annotations) + list(drafts)
         mix = sorted(mix, key=lambda x: x['updated_at'])
-        
+
+        logger.debug(f"ProjectPreviousTaskAPI: tasks and draft list > {str(mix)}")
         # find current task
         prev_item = None
         next_item = None
