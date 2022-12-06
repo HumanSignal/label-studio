@@ -9,7 +9,7 @@ import { useAPI } from "../../providers/ApiProvider";
 import { useProject } from "../../providers/ProjectProvider";
 
 export const DangerZone = () => {
-  const {project} = useProject();
+  const { project } = useProject();
   const api = useAPI();
   const history = useHistory();
   const [processing, setProcessing] = useState(null);
@@ -68,18 +68,19 @@ export const DangerZone = () => {
   }], [project]);
 
   return (
-    <div style={{width: 480}}>
+    <div style={{ width: 480 }}>
       <Label
         text="Delete Annotations, Tasks, or Project"
         description="Perform these actions at your own risk. Actions you take on this page can't be reverted. Make sure your data is backed up."
-        style={{display: 'block', width: 415}}
+        style={{ display: 'block', width: 415 }}
       />
 
       {project.id ? (
-        <Space direction="vertical" spread style={{marginTop: 32}}>
+        <Space direction="vertical" spread style={{ marginTop: 32 }}>
           {buttons.map((btn) => {
             const waiting = processing === btn.type;
             const disabled = btn.disabled || (processing && !waiting);
+
             return (btn.disabled !== true) && (
               <Button key={btn.type} look="danger" disabled={disabled} waiting={waiting} onClick={handleOnClick(btn.type)}>
                 {btn.label}
@@ -88,7 +89,7 @@ export const DangerZone = () => {
           })}
         </Space>
       ) : (
-        <div style={{display: "flex", justifyContent: "center", marginTop: 32}}>
+        <div style={{ display: "flex", justifyContent: "center", marginTop: 32 }}>
           <Spinner size={32}/>
         </div>
       )}

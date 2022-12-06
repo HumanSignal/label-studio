@@ -78,9 +78,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('deploy/requirements-mw.txt') }}-${{ hashFiles('deploy/requirements.txt') }}
+          key: ${{ runner.os }}-pypi-${{ hashFiles('deploy/requirements-mw.txt') }}-${{ hashFiles('deploy/requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-pypi-
 
       - name: Install dependencies
         run: |
@@ -163,7 +163,7 @@ jobs:
             const release_id = '${{ inputs.release-id }}';
             for (let file of await fs.readdirSync('./dist/')) {
                console.log('uploadReleaseAsset', file);
-               await github.repos.uploadReleaseAsset({
+               await github.rest.repos.uploadReleaseAsset({
                   owner,
                   repo,
                   release_id: release_id,

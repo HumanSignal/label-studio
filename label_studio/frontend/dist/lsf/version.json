@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3733: Persist and use the pending draft to attach added comments",
-  "commit": "4b082ba9d7a48216267742f14c0c548beb456f90",
+  "message": "fix: DEV-3901: Paragraph overflow text issue when outliner disabled",
+  "commit": "e6c5505d7304adcbd3619107b3e5787165061959",
   "branch": "master",
-  "date": "2022/11/17 08:06:22"
+  "date": "2022/12/06 12:12:05"
 }
