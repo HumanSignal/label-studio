@@ -322,20 +322,58 @@ A mini map shows separate lines for each added label region. In Figure 22, the m
 <img src="../images/mini-map-upto-5bb.png" class="gif-border" />
 <i>Figure 22: Mini map for multiple regions.</i>
 
+### Stepped navigation 
+You can customize or set the hop size by changing the video settings in the Labeling interface. The stepped navigation feature allows you to hop certain amount of frames forward and backward. When you press `shift + click` on your keyboard, the hop forward (`>>`) button will hop 10 frames in the forward direction. Similarly, when you press `shift + click` on your keyboard, the hop backward (`<<`) button will hop 10 frames in the backward direction. 
+
+Example of the hop forward icon.
+<img src="../images/hop_forward.png" class="gif-border" />
+<i>Figure 23: Hop forward.</i>
+
+Example of the hop backward icon.
+<img src="../images/hop_backward.png" class="gif-border" />
+<i>Figure 24: Hop backward.</i>
+
+To set the hop size: 
+1. Click on the Settings icon on the Label Studio interface. 
+2. Then click on **Video** >> **Video hop size** and customize or set the hop size. 
+
+
+Figure 25 shows the hop size set to 20. 
+<img src="../images/video_hop_size.png" class="gif-border" />
+<i>Figure 25: Set video hop size.</i>
+
+When you go back to the editor, it hops by 20 frames in the forward and backward direction. 
+
+<img src="../images/go_back.png" class="gif-border" />
+<i>Figure 26: Go back.</i>
+
+Frame 1 in the editor.
+<img src="../images/starting_hop_size.png" class="gif-border" />
+<i>Figure 27: Starting frame.</i>
+
+Hop forward to Frame 41.
+<img src="../images/hop_forward_by_hop_size.png" class="gif-border" />
+<i>Figure 28: Hop forward by 20 frames. </i>
+
+Hop backward to Frame 21.
+<img src="../images/hop_back_by_frame_size.png" class="gif-border" />
+<i>Figure 29: Hop backward by 20 frames. </i>
+
+
 ### Additional examples 
 The following shows additional examples of the video object tracking feature. 
 <img src="../images/videoplayer.png" class="gif-border" />
-<i>Figure 23: Example 1 of video object tracking.</i>
+<i>Figure 30: Example 1 of video object tracking.</i>
 
 Example of video object tracking feature with timestamp.
 <video src="../images/video-1.mp4" controls="controls" style="max-width: 730px;" class="gif-border" />
 
-<i>Figure 24: Example 2 of video object tracking with timestamp.</i>
+<i>Figure 31: Example 2 of video object tracking with timestamp.</i>
 
 Move the Outliner window in video player.
 <video src="../images/video-2.mp4" controls="controls" style="max-width: 730px;" class="gif-border" />
 
-<i>Figure 25: Example 3 of moving the outliner window in video player.</i>
+<i>Figure 32: Example 3 of moving the outliner window in video player.</i>
 
 ## Related tags
 
