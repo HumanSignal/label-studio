@@ -1,6 +1,6 @@
 {
-  "message": "Revert "fix: DEV-3901: Paragraph overflow text issue when outliner disabled (#1059)",
-  "commit": "34bda5442032f82d7b0c96469cb2929fd73ba762",
-  "branch": "fb-dev-3901/revert",
-  "date": "2022/12/03 16:46:56"
+  "message": "fix: DEV-3901: Paragraph overflow text issue when outliner disabled",
+  "commit": "b77cbc0e824773e19b45a5d9592f7370b575012f",
+  "branch": "master",
+  "date": "2022/12/06 06:46:05"
 }
