@@ -4,6 +4,9 @@ import drf_yasg.openapi as openapi
 import logging
 import pathlib
 import os
+import uuid
+import label_studio
+import traceback as tb
 
 from django.db import IntegrityError
 from django.conf import settings
@@ -38,7 +41,8 @@ from webhooks.models import WebhookAction
 from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import (
     get_object_with_check_and_log, paginator, paginator_help)
-from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
+from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException, \
+    LabelStudioXMLSyntaxErrorSentryIgnored
 from core.utils.io import find_dir, find_file, read_yaml
 from core.filters import ListFilter
 
@@ -222,8 +226,20 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
         if label_config:
             try:
                 has_changes = config_essential_data_has_changed(label_config, project.label_config)
-            except KeyError:
-                pass
+            except LabelStudioXMLSyntaxErrorSentryIgnored as exc:
+                exc_tb = tb.format_exc()
+                if not settings.DEBUG_MODAL_EXCEPTIONS:
+                    exc_tb = None
+                # error body structure
+                response_data = {
+                    'id': uuid.uuid4(),
+                    'status_code': status.HTTP_400_BAD_REQUEST,  # user provided wrong xml
+                    'version': label_studio.__version__,
+                    'detail': str(exc),  # default value
+                    'exc_info': exc_tb,
+                }
+                response = Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+                return response
 
         return super(ProjectAPI, self).patch(request, *args, **kwargs)
 
@@ -335,7 +351,22 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
             raise RestValidationError('Label config is not set or is empty')
 
         # check new config includes meaningful changes
-        has_changed = config_essential_data_has_changed(label_config, project.label_config)
+        try:
+            has_changes = config_essential_data_has_changed(label_config, project.label_config)
+        except LabelStudioXMLSyntaxErrorSentryIgnored as exc:
+            exc_tb = tb.format_exc()
+            if not settings.DEBUG_MODAL_EXCEPTIONS:
+                exc_tb = None
+            # error body structure
+            response_data = {
+                'id': uuid.uuid4(),
+                'status_code': status.HTTP_400_BAD_REQUEST,  # user provided wrong xml
+                'version': label_studio.__version__,
+                'detail': str(exc),  # default value
+                'exc_info': exc_tb,
+            }
+            response = Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+            return response
         project.validate_config(label_config, strict=True)
         return Response({'config_essential_data_has_changed': has_changed}, status=status.HTTP_200_OK)
 
