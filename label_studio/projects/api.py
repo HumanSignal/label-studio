@@ -226,20 +226,8 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
         if label_config:
             try:
                 has_changes = config_essential_data_has_changed(label_config, project.label_config)
-            except LabelStudioXMLSyntaxErrorSentryIgnored as exc:
-                exc_tb = tb.format_exc()
-                if not settings.DEBUG_MODAL_EXCEPTIONS:
-                    exc_tb = None
-                # error body structure
-                response_data = {
-                    'id': uuid.uuid4(),
-                    'status_code': status.HTTP_400_BAD_REQUEST,  # user provided wrong xml
-                    'version': label_studio.__version__,
-                    'detail': str(exc),  # default value
-                    'exc_info': exc_tb,
-                }
-                response = Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-                return response
+            except KeyError:
+                pass
 
         return super(ProjectAPI, self).patch(request, *args, **kwargs)
 
@@ -351,22 +339,7 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
             raise RestValidationError('Label config is not set or is empty')
 
         # check new config includes meaningful changes
-        try:
-            has_changes = config_essential_data_has_changed(label_config, project.label_config)
-        except LabelStudioXMLSyntaxErrorSentryIgnored as exc:
-            exc_tb = tb.format_exc()
-            if not settings.DEBUG_MODAL_EXCEPTIONS:
-                exc_tb = None
-            # error body structure
-            response_data = {
-                'id': uuid.uuid4(),
-                'status_code': status.HTTP_400_BAD_REQUEST,  # user provided wrong xml
-                'version': label_studio.__version__,
-                'detail': str(exc),  # default value
-                'exc_info': exc_tb,
-            }
-            response = Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
-            return response
+        has_changed = config_essential_data_has_changed(label_config, project.label_config)
         project.validate_config(label_config, strict=True)
         return Response({'config_essential_data_has_changed': has_changed}, status=status.HTTP_200_OK)
 
