@@ -134,24 +134,24 @@ To resolve comments, click on a task and on the right side of the window you wil
 
 When you click **Resolve**, you will see a green color check mark next to your comment. This represents a resolved comment.
 
-<center><br>
+<br>
 <img src="/images/comments-notifications/resolved-comment-green-tick-mark.png" class="gif-border" style="max-width: 300px!important;"/>
 <br/>
 <i>Figure 6: Green color check mark for resolved comments.</i>
-</center>
+
 
 To unresolve comments, click the three dots (**...**) >> **Unresolve** button.
 
 <br>
 <img src="/images/comments-notifications/unresolve.png" class="gif-border"/>
-<i>Figure 7: Unresolved comments</i>
+<i>Figure 7: Unresolved comments.</i>
 
 There is a special pink icon that appears on comments attached to annotations or drafts in the dropdown menu that indicates unresolved comments:
 
 <br>
 <img src="/images/comments-notifications/comment-pink.png" class="gif-border"> 
-
-
+</br>
+<i>Figure 8: Pink color check mark for unresolved comments.</i>
 
 
 ## Comments 
@@ -209,19 +209,19 @@ You can make it mandatory to write comments when annotators click Skip on annota
 <br><img src="/images/comments-notifications/annotator-skip.png" class="gif-border"><br>
 
 A similar option is available for reviewers. You can find it in Project Settings on the Review tab:
-<br><img src="/images/comments-notifications/reviewer-reject.png" class="gif-border"><br>
-
+<br>
+<img src="/images/comments-notifications/reviewer-reject.png" class="gif-border">
+<br>
 
 
 ## Notifications 
 
 To see the notifications, navigate and click the user profile icon on the top-right of the Label Studio UI.  The **Notifications** pane opens with a bell icon next to it. The blue color bell icon indicates unread notifications and the grey color bell icon indicates read notifications.
 
-<center>
 <br>
 <img src="/images/comments-notifications/notifications.png" class="gif-border"/><br/>
-<i>Figure 8: Notification panel.</i>
-</center>
+<i>Figure 9: Notification panel.</i>
+
 
 1. Navigate and click the user profile icon on the top-right of the Label Studio UI.
 2. The **Notifications** pane opens on the right side of the Label Studio UI. 
