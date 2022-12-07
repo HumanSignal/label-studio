@@ -192,7 +192,7 @@ jobs:
       - name: Install OS dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev python-dev
+          sudo apt-get install libsasl2-dev python3-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev python-dev
 
       - uses: actions/cache@v3
         name: Configure pip cache
