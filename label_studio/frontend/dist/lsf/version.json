@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3901: Paragraph overflow text issue when outliner disabled",
-  "commit": "e6c5505d7304adcbd3619107b3e5787165061959",
-  "branch": "master",
-  "date": "2022/12/06 12:12:05"
+  "message": "fix: DEV-3826: Toggling Audio interfaces should correctly update the view",
+  "commit": "5f4db73e71031296e2a60ba3a3a38d3644c4b255",
+  "branch": "fb-dev-3826/controls-fix",
+  "date": "2022/12/07 12:00:40"
 }
