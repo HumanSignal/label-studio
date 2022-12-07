@@ -304,9 +304,11 @@ class ProjectPreviousTaskAPI(generics.RetrieveAPIView):
             annotation['annotation'] = annotation.pop('id')
 
         drafts = request.user.drafts.filter(task__project=project)
-        drafts = drafts.values('task', 'id', 'updated_at')
+        drafts = drafts.values('task', 'id', 'created_at')
         for draft in drafts:
             draft['draft'] = draft.pop('id')
+            # Workaround for constantly updated draft: 2 in a row will become a cycle
+            draft['updated_at'] = draft.pop('created_at')
 
         mix = list(annotations) + list(drafts)
         mix = sorted(mix, key=lambda x: x['updated_at'])
