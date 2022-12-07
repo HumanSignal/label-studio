@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3958: Remove WASD",
-  "commit": "e4a640907af7faa0f3af5fbe53fc8d11d11f534c",
-  "branch": "fb-dev-3958/remove-wasd",
-  "date": "2022/12/07 16:59:08"
+  "commit": "0f5fbfff2698593e8d341316d1e0869386fb7c2e",
+  "branch": "master",
+  "date": "2022/12/07 20:14:23"
 }
