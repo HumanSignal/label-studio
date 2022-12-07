@@ -44,8 +44,7 @@ def backward(apps, _):
 class Migration(migrations.Migration):
 
     dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('tasks', '0031_annotation_updated_by'),
+        ('tasks', '0032_annotation_updated_by')
     ]
 
     operations = [
