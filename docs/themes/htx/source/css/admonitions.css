@@ -9,6 +9,10 @@
   background-color: #fafafa;
 }
 
+.admonition + .admonition {
+  margin-top: 1em;
+}
+
 .admonition p {
   padding: 0.2em 0 !important;
   margin: 0!important;
