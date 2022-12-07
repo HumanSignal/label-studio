@@ -35,7 +35,9 @@ from rest_framework.exceptions import ErrorDetail
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
 from collections import defaultdict
+from django.contrib.postgres.operations import TrigramExtension
 
+from core.utils.params import get_env
 from datetime import datetime
 from functools import wraps
 from pkg_resources import parse_version
@@ -658,3 +660,19 @@ class temporary_disconnect_list_signal:
                 sender=sender,
                 dispatch_uid=dispatch_uid
             )
+
+
+def trigram_migration_operations(next_step):
+    ops = [
+        TrigramExtension(),
+        next_step,
+    ]
+    SKIP_TRIGRAM_EXTENSION = get_env('SKIP_TRIGRAM_EXTENSION', None)
+    if SKIP_TRIGRAM_EXTENSION == '1' or SKIP_TRIGRAM_EXTENSION == 'yes' or SKIP_TRIGRAM_EXTENSION == 'true':
+        ops = [
+            next_step
+        ]
+    if SKIP_TRIGRAM_EXTENSION == 'full':
+        ops = []
+
+    return ops
