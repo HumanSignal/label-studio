@@ -180,9 +180,11 @@
             </form>
           </div>
           <div>
-            <%- partial("component/text", {text: "Contribute to the docs", tag: "h3", size: "Eyebrow"}) %>
-            <%- partial("component/text", {text: "Our docs are open source. See something that could be improved? Submit a pull request.", tag: "h3", size: "Small"}) %>
-            <%- partial("component/button", { url: "https://github.com/heartexlabs/label-studio", label: "Make a contribution", }) %>
+            <% if(!isEnterpriseTheme) {%>
+              <%- partial("component/text", {text: "Contribute to the docs", tag: "h3", size: "Eyebrow"}) %>
+              <%- partial("component/text", {text: "Our docs are open source. See something that could be improved? Submit a pull request.", tag: "h3", size: "Small"}) %>
+              <%- partial("component/button", { url: "https://github.com/heartexlabs/label-studio", label: "Make a contribution", }) %>
+            <% } %>
           </div>
           <div>
             <%- partial("component/text", {text: "Can’t find what you’re looking for?", tag: "h3", size: "Eyebrow"}) %>
