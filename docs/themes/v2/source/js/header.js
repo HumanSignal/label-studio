@@ -30,24 +30,27 @@
     });
   }
 
-  /* window.addEventListener('load', (event) => {
-    window.docsearch({
-      container: '#docsearch-input',
-      inputSelector: '#docsearch-input',
-      appId: 'HELLEDAKPT',
-      apiKey: '1d0410ef855a968fbc40669df1c4a73e',
-      indexName: 'labelstud', // it does not change
-    });
-  
+  window.addEventListener('load', (event) => {
     const searchInput = document.querySelector("#docsearch-input");
-    const handleFocusSearch = (e) => {
-      if (document.activeElement.localName === 'body' && e.code !== "Space" && e.code !== "MetaLeft" && !e.altKey && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
-        searchInput.focus();
+    
+    if(searchInput) {
+      window.docsearch({
+        container: '#docsearch-input',
+        inputSelector: '#docsearch-input',
+        appId: 'HELLEDAKPT',
+        apiKey: '1d0410ef855a968fbc40669df1c4a73e',
+        indexName: 'labelstud', // it does not change
+      });
+    
+      const handleFocusSearch = (e) => {
+        if (document.activeElement.localName === 'body' && e.code !== "Space" && e.code !== "MetaLeft" && !e.altKey && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+          searchInput.focus();
+        }
       }
+    
+      window.addEventListener("keydown", handleFocusSearch);
     }
-  
-    window.addEventListener("keydown", handleFocusSearch);
-  }); */
+  });
 
   if (window.matchMedia( "(hover: none)" ).matches) {
     const toggleQuickNav = (e) => {
