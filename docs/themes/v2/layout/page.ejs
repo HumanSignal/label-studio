@@ -15,6 +15,7 @@
   </div>
   <% if (showToc) { %>
     <div class="toc">
+      <%- partial("component/text", {text: "In this article", tag: "h3", size: "Eyebrow"}) %>
       <%- toc(page.content, {max_depth: 2, list_number: false, class: "toc-list"}) %>
     </div>
     <% } %>
