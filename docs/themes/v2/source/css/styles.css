@@ -705,8 +705,8 @@ main {
 }
 
 .Text.Large {
-  --min-size: 1.25rem; /* 20px */
-  --max-size: 1.5rem; /* 24px */
+  --min-size: 1.15rem; /* 18px */
+  --max-size: 1.25rem; /* 20px */
   --line-height: 1.41;
 }
 
