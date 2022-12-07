@@ -4,9 +4,6 @@ import drf_yasg.openapi as openapi
 import logging
 import pathlib
 import os
-import uuid
-import label_studio
-import traceback as tb
 
 from django.db import IntegrityError
 from django.conf import settings
@@ -41,8 +38,7 @@ from webhooks.models import WebhookAction
 from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import (
     get_object_with_check_and_log, paginator, paginator_help)
-from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException, \
-    LabelStudioXMLSyntaxErrorSentryIgnored
+from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
 from core.utils.io import find_dir, find_file, read_yaml
 from core.filters import ListFilter
 
