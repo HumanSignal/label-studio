@@ -557,6 +557,11 @@ main {
   max-width: 80em;
 }
 
+.page-type-templates .container {
+  margin: 0 auto;
+  max-width: 1030px;
+}
+
 .home-page-title {
   margin: 0 0 -0.1em 0;
 }
