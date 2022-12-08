@@ -24,6 +24,7 @@ from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import retry_database_locked
 from core.utils.params import list_of_strings_from_request, bool_from_request
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
+from users.models import User
 from projects.models import Project
 from tasks.models import Task, Prediction
 from .uploader import load_tasks
