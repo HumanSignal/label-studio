@@ -29,7 +29,7 @@ def forward(apps, _):
             return
 
     projects = Project.objects.all()
-    for project in projects:
+    for project in projects.iterator():
         migration = AsyncMigrationStatus.objects.create(
                 project=project,
                 name='0032_annotation_updated_by_fill',
