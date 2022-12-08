@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3901: Paragraph overflow text issue when outliner disabled",
-  "commit": "b77cbc0e824773e19b45a5d9592f7370b575012f",
+  "commit": "e6c5505d7304adcbd3619107b3e5787165061959",
   "branch": "master",
-  "date": "2022/12/06 06:46:05"
+  "date": "2022/12/06 12:12:05"
 }

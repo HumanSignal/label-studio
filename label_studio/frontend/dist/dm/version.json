@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3874: Fix polling overflow",
-  "commit": "049cb9f247b2353b4bf8a49cfc0412e70b76a39b",
+  "message": "fix: DEV-3958: Remove WASD",
+  "commit": "0f5fbfff2698593e8d341316d1e0869386fb7c2e",
   "branch": "master",
-  "date": "2022/12/01 16:12:47"
+  "date": "2022/12/07 20:14:23"
 }
