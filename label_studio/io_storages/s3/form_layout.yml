@@ -38,9 +38,7 @@ aws_params: &aws_params
     autoComplete: "new-password"
     label: Session Token
     skipAutofill: true
-    allowEmpty: false
-
-
+    allowEmpty: true
 
 ImportStorage:
   # Title, Bucket, Prefix
