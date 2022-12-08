@@ -778,6 +778,9 @@ def bulk_update_stats_project_tasks(tasks, project=None):
     :return:
     """
     # recalc accuracy
+    if not tasks:
+        # break if tasks is empty 
+        return
     # get project if it's not in params
     if project is None:
         project = tasks[0].project
