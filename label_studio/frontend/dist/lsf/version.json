@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3901: Paragraph overflow text issue when outliner disabled",
-  "commit": "e6c5505d7304adcbd3619107b3e5787165061959",
-  "branch": "master",
-  "date": "2022/12/06 12:12:05"
+  "message": "fix: DEV-3974: Fix the "Video Hop Size" parameter",
+  "commit": "a5db22db7ef816c2921ba2ad84cf664356137360",
+  "branch": "fb-dev-3974/fix-video-hop-size",
+  "date": "2022/12/08 19:09:38"
 }
