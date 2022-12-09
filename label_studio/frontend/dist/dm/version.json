@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3958: Remove WASD",
-  "commit": "0f5fbfff2698593e8d341316d1e0869386fb7c2e",
-  "branch": "master",
-  "date": "2022/12/07 20:14:23"
+  "message": "fix: DEV-3917: Reinit history after draft applied",
+  "commit": "478987f87376f758c1f70dfb65cbaa71057cbecd",
+  "branch": "fb-dev-3917/undo-draft",
+  "date": "2022/12/09 01:12:17"
 }
