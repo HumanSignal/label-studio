@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3810: Restrict tabs deletion for reviewers",
-  "commit": "100db8ae51a84caaef338de513db6bdb456e07fe",
+  "commit": "0b6ef0a30498c5b145ece264be0a9c226e8d58f0",
   "branch": "fb-dev-3810/tab-controls",
-  "date": "2022/11/30 17:44:02"
+  "date": "2022/12/09 18:58:25"
 }
