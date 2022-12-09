@@ -92,9 +92,8 @@ def delete_tasks_annotations(project, queryset, **kwargs):
 
     tasks = Task.objects.filter(id__in=real_task_ids)
     tasks.update(updated_at=datetime.now(), updated_by=request.user)
-    # update tasks counter and than is_labeled
-    project.update_tasks_counters(tasks)
-    start_job_async_or_sync(bulk_update_stats_project_tasks, tasks.filter(is_labeled=True), project=project)
+    # Update tasks counter and is_labeled. It should be a single operation as counters affect bulk is_labeled update
+    project.update_tasks_counters_and_is_labeled(tasks_queryset=tasks)
 
     # LSE postprocess
     postprocess = load_func(settings.DELETE_TASKS_ANNOTATIONS_POSTPROCESS)

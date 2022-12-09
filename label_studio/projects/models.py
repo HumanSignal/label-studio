@@ -11,7 +11,6 @@ from django.core.validators import MinLengthValidator, MaxLengthValidator
 from django.db import transaction, models
 from annoying.fields import AutoOneToOneField
 
-from core.redis import start_job_async_or_sync
 from data_manager.managers import TaskQuerySet
 from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks
 from core.utils.common import create_hash, get_attr_or_item, load_func
@@ -838,6 +837,30 @@ class Project(ProjectMixin, models.Model):
         with transaction.atomic():
             bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
         return len(objs)
+
+    def _update_tasks_counters_and_is_labeled(self, queryset, from_scratch=True):
+        """
+        Update tasks counters and is_labeled in a single operation
+        :param queryset: Tasks to update queryset
+        :param from_scratch: Skip calculated tasks
+        :return: Count of updated tasks
+        """
+        objs = self._update_tasks_counters(queryset, from_scratch)
+        bulk_update_stats_project_tasks(queryset, self)
+        return objs
+
+    def _update_tasks_counters_and_task_states(self, queryset, maximum_annotations_changed,
+                                               overlap_cohort_percentage_changed, tasks_number_changed,
+                                               from_scratch=True):
+        """
+        Update tasks counters and update tasks states (rearrange and\or is_labeled)
+        :param queryset: Tasks to update queryset
+        :param from_scratch: Skip calculated tasks
+        :return: Count of updated tasks
+        """
+        objs = self._update_tasks_counters(queryset, from_scratch)
+        self._update_tasks_states(maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed)
+        return objs
 
     def __str__(self):
         return f'{self.title} (id={self.id})' or _("Business number %d") % self.pk
