@@ -272,9 +272,9 @@ Your changes save automatically. Repeat these steps for any additional users.
 !!! warning 
     `NOT_ACTIVATED` status is not available for users in Label Studio, but they are assigned to `Pending` status. 
 
-If a user is in `Pending` status then it means he is invited by his role which is not defined by the admin. 
+If a user is in `Pending` status then it means he was invited and signed up for the account, but his role is not defined by administrator. 
 
-If you assign `Deactivate` to a role then it means you free one seat in license.
+If you assign `Deactivate` to a role then it means you free one seat in license and a user with deactivated doesn't have access to your organization.
 
 ### Programmatically assign roles
 To programmatically activate and assign roles to users, you can use the following API endpoints. 
