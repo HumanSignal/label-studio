@@ -137,10 +137,10 @@ class DatabaseIsLockedRetryMiddleware(CommonMiddleware):
         sleep_time = 1
         backoff = 1.5
         while (
-            response.status_code == 500
-            and hasattr(response, 'content')
-            and b'database-is-locked-error' in response.content
-            and retries_number < 15
+                response.status_code == 500
+                and hasattr(response, 'content')
+                and b'database-is-locked-error' in response.content
+                and retries_number < 15
         ):
             time.sleep(sleep_time)
             response = self.get_response(request)
@@ -164,10 +164,14 @@ class InactivitySessionTimeoutMiddleWare(CommonMiddleware):
     NOT_USER_ACTIVITY_PATHS = []
 
     def process_request(self, request) -> None:
-        if (not hasattr(request, 'session') or
-            request.session.is_empty() or
-            not hasattr(request, 'user') or
-            not request.user.is_authenticated):
+        if (
+                not hasattr(request, 'session') or
+                request.session.is_empty() or
+                not hasattr(request, 'user') or
+                not request.user.is_authenticated or
+                # scim assign request.user implicitly, check CustomSCIMAuthCheckMiddleware
+                (hasattr(request, 'is_scim') and request.is_scim)
+        ):
             return
 
         current_time = time.time()
