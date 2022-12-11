@@ -104,7 +104,10 @@ export const DataManagerPage = ({ ...props }) => {
     });
 
     dataManager.on("exportClicked", () => {
-      history.push(buildLink("/data/export", { id: params.id }));
+      let isFilterSet = dataManager.store.viewsStore.selected.snapshot.data.filters.items.length !== 0
+      let ids = isFilterSet ? extractTasksIds(dataManager.store.taskStore.list) : undefined
+      if (ids === undefined || ids.length !== 0)
+        history.push(buildLink("/data/export", {id: params.id}), {ids: ids});
     });
 
     dataManager.on("error", response => {
@@ -144,6 +147,14 @@ export const DataManagerPage = ({ ...props }) => {
       dataManagerRef.current = null;
     }
   }, [dataManagerRef]);
+
+  const extractTasksIds = tasks => {
+    let ids = []
+    for (let i = 0; i < tasks.length; i++) {
+      ids.push(tasks[i].id)
+    }
+    return ids
+  }
 
   useEffect(() => {
     init();

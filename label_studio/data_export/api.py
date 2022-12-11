@@ -105,6 +105,18 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
                 in_=openapi.IN_PATH,
                 description='A unique integer value identifying this project.'
             ),
+            openapi.Parameter(
+                name='from_creation_date',
+                type=openapi.FORMAT_DATETIME,
+                in_=openapi.IN_QUERY,
+                description='Filter tasks based on created_at after given time'
+            ),
+            openapi.Parameter(
+                name='to_creation_date',
+                type=openapi.FORMAT_DATETIME,
+                in_=openapi.IN_QUERY,
+                description='Filter tasks based on created_at before given time'
+            ),
         ],
         tags=['Export'],
         operation_summary='Easy export of tasks and annotations',
@@ -158,8 +170,19 @@ class ExportAPI(generics.RetrieveAPIView):
         only_finished = not query_serializer.validated_data['download_all_tasks']
         download_resources = query_serializer.validated_data['download_resources']
         interpolate_key_frames = query_serializer.validated_data['interpolate_key_frames']
+        from_creation_date = query_serializer.validated_data['from_creation_date']
+        to_creation_date = query_serializer.validated_data['to_creation_date']
 
         tasks_ids = request.GET.getlist('ids[]')
+
+        temp_task_ids = []
+        for task_id in tasks_ids:
+            if type(task_id) == str:
+                temp_task_ids.extend(task_id.split(','))
+            else:
+                temp_task_ids.extend(task_id)
+
+        tasks_ids = temp_task_ids
 
         logger.debug('Get tasks')
         query = Task.objects.filter(project=project)
@@ -168,6 +191,10 @@ class ExportAPI(generics.RetrieveAPIView):
             query = query.filter(id__in=tasks_ids)
         if only_finished:
             query = query.filter(annotations__isnull=False).distinct()
+        if from_creation_date is not None:
+            query = query.filter(created_at__gt=from_creation_date)
+        if to_creation_date is not None:
+            query = query.filter(created_at__lt=to_creation_date)
 
         task_ids = query.values_list('id', flat=True)
 

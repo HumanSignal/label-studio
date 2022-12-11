@@ -177,6 +177,8 @@ class ExportParamSerializer(serializers.Serializer):
     download_all_tasks = serializers.BooleanField(default=False,
                                                   help_text='Download all tasks or only finished.',
                                                   required=False)
+    from_creation_date = serializers.DateTimeField(required=False, default=None)
+    to_creation_date = serializers.DateTimeField(required=False, default=None)
 
 
 class BaseExportDataSerializerForInteractive(InteractiveMixin, BaseExportDataSerializer):

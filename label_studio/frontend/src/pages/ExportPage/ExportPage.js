@@ -54,11 +54,16 @@ export const ExportPage = () => {
       booleansAsNumbers: true,
     });
 
+    let exportParams = {
+      pk: pageParams.id,
+      ...params
+    }
+
+    if(location.state.ids)
+      exportParams["ids[]"] = location.state.ids
+
     const response = await api.callApi('exportRaw', {
-      params: {
-        pk: pageParams.id,
-        ...params,
-      },
+      params: exportParams,
     });
 
     if (response.ok) {
