@@ -36,19 +36,21 @@ input[type=submit]:hover {
 <body>
     <div class="buttons">
         <form action="/sensormodel/">
-            <input type="submit" value="Go back to sensor model page" />
+            <input type="submit" value="Go back to sensor model page" style="background-color: #c4862b; width:25%"/>
         </form>
     </div>
     <div class="forms">
+        <h2>Add deployment</h2>
         <form action="/sensormodel/add" method="post">
             {{ deploymentform }}
             <input type="submit" value="Create deployment">
         </form>
-
+        <h2>Add sensor</h2>
         <form action="/sensormodel/add" method="post">
             {{ sensorform }}
             <input type="submit" value="Create sensor">
         </form>
+        <h2>Add subject</h2>
         <form action="/sensormodel/add" method="post">
             {{ subjectform }}
             <input type="submit" value="Create subject">

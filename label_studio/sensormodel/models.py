@@ -12,7 +12,7 @@ class Sensor(models.Model):
     sensor_id = models.IntegerField()
     description = models.TextField(max_length=100, blank=True)
 
-    sensortype = models.ForeignKey(SensorType,on_delete=models.RESTRICT, null=True)
+    sensortype = models.ForeignKey(SensorType,on_delete=models.RESTRICT, null=True, blank=True)
 
     def __str__(self):
         return 'Sensor: ' + str(self.sensor_id)
