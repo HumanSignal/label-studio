@@ -163,7 +163,7 @@ jobs:
             const release_id = '${{ inputs.release-id }}';
             for (let file of await fs.readdirSync('./dist/')) {
                console.log('uploadReleaseAsset', file);
-               await github.repos.uploadReleaseAsset({
+               await github.rest.repos.uploadReleaseAsset({
                   owner,
                   repo,
                   release_id: release_id,

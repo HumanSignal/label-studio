@@ -28,7 +28,7 @@ export const MachineLearningSettings = () => {
     });
 
     if (models) setBackends(models);
-  }, [api, project, setBackends]);
+  }, [project, setBackends]);
 
   const showMLFormModal = useCallback((backend) => {
     const action = backend ? "updateMLBackend" : "addMLBackend";
