@@ -3,7 +3,7 @@ title: Troubleshoot Label Studio
 short: Troubleshooting
 type: guide
 tier: all
-order: 100
+order: 102
 order_enterprise: 100
 section: "Get started"
 meta_title: Troubleshoot Label Studio

@@ -3,7 +3,7 @@ title: Label Studio
 short: Overview
 type: guide
 tier: all
-order: 99
+order: 101
 order_enterprise: 99
 section: "Get started"
 meta_title: Overview of Label Studio

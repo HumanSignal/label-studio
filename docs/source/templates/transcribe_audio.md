@@ -8,9 +8,14 @@ meta_title: Audio Transcription Data Labeling Template
 meta_description: Template for audio transcription for automatic speech recognition use cases with Label Studio for your machine learning and data science projects.
 ---
 
+!!! attention "important"
+    A major update to the audio labeling in Label Studio is available on the [Audio Player](/guide/audio_player.html) page.
+
+
 <img src="/images/templates/automatic-speech-recognition.png" alt="" class="gif-border" width="552px" height="408px" />
 
 Listen to an audio file and transcribe its content in natural language, performing speech recognition.
+
 
 ## Interactive Template Preview
 

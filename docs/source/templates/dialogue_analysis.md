@@ -8,6 +8,9 @@ meta_title: Dialogue Analysis Data Labeling Template
 meta_description: Template for performing dialogue analysis for conversational AI use cases with Label Studio for your machine learning and data science projects.
 ---
 
+!!! attention "important"
+    A major update to the audio labeling in Label Studio is available on the [Audio Player](/guide/audio_player.html) page.
+
 <img src="/images/templates-misc/dialogue-analysis.png" alt="" class="gif-border" width="600px" height="512px" />
 
 If you want to evaluate and analyze the responses present in a dialogue that already happened, and optionally correct it, use this template. 

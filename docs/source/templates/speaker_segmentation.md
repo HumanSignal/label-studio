@@ -8,7 +8,10 @@ meta_title: Speaker Diarization (Segmentation) Data Labeling Template
 meta_description: Template for segmenting an audio clip based on speaker with Label Studio for your machine learning and data science projects.
 ---
 
-<img src="/images/templates/select_region_audio_player.png" alt="" class="gif-border" width="552px" height="408px" />
+!!! attention "important"
+    A major update to the audio labeling in Label Studio is available on the [Audio Player](/guide/audio_player.html) page.
+
+<img src="/images/templates/speaker-segmentation.png" alt="" class="gif-border" width="552px" height="408px" />
 
 When preparing audio transcripts or training a machine learning model to differentiate between different speakers, use this template to perform speaker segmentation and label different regions of an audio clip with different speakers. 
 

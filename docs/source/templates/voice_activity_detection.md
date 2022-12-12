@@ -8,6 +8,9 @@ meta_title: Voice Activity Detection Data Labeling Template
 meta_description: Template for detecting voice activity in an audio clip with Label Studio for your machine learning and data science projects.
 ---
 
+!!! attention "important"
+    A major update to the audio labeling in Label Studio is available on the [Audio Player](/guide/audio_player.html) page.
+
 <img src="/images/templates-misc/voice-activity-detection.png" alt="" class="gif-border" width="600px" height="498px" />
 
 If you want to train a voice activity detection (VAD) model for automating call center interactions, improving voice-activated assistant systems, or other speech detection use cases, you can use this template. Create segments of the audio clip that possibly include speech, then classify each segment as to whether it includes speech, a specific wake word for voice-activated assistant system use cases, or is simply noise.  

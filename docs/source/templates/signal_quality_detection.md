@@ -8,6 +8,9 @@ meta_title: Signal Quality Detection Data Labeling Template
 meta_description: Template for detecting the quality of an audio signal with Label Studio for your machine learning and data science projects.
 ---
 
+!!! attention "important"
+    A major update to the audio labeling in Label Studio is available on the [Audio Player](/guide/audio_player.html) page.
+
 <img src="/images/templates/signal-quality-detection.png" alt="" class="gif-border" width="552px" height="408px" />
 
 Rate the quality of a defined signal in an audio clip, for example, when developing a machine learning model to isolate speech from a crowded bar, or to remove other noise from an audio clip.
