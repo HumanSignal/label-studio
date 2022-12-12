@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3719: Pan wasn't working in images from history (#1066)\n\n* fix: DEV-3719: Pan wasn't working in images from history\r\n\r\n* simplify validation",
-  "commit": "10a111b3cae4ebc3496ef39a66cde15d3858e6ea",
-  "branch": "master",
-  "date": "2022-12-12T13:47:58Z"
+  "message": "feat: DEV-3873: Labeling UI improvements",
+  "commit": "47be73c48f16c28a0ea12f47867a36d21235d633",
+  "branch": "fb-dev-3873/labeling-ui",
+  "date": "2022/12/12 12:56:44"
 }
