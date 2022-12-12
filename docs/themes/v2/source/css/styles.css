@@ -951,6 +951,10 @@ main {
   margin: 1em 0;
 }
 
+.content-markdown img.gif-border {
+  border: 1px var(--color-gray-100) solid;
+}
+
 .content-markdown hr {
   margin: 3em 0;
   border: 1px var(--color-gray-100) solid;
