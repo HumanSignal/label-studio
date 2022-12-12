@@ -14,6 +14,43 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
     The release notes for Label Studio Community Edition is available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
 
 
+
+## Label Studio Enterprise 2.4
+This section highlights the breaking changes, new features and enhancements, and bug fixes in Label Studio Enterprise 2.4.
+
+### New features and enhancements 
+Label Studio Enterprise 2.4 introduces the following new features and enhancements.
+
+- Introduce interactive **View All** mode with nested regions [DEV-3391].
+- Add `updated_at` field to comments API [DEV-3715].
+- Able to cancel old import jobs when a new one is created [DEV-2075].
+
+### Bug Fixes
+Label Studio 2.4 includes the following bug fixes:
+
+### Bug Fixes
+Label Studio 2.4 includes the following bug fixes:
+
+- New link to terms of use [DEV-3726]
+- Fix draft notifications [DEV-3339]
+- Show/hide toggle on the outliner properly works with all region types. [DEV-3742]
+- Resolved an issue causing bounding box label reassignment not to toggle correctly when using hotkeys [DEV-3672]
+- Adds boundaries to limit working area for the video regions [DEV-3350]
+- Correctly serialize JSON fields in CSV export files [DEV-3578]
+- Fixed the "Show labels inside the regions" option work in the Video template [DEV-1852]
+- Fix import tasks data validation for nested fields with repeater [DEV-3744]
+=Fixes the issue when clicking the Update button in Label Stream leads the annotator to the next task [DEV-3773]
+- Comments should associate with a current draft even if the draft is pending save. [DEV-3733]
+- Comment edited session state [DEV-3692]
+- Review stream performance optimization [DEV-3668]
+- Fix error on task switching after notification link [DEV-3802]
+- Don't crash/freeze the app on lack of network connection [DEV-3780]
+- fix for read-only FS [SRE-348]
+- GCS persistent storage is broken [SRE-351]
+- Fixes the issue with spam requests [DEV-3874]
+- Avoid the creation of pg_trgm in Postgres if it already exists [DEV-3839]
+
+
 ## Label Studio Enterprise 2.3.1
 This section highlights the breaking changes, new features and enhancements, and bug fixes in Label Studio Enterprise 2.3.1.
 
