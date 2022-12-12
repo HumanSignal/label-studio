@@ -5,8 +5,7 @@ import logging
 from django.utils.timezone import now
 
 from core.permissions import AllPermissions
-from core.redis import start_job_async_or_sync
-from tasks.models import Prediction, Annotation, Task, bulk_update_stats_project_tasks
+from tasks.models import Prediction, Annotation, Task
 from tasks.serializers import TaskSerializerBulk
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance

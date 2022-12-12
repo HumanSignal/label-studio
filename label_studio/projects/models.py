@@ -845,6 +845,8 @@ class Project(ProjectMixin, models.Model):
         :param from_scratch: Skip calculated tasks
         :return: Count of updated tasks
         """
+        if isinstance(queryset, list) or isinstance(queryset, set):
+            queryset = Task.objects.filter(id__in=queryset)
         objs = self._update_tasks_counters(queryset, from_scratch)
         bulk_update_stats_project_tasks(queryset, self)
         return objs
@@ -858,6 +860,8 @@ class Project(ProjectMixin, models.Model):
         :param from_scratch: Skip calculated tasks
         :return: Count of updated tasks
         """
+        if isinstance(queryset, list) or isinstance(queryset, set):
+            queryset = Task.objects.filter(id__in=queryset)
         objs = self._update_tasks_counters(queryset, from_scratch)
         self._update_tasks_states(maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed)
         return objs
