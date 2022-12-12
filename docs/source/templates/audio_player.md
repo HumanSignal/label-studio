@@ -10,8 +10,13 @@ meta_description: Template for audio player interactions in the Label Studio int
 
 <img src="/images/templates-misc/select_region_audio_player.png" alt="" class="gif-border" width="598.4px" height="319.2px" />
 
-The audio labeling platform introduces the enhancements of the audio player with the ability to annotate audio files up to two hours in length, provide fine-grain annotation controls, and implement an efficient rendering engine that displays the audio waveforms while remaining performant, even with large, and multi-hour audio files. You can now play and navigate through an audio waveform by precisely managing the labeled regions. Regions and relations are simple to manage and manipulate on the audio waveform and interface.
 
+!!! attention "important"
+    - This is a new alternative to the existing audio engine. 
+    - Label Studio Open Source users who wish to return to a previous audio engine version must set an environment variable on their operating instance: `ff_front_dev_2715_audio_3_280722_short=false`.
+
+
+The audio labeling platform introduces the enhancements of the audio player with the ability to annotate audio files up to two hours in length, provide fine-grain annotation controls, and implement an efficient rendering engine that displays the audio waveforms while remaining performant, even with large, and multi-hour audio files. You can now play and navigate through an audio waveform by precisely managing the labeled regions. Regions and relations are simple to manage and manipulate on the audio waveform and interface.
 
 
 !!! attention "important"
