@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3719: Pan wasn't working in images from history (#1066)\n\n* fix: DEV-3719: Pan wasn't working in images from history\r\n\r\n* simplify validation",
-  "commit": "10a111b3cae4ebc3496ef39a66cde15d3858e6ea",
-  "branch": "master",
-  "date": "2022-12-12T13:47:58Z"
+  "message": "chore: DEV-3994: Add PR checklist template",
+  "commit": "e2fa31235ea603f6baa560fe1eff08baac589d4b",
+  "branch": "fb-dev-3994",
+  "date": "2022/12/13 14:41:26"
 }
