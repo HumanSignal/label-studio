@@ -366,9 +366,6 @@ class Annotation(AnnotationMixin, models.Model):
                                 help_text='Project ID for this annotation')
     completed_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="annotations", on_delete=models.SET_NULL,
                                      null=True, help_text='User ID of the person who created this annotation')
-    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='updated_annotations',
-                                   on_delete=models.SET_NULL, null=True, verbose_name=_('updated by'),
-                                   help_text='Last user who updated this annotation')
     was_cancelled = models.BooleanField(_('was cancelled'), default=False, help_text='User skipped the task', db_index=True)
     ground_truth = models.BooleanField(_('ground_truth'), default=False, help_text='This annotation is a Ground Truth (ground_truth)', db_index=True)
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
@@ -439,9 +436,6 @@ class Annotation(AnnotationMixin, models.Model):
         self.task.save(update_fields=update_fields)
 
     def save(self, *args, **kwargs):
-        request = get_current_request()
-        if request:
-            self.updated_by = request.user
         result = super().save(*args, **kwargs)
         self.update_task()
         return result
