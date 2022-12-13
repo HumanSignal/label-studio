@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3719: Pan wasn't working in images from history (#1066)\n\n* fix: DEV-3719: Pan wasn't working in images from history\r\n\r\n* simplify validation",
-  "commit": "10a111b3cae4ebc3496ef39a66cde15d3858e6ea",
-  "branch": "master",
-  "date": "2022-12-12T13:47:58Z"
+  "message": "fix: DEV-3734: Add interface to show task counter",
+  "commit": "8857f1a0dc05921673e4cc8440ac972c4bd7239f",
+  "branch": "fb-dev-3734/counter-for-manual",
+  "date": "2022/12/13 16:13:20"
 }
