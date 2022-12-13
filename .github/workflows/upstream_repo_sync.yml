@@ -238,12 +238,16 @@ jobs:
             let openPRs = []  
             for (let submodule of submodules) {
               core.info(`Checking ${ submodule.owner }/${ submodule.repo }`)
-              const { data: listAllOpenPulls } = await github.rest.pulls.list({
-                owner: submodule.owner,
-                repo: submodule.repo,
-                status: 'open',
-                per_page: 100
-              });
+              const listAllOpenPulls = await github.paginate(
+                github.rest.pulls.list,
+                {
+                  owner: submodule.owner,
+                  repo: submodule.repo,
+                  status: 'open',
+                  per_page: 100
+                },
+                (response) => response.data
+              );
               
               const listOpenPulls = listAllOpenPulls.filter(e => e.head.ref.toLowerCase() === branchNameLowerCase)
 

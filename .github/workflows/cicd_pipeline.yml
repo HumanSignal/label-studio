@@ -204,11 +204,15 @@ jobs:
               process.exit()
             }
 
-            const {data: tags} = await github.rest.repos.listTags({
+            const tags = await github.paginate(
+              github.rest.repos.listTags,
+              {
                 owner,
                 repo,
                 per_page: 100
-            });
+              },
+              (response) => response.data
+            );
             console.log(`Tags:`)
             console.log(tags.map(e => e.name))
             const matchedTags = tags.filter(e => e.name.indexOf(version) !== -1)
@@ -241,10 +245,15 @@ jobs:
             console.log(`Previous version: ${previousTag}`)
 
             console.log('Find or Create a Draft release')
-            const {data: releases} = await github.rest.repos.listReleases({
+            const releases = await github.paginate(
+              github.rest.repos.listReleases,
+              {
                 owner,
                 repo,
-            });
+                per_page: 100
+              },
+              (response) => response.data
+            );
             let release = releases.find(e => target_commitish.endsWith(e.target_commitish) && e.draft)
             if (release) {
                 console.log(`Draft release already exist ${release.html_url}`)
