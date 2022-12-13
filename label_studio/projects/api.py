@@ -438,6 +438,7 @@ class ProjectTaskListAPI(generics.ListCreateAPIView,
         project = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
         instance = serializer.save(project=project)
         emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])
+        return instance
 
 
 class TemplateListAPI(generics.ListAPIView):

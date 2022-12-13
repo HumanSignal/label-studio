@@ -174,7 +174,7 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
         # Note: as described in that page, you need to run your function with a service account
         # with the permission roles/iam.serviceAccountTokenCreator
         auth_request = requests.Request()
-        credentials, project = google.auth.default()
+        credentials, project = google.auth.default(['https://www.googleapis.com/auth/cloud-platform'])
         storage_client = google_storage.Client(project, credentials)
         # storage_client = self.get_client()
         data_bucket = storage_client.lookup_bucket(bucket_name)

@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3733: Persist and use the pending draft to attach added comments",
-  "commit": "4b082ba9d7a48216267742f14c0c548beb456f90",
+  "message": "fix: DEV-3719: Pan wasn't working in images from history (#1066)\n\n* fix: DEV-3719: Pan wasn't working in images from history\r\n\r\n* simplify validation",
+  "commit": "10a111b3cae4ebc3496ef39a66cde15d3858e6ea",
   "branch": "master",
-  "date": "2022/11/17 08:06:22"
+  "date": "2022-12-12T13:47:58Z"
 }

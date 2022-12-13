@@ -203,6 +203,12 @@ class Task(TaskMixin, models.Model):
             return False
         return filename.startswith(settings.UPLOAD_DIR + '/')
 
+    @staticmethod
+    def prepare_filename(filename):
+        if isinstance(filename, str):
+            return filename.replace(settings.MEDIA_URL, '')
+        return filename
+
     def resolve_uri(self, task_data, project):
         if project.task_data_login and project.task_data_password:
             protected_data = {}
@@ -218,15 +224,16 @@ class Task(TaskMixin, models.Model):
             # try resolve URLs via storage associated with that task
             for field in task_data:
                 # file saved in django file storage
-                if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(task_data[field]):
+                prepared_filename = self.prepare_filename(task_data[field])
+                if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(prepared_filename):
                     # permission check: resolve uploaded files to the project only
                     file_upload = None
-                    file_upload = FileUpload.objects.filter(project=project, file=task_data[field]).first()
+                    file_upload = FileUpload.objects.filter(project=project, file=prepared_filename).first()
                     if file_upload is not None:
                         if flag_set('ff_back_dev_2915_storage_nginx_proxy_26092022_short', self.project.organization.created_by):
                             task_data[field] = file_upload.url
                         else:
-                            task_data[field] = default_storage.url(name=task_data[field])
+                            task_data[field] = default_storage.url(name=prepared_filename)
                     # it's very rare case, e.g. user tried to reimport exported file from another project
                     # or user wrote his django storage path manually
                     else:
@@ -276,9 +283,6 @@ class Task(TaskMixin, models.Model):
             return self.annotations
         else:
             return self.annotations.filter(Q_finished_annotations)
-
-    def update_is_labeled(self):
-        self.is_labeled = self._get_is_labeled_value()
 
     def increase_project_summary_counters(self):
         if hasattr(self.project, 'summary'):
@@ -749,12 +753,12 @@ def update_task_stats(task, stats=('is_labeled',), save=True):
     """
     logger.debug(f'Update stats {stats} for task {task}')
     if 'is_labeled' in stats:
-        task.update_is_labeled()
+        task.update_is_labeled(save=save)
     if save:
         task.save()
 
 
-def bulk_update_stats_project_tasks(tasks):
+def bulk_update_stats_project_tasks(tasks, project=None):
     """bulk Task update accuracy
        ex: after change settings
        apply several update queries size of batch
@@ -764,12 +768,34 @@ def bulk_update_stats_project_tasks(tasks):
     :return:
     """
     # recalc accuracy
+    if not tasks:
+        # break if tasks is empty 
+        return
+    # get project if it's not in params
+    if project is None:
+        project = tasks[0].project
     with transaction.atomic():
-        # update objects without saving
-        for task in tasks:
-            update_task_stats(task, save=False)
-        # start update query batches
-        bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+        use_overlap = project._can_use_overlap()
+        maximum_annotations = project.maximum_annotations
+        # update filters if we can use overlap
+        if use_overlap:
+            # finished tasks
+            finished_tasks = tasks.filter(Q(total_annotations__gte=maximum_annotations) |
+                                          Q(total_annotations__gte=1, overlap=1))
+            finished_tasks.update(is_labeled=True)
+            # unfinished tasks
+            tasks.exclude(id__in=finished_tasks).update(is_labeled=False)
+        else:
+            # update objects without saving if we can't use overlap
+            for task in tasks:
+                update_task_stats(task, save=False)
+            try:
+                # start update query batches
+                bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+            except OperationalError as exp:
+                logger.error("Operational error while updating tasks: {exc}", exc_info=True)
+                # try to update query batches one more time
+                start_job_async_or_sync(bulk_update, tasks, in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \
