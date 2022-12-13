@@ -218,15 +218,11 @@ class ImportAPI(generics.CreateAPIView):
             task_count = len(tasks)
             annotation_count = len(serializer.db_annotations)
             prediction_count = len(serializer.db_predictions)
-            # Update tasks states if there are related settings in project
-            # after bulk create we can bulk update tasks stats
-            project.update_tasks_states(maximum_annotations_changed=False,
-                                        overlap_cohort_percentage_changed=False,
-                                        tasks_number_changed=True)
-            # Update counters (like total_annotations) for new tasks
-            project.update_tasks_counters(
-                tasks_queryset=tasks
-            )
+            # Update counters (like total_annotations) for new tasks and after bulk update tasks stats. It should be a
+            # single operation as counters affect bulk is_labeled update
+            project.update_tasks_counters_and_task_states(tasks_queryset=tasks, maximum_annotations_changed=False,
+                                                          overlap_cohort_percentage_changed=False,
+                                                          tasks_number_changed=True)
             logger.info('Tasks bulk_update finished')
 
             project.summary.update_data_columns(parsed_data)
@@ -321,15 +317,11 @@ class ReImportAPI(ImportAPI):
             tasks, serializer = self._save(tasks)
         duration = time.time() - start
 
-        # Update task states if there are related settings in project
-        # after bulk create we can bulk update task stats
-        project.update_tasks_states(maximum_annotations_changed=False,
-                                    overlap_cohort_percentage_changed=False,
-                                    tasks_number_changed=True)
-        # Update counters (like total_annotations) for new tasks
-        project.update_tasks_counters(
-            tasks_queryset=tasks
-        )
+        # Update counters (like total_annotations) for new tasks and after bulk update tasks stats. It should be a
+        # single operation as counters affect bulk is_labeled update
+        project.update_tasks_counters_and_task_states(tasks_queryset=tasks, maximum_annotations_changed=False,
+                                                      overlap_cohort_percentage_changed=False,
+                                                      tasks_number_changed=True)
         logger.info('Tasks bulk_update finished')
 
         project.summary.update_data_columns(tasks)

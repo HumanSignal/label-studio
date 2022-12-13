@@ -762,7 +762,7 @@ def update_task_stats(task, stats=('is_labeled',), save=True):
         task.save()
 
 
-def bulk_update_stats_project_tasks(tasks):
+def bulk_update_stats_project_tasks(tasks, project=None):
     """bulk Task update accuracy
        ex: after change settings
        apply several update queries size of batch
@@ -772,13 +772,34 @@ def bulk_update_stats_project_tasks(tasks):
     :return:
     """
     # recalc accuracy
+    if not tasks:
+        # break if tasks is empty 
+        return
+    # get project if it's not in params
+    if project is None:
+        project = tasks[0].project
     with transaction.atomic():
-        # update objects without saving
-        for task in tasks:
-            update_task_stats(task, save=False)
-        # start update query batches
-        bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
-    Task.post_process_bulk_update_stats(tasks)
+        use_overlap = project._can_use_overlap()
+        maximum_annotations = project.maximum_annotations
+        # update filters if we can use overlap
+        if use_overlap:
+            # finished tasks
+            finished_tasks = tasks.filter(Q(total_annotations__gte=maximum_annotations) |
+                                          Q(total_annotations__gte=1, overlap=1))
+            finished_tasks.update(is_labeled=True)
+            # unfinished tasks
+            tasks.exclude(id__in=finished_tasks).update(is_labeled=False)
+        else:
+            # update objects without saving if we can't use overlap
+            for task in tasks:
+                update_task_stats(task, save=False)
+            try:
+                # start update query batches
+                bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+            except OperationalError as exp:
+                logger.error("Operational error while updating tasks: {exc}", exc_info=True)
+                # try to update query batches one more time
+                start_job_async_or_sync(bulk_update, tasks, in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \
