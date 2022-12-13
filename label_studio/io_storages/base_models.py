@@ -1,6 +1,8 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
+import uuid
+
 import django_rq
 import json
 
@@ -87,8 +89,10 @@ class ImportStorage(Storage):
     def _scan_and_create_links(self, link_class):
         tasks_created = 0
         maximum_annotations = self.project.maximum_annotations
-        task = self.project.tasks.order_by('-inner_id').first()
+        tasks = self.project.tasks.order_by('-inner_id')
+        task = tasks.first()
         max_inner_id = (task.inner_id + 1) if task else 1
+        all_unique_ids = list(tasks.values_list('unique_id', flat=True))
         
         for key in self.iterkeys():
             logger.debug(f'Scanning key {key}')
@@ -127,6 +131,15 @@ class ImportStorage(Storage):
                     )
                 cancelled_annotations = len([a for a in annotations if a['was_cancelled']])
 
+            if 'unique_id' in data and isinstance(data['unique_id'], str):
+                unique_id = data['unique_id']
+            else:
+                unique_id = str(uuid.uuid4())
+
+            if unique_id in all_unique_ids:
+                logger.debug(f'{self.__class__.__name__} unique_id {unique_id} already exists')
+                continue
+
             if 'data' in data and isinstance(data['data'], dict):
                 data = data['data']
 
@@ -135,10 +148,11 @@ class ImportStorage(Storage):
                     data=data, project=self.project, overlap=maximum_annotations,
                     is_labeled=len(annotations) >= maximum_annotations, total_predictions=len(predictions),
                     total_annotations=len(annotations)-cancelled_annotations,
-                    cancelled_annotations=cancelled_annotations, inner_id=max_inner_id
+                    cancelled_annotations=cancelled_annotations, inner_id=max_inner_id, unique_id=unique_id
                 )
                 max_inner_id += 1
 
+                all_unique_ids.append(unique_id)
                 link_class.create(task, key, self)
                 logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
                 tasks_created += 1

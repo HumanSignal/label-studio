@@ -54,6 +54,10 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
         if 'annotations' in self.fields:
             self.fields['annotations'].context['interpolate_key_frames'] = self.context.get('interpolate_key_frames', False)
         replace_task_data_undefined_with_config_field(data, project)
+        if 'remove_data' in self.context:
+            remove_data = self.context.get('remove_data', False)
+            if remove_data:
+                task.data = None
 
         return super().to_representation(task)
 
@@ -177,6 +181,9 @@ class ExportParamSerializer(serializers.Serializer):
     download_all_tasks = serializers.BooleanField(default=False,
                                                   help_text='Download all tasks or only finished.',
                                                   required=False)
+    remove_data = serializers.BooleanField(default=False,
+                                           help_text='Remove data in response',
+                                           required=False)
 
 
 class BaseExportDataSerializerForInteractive(InteractiveMixin, BaseExportDataSerializer):

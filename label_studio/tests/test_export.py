@@ -158,3 +158,36 @@ def test_export_with_predictions(
             assert task['predictions'][0]['score'] == predictions['score']
         else:
             assert task['predictions'] == []
+
+
+@pytest.mark.skip(reason='HTX-868')
+@pytest.mark.parametrize('removeData', (True, False))
+@pytest.mark.django_db
+def test_export_remove_download(business_client, configured_project, removeData):
+    r = business_client.get(f'/api/projects/{configured_project.id}/export', data={
+        'export_type': 'JSON',
+        'download_all_tasks': True,
+        'remove_data': removeData
+    })
+    assert r.status_code == 200
+    exports = r.json()
+    if removeData:
+        for task in exports:
+            assert task['data'] is None
+    else:
+        for task in exports:
+            assert task['data'] is not None
+
+@pytest.mark.skip(reason='HTX-868')
+@pytest.mark.parametrize('unique_id', ['uuid_1'])
+@pytest.mark.django_db
+def test_export_filter_unique_id(business_client, configured_project, unique_id):
+    r = business_client.get(f'/api/projects/{configured_project.id}/export', data={
+        'export_type': 'JSON',
+        'download_all_tasks': True,
+        'remove_data': True,
+        'unique_ids[]': unique_id
+    })
+    assert r.status_code == 200
+    exports = r.json()
+    assert exports[0]['unique_id'] == unique_id

@@ -6,6 +6,7 @@ import os
 import datetime
 import numbers
 import time
+import uuid
 
 from urllib.parse import urljoin, quote
 
@@ -70,6 +71,8 @@ class Task(TaskMixin, models.Model):
     )
     inner_id = models.BigIntegerField(_('inner id'), default=0, null=True,
                                       help_text='Internal task ID in the project, starts with 1')
+    unique_id = models.CharField(_('unique id'), default='', max_length=50, null=True,
+                                 help_text='Unique task ID in the project')
     updates = ['is_labeled']
     total_annotations = models.IntegerField(_('total_annotations'), default=0, db_index=True,
                                   help_text='Number of total annotations for the current task except cancelled annotations')
@@ -98,6 +101,7 @@ class Task(TaskMixin, models.Model):
         db_table = 'task'
         indexes = [
             models.Index(fields=['project', 'is_labeled']),
+            models.Index(fields=['project', 'unique_id']),
             models.Index(fields=['project', 'inner_id']),
             models.Index(fields=['id', 'project']),
             models.Index(fields=['id', 'overlap']),
@@ -307,6 +311,8 @@ class Task(TaskMixin, models.Model):
 
                 # max_inner_id might be None in the old projects
                 self.inner_id = None if max_inner_id is None else (max_inner_id + 1)
+        if self.unique_id == '':
+            self.unique_id = uuid.uuid4()
         super().save(*args, **kwargs)
 
     @staticmethod

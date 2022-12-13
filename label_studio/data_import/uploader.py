@@ -185,10 +185,15 @@ def load_tasks(request, project):
     # take one task from request DATA
     elif 'application/json' in request.content_type and isinstance(request.data, dict):
         tasks = [request.data]
+        if 'unique_id' in tasks[0] and type(tasks[0]['unique_id']) is not str:
+            raise ValidationError('unique id must be string')
 
     # take many tasks from request DATA
     elif 'application/json' in request.content_type and isinstance(request.data, list):
         tasks = request.data
+        for data in tasks:
+            if 'unique_id' in data and type(data['unique_id']) is not str:
+                raise ValidationError('unique id must be string')
 
     # incorrect data source
     else:

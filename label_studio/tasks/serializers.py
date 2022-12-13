@@ -1,6 +1,8 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
+import uuid
+
 import ujson as json
 import numbers
 
@@ -282,7 +284,11 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             prev_inner_id = tasks.order_by("-inner_id")[0].inner_id if tasks else 0
             max_inner_id = (prev_inner_id + 1) if prev_inner_id else 1
 
+            all_unique_ids = list(tasks.values_list('unique_id', flat=True))
+
             for i, task in enumerate(validated_tasks):
+                if 'unique_id' in task and task['unique_id'] in all_unique_ids:
+                    continue
                 cancelled_annotations = len([ann for ann in task_annotations[i] if ann.get('was_cancelled', False)])
                 total_annotations = len(task_annotations[i]) - cancelled_annotations
                 t = Task(
@@ -293,6 +299,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                     is_labeled=len(task_annotations[i]) >= max_overlap,
                     file_upload_id=task.get('file_upload_id'),
                     inner_id=None if prev_inner_id is None else max_inner_id + i,
+                    unique_id=str(uuid.uuid4()) if 'unique_id' not in task or task['unique_id'] == '' else task['unique_id'],
                     total_predictions=len(task_predictions[i]),
                     total_annotations=total_annotations,
                     cancelled_annotations=cancelled_annotations

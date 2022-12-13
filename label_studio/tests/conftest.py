@@ -382,8 +382,8 @@ def configured_project(business_client, annotator_client):
             </View>'''
     )
     _2_tasks_with_textA_and_textB = [
-        {'meta_info': 'meta info A', 'text': 'text A'},
-        {'meta_info': 'meta info B', 'text': 'text B'}
+        {'data': {'meta_info': 'meta info A', 'text': 'text A'}, 'unique_id': 'uuid_1'},
+        {'data': {'meta_info': 'meta info B', 'text': 'text B'}, 'unique_id': 'uuid_2'}
     ]
 
     # get user to be owner
@@ -392,7 +392,7 @@ def configured_project(business_client, annotator_client):
 
     assert project.ml_backends.first().url == 'http://localhost:8999'
 
-    Task.objects.bulk_create([Task(data=task, project=project) for task in _2_tasks_with_textA_and_textB])
+    Task.objects.bulk_create([Task(data=task['data'], project=project, unique_id=task['unique_id']) for task in _2_tasks_with_textA_and_textB])
     return project
 
 

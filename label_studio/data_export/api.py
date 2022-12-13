@@ -91,12 +91,29 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
                           """,
             ),
             openapi.Parameter(
+                name='remove_data',
+                type=openapi.TYPE_BOOLEAN,
+                in_=openapi.IN_QUERY,
+                description="""
+                          If true, data tag will remove from response. 
+                          """,
+            ),
+            openapi.Parameter(
                 name='ids',
                 type=openapi.TYPE_ARRAY,
                 items=openapi.Schema(title='Task ID', description='Individual task ID', type=openapi.TYPE_INTEGER),
                 in_=openapi.IN_QUERY,
                 description="""
                           Specify a list of task IDs to retrieve only the details for those tasks.
+                          """,
+            ),
+            openapi.Parameter(
+                name='unique_ids',
+                type=openapi.TYPE_ARRAY,
+                items=openapi.Schema(title='Task Unique ID', description='Individual task unique ID', type=openapi.TYPE_STRING),
+                in_=openapi.IN_QUERY,
+                description="""
+                          Specify a list of task unique IDs to retrieve only the details for those tasks.
                           """,
             ),
             openapi.Parameter(
@@ -158,16 +175,23 @@ class ExportAPI(generics.RetrieveAPIView):
         only_finished = not query_serializer.validated_data['download_all_tasks']
         download_resources = query_serializer.validated_data['download_resources']
         interpolate_key_frames = query_serializer.validated_data['interpolate_key_frames']
+        remove_data = query_serializer.validated_data['remove_data']
 
         tasks_ids = request.GET.getlist('ids[]')
+        task_unique_ids = request.GET.getlist('unique_ids[]')
 
         logger.debug('Get tasks')
         query = Task.objects.filter(project=project)
         if tasks_ids and len(tasks_ids) > 0:
             logger.debug(f'Select only subset of {len(tasks_ids)} tasks')
             query = query.filter(id__in=tasks_ids)
+        if task_unique_ids and len(task_unique_ids) > 0:
+            logger.debug(f'Select only subset of {len(task_unique_ids)} tasks based on unique IDs')
+            query = query.filter(unique_id__in=task_unique_ids)
         if only_finished:
             query = query.filter(annotations__isnull=False).distinct()
+        if remove_data:
+            query = query.defer('data')
 
         task_ids = query.values_list('id', flat=True)
 
@@ -176,7 +200,7 @@ class ExportAPI(generics.RetrieveAPIView):
         for _task_ids in batch(task_ids, 1000):
             tasks += ExportDataSerializer(
                 self.get_task_queryset(query.filter(id__in=_task_ids)), many=True, expand=['drafts'],
-                context={'interpolate_key_frames': interpolate_key_frames}
+                context={'interpolate_key_frames': interpolate_key_frames, 'remove_data': remove_data}
             ).data
         logger.debug('Prepare export files')
 
