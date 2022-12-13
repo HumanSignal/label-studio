@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3917: Reinit history after draft applied",
-  "commit": "478987f87376f758c1f70dfb65cbaa71057cbecd",
-  "branch": "fb-dev-3917/undo-draft",
-  "date": "2022/12/09 01:12:17"
+  "commit": "59044864cbc1dbb407a0f58c07ecab594d3de761",
+  "branch": "master",
+  "date": "2022/12/13 11:58:13"
 }
