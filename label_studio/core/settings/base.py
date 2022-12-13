@@ -594,7 +594,7 @@ if get_env('STORAGE_TYPE') == "azure":
 if get_env('STORAGE_TYPE') == "gcs":
     CLOUD_FILE_STORAGE_ENABLED = True
     # DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
-    DEFAULT_FILE_STORAGE = 'core.gcs_storage_alt.AlternativeGoogleCloudStorage'
+    DEFAULT_FILE_STORAGE = 'core.storage.AlternativeGoogleCloudStorage'
     GS_PROJECT_ID = get_env('STORAGE_GCS_PROJECT_ID')
     GS_BUCKET_NAME = get_env('STORAGE_GCS_BUCKET_NAME')
     GS_EXPIRATION = timedelta(seconds=int(get_env('STORAGE_GCS_EXPIRATION_SECS', '86400')))
