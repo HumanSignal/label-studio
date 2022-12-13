@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3958: Remove WASD",
-  "commit": "0f5fbfff2698593e8d341316d1e0869386fb7c2e",
-  "branch": "master",
-  "date": "2022/12/07 20:14:23"
+  "message": "chore: DEV-3994: Add PR checklist template",
+  "commit": "3a37643b28cf37ab23f5eaf34b277e9d1fc8a138",
+  "branch": "fb-dev-3994",
+  "date": "2022/12/13 14:41:46"
 }
