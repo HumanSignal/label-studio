@@ -14,41 +14,38 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
     The release notes for Label Studio Community Edition is available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
 
 
-
 ## Label Studio Enterprise 2.4
-This section highlights the breaking changes, new features and enhancements, and bug fixes in Label Studio Enterprise 2.4.
+This section highlights the  new features and enhancements, and bug fixes in Label Studio Enterprise 2.4.
 
 ### New features and enhancements 
 Label Studio Enterprise 2.4 introduces the following new features and enhancements.
 
-- Introduce interactive **View All** mode with nested regions [DEV-3391].
+- The [comments and notifications](comments_notifications.html) feature allows you to discuss task issues and other problems during labeling and reviewing processes.
+- Use the interactive **View All** mode with nested regions [DEV-3391].
 - Add `updated_at` field to comments API [DEV-3715].
-- Able to cancel old import jobs when a new one is created [DEV-2075].
+- Cancel old import jobs when a new one is created [DEV-2075].
 
 ### Bug Fixes
 Label Studio 2.4 includes the following bug fixes:
 
-### Bug Fixes
-Label Studio 2.4 includes the following bug fixes:
-
-- New link to terms of use [DEV-3726]
-- Fix draft notifications [DEV-3339]
-- Show/hide toggle on the outliner properly works with all region types. [DEV-3742]
-- Resolved an issue causing bounding box label reassignment not to toggle correctly when using hotkeys [DEV-3672]
-- Adds boundaries to limit working area for the video regions [DEV-3350]
-- Correctly serialize JSON fields in CSV export files [DEV-3578]
-- Fixed the "Show labels inside the regions" option work in the Video template [DEV-1852]
-- Fix import tasks data validation for nested fields with repeater [DEV-3744]
-=Fixes the issue when clicking the Update button in Label Stream leads the annotator to the next task [DEV-3773]
-- Comments should associate with a current draft even if the draft is pending save. [DEV-3733]
-- Comment edited session state [DEV-3692]
-- Review stream performance optimization [DEV-3668]
-- Fix error on task switching after notification link [DEV-3802]
-- Don't crash/freeze the app on lack of network connection [DEV-3780]
-- fix for read-only FS [SRE-348]
-- GCS persistent storage is broken [SRE-351]
-- Fixes the issue with spam requests [DEV-3874]
-- Avoid the creation of pg_trgm in Postgres if it already exists [DEV-3839]
+- Fixed the `terms of service` link on sign up page [DEV-3726].
+- Fixed an issue where the notification about annotator's comment in draft was not sent to anyone [DEV-3339].
+- Show/hide toggle on the outliner worked with all region types [DEV-3742].
+- Used hotkey for label assignment to selected regions (`rectanglelabels`, `polygonlabels`,`keypoints`, `brushes`, `audio`, `timeseries`, `text`, `html`, `paragraph`, and so on) [DEV-3672].
+- Added boundaries that limited the working area for video regions [DEV-3350].
+- Fixed an issue where CSV exports incorrectly serialized complex data types [DEV-3578].
+- Fixed the **Show labels inside the regions** option to work in the video template [DEV-1852].
+- Fixed import tasks data validation for nested fields with repeater [DEV-3744].
+- Fixed an issue when clicking the **Update** button in Label Stream lead the annotator to the next task [DEV-3773].
+- Comments were associated with the current draft even when the draft was in pending save state [DEV-3733].
+- Comment edited session state was displayed accurately in the updated form. (For example, “Updated 10 minutes ago”)[DEV-3692].
+- Fixed an issue with the **Review** stream performance optimization [DEV-3668].
+- Fixed errors on task switching after notification link [DEV-3802].
+- Fixed an issue where the lack of network connection caused infinite loop of requests [DEV-3780].
+- Resolved an issue for read-only file system (FS) [SRE-348].
+- Fixed an issue where the Google Cloud Storage (GCS) persistent storage was broken [SRE-351].
+- Fixed the issue with spam requests [DEV-3874].
+- Avoided the creation of `pg_trgm` in Postgres if it existed [DEV-3839].
 
 
 ## Label Studio Enterprise 2.3.1
