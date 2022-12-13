@@ -53,6 +53,9 @@ stages:
     url: '{django_live_url}/api/tasks/{task_pk}?project={project_pk}'
   response:
     status_code: 200
+    save:
+      json:
+        annotation_id: id
     json:
       annotations:
         - completed_by:
@@ -86,7 +89,7 @@ stages:
     json:
       total: 0
 
-- name: change filter
+- name: change filter to not empty
   request:
     method: PUT
     url: '{django_live_url}/api/dm/views/{view_pk}?interaction=filter&project={project_pk}'
@@ -111,3 +114,71 @@ stages:
     status_code: 200
     json:
       total: 1
+
+- name: change filter to empty true
+  request:
+    method: PUT
+    url: '{django_live_url}/api/dm/views/{view_pk}?interaction=filter&project={project_pk}'
+    json:
+      project: '{project_pk}'
+      data:
+        filters:
+          conjunction: and
+          items:
+            - filter: "filter:tasks:annotations_results"
+              operator: empty
+              value: "true"
+              type: String
+  response:
+    status_code: 200
+
+- name: get the new view
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks?page=1&page_size=30&view={view_pk}&interaction=filter&project={project_pk}'
+  response:
+    status_code: 200
+    json:
+      total: 0
+
+- name: delete anotation
+  request:
+    method: DELETE
+    url: '{django_live_url}/api/annotations/{annotation_pk}'
+  response:
+    status_code: 204
+
+- name: check empty count again
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks?page=1&page_size=30&view={view_pk}&interaction=filter&project={project_pk}'
+  response:
+    status_code: 200
+    json:
+      total: 1
+
+- name: change filter to not empty
+  request:
+    method: PUT
+    url: '{django_live_url}/api/dm/views/{view_pk}?interaction=filter&project={project_pk}'
+    json:
+      project: '{project_pk}'
+      data:
+        filters:
+          conjunction: and
+          items:
+            - filter: "filter:tasks:annotations_results"
+              operator: empty
+              value: "false"
+              type: String
+  response:
+    status_code: 200
+
+- name: get the new view
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks?page=1&page_size=30&view={view_pk}&interaction=filter&project={project_pk}'
+  response:
+    status_code: 200
+    json:
+      total: 0
