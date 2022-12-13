@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-3750: Load task with given comment",
-  "commit": "8d2ddf8825e98156ea15e8695412be434399a13c",
+  "message": "fix: DEV-3958: Remove WASD",
+  "commit": "0f5fbfff2698593e8d341316d1e0869386fb7c2e",
   "branch": "master",
-  "date": "2022/11/18 16:46:59"
+  "date": "2022/12/07 20:14:23"
 }
