@@ -9,6 +9,7 @@ on:
 
 env:
   NODE: '14'
+  CACHE_NAME_PREFIX: v1
 
 jobs:
   migrations:
