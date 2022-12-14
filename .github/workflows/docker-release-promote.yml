@@ -40,7 +40,7 @@ jobs:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
             const {repo, owner} = context.repo;
-            const check_runs = await github.paginate(
+            const checks = await github.paginate(
               github.rest.checks.listForRef,
               {
                 owner,
