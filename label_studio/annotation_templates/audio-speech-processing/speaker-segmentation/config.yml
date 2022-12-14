@@ -9,5 +9,5 @@ config: |
       <Label value="Speaker one" background="#00FF00"/>
       <Label value="Speaker two" background="#12ad59"/>
     </Labels>
-    <AudioPlus name="audio" value="$audio" />
+    <Audio name="audio" value="$audio" />
   </View>
