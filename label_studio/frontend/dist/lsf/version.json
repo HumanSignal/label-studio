@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-4043: A3 channel data support (#1110)\n\n* Fix e2e\r\n\r\n* Restore channels functionality for Audio v1/2\r\n\r\n* Keep channel data in Audio v3",
-  "commit": "cbd030e1a007c93ac74d0bcb3ba5cf07651148b1",
-  "branch": "master",
-  "date": "2022-12-14T14:44:33Z"
+  "message": "chore: DEV-2715: Do not build chunks with period used as separator",
+  "commit": "376e7bd26ea0757f1f67c4f6d4d32ef55906e82a",
+  "branch": "fb-dev-2715-fix-chunk-name",
+  "date": "2022/12/14 13:58:59"
 }
