@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3664: Grouping modes are not persistent in Outliner when switching between tasks in Quick View",
-  "commit": "bd6c9b0c3fe05dea9e0800ec33bf9394a971f23b",
+  "commit": "36788663985602ad04e4b4af39de688a5ec58c39",
   "branch": "fb-dev-3664/grouping",
-  "date": "2022/12/13 08:55:46"
+  "date": "2022/12/14 10:28:41"
 }
