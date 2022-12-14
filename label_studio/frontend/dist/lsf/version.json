@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3904: Allow to clear DateTime",
-  "commit": "17eb6a397a99cfd81ef43909b6fff479a1167387",
-  "branch": "master",
-  "date": "2022/12/14 10:24:20"
+  "message": "feat: DEV-4051: Introducing Jotai",
+  "commit": "352e79777bef79b04c11a6e5e2fd26beac39c275",
+  "branch": "fb-dev-4015/jotai",
+  "date": "2022/12/14 11:23:00"
 }
