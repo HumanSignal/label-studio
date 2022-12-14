@@ -110,3 +110,28 @@ def test_parse_all_configs():
             assert parse_config(config)
             assert parse_config_to_json(config)
             validate_label_config(config)
+
+
+@pytest.mark.django_db
+def test_config_validation_for_choices_workaround(business_client, project_id):
+    """
+    Validate Choices tag for 1 choice with workaround
+    Example bug DEV-3635
+    """
+    payload = {
+        'label_config': '<View><Text name="artist" /><View><Choices name="choices_1" toName="artist"><Choice name="choice_1" value="1"/></Choices></View><View><Choices name="choices_2" toName="artist"><Choice name="choice_2" value="2"/></Choices></View></View>'}
+    response = business_client.patch(
+        f"/api/projects/{project_id}",
+        data=json.dumps(payload),
+        content_type="application/json",
+    )
+    assert response.status_code == 200
+
+    payload = {
+        'label_config': '<View><Text name="artist" /><View><Choices name="choices_1" toName="artist"><Choice name="choice_1" value="1"/></Choices><Choices name="choices_2" toName="artist"><Choice name="choice_2" value="2"/></Choices></View></View>'}
+    response = business_client.patch(
+        f"/api/projects/{project_id}",
+        data=json.dumps(payload),
+        content_type="application/json",
+    )
+    assert response.status_code == 200
