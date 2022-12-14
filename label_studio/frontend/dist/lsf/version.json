@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-4043: A3 channel data support",
-  "commit": "529272e22259c05178c250f273a334095523117d",
-  "branch": "fb-dev-4043/a3-channel-data-support",
-  "date": "2022/12/14 17:30:51"
+  "commit": "cbd030e1a007c93ac74d0bcb3ba5cf07651148b1",
+  "branch": "master",
+  "date": "2022/12/14 17:44:33"
 }
