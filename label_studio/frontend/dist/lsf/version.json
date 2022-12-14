@@ -1,6 +1,6 @@
 {
   "message": "chore: DEV-2715: Do not build chunks with period used as separator",
-  "commit": "376e7bd26ea0757f1f67c4f6d4d32ef55906e82a",
+  "commit": "238f821faa667f609c59370e5ce9b095bce9003a",
   "branch": "fb-dev-2715-fix-chunk-name",
-  "date": "2022/12/14 13:58:59"
+  "date": "2022/12/14 15:02:04"
 }
