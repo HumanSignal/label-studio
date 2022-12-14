@@ -20,6 +20,7 @@ env:
   RELEASE_UBI_DOCKERFILE: "Dockerfile.redhat.release"
   PREFLIGHT_REPO: "quay.io/opdev/preflight:stable"
   DOCKER_CONFIG_PATH: "/home/runner/.docker/config.json"
+  LAUNCHDARKLY_DOWNLOAD_PATH: "feature_flags.json"
 
 jobs:
   docker_release_retag:
@@ -66,7 +67,7 @@ jobs:
             const {repo, owner} = context.repo;
             const newTag = '${{ inputs.release_tag }}';
             const dockerHubImageName = '${{ env.IMAGE_NAME }}';
-            const redHatImageName = 'scan.connect.redhat.com/${{ secrets.REDHAT_MARKETPLACE_LS_OSPID }}/label-studio';
+            const redHatImageName = 'quay.io/redhat-isv-containers/${{ secrets.REDHAT_MARKETPLACE_LS_PROJECT_ID }}';
             const regexp = '^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)(\.post([0-9]+))?$';
             
             function compareVersions(a, b) {
@@ -145,10 +146,23 @@ jobs:
         env:
           LAUNCHDARKLY_COMMUNITY_SDK_KEY: ${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}
         run: |
-          curl -H "Authorization: $LAUNCHDARKLY_COMMUNITY_SDK_KEY" https://app.launchdarkly.com/sdk/latest-all > feature_flags.json
+          set -xeuo pipefail
+          curl \
+            --connect-timeout 30 \
+            --retry 5 \
+            --retry-delay 10 \
+            -H "Authorization: $LAUNCHDARKLY_COMMUNITY_SDK_KEY" \
+            "https://sdk.launchdarkly.com/sdk/latest-all" >"${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }}"
+          if [ "$(jq 'has("flags")' <<< cat ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }})" = "true" ]; then 
+            echo "feature_flags.json is valid"
+          else
+            echo "feature_flags.json is invalid"
+            cat ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }}
+            exit 1
+          fi
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2.2.0
+        uses: docker/setup-buildx-action@v2.2.1
 
       - name: Login to DockerHub
         uses: docker/login-action@v2.1.0
@@ -159,9 +173,9 @@ jobs:
       - name: Login to RedHat Registry
         uses: docker/login-action@v2.1.0
         with:
-          registry: scan.connect.redhat.com
-          username: unused
-          password: ${{ secrets.REDHAT_MARKETPLACE_LS_PASSWORD }}
+          registry: quay.io
+          username: ${{ secrets.REDHAT_REGISTRY_LOGIN }}
+          password: ${{ secrets.REDHAT_REGISTRY_PASSWORD }}
 
       - name: Prepare Release Dockerfile
         id: release_dockerfile
@@ -170,64 +184,20 @@ jobs:
           set -euo pipefail ${ACTIONS_STEP_DEBUG:+-x}
 
           release_dir=release_${{ inputs.release_tag }}
-          echo "::set-output name=release_dir::$release_dir"
+          echo "release_dir=$release_dir" >> $GITHUB_OUTPUT
           mkdir -p $release_dir
           cp label_studio/core/version_.py $release_dir/
-          cp feature_flags.json $release_dir/
+          cp ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }} $release_dir/
           cd $release_dir
 
           cat <<EOF > "${{ env.RELEASE_DOCKERFILE }}"
           FROM ${{ env.IMAGE_NAME }}:${{ steps.get_info.outputs.image_version }}
           COPY --chown=54546:0 version_.py /label-studio/label_studio/core/version_.py
-          COPY --chown=54546:0 feature_flags.json /label-studio/label_studio/feature_flags.json
+          COPY --chown=54546:0 ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }} /label-studio/label_studio/feature_flags.json
           EOF
-
-      - name: Prepare Release UBI Dockerfile
-        id: ubi_release_dockerfile
-        shell: bash
-        run: |
-          set -euo pipefail ${ACTIONS_STEP_DEBUG:+-x}
-
-          release_dir=ubi_release_${{ inputs.release_tag }}
-          echo "::set-output name=release_dir::$release_dir"
-          mkdir -p $release_dir
-          cp label_studio/core/version_.py $release_dir/
-          cp feature_flags.json $release_dir/
-          cd $release_dir
-
-          cat <<EOF > "${{ env.RELEASE_UBI_DOCKERFILE }}"
-          FROM scan.connect.redhat.com/${{ secrets.REDHAT_MARKETPLACE_LS_OSPID }}/label-studio:${{ steps.get_info.outputs.image_version }}
-          COPY --chown=54546:0 version_.py /label-studio/label_studio/core/version_.py
-          COPY --chown=54546:0 feature_flags.json /label-studio/label_studio/feature_flags.json
-          EOF
-
-      - name: Build and push Release UBI Docker image
-        uses: docker/build-push-action@v3.1.1
-        id: docker_build_and_push_ubi
-        with:
-          context: ${{ steps.ubi_release_dockerfile.outputs.release_dir }}
-          file: ${{ steps.ubi_release_dockerfile.outputs.release_dir }}/${{ env.RELEASE_UBI_DOCKERFILE }}
-          push: true
-          tags: ${{ steps.generate-tags.outputs.ubi-tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Run preflight and submit validation results to RedHat
-        shell: bash
-        run: |
-          docker pull ${{ env.PREFLIGHT_REPO }}
-          while IFS= read -d ',' image; do
-            docker run --rm -v ${{ env.DOCKER_CONFIG_PATH }}:${{ env.DOCKER_CONFIG_PATH }} \
-              --env PFLT_DOCKERCONFIG=${{ env.DOCKER_CONFIG_PATH }} \
-              --env PFLT_PYXIS_API_TOKEN=${{ secrets.REDHAT_MARKETPLACE_LS_PYXIS_TOKEN }} \
-              --env PFLT_CERTIFICATION_PROJECT_ID=${{ secrets.REDHAT_MARKETPLACE_LS_PROJECT_ID }} \
-              ${{ env.PREFLIGHT_REPO }} \
-              check container "${image}" \
-              --submit
-          done <<< '${{ steps.generate-tags.outputs.redhat-tags }},'
 
       - name: Build Release Ubuntu Docker image
-        uses: docker/build-push-action@v3.1.1
+        uses: docker/build-push-action@v3.2.0
         id: docker_build
         with:
           context: ${{ steps.release_dockerfile.outputs.release_dir }}
@@ -241,7 +211,7 @@ jobs:
         run: docker run -v ${{ github.workspace }}:/workspace:rw -u root --rm ${{ env.IMAGE_NAME }}:${{ inputs.release_tag }} cp -r /label-studio/label_studio/frontend/ /workspace/label_studio/
 
       - name: Push Release Ubuntu Docker image
-        uses: docker/build-push-action@v3.1.1
+        uses: docker/build-push-action@v3.2.0
         id: docker_push
         with:
           context: ${{ steps.release_dockerfile.outputs.release_dir }}
@@ -271,3 +241,47 @@ jobs:
           version: label-studio@${{ inputs.release_tag }}
           projects: opensource-v1-frontend
           sourcemaps: label_studio/frontend/dist
+
+      - name: Prepare Release UBI Dockerfile
+        id: ubi_release_dockerfile
+        shell: bash
+        run: |
+          set -euo pipefail ${ACTIONS_STEP_DEBUG:+-x}
+
+          release_dir=ubi_release_${{ inputs.release_tag }}
+          echo "release_dir=$release_dir" >> $GITHUB_OUTPUT
+          mkdir -p $release_dir
+          cp label_studio/core/version_.py $release_dir/
+          cp feature_flags.json $release_dir/
+          cd $release_dir
+
+          cat <<EOF > "${{ env.RELEASE_UBI_DOCKERFILE }}"
+          FROM registry.connect.redhat.com/heartexlabs/label-studio:${{ steps.get_info.outputs.image_version }}
+          COPY --chown=54546:0 version_.py /label-studio/label_studio/core/version_.py
+          COPY --chown=54546:0 feature_flags.json /label-studio/label_studio/feature_flags.json
+          EOF
+
+      - name: Build and push Release UBI Docker image
+        uses: docker/build-push-action@v3.2.0
+        id: docker_build_and_push_ubi
+        with:
+          context: ${{ steps.ubi_release_dockerfile.outputs.release_dir }}
+          file: ${{ steps.ubi_release_dockerfile.outputs.release_dir }}/${{ env.RELEASE_UBI_DOCKERFILE }}
+          push: true
+          tags: ${{ steps.generate-tags.outputs.ubi-tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run preflight and submit validation results to RedHat
+        shell: bash
+        run: |
+          docker pull ${{ env.PREFLIGHT_REPO }}
+          while IFS= read -d ',' image; do
+            docker run --rm -v ${{ env.DOCKER_CONFIG_PATH }}:${{ env.DOCKER_CONFIG_PATH }} \
+              --env PFLT_DOCKERCONFIG=${{ env.DOCKER_CONFIG_PATH }} \
+              --env PFLT_PYXIS_API_TOKEN=${{ secrets.REDHAT_MARKETPLACE_LS_PYXIS_TOKEN }} \
+              --env PFLT_CERTIFICATION_PROJECT_ID=${{ secrets.REDHAT_MARKETPLACE_LS_PROJECT_ID }} \
+              ${{ env.PREFLIGHT_REPO }} \
+              check container "${image}" \
+              --submit
+          done <<< '${{ steps.generate-tags.outputs.redhat-tags }},'

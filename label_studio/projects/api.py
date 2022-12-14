@@ -406,7 +406,8 @@ class ProjectTaskListAPI(generics.ListCreateAPIView,
 
     def filter_queryset(self, queryset):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
-        tasks = Task.objects.filter(project=project)
+        # ordering is deprecated here
+        tasks = Task.objects.filter(project=project).order_by('-updated_at')
         page = paginator(tasks, self.request)
         if page:
             return page
@@ -437,6 +438,7 @@ class ProjectTaskListAPI(generics.ListCreateAPIView,
         project = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
         instance = serializer.save(project=project)
         emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])
+        return instance
 
 
 class TemplateListAPI(generics.ListAPIView):

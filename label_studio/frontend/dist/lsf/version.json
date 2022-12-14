@@ -1,6 +1,6 @@
 {
-  "message": "ci: Bump release-drafter/release-drafter from 5.21.0 to 5.21.1 (#923)\n\nBumps [release-drafter/release-drafter](https://github.com/release-drafter/release-drafter) from 5.21.0 to 5.21.1.\r\n- [Release notes](https://github.com/release-drafter/release-drafter/releases)\r\n- [Commits](https://github.com/release-drafter/release-drafter/compare/v5.21.0...v5.21.1)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: release-drafter/release-drafter\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
-  "commit": "149f32e24953ea4fdffaffb4760cd5e0ee385450",
+  "message": "fix: DEV-3719: Pan wasn't working in images from history (#1066)\n\n* fix: DEV-3719: Pan wasn't working in images from history\r\n\r\n* simplify validation",
+  "commit": "10a111b3cae4ebc3496ef39a66cde15d3858e6ea",
   "branch": "master",
-  "date": "2022-10-24T16:17:39Z"
+  "date": "2022-12-12T13:47:58Z"
 }

@@ -28,6 +28,7 @@
     "hexo-renderer-marked": "^4.1.0",
     "hexo-renderer-stylus": "^0.3.3",
     "hexo-server": "^0.3.3",
+    "hexo-tag-collapse": "^1.2.0",
     "hexo-tag-details": "https://github.com/nicholasrq/hexo-tag-details.git",
     "save": "^2.4.0"
   },

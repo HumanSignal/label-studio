@@ -46,18 +46,18 @@ jobs:
         run: |
           set -x
           sha="$(git rev-parse HEAD)"
-          echo "::set-output name=sha::$sha"
+          echo "sha=$sha" >> $GITHUB_OUTPUT
           regexp='^ls-release\/(.*)$'; 
           if [[ '${{ inputs.branch_name }}' =~ $regexp ]]; then
             image_version="${BASH_REMATCH[1]}rc${sha}"
           else
             image_version='${{ inputs.branch_name }}'
           fi
-          echo "::set-output name=image_version::${image_version}"
-          echo "::set-output name=ubi_image_version::ubi_${image_version}"
+          echo "image_version=${image_version}" >> $GITHUB_OUTPUT
+          echo "ubi_image_version=ubi_${image_version}" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2.2.0
+        uses: docker/setup-buildx-action@v2.2.1
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -72,8 +72,22 @@ jobs:
       - name: Download feature flags
         env:
           LAUNCHDARKLY_COMMUNITY_SDK_KEY: ${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}
+          LAUNCHDARKLY_DOWNLOAD_PATH: "label_studio/feature_flags.json"
         run: |
-          curl -H "Authorization: $LAUNCHDARKLY_COMMUNITY_SDK_KEY" https://app.launchdarkly.com/sdk/latest-all > label_studio/feature_flags.json
+          set -xeuo pipefail
+          curl \
+            --connect-timeout 30 \
+            --retry 5 \
+            --retry-delay 10 \
+            -H "Authorization: $LAUNCHDARKLY_COMMUNITY_SDK_KEY" \
+            "https://sdk.launchdarkly.com/sdk/latest-all" >"$LAUNCHDARKLY_DOWNLOAD_PATH"
+          if [ "$(jq 'has("flags")' <<< cat $LAUNCHDARKLY_DOWNLOAD_PATH)" = "true" ]; then 
+            echo "feature_flags.json is valid"
+          else
+            echo "feature_flags.json is invalid"
+            cat $LAUNCHDARKLY_DOWNLOAD_PATH
+            exit 1
+          fi
 
       - name: Login to DockerHub
         uses: docker/login-action@v2.1.0
@@ -82,7 +96,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push ubuntu
-        uses: docker/build-push-action@v3.1.1
+        uses: docker/build-push-action@v3.2.0
         id: docker_build_and_push_ubuntu
         with:
           context: .
@@ -95,18 +109,18 @@ jobs:
       - name: Login to RedHat Registry
         uses: docker/login-action@v2.1.0
         with:
-          registry: scan.connect.redhat.com
-          username: unused
-          password: ${{ secrets.REDHAT_MARKETPLACE_LS_PASSWORD }}
+          registry: quay.io
+          username: ${{ secrets.REDHAT_REGISTRY_LOGIN }}
+          password: ${{ secrets.REDHAT_REGISTRY_PASSWORD }}
 
       - name: Build and push ubi
-        uses: docker/build-push-action@v3.1.1
+        uses: docker/build-push-action@v3.2.0
         id: docker_build_and_push_ubi
         with:
           context: .
           file: Dockerfile.redhat
           push: true
-          tags: scan.connect.redhat.com/${{ secrets.REDHAT_MARKETPLACE_LS_OSPID }}/label-studio:${{ steps.version.outputs.image_version }},${{ env.IMAGE_NAME }}:${{ steps.version.outputs.ubi_image_version }}
+          tags: quay.io/redhat-isv-containers/${{ secrets.REDHAT_MARKETPLACE_LS_PROJECT_ID }}:${{ steps.version.outputs.image_version }},${{ env.IMAGE_NAME }}:${{ steps.version.outputs.ubi_image_version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -118,7 +132,7 @@ jobs:
           --env PFLT_PYXIS_API_TOKEN=${{ secrets.REDHAT_MARKETPLACE_LS_PYXIS_TOKEN }} \
           --env PFLT_CERTIFICATION_PROJECT_ID=${{ secrets.REDHAT_MARKETPLACE_LS_PROJECT_ID }} \
           ${{ env.PREFLIGHT_REPO }} \
-          check container scan.connect.redhat.com/${{ secrets.REDHAT_MARKETPLACE_LS_OSPID }}/label-studio:${{ steps.version.outputs.image_version }} \
+          check container quay.io/redhat-isv-containers/${{ secrets.REDHAT_MARKETPLACE_LS_PROJECT_ID }}:${{ steps.version.outputs.image_version }} \
           --submit
 
       - name: Create Docker image tag Check

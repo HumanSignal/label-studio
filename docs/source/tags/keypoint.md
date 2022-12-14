@@ -24,8 +24,10 @@ Use with the following data types: image
 | [smartOnly] | <code>boolean</code> |  | Only show smart tool for interactive pre-annotations |
 
 ### Example
+
+Basic keypoint image labeling configuration
+
 ```html
-<!--Basic keypoint image labeling configuration-->
 <View>
   <KeyPoint name="kp-1" toName="img-1" />
   <Image name="img-1" value="$img" />
