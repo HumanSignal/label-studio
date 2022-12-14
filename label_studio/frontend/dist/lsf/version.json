@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3904: Allow to clear DateTime",
-  "commit": "17eb6a397a99cfd81ef43909b6fff479a1167387",
-  "branch": "master",
-  "date": "2022/12/14 10:24:20"
+  "message": "fix: DEV-4043: A3 channel data support",
+  "commit": "43adf02f98582748c4c56524f545f5856df81314",
+  "branch": "fb-dev-4043/a3-channel-data-support",
+  "date": "2022/12/14 13:22:27"
 }
