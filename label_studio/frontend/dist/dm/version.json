@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3958: Remove WASD",
-  "commit": "0f5fbfff2698593e8d341316d1e0869386fb7c2e",
-  "branch": "master",
-  "date": "2022/12/07 20:14:23"
+  "message": "fix: DEV-3734: Hide task counter with ff on",
+  "commit": "69554f43920d592fe398fb37347ae9ba48be6ed1",
+  "branch": "fb-dev-3734/counter-for-manual",
+  "date": "2022/12/14 13:37:44"
 }
