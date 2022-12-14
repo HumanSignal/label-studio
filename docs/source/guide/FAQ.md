@@ -22,7 +22,7 @@ After starting Label Studio and opening a project, you see a blank page. Several
 
 If you specify a host without a protocol such as `http://` or `https://` when starting Label Studio, Label Studio can fail to locate the correct files to load the project page. 
 
-To resolve this issue, update the host specified as an environment variable or when starting Label Studio. See [Start Label Studio](start.html)
+To resolve this issue, update the host specified as an environment variable or when starting Label Studio. See [Start Label Studio](start.html).
 
 
 ## Slowness while labeling

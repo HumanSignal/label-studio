@@ -4,7 +4,7 @@ short: Import data
 type: guide
 tier: all
 order: 120
-order_enterprise: 105
+order_enterprise: 
 meta_title: Import Data into Label Studio
 meta_description: Label and annotate data for your machine learning and data science projects using common file formats or the Label Studio JSON format.
 section: "Import and Export"
@@ -488,7 +488,8 @@ To import data from the Label Studio UI, do the following:
 2. Click **Import** to open the Import dialog.
 3. Import your data from files or URLs. 
 
-Data that you import is project-specific.
+!!! note 
+    The data that you import is project-specific.
 
 <img src="/images/screens/import-button.png" class="img-template-example" title="Import Button in Data Manager" /> 
 

@@ -23,7 +23,7 @@ Role-based access control, organizations, and workspaces are available only in L
 
 There are five roles available in Label Studio Enterprise Edition. Organization members have different levels of access to projects and workspaces. Every member can label tasks.
 
-<i> Table 1: Roles in Label Studio Enterprise</i>
+<i> Table 1: Roles in Label Studio Enterprise.</i>
 
 | Role | Description |
 | --- | --- |
@@ -49,7 +49,7 @@ A Label Studio administrator sees all projects and workspaces that exist in the 
 
 ## Permissions in Label Studio Enterprise 
 
-<i>Table 3: Permissions in Label Studio Enterprise </i>
+<i>Table 2: Permissions in Label Studio Enterprise. </i>
 
 <table>
   <tr>
@@ -348,7 +348,7 @@ Each user has a personal Sandbox workspace that they can use to experiment with 
 
 ### More menu to Pin or Unpin and Duplicate projects
 
-Use the more menu (three dots (**...**) located in the bottom-right of each project card) to explore the following features: 
+Use the more menu (three dots (**...**)) located in the bottom-right of each project card) to explore the following features: 
 
 #### Pin or Unpin projects
 
@@ -385,7 +385,7 @@ As an **Annotator** in Label Studio UI, you can do the following:
 - View projects that have been pinned by people with permissions.
 - Cannot manage pinning or unpinning projects.
 - Filter projects.
-- See when there are no pinned projects
+- See when there are no pinned projects.
 - Support copy is not available because permissions are not granted to perform those actions.
 
 
@@ -401,7 +401,7 @@ To pin or unpin projects:
 3. Click **Pin project** to pin your projects. 
     <br>
     <div style="margin:auto; text-align:center;"><img src="/images/pin-project.png" style="opacity: 0.8"/></div>
-  <i>Figure 9: Pin projects.</i>
+   <i>Figure 9: Pin projects.</i>
 
 !!! note
     - When you pin a project, a message (for example, `New Project was pinned`) is displayed at the bottom of the page to confirm that your project is pinned.
@@ -483,4 +483,4 @@ To delete a workspace, do the following:
 
   <br>
   <div style="margin:auto; text-align:center;"><img src="/images/delete-workspace.png" style="opacity: 0.8"/></div>
-  <i>Figure 10: Delete a workspace.</i>
+  <i>Figure 20: Delete a workspace.</i>

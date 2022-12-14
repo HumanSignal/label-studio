@@ -216,16 +216,18 @@ Label Studio is available as a Community edition open source data labeling tool.
 
 Start and finish a labeling project with Label Studio by following these steps:
 
-1. [Install Label Studio](install.html).
-2. [Start Label Studio](start.html).
-3. [Create accounts for Label Studio](signup.html). Create an account to manage and set up labeling projects.
-<div class="enterprise-only"> 4. [Restrict access to the project](manage_users.html). Set up role-based access control. Only available in Label Studio Enterprise Edition. </div>
-5. [Set up the labeling project](setup_project.html). Define the type of labeling to perform on the dataset and configure project settings.
-6. [Set up the labeling interface](setup.html). Add the labels that you want annotators to apply and customize the labeling interface. 
-7. [Import data as labeling tasks](tasks.html).
-8. [Label and annotate the data](labeling.html). 
-<div class="enterprise-only"> 9. [Review the annotated tasks](quality.html). Only available in Label Studio Enterprise Edition.</div>
-10. [Export the labeled data or the annotations](export.html).
+<ol>
+  <li><a href="install.html">Install Label Studio</a>.</li>
+  <li><a href="start.html">Start Label Studio</a>.</li>
+  <li><a href="signup.html">Create accounts for Label Studio</a>.</li>
+  <li class="enterprise-only"><a href="manage_users.html">Restrict access to the project. Set up role-based access control. Only available in Label Studio Enterprise Edition</a>.</li>
+  <li><a href="setup_project.html">Set up the labeling project. Define the type of labeling to perform on the dataset and configure project setting </a>.</li>
+  <li><a href="setup.html">Set up the labeling interface. Add the labels that you want annotators to apply and customize the labeling interface</a>.</li>
+  <li><a href="tasks.html">Import data as labeling tasks</a>.</li>
+  <li><a href="labeling.html">Label and annotate the data</a>.</li>
+  <li><a href="quality.html">Review the annotated tasks. Only available in Label Studio Enterprise Edition</a>.</li>
+  <li class="enterprise-only"><a href="export.html">Export the labeled data or the annotations</a>.</li>
+</ol>
 
 
 ## Quick start
