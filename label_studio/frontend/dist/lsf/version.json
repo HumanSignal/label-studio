@@ -1,6 +1,6 @@
 {
   "message": "updating to rebuild ls release",
-  "commit": "0bb3df16356b215ab78d9391802281f32ebc824e",
-  "branch": "fb-dev-2715-ls-release-170",
-  "date": "2022/12/14 16:13:26"
+  "commit": "67470cb93741c640a79bab2e6ca1366a5f10d2f7",
+  "branch": "ls-release/1.7.0",
+  "date": "2022/12/14 16:40:12"
 }
