@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3719: Pan wasn't working in images from history (#1066)\n\n* fix: DEV-3719: Pan wasn't working in images from history\r\n\r\n* simplify validation",
-  "commit": "10a111b3cae4ebc3496ef39a66cde15d3858e6ea",
-  "branch": "master",
-  "date": "2022-12-12T13:47:58Z"
+  "message": "fix follow merge of Audio v3 release",
+  "commit": "97de037a6de9306e6d5e009e137b5d3bb77c2ea1",
+  "branch": "ls-release/1.7.0",
+  "date": "2022/12/14 10:52:38"
 }
