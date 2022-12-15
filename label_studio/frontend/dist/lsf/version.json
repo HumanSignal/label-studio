@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3719: Pan wasn't working in images from history (#1066)\n\n* fix: DEV-3719: Pan wasn't working in images from history\r\n\r\n* simplify validation",
-  "commit": "10a111b3cae4ebc3496ef39a66cde15d3858e6ea",
+  "message": "fix: DEV-4043: A3 channel data support (#1110)\n\n* Fix e2e\r\n\r\n* Restore channels functionality for Audio v1/2\r\n\r\n* Keep channel data in Audio v3",
+  "commit": "cbd030e1a007c93ac74d0bcb3ba5cf07651148b1",
   "branch": "master",
-  "date": "2022-12-12T13:47:58Z"
+  "date": "2022-12-14T14:44:33Z"
 }
