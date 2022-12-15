@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3917: Reinit history after draft applied (#135)",
-  "commit": "a78c365a6580413e15cf0c194e1513d1ee0d6976",
-  "branch": "fb-dev-3917-release",
-  "date": "2022/12/13 11:58:13"
+  "commit": "7318de4131ccdc4c92bea8f521467c33f7c63c8e",
+  "branch": "ls-release/1.7.0",
+  "date": "2022/12/15 08:30:09"
 }
