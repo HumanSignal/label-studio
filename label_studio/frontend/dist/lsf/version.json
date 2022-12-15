@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-4043: A3 channel data support (#1110)\n\n* Fix e2e\r\n\r\n* Restore channels functionality for Audio v1/2\r\n\r\n* Keep channel data in Audio v3",
-  "commit": "cbd030e1a007c93ac74d0bcb3ba5cf07651148b1",
+  "message": "fix: DEV-3664: Grouping modes are not persistent in Outliner when switching between tasks in Quick View",
+  "commit": "a29a31f1803824803fa4e824ea99c643ff727b1a",
   "branch": "master",
-  "date": "2022-12-14T14:44:33Z"
+  "date": "2022/12/15 07:52:48"
 }
