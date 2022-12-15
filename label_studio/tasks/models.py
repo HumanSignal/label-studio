@@ -30,6 +30,7 @@ from core.utils.common import find_first_one_to_one_related_field_by_prefix, str
 from core.utils.params import get_env
 from core.label_config import SINGLE_VALUED_TAGS
 from core.current_request import get_current_request
+from tasks.choices import ActionType
 from data_manager.managers import PreparedTaskManager, TaskManager
 from core.bulk_update_utils import bulk_update
 from data_import.models import FileUpload
@@ -351,7 +352,7 @@ with tt as (
 AnnotationMixin = load_func(settings.ANNOTATION_MIXIN)
 
 
-class Annotation(AnnotationMixin, models.Model):
+class Annotation(models.Model):
     """ Annotations & Labeling results
     """
     objects = AnnotationManager()
@@ -386,6 +387,22 @@ class Annotation(AnnotationMixin, models.Model):
                                           related_name='child_annotations',
                                           null=True,
                                           help_text='Points to the parent annotation from which this annotation was created')
+    last_action = models.CharField(
+        _('last action'),
+        max_length=128,
+        choices=ActionType.choices,
+        help_text='Action which was performed in the last annotation history item',
+        default=None,
+        null=True,
+    )
+    last_created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        verbose_name=_('last created by'),
+        help_text='User who created the last annotation history item',
+        default=None,
+        null=True
+    )
 
     class Meta:
         db_table = 'task_completion'
@@ -397,6 +414,8 @@ class Annotation(AnnotationMixin, models.Model):
             models.Index(fields=['was_cancelled']),
             models.Index(fields=['ground_truth']),
             models.Index(fields=['created_at']),
+            models.Index(fields=['last_action']),
+            models.Index(fields=['last_created_by']),
         ] + AnnotationMixin.Meta.indexes
 
     def created_ago(self):
