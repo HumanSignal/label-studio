@@ -1,6 +1,6 @@
 {
-  "message": "updating to rebuild ls release",
-  "commit": "67470cb93741c640a79bab2e6ca1366a5f10d2f7",
+  "message": "fix: DEV-3917: Revert #1043 (#1088)",
+  "commit": "63855c94bb9df6529781ee84254dad825f3f3db6",
   "branch": "ls-release/1.7.0",
-  "date": "2022/12/14 16:40:12"
+  "date": "2022/12/15 08:30:21"
 }
