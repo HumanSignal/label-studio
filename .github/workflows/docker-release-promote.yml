@@ -40,7 +40,7 @@ jobs:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
             const {repo, owner} = context.repo;
-            const checks = await github.paginate(
+            const check_runs = await github.paginate(
               github.rest.checks.listForRef,
               {
                 owner,
@@ -51,7 +51,7 @@ jobs:
               },
               (response) => response.data
             );
-            const check = checks.check_runs.find(e => e.name === '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}')
+            const check = check_runs.find(e => e.name === '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}')
             const details = JSON.parse(check.output.summary)
             console.log(details)
             core.setOutput("image_version", details.image_version);
