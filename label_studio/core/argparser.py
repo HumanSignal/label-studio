@@ -146,6 +146,10 @@ def parse_input_args(input_args):
         default=default_params
     )
 
+    annotation_fill_updated_by = subparsers.add_parser(
+        'annotations_fill_updated_by', help='Fill the updated_by field for Annotations', parents=[root_parser]
+    )
+
     args = parser.parse_args(input_args)
 
     if not hasattr(args, 'label_config'):

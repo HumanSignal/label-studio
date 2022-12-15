@@ -27,10 +27,14 @@ The organization owner for Label Studio Enterprise can set up SSO & SAML for the
 - Microsoft Active Directory
 - [Okta](https://www.youtube.com/watch?v=Dr-_hyWIw4M)
 - OneLogin
-- [Ping Federate & Ping Identity & PingOne](pingone.html)
-- others that use SAML assertions
+- [Ping Federate and Ping Identity SAML SSO Setup Example](pingone.html)
+- Others that use SAML assertions
 
-After you set up SSO, you can no longer use native authentication to access the Label Studio UI unless you have the Owner role.
+After setting up the SSO, you can use native authentication to access the Label Studio UI, however it's not a recommended option especially for the user with the Owner role.
+
+- You can use SSO along with normal login. This is not a recommended option.
+
+- You can prevent a user from creating his own organization by using [DISABLE_SIGNUP_WITHOUT_LINK](signup.html#Restrict-signup-for-local-deployments) option.
 
 ### Connect your Identity Provider to Label Studio Enterprise
 

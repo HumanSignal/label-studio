@@ -289,6 +289,8 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         # save user history with annotator_id, time & annotation result
         annotation_id = self.kwargs['pk']
         annotation = get_object_with_check_and_log(request, Annotation, pk=annotation_id)
+        annotation.updated_by = request.user
+        annotation.save(update_fields=['updated_by'])
 
         task = annotation.task
         if self.request.data.get('ground_truth'):
@@ -404,6 +406,7 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
             # serialize annotation
             extra_args.update({
                 'prediction': prediction_ser,
+                'updated_by': user
             })
 
         if 'was_cancelled' in self.request.GET:

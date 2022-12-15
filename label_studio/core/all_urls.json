@@ -261,6 +261,12 @@
     "decorators": ""
   },
   {
+     "url": "/storage-data/uploaded/",
+     "module": "data_import.api.DownloadStorageData",
+     "name": "data_import:storage-data-upload",
+     "decorators": ""
+  },
+  {
     "url": "/api/dm/views/",
     "module": "data_manager.api.ViewAPI",
     "name": "data_manager:api:view-list",
