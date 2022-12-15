@@ -25,7 +25,7 @@ The organization owner for Label Studio Enterprise can set up SSO & SAML for the
 - [Ping Federate and Ping Identity SAML SSO Setup Example](pingone.html)
 - Others that use SAML assertions
 
-After setting up the SSO, you can no longer use native authentication to access the Label Studio UI unless you have the Owner role.
+After setting up the SSO, you can use native authentication to access the Label Studio UI, however it's not a recommended option especially for the user with the Owner role.
 
 - You can use SSO along with normal login. This is not a recommended option.
 
