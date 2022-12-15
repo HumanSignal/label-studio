@@ -1,0 +1,27 @@
+---
+test_name: tasks_download_storage
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- name: without auth
+  request:
+    method: GET
+    url: '{django_live_url}/storage-data/uploaded/'
+  response:
+    status_code: 401
+- id: signup
+  type: ref
+- name: empty filepath
+  request:
+    method: GET
+    url: '{django_live_url}/storage-data/uploaded/'
+  response:
+    status_code: 404
+- name: access denied
+  request:
+    method: GET
+    url: '{django_live_url}/storage-data/uploaded/?filepath=test'
+  response:
+    status_code: 403

@@ -475,6 +475,10 @@ class DownloadStorageData(APIView):
         """ Get export files list
         """
         request = self.request
+        filepath = request.GET.get('filepath')
+        if filepath is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
         filepath = unquote(request.GET['filepath'])
 
         url = None
