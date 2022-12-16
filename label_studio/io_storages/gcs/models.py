@@ -45,7 +45,7 @@ class GCSStorageMixin(models.Model):
         _('google_application_credentials'), null=True, blank=True,
         help_text='The content of GOOGLE_APPLICATION_CREDENTIALS json file')
     google_project_id = models.TextField(
-        _('project ID'), null=True, blank=True,
+        _('Google Project ID'), null=True, blank=True,
         help_text='Google project ID')
 
     def get_client(self, raise_on_error=False):
