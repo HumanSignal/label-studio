@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into fb-dev-4008/quick-task-select",
-  "commit": "6beb1202e57713bec4787cc44dd29b854e9a3cab",
+  "message": "feat: DEV-4008: Allow quickly select tasks using hotkeys",
+  "commit": "ce0983f3f46fb7e398b60c6de95effbc2df66a10",
   "branch": "fb-dev-4008/quick-task-select",
-  "date": "2022-12-14T19:06:21Z"
+  "date": "2022/12/16 10:03:40"
 }
