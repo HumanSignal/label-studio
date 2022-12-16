@@ -29,7 +29,12 @@ export const MachineLearningSettings = () => {
   const [modelsPrecisions, setModelsPrecisions] = useState([]);
   const [fetchedPrecisions, setFetchPrecisions] = useState(false);
   const webhook_url = getWebhookUrl();
+  const [generateSpecs, setGenerateSpecs] = useState(true);
 
+  const handleChange = event => {
+    setGenerateSpecs(!event.target.checked);
+  };
+  
   const mod = useCallback(async () => {
     await axios
       .get(webhook_url + '/get_available_models?id=' + project.id)
@@ -295,6 +300,14 @@ export const MachineLearningSettings = () => {
             />
           </div>
         </Form.Row>
+        <label>
+      <input
+        type="checkbox"
+        checked={!generateSpecs}
+        onChange={handleChange}
+      />
+      Don't generate new specs for training
+    </label>
         <Button style={{ marginTop: 20 }} onClick={() => trainModel()}>Train New Model</Button>
         {/* <Button style={{marginLeft: 20}} onClick={() => onExportModel()}>
         Export Model
