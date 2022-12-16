@@ -830,7 +830,12 @@ If annotators can't see predictions or if you encounter unexpected behavior afte
 In the **Settings > Machine Learning** section for your project, make sure that the following settings are configured:
 - Enable **Show predictions to annotators in the Label Stream and Quick View**
 - Select the relevant **Model Version** in the drop-down. If there is no drop-down menu visible, there might not be a model version listed for the pre-annotations, or there might be another issue happening. 
-- <div class="enterprise-only"> Disable the option to <b>Reveal pre-annotations interactively</b>, which requires manual action from annotators to display pre-annotated regions.</div>
+
+<div class="enterprise-only">
+
+- Disable the option to <b>Reveal pre-annotations interactively</b>, which requires manual action from annotators to display pre-annotated regions.
+
+</div>
 
 ### Check the configuration values of your labeling configuration and tasks
 The `from_name` of the pre-annotation task JSON must match the value of the name in the `<Labels name="label" toName="text">` portion of the labeling configuration. The `to_name` must match the `toName` value. 
