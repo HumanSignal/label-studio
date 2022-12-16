@@ -207,7 +207,7 @@ def add_user_filter(enabled, key, _filter, filter_expressions):
         value = cast_bool_from_str(_filter.value)
         filter_expressions.append(Q(**{key+'__isnull': value}))
         return 'continue'
-
+ 
 
 def apply_filters(queryset, filters, project, request):
     if not filters:
