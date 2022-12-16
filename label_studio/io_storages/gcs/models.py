@@ -44,6 +44,9 @@ class GCSStorageMixin(models.Model):
     google_application_credentials = models.TextField(
         _('google_application_credentials'), null=True, blank=True,
         help_text='The content of GOOGLE_APPLICATION_CREDENTIALS json file')
+    google_project_id = models.TextField(
+        _('project ID'), null=True, blank=True,
+        help_text='Google project ID')
 
     def get_client(self, raise_on_error=False):
         credentials = None
@@ -64,6 +67,10 @@ class GCSStorageMixin(models.Model):
                 logger.error(f"Can't create GCS credentials", exc_info=True)
                 credentials = None
                 project_id = _marker
+
+        if self.google_project_id:
+            # User-defined project ID should override anything that comes from Service Account / environmental vars
+            project_id = self.google_project_id
 
         client = google_storage.Client(project=project_id, credentials=credentials)
         if credentials is not None:
