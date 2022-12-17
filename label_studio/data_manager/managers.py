@@ -164,11 +164,13 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
     from django.db.models.expressions import RawSQL
     from tasks.models import Annotation, Prediction
 
-    if field_name == 'annotations_results' and len(filter_expressions) == 0:
-        subquery = Exists(
-            _class.objects
+    flag = flag_set('ff_back_dev_3865_filters_anno_171222_short', project.organization.created_by)
+    if field_name == 'annotations_results' and flag:
+        subquery = Q(id__in=
+            Annotation.objects
                 .annotate(json_str=RawSQL('cast(result as text)', ''))
                 .filter(Q(project=project) & Q(json_str__contains=_filter.value))
+                .values_list('task', flat=True)
         )
     else:
         _class = Annotation if field_name == 'annotations_results' else Prediction
@@ -207,7 +209,7 @@ def add_user_filter(enabled, key, _filter, filter_expressions):
         value = cast_bool_from_str(_filter.value)
         filter_expressions.append(Q(**{key+'__isnull': value}))
         return 'continue'
- 
+
 
 def apply_filters(queryset, filters, project, request):
     if not filters:
