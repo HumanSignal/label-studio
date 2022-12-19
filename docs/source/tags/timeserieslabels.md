@@ -6,9 +6,9 @@ meta_title: Time Series Label Tag for Labeling Time Series Data
 meta_description: Customize Label Studio for with the TimeSeriesLabel tag to label time series data for machine learning and data science projects.
 ---
 
-Use the TimeSeriesLabels tag to create a labeled time range.
+Use the `TimeSeriesLabels` tag to create a labeled time range.
 
-Use with the following data types: time series
+Use with the following data types: time series.
 
 ### Parameters
 
@@ -26,7 +26,7 @@ Use with the following data types: time series
 
 ### Example
 
-Basic labeling configuration to apply labels to identified regions of a time series with one channel
+Basic labeling configuration to apply labels to identified regions of a time series with one channel.
 
 ```html
 <View>

@@ -6,9 +6,9 @@ meta_title: Image Tags for Images
 meta_description: Customize Label Studio with the Image tag to annotate images for computer vision machine learning and data science projects.
 ---
 
-The Image tag shows an image on the page. Use for all image annotation tasks to display an image on the labeling interface.
+The `Image` tag shows an image on the page. Use for all image annotation tasks to display an image on the labeling interface.
 
-Use with the following data types: images
+Use with the following data types: images.
 
 When you annotate image regions with this tag, the annotations are saved as percentages of the original size of the image, from 0-100.
 
@@ -38,7 +38,7 @@ When you annotate image regions with this tag, the annotations are saved as perc
 
 ### Example
 
-Labeling configuration to display an image on the labeling interface
+Labeling configuration to display an image on the labeling interface.
 
 ```html
 <View>

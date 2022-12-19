@@ -6,9 +6,9 @@ meta_title: Keypoint Label Tag for Labeling Keypoints
 meta_description: Customize Label Studio with the KeyPointLabels tag to label keypoints for computer vision machine learning and data science projects.
 ---
 
-The KeyPointLabels tag creates labeled keypoints. Use to apply labels to identified key points, such as identifying facial features for a facial recognition labeling project.
+The `KeyPointLabels` tag creates labeled keypoints. Use to apply labels to identified key points, such as identifying facial features for a facial recognition labeling project.
 
-Use with the following data types: image
+Use with the following data types: image.
 
 ### Parameters
 

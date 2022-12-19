@@ -29,7 +29,7 @@ For example, if you want to apply labels to text for a named entity recognition 
   <Text name="txt" value="$value"></Text>
 </View>
 ```
-In this example, the Label tags are used with the Text tag to label text. You can combine multiple control and object tags in the same configuration and use names to connect them.
+In this example, the `Label` tags are used with the `Text` tag to label text. You can combine multiple control and object tags in the same configuration and use names to connect them.
 
 ### Variables
 

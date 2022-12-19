@@ -6,9 +6,9 @@ meta_title: Number Tag to Numerically Classify
 meta_description: Customize Label Studio with the Number tag to numerically classify tasks in your machine learning and data science projects.
 ---
 
-The Number tag supports numeric classification. Use to classify tasks using numbers.
+The `Number` tag supports numeric classification. Use to classify tasks using numbers.
 
-Use with the following data types: audio, image, HTML, paragraphs, text, time series, video
+Use with the following data types: audio, image, HTML, paragraphs, text, time series, video.
 
 ### Parameters
 
@@ -28,7 +28,7 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 
 ### Example
 
-Basic labeling configuration for numeric classification of text
+Basic labeling configuration for numeric classification of text.
 
 ```html
 <View>

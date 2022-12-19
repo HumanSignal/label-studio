@@ -6,7 +6,7 @@ meta_title: Relation Tag for a Single Relation
 meta_description: Customize Label Studio by using the Relation tag to add a single consistent label to relations between regions in machine learning and data science projects.
 ---
 
-The Relation tag represents a single relation label. Use with the Relations tag to specify the value of a label to apply to a relation between regions.
+The `Relation` tag represents a single relation label. Use with the Relations tag to specify the value of a label to apply to a relation between regions.
 
 ### Parameters
 
@@ -17,7 +17,7 @@ The Relation tag represents a single relation label. Use with the Relations tag 
 
 ### Example
 
-Basic labeling configuration to apply the label "similar" to a relation identified between two labeled regions of text
+Basic labeling configuration to apply the label "similar" to a relation identified between two labeled regions of text.
 
 ```html
 <View>

@@ -7,9 +7,9 @@ meta_description: Customize Label Studio to label audio data for machine learnin
 tier: all
 ---
 
-The Audio tag plays a simple audio file. Use this tag for basic audio annotation tasks such as classification or transcription.
+The `Audio` tag plays a simple audio file. Use this tag for basic audio annotation tasks such as classification or transcription.
 
-Use with the following data types: audio
+Use with the following data types: audio.
 
 ### Parameters
 
@@ -44,7 +44,7 @@ Use with the following data types: audio
 
 ### Example
 
-Play audio on the labeling interface
+Play audio on the labeling interface.
 
 ```html
 <View>
@@ -53,7 +53,7 @@ Play audio on the labeling interface
 ```
 ### Example
 
-Audio classification
+Audio classification.
 
 ```html
 <View>
@@ -66,7 +66,7 @@ Audio classification
 ```
 ### Example
 
-Audio transcription
+Audio transcription.
 
 ```html
 <View>

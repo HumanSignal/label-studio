@@ -4,9 +4,9 @@ type: tags
 order: 405
 ---
 
-The DateTime tag adds date and time selection to the labeling interface. Use this tag to add a date, timestamp, month, or year to an annotation.
+The `DateTime` tag adds date and time selection to the labeling interface. Use this tag to add a date, timestamp, month, or year to an annotation.
 
-Use with the following data types: audio, image, HTML, paragraph, text, time series, video
+Use with the following data types: audio, image, HTML, paragraph, text, time series, video.
 
 ### Parameters
 

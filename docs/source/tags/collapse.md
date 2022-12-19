@@ -5,7 +5,7 @@ order: 501
 is_new: t
 ---
 
-Collapse tag, a content area which can be collapsed and expanded.
+The `Collapse` tag, a content area which can be collapsed and expanded.
 
 ### Parameters
 
@@ -15,6 +15,7 @@ Collapse tag, a content area which can be collapsed and expanded.
 | [bordered] | <code>string</code> | <code>false</code> | Shows border |
 
 ### Example
+
 ```html
 <Collapse>
   <Panel value="Panel Header">

@@ -6,7 +6,7 @@ meta_title: View Tag for Defining How Blocks are Displayed
 meta_description: Customize how blocks are displayed on the labeling interface in Label Studio for machine learning and data science projects.
 ---
 
-Use the View element to configure the display of blocks, similar to the div tag in HTML.
+Use the `View` element to configure the display of blocks, similar to the div tag in HTML.
 
 ### Parameters
 
@@ -22,7 +22,7 @@ Use the View element to configure the display of blocks, similar to the div tag 
 
 ### Example
 
-Create two cards that flex to take up 50% of the screen width on the labeling interface
+Create two cards that flex to take up 50% of the screen width on the labeling interface.
 
 ```html
 <View style="display: flex;">
