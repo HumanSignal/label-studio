@@ -146,7 +146,7 @@ jobs:
     if: needs.changed_files.outputs.src == 'true'
     uses: heartexlabs/label-studio/.github/workflows/tests.yml@develop
     with:
-      ref: ${{ github.event.pull_request.head.ref || github.ref }}
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
 
   migrations:
     name: "Tests"
