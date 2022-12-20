@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3734: Hide task counter with ff on",
-  "commit": "21ed7052518f2aba802d5c5985bdba9677dea1e3",
-  "branch": "fb-dev-3734/counter-for-manual",
-  "date": "2022/12/19 22:01:27"
+  "commit": "dad2129512daf57155b215b57c542b0486d3167c",
+  "branch": "master",
+  "date": "2022/12/20 00:24:07"
 }
