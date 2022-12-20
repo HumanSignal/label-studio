@@ -153,11 +153,10 @@ jobs:
     needs:
       - changed_files
     if: needs.changed_files.outputs.src == 'true'
-    uses: nikitabelonogov/label-studio/.github/workflows/test_migrations.yml@develop
+    uses: heartexlabs/label-studio/.github/workflows/test_migrations.yml@develop
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
     secrets: inherit
-
 
   draft-release:
     name: "Draft Release"

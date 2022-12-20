@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3734: Add interface to show task counter (#1105)",
-  "commit": "62745827c1cc9e0ab5457b89c180d2c52354f856",
-  "branch": "master",
-  "date": "2022-12-20T00:24:02Z"
+  "message": "Merge branch 'master' into fb-dev-3941",
+  "commit": "b25a361fd300f31017f05b45897d7a50503b0fa1",
+  "branch": "fb-dev-3941",
+  "date": "2022-12-20T14:11:03Z"
 }
