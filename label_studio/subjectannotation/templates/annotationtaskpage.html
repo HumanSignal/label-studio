@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load filters %}
+
+{% block content %}
+<head>
+    <title>Subject annotation task creation </title>
+</head>
+<body>
+    <div class="forms">
+        <h2>Create subject annotation task</h2>
+        <form enctype="multipart/form-data" action="/subjectannotation/create/" method="post">
+            {{ deploymentselectform }}
+            <input type="submit" value="Create annotation task">
+        </form>
+
+    </div>
+</body>
+
+
+{% endblock %}

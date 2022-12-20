@@ -205,6 +205,7 @@ INSTALLED_APPS = [
     'webhooks',
     'labels_manager',
     'sensormodel',
+    'subjectannotation'
 ]
 
 MIDDLEWARE = [

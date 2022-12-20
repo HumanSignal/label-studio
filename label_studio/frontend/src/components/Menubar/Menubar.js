@@ -200,11 +200,18 @@ export const Menubar = ({
                   exact
                 />
                 <Menu.Item
-                label="SensorModel"
-                to="/sensormodel/"
-                icon={<IconBook/>}
-                data-external
-                exact
+                  label="Sensor Model"
+                  to="/sensormodel/"
+                  icon={<IconBook/>}
+                  data-external
+                  exact
+                />
+                <Menu.Item
+                  label="Subject Annotation"
+                  to="/subjectannotation/"
+                  icon={<IconBook/>}
+                  data-external
+                  exact
                 />
 
                 <Menu.Spacer/>

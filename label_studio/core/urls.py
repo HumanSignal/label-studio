@@ -89,6 +89,7 @@ urlpatterns = [
     re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
     path('sensormodel/', include('sensormodel.urls')),
+    path('subjectannotation/', include('subjectannotation.urls')),
 ]
 
 if settings.DEBUG:
