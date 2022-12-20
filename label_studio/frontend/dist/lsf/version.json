@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into fb-dev-3941",
-  "commit": "b25a361fd300f31017f05b45897d7a50503b0fa1",
+  "message": "fix: DEV-3941: Enable adjusting player head position using TimeBox",
+  "commit": "9b95523044438d452eada1e23b44a962cc022b1d",
   "branch": "fb-dev-3941",
-  "date": "2022-12-20T14:11:03Z"
+  "date": "2022/12/20 15:15:40"
 }
