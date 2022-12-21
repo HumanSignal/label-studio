@@ -110,3 +110,24 @@ def test_parse_all_configs():
             assert parse_config(config)
             assert parse_config_to_json(config)
             validate_label_config(config)
+
+@pytest.mark.django_db
+def test_parse_wrong_xml(business_client, project_id):
+    # Change label config to Repeater
+    payload = {
+        'label_config': '<View> <Repeater on="$images" indexFlag="{{idx}}"> <Image name="page_{{idx}}" value="$images" maxWidth="100%"/>     <Header value="Utterance Review"/>     <RectangleLabels name="labels_{{idx}}" toName="page_{{idx}}">       <Label value="Header" hotkey="1"/> <Label value="Body" hotkey="2"/> <Label value="Footer" hotkey="3"/> </RectangleLabels> </Repeater> </View>'}
+    response = business_client.patch(
+        f"/api/projects/{project_id}",
+        data=json.dumps(payload),
+        content_type="application/json",
+    )
+    assert response.status_code == 200
+    # Change label config to worng XML
+    payload = {
+        'label_config': '1<View> <Repeater on="$images" indexFlag="{{idx}}"> <Image name="page_{{idx}}" value="$images" maxWidth="100%"/>     <Header value="Utterance Review"/>     <RectangleLabels name="labels_{{idx}}" toName="page_{{idx}}"> <Label value="Body" hotkey="2"/> <Label value="Footer" hotkey="3"/> </RectangleLabels> </Repeater> </View>'}
+    response = business_client.post(
+        f"/api/projects/{project_id}/validate",
+        data=json.dumps(payload),
+        content_type="application/json",
+    )
+    assert response.status_code == 400
