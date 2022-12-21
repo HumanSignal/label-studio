@@ -192,7 +192,11 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             kwargs = {'all_fields': True}
         project = self.request.query_params.get('project') or self.request.data.get('project')
         if not project:
-            project = Task.objects.get(id=self.request.parser_context['kwargs'].get('pk')).project.id
+            try:
+                task = Task.objects.get(id=self.request.parser_context['kwargs'].get('pk'))
+            except Task.DoesNotExist:
+                return Task.objects.filter(id=self.request.parser_context['kwargs'].get('pk'))
+            project = task.project.id
         return self.prefetch(
             Task.prepared.get_queryset(
                 prepare_params=PrepareParams(project=project, selectedItems=selected, request=self.request),
