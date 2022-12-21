@@ -176,13 +176,24 @@ jobs:
         env:
           TARGET_COMMITISH: "${{ github.ref_name }}"
           RELEASE_BRANCH_PREFIX: "${{ env.RELEASE_BRANCH_PREFIX }}"
+          DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"
         with:
           script: |
             const { repo, owner } = context.repo;
             const target_commitish = process.env.TARGET_COMMITISH;
+            const default_branch = process.env.DEFAULT_BRANCH;
             let version = target_commitish.replace(process.env.RELEASE_BRANCH_PREFIX, '')
-            core.setOutput("rc-version", `${version}rc${{ github.run_id }}`);
             const regexp = '^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)(\.post([0-9]+))?$';
+
+            const {data: compare} = await github.rest.repos.compareCommits({
+              owner,
+              repo,
+              base: default_branch,
+              head: target_commitish,
+            });
+            const rc_version = `${version}rc${ compare.ahead_by }`
+            console.log(`rc-version: ${rc_version}`)
+            core.setOutput("rc-version", rc_version);
             
             function compareVersions(a, b) {
               if (a[1] === b[1])
