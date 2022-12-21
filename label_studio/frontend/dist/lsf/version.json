@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3901: Paragraph overflow text issue when outliner disabled",
-  "commit": "e6c5505d7304adcbd3619107b3e5787165061959",
+  "message": "fix: DEV-3664: Grouping modes are not persistent in Outliner when switching between tasks in Quick View",
+  "commit": "a29a31f1803824803fa4e824ea99c643ff727b1a",
   "branch": "master",
-  "date": "2022/12/06 12:12:05"
+  "date": "2022/12/15 07:52:48"
 }

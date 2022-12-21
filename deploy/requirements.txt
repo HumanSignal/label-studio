@@ -22,6 +22,7 @@ googleapis-common-protos==1.56.4
 grpc-google-iam-v1==0.12.3
 
 Django==3.2.16
+django-storages==1.12.3
 django_annoying==0.10.6
 django_debug_toolbar==3.2.1
 django_filter==2.4.0
