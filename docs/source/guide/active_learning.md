@@ -67,6 +67,8 @@ If you want, you can set up your project to send a webhook event and use that ev
 
 For more details on the webhook event payloads, see the full [payload details for the annotation webhook](webhook_reference.html#Annotation-Created). 
 
+<div class="enterprise-only">
+
 ## Set up task sampling with prediction scores
 
 In order to maximize the training efficiency and effectiveness of your machine learning model, you want your annotators to focus on labeling the tasks with the least confident, or most uncertain, prediction scores from your model. To do make sure of that, [set up uncertainty task sampling](setup_project.html#Set-up-task-sampling).
@@ -77,6 +79,8 @@ On the project data manager, select **Label All Tasks** to start labeling.
 
 As your model retrains and a new version is updated in Label Studio, the tasks shown next to annotators are always those with the lowest prediction scores, reflecting those with the lowest model certainty. The predictions for the tasks correspond to the latest model version.
 
+</div>
+
 ## Customize your active learning loop
 
 If you want to change the behavior of the active learning loop, you can make manual changes.
@@ -86,6 +90,8 @@ If you want to change the behavior of the active learning loop, you can make man
 - If you want to delete all predictions after your model is retrained, see how to [delete predictions](ml.html#Delete-predictions).
 - If you need to retrieve and save predictions for all tasks, see the recommendations for [retrieving predictions from a model](ml.html#Get-predictions-from-a-model).
 
+<div class="opensource-only">
+
 ### Set up manual active learning 
 
 If you're using Label Studio community edition, data annotators can't experience a live active learning loop. You can mimic an active learning experience by doing the following:
@@ -94,3 +100,5 @@ If you're using Label Studio community edition, data annotators can't experience
 3. Select **Label Tasks As Displayed** when labeling tasks. 
 
 This manual active learning loop does not automatically update the order of tasks presented to annotators as the ML backend trains with each new annotation and produces new predictions. Therefore, instead of on-the-fly automated active learning, you can perform a form of batched active learning, where you perform annotation for a period, stop to train the model, then retrieve new predictions and start annotating tasks again.
+
+</div>
