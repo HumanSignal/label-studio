@@ -136,6 +136,7 @@ def test_config_validation_for_choices_workaround(business_client, project_id):
     )
     assert response.status_code == 200
 
+
 @pytest.mark.django_db
 def test_parse_wrong_xml(business_client, project_id):
     # Change label config to Repeater
