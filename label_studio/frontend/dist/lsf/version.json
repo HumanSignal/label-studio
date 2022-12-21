@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3646: Fix regions copying in the Outliner",
-  "commit": "e30bb72b98572f01a4384772df72530cc6b80268",
+  "commit": "2267fa410db9bb1a927f6ad3533f54f7169834fb",
   "branch": "fb-dev-3646/fix-regions-copying",
-  "date": "2022/12/08 13:52:47"
+  "date": "2022/12/21 16:53:44"
 }
