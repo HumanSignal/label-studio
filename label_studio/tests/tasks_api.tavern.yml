@@ -58,4 +58,4 @@ stages:
     method: GET
     url: '{django_live_url}/api/tasks/{task_pk}{task_pk}'
   response:
-    status_code: 200
+    status_code: 404
