@@ -476,6 +476,13 @@ def annotate_completed_at(queryset):
     )
 
 
+def annotate_last_annotation_at(queryset):
+    from tasks.models import Annotation
+
+    newest = Annotation.objects.filter(task=OuterRef("pk")).order_by("-id")[:1]
+    return queryset.annotate(last_annotation_at=newest.values("created_at"))
+
+
 def annotate_annotations_results(queryset):
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
         return queryset.annotate(annotations_results=Coalesce(
@@ -556,6 +563,7 @@ def dummy(queryset):
 settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     "avg_lead_time": annotate_avg_lead_time,
     "completed_at": annotate_completed_at,
+    'last_annotation_at': annotate_last_annotation_at,
     "annotations_results": annotate_annotations_results,
     "predictions_results": annotate_predictions_results,
     "predictions_model_versions": annotate_predictions_model_versions,
