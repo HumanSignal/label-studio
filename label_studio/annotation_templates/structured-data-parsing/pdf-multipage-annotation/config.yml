@@ -1,24 +1,33 @@
-title: PDF Classification
+title: Multipage PDF Classification
 type: community
 group: Structured Data Parsing
 image: /static/templates/pdf-classification.png
-details: <h1>Classify PDF documents</h1>
+details: <h1>Classify Multipage PDF documents</h1>
 config: |
   <View>
-    <Header value="Rate this article"/>
-    <Rating name="rating" toName="pdf" maxRating="10" icon="star" size="medium" />
-
-    <Choices name="choices" choice="single-radio" toName="pdf" showInline="true">
-      <Choice value="Important article"/>
-      <Choice value="Yellow press"/>
-    </Choices>
-    <HyperText name="pdf" value="$pdf" inline="true"/>
+    <Repeater on="$pdf" indexFlag="{{idx}}">
+      <View style="display: flex; align-items: center; column-gap: 50px">
+        <HyperText name="page_{{idx}}" value="$pdf[{{idx}}].page" inline="true"/>
+      </View>
+    </Repeater>
   </View>
 
 
   <!-- {
-    "data": {
-      "pdf": "<embed src='/static/samples/sample.pdf' width='100%' height='600px'/>"
-    }
+    "pdf": [
+      {
+        "page": "<embed src='https://htx-pub.s3.amazonaws.com/samples/Data-Report-Martin-Inline-Graphics-R7.pdf#page=1'/>"
+      },    {
+        "page": "<embed src='https://htx-pub.s3.amazonaws.com/samples/Data-Report-Martin-Inline-Graphics-R7.pdf#page=2'/>"
+      },    {
+        "page": "<embed src='https://htx-pub.s3.amazonaws.com/samples/Data-Report-Martin-Inline-Graphics-R7.pdf#page=3'/>"
+      },    {
+        "page": "<embed src='https://htx-pub.s3.amazonaws.com/samples/Data-Report-Martin-Inline-Graphics-R7.pdf#page=4'/>"
+      },    {
+        "page": "<embed src='https://htx-pub.s3.amazonaws.com/samples/Data-Report-Martin-Inline-Graphics-R7.pdf#page=5'/>"
+      },    {
+        "page": "<embed src='https://htx-pub.s3.amazonaws.com/samples/Data-Report-Martin-Inline-Graphics-R7.pdf#page=6'/>"
+      }
+    ]
   } -->
 
