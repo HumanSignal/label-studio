@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3719: Pan wasn't working in images from history (#1066)\n\n* fix: DEV-3719: Pan wasn't working in images from history\r\n\r\n* simplify validation",
-  "commit": "10a111b3cae4ebc3496ef39a66cde15d3858e6ea",
+  "message": "fix: DEV-3664: Grouping modes are not persistent in Outliner when switching between tasks in Quick View",
+  "commit": "a29a31f1803824803fa4e824ea99c643ff727b1a",
   "branch": "master",
-  "date": "2022-12-12T13:47:58Z"
+  "date": "2022/12/15 07:52:48"
 }
