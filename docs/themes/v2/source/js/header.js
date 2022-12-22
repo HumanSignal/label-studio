@@ -32,22 +32,21 @@
 
   window.addEventListener('load', (event) => {
     const searchInput = document.querySelector("#docsearch-input");
+
+    const siteVersion = searchInput.dataset.siteVersion;
+
+    const appId = siteVersion == "enterprise" ? 'M7RXTHKYPM' : "HELLEDAKPT";
+    const apiKey = siteVersion == "enterprise" ? '8ed23cbc92e0806140603fb62236efee' : '1d0410ef855a968fbc40669df1c4a73e'
+    const indexName = siteVersion == "enterprise" ? 'ghaction' : 'labelstud'
     
     if(searchInput) {
-      /* window.docsearch({
-        container: '#docsearch-input',
-        inputSelector: '#docsearch-input',
-        appId: 'HELLEDAKPT',
-        apiKey: '1d0410ef855a968fbc40669df1c4a73e',
-        indexName: 'labelstud', // it does not change
-      }); */
 
       window.docsearch({
         container: '#docsearch-input',
         inputSelector: '#docsearch-input',
-        appId: 'M7RXTHKYPM',
-        apiKey: '8ed23cbc92e0806140603fb62236efee',
-        indexName: 'example', // it does not change
+        appId,
+        apiKey,
+        indexName
       });
     
       const handleFocusSearch = (e) => {
