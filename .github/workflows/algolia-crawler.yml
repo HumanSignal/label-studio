@@ -3,6 +3,8 @@ name: Algolia Indexer
 on:
   push:
     branches: [ 'ht/add-new-theme' ]
+    paths:
+      - 'docs/**'
 
 jobs:
   algolia_indexer:
