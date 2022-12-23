@@ -477,9 +477,6 @@ def annotate_completed_at(queryset):
 
 
 def annotate_last_annotation_at(queryset):
-    from tasks.models import Annotation
-
-    # newest = Annotation.objects.filter(task=OuterRef("pk")).order_by("-id").values('created_at')[0]
     return queryset.annotate(last_annotation_at=Max('annotations__created_at'))
 
 
