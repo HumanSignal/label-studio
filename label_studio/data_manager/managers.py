@@ -8,7 +8,7 @@ import logging
 from pydantic import BaseModel
 
 from django.db import models
-from django.db.models import Aggregate, OuterRef, Subquery, Avg, Q, F, Value, Exists, When, Case
+from django.db.models import Aggregate, OuterRef, Subquery, Avg, Q, F, Value, Exists, When, Case, Max
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from django.db.models.functions import Coalesce
@@ -479,8 +479,8 @@ def annotate_completed_at(queryset):
 def annotate_last_annotation_at(queryset):
     from tasks.models import Annotation
 
-    newest = Annotation.objects.filter(task=OuterRef("pk")).order_by("-id")[:1]
-    return queryset.annotate(last_annotation_at=newest.values("created_at"))
+    # newest = Annotation.objects.filter(task=OuterRef("pk")).order_by("-id").values('created_at')[0]
+    return queryset.annotate(last_annotation_at=Max('annotations__created_at'))
 
 
 def annotate_annotations_results(queryset):

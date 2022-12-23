@@ -179,6 +179,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     predictions_model_versions = serializers.SerializerMethodField(required=False)
     avg_lead_time = serializers.FloatField(required=False)
     updated_by = serializers.SerializerMethodField(required=False, read_only=True)
+    last_annotation_at = serializers.SerializerMethodField(required=False)
 
     CHAR_LIMITS = 500
 
@@ -219,6 +220,9 @@ class DataManagerTaskSerializer(TaskSerializer):
             output = json.dumps(result, ensure_ascii=False)[1:-1]  # remove brackets [ ]
 
         return output[:self.CHAR_LIMITS].replace(',"', ', "').replace('],[', "] [").replace('"', '')
+
+    def get_last_annotation_at(self, task):
+        return task.last_annotation_at
 
     def get_annotations_results(self, task):
         return self._pretty_results(task, 'annotations_results')
