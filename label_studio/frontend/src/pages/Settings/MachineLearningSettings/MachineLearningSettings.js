@@ -18,6 +18,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios'
 import Swal from 'sweetalert'
 import getWebhookUrl from '../../../webhooks';
+
 export const MachineLearningSettings = () => {
   const api = useAPI();
   const { project, fetchProject } = useContext(ProjectContext);
@@ -34,7 +35,7 @@ export const MachineLearningSettings = () => {
   const handleChange = event => {
     setGenerateSpecs(!event.target.checked);
   };
-  
+
   const mod = useCallback(async () => {
     await axios
       .get(webhook_url + '/get_available_models?id=' + project.id)
@@ -61,10 +62,10 @@ export const MachineLearningSettings = () => {
       });
     await axios.get(webhook_url+ '/get_available_model_versions?id=' + project.id)
       .then((response) => {
-        console.log(response)
+        console.log("model versions")
+        console.log(response.data.model_versions)
         setModelToPredictOn(response.data.current_model_version)
         setAvailableModels(response.data.model_versions)
-        const current_model_version = []
     })
   });
   const saveInferencePath = useCallback(async () => {
@@ -106,9 +107,9 @@ export const MachineLearningSettings = () => {
     if (models) setBackends(models);
   }, [api, project, setBackends]);
 
-  async function onPrune() {
+  async function onPrune(model_version) {
     Swal('Pruning model, this may take some time')
-    axios.post(webhook_url + '/prune?id=' + project.id)
+    axios.post(webhook_url + '/prune?id=' + project.id + "&model_version="+model_version)
     .then((response) => {
       if (response.data.unprune === false){
         Swal("The unpruned model wasn't found in the project. Please train a model or add one first")
@@ -149,8 +150,8 @@ export const MachineLearningSettings = () => {
             Swal('Someone has just trained or predicted, please wait for a moment')
           }
           else if (can_press == true) {
-            Swal('Training has started')
-            axios.post(webhook_url + '/train?id=' + project.id).then((response) => {
+            Swal('Training has started');
+            axios.post(webhook_url + '/train?id=' + project.id+'&generateSpecs='+generateSpecs).then((response) => {
               console.log(response);
             })
           }
@@ -300,15 +301,19 @@ export const MachineLearningSettings = () => {
             />
           </div>
         </Form.Row>
-        <label>
+        <div style={{marginTop: 20}}>
+          <label>
       <input
         type="checkbox"
-        checked={!generateSpecs}
+        checked={generateSpecs}
         onChange={handleChange}
+        style={{marginRight: 5}}
       />
-      Don't generate new specs for training
-    </label>
-        <Button style={{ marginTop: 20 }} onClick={() => trainModel()}>Train New Model</Button>
+      Generate new specs for training
+    </label></div>
+        <div>
+        <Button style={{ marginTop: 5 }} onClick={() => trainModel()}>Train New Model</Button>
+      </div>
         {/* <Button style={{marginLeft: 20}} onClick={() => onExportModel()}>
         Export Model
       </Button>
@@ -369,14 +374,15 @@ export const MachineLearningSettings = () => {
 
                         ))}
                       </table>
-                      {Object.keys(modelsPrecisions[model.label]['score']).length > 0 ?
+                      {modelsPrecisions[model.label]['score'] && Object.keys(modelsPrecisions[model.label]['score']).length > 0 ?
                         <div>
                       <h5 style={{marginTop: 20}}>Beta Score</h5>
                       <table>
                     <thead>
                     <tr><th style={{paddingRight:50}}>Class Name</th>
                       <th>Score</th></tr>
-                        </thead>{Object.keys(modelsPrecisions[model.label]['score']).map((i) => (
+                            </thead>
+                            {Object.keys(modelsPrecisions[model.label]['score']).map((i) => (
                           <tbody key={i}>
                             <tr><td>{i}</td>
                               <td>{modelsPrecisions[model.label]['classes'][i]}</td></tr>
