@@ -21,6 +21,7 @@ from django.utils.timesince import timesince
 from django.utils.timezone import now
 from django.dispatch import receiver, Signal
 from django.core.files.storage import default_storage
+from queryable_properties.properties import queryable_property
 from rest_framework.exceptions import ValidationError
 
 from core.feature_flags import flag_set
@@ -35,7 +36,6 @@ from data_manager.managers import PreparedTaskManager, TaskManager
 from core.bulk_update_utils import bulk_update
 from data_import.models import FileUpload
 
-
 logger = logging.getLogger(__name__)
 
 TaskMixin = load_func(settings.TASK_MIXIN)
@@ -45,9 +45,10 @@ class Task(TaskMixin, models.Model):
     """ Business tasks from project
     """
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID', db_index=True)
-    data = JSONField('data', null=False, help_text='User imported or uploaded data for a task. Data is formatted according to '
-                                                   'the project label config. You can find examples of data for your project '
-                                                   'on the Import page in the Label Studio Data Manager UI.')
+    data = JSONField('data', null=False,
+                     help_text='User imported or uploaded data for a task. Data is formatted according to '
+                               'the project label config. You can find examples of data for your project '
+                               'on the Import page in the Label Studio Data Manager UI.')
 
     meta = JSONField('meta', null=True, default=dict,
                      help_text='Meta is user imported (uploaded) data and can be useful as input for an ML '
@@ -73,11 +74,11 @@ class Task(TaskMixin, models.Model):
                                       help_text='Internal task ID in the project, starts with 1')
     updates = ['is_labeled']
     total_annotations = models.IntegerField(_('total_annotations'), default=0, db_index=True,
-                                  help_text='Number of total annotations for the current task except cancelled annotations')
+                                            help_text='Number of total annotations for the current task except cancelled annotations')
     cancelled_annotations = models.IntegerField(_('cancelled_annotations'), default=0, db_index=True,
                                                 help_text='Number of total cancelled annotations for the current task')
     total_predictions = models.IntegerField(_('total_predictions'), default=0, db_index=True,
-                                  help_text='Number of total predictions for the current task')
+                                            help_text='Number of total predictions for the current task')
 
     comment_count = models.IntegerField(
         _('comment count'), default=0, db_index=True,
@@ -131,9 +132,11 @@ class Task(TaskMixin, models.Model):
         """Check whether current task has been locked by some user"""
         num_locks = self.num_locks
         if self.project.skip_queue == self.project.SkipQueue.REQUEUE_FOR_ME:
-            num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) | ~Q(completed_by=user)).count()
+            num_annotations = self.annotations.filter(ground_truth=False).exclude(
+                Q(was_cancelled=True) | ~Q(completed_by=user)).count()
         else:
-            num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) & ~Q(completed_by=user)).count()
+            num_annotations = self.annotations.filter(ground_truth=False).exclude(
+                Q(was_cancelled=True) & ~Q(completed_by=user)).count()
 
         num = num_locks + num_annotations
         if num > self.overlap:
@@ -153,11 +156,29 @@ class Task(TaskMixin, models.Model):
     def num_locks(self):
         return self.locks.filter(expire_at__gt=now()).count()
 
-    @property
+    @queryable_property
     def storage_filename(self):
         for link_name in settings.IO_STORAGES_IMPORT_LINK_NAMES:
             if hasattr(self, link_name):
                 return getattr(self, link_name).key
+
+    @storage_filename.filter
+    @classmethod
+    def storage_filename(cls, lookup, value):
+        if lookup == 'icontains':
+            return Q(io_storages_s3importstoragelink__key__icontains=value) \
+                   | Q(io_storages_gcsimportstoragelink__key__icontains=value) \
+                   | Q(io_storages_azureblobimportstoragelink__key__icontains=value) \
+                   | Q(io_storages_localfilesimportstoragelink__key__icontains=value) \
+                   | Q(io_storages_redisimportstoragelink__key__icontains=value)
+        elif lookup == 'exact':
+            return Q(io_storages_s3importstoragelink__key__iexact=value) \
+                   | Q(io_storages_gcsimportstoragelink__key__iexact=value) \
+                   | Q(io_storages_azureblobimportstoragelink__key__iexact=value) \
+                   | Q(io_storages_localfilesimportstoragelink__key__iexact=value) \
+                   | Q(io_storages_redisimportstoragelink__key__iexact=value)
+        else:
+            raise NotImplementedError('This type of filter does not available')
 
     def get_lock_ttl(self):
         if settings.TASK_LOCK_TTL is not None:
@@ -231,7 +252,8 @@ class Task(TaskMixin, models.Model):
                     file_upload = None
                     file_upload = FileUpload.objects.filter(project=project, file=prepared_filename).first()
                     if file_upload is not None:
-                        if flag_set('ff_back_dev_2915_storage_nginx_proxy_26092022_short', self.project.organization.created_by):
+                        if flag_set('ff_back_dev_2915_storage_nginx_proxy_26092022_short',
+                                    self.project.organization.created_by):
                             task_data[field] = file_upload.url
                         else:
                             task_data[field] = default_storage.url(name=prepared_filename)
@@ -328,6 +350,7 @@ class Task(TaskMixin, models.Model):
         queryset = Task.objects.filter(id__in=task_ids)
         Task.delete_tasks_without_signals(queryset)
 
+
 pre_bulk_create = Signal(providing_args=["objs", "batch_size"])
 post_bulk_create = Signal(providing_args=["objs", "batch_size"])
 
@@ -370,19 +393,24 @@ class Annotation(models.Model):
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='updated_annotations',
                                    on_delete=models.SET_NULL, null=True, verbose_name=_('updated by'),
                                    help_text='Last user who updated this annotation')
-    was_cancelled = models.BooleanField(_('was cancelled'), default=False, help_text='User skipped the task', db_index=True)
-    ground_truth = models.BooleanField(_('ground_truth'), default=False, help_text='This annotation is a Ground Truth (ground_truth)', db_index=True)
+    was_cancelled = models.BooleanField(_('was cancelled'), default=False, help_text='User skipped the task',
+                                        db_index=True)
+    ground_truth = models.BooleanField(_('ground_truth'), default=False,
+                                       help_text='This annotation is a Ground Truth (ground_truth)', db_index=True)
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last updated time')
-    lead_time = models.FloatField(_('lead time'), null=True, default=None, help_text='How much time it took to annotate the task')
+    lead_time = models.FloatField(_('lead time'), null=True, default=None,
+                                  help_text='How much time it took to annotate the task')
     prediction = JSONField(
         _('prediction'),
         null=True, default=dict, help_text='Prediction viewed at the time of annotation')
     result_count = models.IntegerField(_('result count'), default=0,
                                        help_text='Results inside of annotation counter')
 
-    parent_prediction = models.ForeignKey('tasks.Prediction', on_delete=models.SET_NULL, related_name='child_annotations',
-                                          null=True, help_text='Points to the prediction from which this annotation was created')
+    parent_prediction = models.ForeignKey('tasks.Prediction', on_delete=models.SET_NULL,
+                                          related_name='child_annotations',
+                                          null=True,
+                                          help_text='Points to the prediction from which this annotation was created')
     parent_annotation = models.ForeignKey('tasks.Annotation', on_delete=models.SET_NULL,
                                           related_name='child_annotations',
                                           null=True,
@@ -407,16 +435,16 @@ class Annotation(models.Model):
     class Meta:
         db_table = 'task_completion'
         indexes = [
-            models.Index(fields=['task', 'ground_truth']),
-            models.Index(fields=['task', 'completed_by']),
-            models.Index(fields=['id', 'task']),
-            models.Index(fields=['task', 'was_cancelled']),
-            models.Index(fields=['was_cancelled']),
-            models.Index(fields=['ground_truth']),
-            models.Index(fields=['created_at']),
-            models.Index(fields=['last_action']),
-            models.Index(fields=['last_created_by']),
-        ] + AnnotationMixin.Meta.indexes
+                      models.Index(fields=['task', 'ground_truth']),
+                      models.Index(fields=['task', 'completed_by']),
+                      models.Index(fields=['id', 'task']),
+                      models.Index(fields=['task', 'was_cancelled']),
+                      models.Index(fields=['was_cancelled']),
+                      models.Index(fields=['ground_truth']),
+                      models.Index(fields=['created_at']),
+                      models.Index(fields=['last_action']),
+                      models.Index(fields=['last_created_by']),
+                  ] + AnnotationMixin.Meta.indexes
 
     def created_ago(self):
         """ Humanize date """
@@ -742,6 +770,7 @@ def save_predictions_to_project(sender, instance, **kwargs):
     instance.task.save(update_fields=['total_predictions'])
     logger.debug(f"Updated total_predictions for {instance.task.id}.")
 
+
 # =========== END OF PROJECT SUMMARY UPDATES ===========
 
 
@@ -824,7 +853,9 @@ def bulk_update_stats_project_tasks(tasks, project=None):
             except OperationalError as exp:
                 logger.error("Operational error while updating tasks: {exc}", exc_info=True)
                 # try to update query batches one more time
-                start_job_async_or_sync(bulk_update, tasks, in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+                start_job_async_or_sync(bulk_update, tasks, in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT,
+                                        update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \

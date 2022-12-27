@@ -18,6 +18,8 @@ from django.db.models import FloatField, Count
 from datetime import datetime
 
 from data_manager.prepare_params import ConjunctionEnum
+from queryable_properties.managers import QueryablePropertiesManager, QueryablePropertiesQuerySetMixin
+from label_studio.core.utils.check_field import is_field_property
 from label_studio.core.utils.params import cast_bool_from_str
 from label_studio.core.utils.common import load_func
 from core.feature_flags import flag_set
@@ -312,7 +314,11 @@ def apply_filters(queryset, filters, project, request):
         # get type of annotated field
         value_type = 'str'
         if queryset.exists():
-            value_type = type(queryset.values_list(field_name, flat=True)[0]).__name__
+            if is_field_property(queryset.model, field_name):
+                field_values_list = [prop.storage_filename for prop in queryset]
+            else:
+                field_values_list = queryset.values_list(field_name, flat=True)
+            value_type = type(field_values_list[0]).__name__
 
         if (value_type == 'list' or value_type == 'tuple') and 'equal' in _filter.operator:
             raise Exception('Not supported filter type')
@@ -421,7 +427,7 @@ def apply_filters(queryset, filters, project, request):
     return queryset
 
 
-class TaskQuerySet(models.QuerySet):
+class TaskQuerySet(QueryablePropertiesQuerySetMixin, models.QuerySet):
     def prepared(self, prepare_params=None):
         """ Apply filters, ordering and selected items to queryset
 
@@ -574,7 +580,7 @@ def update_annotation_map(obj):
     settings.DATA_MANAGER_ANNOTATIONS_MAP.update(obj)
 
 
-class PreparedTaskManager(models.Manager):
+class PreparedTaskManager(QueryablePropertiesManager):
     @staticmethod
     def annotate_queryset(queryset, fields_for_evaluation=None, all_fields=False, request=None):
         annotations_map = get_annotations_map()
