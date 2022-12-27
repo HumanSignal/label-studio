@@ -18,7 +18,12 @@ Set up the following cloud and other storage systems with Label Studio:
 - [Google Cloud Storage](#Google-Cloud-Storage)
 - [Microsoft Azure Blob storage](#Microsoft-Azure-Blob-storage)
 - [Redis database](#Redis-database)
+
+<div class="opensource-only">
+
 - [Local storage](#Local-storage)
+
+</div>
 
 If something goes wrong, check the [troubleshooting section](#Troubleshoot-CORS-and-access-problems). 
 
@@ -232,8 +237,6 @@ Use the following role policy for S3 target storage:
 
 For more details about using an IAM role with an external ID to provide access to a third party (Label Studio), see the Amazon AWS documentation [How to use an external ID when granting access to your AWS resources to a third party](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html).
 
-</div>
-
 #### Create the connection to S3 in the Label Studio UI
 In the Label Studio UI, do the following to set up the connection:
 
@@ -275,6 +278,8 @@ In the Label Studio UI, do the following to set up a target storage connection t
 8. Click **Add Storage**.
 
 After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync export storage](https://app.heartex.com/docs/api#operation/api_storages_export_s3s_sync_create).
+
+</div>
 
 ### Add storage with the Label Studio API
 You can also create a storage connection using the Label Studio API. 
@@ -390,6 +395,8 @@ You can also create a storage connection using the Label Studio API.
 - See [Create new import storage](/api#operation/api_storages_redis_create) then [sync the import storage](/api#operation/api_storages_redis_sync_create). 
 - See [Create export storage](/api#operation/api_storages_export_redis_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_redis_sync_create).
 
+<div class="opensource-only">
+
 ## Local storage
 If you have local files that you want to add to Label Studio from a specific directory, you can set up a specific local directory on the machine where LS is running as source or target storage. Label Studio steps through the directory recursively to read tasks.
 
@@ -466,6 +473,8 @@ If you're using Label Studio in Docker, you need to mount the local directory th
 This video tutorial demonstrates how to setup Local Storage from scratch and import json tasks in a complex task format that are linked to the Local Storage files.
 
 <iframe class="video-border" width="100%" height="400vh" src="https://www.youtube.com/embed/lo6ncQajbdU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+</div>
 
 ## Troubleshoot CORS and access problems
 
