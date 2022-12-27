@@ -51,7 +51,7 @@ logger = logging.getLogger(__name__)
 @method_decorator(name='get', decorator=swagger_auto_schema(
     tags=['Tasks'],
     operation_summary='Get tasks list',
-    operation_description='Retrieve a subset of tasks from the Data Manager based on a filter, ordering mechanism, or a predefined view ID.'
+    operation_description="""Retrieve a subset of tasks from the Data Manager based on a filter, ordering mechanism, or a predefined view ID.'
     Retrieve a list of tasks with pagination for a specific view or project, by using filters and ordering.
     """,
     manual_parameters=[

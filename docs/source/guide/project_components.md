@@ -2,7 +2,7 @@
 title: Project components 
 short: Project components 
 type: guide
-tier: 
+tier: all
 order: 118
 meta_title: Project components 
 meta_description: "Label Studio Documentation for Project components."
@@ -22,16 +22,17 @@ The Label Studio interface allows you to label and annotate your data. You can s
 
 Annotation is the process of labeling data on images. The image may contain humans, vehicles, any objects to make it recognizable for machines. Annotations are of various types, and it can be used to educate machines about the presence of various objects in the world. For more information, see the [Label and annotate data](labeling.html#Start-labeling) page. 
 
+<div class="enterprise-only">
 
 ## Review 
 
 After multiple labelers have annotated tasks, review their output to validate the quality of the results. For more information, see the [Review annotations in Label Studio](quality.html) page.
 
-
 ## Members 
 
 In the Label Studio Enterprise version, you can add members to a specific workspace or add members to a specific project within a workspace. For more information, see [Add members to a project](setup_project.html#Add-members-to-a-project) page. 
 
+</div>
 
 ## Machine Learning 
 
