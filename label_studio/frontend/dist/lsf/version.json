@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3646: Fix regions copying in the Outliner",
+  "message": "Fix copy-paste restrictions",
   "commit": "db4ebdb4ab94f68811ed725ecf7d57a60bf0c686",
   "branch": "fb-dev-3646/fix-regions-copying",
-  "date": "2022/12/23 20:20:10"
+  "date": "2022-12-23T20:20:10Z"
 }

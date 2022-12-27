@@ -1,0 +1,86 @@
+name: "Tests"
+
+on:
+  workflow_call:
+    inputs:
+      head_sha:
+        required: true
+        type: string
+
+env:
+  NODE: '14'
+  CACHE_NAME_PREFIX: v1
+
+jobs:
+  migrations:
+    name: "migrations"
+    runs-on: ubuntu-20.04
+    timeout-minutes: 20
+    env:
+      DJANGO_SETTINGS_MODULE: core.settings.label_studio
+      COVERAGE_PROCESS_START: 1
+      LOG_DIR: pytest_logs
+      collect_analytics: true
+      DEBUG_CONTEXTLOG: true
+      LABEL_STUDIO_TEST_ENVIRONMENT: false
+      SENTRY_ENVIRONMENT: tests-ubuntu-sqlite
+      SENTRY_RATE: 0
+      DJANGO_DB: sqlite
+      JSON_LOG: 0
+      # SENTRY_DSN:
+
+    steps:
+      - uses: hmarr/debug-action@v2.1.0
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install OS dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install libsasl2-dev python3-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev
+
+      - uses: actions/cache@v3
+        name: Configure pip cache
+        id: pip-cache
+        with:
+          # Cache the Python package environment, excluding pip and setuptools and label_studio* installed by setup-python
+          path: |
+            ~/.cache/pip
+            ${{ env.pythonLocation }}/bin/*
+            ${{ env.pythonLocation }}/include
+            ${{ env.pythonLocation }}/lib/python*/site-packages/*
+            !${{ env.pythonLocation }}/bin/pip*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/label_studio*
+          key: ${{ runner.os }}-pip-${{ env.pythonLocation }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          restore-keys: |
+            ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-django-${{ env.pythonLocation }}-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools
+          pip install --upgrade cython
+          pip install -U pip==20.2
+          pip install -r deploy/requirements.txt -r deploy/requirements-test.txt
+          pip install -e .
+
+      - name: Test migrations
+        run: |
+          output=$(python label_studio/manage.py makemigrations)
+          if ! grep 'No changes detected' <<< "${output}"; then
+            error="${output}"
+            error="${error//'%'/'%25'}"
+            error="${error//$'\n'/'%0A'}"
+            error="${error//$'\r'/'%0D'}"
+            echo "::error::${error}"
+            exit 1
+          fi

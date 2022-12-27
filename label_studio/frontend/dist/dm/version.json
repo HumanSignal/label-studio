@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3754: Memory usage of repeater initialization causing crashes",
-  "commit": "c4025e010d5db20a725a51f8a5da50c3c938d3ed",
+  "message": "feat: DEV-2715: Audio v3 improvements (#133)\n\n* feat: DEV-2715: Audio v3 improvements\r\n\r\n* initialize hydrated state to false, so the default in LSF remains true\r\n\r\n* only setHydrated with FF set\r\n\r\n* fix: DEV-3917: Reinit history after draft applied (#136)\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
+  "commit": "48041fb71e272a940919c696af3165d56e9c2efb",
   "branch": "master",
-  "date": "2022/11/28 08:50:05"
+  "date": "2022-12-14T11:36:35Z"
 }
