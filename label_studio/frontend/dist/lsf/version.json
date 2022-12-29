@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3664: Grouping modes are not persistent in Outliner when switching between tasks in Quick View",
-  "commit": "a29a31f1803824803fa4e824ea99c643ff727b1a",
+  "message": "fix: DEV-3646: Fix regions copying in the Outliner",
+  "commit": "42020a2e4ed2f187a0b4f9ddeed48bf2362f9cbb",
   "branch": "master",
-  "date": "2022/12/15 07:52:48"
+  "date": "2022/12/29 13:27:17"
 }
