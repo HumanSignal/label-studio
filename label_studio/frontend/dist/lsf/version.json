@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3664: Grouping modes are not persistent in Outliner when switching between tasks in Quick View",
-  "commit": "a29a31f1803824803fa4e824ea99c643ff727b1a",
-  "branch": "master",
-  "date": "2022/12/15 07:52:48"
+  "message": "fix: DEV-4075: Fix taxonomy items overlap on search",
+  "commit": "012b6f3a71a0cda10cb2722d4e7348c7fa764731",
+  "branch": "fb-dev-4075/taxonomy-overlap",
+  "date": "2022/12/29 03:00:51"
 }
