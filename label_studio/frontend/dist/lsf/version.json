@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3646: Fix regions copying in the Outliner",
-  "commit": "42020a2e4ed2f187a0b4f9ddeed48bf2362f9cbb",
+  "message": "fix: DEV-3896: Fix closed polygon undoing by hotkey",
+  "commit": "25580365ef5a016748664f8cde2c97712a5686fa",
   "branch": "master",
-  "date": "2022/12/29 13:27:17"
+  "date": "2022/12/30 17:04:27"
 }
