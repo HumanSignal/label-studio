@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3896: Fix closed polygon undoing by hotkey",
-  "commit": "bd320c0be99b9cbc747fd8beba537180fb661f30",
+  "commit": "0a21a62962e03868464f56ac7e0a1a745b8a79cd",
   "branch": "fb-dev-3896/closed-poly-ctrl-z",
-  "date": "2022/12/01 22:38:57"
+  "date": "2022/12/30 15:59:56"
 }
