@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3874: Fix polling overflow",
-  "commit": "049cb9f247b2353b4bf8a49cfc0412e70b76a39b",
+  "message": "feat: DEV-2715: Audio v3 improvements (#133)\n\n* feat: DEV-2715: Audio v3 improvements\r\n\r\n* initialize hydrated state to false, so the default in LSF remains true\r\n\r\n* only setHydrated with FF set\r\n\r\n* fix: DEV-3917: Reinit history after draft applied (#136)\r\n\r\nCo-authored-by: hlomzik <hlomzik@gmail.com>\r\nCo-authored-by: Nick Skriabin <767890+nicholasrq@users.noreply.github.com>",
+  "commit": "48041fb71e272a940919c696af3165d56e9c2efb",
   "branch": "master",
-  "date": "2022/12/01 16:12:47"
+  "date": "2022-12-14T11:36:35Z"
 }

@@ -146,11 +146,11 @@ jobs:
                 core.setOutput("pipy-artifact-url", artifact.url);
                 core.setOutput("pipy-artifact-digests-sha256", artifact.digests.sha256);
                 clearInterval(intervalId)
-              } else if (currentAttempt > MAX_ATTEMPTS) {
+              } else if (currentAttempt >= MAX_ATTEMPTS) {
                 clearInterval(intervalId)
                 throw Error('Max attempts exceeded')
               }
-            }, 6 * 1000)
+            }, 60 * 1000 )
 
       - name: Attach artifacts to release
         if: inputs.release-id
