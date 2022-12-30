@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3646: Fix regions copying in the Outliner",
-  "commit": "42020a2e4ed2f187a0b4f9ddeed48bf2362f9cbb",
-  "branch": "master",
-  "date": "2022/12/29 13:27:17"
+  "message": "fix: DEV-3888: Fix hotkeys of dynamic children",
+  "commit": "40df15d0c974eeb86de044522aed2f5d925a1aa5",
+  "branch": "fb-dev-3888/dynamic-children-hotkeys",
+  "date": "2022/12/30 00:13:23"
 }
