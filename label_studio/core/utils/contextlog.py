@@ -216,7 +216,7 @@ class ContextLog(object):
         user_id, user_email = None, None
         if hasattr(request, 'user') and hasattr(request.user, 'id'):
             user_id = request.user.id
-            if hasattr(request.user, 'email') and hasattr(request.user, 'allow_newsletters') and request.user.allow_newsletters:
+            if hasattr(request.user, 'email'):
                 user_email = request.user.email
         if hasattr(request, 'advanced_json'):
             advanced_json = request.advanced_json

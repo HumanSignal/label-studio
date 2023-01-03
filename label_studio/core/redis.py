@@ -1,5 +1,8 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from datetime import timedelta
+from functools import partial
+
 import redis
 import logging
 import django_rq
@@ -73,7 +76,7 @@ def redis_delete(key):
     return _redis.delete(key)
 
 
-def start_job_async_or_sync(job, *args, **kwargs):
+def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
     """
     Start job async with redis or sync if redis is not connected
     :param job: Job function
@@ -81,6 +84,7 @@ def start_job_async_or_sync(job, *args, **kwargs):
     :param kwargs: Function keywords arguments
     :return: Job or function result
     """
+
     redis = redis_connected() and kwargs.get('redis', True)
     queue_name = kwargs.get("queue_name", "default")
     if 'queue_name' in kwargs:
@@ -91,10 +95,13 @@ def start_job_async_or_sync(job, *args, **kwargs):
     if 'job_timeout' in kwargs:
         job_timeout = kwargs['job_timeout']
         del kwargs['job_timeout']
-
     if redis:
+        logger.info(f"Start async job {job.__name__} on queue {queue_name}.")
         queue = django_rq.get_queue(queue_name)
-        job = queue.enqueue(
+        enqueue_method = queue.enqueue
+        if in_seconds > 0:
+            enqueue_method = partial(queue.enqueue_in, time_delta=timedelta(in_seconds))
+        job = enqueue_method(
             job,
             *args,
             **kwargs,
@@ -137,10 +144,10 @@ def delete_job_by_id(queue, id):
     @param queue: Queue on redis to delete from
     @param id: Job id
     """
-    logger.debug(f"Stopping job {id}.")
     job = queue.fetch_job(id)
     if job is not None:
         # stop job if it is in master redis node (in the queue)
+        logger.info(f"Stopping job {id} from queue {queue.name}.")
         try:
             job.cancel()
             job.delete()
@@ -149,6 +156,7 @@ def delete_job_by_id(queue, id):
             logger.debug(f"Job {id} was already cancelled.")
     else:
         # try to stop job on worker (job started)
+        logger.info(f"Stopping job {id} on worker from queue {queue.name}.")
         try:
             send_stop_job_command(_redis, id)
             logger.debug(f"Send stop job {id} to redis worker.")

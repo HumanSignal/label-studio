@@ -7,14 +7,6 @@ exec 3>&1
 
 ENTRYPOINT_PATH=/label-studio/deploy/docker-entrypoint.d
 
-uid_entrypoint() {
-  if ! whoami 2>/dev/null; then
-    if [ -w /etc/passwd ]; then
-      echo "labelstudio::$(id -u):0:labelstudio user:${HOME}:/bin/bash" >>/etc/passwd
-    fi
-  fi
-}
-
 exec_entrypoint() {
   if /usr/bin/find -L "$1" -mindepth 1 -maxdepth 1 -type f -print -quit 2>/dev/null | read v; then
     echo >&3 "$0: Looking for init scripts in $1"
@@ -41,13 +33,24 @@ exec_entrypoint() {
   fi
 }
 
-uid_entrypoint
+source_inject_envvars() {
+  if [ -n "${ENV_INJECT_SOURCES:-}" ]; then
+    IFS=","
+    for env_file in $ENV_INJECT_SOURCES; do
+       if [ -f "$env_file" ]; then
+         . $env_file
+       fi
+    done
+  fi
+}
+
+source_inject_envvars
 
 if [ "$1" = "nginx" ]; then
   # in this mode we're running in a separate container
   export APP_HOST=${APP_HOST:=app}
   exec_entrypoint "$ENTRYPOINT_PATH/nginx/"
-  exec nginx -c $OPT_DIR/nginx/nginx.conf
+  exec nginx -c $OPT_DIR/nginx/nginx.conf -e /dev/stderr
 elif [ "$1" = "label-studio-uwsgi" ]; then
   exec_entrypoint "$ENTRYPOINT_PATH/app/"
   exec uwsgi --ini /label-studio/deploy/uwsgi.ini

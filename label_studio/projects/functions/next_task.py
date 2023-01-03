@@ -184,7 +184,7 @@ def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_fla
 
 def skipped_queue(next_task, prepared_tasks, project, user, queue_info):
     if not next_task and project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
-        q = Q(task__project=project, task__isnull=False, was_cancelled=True)
+        q = Q(task__project=project, task__isnull=False, was_cancelled=True, task__is_labeled=False)
         skipped_tasks = user.annotations.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
         if skipped_tasks.exists():
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(skipped_tasks)])
@@ -196,12 +196,13 @@ def skipped_queue(next_task, prepared_tasks, project, user, queue_info):
 
 def postponed_queue(next_task, prepared_tasks, project, user, queue_info):
     if not next_task:
-        q = Q(task__project=project, task__isnull=False, task__is_labeled=False, was_postponed=True)
+        q = Q(task__project=project, task__isnull=False, was_postponed=True, task__is_labeled=False)
         postponed_tasks = user.drafts.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
         if postponed_tasks.exists():
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(postponed_tasks)])
             next_task = prepared_tasks.filter(pk__in=postponed_tasks).order_by(preserved_order).first()
-            next_task.allow_postpone = False
+            if next_task is not None:
+                next_task.allow_postpone = False
             queue_info = f'Postponed draft queue'
 
     return next_task, queue_info
@@ -263,7 +264,7 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
                 count = next_task.annotations.filter(was_cancelled=False).count()
                 task_overlap_reached = count >= next_task.overlap
                 global_overlap_reached = count >= project.maximum_annotations
-                if next_task.is_labeled or not task_overlap_reached or global_overlap_reached:
+                if next_task.is_labeled or task_overlap_reached or global_overlap_reached:
                     from tasks.serializers import TaskSimpleSerializer
 
                     local = dict(locals())

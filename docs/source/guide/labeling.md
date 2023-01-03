@@ -141,10 +141,10 @@ This table describes the hotkeys for a standard keyboard. For a Mac keyboard, us
 | `alt` + `h` | Hide a selected region. | 
 | `ctrl` + `d` OR `cmd` + `d` | Duplicate a selected region. |
 | `u` | Unselect a selected region. | 
-| `s` | On the data manager, change the row selection to the next row, 1 below the current row. |
-| `w` | On the data manager, change the row selection to the previous row, 1 above the current row. |
-| `d` | On the data manager, open the labeling quick view for the selected task row. | 
-| `a` | On the data manager, close the labeling quick view for the selected task row. |
+| `shift + down` | On the data manager, change the row selection to the next row, 1 below the current row. |
+| `shift + up` | On the data manager, change the row selection to the previous row, 1 above the current row. |
+| `shift + right` | On the data manager, open the labeling quick view for the selected task row. | 
+| `shift + left` | On the data manager, close the labeling quick view for the selected task row. |
 
 Other annotation types have labeling-specific shortcuts, such as numbers to select specific labels for named entity recognition tasks. 
 
