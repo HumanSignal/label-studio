@@ -63,7 +63,11 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         try:
             return super().create(*args, **kwargs)
         except IntegrityError as e:
-            if 'duplicate key value violates unique constraint "task_completion_unique_id_key"' in str(e):
+            errors = [
+                'UNIQUE constraint failed: task_completion.unique_id',
+                'duplicate key value violates unique constraint "task_completion_unique_id_key"',
+            ]
+            if any([error in str(e) for error in errors]):
                 raise AnnotationDuplicateError()
             raise
 
