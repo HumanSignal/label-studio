@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3644: Ensure draft is saved correctly and remains editable",
-  "commit": "d1916aab13b5fc8a21143b4596c5c7af1067a497",
-  "branch": "fb-dev-3644/save-draft-editable",
-  "date": "2023/01/03 16:00:40"
+  "commit": "5c0e2b120233ed4a2fc1c5033891b7da0b778817",
+  "branch": "master",
+  "date": "2023/01/03 13:11:22"
 }
