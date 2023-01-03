@@ -23,7 +23,8 @@ ENV LS_DIR=/label-studio \
     SETUPTOOLS_USE_DISTUTILS=stdlib
 
 USER 0
-RUN dnf -y install nginx && \
+RUN dnf module enable -y nginx:1.20 && \
+    dnf -y install nginx && \
     mkdir -p $OPT_DIR && \
     chown -R 1001:0 $OPT_DIR /etc/nginx/nginx.conf && \
     chmod -R g=u $OPT_DIR /etc/nginx/nginx.conf

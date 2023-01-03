@@ -125,7 +125,7 @@ class ImportStorage(Storage):
                     raise ValueError(
                         'If you use "annotations" field in the task, ' 'you must put "data" field in the task too'
                     )
-                cancelled_annotations = len([a for a in annotations if a['was_cancelled']])
+                cancelled_annotations = len([a for a in annotations if a.get('was_cancelled', False)])
 
             if 'data' in data and isinstance(data['data'], dict):
                 data = data['data']
