@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3896: Fix closed polygon undoing by hotkey",
-  "commit": "25580365ef5a016748664f8cde2c97712a5686fa",
+  "message": "fix: DEV-3644: Ensure draft is saved correctly and remains editable (#1011)\n\n* fix: DEV-3644: Ensure draft is saved intact prior to history item navigation\r\n\r\n* await the isDraftSaving flag before proceeding with the annotation history switch\r\n\r\nCo-authored-by: Julio Sgarbi <julio.sgarbi@hotmail.com>",
+  "commit": "5c0e2b120233ed4a2fc1c5033891b7da0b778817",
   "branch": "master",
-  "date": "2022/12/30 17:04:27"
+  "date": "2023-01-03T19:11:22Z"
 }
