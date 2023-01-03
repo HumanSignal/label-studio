@@ -2605,6 +2605,8 @@ span.CodeMirror-selectedtext { background: none; }
   overflow-y: auto;
   border-left: 1px solid rgba(0,0,0,0.1);
   background-color: #fafafa;
+  display: flex;
+  flex-direction: column;
 }
 .ls-wizard .ls-configure__preview::-webkit-scrollbar {
   width: 6px;
@@ -2622,6 +2624,10 @@ span.CodeMirror-selectedtext { background: none; }
   display: block;
   width: 100%;
   height: 100%;
+}
+.ls-wizard .ls-configure__preview-ui {
+  flex: 1;
+  min-height: 0;
 }
 .ls-wizard .ls-configure__preview-error {
   color: #771b04;
@@ -2648,6 +2654,7 @@ div[class^=App_menu]>div {
   min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 .ls-create-project > .ls-modal__header {
   border-bottom: 1px solid rgba(0,0,0,0.1);

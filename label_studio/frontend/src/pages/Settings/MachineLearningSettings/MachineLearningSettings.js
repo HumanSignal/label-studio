@@ -105,7 +105,7 @@ export const MachineLearningSettings = () => {
     });
 
     if (models) setBackends(models);
-  }, [api, project, setBackends]);
+  }, [project, setBackends]);
 
   async function onPrune(model_version) {
     Swal('Pruning model, this may take some time')
