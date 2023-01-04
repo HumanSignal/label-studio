@@ -201,7 +201,8 @@ def postponed_queue(next_task, prepared_tasks, project, user, queue_info):
         if postponed_tasks.exists():
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(postponed_tasks)])
             next_task = prepared_tasks.filter(pk__in=postponed_tasks).order_by(preserved_order).first()
-            next_task.allow_postpone = False
+            if next_task is not None:
+                next_task.allow_postpone = False
             queue_info = f'Postponed draft queue'
 
     return next_task, queue_info
