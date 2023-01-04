@@ -18,6 +18,9 @@ import ujson as json
 import traceback as tb
 import drf_yasg.openapi as openapi
 import contextlib
+
+from label_studio_tools.core.utils.exceptions import LabelStudioXMLSyntaxErrorSentryIgnored
+
 import label_studio
 import re
 
@@ -52,7 +55,6 @@ except (ModuleNotFoundError, ImportError):
 
 from core import version
 from core.utils.exceptions import LabelStudioDatabaseLockedException
-
 
 # these functions will be included to another modules, don't remove them
 from core.utils.params import int_from_request
@@ -115,7 +117,10 @@ def custom_exception_handler(exc, context):
         if not settings.DEBUG_MODAL_EXCEPTIONS:
             exc_tb = None
         response_data['exc_info'] = exc_tb
-        response = Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=response_data)
+        if isinstance(exc, LabelStudioXMLSyntaxErrorSentryIgnored):
+            response = Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+        else:
+            response = Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=response_data)
 
     return response
 
