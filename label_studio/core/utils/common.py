@@ -505,7 +505,7 @@ def collect_versions(force=False):
 
 
 def get_organization_from_request(request):
-    """Helper for backward compatability with org_pk in session """
+    """Helper for backward compatibility with org_pk in session """
     # TODO remove session logic in next release
     user = request.user
     if user and user.is_authenticated:
