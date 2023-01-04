@@ -18,8 +18,13 @@ After you [start Label Studio](start.html) and [create an account](signup.html),
 2. [Import data](tasks.html).
 3. Select a template to configure the labeling interface for your dataset. [Set up the labeling interface for your project](setup.html).
 4. (Optional) [Set up annotation settings for your project](#Set-up-annotation-settings-for-your-project). 
-5. (Optional, Label Studio Enterprise only) [Set up review settings for your project](#Set-up-review-settings-for-your-project).
-6. [Publish your project](#Publish-project-to-annotators). (Label Studio Enterprise only)
+
+<div class="enterprise-only">
+
+5. (Optional) [Set up review settings for your project](#Set-up-review-settings-for-your-project).
+6. [Publish your project](#Publish-project-to-annotators).
+
+</div>
 
 ## Create a project
 
@@ -50,7 +55,19 @@ Some annotation settings are only available in Label Studio Enterprise Edition. 
 In the project settings, you can add instructions and choose whether to show the instructions to annotators before they perform labeling. 
 
 1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Instructions**, or in Label Studio Enterprise, click **Annotation Settings**. 
+
+<div class="enterprise-only">
+
+2. Click **Annotation Settings**.
+
+</div>
+
+<div class="opensource-only">
+
+2. Click **Instructions**.
+
+</div>
+
 3. Type instructions and choose whether to show the instructions to annotators before labeling. If you want to provide additional details or links for reference, instructions support HTML markup.
 4. Click **Save**. <br/>Click the project name to return to the data manager view. 
 
