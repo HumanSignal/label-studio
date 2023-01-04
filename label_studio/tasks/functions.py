@@ -19,7 +19,7 @@ from data_export.mixins import ExportMixin
 logger = logging.getLogger(__name__)
 
 
-def calculate_stats_all_orgs(from_scratch, redis):
+def calculate_stats_all_orgs(from_scratch, redis, migration_name='0018_manual_migrate_counters'):
     logger = logging.getLogger(__name__)
     organizations = Organization.objects.order_by('-id')
 
@@ -31,7 +31,8 @@ def calculate_stats_all_orgs(from_scratch, redis):
             redis_job_for_calculation, org, from_scratch,
             redis=redis,
             queue_name='critical',
-            job_timeout=3600 * 24  # 24 hours for one organization
+            job_timeout=3600 * 24,  # 24 hours for one organization
+            migration_name=migration_name
         )
 
         logger.debug(f"Organization {org.id} stats were recalculated")
@@ -39,7 +40,7 @@ def calculate_stats_all_orgs(from_scratch, redis):
     logger.debug("All organizations were recalculated")
 
 
-def redis_job_for_calculation(org, from_scratch):
+def redis_job_for_calculation(org, from_scratch, migration_name='0018_manual_migrate_counters'):
     """
     Recalculate counters for projects list
     :param org: Organization to recalculate
@@ -58,7 +59,7 @@ def redis_job_for_calculation(org, from_scratch):
     for project in projects:
         migration = AsyncMigrationStatus.objects.create(
             project=project,
-            name='0018_manual_migrate_counters',
+            name=migration_name,
             status=AsyncMigrationStatus.STATUS_STARTED,
         )
         logger.debug(
@@ -135,3 +136,4 @@ def fill_annotations_project():
         start_job_async_or_sync(_fill_annotations_project, project.id)
 
     logger.info('Finished filling project field for Annotation model')
+
