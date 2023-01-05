@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-4025: Label with choice set to multiple was unselecting when using ParagraphLabels (#1126)\n\n* fix: DEV-4025: Label with choice set to multiple was unselecting when using ParagraphLabels\r\n\r\n* stop unselecting labels when change group",
   "commit": "5450bc0a26e7033f604f691cc0ea657dcb0a305a",
-  "branch": "master",
+  "branch": "",
   "date": "2023-01-05T14:28:21Z"
 }
