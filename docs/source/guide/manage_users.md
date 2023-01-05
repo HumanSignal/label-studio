@@ -269,8 +269,8 @@ To activate a user account and assign a role, do the following:
 Your changes save automatically. Repeat these steps for any additional users. 
 
 ### Status of user account
-!!! warning 
-    `NOT_ACTIVATED` status is not available for users in Label Studio, but they are assigned to `Pending` status. 
+!!! note
+    `NOT_ACTIVATED` status is equal to `Pending` status. 
 
 If a user is in `Pending` status then it means he was invited and signed up for the account, but his role is not defined by administrator. 
 
