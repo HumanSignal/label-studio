@@ -128,15 +128,12 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
 
     @classmethod
     def is_gce_instance(cls):
-        """Check if it's GCE instance via ping to metadata server"""
-        s = socket.socket()
+        """Check if it's GCE instance via DNS lookup to metadata server"""
         try:
-            s.connect(('metadata.google.internal', 80))
-            return True
-        except Exception:
+            socket.getaddrinfo('metadata.google.internal', 80)
+        except socket.gaierror:
             return False
-        finally:
-            s.close()
+        return True
 
     def generate_http_url(self, url):
         r = urlparse(url, allow_fragments=False)
