@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3888: Fix hotkeys of dynamic children",
-  "commit": "cb5360fae314afebc5a66fbb2c4c6d528e2fc6e9",
+  "commit": "898ba731ccc51477c902a1edae61a10d93b19837",
   "branch": "fb-dev-3888/dynamic-children-hotkeys",
-  "date": "2023/01/05 17:15:41"
+  "date": "2023/01/05 17:32:56"
 }
