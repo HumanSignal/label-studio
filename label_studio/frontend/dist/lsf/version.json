@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-4025: Label with choice set to multiple was unselecting when using ParagraphLabels",
-  "commit": "9c11fd9f4a93bdf70e124de545cfbd1e51dcc2ca",
+  "commit": "36e0a8910fcf8d35c883cdd61ea35c2d237265ae",
   "branch": "fb-dev-4025",
-  "date": "2023/01/04 12:23:20"
+  "date": "2023/01/05 11:18:22"
 }
