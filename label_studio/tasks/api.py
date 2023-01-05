@@ -182,6 +182,11 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         return Response(data)
 
     def get_queryset(self):
+        task_id = self.request.parser_context['kwargs'].get('pk')
+        task = generics.get_object_or_404(
+            Task.objects.filter(id=task_id),
+            pk=task_id
+        )
         review = bool_from_request(self.request.GET, 'review', False)
         selected = {"all": False, "included": [self.kwargs.get("pk")]}
         if review:
@@ -192,10 +197,6 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             kwargs = {'all_fields': True}
         project = self.request.query_params.get('project') or self.request.data.get('project')
         if not project:
-            try:
-                task = Task.objects.get(id=self.request.parser_context['kwargs'].get('pk'))
-            except Task.DoesNotExist:
-                return Task.objects.filter(id=self.request.parser_context['kwargs'].get('pk'))
             project = task.project.id
         return self.prefetch(
             Task.prepared.get_queryset(
