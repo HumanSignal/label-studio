@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3888: Fix hotkeys of dynamic children",
-  "commit": "1d7491d6d9c79b52a44e812de17324fac686fda4",
-  "branch": "master",
-  "date": "2023/01/05 17:42:38"
+  "message": "feat: DEV-4034: Rendering performance improvements for large-duration audio",
+  "commit": "cae713292f3d26d7890287c80db04c11e55abc04",
+  "branch": "fb-dev-4034",
+  "date": "2023/01/05 10:26:13"
 }
