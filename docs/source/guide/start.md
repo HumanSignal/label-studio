@@ -1,12 +1,12 @@
 ---
 title: Start Label Studio
 type: guide
-tier: all
-order: 206
-order_enterprise: 110
+tier: opensource
+order: 110
+order_enterprise: 99
 meta_title: Start Commands for Label Studio
 meta_description: Documentation for starting Label Studio and configuring the environment to use Label Studio with your machine learning or data science project. 
-section: "Import and Export"
+section: "Install"
 
 ---
 
@@ -132,7 +132,7 @@ To run Label Studio on Docker with a host and sub-path, just pass `LABEL_STUDIO_
 LABEL_STUDIO_HOST=http://localhost:8080/foo docker-compose up -d
 ```
 
-## Run Label Studio on Docker and use local storage
+## Run Label Studio on Docker and use Local Storage
 
 To run Label Studio on Docker and reference persistent local storage directories, mount those directories as volumes when you start Label Studio and specify any environment variables you need.
 

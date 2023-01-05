@@ -159,11 +159,6 @@ class Task(TaskMixin, models.Model):
             if hasattr(self, link_name):
                 return getattr(self, link_name).key
 
-    def get_lock_ttl(self):
-        if settings.TASK_LOCK_TTL is not None:
-            return settings.TASK_LOCK_TTL
-        return settings.TASK_LOCK_MIN_TTL
-
     def has_permission(self, user):
         return self.project.has_permission(user)
 
@@ -174,7 +169,7 @@ class Task(TaskMixin, models.Model):
         """Lock current task by specified user. Lock lifetime is set by `expire_in_secs`"""
         num_locks = self.num_locks
         if num_locks < self.overlap:
-            lock_ttl = self.get_lock_ttl()
+            lock_ttl = settings.TASK_LOCK_TTL
             expire_at = now() + datetime.timedelta(seconds=lock_ttl)
             TaskLock.objects.create(task=self, user=user, expire_at=expire_at)
             logger.debug(f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')

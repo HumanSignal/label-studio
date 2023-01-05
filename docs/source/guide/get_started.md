@@ -20,9 +20,75 @@ You can also integrate Label Studio with machine learning models to supply predi
 Label Studio is also available in Enterprise and Cloud editions with additional features. See [Label Studio features](label_studio_compare.html) for more.
 
 
+
+<div class="opensource-only">
+
+## Quick start
+
+1. Install Label Studio:
+```bash
+pip install label-studio
+```
+2. Start Label Studio
+```bash
+label-studio start
+```
+3. Open the Label Studio UI at http://localhost:8080. 
+4. Sign up with an email address and password that you create.
+5. Click **Create** to create a project and start labeling data.
+6. Name the project, and if you want, type a description and select a color.
+7. Click **Data Import** and upload the data files that you want to use. If you want to use data from a local directory, cloud storage bucket, or database, skip this step for now.
+8. Click **Labeling Setup** and choose a template and customize the label names for your use case. 
+9. Click **Save** to save your project. 
+
+You're ready to start [labeling and annotating your data](labeling.html)!
+
+</div>
+
+
 ## Terminology
 
 When you upload data to Label Studio, each item in the dataset becomes a labeling task. The following table describes some terms you might encounter as you use Label Studio.
+
+<div class="opensource-only">
+
+<br>
+<center><i>Project List Screenshot</i></center>
+<img class="make-intense-zoom" src="/images/terms/os/projects-min.png">
+<br><br>
+<center><i>Data Manager Screenshot</i></center>
+<img class="make-intense-zoom" src="/images/terms/os/project--data-manager-min.png">
+<br><br>
+<center><i>Quick View Screenshot</i></center>
+<img class="make-intense-zoom" src="/images/terms/os/project--data-manager--quick-view-min.png">
+
+</div>
+
+
+<div class="enterprise-only">
+
+<br>
+<center><i>Project List Screenshot</i></center>
+<img class="make-intense-zoom" src="/images/terms/ent/workspace-min.png">
+<br><br>
+<center><i>Data Manager Screenshot</i></center>
+<img class="make-intense-zoom" src="/images/terms/ent/project--data-manager-min.png">
+<br><br>
+<center><i>Quick View Screenshot</i></center>
+<img class="make-intense-zoom" src="/images/terms/ent/project--data-manager--quick-view-min.png">
+
+</div>
+  
+  
+<script src="/js/intense.min.js"></script>
+<script>
+
+window.onload = function() {
+	// Intensify all images on the page.
+    var element = document.querySelectorAll('.make-intense-zoom');
+	Intense(element);
+}
+</script>
 
 | Term | Description |
 | --- | --- |
@@ -32,16 +98,15 @@ When you upload data to Label Studio, each item in the dataset becomes a labelin
 | Labels | What you add to each region while labeling a task in Label Studio. |
 | Relation | A defined relationship between two labeled regions. |
 | Result | A label applied to a specific region as stored in an annotation or prediction. See [Label Studio JSON format of annotated tasks](export.html#Label-Studio-JSON-format-of-annotated-tasks). |
-| Predictions | What machine learning models create for an unlabeled dataset. |
-| Pre-annotations | Predicted annotations in Label Studio format, either in a file or from a machine learning backend. See [import pre-annotations](predictions.html).
 | Annotations | The output of a labeling task. Previously called "completions". |
+| Predictions, <br> Pre-annotations | Annotations in Label Studio format that machine learning models create for an unlabeled dataset. See [import pre-annotations](predictions.html) |
 | Templates | Example labeling configurations that you can use to specify the type of labeling that you're performing with your dataset. See [all available templates](/templates) |
 | Tags | Configuration options to customize the labeling interface. See [more about tags](/tags). |
 
 
 ## Features
 
-Label Studio is available as a Community edition open source data labeling tool. It is also available as a paid version with extended functionality and support. Smaller organizations might want to consider the SaaS option and larger teams with robust data labeling needs can get the Enterprise edition. To get started with Label Studio Enterprise edition, contact the [Heartex team](https://heartex.com/). 
+Label Studio is available as a <a href="https://labelstud.io">Community edition open source data labeling tool</a>. It is also available as a paid version with extended functionality and support. Smaller organizations might want to consider the SaaS option and larger teams with robust data labeling needs can get the Enterprise edition. To get started with Label Studio Enterprise edition, contact the [Heartex team](https://heartex.com/). 
 
 
 <table>
@@ -226,27 +291,6 @@ Start and finish a labeling project with Label Studio by following these steps:
 8. [Label and annotate the data](labeling.html). 
 <div class="enterprise-only"> 9. [Review the annotated tasks](quality.html). Only available in Label Studio Enterprise Edition.</div>
 10. [Export the labeled data or the annotations](export.html).
-
-
-## Quick start
-
-1. Install Label Studio:
-```bash
-pip install label-studio
-```
-2. Start Label Studio
-```bash
-label-studio start
-```
-3. Open the Label Studio UI at http://localhost:8080. 
-4. Sign up with an email address and password that you create.
-5. Click **Create** to create a project and start labeling data.
-6. Name the project, and if you want, type a description and select a color.
-7. Click **Data Import** and upload the data files that you want to use. If you want to use data from a local directory, cloud storage bucket, or database, skip this step for now.
-8. Click **Labeling Setup** and choose a template and customize the label names for your use case. 
-9. Click **Save** to save your project. 
-
-You're ready to start [labeling and annotating your data](labeling.html)!
 
 
 ## Architecture

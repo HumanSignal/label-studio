@@ -4,7 +4,7 @@ short: Task format
 type: guide
 tier: all
 order: 120
-order_enterprise: 106
+order_enterprise: 105
 meta_title: Label Studio Task Format
 meta_description: Label Studio documentation for exporting data labeling annotations to use in machine learning models and data science projects.
 section: "Import and Export"
@@ -18,13 +18,14 @@ When you annotate data, Label Studio stores the output in JSON format. The raw J
 ```json
 {
     "id": 1,
-
-    "data": {
-        "image": "https://example.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
-    },
     "created_at":"2021-03-09T21:52:49.513742Z",
     "updated_at":"2021-03-09T22:16:08.746926Z",
     "project":83,
+
+    "data": {
+        "image": "https://example.com/opensource/label-studio/1.jpg"
+    },
+
     "annotations": [
         {
             "id": "1001",

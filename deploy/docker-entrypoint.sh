@@ -33,6 +33,19 @@ exec_entrypoint() {
   fi
 }
 
+source_inject_envvars() {
+  if [ -n "${ENV_INJECT_SOURCES:-}" ]; then
+    IFS=","
+    for env_file in $ENV_INJECT_SOURCES; do
+       if [ -f "$env_file" ]; then
+         . $env_file
+       fi
+    done
+  fi
+}
+
+source_inject_envvars
+
 if [ "$1" = "nginx" ]; then
   # in this mode we're running in a separate container
   export APP_HOST=${APP_HOST:=app}

@@ -247,6 +247,8 @@ After you create a project template, you can use the template when you create a 
     
 </div>
 
+<div class="opensource-only">
+
 ## Where Label Studio stores your project data and configurations
 
 All labeling activities in Label Studio occur in the context of a project.
@@ -257,19 +259,4 @@ In versions of Label Studio earlier than 1.0.0, when you start Label Studio for 
 
 `label-studio start ./my_project --init`
 
-### Project directory structure
-
-In versions of Label Studio earlier than 1.0.0, the project directory is structured as follows: 
-```
-├── my_project
-│   ├── config.json     // project settings
-│   ├── tasks.json      // all imported tasks in a JSON dictionary: {task_id: task}
-│   ├── config.xml      // labeling config for the current project
-│   ├── completions     // directory with all completed annotations stored in one file for each task_id 
-│   │   ├── <task_id>.json
-│   ├── export          // stores archives with all results exported from Label Studio UI 
-│   │   ├── 2020-03-06-15-23-47.zip
-```
-
-!!! Warning
-    Modifying any of the internal project files is not recommended and can lead to unexpected behavior. Use the Label Studio UI or command line arguments (run `label-studio start --help`) to import tasks, export completed annotations, or to change label configurations. 
+</div>
