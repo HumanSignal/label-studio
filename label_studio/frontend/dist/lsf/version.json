@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-4025: Label with choice set to multiple was unselecting when using ParagraphLabels (#1126)\n\n* fix: DEV-4025: Label with choice set to multiple was unselecting when using ParagraphLabels\r\n\r\n* stop unselecting labels when change group",
-  "commit": "5450bc0a26e7033f604f691cc0ea657dcb0a305a",
-  "branch": "",
-  "date": "2023-01-05T14:28:21Z"
+  "message": "fix: DEV-3888: Fix hotkeys of dynamic children",
+  "commit": "1d7491d6d9c79b52a44e812de17324fac686fda4",
+  "branch": "master",
+  "date": "2023/01/05 17:42:38"
 }
