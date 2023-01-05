@@ -13,6 +13,11 @@ def forwards(apps, schema_editor):
         return
 
     schema_editor.execute('drop index if exists tasks_annotations_result_idx;')
+    schema_editor.execute('drop index if exists tasks_annotations_result_idx2;')
+    schema_editor.execute(
+        'create index concurrently if not exists tasks_annotations_result_proj_gin '
+        'on task_completion using gin (project_id, cast(result as text) gin_trgm_ops);'
+    )
 
 
 def backwards(apps, schema_editor):
