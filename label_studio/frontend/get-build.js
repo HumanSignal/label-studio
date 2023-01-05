@@ -113,10 +113,27 @@ async function get(projectName, ref = 'master') {
   fs.rmdirSync(newPath, { recursive: true });
   fs.mkdirSync(newPath, { recursive: true });
 
-  fs.rename(oldPath, newPath, function (err) {
+  fs.rename(oldPath, newPath, function(err) {
     if (err) throw err;
     console.log(`Successfully renamed - AKA moved into ${newPath}`);
-    fs.rmdirSync(dir, {recursive: true});
+    fs.rmdirSync(dir, { recursive: true });
+
+    if (projectName === 'lsf') {
+      console.log("Copying chunk files to the root folder");
+      // copy any lsf files that match *.chunk.js* or *.wasm to the root /static/js folder so that
+      // webworkers and wasm implementations can be loaded
+      const jsDir = path.join(newPath, 'js');
+      const pathToStatic = path.join(__dirname, '..', 'core', 'static', 'js');
+
+      fs.readdirSync(jsDir).forEach(file => {
+        if (file.match(/^.*\.(chunk\.js|chunk\.js\.map|wasm)$/)) {
+          console.log(`Copying ${file} to ${pathToStatic}`);
+
+          fs.copyFileSync(path.join(jsDir, file), path.join(pathToStatic, file));
+        }
+      });
+    }
+
     console.log(`Cleaned up tmp directory [${dir}]`);
   });
 }
