@@ -17,13 +17,13 @@ Label Studio stores your annotations in a raw JSON format in the SQLite database
 
 Image annotations exported in JSON format use percentages of overall image size, not pixels, to describe the size and location of the bounding boxes. For more information, see [how to convert the image annotation units](#Units-of-image-annotations).
 
-
-## Export data from Label Studio
-
-Export your completed annotations from Label Studio. 
-
 !!! note
     Some export formats export only the annotations and not the data from the task. For more information, see the [export formats supported by Label Studio](#Export-formats-supported-by-Label-Studio).
+
+
+<!-- md annotation_ids.md -->
+
+<div class="opensource-only">
 
 ### Export using the UI in Community Edition of Label Studio
 
@@ -55,14 +55,7 @@ To enable logs:
 DEBUG=1 LOG_LEVEL=DEBUG label-studio export <project-id> <export-format> --path=<output-path>
 ```
 
-### Export all tasks including tasks without annotations
-
-Label Studio open source exports tasks with annotations only by default. If you want to easily export all tasks including tasks without annotations, you can call  the [Easy Export API](https://api.labelstud.io/#operation/api_projects_export_read) with query param `download_all_tasks=true`. For example:
-```
-curl -X GET https://localhost:8080/api/projects/{id}/export?exportType=JSON&download_all_tasks=true
-``` 
-
-If your project is large, you can use a [snapshot export](https://api.labelstud.io/#operation/api_projects_exports_create) (or [snapshot SDK](https://labelstud.io/sdk/project.html#create-new-export-snapshot)) to avoid timeouts in most cases. Snapshots include all tasks without annotations by default.
+</div>
 
 <div class="enterprise-only">
 
@@ -88,22 +81,27 @@ In Label Studio Enterprise, create a snapshot of your data and annotations. Crea
 
 </div>
 
-### Export using the API
+### Export using the Easy Export API
 
 You can call the Label Studio API to export annotations. For a small labeling project, call the [export endpoint](/api#operation/api_projects_export_read) to export annotations.
 
-### Export snapshots using the API 
+
+#### Export all tasks including tasks without annotations
+
+Label Studio open source exports tasks with annotations only by default. If you want to easily export all tasks including tasks without annotations, you can call  the [Easy Export API](https://api.labelstud.io/#operation/api_projects_export_read) with query param `download_all_tasks=true`. For example:
+```
+curl -X GET https://localhost:8080/api/projects/{id}/export?exportType=JSON&download_all_tasks=true
+``` 
+
+If your project is large, you can use a [snapshot export](https://api.labelstud.io/#operation/api_projects_exports_create) (or [snapshot SDK](https://labelstud.io/sdk/project.html#create-new-export-snapshot)) to avoid timeouts in most cases. Snapshots include all tasks without annotations by default.
+
+
+### Export snapshots using the Snapshot API 
 
 For a large labeling project with hundreds of thousands of tasks, do the following:
 1. Make a POST request to [create a new export file or snapshot](/api#operation/api_projects_exports_create). The response includes an `id` for the created file.
 2. [Check the status of the export file created](/api#operation/api_projects_exports_read) using the `id` as the `export_pk`. 
 3. Using the `id` from the created snapshot as the export primary key, or `export_pk`, make a GET request to [download the export file](/api#operation/api_projects_exports_download_read).
-
-## Manually convert JSON annotations to another format
-You can run the [Label Studio converter tool](https://github.com/heartexlabs/label-studio-converter) on a directory or file of completed JSON annotations using the command line or Python to convert the completed annotations from Label Studio JSON format into another format. 
-
-!!! note
-    If you use versions of Label Studio earlier than 1.0.0, then this is the only way to convert your Label Studio JSON format annotations into another labeling format. 
 
 
 ## Export formats supported by Label Studio
@@ -334,7 +332,12 @@ Enterprise fields are presented in export:
 <!-- md image_units.md -->
 
 
-<!-- md annotation_ids.md -->
+## Manually convert JSON annotations to another format
+You can run the [Label Studio converter tool](https://github.com/heartexlabs/label-studio-converter) on a directory or file of completed JSON annotations using the command line or Python to convert the completed annotations from Label Studio JSON format into another format. 
+
+!!! note
+    If you use versions of Label Studio earlier than 1.0.0, then this is the only way to convert your Label Studio JSON format annotations into another labeling format. 
+
 
 ## Access task data (images, audio, texts) outside of Label Studio for ML backends
 
