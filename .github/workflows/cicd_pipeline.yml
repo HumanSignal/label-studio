@@ -76,13 +76,6 @@ jobs:
             });
             core.setOutput("commit-message", commit.commit.message);
 
-  pr_labeler:
-    name: "Validate"
-    if: github.event_name == 'pull_request'
-    permissions:
-      pull-requests: write
-    uses: heartexlabs/label-studio/.github/workflows/pr-labeler.yml@develop
-
   validate_submodules:
     name: "Validate"
     uses: heartexlabs/label-studio/.github/workflows/submodules-validator.yml@develop

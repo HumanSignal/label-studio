@@ -264,6 +264,7 @@ Invite users to your organization by doing the following:
 ### Restrict signup without invite links
 
 To restrict who has access to your Label Studio instance, invite collaborators directly using an invitation link. To disable the signup page unless someone uses the invitation link, you should add this environment variable to your setup:
+
 ```bash
 LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK=true
 ```
@@ -276,6 +277,15 @@ To activate a user account and assign a role, do the following:
 2. Locate the user with a status of **Not Activated**. 
 3. Select the drop-down under **Role** and select the relevant role for the user.
 Your changes save automatically. Repeat these steps for any additional users. 
+
+### Statuses of user accounts
+
+!!! note
+    `NOT_ACTIVATED` status is equal to `Pending` status. 
+
+If a user is in `Pending` status then it means he was invited and signed up for the account, but his role is not defined by administrator. 
+
+If you assign `Deactivate` to a role then it means you free one seat in license and a user with deactivated doesn't have access to your organization.
 
 ### Programmatically assign roles
 To programmatically activate and assign roles to users, you can use the following API endpoints. 

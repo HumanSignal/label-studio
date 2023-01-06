@@ -1,0 +1,56 @@
+textarea_in_view:
+  label_config: '
+    <View>
+    <Text name="transcript" value="$transcript"></Text>
+    <TextArea name="mytext" toName="transcript"
+                showSubmitButton="true" maxSubmissions="1" editable="true"
+                required="true" />
+    </View>
+    '
+  status_code: 200
+textarea_in_view_without_toName:
+  label_config: '
+    <View>
+    <Text name="transcript" value="$transcript"></Text>
+    <TextArea name="mytext"
+                showSubmitButton="true" maxSubmissions="1" editable="true"
+                required="true" />
+    </View>
+    '
+  status_code: 400
+textareas_in_view:
+  label_config: '
+    <View>
+    <Text name="transcript" value="$transcript"></Text>
+    <TextArea name="mytext1" toName="transcript"
+                showSubmitButton="true" maxSubmissions="1" editable="true"
+                required="true" />
+    <TextArea name="mytext2" toName="transcript"
+                    showSubmitButton="true" maxSubmissions="1" editable="true"
+                    required="true" />
+    <TextArea name="mytext3" toName="transcript"
+                    showSubmitButton="true" maxSubmissions="1" editable="true"
+                    required="true" />
+    </View>
+    '
+  status_code: 200
+textareas_in_views:
+  label_config: '
+    <View>
+    <Text name="transcript" value="$transcript"></Text>
+    <View>
+    <TextArea name="mytext1" toName="transcript"
+                showSubmitButton="true" maxSubmissions="1" editable="true"
+                required="true" />
+    </View>
+    <View>
+    <TextArea name="mytext2" toName="transcript"
+                    showSubmitButton="true" maxSubmissions="1" editable="true"
+                    required="true" />
+    <TextArea name="mytext3" toName="transcript"
+                    showSubmitButton="true" maxSubmissions="1" editable="true"
+                    required="true" />
+    </View>
+    </View>
+    '
+  status_code: 200
