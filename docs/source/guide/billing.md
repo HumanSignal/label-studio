@@ -66,4 +66,4 @@ You need to purchase additional seats for your Label Studio Teams subscription i
 
 ### Can I upgrade to Label Studio Enterprise?
 
-Yes, you can upgrade to a Label Studio Enterprise plan from Label Studio Teams! See [how to manage your plan](billing.html#Manage-your-plan).
+Yes, you can upgrade to a Label Studio Enterprise, please contact our sales: sales@heartex.com.

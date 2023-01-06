@@ -78,17 +78,7 @@ When you upload data to Label Studio, each item in the dataset becomes a labelin
 <img class="make-intense-zoom" src="/images/terms/ent/project--data-manager--quick-view-min.png">
 
 </div>
-  
-  
-<script src="/js/intense.min.js"></script>
-<script>
 
-window.onload = function() {
-	// Intensify all images on the page.
-    var element = document.querySelectorAll('.make-intense-zoom');
-	Intense(element);
-}
-</script>
 
 | Term | Description |
 | --- | --- |
@@ -103,6 +93,8 @@ window.onload = function() {
 | Templates | Example labeling configurations that you can use to specify the type of labeling that you're performing with your dataset. See [all available templates](/templates) |
 | Tags | Configuration options to customize the labeling interface. See [more about tags](/tags). |
 
+
+<div class="opensource-only">
 
 ## Features
 
@@ -276,6 +268,7 @@ Label Studio is available as a <a href="https://labelstud.io">Community edition 
   </tr>
 </table>
 
+</div>
 
 ## Labeling workflow 
 
