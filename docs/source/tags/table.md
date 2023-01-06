@@ -1,12 +1,12 @@
 ---
 title: Table
 type: tags
-order: 306
+order: 307
 meta_title: Table Tag to Display Keys & Values in Tables
 meta_description: Customize Label Studio by displaying key-value pairs in tasks for machine learning and data science projects.
 ---
 
-Use the Table tag to display object keys and values in a table.
+The `Table` tag is used to display object keys and values in a table.
 
 ### Parameters
 
