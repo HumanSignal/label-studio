@@ -221,9 +221,9 @@ Click the settings icon when labeling to configure the labeling interface to sui
 
 For example, keep a label selected after creating a region, display labels on bounding boxes, polygons and other regions while labeling, and show line numbers for text labeling.
 
-<center>
-  <img src='../images/lsf-settings.png' class="gif-border">
-</center>
+
+<img style="max-width: 600px" src='../images/lsf-settings.png' class="gif-border">
+<br/>
 <i>Figure 2: Customize the labeling interface  </i>
 
 You can also modify the layout of the screen, hide or show predictions, annotations, or the results panel, and hide or show various controls and buttons.
