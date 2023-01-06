@@ -131,9 +131,13 @@ class Task(TaskMixin, models.Model):
         """Check whether current task has been locked by some user"""
         num_locks = self.num_locks
         if self.project.skip_queue == self.project.SkipQueue.REQUEUE_FOR_ME:
-            num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) | ~Q(completed_by=user)).count()
+            num_annotations = self.annotations\
+                .filter(ground_truth=False)\
+                .exclude(Q(was_cancelled=True) | ~Q(completed_by=user)).count()
         else:
-            num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) & ~Q(completed_by=user)).count()
+            num_annotations = self.annotations\
+                .filter(ground_truth=False)\
+                .exclude(Q(was_cancelled=True) & ~Q(completed_by=user)).count()
 
         num = num_locks + num_annotations
         if num > self.overlap:
