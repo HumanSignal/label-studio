@@ -468,7 +468,7 @@ class DownloadStorageData(APIView):
     """ Check auth for nginx auth_request
     """
     swagger_schema = None
-    http_method_names = ['get']
+    http_method_names = ['get', 'head']
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, *args, **kwargs):
