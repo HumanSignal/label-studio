@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3730: Make shortcut buttons work without focusing textarea",
-  "commit": "574b019c457aa3bef5d4138b2a4690220a5ce858",
+  "commit": "5519112b0d8ca2d2f98f9d3eeeb0b639b6dcc761",
   "branch": "fb-dev-3730/shortcut-initial-element",
-  "date": "2023/01/06 17:17:32"
+  "date": "2023/01/06 19:45:17"
 }
