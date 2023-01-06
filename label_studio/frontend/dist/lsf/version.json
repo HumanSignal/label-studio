@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3730: Make shortcut buttons work without focusing textarea",
-  "commit": "271beab0bf0e8bac795389f6124ecd63d1763f7a",
+  "message": "docs: DEV-4153: Small docs fixes ",
+  "commit": "fdbd3da2f602147001175f74b0103567a3067f50",
   "branch": "master",
-  "date": "2023/01/06 19:58:27"
+  "date": "2023/01/06 17:45:52"
 }
