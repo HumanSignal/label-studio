@@ -1,7 +1,7 @@
 ---
 title: User management
 type: guide
-tier: all
+tier: opensource
 order: 114
 order_enterprise: 101
 meta_title: User Management
@@ -99,7 +99,7 @@ You can review the existing accounts in Label Studio to see which people created
 2. Review the list of users by email address and name. You can see the last time a user was active in Label Studio.
 3. Click a row to see additional detail about a specific user, including the projects that they created or contributed annotations to.
 
-### Reset password
+## Reset password
 If you forget your password or change passwords regularly for security reasons, you can change it from the command line.
 
 1. On the server running Label Studio, run the following command: 

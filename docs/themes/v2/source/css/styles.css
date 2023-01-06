@@ -710,6 +710,15 @@ main {
   font-weight: normal;
 }
 
+.content-markdown ol li ul li {
+  margin-top: 0;
+}
+
+.content-markdown ul li ul li {
+  margin-top: 0;
+}
+
+
 .Text.Large {
   --min-size: 1.15rem; /* 18px */
   --max-size: 1.25rem; /* 20px */
