@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3888: Fix hotkeys of dynamic children",
-  "commit": "1d7491d6d9c79b52a44e812de17324fac686fda4",
+  "message": "fix: DEV-3730: Make shortcut buttons work without focusing textarea",
+  "commit": "271beab0bf0e8bac795389f6124ecd63d1763f7a",
   "branch": "master",
-  "date": "2023/01/05 17:42:38"
+  "date": "2023/01/06 19:58:27"
 }
