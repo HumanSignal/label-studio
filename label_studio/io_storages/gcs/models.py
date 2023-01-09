@@ -139,12 +139,7 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
         r = urlparse(url, allow_fragments=False)
         bucket_name = r.netloc
         key = r.path.lstrip('/')
-        if self.is_gce_instance() and not self.google_application_credentials:
-            logger.debug('Generate signed URL for GCE instance')
-            return self.python_cloud_function_get_signed_url(bucket_name, key)
-        else:
-            logger.debug('Generate signed URL for local instance')
-            return self.generate_download_signed_url_v4(bucket_name, key)
+        return self.generate_download_signed_url_v4(bucket_name, key)
 
     def generate_download_signed_url_v4(self, bucket_name, blob_name):
         """Generates a v4 signed URL for downloading a blob.
