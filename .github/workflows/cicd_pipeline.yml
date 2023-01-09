@@ -76,13 +76,6 @@ jobs:
             });
             core.setOutput("commit-message", commit.commit.message);
 
-  pr_labeler:
-    name: "Validate"
-    if: github.event_name == 'pull_request'
-    permissions:
-      pull-requests: write
-    uses: heartexlabs/label-studio/.github/workflows/pr-labeler.yml@develop
-
   validate_submodules:
     name: "Validate"
     uses: heartexlabs/label-studio/.github/workflows/submodules-validator.yml@develop
@@ -146,8 +139,17 @@ jobs:
     if: needs.changed_files.outputs.src == 'true'
     uses: heartexlabs/label-studio/.github/workflows/tests.yml@develop
     with:
-      ref: ${{ github.event.pull_request.head.ref || github.ref }}
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
 
+  migrations:
+    name: "Tests"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.src == 'true'
+    uses: heartexlabs/label-studio/.github/workflows/test_migrations.yml@develop
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+    secrets: inherit
 
   draft-release:
     name: "Draft Release"
@@ -167,13 +169,24 @@ jobs:
         env:
           TARGET_COMMITISH: "${{ github.ref_name }}"
           RELEASE_BRANCH_PREFIX: "${{ env.RELEASE_BRANCH_PREFIX }}"
+          DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"
         with:
           script: |
             const { repo, owner } = context.repo;
             const target_commitish = process.env.TARGET_COMMITISH;
+            const default_branch = process.env.DEFAULT_BRANCH;
             let version = target_commitish.replace(process.env.RELEASE_BRANCH_PREFIX, '')
-            core.setOutput("rc-version", `${version}rc${{ github.run_id }}`);
             const regexp = '^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)(\.post([0-9]+))?$';
+
+            const {data: compare} = await github.rest.repos.compareCommits({
+              owner,
+              repo,
+              base: default_branch,
+              head: target_commitish,
+            });
+            const rc_version = `${version}rc${ compare.ahead_by }`
+            console.log(`rc-version: ${rc_version}`)
+            core.setOutput("rc-version", rc_version);
             
             function compareVersions(a, b) {
               if (a[1] === b[1])
@@ -194,11 +207,15 @@ jobs:
               process.exit()
             }
 
-            const {data: tags} = await github.rest.repos.listTags({
+            const tags = await github.paginate(
+              github.rest.repos.listTags,
+              {
                 owner,
                 repo,
                 per_page: 100
-            });
+              },
+              (response) => response.data
+            );
             console.log(`Tags:`)
             console.log(tags.map(e => e.name))
             const matchedTags = tags.filter(e => e.name.indexOf(version) !== -1)
@@ -231,10 +248,15 @@ jobs:
             console.log(`Previous version: ${previousTag}`)
 
             console.log('Find or Create a Draft release')
-            const {data: releases} = await github.rest.repos.listReleases({
+            const releases = await github.paginate(
+              github.rest.repos.listReleases,
+              {
                 owner,
                 repo,
-            });
+                per_page: 100
+              },
+              (response) => response.data
+            );
             let release = releases.find(e => target_commitish.endsWith(e.target_commitish) && e.draft)
             if (release) {
                 console.log(`Draft release already exist ${release.html_url}`)

@@ -1,7 +1,7 @@
 ---
 title: Secure Label Studio
 type: guide
-tier: enterprise
+tier: all
 order: 101
 order_enterprise: 128
 meta_title: Secure Label Studio
@@ -17,14 +17,20 @@ All application component interactions are encrypted using the TLS protocol.
 
 <div class="enterprise-only">
 
-Role-based access control is only available in Label Studio Enterprise deployments. Label Studio Enterprise is available as on-premises software that you manage, or as a Software-as-a-Service (SaaS) offering.
+Role-based access control is only available in Label Studio Enterprise.
 
 </div>
 
 <!--If you need to meet strong privacy regulations, legal requirements, or you want to make a custom installation within your infrastructure or any public cloud (AWS, Google, Azure, etc.), Label Studio Enterprise works on-premises. It is a self-contained version (no Internet connection is required) of the Platform, no data will leave your infrastructure. To make the installation the most accessible, we offer a Docker image.-->
 
-If you're running the open source version in production, restrict access to the Label Studio server. Label Studio establishes secure connections to the web application by enforcing HTTPS and secured cookies. Restrict access to the server itself by opening only the [required ports](install.html#Port_requirements) on the server.
+Label Studio establishes secure connections to the web application by enforcing HTTPS and secured cookies.
 
+<div class="opensource-only">
+
+If you're running the open source version in production, restrict access to the Label Studio server.
+Restrict access to the server itself by opening only the [required ports](install.html#Port_requirements) on the server.
+
+</div>
 
 ## Secure user access to Label Studio
 
@@ -50,11 +56,12 @@ Access to the REST API is restricted by user role and requires an access token t
 ## Secure access to data in Label Studio
 
 Data in Label Studio is stored in one or two places, depending on your deployment configuration.
-- Project settings and configuration details are stored in a SQLite or PostgreSQL database. 
-- Project data and annotations can be stored in the SQLite or PostgreSQL database, or stored in a local file directory, a Redis database, or cloud storage buckets on Amazon Web Services (AWS), Google Cloud Platform (GCP), or Microsoft Azure. Data stored in external storage is accessed by Label Studio using URLs, and the data is not stored in Label Studio directly.
+- Project settings and configuration details are stored in Label Studio's internal database. 
+- Input data (texts, images, audio files) is hosted by external data storage and provided to the Label Studio by using URI links. The data is not stored in Label Studio directly, the content is retrieved client-side only.
+- Project annotations are stored in the internal database, and optionally can be stored in a local file directory, a Redis database, or cloud storage buckets on Amazon Web Services (AWS), Google Cloud Platform (GCP), or Microsoft Azure. 
 
 ### Secure database access
-Label Studio does not permit direct access to the SQLite or PostgreSQL databases from the app to prevent SQL injection attacks and other data exfiltration attempts. 
+Label Studio does not permit direct access to the internal databases from the app to prevent SQL injection attacks and other data exfiltration attempts. 
 
 Instead, the app uses URIs to access the data stored in the database. These URIs can only be accessed by the Label Studio labeling interface and API because the requests to retrieve the data using those URIs are verified and proxied by Basic Authentication headers.
 
@@ -70,12 +77,20 @@ Label Studio accesses the data stored in remote cloud storage using URLs, so pla
 
 Use workspaces, projects, and roles to further secure access to cloud storage and data accessed using URLs by setting up cloud storage credentials. You can provide cloud storage authentication credentials globally for all projects in Label Studio, or use different credentials for access to different buckets on a per-project basis. Label Studio allows you to configure different cloud storage buckets for different projects, making it easier to manage access to the data. See [Sync data from external storage](storage.html).
 
+<div class="enterprise-only">
+
 In Label Studio Enterprise, if you're using Amazon S3, Label Studio can use an IAM role configured with an external ID to access S3 bucket contents securely. See [Set up an S3 connection with IAM role access](storage.html#Set-up-an-S3-connection-with-IAM-role-access)
 
+</div>
 
 ### Secure access to Redis storage
 If you use Redis as an external storage database for data and annotations, the setup supports TLS/SSL and requires the Label Studio client to be authenticated to the database with a valid certificate.
 
+
+<div class="enterprise-only">
+
 ## Audit logging
 
 Label Studio Enterprise automatically logs all user activities so that you can monitor the activities being performed in the application.
+
+</div>

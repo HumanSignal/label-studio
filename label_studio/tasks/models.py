@@ -30,6 +30,7 @@ from core.utils.common import find_first_one_to_one_related_field_by_prefix, str
 from core.utils.params import get_env
 from core.label_config import SINGLE_VALUED_TAGS
 from core.current_request import get_current_request
+from tasks.choices import ActionType
 from data_manager.managers import PreparedTaskManager, TaskManager
 from core.bulk_update_utils import bulk_update
 from data_import.models import FileUpload
@@ -130,9 +131,13 @@ class Task(TaskMixin, models.Model):
         """Check whether current task has been locked by some user"""
         num_locks = self.num_locks
         if self.project.skip_queue == self.project.SkipQueue.REQUEUE_FOR_ME:
-            num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) | ~Q(completed_by=user)).count()
+            num_annotations = self.annotations\
+                .filter(ground_truth=False)\
+                .exclude(Q(was_cancelled=True) | ~Q(completed_by=user)).count()
         else:
-            num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) & ~Q(completed_by=user)).count()
+            num_annotations = self.annotations\
+                .filter(ground_truth=False)\
+                .exclude(Q(was_cancelled=True) & ~Q(completed_by=user)).count()
 
         num = num_locks + num_annotations
         if num > self.overlap:
@@ -158,11 +163,6 @@ class Task(TaskMixin, models.Model):
             if hasattr(self, link_name):
                 return getattr(self, link_name).key
 
-    def get_lock_ttl(self):
-        if settings.TASK_LOCK_TTL is not None:
-            return settings.TASK_LOCK_TTL
-        return settings.TASK_LOCK_MIN_TTL
-
     def has_permission(self, user):
         return self.project.has_permission(user)
 
@@ -173,7 +173,7 @@ class Task(TaskMixin, models.Model):
         """Lock current task by specified user. Lock lifetime is set by `expire_in_secs`"""
         num_locks = self.num_locks
         if num_locks < self.overlap:
-            lock_ttl = self.get_lock_ttl()
+            lock_ttl = settings.TASK_LOCK_TTL
             expire_at = now() + datetime.timedelta(seconds=lock_ttl)
             TaskLock.objects.create(task=self, user=user, expire_at=expire_at)
             logger.debug(f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
@@ -351,7 +351,7 @@ with tt as (
 AnnotationMixin = load_func(settings.ANNOTATION_MIXIN)
 
 
-class Annotation(AnnotationMixin, models.Model):
+class Annotation(models.Model):
     """ Annotations & Labeling results
     """
     objects = AnnotationManager()
@@ -366,6 +366,9 @@ class Annotation(AnnotationMixin, models.Model):
                                 help_text='Project ID for this annotation')
     completed_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="annotations", on_delete=models.SET_NULL,
                                      null=True, help_text='User ID of the person who created this annotation')
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='updated_annotations',
+                                   on_delete=models.SET_NULL, null=True, verbose_name=_('updated by'),
+                                   help_text='Last user who updated this annotation')
     was_cancelled = models.BooleanField(_('was cancelled'), default=False, help_text='User skipped the task', db_index=True)
     ground_truth = models.BooleanField(_('ground_truth'), default=False, help_text='This annotation is a Ground Truth (ground_truth)', db_index=True)
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
@@ -383,6 +386,22 @@ class Annotation(AnnotationMixin, models.Model):
                                           related_name='child_annotations',
                                           null=True,
                                           help_text='Points to the parent annotation from which this annotation was created')
+    last_action = models.CharField(
+        _('last action'),
+        max_length=128,
+        choices=ActionType.choices,
+        help_text='Action which was performed in the last annotation history item',
+        default=None,
+        null=True,
+    )
+    last_created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        verbose_name=_('last created by'),
+        help_text='User who created the last annotation history item',
+        default=None,
+        null=True
+    )
 
     class Meta:
         db_table = 'task_completion'
@@ -394,6 +413,8 @@ class Annotation(AnnotationMixin, models.Model):
             models.Index(fields=['was_cancelled']),
             models.Index(fields=['ground_truth']),
             models.Index(fields=['created_at']),
+            models.Index(fields=['last_action']),
+            models.Index(fields=['last_created_by']),
         ] + AnnotationMixin.Meta.indexes
 
     def created_ago(self):
@@ -436,6 +457,9 @@ class Annotation(AnnotationMixin, models.Model):
         self.task.save(update_fields=update_fields)
 
     def save(self, *args, **kwargs):
+        request = get_current_request()
+        if request:
+            self.updated_by = request.user
         result = super().save(*args, **kwargs)
         self.update_task()
         return result
@@ -762,7 +786,7 @@ def update_task_stats(task, stats=('is_labeled',), save=True):
         task.save()
 
 
-def bulk_update_stats_project_tasks(tasks):
+def bulk_update_stats_project_tasks(tasks, project=None):
     """bulk Task update accuracy
        ex: after change settings
        apply several update queries size of batch
@@ -772,13 +796,34 @@ def bulk_update_stats_project_tasks(tasks):
     :return:
     """
     # recalc accuracy
+    if not tasks:
+        # break if tasks is empty 
+        return
+    # get project if it's not in params
+    if project is None:
+        project = tasks[0].project
     with transaction.atomic():
-        # update objects without saving
-        for task in tasks:
-            update_task_stats(task, save=False)
-        # start update query batches
-        bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
-    Task.post_process_bulk_update_stats(tasks)
+        use_overlap = project._can_use_overlap()
+        maximum_annotations = project.maximum_annotations
+        # update filters if we can use overlap
+        if use_overlap:
+            # finished tasks
+            finished_tasks = tasks.filter(Q(total_annotations__gte=maximum_annotations) |
+                                          Q(total_annotations__gte=1, overlap=1))
+            finished_tasks.update(is_labeled=True)
+            # unfinished tasks
+            tasks.exclude(id__in=finished_tasks).update(is_labeled=False)
+        else:
+            # update objects without saving if we can't use overlap
+            for task in tasks:
+                update_task_stats(task, save=False)
+            try:
+                # start update query batches
+                bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+            except OperationalError as exp:
+                logger.error("Operational error while updating tasks: {exc}", exc_info=True)
+                # try to update query batches one more time
+                start_job_async_or_sync(bulk_update, tasks, in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \

@@ -255,6 +255,9 @@ cd label-studio/frontend
 yarn download:lsf <branch-name-from-official-lsf-repo>
 ```
 
+
+<div class="opensource-only">
+
 ## Custom LSF in Label Studio
 
 LS Frontend (LSF) with Backend (LSB) integration is similar what is described in the [Frontend integration guide](#Frontend-integration-guide). The JavaScript integration script is placed in [lsf-sdk.js](https://github.com/heartexlabs/label-studio/blob/master/label_studio/static/js/lsf-sdk.js) in the Label Studio Backend. The main idea of this integration based on LSF callbacks.
@@ -292,3 +295,5 @@ Under `dist/` folder locate the `lsf/` folder and replace its contents with your
     ```bash
     label-studio start <your-project>
     ```
+
+</div>

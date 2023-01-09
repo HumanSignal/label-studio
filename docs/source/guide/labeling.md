@@ -147,10 +147,10 @@ This table describes the hotkeys for a standard keyboard. For a Mac keyboard, us
 | `alt` + `h` | Hide a selected region. | 
 | `ctrl` + `d` OR `cmd` + `d` | Duplicate a selected region. |
 | `u` | Unselect a selected region. | 
-| `s` | On the data manager, change the row selection to the next row, 1 below the current row. |
-| `w` | On the data manager, change the row selection to the previous row, 1 above the current row. |
-| `d` | On the data manager, open the labeling quick view for the selected task row. | 
-| `a` | On the data manager, close the labeling quick view for the selected task row. |
+| `shift + down` | On the data manager, change the row selection to the next row, 1 below the current row. |
+| `shift + up` | On the data manager, change the row selection to the previous row, 1 above the current row. |
+| `shift + right` | On the data manager, open the labeling quick view for the selected task row. | 
+| `shift + left` | On the data manager, close the labeling quick view for the selected task row. |
 
 Other annotation types have labeling-specific shortcuts, such as numbers to select specific labels for named entity recognition tasks. 
 
@@ -221,9 +221,9 @@ Click the settings icon when labeling to configure the labeling interface to sui
 
 For example, keep a label selected after creating a region, display labels on bounding boxes, polygons and other regions while labeling, and show line numbers for text labeling.
 
-<center>
-  <img src='../images/lsf-settings.png' class="gif-border">
-</center>
+
+<img style="max-width: 600px" src='../images/lsf-settings.png' class="gif-border">
+<br/>
 <i>Figure 2: Customize the labeling interface  </i>
 
 You can also modify the layout of the screen, hide or show predictions, annotations, or the results panel, and hide or show various controls and buttons.

@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3901: Paragraph overflow text issue when outliner disabled",
-  "commit": "e6c5505d7304adcbd3619107b3e5787165061959",
+  "message": "docs: DEV-4153: Small docs fixes ",
+  "commit": "fdbd3da2f602147001175f74b0103567a3067f50",
   "branch": "master",
-  "date": "2022/12/06 12:12:05"
+  "date": "2023/01/06 17:45:52"
 }

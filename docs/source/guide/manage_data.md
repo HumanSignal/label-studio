@@ -15,7 +15,20 @@ After you [set up your project](setup_project.html) and [labeling interface](set
 
 You can also take steps to manage your data, such as assigning annotators to tasks in Label Studio Enterprise, or deleting tasks and annotations if needed. 
 
-<br/><img src="/images/ls-data-manager.png" alt="Screenshot of the Label Studio UI showing an OCR project including photographs of receipts, prediction scores, and other metadata for each labeling task." class="gif-border" width="800px" height="515px" />
+<div class="opensource-only">
+<br><br>
+<center><i>Data Manager Screenshot</i></center>
+<img class="make-intense-zoom" src="/images/terms/os/project--data-manager-min.png" alt="Screenshot of the Label Studio UI showing an OCR project including photographs of receipts, prediction scores, and other metadata for each labeling task.">
+</div>
+
+
+<div class="enterprise-only">
+<br><br>
+<center><i>Data Manager Screenshot</i></center>
+<img class="make-intense-zoom" src="/images/terms/ent/project--data-manager-min.png" alt="Screenshot of the Label Studio UI showing an OCR project including photographs of receipts, prediction scores, and other metadata for each labeling task.">
+</div>
+
+
 
 In Label Studio Community Edition, the data manager is the default view for your data. In Label Studio Enterprise, click **Data Manager** to open and view the data manager page. Every row in the data manager represents a labeling task in your dataset.
 
@@ -24,6 +37,8 @@ In Label Studio Community Edition, the data manager is the default view for your
 With filters and tabs, you can split data into different sections to be labeled by different annotators, or set up data in a particular order to perform labeling according to prediction score, or another value in your data.
 
 When you filter or sort the data before you label it, you modify which tasks and the order of the tasks you see when labeling. While [task sampling](start.html#Set_up_task_sampling_for_your_project) affects the task order for an entire project and can't be changed, filtering and sorting tasks can be changed at any time. 
+
+<img src="/images/data-manager-filters.png" class="gif-border">
 
 ### Example: Label new data first
 Sort the data in your project by date to focus on labeling the newest data first.

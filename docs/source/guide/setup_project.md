@@ -18,8 +18,13 @@ After you [start Label Studio](start.html) and [create an account](signup.html),
 2. [Import data](tasks.html).
 3. Select a template to configure the labeling interface for your dataset. [Set up the labeling interface for your project](setup.html).
 4. (Optional) [Set up annotation settings for your project](#Set-up-annotation-settings-for-your-project). 
-5. (Optional, Label Studio Enterprise only) [Set up review settings for your project](#Set-up-review-settings-for-your-project).
-6. [Publish your project](#Publish-project-to-annotators). (Label Studio Enterprise only)
+
+<div class="enterprise-only">
+
+5. (Optional) [Set up review settings for your project](#Set-up-review-settings-for-your-project).
+6. [Publish your project](#Publish-project-to-annotators).
+
+</div>
 
 ## Create a project
 
@@ -50,7 +55,19 @@ Some annotation settings are only available in Label Studio Enterprise Edition. 
 In the project settings, you can add instructions and choose whether to show the instructions to annotators before they perform labeling. 
 
 1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Instructions**, or in Label Studio Enterprise, click **Annotation Settings**. 
+
+<div class="enterprise-only">
+
+2. Click **Annotation Settings**.
+
+</div>
+
+<div class="opensource-only">
+
+2. Click **Instructions**.
+
+</div>
+
 3. Type instructions and choose whether to show the instructions to annotators before labeling. If you want to provide additional details or links for reference, instructions support HTML markup.
 4. Click **Save**. <br/>Click the project name to return to the data manager view. 
 
@@ -230,6 +247,8 @@ After you create a project template, you can use the template when you create a 
     
 </div>
 
+<div class="opensource-only">
+
 ## Where Label Studio stores your project data and configurations
 
 All labeling activities in Label Studio occur in the context of a project.
@@ -240,19 +259,4 @@ In versions of Label Studio earlier than 1.0.0, when you start Label Studio for 
 
 `label-studio start ./my_project --init`
 
-### Project directory structure
-
-In versions of Label Studio earlier than 1.0.0, the project directory is structured as follows: 
-```
-├── my_project
-│   ├── config.json     // project settings
-│   ├── tasks.json      // all imported tasks in a JSON dictionary: {task_id: task}
-│   ├── config.xml      // labeling config for the current project
-│   ├── completions     // directory with all completed annotations stored in one file for each task_id 
-│   │   ├── <task_id>.json
-│   ├── export          // stores archives with all results exported from Label Studio UI 
-│   │   ├── 2020-03-06-15-23-47.zip
-```
-
-!!! Warning
-    Modifying any of the internal project files is not recommended and can lead to unexpected behavior. Use the Label Studio UI or command line arguments (run `label-studio start --help`) to import tasks, export completed annotations, or to change label configurations. 
+</div>

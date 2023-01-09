@@ -379,6 +379,8 @@ styled_scroll()
   overflow-y: auto
   border-left: 1px solid $black_10
   background-color: $grey_2
+  display flex
+  flex-direction column
   styled_scroll()
   h3
     margin: 8px 0 16px
@@ -387,6 +389,9 @@ styled_scroll()
     display: block
     width: 100%
     height: 100%
+  &-ui
+    flex 1
+    min-height 0
   &-error
     color: #771b04
     border: 1px solid #e68a6e
