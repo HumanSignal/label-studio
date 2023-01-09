@@ -953,6 +953,7 @@ class ProjectSummary(models.Model):
     created_labels = JSONField(_('created labels'), null=True, default=dict, help_text='Unique labels')
 
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
     def reset(self, tasks_data_based=True):

@@ -160,6 +160,7 @@ class Task(TaskMixin, models.Model):
                 return getattr(self, link_name).key
 
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
     def clear_expired_locks(self):
@@ -427,6 +428,7 @@ class Annotation(models.Model):
         return len(res)
 
     def has_permission(self, user):
+        user.project = self.task.project  # link for activity log
         return self.task.project.has_permission(user)
 
     def increase_project_summary_counters(self):
@@ -527,6 +529,7 @@ class AnnotationDraft(models.Model):
         return timesince(self.created_at)
 
     def has_permission(self, user):
+        user.project = self.task.project  # link for activity log
         return self.task.project.has_permission(user)
 
 
@@ -549,6 +552,7 @@ class Prediction(models.Model):
         return timesince(self.created_at)
 
     def has_permission(self, user):
+        user.project = self.task.project  # link for activity log
         return self.task.project.has_permission(user)
 
     @classmethod
