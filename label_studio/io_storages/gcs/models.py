@@ -127,15 +127,6 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
                 f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
         return value
 
-    @classmethod
-    def is_gce_instance(cls):
-        """Check if it's GCE instance via DNS lookup to metadata server"""
-        try:
-            socket.getaddrinfo('metadata.google.internal', 80)
-        except socket.gaierror:
-            return False
-        return True
-
     def generate_http_url(self, url):
         r = urlparse(url, allow_fragments=False)
         bucket_name = r.netloc
@@ -186,28 +177,6 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
             "credentials": credentials
         }
         return out
-
-    def python_cloud_function_get_signed_url(self, bucket_name, blob_name):
-        # https://gist.github.com/jezhumble/91051485db4462add82045ef9ac2a0ec
-        # Copyright 2019 Google LLC.
-        # SPDX-License-Identifier: Apache-2.0
-        # This snippet shows you how to use Blob.generate_signed_url() from within compute engine / cloud functions
-        # as described here: https://cloud.google.com/functions/docs/writing/http#uploading_files_via_cloud_storage
-        # (without needing access to a private key)
-        # Note: as described in that page, you need to run your function with a service account
-        # with the permission roles/iam.serviceAccountTokenCreator
-        auth_request = requests.Request()
-        credentials, project = google.auth.default(['https://www.googleapis.com/auth/cloud-platform'])
-        storage_client = google_storage.Client(project, credentials)
-        # storage_client = self.get_client()
-        data_bucket = storage_client.lookup_bucket(bucket_name)
-        signed_blob_path = data_bucket.blob(blob_name)
-        expires_at_ms = datetime.now() + timedelta(minutes=self.presign_ttl)
-        # This next line is the trick!
-        signing_credentials = compute_engine.IDTokenCredentials(auth_request, "",
-                                                                service_account_email=None)
-        signed_url = signed_blob_path.generate_signed_url(expires_at_ms, credentials=signing_credentials, version="v4")
-        return signed_url
 
     def scan_and_create_links(self):
         return self._scan_and_create_links(GCSImportStorageLink)
