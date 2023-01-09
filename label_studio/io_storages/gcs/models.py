@@ -123,7 +123,8 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
         blob_str = blob.download_as_string()
         value = json.loads(blob_str)
         if not isinstance(value, dict):
-            raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
+            raise ValueError(
+                f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
         return value
 
     @classmethod
@@ -161,10 +162,30 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
             expiration=timedelta(minutes=self.presign_ttl),
             # Allow GET requests using this URL.
             method="GET",
+            **self._get_signing_kwargs()
         )
 
         logger.debug('Generated GCS signed url: ' + url)
         return url
+
+    def _get_signing_credentials(self):
+        # TODO: fix me
+        # with self._signing_credentials_lock:
+        #     if self._signing_credentials is None or self._signing_credentials.expired:
+        credentials, _ = google.auth.default(['https://www.googleapis.com/auth/cloud-platform'])
+        auth_req = google.auth.transport.requests.Request()
+        credentials.refresh(auth_req)
+        self._signing_credentials = credentials
+        return self._signing_credentials
+
+    def _get_signing_kwargs(self):
+        credentials = self._get_signing_credentials()
+        out = {
+            "service_account_email": credentials.service_account_email,
+            "access_token": credentials.token,
+            "credentials": credentials
+        }
+        return out
 
     def python_cloud_function_get_signed_url(self, bucket_name, blob_name):
         # https://gist.github.com/jezhumble/91051485db4462add82045ef9ac2a0ec
