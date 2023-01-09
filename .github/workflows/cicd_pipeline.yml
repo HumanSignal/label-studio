@@ -19,8 +19,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.pull_request.head.ref || github.ref }}
   cancel-in-progress: true
 
-permissions: read-all
-
 env:
   RELEASE_BRANCH_PREFIX: "ls-release/"
 
@@ -125,6 +123,7 @@ jobs:
       ( ( github.ref_name == 'develop' && needs.changed_files.outputs.docker == 'true' )
         || startsWith(github.ref_name, 'ls-release/') )
     permissions:
+      contents: read
       checks: write
     uses: heartexlabs/label-studio/.github/workflows/docker-build.yml@develop
     with:
