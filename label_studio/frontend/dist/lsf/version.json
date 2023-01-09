@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3901: Paragraph overflow text issue when outliner disabled",
-  "commit": "e6c5505d7304adcbd3619107b3e5787165061959",
-  "branch": "master",
-  "date": "2022/12/06 12:12:05"
+  "message": "fix: DEV-3919: Pin regions to the bottom in Preview",
+  "commit": "a8dd9c2ffde9a19293005b2be6f3eeb75d954acb",
+  "branch": "fb-dev-3919",
+  "date": "2023/01/09 17:06:18"
 }
