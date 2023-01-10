@@ -198,6 +198,9 @@ def skipped_queue(next_task, prepared_tasks, project, user, queue_info):
 def postponed_queue(next_task, prepared_tasks, project, user, queue_info):
     if not next_task:
         q = Q(task__project=project, task__isnull=False, was_postponed=True, task__is_labeled=False)
+        if flag_set(FFLAG_OVERLAP_ISSUE_EXPERIMENTS, user):
+            # In postponed queue, filter only tasks with comments - other tasks remain there until unlocked
+            q &= Q(task__comments__isnull=False)
         postponed_tasks = user.drafts.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
         if postponed_tasks.exists():
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(postponed_tasks)])
