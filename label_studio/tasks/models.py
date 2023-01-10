@@ -645,7 +645,7 @@ def update_all_task_states_after_deleting_task(sender, instance, **kwargs):
 
 @receiver(pre_delete, sender=Task)
 def remove_data_columns(sender, instance, **kwargs):
-    """Reduce data column counters afer removing task"""
+    """Reduce data column counters after removing task"""
     instance.decrease_project_summary_counters()
 
 
