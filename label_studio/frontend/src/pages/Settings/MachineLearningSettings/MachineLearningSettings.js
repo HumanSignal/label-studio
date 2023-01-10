@@ -31,10 +31,17 @@ export const MachineLearningSettings = () => {
   const [fetchedPrecisions, setFetchPrecisions] = useState(false);
   const webhook_url = getWebhookUrl();
   const [generateSpecs, setGenerateSpecs] = useState(true);
+  const [selectedTrainingType, setSelectedTrainingType] = useState('');
+  const [trainingTypes, setTrainingTypes] = useState([]);
 
   const handleChange = event => {
     setGenerateSpecs(!event.target.checked);
   };
+
+  const handleTrainingTypeChange = (event) => {
+    setSelectedTrainingType(event.target.value);
+  }
+
 
   const mod = useCallback(async () => {
     await axios
@@ -49,21 +56,25 @@ export const MachineLearningSettings = () => {
       .catch((error) => {
         console.log(error);
       });
+    await axios
+    .get(webhook_url + '/get_training_types?id=' + project.id)
+      .then((response) => {
+        const training_types = response.data.training_types;
+        setTrainingTypes(training_types);
+        setSelectedTrainingType(training_types[0]);
+    })
       await axios
       .get(webhook_url + '/get_mean_average_precisions?id=' + project.id)
         .then((response) => {
           console.log(response);
           setModelsPrecisions(response.data.models);
           setFetchModels(true)
-          console.log(Object.keys(response.data.models))
       })
       .catch((error) => {
         console.log(error);
       });
     await axios.get(webhook_url+ '/get_available_model_versions?id=' + project.id)
       .then((response) => {
-        console.log("model versions")
-        console.log(response.data.model_versions)
         setModelToPredictOn(response.data.current_model_version)
         setAvailableModels(response.data.model_versions)
     })
@@ -122,6 +133,14 @@ export const MachineLearningSettings = () => {
       }
     })
   }
+  async function onDeleteModel(model_version) {
+    console.log('deleting model')
+    axios.post(webhook_url + '/deleteModel?id=' + project.id + '&model_version=' + model_version)
+      .then((data) => {
+        if (data.delete = True)
+          Swal('Model is successfully deleted');
+      });
+  }
   async function onExportModel(model_version) {
             console.log(model_version)
             Swal('Exporting Model, it may take some time')
@@ -151,7 +170,7 @@ export const MachineLearningSettings = () => {
           }
           else if (can_press == true) {
             Swal('Training has started');
-            axios.post(webhook_url + '/train?id=' + project.id+'&generateSpecs='+generateSpecs).then((response) => {
+            axios.post(webhook_url + '/train?id=' + project.id+'&generateSpecs='+generateSpecs+'&type='+selectedTrainingType).then((response) => {
               console.log(response);
             })
           }
@@ -311,9 +330,25 @@ export const MachineLearningSettings = () => {
       />
       Generate new specs for training
     </label></div>
+        <div style={{marginTop: 10}}>
+      <label htmlFor="training-type-select">Select Training Type:</label>
+            <select
+              style={{marginLeft: 5}}
+        id="training-type-select"
+        value={selectedTrainingType}
+        onChange={handleTrainingTypeChange}
+      >
+        {trainingTypes.map(type => (
+          <option key={type} value={type}>
+            {type}
+          </option>
+        ))}
+          </select>
+        </div>
         <div>
-        <Button style={{ marginTop: 5 }} onClick={() => trainModel()}>Train New Model</Button>
-      </div>
+      <Button style={{ marginTop: 10 }} onClick={() => trainModel()}>Train New Model</Button>
+
+    </div>
         {/* <Button style={{marginLeft: 20}} onClick={() => onExportModel()}>
         Export Model
       </Button>
@@ -394,7 +429,8 @@ export const MachineLearningSettings = () => {
                         : ''}
                       <div style={{marginTop: 20}}>
                       <button style={{marginRight: 10}} onClick={() =>onExportModel(model.value)} className='btn btn-outline-primary'>Export Model</button>
-                      <button onClick={() =>onPrune(model.value)} className='btn btn-outline-danger'>Prune/Re-train</button>
+                      <button onClick={() =>onPrune(model.value)} className='btn btn-outline-warning'>Prune/Re-train</button>
+                      <button style={{marginLeft: 10}} onClick={() =>onDeleteModel(model.value)} className='btn btn-outline-danger'>Delete Model</button>
 
                       </div>
                       </div>
