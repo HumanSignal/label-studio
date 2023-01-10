@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/"
+  to = "/guide"
+  status = 301
+  force = true
