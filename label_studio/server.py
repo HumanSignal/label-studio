@@ -10,11 +10,13 @@ import json
 import getpass
 
 from colorama import init, Fore
+
 if sys.platform == 'win32':
     init(convert=True)
 
 # on windows there will be problems with sqlite and json1 support, so fix it
 from label_studio.core.utils.windows_sqlite_fix import windows_dll_fix
+
 windows_dll_fix()
 
 from django.core.management import call_command
@@ -26,9 +28,7 @@ from django.db.migrations.executor import MigrationExecutor
 from label_studio.core.argparser import parse_input_args
 from label_studio.core.utils.params import get_env
 
-
 logger = logging.getLogger(__name__)
-
 
 LS_PATH = str(pathlib.Path(__file__).parent.absolute())
 DEFAULT_USERNAME = 'default_user@localhost'

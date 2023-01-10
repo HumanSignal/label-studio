@@ -17,8 +17,7 @@ _api_projects_urlpatterns = [
     path('<int:pk>/import', api.ImportAPI.as_view(), name='project-import'),
     path('<int:pk>/import/predictions', api.ImportPredictionsAPI.as_view(), name='project-import-predictions'),
     path('<int:pk>/reimport', api.ReImportAPI.as_view(), name='project-reimport'),
-    path('<int:pk>/file-uploads', api.FileUploadListAPI.as_view(), name='project-file-upload-list'),
-    path('<int:pk>/', api.FileUploadListAPI.as_view(), name='project-file-upload-list'),
+    path('<int:pk>/file-uploads', api.FileUploadListAPI.as_view(), name='project-file-upload-list')
 ]
 
 urlpatterns = [
@@ -27,4 +26,5 @@ urlpatterns = [
 
     # special endpoints for serving imported files
     path('data/upload/<path:filename>', api.UploadedFileResponse.as_view(), name='data-upload'),
+    path('storage-data/uploaded/', api.DownloadStorageData.as_view(), name='storage-data-upload'),
 ]

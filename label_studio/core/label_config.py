@@ -62,8 +62,16 @@ def _fix_choices(config):
     workaround for single choice
     https://github.com/heartexlabs/label-studio/issues/1259
     '''
-    if 'Choices' in config and 'Choice' in config['Choices'] and not isinstance(config['Choices']['Choice'], list):
-        config['Choices']['Choice'] = [config['Choices']['Choice']]
+    if 'Choices' in config:
+        # for single Choices tag in View
+        if 'Choice' in config['Choices'] and not isinstance(config['Choices']['Choice'], list):
+            config['Choices']['Choice'] = [config['Choices']['Choice']]
+        # for several Choices tags in View
+        elif isinstance(config['Choices'], list) and all('Choice' in tag_choices for tag_choices in config['Choices']):
+            for n in range(len(config['Choices'])):
+                # check that Choices tag has only 1 choice
+                if not isinstance(config['Choices'][n]['Choice'], list):
+                    config['Choices'][n]['Choice'] = [config['Choices'][n]['Choice']]
     if 'View' in config:
         if isinstance(config['View'], OrderedDict):
             config['View'] = _fix_choices(config['View'])
@@ -125,7 +133,10 @@ def extract_data_types(label_config):
         name = match.get('value')
         if len(name) > 1 and name[0] == '$':
             name = name[1:]
-            data_type[name] = match.tag
+            # video has highest priority, e.g.
+            # for <Video value="url"/> <Audio value="url"> it must be data_type[url] = Video
+            if data_type.get(name) != 'Video':
+                data_type[name] = match.tag
 
     return data_type
 

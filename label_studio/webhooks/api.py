@@ -1,6 +1,5 @@
 import logging
 
-
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 import django_filters
@@ -112,7 +111,6 @@ class WebhookInfoAPI(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
-
         result = {
             key: {
                 'name': value['name'],

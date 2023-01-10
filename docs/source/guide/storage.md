@@ -381,19 +381,6 @@ You can also create a storage connection using the Label Studio API.
 ## Local storage
 If you have local files that you want to add to Label Studio from a specific directory, you can set up a specific local directory on the machine where LS is running as source or target storage. Label Studio steps through the directory recursively to read tasks.
 
-### Tasks with local storage file references 
-In cases where your tasks have multiple or complex input sources, such as multiple object tags in the labeling config or a HyperText tag with custom data values, you must prepare tasks manually. 
-
-In those cases, you can add local storage without syncing (to avoid automatic task creation from storage files) and specify the local files in your data values. For example, to specify multiple data types in the Label Studio JSON format, specifically an audio file `1.wav` and an image file `1.jpg`:
-```
-{
- "data": {
-    "audio": "/data/local-files/?d=dataset1/1.wav",
-    "image": "/data/local-files/?d=dataset1/1.jpg"
-  }
-}
-```
-
 ### Prerequisites
 Add these variables to your environment setup:
 - `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true`
@@ -410,16 +397,50 @@ In the Label Studio UI, do the following to set up the connection:
    <img src="/images/local-storage-settings.png" alt="Screenshot of the storage settings modal described in the preceding steps." width=670 height=490 style="border: 1px solid #eee">
 4. In the dialog box that appears, select **Local Files** as the storage type.
 5. In the **Storage Title** field, type a name for the storage to appear in the Label Studio UI.
-5. Specify an **Absolute local path** to the directory with your files. The local path must be an absolute path and include the `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` value. 
+6. Specify an **Absolute local path** to the directory with your files. The local path must be an absolute path and include the `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` value. 
    For example, if `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/home/user`, then your local path must be `/home/user/dataset1`. For more about that environment variable, see [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage).    
-6. (Optional) In the **File Filter Regex** field, specify a regular expression to filter bucket objects. Use `.*` to collect all objects.
-7. (Optional) Toggle **Treat every bucket object as a source file**. 
+7. (Optional) In the **File Filter Regex** field, specify a regular expression to filter bucket objects. Use `.*` to collect all objects.
+8. (Optional) Toggle **Treat every bucket object as a source file**. 
    - Enable this option if you want to create Label Studio tasks from media files automatically, such as JPG, MP3, or similar file types. Use this option for labeling configurations with one source tag.
    - Disable this option if you want to import tasks in Label Studio JSON format directly from your storage. Use this option for complex labeling configurations with HyperText or multiple source tags.    
-8. Click **Add Storage**.
-9. Repeat these steps for **Add Target Storage** to use a local file directory for exporting.
+9. Click **Add Storage**.
+10. Repeat these steps for **Add Target Storage** to use a local file directory for exporting.
 
 After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync import storage](/api#operation/api_storages_localfiles_sync_create).
+
+### Tasks with local storage file references 
+In cases where your tasks have multiple or complex input sources, such as multiple object tags in the labeling config or a HyperText tag with custom data values, you must prepare tasks manually. 
+
+In those cases, you have to repeat all stages above to create local storage, but skip *optional* stages. Your **Absolute local path** have to lead to directory with files (not tasks) that you want to include by task, it also can contain other directories or files, you will specified them inside task. 
+
+Differences with instruction above: 
+- **7. File Filter Regex** - stay empty (because you will specify it inside tasks)
+- **8. Treat every bucket object as a source file** - switch off (because you will specify it inside tasks)
+
+Your window will look like this:
+<img src="/images/local-storage-settings2.png" alt="Screenshot of the local storage settings for user task." width=670 height=490 style="border: 1px solid #eee">
+
+Click **Add Storage**, but not use synchronization (don't touch button **Sync Storage**) after storage creation, to avoid automatic task creation from storage files.
+
+Path to all your files inside task will start with string `/data/local-files/?d=`, also you have to add to this string full path to each file, that start from the first directory in **Absolute local path** of local storage after your `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT`. In our example it is `dataset1`. For example, to specify multiple data types in the Label Studio JSON format, specifically an audio files `1.wav`, `2.wav` inside `audio` folder and an image files `1.jpg`, `2.jpg` inside `images` folder:
+```
+[{
+ "id": 1,
+ "data": {
+    "audio": "/data/local-files/?d=dataset1/audio/1.wav",
+    "image": "/data/local-files/?d=dataset1/images/1.jpg"
+  }
+},
+{
+ "id": 2,
+ "data": {
+    "audio": "/data/local-files/?d=dataset1/audio/2.wav",
+    "image": "/data/local-files/?d=dataset1/images/2.jpg"
+  }
+}]
+```
+There are several ways to add your hand made task: API, web interface, another storage. The simplest one is to use **Import** button inside project main page. Drag and drop your json file inside window, after this push blue button **Import**.
+<img src="/images/upload-task.png" alt="Task upload via web." width="100%">
 
 #### Add storage with the Label Studio API
 You can also create a storage connection using the Label Studio API. 
@@ -429,11 +450,17 @@ You can also create a storage connection using the Label Studio API.
 ### Set up local storage with Docker
 If you're using Label Studio in Docker, you need to mount the local directory that you want to access as a volume when you start the Docker container. See [Run Label Studio on Docker and use local storage](start.html#Run-Label-Studio-on-Docker-and-use-local-storage).
 
+### Local Storage with Custom Task Format
+This video tutorial demonstrates how to setup Local Storage from scratch and import json tasks in a complex task format that are linked to the Local Storage files.
+
+<iframe class="video-border" width="100%" height="400vh" src="https://www.youtube.com/embed/lo6ncQajbdU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 ## Troubleshoot CORS and access problems
 
 Troubleshoot some common problems when using cloud or external storage with Label Studio. 
 
 ### I can't see the data in my tasks
+
 Check your web browser console for errors.
 
 - If you see CORS problems, make sure you have CORS set up properly. 
@@ -442,6 +469,12 @@ Check your web browser console for errors.
     - For Amazon S3, see [Configuring and using cross-origin resource sharing (CORS)](https://docs.aws.amazon.com/AmazonS3/latest/userguide/cors.html) in the Amazon S3 User Guide.
     - For GCS, see [Configuring cross-origin resource sharing (CORS)](https://cloud.google.com/storage/docs/configuring-cors) in the Google Cloud Storage documentation.
     - For Microsoft Azure, see [Cross-Origin Resource Sharing (CORS) support for Azure Storage](https://docs.microsoft.com/en-us/rest/api/storageservices/cross-origin-resource-sharing--cors--support-for-the-azure-storage-services) in the Microsoft Azure documentation. 
+
+!!! note
+    1. Make sure to apply the correct role and permissions for your Service Account. For example, Service Account Role "roles/iam.serviceAccountTokenCreator" to the Service Account.
+    
+    2. If the name of the Service Account `labelstudio` is using the error displayed in the DEBUG logs, then you can enable them using the `--log-level DEBUG` flag in the `label-studio start` command.
+
 - If you see 403 errors, make sure you configured the correct credentials. 
     - For Amazon S3, see [Configuration and credential file settings](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) in the Amazon AWS Command Line Interface User Guide.
     - For GCS, see [Setting up authentication](https://cloud.google.com/storage/docs/reference/libraries#setting_up_authentication) in the Google Cloud Storage documentation. Your account must have the `Service Account Token Creator` role. 

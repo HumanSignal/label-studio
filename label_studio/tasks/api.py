@@ -18,7 +18,7 @@ from core.utils.common import (
     DjangoFilterDescriptionInspector,
     get_object_with_check_and_log,
 )
-from core.utils.common import bool_from_request
+from core.utils.params import bool_from_request
 from data_manager.api import TaskListAPI as DMTaskListAPI
 from data_manager.functions import evaluate_predictions
 from data_manager.models import PrepareParams
@@ -156,11 +156,10 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         )
 
     def get_retrieve_serializer_context(self, request):
-        fields = ['completed_by_full', 'drafts', 'predictions', 'annotations']
+        fields = ['drafts', 'predictions', 'annotations']
 
         return {
             'resolve_uri': True,
-            'completed_by': 'full' if 'completed_by_full' in fields else None,
             'predictions': 'predictions' in fields,
             'annotations': 'annotations' in fields,
             'drafts': 'drafts' in fields,
@@ -178,7 +177,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
                 and not self.task.predictions.exists():
             evaluate_predictions([self.task])
 
-        serializer = self.get_serializer_class()(self.task, many=False, context=context)
+        serializer = self.get_serializer_class()(self.task, many=False, context=context, expand=['annotations.completed_by'])
         data = serializer.data
         return Response(data)
 
@@ -196,8 +195,8 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             project = Task.objects.get(id=self.request.parser_context['kwargs'].get('pk')).project.id
         return self.prefetch(
             Task.prepared.get_queryset(
-                prepare_params=PrepareParams(project=project,
-                                             selectedItems=selected), **kwargs
+                prepare_params=PrepareParams(project=project, selectedItems=selected, request=self.request),
+                **kwargs
             ))
 
     def get_serializer_class(self):
@@ -270,6 +269,8 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         # save user history with annotator_id, time & annotation result
         annotation_id = self.kwargs['pk']
         annotation = get_object_with_check_and_log(request, Annotation, pk=annotation_id)
+        annotation.updated_by = request.user
+        annotation.save(update_fields=['updated_by'])
 
         task = annotation.task
         if self.request.data.get('ground_truth'):
@@ -370,7 +371,7 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
 
         # updates history
         result = ser.validated_data.get('result')
-        extra_args = {'task_id': self.kwargs['pk']}
+        extra_args = {'task_id': self.kwargs['pk'], 'project_id': task.project_id}
 
         # save stats about how well annotator annotations coincide with current prediction
         # only for finished task annotations
@@ -385,6 +386,7 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
             # serialize annotation
             extra_args.update({
                 'prediction': prediction_ser,
+                'updated_by': user
             })
 
         if 'was_cancelled' in self.request.GET:

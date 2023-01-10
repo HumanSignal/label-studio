@@ -18,6 +18,9 @@ import ujson as json
 import traceback as tb
 import drf_yasg.openapi as openapi
 import contextlib
+
+from label_studio_tools.core.utils.exceptions import LabelStudioXMLSyntaxErrorSentryIgnored
+
 import label_studio
 import re
 
@@ -35,12 +38,11 @@ from rest_framework.exceptions import ErrorDetail
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
 from collections import defaultdict
+from django.contrib.postgres.operations import TrigramExtension
 
-from base64 import b64encode
+from core.utils.params import get_env
 from datetime import datetime
-from appdirs import user_cache_dir
 from functools import wraps
-from requests.auth import HTTPBasicAuth
 from pkg_resources import parse_version
 from colorama import Fore
 from boxing import boxing
@@ -54,11 +56,8 @@ except (ModuleNotFoundError, ImportError):
 from core import version
 from core.utils.exceptions import LabelStudioDatabaseLockedException
 
-
 # these functions will be included to another modules, don't remove them
-from core.utils.params import (
-    get_bool_env, bool_from_request, float_from_request, int_from_request
-)
+from core.utils.params import int_from_request
 
 logger = logging.getLogger(__name__)
 url_validator = URLValidator()
@@ -116,9 +115,12 @@ def custom_exception_handler(exc, context):
         logger.debug(exc_tb)
         response_data['detail'] = str(exc)
         if not settings.DEBUG_MODAL_EXCEPTIONS:
-            exc_tb = 'Tracebacks disabled in settings'
+            exc_tb = None
         response_data['exc_info'] = exc_tb
-        response = Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=response_data)
+        if isinstance(exc, LabelStudioXMLSyntaxErrorSentryIgnored):
+            response = Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+        else:
+            response = Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=response_data)
 
     return response
 
@@ -351,7 +353,11 @@ def retry_database_locked():
 
 
 def get_app_version():
-    return pkg_resources.get_distribution('label-studio').version
+    version = pkg_resources.get_distribution('label-studio').version
+    if isinstance(version, str):
+        return version
+    elif isinstance(version, dict):
+        return version.get('version') or version.get('latest_version')
 
 
 def get_latest_version():
@@ -414,7 +420,9 @@ def check_for_the_latest_version(print_message):
 
 
 # check version ASAP while package loading
-check_for_the_latest_version(print_message=True)
+# skip notification for uwsgi, as we're running in production ready mode
+if settings.APP_WEBSERVER != 'uwsgi':
+    check_for_the_latest_version(print_message=True)
 
 
 def collect_versions(force=False):
@@ -657,3 +665,19 @@ class temporary_disconnect_list_signal:
                 sender=sender,
                 dispatch_uid=dispatch_uid
             )
+
+
+def trigram_migration_operations(next_step):
+    ops = [
+        TrigramExtension(),
+        next_step,
+    ]
+    SKIP_TRIGRAM_EXTENSION = get_env('SKIP_TRIGRAM_EXTENSION', None)
+    if SKIP_TRIGRAM_EXTENSION == '1' or SKIP_TRIGRAM_EXTENSION == 'yes' or SKIP_TRIGRAM_EXTENSION == 'true':
+        ops = [
+            next_step
+        ]
+    if SKIP_TRIGRAM_EXTENSION == 'full':
+        ops = []
+
+    return ops

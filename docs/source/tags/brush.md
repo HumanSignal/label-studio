@@ -6,9 +6,9 @@ meta_title: Brush Tag for Image Segmentation Labeling
 meta_description: Customize Label Studio with brush tags for image segmentation labeling for machine learning and data science projects.
 ---
 
-Use the Brush tag for image segmentation tasks where you want to apply a mask or use a brush to draw a region on the image.
+The `Brush` tag is used for image segmentation tasks where you want to apply a mask or use a brush to draw a region on the image.
 
-Use with the following data types: image
+Use with the following data types: image.
 
 ### Parameters
 
@@ -48,8 +48,10 @@ Use with the following data types: image
 ```
 
 ### Example
+
+Basic image segmentation labeling configuration:
+
 ```html
-<!--Basic image segmentation labeling configuration-->
 <View>
   <Brush name="labels" toName="image">
     <Label value="Person" />

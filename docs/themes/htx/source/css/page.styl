@@ -9,6 +9,7 @@
 @import "_modal"
 @import "_themes-example"
 @import "_code-tabs"
+@import "_details"
 
 ::-webkit-scrollbar-track
   /*-webkit-box-shadow: inset 0 0 2px rgba(0,0,0,0.3) !important;*/
@@ -23,10 +24,23 @@
   background-color: #AAA !important;
   border: 1px solid #999 !important;
 
+.main__container
+  background-color:var(--color-white)
+  position:relative
+  z-index:1
+  min-height:90vh
+  transition:transform .2s
+  overflow: hidden
+
+@media (min-width: 75rem)
+  .js-enabled .main__container.footerActive
+    transform:scale(.95)
+
 .gif-border
   border: 1px solid #f1f1f1;
   max-width: 100% !important;
   height:auto !important;
+  margin: 0 auto;
 
 .video-border
   border: 1px solid #f1f1f1;
@@ -290,6 +304,7 @@
   position: static
   .sidebar
     position: fixed
+    z-index: 100
 
 @media (max-width: 991px)
   .sidebar

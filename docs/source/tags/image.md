@@ -1,14 +1,14 @@
 ---
 title: Image
 type: tags
-order: 304
+order: 305
 meta_title: Image Tags for Images
 meta_description: Customize Label Studio with the Image tag to annotate images for computer vision machine learning and data science projects.
 ---
 
-The Image tag shows an image on the page. Use for all image annotation tasks to display an image on the labeling interface.
+The `Image` tag shows an image on the page. Use for all image annotation tasks to display an image on the labeling interface.
 
-Use with the following data types: images
+Use with the following data types: images.
 
 When you annotate image regions with this tag, the annotations are saved as percentages of the original size of the image, from 0-100.
 
@@ -32,10 +32,15 @@ When you annotate image regions with this tag, the annotations are saved as perc
 | [contrastControl] | <code>boolean</code> | <code>false</code> | Show contrast control in toolbar |
 | [rotateControl] | <code>boolean</code> | <code>false</code> | Show rotate control in toolbar |
 | [crosshair] | <code>boolean</code> | <code>false</code> | Show crosshair cursor |
+| [horizontalAlignment] | <code>string</code> | <code>&quot;\&quot;left\&quot;&quot;</code> | Where to align image horizontally. Can be one of "left", "center" or "right" |
+| [verticalAlignment] | <code>string</code> | <code>&quot;\&quot;top\&quot;&quot;</code> | Where to align image vertically. Can be one of "top", "center" or "bottom" |
+| [defaultZoom] | <code>string</code> | <code>&quot;\&quot;fit\&quot;&quot;</code> | Specify the initial zoom of the image within the viewport while preserving it’s ratio. Can be one of "auto", "original" or "fit" |
 
 ### Example
+
+Labeling configuration to display an image on the labeling interface
+
 ```html
-<!--Labeling configuration to display an image on the labeling interface-->
 <View>
   <!-- Retrieve the image url from the url field in JSON or column in CSV -->
   <Image name="image" value="$url" rotateControl="true" zoomControl="true"></Image>

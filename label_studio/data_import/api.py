@@ -6,20 +6,25 @@ import drf_yasg.openapi as openapi
 import json
 import mimetypes
 
+
 from django.conf import settings
 from django.db import transaction
+from django.http import HttpResponse
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from urllib.parse import unquote, urlparse
 from ranged_fileresponse import RangedFileResponse
 
 from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import retry_database_locked
 from core.utils.params import list_of_strings_from_request, bool_from_request
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
+from users.models import User
 from projects.models import Project
 from tasks.models import Task, Prediction
 from .uploader import load_tasks
@@ -218,16 +223,11 @@ class ImportAPI(generics.CreateAPIView):
             task_count = len(tasks)
             annotation_count = len(serializer.db_annotations)
             prediction_count = len(serializer.db_predictions)
-            # Update tasks states if there are related settings in project
-            # after bulk create we can bulk update tasks stats with
-            # flag_update_stats=True but they are already updated with signal in same transaction
-            # so just update tasks_number_changed
-            project.update_tasks_states_with_counters(
-                maximum_annotations_changed=False,
-                overlap_cohort_percentage_changed=False,
-                tasks_number_changed=True,
-                tasks_queryset=tasks
-            )
+            # Update counters (like total_annotations) for new tasks and after bulk update tasks stats. It should be a
+            # single operation as counters affect bulk is_labeled update
+            project.update_tasks_counters_and_task_states(tasks_queryset=tasks, maximum_annotations_changed=False,
+                                                          overlap_cohort_percentage_changed=False,
+                                                          tasks_number_changed=True)
             logger.info('Tasks bulk_update finished')
 
             project.summary.update_data_columns(parsed_data)
@@ -322,16 +322,11 @@ class ReImportAPI(ImportAPI):
             tasks, serializer = self._save(tasks)
         duration = time.time() - start
 
-        # Update task states if there are related settings in project
-        # after bulk create we can bulk update task stats with
-        # flag_update_stats=True but they are already updated with signal in same transaction
-        # so just update tasks_number_changed
-        project.update_tasks_states_with_counters(
-            maximum_annotations_changed=False,
-            overlap_cohort_percentage_changed=False,
-            tasks_number_changed=True,
-            tasks_queryset=tasks
-        )
+        # Update counters (like total_annotations) for new tasks and after bulk update tasks stats. It should be a
+        # single operation as counters affect bulk is_labeled update
+        project.update_tasks_counters_and_task_states(tasks_queryset=tasks, maximum_annotations_changed=False,
+                                                      overlap_cohort_percentage_changed=False,
+                                                      tasks_number_changed=True)
         logger.info('Tasks bulk_update finished')
 
         project.summary.update_data_columns(tasks)
@@ -467,3 +462,47 @@ class UploadedFileResponse(generics.RetrieveAPIView):
             return RangedFileResponse(request, file.open(mode='rb'), content_type=content_type)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class DownloadStorageData(APIView):
+    """ Check auth for nginx auth_request
+    """
+    swagger_schema = None
+    http_method_names = ['get']
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, *args, **kwargs):
+        """ Get export files list
+        """
+        request = self.request
+        filepath = request.GET.get('filepath')
+        if filepath is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        filepath = unquote(request.GET['filepath'])
+
+        url = None
+        if filepath.startswith(settings.UPLOAD_DIR):
+            logger.debug(f'Fetch uploaded file by user {request.user} => {filepath}')
+            file_upload = FileUpload.objects.filter(file=filepath).last()
+
+            if file_upload is not None and file_upload.has_permission(request.user):
+                url = file_upload.file.storage.url(file_upload.file.name, storage_url=True)
+        elif filepath.startswith(settings.AVATAR_PATH):
+            user = User.objects.filter(avatar=filepath).first()
+            if user is not None and request.user.active_organization.has_user(user):
+                url = user.avatar.storage.url(user.avatar.name, storage_url=True)
+
+        if url is None:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        protocol = urlparse(url).scheme
+
+        # Let NGINX handle it
+        response = HttpResponse()
+        # The below header tells NGINX to catch it and serve, see docker-config/nginx-app.conf
+        redirect = '/file_download/' + protocol + '/' + url.replace(protocol + '://', '')
+
+        response['X-Accel-Redirect'] = redirect
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filepath)
+        return response

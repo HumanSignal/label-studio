@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/stale@v5
+      - uses: actions/stale@v7
         with:
           days-before-issue-stale: -1
           days-before-issue-close: -1 # never closed automatically

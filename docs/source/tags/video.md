@@ -1,7 +1,7 @@
 ---
 title: Video
 type: tags
-order: 310
+order: 311
 meta_title: Video Tag for Video Labeling
 meta_description: Customize Label Studio with the Video tag for basic video annotation tasks for machine learning and data science projects.
 ---
@@ -22,8 +22,10 @@ Use with the following data types: video
 | [height] | <code>number</code> | <code>600</code> | height of the video |
 
 ### Example
+
+Labeling configuration to display a video on the labeling interface
+
 ```html
-<!--Labeling configuration to display a video on the labeling interface-->
 <View>
   <Video name="video" value="$video" />
 </View>

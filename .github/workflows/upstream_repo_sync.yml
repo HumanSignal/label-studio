@@ -12,6 +12,7 @@ env:
   NODE: 14
   CACHE_NAME_PREFIX: v1
   STATIC_DIST: 'label_studio/frontend/dist'
+  RELEASE_BRANCH_PREFIX: "ls-release/"
 
 jobs:
   open:
@@ -24,7 +25,7 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Configure git
         shell: bash
@@ -58,7 +59,7 @@ jobs:
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
       - name: Configure yarn cache
         uses: actions/cache@v3
@@ -140,7 +141,7 @@ jobs:
           
           branch_name='${{ steps.get-pr.outputs.branch-name }}'
           
-          if grep -q '^ls-release/.*$' <<< '${{ github.event.client_payload.base_branch_name }}'; then
+          if grep -q '^${{ env.RELEASE_BRANCH_PREFIX }}.*$' <<< '${{ github.event.client_payload.base_branch_name }}'; then
             git checkout '${{ github.event.client_payload.base_branch_name }}'
           else
             git checkout '${{ github.event.repository.default_branch }}'
@@ -175,6 +176,7 @@ jobs:
         uses: actions/github-script@v6
         env:
           TITLE: ${{ github.event.client_payload.title }}
+          RELEASE_BRANCH_PREFIX: "${{ env.RELEASE_BRANCH_PREFIX }}"
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
@@ -200,7 +202,7 @@ jobs:
               }
             } else {
               let base = '${{ github.event.repository.default_branch }}'
-              if ( '${{ github.event.client_payload.base_branch_name }}'.startsWith('lse-release/') ) {
+              if ( '${{ github.event.client_payload.base_branch_name }}'.startsWith(process.env.RELEASE_BRANCH_PREFIX) ) {
                 base = '${{ github.event.client_payload.base_branch_name }}'
               }
               const createPullResponse = await github.rest.pulls.create({
@@ -238,12 +240,16 @@ jobs:
             let openPRs = []  
             for (let submodule of submodules) {
               core.info(`Checking ${ submodule.owner }/${ submodule.repo }`)
-              const { data: listAllOpenPulls } = await github.rest.pulls.list({
-                owner: submodule.owner,
-                repo: submodule.repo,
-                status: 'open',
-                per_page: 100
-              });
+              const listAllOpenPulls = await github.paginate(
+                github.rest.pulls.list,
+                {
+                  owner: submodule.owner,
+                  repo: submodule.repo,
+                  status: 'open',
+                  per_page: 100
+                },
+                (response) => response.data
+              );
               
               const listOpenPulls = listAllOpenPulls.filter(e => e.head.ref.toLowerCase() === branchNameLowerCase)
 
@@ -344,7 +350,7 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Get PR
         uses: actions/github-script@v6
