@@ -1263,10 +1263,10 @@ Footer
 }
 .FooterCTA {
   position:relative;
-  background-color:var(--color-white)
+  background-color: var(--color-white)
 }
-.FooterCTAButton:hover{
-  background-color:var(--color-main-accent)
+.FooterCTAButton:hover {
+  background-color: var(--color-main-accent)
 }
 .FooterCTASquares {
   position:absolute;
@@ -1278,10 +1278,7 @@ Footer
   margin-top:0;
   color:var(--color-gray-400)
 }
-.Footer .FooterCopyright {
-  color:var(--color-gray-400);
-  margin-top:5em
-}
+
 .FooterSocials {
   margin-top:clamp(1em,7vw,2em)
 }
@@ -1289,6 +1286,34 @@ Footer
   overflow:hidden;
   width:100%
 }
+
+.FooterGridCopyright {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2em;
+  color:var(--color-gray-400);
+  margin-top:5em
+}
+
+.FooterGridCopyright a,
+.FooterGridCopyright p {
+  color: currentColor;
+}
+
+.FooterGridCopyright p {
+  margin: 0;
+}
+
+.FooterGridCopyright a {
+  text-decoration: none;
+}
+
+.FooterGridCopyright a:hover {
+  color: var(--color-main-accent);
+}
+
+
 @media (max-width: 62.8125rem){
   .FooterCTASquares {
       display:none

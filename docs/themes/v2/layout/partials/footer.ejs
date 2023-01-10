@@ -1,3 +1,6 @@
+<% const tier = theme.tier || "all" %>
+<% const isEnterpriseTheme = tier === "enterprise" %>
+
 <footer class="Footer">
   <section class="FooterWrapper">
     <div class="FooterGrid">
@@ -52,54 +55,38 @@
       </div>
       <div class="FooterMenus">
         <nav class="FooterNav" aria-label="Footer navigation">
+          <% if(isEnterpriseTheme) { %>
           <div>
             <h3 class="Text Eyebrow FooterNavHeading">Products</h3>
             <ul>
               <li>
+                <a href="https://heartex.com/product">Enterprise</a>
+              </li>
+              <li>
                 <a href="https://labelstud.io/">Community Edition</a>
               </li>
               <li>
-                <a href="https://heartex.com/product" target="_blank" rel="noopener noreferrer">Enterprise</a>
+                <a href="https://app.heartex.com/user/trial">Start Free Trial</a>
               </li>
               <li>
-                <a href="https://heartex.com/pricing" target="_blank" rel="noopener noreferrer">Pricing</a>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="Text Eyebrow FooterNavHeading">Community</h3>
-            <ul>
-              <li>
-                <a href="/blog">Blog</a>
+                <a href="https://heartex.com/get-demo">Schedule Demo</a>
               </li>
               <li>
-                <a href="https://labelstud.io/community/">Newsletter</a>
-              </li>
-              <li>
-                <a href="/?source=site" target="_blank" rel="noopener noreferrer">Slack</a>
-              </li>
-              <li>
-                <a href="https://labelstud.io/videos">Webinars</a>
+                <a href="https://heartex.com/pricing">Pricing</a>
               </li>
             </ul>
           </div>
           <div>
-            <h3 class="Text Eyebrow FooterNavHeading">Documentation</h3>
+            <h3 class="Text Eyebrow FooterNavHeading">Resources</h3>
             <ul>
               <li>
-                <a href="/guide">Quickstart</a>
+                <a href="https://heartex.com/resources/data-labeling-guide-download">Guide</a>
               </li>
               <li>
-                <a href="/api">API Reference</a>
+                <a href="https://docs.heartex.com">Documentation</a>
               </li>
               <li>
-                <a href="https://labelstud.io/sdk">SDK Reference</a>
-              </li>
-              <li>
-                <a href="/tags">Customizable Tags</a>
-              </li>
-              <li>
-                <a href="/templates">Labeling Templates</a>
+                <a href="https://heartex.com/changelog">What’s New</a>
               </li>
             </ul>
           </div>
@@ -107,34 +94,125 @@
             <h3 class="Text Eyebrow FooterNavHeading">Company</h3>
             <ul>
               <li>
-                <a href="https://heartex.com/company/about-us" target="_blank" rel="noopener noreferrer">About Us</a>
+                <a href="https://heartex.com/blog">Blog</a>
               </li>
               <li>
-                <a href="https://heartex.com/careers" target="_blank" rel="noopener noreferrer">Careers</a>
+                <a href="https://heartex.com/company/about-us">About Us</a>
               </li>
               <li>
-                <a href="mailto:hi@heartex.com">Contact</a>
+                <a href="https://heartex.com/careers">Careers</a>
               </li>
               <li>
-                <a href="https://heartex.com/company/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy</a>
+                <a href="mailto:hi@heartex.com">Contact Us</a>
               </li>
             </ul>
           </div>
+          <div>
+            <h3 class="Text Eyebrow FooterNavHeading">Open Source</h3>
+            <ul>
+              <li>
+                <a href="https://labelstud.io/">Install</a>
+              </li>
+              <li>
+                <a href="http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com/?source=heartex-docs-footer">Community</a>
+              </li>
+              <li>
+                <a href="https://github.com/heartexlabs/label-studio">GitHub</a>
+              </li>
+            </ul>
+          </div>
+          
+          <% } else { %>
+            <div>
+              <h3 class="Text Eyebrow FooterNavHeading">Products</h3>
+              <ul>
+                <li>
+                  <a href="https://labelstud.io/">Community Edition</a>
+                </li>
+                <li>
+                  <a href="https://heartex.com/product">Enterprise</a>
+                </li>
+                <li>
+                  <a href="https://heartex.com/pricing">Pricing</a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="Text Eyebrow FooterNavHeading">Community</h3>
+              <ul>
+                <li>
+                  <a href="/blog">Blog</a>
+                </li>
+                <li>
+                  <a href="https://labelstud.io/community/">Newsletter</a>
+                </li>
+                <li>
+                  <a href="/?source=site">Slack</a>
+                </li>
+                <li>
+                  <a href="https://labelstud.io/videos">Webinars</a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="Text Eyebrow FooterNavHeading">Documentation</h3>
+              <ul>
+                <li>
+                  <a href="/guide">Quickstart</a>
+                </li>
+                <li>
+                  <a href="/api">API Reference</a>
+                </li>
+                <li>
+                  <a href="https://labelstud.io/sdk">SDK Reference</a>
+                </li>
+                <li>
+                  <a href="/tags">Customizable Tags</a>
+                </li>
+                <li>
+                  <a href="/templates">Labeling Templates</a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="Text Eyebrow FooterNavHeading">Company</h3>
+              <ul>
+                <li>
+                  <a href="https://heartex.com/company/about-us">About Us</a>
+                </li>
+                <li>
+                  <a href="https://heartex.com/careers">Careers</a>
+                </li>
+                <li>
+                  <a href="mailto:hi@heartex.com">Contact</a>
+                </li>
+                <li>
+                  <a href="https://heartex.com/company/privacy-policy">Privacy</a>
+                </li>
+              </ul>
+            </div>
+          <% } %>
         </nav>
-        <div class="FooterCTA">
-          <a class="Button Secondary FooterCTAButton" href="https://labelstud.io/guide/"><span class="Heading XXSmall ButtonText astro-EXBSDJPD">Quick Start</span></a>
-          <svg class="FooterCTASquares" width="201" height="201" viewBox="0 0 201 201" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect x="0.504975" y="100.505" width="49.9901" height="49.9901" stroke="#505263" stroke-width="1.00995"></rect>
-            <rect x="50.505" y="150.505" width="49.9901" height="49.9901" stroke="#505263" stroke-width="1.00995"></rect>
-            <rect x="100.505" y="100.505" width="49.9901" height="49.9901" stroke="#505263" stroke-width="1.00995"></rect>
-            <rect x="100.505" y="50.505" width="49.9901" height="49.9901" stroke="#505263" stroke-width="1.00995"></rect>
-            <rect x="150.505" y="0.504975" width="49.9901" height="49.9901" stroke="#505263" stroke-width="1.00995"></rect>
-            <rect x="150.505" y="50.505" width="49.9901" height="49.9901" stroke="#505263" stroke-width="1.00995"></rect>
-            <rect x="50.505" y="50.505" width="49.9901" height="49.9901" stroke="#505263" stroke-width="1.00995"></rect>
-          </svg>
+        <% if(!isEnterpriseTheme) { %>
+          <div class="FooterCTA">
+            <a class="Button Secondary FooterCTAButton" href="https://labelstud.io/guide/"><span class="Heading XXSmall ButtonText astro-EXBSDJPD">Quick Start</span></a>
+            <svg class="FooterCTASquares" width="201" height="201" viewBox="0 0 201 201" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="0.504975" y="100.505" width="49.9901" height="49.9901" stroke="#505263" stroke-width="1.00995"></rect>
+              <rect x="50.505" y="150.505" width="49.9901" height="49.9901" stroke="#505263" stroke-width="1.00995"></rect>
+              <rect x="100.505" y="100.505" width="49.9901" height="49.9901" stroke="#505263" stroke-width="1.00995"></rect>
+              <rect x="100.505" y="50.505" width="49.9901" height="49.9901" stroke="#505263" stroke-width="1.00995"></rect>
+              <rect x="150.505" y="0.504975" width="49.9901" height="49.9901" stroke="#505263" stroke-width="1.00995"></rect>
+              <rect x="150.505" y="50.505" width="49.9901" height="49.9901" stroke="#505263" stroke-width="1.00995"></rect>
+              <rect x="50.505" y="50.505" width="49.9901" height="49.9901" stroke="#505263" stroke-width="1.00995"></rect>
+            </svg>
+          </div>
+        <% } %>
         </div>
       </div>
-      </div><p class="Text Small FooterCopyright">© <script>document.write(new Date().getFullYear())</script> Heartex, Inc.</p>
+      <div class="FooterGridCopyright">
+        <p class="Text Small FooterCopyright">© <script>document.write(new Date().getFullYear())</script> Heartex, Inc.</p>
+        <a href="https://heartex.com/company/privacy-policy" class="Text Small">Privacy Policy</a>
+      </div>
   </section>
 </footer>
 
