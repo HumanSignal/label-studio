@@ -858,6 +858,7 @@ main {
 
 .toc h3 {
   color: var(--color-gray-600);
+  margin-top: 0;
 }
 
 .toc-list {
