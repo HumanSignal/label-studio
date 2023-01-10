@@ -143,6 +143,7 @@ class Task(TaskMixin, models.Model):
                     lock_ttl=self.get_lock_ttl(),
                     num_locks=num_locks,
                     num_annotations=num_annotations,
+                    user=user
                 )
             )
         result = bool(num >= self.overlap)
