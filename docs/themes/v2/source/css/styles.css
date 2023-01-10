@@ -849,7 +849,7 @@ main {
 
 .toc {
   background-color: var(--color-gray-10);
-  padding: 0 2em;
+  padding: 2em;
   width: var(--toc-size);
   flex-shrink: 0;
   position: sticky;
