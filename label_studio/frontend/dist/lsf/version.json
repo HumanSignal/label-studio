@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3919: Pin regions to the bottom in Preview",
-  "commit": "e1853d22c5d1fc1e0fb7fa725bdb486d91b9c641",
-  "branch": "fb-dev-3919",
-  "date": "2023/01/09 17:55:50"
+  "message": "ci: SRE-391: Assign job permissions (#1144)\n\n* ci: SRE-384: Fix cancel pipeline\r\n\r\n* ci: SRE-391: Assign job permissions\r\n\r\n* Remove default permissions",
+  "commit": "aa1f440729d929a728c9bd31c35be82d0db3b5a0",
+  "branch": "master",
+  "date": "2023-01-09T16:03:04Z"
 }
