@@ -1279,6 +1279,10 @@ Footer
   color:var(--color-gray-400)
 }
 
+.FooterSocialsLogo {
+  margin-top: 4px;
+}
+
 .FooterSocials {
   margin-top:clamp(1em,7vw,2em)
 }
