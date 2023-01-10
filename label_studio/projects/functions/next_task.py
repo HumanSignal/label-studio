@@ -4,12 +4,13 @@ import logging
 from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Value, When, Q
 from django.db.models.fields import DecimalField
 from django.conf import settings
-import numpy as np
+from core.feature_flags import flag_set
 
 from core.utils.common import conditional_atomic
 from tasks.models import Annotation, Task
 
 logger = logging.getLogger(__name__)
+FFLAG_OVERLAP_ISSUE_EXPERIMENTS = 'fflag_fix_back_dev_4174_overlap_issue_experiments_10012023_short'
 
 
 def _get_random_unlocked(task_query, user, upper_limit=None):
@@ -160,7 +161,7 @@ def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_fla
         queue_info += (' & ' if queue_info else '') + 'Manually assigned queue'
 
     # If current user has already lock one task - return it (without setting the lock again)
-    if not next_task:
+    if not next_task and not flag_set(FFLAG_OVERLAP_ISSUE_EXPERIMENTS, user):
         next_task = Task.get_locked_by(user, tasks=not_solved_tasks)
         if next_task:
             logger.debug(f'User={user} got already locked for them {next_task}')
@@ -172,7 +173,7 @@ def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_fla
         next_task = _try_ground_truth(not_solved_tasks, project, user)
         queue_info += (' & ' if queue_info else '') + 'Ground truth queue'
 
-    if not next_task and project.maximum_annotations > 1:
+    if not next_task and project.maximum_annotations > 1 and not flag_set(FFLAG_OVERLAP_ISSUE_EXPERIMENTS, user):
         # if there any tasks in progress (with maximum number of annotations), randomly sampling from them
         logger.debug(f'User={user} tries depth first from prepared tasks')
         next_task = _try_breadth_first(not_solved_tasks, user)
