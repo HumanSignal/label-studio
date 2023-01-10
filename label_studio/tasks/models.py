@@ -140,7 +140,7 @@ class Task(TaskMixin, models.Model):
             logger.error(
                 f"Num takes={num} > overlap={self.overlap} for task={self.id} - it's a bug",
                 extra=dict(
-                    lock_ttl=self.get_lock_ttl(),
+                    lock_ttl=self.locks.values_list('user', 'expire_at'),
                     num_locks=num_locks,
                     num_annotations=num_annotations,
                 )
