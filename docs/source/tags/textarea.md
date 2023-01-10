@@ -6,9 +6,9 @@ meta_title: Textarea Tag for Text areas
 meta_description: Customize Label Studio with the TextArea tag to support audio transcription, image captioning, and OCR tasks for machine learning and data science projects.
 ---
 
-Use the TextArea tag to display a text area for user input. Use for transcription, paraphrasing, or captioning tasks.
+The `TextArea` tag is used to display a text area for user input. Use for transcription, paraphrasing, or captioning tasks.
 
-Use with the following data types: audio, image, HTML, paragraphs, text, time series, video
+Use with the following data types: audio, image, HTML, paragraphs, text, time series, video.
 
 ### Parameters
 
@@ -39,7 +39,7 @@ Basic labeling configuration to display only a text area
 ```
 ### Example
 
-You can combine the TextArea tag with other tags for OCR or other transcription tasks
+You can combine the `TextArea` tag with other tags for OCR or other transcription tasks
 
 ```html
 <View>
