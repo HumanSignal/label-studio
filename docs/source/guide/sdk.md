@@ -21,7 +21,7 @@ With the Label Studio Python SDK, you can perform the following tasks in a Pytho
 - [Connect to a cloud storage provider](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/annotate_data_from_gcs/annotate_data_from_gcs.ipynb), such as Amazon S3, Microsoft Azure, or Google Cloud Services (GCS), to retrieve unlabeled tasks and store annotated tasks.
 - [Modify project settings](/sdk/project.html#label_studio_sdk.project.Project.set_params), such as task sampling or the model version used to display predictions. 
 
-See the [full SDK reference documentation for all available modules](/sdk/index.html), or review the available [API endpoints](/api) for any tasks that the SDK does not cover. 
+See the [full SDK reference documentation for all available modules](https://labelstud.io/sdk/), or review the available [API endpoints](/api) for any tasks that the SDK does not cover. 
 
 ## Start using the Label Studio Python SDK
 
