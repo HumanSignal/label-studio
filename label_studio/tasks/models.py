@@ -330,7 +330,7 @@ post_bulk_create = Signal(providing_args=["objs", "batch_size"])
 
 class AnnotationManager(models.Manager):
     def for_user(self, user):
-        return self.filter(task__project__organization=user.active_organization)
+        return self.filter(project__organization=user.active_organization)
 
     def bulk_create(self, objs, batch_size=None):
         pre_bulk_create.send(sender=self.model, objs=objs, batch_size=batch_size)
