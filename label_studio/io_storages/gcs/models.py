@@ -6,6 +6,8 @@ import socket
 import google.auth
 import re
 
+from google.auth.exceptions import DefaultCredentialsError
+
 from core.redis import start_job_async_or_sync
 from google.auth import compute_engine
 from google.cloud import storage as google_storage
@@ -20,12 +22,15 @@ from django.conf import settings
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
+from core.feature_flags import flag_set
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
 
 clients_cache = {}
+# cache for Application Default Credentials https://google-auth.readthedocs.io/en/master/reference/google.auth.html
+credentials_cache = {}
 
 
 class GCSStorageMixin(models.Model):
@@ -160,22 +165,30 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
         return url
 
     def _get_signing_credentials(self):
-        # TODO: fix me
-        # with self._signing_credentials_lock:
-        #     if self._signing_credentials is None or self._signing_credentials.expired:
-        credentials, _ = google.auth.default(['https://www.googleapis.com/auth/cloud-platform'])
-        auth_req = google.auth.transport.requests.Request()
-        credentials.refresh(auth_req)
-        self._signing_credentials = credentials
-        return self._signing_credentials
+        cache_key = f'{self.google_application_credentials}'
+        signing_credentials = credentials_cache.get(cache_key)
+        if signing_credentials is None or signing_credentials.expired:
+            signing_credentials, _ = google.auth.default(['https://www.googleapis.com/auth/cloud-platform'])
+            auth_req = google.auth.transport.requests.Request()
+            signing_credentials.refresh(auth_req)
+            credentials_cache[cache_key] = signing_credentials
+        return signing_credentials
 
     def _get_signing_kwargs(self):
-        credentials = self._get_signing_credentials()
-        out = {
-            "service_account_email": credentials.service_account_email,
-            "access_token": credentials.token,
-            "credentials": credentials
-        }
+        if flag_set('fflag_feat_back_dev_4166_google_project_id_11012023_long', self.project.organization.created_by):
+            try:
+                credentials = self._get_signing_credentials()
+                out = {
+                    "service_account_email": credentials.service_account_email,
+                    "access_token": credentials.token,
+                    "credentials": credentials
+                }
+            except DefaultCredentialsError as exc:
+                logger.error(f"Label studio couldn't load default credentials from env to {self.id}. {exc}",
+                             exc_info=True)
+                out = {}
+        else:
+            out = {}
         return out
 
     def scan_and_create_links(self):
