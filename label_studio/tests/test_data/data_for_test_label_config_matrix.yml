@@ -54,3 +54,110 @@ textareas_in_views:
     </View>
     '
   status_code: 200
+
+choices_without_choices_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Choices name="choices" toName="trans" />
+    </View>
+    '
+  status_code: 400
+choices_with_1choice_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Choices name="choices" toName="trans">
+      <Choice value="test"/>
+    </Choices>
+    </View>
+    '
+  status_code: 200
+choices_with_1choice_without_value_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Choices name="choices" toName="trans">
+      <Choice />
+    </Choices>
+    </View>
+    '
+  status_code: 400
+choices_with_1choice_in_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    </View>
+    <View>
+    <Choices name="choices" toName="trans">
+      <Choice value="test"/>
+    </Choices>
+    </View>
+    '
+  status_code: 200
+choices_with_1choice_in_nested_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <View>
+    <Choices name="choices" toName="trans">
+      <Choice value="test"/>
+    </Choices>
+    </View>
+    </View>
+    '
+  status_code: 200
+choices_in_nested_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <View>
+    <Choices name="choices" toName="trans">
+      <Choice value="1"/>
+      <Choice value="2"/>
+      <Choice value="3"/>
+      <Choice value="4"/>
+    </Choices>
+    </View>
+    </View>
+    '
+  status_code: 200
+choices_withoutname_with_1choice_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Choices toName="trans">
+      <Choice value="test"/>
+    </Choices>
+    </View>
+    '
+  status_code: 400
+choices_withouttoname_with_1choice_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Choices name="choices" >
+      <Choice value="test"/>
+    </Choices>
+    </View>
+    '
+  status_code: 400
+choices_in_several_nested_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <View>
+    <Choices name="choices" toName="trans">
+    <View>
+      <Choice value="1"/>
+    </View>
+    <View>
+      <Choice value="2"/>
+    </View>
+      <Choice value="3"/>
+      <Choice value="4"/>
+    </Choices>
+    </View>
+    </View>
+    '
+  status_code: 200
