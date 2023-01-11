@@ -140,7 +140,7 @@ class Task(TaskMixin, models.Model):
             logger.error(
                 f"Num takes={num} > overlap={self.overlap} for task={self.id} - it's a bug",
                 extra=dict(
-                    lock_ttl=self.get_lock_ttl(),
+                    lock_ttl=self.locks.values_list('user', 'expire_at'),
                     num_locks=num_locks,
                     num_annotations=num_annotations,
                 )
@@ -159,12 +159,8 @@ class Task(TaskMixin, models.Model):
             if hasattr(self, link_name):
                 return getattr(self, link_name).key
 
-    def get_lock_ttl(self):
-        if settings.TASK_LOCK_TTL is not None:
-            return settings.TASK_LOCK_TTL
-        return settings.TASK_LOCK_MIN_TTL
-
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
     def clear_expired_locks(self):
@@ -174,7 +170,7 @@ class Task(TaskMixin, models.Model):
         """Lock current task by specified user. Lock lifetime is set by `expire_in_secs`"""
         num_locks = self.num_locks
         if num_locks < self.overlap:
-            lock_ttl = self.get_lock_ttl()
+            lock_ttl = settings.TASK_LOCK_TTL
             expire_at = now() + datetime.timedelta(seconds=lock_ttl)
             TaskLock.objects.create(task=self, user=user, expire_at=expire_at)
             logger.debug(f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
@@ -334,7 +330,7 @@ post_bulk_create = Signal(providing_args=["objs", "batch_size"])
 
 class AnnotationManager(models.Manager):
     def for_user(self, user):
-        return self.filter(task__project__organization=user.active_organization)
+        return self.filter(project__organization=user.active_organization)
 
     def bulk_create(self, objs, batch_size=None):
         pre_bulk_create.send(sender=self.model, objs=objs, batch_size=batch_size)
@@ -432,6 +428,7 @@ class Annotation(models.Model):
         return len(res)
 
     def has_permission(self, user):
+        user.project = self.task.project  # link for activity log
         return self.task.project.has_permission(user)
 
     def increase_project_summary_counters(self):
@@ -532,6 +529,7 @@ class AnnotationDraft(models.Model):
         return timesince(self.created_at)
 
     def has_permission(self, user):
+        user.project = self.task.project  # link for activity log
         return self.task.project.has_permission(user)
 
 
@@ -554,6 +552,7 @@ class Prediction(models.Model):
         return timesince(self.created_at)
 
     def has_permission(self, user):
+        user.project = self.task.project  # link for activity log
         return self.task.project.has_permission(user)
 
     @classmethod
@@ -650,7 +649,7 @@ def update_all_task_states_after_deleting_task(sender, instance, **kwargs):
 
 @receiver(pre_delete, sender=Task)
 def remove_data_columns(sender, instance, **kwargs):
-    """Reduce data column counters afer removing task"""
+    """Reduce data column counters after removing task"""
     instance.decrease_project_summary_counters()
 
 

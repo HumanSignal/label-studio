@@ -3,7 +3,7 @@ name: "Tests"
 on:
   workflow_call:
     inputs:
-      ref:
+      head_sha:
         required: true
         type: string
 
@@ -43,7 +43,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.head_sha }}
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -184,7 +184,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.head_sha }}
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -291,7 +291,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.head_sha }}
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4

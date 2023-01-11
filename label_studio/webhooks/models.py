@@ -91,6 +91,7 @@ class Webhook(models.Model):
         WebhookAction.objects.filter(webhook=self, action__in=(old_actions - actions)).delete()
 
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         return self.organization.has_user(user)
 
     class Meta:

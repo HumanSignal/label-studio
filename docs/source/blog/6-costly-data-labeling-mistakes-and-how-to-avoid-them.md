@@ -91,7 +91,7 @@ Label Studio also has the capability to show labels dynamically as a task input,
 
 ## 5. Annotator Bias
 
-Biased models result from having too many annotators who represent a single, homogenous point of view. Since that group’s point of view is centered during the annotation process, the algorithm itself starts to center that point of view. This leaves marginalized groups and their interests out of algorithms ranging from [search results](https://www.bloomberg.com/news/articles/2021-10-19/google-quietly-tweaks-image-search-for-racially-diverse-results#xj4y7vzkg) to [recommendations](https://venturebeat.com/ai/researchers-find-evidence-of-bias-in-recommender-systems/).  
+Biased models result from having too many annotators who represent a single, homogeneous point of view. Since that group’s point of view is centered during the annotation process, the algorithm itself starts to center that point of view. This leaves marginalized groups and their interests out of algorithms ranging from [search results](https://www.bloomberg.com/news/articles/2021-10-19/google-quietly-tweaks-image-search-for-racially-diverse-results#xj4y7vzkg) to [recommendations](https://venturebeat.com/ai/researchers-find-evidence-of-bias-in-recommender-systems/).  
 
 There are less insidious forms of annotator bias, too. If you’re working with annotators who speak British English, they’ll call a bag of potato chips “Crisps.” Your American English speakers will label the same data “Chips.” Meanwhile, your British English speakers will reserve the “Chips” label for fries. That inconsistency will reflect in the algorithm itself, which will arbitrarily mix American and British English into its predictions. 
  

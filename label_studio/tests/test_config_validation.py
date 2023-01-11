@@ -4,6 +4,8 @@ import pytest
 import json
 import os
 import glob
+import io
+import yaml
 
 from core.label_config import parse_config, validate_label_config, parse_config_to_json
 from label_studio.tests.utils import make_task, make_annotation, make_prediction, project_id
@@ -135,3 +137,39 @@ def test_config_validation_for_choices_workaround(business_client, project_id):
         content_type="application/json",
     )
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_parse_wrong_xml(business_client, project_id):
+    # Change label config to Repeater
+    payload = {
+        'label_config': '<View> <Repeater on="$images" indexFlag="{{idx}}"> <Image name="page_{{idx}}" value="$images" maxWidth="100%"/>     <Header value="Utterance Review"/>     <RectangleLabels name="labels_{{idx}}" toName="page_{{idx}}">       <Label value="Header" hotkey="1"/> <Label value="Body" hotkey="2"/> <Label value="Footer" hotkey="3"/> </RectangleLabels> </Repeater> </View>'}
+    response = business_client.patch(
+        f"/api/projects/{project_id}",
+        data=json.dumps(payload),
+        content_type="application/json",
+    )
+    assert response.status_code == 200
+    # Change label config to wrong XML
+    payload = {
+        'label_config': '1<View> <Repeater on="$images" indexFlag="{{idx}}"> <Image name="page_{{idx}}" value="$images" maxWidth="100%"/>     <Header value="Utterance Review"/>     <RectangleLabels name="labels_{{idx}}" toName="page_{{idx}}"> <Label value="Body" hotkey="2"/> <Label value="Footer" hotkey="3"/> </RectangleLabels> </Repeater> </View>'}
+    response = business_client.post(
+        f"/api/projects/{project_id}/validate",
+        data=json.dumps(payload),
+        content_type="application/json",
+    )
+    assert response.status_code == 400
+
+@pytest.mark.django_db
+def test_label_config_versions(business_client, project_id):
+    with io.open(os.path.join(os.path.dirname(__file__), 'test_data/data_for_test_label_config_matrix.yml')) as f:
+        test_suites = yaml.safe_load(f)
+    for test_name, test_content in test_suites.items():
+        payload = {
+            'label_config': test_content['label_config']}
+        response = business_client.post(
+            f"/api/projects/{project_id}/validate",
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+        assert response.status_code == test_content['status_code']

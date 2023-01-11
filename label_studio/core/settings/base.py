@@ -416,9 +416,7 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = int(get_env('DATA_UPLOAD_MAX_MEMORY_SIZE', 250 * 1
 TASKS_MAX_NUMBER = 1000000
 TASKS_MAX_FILE_SIZE = DATA_UPLOAD_MAX_MEMORY_SIZE
 
-TASK_LOCK_TTL = int(get_env('TASK_LOCK_TTL')) if get_env('TASK_LOCK_TTL') else None
-TASK_LOCK_DEFAULT_TTL = int(get_env('TASK_LOCK_DEFAULT_TTL', 3600))
-TASK_LOCK_MIN_TTL = int(get_env('TASK_LOCK_MIN_TTL', 120))
+TASK_LOCK_TTL = int(get_env('TASK_LOCK_TTL', default=86400))
 
 RANDOM_NEXT_TASK_SAMPLE_SIZE = int(get_env('RANDOM_NEXT_TASK_SAMPLE_SIZE', 50))
 
@@ -543,7 +541,7 @@ FEATURE_FLAGS_FROM_FILE = get_bool_env('FEATURE_FLAGS_FROM_FILE', False)
 FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE', 'feature_flags.json')
 # or if file is not set, default is using offline mode
 FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)
-# default value for feature flags (if not overrided by environment or client)
+# default value for feature flags (if not overridden by environment or client)
 FEATURE_FLAGS_DEFAULT_VALUE = False
 
 # Strip harmful content from SVG files by default
@@ -579,6 +577,7 @@ if get_env('STORAGE_TYPE') == "s3":
         AWS_SECRET_ACCESS_KEY = get_env('STORAGE_AWS_SECRET_ACCESS_KEY')
     AWS_STORAGE_BUCKET_NAME = get_env('STORAGE_AWS_BUCKET_NAME')
     AWS_S3_REGION_NAME = get_env('STORAGE_AWS_REGION_NAME', None)
+    AWS_S3_ENDPOINT_URL = get_env('STORAGE_AWS_ENDPOINT_URL', None)
     AWS_QUERYSTRING_EXPIRE = int(get_env('STORAGE_AWS_X_AMZ_EXPIRES', '86400'))
     AWS_LOCATION = get_env('STORAGE_AWS_FOLDER', default='')
 

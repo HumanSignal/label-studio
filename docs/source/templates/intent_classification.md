@@ -61,7 +61,7 @@ Use the [Choices](/tags/choices.html) control tag to classify the intent for eac
     <Choice value="Unsatisfied" />
   </Choices>
 ```
-Because of the `perRegion="true"` argument, each choice applies to a different segment labeled as a segment. The `required="true"` argument ensures that each labeled audio segment has a choice selected before the annotation can be submited.
+Because of the `perRegion="true"` argument, each choice applies to a different segment labeled as a segment. The `required="true"` argument ensures that each labeled audio segment has a choice selected before the annotation can be submitted.
 
 ## Related tags
 
