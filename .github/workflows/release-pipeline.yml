@@ -28,7 +28,6 @@ jobs:
     name: "Build"
     permissions:
       contents: write
-      checks: read
     uses: heartexlabs/label-studio/.github/workflows/build_pypi.yml@develop
     with:
       version: ${{ github.ref_name }}
