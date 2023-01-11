@@ -8,12 +8,12 @@ import { IconBell } from '../../assets/icons';
 
 const VersionContext = createContext();
 
-export const VersionProvider = ({children}) => {
+export const VersionProvider = ({ children }) => {
   const api = useAPI();
 
   const [state, dispatch] = useReducer((state, action) => {
     if (action.type === 'fetch-version') {
-      return {...state, ...action.payload};
+      return { ...state, ...action.payload };
     }
   });
 
@@ -33,7 +33,7 @@ export const VersionProvider = ({children}) => {
         },
       });
     }
-  }, [api]);
+  }, []);
 
   useEffect(() => {
     fetchVersion();
@@ -46,9 +46,9 @@ export const VersionProvider = ({children}) => {
   );
 };
 
-export const VersionNotifier = ({showNewVersion, showCurrentVersion}) => {
+export const VersionNotifier = ({ showNewVersion, showCurrentVersion }) => {
   const url = "https://pypi.org/project/label-studio/#history";
-  const {newVersion, updateTime, latestVersion, version } = useContext(VersionContext) ?? {};
+  const { newVersion, updateTime, latestVersion, version } = useContext(VersionContext) ?? {};
 
   return (newVersion && showNewVersion) ? (
     <Block tag="li" name="version-notifier">

@@ -16,6 +16,9 @@ env:
 jobs:
   promote_docker_image:
     name: "Promote"
+    permissions:
+      contents: read
+      checks: read
     uses: heartexlabs/label-studio/.github/workflows/docker-release-promote.yml@develop
     with:
       release_tag: ${{ github.ref_name }}
@@ -23,6 +26,8 @@ jobs:
 
   build-pypi:
     name: "Build"
+    permissions:
+      contents: write
     uses: heartexlabs/label-studio/.github/workflows/build_pypi.yml@develop
     with:
       version: ${{ github.ref_name }}

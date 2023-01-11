@@ -70,4 +70,4 @@ Feature flags JSON object is available on frontend via
 window.APP_SETTINGS.feature_flags
 ```
 
-To make use flags with LD client, [populate it with bootstap values](https://docs.launchdarkly.com/sdk/features/bootstrapping#javascript)
+To make use flags with LD client, [populate it with bootstrap values](https://docs.launchdarkly.com/sdk/features/bootstrapping#javascript)

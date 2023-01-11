@@ -27,7 +27,7 @@ Perform classification tasks within the context of a defined taxonomy or hierarc
     <Choice value="Eukarya">
       <Choice value="Human" />
       <Choice value="Oppossum" />
-      <Choice value="Extraterrestial" />
+      <Choice value="Extraterrestrial" />
     </Choice>
   </Taxonomy>
 </View>
@@ -52,7 +52,7 @@ Use the [Choice](/tags/choice.html) control tag within the Taxonomy tag to speci
     <Choice value="Eukarya">
       <Choice value="Human" />
       <Choice value="Oppossum" />
-      <Choice value="Extraterrestial" />
+      <Choice value="Extraterrestrial" />
     </Choice>
 ```
 Nest choices under a specific [Choice](/tags/choice.html) tag to create layers in the taxonomy.

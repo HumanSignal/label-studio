@@ -77,7 +77,8 @@
         "Image": {"$ref": "#/definitions/tags_with_value_required_name"},
         "Text": {"$ref": "#/definitions/tags_with_value_or_object"},
         "HyperText": {"$ref": "#/definitions/tags_with_value_or_object"},
-        "View": {"$ref": "#/definitions/MaybeMultipleView"}
+        "View": {"$ref": "#/definitions/MaybeMultipleView"},
+		"TextArea": {"$ref": "#/definitions/MaybeMultipleTextAreas"}
       }
     },
     "MaybeMultipleView": {
@@ -166,6 +167,29 @@
         "type": "array",
         "items": {"$ref": "#/definitions/Labels"}
       }, {"$ref": "#/definitions/Labels"}]
+    },
+	"TextArea": {
+      "type": "object",
+      "anyOf": [
+        {"required": ["@name", "@toName"]}
+      ],
+      "properties": {
+        "@name": {
+          "$ref": "#/definitions/@name"
+        },
+        "@toName": {
+          "$ref": "#/definitions/@toName"
+        },
+        "$": {
+          "$ref": "#/definitions/$"
+        }
+      }
+    },
+	"MaybeMultipleTextAreas": {
+      "anyOf": [{
+        "type": "array",
+        "items": {"$ref": "#/definitions/TextArea"}
+      }, {"$ref": "#/definitions/TextArea"}]
     }
   },
   "type": "object",
@@ -179,7 +203,8 @@
         "View": {"$ref": "#/definitions/MaybeMultipleView"},
         "Image": {"$ref": "#/definitions/tags_with_value_required_name"},
         "Text": {"$ref": "#/definitions/tags_with_value_or_object"},
-        "HyperText": {"$ref": "#/definitions/tags_with_value_or_object"}
+        "HyperText": {"$ref": "#/definitions/tags_with_value_or_object"},
+		"TextArea": {"$ref": "#/definitions/MaybeMultipleTextAreas"}
       }
     }
   }
