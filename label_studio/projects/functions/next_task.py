@@ -4,12 +4,20 @@ import logging
 from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Value, When, Q
 from django.db.models.fields import DecimalField
 from django.conf import settings
+from core.feature_flags import flag_set
 import numpy as np
 
 from core.utils.common import conditional_atomic
 from tasks.models import Annotation, Task
 
 logger = logging.getLogger(__name__)
+
+
+def get_next_task_logging_level():
+    level = logging.DEBUG
+    if flag_set('fflag_fix_back_dev_4185_next_task_additional_logging_long'):
+        level = logging.INFO
+    return level
 
 
 def _get_random_unlocked(task_query, user, upper_limit=None):
@@ -256,7 +264,7 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
 
         next_task, queue_info = skipped_queue(next_task, prepared_tasks, project, user, queue_info)
 
-        logger.debug(f'get_next_task finished. next_task: {next_task}, queue_info: {queue_info}')
+        logger.log(get_next_task_logging_level(), f'get_next_task finished. next_task: {next_task}, queue_info: {queue_info}')
 
         # debug for critical overlap issue
         if next_task:
