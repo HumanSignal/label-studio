@@ -172,4 +172,5 @@ def test_label_config_versions(business_client, project_id):
             data=json.dumps(payload),
             content_type="application/json",
         )
+        print(test_name)
         assert response.status_code == test_content['status_code']

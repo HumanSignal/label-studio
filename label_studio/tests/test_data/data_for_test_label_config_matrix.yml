@@ -161,3 +161,24 @@ choices_in_several_nested_views:
     </View>
     '
   status_code: 200
+several_choices_in_several_nested_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <View>
+    <Choices name="choices1" toName="trans">
+    <View>
+      <Choice value="1"/>
+    </View>
+    <View>
+      <Choice value="2"/>
+    </View>
+    </Choices>
+    <Choices name="choices2" toName="trans">
+      <Choice value="3"/>
+      <Choice value="4"/>
+    </Choices>
+    </View>
+    </View>
+    '
+  status_code: 200
