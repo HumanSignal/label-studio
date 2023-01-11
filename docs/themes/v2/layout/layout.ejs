@@ -189,7 +189,7 @@
           <div>
             <%- partial("component/text", {text: "Can’t find what you’re looking for?", tag: "h3", size: "Eyebrow"}) %>
             <% if(isEnterpriseTheme) { %>
-              <%- partial("component/button", { url: "mailto:hi@heartex.com", label: "Contact Support", }) %>
+              <%- partial("component/button", { url: "https://heartex.atlassian.net/servicedesk/customer/user/login?destination=portals", label: "Contact Support", }) %>
             <% } else { %>
               <div class="content-footer-button-group">
                 <%- partial("component/button", { url: "https://github.com/heartexlabs/label-studio/issues", label: "Submit a GitHub Issue", }) %>
