@@ -94,6 +94,20 @@ choices_with_1choice_in_views:
     </Choices>
     </View>
     '
+  status_code: 400
+choices_with_1choice_in_several_views:
+  label_config: '
+    <View>
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    </View>
+    <View>
+    <Choices name="choices" toName="trans">
+      <Choice value="test"/>
+    </Choices>
+    </View>
+    </View>
+    '
   status_code: 200
 choices_with_1choice_in_nested_views:
   label_config: '
