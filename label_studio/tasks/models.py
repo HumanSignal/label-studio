@@ -160,6 +160,7 @@ class Task(TaskMixin, models.Model):
                 return getattr(self, link_name).key
 
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
     def clear_expired_locks(self):
@@ -329,7 +330,7 @@ post_bulk_create = Signal(providing_args=["objs", "batch_size"])
 
 class AnnotationManager(models.Manager):
     def for_user(self, user):
-        return self.filter(task__project__organization=user.active_organization)
+        return self.filter(project__organization=user.active_organization)
 
     def bulk_create(self, objs, batch_size=None):
         pre_bulk_create.send(sender=self.model, objs=objs, batch_size=batch_size)
@@ -427,6 +428,7 @@ class Annotation(models.Model):
         return len(res)
 
     def has_permission(self, user):
+        user.project = self.task.project  # link for activity log
         return self.task.project.has_permission(user)
 
     def increase_project_summary_counters(self):
@@ -527,6 +529,7 @@ class AnnotationDraft(models.Model):
         return timesince(self.created_at)
 
     def has_permission(self, user):
+        user.project = self.task.project  # link for activity log
         return self.task.project.has_permission(user)
 
 
@@ -549,6 +552,7 @@ class Prediction(models.Model):
         return timesince(self.created_at)
 
     def has_permission(self, user):
+        user.project = self.task.project  # link for activity log
         return self.task.project.has_permission(user)
 
     @classmethod
