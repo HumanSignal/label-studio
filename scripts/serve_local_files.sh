@@ -27,5 +27,5 @@ reset=`tput sgr0`
 echo "${green}File list stored in '${OUTPUT_FILE}'. Now import it directly from Label Studio UI${reset}"
 
 echo "Running web server on the port ${PORT}"
-cd $INPUT_DIR
+cd "$INPUT_DIR"
 python3 -m http.server $PORT
