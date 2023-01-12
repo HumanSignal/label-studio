@@ -196,3 +196,145 @@ several_choices_in_several_nested_views:
     </View>
     '
   status_code: 200
+
+labels_without_labels_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Labels name="labels" toName="trans" />
+    </View>
+    '
+  status_code: 400
+labels_with_1label_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Labels name="labels" toName="trans">
+      <Label value="test"/>
+    </Labels>
+    </View>
+    '
+  status_code: 200
+labels_with_1label_without_value_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Labels name="labels" toName="trans">
+      <Label />
+    </Labels>
+    </View>
+    '
+  status_code: 400
+labels_with_1label_in_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    </View>
+    <View>
+    <Labels name="labels" toName="trans">
+      <Label value="test"/>
+    </Labels>
+    </View>
+    '
+  status_code: 400
+labels_with_1label_in_several_views:
+  label_config: '
+    <View>
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    </View>
+    <View>
+    <Labels name="labels" toName="trans">
+      <Label value="test"/>
+    </Labels>
+    </View>
+    </View>
+    '
+  status_code: 200
+labels_with_1label_in_nested_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <View>
+    <Labels name="labels" toName="trans">
+      <Label value="test"/>
+    </Labels>
+    </View>
+    </View>
+    '
+  status_code: 200
+labels_in_nested_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <View>
+    <Labels name="labels" toName="trans">
+      <Label value="1"/>
+      <Label value="2"/>
+      <Label value="3"/>
+      <Label value="4"/>
+    </Labels>
+    </View>
+    </View>
+    '
+  status_code: 200
+labels_withoutname_with_1label_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Labels toName="trans">
+      <Label value="test"/>
+    </Labels>
+    </View>
+    '
+  status_code: 400
+labels_withouttoname_with_1label_in_view:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <Labels name="labels" >
+      <Label value="test"/>
+    </Labels>
+    </View>
+    '
+  status_code: 400
+labels_in_several_nested_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <View>
+    <Labels name="labels" toName="trans">
+    <View>
+      <Label value="1"/>
+    </View>
+    <View>
+      <Label value="2"/>
+    </View>
+      <Label value="3"/>
+      <Label value="4"/>
+    </Labels>
+    </View>
+    </View>
+    '
+  status_code: 200
+several_labels_in_several_nested_views:
+  label_config: '
+    <View>
+    <Text name="trans" value="$transcript"></Text>
+    <View>
+    <Labels name="labels1" toName="trans">
+    <View>
+      <Label value="1"/>
+    </View>
+    <View>
+      <Label value="2"/>
+    </View>
+    </Labels>
+    <Labels name="labels2" toName="trans">
+      <Label value="3"/>
+      <Label value="4"/>
+    </Labels>
+    </View>
+    </View>
+    '
+  status_code: 200
