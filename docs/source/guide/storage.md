@@ -159,11 +159,73 @@ After adding the storage, click **Sync** to collect tasks from the bucket, or ma
 If you want to use a revocable method to grant Label Studio access to your Amazon S3 bucket, use an IAM role and its temporary security credentials instead of an access key ID and secret. This added layer of security is only available in Label Studio Enterprise. For more details about security in Label Studio and Label Studio Enterprise, see [Secure Label Studio](security.html).
 
 #### Set up an IAM role in Amazon AWS
-Set up an IAM role in Amazon AWS to use with Label Studio.
+Set up an IAM role in Amazon AWS to use with Label Studio:
 
-1. In the Label Studio UI, open the **Organization** page to get an `External ID` to use for the IAM role creation in Amazon AWS. You must be an administrator to view the Organization page.
-2. Follow the [Amazon AWS documentation to create an IAM role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user.html) in your AWS account. <br/>Make sure to require an external ID and do not require multi-factor authentication when you set up the role. Select an existing permissions policy, or create one that allows programmatic access to the bucket.
-3. Create a trust policy using the external ID. Use the following example: 
+1. Create an S3 source bucket. 
+2. Create an S3 target bucket.
+3. Create IAM Policy for the source bucket using **IAM** >> **Policies** >> **Create Policy** >> **JSON**. 
+
+!!! note 
+    Check if you have replaced `<your_bucket_name>` with the S3 source bucket name.
+
+
+4. Paste the following policy.
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket",
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::<your_bucket_name>",
+                "arn:aws:s3:::<your_bucket_name>/*"
+            ]
+        }
+    ]
+}
+```
+
+5. Create IAM Policy for the Source Bucket using **IAM** >> **Policies** >> **Create Policy** >> **JSON**. 
+
+!!! note 
+    Check if you have replaced `<your_bucket_name>` with the S3 target bucket name.
+
+
+```json 
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket",
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::<your_bucket_name>",
+                "arn:aws:s3:::<your_bucket_name>/*"
+            ]
+        }
+    ]
+}
+```
+
+6.  Create a new IAM Role using **IAM** >> **Roles** >> **Create Role**.
+
+7. Choose Custom Trust Policy. 
+
+!!! note
+    Check if you have replaced `<YOUR-ORG-ExternalId>` with the Label Studio’s External ID.
+
 ```json
 {
   "Version": "2012-10-17",
@@ -187,52 +249,10 @@ Set up an IAM role in Amazon AWS to use with Label Studio.
   ]
 }
 ```
-4. After you create the IAM role, note the Amazon Resource Name (ARN) of the role. You need it to set up the S3 source storage in Label Studio.
-5. Assign role policies to the role to allow it to access your S3 bucket. Replace `<your_bucket_name>` with your S3 bucket name. Use the following role policy for S3 source storage:
-```json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "VisualEditor1",
-            "Effect": "Allow",
-            "Action": [
-                "s3:ListBucket",
-                "s3:GetObject",
-            ],
-            "Resource": [
-                "arn:aws:s3:::<your_bucket_name>",
-                "arn:aws:s3:::<your_bucket_name>/*"
-            ]
-        }
-    ]
-}
-```
-Use the following role policy for S3 target storage:
-```json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "VisualEditor1",
-            "Effect": "Allow",
-            "Action": [
-                "s3:ListBucket",
-                "s3:PutObject",
-                "s3:GetObject",
-                "s3:DeleteObject"
-            ],
-            "Resource": [
-                "arn:aws:s3:::<your_bucket_name>",
-                "arn:aws:s3:::<your_bucket_name>/*"
-            ]
-        }
-    ]
-}
-```
 
-!!! note 
-    `"s3:DeleteObject"` is only needed for target storage connections where you want deleted annotations in Label Studio to also be deleted in the target S3 bucket.  
+8. Assign to this role the source and target bucket policies you have just created above.
+
+9. Give your new role any name you would like to have and note the Amazon Resource Name (ARN) of the role. You need it to set up the S3 source storage in Label Studio. 
 
 
 For more details about using an IAM role with an external ID to provide access to a third party (Label Studio), see the Amazon AWS documentation [How to use an external ID when granting access to your AWS resources to a third party](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html).
