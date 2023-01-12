@@ -463,7 +463,7 @@ only_views_with_hypertext_without_value:
     </View>
     '
   status_code: 400
-only_views_with_correct_text:
+only_views_with_correct_hypertext:
   label_config: '
     <View>
     <HyperText name="text" value="$text"/>
