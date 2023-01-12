@@ -13,11 +13,18 @@ meta_description: Get started with Label Studio by creating projects to label an
 
 ## What is Label Studio?
 
-Label Studio is an open source data labeling tool for labeling and exploring multiple types of data. You can perform different types of labeling with many data formats. 
+Label Studio is an open source data labeling tool for labeling and exploring multiple types of data. It allows you to do the following:
+- Perform different types of labeling with many data formats. 
 
-You can also integrate Label Studio with machine learning models to supply predictions for labels (pre-labels), or perform continuous active learning. See [Set up machine learning with your labeling process](ml.html). 
+<div class="enterprise-only">
 
-Label Studio is also available in Enterprise and Cloud editions with additional features. See [Label Studio features](label_studio_compare.html) for more.
+- Use [Label Studio Enterprise as a cloud offering](https://heartex.com/product). 
+
+</div>
+
+- Integrate Label Studio with machine learning models to supply predictions for labels (pre-labels), or perform continuous active learning. See [Set up machine learning with your labeling process](ml.html). 
+
+Label Studio is also available in Enterprise and Cloud editions with additional features. For more information, see the [Label Studio features](label_studio_compare.html) page.
 
 
 
