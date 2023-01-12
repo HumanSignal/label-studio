@@ -338,3 +338,65 @@ several_labels_in_several_nested_views:
     </View>
     '
   status_code: 200
+no_views:
+  label_config: '
+    <Text name="trans" value="$transcript"></Text>
+    <Labels name="labels" toName="trans">
+      <Label value="1"/>
+      <Label value="2"/>
+    </Labels>
+    '
+  status_code: 400
+only_views:
+  label_config: '
+    <View>
+    <View>
+    </View>
+    </View>
+    '
+  status_code: 200
+only_views_with_1view:
+  label_config: '
+    <View>
+    <View>
+    <View>
+    </View>
+    </View>
+    '
+  status_code: 400
+only_views_with_image_without_params:
+  label_config: '
+    <View>
+    <Image />
+    <View>
+    </View>
+    </View>
+    '
+  status_code: 400
+only_views_with_image_without_name:
+  label_config: '
+    <View>
+    <View>
+    </View>
+        <Image value="$image"/>
+    </View>
+    '
+  status_code: 400
+only_views_with_image_without_value:
+  label_config: '
+    <View>
+    <View>
+    <Image name="image"/>
+    </View>
+    </View>
+    '
+  status_code: 400
+only_views_with_correct_image:
+  label_config: '
+    <View>
+    <Image name="image" value="$image"/>
+    <View>
+    </View>
+    </View>
+    '
+  status_code: 200
