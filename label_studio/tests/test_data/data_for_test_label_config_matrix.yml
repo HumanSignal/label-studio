@@ -400,3 +400,75 @@ only_views_with_correct_image:
     </View>
     '
   status_code: 200
+only_views_with_text_without_params:
+  label_config: '
+    <View>
+    <Text />
+    <View>
+    </View>
+    </View>
+    '
+  status_code: 400
+only_views_with_text_without_name:
+  label_config: '
+    <View>
+    <View>
+    </View>
+        <Text value="$text"/>
+    </View>
+    '
+  status_code: 400
+only_views_with_text_without_value:
+  label_config: '
+    <View>
+    <View>
+    <Text name="text"/>
+    </View>
+    </View>
+    '
+  status_code: 400
+only_views_with_correct_text:
+  label_config: '
+    <View>
+    <Text name="text" value="$text"/>
+    <View>
+    </View>
+    </View>
+    '
+  status_code: 200
+only_views_with_hypertext_without_params:
+  label_config: '
+    <View>
+    <HyperText />
+    <View>
+    </View>
+    </View>
+    '
+  status_code: 400
+only_views_with_hypertext_without_name:
+  label_config: '
+    <View>
+    <View>
+    </View>
+        <HyperText value="$text"/>
+    </View>
+    '
+  status_code: 400
+only_views_with_hypertext_without_value:
+  label_config: '
+    <View>
+    <View>
+    <HyperText name="text"/>
+    </View>
+    </View>
+    '
+  status_code: 400
+only_views_with_correct_text:
+  label_config: '
+    <View>
+    <HyperText name="text" value="$text"/>
+    <View>
+    </View>
+    </View>
+    '
+  status_code: 200
