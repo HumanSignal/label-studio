@@ -2,9 +2,18 @@
 import logging
 
 from django.db import migrations
+from core.redis import start_job_async_or_sync
+from core.utils.common import btree_gin_migration_operations
 
 logger = logging.getLogger(__name__)
 
+
+def async_index_creation():
+    from django.db import connection
+    with connection.schema_editor(atomic=False) as schema_editor:
+        schema_editor.execute('create index concurrently if not exists tasks_annotations_result_proj_gin '
+            'on task_completion using gin (project_id, cast(result as text) gin_trgm_ops);'
+        )
 
 def forwards(apps, schema_editor):
     if not schema_editor.connection.vendor.startswith('postgres'):
@@ -14,10 +23,7 @@ def forwards(apps, schema_editor):
 
     schema_editor.execute('drop index if exists tasks_annotations_result_idx;')
     schema_editor.execute('drop index if exists tasks_annotations_result_idx2;')
-    schema_editor.execute(
-        'create index concurrently if not exists tasks_annotations_result_proj_gin '
-        'on task_completion using gin (project_id, cast(result as text) gin_trgm_ops);'
-    )
+    start_job_async_or_sync(async_index_creation)
 
 
 def backwards(apps, schema_editor):
@@ -25,7 +31,8 @@ def backwards(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
+    atomic = False
 
     dependencies = [('tasks', '0034_auto_20221221_1101')]
 
-    operations = [migrations.RunPython(forwards, backwards)]
+    operations = btree_gin_migration_operations(migrations.RunPython(forwards, backwards))
