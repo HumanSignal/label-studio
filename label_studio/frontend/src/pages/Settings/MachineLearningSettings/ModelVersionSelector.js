@@ -17,11 +17,15 @@ export const ModelVersionSelector = ({
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [versions, setVersions] = useState([]);
-  const [version, setVersion] = useState(object?.[valueName] || null);
+  const [version, setVersion] = useState(null);
 
   useEffect(() => {
-    setVersion(object?.[valueName] || null);
-  }, [object?.[valueName]]);
+    if (versions.length && object?.[valueName] ) {
+      const selectedVersion = versions.find(version => version.value === parseInt(object?.[valueName]));
+
+      setVersion(selectedVersion);
+    }
+  }, [object?.[valueName], versions]);
 
   const fetchMLVersions = useCallback(async () => {
     const pk = object?.id;
@@ -53,26 +57,15 @@ export const ModelVersionSelector = ({
 
   return (
     <Block name="modelVersionSelector">
-      {loading ? (
-        <Select
-          disabled={true}
-          value={null}
-          options={[]}
-          placeholder={"Loading ..."}
-          {...props}
-        />
-      )
-        : (
-          <Select
-            name={name}
-            disabled={!versions.length}
-            value={version}
-            onChange={e => setVersion(e.target.value)}
-            options={versions}
-            placeholder={placeholder}
-            {...props}
-          />
-        )}
+      <Select
+        name={name}
+        disabled={!versions.length}
+        value={version}
+        onChange={e => setVersion(e.target.value)}
+        options={versions}
+        placeholder={loading ? "Loading ..." : placeholder}
+        {...props}
+      />
       {error && (
         <Elem name="message">
           {error}
