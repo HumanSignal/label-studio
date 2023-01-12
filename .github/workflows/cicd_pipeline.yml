@@ -19,8 +19,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.pull_request.head.ref || github.ref }}
   cancel-in-progress: true
 
-permissions: read-all
-
 env:
   RELEASE_BRANCH_PREFIX: "ls-release/"
 
@@ -76,13 +74,6 @@ jobs:
             });
             core.setOutput("commit-message", commit.commit.message);
 
-  pr_labeler:
-    name: "Validate"
-    if: github.event_name == 'pull_request'
-    permissions:
-      pull-requests: write
-    uses: heartexlabs/label-studio/.github/workflows/pr-labeler.yml@develop
-
   validate_submodules:
     name: "Validate"
     uses: heartexlabs/label-studio/.github/workflows/submodules-validator.yml@develop
@@ -132,6 +123,7 @@ jobs:
       ( ( github.ref_name == 'develop' && needs.changed_files.outputs.docker == 'true' )
         || startsWith(github.ref_name, 'ls-release/') )
     permissions:
+      contents: read
       checks: write
     uses: heartexlabs/label-studio/.github/workflows/docker-build.yml@develop
     with:
@@ -314,6 +306,8 @@ jobs:
     if: |
       github.event_name == 'push' &&
       startsWith(github.ref_name, 'ls-release/')
+    permissions:
+      contents: write
     uses: heartexlabs/label-studio/.github/workflows/build_pypi.yml@develop
     with:
       version: ${{ needs.draft-release.outputs.rc-version }}
