@@ -136,3 +136,4 @@ def fill_annotations_project():
         start_job_async_or_sync(_fill_annotations_project, project.id)
 
     logger.info('Finished filling project field for Annotation model')
+

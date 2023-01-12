@@ -94,7 +94,7 @@ MyLayout.title = "My Page Set";
 MyLayout.path = "/some_root"
 ```
 
-Notice the `props` argument and `props.children`. This is the default React way of passing content to the component. It will work fo every component you create. In this case `children` would be a content of a single page you create depending on current route.
+Notice the `props` argument and `props.children`. This is the default React way of passing content to the component. It will work for every component you create. In this case `children` would be a content of a single page you create depending on current route.
 
 Layout can also be extended with `title` and `path`.
 

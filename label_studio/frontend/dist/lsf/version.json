@@ -1,6 +1,6 @@
 {
-  "message": "Revert "fix: DEV-3901: Paragraph overflow text issue when outliner disabled (#1059)",
-  "commit": "34bda5442032f82d7b0c96469cb2929fd73ba762",
-  "branch": "fb-dev-3901/revert",
-  "date": "2022/12/03 16:46:56"
+  "message": "fix: DEV-3941: Enable adjusting player head position using TimeBox (#1111)\n\n* fix: DEV-3941: Enable adjusting player head position using TimeBox\r\n\r\n* fix timebox when insert more than .500 it was rendering more .001\r\n\r\n* fix timebox formating\r\n\r\n* add hours to timebox\r\n\r\n* set show hour in timebox by default\r\n\r\n* fix how UI is working to delete and add numbers\r\n\r\n* fix how to mask works",
+  "commit": "cfd2ccbf8c73e57bc47d68034ab5848e8bc6a402",
+  "branch": "master",
+  "date": "2023-01-11T14:45:49Z"
 }
