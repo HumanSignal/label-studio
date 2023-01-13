@@ -1,5 +1,7 @@
 var iframeTimer = null;
 
+
+
   function editor_iframe(res, modal, full) {
     // generate new iframe
     var iframeTemplate = `<iframe onclick="event.stopPropagation()" id="render-editor" style="display: none"></iframe>`;
@@ -137,6 +139,10 @@ function insert_render_editor(config, modal, full) {
 
     const openPreviewButton = pre.querySelector(".code-block-open-preview");
     openPreviewButton.addEventListener("click", () => show_render_editor(code))
+
+    const inlinePlayground = document.querySelector("#main-preview");
+
+    if(inlinePlayground) insert_render_editor(code, inlinePlayground);
   }
 
   const enhanceCodeBlocks = (codeBlock) => {
