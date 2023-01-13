@@ -13,6 +13,10 @@ var iframeTimer = null;
     const iframe = document.querySelector("#render-editor");
     const spinner = document.querySelector("#render-editor-loader");
 
+    if (full) {
+      iframe.style.width = window.innerWidth * 0.9;
+    }
+
     iframe.addEventListener("load", function() {
       spinner.style.display = "none";
       iframe.style.display = "block";
