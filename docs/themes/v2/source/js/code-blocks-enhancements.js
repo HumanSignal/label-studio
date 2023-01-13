@@ -69,10 +69,8 @@ function insert_render_editor(config, modal, full) {
     credentials: 'include',
     body: formData,
   })
-  .then((response) => {
-    console.log(response.json());
-    editor_iframe(response, modal, full)
-  })
+  .then((response) => response.json())
+  .then((data) => editor_iframe(data, modal, full))
   .catch((error) => {
     console.log(error);
     console.log("=> Can't load preview, demo server error");
