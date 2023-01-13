@@ -8,7 +8,6 @@ var iframeTimer = null;
       iframe.css('width', $(window).width() * 0.9);
     } */
 
-
     modal.insertAdjacentHTML("afterbegin", iframeTemplate)
 
     const iframe = document.querySelector("#render-editor");
@@ -40,12 +39,14 @@ var iframeTimer = null;
   
 function show_render_editor(config) {
   const body = document.querySelector("body");
-  const modal = `
+  const modalTemplate = `
   <div id="preview-wrapper" onclick="this.remove()">
     <div id="render-editor-loader"><img width="50px" src="/images/loading.gif"></div>
   </div>
   `
-  body.insertAdjacentHTML("beforeend", modal)
+  body.insertAdjacentHTML("beforeend", modalTemplate)
+
+  const modal = document.querySelector("#preview-wrapper");
 
   insert_render_editor(config, modal, true);
 }
@@ -56,6 +57,7 @@ function insert_render_editor(config, modal, full) {
     url += '&full_editor=t';
   }
 
+  // The API expects formData - not JSON
   const formData = new FormData();
   formData.append("config", config);
   formData.append("edit_count", 0)
