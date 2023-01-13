@@ -69,7 +69,7 @@ function insert_render_editor(config, modal, full) {
     credentials: 'include',
     body: formData,
   })
-  .then((response) => response.json())
+  .then((response) => response.body)
   .then((data) => editor_iframe(data, modal, full))
   .catch((error) => {
     console.log(error);
