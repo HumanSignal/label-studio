@@ -14,7 +14,7 @@ var iframeTimer = null;
     const spinner = document.querySelector("#render-editor-loader");
 
     if (full) {
-      iframe.style.width = window.innerWidth * 0.9;
+      iframe.style.width = window.innerWidth * 0.9 + "px"
     }
 
     iframe.addEventListener("load", function() {
