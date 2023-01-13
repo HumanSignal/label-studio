@@ -123,7 +123,10 @@ def test_config_validation_for_choices_workaround(business_client, project_id):
     Example bug DEV-3635
     """
     payload = {
-        'label_config': '<View><Text name="artist" /><View><Choices name="choices_1" toName="artist"><Choice name="choice_1" value="1"/></Choices></View><View><Choices name="choices_2" toName="artist"><Choice name="choice_2" value="2"/></Choices></View></View>'}
+        'label_config': '<View><Text value="$text" name="artist" /><View><Choices name="choices_1" toName="artist">'
+                        '<Choice name="choice_1" value="1"/></Choices></View><View>'
+                        '<Choices name="choices_2" toName="artist"><Choice name="choice_2" value="2"/></Choices>'
+                        '</View></View>'}
     response = business_client.patch(
         f"/api/projects/{project_id}",
         data=json.dumps(payload),
