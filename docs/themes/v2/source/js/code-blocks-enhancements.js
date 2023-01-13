@@ -70,7 +70,7 @@ function insert_render_editor(config, modal, full) {
     body: formData,
   })
   .then((response) => {
-    console.log(response);
+    console.log(response.json());
     editor_iframe(response, modal, full)
   })
   .catch((error) => {
