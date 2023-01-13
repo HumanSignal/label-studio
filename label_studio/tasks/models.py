@@ -129,6 +129,8 @@ class Task(TaskMixin, models.Model):
 
     def has_lock(self, user=None):
         """Check whether current task has been locked by some user"""
+        from projects.functions.next_task import get_next_task_logging_level
+
         num_locks = self.num_locks
         if self.project.skip_queue == self.project.SkipQueue.REQUEUE_FOR_ME:
             num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) | ~Q(completed_by=user)).count()
@@ -146,7 +148,7 @@ class Task(TaskMixin, models.Model):
                 )
             )
         result = bool(num >= self.overlap)
-        logger.debug(f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations}')
+        logger.log(get_next_task_logging_level(), f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations}')
         return result
 
     @property
@@ -168,12 +170,14 @@ class Task(TaskMixin, models.Model):
 
     def set_lock(self, user):
         """Lock current task by specified user. Lock lifetime is set by `expire_in_secs`"""
+        from projects.functions.next_task import get_next_task_logging_level
+
         num_locks = self.num_locks
         if num_locks < self.overlap:
             lock_ttl = settings.TASK_LOCK_TTL
             expire_at = now() + datetime.timedelta(seconds=lock_ttl)
             TaskLock.objects.create(task=self, user=user, expire_at=expire_at)
-            logger.debug(f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
+            logger.log(get_next_task_logging_level(), f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
         else:
             logger.error(
                 f"Current number of locks for task {self.id} is {num_locks}, but overlap={self.overlap}: "
