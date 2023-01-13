@@ -62,7 +62,7 @@ class Task(TaskMixin, models.Model):
                                    help_text='Last annotator or reviewer who updated this task')
     is_labeled = models.BooleanField(_('is_labeled'), default=False,
                                      help_text='True if the number of annotations for this task is greater than or equal '
-                                               'to the number of maximum_completions for the project', db_index=True)
+                                               'to the number of maximum_completions for the project')
     overlap = models.IntegerField(_('overlap'), default=1, db_index=True,
                                   help_text='Number of distinct annotators that processed the current task')
     file_upload = models.ForeignKey(
@@ -103,7 +103,6 @@ class Task(TaskMixin, models.Model):
             models.Index(fields=['id', 'project']),
             models.Index(fields=['id', 'overlap']),
             models.Index(fields=['overlap']),
-            models.Index(fields=['is_labeled'])
         ]
 
     @property
@@ -370,8 +369,8 @@ class Annotation(models.Model):
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='updated_annotations',
                                    on_delete=models.SET_NULL, null=True, verbose_name=_('updated by'),
                                    help_text='Last user who updated this annotation')
-    was_cancelled = models.BooleanField(_('was cancelled'), default=False, help_text='User skipped the task', db_index=True)
-    ground_truth = models.BooleanField(_('ground_truth'), default=False, help_text='This annotation is a Ground Truth (ground_truth)', db_index=True)
+    was_cancelled = models.BooleanField(_('was cancelled'), default=False, help_text='User skipped the task')
+    ground_truth = models.BooleanField(_('ground_truth'), default=False, help_text='This annotation is a Ground Truth (ground_truth)')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last updated time')
     lead_time = models.FloatField(_('lead time'), null=True, default=None, help_text='How much time it took to annotate the task')
@@ -415,7 +414,6 @@ class Annotation(models.Model):
             models.Index(fields=['ground_truth']),
             models.Index(fields=['created_at']),
             models.Index(fields=['last_action']),
-            models.Index(fields=['last_created_by']),
         ] + AnnotationMixin.Meta.indexes
 
     def created_ago(self):
