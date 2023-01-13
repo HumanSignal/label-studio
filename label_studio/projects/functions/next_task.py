@@ -1,11 +1,11 @@
-from collections import Counter
 import logging
 
+from collections import Counter
 from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Value, When, Q
 from django.db.models.fields import DecimalField
 from django.conf import settings
-import numpy as np
 
+from core.feature_flags import flag_set
 from core.utils.common import conditional_atomic
 from tasks.models import Annotation, Task
 
@@ -136,27 +136,28 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
     # if annotator is assigned for tasks, he must to solve it regardless of is_labeled=True
     if not assigned_flag:
         not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
-        # check that tasks states are actual
-        # 1 overlap
-        overlap_error = project.has_errors_project_state_overlap()
-        if overlap_error:
-            # if overlap is wrong - take only save tasks (without annotations in queue)
-            not_solved_tasks = not_solved_tasks.filter(total_annotations__lt=1)
-            # start overlap recalculation
-            project.has_errors_project_state_overlap(update_to_actual=True)
-        elif project.has_errors_project_state_is_labeled():
-            # if is_labeled is wrong and overlap is right: take only tasks with less than maximum_annotations and
-            # tasks without annotations
-            not_solved_tasks = not_solved_tasks.filter(Q(total_annotations__lt=project.maximum_annotations,
-                                                         overlap=project.maximum_annotations) |
-                                                       Q(total_annotations__lt=1, overlap=1))
-            if not_solved_tasks.count() < 1:
-                # if no tasks left - recalculate is_labeled in sync mode
-                project.has_errors_project_state_is_labeled(update_to_actual=True, async_start=False,
-                                                            tasks=not_solved_tasks, sync_border=50)
-            else:
-                # if there are tasks left - recalculate is_labeled in async mode
-                project.has_errors_project_state_is_labeled(update_to_actual=True, async_start=True, sync_border=0)
+        if flag_set('fflag_feat_back_dev_3792_next_task_data_fix_long', user):
+            # check that tasks states are actual
+            # 1 overlap
+            overlap_error = project.has_errors_project_state_overlap()
+            if overlap_error:
+                # if overlap is wrong - take only save tasks (without annotations in queue)
+                not_solved_tasks = not_solved_tasks.filter(total_annotations__lt=1)
+                # start overlap recalculation
+                project.has_errors_project_state_overlap(update_to_actual=True)
+            elif project.has_errors_project_state_is_labeled():
+                # if is_labeled is wrong and overlap is right: take only tasks with less than maximum_annotations and
+                # tasks without annotations
+                not_solved_tasks = not_solved_tasks.filter(Q(total_annotations__lt=project.maximum_annotations,
+                                                             overlap=project.maximum_annotations) |
+                                                           Q(total_annotations__lt=1, overlap=1))
+                if not_solved_tasks.count() < 1:
+                    # if no tasks left - recalculate is_labeled in sync mode
+                    project.has_errors_project_state_is_labeled(update_to_actual=True, async_start=False,
+                                                                tasks=not_solved_tasks, sync_border=50)
+                else:
+                    # if there are tasks left - recalculate is_labeled in async mode
+                    project.has_errors_project_state_is_labeled(update_to_actual=True, async_start=True, sync_border=0)
 
     # show tasks with overlap > 1 first
     if project.show_overlap_first:
