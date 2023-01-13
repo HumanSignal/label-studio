@@ -20,7 +20,7 @@ var iframeTimer = null;
     }
 
     iframe.addEventListener("load", function() {
-      spinner.style.display = "none";
+      if(spinner) spinner.style.display = "none";
       iframe.style.display = "block";
 
       var obj = document.getElementById('render-editor');
