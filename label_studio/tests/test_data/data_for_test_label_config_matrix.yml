@@ -500,9 +500,10 @@ several_views_with_several_components:
             <View>
               <Label value="2"/>
               <View>
-                  <Choices toName="text">
-                    <Choice value="test"/>
-                  </Choices>
+                  <Choices name="choice_test" toName="text">
+                                      <Choice value="test1"/>
+                                      <Choice value="test2"/>
+                                    </Choices>
               </View>
             </View>
               <Label value="3"/>
