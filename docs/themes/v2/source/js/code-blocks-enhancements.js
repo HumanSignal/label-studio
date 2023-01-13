@@ -56,15 +56,14 @@ function insert_render_editor(config, modal, full) {
     url += '&full_editor=t';
   }
 
-  console.log(config);
+  const formData = new FormData();
+  formData.append("config", config);
+  formData.append("edit_count", 0)
 
   fetch(url, {
     method: 'POST',
     credentials: 'include',
-    body: JSON.stringify({
-      config: config,
-      edit_count: 0
-    }),
+    body: formData,
   })
   .then((response) => {
     editor_iframe(response, modal, full)
