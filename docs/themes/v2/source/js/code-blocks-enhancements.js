@@ -8,14 +8,14 @@ var iframeTimer = null;
       iframe.css('width', $(window).width() * 0.9);
     } */
 
-    modal.insertAdjacentHTML("afterbegin", iframeTemplate)
+    modal.insertAdjacentHTML("beforeend", iframeTemplate)
 
     const iframe = document.querySelector("#render-editor");
     const spinner = document.querySelector("#render-editor-loader");
 
     iframe.addEventListener("load", function() {
-      spinner.style.display === "none";
-      iframe.style.display === "block";
+      spinner.style.display = "none";
+      iframe.style.display = "block";
 
       var obj = document.getElementById('render-editor');
       clearTimeout(iframeTimer);
@@ -50,8 +50,6 @@ function show_render_editor(config) {
 
   const modal = document.querySelector("#preview-wrapper");
 
-  console.log(modal);
-
   insert_render_editor(config, modal, true);
 }
 
@@ -75,7 +73,6 @@ function insert_render_editor(config, modal, full) {
     editor_iframe(response, modal, full)
   })
   .catch((error) => {
-    editor_iframe("hugues", modal, full)
     console.log(error);
     console.log("=> Can't load preview, demo server error");
   });
