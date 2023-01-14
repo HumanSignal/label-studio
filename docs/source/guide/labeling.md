@@ -217,14 +217,46 @@ You cannot use this environment variable to remove an existing or add a new keyb
 
 ## Customize the labeling interface 
 
-Click the settings icon when labeling to configure the labeling interface to suit your labeling use case. 
+Go to the Label Studio Frontend settings by clicking the following button to configure the labeling interface based on your labeling use case. 
+
+<img style="max-width: 600px" src='../images/frontend_icon.png' class="gif-border">
+<br/>
+<i>Figure 2: Frontend settings  </i>
+
+You can select or deselect one or more check boxes located under the **Settings** icon. 
+
+**Settings** >> **General** tab:
+
+<img style="max-width: 600px" src='../images/general.png' class="gif-border">
+<br/>
+<i>Figure 3: General tab </i>
+
+**Settings** >> **Hotkeys** tab:
+
+<img style="max-width: 600px" src='../images/hotkeys.png' class="gif-border">
+<br/>
+<i>Figure 4: Hotkeys tab </i>
+
+**Settings** >> **Layout** tab:
+
+<img style="max-width: 600px" src='../images/layout.png' class="gif-border">
+<br/>
+<i>Figure 5: Layout tab </i>
+
+**Settings** >> **Video** tab:
+You can manually adjust the video hop size in the **Video hop size** text box.
+
+<img style="max-width: 600px" src='../images/video.png' class="gif-border">
+<br/>
+<i>Figure 6: Video tab </i>
+
 
 For example, keep a label selected after creating a region, display labels on bounding boxes, polygons and other regions while labeling, and show line numbers for text labeling.
 
 
 <img style="max-width: 600px" src='../images/lsf-settings.png' class="gif-border">
 <br/>
-<i>Figure 2: Customize the labeling interface  </i>
+<i>Figure 7: Customize the labeling interface  </i>
 
 You can also modify the layout of the screen, hide or show predictions, annotations, or the results panel, and hide or show various controls and buttons.
 
@@ -298,7 +330,7 @@ Outliner is the area where you can see all the details about annotation, regions
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/outliner-details-panels-view.png" style="opacity: 0.8" class="gif-border"/></div>
-<i>Figure 3: View of Outliner and Details panels view </i>
+<i>Figure 8: View of Outliner and Details panels view </i>
  
 **Panel actions**
 
@@ -308,46 +340,46 @@ The **Outliner** and **Details** panels are collapsible and detachable, so you c
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/collapse-details-button.png" style="opacity: 0.8" class="gif-border"/></div>
-<i>Figure 4: Collapsed details button</i>
+<i>Figure 9: Collapsed details button</i>
 
 Now, the **Details** panel is collapsed, and you can expand it by clicking the **Expand Details** icon.
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/details-collapsed-button-view.png" style="opacity: 0.8" class="gif-border"/></div>
-<i>Figure 5: Details panel in collapsed view</i>
+<i>Figure 10: Details panel in collapsed view</i>
 
 The details panel is displayed in expanded view to explore the feature. 
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/details-panel-expanded-view.png" style="opacity: 0.8" class="gif-border"/></div>
-<i>Figure 6: Details panel in expanded view</i>
+<i>Figure 11: Details panel in expanded view</i>
 
 To collapse the **Outliner** panel, click on the **Collapse outliner** icon. 
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/collapse-outliner-button.png" style="opacity: 0.8" class="gif-border"/></div>
-<i>Figure 7: Collapse outliner button</i>
+<i>Figure 12: Collapse outliner button</i>
 
 Now, the **Outliner** panel is collapsed, and you can expand it by clicking the **Expand Details** icon.
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/outliner-collapsed-view.png" style="opacity: 0.8" class="gif-border"/></div>
-<i>Figure 8: Outliner panel in collapsed view</i>
+<i>Figure 13: Outliner panel in collapsed view</i>
 
 The **Expand Details** icon expands the **Outliner** panel for further actions.
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/expand-outliner-button.png" style="opacity: 0.8" class="gif-border"/></div>
-<i>Figure 9: Outliner panel with expand outliner icon</i>
+<i>Figure 14: Outliner panel with expand outliner icon</i>
 
 The Outliner panel is displayed in expanded view to explore the feature. 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/outliner-expanded-view.png" style="opacity: 0.8" class="gif-border"/></div>
-<i>Figure 10: Outliner panel in expanded view</i>
+<i>Figure 15: Outliner panel in expanded view</i>
 
 These panels are detachable, so you can place them wherever you want on the screen, and you can resize them. 
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/details-floating-dock.png" style="opacity: 0.8" class="gif-border"/></div>
-<i>Figure 11: Details panel in floating dock view</i>
+<i>Figure 16: Details panel in floating dock view</i>
  
 **Region editor** 
 
@@ -355,7 +387,7 @@ You can edit regions with a focus on labeling. You can zoom in and precise contr
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/region-editor.png" style="opacity: 0.8" class="gif-border"/></div>
-<i>Figure 12: Edit regions using different attributes</i>
+<i>Figure 17: Edit regions using different attributes</i>
 
 
 !!! note 
@@ -365,7 +397,7 @@ You can edit regions with a focus on labeling. You can zoom in and precise contr
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/comments-box.png" style="opacity: 0.8" class="gif-border"/></div>
-<i>Figure 13: Comments box </i>
+<i>Figure 18: Comments box </i>
 
 !!! info 
     Use Outliner to work with larger annotation tasks (many bounding boxes in one image, larger videos, and so on).
@@ -381,7 +413,7 @@ To add a region in the OCR transcription templates, draw a rectangle, and you ca
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/text-inside-outliner.png" style="opacity: 0.8" class="gif-border"/></div>
-<i>Figure 13: Text inside outliner</i>
+<i>Figure 19: Text inside outliner</i>
 
 **Regions grouping or sorting**
 
@@ -398,19 +430,19 @@ You can also order your regions by **Order by Score** or **Order by Time** optio
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/group-by-label-sorted-by-score-expanded-dog-icon.png" style="opacity: 0.8" class="gif-border"/></div>
-<i>Figure 14: Group by label using sorted by score</i>
+<i>Figure 20: Group by label using sorted by score</i>
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/group-by-tool-sorted-by-score.png" style="opacity: 0.8" class="gif-border"/></div>
-<i>Figure 15: Group by tool using sorted by score</i>
+<i>Figure 21: Group by tool using sorted by score</i>
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/group-by-label-sorted-by-score.png" style="opacity: 0.8" class="gif-border"/></div>
-<i>Figure 16: Group by label using sorted by score</i>
+<i>Figure 22: Group by label using sorted by score</i>
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/manual-grouping.png" style="opacity: 0.8" class="gif-border"/></div>
-<i>Figure 17: Manual grouping</i>
+<i>Figure 23: Manual grouping</i>
 
 **Prediction indication of the region**
 This capability shows whether an ML model created the region or not.  
