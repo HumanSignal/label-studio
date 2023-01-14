@@ -1045,6 +1045,10 @@ main {
   margin-top: 1em;
 }
 
+.content-markdown pre {
+  max-width: 720px;
+}
+
 .code-tabs > div:not(.buttons) {
   border: 1px solid var(--color-gray-100);
   border-radius: 2px;
