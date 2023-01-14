@@ -35,7 +35,7 @@
     if (isBlog) {
       titlePrefix = 'Label Studio Blog';
     } else if (isGuide) {
-      titlePrefix = 'Label Studio Documentation';
+      titlePrefix = isEnterpriseTheme ? "Label Studio Enterprise Documentation" : "Label Studio Documentation";
     } else {
       titlePrefix = isEnterpriseTheme ? "Label Studio Enterprise" : "Label Studio";
     }
