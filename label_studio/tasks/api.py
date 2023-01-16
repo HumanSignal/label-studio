@@ -183,10 +183,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         task_id = self.request.parser_context['kwargs'].get('pk')
-        task = generics.get_object_or_404(
-            Task.objects.filter(id=task_id),
-            pk=task_id
-        )
+        task = generics.get_object_or_404(Task, pk=task_id)
         review = bool_from_request(self.request.GET, 'review', False)
         selected = {"all": False, "included": [self.kwargs.get("pk")]}
         if review:
