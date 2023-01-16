@@ -62,7 +62,7 @@ class Task(TaskMixin, models.Model):
                                    help_text='Last annotator or reviewer who updated this task')
     is_labeled = models.BooleanField(_('is_labeled'), default=False,
                                      help_text='True if the number of annotations for this task is greater than or equal '
-                                               'to the number of maximum_completions for the project', db_index=True)
+                                               'to the number of maximum_completions for the project')
     overlap = models.IntegerField(_('overlap'), default=1, db_index=True,
                                   help_text='Number of distinct annotators that processed the current task')
     file_upload = models.ForeignKey(
@@ -103,7 +103,6 @@ class Task(TaskMixin, models.Model):
             models.Index(fields=['id', 'project']),
             models.Index(fields=['id', 'overlap']),
             models.Index(fields=['overlap']),
-            models.Index(fields=['is_labeled'])
         ]
 
     @property
@@ -129,6 +128,8 @@ class Task(TaskMixin, models.Model):
 
     def has_lock(self, user=None):
         """Check whether current task has been locked by some user"""
+        from projects.functions.next_task import get_next_task_logging_level
+
         num_locks = self.num_locks
         if self.project.skip_queue == self.project.SkipQueue.REQUEUE_FOR_ME:
             num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) | ~Q(completed_by=user)).count()
@@ -140,13 +141,13 @@ class Task(TaskMixin, models.Model):
             logger.error(
                 f"Num takes={num} > overlap={self.overlap} for task={self.id} - it's a bug",
                 extra=dict(
-                    lock_ttl=self.get_lock_ttl(),
+                    lock_ttl=self.locks.values_list('user', 'expire_at'),
                     num_locks=num_locks,
                     num_annotations=num_annotations,
                 )
             )
         result = bool(num >= self.overlap)
-        logger.debug(f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations}')
+        logger.log(get_next_task_logging_level(), f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations}')
         return result
 
     @property
@@ -160,6 +161,7 @@ class Task(TaskMixin, models.Model):
                 return getattr(self, link_name).key
 
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
     def clear_expired_locks(self):
@@ -167,12 +169,14 @@ class Task(TaskMixin, models.Model):
 
     def set_lock(self, user):
         """Lock current task by specified user. Lock lifetime is set by `expire_in_secs`"""
+        from projects.functions.next_task import get_next_task_logging_level
+
         num_locks = self.num_locks
         if num_locks < self.overlap:
             lock_ttl = settings.TASK_LOCK_TTL
             expire_at = now() + datetime.timedelta(seconds=lock_ttl)
             TaskLock.objects.create(task=self, user=user, expire_at=expire_at)
-            logger.debug(f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
+            logger.log(get_next_task_logging_level(), f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
         else:
             logger.error(
                 f"Current number of locks for task {self.id} is {num_locks}, but overlap={self.overlap}: "
@@ -329,7 +333,7 @@ post_bulk_create = Signal(providing_args=["objs", "batch_size"])
 
 class AnnotationManager(models.Manager):
     def for_user(self, user):
-        return self.filter(task__project__organization=user.active_organization)
+        return self.filter(project__organization=user.active_organization)
 
     def bulk_create(self, objs, batch_size=None):
         pre_bulk_create.send(sender=self.model, objs=objs, batch_size=batch_size)
@@ -365,8 +369,8 @@ class Annotation(models.Model):
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='updated_annotations',
                                    on_delete=models.SET_NULL, null=True, verbose_name=_('updated by'),
                                    help_text='Last user who updated this annotation')
-    was_cancelled = models.BooleanField(_('was cancelled'), default=False, help_text='User skipped the task', db_index=True)
-    ground_truth = models.BooleanField(_('ground_truth'), default=False, help_text='This annotation is a Ground Truth (ground_truth)', db_index=True)
+    was_cancelled = models.BooleanField(_('was cancelled'), default=False, help_text='User skipped the task')
+    ground_truth = models.BooleanField(_('ground_truth'), default=False, help_text='This annotation is a Ground Truth (ground_truth)')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last updated time')
     lead_time = models.FloatField(_('lead time'), null=True, default=None, help_text='How much time it took to annotate the task')
@@ -410,7 +414,6 @@ class Annotation(models.Model):
             models.Index(fields=['ground_truth']),
             models.Index(fields=['created_at']),
             models.Index(fields=['last_action']),
-            models.Index(fields=['last_created_by']),
         ] + AnnotationMixin.Meta.indexes
 
     def created_ago(self):
@@ -427,6 +430,7 @@ class Annotation(models.Model):
         return len(res)
 
     def has_permission(self, user):
+        user.project = self.task.project  # link for activity log
         return self.task.project.has_permission(user)
 
     def increase_project_summary_counters(self):
@@ -527,6 +531,7 @@ class AnnotationDraft(models.Model):
         return timesince(self.created_at)
 
     def has_permission(self, user):
+        user.project = self.task.project  # link for activity log
         return self.task.project.has_permission(user)
 
 
@@ -549,6 +554,7 @@ class Prediction(models.Model):
         return timesince(self.created_at)
 
     def has_permission(self, user):
+        user.project = self.task.project  # link for activity log
         return self.task.project.has_permission(user)
 
     @classmethod
@@ -645,7 +651,7 @@ def update_all_task_states_after_deleting_task(sender, instance, **kwargs):
 
 @receiver(pre_delete, sender=Task)
 def remove_data_columns(sender, instance, **kwargs):
-    """Reduce data column counters afer removing task"""
+    """Reduce data column counters after removing task"""
     instance.decrease_project_summary_counters()
 
 

@@ -91,7 +91,7 @@ from django.urls import reverse
         <Choice value="Politics" />
       </View>
       <View style="margin-right: 4em">
-        <Header size="4" value="Speach Type" />
+        <Header size="4" value="Speech Type" />
         <Choice value="Legible" />
         <Choice value="Slurred" />
       </View>
