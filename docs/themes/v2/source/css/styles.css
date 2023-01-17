@@ -574,8 +574,10 @@ main {
   margin-bottom: 1em;
 }
 
-.home-page-title-grid div {
-  max-width: 85%;
+@media (min-width: 1280px) {
+  .home-page-title-grid div {
+    max-width: 85%;
+  }
 }
 
 /****************************
