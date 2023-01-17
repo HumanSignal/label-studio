@@ -130,7 +130,7 @@ class Task(TaskMixin, models.Model):
         """Check whether current task has been locked by some user"""
         from projects.functions.next_task import get_next_task_logging_level
 
-        num_locks = self.num_locks
+        num_locks = self.num_locks_user(user=user)
         if self.project.skip_queue == self.project.SkipQueue.REQUEUE_FOR_ME:
             num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) | ~Q(completed_by=user)).count()
         else:
@@ -153,6 +153,9 @@ class Task(TaskMixin, models.Model):
     @property
     def num_locks(self):
         return self.locks.filter(expire_at__gt=now()).count()
+
+    def num_locks_user(self, user):
+        return self.locks.filter(expire_at__gt=now()).exclude(user=user).count()
 
     @property
     def storage_filename(self):
