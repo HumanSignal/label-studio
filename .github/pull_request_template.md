@@ -7,17 +7,6 @@
 
 
 
-### What kind of change does this PR introduce?
-_(check only one)_
-- [ ] Bug fix
-- [ ] Feature
-- [ ] CI/CD
-- [ ] Chore (Refactor, dependency updates etc.)
-- [ ] Docs
-- [ ] Not sure (If this does not fit into the above categories, add a short explanation below of why)
-
-
-
 #### Change has impacts in these area(s)
 _(check all that apply)_
 - [ ] Product design
