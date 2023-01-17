@@ -1,11 +1,9 @@
-from collections import Counter
 import logging
 
 from collections import Counter
 from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Value, When, Q
 from django.db.models.fields import DecimalField
 from django.conf import settings
-import numpy as np
 
 from core.feature_flags import flag_set
 from core.utils.common import conditional_atomic
