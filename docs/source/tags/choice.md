@@ -6,7 +6,7 @@ meta_title: Choice Tag for Single Choice Labels
 meta_description: Customize Label Studio with choice tags for simple classification tasks in machine learning and data science projects.
 ---
 
-The Choice tag represents a single choice for annotations. Use with the Choices tag or Taxonomy tag to provide specific choice options.
+The `Choice` tag represents a single choice for annotations. Use with the `Choices` tag or `Taxonomy` tag to provide specific choice options.
 
 ### Parameters
 

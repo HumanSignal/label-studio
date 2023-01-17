@@ -52,7 +52,7 @@ _result_schema = openapi.Schema(
     title='Labeling result',
     description='Labeling result (choices, labels, bounding boxes, etc.)',
     type=openapi.TYPE_OBJECT,
-    properies={
+    properties={
         'from_name': openapi.Schema(
             title='from_name',
             description='The name of the labeling tag from the project config',
@@ -438,6 +438,7 @@ class ProjectTaskListAPI(generics.ListCreateAPIView,
         project = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
         instance = serializer.save(project=project)
         emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])
+        return instance
 
 
 class TemplateListAPI(generics.ListAPIView):

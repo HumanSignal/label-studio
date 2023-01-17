@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3874: Fix polling overflow",
-  "commit": "049cb9f247b2353b4bf8a49cfc0412e70b76a39b",
+  "message": "fix: DEV-3810: Restrict tabs deletion for reviewers (#132)\n\n* Introduce granular control over tabs' actions\r\n\r\n* Hide tab menu when no actions available\r\n\r\nCo-authored-by: bmartel <brandonmartel@gmail.com>",
+  "commit": "e6a4997356ef6fc680245dd501794243e5470255",
   "branch": "master",
-  "date": "2022/12/01 16:12:47"
+  "date": "2023-01-04T20:06:24Z"
 }
