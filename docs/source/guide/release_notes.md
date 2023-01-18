@@ -14,19 +14,18 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
     The release notes for Label Studio Community Edition is available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
 
 
-## Label Studio Enterprise 2.4
+## Label Studio Enterprise 2.4.0
 This section highlights the new features and enhancements, and bug fixes in Label Studio Enterprise 2.4.
 
 ### New features and enhancements 
-Label Studio Enterprise 2.4 introduces the following new features and enhancements.
+Label Studio Enterprise 2.4.0 introduces the following new features and enhancements.
 
-- The [Comments and Notifications](comments_notifications.html) feature allows you to discuss task issues and other problems during labeling and reviewing processes.
-- The [Audio Player](audio_player.html) feature provides a new configurable UI that improves the audio labeling efficiency and usability [DEV-2715].
+- The [Comments and Notifications](https://labelstud.io/guide/comments_notifications.html) feature allows you to discuss task issues and other problems during labeling and reviewing processes.
+- The Audio Player feature provides a new configurable UI that improves the audio labeling efficiency and usability [DEV-2715].
 - Use the interactive **View All** mode with nested regions [DEV-3391].
 - Add `updated_at` field to comments API [DEV-3715].
 - Cancel old import jobs when a new one is created [DEV-2075].
-- [internal] Add working navigation links for drafts [DEV-3750].
-- Support for numpad hotkeys (letter/number keys and keyboard shortcuts) that allows you to label or classify the materials faster in productivity/metrics.[DEV-3638].
+- Support for numpad hotkeys (letter/number keys and keyboard shortcuts) that allows you to label or classify the materials faster in productivity/metrics [DEV-3638].
 - Accept/Reject action does not update `updated_by` field of task [DEV-3259].
 - Move persistent storage from Enterprise to Open Source [DEV-3911].
 - Support for environment files from Vault ca-injector [SRE-380].
@@ -90,27 +89,14 @@ Label Studio Enterprise 2.4 includes the following bug fixes:
 - Disabled task counter in **Label** or **Review** stream [DEV-3734].
 - Downloaded storage empty path [DEV-4039].
 - Fixed the broken **Review** stream on the second task using Audio v3 [DEV-3933].
-- SSO failed to work with capitalized emails. The environment variable was enabled: `ALLOW_FIX_LOWERCASE_USER=true` [DEV-3988].
+- SSO failed to work with capitalized emails. Use this environment variable to enable autofix: `ALLOW_FIX_LOWERCASE_USER=true` [DEV-3988].
 - Removed duplicated PDF template [DEV-4094].
 - Supported copying regions in the Outliner [DEV-3646].
 - Fixed an issue with undoing closed polygons by Hotkey [DEV-3896].
 - Time Series truncate signal and triangle marks disappeared [DEV-3748].
 - SCIM was broken and always returned a logout page [DEV-4000].
 - Filtering failed to work for Annotation results [DEV-4060].
-
-#### Internal Bug Fixes
-Label Studio Enterprise 2.4 includes the following internal bug fixes:
-
-- Added a retry for bulk stats recalculation [DEV-3296].
-- Removed the next task behavior for editor in notification links [DEV-3736].
-- Concealed the action buttons for notification editor [DEV-3785].
-- Added tests that cover `MAX_SESSION` activity [DEV-3735].
-- Added more logs to `rqworker` to identify why the jobs were in the run state instead of the stop state [DEV-3866].
-- Improved performance of `_rearrange_overlap_cohort` [DEV-3798].
-- Reused Data Manager `annotate_reviewed` for statistics on Dashboard [DEV-3975].
-- Pinned NumPy version [DEV-4092].
 - Returned `400` bad requests on incorrect XML [DEV-3812].
-- License expiration check was incorrect for cloud enterprises [DEV-3991].
 
 
 ## Label Studio Enterprise 2.3.1
@@ -192,7 +178,6 @@ Label Studio 2.3.1 includes the following bug fixes:
 - Allowed annotators and reviewers to filter view of transcriptions by author name [DEV-2669].
 - Added ability to delete points with an alt click. [DEV-2431].
 - Allowed users to pin/unpin projects to more easily filter and find projects of interest. [DEV-2069]
-- [internal] Ensure the Feature Flag for DEV-2575 is included for projects list handling changes in DEV-2629 to decouple operation. [DEV-2852]
 - Fixed `PyJWT` vulnerability [DEV-2793].
 - `get_local_path` doesn't work for local-files in ML backends and converters [DEV-2827].
 - Hold to continuously draw image view shapes should work with DEV-1442 enabled [DEV-2655].
