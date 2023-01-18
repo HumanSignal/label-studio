@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3941: Enable adjusting player head position using TimeBox (#1111)\n\n* fix: DEV-3941: Enable adjusting player head position using TimeBox\r\n\r\n* fix timebox when insert more than .500 it was rendering more .001\r\n\r\n* fix timebox formating\r\n\r\n* add hours to timebox\r\n\r\n* set show hour in timebox by default\r\n\r\n* fix how UI is working to delete and add numbers\r\n\r\n* fix how to mask works",
-  "commit": "cfd2ccbf8c73e57bc47d68034ab5848e8bc6a402",
+  "message": "fix: DEV-3919: Pin regions to the bottom in Preview (#1146)",
+  "commit": "c538eb721831a45d3c77b25a4a8d6437872b1ad7",
   "branch": "master",
-  "date": "2023-01-11T14:45:49Z"
+  "date": "2023-01-18T13:54:43Z"
 }
