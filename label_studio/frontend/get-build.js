@@ -100,7 +100,7 @@ async function get(projectName, ref = 'master') {
   res = await fetch(commitInfoUrl, { headers: { Authorization: `token ${TOKEN}` } });
   json = await res.json();
   const info = {
-    message: json.message,
+    message: json.message.split('\n')[0],
     commit: json.sha,
     branch,
     date: (json.author && json.author.date) || (json.committer && json.committer.date),
