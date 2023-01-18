@@ -1,6 +1,6 @@
 {
   "message": "feat: DEV-3346: Task history is stored on the backend for the label stream",
-  "commit": "9e91607d584644bff469ff16a03e599ad84ac40f",
+  "commit": "443dda034f516eca1cada37e73e22064abe1ff28",
   "branch": "fb-dev-3346",
-  "date": "2023/01/18 11:15:26"
+  "date": "2023/01/18 11:23:27"
 }
