@@ -13,27 +13,20 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
 !!! info 
     The release notes for Label Studio Community Edition is available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
 
-
 ## Label Studio Enterprise 2.4.0
 This section highlights the new features and enhancements, and bug fixes in Label Studio Enterprise 2.4.
 
 ### New features and enhancements 
-Label Studio Enterprise 2.4.0 introduces the following new features and enhancements.
-
 - The [Comments and Notifications](https://labelstud.io/guide/comments_notifications.html) feature allows you to discuss task issues and other problems during labeling and reviewing processes.
-- The Audio Player feature provides a new configurable UI that improves the audio labeling efficiency and usability [DEV-2715].
-- Use the interactive **View All** mode with nested regions [DEV-3391].
+- The new Audio Player feature provides a new configurable UI that improves the audio labeling efficiency and usability [DEV-2715].
 - Add `updated_at` field to comments API [DEV-3715].
 - Cancel old import jobs when a new one is created [DEV-2075].
 - Support for numpad hotkeys (letter/number keys and keyboard shortcuts) that allows you to label or classify the materials faster in productivity/metrics [DEV-3638].
-- Accept/Reject action does not update `updated_by` field of task [DEV-3259].
-- Move persistent storage from Enterprise to Open Source [DEV-3911].
 - Support for environment files from Vault ca-injector [SRE-380].
 
 
 ### Bug Fixes
-Label Studio Enterprise 2.4 includes the following bug fixes:
-
+- Accept/Reject action does not update `updated_by` field of task [DEV-3259].
 - Fixed the `terms of service` link on sign up page [DEV-3726].
 - Fixed an issue where the notification about annotator's comment in draft was not sent to anyone [DEV-3339].
 - Show/hide toggle on the Outliner worked with all region types [DEV-3742].
