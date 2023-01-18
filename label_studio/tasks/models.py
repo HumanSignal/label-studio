@@ -168,6 +168,7 @@ class Task(TaskMixin, models.Model):
         self.locks.filter(expire_at__lt=now()).delete()
 
     def set_lock(self, user):
+        task = Task.objects.select_for_update(skip_locked=False).get(pk=self.id)
         """Lock current task by specified user. Lock lifetime is set by `expire_in_secs`"""
         from projects.functions.next_task import get_next_task_logging_level
 
@@ -182,6 +183,8 @@ class Task(TaskMixin, models.Model):
                 f"Current number of locks for task {self.id} is {num_locks}, but overlap={self.overlap}: "
                 f"that's a bug because this task should not be taken in a label stream (task should be locked)")
         self.clear_expired_locks()
+
+        task.save(update_fields=['created_at'])
 
     def release_lock(self, user=None):
         """Release lock for the task.
