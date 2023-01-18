@@ -353,7 +353,7 @@ def main():
             migrated = False
             project_path = pathlib.Path(input_args.project_name)
             if project_path.exists():
-                print('Project directory from previous verion of label-studio found')
+                print('Project directory from previous version of label-studio found')
                 print('Start migrating..')
                 config_path = project_path / 'config.json'
                 config = _get_config(config_path)

@@ -306,6 +306,8 @@ jobs:
     if: |
       github.event_name == 'push' &&
       startsWith(github.ref_name, 'ls-release/')
+    permissions:
+      contents: write
     uses: heartexlabs/label-studio/.github/workflows/build_pypi.yml@develop
     with:
       version: ${{ needs.draft-release.outputs.rc-version }}

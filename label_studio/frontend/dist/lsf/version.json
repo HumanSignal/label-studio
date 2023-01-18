@@ -1,5 +1,5 @@
 {
-  "message": "fix: DEV-3919: Pin regions to the bottom in Preview (#1146)\n\n* fix: DEV-3919: Pin regions to the bottom in Preview\r\n\r\n`collapsed` is used only on small screens, so panels should be pinned\r\nto bottom in this mode.\r\n\r\n* Different flex approach to expand viewport to max\r\n\r\n* Fix standalone LSF on narrow screen",
+  "message": "fix: DEV-3919: Pin regions to the bottom in Preview (#1146)",
   "commit": "c538eb721831a45d3c77b25a4a8d6437872b1ad7",
   "branch": "master",
   "date": "2023-01-18T13:54:43Z"
