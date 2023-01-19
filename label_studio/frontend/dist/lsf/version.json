@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3919: Pin regions to the bottom in Preview (#1146)",
-  "commit": "c538eb721831a45d3c77b25a4a8d6437872b1ad7",
-  "branch": "master",
-  "date": "2023-01-18T13:54:43Z"
+  "message": "fix: DEV-3731: Fix keeping center of zoom at image on resize",
+  "commit": "a0988639955ffb64e2536e1fe901d949fc70a5e0",
+  "branch": "fb-dev-3731/image-zoom-centering",
+  "date": "2023/01/19 04:45:05"
 }
