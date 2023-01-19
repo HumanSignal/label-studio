@@ -1,7 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import json
-import uuid
 import logging
 import os
 import datetime
@@ -158,7 +157,10 @@ class Task(TaskMixin, models.Model):
                 )
             )
         result = bool(num >= self.overlap)
-        logger.log(get_next_task_logging_level(), f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations}')
+        logger.log(
+            get_next_task_logging_level(user),
+            f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations}'
+        )
         return result
 
     @property
@@ -187,7 +189,7 @@ class Task(TaskMixin, models.Model):
             lock_ttl = settings.TASK_LOCK_TTL
             expire_at = now() + datetime.timedelta(seconds=lock_ttl)
             TaskLock.objects.create(task=self, user=user, expire_at=expire_at)
-            logger.log(get_next_task_logging_level(), f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
+            logger.log(get_next_task_logging_level(user), f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
         else:
             logger.error(
                 f"Current number of locks for task {self.id} is {num_locks}, but overlap={self.overlap}: "
@@ -397,7 +399,6 @@ class Annotation(models.Model):
                                           related_name='child_annotations',
                                           null=True,
                                           help_text='Points to the parent annotation from which this annotation was created')
-    unique_id = models.UUIDField(default=uuid.uuid4, null=True, blank=True, unique=True, editable=False)
     last_action = models.CharField(
         _('last action'),
         max_length=128,
@@ -507,7 +508,6 @@ class TaskLock(models.Model):
     task = models.ForeignKey(
         'tasks.Task', on_delete=models.CASCADE, related_name='locks', help_text='Locked task')
     expire_at = models.DateTimeField(_('expire_at'))
-    unique_id = models.UUIDField(default=uuid.uuid4, null=True, blank=True, unique=True, editable=False)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='task_locks', on_delete=models.CASCADE,
         help_text='User who locked this task')
