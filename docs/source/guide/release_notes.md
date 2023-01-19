@@ -12,7 +12,8 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
 
 !!! info 
     The release notes for Label Studio Community Edition is available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
-
+<br>
+<br>
 
 !!! info 
     The release notes for Label Studio Enterprise Cloud (SaaS) is available <a href="https://heartex.com/changelog">here</a>.
