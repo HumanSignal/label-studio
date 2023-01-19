@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3919: Outliner on a narrow screen",
-  "commit": "c04e444de9c2fd52cb3e8566026fdccba00181df",
-  "branch": "master",
-  "date": "2023/01/19 13:24:40"
+  "message": "fix: DEV-4178: Disable postpone button when no comments left",
+  "commit": "8847bc0e8323756ec21c6807188d0ddb6cb2d96b",
+  "branch": "fb-dev-4179",
+  "date": "2023/01/19 12:26:10"
 }
