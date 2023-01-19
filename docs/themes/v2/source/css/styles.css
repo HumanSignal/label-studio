@@ -390,7 +390,7 @@ main {
   height: 100vh;
   overflow: auto;
   border-right: 1px black solid;
-  padding: 1.5em 1.5em 3em 1.5em;
+  padding: 1.5em 1.5em 7em 1.5em;
   flex-shrink: 0;
 }
 
