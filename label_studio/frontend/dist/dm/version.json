@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3810: Restrict tabs deletion for reviewers (#132)\n\n* Introduce granular control over tabs' actions\r\n\r\n* Hide tab menu when no actions available\r\n\r\nCo-authored-by: bmartel <brandonmartel@gmail.com>",
-  "commit": "e6a4997356ef6fc680245dd501794243e5470255",
+  "message": "fix: DEV-4090: Use unique_lock_id in Label Stream",
+  "commit": "01a47c5c8ac2fd9eab3a7ceab61788adcda7143c",
   "branch": "master",
-  "date": "2023-01-04T20:06:24Z"
+  "date": "2023/01/18 13:43:09"
 }

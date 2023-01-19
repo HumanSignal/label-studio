@@ -70,11 +70,7 @@ def propagate_annotations_form(user, project):
 
 
 def remove_duplicates(project, queryset, **kwargs):
-    tasks = list(
-        queryset
-        .annotate(total_annotations=Count('annotations'))
-        .values('data', 'id', 'total_annotations')
-    )
+    tasks = list(queryset.values('data', 'id', 'total_annotations'))
     duplicates = defaultdict(list)
     for task in list(tasks):
         task['data'] = json.dumps(task['data'])
