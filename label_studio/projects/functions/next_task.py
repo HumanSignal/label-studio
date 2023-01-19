@@ -23,7 +23,7 @@ def get_next_task_logging_level():
 def _get_random_unlocked(task_query, user, upper_limit=None):
     for task in task_query.order_by('?').only('id')[:settings.RANDOM_NEXT_TASK_SAMPLE_SIZE]:
         try:
-            task = Task.objects.filter(pk=task.id).select_for_update(skip_locked=True).get()
+            task = Task.objects.select_for_update(skip_locked=True).get(pk=task.id)
             if not task.has_lock(user):
                 return task
         except Task.DoesNotExist:
@@ -34,7 +34,7 @@ def _get_first_unlocked(tasks_query, user):
     # Skip tasks that are locked due to being taken by collaborators
     for task_id in tasks_query.values_list('id', flat=True):
         try:
-            task = Task.objects.filter(pk=task_id).select_for_update(skip_locked=True).get()
+            task = Task.objects.select_for_update(skip_locked=True).get(pk=task_id)
             if not task.has_lock(user):
                 return task
 
