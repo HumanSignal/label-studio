@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3919: Pin regions to the bottom in Preview (#1146)",
-  "commit": "c538eb721831a45d3c77b25a4a8d6437872b1ad7",
+  "message": "fix: DEV-3919: Outliner on a narrow screen",
+  "commit": "c04e444de9c2fd52cb3e8566026fdccba00181df",
   "branch": "master",
-  "date": "2023-01-18T13:54:43Z"
+  "date": "2023/01/19 13:24:40"
 }
