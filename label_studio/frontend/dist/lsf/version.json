@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3919: Pin regions to the bottom in Preview (#1146)",
-  "commit": "c538eb721831a45d3c77b25a4a8d6437872b1ad7",
-  "branch": "master",
-  "date": "2023-01-18T13:54:43Z"
+  "message": "fix: DEV-2019: Sync video timeline seeker with frame position",
+  "commit": "a9c3260e6c6d0e764436f57b029bfeb08a512768",
+  "branch": "fb-dev-2019",
+  "date": "2023/01/18 18:18:37"
 }
