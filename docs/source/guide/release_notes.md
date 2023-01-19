@@ -1,23 +1,28 @@
 ---
-title: Release notes for Label Studio Enterprise
-short: Release notes
+title: On-Premise Release Notes for Label Studio Enterprise
+short: On-Premise Release Notes
 type: guide
 tier: enterprise
 order: 221
 order_enterprise: 142
 section: "Reference"
-meta_title: Release notes for Label Studio Enterprise
+meta_title: On-premise Release notes for Label Studio Enterprise
 meta_description: Discover what's new and improved, and review bug fixes, in the release notes and changelog for Label Studio Enterprise.
 ---
 
 !!! info 
     The release notes for Label Studio Community Edition is available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
 
+
+!!! info 
+    The release notes for Label Studio Enterprise Cloud (SaaS) is available <a href="https://heartex.com/changelog">here</a>.
+
+
 ## Label Studio Enterprise 2.4.0
 This section highlights the new features and enhancements, and bug fixes in Label Studio Enterprise 2.4.
 
 ### New features and enhancements 
-- The [Comments and Notifications](https://labelstud.io/guide/comments_notifications.html) feature allows you to discuss task issues and other problems during labeling and reviewing processes.
+- The [Comments and Notifications](/guide/comments_notifications.html) feature allows you to discuss task issues and other problems during labeling and reviewing processes.
 - The new Audio Player feature provides a new configurable UI that improves the audio labeling efficiency and usability [DEV-2715].
 - Add `updated_at` field to comments API [DEV-3715].
 - Cancel old import jobs when a new one is created [DEV-2075].
