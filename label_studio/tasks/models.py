@@ -179,7 +179,13 @@ class Task(TaskMixin, models.Model):
         if num_locks < self.overlap:
             lock_ttl = settings.TASK_LOCK_TTL
             expire_at = now() + datetime.timedelta(seconds=lock_ttl)
-            TaskLock.objects.create(task=self, user=user, expire_at=expire_at)
+            try:
+                task_lock = TaskLock.objects.get(task=self, user=user)
+            except TaskLock.DoesNotExist:
+                TaskLock.objects.create(task=self, user=user, expire_at=expire_at)
+            else:
+                task_lock.expire_at = expire_at
+                task_lock.save()
             logger.log(get_next_task_logging_level(), f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
         else:
             logger.error(
