@@ -149,7 +149,8 @@ class Task(TaskMixin, models.Model):
         num = num_locks + num_annotations
         if num > self.overlap:
             logger.error(
-                f"Num takes={num} > overlap={self.overlap} for task={self.id} - it's a bug",
+                f"Num takes={num} > overlap={self.overlap} for task={self.id}, "
+                f"skipped mode {self.project.skip_queue} - it's a bug",
                 extra=dict(
                     lock_ttl=self.locks.values_list('user', 'expire_at'),
                     num_locks=num_locks,
@@ -159,7 +160,8 @@ class Task(TaskMixin, models.Model):
         result = bool(num >= self.overlap)
         logger.log(
             get_next_task_logging_level(user),
-            f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations}'
+            f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations} '
+            f'skipped mode: {self.project.skip_queue}'
         )
         return result
 
