@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import json
+import uuid
 import logging
 import os
 import datetime
@@ -386,6 +387,7 @@ class Annotation(models.Model):
                                           related_name='child_annotations',
                                           null=True,
                                           help_text='Points to the parent annotation from which this annotation was created')
+    unique_id = models.UUIDField(default=uuid.uuid4, null=True, blank=True, unique=True, editable=False)
     last_action = models.CharField(
         _('last action'),
         max_length=128,
@@ -495,6 +497,7 @@ class TaskLock(models.Model):
     task = models.ForeignKey(
         'tasks.Task', on_delete=models.CASCADE, related_name='locks', help_text='Locked task')
     expire_at = models.DateTimeField(_('expire_at'))
+    unique_id = models.UUIDField(default=uuid.uuid4, null=True, blank=True, unique=True, editable=False)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='task_locks', on_delete=models.CASCADE,
         help_text='User who locked this task')
