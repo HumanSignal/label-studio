@@ -115,6 +115,19 @@
       <aside class="page-sidebar">
         <%- partial("partials/toc", { type: page.type, tier: tier }) %>
       </aside>
+
+      <script>
+        let sidebar = document.querySelector(".page-sidebar");
+      
+        let sidebarTopPosition = localStorage.getItem("heartex-sidebar-scroll");
+        if (sidebarTopPosition !== null) {
+          sidebar.scrollTop = parseInt(sidebarTopPosition, 10);
+        }
+      
+        window.addEventListener("beforeunload", () => {
+          localStorage.setItem("heartex-sidebar-scroll", sidebar.scrollTop);
+        });
+    </script>
     <% } %>
     <div class="content">
       <% if(isEnterpriseTheme) { %>
