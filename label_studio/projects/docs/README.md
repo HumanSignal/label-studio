@@ -1,3 +1,7 @@
+# Projects
+Projects app contains models and apis for serving Projects, Project Settings and Label stream pages.
+
+
 ### Task locks
 
  - if a task has a lock, this task will be shown in the beginning of the stream
