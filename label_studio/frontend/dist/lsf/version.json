@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3731: Fix keeping center of zoom at image on resize",
-  "commit": "8e1857f8fc52f05cdc04538ab70d4bde16c6cd95",
+  "commit": "cfb8f5d8e6a3817b61ef113dcb871e1b0f0cca52",
   "branch": "fb-dev-3731/image-zoom-centering",
-  "date": "2023/01/20 01:10:58"
+  "date": "2023/01/20 01:16:02"
 }
