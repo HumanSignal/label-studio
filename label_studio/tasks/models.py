@@ -145,7 +145,7 @@ class Task(TaskMixin, models.Model):
             # alien's and my skipped annotations are counted as regular annotations
             q = Q()
 
-        num_locks = self.num_locks
+        num_locks = self.num_locks_user(user=user)
         num_annotations = self.annotations.exclude(q | Q(ground_truth=True)).count()
         num = num_locks + num_annotations
         if num > self.overlap:
@@ -170,6 +170,9 @@ class Task(TaskMixin, models.Model):
     def num_locks(self):
         return self.locks.filter(expire_at__gt=now()).count()
 
+    def num_locks_user(self, user):
+        return self.locks.filter(expire_at__gt=now()).exclude(user=user).count()
+
     @property
     def storage_filename(self):
         for link_name in settings.IO_STORAGES_IMPORT_LINK_NAMES:
@@ -191,7 +194,13 @@ class Task(TaskMixin, models.Model):
         if num_locks < self.overlap:
             lock_ttl = settings.TASK_LOCK_TTL
             expire_at = now() + datetime.timedelta(seconds=lock_ttl)
-            TaskLock.objects.create(task=self, user=user, expire_at=expire_at)
+            try:
+                task_lock = TaskLock.objects.get(task=self, user=user)
+            except TaskLock.DoesNotExist:
+                TaskLock.objects.create(task=self, user=user, expire_at=expire_at)
+            else:
+                task_lock.expire_at = expire_at
+                task_lock.save()
             logger.log(get_next_task_logging_level(user), f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
         else:
             logger.error(

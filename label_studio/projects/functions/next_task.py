@@ -197,7 +197,8 @@ def skipped_queue(next_task, prepared_tasks, project, user, queue_info):
         skipped_tasks = user.annotations.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
         if skipped_tasks.exists():
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(skipped_tasks)])
-            next_task = prepared_tasks.filter(pk__in=skipped_tasks).order_by(preserved_order).first()
+            skipped_tasks = prepared_tasks.filter(pk__in=skipped_tasks).order_by(preserved_order)
+            next_task = _get_first_unlocked(skipped_tasks, user)
             queue_info = 'Skipped queue'
 
     return next_task, queue_info
@@ -209,7 +210,8 @@ def postponed_queue(next_task, prepared_tasks, project, user, queue_info):
         postponed_tasks = user.drafts.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
         if postponed_tasks.exists():
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(postponed_tasks)])
-            next_task = prepared_tasks.filter(pk__in=postponed_tasks).order_by(preserved_order).first()
+            postponed_tasks = prepared_tasks.filter(pk__in=postponed_tasks).order_by(preserved_order)
+            next_task = _get_first_unlocked(postponed_tasks, user)
             if next_task is not None:
                 next_task.allow_postpone = False
             queue_info = f'Postponed draft queue'
@@ -257,13 +259,14 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
                 logger.debug(f'User={user} tries random sampling from prepared tasks')
                 next_task = _get_random_unlocked(not_solved_tasks, user)
 
-        if next_task and use_task_lock:
-            # set lock for the task with TTL 3x time more then current average lead time (or 1 hour by default)
-            next_task.set_lock(user)
 
         next_task, queue_info = postponed_queue(next_task, prepared_tasks, project, user, queue_info)
 
         next_task, queue_info = skipped_queue(next_task, prepared_tasks, project, user, queue_info)
+
+        if next_task and use_task_lock:
+            # set lock for the task with TTL 3x time more then current average lead time (or 1 hour by default)
+            next_task.set_lock(user)
 
         logger.log(
             get_next_task_logging_level(user),
