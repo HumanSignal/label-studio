@@ -118,10 +118,15 @@
 
       <script>
         let sidebar = document.querySelector(".page-sidebar");
+
+        let activeSidebarLink = sidebar.querySelector("[aria-current]");
       
         let sidebarTopPosition = localStorage.getItem("heartex-sidebar-scroll");
         if (sidebarTopPosition !== null) {
           sidebar.scrollTop = parseInt(sidebarTopPosition, 10);
+        } else {
+          let activeSidebarLink = sidebar.querySelector("[aria-current]");
+          sidebar.scrollTop = activeSidebarLink.getBoundingClientRect().y;
         }
       
         window.addEventListener("beforeunload", () => {
