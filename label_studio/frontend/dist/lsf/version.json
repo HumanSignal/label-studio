@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-4075: Fix taxonomy items overlap on search",
-  "commit": "2004a0f7ad1aa7b927a79dec337c2f52555b063c",
+  "commit": "3e03295cb783fde4ddfac9860192b77dbdaf641f",
   "branch": "fb-dev-4075/taxonomy-overlap",
-  "date": "2023/01/20 13:40:21"
+  "date": "2023/01/20 13:42:34"
 }
