@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3793: Relative coords for Image regions",
-  "commit": "c1b5df1d6610666e5b11616262bacb3ab21d021b",
+  "commit": "4288f4a323d06293899202247ee91cd9a5012f34",
   "branch": "fb-dev-3793/relative-coords",
-  "date": "2023/01/18 23:25:10"
+  "date": "2023/01/20 13:02:02"
 }
