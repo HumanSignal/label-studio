@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3919: Outliner on a narrow screen",
-  "commit": "c04e444de9c2fd52cb3e8566026fdccba00181df",
+  "message": "fix: DEV-3694: Fix video zooming",
+  "commit": "65065524b7e9cc67723e0c8074ea484c2b86ee72",
   "branch": "master",
-  "date": "2023/01/19 13:24:40"
+  "date": "2023/01/20 06:35:50"
 }
