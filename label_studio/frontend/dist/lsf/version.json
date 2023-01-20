@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3694: Fix video zooming",
-  "commit": "dd2cd00a37d3540ded158cfc0587b98a9a995998",
-  "branch": "fb-dev-3694/video-zoom-position",
-  "date": "2023/01/20 05:13:26"
+  "commit": "65065524b7e9cc67723e0c8074ea484c2b86ee72",
+  "branch": "master",
+  "date": "2023/01/20 06:35:50"
 }
