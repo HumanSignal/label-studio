@@ -130,17 +130,28 @@ class Task(TaskMixin, models.Model):
     def has_lock(self, user=None):
         """Check whether current task has been locked by some user"""
         from projects.functions.next_task import get_next_task_logging_level
+        SkipQueue = self.project.SkipQueue
+
+        if self.project.skip_queue == SkipQueue.REQUEUE_FOR_ME:
+            # REQUEUE_FOR_ME means: only my skipped tasks go back to me,
+            # alien's skipped annotations are counted as regular annotations
+            q = Q(was_cancelled=True) & Q(completed_by=user)
+        elif self.project.skip_queue == SkipQueue.REQUEUE_FOR_OTHERS:
+            # REQUEUE_FOR_OTHERS: my skipped tasks go to others
+            # alien's skipped annotations are not counted at all
+            q = Q(was_cancelled=True) & ~Q(completed_by=user)
+        else:  # SkipQueue.IGNORE_SKIPPED
+            # IGNORE_SKIPPED: my skipped tasks don't go anywhere
+            # alien's and my skipped annotations are counted as regular annotations
+            q = Q()
 
         num_locks = self.num_locks
-        if self.project.skip_queue == self.project.SkipQueue.REQUEUE_FOR_ME:
-            num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) | ~Q(completed_by=user)).count()
-        else:
-            num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) & ~Q(completed_by=user)).count()
-
+        num_annotations = self.annotations.exclude(q | Q(ground_truth=True)).count()
         num = num_locks + num_annotations
         if num > self.overlap:
             logger.error(
-                f"Num takes={num} > overlap={self.overlap} for task={self.id} - it's a bug",
+                f"Num takes={num} > overlap={self.overlap} for task={self.id}, "
+                f"skipped mode {self.project.skip_queue} - it's a bug",
                 extra=dict(
                     lock_ttl=self.locks.values_list('user', 'expire_at'),
                     num_locks=num_locks,
@@ -148,7 +159,11 @@ class Task(TaskMixin, models.Model):
                 )
             )
         result = bool(num >= self.overlap)
-        logger.log(get_next_task_logging_level(), f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations}')
+        logger.log(
+            get_next_task_logging_level(user),
+            f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations} '
+            f'skipped mode: {self.project.skip_queue}'
+        )
         return result
 
     @property
@@ -177,7 +192,7 @@ class Task(TaskMixin, models.Model):
             lock_ttl = settings.TASK_LOCK_TTL
             expire_at = now() + datetime.timedelta(seconds=lock_ttl)
             TaskLock.objects.create(task=self, user=user, expire_at=expire_at)
-            logger.log(get_next_task_logging_level(), f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
+            logger.log(get_next_task_logging_level(user), f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
         else:
             logger.error(
                 f"Current number of locks for task {self.id} is {num_locks}, but overlap={self.overlap}: "
