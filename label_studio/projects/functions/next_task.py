@@ -4,12 +4,20 @@ import logging
 from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Value, When, Q
 from django.db.models.fields import DecimalField
 from django.conf import settings
+from core.feature_flags import flag_set
 import numpy as np
 
 from core.utils.common import conditional_atomic
 from tasks.models import Annotation, Task
 
 logger = logging.getLogger(__name__)
+
+
+def get_next_task_logging_level(user):
+    level = logging.DEBUG
+    if flag_set('fflag_fix_back_dev_4185_next_task_additional_logging_long', user=user):
+        level = logging.INFO
+    return level
 
 
 def _get_random_unlocked(task_query, user, upper_limit=None):
@@ -29,6 +37,7 @@ def _get_first_unlocked(tasks_query, user):
             task = Task.objects.select_for_update(skip_locked=True).get(pk=task_id)
             if not task.has_lock(user):
                 return task
+
         except Task.DoesNotExist:
             logger.debug('Task with id {} locked'.format(task_id))
 
@@ -256,15 +265,19 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
 
         next_task, queue_info = skipped_queue(next_task, prepared_tasks, project, user, queue_info)
 
-        logger.debug(f'get_next_task finished. next_task: {next_task}, queue_info: {queue_info}')
+        logger.log(
+            get_next_task_logging_level(user),
+            f'get_next_task finished. next_task: {next_task}, queue_info: {queue_info}'
+        )
 
         # debug for critical overlap issue
-        if next_task:
+        if next_task and flag_set('fflag_fix_back_dev_4185_next_task_additional_logging_long', user):
             try:
                 count = next_task.annotations.filter(was_cancelled=False).count()
                 task_overlap_reached = count >= next_task.overlap
                 global_overlap_reached = count >= project.maximum_annotations
-                if next_task.is_labeled or task_overlap_reached or global_overlap_reached:
+                locks = next_task.locks.count() > project.maximum_annotations - next_task.annotations.count()
+                if next_task.is_labeled or task_overlap_reached or global_overlap_reached or locks:
                     from tasks.serializers import TaskSimpleSerializer
 
                     local = dict(locals())

@@ -4,11 +4,15 @@ import pytest
 import json
 import os
 import glob
+import io
+import yaml
+import logging
 
 from core.label_config import parse_config, validate_label_config, parse_config_to_json
 from label_studio.tests.utils import make_task, make_annotation, make_prediction, project_id
 from projects.models import Project
 
+logger = logging.getLogger(__name__)
 
 @pytest.mark.parametrize(
     "tasks_count, annotations_count, predictions_count",
@@ -119,7 +123,10 @@ def test_config_validation_for_choices_workaround(business_client, project_id):
     Example bug DEV-3635
     """
     payload = {
-        'label_config': '<View><Text name="artist" /><View><Choices name="choices_1" toName="artist"><Choice name="choice_1" value="1"/></Choices></View><View><Choices name="choices_2" toName="artist"><Choice name="choice_2" value="2"/></Choices></View></View>'}
+        'label_config': '<View><Text value="$text" name="artist" /><View><Choices name="choices_1" toName="artist">'
+                        '<Choice name="choice_1" value="1"/></Choices></View><View>'
+                        '<Choices name="choices_2" toName="artist"><Choice name="choice_2" value="2"/></Choices>'
+                        '</View></View>'}
     response = business_client.patch(
         f"/api/projects/{project_id}",
         data=json.dumps(payload),
@@ -128,7 +135,9 @@ def test_config_validation_for_choices_workaround(business_client, project_id):
     assert response.status_code == 200
 
     payload = {
-        'label_config': '<View><Text name="artist" /><View><Choices name="choices_1" toName="artist"><Choice name="choice_1" value="1"/></Choices><Choices name="choices_2" toName="artist"><Choice name="choice_2" value="2"/></Choices></View></View>'}
+        'label_config': '<View><Text value="$text" name="artist" /><View><Choices name="choices_1" toName="artist">'
+                        '<Choice name="choice_1" value="1"/></Choices><Choices name="choices_2" toName="artist">'
+                        '<Choice name="choice_2" value="2"/></Choices></View></View>'}
     response = business_client.patch(
         f"/api/projects/{project_id}",
         data=json.dumps(payload),
@@ -157,3 +166,18 @@ def test_parse_wrong_xml(business_client, project_id):
         content_type="application/json",
     )
     assert response.status_code == 400
+
+@pytest.mark.django_db
+def test_label_config_versions(business_client, project_id):
+    with io.open(os.path.join(os.path.dirname(__file__), 'test_data/data_for_test_label_config_matrix.yml')) as f:
+        test_suites = yaml.safe_load(f)
+    for test_name, test_content in test_suites.items():
+        payload = {
+            'label_config': test_content['label_config']}
+        response = business_client.post(
+            f"/api/projects/{project_id}/validate",
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+        logger.warning(f"Test: {test_name}")
+        assert response.status_code == test_content['status_code']

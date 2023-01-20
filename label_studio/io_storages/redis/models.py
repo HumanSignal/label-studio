@@ -51,7 +51,7 @@ class RedisStorageMixin(models.Model):
             # This should never happen, but better to check than to accidentally
             # overwrite an existing database by choosing a wrong default:
             raise ValueError(
-                "Please explicitely pass a redis db id to prevent accidentally overwriting existing database!")
+                "Please explicitly pass a redis db id to prevent accidentally overwriting existing database!")
 
         # Since tasks are always text, we use StrictRedis with utf-8 decoding.
         r = redis.StrictRedis(db=db, charset="utf-8", decode_responses=True, **redis_config)
