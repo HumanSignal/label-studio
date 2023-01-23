@@ -219,8 +219,8 @@ def async_export_annotation_to_gcs_storages(annotation):
 
 @receiver(post_save, sender=Annotation)
 def export_annotation_to_gcs_storages(sender, instance, **kwargs):
-    project = instance.task.project
-    if hasattr(project, 'io_storages_gcsexportstorages'):  # avoid excess jobs in rq
+    storages = getattr(instance.task.project, 'io_storages_gcsexportstorages', None)
+    if storages and storages.exists():  # avoid excess jobs in rq
         start_job_async_or_sync(async_export_annotation_to_gcs_storages, instance)
 
 

@@ -209,8 +209,8 @@ def async_export_annotation_to_s3_storages(annotation):
 
 @receiver(post_save, sender=Annotation)
 def export_annotation_to_s3_storages(sender, instance, **kwargs):
-    project = instance.task.project
-    if hasattr(project, 'io_storages_s3exportstorages'):  # avoid excess jobs in rq
+    storages = getattr(instance.task.project, 'io_storages_s3exportstorages', None)
+    if storages and storages.exists():  # avoid excess jobs in rq
         start_job_async_or_sync(async_export_annotation_to_s3_storages, instance)
 
 
