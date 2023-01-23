@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3694: Fix video zooming",
-  "commit": "65065524b7e9cc67723e0c8074ea484c2b86ee72",
+  "message": "feat: DEV-4034: Rendering performance improvements for large-duration audio",
+  "commit": "5a7210b52f9d8789bc7f82519964bf08bf45fcc4",
   "branch": "master",
-  "date": "2023/01/20 06:35:50"
+  "date": "2023/01/23 09:54:53"
 }
