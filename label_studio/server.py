@@ -160,7 +160,7 @@ def _create_user(input_args, config):
         if token and len(token) > 5:
             from rest_framework.authtoken.models import Token
             Token.objects.filter(key=user.auth_token.key).update(key=token)
-        else:
+        elif token:
             print(f"Token {token} is not applied to user {DEFAULT_USERNAME} "
                   f"because it's empty or len(token) < 5")
 
@@ -180,11 +180,12 @@ def _create_user(input_args, config):
 
 
 def _init(input_args, config):
-    if not _project_exists(input_args.project_name):
+    user = _create_user(input_args, config)
+
+    if input_args.project_name and not _project_exists(input_args.project_name):
         from projects.models import Project
         sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM,
                         'prediction-score-min': Project.UNCERTAINTY}
-        user = _create_user(input_args, config)
         _create_project(
             title=input_args.project_name,
             user=user,
@@ -193,7 +194,7 @@ def _init(input_args, config):
             sampling=sampling_map.get(input_args.sampling, 'sequential'),
             ml_backends=input_args.ml_backends
         )
-    else:
+    elif input_args.project_name:
         print('Project "{0}" already exists'.format(input_args.project_name))
 
 
@@ -338,7 +339,7 @@ def main():
 
         print('')
         print('Label Studio has been successfully initialized.')
-        if input_args.command != 'start':
+        if input_args.command != 'start' and input_args.project_name:
             print('Start the server: label-studio start ' + input_args.project_name)
             return
 
@@ -349,11 +350,11 @@ def main():
         sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM,
                         'prediction-score-min': Project.UNCERTAINTY}
 
-        if not _project_exists(input_args.project_name):
+        if input_args.project_name and not _project_exists(input_args.project_name):
             migrated = False
             project_path = pathlib.Path(input_args.project_name)
             if project_path.exists():
-                print('Project directory from previous verion of label-studio found')
+                print('Project directory from previous version of label-studio found')
                 print('Start migrating..')
                 config_path = project_path / 'config.json'
                 config = _get_config(config_path)
