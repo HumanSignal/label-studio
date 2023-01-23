@@ -791,7 +791,7 @@ def update_ml_backend(sender, instance, **kwargs):
     project = instance.task.project
 
     if hasattr(project, 'ml_backends') and project.min_annotations_to_start_training:
-        annotation_count = Annotation.objects.filter(task__project=project).count()
+        annotation_count = Annotation.objects.filter(project=project).count()
 
         # start training every N annotation
         if annotation_count % project.min_annotations_to_start_training == 0:
