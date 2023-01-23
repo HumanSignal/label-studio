@@ -20,7 +20,7 @@ def annotate_total_annotations_number(queryset):
     subquery = Annotation.objects.filter(
         Q(project=OuterRef('pk'))
         & Q(was_cancelled=False)
-    ).values('id')
+    ).values('id').distinct()
     return queryset.annotate(total_annotations_number=SQCount(subquery))
 
 
@@ -40,7 +40,7 @@ def annotate_useful_annotation_number(queryset):
         & Q(was_cancelled=False)
         & Q(ground_truth=False)
         & Q(result__isnull=False)
-    ).values('id')
+    ).values('id').distinct()
     return queryset.annotate(useful_annotation_number=SQCount(subquery))
 
 
@@ -48,7 +48,7 @@ def annotate_ground_truth_number(queryset):
     subquery = Annotation.objects.filter(
         Q(project=OuterRef('pk'))
         & Q(ground_truth=True)
-    ).values('id')
+    ).values('id').distinct()
     return queryset.annotate(ground_truth_number=SQCount(subquery))
 
 
@@ -56,5 +56,5 @@ def annotate_skipped_annotations_number(queryset):
     subquery = Annotation.objects.filter(
         Q(project=OuterRef('pk'))
         & Q(was_cancelled=True)
-    ).values('id')
+    ).values('id').distinct()
     return queryset.annotate(skipped_annotations_number=SQCount(subquery))
