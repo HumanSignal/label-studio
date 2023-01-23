@@ -256,7 +256,7 @@ class Project(ProjectMixin, models.Model):
 
     @property
     def num_annotations(self):
-        return Annotation.objects.filter(task__project=self).count()
+        return Annotation.objects.filter(project=self).count()
 
     @property
     def has_predictions(self):
@@ -671,7 +671,7 @@ class Project(ProjectMixin, models.Model):
         :return: filtered annotators
         """
         annotators = self.annotators()
-        q = Q(annotations__task__project=self) & Q_task_finished_annotations & Q(annotations__ground_truth=False)
+        q = Q(annotations__project=self) & Q_task_finished_annotations & Q(annotations__ground_truth=False)
         annotators = annotators.annotate(annotation_count=Count('annotations', filter=q, distinct=True))
         return annotators.filter(annotation_count__gte=min_count)
 
@@ -681,7 +681,7 @@ class Project(ProjectMixin, models.Model):
     def has_annotations(self):
         from tasks.models import Annotation  # prevent cycling imports
 
-        return Annotation.objects.filter(Q(task__project=self) & Q(ground_truth=False)).count() > 0
+        return Annotation.objects.filter(Q(project=self) & Q(ground_truth=False)).count() > 0
 
     # [TODO] this should be a template tag or something like this
     @property
@@ -710,7 +710,7 @@ class Project(ProjectMixin, models.Model):
         min_n_finished_annotations = sum([ft.overlap for ft in finished_tasks])
 
         annotations_unfinished_tasks = Annotation.objects.filter(
-            task__project=self.id, task__is_labeled=False, ground_truth=False, result__isnull=False
+            project=self.id, task__is_labeled=False, ground_truth=False, result__isnull=False
         ).count()
 
         # get minimum remain annotations
@@ -719,7 +719,7 @@ class Project(ProjectMixin, models.Model):
 
         # get average time of all finished TC
         finished_annotations = Annotation.objects.filter(
-            Q(task__project=self.id) & Q(ground_truth=False), result__isnull=False
+            Q(project=self.id) & Q(ground_truth=False), result__isnull=False
         ).values('lead_time')
         avg_lead_time = finished_annotations.aggregate(avg_lead_time=Avg('lead_time'))['avg_lead_time']
 
@@ -731,7 +731,7 @@ class Project(ProjectMixin, models.Model):
         return not self.tasks.filter(is_labeled=False).exists()
 
     def annotations_lead_time(self):
-        annotations = Annotation.objects.filter(Q(task__project=self.id) & Q(ground_truth=False))
+        annotations = Annotation.objects.filter(Q(project=self.id) & Q(ground_truth=False))
         return annotations.aggregate(avg_lead_time=Avg('lead_time'))['avg_lead_time']
 
     @staticmethod

@@ -133,7 +133,7 @@ def _try_uncertainty_sampling(tasks, project, user_solved_tasks_array, user, pre
 
 
 def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_info):
-    user_solved_tasks_array = user.annotations.filter(task__project=project, task__isnull=False)
+    user_solved_tasks_array = user.annotations.filter(project=project, task__isnull=False)
     user_solved_tasks_array = user_solved_tasks_array.distinct().values_list('task__pk', flat=True)
     not_solved_tasks = prepared_tasks.exclude(pk__in=user_solved_tasks_array)
 
@@ -193,7 +193,7 @@ def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_fla
 
 def skipped_queue(next_task, prepared_tasks, project, user, queue_info):
     if not next_task and project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
-        q = Q(task__project=project, task__isnull=False, was_cancelled=True, task__is_labeled=False)
+        q = Q(project=project, task__isnull=False, was_cancelled=True, task__is_labeled=False)
         skipped_tasks = user.annotations.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
         if skipped_tasks.exists():
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(skipped_tasks)])
