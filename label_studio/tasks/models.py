@@ -456,19 +456,19 @@ class Annotation(models.Model):
         return len(res)
 
     def has_permission(self, user):
-        user.project = self.task.project  # link for activity log
-        return self.task.project.has_permission(user)
+        user.project = self.project  # link for activity log
+        return self.project.has_permission(user)
 
     def increase_project_summary_counters(self):
-        if hasattr(self.task.project, 'summary'):
+        if hasattr(self.project, 'summary'):
             logger.debug(f'Increase project.summary counters from {self}')
-            summary = self.task.project.summary
+            summary = self.project.summary
             summary.update_created_annotations_and_labels([self])
 
     def decrease_project_summary_counters(self):
-        if hasattr(self.task.project, 'summary'):
+        if hasattr(self.project, 'summary'):
             logger.debug(f'Decrease project.summary counters from {self}')
-            summary = self.task.project.summary
+            summary = self.project.summary
             summary.remove_created_annotations_and_labels([self])
 
     def update_task(self):
@@ -788,7 +788,7 @@ def update_ml_backend(sender, instance, **kwargs):
     if instance.ground_truth:
         return
 
-    project = instance.task.project
+    project = instance.project
 
     if hasattr(project, 'ml_backends') and project.min_annotations_to_start_training:
         annotation_count = Annotation.objects.filter(project=project).count()
