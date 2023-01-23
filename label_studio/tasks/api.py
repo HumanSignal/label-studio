@@ -271,8 +271,8 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         # save user history with annotator_id, time & annotation result
         annotation_id = self.kwargs['pk']
         annotation = get_object_with_check_and_log(request, Annotation, pk=annotation_id)
-        annotation.updated_by = request.user
-        annotation.save(update_fields=['updated_by'])
+        # use updated instead of save to avoid duplicated signals
+        Annotation.objects.filter(id=annotation_id).update(updated_by=request.user)
 
         task = annotation.task
         if self.request.data.get('ground_truth'):
