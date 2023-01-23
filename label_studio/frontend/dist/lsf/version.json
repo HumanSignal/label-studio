@@ -1,6 +1,6 @@
 {
   "message": "feat: DEV-4187: Select regions without 300ms lag",
-  "commit": "4867dc715a0b9e5f49a68107ddadf7e64e9ef9fe",
+  "commit": "f711f2edc44fd7a16db075feb70bd3c3f380baac",
   "branch": "fb-dev-4187/faster-select",
-  "date": "2023/01/18 01:36:55"
+  "date": "2023/01/23 01:08:56"
 }
