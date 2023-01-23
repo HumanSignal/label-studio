@@ -440,6 +440,8 @@ class Annotation(models.Model):
             models.Index(fields=['ground_truth']),
             models.Index(fields=['created_at']),
             models.Index(fields=['last_action']),
+            models.Index(fields=['project', 'ground_truth']),
+            models.Index(fields=['project', 'was_cancelled']),
         ] + AnnotationMixin.Meta.indexes
 
     def created_ago(self):
