@@ -35,5 +35,61 @@ If you post in off hours, please be patient, someone will get back to you. Spamm
 ### Know your support channel
 Asking your question in the right channel will allow us to help you more efficiently.
 
-### Use Public Channels, Not Private Groups
+### Use public channels, not private groups
 Slack is about communication, so use public channels whenever possible. This is good for transparency, but also keeps the community vibrant and alive. You also have an opportunity to help someone else who might find your conversation helpful or encouraging.
+
+
+# All Community Channels
+
+### #00-announcements
+Announcements, news, and updates from the Label Studio team.
+
+### #00-how-to-slack 
+Tips and tricks to get the most out of the Slack Community.
+
+### #01-introductions
+Introductions from community members in Label Studio.
+
+### #02-community-celebrations
+Celebrating members of our community that have done something amazing this week.
+
+### #03-tips-and-tricks
+Tips and tricks for you to get started with Label Studio.
+
+### #04-general 
+General discussion not related to Label Studio.
+
+### #05-feature-requests 
+Feature requests for Label Studio.
+
+### #06-contributors 
+Discussion for those who want to contribute to Label Studio on GitHub.
+
+### #07-open-issues
+Open GitHub issues for contribution.
+
+### #10-support-frontend 
+Support channel for frontend-related questions.
+
+### #11-support-ml-integrations
+Support channel for machine learning integrations.
+
+### #12-support-ecosystem
+Support channel for ecosystem-related questions. 
+
+### #13-support-other 
+Support channel for other questions not listed above.
+
+### #20-opportunities
+Channel for job posting, internship sharing, or other opportunities for those in this space. 
+
+### #30-academics
+Channel for discussion between those using Label Studio or other Data Science methods for Academic research.
+
+### #99-opossums
+Opposums.  Obviously. 
+
+### #99-random 
+Random thoughts and discussion not related to Label Studio.
+
+
