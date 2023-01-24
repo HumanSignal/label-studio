@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-4028: Use  from task for frameRate",
-  "commit": "83ce830ffbe7dc237550ec62292cb354335dd8ac",
-  "branch": "master",
-  "date": "2023/01/24 14:45:20"
+  "message": "Revert "feat: DEV-4034: Rendering performance improvements for large-duration audio (#1138)",
+  "commit": "1afb6a88ccc96068efe6814fed4e377242e87a12",
+  "branch": "fb-dev-4034-revert",
+  "date": "2023/01/24 15:33:54"
 }
