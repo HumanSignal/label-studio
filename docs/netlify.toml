@@ -1,4 +1,16 @@
 [[redirects]]
+  from = "https://heartex-docs.netlify.app/api/*"
+  to = "https://app.heartex.com/docs/api/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://docs.heartex.com/api/*"
+  to = "https://app.heartex.com/docs/api/:splat"
+  status = 301
+  force = true
+  
+[[redirects]]
   from = "/"
   to = "/guide"
   status = 301
@@ -8,9 +20,3 @@
   from = "/*"
   to = "/404.html"
   status = 404
-
-[[redirects]]
-  from = "https://heartex-docs.netlify.app/api/*"
-  to = "https://app.heartex.com/docs/api/:splat"
-  status = 301
-  force = true
