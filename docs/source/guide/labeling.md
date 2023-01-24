@@ -223,36 +223,75 @@ Go to the Label Studio Frontend settings by clicking the following button to con
 <br/>
 <i>Figure 2: Frontend settings  </i>
 
-You can select or deselect one or more check boxes located under the **Settings** icon. 
+You can select or deselect one or more check boxes located under the **Settings** icon.
 
-**Settings** >> **General** tab:
+**Settings** >> **General** tab consists of the following actions:
+
+- Enable labeling hotkeys
+- Show hotkey tooltips
+- Show labels hotkey tooltips
+- Show labels inside the regions
+- Keep label selected after creating a region
+- Select regions after creating
+- Show line numbers for Text
+- Remember Selected Tool
+- Enable image smoothing when zoom
 
 <img style="max-width: 600px" src='../images/general.png' class="gif-border">
 <br/>
 <i>Figure 3: General tab </i>
 
-**Settings** >> **Hotkeys** tab:
+**Settings** >> **Hotkeys** >> **Hotkeys** tab consists of the following actions:
+
+- `ALT` `LEFT` - Go one step back
+- `ALT` `SPACE` - Play/pause
+- `ALT` `RIGHT` - Go one step forward
+
+**Settings** >> **Hotkeys** >> **Global Hotkeys** tab consists of the following actions:
+
+- `COMMAND` `ENTER`- Submit annotation
+- `COMMAND` `BACKSPACE`- Delete all regions
+- `ALT` `R` - Create relation between regions
+- `ENTER` - Focus first focusable region
+- `U` - Unselect region
+- `ALT` `H`- Toggle selected region visibility
+- `COMMAND` `Z` - Undo
+- `COMMAND` `SHIFT` `Z` - Redo
+- `ESCAPE` - Exit relation mode, unselect region
+- `BACKSPACE` - Delete selected region
+- `ALT` `.` - Cycle through regions
+- `COMMAND` `D` - Duplicate selected region
 
 <img style="max-width: 600px" src='../images/hotkeys.png' class="gif-border">
 <br/>
 <i>Figure 4: Hotkeys tab </i>
 
-**Settings** >> **Layout** tab:
+**Settings** >> **Layout** tab tab consists of the following actions:
+
+- Move sidepanel to the bottom
+
+- Display Labels by default in Results panel
+
+- Show Annotations panel
+
+- Show Predictions panel
 
 <img style="max-width: 600px" src='../images/layout.png' class="gif-border">
 <br/>
 <i>Figure 5: Layout tab </i>
 
-**Settings** >> **Video** tab:
-You can manually adjust the video hop size in the **Video hop size** text box.
+**Settings** >> **Video** tab tab consists of the following actions:
+
+- Allow drawing outside of video boundaries
+
+!!! note 
+    You can manually adjust the video hop size in the **Video hop size** text box.
 
 <img style="max-width: 600px" src='../images/video.png' class="gif-border">
 <br/>
 <i>Figure 6: Video tab </i>
 
-
 For example, keep a label selected after creating a region, display labels on bounding boxes, polygons and other regions while labeling, and show line numbers for text labeling.
-
 
 <img style="max-width: 600px" src='../images/lsf-settings.png' class="gif-border">
 <br/>
