@@ -121,7 +121,7 @@ jobs:
     if: |
       github.event_name == 'push' &&
       ( ( github.ref_name == 'develop' && needs.changed_files.outputs.docker == 'true' )
-        || startsWith(github.ref_name, env.RELEASE_BRANCH_PREFIX) )
+        || startsWith(github.ref_name, 'ls-release/') )
     permissions:
       contents: read
       checks: write
@@ -154,7 +154,7 @@ jobs:
     name: "Draft Release"
     if: |
       github.event_name == 'push' &&
-      startsWith(github.ref_name, env.RELEASE_BRANCH_PREFIX)
+      startsWith(github.ref_name, 'ls-release/')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -162,6 +162,15 @@ jobs:
       id: ${{ steps.update-draft-release.outputs.id }}
       rc-version: ${{ steps.create-draft-release.outputs.rc-version }}
     steps:
+      - uses: hmarr/debug-action@v2.1.0
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
       - name: Create release draft
         uses: actions/github-script@v6
         id: create-draft-release
@@ -274,6 +283,8 @@ jobs:
                 release = newDraftRelease;
                 core.setOutput("created", true);
             }
+            core.setOutput("id", release.id);
+            core.setOutput("tag_name", release.tag_name);
 
       - uses: actions/cache@v3
         name: Configure pip cache
@@ -347,7 +358,7 @@ jobs:
       - draft-release
     if: |
       github.event_name == 'push' &&
-      startsWith(github.ref_name, env.RELEASE_BRANCH_PREFIX)
+      startsWith(github.ref_name, 'ls-release/')
     permissions:
       contents: write
     uses: heartexlabs/label-studio/.github/workflows/build_pypi.yml@develop
