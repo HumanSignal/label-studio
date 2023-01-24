@@ -4,24 +4,29 @@
 We are committed to upholding the values of Label Studio, and are intentional about how we interact and provide support to the members of this Slack community as well.
 
 ### Fight for the users
-
 Our customers and community come first; we go above and beyond to solve their problems and help them succeed. 
 
 ### No cheap swag
-
 We strive for the highest quality, we’re intentional, and we take pride in our work. We own the outcomes and finish what we start. 
 
 ### Light on our feet
-
 We’re setting the pace for the industry. Quality comes with iteration, gathering data and feedback—we balance our quest for quality with staying agile and moving quickly.
 
 ### No spin zone
-
 We’re transparent, authentic, and open to feedback and new ideas. We’re going to face challenges and make mistakes; it’s important to create an environment that allows for honesty and bad, so we can work the problem together. 
 
 ### Positive sum game
-
 Individual success doesn’t scale. We’re one team with shared goals, shared responsibility and shared success. Collaboration across departments is how we will succeed.
+
+## Be Human
+This is an open source project made possible through a collaborative, communicative spirit. We're building something together — no need to be unkind while doing so. 
+
+#### Take a moment to introduce yourself! (optional but helps the community)
+- Update your Slack profile 
+- Enter your full name (this community will work best if we are all real humans), but feel free to add a custom “display name.”
+- Add a headline in the “what I do” box (it can be “title @ company” or anything that helps people know who they are chatting with).
+- Add a profile photo
+- Intro yourself in #01-introductions
 
 ## We're an async, global community — please be respectful of people's time.
 While we're fortunate to have a team from around the globe, we operate in an async, global manner. 
