@@ -38,8 +38,8 @@ Asking your question in the right channel will allow us to help you more efficie
 ### Use public channels, not private groups
 Slack is about communication, so use public channels whenever possible. This is good for transparency, but also keeps the community vibrant and alive. You also have an opportunity to help someone else who might find your conversation helpful or encouraging.
 
-
 # All Community Channels
+Looking to join our Slack Community? [Click here to join.](https://bit.ly/Join-LS-Slack)
 
 ### #00-announcements
 Announcements, news, and updates from the Label Studio team.
