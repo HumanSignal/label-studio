@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-1023: Handle both media and xhr load errors for audio",
-  "commit": "a4f7fa97b3181f19909697fe28c3350da56ee005",
+  "commit": "b2956a5c821b57e86b4b2e52fe110fa621ce7db2",
   "branch": "fb-lsdv-1023",
-  "date": "2023/01/24 09:41:46"
+  "date": "2023/01/24 14:18:22"
 }
