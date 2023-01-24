@@ -61,7 +61,7 @@ The webhook payload includes the name of the action and some additional task dat
         {
             "id": 21,
             "data": {
-                "ner": "Opossums like to be aloft \n\n\n\n\n\nin trees."
+                "ner": "Opossums like to be aloft \n\n\n\n\n\n in trees."
             },
             "meta": {},
             "created_at": "2021-08-17T13:51:02.590839Z",

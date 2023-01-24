@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import json
+import uuid
 import logging
 import os
 import datetime
@@ -129,17 +130,28 @@ class Task(TaskMixin, models.Model):
     def has_lock(self, user=None):
         """Check whether current task has been locked by some user"""
         from projects.functions.next_task import get_next_task_logging_level
+        SkipQueue = self.project.SkipQueue
 
-        num_locks = self.num_locks
-        if self.project.skip_queue == self.project.SkipQueue.REQUEUE_FOR_ME:
-            num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) | ~Q(completed_by=user)).count()
-        else:
-            num_annotations = self.annotations.filter(ground_truth=False).exclude(Q(was_cancelled=True) & ~Q(completed_by=user)).count()
+        if self.project.skip_queue == SkipQueue.REQUEUE_FOR_ME:
+            # REQUEUE_FOR_ME means: only my skipped tasks go back to me,
+            # alien's skipped annotations are counted as regular annotations
+            q = Q(was_cancelled=True) & Q(completed_by=user)
+        elif self.project.skip_queue == SkipQueue.REQUEUE_FOR_OTHERS:
+            # REQUEUE_FOR_OTHERS: my skipped tasks go to others
+            # alien's skipped annotations are not counted at all
+            q = Q(was_cancelled=True) & ~Q(completed_by=user)
+        else:  # SkipQueue.IGNORE_SKIPPED
+            # IGNORE_SKIPPED: my skipped tasks don't go anywhere
+            # alien's and my skipped annotations are counted as regular annotations
+            q = Q()
 
+        num_locks = self.num_locks_user(user=user)
+        num_annotations = self.annotations.exclude(q | Q(ground_truth=True)).count()
         num = num_locks + num_annotations
         if num > self.overlap:
             logger.error(
-                f"Num takes={num} > overlap={self.overlap} for task={self.id} - it's a bug",
+                f"Num takes={num} > overlap={self.overlap} for task={self.id}, "
+                f"skipped mode {self.project.skip_queue} - it's a bug",
                 extra=dict(
                     lock_ttl=self.locks.values_list('user', 'expire_at'),
                     num_locks=num_locks,
@@ -147,12 +159,19 @@ class Task(TaskMixin, models.Model):
                 )
             )
         result = bool(num >= self.overlap)
-        logger.log(get_next_task_logging_level(), f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations}')
+        logger.log(
+            get_next_task_logging_level(user),
+            f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations} '
+            f'skipped mode: {self.project.skip_queue}'
+        )
         return result
 
     @property
     def num_locks(self):
         return self.locks.filter(expire_at__gt=now()).count()
+
+    def num_locks_user(self, user):
+        return self.locks.filter(expire_at__gt=now()).exclude(user=user).count()
 
     @property
     def storage_filename(self):
@@ -175,8 +194,14 @@ class Task(TaskMixin, models.Model):
         if num_locks < self.overlap:
             lock_ttl = settings.TASK_LOCK_TTL
             expire_at = now() + datetime.timedelta(seconds=lock_ttl)
-            TaskLock.objects.create(task=self, user=user, expire_at=expire_at)
-            logger.log(get_next_task_logging_level(), f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
+            try:
+                task_lock = TaskLock.objects.get(task=self, user=user)
+            except TaskLock.DoesNotExist:
+                TaskLock.objects.create(task=self, user=user, expire_at=expire_at)
+            else:
+                task_lock.expire_at = expire_at
+                task_lock.save()
+            logger.log(get_next_task_logging_level(user), f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
         else:
             logger.error(
                 f"Current number of locks for task {self.id} is {num_locks}, but overlap={self.overlap}: "
@@ -386,6 +411,7 @@ class Annotation(models.Model):
                                           related_name='child_annotations',
                                           null=True,
                                           help_text='Points to the parent annotation from which this annotation was created')
+    unique_id = models.UUIDField(default=uuid.uuid4, null=True, blank=True, unique=True, editable=False)
     last_action = models.CharField(
         _('last action'),
         max_length=128,
@@ -495,6 +521,7 @@ class TaskLock(models.Model):
     task = models.ForeignKey(
         'tasks.Task', on_delete=models.CASCADE, related_name='locks', help_text='Locked task')
     expire_at = models.DateTimeField(_('expire_at'))
+    unique_id = models.UUIDField(default=uuid.uuid4, null=True, blank=True, unique=True, editable=False)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='task_locks', on_delete=models.CASCADE,
         help_text='User who locked this task')
