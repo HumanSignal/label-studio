@@ -1,6 +1,6 @@
 {
-  "message": "Revert feat: DEV-4034: Rendering performance improvements for large-duration audio (#1138)",
-  "commit": "d84c38e3b5f03bd2781ca976ae83c827c56a6adf",
-  "branch": "master",
-  "date": "2023/01/24 16:00:07"
+  "message": "chore: LSDV-1376: Remove ff for 2480 (empty nodes)",
+  "commit": "a6bff019926df2f4b6ff47446a669611ef1d048d",
+  "branch": "fb-LSDV-1376/remove-2480-ff",
+  "date": "2023/01/25 15:13:36"
 }
