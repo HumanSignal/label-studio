@@ -1,6 +1,6 @@
 {
-  "message": "Revert feat: DEV-4034: Rendering performance improvements for large-duration audio (#1138)",
-  "commit": "d84c38e3b5f03bd2781ca976ae83c827c56a6adf",
-  "branch": "master",
-  "date": "2023/01/24 16:00:07"
+  "message": "fix: LSDV-1140: Select region when regions is dragged",
+  "commit": "8623f2939e82941c0262c314784f270ecc726419",
+  "branch": "fb-lsdv-1140",
+  "date": "2023/01/25 12:06:01"
 }
