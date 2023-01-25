@@ -1,6 +1,6 @@
 {
-  "message": "Revert feat: DEV-4034: Rendering performance improvements for large-duration audio (#1138)",
-  "commit": "d84c38e3b5f03bd2781ca976ae83c827c56a6adf",
-  "branch": "master",
-  "date": "2023/01/24 16:00:07"
+  "message": "fix: LSDV-4532: Audio v3 visual data is offset to sound playback",
+  "commit": "456233970b02334c6bf8b97453d8e8310437faad",
+  "branch": "fb-lsdv-4532",
+  "date": "2023/01/25 17:18:56"
 }
