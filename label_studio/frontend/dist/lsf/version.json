@@ -1,6 +1,6 @@
 {
-  "message": "Revert feat: DEV-4034: Rendering performance improvements for large-duration audio (#1138)",
-  "commit": "d84c38e3b5f03bd2781ca976ae83c827c56a6adf",
-  "branch": "master",
-  "date": "2023/01/24 16:00:07"
+  "message": "fix: DEV-3928: Make error messages more configurable",
+  "commit": "318111fcd864410509d37e9cf13cf569ebec4ba7",
+  "branch": "fb-dev-3928/docs-links",
+  "date": "2023/01/25 04:17:50"
 }
