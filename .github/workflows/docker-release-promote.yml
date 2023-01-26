@@ -40,13 +40,18 @@ jobs:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
             const {repo, owner} = context.repo;
-            const {data: checks} = await github.rest.checks.listForRef({
-              owner,
-              repo,
-              ref: 'tags/${{ inputs.release_tag }}',
-              status: "completed",
-            })
-            const check = checks.check_runs.find(e => e.name === '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}')
+            const check_runs = await github.paginate(
+              github.rest.checks.listForRef,
+              {
+                owner,
+                repo,
+                ref: 'tags/${{ inputs.release_tag }}',
+                status: "completed",
+                per_page: 100
+              },
+              (response) => response.data
+            );
+            const check = check_runs.find(e => e.name === '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}')
             const details = JSON.parse(check.output.summary)
             console.log(details)
             core.setOutput("image_version", details.image_version);
@@ -83,11 +88,15 @@ jobs:
                 return +a[1] - b[1]
             }
             
-            const {data: tags} = await github.rest.repos.listTags({
-              owner,
-              repo,
-              per_page: 100
-            });
+            const tags = await github.paginate(
+              github.rest.repos.listTags,
+              {
+                owner,
+                repo,
+                per_page: 100
+              },
+              (response) => response.data
+            );
             const rawTags = tags.map(e => e.name)
             const filteredTags = rawTags.filter(e => e.match(regexp))
             const sortedTags = filteredTags
@@ -197,7 +206,7 @@ jobs:
           EOF
 
       - name: Build Release Ubuntu Docker image
-        uses: docker/build-push-action@v3.2.0
+        uses: docker/build-push-action@v3.3.0
         id: docker_build
         with:
           context: ${{ steps.release_dockerfile.outputs.release_dir }}
@@ -211,7 +220,7 @@ jobs:
         run: docker run -v ${{ github.workspace }}:/workspace:rw -u root --rm ${{ env.IMAGE_NAME }}:${{ inputs.release_tag }} cp -r /label-studio/label_studio/frontend/ /workspace/label_studio/
 
       - name: Push Release Ubuntu Docker image
-        uses: docker/build-push-action@v3.2.0
+        uses: docker/build-push-action@v3.3.0
         id: docker_push
         with:
           context: ${{ steps.release_dockerfile.outputs.release_dir }}
@@ -262,7 +271,7 @@ jobs:
           EOF
 
       - name: Build and push Release UBI Docker image
-        uses: docker/build-push-action@v3.2.0
+        uses: docker/build-push-action@v3.3.0
         id: docker_build_and_push_ubi
         with:
           context: ${{ steps.ubi_release_dockerfile.outputs.release_dir }}
