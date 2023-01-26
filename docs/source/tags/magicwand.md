@@ -58,7 +58,7 @@ If the image is on the same host as your Label Studio instance, you can simply l
 
 ### Example JSON
 
-Basic image segmentation labeling configuration with both the Magic Wand and brush present, with images stored on a third-party public cloud bucket:
+Basic image segmentation labeling configuration, with images stored on a third-party public cloud bucket; note that when the Magicwand tag is used the Brush and Eraser tools are automatically added along with it:
 
 ```html
 <View>
@@ -66,7 +66,6 @@ Basic image segmentation labeling configuration with both the Magic Wand and bru
     <Label value="Person" />
     <Label value="Animal" />
   </Labels>
-  <Brush name="brush" toName="image" />
   <MagicWand name="magicwand" toName="image" />
   <Image name="image" value="$image" crossOrigin="anonymous" />
 </View>
@@ -80,7 +79,6 @@ Magic Wand example with zoom controls turned on:
     <Label value="Person" />
     <Label value="Animal" />
   </Labels>
-  <Brush name="brush" toName="image" />
   <MagicWand name="magicwand" toName="image" />
   <Image name="image" value="$image" zoomControl="true" zoom="true" crossOrigin="anonymous" />
 </View>
