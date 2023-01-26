@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-1140: Select region when regions is dragged",
-  "commit": "e7476d6b02068000ae681e54a2cc5fd954a4f1e2",
-  "branch": "fb-lsdv-1140",
-  "date": "2023/01/25 18:24:24"
+  "commit": "ef5d20754a14cd3d2a90a36c4aea34534062c3d7",
+  "branch": "master",
+  "date": "2023/01/26 10:29:18"
 }
