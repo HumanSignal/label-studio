@@ -48,7 +48,7 @@ ordered_set==4.0.2
 pandas>=0.24.0
 protobuf>=3.15.5
 psycopg2-binary==2.9.1
-pydantic>=1.7.3,<=1.8.2
+pydantic>=1.7.3,<=1.11.0
 python_dateutil==2.8.1
 pytz ~=2019.3
 requests>=2.22.0,<2.28

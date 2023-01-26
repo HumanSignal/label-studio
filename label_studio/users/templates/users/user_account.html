@@ -176,7 +176,7 @@
   <script>
     (() => {
       {% if settings.HOSTNAME %}
-      const hostname = {{ settings.HOSTNAME }};
+      const hostname = '{{ settings.HOSTNAME }}';
       {% else %}
       const hostname = 'http://localhost:8080';
       {% endif %}

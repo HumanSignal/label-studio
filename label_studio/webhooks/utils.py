@@ -111,11 +111,11 @@ def api_webhook(action):
     def decorator(func):
         @wraps(func)
         def wrap(self, request, *args, **kwargs):
-            responce = func(self, request, *args, **kwargs)
+            response = func(self, request, *args, **kwargs)
 
             action_meta = WebhookAction.ACTIONS[action]
             many = action_meta['many']
-            instance = action_meta['model'].objects.get(id=responce.data.get('id'))
+            instance = action_meta['model'].objects.get(id=response.data.get('id'))
             if many:
                 instance = [instance]
             project = None
@@ -127,7 +127,7 @@ def api_webhook(action):
                 action,
                 instance,
             )
-            return responce
+            return response
 
         return wrap
 
@@ -163,10 +163,10 @@ def api_webhook_for_delete(action):
             if many:
                 obj = [obj]
 
-            responce = func(self, request, *args, **kwargs)
+            response = func(self, request, *args, **kwargs)
 
             emit_webhooks_for_instance(request.user.active_organization, project, action, obj)
-            return responce
+            return response
 
         return wrap
 
