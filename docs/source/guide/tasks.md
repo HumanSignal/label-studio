@@ -32,6 +32,7 @@ You can import many types of data, including text, timeseries, audio, and image 
 | [Text](#Plain-text) | .txt, .json |
 | [Time series](#Import-CSV-or-TSV-data) | .csv, .tsv, .json |
 | [Tasks with multiple data types](#Basic-Label-Studio-JSON-format) | .csv, .tsv, .json |
+| Video | .mp4, .webm, .avi |
 
 If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](https://slack.labelstudio.heartex.com/?source=docs-gdi). 
 
