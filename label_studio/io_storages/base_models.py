@@ -76,12 +76,25 @@ class ImportStorage(Storage):
 
     def resolve_uri(self, uri):
         try:
-            extracted_uri, extracted_storage = get_uri_via_regex(uri, prefixes=(self.url_scheme,))
-            if not extracted_storage:
-                logger.info(f'No storage info found for URI={uri}')
-                return
-            http_url = self.generate_http_url(extracted_uri)
-            return uri.replace(extracted_uri, http_url)
+            if type(uri) == str:
+                uri = [uri]
+
+            resolved_uris = []
+            for sub_uri in uri:
+                extracted_uri, extracted_storage = get_uri_via_regex(
+                    sub_uri, prefixes=(self.url_scheme,)
+                )
+                if not extracted_storage:
+                    logger.info(f'No storage info found for URI={sub_uri}')
+                    return
+
+                http_url = self.generate_http_url(extracted_uri)
+                resolved_uris.append(sub_uri.replace(extracted_uri, http_url))
+
+            if len(uri) == 1:
+                return resolved_uris[0]
+
+            return resolved_uris
         except Exception as exc:
             logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
 
