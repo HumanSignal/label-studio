@@ -1,6 +1,6 @@
 {
-  "message": "chore: DEV-3994: Add PR checklist template",
-  "commit": "ee7eb6eb59064e1039ea544380ca7f557c5dbfa9",
-  "branch": "master",
-  "date": "2023/01/23 11:24:46"
+  "message": "fix: DEV-4033: fix adjustable columns data manager",
+  "commit": "3ebc7ea0a7e8d46b9ed6ca575bec874a7bb03974",
+  "branch": "fb-dev-4033/fix-adjustable-columns-data-manager",
+  "date": "2023/01/26 14:32:39"
 }
