@@ -26,6 +26,7 @@ class View(models.Model):
     )
 
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         if self.project.organization == user.active_organization:
             return True
         return False

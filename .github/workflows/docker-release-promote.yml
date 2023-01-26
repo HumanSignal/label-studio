@@ -206,7 +206,7 @@ jobs:
           EOF
 
       - name: Build Release Ubuntu Docker image
-        uses: docker/build-push-action@v3.2.0
+        uses: docker/build-push-action@v3.3.0
         id: docker_build
         with:
           context: ${{ steps.release_dockerfile.outputs.release_dir }}
@@ -220,7 +220,7 @@ jobs:
         run: docker run -v ${{ github.workspace }}:/workspace:rw -u root --rm ${{ env.IMAGE_NAME }}:${{ inputs.release_tag }} cp -r /label-studio/label_studio/frontend/ /workspace/label_studio/
 
       - name: Push Release Ubuntu Docker image
-        uses: docker/build-push-action@v3.2.0
+        uses: docker/build-push-action@v3.3.0
         id: docker_push
         with:
           context: ${{ steps.release_dockerfile.outputs.release_dir }}
@@ -271,7 +271,7 @@ jobs:
           EOF
 
       - name: Build and push Release UBI Docker image
-        uses: docker/build-push-action@v3.2.0
+        uses: docker/build-push-action@v3.3.0
         id: docker_build_and_push_ubi
         with:
           context: ${{ steps.ubi_release_dockerfile.outputs.release_dir }}

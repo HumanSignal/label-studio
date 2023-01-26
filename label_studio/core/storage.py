@@ -94,7 +94,7 @@ class AlternativeGoogleCloudStorageBase(GoogleCloudStorage):
     def url(self, name):
         """
         Return public url or a signed url for the Blob.
-        This DOES NOT check for existance of Blob - that makes codes too slow
+        This DOES NOT check for existence of Blob - that makes codes too slow
         for many use cases.
         Overridden to force the use of the IAM signBlob API.
         See https://github.com/googleapis/python-storage/blob/519074112775c19742522158f612b467cf590219/google/cloud/storage/_signing.py#L628  # NOQA
