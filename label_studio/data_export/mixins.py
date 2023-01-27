@@ -150,7 +150,7 @@ class ExportMixin:
                 "annotations",
                 queryset=annotations_qs,
             )
-        ).select_related('project').prefetch_related(
+        ).prefetch_related(
                 'predictions', 'drafts'
             )
 
@@ -198,7 +198,7 @@ class ExportMixin:
             BATCH_SIZE = 1000
             for ids in batch(task_ids, BATCH_SIZE):
                 i += 1
-                tasks = list(self.get_task_queryset(ids, annotation_filter_options))
+                tasks = self.get_task_queryset(ids, annotation_filter_options)
                 logger.debug(f'Batch: {i*BATCH_SIZE}')
                 if isinstance(task_filter_options, dict) and task_filter_options.get('only_with_annotations'):
                     tasks = [task for task in tasks if task.annotations.exists()]
