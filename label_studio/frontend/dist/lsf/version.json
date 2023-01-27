@@ -1,6 +1,6 @@
 {
-  "message": "docs: DEV-4153: Small docs fixes ",
-  "commit": "fdbd3da2f602147001175f74b0103567a3067f50",
+  "message": "fix: LSDV-1140: Select region when regions is dragged",
+  "commit": "ef5d20754a14cd3d2a90a36c4aea34534062c3d7",
   "branch": "master",
-  "date": "2023/01/06 17:45:52"
+  "date": "2023/01/26 10:29:18"
 }
