@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-3004: Fix click on already assigned label",
-  "commit": "53016b65954c8be318866b21939151a0487de98c",
+  "commit": "9ebff4265fe0ef55ea7cb81ede39b3282780d99a",
   "branch": "fb-lsdv-3004/no-label",
-  "date": "2023/01/27 19:14:44"
+  "date": "2023/01/27 19:36:47"
 }
