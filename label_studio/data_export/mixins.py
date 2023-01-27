@@ -150,7 +150,7 @@ class ExportMixin:
                 "annotations",
                 queryset=annotations_qs,
             )
-        ).select_related('project').prefetch_related(
+        ).prefetch_related(
                 'predictions', 'drafts'
             )
 
