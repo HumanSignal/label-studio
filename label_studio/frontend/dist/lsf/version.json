@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-1140: Select region when regions is dragged",
-  "commit": "ef5d20754a14cd3d2a90a36c4aea34534062c3d7",
-  "branch": "master",
-  "date": "2023/01/26 10:29:18"
+  "message": "fix: LSDV-3004: Fix click on already assigned label",
+  "commit": "fbc4f86d730eb60fcaf4b4601f0112895f282395",
+  "branch": "fb-lsdv-3004/no-label",
+  "date": "2023/01/27 13:27:23"
 }
