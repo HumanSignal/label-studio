@@ -19,7 +19,7 @@ With the Label Studio Python SDK, you can perform the following tasks in a Pytho
 - [Import tasks](#Import-tasks-with-the-Label-Studio-Python-SDK).
 - [Manage pre-annotated tasks and model predictions](#Add-predictions-to-existing-tasks-with-the-Label-Studio-Python-SDK).
 - [Connect to a cloud storage provider](https://github.com/heartexlabs/label-studio-sdk/blob/master/examples/annotate_data_from_gcs/annotate_data_from_gcs.ipynb), such as Amazon S3, Microsoft Azure, or Google Cloud Services (GCS), to retrieve unlabeled tasks and store annotated tasks.
-- [Modify project settings](/sdk/project.html#label_studio_sdk.project.Project.set_params), such as task sampling or the model version used to display predictions. 
+- [Modify project settings](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.set_params), such as task sampling or the model version used to display predictions. 
 
 See the [full SDK reference documentation for all available modules](https://labelstud.io/sdk/), or review the available [API endpoints](/api) for any tasks that the SDK does not cover. 
 
@@ -64,7 +64,7 @@ project = ls.start_project(
 )
 ```
 
-For more about what you can do with the project module of the SDK, see the [project module SDK reference](/sdk/project.html). 
+For more about what you can do with the project module of the SDK, see the [project module SDK reference](https://labelstud.io/sdk/project.html). 
 
 ## Import tasks with the Label Studio Python SDK
 
