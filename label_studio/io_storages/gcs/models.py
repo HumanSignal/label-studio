@@ -132,11 +132,29 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
                 f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
         return value
 
+    @classmethod
+    def is_gce_instance(cls):
+        """Check if it's GCE instance via DNS lookup to metadata server"""
+        try:
+            socket.getaddrinfo('metadata.google.internal', 80)
+        except socket.gaierror:
+            return False
+        return True
+
     def generate_http_url(self, url):
         r = urlparse(url, allow_fragments=False)
         bucket_name = r.netloc
         key = r.path.lstrip('/')
-        return self.generate_download_signed_url_v4(bucket_name, key)
+
+        if flag_set('fflag_feat_back_dev_4166_google_project_id_11012023_long', self.project.organization.created_by):
+            return self.generate_download_signed_url_v4(bucket_name, key)
+        else:
+            if self.is_gce_instance() and not self.google_application_credentials:
+                logger.debug('Generate signed URL for GCE instance')
+                return self.python_cloud_function_get_signed_url(bucket_name, key)
+            else:
+                logger.debug('Generate signed URL for local instance')
+            return self.generate_download_signed_url_v4(bucket_name, key)
 
     def generate_download_signed_url_v4(self, bucket_name, blob_name):
         """Generates a v4 signed URL for downloading a blob.
@@ -152,14 +170,23 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
         bucket = self.get_bucket(client, bucket_name)
         blob = bucket.blob(blob_name)
 
-        url = blob.generate_signed_url(
-            version="v4",
-            # This URL is valid for 15 minutes
-            expiration=timedelta(minutes=self.presign_ttl),
-            # Allow GET requests using this URL.
-            method="GET",
-            **self._get_signing_kwargs()
-        )
+        if flag_set('fflag_feat_back_dev_4166_google_project_id_11012023_long', self.project.organization.created_by):
+            url = blob.generate_signed_url(
+                version="v4",
+                # This URL is valid for 15 minutes
+                expiration=timedelta(minutes=self.presign_ttl),
+                # Allow GET requests using this URL.
+                method="GET",
+                **self._get_signing_kwargs()
+            )
+        else:
+            url = blob.generate_signed_url(
+                version="v4",
+                # This URL is valid for 15 minutes
+                expiration=timedelta(minutes=self.presign_ttl),
+                # Allow GET requests using this URL.
+                method="GET",
+            )
 
         logger.debug('Generated GCS signed url: ' + url)
         return url
@@ -175,21 +202,40 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
         return signing_credentials
 
     def _get_signing_kwargs(self):
-        if flag_set('fflag_feat_back_dev_4166_google_project_id_11012023_long', self.project.organization.created_by):
-            try:
-                credentials = self._get_signing_credentials()
-                out = {
-                    "service_account_email": credentials.service_account_email,
-                    "access_token": credentials.token,
-                    "credentials": credentials
-                }
-            except DefaultCredentialsError as exc:
-                logger.error(f"Label studio couldn't load default credentials from env to {self.id}. {exc}",
-                             exc_info=True)
-                out = {}
-        else:
+        try:
+            credentials = self._get_signing_credentials()
+            out = {
+                "service_account_email": credentials.service_account_email,
+                "access_token": credentials.token,
+                "credentials": credentials
+            }
+        except DefaultCredentialsError as exc:
+            logger.error(f"Label studio couldn't load default credentials from env to {self.id}. {exc}",
+                         exc_info=True)
             out = {}
         return out
+
+    def python_cloud_function_get_signed_url(self, bucket_name, blob_name):
+        # https://gist.github.com/jezhumble/91051485db4462add82045ef9ac2a0ec
+        # Copyright 2019 Google LLC.
+        # SPDX-License-Identifier: Apache-2.0
+        # This snippet shows you how to use Blob.generate_signed_url() from within compute engine / cloud functions
+        # as described here: https://cloud.google.com/functions/docs/writing/http#uploading_files_via_cloud_storage
+        # (without needing access to a private key)
+        # Note: as described in that page, you need to run your function with a service account
+        # with the permission roles/iam.serviceAccountTokenCreator
+        auth_request = requests.Request()
+        credentials, project = google.auth.default(['https://www.googleapis.com/auth/cloud-platform'])
+        storage_client = google_storage.Client(project, credentials)
+        # storage_client = self.get_client()
+        data_bucket = storage_client.lookup_bucket(bucket_name)
+        signed_blob_path = data_bucket.blob(blob_name)
+        expires_at_ms = datetime.now() + timedelta(minutes=self.presign_ttl)
+        # This next line is the trick!
+        signing_credentials = compute_engine.IDTokenCredentials(auth_request, "",
+                                                                service_account_email=None)
+        signed_url = signed_blob_path.generate_signed_url(expires_at_ms, credentials=signing_credentials, version="v4")
+        return signed_url
 
     def scan_and_create_links(self):
         return self._scan_and_create_links(GCSImportStorageLink)
