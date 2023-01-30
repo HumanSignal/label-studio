@@ -240,8 +240,9 @@ class Project(ProjectMixin, models.Model):
         # TODO: once bugfix with incorrect data types in List
         # logging.warning('! Please, remove code below after patching of all projects (extract_data_types)')
         if self.label_config is not None:
-            if self.data_types != extract_data_types(self.label_config):
-                self.data_types = extract_data_types(self.label_config)
+            data_types = extract_data_types(self.label_config)
+            if self.data_types != data_types:
+                self.data_types = data_types
 
     @property
     def num_tasks(self):
@@ -365,7 +366,7 @@ class Project(ProjectMixin, models.Model):
         if maximum_annotations_changed and (not overlap_cohort_percentage_changed or self.maximum_annotations == 1):
             tasks_with_overlap = self.tasks.filter(overlap__gt=1)
             if tasks_with_overlap.exists():
-                # if there is a part with overlaped tasks, affect only them
+                # if there is a part with overlapped tasks, affect only them
                 tasks_with_overlap.update(overlap=self.maximum_annotations)
             elif self.overlap_cohort_percentage < 100:
                 self._rearrange_overlap_cohort()
@@ -953,6 +954,7 @@ class ProjectSummary(models.Model):
     created_labels = JSONField(_('created labels'), null=True, default=dict, help_text='Unique labels')
 
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
     def reset(self, tasks_data_based=True):

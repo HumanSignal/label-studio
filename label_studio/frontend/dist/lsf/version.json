@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3664: Grouping modes are not persistent in Outliner when switching between tasks in Quick View",
-  "commit": "a29a31f1803824803fa4e824ea99c643ff727b1a",
+  "message": "fix: LSDV-1066: Bbox can be resized if ImageView is zoomed (#1167)",
+  "commit": "a08961574eb6c961ee21466afe7d3a2c058d22db",
   "branch": "master",
-  "date": "2022/12/15 07:52:48"
+  "date": "2023-01-30T16:28:13Z"
 }

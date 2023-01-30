@@ -34,6 +34,7 @@ class FileUpload(models.Model):
     file = models.FileField(upload_to=upload_name_generator)
 
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
     @property
