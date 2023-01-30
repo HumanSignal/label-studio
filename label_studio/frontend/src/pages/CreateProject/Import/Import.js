@@ -274,7 +274,7 @@ export const ImportPage = ({
   return (
     <div className={importClass}>
       {highlightCsvHandling && <div className={importClass.elem("csv-splash")}/>}
-      <input data-testid="import:fileinput" id="file-input" type="file" name="file" multiple onChange={onUpload} style={{ display: "none" }}/>
+      <input id="file-input" type="file" name="file" multiple onChange={onUpload} style={{ display: "none" }}/>
 
       <header>
         <form className={importClass.elem("url-form") + " inline"} method="POST" onSubmit={onLoadURL}>
