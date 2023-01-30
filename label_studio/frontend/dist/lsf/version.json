@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-1140: Select region when regions is dragged",
-  "commit": "ef5d20754a14cd3d2a90a36c4aea34534062c3d7",
+  "message": "fix: DEV-4178: Disable postpone button when no comments left (#1156)",
+  "commit": "dc33be5d837a872267cf8f7456ab2966fabd2e10",
   "branch": "master",
-  "date": "2023/01/26 10:29:18"
+  "date": "2023-01-27T13:57:31Z"
 }
