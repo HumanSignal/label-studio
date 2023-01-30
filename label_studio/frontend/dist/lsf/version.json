@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-1066: Bbox can be resized if ImageView is zoomed",
+  "message": "fix: LSDV-1066: Bbox can be resized if ImageView is zoomed (#1167)",
   "commit": "a08961574eb6c961ee21466afe7d3a2c058d22db",
   "branch": "master",
-  "date": "2023/01/30 13:28:13"
+  "date": "2023-01-30T16:28:13Z"
 }
