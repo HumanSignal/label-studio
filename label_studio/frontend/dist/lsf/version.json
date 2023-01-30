@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-4178: Disable postpone button when no comments left (#1156)",
-  "commit": "dc33be5d837a872267cf8f7456ab2966fabd2e10",
+  "message": "fix: LSDV-1066: Bbox can be resized if ImageView is zoomed (#1167)",
+  "commit": "a08961574eb6c961ee21466afe7d3a2c058d22db",
   "branch": "master",
-  "date": "2023-01-27T13:57:31Z"
+  "date": "2023-01-30T16:28:13Z"
 }
