@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3793: Relative coords for Image regions",
-  "commit": "8f1bdeaf861d5cbfd56c54487ed8412ea37c97ae",
+  "message": "fix: DEV-3793: LSDV-964: Relative coords for Image regions",
+  "commit": "2854971274220f5f164d3b5a4a041fb30b8fa22a",
   "branch": "fb-dev-3793/relative-coords",
-  "date": "2023/01/20 14:09:59"
+  "date": "2023/01/31 16:27:56"
 }
