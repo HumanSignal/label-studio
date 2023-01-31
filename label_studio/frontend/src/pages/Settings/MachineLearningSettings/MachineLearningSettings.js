@@ -28,7 +28,6 @@ export const MachineLearningSettings = () => {
   const [availableModels, setAvailableModels] = useState([]);
   const [modelToPredictOn, setModelToPredictOn] = useState('');
   const [modelsPrecisions, setModelsPrecisions] = useState([]);
-  const [fetchedPrecisions, setFetchPrecisions] = useState(false);
   const webhook_url = getWebhookUrl();
   const [generateSpecs, setGenerateSpecs] = useState(true);
   const [selectedTrainingType, setSelectedTrainingType] = useState('');
@@ -134,15 +133,31 @@ export const MachineLearningSettings = () => {
     })
   }
   async function onDeleteModel(model_version) {
-    console.log('deleting model')
-    axios.post(webhook_url + '/deleteModel?id=' + project.id + '&model_version=' + model_version)
-      .then((data) => {
-        if (data.delete = True)
-          Swal('Model is successfully deleted');
-      });
+    console.log('delete model')
+    Swal({
+      title: "Are you sure?",
+      text: "Once deleted, you will not be able to recover this imaginary file!",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+      if (willDelete) {
+        axios.post(webhook_url + '/deleteModel?id=' + project.id + '&model_version=' + model_version)
+          .then((data) => {
+          if (data.delete == true)
+            Swal('Model is successfully deleted');
+        });
+        Swal("Your model has been deleted!", {
+          icon: "success",
+        });
+      } else {
+        Swal("Your model is safe!");
+      }
+    });
+
   }
   async function onExportModel(model_version) {
-            console.log(model_version)
             Swal('Exporting Model, it may take some time')
             axios.post(webhook_url + '/export?id=' + project.id +'&model_version=' + model_version)
               .then((data) => {
