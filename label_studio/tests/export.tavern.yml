@@ -97,9 +97,7 @@ stages:
     headers:
       content-type: application/json
     json:
-      label_config: <View><Header value="Select label and click the image to start"/>
-      <Image name="image" value="$image" /><PolygonLabels name="label" toName="image" strokeWidth="3" pointSize="small">
-      <Label value="Airplane" background="red"/><Label value="Car" background="blue"/></PolygonLabels></View>
+      label_config: <View><Header value="Select label and click the image to start"/><Image name="image" value="$image" /><PolygonLabels name="label" toName="image" strokeWidth="3" pointSize="small"><Label value="Airplane" background="red"/><Label value="Car" background="blue"/></PolygonLabels></View>
     method: POST
     url: '{django_live_url}/api/projects'
   response:
