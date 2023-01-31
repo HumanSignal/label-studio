@@ -6,9 +6,9 @@ meta_title: List Tag for Lists
 meta_description: Customize Label Studio with lists for machine learning and data science projects.
 ---
 
-Use the List tag to rank results, for example for recommendation systems.
+The `List` tag is used to rank results, for example for recommendation systems.
 
-Use with the following data types: audio, image, HTML, paragraphs, text
+Use with the following data types: audio, image, HTML, paragraphs, text.
 
 ### Parameters
 
