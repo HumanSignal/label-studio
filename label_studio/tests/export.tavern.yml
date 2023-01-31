@@ -82,3 +82,40 @@ stages:
     url: '{django_live_url}/api/projects/{pk}/export?ids[]=9999999'
   response:
     status_code: 200
+
+---
+test_name: YOLO_export_option_polygons
+strict: true
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: <View><Header value="Select label and click the image to start"/>
+      <Image name="image" value="$image" /><PolygonLabels name="label" toName="image" strokeWidth="3" pointSize="small">
+      <Label value="Airplane" background="red"/><Label value="Car" background="blue"/></PolygonLabels></View>
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+- name: stage_export
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/export/formats'
+  response:
+    json:
+      - title: 'YOLO'
+        description: 'Popular TXT format is created for each image file. Each txt file contains annotations for the corresponding image file, that is object class, object coordinates, height & width.'
+        link: 'https://labelstud.io/guide/export.html#YOLO'
+        tags: ["image segmentation", "object detection"]
+        name: 'YOLO'
+    status_code: 200
