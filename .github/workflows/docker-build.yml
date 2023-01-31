@@ -57,7 +57,7 @@ jobs:
           echo "ubi_image_version=ubi_${image_version}" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2.2.1
+        uses: docker/setup-buildx-action@v2.3.0
 
       - name: Set up Python
         uses: actions/setup-python@v4
