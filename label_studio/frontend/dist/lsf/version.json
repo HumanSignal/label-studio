@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-1148: Hotkeys namespaces",
-  "commit": "39345748e4263e5fbe16d7f0efa0cdaae1c69c25",
+  "commit": "a5a2277f7cdf9aebc1e62a5d1c17e2f7968ba3cf",
   "branch": "fb-lsdv-1148",
-  "date": "2023/02/01 05:12:04"
+  "date": "2023/02/01 06:29:04"
 }
