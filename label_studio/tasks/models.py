@@ -1,11 +1,11 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import json
+import uuid
 import logging
 import os
 import datetime
 import numbers
-import time
 
 from urllib.parse import urljoin, quote
 
@@ -512,6 +512,12 @@ class Annotation(models.Model):
         self.task.save(update_fields=update_fields)
 
     def save(self, *args, **kwargs):
+        # Pre save actions
+        created = False if self.pk else True
+        self.decrease_project_summary_counters()
+        old_annotation = Annotation.objects.filter(id=self.id).first()
+        old_annotation_was_cancelled = old_annotation.was_cancelled if old_annotation else None
+
         request = get_current_request()
         if request:
             self.updated_by = request.user
