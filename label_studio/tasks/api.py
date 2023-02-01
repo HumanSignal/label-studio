@@ -182,6 +182,8 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         return Response(data)
 
     def get_queryset(self):
+        task_id = self.request.parser_context['kwargs'].get('pk')
+        task = generics.get_object_or_404(Task, pk=task_id)
         review = bool_from_request(self.request.GET, 'review', False)
         selected = {"all": False, "included": [self.kwargs.get("pk")]}
         if review:
@@ -192,7 +194,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             kwargs = {'all_fields': True}
         project = self.request.query_params.get('project') or self.request.data.get('project')
         if not project:
-            project = Task.objects.get(id=self.request.parser_context['kwargs'].get('pk')).project.id
+            project = task.project.id
         return self.prefetch(
             Task.prepared.get_queryset(
                 prepare_params=PrepareParams(project=project, selectedItems=selected, request=self.request),
@@ -269,6 +271,8 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         # save user history with annotator_id, time & annotation result
         annotation_id = self.kwargs['pk']
         annotation = get_object_with_check_and_log(request, Annotation, pk=annotation_id)
+        # use updated instead of save to avoid duplicated signals
+        Annotation.objects.filter(id=annotation_id).update(updated_by=request.user)
 
         task = annotation.task
         if self.request.data.get('ground_truth'):
@@ -384,6 +388,7 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
             # serialize annotation
             extra_args.update({
                 'prediction': prediction_ser,
+                'updated_by': user
             })
 
         if 'was_cancelled' in self.request.GET:

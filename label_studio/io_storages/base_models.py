@@ -45,6 +45,7 @@ class Storage(models.Model):
         pass
 
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         if self.project.has_permission(user):
             return True
         return False
@@ -125,7 +126,7 @@ class ImportStorage(Storage):
                     raise ValueError(
                         'If you use "annotations" field in the task, ' 'you must put "data" field in the task too'
                     )
-                cancelled_annotations = len([a for a in annotations if a['was_cancelled']])
+                cancelled_annotations = len([a for a in annotations if a.get('was_cancelled', False)])
 
             if 'data' in data and isinstance(data['data'], dict):
                 data = data['data']
@@ -266,6 +267,7 @@ class ImportStorageLink(models.Model):
         return link
 
     def has_permission(self, user):
+        user.project = self.task.project  # link for activity log
         if self.task.has_permission(user):
             return True
         return False
@@ -308,6 +310,7 @@ class ExportStorageLink(models.Model):
         return link
 
     def has_permission(self, user):
+        user.project = self.annotation.project  # link for activity log
         if self.annotation.has_permission(user):
             return True
         return False

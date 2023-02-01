@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3719: Pan wasn't working in images from history (#1066)\n\n* fix: DEV-3719: Pan wasn't working in images from history\r\n\r\n* simplify validation",
-  "commit": "10a111b3cae4ebc3496ef39a66cde15d3858e6ea",
+  "message": "fix: LSDV-1066: Bbox can be resized if ImageView is zoomed (#1167)",
+  "commit": "a08961574eb6c961ee21466afe7d3a2c058d22db",
   "branch": "master",
-  "date": "2022-12-12T13:47:58Z"
+  "date": "2023-01-30T16:28:13Z"
 }

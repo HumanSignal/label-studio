@@ -108,7 +108,8 @@ def parse_input_args(input_args):
 
     parser_init = subparsers.add_parser('init', help='Initialize Label Studio', parents=[root_parser])
     parser_init.add_argument(
-        'project_name', help='Path to directory where project state will be initialized', type=project_name
+        'project_name', help='Path to directory where project state will be initialized', type=project_name,
+        nargs='?'
     )
 
     # start sub-command parser
@@ -144,6 +145,10 @@ def parse_input_args(input_args):
         '--export-serializer-context',
         help=f"Export serializer context, default value: '{default_params}'",
         default=default_params
+    )
+
+    annotation_fill_updated_by = subparsers.add_parser(
+        'annotations_fill_updated_by', help='Fill the updated_by field for Annotations', parents=[root_parser]
     )
 
     args = parser.parse_args(input_args)

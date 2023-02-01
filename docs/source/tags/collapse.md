@@ -2,7 +2,6 @@
 title: Collapse
 type: tags
 order: 501
-is_new: t
 ---
 
 Collapse tag, a content area which can be collapsed and expanded.

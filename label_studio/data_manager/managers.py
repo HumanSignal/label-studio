@@ -164,8 +164,15 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
     from django.db.models.expressions import RawSQL
     from tasks.models import Annotation, Prediction
 
-    # new approach with contain instead of icontains
-    if flag_set('ff_back_2214_annotation_result_12052022_short', project.organization.created_by):
+    flag = flag_set('ff_back_dev_3865_filters_anno_171222_short', project.organization.created_by)
+    if field_name == 'annotations_results' and flag:
+        subquery = Q(id__in=
+            Annotation.objects
+                .annotate(json_str=RawSQL('cast(result as text)', ''))
+                .filter(Q(project=project) & Q(json_str__contains=_filter.value))
+                .values_list('task', flat=True)
+        )
+    else:
         _class = Annotation if field_name == 'annotations_results' else Prediction
         subquery = Exists(
             _class.objects
@@ -173,40 +180,22 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
             .filter(Q(task=OuterRef('pk')) & Q(json_str__contains=_filter.value))
         )
 
-        if _filter.operator in [Operator.EQUAL, Operator.NOT_EQUAL]:
-            try:
-                value = json.loads(_filter.value)
-            except:
-                return 'exit'
+    if _filter.operator in [Operator.EQUAL, Operator.NOT_EQUAL]:
+        try:
+            value = json.loads(_filter.value)
+        except:
+            return 'exit'
 
-            q = Exists(_class.objects.filter(Q(task=OuterRef('pk')) & Q(result=value)))
-            filter_expressions.append(q if _filter.operator == Operator.EQUAL else ~q)
-            return 'continue'
-        elif _filter.operator == Operator.CONTAINS:
-            filter_expressions.append(Q(subquery))
-            return 'continue'
-        elif _filter.operator == Operator.NOT_CONTAINS:
-            filter_expressions.append(~Q(subquery))
-            return 'continue'
+        q = Exists(_class.objects.filter(Q(task=OuterRef('pk')) & Q(result=value)))
+        filter_expressions.append(q if _filter.operator == Operator.EQUAL else ~q)
+        return 'continue'
+    elif _filter.operator == Operator.CONTAINS:
+        filter_expressions.append(Q(subquery))
+        return 'continue'
+    elif _filter.operator == Operator.NOT_CONTAINS:
+        filter_expressions.append(~Q(subquery))
+        return 'continue'
 
-    # old approach
-    else:
-        name = 'annotations__result' if field_name == 'annotations_results' else 'predictions__result'
-        if _filter.operator in [Operator.EQUAL, Operator.NOT_EQUAL]:
-            try:
-                value = json.loads(_filter.value)
-            except:
-                return 'exit'
-
-            q = Q(**{name: value})
-            filter_expressions.append(q if _filter.operator == Operator.EQUAL else ~q)
-            return 'continue'
-        elif _filter.operator == Operator.CONTAINS:
-            filter_expressions.append(Q(**{name + '__icontains': _filter.value}))
-            return 'continue'
-        elif _filter.operator == Operator.NOT_CONTAINS:
-            filter_expressions.append(~Q(**{name + '__icontains': _filter.value}))
-            return 'continue'
 
 
 def add_user_filter(enabled, key, _filter, filter_expressions):

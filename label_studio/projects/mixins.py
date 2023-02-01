@@ -62,6 +62,7 @@ class ProjectMixin:
         """
         Dummy stub for has_permission
         """
+        user.project = self  # link for activity log
         return True
 
     def _can_use_overlap(self):

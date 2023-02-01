@@ -52,7 +52,7 @@ _result_schema = openapi.Schema(
     title='Labeling result',
     description='Labeling result (choices, labels, bounding boxes, etc.)',
     type=openapi.TYPE_OBJECT,
-    properies={
+    properties={
         'from_name': openapi.Schema(
             title='from_name',
             description='The name of the labeling tag from the project config',
