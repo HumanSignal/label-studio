@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-1066: Bbox can be resized if ImageView is zoomed (#1167)",
-  "commit": "a08961574eb6c961ee21466afe7d3a2c058d22db",
-  "branch": "master",
-  "date": "2023-01-30T16:28:13Z"
+  "message": "fix: LSDV-1148: Hotkeys namespaces",
+  "commit": "c7fa1753515f603fbc29b32982cc8bc22d5c1516",
+  "branch": "fb-lsdv-1148",
+  "date": "2023/02/01 04:10:00"
 }
