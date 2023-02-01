@@ -47,7 +47,7 @@ You can also delete annotations in target storage when they are deleted in Label
 
 ## Amazon S3
 
-Connect your [Amazon S3]((https://aws.amazon.com/s3)) bucket to Label Studio to retrieve labeling tasks or store completed annotations. 
+Connect your [Amazon S3](https://aws.amazon.com/s3/) bucket to Label Studio to retrieve labeling tasks or store completed annotations. 
 
 For details about how Label Studio secures access to cloud storage, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
 
