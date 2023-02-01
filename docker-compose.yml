@@ -43,7 +43,7 @@ services:
 #      - LOG_LEVEL=DEBUG
     volumes:
       - ./mydata:/label-studio/data:rw
-    command: label-studio-uwsgi
+    command: label-studio-gunicorn
 
   db:
     image: postgres:11.5

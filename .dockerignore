@@ -8,6 +8,7 @@
 !deploy/requirements.txt
 !deploy/heroku_run.sh
 !deploy/uwsgi.ini
+!deploy/gunicorn.conf.py
 !deploy/default.conf
 !label_studio/**
 !setup.py

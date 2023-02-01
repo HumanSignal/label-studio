@@ -66,6 +66,9 @@ if [ "$1" = "nginx" ]; then
 elif [ "$1" = "label-studio-uwsgi" ]; then
   exec_entrypoint "$ENTRYPOINT_PATH/app/"
   exec_or_wrap_n_exec uwsgi --ini /label-studio/deploy/uwsgi.ini
+elif [ "$1" = "label-studio-gunicorn" ]; then
+  exec_entrypoint "$ENTRYPOINT_PATH/app/"
+  exec_or_wrap_n_exec gunicorn -c /label-studio/deploy/gunicorn.conf.py
 elif [ "$1" = "label-studio-migrate" ]; then
   exec_entrypoint "$ENTRYPOINT_PATH/app-init/"
   exec python3 /label-studio/label_studio/manage.py migrate >&3

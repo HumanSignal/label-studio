@@ -62,5 +62,6 @@ redis>=4.2.0
 sentry-sdk>=1.1.0
 launchdarkly-server-sdk==7.5.0
 python-json-logger==2.0.4
+gunicorn==20.1.0
 
 label-studio-converter==0.0.48rc0
