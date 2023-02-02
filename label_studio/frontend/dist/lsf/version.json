@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3928: Make error messages more configurable",
-  "commit": "5d7922496e11c963e33c3f5efa9d85f4de665052",
+  "message": "fix: DEV-4075: Fix taxonomy items overlap on search",
+  "commit": "14b535379d9e3714702ef1b68587cc806c84a298",
   "branch": "master",
-  "date": "2023/02/02 21:15:53"
+  "date": "2023/02/02 22:51:15"
 }
