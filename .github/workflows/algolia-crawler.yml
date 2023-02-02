@@ -13,7 +13,7 @@ jobs:
       APPLICATION_ID: "M7RXTHKYPM"
       API_KEY: ${{ secrets.ALGOLIA_ADMIN_API_KEY }}
       INDEX_NAME: "ghaction"
-      CONFIG: '{"index_name": "ghaction","start_urls": ["https://docs.heartex.com/guide", "https://docs.heartex.com/templates", "https://docs.heartex.com/tags"],"selectors": {"lvl0": ".content h1, .ResourcesBannerHeading","lvl1": ".content h2, .ResourcesContent h2","lvl2": ".content h3, .ResourcesContent h3","lvl3": ".content h4, .ResourcesContent h4","lvl4": ".content h5, .ResourcesContent h5","lvl5": ".content h6, .ResourcesContent h6", content: ".content p, .ResourcesContent p, .content li, .ResourcesContent li"}}'
+      CONFIG: '{"index_name": "ghaction","start_urls": ["https://docs.heartex.com/guide", "https://docs.heartex.com/templates", "https://docs.heartex.com/tags"],"selectors": {"lvl0": ".content h1, .ResourcesBannerHeading","lvl1": ".content h2, .ResourcesContent h2","lvl2": ".content h3, .ResourcesContent h3","lvl3": ".content h4, .ResourcesContent h4","lvl4": ".content h5, .ResourcesContent h5","lvl5": ".content h6, .ResourcesContent h6", "content": ".content p, .ResourcesContent p, .content li, .ResourcesContent li"}}'
     name: Index Algolia
     steps:
       - name: Algolia Docsearch Action
