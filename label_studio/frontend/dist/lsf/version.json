@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-1066: Bbox can be resized if ImageView is zoomed (#1167)",
-  "commit": "a08961574eb6c961ee21466afe7d3a2c058d22db",
+  "message": "fix: DEV-3666: Fix maxUsages on regions creation",
+  "commit": "ade7295749e520d3bd52dbf7e2da903d5d6f18b6",
   "branch": "master",
-  "date": "2023-01-30T16:28:13Z"
+  "date": "2023/02/01 21:41:01"
 }
