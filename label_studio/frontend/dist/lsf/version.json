@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3666: Fix maxUsages on regions creation",
-  "commit": "ade7295749e520d3bd52dbf7e2da903d5d6f18b6",
-  "branch": "master",
-  "date": "2023/02/01 21:41:01"
+  "message": "feat: LSDV-4583-1: Introduce  support",
+  "commit": "cedb7c494983964a411d488a0abe08c3c2c1bacb",
+  "branch": "fb-lsdev-4583-1/image-value-list",
+  "date": "2023/02/02 11:27:25"
 }
