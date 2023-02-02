@@ -207,6 +207,9 @@ def skipped_queue(next_task, prepared_tasks, project, user, queue_info):
 def postponed_queue(next_task, prepared_tasks, project, user, queue_info):
     if not next_task:
         q = Q(task__project=project, task__isnull=False, was_postponed=True, task__is_labeled=False)
+        if flag_set('fflag_fix_back_lsdv_1044_check_annotations_24012023_short', user):
+            q &= ~Q(task__annotations__completed_by=user)
+
         postponed_tasks = user.drafts.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
         if postponed_tasks.exists():
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(postponed_tasks)])
