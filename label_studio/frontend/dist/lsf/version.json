@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3666: Fix maxUsages on regions creation",
-  "commit": "ade7295749e520d3bd52dbf7e2da903d5d6f18b6",
+  "message": "fix: DEV-3928: Make error messages more configurable",
+  "commit": "5d7922496e11c963e33c3f5efa9d85f4de665052",
   "branch": "master",
-  "date": "2023/02/01 21:41:01"
+  "date": "2023/02/02 21:15:53"
 }
