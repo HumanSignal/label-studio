@@ -471,6 +471,9 @@ class DownloadStorageData(APIView):
     http_method_names = ['get', 'head']
     permission_classes = (IsAuthenticated, )
 
+    def head(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         """ Get export files list
         """
