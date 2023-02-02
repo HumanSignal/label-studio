@@ -24,6 +24,14 @@ jobs:
       release_tag: ${{ github.ref_name }}
     secrets: inherit
 
+  build_ubi_docker_image:
+    name: "Build UBI docker image"
+    uses: heartexlabs/label-studio/.github/workflows/docker-build-ubi.yml@develop
+    with:
+      sha: ${{ github.ref_name }}
+      version: ${{ github.ref_name }}
+    secrets: inherit
+
   build-pypi:
     name: "Build"
     permissions:
