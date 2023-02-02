@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3666: Fix maxUsages on regions creation",
-  "commit": "ade7295749e520d3bd52dbf7e2da903d5d6f18b6",
-  "branch": "master",
-  "date": "2023/02/01 21:41:01"
+  "message": "feat: LSDV-E-131: Labels inside regions",
+  "commit": "4dee651d4788c5fb66209ef161c04027f09b1391",
+  "branch": "fb-lsdv-e-131/labels-inside-regions",
+  "date": "2023/02/02 10:42:41"
 }
