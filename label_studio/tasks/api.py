@@ -417,6 +417,11 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         if self.request.data.get('ground_truth'):
             annotation.task.ensure_unique_groundtruth(annotation_id=annotation.id)
 
+        history = user.histories.filter(project=task.project).first()
+        if history and history.data and history.data[-1]['taskId'] == task.id:
+            history.data[-1]['annotationId'] = annotation.id
+            history.save()
+
         return annotation
 
 

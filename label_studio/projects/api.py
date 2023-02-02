@@ -276,6 +276,21 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         response['queue'] = queue_info
         return Response(response)
 
+class LabelStreamHistoryAPI(generics.RetrieveAPIView):
+    permission_required = all_permissions.tasks_view
+    queryset = Project.objects.all()
+    swagger_schema = None  # this endpoint doesn't need to be in swagger API docs
+
+    def get(self, request, *args, **kwargs):
+        project = self.get_object()
+        history = request.user.histories.filter(project=project).first()
+        if history:
+            data = history.data
+        else:
+            data = []
+
+        return Response(data)
+
 
 @method_decorator(name='post', decorator=swagger_auto_schema(
         tags=['Projects'],
