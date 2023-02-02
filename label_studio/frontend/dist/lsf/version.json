@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-2019: Sync video timeline seeker with frame position",
-  "commit": "06fc89faf035f4a0110651ac39a4cd7564fbc826",
+  "commit": "994e7068da933c9a246c3d52baf002921175dd7c",
   "branch": "fb-dev-2019",
-  "date": "2023/02/02 14:16:12"
+  "date": "2023/02/02 17:12:01"
 }
