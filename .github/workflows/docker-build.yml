@@ -15,9 +15,6 @@ on:
         value: ${{ jobs.docker_build_and_push.outputs.image_version }}
 
 env:
-  # increment it in case if you need to reset cache
-  CACHE_NAME_PREFIX: v2
-  NODE: '14'
   DOCKER_CLI_EXPERIMENTAL: enabled
   IMAGE_NAME: heartexlabs/label-studio
   DOCKER_IMAGE_TAG_CHECK_NAME: "Docker image tag"

@@ -12,6 +12,7 @@ on:
 
 env:
   DOCKER_CLI_EXPERIMENTAL: enabled
+  IMAGE_NAME: heartexlabs/label-studio
   PREFLIGHT_REPO: quay.io/opdev/preflight:stable
   DOCKER_CONFIG_PATH: /home/runner/.docker/config.json
 
@@ -70,14 +71,14 @@ jobs:
             exit 1
           fi
 
-      - name: Push Docker image
+      - name: Build and push ubi
         uses: docker/build-push-action@v3.3.0
-        id: docker_build_and_push
+        id: docker_build_and_push_ubi
         with:
           context: .
           file: Dockerfile.redhat
           push: true
-          tags: quay.io/redhat-isv-containers/${{ secrets.REDHAT_MARKETPLACE_LSE_PROJECT_ID }}:${{ inputs.version }}
+          tags: quay.io/redhat-isv-containers/${{ secrets.REDHAT_MARKETPLACE_LS_PROJECT_ID }}:${{ inputs.version }},${{ env.IMAGE_NAME }}:${{ inputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
