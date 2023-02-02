@@ -52,7 +52,6 @@ You're ready to start [labeling and annotating your data](labeling.html)!
 
 </div>
 
-
 ## Terminology
 
 When you upload data to Label Studio, each item in the dataset becomes a labeling task. The following table describes some terms you might encounter as you use Label Studio.
