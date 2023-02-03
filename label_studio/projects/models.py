@@ -927,6 +927,11 @@ class LabelStreamHistory(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='histories', help_text='Project ID')
     data = models.JSONField(default=list)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'project'], name='unique_history')
+        ]
+
 
 class ProjectMember(models.Model):
 
