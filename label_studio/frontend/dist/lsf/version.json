@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-4075: Fix taxonomy items overlap on search",
-  "commit": "14b535379d9e3714702ef1b68587cc806c84a298",
-  "branch": "master",
-  "date": "2023/02/02 22:51:15"
+  "message": "fix: LSDV-4539: Don't show history for wrong anno",
+  "commit": "38dd8bb2581637871669f18bf6b273a2a6e44e3b",
+  "branch": "fb-lsdv-4539/history-for-annotation",
+  "date": "2023/02/03 12:54:25"
 }
