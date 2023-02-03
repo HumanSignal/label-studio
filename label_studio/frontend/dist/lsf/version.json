@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4532: Audio v3 visual data is offset to sound playback",
-  "commit": "ae00a9bc88c1f6cad2e5a7b7f0ce06808416124c",
+  "commit": "79de0c26e521c6b59d7fbaf5e15ec88061059683",
   "branch": "fb-lsdv-4532",
-  "date": "2023/02/01 18:37:48"
+  "date": "2023/02/03 11:28:07"
 }
