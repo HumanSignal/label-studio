@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4539: Don't show history for wrong anno",
-  "commit": "38dd8bb2581637871669f18bf6b273a2a6e44e3b",
+  "commit": "fa0e6ff8065edf85213aee402307f56f6f70d3ee",
   "branch": "fb-lsdv-4539/history-for-annotation",
-  "date": "2023/02/03 12:54:25"
+  "date": "2023/02/03 15:36:59"
 }
