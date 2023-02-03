@@ -1,8 +1,6 @@
 import io
 import os
 import pytest
-import resource
-import os
 import psutil
 
 from django.conf import settings
@@ -14,6 +12,13 @@ pytestmark = pytest.mark.django_db
 
 
 def memory_limit(max_mem):
+    try:
+        import resource
+    except ImportError:
+        def decorator(f):
+            return f
+        return decorator
+
     def decorator(f):
         def wrapper(*args, **kwargs):
             process = psutil.Process(os.getpid())
