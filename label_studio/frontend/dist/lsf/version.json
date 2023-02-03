@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-4075: Fix taxonomy items overlap on search",
-  "commit": "14b535379d9e3714702ef1b68587cc806c84a298",
+  "message": "fix: LSDV-1148: Hotkeys namespaces",
+  "commit": "12baa5f7f321e655704df12edc0f8e2013ad3e75",
   "branch": "master",
-  "date": "2023/02/02 22:51:15"
+  "date": "2023/02/03 19:49:27"
 }
