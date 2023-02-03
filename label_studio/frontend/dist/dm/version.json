@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-4090: Use unique_lock_id in Label Stream",
-  "commit": "01a47c5c8ac2fd9eab3a7ceab61788adcda7143c",
+  "message": "feat: DEV-3928: Add messages parameter  providing into LSF options",
+  "commit": "8b17880756ee4c003f175ac60563434daf3ccd0c",
   "branch": "master",
-  "date": "2023/01/18 13:43:09"
+  "date": "2023/02/02 21:05:50"
 }
