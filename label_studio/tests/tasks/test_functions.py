@@ -1,7 +1,9 @@
 import io
 import os
 import pytest
-import resource, os, psutil
+import resource
+import os
+import psutil
 
 from django.conf import settings
 
