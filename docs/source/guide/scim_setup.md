@@ -24,7 +24,7 @@ SCIM interacts with your SSO integration.
 
 
 !!! attention "important"
-    If you do not have SSO set up yet, then follow [Set up SSO](auth_setup.md).
+    If you do not have SSO set up yet, then follow [Set up SSO](auth_setup.html).
 
 Label Studio Enterprise uses SCIM Version 2.0 standard. As an example, this page uses integration with [Okta](https://www.okta.com/integrate/). However, Label Studio Enterprise follows [SCIM RFC 5741](https://datatracker.ietf.org/doc/html/rfc7644#section-3.2) and can be integrated with any access management services that support the standard.
 
@@ -39,7 +39,7 @@ To manage access to Label Studio Enterprise, add the application to your SCIM pr
 
 1. Navigate to **Applications → Applications** in Okta. Click  **Create App Integration**. 
 2. Select **SAML 2.0**. Fill App name (for example, _Label Studio Enterprise_).
-3. On the next step **Configure SAML** set up SAML integration following the instructions to [Set up SSO guide](auth_setup.md).
+3. On the next step **Configure SAML** set up SAML integration following the instructions to [Set up SSO guide](auth_setup.html).
 4. Make sure Label Studio Enterprise appears in the list of active applications.
 
 ### Enable SCIM provisioning

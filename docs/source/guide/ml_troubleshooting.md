@@ -49,7 +49,7 @@ If you can't resolve the traceback issues by yourself, <a href="https://slack.la
 Your ML backend might be producing predictions in the wrong format. 
 
 - Check to see whether the ML backend predictions format follows the same structure as [predictions in imported pre-annotations](predictions.html).
-- Confirm that your project's label configuration matches the output produced by your ML backend. For example, use the Choices tag to create a class of predictions for text. See more [Label Studio tags](/tags.html). 
+- Confirm that your project's label configuration matches the output produced by your ML backend. For example, use the Choices tag to create a class of predictions for text. See more [Label Studio tags](/tags). 
 
 
 ## The model backend fails to start or run properly

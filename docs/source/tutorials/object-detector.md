@@ -91,7 +91,7 @@ In this case, you must provide the Label Studio hostname before running ML backe
 ## Other parameters
 
 You can also specify other parameters when you start this ML backend to fit your use case or environment.
-Addionaly check our [Quickstart](ml.html#Quickstart-with-an-example-ML-backend).
+Addionaly check our [Quickstart](/guide/ml.html#Quickstart-with-an-example-ML-backend).
 
 #### GPU support
 If you have a GPU available, you can specify that with `device=cuda:0` when you start the ML backend to significantly speed up pre-annotation of images. For example:
