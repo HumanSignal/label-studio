@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-4087: Fix multiple labels in Outliner",
-  "commit": "1c40405bad0297cbbcf8611ec11e935192df14a2",
-  "branch": "fb-dev-4087/outliner-labels",
-  "date": "2023/02/06 18:08:15"
+  "commit": "6a8b1db1035057559a5a9d9937562a1ffda698b5",
+  "branch": "master",
+  "date": "2023/02/06 18:21:35"
 }
