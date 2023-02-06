@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-1148: Hotkeys namespaces",
-  "commit": "12baa5f7f321e655704df12edc0f8e2013ad3e75",
+  "message": "fix: DEV-3731: Fix keeping center of zoom at image on resize",
+  "commit": "0c1f79c48bb025742fe6319dbbfd783a4cb04c0b",
   "branch": "master",
-  "date": "2023/02/03 19:49:27"
+  "date": "2023/02/06 19:41:16"
 }
