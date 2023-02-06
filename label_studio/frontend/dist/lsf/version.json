@@ -1,6 +1,6 @@
 {
   "message": "chore: LSDV-1376: Remove ff for 2480 (empty nodes)",
-  "commit": "3ff96161e3b2a6059af901ca75c530b76babeb47",
+  "commit": "0a853e0bd564c1dc72dfb6e6e0fac0762e6ebb24",
   "branch": "fb-LSDV-1376/remove-2480-ff",
-  "date": "2023/02/06 17:32:27"
+  "date": "2023/02/06 21:00:53"
 }
