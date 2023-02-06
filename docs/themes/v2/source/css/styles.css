@@ -12,6 +12,7 @@ html {
   --color-orange-10: #FFF3F0;
 
   --color-yellow-120: #df9750;
+  --color-yellow-110: #efA753;
   --color-yellow-100: #FFB156;
   --color-yellow-90: #FDB515;
   --color-yellow-30: #FFEDD8;
@@ -1812,7 +1813,7 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
 ****************************/
 
 .page-tier-enterprise {
-  --color-main-accent: var(--color-yellow-90);
+  --color-main-accent: var(--color-yellow-120);
 }
 
 .page-tier-enterprise .page-header {
