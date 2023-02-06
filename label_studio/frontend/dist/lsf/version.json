@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-3004: Fix click on already assigned label",
-  "commit": "9ebff4265fe0ef55ea7cb81ede39b3282780d99a",
+  "message": "fix: LSDV-3004: Region with per-regions is broken when user click on assigned label",
+  "commit": "02aa1e649a2dad8e9c6f4d8e19b84d95570ffb48",
   "branch": "fb-lsdv-3004/no-label",
-  "date": "2023/01/27 19:36:47"
+  "date": "2023/02/06 13:52:24"
 }
