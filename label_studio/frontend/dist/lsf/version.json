@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-3004: Region with per-regions is broken when user click on assigned label",
-  "commit": "02aa1e649a2dad8e9c6f4d8e19b84d95570ffb48",
-  "branch": "fb-lsdv-3004/no-label",
-  "date": "2023/02/06 13:52:24"
+  "commit": "e426d82a8894acbc8e22598c3adcc37240e21adb",
+  "branch": "master",
+  "date": "2023/02/06 14:25:16"
 }
