@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-3928: Add messages parameter  providing into LSF options",
-  "commit": "8b17880756ee4c003f175ac60563434daf3ccd0c",
-  "branch": "master",
-  "date": "2023/02/02 21:05:50"
+  "message": "feat: lsdv-3936: Task history is stored on the backend",
+  "commit": "1f1a6401fe2756c58b6f7a846f26ce386fd4bbe4",
+  "branch": "fb-lsdv-3936",
+  "date": "2023/02/07 13:00:36"
 }
