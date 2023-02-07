@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-1066: Bbox can be resized if ImageView is zoomed (#1167)",
-  "commit": "a08961574eb6c961ee21466afe7d3a2c058d22db",
+  "message": "chore: DEV-4026: E2E for TimeSeries with huge data and overview manipulations",
+  "commit": "46cf2607cf6f9b256a5dd072d52d707b2284c152",
   "branch": "master",
-  "date": "2023-01-30T16:28:13Z"
+  "date": "2023/02/07 16:26:51"
 }
