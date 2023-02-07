@@ -38,7 +38,7 @@ from rest_framework.exceptions import ErrorDetail
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
 from collections import defaultdict
-from django.contrib.postgres.operations import TrigramExtension
+from django.contrib.postgres.operations import TrigramExtension, BtreeGinExtension
 
 from core.utils.params import get_env
 from datetime import datetime
@@ -678,6 +678,22 @@ def trigram_migration_operations(next_step):
             next_step
         ]
     if SKIP_TRIGRAM_EXTENSION == 'full':
+        ops = []
+
+    return ops
+
+
+def btree_gin_migration_operations(next_step):
+    ops = [
+        BtreeGinExtension(),
+        next_step,
+    ]
+    SKIP_BTREE_GIN_EXTENSION = get_env('SKIP_BTREE_GIN_EXTENSION', None)
+    if SKIP_BTREE_GIN_EXTENSION == '1' or SKIP_BTREE_GIN_EXTENSION == 'yes' or SKIP_BTREE_GIN_EXTENSION == 'true':
+        ops = [
+            next_step
+        ]
+    if SKIP_BTREE_GIN_EXTENSION == 'full':
         ops = []
 
     return ops
