@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-4033: fix adjustable columns data manager",
-  "commit": "92489eef2a544cfb454462452806f62963de8a22",
-  "branch": "fb-dev-4033/fix-adjustable-columns-data-manager",
-  "date": "2023/02/07 10:03:51"
+  "commit": "1c77bc7fa11f7251dd78ebfe97ed58a29d01d89e",
+  "branch": "master",
+  "date": "2023/02/07 10:05:28"
 }
