@@ -16,13 +16,26 @@ env:
 jobs:
   promote_docker_image:
     name: "Promote"
+    permissions:
+      contents: read
+      checks: read
     uses: heartexlabs/label-studio/.github/workflows/docker-release-promote.yml@develop
     with:
       release_tag: ${{ github.ref_name }}
     secrets: inherit
 
+  build_ubi_docker_image:
+    name: "Build UBI docker image"
+    uses: heartexlabs/label-studio/.github/workflows/docker-build-ubi.yml@develop
+    with:
+      sha: ${{ github.ref_name }}
+      version: ${{ github.ref_name }}
+    secrets: inherit
+
   build-pypi:
     name: "Build"
+    permissions:
+      contents: write
     uses: heartexlabs/label-studio/.github/workflows/build_pypi.yml@develop
     with:
       version: ${{ github.ref_name }}
