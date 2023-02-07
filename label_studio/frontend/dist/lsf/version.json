@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-1140: Select region when regions is dragged",
-  "commit": "ef5d20754a14cd3d2a90a36c4aea34534062c3d7",
+  "message": "fix: DEV-3731: Fix keeping center of zoom at image on resize",
+  "commit": "0c1f79c48bb025742fe6319dbbfd783a4cb04c0b",
   "branch": "master",
-  "date": "2023/01/26 10:29:18"
+  "date": "2023/02/06 19:41:16"
 }

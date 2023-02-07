@@ -1,6 +1,6 @@
 {
-  "message": "chore: DEV-3994: Add PR checklist template",
-  "commit": "ee7eb6eb59064e1039ea544380ca7f557c5dbfa9",
+  "message": "feat: DEV-3928: Add messages parameter  providing into LSF options",
+  "commit": "8b17880756ee4c003f175ac60563434daf3ccd0c",
   "branch": "master",
-  "date": "2023/01/23 11:24:46"
+  "date": "2023/02/02 21:05:50"
 }

@@ -131,7 +131,8 @@ class TaskListAPI(DMTaskListAPI):
 @method_decorator(name='patch', decorator=swagger_auto_schema(
         tags=['Tasks'],
         operation_summary='Update task',
-        operation_description='Update the attributes of an existing labeling task.',
+        operation_description='Update the attributes of an existing labeling task. Note: patch for partial fields '
+                              'inside of `task.data` is not supported, you should provide all `task.data` fields.',
         manual_parameters=[
             openapi.Parameter(
                 name='id',

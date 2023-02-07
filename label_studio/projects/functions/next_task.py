@@ -133,13 +133,14 @@ def _try_uncertainty_sampling(tasks, project, user_solved_tasks_array, user, pre
 
 
 def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_info):
-    user_solved_tasks_array = user.annotations.filter(task__project=project, task__isnull=False)
+    user_solved_tasks_array = user.annotations.filter(project=project, task__isnull=False)
     user_solved_tasks_array = user_solved_tasks_array.distinct().values_list('task__pk', flat=True)
     not_solved_tasks = prepared_tasks.exclude(pk__in=user_solved_tasks_array)
 
-    if user.drafts.filter(was_postponed=True).exists():
-        user_postponed_drafts = user.drafts.filter(was_postponed=True).distinct()
-        user_postponed_tasks = user_postponed_drafts.values_list('task__pk', flat=True)
+    # annotation can't have postponed draft, so skip annotation__project filter
+    postponed_drafts = user.drafts.filter(task__project=project, was_postponed=True)
+    if postponed_drafts.exists():
+        user_postponed_tasks = postponed_drafts.distinct().values_list('task__pk', flat=True)
         not_solved_tasks = not_solved_tasks.exclude(pk__in=user_postponed_tasks)
 
     # if annotator is assigned for tasks, he must to solve it regardless of is_labeled=True
@@ -207,6 +208,9 @@ def skipped_queue(next_task, prepared_tasks, project, user, queue_info):
 def postponed_queue(next_task, prepared_tasks, project, user, queue_info):
     if not next_task:
         q = Q(task__project=project, task__isnull=False, was_postponed=True, task__is_labeled=False)
+        if flag_set('fflag_fix_back_lsdv_1044_check_annotations_24012023_short', user):
+            q &= ~Q(task__annotations__completed_by=user)
+
         postponed_tasks = user.drafts.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
         if postponed_tasks.exists():
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(postponed_tasks)])
