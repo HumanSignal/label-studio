@@ -69,6 +69,33 @@ stages:
     json:
       - taskId: !int '{task_pk}'
         annotationId: !int '{annotation_pk}'
+
+- id: delete_annotation
+  type: ref
+
+# annotation empty again
+- name: history
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/label-stream-history/'
+  response:
+    status_code: 200
+    json:
+      - taskId: !int '{task_pk}'
+        annotationId: null
+
+- id: delete_all_tasks
+  type: ref
+
+# history is empty again
+- name: history
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/label-stream-history/'
+  response:
+    status_code: 200
+    json: []
+
 ---
 test_name: history_limit
 strict: true

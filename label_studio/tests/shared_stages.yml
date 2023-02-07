@@ -141,6 +141,22 @@ stages:
           invite_url: invite_url
           invite_token: token
 
+  - id: delete_all_tasks
+    name: delete all tasks
+    request:
+      method: DELETE
+      url: '{django_live_url}/api/projects/{project_pk}/tasks'
+    response:
+      status_code: 204
+
+  - id: delete_annotation
+    name: delete_annotation
+    request:
+      method: DELETE
+      url: '{django_live_url}/api/annotations/{annotation_pk}/'
+    response:
+      status_code: 204
+
 
 # TODO: add teardown/clean up methods
 # - id: delete_task

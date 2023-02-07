@@ -41,6 +41,7 @@ from core.utils.common import (
 from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
 from core.utils.io import find_dir, find_file, read_yaml
 from core.filters import ListFilter
+from projects.functions.stream_history import get_label_stream_history
 
 from data_manager.functions import get_prepared_queryset, filters_ordering_selected_items_exist
 from data_manager.models import View
@@ -283,13 +284,10 @@ class LabelStreamHistoryAPI(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         project = self.get_object()
-        history = request.user.histories.filter(project=project).first()
-        if history:
-            data = history.data
-        else:
-            data = []
 
-        return Response(data)
+        history = get_label_stream_history(request.user, project)
+
+        return Response(history)
 
 
 @method_decorator(name='post', decorator=swagger_auto_schema(
