@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 from django.db import models
 from django.db.models import Aggregate, OuterRef, Subquery, Avg, Q, F, Value, Exists, When, Case
-from django.contrib.postgres.aggregates import ArrayAgg
+from data_manager.aggregates import ArrayAgg
 from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from django.db.models.functions import Coalesce
 from django.conf import settings
