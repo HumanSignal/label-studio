@@ -39,7 +39,7 @@ NER got an update, nested entities representation is more apparent now, and it's
 
 ### Image Segmentation
 
-Initial implementation of the image segmentation using masks. You get two controls, brush with configurable size, and eraser. The output format is RLE implemented by [rle-pack](https://www.npmjs.com/package/@thi.ng/rle-pack) library.
+Initial implementation of the image segmentation using masks. You get two controls, brush with configurable size, and eraser. The output format is RLE implemented by [rle-pack](https://www.npmjs.com/package/%40thi.ng/rle-pack) library.
 
 There is a [new template](/templates/image_segmentation.html) available that provides more information about the setup.
 

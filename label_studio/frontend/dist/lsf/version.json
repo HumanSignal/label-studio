@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3664: Grouping modes are not persistent in Outliner when switching between tasks in Quick View",
-  "commit": "a29a31f1803824803fa4e824ea99c643ff727b1a",
+  "message": "chore: DEV-4026: E2E for TimeSeries with huge data and overview manipulations",
+  "commit": "46cf2607cf6f9b256a5dd072d52d707b2284c152",
   "branch": "master",
-  "date": "2022/12/15 07:52:48"
+  "date": "2023/02/07 16:26:51"
 }

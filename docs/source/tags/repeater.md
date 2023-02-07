@@ -2,7 +2,6 @@
 title: Repeater
 type: tags
 order: 504
-is_new: t
 meta_title: Repeater Tag to duplicate annotation settings
 meta_description: Customize Label Studio with the Repeater tag to repeat similar data blocks to accelerate labeling for machine learning and data science projects.
 ---
@@ -11,15 +10,16 @@ Repeater Tag for annotating multiple data objects in a dynamic range with the sa
 It repeats tags inside it for every item in a given data array from your dataset. All the occurrences of `indexFlag` (default is `{{idx}}`) in parameter values will be replaced by the current index.
 Names should always be unique, so you can use this placeholder in tag names.
 
-The Repeater Tag supports the `mode` property. This creates the possibility to enable pagination in repeater for performance improvement. You can add a parameter `<Repeater mode="pagination" ...>` to show only one page at a time, shrinking memory used to one tag set.
+The Repeater Tag supports the `mode` property. This creates the possibility to enable pagination in repeater for performance improvement.
+You can add a parameter `<Repeater mode="pagination" ...>`  to show only one page at a time, shrinking memory used to one tag set.
 
 ### Parameters
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| on | <code>string</code> |  | Data field object with array of similar data |
+| on | <code>string</code> |  | Data field object with array with similar data |
 | [indexFlag] | <code>string</code> | <code>&quot;{{idx}}&quot;</code> | Placeholder for array index in params of underlying tags |
-| mode | <code>pagination</code> \| <code>list</code> \|  | Data field object for pagination |
+| [mode] | <code>list</code> \| <code>pagination</code> |  | Select display mode between default and paginated |
 
 ### Example
 
@@ -28,7 +28,7 @@ How tags are repeated and placeholders are replaced internally.
 ```html
 <!-- original config -->
 <View>
-  <Repeater on="$images" mode="pagination">
+  <Repeater on="$images">
     <Image name="image_{{idx}}" value="$images[{{idx}}]"/>
   </Repeater>
 </View>

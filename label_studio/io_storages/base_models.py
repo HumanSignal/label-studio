@@ -45,6 +45,7 @@ class Storage(models.Model):
         pass
 
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         if self.project.has_permission(user):
             return True
         return False
@@ -74,15 +75,24 @@ class ImportStorage(Storage):
         return False
 
     def resolve_uri(self, uri):
-        try:
-            extracted_uri, extracted_storage = get_uri_via_regex(uri, prefixes=(self.url_scheme,))
-            if not extracted_storage:
-                logger.info(f'No storage info found for URI={uri}')
-                return
-            http_url = self.generate_http_url(extracted_uri)
-            return uri.replace(extracted_uri, http_url)
-        except Exception as exc:
-            logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
+        # process list of urls
+        if isinstance(uri, list):
+            resolved = []
+            for sub in uri:
+                resolved.append(self.resolve_uri(sub))
+            return resolved
+
+        # process one url
+        else:
+            try:
+                extracted_uri, extracted_storage = get_uri_via_regex(uri, prefixes=(self.url_scheme,))
+                if not extracted_storage:
+                    logger.info(f'No storage info found for URI={uri}')
+                    return
+                http_url = self.generate_http_url(extracted_uri)
+                return uri.replace(extracted_uri, http_url)
+            except Exception as exc:
+                logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
 
     def _scan_and_create_links(self, link_class):
         tasks_created = 0
@@ -266,6 +276,7 @@ class ImportStorageLink(models.Model):
         return link
 
     def has_permission(self, user):
+        user.project = self.task.project  # link for activity log
         if self.task.has_permission(user):
             return True
         return False
@@ -308,6 +319,7 @@ class ExportStorageLink(models.Model):
         return link
 
     def has_permission(self, user):
+        user.project = self.annotation.project  # link for activity log
         if self.annotation.has_permission(user):
             return True
         return False
