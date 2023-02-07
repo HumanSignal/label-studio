@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3731: Fix keeping center of zoom at image on resize",
-  "commit": "0c1f79c48bb025742fe6319dbbfd783a4cb04c0b",
+  "message": "chore: DEV-4026: E2E for TimeSeries with huge data and overview manipulations",
+  "commit": "46cf2607cf6f9b256a5dd072d52d707b2284c152",
   "branch": "master",
-  "date": "2023/02/06 19:41:16"
+  "date": "2023/02/07 16:26:51"
 }
