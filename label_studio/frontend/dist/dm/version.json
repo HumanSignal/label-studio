@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-3928: Add messages parameter  providing into LSF options",
-  "commit": "8b17880756ee4c003f175ac60563434daf3ccd0c",
+  "message": "fix: DEV-4033: Hotfix import issue ",
+  "commit": "de72bccace8c6e128076a93e64414eb4e3d8ea1e",
   "branch": "master",
-  "date": "2023/02/02 21:05:50"
+  "date": "2023/02/08 11:29:40"
 }
