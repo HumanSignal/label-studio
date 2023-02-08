@@ -1,6 +1,6 @@
 {
-  "message": "chore: DEV-4026: E2E for TimeSeries with huge data and overview manipulations",
-  "commit": "46cf2607cf6f9b256a5dd072d52d707b2284c152",
-  "branch": "master",
-  "date": "2023/02/07 16:26:51"
+  "message": "feat: LSDV-4583-4: Image per item segmentation",
+  "commit": "371c2a27024f1b73fa87f965579378c0095a2c1d",
+  "branch": "fb-lsdv-4583-4/image-per-item-segmentation",
+  "date": "2023/02/08 14:31:19"
 }
