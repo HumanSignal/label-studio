@@ -63,4 +63,4 @@ sentry-sdk>=1.1.0
 launchdarkly-server-sdk==7.5.0
 python-json-logger==2.0.4
 
--e git+https://github.com/heartexlabs/label-studio-converter.git@ef38379983eb5c7bc9c5feec0f279cc2c4a06f2a#egg=label-studio-converter
+label-studio-converter==0.0.50
