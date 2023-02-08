@@ -59,6 +59,8 @@ def predictions_to_annotations(project, queryset, **kwargs):
         emit_webhooks_for_instance(user.active_organization, project, WebhookAction.ANNOTATIONS_CREATED, db_annotations)
         # Update counters for tasks and is_labeled. It should be a single operation as counters affect bulk is_labeled update
         project.update_tasks_counters_and_is_labeled(Task.objects.filter(id__in=tasks_ids))
+        # recalculate project summary
+        start_job_async_or_sync(project.summary.update_created_annotations_and_labels, db_annotations)
     return {'response_code': 200, 'detail': f'Created {count} annotations'}
 
 
