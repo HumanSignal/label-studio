@@ -281,6 +281,7 @@ Label Studio is available as a <a href="https://labelstud.io">Community edition 
 Start and finish a labeling project with Label Studio by following these steps:
 
 <div class="opensource-only">
+
 1. [Install Label Studio](install.html).
 2. [Start Label Studio](start.html).
 3. [Create accounts for Label Studio](signup.html). Create an account to manage and set up labeling projects.
@@ -289,9 +290,11 @@ Start and finish a labeling project with Label Studio by following these steps:
 6. [Import data as labeling tasks](tasks.html).
 7. [Label and annotate the data](labeling.html). 
 8. [Export the labeled data or the annotations](export.html).
+
 </div>
 
 <div class="enterprise-only">
+
 1. [Install Label Studio](install.html).
 2. [Start Label Studio](start.html).
 3. [Create accounts for Label Studio](signup.html). Create an account to manage and set up labeling projects.
@@ -302,6 +305,7 @@ Start and finish a labeling project with Label Studio by following these steps:
 8. [Label and annotate the data](labeling.html). 
 9. [Review the annotated tasks](quality.html). Only available in Label Studio Enterprise Edition.
 10. [Export the labeled data or the annotations](export.html).
+
 </div>
 
 
