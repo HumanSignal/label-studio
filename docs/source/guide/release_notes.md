@@ -24,7 +24,6 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
 ### New features and enhancements 
 - Add project annotation history API [DEV-4170]
 - Improve logging [SRE-388]
-- Support decoding and rendering large audio duration [DEV-4034]
 
 ### Bug Fixes
 - Fix anonymize annotators while reviewing [DEV-2917]
