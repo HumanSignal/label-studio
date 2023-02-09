@@ -87,6 +87,7 @@ def flag_set(feature_flag, user=None):
     if user is None:
         user = AnonymousUser
     elif user == 'auto':
+        user = AnonymousUser
         request = get_current_request()
         if request and getattr(request, 'user', None) and request.user.is_authenticated:
             user = request.user
