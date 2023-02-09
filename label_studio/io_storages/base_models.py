@@ -299,7 +299,7 @@ class ExportStorageLink(models.Model):
     @staticmethod
     def get_key(annotation):
         if settings.FUTURE_SAVE_TASK_TO_STORAGE:
-            return str(annotation.task.id) + '.json'
+            return str(annotation.task.id) + '.json' if settings.FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT else ''
         return str(annotation.id)
 
     @property
