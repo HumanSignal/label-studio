@@ -1,6 +1,6 @@
 {
-  "message": "chore: DEV-4026: E2E for TimeSeries with huge data and overview manipulations",
-  "commit": "46cf2607cf6f9b256a5dd072d52d707b2284c152",
+  "message": "fix: LSDV-4541: Audio segment is being deleted by pressing delete button",
+  "commit": "d56dd55b9bb8af666588db11ebd732a7ade541e2",
   "branch": "master",
-  "date": "2023/02/07 16:26:51"
+  "date": "2023/02/09 09:47:29"
 }
