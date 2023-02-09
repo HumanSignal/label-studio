@@ -103,7 +103,7 @@ class LocalFilesExportStorage(ExportStorage, LocalFilesMixin):
 
         # get key that identifies this object in storage
         key = LocalFilesExportStorageLink.get_key(annotation)
-        key = os.path.join(self.path, f"{key}.json")
+        key = os.path.join(self.path, f"{key}")
 
         # put object into storage
         with open(key, mode='w') as f:

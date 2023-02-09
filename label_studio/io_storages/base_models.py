@@ -75,15 +75,24 @@ class ImportStorage(Storage):
         return False
 
     def resolve_uri(self, uri):
-        try:
-            extracted_uri, extracted_storage = get_uri_via_regex(uri, prefixes=(self.url_scheme,))
-            if not extracted_storage:
-                logger.info(f'No storage info found for URI={uri}')
-                return
-            http_url = self.generate_http_url(extracted_uri)
-            return uri.replace(extracted_uri, http_url)
-        except Exception as exc:
-            logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
+        # process list of urls
+        if isinstance(uri, list):
+            resolved = []
+            for sub in uri:
+                resolved.append(self.resolve_uri(sub))
+            return resolved
+
+        # process one url
+        else:
+            try:
+                extracted_uri, extracted_storage = get_uri_via_regex(uri, prefixes=(self.url_scheme,))
+                if not extracted_storage:
+                    logger.info(f'No storage info found for URI={uri}')
+                    return
+                http_url = self.generate_http_url(extracted_uri)
+                return uri.replace(extracted_uri, http_url)
+            except Exception as exc:
+                logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
 
     def _scan_and_create_links(self, link_class):
         tasks_created = 0
@@ -208,7 +217,7 @@ class ExportStorage(Storage):
     can_delete_objects = models.BooleanField(_('can_delete_objects'), null=True, blank=True, help_text='Deletion from storage enabled')
 
     def _get_serialized_data(self, annotation):
-        if get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False):
+        if settings.FUTURE_SAVE_TASK_TO_STORAGE:
             # export task with annotations
             return ExportDataSerializer(annotation.task).data
         else:
@@ -289,8 +298,8 @@ class ExportStorageLink(models.Model):
 
     @staticmethod
     def get_key(annotation):
-        if get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False):
-            return str(annotation.task.id)
+        if settings.FUTURE_SAVE_TASK_TO_STORAGE:
+            return str(annotation.task.id) + '.json' if settings.FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT else ''
         return str(annotation.id)
 
     @property

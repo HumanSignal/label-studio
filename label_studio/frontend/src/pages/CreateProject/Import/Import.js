@@ -110,6 +110,7 @@ const ErrorMessage = ({ error }) => {
   );
 };
 
+
 export const ImportPage = ({
   project,
   show = true,
@@ -123,7 +124,6 @@ export const ImportPage = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState();
-  const [ids, _setIds] = useState([]);
   const api = useAPI();
 
   const processFiles = (state, action) => {
@@ -136,20 +136,17 @@ export const ImportPage = ({
     if (action.uploaded) {
       return { ...state, uploaded: unique([...state.uploaded, ...action.uploaded], (a, b) => a.id === b.id) };
     }
-    // if (action.ids) {
-    //   const ids = unique([...state.ids, ...action.ids]);
-    //   onFileListUpdate?.(ids);
-    //   return {...state, ids };
-    // }
+    if (action.ids) {
+      const ids = unique([...state.ids, ...action.ids]);
+
+      onFileListUpdate?.(ids);
+      return { ...state, ids };
+    }
     return state;
   };
-  const [files, dispatch] = useReducer(processFiles, { uploaded: [], uploading: [] });
-  const showList = Boolean(files.uploaded?.length || files.uploading?.length);
 
-  const setIds = (ids) => {
-    _setIds(ids);
-    onFileListUpdate?.(ids);
-  };
+  const [files, dispatch] = useReducer(processFiles, { uploaded: [], uploading: [], ids: [] });
+  const showList = Boolean(files.uploaded?.length || files.uploading?.length);
 
   const loadFilesList = useCallback(async (file_upload_ids) => {
     const query = {};
@@ -163,8 +160,9 @@ export const ImportPage = ({
     });
 
     dispatch({ uploaded: files ?? [] });
+
     if (files?.length) {
-      setIds(unique([...ids, ...files.map(f => f.id)]));
+      dispatch({ ids: files.map(f => f.id) });
     }
     return files;
   }, [project]);
@@ -186,17 +184,17 @@ export const ImportPage = ({
     setLoading(false);
     onWaiting?.(false);
   };
-  const onFinish = useCallback(res => {
+  const onFinish = useCallback(async res => {
     const { could_be_tasks_list, data_columns, file_upload_ids } = res;
-    const file_ids = [...ids, ...file_upload_ids];
 
-    setIds(file_ids);
+    dispatch({ ids: file_upload_ids });
     if (could_be_tasks_list && !csvHandling) setCsvHandling("choose");
     setLoading(true);
     onWaiting?.(false);
     addColumns(data_columns);
-    return loadFilesList(file_ids).then(() => setLoading(false));
-  }, [addColumns, loadFilesList, setIds, ids, setLoading]);
+
+    return loadFilesList(file_upload_ids).then(() => setLoading(false));
+  }, [addColumns, loadFilesList, setLoading]);
 
   const importFiles = useCallback(async (files, body) => {
     dispatch({ sending: files });
@@ -330,8 +328,8 @@ export const ImportPage = ({
           {showList && (
             <table>
               <tbody>
-                {files.uploading.map(file => (
-                  <tr key={file.name}>
+                {files.uploading.map((file, idx) => (
+                  <tr key={`${idx}-${file.name}`}>
                     <td>{file.name}</td>
                     <td><span className={importClass.elem("file-status").mod({ uploading: true })} /></td>
                   </tr>

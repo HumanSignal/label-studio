@@ -1,6 +1,6 @@
 {
-  "message": "chore: DEV-3994: Add PR checklist template",
-  "commit": "48c29435d8c0ce79aa20d672d68fa53a51790b69",
+  "message": "fix: LSDV-4541: Audio segment is being deleted by pressing delete button",
+  "commit": "d56dd55b9bb8af666588db11ebd732a7ade541e2",
   "branch": "master",
-  "date": "2023/01/23 11:24:58"
+  "date": "2023/02/09 09:47:29"
 }
