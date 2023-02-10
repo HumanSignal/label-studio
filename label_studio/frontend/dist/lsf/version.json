@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4532: Audio v3 visual data is offset to sound playback (#1166)",
-  "commit": "61e6d9f3d41a1b0463e559d1501113b55d49b081",
-  "branch": "master",
-  "date": "2023-02-09T18:13:43Z"
+  "message": "feat: LSDV-3023: Annotation Tab Carousel",
+  "commit": "89fdbeae0ef1b17b85483ecbac88fc0056edfb13",
+  "branch": "fb-lsdv-3023/labeling-improvements",
+  "date": "2023/02/10 14:38:52"
 }
