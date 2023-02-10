@@ -26,8 +26,10 @@ def add_stream_history(next_task, user, project):
 
 def fill_history_annotation(user, task, annotation):
     history = user.histories.filter(project=task.project).first()
-    if history and history.data and history.data[-1]['taskId'] == task.id:
-        history.data[-1]['annotationId'] = annotation.id
+    if history and history.data:
+        for item in history.data:
+            if item[TASK_ID_KEY] == task.id:
+                item[ANNOTATION_ID_KEY] = annotation.id
         history.save()
 
 
