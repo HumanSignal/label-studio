@@ -871,6 +871,9 @@ class Project(ProjectMixin, models.Model):
 
     class Meta:
         db_table = 'project'
+        indexes = [
+            models.Index(fields=['pinned_at', 'created_at']),
+        ]
 
 
 class ProjectOnboardingSteps(models.Model):
