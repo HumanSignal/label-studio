@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4541: Audio segment is being deleted by pressing delete button",
-  "commit": "d56dd55b9bb8af666588db11ebd732a7ade541e2",
+  "message": "fix: LSDV-4532: Audio v3 visual data is offset to sound playback (#1166)",
+  "commit": "61e6d9f3d41a1b0463e559d1501113b55d49b081",
   "branch": "master",
-  "date": "2023/02/09 09:47:29"
+  "date": "2023-02-09T18:13:43Z"
 }
