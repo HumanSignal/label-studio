@@ -75,19 +75,28 @@ class ImportStorage(Storage):
         return False
 
     def resolve_uri(self, uri):
-        # process list of urls
+        #  list of objects
         if isinstance(uri, list):
             resolved = []
-            for sub in uri:
-                resolved.append(self.resolve_uri(sub))
+            for item in uri:
+                result = self.resolve_uri(item)
+                resolved.append(result if result else item)
             return resolved
 
-        # process one url
-        else:
+        # dict of objects
+        elif isinstance(uri, dict):
+            resolved = {}
+            for key in uri.keys():
+                result = self.resolve_uri(uri[key])
+                resolved[key] = result if result else uri[key]
+            return resolved
+
+        # string: process one url
+        elif isinstance(uri, str):
             try:
                 extracted_uri, extracted_storage = get_uri_via_regex(uri, prefixes=(self.url_scheme,))
                 if not extracted_storage:
-                    logger.info(f'No storage info found for URI={uri}')
+                    logger.debug(f'No storage info found for URI={uri}')
                     return
                 http_url = self.generate_http_url(extracted_uri)
                 return uri.replace(extracted_uri, http_url)
