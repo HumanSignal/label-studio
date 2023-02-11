@@ -82,3 +82,89 @@ stages:
     url: '{django_live_url}/api/projects/{pk}/export?ids[]=9999999'
   response:
     status_code: 200
+
+---
+test_name: YOLO_export_option_polygons
+strict: true
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: <View><Header value="Select label and click the image to start"/><Image name="image" value="$image" /><PolygonLabels name="label" toName="image" strokeWidth="3" pointSize="small"><Label value="Airplane" background="red"/><Label value="Car" background="blue"/></PolygonLabels></View>
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+- name: stage_export
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/export/formats'
+  response:
+    json:
+      - title: 'JSON'
+        description: !anystr
+        link: 'https://labelstud.io/guide/export.html#JSON'
+        name: 'JSON'
+      - title: 'JSON-MIN'
+        description: !anystr
+        link: 'https://labelstud.io/guide/export.html#JSON-MIN'
+        name: 'JSON_MIN'
+      - title: 'CSV'
+        description: !anystr
+        link: 'https://labelstud.io/guide/export.html#CSV'
+        name: 'CSV'
+      - title: 'TSV'
+        description: !anystr
+        link: 'https://labelstud.io/guide/export.html#TSV'
+        name: 'TSV'
+      - title: 'COCO'
+        description: 'Popular machine learning format used by the COCO dataset for object detection and image segmentation tasks with polygons and rectangles.'
+        link: 'https://labelstud.io/guide/export.html#COCO'
+        tags: ['image segmentation', 'object detection']
+        name: 'COCO'
+      - title: 'YOLO'
+        description: 'Popular TXT format is created for each image file. Each txt file contains annotations for the corresponding image file, that is object class, object coordinates, height & width.'
+        link: 'https://labelstud.io/guide/export.html#YOLO'
+        tags: ['image segmentation', 'object detection']
+        name: 'YOLO'
+      - title: 'CONLL2003'
+        description: 'Popular format used for the CoNLL-2003 named entity recognition challenge.'
+        link: 'https://labelstud.io/guide/export.html#CONLL2003'
+        tags: ['sequence labeling', 'text tagging', 'named entity recognition']
+        name: 'CONLL2003'
+        disabled: true
+      - title: 'Pascal VOC XML'
+        description: 'Popular XML format used for object detection and polygon image segmentation tasks.'
+        link: 'https://labelstud.io/guide/export.html#Pascal-VOC-XML'
+        tags: ['image segmentation', 'object detection']
+        name: 'VOC'
+        disabled: true
+      - title: 'Brush labels to NumPy'
+        description: 'Export your brush labels as NumPy 2d arrays. Each label outputs as one image.'
+        link: 'https://labelstud.io/guide/export.html#Brush-labels-to-NumPy-amp-PNG'
+        tags: ['image segmentation']
+        name: 'BRUSH_TO_NUMPY'
+        disabled: true
+      - title: 'Brush labels to PNG'
+        description: 'Export your brush labels as PNG images. Each label outputs as one image.'
+        link: 'https://labelstud.io/guide/export.html#Brush-labels-to-NumPy-amp-PNG'
+        tags: ['image segmentation']
+        name: 'BRUSH_TO_PNG'
+        disabled: true
+      - title: 'ASR Manifest'
+        description: 'Export audio transcription labels for automatic speech recognition as the JSON manifest format expected by NVIDIA NeMo models.'
+        link: 'https://labelstud.io/guide/export.html#ASR-MANIFEST'
+        tags: ['speech recognition']
+        name: 'ASR_MANIFEST'
+        disabled: true
+    status_code: 200

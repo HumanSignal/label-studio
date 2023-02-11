@@ -15,7 +15,7 @@ export const ProjectModelVersionSelector = ({
   const { project, updateProject } = useContext(ProjectContext);
   const [loading, setLoading] = useState(true);
   const [versions, setVersions] = useState([]);
-  const [version, setVersion] = useState(project?.[valueName] || null);
+  const [version, setVersion] = useState(null);
 
   useEffect(() => {
     setVersion(project?.[valueName] || null);
@@ -74,26 +74,15 @@ export const ProjectModelVersionSelector = ({
 
       <div style={{ display: 'flex', alignItems: 'center', width: 400, paddingLeft: 16 }}>
         <div style={{ flex: 1, paddingRight: 16 }}>
-          {loading ? (
-            <Select
-              disabled={true}
-              value={null}
-              options={[]}
-              placeholder={"Loading ..."}
-              {...props}
-            />
-          )
-            : (
-              <Select
-                name={name}
-                disabled={!versions.length}
-                value={version}
-                onChange={e => setVersion(e.target.value)}
-                options={versions}
-                placeholder={placeholder}
-                {...props}
-              />
-            )}
+          <Select
+            name={name}
+            disabled={!versions.length}
+            value={version}
+            onChange={e => setVersion(e.target.value)}
+            options={versions}
+            placeholder={loading ? "Loading ..." : placeholder}
+            {...props}
+          />
         </div>
 
         <Button onClick={resetMLVersion}>

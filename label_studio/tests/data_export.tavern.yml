@@ -245,7 +245,7 @@ stages:
     name: create_project
     request:
       data:
-        label_config: <View><Text name="pdf" /><DateTime name="publication_date" toName="pdf" only="date" /><DateTime name="effective_date" toName="pdf" only="date" /></View>
+        label_config: <View><Text value="pdf" name="pdf" /><DateTime name="publication_date" toName="pdf" only="date" /><DateTime name="effective_date" toName="pdf" only="date" /></View>
         title: Test Draft 1
         show_collab_predictions: true
       method: POST

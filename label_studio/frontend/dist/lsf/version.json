@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3664: Grouping modes are not persistent in Outliner when switching between tasks in Quick View",
-  "commit": "a29a31f1803824803fa4e824ea99c643ff727b1a",
+  "message": "fix: LSDV-4532: Audio v3 visual data is offset to sound playback (#1166)",
+  "commit": "61e6d9f3d41a1b0463e559d1501113b55d49b081",
   "branch": "master",
-  "date": "2022/12/15 07:52:48"
+  "date": "2023-02-09T18:13:43Z"
 }

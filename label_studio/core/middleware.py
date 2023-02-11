@@ -2,6 +2,7 @@
 """
 import ujson as json
 import time
+import logging
 
 from uuid import uuid4
 from django.http import HttpResponsePermanentRedirect
@@ -15,6 +16,8 @@ from django.conf import settings
 from django.utils.http import escape_leading_slashes
 from rest_framework.permissions import SAFE_METHODS
 from core.utils.contextlog import ContextLog
+
+logger = logging.getLogger(__name__)
 
 
 def enforce_csrf_checks(func):
@@ -137,10 +140,10 @@ class DatabaseIsLockedRetryMiddleware(CommonMiddleware):
         sleep_time = 1
         backoff = 1.5
         while (
-            response.status_code == 500
-            and hasattr(response, 'content')
-            and b'database-is-locked-error' in response.content
-            and retries_number < 15
+                response.status_code == 500
+                and hasattr(response, 'content')
+                and b'database-is-locked-error' in response.content
+                and retries_number < 15
         ):
             time.sleep(sleep_time)
             response = self.get_response(request)
@@ -164,10 +167,14 @@ class InactivitySessionTimeoutMiddleWare(CommonMiddleware):
     NOT_USER_ACTIVITY_PATHS = []
 
     def process_request(self, request) -> None:
-        if (not hasattr(request, 'session') or
-            request.session.is_empty() or
-            not hasattr(request, 'user') or
-            not request.user.is_authenticated):
+        if (
+                not hasattr(request, 'session') or
+                request.session.is_empty() or
+                not hasattr(request, 'user') or
+                not request.user.is_authenticated or
+                # scim assign request.user implicitly, check CustomSCIMAuthCheckMiddleware
+                (hasattr(request, 'is_scim') and request.is_scim)
+        ):
             return
 
         current_time = time.time()
@@ -175,6 +182,7 @@ class InactivitySessionTimeoutMiddleWare(CommonMiddleware):
 
         # Check if this request is too far from when the login happened
         if (current_time - last_login) > settings.MAX_SESSION_AGE:
+            logger.info(f'Request is too far from last login {current_time - last_login:.0f} > {settings.MAX_SESSION_AGE}; logout')
             logout(request)
 
         # Push the expiry to the max every time a new request is made to a url that indicates user activity

@@ -103,6 +103,7 @@ class MLBackend(models.Model):
         return MLApi(url=url).health()
 
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
     @staticmethod
