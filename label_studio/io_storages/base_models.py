@@ -68,27 +68,38 @@ class ImportStorage(Storage):
     def can_resolve_url(self, url):
         # TODO: later check to the full prefix like "url.startswith(self.path_full)"
         # Search of occurrences inside string, e.g. for cases like "gs://bucket/file.pdf" or "<embed src='gs://bucket/file.pdf'/>"  # noqa
-        _, storage = get_uri_via_regex(url, prefixes=(self.url_scheme,))
-        if storage == self.url_scheme:
+        _, prefix = get_uri_via_regex(url, prefixes=(self.url_scheme,))
+        if prefix == self.url_scheme:
             return True
         # if not found any occurrences - this Storage can't resolve url
         return False
 
     def resolve_uri(self, uri):
-        # process list of urls
+        #  list of objects
         if isinstance(uri, list):
             resolved = []
-            for sub in uri:
-                resolved.append(self.resolve_uri(sub))
+            for item in uri:
+                result = self.resolve_uri(item)
+                resolved.append(result if result else item)
             return resolved
 
-        # process one url
-        else:
+        # dict of objects
+        elif isinstance(uri, dict):
+            resolved = {}
+            for key in uri.keys():
+                result = self.resolve_uri(uri[key])
+                resolved[key] = result if result else uri[key]
+            return resolved
+
+        # string: process one url
+        elif isinstance(uri, str):
             try:
+                # extract uri first from task data
                 extracted_uri, extracted_storage = get_uri_via_regex(uri, prefixes=(self.url_scheme,))
                 if not extracted_storage:
-                    logger.info(f'No storage info found for URI={uri}')
+                    logger.debug(f'No storage info found for URI={uri}')
                     return
+                # resolve uri to url using storages
                 http_url = self.generate_http_url(extracted_uri)
                 return uri.replace(extracted_uri, http_url)
             except Exception as exc:

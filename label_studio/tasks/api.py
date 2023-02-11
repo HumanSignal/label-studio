@@ -65,6 +65,11 @@ logger = logging.getLogger(__name__)
             type=openapi.TYPE_INTEGER,
             in_=openapi.IN_QUERY,
             description='Project ID'),
+        openapi.Parameter(
+            name='resolve_uri',
+            type=openapi.TYPE_BOOLEAN,
+            in_=openapi.IN_QUERY,
+            description='Resolve task data URIs using Cloud Storage'),
     ],
 ))
 class TaskListAPI(DMTaskListAPI):
@@ -74,7 +79,7 @@ class TaskListAPI(DMTaskListAPI):
         POST=all_permissions.tasks_create,
     )
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['project',]
+    filterset_fields = ['project']
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
