@@ -331,3 +331,4 @@ The component parts of Label Studio are available as modular extensible packages
 
 Label Studio collects anonymous usage statistics about the number of page visits and data types being used in labeling configurations that you set up. No sensitive information is included in the information we collect. The information we collect helps us improve the experience of labeling data in Label Studio and helps us plan future data types and labeling configurations to support. 
 
+
