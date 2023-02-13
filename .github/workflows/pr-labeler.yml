@@ -29,7 +29,7 @@ jobs:
       - uses: hmarr/debug-action@v2.1.0
 
       - name: "Validate PR's title"
-        uses: thehanimo/pr-title-checker@v1.3.6
+        uses: thehanimo/pr-title-checker@v1.3.7
         with:
           GITHUB_TOKEN: ${{ github.token }}
           pass_on_octokit_error: false
