@@ -51,40 +51,25 @@ logger = logging.getLogger(__name__)
 @method_decorator(name='get', decorator=swagger_auto_schema(
     tags=['Tasks'],
     operation_summary='Get tasks list',
-    operation_description="""Retrieve a subset of tasks from the Data Manager based on a filter, ordering mechanism, or a predefined view ID.'
+    operation_description="""
     Retrieve a list of tasks with pagination for a specific view or project, by using filters and ordering.
     """,
     manual_parameters=[
-        openapi.Parameter(
-            name='project',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_QUERY,
-            description='Project ID'),
-        openapi.Parameter(
-            name='page',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_QUERY,
-            description='Page'),
-        openapi.Parameter(
-            name='page_size',
-            type=openapi.TYPE_INTEGER,
-            in_=openapi.IN_QUERY,
-            description='Page Size'),
         openapi.Parameter(
             name='view',
             type=openapi.TYPE_INTEGER,
             in_=openapi.IN_QUERY,
             description='View ID'),
         openapi.Parameter(
-            name='query',
+            name='project',
             type=openapi.TYPE_INTEGER,
             in_=openapi.IN_QUERY,
-            description='json.dumps(query)'),
+            description='Project ID'),
         openapi.Parameter(
-            name='fields',
-            type=openapi.TYPE_INTEGER,
+            name='resolve_uri',
+            type=openapi.TYPE_BOOLEAN,
             in_=openapi.IN_QUERY,
-            description='all'),
+            description='Resolve task data URIs using Cloud Storage'),
     ],
 ))
 class TaskListAPI(DMTaskListAPI):
@@ -94,7 +79,7 @@ class TaskListAPI(DMTaskListAPI):
         POST=all_permissions.tasks_create,
     )
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['project',]
+    filterset_fields = ['project']
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
