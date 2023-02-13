@@ -19,6 +19,52 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
     The release notes for Label Studio Enterprise Cloud (SaaS) is available <a href="https://heartex.com/changelog">here</a>.
 
 
+## New helm chart
+
+A common chart for LS and LSE has been released and is available since LSE version 2.3.x. The chart can be accessed at the following repository: https://github.com/heartexlabs/charts/tree/master/heartex/label-studio.
+
+### Migration Process
+
+The migration process can be performed without any downtime. The steps required to carry out the migration are documented in the migration guide, available at: https://github.com/heartexlabs/charts/blob/master/heartex/label-studio/FAQs.md#label-studio-enterprise-upgrade-from-decommissioned-label-studio-enterprise-helm-chart.
+
+### Deprecation of the Old Chart
+
+The old chart, heartex/label-studio-enterprise, **has been deprecated**. Support for as many releases as possible will be provided. A notification will be posted in the Release Notes section when this changes. We hope that this revised chart will meet your technical needs. If you have any questions or concerns, please don't hesitate to reach out to us.
+
+
+## Label Studio Enterprise 2.4.1
+
+### New features and enhancements 
+- Add project annotation history API [DEV-4170]
+- Improve logging [SRE-388]
+
+### Bug Fixes
+- Fix anonymize annotators while reviewing [DEV-2917]
+- Unrelated organizations can view Roles from another organizations [DEV-3622]
+- Remove unused task lock ttl settings [DEV-4091]
+- Fixed issue with displaying history in review after View All [DEV-3782]
+- Readonly regions should always be selectable. [DEV-3644]
+- Fix agreement calculation for Taxonomy with custom labels [DEV-2796]
+- Restrict tabs deletion for reviewers [DEV-3810]
+- Fixed issue with hotkeys of dynamic children [DEV-3888]
+- Add validation for required toName parameter on TextArea [DEV-3577]
+- Fix project cloning with cloud storages tasks [DEV-2985]
+- Add filters by columns, datetime range filter and ordering to activity log [DEV-1395]
+- Add project annotation history API [DEV-4170]
+- Logs error: AttributeError: 'Task' object has no attribute 'get_lock_ttl' [DEV-4175]
+- Enable player head time input and change the way that it was working [DEV-3941]
+- Switch level of next task log messages [DEV-4185]
+- Fix log message [SRE-397]
+- Fix layout in Preview for small content configs panels now are pinned to the bottom [DEV-3919]
+- Prevent annotations duplicating in Label Stream [DEV-4090]
+- Fix status code for not found task to 404 in tasks API [DEV-4074]
+- Text and HyperText elements should have value and name properties [DEV-4114]
+- Fixed issues in following  cursor pointer during video zooming [DEV-3694]
+- Task locks in postponed/skipped queue [DEV-4202]
+- Prevent annotation duplicates when 'Re-queue skipped tasks back to the annotator' parameter is selected [DEV-4228]
+- Add Google project ID to Source/Target GCS form [DEV-4058]
+
+
 ## Label Studio Enterprise 2.4.0
 This section highlights the new features and enhancements, and bug fixes in Label Studio Enterprise 2.4.
 
