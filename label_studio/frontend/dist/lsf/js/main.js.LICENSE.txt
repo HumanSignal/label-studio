@@ -6,15 +6,15 @@ object-assign
 
 /* @license
 Papa Parse
-v5.3.1
+v5.3.2
 https://github.com/mholt/PapaParse
 License: MIT
 */
 
 /*!
-  Copyright (c) 2018 Jed Watson.
-  Licensed under the MIT License (MIT), see
-  http://jedwatson.github.io/classnames
+	Copyright (c) 2018 Jed Watson.
+	Licensed under the MIT License (MIT), see
+	http://jedwatson.github.io/classnames
 */
 
 /*!
@@ -25,25 +25,13 @@ License: MIT
  */
 
 /*!
- * wavesurfer.js 6.0.4 (2022-03-08)
+ * wavesurfer.js 6.4.0 (2022-11-05)
  * https://wavesurfer-js.org
  * @license BSD-3-Clause
  */
 
 /*!
- * wavesurfer.js cursor plugin 6.0.4 (2022-03-08)
- * https://wavesurfer-js.org
- * @license BSD-3-Clause
- */
-
-/*!
- * wavesurfer.js regions plugin 6.0.4 (2022-03-08)
- * https://wavesurfer-js.org
- * @license BSD-3-Clause
- */
-
-/*!
- * wavesurfer.js timeline plugin 6.0.4 (2022-03-08)
+ * wavesurfer.js cursor plugin 6.4.0 (2022-11-05)
  * https://wavesurfer-js.org
  * @license BSD-3-Clause
  */
@@ -125,6 +113,8 @@ and limitations under the License.
 /*! ./webaudio */
 
 /*! debounce */
+
+/*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */
 
 /*!***********************!*\
   !*** ./src/drawer.js ***!
