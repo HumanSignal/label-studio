@@ -19,10 +19,7 @@
       ]},
     "@valueList": {
       "anyOf": [
-      {
-        "type": "array",
-        "items": {"type": "string"}
-      }
+        {"type": "string"}
       ]},
     "tag_with_value": {
       "type": "object",
