@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-4081: Implements Magic Wand tool for image segmentation (#1119)",
-  "commit": "18fc2e52136e5c2652dadb2659f44ef7625c8459",
+  "message": "feat: LSDV-3936: Task history is stored on the backend (#1181)",
+  "commit": "63f7e01c9c699be7b35f52dea5d635be8e5d48cc",
   "branch": "master",
-  "date": "2023-02-13T15:56:46Z"
+  "date": "2023-02-14T16:27:27Z"
 }
