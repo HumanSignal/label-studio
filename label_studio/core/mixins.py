@@ -2,6 +2,7 @@
 """
 import logging
 
+from django.db.models.query import QuerySet
 from rest_framework.generics import get_object_or_404
 
 logger = logging.getLogger(__name__)
@@ -13,12 +14,21 @@ class DummyModelMixin():
 
 
 class GetParentObjectMixin:
+    parent_queryset = None
+
     def get_parent_object(self):
         """
         The same as get_object method from DRF, but for the parent object
         For example if you want to get project inside /api/projects/ID/tasks handler
         """
-        queryset = self.parent_object_queryset
+        assert self.parent_queryset is not None, (
+            "'%s' should include a `parent_queryset` attribute, "
+            % self.__class__.__name__
+        )
+        queryset = self.parent_queryset
+        if isinstance(queryset, QuerySet):
+            # Ensure queryset is re-evaluated on each request.
+            queryset = queryset.all()
 
         # Perform the lookup filtering.
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field

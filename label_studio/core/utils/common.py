@@ -229,35 +229,6 @@ def sample_query(q, sample_size):
     return q.filter(id__in=random_ids)
 
 
-def get_project(obj):
-    from projects.models import Project, ProjectSummary
-    from tasks.models import Task, Annotation, AnnotationDraft
-    from io_storages.base_models import ImportStorage
-    from data_manager.models import View
-
-    if isinstance(obj, Project):
-        return obj
-    elif isinstance(obj, (Task, ProjectSummary, View, ImportStorage)):
-        return obj.project
-    elif isinstance(obj, (Annotation, AnnotationDraft)):
-        return obj.task.project
-    else:
-        raise AttributeError(f'Can\'t get Project from instance {obj}')
-
-
-def request_permissions_add(request, key, model_instance):
-    """ Store accessible objects via permissions to request. It's used for access log.
-    """
-    request.permissions = {} if not hasattr(request, 'permissions') else request.permissions
-    # this func could be called multiple times in one request, and this means there are multiple objects on page/api
-    # do not save different values, just rewrite value to None
-    if key not in request.permissions:
-        request.permissions[key] = copy.deepcopy(model_instance)
-    else:
-        if request.permissions[key] is not None and request.permissions[key].id != model_instance.id:
-            request.permissions[key] = None
-
-
 def get_client_ip(request):
     """ Get IP address from django request
 
@@ -540,9 +511,6 @@ def import_from_string(func_string):
     except ImportError:
         msg = f"Could not import {func_string} from settings"
         raise ImportError(msg)
-
-
-get_object_with_check_and_log = load_func(settings.GET_OBJECT_WITH_CHECK_AND_LOG)
 
 
 class temporary_disconnect_signal:

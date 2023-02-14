@@ -13,7 +13,6 @@ from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
 
 from core.permissions import all_permissions
-from core.utils.common import get_object_with_check_and_log
 from core.utils.io import read_yaml
 from io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
 from projects.models import Project
@@ -28,7 +27,7 @@ class ImportStorageListAPI(generics.ListCreateAPIView):
 
     def get_queryset(self):
         project_pk = self.request.query_params.get('project')
-        project = get_object_with_check_and_log(self.request, Project, pk=project_pk)
+        project = generics.get_object_or_404(Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
         ImportStorageClass = self.serializer_class.Meta.model
         return ImportStorageClass.objects.filter(project_id=project.id)
@@ -53,7 +52,7 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
 
     def get_queryset(self):
         project_pk = self.request.query_params.get('project')
-        project = get_object_with_check_and_log(self.request, Project, pk=project_pk)
+        project = generics.get_object_or_404(Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
         ImportStorageClass = self.serializer_class.Meta.model
         return ImportStorageClass.objects.filter(project_id=project.id)
