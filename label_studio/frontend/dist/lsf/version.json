@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-1020: Validation error about unknown tag",
-  "commit": "b2396ed77647cfd684748f5b2d3b35b48c955b31",
+  "commit": "73760a1c89503bd6b008c4584fd540d995e85b4c",
   "branch": "fb-dev-1020/unknown-tag",
-  "date": "2022/12/05 14:48:54"
+  "date": "2023/02/14 20:30:24"
 }
