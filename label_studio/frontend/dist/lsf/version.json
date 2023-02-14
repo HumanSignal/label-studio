@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4532: Audio v3 visual data is offset to sound playback (#1166)",
-  "commit": "61e6d9f3d41a1b0463e559d1501113b55d49b081",
+  "message": "feat: DEV-4081: Implements Magic Wand tool for image segmentation (#1119)",
+  "commit": "18fc2e52136e5c2652dadb2659f44ef7625c8459",
   "branch": "master",
-  "date": "2023-02-09T18:13:43Z"
+  "date": "2023-02-13T15:56:46Z"
 }
