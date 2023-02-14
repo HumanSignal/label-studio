@@ -73,7 +73,7 @@ The simplest way to work with multi-page document annotation is to go in [projec
       <Choice value="Eukarya">
         <Choice value="Human"/>
         <Choice value="Oppossum"/>
-        <Choice value="Extraterrestial"/>
+        <Choice value="Extraterrestrial"/>
       </Choices>
   </Taxonomy>
   </Repeater>

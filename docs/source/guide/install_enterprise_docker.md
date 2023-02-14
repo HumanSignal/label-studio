@@ -133,23 +133,33 @@ REDIS_LOCATION=redis://redis:6379/1
 2. After you set all the environment variables, create the following `docker-compose.yml`:
 
 ```yaml
-version: '3.3'
+version: '3.8'
 
 services:
-  app:
+  nginx:
     image: heartexlabs/label-studio-enterprise:VERSION
     ports:
       - "80:8085"
       - "443:8086"
-    expose:
-      - "80"
-      - "443"
+    depends_on:
+      - app
+    restart: on-failure
     env_file:
       - env.list
+    command: nginx
+    volumes:
+      - ./certs:/certs:ro
+    working_dir: /label-studio-enterprise
+
+  app:
+    image: heartexlabs/label-studio-enterprise:VERSION
+    restart: on-failure
+    env_file:
+      - env.list
+    command: label-studio-uwsgi
     volumes:
       - ./mydata:/label-studio/data:rw
       - ./license.txt:/label-studio-enterprise/license.txt:ro
-      - ./certs:/certs:ro
     working_dir: /label-studio-enterprise
 
   rqworkers_low:
@@ -199,18 +209,6 @@ services:
       - ./license.txt:/label-studio-enterprise/license.txt:ro
     working_dir: /label-studio-enterprise
     command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "critical" ]
-
-  rqworkers_all:
-    image: heartexlabs/label-studio-enterprise:VERSION
-    depends_on:
-      - app
-    env_file:
-      - env.list
-    volumes:
-      - ./mydata:/label-studio/data:rw
-      - ./license.txt:/label-studio-enterprise/license.txt:ro
-    working_dir: /label-studio-enterprise
-    command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "critical", "high", "default", "low" ]
 ```
 
 3. Run Docker Compose:

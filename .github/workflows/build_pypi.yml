@@ -128,7 +128,7 @@ jobs:
         if: inputs.upload_to_pypi
         uses: actions/github-script@v6
         env:
-          VERSION: ${{ github.event.pull_request.title }}
+          VERSION: ${{ inputs.version }}
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
