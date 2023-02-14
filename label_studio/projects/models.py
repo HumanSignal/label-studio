@@ -919,6 +919,20 @@ class ProjectOnboarding(models.Model):
             self.project.save(recalc=False)
 
 
+class LabelStreamHistory(models.Model):
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='histories', help_text='User ID'
+    )  # noqa
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='histories', help_text='Project ID')
+    data = models.JSONField(default=list)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'project'], name='unique_history')
+        ]
+
+
 class ProjectMember(models.Model):
 
     user = models.ForeignKey(

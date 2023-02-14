@@ -9,6 +9,8 @@ import numpy as np
 
 from core.utils.common import conditional_atomic
 from tasks.models import Annotation, Task
+from projects.models import LabelStreamHistory
+from projects.functions.stream_history import add_stream_history
 
 logger = logging.getLogger(__name__)
 
@@ -317,6 +319,7 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
                 logger.error(f'get_next_task is_labeled/overlap try/except: {str(e)}')
                 pass
 
+        add_stream_history(next_task, user, project)
         return next_task, queue_info
 
 

@@ -41,6 +41,7 @@ from core.utils.common import (
 from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
 from core.utils.io import find_dir, find_file, read_yaml
 from core.filters import ListFilter
+from projects.functions.stream_history import get_label_stream_history
 
 from data_manager.functions import get_prepared_queryset, filters_ordering_selected_items_exist
 from data_manager.models import View
@@ -275,6 +276,18 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
         response['queue'] = queue_info
         return Response(response)
+
+class LabelStreamHistoryAPI(generics.RetrieveAPIView):
+    permission_required = all_permissions.tasks_view
+    queryset = Project.objects.all()
+    swagger_schema = None  # this endpoint doesn't need to be in swagger API docs
+
+    def get(self, request, *args, **kwargs):
+        project = self.get_object()
+
+        history = get_label_stream_history(request.user, project)
+
+        return Response(history)
 
 
 @method_decorator(name='post', decorator=swagger_auto_schema(
