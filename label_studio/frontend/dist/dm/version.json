@@ -1,6 +1,6 @@
 {
   "message": "feat: DEV-4008: Allow quickly select tasks using hotkeys",
-  "commit": "3107758015d6f1e9b709073a39d3410e07231464",
+  "commit": "fb335103d982a44e4169887de9273ffadf2d8b72",
   "branch": "fb-dev-4008/quick-task-select",
-  "date": "2023/02/14 18:58:15"
+  "date": "2023/02/14 20:58:56"
 }
