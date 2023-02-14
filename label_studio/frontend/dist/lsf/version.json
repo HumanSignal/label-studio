@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3936: Task history is stored on the backend (#1181)",
-  "commit": "63f7e01c9c699be7b35f52dea5d635be8e5d48cc",
+  "message": "fix: DEV-2019: Sync video timeline seeker with frame position (#1153)",
+  "commit": "ac4a98d3f32a40441518b75658c49dff6101c984",
   "branch": "master",
-  "date": "2023-02-14T16:27:27Z"
+  "date": "2023-02-14T17:06:55Z"
 }
