@@ -66,7 +66,6 @@ LOGGING = {
     },
 }
 
-
 # for printing messages before main logging config applied
 if not logging.getLogger().hasHandlers():
     logging.basicConfig(level=logging.DEBUG, format='%(message)s')
@@ -107,7 +106,6 @@ SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_bool_env('DEBUG', True)
 DEBUG_MODAL_EXCEPTIONS = get_bool_env('DEBUG_MODAL_EXCEPTIONS', True)
-
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -154,7 +152,6 @@ DATABASES_ALL['default'] = DATABASES_ALL[DJANGO_DB_POSTGRESQL]
 DATABASES = {'default': DATABASES_ALL.get(get_env('DJANGO_DB', 'default'))}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
-
 
 if get_bool_env('GOOGLE_LOGGING_ENABLED', False):
     logging.info('Google Cloud Logging handler is enabled.')
@@ -262,7 +259,7 @@ ALLOWED_HOSTS = ['*']
 
 # Auth modules
 AUTH_USER_MODEL = 'users.User'
-AUTHENTICATION_BACKENDS = ['rules.permissions.ObjectPermissionBackend', 'django.contrib.auth.backends.ModelBackend',]
+AUTHENTICATION_BACKENDS = ['rules.permissions.ObjectPermissionBackend', 'django.contrib.auth.backends.ModelBackend', ]
 USE_USERNAME_FOR_LOGIN = False
 
 DISABLE_SIGNUP_WITHOUT_LINK = get_bool_env('DISABLE_SIGNUP_WITHOUT_LINK', False)
@@ -529,7 +526,6 @@ import mimetypes
 mimetypes.add_type("application/javascript", ".js", True)
 mimetypes.add_type("image/png", ".png", True)
 
-
 # fields name was used in DM api before
 REST_FLEX_FIELDS = {"FIELDS_PARAM": "include"}
 
@@ -606,3 +602,5 @@ if get_env('STORAGE_TYPE') == "gcs":
     GS_BUCKET_NAME = get_env('STORAGE_GCS_BUCKET_NAME')
     GS_EXPIRATION = timedelta(seconds=int(get_env('STORAGE_GCS_EXPIRATION_SECS', '86400')))
     GS_LOCATION = get_env('STORAGE_GCS_FOLDER', default='')
+
+X_FRAME_OPTIONS = get_env('X_FRAME_OPTIONS', 'DENY')  # SAMEORIGIN
