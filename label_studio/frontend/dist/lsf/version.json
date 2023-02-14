@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4627: Fix app with FF for DEV-3391 is on",
-  "commit": "935bab1bf8938be6cc2baf790e1fb1f4031eb6b6",
+  "message": "fix: LSDV-4627: App crash with FF for DEV-3391 is on",
+  "commit": "57791372ccb76c732885caa5fdd1a2ec01e9c7d3",
   "branch": "fb-lsdv-4627/view-all-magic",
-  "date": "2023/02/14 21:16:56"
+  "date": "2023/02/14 22:05:27"
 }
