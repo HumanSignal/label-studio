@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3936: Task history is stored on the backend",
+  "message": "feat: LSDV-3936: Task history is stored on the backend (#1181)",
   "commit": "63f7e01c9c699be7b35f52dea5d635be8e5d48cc",
   "branch": "master",
-  "date": "2023/02/14 13:27:27"
+  "date": "2023-02-14T16:27:27Z"
 }
