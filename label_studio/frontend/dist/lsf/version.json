@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-4081: Implements Magic Wand tool for image segmentation (#1119)",
-  "commit": "18fc2e52136e5c2652dadb2659f44ef7625c8459",
-  "branch": "master",
-  "date": "2023-02-13T15:56:46Z"
+  "message": "fix: LSDV-4592: Add tests to validate if ghost regions are created on AudioV3",
+  "commit": "884635296a15a5523a6406ce34be7cabb6c670cb",
+  "branch": "fb-lsdv-4592",
+  "date": "2023/02/14 13:13:36"
 }
