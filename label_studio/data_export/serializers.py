@@ -48,7 +48,12 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
 
     # resolve $undefined$ key in task data, if any
     def to_representation(self, task):
-        project = task.project
+        # avoid long project initializations
+        project = getattr(self, '_project', None)
+        if project is None:
+            project = task.project
+            setattr(self, '_project', project)
+
         data = task.data
         # add interpolate_key_frames param to annotations serializer
         if 'annotations' in self.fields:

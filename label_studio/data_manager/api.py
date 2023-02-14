@@ -161,7 +161,7 @@ class TaskListAPI(generics.ListCreateAPIView):
         all_fields = request.GET.get('fields', None) == 'all'  # false by default
 
         return {
-            'resolve_uri': True,
+            'resolve_uri': bool_from_request(request.GET, 'resolve_uri', True),
             'request': request,
             'project': project,
             'drafts': all_fields,

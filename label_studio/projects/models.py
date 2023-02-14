@@ -240,8 +240,9 @@ class Project(ProjectMixin, models.Model):
         # TODO: once bugfix with incorrect data types in List
         # logging.warning('! Please, remove code below after patching of all projects (extract_data_types)')
         if self.label_config is not None:
-            if self.data_types != extract_data_types(self.label_config):
-                self.data_types = extract_data_types(self.label_config)
+            data_types = extract_data_types(self.label_config)
+            if self.data_types != data_types:
+                self.data_types = data_types
 
     @property
     def num_tasks(self):
@@ -916,6 +917,20 @@ class ProjectOnboarding(models.Model):
         if ProjectOnboarding.objects.filter(project=self.project, finished=True).count() == 4:
             self.project.skip_onboarding = True
             self.project.save(recalc=False)
+
+
+class LabelStreamHistory(models.Model):
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='histories', help_text='User ID'
+    )  # noqa
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='histories', help_text='Project ID')
+    data = models.JSONField(default=list)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'project'], name='unique_history')
+        ]
 
 
 class ProjectMember(models.Model):
