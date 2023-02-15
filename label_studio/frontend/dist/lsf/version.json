@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2019: Sync video timeline seeker with frame position (#1153)",
-  "commit": "ac4a98d3f32a40441518b75658c49dff6101c984",
+  "message": "fix: LSDV-4627: App crash with FF for DEV-3391 is on",
+  "commit": "d1086773e06ca1f4fc0adbc7fbdddfc0ebd0528e",
   "branch": "master",
-  "date": "2023-02-14T17:06:55Z"
+  "date": "2023/02/14 22:19:23"
 }
