@@ -38,7 +38,18 @@ Secure user access to Label Studio to protect data integrity and allow changes t
 
 Each user must create an account with a password of at least 8 characters, allowing you to track who has access to Label Studio and which actions they perform. 
 
-You can restrict signup to only those with a link to the signup page, and the invitation link to the signup page can be reset. See [Set up user accounts for Label Studio](signup.html) for more. 
+<div class="opensource-only">
+
+You can restrict signup to only those with a link to the signup page, and the invitation link to the signup page can be reset. See [Set up user accounts for Label Studio](signup.html) for more.
+
+</div>
+
+<div class="enterprise-only">
+
+You can restrict signup to only those with a link to the signup page, and the invitation link to the signup page can be reset. See [Set up user accounts for Label Studio](manage_users.html#Signup) for more. 
+
+</div>
+
 
 <div class="enterprise-only">
 
