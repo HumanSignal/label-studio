@@ -533,6 +533,7 @@ class PredictionAPI(viewsets.ModelViewSet):
         return Prediction.objects.filter(task__project__organization=self.request.user.active_organization)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
 @method_decorator(name='post', decorator=swagger_auto_schema(
         tags=['Annotations'],
         operation_summary='Convert annotation to draft',

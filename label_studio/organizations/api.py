@@ -158,7 +158,7 @@ class OrganizationInviteAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.organizations_change
 
     def get(self, request, *args, **kwargs):
-        org = self.get_object()
+        org = request.user.active_organization
         invite_url = '{}?token={}'.format(reverse('user-signup'), org.token)
         if hasattr(settings, 'FORCE_SCRIPT_NAME') and settings.FORCE_SCRIPT_NAME:
             invite_url = invite_url.replace(settings.FORCE_SCRIPT_NAME, '', 1)
