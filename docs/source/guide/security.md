@@ -44,7 +44,7 @@ You can restrict signup to only those with a link to the signup page, and the in
 
 If you're using Label Studio Enterprise, you can further secure user access in many ways:
 - Assign specific roles to specific user accounts to set up role-based access control. For more about the different roles and permissions in Label Studio Enterprise, see [Manage access to Label Studio](manage_users.html). 
-- Set up organizations, workspaces, and projects to separate projects and data across different groups of users. Users in one organization cannot see the workspaces or projects in other organizations. For more about how to use organizations, workspaces, and projects to secure access, see [Organize projects in Label Studio](organize_projects.html).
+- Set up organizations, workspaces, and projects to separate projects and data across different groups of users. Users in one organization cannot see the workspaces or projects in other organizations. For more about how to use organizations, workspaces, and projects to secure access, see [Organize projects in Label Studio](manage_users.html#Roles-and-workspaces).
 
 </div>
 

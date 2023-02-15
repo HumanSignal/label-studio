@@ -295,16 +295,14 @@ Start and finish a labeling project with Label Studio by following these steps:
 
 <div class="enterprise-only">
 
-1. [Install Label Studio](install.html).
-2. [Start Label Studio](start.html).
-3. [Create accounts for Label Studio](signup.html). Create an account to manage and set up labeling projects.
-4. [Restrict access to the project](manage_users.html). Set up role-based access control. Only available in Label Studio Enterprise Edition.
-5. [Set up the labeling project](setup_project.html). Define the type of labeling to perform on the dataset and configure project settings.
-6. [Set up the labeling interface](setup.html). Add the labels that you want annotators to apply and customize the labeling interface. 
-7. [Import data as labeling tasks](tasks.html).
-8. [Label and annotate the data](labeling.html). 
-9. [Review the annotated tasks](quality.html). Only available in Label Studio Enterprise Edition.
-10. [Export the labeled data or the annotations](export.html).
+1. [Create accounts for Label Studio](manage_users.html#Signup). Create an account to manage and set up labeling projects.
+2. [Restrict access to the project](manage_users.html). Set up role-based access control. Only available in Label Studio Enterprise Edition.
+3. [Set up the labeling project](setup_project.html). Define the type of labeling to perform on the dataset and configure project settings.
+4. [Set up the labeling interface](setup.html). Add the labels that you want annotators to apply and customize the labeling interface. 
+5. [Import data as labeling tasks](tasks.html).
+6. [Label and annotate the data](labeling.html). 
+7. [Review the annotated tasks](quality.html). Only available in Label Studio Enterprise Edition.
+8. [Export the labeled data or the annotations](export.html).
 
 </div>
 
