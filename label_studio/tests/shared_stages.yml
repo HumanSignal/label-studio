@@ -87,27 +87,6 @@ stages:
         json:
           task_pk: id
       status_code: 201
-  - id: create_annotation
-    name: create_annotation
-    request:
-      headers:
-        content-type: application/json
-      json:
-        lead_time: 12.34
-        result:
-        - from_name: label
-          to_name: text
-          type: choices
-          value:
-            choices:
-            - pos
-      method: POST
-      url: '{django_live_url}/api/tasks/{task_pk}/annotations'
-    response:
-      save:
-        json:
-          annotation_pk: id
-      status_code: 201
   - id: get_user_token
     name: Get my user
     request:
@@ -161,6 +140,22 @@ stages:
         json:
           invite_url: invite_url
           invite_token: token
+
+  - id: delete_all_tasks
+    name: delete all tasks
+    request:
+      method: DELETE
+      url: '{django_live_url}/api/projects/{project_pk}/tasks'
+    response:
+      status_code: 204
+
+  - id: delete_annotation
+    name: delete_annotation
+    request:
+      method: DELETE
+      url: '{django_live_url}/api/annotations/{annotation_pk}/'
+    response:
+      status_code: 204
 
 
 # TODO: add teardown/clean up methods

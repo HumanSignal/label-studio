@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-3928: Add messages parameter  providing into LSF options",
-  "commit": "8b17880756ee4c003f175ac60563434daf3ccd0c",
+  "message": "feat: DEV-4008: Allow quickly select tasks using hotkeys",
+  "commit": "6013c846d13cf1c212257c4536223e04fc70e161",
   "branch": "master",
-  "date": "2023/02/02 21:05:50"
+  "date": "2023/02/15 04:11:11"
 }

@@ -266,6 +266,10 @@ class Task(TaskMixin, models.Model):
                     continue
 
                 # project storage
+                # TODO: to resolve nested lists and dicts we should improve _get_storage_by_url(),
+                # TODO: problem with current approach: it can be used only the first storage that _get_storage_by_url
+                # TODO: returns. However, maybe the second storage will resolve uris properly. 
+                # TODO: resolve_uri() already supports them
                 storage = self.storage or self._get_storage_by_url(task_data[field], storage_objects)
                 if storage:
                     try:
@@ -853,6 +857,7 @@ def bulk_update_stats_project_tasks(tasks, project=None):
                 logger.error("Operational error while updating tasks: {exc}", exc_info=True)
                 # try to update query batches one more time
                 start_job_async_or_sync(bulk_update, tasks, in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \
