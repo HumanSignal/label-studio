@@ -241,7 +241,7 @@ class ExportStorage(Storage):
 
     def save_all_annotations(self):
         annotation_exported = 0
-        for annotation in Annotation.objects.filter(task__project=self.project):
+        for annotation in Annotation.objects.filter(project=self.project):
             self.save_annotation(annotation)
             annotation_exported += 1
 

@@ -554,8 +554,8 @@ class AnnotationConvertAPI(views.APIView):
     @swagger_auto_schema(auto_schema=None)
     def post(self, request, *args, **kwargs):
         annotation = get_object_with_check_and_log(request, Annotation, pk=self.kwargs['pk'])
-        organization = annotation.task.project.organization
-        project = annotation.task.project
+        organization = annotation.project.organization
+        project = annotation.project
         pk = annotation.pk
 
         with transaction.atomic():
