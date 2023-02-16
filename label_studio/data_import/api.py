@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import time
+import requests
 import logging
 import drf_yasg.openapi as openapi
 import json
@@ -490,7 +491,7 @@ class DownloadStorageData(APIView):
             file_upload = FileUpload.objects.filter(file=filepath).last()
 
             if file_upload is not None and file_upload.has_permission(request.user):
-                url = file_upload.file.storage.url(file_upload.file.name, storage_url=True)
+                url = file_upload.file.storage.url(file_upload.file.name, storage_url=True, http_method=request.method)
         elif filepath.startswith(settings.AVATAR_PATH):
             user = User.objects.filter(avatar=filepath).first()
             if user is not None and request.user.active_organization.has_user(user):
