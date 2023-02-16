@@ -128,7 +128,7 @@ def _get_user_info(username):
     return user_data
 
 
-def _create_user(input_args, config):
+def _create_user(input_args, config, allow_input=True):
     from users.models import User
     from organizations.models import Organization
 
@@ -144,11 +144,16 @@ def _create_user(input_args, config):
                 user.save()
                 print(f'User {DEFAULT_USERNAME} password changed')
             return user
+
+        if not allow_input:
+            return None
+
         print(f'Please enter default user email, or press Enter to use {DEFAULT_USERNAME}')
         username = input('Email: ')
         if not username:
             username = DEFAULT_USERNAME
-    if not password:
+
+    if not password and allow_input:
         password = getpass.getpass(f'User password for {username}: ')
 
     try:
@@ -182,7 +187,7 @@ def _create_user(input_args, config):
 def _init(input_args, config):
     user = _create_user(input_args, config)
 
-    if input_args.project_name and not _project_exists(input_args.project_name):
+    if user and input_args.project_name and not _project_exists(input_args.project_name):
         from projects.models import Project
         sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM,
                         'prediction-score-min': Project.UNCERTAINTY}
