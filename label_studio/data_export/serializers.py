@@ -35,7 +35,7 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
     def get_result(self, obj):
         # run frames extraction on param, result and result type
         if obj.result and self.context.get('interpolate_key_frames', False) and \
-                is_video_object_tracking(parsed_config=obj.task.project.get_parsed_config()):
+                is_video_object_tracking(parsed_config=obj.project.get_parsed_config()):
             return extract_key_frames(obj.result)
         return obj.result
 

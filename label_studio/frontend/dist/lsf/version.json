@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4532: Audio v3 visual data is offset to sound playback (#1166)",
-  "commit": "61e6d9f3d41a1b0463e559d1501113b55d49b081",
+  "message": "fix: LSDV-4627: App crash with FF for DEV-3391 is on",
+  "commit": "d1086773e06ca1f4fc0adbc7fbdddfc0ebd0528e",
   "branch": "master",
-  "date": "2023-02-09T18:13:43Z"
+  "date": "2023/02/14 22:19:23"
 }

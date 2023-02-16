@@ -22,6 +22,7 @@ from data_manager.functions import evaluate_predictions
 from data_manager.models import PrepareParams
 from data_manager.serializers import DataManagerTaskSerializer
 from projects.models import Project
+from projects.functions.stream_history import fill_history_annotation
 from tasks.models import Annotation, AnnotationDraft, Prediction, Task
 from tasks.serializers import (
     AnnotationDraftSerializer,
@@ -420,6 +421,8 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
         if self.request.data.get('ground_truth'):
             annotation.task.ensure_unique_groundtruth(annotation_id=annotation.id)
 
+        fill_history_annotation(user, task, annotation)
+
         return annotation
 
 
@@ -551,8 +554,9 @@ class AnnotationConvertAPI(generics.RetrieveAPIView):
     @swagger_auto_schema(auto_schema=None)
     def post(self, request, *args, **kwargs):
         annotation = self.get_object()
-        organization = annotation.task.project.organization
-        project = annotation.task.project
+        organization = annotation.project.organization
+        project = annotation.project
+
         pk = annotation.pk
 
         with transaction.atomic():
