@@ -166,7 +166,7 @@ class WebhookAction(models.Model):
             'many': False,
             'model': Annotation,
             'serializer': load_func(settings.WEBHOOK_SERIALIZERS['annotation']),
-            'project-field': 'task__project',
+            'project-field': 'project',
             'nested-fields': {
                 'task': {
                     'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),
@@ -182,7 +182,7 @@ class WebhookAction(models.Model):
             'many': True,
             'model': Annotation,
             'serializer': load_func(settings.WEBHOOK_SERIALIZERS['annotation']),
-            'project-field': 'task__project',
+            'project-field': 'project',
             'nested-fields': {
                 'task': {
                     'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),
@@ -198,7 +198,7 @@ class WebhookAction(models.Model):
             'many': False,
             'model': Annotation,
             'serializer': load_func(settings.WEBHOOK_SERIALIZERS['annotation']),
-            'project-field': 'task__project',
+            'project-field': 'project',
             'nested-fields': {
                 'task': {
                     'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),
@@ -214,7 +214,7 @@ class WebhookAction(models.Model):
             'many': True,
             'model': Annotation,
             'serializer': OnlyIDWebhookSerializer,
-            'project-field': 'task__project',
+            'project-field': 'project',
         },
         LABEL_LINK_CREATED: {
             'name': _('Label link created'),

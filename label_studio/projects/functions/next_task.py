@@ -196,7 +196,7 @@ def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_fla
 
 def skipped_queue(next_task, prepared_tasks, project, user, queue_info):
     if not next_task and project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
-        q = Q(task__project=project, task__isnull=False, was_cancelled=True, task__is_labeled=False)
+        q = Q(project=project, task__isnull=False, was_cancelled=True, task__is_labeled=False)
         skipped_tasks = user.annotations.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
         if skipped_tasks.exists():
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(skipped_tasks)])
