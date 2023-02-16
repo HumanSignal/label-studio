@@ -128,7 +128,7 @@ def _get_user_info(username):
     return user_data
 
 
-def _create_user(input_args, config, allow_input=True):
+def _create_user(input_args, config):
     from users.models import User
     from organizations.models import Organization
 
@@ -145,7 +145,7 @@ def _create_user(input_args, config, allow_input=True):
                 print(f'User {DEFAULT_USERNAME} password changed')
             return user
 
-        if not allow_input:
+        if input_args.quiet_mode:
             return None
 
         print(f'Please enter default user email, or press Enter to use {DEFAULT_USERNAME}')
@@ -153,7 +153,7 @@ def _create_user(input_args, config, allow_input=True):
         if not username:
             username = DEFAULT_USERNAME
 
-    if not password and allow_input:
+    if not password and not input_args.quiet_mode:
         password = getpass.getpass(f'User password for {username}: ')
 
     try:
