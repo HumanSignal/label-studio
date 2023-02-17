@@ -1,6 +1,6 @@
 {
-  "message": "chore: LSDV-4592: Add tests to validate if ghost regions are created on AudioV3",
-  "commit": "cea99c6ac188fcbc0cee892fd0cc10daf8936185",
-  "branch": "master",
-  "date": "2023/02/14 18:34:46"
+  "message": "fix: LSDV-4592: Remove ghost region on AudioV3",
+  "commit": "e42cb89227e2e8095d3dd26682cd0b99e00fc3fd",
+  "branch": "fb-lsdv-4592",
+  "date": "2023/02/17 15:23:14"
 }
