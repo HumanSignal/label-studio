@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4627: App crash with FF for DEV-3391 is on",
-  "commit": "d1086773e06ca1f4fc0adbc7fbdddfc0ebd0528e",
+  "message": "feat: LSDV-3028: Audio v3 dual channel render",
+  "commit": "4ad8edb32ad7ca9bf37f878db4879b1ab0dc7d57",
   "branch": "master",
-  "date": "2023/02/14 22:19:23"
+  "date": "2023/02/17 13:15:08"
 }
