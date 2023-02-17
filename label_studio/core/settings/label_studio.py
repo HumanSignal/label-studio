@@ -21,7 +21,7 @@ DEBUG = get_bool_env('DEBUG', False)
 
 DEBUG_PROPAGATE_EXCEPTIONS = get_bool_env('DEBUG_PROPAGATE_EXCEPTIONS', False)
 
-SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = get_bool_env('SESSION_COOKIE_SECURE', False)
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 

@@ -23,7 +23,7 @@ def propagate_annotations(project, queryset, **kwargs):
     request = kwargs['request']
     user = request.user
     source_annotation_id = request.data.get('source_annotation_id')
-    annotations = Annotation.objects.filter(task__project=project, id=source_annotation_id)
+    annotations = Annotation.objects.filter(project=project, id=source_annotation_id)
     if not annotations:
         raise DataManagerException(f'Source annotation {source_annotation_id} not found in the current project')
     source_annotation = annotations.first()
@@ -123,7 +123,7 @@ def rename_labels(project, queryset, **kwargs):
         raise Exception('Wrong old label name, it is not from labeling config: ' + old_label_name)
     label_type = labels[control_tag]['type'].lower()
 
-    annotations = Annotation.objects.filter(task__project=project)
+    annotations = Annotation.objects.filter(project=project)
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
         annotations = annotations \
             .filter(result__icontains=control_tag) \
@@ -159,7 +159,7 @@ def rename_labels(project, queryset, **kwargs):
     # update summaries
     project.summary.reset()
     project.summary.update_data_columns(project.tasks.all())
-    annotations = Annotation.objects.filter(task__project=project)
+    annotations = Annotation.objects.filter(project=project)
     project.summary.update_created_annotations_and_labels(annotations)
 
     return {'response_code': 200, 'detail': f'Updated {label_count} labels in {annotation_count}'}

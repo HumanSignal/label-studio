@@ -266,6 +266,10 @@ class Task(TaskMixin, models.Model):
                     continue
 
                 # project storage
+                # TODO: to resolve nested lists and dicts we should improve _get_storage_by_url(),
+                # TODO: problem with current approach: it can be used only the first storage that _get_storage_by_url
+                # TODO: returns. However, maybe the second storage will resolve uris properly. 
+                # TODO: resolve_uri() already supports them
                 storage = self.storage or self._get_storage_by_url(task_data[field], storage_objects)
                 if storage:
                     try:
@@ -440,6 +444,8 @@ class Annotation(models.Model):
             models.Index(fields=['ground_truth']),
             models.Index(fields=['created_at']),
             models.Index(fields=['last_action']),
+            models.Index(fields=['project', 'ground_truth']),
+            models.Index(fields=['project', 'was_cancelled']),
         ] + AnnotationMixin.Meta.indexes
 
     def created_ago(self):
@@ -456,19 +462,19 @@ class Annotation(models.Model):
         return len(res)
 
     def has_permission(self, user):
-        user.project = self.task.project  # link for activity log
-        return self.task.project.has_permission(user)
+        user.project = self.project  # link for activity log
+        return self.project.has_permission(user)
 
     def increase_project_summary_counters(self):
-        if hasattr(self.task.project, 'summary'):
+        if hasattr(self.project, 'summary'):
             logger.debug(f'Increase project.summary counters from {self}')
-            summary = self.task.project.summary
+            summary = self.project.summary
             summary.update_created_annotations_and_labels([self])
 
     def decrease_project_summary_counters(self):
-        if hasattr(self.task.project, 'summary'):
+        if hasattr(self.project, 'summary'):
             logger.debug(f'Decrease project.summary counters from {self}')
-            summary = self.task.project.summary
+            summary = self.project.summary
             summary.remove_created_annotations_and_labels([self])
 
     def update_task(self):
@@ -788,10 +794,10 @@ def update_ml_backend(sender, instance, **kwargs):
     if instance.ground_truth:
         return
 
-    project = instance.task.project
+    project = instance.project
 
     if hasattr(project, 'ml_backends') and project.min_annotations_to_start_training:
-        annotation_count = Annotation.objects.filter(task__project=project).count()
+        annotation_count = Annotation.objects.filter(project=project).count()
 
         # start training every N annotation
         if annotation_count % project.min_annotations_to_start_training == 0:
@@ -853,6 +859,7 @@ def bulk_update_stats_project_tasks(tasks, project=None):
                 logger.error("Operational error while updating tasks: {exc}", exc_info=True)
                 # try to update query batches one more time
                 start_job_async_or_sync(bulk_update, tasks, in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \

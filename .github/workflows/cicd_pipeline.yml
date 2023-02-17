@@ -74,14 +74,6 @@ jobs:
             });
             core.setOutput("commit-message", commit.commit.message);
 
-  validate_submodules:
-    name: "Validate"
-    uses: heartexlabs/label-studio/.github/workflows/submodules-validator.yml@develop
-    with:
-      head_sha: ${{ github.sha }}
-      base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
-      target_branch: ${{ github.event.pull_request.base.ref || github.event.ref }}
-
   gitleaks:
     name: "Linter"
     if: github.event_name == 'pull_request'
@@ -139,6 +131,7 @@ jobs:
     uses: heartexlabs/label-studio/.github/workflows/tests.yml@develop
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+    secrets: inherit
 
   migrations:
     name: "Tests"

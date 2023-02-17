@@ -24,6 +24,7 @@ from data_manager.functions import evaluate_predictions
 from data_manager.models import PrepareParams
 from data_manager.serializers import DataManagerTaskSerializer
 from projects.models import Project
+from projects.functions.stream_history import fill_history_annotation
 from tasks.models import Annotation, AnnotationDraft, Prediction, Task
 from tasks.serializers import (
     AnnotationDraftSerializer,
@@ -65,6 +66,11 @@ logger = logging.getLogger(__name__)
             type=openapi.TYPE_INTEGER,
             in_=openapi.IN_QUERY,
             description='Project ID'),
+        openapi.Parameter(
+            name='resolve_uri',
+            type=openapi.TYPE_BOOLEAN,
+            in_=openapi.IN_QUERY,
+            description='Resolve task data URIs using Cloud Storage'),
     ],
 ))
 class TaskListAPI(DMTaskListAPI):
@@ -74,7 +80,7 @@ class TaskListAPI(DMTaskListAPI):
         POST=all_permissions.tasks_create,
     )
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['project',]
+    filterset_fields = ['project']
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
@@ -417,6 +423,8 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         if self.request.data.get('ground_truth'):
             annotation.task.ensure_unique_groundtruth(annotation_id=annotation.id)
 
+        fill_history_annotation(user, task, annotation)
+
         return annotation
 
 
@@ -546,8 +554,8 @@ class AnnotationConvertAPI(views.APIView):
     @swagger_auto_schema(auto_schema=None)
     def post(self, request, *args, **kwargs):
         annotation = get_object_with_check_and_log(request, Annotation, pk=self.kwargs['pk'])
-        organization = annotation.task.project.organization
-        project = annotation.task.project
+        organization = annotation.project.organization
+        project = annotation.project
         pk = annotation.pk
 
         with transaction.atomic():
