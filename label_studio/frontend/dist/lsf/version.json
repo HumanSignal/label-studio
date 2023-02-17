@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4627: App crash with FF for DEV-3391 is on",
-  "commit": "d1086773e06ca1f4fc0adbc7fbdddfc0ebd0528e",
-  "branch": "master",
-  "date": "2023/02/14 22:19:23"
+  "message": "fix: LSDV-3012: Syncable with new simple approach",
+  "commit": "73da5407093af73ac599f0fe8dc947dade657519",
+  "branch": "fb-lsdv-3012/sync",
+  "date": "2023/02/17 16:38:27"
 }
