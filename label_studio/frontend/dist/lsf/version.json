@@ -1,6 +1,6 @@
 {
-  "message": "change Audio tag param from minwaveheight to more aptly named waveheight",
-  "commit": "887a82a4b29da817b5f77a51076d6147cf6d1fae",
+  "message": "feat: LSDV-3028: Audio v3 dual channel render",
+  "commit": "7bcd46e7858c75c0966e8306e00c25f1e53e6002",
   "branch": "fb-lsdv-3028",
-  "date": "2023-02-16T18:58:36Z"
+  "date": "2023/02/17 08:58:03"
 }
