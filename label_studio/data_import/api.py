@@ -356,6 +356,19 @@ class ReImportAPI(ImportAPI):
 @method_decorator(name='get', decorator=swagger_auto_schema(
         tags=['Import'],
         operation_summary='Get files list',
+        manual_parameters=[
+            openapi.Parameter(
+                name='all',
+                type=openapi.TYPE_BOOLEAN,
+                in_=openapi.IN_QUERY,
+                description='Set to "true" if you want to retrieve all file uploads'),
+            openapi.Parameter(
+                name='ids',
+                type=openapi.TYPE_ARRAY,
+                in_=openapi.IN_QUERY,
+                items=openapi.Schema(title="File upload ID", type=openapi.TYPE_INTEGER),
+                description='Specify the list of file upload IDs to retrieve, e.g. ids=[1,2,3]'),
+        ],
         operation_description="""
         Retrieve the list of uploaded files used to create labeling tasks for a specific project.
         """
@@ -380,7 +393,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin,
 
     def get_queryset(self):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
-        if project.is_draft:
+        if project.is_draft or bool_from_request(self.request.query_params, 'all', False):
             # If project is in draft state, we return all uploaded files, ignoring queried ids
             logger.debug(f'Return all uploaded files for draft project {project}')
             return FileUpload.objects.filter(project_id=project.id, user=self.request.user)
