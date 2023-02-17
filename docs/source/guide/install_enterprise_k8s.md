@@ -51,6 +51,7 @@ Your Kubernetes cluster can be self-hosted or installed somewhere such as Amazon
 To plan the capacity of your Kubernetes cluster, refer to these guidelines. 
 
 Label Studio Enterprise has the following default configurations for resource requests, resource limits, and replica counts:
+
 ```yaml
 app:
   replicas: 1
@@ -303,7 +304,7 @@ kubectl get pods
 
 Restart your Helm release by doing the following from the command line:
 
-1. Identify the <RELEASE_NAME> of the latest Label Studio Enterprise release:
+1. Identify the &lt;RELEASE_NAME&gt; of the latest Label Studio Enterprise release:
 ```shell
 helm list
 ```
