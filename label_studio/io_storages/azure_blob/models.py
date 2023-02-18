@@ -144,7 +144,7 @@ class AzureBlobExportStorage(ExportStorage, AzureBlobStorageMixin):
 
 
 def async_export_annotation_to_azure_storages(annotation):
-    project = annotation.task.project
+    project = annotation.project
     if hasattr(project, 'io_storages_azureblobexportstorages'):
         for storage in project.io_storages_azureblobexportstorages.all():
             logger.debug(f'Export {annotation} to Azure Blob storage {storage}')
@@ -153,7 +153,9 @@ def async_export_annotation_to_azure_storages(annotation):
 
 @receiver(post_save, sender=Annotation)
 def export_annotation_to_azure_storages(sender, instance, **kwargs):
-    start_job_async_or_sync(async_export_annotation_to_azure_storages, instance)
+    storages = getattr(instance.project, 'io_storages_azureblobexportstorages', None)
+    if storages and storages.exists():  # avoid excess jobs in rq
+        start_job_async_or_sync(async_export_annotation_to_azure_storages, instance)
 
 
 class AzureBlobImportStorageLink(ImportStorageLink):

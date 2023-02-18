@@ -22,6 +22,12 @@ gcs_credentials: &gcs_credentials
     validators:
       - json
 
+project_id: &project_id
+  - type: text
+    name: google_project_id
+    label: Google Project ID
+    placeholder: 'Leave blank to inherit from the Google Application Credentials...'
+
 ImportStorage:
   # Title, Bucket, Prefix
   - columnCount: 3
@@ -60,9 +66,15 @@ ImportStorage:
   # GCS credentials
   - columnCount: 1
     fields: *gcs_credentials
+  # Project ID
+  - columnCount: 1
+    fields: *project_id
 
 ExportStorage:
   - columnCount: 3
     fields: *title_bucket_prefix
   - columnCount: 1
     fields: *gcs_credentials
+  # Project ID
+  - columnCount: 1
+    fields: *project_id

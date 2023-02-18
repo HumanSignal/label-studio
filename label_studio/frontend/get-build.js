@@ -100,7 +100,7 @@ async function get(projectName, ref = 'master') {
   res = await fetch(commitInfoUrl, { headers: { Authorization: `token ${TOKEN}` } });
   json = await res.json();
   const info = {
-    message: json.message,
+    message: json.message.split('\n')[0],
     commit: json.sha,
     branch,
     date: (json.author && json.author.date) || (json.committer && json.committer.date),
@@ -124,13 +124,13 @@ async function get(projectName, ref = 'master') {
 
     if (projectName === 'lsf') {
       console.log("Copying chunk files to the root folder");
-      // copy any lsf files that match *.chunk.js* to the root /static/js folder so that
-      // webworkers can be loaded
+      // copy any lsf files that match *.chunk.js* or *.wasm to the root /static/js folder so that
+      // webworkers and wasm implementations can be loaded
       const jsDir = path.join(newPath, 'js');
       const pathToStatic = path.join(__dirname, '..', 'core', 'static', 'js');
 
       fs.readdirSync(jsDir).forEach(file => {
-        if (file.match(/.*chunk\.js(\.map)?/)) {
+        if (file.match(/^.*\.(chunk\.js|chunk\.js\.map|wasm)$/)) {
           console.log(`Copying ${file} to ${pathToStatic}`);
 
           fs.copyFileSync(path.join(jsDir, file), path.join(pathToStatic, file));

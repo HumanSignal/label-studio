@@ -161,7 +161,7 @@ class TaskListAPI(generics.ListCreateAPIView):
         all_fields = request.GET.get('fields', None) == 'all'  # false by default
 
         return {
-            'resolve_uri': True,
+            'resolve_uri': bool_from_request(request.GET, 'resolve_uri', True),
             'request': request,
             'project': project,
             'drafts': all_fields,
@@ -286,7 +286,7 @@ class ProjectStateAPI(APIView):
                 "source_syncing": False,
                 "target_syncing": False,
                 "task_count": project.tasks.count(),
-                "annotation_count": Annotation.objects.filter(task__project=project).count(),
+                "annotation_count": Annotation.objects.filter(project=project).count(),
                 'config_has_control_tags': len(project.get_parsed_config()) > 0
             }
         )
