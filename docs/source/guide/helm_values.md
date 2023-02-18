@@ -43,6 +43,7 @@ when configuring your Label Studio Enterprise deployment on Kubernetes. See [Dep
 
 To enable the debug mode, you should enable `app.debug` and set app.logLevel to `DEBUG`. Additionally, it may be more convenient to have simple logs instead of JSON-formatted messages. To achieve this, add `JSON_LOG=0` to `global.extraEnvironmentVars`.
 
+
 ## Global parameters
 Global parameters for the Helm chart.
 
