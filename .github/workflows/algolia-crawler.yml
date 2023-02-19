@@ -14,8 +14,8 @@ jobs:
       APPLICATION_ID: "M7RXTHKYPM"
       API_KEY: ${{ secrets.ALGOLIA_ADMIN_API_KEY }}
       INDEX_NAME: "ghaction"
-      CONFIG: |
-        '{"index_name": "ghaction",
+      CONFIG: >
+        {"index_name": "ghaction",
         "stop_urls": ["https://docs.heartex.com/guide/index.html"], 
         "selectors_exclude": [".home-page-index"], 
         "start_urls": ["https://docs.heartex.com/guide", "https://docs.heartex.com/templates", "https://docs.heartex.com/tags"],
@@ -27,7 +27,7 @@ jobs:
         "lvl4": ".content h5, .ResourcesContent h5,",
         "lvl5": ".content h6, .ResourcesContent h6", 
         "content": ".content p, .ResourcesContent p, .content li, .ResourcesContent li, .content tr, .ResourcesContent tr"
-        }}'
+        }}
     name: Index Algolia
     steps:
       - name: Algolia Docsearch Action
