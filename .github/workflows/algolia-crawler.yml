@@ -5,6 +5,7 @@ on:
     branches: [ 'ht/add-new-theme' ]
     paths:
       - 'docs/**'
+      - '.github/workflow/algolia-crawler.yml'
 
 jobs:
   algolia_indexer:
