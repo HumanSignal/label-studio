@@ -18,7 +18,7 @@ jobs:
         {"index_name": "ghaction",
         "stop_urls": ["https://docs.heartex.com/guide/index.html"], 
         "selectors_exclude": [".home-page-index"], 
-        "start_urls": ["https://docs.heartex.com/guide", "https://docs.heartex.com/templates", "https://docs.heartex.com/tags", "url": "https://labelstud.io/sdk/"],
+        "start_urls": ["https://docs.heartex.com/guide", "https://docs.heartex.com/templates", "https://docs.heartex.com/tags", "https://labelstud.io/sdk/"],
         "selectors": {
         "lvl0": ".content h1, .ResourcesBannerHeading",
         "lvl1": ".content h2, .ResourcesContent h2",
