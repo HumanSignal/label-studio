@@ -14,11 +14,9 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
 from core.permissions import ViewClassPermission, all_permissions
-from core.utils.common import (
-    DjangoFilterDescriptionInspector,
-    get_object_with_check_and_log,
-)
+from core.utils.common import DjangoFilterDescriptionInspector
 from core.utils.params import bool_from_request
+from core.mixins import GetParentObjectMixin
 from data_manager.api import TaskListAPI as DMTaskListAPI
 from data_manager.functions import evaluate_predictions
 from data_manager.models import PrepareParams
@@ -275,10 +273,9 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
 
     def update(self, request, *args, **kwargs):
         # save user history with annotator_id, time & annotation result
-        annotation_id = self.kwargs['pk']
-        annotation = get_object_with_check_and_log(request, Annotation, pk=annotation_id)
+        annotation = self.get_object()
         # use updated instead of save to avoid duplicated signals
-        Annotation.objects.filter(id=annotation_id).update(updated_by=request.user)
+        Annotation.objects.filter(id=annotation.id).update(updated_by=request.user)
 
         task = annotation.task
         if self.request.data.get('ground_truth'):
@@ -349,12 +346,13 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         ],
         request_body=AnnotationSerializer
         ))
-class AnnotationsListAPI(generics.ListCreateAPIView):
+class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
         GET=all_permissions.annotations_view,
         POST=all_permissions.annotations_create,
     )
+    parent_queryset = Task.objects.all()
 
     serializer_class = AnnotationSerializer
 
@@ -373,7 +371,7 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         return AnnotationDraft.objects.filter(id=draft_id).delete()
 
     def perform_create(self, ser):
-        task = get_object_with_check_and_log(self.request, Task, pk=self.kwargs['pk'])
+        task = self.get_parent_object()
         # annotator has write access only to annotations and it can't be checked it after serializer.save()
         user = self.request.user
 
@@ -538,24 +536,27 @@ class PredictionAPI(viewsets.ModelViewSet):
         return Prediction.objects.filter(task__project__organization=self.request.user.active_organization)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
 @method_decorator(name='post', decorator=swagger_auto_schema(
         tags=['Annotations'],
         operation_summary='Convert annotation to draft',
         operation_description='Convert annotation to draft',
         ))
-class AnnotationConvertAPI(views.APIView):
+class AnnotationConvertAPI(generics.RetrieveAPIView):
     permission_required = ViewClassPermission(
         POST=all_permissions.annotations_change
     )
+    queryset = Annotation.objects.all()
 
     def process_intermediate_state(self, annotation, draft):
         pass
 
     @swagger_auto_schema(auto_schema=None)
     def post(self, request, *args, **kwargs):
-        annotation = get_object_with_check_and_log(request, Annotation, pk=self.kwargs['pk'])
+        annotation = self.get_object()
         organization = annotation.project.organization
         project = annotation.project
+
         pk = annotation.pk
 
         with transaction.atomic():

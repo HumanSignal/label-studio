@@ -7,7 +7,7 @@ import numbers
 from django.db import transaction, IntegrityError
 from django.conf import settings
 
-from rest_framework import serializers
+from rest_framework import serializers, generics
 from rest_framework.serializers import ModelSerializer
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField
@@ -18,7 +18,7 @@ from projects.models import Project
 from tasks.models import Task, Annotation, AnnotationDraft, Prediction
 from tasks.validation import TaskValidator
 from tasks.exceptions import AnnotationDuplicateError
-from core.utils.common import get_object_with_check_and_log, retry_database_locked
+from core.utils.common import retry_database_locked
 from core.label_config import replace_task_data_undefined_with_config_field
 from users.serializers import UserSerializer
 from users.models import User
@@ -135,7 +135,7 @@ class BaseTaskSerializer(FlexFieldsModelSerializer):
             project = self.context['project']
         elif 'view' in self.context and 'project_id' in self.context['view'].kwargs:
             kwargs = self.context['view'].kwargs
-            project = get_object_with_check_and_log(Project, kwargs['project_id'])
+            project = generics.get_object_or_404(Project, kwargs['project_id'])
         elif task:
             project = task.project
         else:
