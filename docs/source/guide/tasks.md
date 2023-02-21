@@ -327,10 +327,10 @@ You can then import text tasks to label that match the following JSON format:
   }]
 }]
 ```
-If you're placing JSON files in [cloud storage](storage.html), place 1 task in each JSON file in the storage bucket. If you want to upload a JSON file from your machine directly into Label Studio, you can place multiple tasks in one JSON file. 
+If you're placing JSON files in [cloud storage](storage.html), place 1 task in each JSON file in the storage bucket. If you want to upload a JSON file from your machine directly into Label Studio, you can place multiple tasks in one JSON file and import it using Label Studio GUI (Data Manager => Import button). 
 
 #### Example JSON with multiple tasks
-You can place multiple tasks in one JSON file if you're uploading the JSON file to Label Studio. 
+You can place multiple tasks in one JSON file if you're uploading the JSON file using Label Studio Import Dialog only (Data Manager => Import button). 
 
 <br/>
 {% details <b>To place multiple tasks in one JSON file, use this JSON format example</b> %}

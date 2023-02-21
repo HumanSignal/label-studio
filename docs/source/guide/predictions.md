@@ -19,6 +19,14 @@ To import predicted labels into Label Studio, you must use the [Basic Label Stud
 
 <iframe class="video-border" width="100%" height="400vh" src="https://www.youtube.com/embed/CyRe73VD4EE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
+### Pre-annotations are read-only
+
+Pre-annotations (predictions) cannot be modified and are always read-only.
+
+If the "Show predictions to annotators in the Label Stream and Quick View" toggle in the project settings (Machine Learning section) is enabled, predictions will be automatically copied to newly created annotations. In Quick View mode, annotations can be created from predictions by using the special copy button on the editor tool panel:
+
+<img src="/images/quickview-copy-button.png" class="gif-border">
+
 ### Specific examples for pre-annotations
 
 Refer to the following examples for sample pre-annotation formats:
