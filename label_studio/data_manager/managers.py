@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 from django.db import models
 from django.db.models import Aggregate, OuterRef, Subquery, Avg, Q, F, Value, Exists, When, Case
-from data_manager.aggregates import ArrayAgg
+from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from django.db.models.functions import Coalesce
 from django.conf import settings
@@ -194,7 +194,13 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
     elif _filter.operator == Operator.NOT_CONTAINS:
         filter_expressions.append(~Q(subquery))
         return 'continue'
-
+    elif _filter.operator == Operator.EMPTY and field_name == 'annotations_results':
+        if _filter.value == 'true':
+            q = Q(annotations__result__isnull=True) | Q(annotations__result=[])
+        else:
+            q = Q(annotations__result__isnull=False) & ~Q(annotations__result=[])
+        filter_expressions.append(q)
+        return 'continue'
 
 
 def add_user_filter(enabled, key, _filter, filter_expressions):
