@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-4033: Hotfix import issue ",
-  "commit": "de72bccace8c6e128076a93e64414eb4e3d8ea1e",
+  "message": "feat: DEV-4008: Allow quickly select tasks using hotkeys",
+  "commit": "6013c846d13cf1c212257c4536223e04fc70e161",
   "branch": "master",
-  "date": "2023/02/08 11:29:40"
+  "date": "2023/02/15 04:11:11"
 }

@@ -98,7 +98,7 @@ class DataExport(object):
         """Generate two files: meta info and result file and store them locally for logging"""
         filename_results = os.path.join(settings.EXPORT_DIR, name + '.json')
         filename_info = os.path.join(settings.EXPORT_DIR, name + '-info.json')
-        annotation_number = Annotation.objects.filter(task__project=project).count()
+        annotation_number = Annotation.objects.filter(project=project).count()
         try:
             platform_version = version.get_git_version()
         except:

@@ -22,6 +22,7 @@ from rest_framework.views import exception_handler
 from django.http import Http404
 
 from core.utils.common import temporary_disconnect_all_signals
+from core.mixins import GetParentObjectMixin
 from core.label_config import config_essential_data_has_changed
 from projects.models import (
     Project, ProjectSummary, ProjectManager
@@ -36,11 +37,11 @@ from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_fo
 from webhooks.models import WebhookAction
 
 from core.permissions import all_permissions, ViewClassPermission
-from core.utils.common import (
-    get_object_with_check_and_log, paginator, paginator_help)
+from core.utils.common import (paginator, paginator_help)
 from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
 from core.utils.io import find_dir, find_file, read_yaml
 from core.filters import ListFilter
+from projects.functions.stream_history import get_label_stream_history
 
 from data_manager.functions import get_prepared_queryset, filters_ordering_selected_items_exist
 from data_manager.models import View
@@ -276,6 +277,18 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         response['queue'] = queue_info
         return Response(response)
 
+class LabelStreamHistoryAPI(generics.RetrieveAPIView):
+    permission_required = all_permissions.tasks_view
+    queryset = Project.objects.all()
+    swagger_schema = None  # this endpoint doesn't need to be in swagger API docs
+
+    def get(self, request, *args, **kwargs):
+        project = self.get_object()
+
+        history = get_label_stream_history(request.user, project)
+
+        return Response(history)
+
 
 @method_decorator(name='post', decorator=swagger_auto_schema(
         tags=['Projects'],
@@ -384,11 +397,12 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
                 description='A unique integer value identifying this project.'),
         ] + paginator_help('tasks', 'Projects')['manual_parameters'],
     ))
-class ProjectTaskListAPI(generics.ListCreateAPIView,
+class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView,
                          generics.DestroyAPIView):
 
     parser_classes = (JSONParser, FormParser)
     queryset = Task.objects.all()
+    parent_queryset = Project.objects.all()
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
         POST=all_permissions.tasks_change,
@@ -431,11 +445,11 @@ class ProjectTaskListAPI(generics.ListCreateAPIView,
 
     def get_serializer_context(self):
         context = super(ProjectTaskListAPI, self).get_serializer_context()
-        context['project'] = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
+        context['project'] = self.get_parent_object()
         return context
 
     def perform_create(self, serializer):
-        project = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
+        project = self.get_parent_object()
         instance = serializer.save(project=project)
         emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])
         return instance

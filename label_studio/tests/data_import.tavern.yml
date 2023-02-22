@@ -227,6 +227,18 @@ stages:
     url: '{django_live_url}/api/projects/{project_pk}/file-uploads'
   response:
     status_code: 200
+- name: check_list_of_file_uploads
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/file-uploads'
+    params:
+      all: true
+  response:
+    status_code: 200
+    json:
+      - id: !anyint
+      - id: !anyint
+
 - name: stage
   request:
     method: GET
