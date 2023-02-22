@@ -9,6 +9,7 @@ import { MachineLearningSettings } from './MachineLearningSettings/MachineLearni
 import { StorageSettings } from './StorageSettings/StorageSettings';
 import { DisplayLogs } from './DisplayLogs';
 import { ClassesLabeled } from './classesLabeled';
+import { ChangeLabelName } from './ChangeLabelName';
 
 export const MenuLayout = ({children, ...routeProps}) => {
   return (
@@ -22,6 +23,7 @@ export const MenuLayout = ({children, ...routeProps}) => {
         WebhookPage,
         DisplayLogs,
         ClassesLabeled,
+        ChangeLabelName,
         DangerZone,
 
       ]}
@@ -45,6 +47,7 @@ export const SettingsPage = {
     WebhookPage,
     DisplayLogs, 
     ClassesLabeled,
+    ChangeLabelName,
     DangerZone,
   },
 };

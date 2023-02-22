@@ -19,8 +19,8 @@ export const DisplayLogs = () => {
     useEffect(() => {
         console.log('re-rendering');
         getLogs();
-
     }, []);
+  
     function getLogs() {
         axios
         .get(webhook_url+'/stream?id='+ project.id)

@@ -32,9 +32,11 @@ export const MachineLearningSettings = () => {
   const [generateSpecs, setGenerateSpecs] = useState(true);
   const [selectedTrainingType, setSelectedTrainingType] = useState('');
   const [trainingTypes, setTrainingTypes] = useState([]);
+  const [modelsType, setModelsType] = useState('tao');
+
 
   const handleChange = event => {
-    setGenerateSpecs(!event.target.checked);
+    setGenerateSpecs(event.target.checked);
   };
 
   const handleTrainingTypeChange = (event) => {
@@ -42,19 +44,20 @@ export const MachineLearningSettings = () => {
   }
 
 
-  const mod = useCallback(async () => {
-    await axios
-      .get(webhook_url + '/get_available_models?id=' + project.id)
-      .then((response) => {
-        console.log(response);
-        setAvailableModels(response.data.models);
-        setModelToPredictOn(response.data.model_path);
-        console.log(availableModels);
-        setFetchModels(true);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  async function mod()  {
+    // await axios
+    //   .get(webhook_url + '/get_available_models?id=' + project.id)
+    //   .then((response) => {
+    //     console.log(response);
+    //     setAvailableModels(response.data.models);
+    //     setModelToPredictOn(response.data.model_path);
+    //     console.log(availableModels);
+    //     setFetchModels(true);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+    console.log('mod is called');
     await axios
     .get(webhook_url + '/get_training_types?id=' + project.id)
       .then((response) => {
@@ -63,10 +66,11 @@ export const MachineLearningSettings = () => {
         setSelectedTrainingType(training_types[0]);
     })
       await axios
-      .get(webhook_url + '/get_mean_average_precisions?id=' + project.id)
+      .get(webhook_url + '/get_models_info?id=' + project.id)
         .then((response) => {
           console.log(response);
-          setModelsPrecisions(response.data.models);
+          setModelsPrecisions(response.data.models_info);
+          setModelsType(response.data.models_type);
           setFetchModels(true)
       })
       .catch((error) => {
@@ -77,36 +81,13 @@ export const MachineLearningSettings = () => {
         setModelToPredictOn(response.data.current_model_version)
         setAvailableModels(response.data.model_versions)
     })
-  });
+  };
   const saveInferencePath = useCallback(async () => {
     await axios.post(webhook_url + '/change_current_model_version?id=' + project.id + '&model_version=' + modelToPredictOn)
       .then((response) => {
         console.log(response);
     })
   })
-  const evaluate = useCallback(async (param) => {
-    await axios.get(webhook_url + '/can_press').then((response_press) => {
-      var can_press = response_press.data.can_press;
-      if (can_press == undefined) {
-        Swal('Someone has just trained or predicted, please wait for a moment')
-      }
-      else if (can_press == true) {
-        Swal('Evaluation has started')
-        axios.post(webhook_url + '/evaluate?id=' + project.id + '&model_path=' + param)
-        .then((response) => {
-          console.log(response);
-          if (response.data.evaluation === false) {
-            Swal("Something went wrong while evaluating, please check the logs")
-          } else {
-                    setModelsPrecisions(response.data.models);
-          }
-        })
-      }
-      else {
-        Swal(`All Gpus are occupied, your evaluation didn't start`)
-      }
-    })
-  });
   const fetchBackends = useCallback(async () => {
     const models = await api.callApi('mlBackends', {
       params: {
@@ -136,7 +117,7 @@ export const MachineLearningSettings = () => {
     console.log('delete model')
     Swal({
       title: "Are you sure?",
-      text: "Once deleted, you will not be able to recover this imaginary file!",
+      text: "Once deleted, you will not be able to recover this model!",
       icon: "warning",
       buttons: true,
       dangerMode: true,
@@ -287,7 +268,7 @@ export const MachineLearningSettings = () => {
       mod();
       fetchBackends();
     }
-  }, [project]);
+  }, [project.id]);
 
   return (
     <>
@@ -409,51 +390,76 @@ export const MachineLearningSettings = () => {
               <div className='col-6' key={model.value} style={{marginBottom: 10}}>
               <Card  key={model.value}>
                   Model Version: {model.label}
-                  {Object.keys(modelsPrecisions).includes(model.label) ?
-                    <div style={{paddingTop:15}}>
-                      <h5>Mean Average Precision <strong>(mAp)</strong>: {modelsPrecisions[model.label]['mAp']}</h5>
-                    <table>
-                    <thead>
-                    <tr><th style={{paddingRight:50}}>Class Name</th>
-                      <th>Average Precision</th></tr>
-                        </thead>{Object.keys(modelsPrecisions[model.label]['classes']).map((i) => (
-                          <tbody key={i}>
-                            <tr><td>{i}</td>
-                              <td>{modelsPrecisions[model.label]['classes'][i]}</td></tr>
-                          </tbody>
+                  {modelsType == 'tao' ?
+                    <div>
+                    {
+                      Object.keys(modelsPrecisions).includes(model.label) ?
+                        <div style={{ paddingTop: 15 }}>
+                          <h5>Mean Average Precision <strong>(mAp)</strong>: {modelsPrecisions[model.label]['mAp']}</h5>
+                          <table>
+                            <thead>
+                              <tr><th style={{ paddingRight: 50 }}>Class Name</th>
+                                <th>Average Precision</th></tr>
+                            </thead>{Object.keys(modelsPrecisions[model.label]['classes']).map((i) => (
+                              <tbody key={i}>
+                                <tr><td>{i}</td>
+                                  <td>{modelsPrecisions[model.label]['classes'][i]}</td></tr>
+                              </tbody>
 
-                        ))}
-                      </table>
-                      {modelsPrecisions[model.label]['score'] && Object.keys(modelsPrecisions[model.label]['score']).length > 0 ?
-                        <div>
-                      <h5 style={{marginTop: 20}}>Beta Score</h5>
-                      <table>
-                    <thead>
-                    <tr><th style={{paddingRight:50}}>Class Name</th>
-                      <th>Score</th></tr>
-                            </thead>
-                            {Object.keys(modelsPrecisions[model.label]['score']).map((i) => (
-                          <tbody key={i}>
-                            <tr><td>{i}</td>
-                              <td>{modelsPrecisions[model.label]['classes'][i]}</td></tr>
-                          </tbody>
-
-                        ))}
+                            ))}
                           </table>
+                          {modelsPrecisions[model.label]['score'] && Object.keys(modelsPrecisions[model.label]['score']).length > 0 ?
+                            <div>
+                              <h5 style={{ marginTop: 20 }}>Beta Score</h5>
+                              <table>
+                                <thead>
+                                  <tr><th style={{ paddingRight: 50 }}>Class Name</th>
+                                    <th>Score</th></tr>
+                                </thead>
+                                {Object.keys(modelsPrecisions[model.label]['score']).map((i) => (
+                                  <tbody key={i}>
+                                    <tr><td>{i}</td>
+                                      <td>{modelsPrecisions[model.label]['classes'][i]}</td></tr>
+                                  </tbody>
+
+                                ))}
+                              </table>
+                            </div>
+                            : ''}
+
+                      
+
+                        </div>
+                    
+                        :
+                        <div style={{ paddingTop: 15 }}>
+                          You don't have any information regarding this model <br></br>
                           </div>
-                        : ''}
-                      <div style={{marginTop: 20}}>
-                      <button style={{marginRight: 10}} onClick={() =>onExportModel(model.value)} className='btn btn-outline-primary'>Export Model</button>
-                      <button onClick={() =>onPrune(model.value)} className='btn btn-outline-warning'>Prune/Re-train</button>
-                      <button style={{marginLeft: 10}} onClick={() =>onDeleteModel(model.value)} className='btn btn-outline-danger'>Delete Model</button>
+                    }
+                    </div>
+                    :
+                    <div>
+                      {Object.keys(modelsPrecisions).includes(model.label) ? 
+                        <div>
+                          <table>
+                            <thead>
+                              <tr><th style={{ paddingRight: 50 }}>Model Information</th>
+                                <th>Values</th></tr>
+                            </thead>{Object.keys(modelsPrecisions[model.label]).map((i) => (
+                              <tbody key={i}>
+                                <tr><td>{i}</td>
+                                  <td>{modelsPrecisions[model.label][i]}</td></tr>
+                              </tbody>
 
-                      </div>
-                      </div>
-                    : 
-                    <div style={{paddingTop: 15}}>
-                      You don't have any information regarding this model <br></br>
-                    <button onClick={() =>evaluate(model.label)} className='btn btn-outline-primary'>Evaluate</button></div>}
+                            ))}
+                          </table>
+                      </div>:<div>You have no information about this model</div>}</div>}
+                      <div style={{ marginTop: 20 }}>
+                            <button style={{ marginRight: 10 }} onClick={() => onExportModel(model.value)} className='btn btn-outline-primary'>Export Model</button>
+                    {modelsType == 'tao' ? <button onClick={() => onPrune(model.value)} className='btn btn-outline-warning'>Prune/Re-train</button> : ''}
+                            <button style={{ marginLeft: 10 }} onClick={() => onDeleteModel(model.value)} className='btn btn-outline-danger'>Delete Model</button>
 
+                          </div>
           </Card>
                 </div>
          ))}
