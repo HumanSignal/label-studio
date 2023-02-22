@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-4187: Select regions without 300ms lag",
-  "commit": "9f3733860b3d6f64f093a2d546fab38fad23748f",
-  "branch": "master",
-  "date": "2023/02/18 03:31:18"
+  "message": "docs: Add choices with html example",
+  "commit": "cdf8b5d8b2236f913a14b5c858d29e05a203efc8",
+  "branch": "fb-docs/add-choices-html",
+  "date": "2023/02/22 04:44:27"
 }
