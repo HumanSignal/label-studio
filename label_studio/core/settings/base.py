@@ -400,6 +400,33 @@ MEDIA_URL = '/data/'
 UPLOAD_DIR = 'upload'
 AVATAR_PATH = 'avatars'
 
+SUPPORTED_EXTENSIONS = set(
+    [
+        '.aiff',
+        '.au',
+        '.bmp',
+        '.csv',
+        '.flac',
+        '.gif',
+        '.htm',
+        '.html',
+        '.jpg',
+        '.json',
+        '.m4a',
+        '.mp3',
+        '.ogg',
+        '.png',
+        '.svg',
+        '.tsv',
+        '.txt',
+        '.wav',
+        '.webp',
+        '.xml',
+        '.mp4',
+        '.webm',
+    ]
+)
+
 # project exports
 EXPORT_DIR = os.path.join(BASE_DATA_DIR, 'export')
 EXPORT_URL_ROOT = '/export/'
