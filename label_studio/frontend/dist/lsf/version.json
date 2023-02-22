@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-1023: Add audio error handler to audio v3 (#1190)",
-  "commit": "ee8bd7ae61e5f1fb147b4658b9dc4770b2afa956",
-  "branch": "master",
-  "date": "2023-02-22T15:59:29Z"
+  "message": "feat: LSDV-3896-2: Panel grouping",
+  "commit": "8d325739a9f5c369db326a1f36cf2535a0f371fb",
+  "branch": "fb-lsdv-3892-2/panel-grouping",
+  "date": "2023/02/22 15:15:39"
 }
