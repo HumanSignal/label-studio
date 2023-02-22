@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-4583-6: Image preloading",
+  "message": "Merge branch 'master' into fb-lsdv-4583-6/image-preloading",
   "commit": "c7287913449fc6885adc4c993a751c5aed4fa276",
   "branch": "fb-lsdv-4583-6/image-preloading",
-  "date": "2023/02/22 12:22:44"
+  "date": "2023-02-22T12:22:44Z"
 }
