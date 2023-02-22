@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4613: Order Table tag items alphabetically",
-  "commit": "7022478a3f5b7d3a28c0ca074b19fce9c3e9667a",
+  "commit": "12253f5390497fef7499c1db2e21cc12abaf4794",
   "branch": "fb-lsdv-4613",
-  "date": "2023/02/22 16:48:05"
+  "date": "2023/02/22 17:32:21"
 }
