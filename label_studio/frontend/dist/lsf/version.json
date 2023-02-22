@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-4187: Select regions without 300ms lag",
-  "commit": "9f3733860b3d6f64f093a2d546fab38fad23748f",
+  "message": "fix: LSDV-1023: Add audio error handler to audio v3 (#1190)",
+  "commit": "ee8bd7ae61e5f1fb147b4658b9dc4770b2afa956",
   "branch": "master",
-  "date": "2023/02/18 03:31:18"
+  "date": "2023-02-22T15:59:29Z"
 }
