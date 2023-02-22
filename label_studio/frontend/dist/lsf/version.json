@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-1023: Add audio error handler to audio v3",
-  "commit": "47cffc3208abdb995f612adfca751ea6c9b505b7",
+  "commit": "967d3c3ac87ee54b10bbd8e0193e1233720afa2d",
   "branch": "fb-lsdv-1023",
-  "date": "2023/02/22 11:10:01"
+  "date": "2023/02/22 12:01:05"
 }
