@@ -17,6 +17,10 @@
         {"type": "boolean"},
         {"type": "number"}
       ]},
+    "@valueList": {
+      "anyOf": [
+        {"type": "string"}
+      ]},
     "tag_with_value": {
       "type": "object",
       "required": [
@@ -33,9 +37,19 @@
     },
     "tag_with_value_required_name": {
       "type": "object",
-      "required": [
-        "@name",
-        "@value"
+      "oneOf": [
+          {
+            "required": [
+                "@name",
+                "@value"
+            ]
+          },
+          {
+            "required": [
+                "@name",
+                "@valueList"
+            ]
+          }
       ],
       "properties": {
         "@value": {
