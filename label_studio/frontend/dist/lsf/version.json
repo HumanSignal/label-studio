@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-3012: Syncable with new simple approach",
-  "commit": "fbfdb430de165c83058f4d37d6f731560d5fb185",
+  "commit": "eb6719317c0a83733eb65e625b87d0c4ccdaec15",
   "branch": "fb-lsdv-3012/sync",
-  "date": "2023/02/21 09:22:28"
+  "date": "2023/02/22 12:48:54"
 }
