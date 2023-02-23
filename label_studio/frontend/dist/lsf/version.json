@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-1023: Add audio error handler to audio v3 (#1190)",
-  "commit": "ee8bd7ae61e5f1fb147b4658b9dc4770b2afa956",
+  "message": "fix: DEV-3627: Video type unsupported modal misfires fix (#952)",
+  "commit": "e3835c1d9fd36e74c98c986f69fd30bc5880c639",
   "branch": "master",
-  "date": "2023-02-22T15:59:29Z"
+  "date": "2023-02-23T15:36:53Z"
 }
