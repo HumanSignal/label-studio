@@ -232,3 +232,110 @@ stages:
       save:
         json:
           export_id: id
+---
+test_name: export csv with non-existing columns
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+  - id: signup
+    type: ref
+  - id: create_project
+    name: create_project
+    request:
+      data:
+        label_config: <View><Text value="pdf" name="pdf" /><DateTime name="publication_date" toName="pdf" only="date" /><DateTime name="effective_date" toName="pdf" only="date" /></View>
+        title: Test Draft 1
+        show_collab_predictions: true
+      method: POST
+      url: '{django_live_url}/api/projects'
+    response:
+      save:
+        json:
+          project_pk: id
+      status_code: 201
+  - name: create_task
+    request:
+      json:
+        data:
+          text: 'Test text'
+        project: '{project_pk}'
+      method: POST
+      url: '{django_live_url}/api/tasks'
+    response:
+      save:
+        json:
+          first_task_pk: id
+      status_code: 201
+  - name: create_task
+    request:
+      json:
+        data:
+          text: 'Test text'
+        project: '{project_pk}'
+      method: POST
+      url: '{django_live_url}/api/tasks'
+    response:
+      save:
+        json:
+          second_task_pk: id
+      status_code: 201
+  - name: create_annotation_second_task
+    request:
+      headers:
+        content-type: application/json
+      json:
+        lead_time: 12.34
+        result:
+        - from_name: publication_date
+          to_name: pdf
+          origin: manual
+          type: datetime
+          value:
+            datetime: "2022-11-17"
+      method: POST
+      url: '{django_live_url}/api/tasks/{first_task_pk}/annotations'
+    response:
+      status_code: 201
+  - name: create_annotation_second_task
+    request:
+      headers:
+        content-type: application/json
+      json:
+        lead_time: 12.34
+        result:
+        - from_name: effective_date
+          to_name: pdf
+          origin: manual
+          type: datetime
+          value:
+            datetime: "2022-11-17"
+      method: POST
+      url: '{django_live_url}/api/tasks/{second_task_pk}/annotations'
+    response:
+      status_code: 201
+  - name: export_csv
+    request:
+      headers:
+        content-type: application/json
+      method: GET
+      url: '{django_live_url}/api/projects/{project_pk}/export?exportType=CSV'
+    response:
+      status_code: 200
+  - name: export_tsv
+    request:
+      headers:
+        content-type: application/json
+      method: GET
+      url: '{django_live_url}/api/projects/{project_pk}/export?exportType=TSV'
+    response:
+      status_code: 200
+  - name: export_json_min
+    request:
+      headers:
+        content-type: application/json
+      method: GET
+      url: '{django_live_url}/api/projects/{project_pk}/export?exportType=JSON_MIN'
+    response:
+      status_code: 200

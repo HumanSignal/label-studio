@@ -23,7 +23,7 @@ def propagate_annotations(project, queryset, **kwargs):
     request = kwargs['request']
     user = request.user
     source_annotation_id = request.data.get('source_annotation_id')
-    annotations = Annotation.objects.filter(task__project=project, id=source_annotation_id)
+    annotations = Annotation.objects.filter(project=project, id=source_annotation_id)
     if not annotations:
         raise DataManagerException(f'Source annotation {source_annotation_id} not found in the current project')
     source_annotation = annotations.first()
@@ -42,20 +42,21 @@ def propagate_annotations(project, queryset, **kwargs):
             'completed_by_id': user.id,
             'result': source_annotation.result,
             'result_count': source_annotation.result_count,
-            'parent_annotation_id': source_annotation.id
+            'parent_annotation_id': source_annotation.id,
+            'project': project,
         }
         body = TaskSerializerBulk.add_annotation_fields(body, user, 'propagated_annotation')
         db_annotations.append(Annotation(**body))
 
     db_annotations = Annotation.objects.bulk_create(db_annotations, batch_size=settings.BATCH_SIZE)
     TaskSerializerBulk.post_process_annotations(user, db_annotations, 'propagated_annotation')
-
-    start_job_async_or_sync(project.update_tasks_counters, Task.objects.filter(id__in=tasks))
+    # Update counters for tasks and is_labeled. It should be a single operation as counters affect bulk is_labeled update
+    project.update_tasks_counters_and_is_labeled(tasks_queryset=Task.objects.filter(id__in=tasks))
     return {'response_code': 200, 'detail': f'Created {len(db_annotations)} annotations'}
 
 
 def propagate_annotations_form(user, project):
-    first_annotation = Annotation.objects.filter(task__project=project).first()
+    first_annotation = Annotation.objects.filter(project=project).first()
     field = {
         'type': 'number',
         'name': 'source_annotation_id',
@@ -69,11 +70,7 @@ def propagate_annotations_form(user, project):
 
 
 def remove_duplicates(project, queryset, **kwargs):
-    tasks = list(
-        queryset
-        .annotate(total_annotations=Count('annotations'))
-        .values('data', 'id', 'total_annotations')
-    )
+    tasks = list(queryset.values('data', 'id', 'total_annotations'))
     duplicates = defaultdict(list)
     for task in list(tasks):
         task['data'] = json.dumps(task['data'])
@@ -126,10 +123,15 @@ def rename_labels(project, queryset, **kwargs):
         raise Exception('Wrong old label name, it is not from labeling config: ' + old_label_name)
     label_type = labels[control_tag]['type'].lower()
 
-    annotations = Annotation.objects.filter(task__project=project)
-    annotations = annotations \
-        .filter(result__contains=[{'from_name': control_tag}]) \
-        .filter(result__contains=[{'value': {label_type: [old_label_name]}}])
+    annotations = Annotation.objects.filter(project=project)
+    if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
+        annotations = annotations \
+            .filter(result__icontains=control_tag) \
+            .filter(result__icontains=old_label_name)
+    else:
+        annotations = annotations \
+            .filter(result__contains=[{'from_name': control_tag}]) \
+            .filter(result__contains=[{'value': {label_type: [old_label_name]}}])
 
     label_count = 0
     annotation_count = 0
@@ -157,7 +159,7 @@ def rename_labels(project, queryset, **kwargs):
     # update summaries
     project.summary.reset()
     project.summary.update_data_columns(project.tasks.all())
-    annotations = Annotation.objects.filter(task__project=project)
+    annotations = Annotation.objects.filter(project=project)
     project.summary.update_created_annotations_and_labels(annotations)
 
     return {'response_code': 200, 'detail': f'Updated {label_count} labels in {annotation_count}'}
@@ -246,6 +248,7 @@ def process_arrays(params):
 
 
 add_data_field_examples = (
+    'range(2) or '
     'sample() or '
     'random(<min_int>, <max_int>) or '
     'choices(["<value1>", "<value2>", ...], [<weight1>, <weight2>, ...]) or '
@@ -265,8 +268,16 @@ def add_expression(queryset, size, value, value_name):
 
     tasks = list(queryset.only('data'))
 
+    # range
+    if command == 'range':
+        assert len(args) == 1, "range(start:int) should have start argument "
+        start = int(args[0])
+        values = range(start, start + size)
+        for i, v in enumerate(values):
+            tasks[i].data[value_name] = v
+
     # permutation sampling
-    if command == 'sample':
+    elif command == 'sample':
         assert len(args) == 0, "sample() doesn't have arguments"
         values = random.sample(range(0, size), size)
         for i, v in enumerate(values):
@@ -274,14 +285,15 @@ def add_expression(queryset, size, value, value_name):
 
     # uniform random
     elif command == 'random':
-        assert len(args) == 2, 'random() should have 2 args: min & max'
+        assert len(args) == 2, 'random(min, max) should have 2 args: min & max'
         minimum, maximum = int(args[0]), int(args[1])
         for i in range(size):
             tasks[i].data[value_name] = random.randint(minimum, maximum)
 
     # sampling with choices and weights
     elif command == 'choices':
-        assert 0 < len(args) < 3, 'choices() should have 1 or 2 args: values & weights (default=None)'
+        assert 0 < len(args) < 3, 'choices(values:list, weights:list) ' \
+                                  'should have 1 or 2 args: values & weights (default=None)'
         weights = json.loads(args[1]) if len(args) == 2 else None
         values = random.choices(
             population=json.loads(args[0]),
@@ -293,7 +305,7 @@ def add_expression(queryset, size, value, value_name):
 
     # replace
     elif command == 'replace':
-        assert len(args) == 2, 'replace() should have 2 args: old value & new value'
+        assert len(args) == 2, 'replace(old_value:str, new_value:str) should have 2 args: old value & new value'
         old_value, new_value = json.loads(args[0]), json.loads(args[1])
         for task in tasks:
             if value_name in task.data:

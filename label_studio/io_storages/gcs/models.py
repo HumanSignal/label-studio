@@ -6,6 +6,8 @@ import socket
 import google.auth
 import re
 
+from google.auth.exceptions import DefaultCredentialsError
+
 from core.redis import start_job_async_or_sync
 from google.auth import compute_engine
 from google.cloud import storage as google_storage
@@ -20,12 +22,15 @@ from django.conf import settings
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
+from core.feature_flags import flag_set
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
 
 clients_cache = {}
+# cache for Application Default Credentials https://google-auth.readthedocs.io/en/master/reference/google.auth.html
+credentials_cache = {}
 
 
 class GCSStorageMixin(models.Model):
@@ -44,6 +49,9 @@ class GCSStorageMixin(models.Model):
     google_application_credentials = models.TextField(
         _('google_application_credentials'), null=True, blank=True,
         help_text='The content of GOOGLE_APPLICATION_CREDENTIALS json file')
+    google_project_id = models.TextField(
+        _('Google Project ID'), null=True, blank=True,
+        help_text='Google project ID')
 
     def get_client(self, raise_on_error=False):
         credentials = None
@@ -64,6 +72,10 @@ class GCSStorageMixin(models.Model):
                 logger.error(f"Can't create GCS credentials", exc_info=True)
                 credentials = None
                 project_id = _marker
+
+        if self.google_project_id:
+            # User-defined project ID should override anything that comes from Service Account / environmental vars
+            project_id = self.google_project_id
 
         client = google_storage.Client(project=project_id, credentials=credentials)
         if credentials is not None:
@@ -116,7 +128,8 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
         blob_str = blob.download_as_string()
         value = json.loads(blob_str)
         if not isinstance(value, dict):
-            raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
+            raise ValueError(
+                f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
         return value
 
     @classmethod
@@ -132,11 +145,15 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
         r = urlparse(url, allow_fragments=False)
         bucket_name = r.netloc
         key = r.path.lstrip('/')
-        if self.is_gce_instance() and not self.google_application_credentials:
-            logger.debug('Generate signed URL for GCE instance')
-            return self.python_cloud_function_get_signed_url(bucket_name, key)
+
+        if flag_set('fflag_feat_back_dev_4166_google_project_id_11012023_long', self.project.organization.created_by):
+            return self.generate_download_signed_url_v4(bucket_name, key)
         else:
-            logger.debug('Generate signed URL for local instance')
+            if self.is_gce_instance() and not self.google_application_credentials:
+                logger.debug('Generate signed URL for GCE instance')
+                return self.python_cloud_function_get_signed_url(bucket_name, key)
+            else:
+                logger.debug('Generate signed URL for local instance')
             return self.generate_download_signed_url_v4(bucket_name, key)
 
     def generate_download_signed_url_v4(self, bucket_name, blob_name):
@@ -153,16 +170,50 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
         bucket = self.get_bucket(client, bucket_name)
         blob = bucket.blob(blob_name)
 
-        url = blob.generate_signed_url(
-            version="v4",
-            # This URL is valid for 15 minutes
-            expiration=timedelta(minutes=self.presign_ttl),
-            # Allow GET requests using this URL.
-            method="GET",
-        )
+        if flag_set('fflag_feat_back_dev_4166_google_project_id_11012023_long', self.project.organization.created_by):
+            url = blob.generate_signed_url(
+                version="v4",
+                # This URL is valid for 15 minutes
+                expiration=timedelta(minutes=self.presign_ttl),
+                # Allow GET requests using this URL.
+                method="GET",
+                **self._get_signing_kwargs()
+            )
+        else:
+            url = blob.generate_signed_url(
+                version="v4",
+                # This URL is valid for 15 minutes
+                expiration=timedelta(minutes=self.presign_ttl),
+                # Allow GET requests using this URL.
+                method="GET",
+            )
 
         logger.debug('Generated GCS signed url: ' + url)
         return url
+
+    def _get_signing_credentials(self):
+        cache_key = f'{self.google_application_credentials}'
+        signing_credentials = credentials_cache.get(cache_key)
+        if signing_credentials is None or signing_credentials.expired:
+            signing_credentials, _ = google.auth.default(['https://www.googleapis.com/auth/cloud-platform'])
+            auth_req = google.auth.transport.requests.Request()
+            signing_credentials.refresh(auth_req)
+            credentials_cache[cache_key] = signing_credentials
+        return signing_credentials
+
+    def _get_signing_kwargs(self):
+        try:
+            credentials = self._get_signing_credentials()
+            out = {
+                "service_account_email": credentials.service_account_email,
+                "access_token": credentials.token,
+                "credentials": credentials
+            }
+        except DefaultCredentialsError as exc:
+            logger.error(f"Label studio couldn't load default credentials from env to {self.id}. {exc}",
+                         exc_info=True)
+            out = {}
+        return out
 
     def python_cloud_function_get_signed_url(self, bucket_name, blob_name):
         # https://gist.github.com/jezhumble/91051485db4462add82045ef9ac2a0ec
@@ -174,7 +225,7 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
         # Note: as described in that page, you need to run your function with a service account
         # with the permission roles/iam.serviceAccountTokenCreator
         auth_request = requests.Request()
-        credentials, project = google.auth.default()
+        credentials, project = google.auth.default(['https://www.googleapis.com/auth/cloud-platform'])
         storage_client = google_storage.Client(project, credentials)
         # storage_client = self.get_client()
         data_bucket = storage_client.lookup_bucket(bucket_name)
@@ -210,7 +261,7 @@ class GCSExportStorage(GCSStorageMixin, ExportStorage):
 
 
 def async_export_annotation_to_gcs_storages(annotation):
-    project = annotation.task.project
+    project = annotation.project
     if hasattr(project, 'io_storages_gcsexportstorages'):
         for storage in project.io_storages_gcsexportstorages.all():
             logger.debug(f'Export {annotation} to GCS storage {storage}')
@@ -218,8 +269,10 @@ def async_export_annotation_to_gcs_storages(annotation):
 
 
 @receiver(post_save, sender=Annotation)
-def export_annotation_to_s3_storages(sender, instance, **kwargs):
-    start_job_async_or_sync(async_export_annotation_to_gcs_storages, instance)
+def export_annotation_to_gcs_storages(sender, instance, **kwargs):
+    storages = getattr(instance.project, 'io_storages_gcsexportstorages', None)
+    if storages and storages.exists():  # avoid excess jobs in rq
+        start_job_async_or_sync(async_export_annotation_to_gcs_storages, instance)
 
 
 class GCSImportStorageLink(ImportStorageLink):

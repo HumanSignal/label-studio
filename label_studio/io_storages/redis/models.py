@@ -51,7 +51,7 @@ class RedisStorageMixin(models.Model):
             # This should never happen, but better to check than to accidentally
             # overwrite an existing database by choosing a wrong default:
             raise ValueError(
-                "Please explicitely pass a redis db id to prevent accidentally overwriting existing database!")
+                "Please explicitly pass a redis db id to prevent accidentally overwriting existing database!")
 
         # Since tasks are always text, we use StrictRedis with utf-8 decoding.
         r = redis.StrictRedis(db=db, charset="utf-8", decode_responses=True, **redis_config)
@@ -120,8 +120,8 @@ class RedisExportStorage(ExportStorage, RedisStorageMixin):
 
 
 @receiver(post_save, sender=Annotation)
-def export_annotation_to_s3_storages(sender, instance, **kwargs):
-    project = instance.task.project
+def export_annotation_to_redis_storages(sender, instance, **kwargs):
+    project = instance.project
     if hasattr(project, 'io_storages_redisexportstorages'):
         for storage in project.io_storages_redisexportstorages.all():
             logger.debug(f'Export {instance} to Redis storage {storage}')

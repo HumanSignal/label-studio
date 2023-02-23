@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.permissions import all_permissions
-from core.utils.common import get_object_with_check_and_log, batch
+from core.utils.common import batch
 from projects.models import Project
 from tasks.models import Task
 from .models import DataExport, Export
@@ -209,9 +209,8 @@ class ProjectExportFiles(generics.RetrieveAPIView):
         return Project.objects.filter(organization=self.request.user.active_organization)
 
     def get(self, request, *args, **kwargs):
-        project = self.get_object()
-        project = get_object_with_check_and_log(request, Project, pk=self.kwargs['pk'])
-        self.check_object_permissions(self.request, project)
+        # project permission check
+        self.get_object()
 
         paths = []
         for name in os.listdir(settings.EXPORT_DIR):
