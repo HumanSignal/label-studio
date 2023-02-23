@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-4008: Allow quickly select tasks using hotkeys",
-  "commit": "6013c846d13cf1c212257c4536223e04fc70e161",
-  "branch": "master",
-  "date": "2023/02/15 04:11:11"
+  "message": "feat: LOPS-12: Frontend spike - adding a new LabelOps page",
+  "commit": "ee6a0a9cd69a987722dee31c7e2e0895aee3dc4e",
+  "branch": "fb-lops-12/fronend-spike",
+  "date": "2023/02/23 16:42:34"
 }
