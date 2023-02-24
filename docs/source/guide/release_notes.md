@@ -273,7 +273,7 @@ Label Studio Enterprise 2.3.1 introduces the following new features and enhancem
 - Add a list of supported video formats [DEV-3371].
 - Allow negative timeseries data and additional customization options to visualization [DEV-3535].
 - Introduce new Video settings in the Labeling Interface to allow changing the hop size [DEV-1041].
-- Add Multi-page document annotations template with <Repeater> example among the template gallery [DEV-3545].
+- Add Multi-page document annotations template with `<Repeater>` example among the template gallery [DEV-3545].
 - Inactive users now show `Never` in the **Last Activity** column of the organization table instead of the date they were invited [DEV-3177].
 - Improve revoke invite UX so it's consistent when used from the selected user section and the revoke invite button in the dropdown in User list [DEV-3196].
 - Annotator's Data Manager filters persist between page navigation [DEV-3572].
@@ -427,7 +427,7 @@ Label Studio 2.3.1 includes the following bug fixes:
 - Reverted current `isReady` fix [DEV-3550].
 - Denied removing users by API [DEV-3598].
 - Added simple equality metric for video [DEV-2776].
-- Fixed issue with <Repeater> scrolling and Taxonomy annotations display [DEV-3559].
+- Fixed issue with `<Repeater>` scrolling and Taxonomy annotations display [DEV-3559].
 - Prevented the tabs from being removed and clearing out the related popup [DEV-3329].
 - Fixed CONLL export tokenization issue with splitting into individual tokens [DEV-1923].
 - Implemented Proxy storage links through nginx for auth check [DEV-2915].
@@ -453,12 +453,12 @@ Label Studio 2.3.1 includes the following bug fixes:
 - Unfinished polygons were saved automatically and the history undo/redo hotkeys worked correctly [DEV-3612].
 - Stacktrace was no longer visible in the server error API responses [DEV-3473].
 - Resolved an issue affecting canceled skips for annotations where an incorrect button will display after [DEV-2505].
-- Fixed naive metric for the regions without labels and compound configs (like <Rectangle> + <Labels>)[DEV-3201].
+- Fixed naive metric for the regions without labels and compound configs (like `<Rectangle>` + `<Labels>`)[DEV-3201].
 - Fixed OCR template agreement calculation for missing labels [DEV-3652].
 - Removed project number from `file_name` of image in COCO Export [DEV-3669].
 - Fixed the issue when switching between history items doesn't display selected choices/taxonomy. [DEV-2301]
 - Copied all project settings from template to new project [DEV-3596].
-- Fixed an issue with broken <Repeater> pagination mode when "Select regions after creating" was opted[DEV-3651].
+- Fixed an issue with broken `<Repeater>` pagination mode when "Select regions after creating" was opted[DEV-3651].
 - Logins expired after 15 minutes of inactivity or 8 days after login, based on first come first served occurrence [DEV-3397],[DEV-3397].
 - Fixed validation error for history [DEV-3200].
 - Resolved an issue affecting the Eraser tool which made it unusable since it cleared selected regions on tool selection [DEV-3647].
