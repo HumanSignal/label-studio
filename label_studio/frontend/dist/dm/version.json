@@ -1,6 +1,6 @@
 {
-  "message": "fix: lsdv-4582: convert date values to utc before save and back to lo…",
-  "commit": "d5133bb8fb836d9aa927ce3e40345e87d3acac05",
+  "message": "fix: LSDV-4582: Save date values to UTC, display as local time",
+  "commit": "e70b0d6733078ce7e110be3a4a1935ac5c59dc0e",
   "branch": "fb-lsdv-4582/dm-time-filter-utc",
-  "date": "2023/02/24 11:31:16"
+  "date": "2023/02/24 12:53:03"
 }
