@@ -12,7 +12,7 @@ section: "Configuration"
 
 Sign up and create an account for Label Studio to start labeling data and setting up projects. 
 
-Everyone with an account in Label Studio has access to the same functionality. If you're using Label Studio Enterprise, see [Manage access to Label Studio](manage_users.html) for details about what role-based access control is available. 
+Everyone with an account in Label Studio has access to the same functionality. If you're using Label Studio Enterprise, see [Manage access to Label Studio](https://docs.heartex.com/guide/manage_users.html) for details about what role-based access control is available. 
 
 ## Create an account
 

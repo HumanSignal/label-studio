@@ -122,12 +122,12 @@ Label Studio is available as a <a href="https://labelstud.io">Community edition 
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td><a href="manage_users.html">Role-based access control for each user account.</a></td>
+    <td><a href="https://docs.heartex.com/guide/manage_users.html#Set-up-role-based-access-control-RBAC-with-Label-Studio">Role-based access control for each user account.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td><a href="manage_users.html">Organizations and workspaces to manage users and projects.</a></td>
+    <td><a href="https://docs.heartex.com/guide/manage_users.html">Organizations and workspaces to manage users and projects.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
@@ -199,27 +199,27 @@ Label Studio is available as a <a href="https://labelstud.io">Community edition 
     <td colspan="3"><b>Annotator Performance</b></td>
   </tr>
   <tr>
-    <td><a href="quality.html#Review-annotator-agreement-matrix">Control label quality by monitoring annotator agreement.</a></td>
+    <td><a href="https://docs.heartex.com/guide/quality.html#Review-annotator-agreement-matrix">Control label quality by monitoring annotator agreement.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td><a href="quality.html#Review-annotator-activity-on-the-project-dashboard">Manage and review annotator performance.</a></td>
+    <td><a href="https://docs.heartex.com/guide/quality.html#Review-annotator-activity-on-the-project-dashboard">Manage and review annotator performance.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td><a href="quality.html">Verify model and annotator accuracy against ground truth annotations.</a></td>
+    <td><a href="https://docs.heartex.com/guide/quality.html">Verify model and annotator accuracy against ground truth annotations.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td><a href="quality.html#Verify-model-and-annotator-performance">Verify annotation results.</a></td>
+    <td><a href="https://docs.heartex.com/guide/quality.html#Verify-model-and-annotator-performance">Verify annotation results.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td><a href="quality.html#Review-annotator-performance">Assign reviewers to review annotation results.</a></td>
+    <td><a href="https://docs.heartex.com/guide/quality.html#Review-annotator-performance">Assign reviewers to review annotation results.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
@@ -268,7 +268,7 @@ Label Studio is available as a <a href="https://labelstud.io">Community edition 
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td><a href="auth_setup.html">Support for single sign-on using LDAP or SAML. </a></td>
+    <td><a href="https://docs.heartex.com/guide/auth_setup.html">Support for single sign-on using LDAP or SAML. </a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>

@@ -110,7 +110,7 @@ Transfer it to another VM:
 scp label_studio_latest.tar.gz <ANOTHER_HOST>:/tmp
 ```
 
-SSH into <ANOTHER_HOST> and import the archive:
+SSH into `<ANOTHER_HOST>` and import the archive:
 ```bash
 docker image import /tmp/label_studio_latest.tar.gz
 ```
