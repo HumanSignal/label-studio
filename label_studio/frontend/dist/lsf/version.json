@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3627: Video type unsupported modal misfires fix (#952)",
-  "commit": "e3835c1d9fd36e74c98c986f69fd30bc5880c639",
-  "branch": "master",
-  "date": "2023-02-23T15:36:53Z"
+  "message": "fix: LSDV-4542: Hiding an audio segment and select a segment below no longer works",
+  "commit": "9d6fe911fd3394e3d548deed5308a14b67bad9a9",
+  "branch": "fb-lsdv-4542",
+  "date": "2023/02/24 11:28:10"
 }
