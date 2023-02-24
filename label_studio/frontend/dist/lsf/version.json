@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3627: Video type unsupported modal misfires fix (#952)",
-  "commit": "e3835c1d9fd36e74c98c986f69fd30bc5880c639",
-  "branch": "master",
-  "date": "2023-02-23T15:36:53Z"
+  "message": "fix: LSDV-4572: Sound sometimes delayed to playback visual cursor",
+  "commit": "ae190bf9610683368a8cfbdce3c26c02600732c0",
+  "branch": "fb-lsdv-4572",
+  "date": "2023/02/24 07:32:19"
 }
