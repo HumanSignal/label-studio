@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-4008: Allow quickly select tasks using hotkeys",
-  "commit": "6013c846d13cf1c212257c4536223e04fc70e161",
-  "branch": "master",
-  "date": "2023/02/15 04:11:11"
+  "message": "fix: lsdv-4582: convert date values to utc before save and back to lo…",
+  "commit": "d5133bb8fb836d9aa927ce3e40345e87d3acac05",
+  "branch": "fb-lsdv-4582/dm-time-filter-utc",
+  "date": "2023/02/24 11:31:16"
 }
