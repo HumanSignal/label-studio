@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3820: Universal readonly",
-  "commit": "7926db80a46a4c1ff59b732661f0a621740ee1fb",
+  "commit": "d505c336e7c84b545d1e3a5a7e286bb2d7bc94b8",
   "branch": "fb-dev-3820/readonly-refactoring",
-  "date": "2023/02/24 12:18:09"
+  "date": "2023/02/24 17:43:37"
 }
