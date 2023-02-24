@@ -26,7 +26,7 @@ jobs:
         "lvl3": ".content h4, .ResourcesContent h4",
         "lvl4": ".content h5, .ResourcesContent h5",
         "lvl5": ".content h6, .ResourcesContent h6", 
-        "content": ".content p, .ResourcesContent p, .content li, .ResourcesContent li, .content tr, .ResourcesContent tr"
+        "content": ".content-markdown > *"
         }}
     name: Index Algolia
     steps:
