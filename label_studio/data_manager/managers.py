@@ -195,7 +195,7 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
         filter_expressions.append(~Q(subquery))
         return 'continue'
     elif _filter.operator == Operator.EMPTY and field_name == 'annotations_results':
-        if _filter.value == 'true':
+        if cast_bool_from_str(_filter.value):
             q = Q(annotations__result__isnull=True) | Q(annotations__result=[])
         else:
             q = Q(annotations__result__isnull=False) & ~Q(annotations__result=[])
