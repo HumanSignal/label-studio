@@ -26,6 +26,9 @@ _api_urlpatterns = [
     # Get next task
     path('<int:pk>/next/', api.ProjectNextTaskAPI.as_view(), name='project-next'),
 
+    # Label stream history
+    path('<int:pk>/label-stream-history/', api.LabelStreamHistoryAPI.as_view(), name='label-stream-history'),
+
     # Validate label config in general
     path('validate/', api.LabelConfigValidateAPI.as_view(), name='label-config-validate'),
 

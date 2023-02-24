@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from label_studio.core.utils.params import get_bool_env, get_all_env_with_prefix
 from label_studio.core.utils.io import find_node
+from label_studio.core.current_request import get_current_request
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +86,12 @@ def flag_set(feature_flag, user=None):
     """
     if user is None:
         user = AnonymousUser
+    elif user == 'auto':
+        user = AnonymousUser
+        request = get_current_request()
+        if request and getattr(request, 'user', None) and request.user.is_authenticated:
+            user = request.user
+
     user_dict = _get_user_repr(user)
     env_value = get_bool_env(feature_flag, default=None)
     if env_value is not None:

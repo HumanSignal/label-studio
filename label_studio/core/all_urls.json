@@ -132,6 +132,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/projects/<int:pk>/label-stream-history/",
+        "module": "projects.api.LabelStreamHistoryAPI",
+        "name": "projects:api:label-stream-history",
+        "decorators": ""
+    },
+    {
         "url": "/api/projects/validate/",
         "module": "projects.api.LabelConfigValidateAPI",
         "name": "projects:api:label-config-validate",
