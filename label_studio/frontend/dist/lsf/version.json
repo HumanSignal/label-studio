@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3627: Video type unsupported modal misfires fix (#952)",
-  "commit": "e3835c1d9fd36e74c98c986f69fd30bc5880c639",
-  "branch": "master",
-  "date": "2023-02-23T15:36:53Z"
+  "message": "fix: LSDV-4600: Lead time for TextArea",
+  "commit": "1d47d7defb1f0ec35c5ba3ecc40e20ee30a22c84",
+  "branch": "fb-lsdv-4600",
+  "date": "2023/02/24 17:58:15"
 }
