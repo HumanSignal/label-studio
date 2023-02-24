@@ -219,7 +219,7 @@ Label Studio is available as a <a href="https://labelstud.io">Community edition 
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td><a href="guide/quality.html#Review-annotator-performance">Assign reviewers to review annotation results.</a></td>
+    <td><a href="quality.html#Review-annotator-performance">Assign reviewers to review annotation results.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>

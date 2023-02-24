@@ -240,7 +240,7 @@ Refer to the [Frontend Reference](frontend_reference.html) when developing with 
 
 ### Manual builds
 
-If you want to build a new tag or change the behaviour of default components inside of LSF, then you need to go into the LSF repo and review the [Development part](https://github.com/heartexlabs/label-studio-frontend#development) of the README file. Making any changes requires that you have a good knowledge of React and Javascript.build.js <branch-name-from-official-lsf-repo>
+If you want to build a new tag or change the behaviour of default components inside of LSF, then you need to go into the LSF repo and review the [Development part](https://github.com/heartexlabs/label-studio-frontend#development) of the README file. Making any changes requires that you have a good knowledge of React and Javascript.build.js `<branch-name-from-official-lsf-repo>`
 
 ### GitHub Artifacts
 
