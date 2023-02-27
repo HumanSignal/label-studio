@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4670: Fix frontend build",
-  "commit": "654b67923097779ffe390a4c7bacdaefe84ef0dd",
+  "commit": "b08575177518a511732f31314b2afb8ac15bdbc0",
   "branch": "fb-lsdv-4670/fix-frontend-build",
-  "date": "2023/02/27 14:06:27"
+  "date": "2023/02/27 14:38:04"
 }
