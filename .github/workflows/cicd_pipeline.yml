@@ -297,6 +297,7 @@ jobs:
         env:
           RELEASE_VERSION: "${{ steps.create-draft-release.outputs.tag_name }}"
           CURRENT_REF: "${{ github.event.after }}"
+          GH_REPO: "${{ github.repository }}"
           GH_TOKEN: "${{ secrets.GIT_PAT }}"
           AHA_SERVER: "https://labelstudio.aha.io"
           AHA_TOKEN: "${{ secrets.AHA_TOKEN }}"
@@ -308,6 +309,7 @@ jobs:
           JIRA_PROJECT: "DEV"
           JIRA_RN_FIELD: "customfield_10064"
           LAUNCHDARKLY_SDK_KEY: "${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}"
+          LAUNCHDARKLY_ENVIRONMENT:  "community"
           OUTPUT_FILE_MD: "${{ github.workspace }}/output.md"
           OUTPUT_FILE_JSON: "${{ github.workspace }}/output.json"
           WORKFLOW_RUN_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"

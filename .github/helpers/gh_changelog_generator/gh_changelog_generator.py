@@ -27,6 +27,7 @@ GH_REPO = os.getenv("GH_REPO", "heartexlabs/label-studio").strip('\"')
 GH_TOKEN = os.getenv("GH_TOKEN").strip('\"')  # https://github.com/settings/tokens/new
 
 LAUNCHDARKLY_SDK_KEY = os.getenv("LAUNCHDARKLY_SDK_KEY", '').strip('\"')
+LAUNCHDARKLY_ENVIRONMENT = os.getenv("LAUNCHDARKLY_ENVIRONMENT", 'community').strip('\"')
 
 OUTPUT_FILE_MD = os.getenv("OUTPUT_FILE_MD", 'output.md')
 OUTPUT_FILE_JSON = os.getenv("OUTPUT_FILE_JSON", 'output.json')
@@ -219,7 +220,7 @@ def get_feature_flags() -> list[str]:
         )
         for key, flag in response.json().get('flags', {}).items():
             if not flag.get('on'):
-                result.append(f'- [{key}](https://app.launchdarkly.com/default/onpremise/features/{key}/targeting)')
+                result.append(f'- [{key}](https://app.launchdarkly.com/default/{LAUNCHDARKLY_ENVIRONMENT}/features/{key}/targeting)')
     return result
 
 
