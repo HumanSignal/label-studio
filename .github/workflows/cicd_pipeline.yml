@@ -284,42 +284,52 @@ jobs:
         id: pip-cache
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-gh-actions-${{ hashFiles('.github/helpers/gh_jira_comparisonator/requirements.txt') }}-${{ hashFiles('.github/helpers/gh_changelog_generator/requirements.txt') }}
+          key: ${{ runner.os }}-pip-gh-actions-${{ hashFiles('.github/helpers/gh_changelog_generator/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-gh-actions-
 
       - name: Install tools and dependencies
         run: |
-          pip3 install -r .github/helpers/gh_jira_comparisonator/requirements.txt
           pip3 install -r .github/helpers/gh_changelog_generator/requirements.txt
 
       - name: Generate release changelog
         id: changelog_md
         env:
-          RELEASE_VERSION: ${{ steps.create-draft-release.outputs.tag_name }}
-          CHANGELOG_SOURCE: "${{ github.workspace }}/output.md"
+          RELEASE_VERSION: "${{ steps.create-draft-release.outputs.tag_name }}"
+          CURRENT_REF: "${{ github.event.after }}"
+          GH_TOKEN: "${{ secrets.GIT_PAT }}"
+          AHA_SERVER: "https://labelstudio.aha.io"
+          AHA_TOKEN: "${{ secrets.AHA_TOKEN }}"
+          AHA_PRODUCT: "LSDV"
+          AHA_RN_FIELD: "release_notes"
+          JIRA_SERVER: "https://heartex.atlassian.net"
           JIRA_USERNAME: "${{ secrets.JIRA_USERNAME }}"
           JIRA_TOKEN: "${{ secrets.JIRA_TOKEN }}"
-          GH_TOKEN: "${{ secrets.GIT_PAT }}"
+          JIRA_PROJECT: "DEV"
+          JIRA_RN_FIELD: "customfield_10064"
+          LAUNCHDARKLY_SDK_KEY: "${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}"
           OUTPUT_FILE_MD: "${{ github.workspace }}/output.md"
           OUTPUT_FILE_JSON: "${{ github.workspace }}/output.json"
+          WORKFLOW_RUN_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         run: |
           set -eux
           
           previous_tag=$(git tag --sort=-committerdate | head -n1)
           
-          export PREVIOUS_REF=${previous_tag} 
+          export PREVIOUS_REF="tags/${previous_tag}"
           python3 .github/helpers/gh_changelog_generator/gh_changelog_generator.py
           
-          echo >> '${{ env.OUTPUT_FILE_MD }}'
-          echo ">" >> '${{ env.OUTPUT_FILE_MD }}'
-          echo ">**Full Changelog**: [${previous_tag}...${{ github.ref_name }}](${{ github.server_url }}/${{ github.repository }}/compare/${previous_tag}...${{ github.sha }})" >> '${{ env.OUTPUT_FILE_MD }}'
-          echo ">This changelog was updated in response to a push of ${{ github.sha }} into ${{ github.ref_name }}. [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> '${{ env.OUTPUT_FILE_MD }}'
-          echo ">" >> '${{ env.OUTPUT_FILE_MD }}'
-          python3 .github/helpers/gh_jira_comparisonator/gh_jira_releases.py >> '${{ env.OUTPUT_FILE_MD }}'
-          echo ">" >> '${{ env.OUTPUT_FILE_MD }}'
-          echo ">**ALL LINES STARTING FROM QUOTE WILL BE IGNORED**" >> '${{ env.OUTPUT_FILE_MD }}'
           echo "changelog_msg_b64=$(cat '${{ env.OUTPUT_FILE_MD }}' | base64 -w 0)" >> $GITHUB_OUTPUT
+          
+          echo "CHANGELOG_MD<<CHANGELOG_MD_EOF" >> $GITHUB_ENV
+          cat '${{ env.OUTPUT_FILE_MD }}' >> $GITHUB_ENV
+          echo >> $GITHUB_ENV
+          echo "CHANGELOG_MD_EOF" >> $GITHUB_ENV
+          
+          echo "CHANGELOG_JSON<<CHANGELOG_JSON_EOF" >> $GITHUB_ENV
+          cat '${{ env.OUTPUT_FILE_JSON }}' >> $GITHUB_ENV
+          echo >> $GITHUB_ENV
+          echo "CHANGELOG_JSON_EOF" >> $GITHUB_ENV
 
       - name: Update Draft Release
         uses: actions/github-script@v6
