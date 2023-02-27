@@ -1,6 +1,6 @@
 {
   "message": "fix: DEV-3974: Fix the "Video Hop Size" parameter",
-  "commit": "f4b9589fef9e775ffc7af7f6fa513ce2ca8c85ba",
-  "branch": "fb-dev-3974/fix-video-hop-size",
-  "date": "2023/02/27 17:37:56"
+  "commit": "d0778e8eb19bbb0c35ebb105d945e925ed11f461",
+  "branch": "master",
+  "date": "2023/02/27 18:02:15"
 }
