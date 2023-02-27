@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3627: Video type unsupported modal misfires fix (#952)",
-  "commit": "e3835c1d9fd36e74c98c986f69fd30bc5880c639",
+  "message": "fix: LSDV-4613: Order Table tag items alphabetically (#1210)",
+  "commit": "8044b184643c8f9ab8112f34343bff5b289f0f3c",
   "branch": "master",
-  "date": "2023-02-23T15:36:53Z"
+  "date": "2023-02-27T12:43:44Z"
 }
