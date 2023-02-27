@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4613: Order Table tag items alphabetically (#1210)",
-  "commit": "8044b184643c8f9ab8112f34343bff5b289f0f3c",
+  "message": "fix: LSDV-4670: Fix frontend build",
+  "commit": "0222a39f2bea9086e59f868817a107ef9c199002",
   "branch": "master",
-  "date": "2023-02-27T12:43:44Z"
+  "date": "2023/02/27 15:29:27"
 }
