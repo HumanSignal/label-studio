@@ -384,14 +384,14 @@ def main():
     tracker_release_tasks = jira_release_issues + aha_release_features
 
     if tracker_release_tasks:
-        print(f"{len(tracker_release_tasks)} tasks fount in Task Tracker")
+        print(f"{len(tracker_release_tasks)} tasks found in Task Tracker")
         print("Using Task Tracker as a source")
         sorted_release_tasks = sort_task_by_label(tracker_release_tasks)
         missing_in_gh = missing_tasks(tracker_release_tasks, gh_release_tasks)
         missing_in_tracker = missing_tasks(gh_release_tasks, tracker_release_tasks)
         missing_release_note_field = [x for x in tracker_release_tasks if not x.release_note]
     else:
-        print(f"No tasks fount in Task Tracker")
+        print(f"No tasks found in Task Tracker")
         print("Using GitHub as a source")
         sorted_release_tasks = sort_task_by_label(gh_release_tasks)
         missing_in_gh = []
