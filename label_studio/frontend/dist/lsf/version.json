@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4542: Hiding an audio segment and select a segment below no longer works",
-  "commit": "bae6f80d8a6fc069a1f9e5218785c45102aa2beb",
+  "commit": "638e0ed2a53d16dc5f3bd10438a32c25aefbb1ac",
   "branch": "fb-lsdv-4542",
-  "date": "2023/02/27 09:32:18"
+  "date": "2023/02/28 14:46:17"
 }
