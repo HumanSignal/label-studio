@@ -47,7 +47,7 @@ If you're using Label Studio Enterprise with Amazon S3, you can also delete anno
 
 #### Target storage permissions
 
-To use this type of storage, you must have PUT permission, and DELETE permission are optional.
+To use this type of storage, you must have PUT permission, and DELETE permission is optional.
 
 
 ## Amazon S3
