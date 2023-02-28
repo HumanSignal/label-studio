@@ -141,8 +141,8 @@ This table describes the hotkeys for a standard keyboard. For a Mac keyboard, us
 | `alt` + `h` | Hide a selected region. | 
 | `ctrl` + `d` OR `cmd` + `d` | Duplicate a selected region. |
 | `u` | Unselect a selected region. | 
-| `shift + down` | On the data manager, change the row selection to the next row, 1 below the current row. |
-| `shift + up` | On the data manager, change the row selection to the previous row, 1 above the current row. |
+| `shift + down` | On the data manager, change the row selection to the next row, 1 below the current row. The quick view for the selected task row appears automatically. |
+| `shift + up` | On the data manager, change the row selection to the previous row, 1 above the current row. The quick view for the selected task row appears automatically. |
 | `shift + right` | On the data manager, open the labeling quick view for the selected task row. | 
 | `shift + left` | On the data manager, close the labeling quick view for the selected task row. |
 
