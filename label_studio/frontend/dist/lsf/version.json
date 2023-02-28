@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4572: Audio playback and playhead briefly get out of sync (#1212)",
-  "commit": "a93771bd8b35d27a2cfb9491335924e74f5edfb0",
-  "branch": "master",
-  "date": "2023-02-28T15:54:08Z"
+  "message": "fix: LSDV-4572: Waveform is offset on some audio files",
+  "commit": "6e1605c7a3244d1804e44d5fd3914bab7cc2c281",
+  "branch": "fb-lsdv-4572-fix",
+  "date": "2023/02/28 17:38:57"
 }
