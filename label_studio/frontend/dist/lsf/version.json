@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4572: Sound sometimes delayed to playback visual cursor",
-  "commit": "33da9bdb6036ee285cb4f7ba17644a184c6d463c",
+  "message": "fix: LSDV-4572: Audio playback and playhead briefly get out of sync",
+  "commit": "ab30d2dde38f866452f5deb5c899116c8acad34b",
   "branch": "fb-lsdv-4572",
-  "date": "2023/02/24 09:45:56"
+  "date": "2023/02/28 09:30:13"
 }
