@@ -28,6 +28,15 @@ Label Studio does not automatically sync data from source storage. If you upload
 
 Task data synced from cloud storage is not stored in Label Studio. Instead, the data is accessed using a URL. You can also secure access to cloud storage using cloud storage credentials. For details, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
 
+#### Source storage permissions
+
+* If you enable the "Treat every bucket object as a source file" option in your storage settings, Label Studio backend will require GET permissions to read JSON files and convert them to Label Studio tasks. 
+
+* If you don't enable this option, Label Studio backend will only need LIST permissions and won't download any data from your buckets.
+
+When your users access labeling, the backend will attempt to resolve URI (e.g., s3://) to URL (https://) links. URLs will be returned to the frontend and loaded by the user's browser. To load these URLs, the browser will require HEAD and GET permissions from your Cloud Storage. The HEAD request is made at the beginning and allows the browser to determine the size of the audio, video, or other files. The browser then makes a GET request to retrieve the file body.
+
+
 ### Target storage
 
 When annotators click **Submit** or **Update** while labeling tasks, Label Studio saves annotations in the Label Studio database. 
@@ -35,6 +44,11 @@ When annotators click **Submit** or **Update** while labeling tasks, Label Studi
 If you configure target storage, annotations are sent to target storage after you click **Sync** for the configured target storage connection. The target storage receives a JSON-formatted export of each annotation. See [Label Studio JSON format of annotated tasks](export.html#Label-Studio-JSON-format-of-annotated-tasks) for details about how exported tasks appear in  target storage.
 
 If you're using Label Studio Enterprise with Amazon S3, you can also delete annotations in target storage when they are deleted in Label Studio. See [Set up target storage connection in the Label Studio UI](storage.html#Set-up-target-storage-connection-in-the-Label-Studio-UI) for more details.
+
+#### Target storage permissions
+
+To use this type of storage, you must have PUT permission, and DELETE permission are optional.
+
 
 ## Amazon S3
 
