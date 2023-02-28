@@ -128,7 +128,7 @@ jobs:
         if: inputs.upload_to_pypi
         uses: actions/github-script@v6
         env:
-          VERSION: ${{ github.event.pull_request.title }}
+          VERSION: ${{ inputs.version }}
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
@@ -146,11 +146,11 @@ jobs:
                 core.setOutput("pipy-artifact-url", artifact.url);
                 core.setOutput("pipy-artifact-digests-sha256", artifact.digests.sha256);
                 clearInterval(intervalId)
-              } else if (currentAttempt > MAX_ATTEMPTS) {
+              } else if (currentAttempt >= MAX_ATTEMPTS) {
                 clearInterval(intervalId)
                 throw Error('Max attempts exceeded')
               }
-            }, 6 * 1000)
+            }, 60 * 1000 )
 
       - name: Attach artifacts to release
         if: inputs.release-id

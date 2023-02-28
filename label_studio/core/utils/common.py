@@ -18,6 +18,9 @@ import ujson as json
 import traceback as tb
 import drf_yasg.openapi as openapi
 import contextlib
+
+from label_studio_tools.core.utils.exceptions import LabelStudioXMLSyntaxErrorSentryIgnored
+
 import label_studio
 import re
 
@@ -35,7 +38,7 @@ from rest_framework.exceptions import ErrorDetail
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
 from collections import defaultdict
-from django.contrib.postgres.operations import TrigramExtension
+from django.contrib.postgres.operations import TrigramExtension, BtreeGinExtension
 
 from core.utils.params import get_env
 from datetime import datetime
@@ -52,7 +55,6 @@ except (ModuleNotFoundError, ImportError):
 
 from core import version
 from core.utils.exceptions import LabelStudioDatabaseLockedException
-
 
 # these functions will be included to another modules, don't remove them
 from core.utils.params import int_from_request
@@ -115,7 +117,10 @@ def custom_exception_handler(exc, context):
         if not settings.DEBUG_MODAL_EXCEPTIONS:
             exc_tb = None
         response_data['exc_info'] = exc_tb
-        response = Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=response_data)
+        if isinstance(exc, LabelStudioXMLSyntaxErrorSentryIgnored):
+            response = Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+        else:
+            response = Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=response_data)
 
     return response
 
@@ -222,35 +227,6 @@ def sample_query(q, sample_size):
     ids = q.values_list('id', flat=True)
     random_ids = random.sample(list(ids), sample_size)
     return q.filter(id__in=random_ids)
-
-
-def get_project(obj):
-    from projects.models import Project, ProjectSummary
-    from tasks.models import Task, Annotation, AnnotationDraft
-    from io_storages.base_models import ImportStorage
-    from data_manager.models import View
-
-    if isinstance(obj, Project):
-        return obj
-    elif isinstance(obj, (Task, ProjectSummary, View, ImportStorage)):
-        return obj.project
-    elif isinstance(obj, (Annotation, AnnotationDraft)):
-        return obj.task.project
-    else:
-        raise AttributeError(f'Can\'t get Project from instance {obj}')
-
-
-def request_permissions_add(request, key, model_instance):
-    """ Store accessible objects via permissions to request. It's used for access log.
-    """
-    request.permissions = {} if not hasattr(request, 'permissions') else request.permissions
-    # this func could be called multiple times in one request, and this means there are multiple objects on page/api
-    # do not save different values, just rewrite value to None
-    if key not in request.permissions:
-        request.permissions[key] = copy.deepcopy(model_instance)
-    else:
-        if request.permissions[key] is not None and request.permissions[key].id != model_instance.id:
-            request.permissions[key] = None
 
 
 def get_client_ip(request):
@@ -500,7 +476,7 @@ def collect_versions(force=False):
 
 
 def get_organization_from_request(request):
-    """Helper for backward compatability with org_pk in session """
+    """Helper for backward compatibility with org_pk in session """
     # TODO remove session logic in next release
     user = request.user
     if user and user.is_authenticated:
@@ -535,9 +511,6 @@ def import_from_string(func_string):
     except ImportError:
         msg = f"Could not import {func_string} from settings"
         raise ImportError(msg)
-
-
-get_object_with_check_and_log = load_func(settings.GET_OBJECT_WITH_CHECK_AND_LOG)
 
 
 class temporary_disconnect_signal:
@@ -673,6 +646,22 @@ def trigram_migration_operations(next_step):
             next_step
         ]
     if SKIP_TRIGRAM_EXTENSION == 'full':
+        ops = []
+
+    return ops
+
+
+def btree_gin_migration_operations(next_step):
+    ops = [
+        BtreeGinExtension(),
+        next_step,
+    ]
+    SKIP_BTREE_GIN_EXTENSION = get_env('SKIP_BTREE_GIN_EXTENSION', None)
+    if SKIP_BTREE_GIN_EXTENSION == '1' or SKIP_BTREE_GIN_EXTENSION == 'yes' or SKIP_BTREE_GIN_EXTENSION == 'true':
+        ops = [
+            next_step
+        ]
+    if SKIP_BTREE_GIN_EXTENSION == 'full':
         ops = []
 
     return ops

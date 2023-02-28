@@ -3,12 +3,13 @@ name: "Tests"
 on:
   workflow_call:
     inputs:
-      ref:
+      head_sha:
         required: true
         type: string
 
 env:
   NODE: '14'
+  CACHE_NAME_PREFIX: v1
 
 jobs:
   run_pytest_sqlite:
@@ -42,7 +43,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.head_sha }}
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -58,7 +59,7 @@ jobs:
         name: Configure pip cache
         id: pip-cache
         with:
-          # Cache the Python package environment, excluding pip and setuptools installed by setup-python
+          # Cache the Python package environment, excluding pip and setuptools and label_studio* installed by setup-python
           path: |
             ~/.cache/pip
             ${{ env.pythonLocation }}/bin/*
@@ -67,9 +68,10 @@ jobs:
             !${{ env.pythonLocation }}/bin/pip*
             !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
             !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/label_studio*
           key: ${{ runner.os }}-pip-${{ env.pythonLocation }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-${{ env.pythonLocation }}-
+            ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-django-${{ env.pythonLocation }}-
 
       - name: Install dependencies
         run: |
@@ -182,7 +184,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.head_sha }}
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -198,7 +200,7 @@ jobs:
         name: Configure pip cache
         id: pip-cache
         with:
-          # Cache the Python package environment, excluding pip and setuptools installed by setup-python
+          # Cache the Python package environment, excluding pip and setuptools and label_studio* installed by setup-python
           path: |
             ~/.cache/pip
             ${{ env.pythonLocation }}/bin/*
@@ -207,9 +209,10 @@ jobs:
             !${{ env.pythonLocation }}/bin/pip*
             !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
             !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/label_studio*
           key: ${{ runner.os }}-pip-${{ env.pythonLocation }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-${{ env.pythonLocation }}-
+            ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-django-${{ env.pythonLocation }}-
 
       - name: Install pip dependencies
         run: |
@@ -288,7 +291,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.head_sha }}
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4

@@ -452,7 +452,7 @@ def test_next_task_with_active_learning(mocker,
         Prediction.objects.create(task=task, model_version=project.model_version, **prediction)
         if annotation is not None:
             completed_by = any_client.annotator if num_annotators == 1 else annotator2_client.annotator
-            Annotation.objects.create(task=task, completed_by=completed_by, **annotation)
+            Annotation.objects.create(task=task, completed_by=completed_by, project=project, **annotation)
     r = any_client.get(f'/api/projects/{project.id}/next')
     assert r.status_code == status_code
     rdata = json.loads(r.content)

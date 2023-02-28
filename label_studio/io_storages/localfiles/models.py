@@ -103,7 +103,7 @@ class LocalFilesExportStorage(ExportStorage, LocalFilesMixin):
 
         # get key that identifies this object in storage
         key = LocalFilesExportStorageLink.get_key(annotation)
-        key = os.path.join(self.path, f"{key}.json")
+        key = os.path.join(self.path, f"{key}")
 
         # put object into storage
         with open(key, mode='w') as f:
@@ -123,7 +123,7 @@ class LocalFilesExportStorageLink(ExportStorageLink):
 
 @receiver(post_save, sender=Annotation)
 def export_annotation_to_local_files(sender, instance, **kwargs):
-    project = instance.task.project
+    project = instance.project
     if hasattr(project, 'io_storages_localfilesexportstorages'):
         for storage in project.io_storages_localfilesexportstorages.all():
             logger.debug(f'Export {instance} to Local Storage {storage}')

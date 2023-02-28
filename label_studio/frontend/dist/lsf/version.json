@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3974: Fix the "Video Hop Size" parameter",
-  "commit": "d0778e8eb19bbb0c35ebb105d945e925ed11f461",
+  "message": "fix: LSDV-4572: Audio playback and playhead briefly get out of sync (#1212)",
+  "commit": "a93771bd8b35d27a2cfb9491335924e74f5edfb0",
   "branch": "master",
-  "date": "2023/02/27 18:02:15"
+  "date": "2023-02-28T15:54:08Z"
 }

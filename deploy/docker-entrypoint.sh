@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e ${DEBUG:+-x}
 
@@ -33,6 +33,31 @@ exec_entrypoint() {
   fi
 }
 
+source_inject_envvars() {
+  if [ -n "${ENV_INJECT_SOURCES:-}" ]; then
+    IFS=","
+    for env_file in $ENV_INJECT_SOURCES; do
+       if [ -f "$env_file" ]; then
+         . $env_file
+       fi
+    done
+  fi
+}
+
+exec_or_wrap_n_exec() {
+  if [ -n "${CMD_WRAPPER:-}" ]; then
+    IFS=" "
+    wrapper_cmd_array=($CMD_WRAPPER)
+    wrapper_cmd=${wrapper_cmd_array[0]}
+    wrapper_cmd_args=${wrapper_cmd_array[@]:1}
+    exec "$wrapper_cmd" $wrapper_cmd_args $@
+  else
+    exec "$@"
+  fi
+}
+
+source_inject_envvars
+
 if [ "$1" = "nginx" ]; then
   # in this mode we're running in a separate container
   export APP_HOST=${APP_HOST:=app}
@@ -40,10 +65,10 @@ if [ "$1" = "nginx" ]; then
   exec nginx -c $OPT_DIR/nginx/nginx.conf -e /dev/stderr
 elif [ "$1" = "label-studio-uwsgi" ]; then
   exec_entrypoint "$ENTRYPOINT_PATH/app/"
-  exec uwsgi --ini /label-studio/deploy/uwsgi.ini
+  exec_or_wrap_n_exec uwsgi --ini /label-studio/deploy/uwsgi.ini
 elif [ "$1" = "label-studio-migrate" ]; then
   exec_entrypoint "$ENTRYPOINT_PATH/app-init/"
   exec python3 /label-studio/label_studio/manage.py migrate >&3
 else
-  exec "$@"
+  exec_or_wrap_n_exec "$@"
 fi
