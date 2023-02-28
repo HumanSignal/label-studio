@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4670: Fix frontend build",
-  "commit": "0222a39f2bea9086e59f868817a107ef9c199002",
+  "message": "fix: LSDV-4572: Audio playback and playhead briefly get out of sync (#1212)",
+  "commit": "a93771bd8b35d27a2cfb9491335924e74f5edfb0",
   "branch": "master",
-  "date": "2023/02/27 15:29:27"
+  "date": "2023-02-28T15:54:08Z"
 }
