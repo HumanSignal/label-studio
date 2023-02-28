@@ -30,9 +30,9 @@ Task data synced from cloud storage is not stored in Label Studio. Instead, the 
 
 #### Source storage permissions
 
-* If you enable the "Treat every bucket object as a source file" option in your storage settings, Label Studio backend will require GET permissions to read JSON files and convert them to Label Studio tasks. 
+* If you enable the "Treat every bucket object as a source file" option, Label Studio backend will only need LIST permissions and won't download any data from your buckets.
 
-* If you don't enable this option, Label Studio backend will only need LIST permissions and won't download any data from your buckets.
+* If you disable this option in your storage settings, Label Studio backend will require GET permissions to read JSON files and convert them to Label Studio tasks. 
 
 When your users access labeling, the backend will attempt to resolve URI (e.g., s3://) to URL (https://) links. URLs will be returned to the frontend and loaded by the user's browser. To load these URLs, the browser will require HEAD and GET permissions from your Cloud Storage. The HEAD request is made at the beginning and allows the browser to determine the size of the audio, video, or other files. The browser then makes a GET request to retrieve the file body.
 
