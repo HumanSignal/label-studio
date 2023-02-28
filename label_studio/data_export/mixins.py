@@ -40,6 +40,7 @@ logger = logging.getLogger(__name__)
 
 class ExportMixin:
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
     def get_default_title(self):
@@ -149,7 +150,7 @@ class ExportMixin:
                 "annotations",
                 queryset=annotations_qs,
             )
-        ).select_related('project').prefetch_related(
+        ).prefetch_related(
                 'predictions', 'drafts'
             )
 

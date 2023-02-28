@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3820: Universal readonly",
-  "commit": "7b58096e4f3901ce1a5c9d70412530cb4e40d656",
+  "message": "fix: LSDV-4572: Audio playback and playhead briefly get out of sync (#1212)",
+  "commit": "a93771bd8b35d27a2cfb9491335924e74f5edfb0",
   "branch": "master",
-  "date": "2023/02/27 17:29:58"
+  "date": "2023-02-28T15:54:08Z"
 }

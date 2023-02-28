@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3874: Fix polling overflow",
-  "commit": "049cb9f247b2353b4bf8a49cfc0412e70b76a39b",
+  "message": "feat: DEV-4008: Allow quickly select tasks using hotkeys",
+  "commit": "6013c846d13cf1c212257c4536223e04fc70e161",
   "branch": "master",
-  "date": "2022/12/01 16:12:47"
+  "date": "2023/02/15 04:11:11"
 }

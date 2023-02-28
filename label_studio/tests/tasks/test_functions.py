@@ -1,6 +1,7 @@
 import io
 import os
 import pytest
+import psutil
 
 from django.conf import settings
 
@@ -8,6 +9,30 @@ from data_export.serializers import ExportDataSerializer
 from tasks.functions import export_project
 
 pytestmark = pytest.mark.django_db
+
+
+def memory_limit(max_mem):
+    try:
+        import resource
+    except ImportError:
+        def decorator(f):
+            return f
+        return decorator
+
+    def decorator(f):
+        def wrapper(*args, **kwargs):
+            process = psutil.Process(os.getpid())
+            prev_limits = resource.getrlimit(resource.RLIMIT_AS)
+            resource.setrlimit(
+                resource.RLIMIT_AS, (
+                     process.memory_info().rss + max_mem, -1
+                )
+            )
+            result = f(*args, **kwargs)
+            resource.setrlimit(resource.RLIMIT_AS, prev_limits)
+            return result
+        return wrapper
+    return decorator
 
 
 class TestExportProject:

@@ -34,7 +34,7 @@ At a high level, do the following:
 Label Studio includes several example machine learning backends with popular machine learning models. See the [machine learning tutorials](ml_tutorials.html). Each example ML backend uses Docker Compose to start running the example ML backend server.
 
 To start an example machine learning backend with Docker Compose, do the following:
-1. Make sure port 9090 is available.
+1. Make sure port 9090 is available (or override it with --port parameter).
 2. Clone the Label Studio Machine Learning Backend git repository. From the command line, run the following:
   ```bash
    git clone https://github.com/heartexlabs/label-studio-ml-backend  

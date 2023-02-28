@@ -108,7 +108,7 @@ labelStudio.on("labelStudioLoad", (LS) => {
 });
 
 labelStudio.on("submitAnnotation", (LS, annotation) => {
-  // Retrive an annotation in JSON format
+  // Retrieve an annotation in JSON format
   console.log(annotation.serializeAnnotation())
 });
 ```
