@@ -1,6 +1,6 @@
 {
-  "message": "Fb lsdv 4649/outliner tree dnd",
-  "commit": "a8ff0dfc7b23229a001fce61981680a3ba2e8de4",
+  "message": "fix: LSDV-4649: Regrouping regions after switching annotations",
+  "commit": "cace0269e4ac1ee3c39b691fa756c28837604547",
   "branch": "fb-lsdv-4649/outliner-tree-dnd",
-  "date": "2023/03/01 16:12:46"
+  "date": "2023/03/01 19:42:23"
 }
