@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4542: Hiding an audio segment and select a segment below no longer works (#1213)",
-  "commit": "94c62fad3a3b8b26e87b97881fb221e815ecad7b",
+  "message": "feat: LSDV-4583-6: Image preloading (#1187)",
+  "commit": "a75b52f99c2f954db25bd08533dc4328372d409a",
   "branch": "master",
-  "date": "2023-02-28T22:14:22Z"
+  "date": "2023-03-01T11:56:08Z"
 }
