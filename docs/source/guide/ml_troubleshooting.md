@@ -20,6 +20,35 @@ If you're running an ML backend using Docker Compose:
 - Training logs are located in `logs/rq.log`
 - Main process and inference logs are located in `logs/uwsgi.log`
 
+## Label Studio default timeout settings for ML server requests
+Label studio has default timeouts for all types of requests to ML server.   
+
+Label studio has several different requests to ML server:
+1. Health - request to check ML backend health status when adding new ML backend (env variable ML_TIMEOUT_HEALTH)
+2. Setup - request to setup ML backend, initialize ML model (env variable ML_TIMEOUT_SETUP)
+3. Predict - prediction request when Label Studio gets predictions from ML backend (env variable ML_TIMEOUT_PREDICT)
+4. Train - request to train ML backend  (env variable ML_TIMEOUT_PREDICT)
+5. Duplicate model - duplicate model request to ML backend (env variable ML_TIMEOUT_PREDICT)
+6. Delete - send delete request to ML backend (env variable ML_TIMEOUT_PREDICT)
+7. Train job status - request train job status from ML backend (env variable ML_TIMEOUT_PREDICT)
+
+You can adjust the timeout by setting an environment variables for each request or modify in Label Studio variables. These are the variables section in Label Studio (in seconds):
+
+```python
+CONNECTION_TIMEOUT = float(get_env('ML_CONNECTION_TIMEOUT', 1))  
+TIMEOUT_DEFAULT = float(get_env('ML_TIMEOUT_DEFAULT', 100))  
+TIMEOUT_TRAIN = float(get_env('ML_TIMEOUT_TRAIN', 30))
+TIMEOUT_PREDICT = float(get_env('ML_TIMEOUT_PREDICT', 100))
+TIMEOUT_HEALTH = float(get_env('ML_TIMEOUT_HEALTH', 1))
+TIMEOUT_SETUP = float(get_env('ML_TIMEOUT_SETUP', 3))
+TIMEOUT_DUPLICATE_MODEL = float(get_env('ML_TIMEOUT_DUPLICATE_MODEL', 1))
+TIMEOUT_DELETE = float(get_env('ML_TIMEOUT_DELETE', 1))
+TIMEOUT_TRAIN_JOB_STATUS = float(get_env('ML_TIMEOUT_TRAIN_JOB_STATUS', 1))
+```
+
+You can modify them in [ml/api_connector.py](https://github.com/heartexlabs/label-studio/blob/develop/label_studio/ml/api_connector.py#L22..L31).
+
+
 ## I launched the ML backend, but it appears as **Disconnected** after adding it in the Label Studio UI
 
 Your ML backend server might not have started properly. 
