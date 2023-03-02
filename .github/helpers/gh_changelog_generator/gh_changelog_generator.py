@@ -1,7 +1,6 @@
 import json
 import os
 import re
-from pprint import pprint
 
 import requests
 from github import Github
@@ -77,7 +76,7 @@ class AHA:
         )
         return response.json()
 
-    def paginage(self, url: str, key: str, data: dict = None, method: str = 'GET', page: int = 0, per_page: int = 100):
+    def paginate(self, url: str, key: str, data: dict = None, method: str = 'GET', page: int = 0, per_page: int = 100):
         result = []
         current_page = page
         total_pages = None
@@ -185,7 +184,7 @@ def get_aha_release_features(release_num: str) -> list[AhaFeature]:
 
 
 def get_aha_release_features_by_tag(tag: str) -> list[AhaFeature]:
-    features = aha_client.paginage(f'api/v1/features', 'features', data={"tag": tag})
+    features = aha_client.paginate(f'api/v1/features', 'features', data={"tag": tag})
     tasks = set()
     for feature in features:
         if task := get_task(feature.get('reference_num')):
@@ -385,7 +384,7 @@ def main():
     print(f"Behind by {gh_release.behind_by}")
     print(f"Merge base commit: {gh_release.merge_base_commit}")
     print(f"Commits: {gh_release.commits}")
-    gh_release_tasks = []  # get_github_release_tasks(gh_release.commits)
+    gh_release_tasks = get_github_release_tasks(gh_release.commits)
 
     aha_release = None
     aha_release_features = []
@@ -398,7 +397,7 @@ def main():
             print(f"Aha! Release not found")
     else:
         if AHA_TAG:
-            aha_release = {'url': f'{AHA_SERVER}/api/v1/features?tag={AHA_TAG}'}
+            aha_release = {'url': f'{AHA_SERVER}/api/v1/features?tag={AHA_TAG.replace(" ", "%20")}'}
             aha_release_features = get_aha_release_features_by_tag(AHA_TAG)
         else:
             print("AHA TAG is not specified")
