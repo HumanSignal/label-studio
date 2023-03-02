@@ -211,17 +211,17 @@ class GCS(object):
         bucket = client.get_bucket(bucket_name)
         blob = bucket.blob(key)
         blob_str = blob.download_as_bytes()
-        if convert_to == ConvertBlobTo.NOTHING:
+        if convert_to == cls.ConvertBlobTo.NOTHING:
             return blob_str
-        elif convert_to == ConvertBlobTo.JSON:
+        elif convert_to == cls.ConvertBlobTo.JSON:
             return cls._try_read_json(blob_str)
-        elif convert_to == ConvertBlobTo.JSON_DICT:
+        elif convert_to == cls.ConvertBlobTo.JSON_DICT:
             json_data = cls._try_read_json(blob_str)
             if not isinstance(json_data, dict):
                 raise ValueError(
                     f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
             return json_data
-        elif convert_to == ConvertBlobTo.BASE64:
+        elif convert_to == cls.ConvertBlobTo.BASE64:
             return base64.b64encode(blob_str)
 
         return blob_str
