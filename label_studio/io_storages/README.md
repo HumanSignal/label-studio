@@ -4,12 +4,14 @@ There are 3 basic types of cloud storages:
 
 1. Import Storages (aka Source Cloud Storages)
 2. Export Storages (aka Target Cloud Storages)
-3. Dataset Storages
+3. Dataset Storages (available in enterprise)
 
 ## Basic hierarchy 
 
-### Import and Dataset storages example based on Google Cloud
+### Import and Dataset Storages 
  
+This diagram is based on Google Cloud Storage (GCS) and other storages are implemented the same way.
+  
 ```mermaid
     graph TD;
     
@@ -29,5 +31,3 @@ There are 3 basic types of cloud storages:
         GCSDatasetStorage;
     end
 ```
-
-Other dataset and import storages are implemented the same way.  
