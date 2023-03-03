@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4572: Waveform is offset on some audio files (#1222)",
-  "commit": "2e6d833725fc38d229ddcb3d05c439475dfce90a",
+  "message": "fix: LSDV-4592: Remove ghost region on AudioV3 (#1202)",
+  "commit": "ebab13ff128f88f2c6caa2a5a1d572e42da163c9",
   "branch": "master",
-  "date": "2023-03-01T15:52:32Z"
+  "date": "2023-03-03T12:04:30Z"
 }
