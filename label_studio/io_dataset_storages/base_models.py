@@ -28,31 +28,3 @@ class DatasetStorage(ImportStorage):
 def sync_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.scan_and_create_links_v2()
-
-
-class DatasetStorageLink(models.Model):
-
-    task = models.OneToOneField('tasks.Task', on_delete=models.CASCADE, related_name='%(app_label)s_%(class)s')
-    key = models.TextField(_('key'), null=False, help_text='External link key')
-    object_exists = models.BooleanField(
-        _('object exists'), help_text='Whether object under external link still exists', default=True
-    )
-    created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
-
-    @classmethod
-    def exists(cls, key, storage):
-        return cls.objects.filter(key=key, storage=storage.id).exists()
-
-    @classmethod
-    def create(cls, task, key, storage):
-        link, created = cls.objects.get_or_create(task_id=task.id, key=key, storage=storage, object_exists=True)
-        return link
-
-    def has_permission(self, user):
-        user.project = self.task.project  # link for activity log
-        if self.task.has_permission(user):
-            return True
-        return False
-
-    class Meta:
-        abstract = True

@@ -10,11 +10,15 @@ from django.conf import settings
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
-from io_storages.base_models import (
-    ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink, ProjectImportStorageMixin
-)
 from io_storages.gcs.utils import GCS
 from tasks.models import Annotation
+from io_storages.base_models import (
+    ExportStorage,
+    ExportStorageLink,
+    ImportStorage,
+    ImportStorageLink,
+    ProjectStorageMixin
+)
 
 logger = logging.getLogger(__name__)
 
@@ -92,13 +96,16 @@ class GCSImportStorageBase(GCSStorageMixin, ImportStorage):
             presign_ttl=self.presign_ttl
         )
 
-
-class GCSImportStorage(GCSImportStorageBase, ProjectImportStorageMixin):
     def scan_and_create_links(self):
         return self._scan_and_create_links(GCSImportStorageLink)
 
     class Meta:
-        pass
+        abstract = True
+
+
+class GCSImportStorage(ProjectStorageMixin, GCSImportStorageBase):
+    class Meta:
+        abstract = False
 
 
 class GCSExportStorage(GCSStorageMixin, ExportStorage):

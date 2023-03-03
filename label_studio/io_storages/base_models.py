@@ -104,18 +104,6 @@ class ImportStorage(Storage):
             except Exception as exc:
                 logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
 
-    class Meta:
-        abstract = True
-
-
-class ProjectImportStorageMixin(ImportStorage):
-    project = models.ForeignKey(
-        'projects.Project',
-        related_name='%(app_label)s_%(class)ss',
-        on_delete=models.CASCADE,
-        help_text='A unique integer value identifying this project.'
-    )
-
     @classmethod
     def add_task(cls, data, project, maximum_annotations, max_inner_id, storage, key, link_class):
         # predictions
@@ -228,6 +216,21 @@ class ProjectImportStorageMixin(ImportStorage):
         else:
             logger.info(f'Start syncing storage {self}')
             self.scan_and_create_links()
+
+    class Meta:
+        abstract = True
+
+
+class ProjectStorageMixin(models.Model):
+    project = models.ForeignKey(
+        'projects.Project',
+        related_name='%(app_label)s_%(class)ss',
+        on_delete=models.CASCADE,
+        help_text='A unique integer value identifying this project.'
+    )
+    
+    class Meta:
+        abstract = True
 
 
 @job('low')

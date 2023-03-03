@@ -6,46 +6,11 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
-from io_dataset_storages.base_models import DatasetStorage, DatasetStorageLink
+from io_dataset_storages.base_models import DatasetStorage
 from io_storages.gcs.utils import GCS
-
+from io_storages.gcs.models import GCSStorageMixin
 
 logger = logging.getLogger(__name__)
-
-
-class GCSStorageMixin(models.Model):
-    bucket = models.TextField(
-        _('bucket'), null=True, blank=True,
-        help_text='GCS bucket name')
-    prefix = models.TextField(
-        _('prefix'), null=True, blank=True,
-        help_text='GCS bucket prefix')
-    regex_filter = models.TextField(
-        _('regex_filter'), null=True, blank=True,
-        help_text='Cloud storage regex for filtering objects')
-    use_blob_urls = models.BooleanField(
-        _('use_blob_urls'), default=False,
-        help_text='Interpret objects as BLOBs and generate URLs')
-    google_application_credentials = models.TextField(
-        _('google_application_credentials'), null=True, blank=True,
-        help_text='The content of GOOGLE_APPLICATION_CREDENTIALS json file')
-    google_project_id = models.TextField(
-        _('Google Project ID'), null=True, blank=True,
-        help_text='Google project ID')
-
-    def get_client(self):
-        return GCS.get_client(
-            google_project_id=self.google_project_id,
-            google_application_credentials=self.google_application_credentials
-        )
-
-    def get_bucket(self, client=None, bucket_name=None):
-        if not client:
-            client = self.get_client()
-        return client.get_bucket(bucket_name or self.bucket)
-
-    def validate_connection(self):
-        GCS.validate_connection(self.bucket, self.google_project_id, self.google_application_credentials)
 
 
 class GCSDatasetStorage(GCSStorageMixin, DatasetStorage):
@@ -87,8 +52,4 @@ class GCSDatasetStorage(GCSStorageMixin, DatasetStorage):
         )
 
     def scan_and_create_links(self):
-        return self._scan_and_create_links(GCSDatasetStorageLink)
-
-
-class GCSDatasetStorageLink(DatasetStorageLink):
-    storage = models.ForeignKey(GCSDatasetStorage, on_delete=models.CASCADE, related_name='links')
+        return self._scan_and_create_links_v2()
