@@ -3,6 +3,8 @@
 import ujson as json
 
 import json
+import re
+import io
 import pytest
 import requests_mock
 import requests
@@ -45,6 +47,18 @@ def register_ml_backend_mock(m, url='http://localhost:9090', predictions=None, h
     m.post(f'{url}/webhook', text=json.dumps({}))
     m.post(f'{url}/versions', text=json.dumps({'versions': ["1", "2"]}))
     return m
+
+
+@contextmanager
+def import_from_url_mock(**kwargs):
+    with requests_mock.Mocker(real_http=True) as m:
+        url='https://data.heartextest.net'
+
+        with open('./tests/test_suites/samples/test_1.csv', 'rb') as f:
+            matcher = re.compile('data.heartextest.net/test_1.csv')
+
+            m.get(matcher, body=f, headers={'Content-Length': '100'})
+            yield m
 
 
 class _TestJob(object):
