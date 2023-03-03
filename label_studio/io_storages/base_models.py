@@ -108,10 +108,12 @@ class ImportStorage(Storage):
     def _scan_and_create_links_v2(self):
         # Async job execution for batch of objects:
         # e.g. GCS example
-        # | "ReadFile" >> beam.Map(GCS.read_file)
-        # | "AddObject" >> label_studio_semantic_search.indexer.add_objects
-        # or for task creation last step would be
+        # | "ReadFile" >> beam.Map(GCS.read_file) --> read file content into label_studio_semantic_search.indexer.RawDataObject repr
+        # | "AggregateBatch" >> beam.Combine      --> combine read objects into a batch
+        # | "AddObject" >> label_studio_semantic_search.indexer.add_objects --> add objects from batch to Vector DB
+        # or for project task creation last step would be
         # | "AddObject" >> ImportStorage.add_task
+
         raise NotImplementedError
 
     @classmethod
