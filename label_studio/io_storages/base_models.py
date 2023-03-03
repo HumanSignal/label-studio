@@ -1,7 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
-
 import django_rq
 import json
 
@@ -171,7 +170,7 @@ class ImportStorage(Storage):
         maximum_annotations = self.project.maximum_annotations
         task = self.project.tasks.order_by('-inner_id').first()
         max_inner_id = (task.inner_id + 1) if task else 1
-        
+
         for key in self.iterkeys():
             logger.debug(f'Scanning key {key}')
 
@@ -247,13 +246,7 @@ def sync_background(storage_class, storage_id, **kwargs):
     storage.scan_and_create_links()
 
 
-class ExportStorage(Storage):
-    project = models.ForeignKey(
-        'projects.Project',
-        related_name='%(app_label)s_%(class)ss',
-        on_delete=models.CASCADE,
-        help_text='A unique integer value identifying this project.'
-    )
+class ExportStorage(Storage, ProjectStorageMixin):
     can_delete_objects = models.BooleanField(
         _('can_delete_objects'),
         null=True,
