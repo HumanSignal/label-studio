@@ -44,6 +44,11 @@ def enable_csrf():
     settings.USE_ENFORCE_CSRF_CHECKS = True
 
 
+@pytest.fixture(autouse=False)
+def label_stream_history_limit():
+    settings.LABEL_STREAM_HISTORY_LIMIT = 1
+
+
 @pytest.fixture(autouse=True)
 def disable_sentry():
     settings.SENTRY_RATE = 0

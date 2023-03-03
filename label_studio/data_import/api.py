@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import time
+import requests
 import logging
 import drf_yasg.openapi as openapi
 import json
@@ -356,6 +357,19 @@ class ReImportAPI(ImportAPI):
 @method_decorator(name='get', decorator=swagger_auto_schema(
         tags=['Import'],
         operation_summary='Get files list',
+        manual_parameters=[
+            openapi.Parameter(
+                name='all',
+                type=openapi.TYPE_BOOLEAN,
+                in_=openapi.IN_QUERY,
+                description='Set to "true" if you want to retrieve all file uploads'),
+            openapi.Parameter(
+                name='ids',
+                type=openapi.TYPE_ARRAY,
+                in_=openapi.IN_QUERY,
+                items=openapi.Schema(title="File upload ID", type=openapi.TYPE_INTEGER),
+                description='Specify the list of file upload IDs to retrieve, e.g. ids=[1,2,3]'),
+        ],
         operation_description="""
         Retrieve the list of uploaded files used to create labeling tasks for a specific project.
         """
@@ -380,7 +394,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin,
 
     def get_queryset(self):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
-        if project.is_draft:
+        if project.is_draft or bool_from_request(self.request.query_params, 'all', False):
             # If project is in draft state, we return all uploaded files, ignoring queried ids
             logger.debug(f'Return all uploaded files for draft project {project}')
             return FileUpload.objects.filter(project_id=project.id, user=self.request.user)
@@ -468,8 +482,11 @@ class DownloadStorageData(APIView):
     """ Check auth for nginx auth_request
     """
     swagger_schema = None
-    http_method_names = ['get']
+    http_method_names = ['get', 'head']
     permission_classes = (IsAuthenticated, )
+
+    def head(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         """ Get export files list
@@ -487,7 +504,7 @@ class DownloadStorageData(APIView):
             file_upload = FileUpload.objects.filter(file=filepath).last()
 
             if file_upload is not None and file_upload.has_permission(request.user):
-                url = file_upload.file.storage.url(file_upload.file.name, storage_url=True)
+                url = file_upload.file.storage.url(file_upload.file.name, storage_url=True, http_method=request.method)
         elif filepath.startswith(settings.AVATAR_PATH):
             user = User.objects.filter(avatar=filepath).first()
             if user is not None and request.user.active_organization.has_user(user):

@@ -11,7 +11,6 @@ from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS
 from projects.models import Project, ProjectOnboarding, ProjectSummary
 
 
-
 class CreatedByFromContext:
     requires_context = True
 
