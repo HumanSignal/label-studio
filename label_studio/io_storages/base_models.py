@@ -1,6 +1,8 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
+from abc import ABC
+
 import django_rq
 import json
 
@@ -31,8 +33,6 @@ class Storage(models.Model):
 
     title = models.CharField(_('title'), null=True, blank=True, max_length=256, help_text='Cloud storage title')
     description = models.TextField(_('description'), null=True, blank=True, help_text='Cloud storage description')
-    project = models.ForeignKey('projects.Project', related_name='%(app_label)s_%(class)ss', on_delete=models.CASCADE,
-                                help_text='A unique integer value identifying this project.')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     last_sync = models.DateTimeField(_('last sync'), null=True, blank=True, help_text='Last sync finished time')
     last_sync_count = models.PositiveIntegerField(
@@ -55,7 +55,6 @@ class Storage(models.Model):
 
 
 class ImportStorage(Storage):
-
     def iterkeys(self):
         return iter(())
 
@@ -105,14 +104,17 @@ class ImportStorage(Storage):
             except Exception as exc:
                 logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
 
-    def _scan_and_create_links_v2(self):
-        # Async job execution for batch of objects:
-        # e.g. GCS example
-        # | "ReadFile" >> beam.Map(GCS.read_file)
-        # | "AddObject" >> label_studio_semantic_search.indexer.add_objects
-        # or for task creation last step would be
-        # | "AddObject" >> ImportStorage.add_task
-        raise NotImplementedError
+    class Meta:
+        abstract = True
+
+
+class ProjectImportStorageMixin(ImportStorage):
+    project = models.ForeignKey(
+        'projects.Project',
+        related_name='%(app_label)s_%(class)ss',
+        on_delete=models.CASCADE,
+        help_text='A unique integer value identifying this project.'
+    )
 
     @classmethod
     def add_task(cls, data, project, maximum_annotations, max_inner_id, storage, key, link_class):
@@ -173,7 +175,7 @@ class ImportStorage(Storage):
         maximum_annotations = self.project.maximum_annotations
         task = self.project.tasks.order_by('-inner_id').first()
         max_inner_id = (task.inner_id + 1) if task else 1
-        
+
         for key in self.iterkeys():
             logger.debug(f'Scanning key {key}')
 
@@ -202,10 +204,10 @@ class ImportStorage(Storage):
         self.save()
 
         self.project.update_tasks_states(
-                maximum_annotations_changed=False,
-                overlap_cohort_percentage_changed=False,
-                tasks_number_changed=True
-            )
+            maximum_annotations_changed=False,
+            overlap_cohort_percentage_changed=False,
+            tasks_number_changed=True
+        )
 
     def scan_and_create_links(self):
         """This is proto method - you can override it, or just replace ImportStorageLink by your own model"""
@@ -227,9 +229,6 @@ class ImportStorage(Storage):
             logger.info(f'Start syncing storage {self}')
             self.scan_and_create_links()
 
-    class Meta:
-        abstract = True
-
 
 @job('low')
 def sync_background(storage_class, storage_id, **kwargs):
@@ -238,7 +237,18 @@ def sync_background(storage_class, storage_id, **kwargs):
 
 
 class ExportStorage(Storage):
-    can_delete_objects = models.BooleanField(_('can_delete_objects'), null=True, blank=True, help_text='Deletion from storage enabled')
+    project = models.ForeignKey(
+        'projects.Project',
+        related_name='%(app_label)s_%(class)ss',
+        on_delete=models.CASCADE,
+        help_text='A unique integer value identifying this project.'
+    )
+    can_delete_objects = models.BooleanField(
+        _('can_delete_objects'),
+        null=True,
+        blank=True,
+        help_text='Deletion from storage enabled'
+    )
 
     def _get_serialized_data(self, annotation):
         if settings.FUTURE_SAVE_TASK_TO_STORAGE:
