@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4592: Remove ghost region on AudioV3 (#1202)",
-  "commit": "ebab13ff128f88f2c6caa2a5a1d572e42da163c9",
-  "branch": "master",
-  "date": "2023-03-03T12:04:30Z"
+  "message": "fix: LSDV-4662: Use empty range GET requests instead of HEAD to avoid CORS issue",
+  "commit": "41a080e35bf2a90300fb7c86c072b37365dc0e00",
+  "branch": "fb-lsdv-4662",
+  "date": "2023/03/03 12:11:58"
 }
