@@ -268,6 +268,14 @@ To activate a user account and assign a role, do the following:
 3. Select the drop-down under **Role** and select the relevant role for the user.
 Your changes save automatically. Repeat these steps for any additional users. 
 
+### Status of user account
+!!! note
+    `NOT_ACTIVATED` status is equal to `Pending` status. 
+
+If a user is in `Pending` status then it means he was invited and signed up for the account, but his role is not defined by administrator. 
+
+If you assign `Deactivate` to a role then it means you free one seat in license and a user with deactivated doesn't have access to your organization.
+
 ### Programmatically assign roles
 To programmatically activate and assign roles to users, you can use the following API endpoints. 
 

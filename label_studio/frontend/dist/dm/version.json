@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3958: Remove WASD",
-  "commit": "0f5fbfff2698593e8d341316d1e0869386fb7c2e",
+  "message": "feat: LOPS-12: Frontend spike - adding a new LabelOps page",
+  "commit": "cc0bd41d62dd5e482799be1a72d5137b789671dd",
   "branch": "master",
-  "date": "2022/12/07 20:14:23"
+  "date": "2023/02/28 15:44:36"
 }

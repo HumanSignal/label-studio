@@ -45,6 +45,7 @@ class Storage(models.Model):
         pass
 
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         if self.project.has_permission(user):
             return True
         return False
@@ -67,22 +68,42 @@ class ImportStorage(Storage):
     def can_resolve_url(self, url):
         # TODO: later check to the full prefix like "url.startswith(self.path_full)"
         # Search of occurrences inside string, e.g. for cases like "gs://bucket/file.pdf" or "<embed src='gs://bucket/file.pdf'/>"  # noqa
-        _, storage = get_uri_via_regex(url, prefixes=(self.url_scheme,))
-        if storage == self.url_scheme:
+        _, prefix = get_uri_via_regex(url, prefixes=(self.url_scheme,))
+        if prefix == self.url_scheme:
             return True
         # if not found any occurrences - this Storage can't resolve url
         return False
 
     def resolve_uri(self, uri):
-        try:
-            extracted_uri, extracted_storage = get_uri_via_regex(uri, prefixes=(self.url_scheme,))
-            if not extracted_storage:
-                logger.info(f'No storage info found for URI={uri}')
-                return
-            http_url = self.generate_http_url(extracted_uri)
-            return uri.replace(extracted_uri, http_url)
-        except Exception as exc:
-            logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
+        #  list of objects
+        if isinstance(uri, list):
+            resolved = []
+            for item in uri:
+                result = self.resolve_uri(item)
+                resolved.append(result if result else item)
+            return resolved
+
+        # dict of objects
+        elif isinstance(uri, dict):
+            resolved = {}
+            for key in uri.keys():
+                result = self.resolve_uri(uri[key])
+                resolved[key] = result if result else uri[key]
+            return resolved
+
+        # string: process one url
+        elif isinstance(uri, str):
+            try:
+                # extract uri first from task data
+                extracted_uri, extracted_storage = get_uri_via_regex(uri, prefixes=(self.url_scheme,))
+                if not extracted_storage:
+                    logger.debug(f'No storage info found for URI={uri}')
+                    return
+                # resolve uri to url using storages
+                http_url = self.generate_http_url(extracted_uri)
+                return uri.replace(extracted_uri, http_url)
+            except Exception as exc:
+                logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
 
     def _scan_and_create_links(self, link_class):
         tasks_created = 0
@@ -125,7 +146,7 @@ class ImportStorage(Storage):
                     raise ValueError(
                         'If you use "annotations" field in the task, ' 'you must put "data" field in the task too'
                     )
-                cancelled_annotations = len([a for a in annotations if a['was_cancelled']])
+                cancelled_annotations = len([a for a in annotations if a.get('was_cancelled', False)])
 
             if 'data' in data and isinstance(data['data'], dict):
                 data = data['data']
@@ -207,7 +228,7 @@ class ExportStorage(Storage):
     can_delete_objects = models.BooleanField(_('can_delete_objects'), null=True, blank=True, help_text='Deletion from storage enabled')
 
     def _get_serialized_data(self, annotation):
-        if get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False):
+        if settings.FUTURE_SAVE_TASK_TO_STORAGE:
             # export task with annotations
             return ExportDataSerializer(annotation.task).data
         else:
@@ -220,7 +241,7 @@ class ExportStorage(Storage):
 
     def save_all_annotations(self):
         annotation_exported = 0
-        for annotation in Annotation.objects.filter(task__project=self.project):
+        for annotation in Annotation.objects.filter(project=self.project):
             self.save_annotation(annotation)
             annotation_exported += 1
 
@@ -266,6 +287,7 @@ class ImportStorageLink(models.Model):
         return link
 
     def has_permission(self, user):
+        user.project = self.task.project  # link for activity log
         if self.task.has_permission(user):
             return True
         return False
@@ -287,8 +309,8 @@ class ExportStorageLink(models.Model):
 
     @staticmethod
     def get_key(annotation):
-        if get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False):
-            return str(annotation.task.id)
+        if settings.FUTURE_SAVE_TASK_TO_STORAGE:
+            return str(annotation.task.id) + '.json' if settings.FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT else ''
         return str(annotation.id)
 
     @property
@@ -308,6 +330,7 @@ class ExportStorageLink(models.Model):
         return link
 
     def has_permission(self, user):
+        user.project = self.annotation.project  # link for activity log
         if self.annotation.has_permission(user):
             return True
         return False

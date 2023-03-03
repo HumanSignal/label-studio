@@ -4,10 +4,10 @@ import logging
 import ujson as json
 import numbers
 
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from django.conf import settings
 
-from rest_framework import serializers
+from rest_framework import serializers, generics
 from rest_framework.serializers import ModelSerializer
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField
@@ -17,7 +17,8 @@ from rest_flex_fields import FlexFieldsModelSerializer
 from projects.models import Project
 from tasks.models import Task, Annotation, AnnotationDraft, Prediction
 from tasks.validation import TaskValidator
-from core.utils.common import get_object_with_check_and_log, retry_database_locked
+from tasks.exceptions import AnnotationDuplicateError
+from core.utils.common import retry_database_locked
 from core.label_config import replace_task_data_undefined_with_config_field
 from users.serializers import UserSerializer
 from users.models import User
@@ -56,6 +57,19 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
     completed_by = serializers.PrimaryKeyRelatedField(required=False, queryset=User.objects.all())
+    unique_id = serializers.CharField(required=False, write_only=True)
+
+    def create(self, *args, **kwargs):
+        try:
+            return super().create(*args, **kwargs)
+        except IntegrityError as e:
+            errors = [
+                'UNIQUE constraint failed: task_completion.unique_id',
+                'duplicate key value violates unique constraint "task_completion_unique_id_key"',
+            ]
+            if any([error in str(e) for error in errors]):
+                raise AnnotationDuplicateError()
+            raise
 
     def validate_result(self, value):
         data = value
@@ -121,7 +135,7 @@ class BaseTaskSerializer(FlexFieldsModelSerializer):
             project = self.context['project']
         elif 'view' in self.context and 'project_id' in self.context['view'].kwargs:
             kwargs = self.context['view'].kwargs
-            project = get_object_with_check_and_log(Project, kwargs['project_id'])
+            project = generics.get_object_or_404(Project, kwargs['project_id'])
         elif task:
             project = task.project
         else:
@@ -545,6 +559,14 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
 
 
 class NextTaskSerializer(TaskWithAnnotationsAndPredictionsAndDraftsSerializer):
+    unique_lock_id = serializers.SerializerMethodField()
+
+    def get_unique_lock_id(self, task):
+        user = self.context['request'].user
+        lock = task.locks.filter(user=user).first()
+        if lock:
+            return lock.unique_id
+
     def get_predictions(self, task):
         project = task.project
         if not project.show_collab_predictions:
