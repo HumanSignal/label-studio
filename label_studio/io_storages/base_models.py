@@ -105,23 +105,12 @@ class ImportStorage(Storage):
             except Exception as exc:
                 logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
 
-    @classmethod
-    def convert_to_json(cls, blob_content, column_def):
-        """
-        Given user defined column def, convert blob content to internal JSON representation
-        :param blob_content:
-        :param column_def:
-        :return:
-        """
-        raise NotImplementedError
-
     def _scan_and_create_links_v2(self):
         # Async job execution for batch of objects:
         # e.g. GCS example
-        # | "ReadFile" >> beam.Map(GCS.read_file) --> read file content into label_studio_semantic_search.indexer.RawDataObject repr
-        # | "ConvertToJSon" >> beam.Map(ImportStorage.conver_to_json(column_def)) --> read file content into label_studio_semantic_search.indexer.RawDataObject repr
+        # | "GetKey" >>  --> read file content into label_studio_semantic_search.indexer.RawDataObject repr
         # | "AggregateBatch" >> beam.Combine      --> combine read objects into a batch
-        # | "AddObject" >> label_studio_semantic_search.indexer.add_objects --> add objects from batch to Vector DB
+        # | "AddObjects" >> label_studio_semantic_search.indexer.add_objects_from_bucket --> add objects from batch to Vector DB
         # or for project task creation last step would be
         # | "AddObject" >> ImportStorage.add_task
 
