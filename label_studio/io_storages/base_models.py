@@ -105,10 +105,21 @@ class ImportStorage(Storage):
             except Exception as exc:
                 logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
 
+    @classmethod
+    def convert_to_json(cls, blob_content, column_def):
+        """
+        Given user defined column def, convert blob content to internal JSON representation
+        :param blob_content:
+        :param column_def:
+        :return:
+        """
+        raise NotImplementedError
+
     def _scan_and_create_links_v2(self):
         # Async job execution for batch of objects:
         # e.g. GCS example
         # | "ReadFile" >> beam.Map(GCS.read_file) --> read file content into label_studio_semantic_search.indexer.RawDataObject repr
+        # | "ConvertToJSon" >> beam.Map(ImportStorage.conver_to_json(column_def)) --> read file content into label_studio_semantic_search.indexer.RawDataObject repr
         # | "AggregateBatch" >> beam.Combine      --> combine read objects into a batch
         # | "AddObject" >> label_studio_semantic_search.indexer.add_objects --> add objects from batch to Vector DB
         # or for project task creation last step would be
@@ -171,12 +182,19 @@ class ImportStorage(Storage):
             # FIXME: add_annotation_history / post_process_annotations should be here
 
     def _scan_and_create_links(self, link_class):
+        """
+        TODO: deprecate this function and transform it to "pipeline" version  _scan_and_create_links_v2
+        """
         tasks_created = 0
         maximum_annotations = self.project.maximum_annotations
         task = self.project.tasks.order_by('-inner_id').first()
         max_inner_id = (task.inner_id + 1) if task else 1
         
         for key in self.iterkeys():
+            # w/o Dataflow
+            # pubsub.push(topic, key)
+            # -> GF.pull(topic, key) + env -> add_task()
+
             logger.debug(f'Scanning key {key}')
 
             # skip if task already exists
