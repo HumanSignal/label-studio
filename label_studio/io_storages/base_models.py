@@ -247,12 +247,7 @@ def sync_background(storage_class, storage_id, **kwargs):
 
 
 class ExportStorage(Storage, ProjectStorageMixin):
-    can_delete_objects = models.BooleanField(
-        _('can_delete_objects'),
-        null=True,
-        blank=True,
-        help_text='Deletion from storage enabled'
-    )
+    can_delete_objects = models.BooleanField(_('can_delete_objects'), null=True, blank=True, help_text='Deletion from storage enabled')
 
     def _get_serialized_data(self, annotation):
         if settings.FUTURE_SAVE_TASK_TO_STORAGE:
