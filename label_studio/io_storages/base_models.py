@@ -31,8 +31,6 @@ class Storage(models.Model):
 
     title = models.CharField(_('title'), null=True, blank=True, max_length=256, help_text='Cloud storage title')
     description = models.TextField(_('description'), null=True, blank=True, help_text='Cloud storage description')
-    project = models.ForeignKey('projects.Project', related_name='%(app_label)s_%(class)ss', on_delete=models.CASCADE,
-                                help_text='A unique integer value identifying this project.')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     last_sync = models.DateTimeField(_('last sync'), null=True, blank=True, help_text='Last sync finished time')
     last_sync_count = models.PositiveIntegerField(
@@ -55,7 +53,6 @@ class Storage(models.Model):
 
 
 class ImportStorage(Storage):
-
     def iterkeys(self):
         return iter(())
 
@@ -178,7 +175,7 @@ class ImportStorage(Storage):
         maximum_annotations = self.project.maximum_annotations
         task = self.project.tasks.order_by('-inner_id').first()
         max_inner_id = (task.inner_id + 1) if task else 1
-        
+
         for key in self.iterkeys():
             # w/o Dataflow
             # pubsub.push(topic, key)
@@ -240,13 +237,25 @@ class ImportStorage(Storage):
         abstract = True
 
 
+class ProjectStorageMixin(models.Model):
+    project = models.ForeignKey(
+        'projects.Project',
+        related_name='%(app_label)s_%(class)ss',
+        on_delete=models.CASCADE,
+        help_text='A unique integer value identifying this project.'
+    )
+    
+    class Meta:
+        abstract = True
+
+
 @job('low')
 def sync_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.scan_and_create_links()
 
 
-class ExportStorage(Storage):
+class ExportStorage(Storage, ProjectStorageMixin):
     can_delete_objects = models.BooleanField(_('can_delete_objects'), null=True, blank=True, help_text='Deletion from storage enabled')
 
     def _get_serialized_data(self, annotation):

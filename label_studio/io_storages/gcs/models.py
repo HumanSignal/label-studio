@@ -10,9 +10,15 @@ from django.conf import settings
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
-from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from io_storages.gcs.utils import GCS
 from tasks.models import Annotation
+from io_storages.base_models import (
+    ExportStorage,
+    ExportStorageLink,
+    ImportStorage,
+    ImportStorageLink,
+    ProjectStorageMixin
+)
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +58,7 @@ class GCSStorageMixin(models.Model):
         GCS.validate_connection(self.bucket, self.google_project_id, self.google_application_credentials)
 
 
-class GCSImportStorage(GCSStorageMixin, ImportStorage):
+class GCSImportStorageBase(GCSStorageMixin, ImportStorage):
     url_scheme = 'gs'
 
     presign = models.BooleanField(
@@ -92,6 +98,14 @@ class GCSImportStorage(GCSStorageMixin, ImportStorage):
 
     def scan_and_create_links(self):
         return self._scan_and_create_links(GCSImportStorageLink)
+
+    class Meta:
+        abstract = True
+
+
+class GCSImportStorage(ProjectStorageMixin, GCSImportStorageBase):
+    class Meta:
+        abstract = False
 
 
 class GCSExportStorage(GCSStorageMixin, ExportStorage):
