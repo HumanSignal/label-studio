@@ -105,6 +105,69 @@ class ImportStorage(Storage):
             except Exception as exc:
                 logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
 
+    def _scan_and_create_links_v2(self):
+        # Async job execution for batch of objects:
+        # e.g. GCS example
+        # | "ReadFile" >> beam.Map(GCS.read_file)
+        # | "AddObject" >> label_studio_semantic_search.indexer.add_objects
+        # or for task creation last step would be
+        # | "AddObject" >> ImportStorage.add_task
+        raise NotImplementedError
+
+    @classmethod
+    def add_task(cls, data, project, maximum_annotations, max_inner_id, storage, key, link_class):
+        # predictions
+        predictions = data.get('predictions', [])
+        if predictions:
+            if 'data' not in data:
+                raise ValueError(
+                    'If you use "predictions" field in the task, ' 'you must put "data" field in the task too'
+                )
+
+        # annotations
+        annotations = data.get('annotations', [])
+        cancelled_annotations = 0
+        if annotations:
+            if 'data' not in data:
+                raise ValueError(
+                    'If you use "annotations" field in the task, ' 'you must put "data" field in the task too'
+                )
+            cancelled_annotations = len([a for a in annotations if a.get('was_cancelled', False)])
+
+        if 'data' in data and isinstance(data['data'], dict):
+            data = data['data']
+
+        with transaction.atomic():
+            task = Task.objects.create(
+                data=data, project=project, overlap=maximum_annotations,
+                is_labeled=len(annotations) >= maximum_annotations, total_predictions=len(predictions),
+                total_annotations=len(annotations) - cancelled_annotations,
+                cancelled_annotations=cancelled_annotations, inner_id=max_inner_id
+            )
+
+            link_class.create(task, key, storage)
+            logger.debug(f'Create {storage.__class__.__name__} link with key={key} for task={task}')
+
+            raise_exception = not flag_set('ff_fix_back_dev_3342_storage_scan_with_invalid_annotations',
+                                           user=AnonymousUser())
+
+            # add predictions
+            logger.debug(f'Create {len(predictions)} predictions for task={task}')
+            for prediction in predictions:
+                prediction['task'] = task.id
+            prediction_ser = PredictionSerializer(data=predictions, many=True)
+            if prediction_ser.is_valid(raise_exception=raise_exception):
+                prediction_ser.save()
+
+            # add annotations
+            logger.debug(f'Create {len(annotations)} annotations for task={task}')
+            for annotation in annotations:
+                annotation['task'] = task.id
+            annotation_ser = AnnotationSerializer(data=annotations, many=True)
+            if annotation_ser.is_valid(raise_exception=raise_exception):
+                annotation_ser.save()
+            # FIXME: add_annotation_history / post_process_annotations should be here
+
     def _scan_and_create_links(self, link_class):
         tasks_created = 0
         maximum_annotations = self.project.maximum_annotations
@@ -130,59 +193,9 @@ class ImportStorage(Storage):
                     f'"Treat every bucket object as a source file"'
                 )
 
-            # predictions
-            predictions = data.get('predictions', [])
-            if predictions:
-                if 'data' not in data:
-                    raise ValueError(
-                        'If you use "predictions" field in the task, ' 'you must put "data" field in the task too'
-                    )
-
-            # annotations
-            annotations = data.get('annotations', [])
-            cancelled_annotations = 0
-            if annotations:
-                if 'data' not in data:
-                    raise ValueError(
-                        'If you use "annotations" field in the task, ' 'you must put "data" field in the task too'
-                    )
-                cancelled_annotations = len([a for a in annotations if a.get('was_cancelled', False)])
-
-            if 'data' in data and isinstance(data['data'], dict):
-                data = data['data']
-
-            with transaction.atomic():
-                task = Task.objects.create(
-                    data=data, project=self.project, overlap=maximum_annotations,
-                    is_labeled=len(annotations) >= maximum_annotations, total_predictions=len(predictions),
-                    total_annotations=len(annotations)-cancelled_annotations,
-                    cancelled_annotations=cancelled_annotations, inner_id=max_inner_id
-                )
-                max_inner_id += 1
-
-                link_class.create(task, key, self)
-                logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
-                tasks_created += 1
-
-                raise_exception = not flag_set('ff_fix_back_dev_3342_storage_scan_with_invalid_annotations', user=AnonymousUser())
-
-                # add predictions
-                logger.debug(f'Create {len(predictions)} predictions for task={task}')
-                for prediction in predictions:
-                    prediction['task'] = task.id
-                prediction_ser = PredictionSerializer(data=predictions, many=True)
-                if prediction_ser.is_valid(raise_exception=raise_exception):
-                    prediction_ser.save()
-
-                # add annotations
-                logger.debug(f'Create {len(annotations)} annotations for task={task}')
-                for annotation in annotations:
-                    annotation['task'] = task.id
-                annotation_ser = AnnotationSerializer(data=annotations, many=True)
-                if annotation_ser.is_valid(raise_exception=raise_exception):
-                    annotation_ser.save()
-
-                # FIXME: add_annotation_history / post_process_annotations should be here
+            self.add_task(data, self.project, maximum_annotations, max_inner_id, self, key, link_class)
+            max_inner_id += 1
+            tasks_created += 1
 
         self.last_sync = timezone.now()
         self.last_sync_count = tasks_created
