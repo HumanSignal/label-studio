@@ -1,7 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
-from abc import ABC
 
 import django_rq
 import json
@@ -104,6 +103,15 @@ class ImportStorage(Storage):
             except Exception as exc:
                 logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
 
+    def _scan_and_create_links_v2(self):
+        # Async job execution for batch of objects:
+        # e.g. GCS example
+        # | "ReadFile" >> beam.Map(GCS.read_file)
+        # | "AddObject" >> label_studio_semantic_search.indexer.add_objects
+        # or for task creation last step would be
+        # | "AddObject" >> ImportStorage.add_task
+        raise NotImplementedError
+
     @classmethod
     def add_task(cls, data, project, maximum_annotations, max_inner_id, storage, key, link_class):
         # predictions
@@ -163,7 +171,7 @@ class ImportStorage(Storage):
         maximum_annotations = self.project.maximum_annotations
         task = self.project.tasks.order_by('-inner_id').first()
         max_inner_id = (task.inner_id + 1) if task else 1
-
+        
         for key in self.iterkeys():
             logger.debug(f'Scanning key {key}')
 
@@ -192,10 +200,10 @@ class ImportStorage(Storage):
         self.save()
 
         self.project.update_tasks_states(
-            maximum_annotations_changed=False,
-            overlap_cohort_percentage_changed=False,
-            tasks_number_changed=True
-        )
+                maximum_annotations_changed=False,
+                overlap_cohort_percentage_changed=False,
+                tasks_number_changed=True
+            )
 
     def scan_and_create_links(self):
         """This is proto method - you can override it, or just replace ImportStorageLink by your own model"""
