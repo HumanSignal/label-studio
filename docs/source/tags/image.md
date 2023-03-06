@@ -35,6 +35,7 @@ When you annotate image regions with this tag, the annotations are saved as perc
 | [horizontalAlignment] | <code>string</code> | <code>&quot;\&quot;left\&quot;&quot;</code> | Where to align image horizontally. Can be one of "left", "center" or "right" |
 | [verticalAlignment] | <code>string</code> | <code>&quot;\&quot;top\&quot;&quot;</code> | Where to align image vertically. Can be one of "top", "center" or "bottom" |
 | [defaultZoom] | <code>string</code> | <code>&quot;\&quot;fit\&quot;&quot;</code> | Specify the initial zoom of the image within the viewport while preserving it’s ratio. Can be one of "auto", "original" or "fit" |
+| [crossOrigin] | <code>string</code> | <code>&quot;\&quot;none\&quot;&quot;</code> | Configures CORS cross domain behavior for this image, either "none", "anonymous", or "use-credentials", similar to [DOM `img` crossOrigin property](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin). |
 
 ### Example
 

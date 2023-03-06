@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3627: Video type unsupported modal misfires fix (#952)",
-  "commit": "e3835c1d9fd36e74c98c986f69fd30bc5880c639",
+  "message": "fix: LSDV-4572: Waveform is offset on some audio files (#1222)",
+  "commit": "2e6d833725fc38d229ddcb3d05c439475dfce90a",
   "branch": "master",
-  "date": "2023-02-23T15:36:53Z"
+  "date": "2023-03-01T15:52:32Z"
 }
