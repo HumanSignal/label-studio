@@ -5,6 +5,7 @@ tier: enterprise
 order: 253
 meta_title: Ping Federate & Ping Identity & PingOne SAML SSO Setup Example
 meta_description: Label Studio Enterprise documentation for setting up Ping Federate & Ping Identity & PingOne SAML SSO Setup Example.
+hide_sidebar: true
 ---
 
 ## PingOne Configuration
