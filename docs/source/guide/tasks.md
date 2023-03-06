@@ -188,13 +188,13 @@ If you import a file with a list of tasks, and every task in this list is a link
 
 **Use case**
 
-There is a list of tasks, where the "remote-csv" field of every task is a link to a CSV file in the storage. Every CSV file has a “text” column with text to be labeled. Every CSV file has a “text” column with text to be labeled. For example:
+There is a list of tasks, where the "remote" field of every task is a link to a CSV file in the storage. Every CSV file has a “text” column with text to be labeled. Every CSV file has a “text” column with text to be labeled. For example:
 
 Tasks:
 ```json
 [
-    { "remote-csv": "s3://bucket/text1.csv" },
-    { "remote-csv": "s3://bucket/text2.csv" }
+    { "remote": "s3://bucket/text1.csv" },
+    { "remote": "s3://bucket/text2.csv" }
 ]
 ```
 
@@ -208,7 +208,7 @@ id;text
 
 To retrieve the file, use the following parameters:
 
-1. `value="$remote-csv"`: The URL to CSV on S3 is in "remote-csv" field of task data. If you use the `resolver` parameter the `value` is always treated as a URL, so you don't need to set `valueType`.
+1. `value="$remote"`: The URL to CSV on S3 is in "remote" field of task data. If you use the `resolver` parameter the `value` is always treated as URL, so you don't need to set `valueType`.
 
 2. `resolver="csv|separator=;|column=text"`: Load this file in run-time, parse it as CSV, and get the “text” column from the first row. 
 
