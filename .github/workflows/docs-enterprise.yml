@@ -1,4 +1,4 @@
-name: deploy:docs
+name: "Deploy docs @ Enterprise"
 
 on:
   push:
