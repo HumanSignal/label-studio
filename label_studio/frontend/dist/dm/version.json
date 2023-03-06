@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-12: Frontend spike - adding a new LabelOps page",
-  "commit": "cc0bd41d62dd5e482799be1a72d5137b789671dd",
+  "message": "fix: LOPS-25: Update grid images to not be cropped",
+  "commit": "02d31a7147ef16c72bc6df72c72e1e1fb424c889",
   "branch": "master",
-  "date": "2023/02/28 15:44:36"
+  "date": "2023/03/06 08:00:29"
 }
