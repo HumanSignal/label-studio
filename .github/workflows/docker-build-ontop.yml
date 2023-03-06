@@ -98,7 +98,7 @@ jobs:
         id: docker_build_and_push
         with:
           context: .
-          file: ${{ inputs. }}
+          file: ${{ inputs.dockerfile_path }}
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.calculate-docker-tags.outputs.docker-tags }}
