@@ -22,6 +22,8 @@ AHA_SERVER = os.getenv("AHA_SERVER", "https://labelstudio.aha.io").strip('\"')
 AHA_TOKEN = os.getenv("AHA_TOKEN").strip('\"')
 AHA_PRODUCT = os.getenv("AHA_PRODUCT", "LSDV").strip('\"')
 AHA_RN_FIELD = os.getenv("AHA_RN_FIELD", "release_notes").strip('\"')
+AHA_FETCH_STRATEGY = os.getenv("AHA_FETCH_STRATEGY", "PARKING_LOT").strip('\"')  # PARKING_LOT or TAG
+AHA_TAG = os.getenv("AHA_TAG", "").strip('\"')
 
 GH_REPO = os.getenv("GH_REPO", "heartexlabs/label-studio").strip('\"')
 GH_TOKEN = os.getenv("GH_TOKEN").strip('\"')  # https://github.com/settings/tokens/new
@@ -60,26 +62,37 @@ class AHA:
         self.server = server
         self.token = token
 
-    def query(self, url: str, data: dict = None):
-        if data:
-            response = requests.put(
-                f"{self.server}/{url}",
-                headers={
-                    "Authorization": f"Bearer {self.token}",
-                    "Content-Type": "application/json",
-                    "Accept": "application/json",
-                },
-                json=data,
+    def query(self, url: str, data: dict = None, params: dict = None, method: str = 'GET'):
+        response = requests.request(
+            method=method,
+            url=f"{self.server}/{url}",
+            headers={
+                "Authorization": f"Bearer {self.token}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+            json=data,
+            params=params,
+        )
+        return response.json()
+
+    def paginate(self, url: str, key: str, data: dict = None, method: str = 'GET', page: int = 0, per_page: int = 100):
+        result = []
+        current_page = page
+        total_pages = None
+        while total_pages is None or current_page <= total_pages:
+            response_json = self.query(
+                url=url,
+                data=data,
+                params={"page": current_page + 1, "per_page": per_page},
+                method=method,
             )
-            return response.json()
-        else:
-            response = requests.get(
-                f"{self.server}/{url}",
-                headers={
-                    "Authorization": f"Bearer {self.token}",
-                },
-            )
-            return response.json()
+            pagination = response_json.get('pagination', [])
+            current_page = int(pagination.get('current_page'))
+            total_pages = int(pagination.get('total_pages'))
+            entries = response_json.get(key, [])
+            result.extend(entries)
+        return result
 
 
 github_client = Github(GH_TOKEN)
@@ -170,6 +183,15 @@ def get_aha_release_features(release_num: str) -> list[AhaFeature]:
     return list(tasks)
 
 
+def get_aha_release_features_by_tag(tag: str) -> list[AhaFeature]:
+    features = aha_client.paginate(f'api/v1/features', 'features', data={"tag": tag})
+    tasks = set()
+    for feature in features:
+        if task := get_task(feature.get('reference_num')):
+            tasks.add(task)
+    return list(tasks)
+
+
 def get_jira_release(project: str, version: str):
     jira_project_versions = jira_client.project_versions(project=project)
     jira_sorted_project_versions = sorted(jira_project_versions, key=lambda x: x.name, reverse=True)
@@ -220,7 +242,9 @@ def get_feature_flags() -> list[str]:
         )
         for key, flag in response.json().get('flags', {}).items():
             if not flag.get('on'):
-                result.append(f'- [{key}](https://app.launchdarkly.com/default/{LAUNCHDARKLY_ENVIRONMENT}/features/{key}/targeting)')
+                result.append(
+                    f'- [{key}]'
+                    f'(https://app.launchdarkly.com/default/{LAUNCHDARKLY_ENVIRONMENT}/features/{key}/targeting)')
     return result
 
 
@@ -272,7 +296,7 @@ def render_output_md(
         missing_in_gh: list[AhaFeature],
         missing_in_tracker: list[AhaFeature],
         missing_release_note_field: list[AhaFeature],
-        turned_off_feture_flags: list[str],
+        turned_off_feature_flags: list[str],
 ) -> str:
     release_notes_lines = []
 
@@ -323,11 +347,11 @@ def render_output_md(
                 render_tasks_md(missing_release_note_field)
             )
         )
-    if turned_off_feture_flags:
+    if turned_off_feature_flags:
         comment.extend(
             render_add_spoiler_md(
-                f'Turned off Feature Flags ({len(turned_off_feture_flags)})',
-                turned_off_feture_flags
+                f'Turned off Feature Flags ({len(turned_off_feature_flags)})',
+                turned_off_feature_flags
             )
         )
 
@@ -362,14 +386,21 @@ def main():
     print(f"Commits: {gh_release.commits}")
     gh_release_tasks = get_github_release_tasks(gh_release.commits)
 
-    aha_release = get_aha_release(AHA_PRODUCT, RELEASE_VERSION)
+    aha_release = None
     aha_release_features = []
-    if aha_release:
-        aha_release_features = get_aha_release_features(aha_release.get("reference_num", None))
-        print(
-            f"Aha! Release {aha_release.get('url', '')}")
+    if AHA_FETCH_STRATEGY == 'PARKING_LOT':
+        aha_release = get_aha_release(AHA_PRODUCT, RELEASE_VERSION)
+        if aha_release:
+            aha_release_features = get_aha_release_features(aha_release.get("reference_num", None))
+            print(f"Aha! Release {aha_release.get('url', '')}")
+        else:
+            print(f"Aha! Release not found")
     else:
-        print(f"Aha! Release not found")
+        if AHA_TAG:
+            aha_release = {'url': f'{AHA_SERVER}/api/v1/features?tag={AHA_TAG.replace(" ", "%20")}'}
+            aha_release_features = get_aha_release_features_by_tag(AHA_TAG)
+        else:
+            print("AHA TAG is not specified")
 
     jira_release = get_jira_release(JIRA_PROJECT, RELEASE_VERSION)
     jira_release_issues = []
@@ -397,9 +428,9 @@ def main():
         missing_in_gh = []
         missing_in_tracker = []
         missing_release_note_field = [x for x in tracker_release_tasks if not x.release_note]
-    turned_off_feture_flags = []
+    turned_off_feature_flags = []
     try:
-        turned_off_feture_flags = get_feature_flags()
+        turned_off_feature_flags = get_feature_flags()
     except Exception as e:
         print(f'Failed to fetch Feature Flags: {e}')
 
@@ -411,7 +442,7 @@ def main():
         missing_in_gh,
         missing_in_tracker,
         missing_release_note_field,
-        turned_off_feture_flags,
+        turned_off_feature_flags,
     )
     if OUTPUT_FILE_MD:
         with open(OUTPUT_FILE_MD, 'w') as f:

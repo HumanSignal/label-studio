@@ -582,6 +582,7 @@ if get_env('STORAGE_TYPE') == "s3":
     AWS_S3_ENDPOINT_URL = get_env('STORAGE_AWS_ENDPOINT_URL', None)
     AWS_QUERYSTRING_EXPIRE = int(get_env('STORAGE_AWS_X_AMZ_EXPIRES', '86400'))
     AWS_LOCATION = get_env('STORAGE_AWS_FOLDER', default='')
+    AWS_S3_USE_SSL = get_bool_env('STORAGE_AWS_S3_USE_SSL', True)
     AWS_S3_VERIFY = get_env('STORAGE_AWS_S3_VERIFY', None)
     if AWS_S3_VERIFY == 'false' or AWS_S3_VERIFY == 'False' or AWS_S3_VERIFY == '0':
         AWS_S3_VERIFY = False
@@ -603,6 +604,7 @@ if get_env('STORAGE_TYPE') == "gcs":
     GS_BUCKET_NAME = get_env('STORAGE_GCS_BUCKET_NAME')
     GS_EXPIRATION = timedelta(seconds=int(get_env('STORAGE_GCS_EXPIRATION_SECS', '86400')))
     GS_LOCATION = get_env('STORAGE_GCS_FOLDER', default='')
+    GS_CUSTOM_ENDPOINT = get_env('STORAGE_GCS_ENDPOINT')
 
 CSRF_TRUSTED_ORIGINS = get_env('CSRF_TRUSTED_ORIGINS', [])
 if CSRF_TRUSTED_ORIGINS:
