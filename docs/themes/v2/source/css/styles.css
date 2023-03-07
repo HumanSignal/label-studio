@@ -1559,6 +1559,7 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
   align-items: center;
   z-index: 2;
   white-space: normal;
+  cursor: pointer;
 }
 
 .code-block-copy-button svg {
