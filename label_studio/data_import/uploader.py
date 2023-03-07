@@ -140,7 +140,7 @@ def tasks_from_url(file_upload_ids, project, request, url, could_be_tasks_lists)
                 if isinstance(file_content, str):
                     file_content = file_content.encode()
         file_upload = create_file_upload(request, project, SimpleUploadedFile(filename, file_content))
-        if file_upload.format_could_be_tasks_list:
+        if flag_set('fflag_fix_back_lsdv_4568_import_csv_links_03032023_short') and file_upload.format_could_be_tasks_list:
             could_be_tasks_lists = True
         file_upload_ids.append(file_upload.id)
         tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(project, file_upload_ids)
