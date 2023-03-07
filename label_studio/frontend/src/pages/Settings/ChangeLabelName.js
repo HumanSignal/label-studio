@@ -65,7 +65,7 @@ export const ChangeLabelName = () => {
           <option value="" disabled>
             Select a label
           </option>
-          {availableLabels.map((label) => (
+          {availableLabels?.map((label) => (
             <option key={label} value={label}>
               {label}
             </option>
