@@ -58,6 +58,12 @@ export const GeneralSettings = () => {
             ))}
           </RadioGroup>
 
+          <TextArea
+            name="maximum_annotations"
+            label="Number of annotations to finish a task"
+            labelProps={{large: true}}
+          />
+
           <RadioGroup label="Task Sampling" labelProps={{size: "large"}} name="sampling" simple>
             {samplings.map(({value, label, description}) => (
               <RadioGroup.Button

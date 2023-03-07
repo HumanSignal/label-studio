@@ -71,16 +71,14 @@ def delete_tasks(project, queryset, **kwargs):
             'detail': 'Deleted ' + str(count) + ' tasks'}
 
 
-def delete_tasks_annotations(project, queryset, **kwargs):
-    """ Delete all annotations by tasks ids
+def delete_annotations(project, task_ids, annotations, **kwargs):
+    """ Delete a list of annotations in a project by tasks ids
 
     :param project: project instance
-    :param queryset: filtered tasks db queryset
+    :param task_ids: task IDs of the annotations to be deleted
+    :param annotations: annotations to be deleted
     """
-    task_ids = queryset.values_list('id', flat=True)
-    annotations = Annotation.objects.filter(task__id__in=task_ids)
     count = annotations.count()
-
     # take only tasks where annotations were deleted
     real_task_ids = set(list(annotations.values_list('task__id', flat=True)))
     annotations_ids = list(annotations.values('id'))
@@ -103,6 +101,29 @@ def delete_tasks_annotations(project, queryset, **kwargs):
 
     return {'processed_items': count,
             'detail': 'Deleted ' + str(count) + ' annotations'}
+
+
+def delete_my_tasks_annotations(project, queryset, **kwargs):
+    """ Delete annotations of connected user by tasks ids
+
+    :param project: project instance
+    :param queryset: filtered tasks db queryset
+    """
+    request = kwargs['request']
+    task_ids = queryset.values_list('id', flat=True)
+    annotations = Annotation.objects.filter(task__id__in=task_ids).filter(completed_by=request.user.id)
+    return delete_annotations(project, task_ids, annotations, **kwargs)
+
+
+def delete_tasks_annotations(project, queryset, **kwargs):
+    """ Delete all annotations by tasks ids
+
+    :param project: project instance
+    :param queryset: filtered tasks db queryset
+    """
+    task_ids = queryset.values_list('id', flat=True)
+    annotations = Annotation.objects.filter(task__id__in=task_ids)
+    return delete_annotations(project, task_ids, annotations, **kwargs)
 
 
 def delete_tasks_predictions(project, queryset, **kwargs):
@@ -155,10 +176,20 @@ actions = [
         }
     },
     {
+        'entry_point': delete_my_tasks_annotations,
+        'permission': all_permissions.tasks_delete,
+        'title': 'Delete My Annotations',
+        'order': 101,
+        'dialog': {
+            'text': 'You are going to delete your annotations from the selected tasks. Please confirm your action.',
+            'type': 'confirm'
+        }
+    },
+    {
         'entry_point': delete_tasks_annotations,
         'permission': all_permissions.tasks_delete,
-        'title': 'Delete Annotations',
-        'order': 101,
+        'title': 'Delete All Annotations',
+        'order': 102,
         'dialog': {
             'text': 'You are going to delete all annotations from the selected tasks. Please confirm your action.',
             'type': 'confirm'
@@ -168,7 +199,7 @@ actions = [
         'entry_point': delete_tasks_predictions,
         'permission': all_permissions.predictions_any,
         'title': 'Delete Predictions',
-        'order': 102,
+        'order': 103,
         'dialog': {
             'text': 'You are going to delete all predictions from the selected tasks. Please confirm your action.',
             'type': 'confirm'
