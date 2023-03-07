@@ -2,9 +2,12 @@
 title: Get data into Label Studio
 short: Import data
 type: guide
-order: 300
+tier: all
+order: 120
+order_enterprise: 105
 meta_title: Import Data into Label Studio
-meta_description: Import and upload data labeling tasks from audio, HTML, image, CSV, text, and time series datasets using common file formats or the Label Studio JSON format to label and annotate that data for your machine learning and data science projects. 
+meta_description: Label and annotate data for your machine learning and data science projects using common file formats or the Label Studio JSON format.
+section: "Import and Export"
 ---
 
 Get data into Label Studio by importing files, referencing URLs, or syncing with cloud or database storage. 
@@ -29,6 +32,7 @@ You can import many types of data, including text, timeseries, audio, and image 
 | [Text](#Plain-text) | .txt, .json |
 | [Time series](#Import-CSV-or-TSV-data) | .csv, .tsv, .json |
 | [Tasks with multiple data types](#Basic-Label-Studio-JSON-format) | .csv, .tsv, .json |
+| Video | .mp4, .webm, .avi |
 
 If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](https://slack.labelstudio.heartex.com/?source=docs-gdi). 
 
@@ -188,13 +192,13 @@ If you import a file with a list of tasks, and every task in this list is a link
 
 **Use case**
 
-There is a list of tasks, where the "remote-csv" field of every task is a link to a CSV file in the storage. Every CSV file has a “text” column with text to be labeled. Every CSV file has a “text” column with text to be labeled. For example:
+There is a list of tasks, where the "remote" field of every task is a link to a CSV file in the storage. Every CSV file has a “text” column with text to be labeled. Every CSV file has a “text” column with text to be labeled. For example:
 
 Tasks:
 ```json
 [
-    { "remote-csv": "s3://bucket/text1.csv" },
-    { "remote-csv": "s3://bucket/text2.csv" }
+    { "remote": "s3://bucket/text1.csv" },
+    { "remote": "s3://bucket/text2.csv" }
 ]
 ```
 
@@ -208,7 +212,7 @@ id;text
 
 To retrieve the file, use the following parameters:
 
-1. `value="$remote-csv"`: The URL to CSV on S3 is in "remote-csv" field of task data. If you use the `resolver` parameter the `value` is always treated as a URL, so you don't need to set `valueType`.
+1. `value="$remote"`: The URL to CSV on S3 is in "remote" field of task data. If you use the `resolver` parameter the `value` is always treated as URL, so you don't need to set `valueType`.
 
 2. `resolver="csv|separator=;|column=text"`: Load this file in run-time, parse it as CSV, and get the “text” column from the first row. 
 

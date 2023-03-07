@@ -8,7 +8,7 @@ meta_description: Label Studio Template library of data labeling and annotation 
 
 Label Studio templates provide predefined labeling interfaces for specific use cases and data types. You can use templates to get started labeling right away, or as a starting point to build a fully customized labeling interface for your data labeling project.
 
-<a class="button" href="gallery.html">See all templates!</a>
+<a class="button" href="index.html">See all templates!</a>
 
 ## Template components
 
