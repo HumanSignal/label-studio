@@ -97,7 +97,7 @@ function insert_render_editor(config, modal, full) {
     const CheckIcon = event.currentTarget.querySelector(".code-block-copy-check-icon");
     const CopyIcon = event.currentTarget.querySelector(".code-block-copy-copy-icon");
 
-    const text = event.target.nextElementSibling.textContent;
+    const text = event.currentTarget.nextElementSibling.textContent;
 
     navigator.clipboard.writeText(text).then(() => {
       CopyIcon.style.display = "none"

@@ -96,3 +96,21 @@ If you get a validation error when adding the ML backend URL to your Label Studi
 - Is your machine learning backend available from your Label Studio instance? It must be available to the instance running Label Studio.
   
 If you're running Label Studio in Docker, you must run the machine learning backend inside the same Docker container, or otherwise make it available to the Docker container running Label Studio. You can use the `docker exec` command to run commands inside the Docker container, or use `docker exec -it <container_id> /bin/sh` to start a shell in the context of the container. See the [docker exec documentation](https://docs.docker.com/engine/reference/commandline/exec/). 
+
+<div class="enterprise-only">
+## Timeouts in SaaS Cloud
+
+Default timeouts for all types of requests to ML server in SaaS Cload (in seconds):
+  
+```bash
+TIMEOUT_DEFAULT = 100
+TIMEOUT_TRAIN = 30
+TIMEOUT_PREDICT = 100
+TIMEOUT_HEALTH = 1
+TIMEOUT_SETUP = 3
+TIMEOUT_DUPLICATE_MODEL = 1
+TIMEOUT_DELETE = 1
+TIMEOUT_TRAIN_JOB_STATUS = 1
+```
+  
+</div>

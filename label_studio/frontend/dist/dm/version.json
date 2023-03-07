@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-25: Update grid images to not be cropped",
-  "commit": "02d31a7147ef16c72bc6df72c72e1e1fb424c889",
+  "message": "fix: LSDV-4659: Fix hanging tab request",
+  "commit": "3bf653aba8222ee6dfda1bc1b00136e0dd06dc76",
   "branch": "master",
-  "date": "2023/03/06 08:00:29"
+  "date": "2023/03/07 19:06:40"
 }
