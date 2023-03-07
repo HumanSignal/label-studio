@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4706: Video timeline segmentation plays correctly without micro stuttering issues",
-  "commit": "1ce5fa3aa5a560c2d6dcfed2bf251bf3561e915f",
+  "commit": "922ab7c57176e039443eb2c7fa32a9ea53a1e09b",
   "branch": "fb-lsdv-4706",
-  "date": "2023/03/06 14:59:42"
+  "date": "2023/03/07 10:37:54"
 }
