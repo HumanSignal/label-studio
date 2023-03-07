@@ -22,7 +22,8 @@
     fetch("https://api.github.com/repos/heartexlabs/label-studio")
     .then((response) => response.json()
     .then((data) => {
-      const stars = data.stargazers_count?.toLocaleString('en-US');
+      let stars = "";
+      if(data.stargazers_count) stars = data.stargazers_count.toLocaleString('en-US')
       if(stars) githubstarsContainer.textContent = stars;
     }))
     .catch((err) => {
