@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4651: Fix column size when data column is not the last column",
-  "commit": "35887075904e42b38800d48c62e62c234b5141d2",
+  "commit": "133c7efd0ed26c26751cca58bb8de93d99fdacd9",
   "branch": "fb-lsdv-4651",
-  "date": "2023/03/07 15:56:46"
+  "date": "2023/03/07 16:18:52"
 }
