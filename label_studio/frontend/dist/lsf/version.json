@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4682: Region corruption mig",
-  "commit": "608d0069ccf8dfba0b2a2a05fc1fd20e76ccfc25",
+  "message": "fix: LSDV-4682: Region corruption in MIG scenario",
+  "commit": "87e5d036a93ba00c083f5e907a8856aa488c5429",
   "branch": "fb-lsdv-4682/region-corruption-mig",
-  "date": "2023/03/07 16:36:08"
+  "date": "2023/03/07 18:31:27"
 }
