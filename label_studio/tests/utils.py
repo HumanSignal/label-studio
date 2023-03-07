@@ -61,7 +61,7 @@ def email_mock():
 
 @contextmanager
 def gcs_client_mock():
-    from io_storages.gcs.models import google_storage
+    from google.cloud import storage as google_storage
     from collections import namedtuple
 
     File = namedtuple('File', ['name'])
