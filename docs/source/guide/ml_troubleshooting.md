@@ -101,6 +101,8 @@ If you're running Label Studio in Docker, you must run the machine learning back
 ## Timeouts in SaaS Cloud
 
 Default timeouts for all types of requests to ML server in SaaS Cload (in seconds):
+  
+```bash
 TIMEOUT_DEFAULT = 100
 TIMEOUT_TRAIN = 30
 TIMEOUT_PREDICT = 100
@@ -109,4 +111,6 @@ TIMEOUT_SETUP = 3
 TIMEOUT_DUPLICATE_MODEL = 1
 TIMEOUT_DELETE = 1
 TIMEOUT_TRAIN_JOB_STATUS = 1
+```
+  
 </div>
