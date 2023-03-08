@@ -246,8 +246,8 @@ class ProjectStorageMixin(models.Model):
     )
 
     def has_permission(self, user):
-        user.project = self.task.project  # link for activity log
-        if self.task.has_permission(user):
+        user.project = self.project  # link for activity log
+        if self.project.has_permission(user):
             return True
         return False
 
