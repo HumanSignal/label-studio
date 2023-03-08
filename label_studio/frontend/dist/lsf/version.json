@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4585: Show nested Collapse correctly",
-  "commit": "916fd2e9513d8dd51603660932d12530c9f9bc9d",
-  "branch": "fb-lsdv-4585/nested-collapse",
-  "date": "2023/03/07 17:14:14"
+  "commit": "d52baca0a9660f8d2b5203bd783c648a41b2a763",
+  "branch": "master",
+  "date": "2023/03/08 00:07:11"
 }
