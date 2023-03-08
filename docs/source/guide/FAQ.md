@@ -2,9 +2,12 @@
 title: Troubleshoot Label Studio
 short: Troubleshooting
 type: guide
-order: 210
+tier: all
+order: 100
+order_enterprise: 100
+section: "Get started"
 meta_title: Troubleshoot Label Studio
-meta_description: Troubleshoot common issues with Label Studio configuration and performance so that you can return to your machine learning and data science projects.
+meta_description: Troubleshoot common issuesTroubleshoot machine learning with Label Studio configuration and performance so that you can return to your machine learning and data science projects.
 ---
 
 If you encounter an issue using Label Studio, use this page to troubleshoot it. 
@@ -17,10 +20,19 @@ After starting Label Studio and opening a project, you see a blank page. Several
 
 ### Cause: Host not recognized
 
-If you specify a host without a protocol such as `http://` or `https://` when starting Label Studio, Label Studio can fail to locate the correct files to load the project page. 
+If you specify a host without a protocol such as `http://` or `https://` when starting Label Studio, Label Studio can fail to locate the correct files to load the project page.
+
+<div class="opensource-only">
 
 To resolve this issue, update the host specified as an environment variable or when starting Label Studio. See [Start Label Studio](start.html)
 
+</div>
+
+<div class="enterprise-only">
+
+To resolve this issue, update the host specified as an environment variable or when starting Label Studio. Check LABEL_STUDIO_HOST environment variable.
+
+</div>
 
 ## Slowness while labeling
 
@@ -176,5 +188,4 @@ rqworker:
       readOnly: true
 ```
   </div>
-
 </div>

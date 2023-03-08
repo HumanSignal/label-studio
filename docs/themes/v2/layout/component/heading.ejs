@@ -1,0 +1,6 @@
+<% var size = locals.size || "Medium" %>
+<% var text = locals.text || "Heading" %>
+<% var tag = locals.tag || "h2" %>
+<% var customClass = locals.customClass || "" %>
+
+<<%= tag %> class="Heading <%= customClass %> <%= size %> "><% if(locals.href) {%><a href="<%= href %>"><% } %><%= text %><% if(locals.href) {%></a><% } %></<%= tag %>>

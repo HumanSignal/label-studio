@@ -1,0 +1,22 @@
+<% const pageContainsHeadings = page.content.includes("<h2") %>
+<% const tocPageTypes = page.type === "guide" || page.type === "blog" || page.type === "templates" || page.type === "tags" %>
+
+<% const showToc = pageContainsHeadings && tocPageTypes %>
+
+<div class="content-grid">
+  <div class="content-markdown">
+    <% if(page.type && page.parent !== undefined) { %>
+      <%- breadcrumb({pageType: page.type, parentPage: page.parent, currentPage: page.title }) %>
+    <% } %>
+    <% if (page.title.trim()) { %>
+      <%- partial("component/heading", {text: page.title, size: "XLarge", tag: "h1", customClass: "home-page-title"}) %>
+    <% } %>
+    <%- page.content %>
+  </div>
+  <% if (showToc) { %>
+    <div class="toc">
+      <%- partial("component/text", {text: "In this article", tag: "h3", size: "Eyebrow"}) %>
+      <%- toc(page.content, {max_depth: 2, list_number: false, class: "toc-list"}) %>
+    </div>
+    <% } %>
+</div>

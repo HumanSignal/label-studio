@@ -1,6 +1,5 @@
 ---
 title: Repeater
-type: tags
 order: 504
 meta_title: Repeater Tag to duplicate annotation settings
 meta_description: Customize Label Studio with the Repeater tag to repeat similar data blocks to accelerate labeling for machine learning and data science projects.
