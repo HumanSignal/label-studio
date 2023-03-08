@@ -1,11 +1,14 @@
 ---
 title: Available Helm values for Label Studio Enterprise Kubernetes deployments
 short: Available Helm values
-badge: <i class='ent'></i>
+tier: enterprise
 type: guide
-order: 220
+order: 114
+order_enterprise: 141
 meta_title: Available Helm values for Label Studio Enterprise Kubernetes deployments
 meta_description: For cases when you want to customize your Label Studio Enterprise Kubernetes deployment, review these available Helm values that you can set in your Helm chart.
+section: "Install"
+
 ---
 
 <!-- Fix for long values in table cells -->
@@ -35,6 +38,11 @@ meta_description: For cases when you want to customize your Label Studio Enterpr
 
 Refer to these tables with available Helm chart values for your `lse-values.yaml` file
 when configuring your Label Studio Enterprise deployment on Kubernetes. See [Deploy Label Studio Enterprise on Kubernetes](install_enterprise_k8s.html) for more.
+
+## Debug mode
+
+To enable the debug mode, you should enable `app.debug` and set app.logLevel to `DEBUG`. Additionally, it may be more convenient to have simple logs instead of JSON-formatted messages. To achieve this, add `JSON_LOG=0` to `global.extraEnvironmentVars`. For non-standard setups you can place `DEBUG=true` and `LOG_LEVEL=DEBUG` directly in the `extraEnvironmentVars` section. 
+
 
 ## Global parameters
 Global parameters for the Helm chart.

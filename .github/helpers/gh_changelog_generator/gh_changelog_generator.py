@@ -133,6 +133,21 @@ class AhaFeature:
         }
 
 
+class AhaRequirement(AhaFeature):
+    def __init__(self, feature_num: str, pr: int = None):
+        self.type = "Aha! Requirement"
+        self.pr = pr
+        feature = aha_client.query(f'api/v1/requirements/{feature_num}').get('requirement')
+        self.key = str(feature.get('reference_num'))
+        self.status = str(feature.get('workflow_status').get('name'))
+        self.label = feature.get('workflow_kind', {}).get('name', DEFAULT_LABEL)
+        self.summary = str(feature.get('name'))
+        self.release_note = next(
+            (f.get('value') for f in feature.get('custom_fields', []) if f.get('key') == AHA_RN_FIELD), None)
+        self.desc = self.release_note if self.release_note else self.summary
+        self.link = str(feature.get('url'))
+
+
 class JiraIssue(AhaFeature):
     def __init__(self, issue_number: str, pr: int = None):
         self.type = "Jira Issue"
@@ -159,6 +174,12 @@ def get_task(task_number: str, pr: int = None) -> AhaFeature or JiraIssue:
         return task
     except Exception as e:
         print(f'Could not find Feature {task_number} in Aha!: {e}')
+    try:
+        task = AhaRequirement(task_number, pr)
+        TASK_CACHE[task_number] = task
+        return task
+    except Exception as e:
+        print(f'Could not find Requirement {task_number} in Aha!: {e}')
     try:
         task = JiraIssue(task_number, pr)
         TASK_CACHE[task_number] = task

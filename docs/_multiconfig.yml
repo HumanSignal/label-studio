@@ -1,0 +1,80 @@
+theme_config:
+  tier: enterprise
+  root_domain: heartex.com
+deploy:
+  type: aws-s3
+  region: us-east-1
+  bucket: docs.heartex.com
+title: Label Studio
+subtitle: Data labeling, annotation and exploration tool
+description: >-
+  Label Studio is a multi-type data labeling and annotation tool with
+  standardized output format
+keywords: >-
+  computer-vision, deep-learning, image-annotation, annotation-tool, annotation,
+  labeling, labeling-tool, image-labeling, image-labeling-tool, boundingbox,
+  image-classification, annotations, imagenet, semantic-segmentation, dataset,
+  datasets, label-studio, label-region, data-labeling, text-annotation
+author: Heartex
+language: en
+timezone: null
+google_analytics: UA-129877673-4
+url: https://labelstud.io/
+root: /
+permalink: ':year/:month/:day/:title/'
+permalink_defaults: null
+source_dir: source
+public_dir: public
+tag_dir: tags
+archive_dir: archives
+category_dir: categories
+code_dir: downloads/code
+i18n_dir: ':lang'
+skip_render: source/playground/render.html
+favicon: images/favicon.ico
+new_post_name: ':title.md'
+default_layout: post
+titlecase: false
+external_link.enable: true
+filename_case: 0
+render_drafts: false
+post_asset_folder: true
+relative_link: false
+future: true
+highlight:
+  enable: true
+  line_number: false
+  tab_replace: '  '
+  hljs: true
+  wrap: false
+prismjs:
+  enable: false
+markdown:
+  gfm: true
+  pedantic: false
+  sanitize: false
+  tables: true
+  breaks: true
+  smartLists: true
+  smartypants: true
+index_generator:
+  path: ''
+  per_page: 10
+  order_by: '-date'
+default_category: uncategorized
+category_map: null
+tag_map: null
+date_format: YYYY-MM-DD
+time_format: HH:mm:ss
+per_page: 10
+pagination_dir: page
+theme: v2
+sitemap:
+  path:
+    - sitemap-docs.xml
+search:
+  path: search.xml
+  field: all
+  content: true
+include_markdown:
+  dir: source/includes

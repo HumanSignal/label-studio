@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4572: Waveform is offset on some audio files (#1222)",
-  "commit": "2e6d833725fc38d229ddcb3d05c439475dfce90a",
+  "message": "fix: LSDV-4706: Video timeline segmentation plays correctly without micro stuttering issues (#1226)",
+  "commit": "939f2a4098387d449343161aaab0b489d1d35567",
   "branch": "master",
-  "date": "2023-03-01T15:52:32Z"
+  "date": "2023-03-07T17:05:14Z"
 }

@@ -63,6 +63,8 @@ Use the [Choices](/tags/choices.html) control tag to classify the intent for eac
 ```
 Because of the `perRegion="true"` argument, each choice applies to a different segment labeled as a segment. The `required="true"` argument ensures that each labeled audio segment has a choice selected before the annotation can be submitted.
 
+<!-- md nested-classification.md -->
+
 ## Related tags
 
 - [Labels](/tags/labels.html)

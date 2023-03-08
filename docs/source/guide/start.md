@@ -1,9 +1,13 @@
 ---
 title: Start Label Studio
 type: guide
-order: 206
+tier: opensource
+order: 110
+order_enterprise: 99
 meta_title: Start Commands for Label Studio
 meta_description: Documentation for starting Label Studio and configuring the environment to use Label Studio with your machine learning or data science project. 
+section: "Install"
+
 ---
 
 After you install Label Studio, start the server to start using it. 
@@ -14,7 +18,9 @@ label-studio start
 
 By default, Label Studio starts with an SQLite database to store labeling tasks and annotations. You can specify different sources and target storage for labeling tasks and annotations using Label Studio UI or the API. See [Database storage](storedata.html) for more.
 
+
 ## Command line arguments for starting Label Studio
+
 You can specify a machine learning backend and other options using the command line interface. Run `label-studio --help` to see all available options, or refer to the following tables.
 
 Some available commands for Label Studio provide information or start the Label Studio server:
@@ -84,6 +90,7 @@ echo %LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED%
 ```
 
 ## Run Label Studio on localhost with a different port
+
 By default, Label Studio runs on port 8080. If that port is already in use or if you want to specify a different port, start Label Studio with the following command:
 ```bash
 label-studio start --port <port>
@@ -125,7 +132,8 @@ To run Label Studio on Docker with a host and sub-path, just pass `LABEL_STUDIO_
 LABEL_STUDIO_HOST=http://localhost:8080/foo docker-compose up -d
 ```
 
-## Run Label Studio on Docker and use local storage
+## Run Label Studio on Docker and use Local Storage
+
 To run Label Studio on Docker and reference persistent local storage directories, mount those directories as volumes when you start Label Studio and specify any environment variables you need.
 
 The following command starts a Docker container with the latest image of Label Studio with port 8080 and an environment variable that allows Label Studio to access local files. In this example, a local directory `./myfiles` is mounted to the `/label-studio/files` location. 
@@ -143,9 +151,10 @@ Place files in the specified source directory (`./myfiles` in this example) and 
 
 If you're using Docker Compose, specify the volumes in the Docker Compose YAML file and add the relevant environment variables to the app container. For more about specifying volumes in Docker Compose, see the volumes section of the [Docker Compose file documentation](https://docs.docker.com/compose/compose-file/compose-file-v3/#volumes).
 
-## Run Label Studio with HTTPS
-To run Label Studio with HTTPS and access the web server using HTTPS in the browser, use NGINX or another web server to run HTTPS for Label Studio.  
 
+## Run Label Studio with HTTPS
+
+To run Label Studio with HTTPS and access the web server using HTTPS in the browser, use NGINX or another web server to run HTTPS for Label Studio.  
 
 
 ## Run Label Studio on the cloud using Heroku
@@ -175,6 +184,8 @@ Using S3 storage is recommended.
 ## Run Label Studio on the cloud using a different cloud provider
 To run Label Studio on the cloud using a cloud provider such as Google Cloud Services (GCS), Amazon Web Services (AWS), or Microsoft Azure, 
 -->
+
+
 ## Run Label Studio with an external domain name
 
 If you want multiple people to collaborate on a project, you might want to run Label Studio with an external domain name. 
@@ -195,6 +206,7 @@ LABEL_STUDIO_HOST = https://subdomain.example.com:7777
 You must specify the protocol for the domain name: `http://` or `https://`
 
 If your external host has a port, specify the port as part of the host name. 
+
 
 ## Set up task sampling for your project 
 
