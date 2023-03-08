@@ -244,7 +244,13 @@ class ProjectStorageMixin(models.Model):
         on_delete=models.CASCADE,
         help_text='A unique integer value identifying this project.'
     )
-    
+
+    def has_permission(self, user):
+        user.project = self.task.project  # link for activity log
+        if self.task.has_permission(user):
+            return True
+        return False
+
     class Meta:
         abstract = True
 
@@ -316,12 +322,6 @@ class ImportStorageLink(models.Model):
     def create(cls, task, key, storage):
         link, created = cls.objects.get_or_create(task_id=task.id, key=key, storage=storage, object_exists=True)
         return link
-
-    def has_permission(self, user):
-        user.project = self.task.project  # link for activity log
-        if self.task.has_permission(user):
-            return True
-        return False
 
     class Meta:
         abstract = True
