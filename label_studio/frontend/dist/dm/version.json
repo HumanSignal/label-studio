@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4659: Fix hanging tab request",
-  "commit": "3bf653aba8222ee6dfda1bc1b00136e0dd06dc76",
+  "message": "fix: LSDV-4651: Fix column size when data column is not the last column",
+  "commit": "0f704d7c7a8ab5182fe7cd957c07bf8425c802a3",
   "branch": "master",
-  "date": "2023/03/07 19:06:40"
+  "date": "2023/03/08 16:54:14"
 }
