@@ -8,6 +8,8 @@ import requests_mock
 import requests
 import tempfile
 
+some bad thing
+
 from contextlib import contextmanager
 from unittest import mock
 from types import SimpleNamespace
