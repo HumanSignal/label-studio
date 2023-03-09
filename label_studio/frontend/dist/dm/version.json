@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4720: Fix datamanager column styles",
-  "commit": "cd0c2fc7f9c63cd1965a9ae2b5120c091b00fc0b",
-  "branch": "fb-lsdv-4720",
-  "date": "2023/03/08 22:10:13"
+  "commit": "61bf89222d51d4c78d397082e6ff383a832269f9",
+  "branch": "master",
+  "date": "2023/03/09 08:40:24"
 }
