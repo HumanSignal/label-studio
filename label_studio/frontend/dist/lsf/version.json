@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4701: Removing feature flag from base file",
-  "commit": "36f8e267607508c86d2ad76d741b73bc9a408766",
+  "message": "fix: LSDV-4682: Fix regions shifting in MIG scenario (#1231)",
+  "commit": "40853fafad51b07e99d95d3f4e44e981e11c013c",
   "branch": "master",
-  "date": "2023/03/08 16:32:07"
+  "date": "2023-03-09T19:22:09Z"
 }
