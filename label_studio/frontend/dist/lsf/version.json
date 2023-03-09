@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4682: Fix regions shifting in MIG scenario",
-  "commit": "80bf8ca893f9537d596554992269913f23a440fc",
+  "commit": "aa0ef563ce8e71d1ffb8acb8a6ec1c32db024e40",
   "branch": "fb-lsdv-4682/regions-shift-mig",
-  "date": "2023/03/09 12:23:28"
+  "date": "2023/03/09 12:37:58"
 }
