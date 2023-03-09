@@ -1,6 +1,6 @@
 {
-  "message": "chore: LSDV-4651,LSDV-4720: Cherry pick",
-  "commit": "541393a4a8166bd573669b915579f0fbe4923938",
-  "branch": "fb-ls-release-1.7.2-1678375005",
-  "date": "2023/03/09 08:40:24"
+  "message": "Trigger build",
+  "commit": "2ee2ddaf9596b9e600bbaf231768acd16815e498",
+  "branch": "ls-release/1.7.2",
+  "date": "2023-03-09T16:36:40Z"
 }
