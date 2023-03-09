@@ -21,6 +21,11 @@ const PROJECTS = {
   'dm': 'heartexlabs/dm2',
 };
 
+const BUILD_PREFIX = {
+  'lsf': 'LSF',
+  'dm': 'build',
+};
+
 const DIST_DIR = "/dist";
 
 /**
@@ -30,6 +35,7 @@ async function get(projectName, ref = 'master') {
   let res, json, sha, branch = '';
 
   const REPO = PROJECTS[projectName || 'lsf'];
+  const BUILD = BUILD_PREFIX[projectName || 'lsf'];
 
   if (!REPO) {
     const repos = Object.entries(PROJECTS).map(a => "\t" + a.join("\t")).join("\n");
@@ -69,7 +75,7 @@ async function get(projectName, ref = 'master') {
   res = await fetch(artifactsUrl, { headers: { Authorization: `token ${TOKEN}` } });
   json = await res.json();
 
-  const artifact = json.artifacts.find(art => art.name.match(sha) !== null && art.name.startsWith('LSF'));
+  const artifact = json.artifacts.find(art => art.name.match(sha) !== null && art.name.startsWith(BUILD));
 
   if (!artifact) throw new Error(`Artifact for commit ${sha} was not found. Build failed?`);
   const buildUrl = artifact.archive_download_url;
