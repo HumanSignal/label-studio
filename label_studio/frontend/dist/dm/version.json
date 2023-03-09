@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4720: Fix datamanager column styles",
-  "commit": "61bf89222d51d4c78d397082e6ff383a832269f9",
-  "branch": "master",
+  "message": "chore: LSDV-4651,LSDV-4720: Cherry pick",
+  "commit": "541393a4a8166bd573669b915579f0fbe4923938",
+  "branch": "fb-ls-release-1.7.2-1678375005",
   "date": "2023/03/09 08:40:24"
 }
