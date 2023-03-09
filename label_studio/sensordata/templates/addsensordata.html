@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load filters %}
+
+{% block content %}
+<head>
+    <title>Add sensor data </title>
+</head>
+<body>
+    <div class="forms">
+        <h2>Add sensor data</h2>
+        <form enctype="multipart/form-data" action="/sensordata/add/" method="post">
+            {{ sensordataform }}
+            <input type="submit" value="Add sensor data file">
+        </form>
+
+    </div>
+</body>
+
+
+{% endblock %}
