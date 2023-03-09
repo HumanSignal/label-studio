@@ -57,7 +57,7 @@ The default web browser opens automatically at [http://localhost:8080](http://lo
 Label Studio is also available as a Docker container. Make sure you have [Docker](https://www.docker.com/) installed on your machine.
 
 ### Install with Docker on *nix
-To install and start Label Studio at [http://localhost:8080](http://localhost:8080), storing all labeling data in `./my_project` directory, run the following:
+To install and start Label Studio at [http://localhost:8080](http://localhost:8080), storing all labeling data in `./mydata` directory, run the following:
 ```bash
 docker run -it -p 8080:8080 -v $(pwd)/mydata:/label-studio/data heartexlabs/label-studio:latest
 ```
