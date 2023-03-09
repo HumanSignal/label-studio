@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4651: Fix column size when data column is not the last column",
-  "commit": "0f704d7c7a8ab5182fe7cd957c07bf8425c802a3",
+  "message": "fix: LSDV-4720: Fix datamanager column styles",
+  "commit": "61bf89222d51d4c78d397082e6ff383a832269f9",
   "branch": "master",
-  "date": "2023/03/08 16:54:14"
+  "date": "2023/03/09 08:40:24"
 }
