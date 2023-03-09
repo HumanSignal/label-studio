@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load filters %}
+
+{% block content %}
+
+
+<style>
+    table {
+        font-family: Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+    td, th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+    tr:nth-child(even){
+        background-color: #f2f2f2;
+    }
+    th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #04AA6D !important;
+        color: white;
+    }
+    .tables {
+        margin: 1em;
+    }
+    input[type=submit] {
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 1em;
+    }
+
+    input[type=submit]:hover {
+        background-color: #45a049;
+    }
+
+</style>
+<head>
+    <title>Sensor mapping</title>
+</head>
+<body>
+    <div class="buttons">
+        <form action="/sensormodel/">
+            <input type="submit" value="Go back to sensor model page" style="background-color: #c4862b; width:25%"/>
+        </form>
+        <form action="/sensordata/add/">
+            <input type="submit" value="Add sensor data file" style="background-color: #c4862b; width:25%"/>
+        </form>
+    </div>
+    <div class="sensordata">
+        <h2>Sensor data</h2>
+        <table class="tables">
+            <tr>
+                <th>Sensor data name</th>
+                <th>Begin Date Time</th>
+                <th>End Date Time</th>
+                <th>Sensor</th>
+                <th>Sensor type</th>
+                {% comment %} <th></th>
+                <th></th> {% endcomment %}
+            </tr>
+            {% for sendata in sensordata %}
+            <tr>
+                <td>{{ sendata.name }}</td>
+                <td>{{ sendata.begin_datetime }}</td>
+                <td>{{ sendata.end_datetime }}</td> 
+                <td>{{ sendata.sensor}} </td>
+                <td>{{ sendata.sensor.sensortype.sensortype.get_sensortype_display}} </td>
+                {% comment %} <td><a href="{% url 'sensormodel:adjust_deployment' deployment.id %}">[Edit]</a></td>
+                <td><a href="{% url 'sensormodel:delete_deployment' deployment.id %}">[Delete]</a></td> {% endcomment %}
+            </tr> 
+            {% endfor %} 
+        </table>
+        
+        
+    </div>
+
+</body>
+
+
+{% endblock %}

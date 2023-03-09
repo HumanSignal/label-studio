@@ -656,7 +656,8 @@ class TemplateListAPI(generics.ListAPIView):
     swagger_schema = None
 
     def list(self, request, *args, **kwargs):
-        annotation_templates_dir = find_dir('annotation_templates')
+        # annotation_templates_dir = find_dir('annotation_templates')
+        annotation_templates_dir = pathlib.Path(__file__).parents[1]/ 'annotation_templates' #changed to directory in 'this' repo
         configs = []
         for config_file in pathlib.Path(annotation_templates_dir).glob('**/*.yml'):
             config = read_yaml(config_file)

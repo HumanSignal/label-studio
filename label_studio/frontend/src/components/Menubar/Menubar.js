@@ -182,6 +182,34 @@ export const Menubar = ({
                   data-external
                   exact
                 />
+                <Menu.Item
+                  label="Landingpage"
+                  to="/landingpage/"
+                  icon={<IconBook/>}
+                  data-external
+                  exact
+                />
+                <Menu.Item
+                  label="Sensor Model"
+                  to="/sensormodel/"
+                  icon={<IconBook/>}
+                  data-external
+                  exact
+                />
+                <Menu.Item
+                  label="Sensor Data"
+                  to="/sensordata/"
+                  icon={<IconBook/>}
+                  data-external
+                  exact
+                />
+                <Menu.Item
+                  label="Subject Annotation"
+                  to="/subjectannotation/"
+                  icon={<IconBook/>}
+                  data-external
+                  exact
+                />
 
                 <Menu.Spacer/>
 
