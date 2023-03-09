@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4715: Start and offset of paragraph selection should not include empty or newline",
-  "commit": "795a9e836f5783de9f512dd2fa65da207c98def2",
+  "commit": "a4532fea692bae7a3ed8028cda242a2b42411518",
   "branch": "fb-lsdv-4715",
-  "date": "2023/03/09 15:36:10"
+  "date": "2023/03/09 16:17:52"
 }
