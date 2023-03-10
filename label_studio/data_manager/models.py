@@ -16,7 +16,7 @@ class ViewBaseModel(models.Model):
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        related_name="views",
+        related_name='%(app_label)s_%(class)ss',
         on_delete=models.CASCADE,
         help_text="User who made this view",
         null=True,
