@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4682: Fix regions shifting in MIG scenario (#1231)",
-  "commit": "40853fafad51b07e99d95d3f4e44e981e11c013c",
+  "message": "fix: LSDV-4676: Region corruption MIG (#1230)",
+  "commit": "53d62b133de0d439b9f078e442802df3ce2cb129",
   "branch": "master",
-  "date": "2023-03-09T19:22:09Z"
+  "date": "2023-03-10T14:21:12Z"
 }
