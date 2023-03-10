@@ -15,8 +15,14 @@ from django.db.models.signals import post_save
 from azure.storage.blob import BlobServiceClient, generate_blob_sas, BlobSasPermissions
 from django.dispatch import receiver
 from core.utils.params import get_env
-from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from tasks.models import Annotation
+from io_storages.base_models import (
+    ExportStorage,
+    ExportStorageLink,
+    ImportStorage,
+    ImportStorageLink,
+    ProjectStorageMixin
+)
 
 
 logger = logging.getLogger(__name__)
@@ -66,7 +72,7 @@ class AzureBlobStorageMixin(models.Model):
         return container
 
 
-class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
+class AzureBlobImportStorageBase(ImportStorage, AzureBlobStorageMixin):
     url_scheme = 'azure-blob'
 
     presign = models.BooleanField(
@@ -123,6 +129,14 @@ class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
                                       permission=BlobSasPermissions(read=True),
                                       expiry=expiry)
         return 'https://' + self.get_account_name() + '.blob.core.windows.net/' + container + '/' + blob + '?' + sas_token
+
+    class Meta:
+        abstract = True
+
+
+class AzureBlobImportStorage(ProjectStorageMixin, AzureBlobImportStorageBase):
+    class Meta:
+        abstract = False
 
 
 class AzureBlobExportStorage(ExportStorage, AzureBlobStorageMixin):

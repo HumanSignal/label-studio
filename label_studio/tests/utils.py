@@ -75,7 +75,7 @@ def email_mock():
 
 @contextmanager
 def gcs_client_mock():
-    from io_storages.gcs.models import google_storage
+    from google.cloud import storage as google_storage
     from collections import namedtuple
 
     File = namedtuple('File', ['name'])
@@ -94,6 +94,11 @@ def gcs_client_mock():
             print(f'String {string} uploaded to bucket {self.bucket_name}')
         def generate_signed_url(self, **kwargs):
             return f'https://storage.googleapis.com/{self.bucket_name}/{self.key}'
+        def download_as_bytes(self):
+            data = f'test_blob_{self.key}'
+            if self.is_json:
+                return json.dumps({'str_field': data, 'int_field': 123, 'dict_field': {'one': 'wow', 'two': 456}})
+            return data
 
     class DummyGCSBucket:
         def __init__(self, bucket_name, is_json, **kwargs):
@@ -108,6 +113,9 @@ def gcs_client_mock():
         def get_bucket(self, bucket_name):
             is_json = bucket_name.endswith('_JSON')
             return DummyGCSBucket(bucket_name, is_json)
+
+        def list_blobs(self, bucket_name, prefix):
+            return [File('abc'), File('def'), File('ghi')]
 
     with mock.patch.object(google_storage, 'Client', return_value=DummyGCSClient()):
         yield
