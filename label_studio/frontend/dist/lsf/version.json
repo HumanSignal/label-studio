@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4676: Region corruption MIG (#1230)",
-  "commit": "53d62b133de0d439b9f078e442802df3ce2cb129",
-  "branch": "master",
-  "date": "2023-03-10T14:21:12Z"
+  "message": "fix: LSDV-4593: CORS error requesting audio",
+  "commit": "323ca7694736bb2e9f1cf04e917c99464d46ce34",
+  "branch": "fb-lsdv-4593-cors",
+  "date": "2023/03/10 16:06:10"
 }
