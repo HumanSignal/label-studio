@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4676: Region corruption MIG (#1230)",
-  "commit": "53d62b133de0d439b9f078e442802df3ce2cb129",
-  "branch": "master",
-  "date": "2023-03-10T14:21:12Z"
+  "message": "docs: LSDV-4707: Remove Repeater from docs",
+  "commit": "bc76311906787b4bea24598b1cbf36fa04cd4dad",
+  "branch": "fb-lsdv-4707/remove-repeater-doc",
+  "date": "2023/03/11 11:36:42"
 }
