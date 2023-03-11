@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4676: Region corruption MIG (#1230)",
-  "commit": "53d62b133de0d439b9f078e442802df3ce2cb129",
-  "branch": "master",
-  "date": "2023-03-10T14:21:12Z"
+  "message": "chore: LSDV-4734: Setup Cypress integration tests",
+  "commit": "4b37dfde7c317f59810b5873baf2a912a1a49c02",
+  "branch": "fb-lsdv-4734/cypress-init",
+  "date": "2023/03/11 13:23:52"
 }
