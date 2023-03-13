@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4720: Fix datamanager column styles",
-  "commit": "61bf89222d51d4c78d397082e6ff383a832269f9",
+  "message": "fix: LSDV-4746-1: Only include limited fields for project when polling",
+  "commit": "9aa96a97e9bcb4154838249dc721efbc724198b7",
   "branch": "master",
-  "date": "2023/03/09 08:40:24"
+  "date": "2023/03/13 15:43:21"
 }
