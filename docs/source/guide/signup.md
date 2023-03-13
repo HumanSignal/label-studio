@@ -78,6 +78,8 @@ Then, start Label Studio and log in with the username and password that you set 
 
 ## Invite collaborators to a project
 
+<img src="/images/invite-collaborators-ls-single-server.png" class="gif-border"/>
+
 After you [set up a labeling project](setup.html), invite annotators to the project to start collaborating on labeling tasks. Inviting people to your Label Studio instance with a link does not restrict access to the signup page unless you also set an environment variable. See how to [Restrict signup for local deployments](#Restrict-signup-for-local-deployments) and [Restrict signup for cloud deployments](#Restrict-signup-for-cloud-deployments) on this page.
 
 1. In the Label Studio UI, click the hamburger icon and click **People**.
