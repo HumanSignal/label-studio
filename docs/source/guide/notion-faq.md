@@ -3,8 +3,10 @@ title: Notion FAQ
 short: Notion FAQ
 type: guide
 tier: enterprise
+hide_menu: true
 order: 99
 section: "Get started"
+layout: "notion"
 ---
 If you encounter an issue using Label Studio, use this page to troubleshoot it.
 
@@ -30,7 +32,7 @@ There are 3 ways to reset a password:
 1. Using email by “Forgot password” link on the login page. It works in SaaS by default. It can work in on-premise deployments, but you need to set up the email backend.
 2. Login as a superuser, go to `/admin/users/user` page, find your user and reset password:
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/094cbbb3-23f6-4862-b9ae-2c6f51e50669/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T200021Z&X-Amz-Expires=3600&X-Amz-Signature=0cc6e2f38140eb72fec0ca649ee11c80c5ec8294b7a3d1210f3c706c33db59f1&X-Amz-SignedHeaders=host&x-id=GetObject)
+![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/094cbbb3-23f6-4862-b9ae-2c6f51e50669/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T211002Z&X-Amz-Expires=3600&X-Amz-Signature=076c3729788c2e88ad177fedc088bb034fed1cbfbb2af674fde1f129265540e8&X-Amz-SignedHeaders=host&x-id=GetObject)
 
 1. Go to LS terminal, run  `/label-studio-enterprise/label_studio_enterprise && python3` [`manage.py`](http://manage.py) `shell_plus`
 
@@ -49,7 +51,7 @@ u.save()
 - By default owner email is used as organization title. It can be fixed using `/admin/organizations/` page.
 - Or customers can do it through API: `{”title”: “new title”} PATCH api/organization/`
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/9e140bb5-7b37-49ef-9f61-cb0bb9fbc5e0/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T200021Z&X-Amz-Expires=3600&X-Amz-Signature=7e0dbb7be7546bccfdd5263e527d6306fc9fd6a00301b68e1fe52cf2faadbf9d&X-Amz-SignedHeaders=host&x-id=GetObject)
+![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/9e140bb5-7b37-49ef-9f61-cb0bb9fbc5e0/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T211002Z&X-Amz-Expires=3600&X-Amz-Signature=3cd68e5997ad742c677012dad6d442cf596719d896a0e0de0d85db084f42495c&X-Amz-SignedHeaders=host&x-id=GetObject)
 
 
 ## Common LDAP & SAML SSO Questions
@@ -69,12 +71,12 @@ This action can only be performed using the /admin page because of security reas
 1. Go to SAML settings page
 2. Find organization you need
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/faa6e3d2-bafc-4d4d-8380-cc6c2cc43e5e/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T200021Z&X-Amz-Expires=3600&X-Amz-Signature=c901f3cf82078b316d171b18ac4ee4f5a84c943a8f64b811bc747e1ff78afce4&X-Amz-SignedHeaders=host&x-id=GetObject)
+![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/faa6e3d2-bafc-4d4d-8380-cc6c2cc43e5e/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T211002Z&X-Amz-Expires=3600&X-Amz-Signature=f09e0cbeaf05cf5778083424dc79f07bbc3a068ce32750c5537ea742a79fec0c&X-Amz-SignedHeaders=host&x-id=GetObject)
 
 1. Click on the pk
 2. Change the domain
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/d16ece68-fb6f-4d40-81a3-69437d41da42/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T200021Z&X-Amz-Expires=3600&X-Amz-Signature=a6ce6ea65ecf13b3dfd67a938d700a6c1ff6af6d66914bc74720e6a04a3be7f0&X-Amz-SignedHeaders=host&x-id=GetObject)
+![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/d16ece68-fb6f-4d40-81a3-69437d41da42/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T211002Z&X-Amz-Expires=3600&X-Amz-Signature=b81936d80e83ef42a2039705fc6b5dcbcb864664c6ae2a9745bd62d1327805b2&X-Amz-SignedHeaders=host&x-id=GetObject)
 
 
 ### Is the Organization Owner role required to setup LDAP?
@@ -142,7 +144,7 @@ Go to the cloud storage settings page, click on **Edit** cloud storage connectio
 3. Sometimes the sync process doesn’t start immediately. That is because syncing process is based on internal job scheduler. Please wait, if nothing happens during long period of time - contact us via  form, and please provide the time when you launched the “Sync” job
 4. An easy way to check rq workers is to run an export: go to the Data manager, click Export, and create a new snapshot and download the JSON file. If you see an Error, most likely your rq workers have problems. Another way to check rq workers - login as a superuser and go to /django-rq page. You should see a `workers` column, `workers` values shouldn’t be 0 as far as failed column should be empty (0).
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/cdfc0455-a5ce-4fec-8260-8019a097f3bc/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T200021Z&X-Amz-Expires=3600&X-Amz-Signature=5481cf5531ca5543b9dea3b4fdbb1b9c9b274e1864ef4a20c21dc7968394337b&X-Amz-SignedHeaders=host&x-id=GetObject)
+![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/cdfc0455-a5ce-4fec-8260-8019a097f3bc/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T211002Z&X-Amz-Expires=3600&X-Amz-Signature=f4af6a892a5d5d8d39270406ec8209500212c1386a0cadb618295126b4811abd&X-Amz-SignedHeaders=host&x-id=GetObject)
 
 
 ### JSON files from a cloud storage are not synced, the data manager is empty
@@ -174,7 +176,7 @@ You access the labeling data via navigating to the next task while clicking on s
 Without an internet connection, you will receive a “Failed to fetch” message each time you try opening the data labeling screen. This is because data content is fetched on the client side at the time you load the app, ensuring secure data flow. Please check your internet connection and reload the page again.
 
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/b435f38d-fd2e-404b-8f03-6e973e3788ee/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T200021Z&X-Amz-Expires=3600&X-Amz-Signature=28155d0778e174c36712c6b9e100514bbc38c3a514a0ec7e47ffe438b9139ed3&X-Amz-SignedHeaders=host&x-id=GetObject)
+![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/b435f38d-fd2e-404b-8f03-6e973e3788ee/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T211002Z&X-Amz-Expires=3600&X-Amz-Signature=3ebe2609580cc9d178c3d132e45c34443dee1a70816c4b950396e8b7f54d9a50&X-Amz-SignedHeaders=host&x-id=GetObject)
 
 
 ### Check data access
@@ -186,7 +188,7 @@ It is a common scenario when working with external storage that the URLs provide
 To locate this source of error, try navigating to your browser’s _Network_ panel and check to see if there are 403 or 404 errors.
 
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/b70bf220-25da-4de3-bc4f-7ae70f858359/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T200021Z&X-Amz-Expires=3600&X-Amz-Signature=a2e638d946e82c1e6436f85e4d7073cb23c62384abfe028fd2364ae1ff3dda98&X-Amz-SignedHeaders=host&x-id=GetObject)
+![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/b70bf220-25da-4de3-bc4f-7ae70f858359/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T211002Z&X-Amz-Expires=3600&X-Amz-Signature=ff3635bcbb56ef26b6d8b3121efa30b16c26a9667afe834e57a0df72650b91b3&X-Amz-SignedHeaders=host&x-id=GetObject)
 
 
 To validate the link doesn’t work - copy it and try opening in a separate browser tab.
@@ -410,7 +412,7 @@ Most likely RQ Workers are
 To inspect this issue you should open `/django-rq` page and see number of workers in Workers column:
 
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/eb816b18-7c6a-4b66-88e1-eaa5007928cd/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T200022Z&X-Amz-Expires=3600&X-Amz-Signature=cad0821b341357141d0420ca80b735e4a61a3262068d9d997172ce5e8b7847e8&X-Amz-SignedHeaders=host&x-id=GetObject)
+![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/eb816b18-7c6a-4b66-88e1-eaa5007928cd/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T211003Z&X-Amz-Expires=3600&X-Amz-Signature=064f9a0fa5ee219684d1544c29951f4509d7a21be4c4a10a1f218373752b214d&X-Amz-SignedHeaders=host&x-id=GetObject)
 
 
 If you see 0, it’s definitely a problem with your rq worker setup, you have to connect with your devops team and check what **rqworker containers** are running. 
@@ -462,7 +464,7 @@ Try to run postgresql VACUUM, ANALYZE and REINDEX:
 This script helps to evaluate how many annotations do annotators have in the export snapshot:
 
 
-[image](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/896aac75-4e01-409b-a479-8404c8841231/annotator-counter.py?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T200022Z&X-Amz-Expires=3600&X-Amz-Signature=bb899c3e6d036fe1cc1ebe7fede011e27372a2b6ab944a73e8a9d04544a7dd80&X-Amz-SignedHeaders=host&x-id=GetObject)
+[image](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/896aac75-4e01-409b-a479-8404c8841231/annotator-counter.py?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T211003Z&X-Amz-Expires=3600&X-Amz-Signature=791585f095d89d00e30a7a3bc0125f940f0e6f00811184a2fd5c20e50c827e04&X-Amz-SignedHeaders=host&x-id=GetObject)
 
 
 ## Contact Support
