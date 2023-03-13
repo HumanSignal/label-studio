@@ -1,9 +1,10 @@
 const { Client } = require("@notionhq/client")
 const { NotionToMarkdown } = require("notion-to-md");
 const fs = require('hexo-fs');
+require('dotenv').config()
 
 const notion = new Client({
-  auth: "secret_SeBGJj4SOW2aTiRg3S8n80d0y6VcHiMJSXypXbx7zLy",
+  auth: process.env.NOTION_API_KEY,
 })
 
 hexo.extend.filter.register('after_init', async function(){
