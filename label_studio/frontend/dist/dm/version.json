@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4746-1: Only include limited fields for project when polling",
-  "commit": "3de93ddee0b08500204470cbe1549049bfe0374e",
+  "commit": "202d1df7369290f270e90be5ece26597885bb9ce",
   "branch": "fb-lsdv-4746-1",
-  "date": "2023/03/13 12:42:06"
+  "date": "2023/03/13 13:16:21"
 }
