@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4662: Use empty range GET requests instead of HEAD to avoid CORS issue on video presigned urls",
-  "commit": "26162ba1db80ccd9b252b96b7d34e94cf27e4a2d",
-  "branch": "fb-lsdv-4662",
-  "date": "2023/03/14 11:04:57"
+  "commit": "91b4ca313dbc0b19882ed6e0a64c5b3dfc5e87d0",
+  "branch": "master",
+  "date": "2023/03/14 12:02:28"
 }
