@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4649: Regrouping regions after switching annotations",
-  "commit": "77dd0e2e61bdbc7610b1ca7d317617eba31b786c",
+  "message": "fix: LSDV-4662: Use empty range GET requests instead of HEAD to avoid CORS issue on video presigned urls (#1225)",
+  "commit": "91b4ca313dbc0b19882ed6e0a64c5b3dfc5e87d0",
   "branch": "master",
-  "date": "2023/03/14 18:58:18"
+  "date": "2023-03-14T17:02:28Z"
 }
