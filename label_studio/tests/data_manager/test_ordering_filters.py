@@ -32,6 +32,8 @@ from django.utils.timezone import now
         [["tasks:-predictions_score"], -1, False],
         [["tasks:data.text"], 0, False],
         [["tasks:-data.text"], -1, False],
+        [["tasks:data.number"], -1, False],
+        [["tasks:-data.number"], 0, False],
         [["tasks:data.data"], 0, True],
         [["-tasks:data.data"], 1, True],
         [["tasks:file_upload"], 0, False],
@@ -63,12 +65,12 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
 
     file_upload1 = FileUpload.objects.create(user=project.created_by, project=project, file=ContentFile('', name='file_upload1'))
 
-    task_id_1 = make_task({"data": {task_field_name: 1}, 'file_upload': file_upload1}, project).id
+    task_id_1 = make_task({"data": {task_field_name: 1, 'number': -1}, 'file_upload': file_upload1}, project).id
     make_annotation({"result": [{"1": True}]}, task_id_1)
     make_prediction({"result": [{"1": True}], "score": 1}, task_id_1)
 
     file_upload2 = FileUpload.objects.create(user=project.created_by, project=project, file=ContentFile('', name='file_upload2'))
-    task_id_2 = make_task({"data": {task_field_name: 2}, 'file_upload': file_upload2}, project).id
+    task_id_2 = make_task({"data": {task_field_name: 2, 'number': -2}, 'file_upload': file_upload2}, project).id
     for _ in range(0, 2):
         make_annotation({"result": [{"2": True}], "was_cancelled": True}, task_id_2)
     for _ in range(0, 2):

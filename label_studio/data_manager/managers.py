@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from django.db import models
 from django.db.models import Aggregate, OuterRef, Subquery, Avg, Q, F, Value, Exists, When, Case
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.contrib.postgres.fields.jsonb import KeyTextTransform
+from django.contrib.postgres.fields.jsonb import KeyTextTransform, KeyTransform
 from django.db.models.functions import Coalesce
 from django.conf import settings
 from django.db.models.functions import Cast
@@ -128,7 +128,7 @@ def apply_ordering(queryset, ordering, project, request):
         if field_name.startswith('data__'):
             # annotate task with data field for float/int/bool ordering support
             json_field = field_name.replace('data__', '')
-            queryset = queryset.annotate(ordering_field=KeyTextTransform(json_field, 'data'))
+            queryset = queryset.annotate(ordering_field=KeyTransform(json_field, 'data'))
             f = F('ordering_field').asc(nulls_last=True) if ascending else F('ordering_field').desc(nulls_last=True)
 
         else:
