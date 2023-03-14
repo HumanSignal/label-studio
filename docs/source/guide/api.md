@@ -2,21 +2,28 @@
 title: API Reference for Label Studio
 short: Backend API
 type: guide
-order: 704
+tier: all
+order: 214
+order_enterprise: 120
 meta_title: API Endpoints
-meta_description: API documentation for authenticating, listing data science projects, importing predictions and raw data and exporting annotated data, and user management in Label Studio.
+meta_description: API documentation for authenticating, listing data science projects, importing predictions and raw data and exporting annotated data, and user management.
+section: "Integration and Development"
+
 ---
 
 You can use the Label Studio API to import data for labeling, export annotations, set up machine learning with Label Studio, and sync tasks with cloud storage. 
 
 See the [API reference documentation](/api) for further guidance and interactive examples. If you want to write Python scripts using the API, use the [Label Studio Python SDK](sdk.html). 
 
-<div class="enterprise"><p>
+<div class="enterprise-only">
+
+<p>
 The Label Studio Enterprise API shares many endpoints with the Label Studio Community Edition API, but includes extra payload options and additional endpoints specific to Enterprise features. Access the full Label Studio Enterprise API reference documentation by doing the following:</p>
 <ol>
 <li>Log in to Label Studio Enterprise</li>
 <li>Open the menu and click <b>API</b></li>
 </ol>
+
 </div>
 
 ### Authenticate to the API
@@ -32,12 +39,16 @@ In your first API call, specify the access token in the headers:
 curl -X <method> <Label Studio URL>/api/<endpoint> -H 'Authorization: Token <token>'
 ```
 
+<div class="opensource-only">
+
 You can also retrieve the access token using the command line. 
 1. From the command line, run the following: 
 ```bash
 label-studio user --username <username>
 ```
 2. In the output returned in your terminal, the token for the user is listed as part of the user info.  
+
+</div>
 
 See [API documentation for authentication](/api#section/Authentication).
 

@@ -5,4 +5,4 @@ skip = *.css*,*.yml,*.map,*.js,package-lock.json,*.ai,.venv,.git,build,*.egg-inf
 # ist - from german
 # respone - response one, popular among examples along with resptwo, respthree
 # classe - spanish(?) example
-ignore-words-list = aks,postgressql,filterin,ser,ist,respone,classe
+ignore-words-list = aks,postgressql,filterin,ser,ist,respone,classe,couldn

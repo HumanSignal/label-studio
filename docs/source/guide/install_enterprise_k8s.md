@@ -1,20 +1,25 @@
 ---
 title: Deploy Label Studio Enterprise on Kubernetes
-short: Deploy on Kubernetes
-badge: <i class='ent'></i>
+short: Kubernetes
+tier: enterprise
 type: guide
-order: 216
+order: 108
+order_enterprise: 133
 meta_title: Deploy Label Studio Enterprise on Kubernetes
 meta_description: Deploy Label Studio Enterprise on Kubernetes, such as on Amazon Elastic Container Service for Kubernetes, to create machine learning and data science projects in a scalable containerized environment. 
+section: "Install"
+
 ---
 
 Deploy Label Studio Enterprise on a Kubernetes Cluster using Helm 3. You can use this Helm chart to set up Label Studio Enterprise for deployment onto a Kubernetes cluster and install, upgrade, and manage the application. 
 
 Your Kubernetes cluster can be self-hosted or installed somewhere such as Amazon EKS. See the Amazon tutorial on how to [Deploy a Kubernetes Application with Amazon Elastic Container Service for Kubernetes](https://aws.amazon.com/getting-started/hands-on/deploy-kubernetes-app-amazon-eks/) for more about deploying an app on Amazon EKS.
 
-<div class="enterprise"><p>
+<div class="enterprise-only">
+
 To install Label Studio Community Edition, see <a href="install.html">Install and Upgrade Label Studio</a>. This page is specific to the Enterprise version of Label Studio.
-</p></div>
+
+</div>
 
 ## Install Label Studio Enterprise on Kubernetes
 
@@ -46,6 +51,7 @@ Your Kubernetes cluster can be self-hosted or installed somewhere such as Amazon
 To plan the capacity of your Kubernetes cluster, refer to these guidelines. 
 
 Label Studio Enterprise has the following default configurations for resource requests, resource limits, and replica counts:
+
 ```yaml
 app:
   replicas: 1
@@ -221,7 +227,10 @@ redis:
 
 Adjust the included defaults to reflect your environment and copy these into a new file and save it as `lse-values.yaml`.
 
-> For more complex configurations, you can create your own file based on the [list of all available Helm values](helm_values.html).
+
+!!! note 
+    For more complex configurations, you can create your own file based on the [list of all available Helm values](helm_values.html).
+
 
 ## Set up TLS for PostgreSQL
 To configure Label Studio Enterprise to use TLS for end-client connections with PostgreSQL, do the following:
@@ -234,7 +243,8 @@ kubectl create secret generic <YOUR_SECRET_NAME> --from-file=ca.crt=<PATH_TO_CA>
 ```
 3. Update your `lse-values.yaml` file with your newly-created Kubernetes secret:
 
-> If `POSTGRE_SSL_MODE: verify-ca`, the server is verified by checking the certificate chain up to the root certificate stored on the client. If `POSTGRE_SSL_MODE: verify-full`, the server host name will be verified to make sure it matches the name stored in the server certificate. The SSL connection will fail if the server certificate cannot be verified. `verify-full` is recommended in most security-sensitive environments.
+!!! note 
+    If `POSTGRE_SSL_MODE: verify-ca`, the server is verified by checking the certificate chain up to the root certificate stored on the client. If `POSTGRE_SSL_MODE: verify-full`, the server host name will be verified to make sure it matches the name stored in the server certificate. The SSL connection will fail if the server certificate cannot be verified. `verify-full` is recommended in most security-sensitive environments.
 
 ```yaml
 global:
@@ -260,7 +270,8 @@ kubectl create secret generic <YOUR_SECRET_NAME> --from-file=ca.crt=<PATH_TO_CA>
 ```
 3. Update your `lse-values.yaml` file with your newly-created Kubernetes secret:
 
-> In the case if you're using self signed certificates that host cannot verify you have to set `redisSslCertReqs` to `None`
+!!! note 
+    In the case if you are using self-signed certificates that host cannot verify you have to set `redisSslCertReqs` to `None`
 
 ```yaml
 global:
@@ -293,7 +304,7 @@ kubectl get pods
 
 Restart your Helm release by doing the following from the command line:
 
-1. Identify the <RELEASE_NAME> of the latest Label Studio Enterprise release:
+1. Identify the &lt;RELEASE_NAME&gt; of the latest Label Studio Enterprise release:
 ```shell
 helm list
 ```

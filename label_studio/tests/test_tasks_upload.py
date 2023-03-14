@@ -5,6 +5,7 @@ import copy
 import pytest
 import zipfile
 import ujson as json
+import requests_mock
 
 from rest_framework.authtoken.models import Token
 
@@ -238,20 +239,9 @@ def test_upload_duration(setup_project_dialog, tasks, status_code, task_count, m
 def test_url_upload(mocker, setup_project_dialog, tasks, status_code, task_count):
     """ Upload tasks from URL
     """
-    def info():
-        class Info:
-            @staticmethod
-            def get(name):
-                return 12345
-        return Info()
-
-    urlopen_return = io.StringIO(json.dumps(tasks))
-    urlopen_return.info = info
-
-    with mocker.patch('data_import.uploader.urlopen', return_value=urlopen_return) as m:
-        # m.return_value.info.get = mocker.PropertyMock(return_value=lambda x: 12345)
-
+    with requests_mock.Mocker(real_http=True) as m:
         url = 'http://localhost:8111/test.json'
+        m.get(url, text=json.dumps(tasks), headers={'Content-Length': '100'})
         r = setup_project_dialog.post(setup_project_dialog.urls.task_bulk, data='url='+url,
                                       content_type="application/x-www-form-urlencoded")
         assert r.status_code == status_code, 'Upload URL failed: ' + str(r.content)
