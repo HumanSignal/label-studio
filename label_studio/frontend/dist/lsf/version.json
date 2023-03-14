@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4715: Start, end and offset of paragraph selection should not include empty or newline (#1233)",
-  "commit": "2bd23c208c842703b2d8b71c77d7d7c1c079bbee",
-  "branch": "master",
-  "date": "2023-03-14T13:56:31Z"
+  "message": "fix: LSDV-4752: Support relations in MIG scenario",
+  "commit": "f4f982bd5a101e4edfdda0861c5475de68990650",
+  "branch": "fb-lsdv-4752/mig-relations-support",
+  "date": "2023/03/14 15:59:01"
 }
