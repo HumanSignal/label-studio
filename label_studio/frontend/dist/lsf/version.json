@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4676: Region corruption MIG (#1230)",
-  "commit": "53d62b133de0d439b9f078e442802df3ce2cb129",
+  "message": "fix: LSDV-4715: Start, end and offset of paragraph selection should not include empty or newline (#1233)",
+  "commit": "2bd23c208c842703b2d8b71c77d7d7c1c079bbee",
   "branch": "master",
-  "date": "2023-03-10T14:21:12Z"
+  "date": "2023-03-14T13:56:31Z"
 }
