@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4676: Region corruption MIG (#1230)",
-  "commit": "53d62b133de0d439b9f078e442802df3ce2cb129",
-  "branch": "master",
-  "date": "2023-03-10T14:21:12Z"
+  "message": "fix: LSDV-1476: Fix selected=true for Taxonomy",
+  "commit": "c7ace6720418a3ff8e8038283c9a931dd71e1b0b",
+  "branch": "fb-lsdv-1476/preselected-taxonomy",
+  "date": "2023/03/14 15:04:25"
 }
