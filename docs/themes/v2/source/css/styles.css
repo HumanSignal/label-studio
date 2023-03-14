@@ -855,6 +855,7 @@ main {
 
 .notion-grid .content-markdown {
   max-width: 100%;
+  width: 100%;
 }
 
 .make-intense-zoom {
