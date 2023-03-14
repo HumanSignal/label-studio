@@ -1,7 +1,7 @@
 ---
 title: Style
 type: tags
-order: 505
+order: 504
 meta_title: Style Tag to use CSS Styles
 meta_description: Customize Label Studio with CSS styles to modify the labeling interface for machine learning and data science projects.
 ---
@@ -12,7 +12,7 @@ The `Style` tag is used in combination with the View tag to apply custom CSS pro
 
 | Param | Type | Description |
 | --- | --- | --- |
-| .`<className>` | <code>string</code> | Reference the className specified in the View tag to apply to a section of the labeling configuration. |
+| .<className> | <code>string</code> | Reference the className specified in the View tag to apply to a section of the labeling configuration. |
 | [CSS property] | <code>string</code> | CSS property and value to apply. |
 
 ### Example
