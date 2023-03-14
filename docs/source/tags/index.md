@@ -3,7 +3,7 @@ title: Introduction
 type: tags
 order: 201
 meta_title: Customize the Label Studio User Interface
-meta_description: Customize the Label Studio labeling interface using XML-like tags for simple and complex data annotation tasks for machine learning and data science projects.
+meta_description: Customize the Label Studio labeling interface using XML-like tags for data annotation tasks in machine learning and data science projects.
 ---
 
 You can use XML-like tags in Label Studio to configure the labeling interface. Label Studio uses three different types of tags to manage labeling:

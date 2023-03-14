@@ -33,7 +33,7 @@ except ImportError:
 
 from .utils import (
     create_business, signin, gcs_client_mock, ml_backend_mock, register_ml_backend_mock, azure_client_mock,
-    redis_client_mock, make_project
+    redis_client_mock, make_project, import_from_url_mock
 )
 
 boto3.set_stream_logger('botocore.credentials', logging.DEBUG)
@@ -160,6 +160,12 @@ def redis_client():
 @pytest.fixture(autouse=True)
 def ml_backend():
     with ml_backend_mock() as m:
+        yield m
+
+
+@pytest.fixture(name='import_from_url')
+def import_from_url():
+    with import_from_url_mock() as m:
         yield m
 
 
