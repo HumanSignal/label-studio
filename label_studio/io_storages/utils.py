@@ -2,6 +2,7 @@
 """
 import logging
 import re
+import ujson as json
 
 logger = logging.getLogger(__name__)
 
