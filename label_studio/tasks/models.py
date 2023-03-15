@@ -294,9 +294,8 @@ class Task(TaskMixin, models.Model):
         # url is list or dict
         if flag_set('fflag_feat_front_lsdv_4661_full_uri_resolve_15032023_short', user='auto'):
             if isinstance(url, dict) or isinstance(url, list):
-                stringify = json.dumps(url)
                 for storage_object in storage_objects:
-                    if storage_object.can_resolve_url(stringify):
+                    if storage_object.can_resolve_url(url):
                         # note: only first found storage_object will be used for link resoling
                         # probably we need to use more advanced can_resolve_url mechanics
                         # that takes into account not only prefixes, but bucket path too
