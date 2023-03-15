@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4593: CORS error requesting audio",
-  "commit": "d63ac002f5b433f770e5759580a72bf40afa1229",
-  "branch": "fb-lsdv-4593-cors",
-  "date": "2023/03/15 08:44:31"
+  "message": "fix: LSDV-4593: CORS error requesting audio (#1234)",
+  "commit": "d847f70728e9e7d4500536b642160676137ce8f6",
+  "branch": "master",
+  "date": "2023-03-15T14:10:32Z"
 }
