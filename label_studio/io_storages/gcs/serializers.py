@@ -46,3 +46,17 @@ class GCSExportStorageSerializer(ExportStorageSerializer):
     class Meta:
         model = GCSExportStorage
         fields = '__all__'
+
+    def validate(self, data):
+        data = super(GCSExportStorageSerializer, self).validate(data)
+        storage = self.instance
+        if storage:
+            for key, value in data.items():
+                setattr(storage, key, value)
+        else:
+            storage = GCSExportStorage(**data)
+        try:
+            storage.validate_connection()
+        except Exception as exc:
+            raise ValidationError(exc)
+        return data

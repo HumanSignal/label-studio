@@ -44,3 +44,12 @@ class AzureBlobExportStorageSerializer(ExportStorageSerializer):
     class Meta:
         model = AzureBlobExportStorage
         fields = '__all__'
+
+    def validate(self, data):
+        data = super(AzureBlobExportStorageSerializer, self).validate(data)
+        storage = AzureBlobExportStorage(**data)
+        try:
+            storage.validate_connection()
+        except Exception as exc:
+            raise ValidationError(exc)
+        return data
