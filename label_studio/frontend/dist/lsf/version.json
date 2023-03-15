@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4662: Use empty range GET requests instead of HEAD to avoid CORS issue on video presigned urls (#1225)",
-  "commit": "91b4ca313dbc0b19882ed6e0a64c5b3dfc5e87d0",
-  "branch": "master",
-  "date": "2023-03-14T17:02:28Z"
+  "message": "fix: LSDV-4757: Fix brush crashing",
+  "commit": "0a050d0335385a96eb0d46f95cad0f97bdee7c18",
+  "branch": "fb-lsdv-4757/brush-order-crash",
+  "date": "2023/03/15 14:28:26"
 }
