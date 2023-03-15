@@ -10,7 +10,6 @@ from django.contrib.auth.models import AnonymousUser
 from label_studio.core.utils.params import get_bool_env, get_all_env_with_prefix
 from label_studio.core.utils.io import find_node
 from label_studio.core.current_request import get_current_request
-from core.feature_flags import flag_set
 
 logger = logging.getLogger(__name__)
 
