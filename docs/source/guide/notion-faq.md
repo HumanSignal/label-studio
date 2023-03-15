@@ -32,7 +32,7 @@ There are 3 ways to reset a password:
 1. Using email by “Forgot password” link on the login page. It works in SaaS by default. It can work in on-premise deployments, but you need to set up the email backend.
 2. Login as a superuser, go to `/admin/users/user` page, find your user and reset password:
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/094cbbb3-23f6-4862-b9ae-2c6f51e50669/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230314%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230314T205852Z&X-Amz-Expires=3600&X-Amz-Signature=1cda61d12143e3fd303af5bf10784beea5b32d637dd24b37254f377749b8613b&X-Amz-SignedHeaders=host&x-id=GetObject)
+![](/images/notion/2a6c8bf8535c442.png)
 
 1. Go to LS terminal, run  `/label-studio-enterprise/label_studio_enterprise && python3` [`manage.py`](http://manage.py) `shell_plus`
 
@@ -51,7 +51,7 @@ u.save()
 - By default owner email is used as organization title. It can be fixed using `/admin/organizations/` page.
 - Or customers can do it through API: `{”title”: “new title”} PATCH api/organization/`
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/9e140bb5-7b37-49ef-9f61-cb0bb9fbc5e0/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230314%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230314T205852Z&X-Amz-Expires=3600&X-Amz-Signature=01240386935aaf0c8d077c05aa0d61a2f9b5d0d97f531e500dcaf8878c23ff9b&X-Amz-SignedHeaders=host&x-id=GetObject)
+![](/images/notion/47132a946ede4c0.png)
 
 
 ## Common LDAP & SAML SSO Questions
@@ -71,12 +71,12 @@ This action can only be performed using the /admin page because of security reas
 1. Go to SAML settings page
 2. Find organization you need
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/faa6e3d2-bafc-4d4d-8380-cc6c2cc43e5e/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230314%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230314T205852Z&X-Amz-Expires=3600&X-Amz-Signature=c523af2dfbf33ac450bed9ed048bba70166de79fa6e787e523e1bab14e15e119&X-Amz-SignedHeaders=host&x-id=GetObject)
+![](/images/notion/da39d335d2dd4f9.png)
 
 1. Click on the pk
 2. Change the domain
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/d16ece68-fb6f-4d40-81a3-69437d41da42/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230314%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230314T205852Z&X-Amz-Expires=3600&X-Amz-Signature=983c781d274dce19db5c0a8f1e83fd68031f6c6d74c618f5a4d2861c43548ee1&X-Amz-SignedHeaders=host&x-id=GetObject)
+![](/images/notion/365f186f68e947c.png)
 
 
 ### Is the Organization Owner role required to setup LDAP?
@@ -144,7 +144,7 @@ Go to the cloud storage settings page, click on **Edit** cloud storage connectio
 3. Sometimes the sync process doesn’t start immediately. That is because syncing process is based on internal job scheduler. Please wait, if nothing happens during long period of time - contact us via  form, and please provide the time when you launched the “Sync” job
 4. An easy way to check rq workers is to run an export: go to the Data manager, click Export, and create a new snapshot and download the JSON file. If you see an Error, most likely your rq workers have problems. Another way to check rq workers - login as a superuser and go to /django-rq page. You should see a `workers` column, `workers` values shouldn’t be 0 as far as failed column should be empty (0).
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/cdfc0455-a5ce-4fec-8260-8019a097f3bc/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230314%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230314T205852Z&X-Amz-Expires=3600&X-Amz-Signature=d5527fd8062b816c04f30ae99df815545bd95b04f8c5354d2a045f3139623121&X-Amz-SignedHeaders=host&x-id=GetObject)
+![](/images/notion/433c7b478e4440a.png)
 
 
 ### JSON files from a cloud storage are not synced, the data manager is empty
@@ -176,7 +176,7 @@ You access the labeling data via navigating to the next task while clicking on s
 Without an internet connection, you will receive a “Failed to fetch” message each time you try opening the data labeling screen. This is because data content is fetched on the client side at the time you load the app, ensuring secure data flow. Please check your internet connection and reload the page again.
 
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/b435f38d-fd2e-404b-8f03-6e973e3788ee/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230314%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230314T205852Z&X-Amz-Expires=3600&X-Amz-Signature=23e6f147f7f14ea9ea4d506ef8354c90369be9a14a151f704afe90dba9a00029&X-Amz-SignedHeaders=host&x-id=GetObject)
+![](/images/notion/01671c7a993f4c3.png)
 
 
 ### Check data access
@@ -188,7 +188,7 @@ It is a common scenario when working with external storage that the URLs provide
 To locate this source of error, try navigating to your browser’s _Network_ panel and check to see if there are 403 or 404 errors.
 
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/b70bf220-25da-4de3-bc4f-7ae70f858359/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230314%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230314T205852Z&X-Amz-Expires=3600&X-Amz-Signature=54a849aaa1c4d13449c71745be454a252264c1dbc30bcb1f465d0571f262f7a0&X-Amz-SignedHeaders=host&x-id=GetObject)
+![](/images/notion/16bab76694704c7.png)
 
 
 To validate the link doesn’t work - copy it and try opening in a separate browser tab.
@@ -412,7 +412,7 @@ Most likely RQ Workers are
 To inspect this issue you should open `/django-rq` page and see number of workers in Workers column:
 
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/eb816b18-7c6a-4b66-88e1-eaa5007928cd/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230314%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230314T205854Z&X-Amz-Expires=3600&X-Amz-Signature=1e6bc83681075e09dad48d8fb66d342aa6ef2f0d30d3526a32be723be193eef4&X-Amz-SignedHeaders=host&x-id=GetObject)
+![](/images/notion/693a9344eff7413.png)
 
 
 If you see 0, it’s definitely a problem with your rq worker setup, you have to connect with your devops team and check what **rqworker containers** are running. 
@@ -464,7 +464,7 @@ Try to run postgresql VACUUM, ANALYZE and REINDEX:
 This script helps to evaluate how many annotations do annotators have in the export snapshot:
 
 
-[image](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/896aac75-4e01-409b-a479-8404c8841231/annotator-counter.py?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230314%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230314T205854Z&X-Amz-Expires=3600&X-Amz-Signature=11c3703bfe79e34b350fa0ccbddfe1f512ed9762aa2fbdd272e2480d2d8b6727&X-Amz-SignedHeaders=host&x-id=GetObject)
+[image](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/896aac75-4e01-409b-a479-8404c8841231/annotator-counter.py?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230315%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230315T024328Z&X-Amz-Expires=3600&X-Amz-Signature=978174495a3e2d7649db689e0256a869fe29ab44ab12990d54e2de87a805f96d&X-Amz-SignedHeaders=host&x-id=GetObject)
 
 
 ## Contact Support

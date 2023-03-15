@@ -36,7 +36,7 @@
     "hexo-server": "^0.3.3",
     "hexo-tag-details": "https://github.com/nicholasrq/hexo-tag-details.git",
     "node-html-parser": "^6.1.4",
-    "notion-to-md": "^2.5.5",
+    "notion-to-md": "github:huguestennier/notion-to-md",
     "save": "^2.4.0"
   },
   "scripts": {
