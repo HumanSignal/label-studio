@@ -4,6 +4,7 @@ type: tags
 order: 303
 meta_title: Audio Tag for Labeling Audio
 meta_description: Customize Label Studio to label audio data for machine learning and data science projects.
+tier: all
 ---
 
 The `Audio` tag plays a simple audio file. Use this tag for basic audio annotation tasks such as classification or transcription.

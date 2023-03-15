@@ -1,9 +1,14 @@
 ---
 title: Write your own ML backend
+short: Write your own ML backend
 type: guide
-order: 607
+tier: all
+order: 210
+order_enterprise: 117
 meta_title: Machine Learning SDK
 meta_description: Set up your machine learning model to output and consume predictions in your data science and data labeling projects. 
+section: "Machine learning"
+
 ---
 
 Set up a machine learning model as a backend to Label Studio so that you can dynamically output and consume predictions as labeling occurs. You can follow this tutorial to wrap custom machine learning model code with the Label Studio ML SDK, or refer to [example ML backend tutorials](ml_tutorials.html) to integrate with popular machine learning frameworks such as PyTorch, GPT2, and others. 
@@ -18,12 +23,15 @@ This example tutorial outlines how to wrap a simple text classifier based on the
 
 If you want to create an ML backend that you can use for dynamic ML-assisted labeling with interactive pre-annotations, see [Support interactive preannotations in your ML backend](#Support-interactive-preannotations-in-your-ML-backend).
 
+
 ## Prerequisites 
+
 Before you start integrating your custom model code with the Label Studio ML SDK to use it as an ML backend with Label Studio, determine the following:
 1. The expected inputs and outputs for your model. In other words, the type of labeling that your model supports in Label Studio, which informs the [Label Studio labeling config](setup.html#Set-up-the-labeling-interface-for-your-project). For example, text classification labels of "Dog", "Cat", or "Opossum" could be possible inputs and outputs. 
 2. Whether you want to create an ML backend that predicts labels, is trained by annotated tasks, or both. 
 3. If creating an ML backend that predicts labels, determine the [prediction format](predictions.html) that your predictions must be outputted as.
 4. The required packages and dependencies necessary to run your machine learning model.
+
 
 ## Declare and initialize a class
 
@@ -145,7 +153,7 @@ Do the following in your code:
 - Define an inference call with the **predict** method as outlined in the [inference section of this guide](ml_create.html#Example-inference-call).
 - The `predict()` method takes task data and context data:
   - the `tasks` parameter contains details about the task being pre-annotated. 
-  - the `kwargs['context']` parameter contains details about annotation actions performed in Label Studio, such as a text string highlighted sent in [Label Studio annotation results format](/export.html#Raw-JSON-format-of-completed-labeled-tasks).
+  - the `kwargs['context']` parameter contains details about annotation actions performed in Label Studio, such as a text string highlighted sent in [Label Studio annotation results format](export.html#Raw-JSON-format-of-completed-labeled-tasks).
 - With the task and context data, construct a prediction using the data received from Label Studio. 
 - Return a result in the [Label Studio predictions format](predictions.html#Format-pre-annotations-for-Label-Studio), which varies depending on the type of labeling being performed.
 
@@ -155,15 +163,16 @@ Refer to the code example for more details about how this might be performed for
 
 If you want to train a model, use the training call to update your model based on new annotations. You can perform training as part of an active learning with predictions, or you can create an ML backend that trains or retrains a model based on annotations. You don't need to use this call in your code if you just want to use an ML backend for predictions. 
 
-Write your own code to override the `fit()` method, which takes [JSON-formatted Label Studio annotations](/export.html#Raw-JSON-format-of-completed-labeled-tasks) and returns an arbitrary JSON dictionary where information about the created model can be stored. 
+Write your own code to override the `fit()` method, which takes [JSON-formatted Label Studio annotations](export.html#Raw-JSON-format-of-completed-labeled-tasks) and returns an arbitrary JSON dictionary where information about the created model can be stored. 
 
-> Note: The `completions` field is deprecated as of Label Studio 1.0.x. In version 1.5.0 it will be removed. Instead, use the SDK or the API to retrieve annotation and task data using annotation and task IDs. See [trigger training with webhooks](#Trigger-training-with-webhooks) for more details.
+!!! note
+    The `completions` field is deprecated as of Label Studio 1.0.x. In version 1.5.0 it will be removed. Instead, use the SDK or the API to retrieve annotation and task data using annotation and task IDs. See [trigger training with webhooks](#Trigger-training-with-webhooks) for more details.
 
 ### Trigger training with webhooks
 
 Starting in version 1.4.1 of Label Studio, when you add an ML backend to your project, Label Studio creates a webhook to your ML backend to send an event every time an annotation is created or updated.
 
-By default, the payload of the webhook event does not contain the annotation itself. You can either [modify the webhook event](webhooks.html) sent by Label Studio to send the full payload, or retrieve the annotation using the [Label Studio API](/api) using the [get annotation by its ID endpoint](/api#operation/api_annotations_read), [SDK](sdk.html) using the [get task by ID method](/sdk/project.html#label_studio_sdk.project.Project.get_task), or by retrieving it from [target storage that you set up](storage.html) to store annotations.
+By default, the payload of the webhook event does not contain the annotation itself. You can either [modify the webhook event](webhooks.html) sent by Label Studio to send the full payload, or retrieve the annotation using the [Label Studio API](/api) using the [get annotation by its ID endpoint](/api#operation/api_annotations_read), [SDK](sdk.html) using the [get task by ID method](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.get_task), or by retrieving it from [target storage that you set up](storage.html) to store annotations.
 
 See the [annotation webhook event reference](webhook_reference.html#Annotation-Created) for more details about the webhook event.
 

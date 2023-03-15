@@ -2,22 +2,35 @@
 title: Import pre-annotated data into Label Studio
 short: Import pre-annotations
 type: guide
-order: 301
+tier: all
+order: 122
+order_enterprise: 107
 meta_title: Import pre-annotated data into Label Studio
 meta_description: Import predicted labels, predictions, pre-annotations, or pre-labels into Label Studio for your data labeling, machine learning, and data science projects.
+section: "Import and Export"
 ---
 
 If you have predictions generated for your dataset from a model, either as pre-annotated tasks or pre-labeled tasks, you can import the predictions with your dataset into Label Studio for review and correction. Label Studio automatically displays the pre-annotations that you import on the Labeling page for each task. 
 
-> To generate interactive pre-annotations with a machine learning model while labeling, see [Set up machine learning with Label Studio](ml.html).
+!!! note 
+    To generate interactive pre-annotations with a machine learning model while labeling, see [Set up machine learning with Label Studio](ml.html).
 
 You can import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-data-from-the-Label-Studio-UI) or [using the API](/api#operation/projects_import_create). 
+
 
 ## Format pre-annotations for Label Studio 
 
 To import predicted labels into Label Studio, you must use the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format) and set up your tasks with the `predictions` JSON key. The Label Studio ML backend also outputs tasks in this format. Check this common video tutorial showing how to convert a submitted annotation to a prediction:
 
 <iframe class="video-border" width="100%" height="400vh" src="https://www.youtube.com/embed/CyRe73VD4EE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+### Pre-annotations are read-only
+
+Pre-annotations (predictions) cannot be modified and are always read-only.
+
+If the "Show predictions to annotators in the Label Stream and Quick View" toggle in the project settings (Machine Learning section) is enabled, predictions will be automatically copied to newly created annotations. In Quick View mode, annotations can be created from predictions by using the special copy button on the editor tool panel:
+
+<img src="/images/quickview-copy-button.png" class="gif-border">
 
 ### Specific examples for pre-annotations
 
@@ -78,9 +91,10 @@ The `predictions` array also depends on the labeling configuration. Some pre-ann
 | `result.readonly` | bool | readonly mode for a specific region | 
 | `result.hidden` |  bool | default visibility (eye icon) for a specific region |
 
-Other types of annotation contain specific fields. You can review the [examples on this page](#Specific-examples-for-pre-annotations), or review the [tag documentation for the Object and Control tags](/tags) in your labeling configuration labeling-specific `result` objects. For example, the [Audio tag](tags/audio.html), [HyperText tag](tags/hypertext.html), [Paragraphs tag](tags/paragraphs.html), [KeyPointLabels](/tags/keypointlabels.html) and more all contain sample `result` JSON examples.
+Other types of annotation contain specific fields. You can review the [examples on this page](#Specific-examples-for-pre-annotations), or review the [tag documentation for the Object and Control tags](/tags) in your labeling configuration labeling-specific `result` objects. For example, the [Audio tag](/tags/audio.html), [HyperText tag](/tags/hypertext.html), [Paragraphs tag](/tags/paragraphs.html), [KeyPointLabels](/tags/keypointlabels.html) and more all contain sample `result` JSON examples.
 
-> Note: If you're generating pre-annotations for a [custom ML backend](ml_create.html), you can use the `self.parsed_label_config` variable to retrieve the labeling configuration for a project and generate pre-annotations. See the [custom ML backend](ml_create.html) documentation for more details.
+!!! info
+    If you're generating pre-annotations for a [custom ML backend](ml_create.html), you can use the `self.parsed_label_config` variable to retrieve the labeling configuration for a project and generate pre-annotations. See the [custom ML backend](ml_create.html) documentation for more details.
 
 ## Import bbox and choice pre-annotations for images
 
@@ -810,9 +824,11 @@ Save this example JSON as a file to import it into Label Studio, for example, `e
 
 This example JSON also includes a prediction score for the task. The IDs for each rectangle result match the label assigned to the region and the text area transcription for the region. 
 
-> The image data in this example task references an uploaded file, identified by the source_filename assigned by Label Studio after uploading the image. The best way to reference image data is using presigned URLs for images stored in cloud storage, or absolute paths to image data stored in local storage and added to Label Studio by [syncing storage](storage.html). 
+!!! note 
+    The image data in this example task references an uploaded file, identified by the source_filename assigned by Label Studio after uploading the image. The best way to reference image data is using presigned URLs for images stored in cloud storage, or absolute paths to image data stored in local storage and added to Label Studio by [syncing storage](storage.html). 
 
 Import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-data-from-the-Label-Studio-UI) or [using the API](/api#operation/projects_import_create).
+
 
 ## Troubleshoot pre-annotations
 
@@ -822,7 +838,12 @@ If annotators can't see predictions or if you encounter unexpected behavior afte
 In the **Settings > Machine Learning** section for your project, make sure that the following settings are configured:
 - Enable **Show predictions to annotators in the Label Stream and Quick View**
 - Select the relevant **Model Version** in the drop-down. If there is no drop-down menu visible, there might not be a model version listed for the pre-annotations, or there might be another issue happening. 
-- <i class='ent'></i> Disable the option to **Reveal pre-annotations interactively**, which requires manual action from annotators to display pre-annotated regions. (Label Studio Enterprise only)  
+
+<div class="enterprise-only">
+
+- Disable the option to <b>Reveal pre-annotations interactively</b>, which requires manual action from annotators to display pre-annotated regions.
+
+</div>
 
 ### Check the configuration values of your labeling configuration and tasks
 The `from_name` of the pre-annotation task JSON must match the value of the name in the `<Labels name="label" toName="text">` portion of the labeling configuration. The `to_name` must match the `toName` value. 
