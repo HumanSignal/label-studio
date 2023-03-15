@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4757: Fix brush crashing",
-  "commit": "0a050d0335385a96eb0d46f95cad0f97bdee7c18",
+  "commit": "ec5f7d626751d4795b3441dfcc7b162d6d4e093f",
   "branch": "fb-lsdv-4757/brush-order-crash",
-  "date": "2023/03/15 14:28:26"
+  "date": "2023/03/15 22:29:18"
 }
