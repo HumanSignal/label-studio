@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4593: CORS error requesting audio",
-  "commit": "d847f70728e9e7d4500536b642160676137ce8f6",
+  "message": "feat: LSDV-3023: Annotation Tab Carousel (#1188)",
+  "commit": "3d56cefbaac1ea5b53e2cd6c80956f1f457d8be2",
   "branch": "master",
-  "date": "2023/03/15 09:10:32"
+  "date": "2023-03-15T16:08:54Z"
 }
