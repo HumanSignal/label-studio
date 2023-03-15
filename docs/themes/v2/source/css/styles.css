@@ -849,13 +849,24 @@ main {
 }
 
 .notion-grid {
+  --toc-size: 0px;
   max-width: 97ch;
   margin: 0 auto;
 }
 
 .notion-grid .content-markdown {
-  max-width: 100%;
-  width: 100%;
+  width: calc(100vw - var(--sidebar-size) - var(--toc-size) - calc(2 * var(--page-padding)) - 0px)
+}
+
+@media (max-width: 800px) {
+  .notion-grid .content-markdown {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .notion-grid .content-markdown * {
+    word-break: break-all;
+  }
 }
 
 .make-intense-zoom {
