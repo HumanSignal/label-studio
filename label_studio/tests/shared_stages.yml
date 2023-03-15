@@ -47,6 +47,20 @@ stages:
         json:
           project_pk: id
       status_code: 201
+  - id: create_project_empty_config
+    name: create_project
+    request:
+      data:
+        label_config: <View></View>
+        title: Test Draft 1
+        show_collab_predictions: true
+      method: POST
+      url: '{django_live_url}/api/projects'
+    response:
+      save:
+        json:
+          project_pk: id
+      status_code: 201
   - id: create_project_image
     name: stage
     request:
