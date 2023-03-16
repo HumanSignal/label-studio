@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4773: Undo history resets in MIG",
-  "commit": "e99c4c7aa85c5c698c015a6ecff27f5434f2c5c6",
+  "commit": "cc2a2c8875389d1d4a1dcf8e961565a8c94a1d11",
   "branch": "fb-lsdv-4773/history-erase-mig",
-  "date": "2023/03/16 14:22:19"
+  "date": "2023/03/16 15:13:14"
 }
