@@ -47,7 +47,7 @@ correctly setup the `crossOrigin` on the `Image` attribute. This attribute mimic
 `crossOrigin` attribute that a normal DOM `img` tag would
 have ([reference])(https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin).
 
-If the image is on a public server or Google/AWS/Azure bucket that is publically readable
+If the image is on a public server or Google/AWS/Azure bucket that is publicly readable
 without any authentication, you should set `crossOrigin` to `anonymous`.
 
 If the image is on a server or a private cloud bucket that requires authentication of any
