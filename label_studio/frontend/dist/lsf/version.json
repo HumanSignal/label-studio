@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3023: Annotation Tab Carousel (#1188)",
-  "commit": "3d56cefbaac1ea5b53e2cd6c80956f1f457d8be2",
-  "branch": "master",
-  "date": "2023-03-15T16:08:54Z"
+  "message": "fix: LSDV-4776: Fix interpolating a video region rotation prop",
+  "commit": "5b7c1b1f12cd084e46189c7505cf6a3e6d24b193",
+  "branch": "fb-lsdv-4776/rotation-interpolation",
+  "date": "2023/03/16 06:39:57"
 }
