@@ -1,12 +1,13 @@
 ---
-title: Label Studio features
+title: Compare OSS and Enterprise
 type: guide
-order: 108
+tier: all
+order: 100
 meta_title: Label Studio Community and Enterprise Features
 meta_description: Compare the features of Label Studio Community Edition with the paid Label Studio Enterprise Edition so that you can choose the best option for your data labeling and annotation projects. 
 ---
 
-Label Studio is available as a Community edition open source data labeling tool. It is also available as a paid version with extended functionality and support. Smaller organizations might want to consider the SaaS option and larger teams with robust data labeling needs can get the Enterprise edition. To get started with Label Studio Enterprise edition, contact the [Heartex team](https://heartex.com/). 
+Label Studio is available as a Community edition open source data labeling tool. It is also available as a paid version with extended functionality and support. Smaller organizations might want to consider the SaaS option and larger teams with robust data labeling needs can get the Enterprise edition.
 
 
 <table>

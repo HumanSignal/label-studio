@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-4187: Select regions without 300ms lag",
-  "commit": "9f3733860b3d6f64f093a2d546fab38fad23748f",
+  "message": "feat: LSDV-3023: Annotation Tab Carousel (#1188)",
+  "commit": "3d56cefbaac1ea5b53e2cd6c80956f1f457d8be2",
   "branch": "master",
-  "date": "2023/02/18 03:31:18"
+  "date": "2023-03-15T16:08:54Z"
 }

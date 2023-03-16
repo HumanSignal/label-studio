@@ -1,14 +1,18 @@
 ---
-title: Set up user accounts
+title: User management
 type: guide
-order: 250
-meta_title: User Accounts
+tier: opensource
+order: 114
+order_enterprise: 101
+meta_title: User Management
 meta_description: Sign up for Label Studio and invite users to collaborate on your data labeling, machine learning, and data science projects.
+section: "Configuration"
+
 ---
 
 Sign up and create an account for Label Studio to start labeling data and setting up projects. 
 
-Everyone with an account in Label Studio has access to the same functionality. If you're using Label Studio Enterprise, see [Manage access to Label Studio](manage_users.html) for details about what role-based access control is available. 
+Everyone with an account in Label Studio has access to the same functionality. If you're using Label Studio Enterprise, see [Manage access to Label Studio](https://docs.heartex.com/guide/manage_users.html) for details about what role-based access control is available. 
 
 ## Create an account
 
@@ -24,7 +28,8 @@ If you want, you can create an account from the command line when you start Labe
 label-studio start --username <username> --password <password> [--user-token <token-at-least-5-chars>]
 ```
 
-> Note: The `--user-token` argument is optional. If you don't set the user token, one is automatically generated for the user. Use the user token for API access. The minimum token length is 5 characters. 
+!!! note 
+    The `--user-token` argument is optional. If you don't set the user token, one is automatically generated for the user. Use the user token for API access. The minimum token length is 5 characters. 
 
 ### Retrieve user info from the command line
 
@@ -73,6 +78,8 @@ Then, start Label Studio and log in with the username and password that you set 
 
 ## Invite collaborators to a project
 
+<img src="/images/invite-collaborators-ls-single-server.png" class="gif-border"/>
+
 After you [set up a labeling project](setup.html), invite annotators to the project to start collaborating on labeling tasks. Inviting people to your Label Studio instance with a link does not restrict access to the signup page unless you also set an environment variable. See how to [Restrict signup for local deployments](#Restrict-signup-for-local-deployments) and [Restrict signup for cloud deployments](#Restrict-signup-for-cloud-deployments) on this page.
 
 1. In the Label Studio UI, click the hamburger icon and click **People**.
@@ -94,7 +101,7 @@ You can review the existing accounts in Label Studio to see which people created
 2. Review the list of users by email address and name. You can see the last time a user was active in Label Studio.
 3. Click a row to see additional detail about a specific user, including the projects that they created or contributed annotations to.
 
-### Reset password
+## Reset password
 If you forget your password or change passwords regularly for security reasons, you can change it from the command line.
 
 1. On the server running Label Studio, run the following command: 
