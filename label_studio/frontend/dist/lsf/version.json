@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3023: Annotation Tab Carousel (#1188)",
-  "commit": "3d56cefbaac1ea5b53e2cd6c80956f1f457d8be2",
-  "branch": "master",
-  "date": "2023-03-15T16:08:54Z"
+  "message": "fix: LSDV-4774: Drawing on the hidden image in MIG scenario",
+  "commit": "68aeda880c17508f538252c705367d54e92850f6",
+  "branch": "fb-lsdv-4774/drawing-on-hidden-images-mig",
+  "date": "2023/03/16 13:35:46"
 }
