@@ -428,7 +428,11 @@ stages:
             array:
               - gs://whatever-bucket-with/manual.link.jpg
               - gs://whatever-bucket-with/manual.link.jpg
-
+          array:
+            - item1: gs://whatever-bucket-with/manual.link.jpg
+              some: 'some text'
+            - item2: gs://whatever-bucket-with/manual.link.jpg
+              some: 'some text'
       method: POST
       url: '{django_live_url}/api/projects/{project_pk}/import'
     response:
@@ -466,6 +470,11 @@ stages:
             array:
               - !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
               - !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
+          array:
+            - item1: !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
+              some: 'some text'
+            - item2: !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
+              some: 'some text'
       status_code: 200
 
 ---
