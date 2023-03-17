@@ -39,6 +39,7 @@ Run Label Studio in a Docker container and access it at `http://localhost:8080`.
 
 ```bash
 docker pull heartexlabs/label-studio:latest
+chown -R 1001:0 $(pwd)/mydata
 docker run -it -p 8080:8080 -v $(pwd)/mydata:/label-studio/data heartexlabs/label-studio:latest
 ```
 You can find all the generated assets, including SQLite3 database storage `label_studio.sqlite3` and uploaded files, in the `./mydata` directory.
@@ -62,10 +63,18 @@ Docker Compose script provides production-ready stack consisting of the followin
 - [Nginx](https://www.nginx.com/) - proxy web server used to load various static data, including uploaded audio, images, etc.
 - [PostgreSQL](https://www.postgresql.org/) - production-ready database that replaces less performant SQLite3.
 
-To start using the app from `http://localhost` run this command:
+Before the first startup **you must** assign the data folder to the correct user, to do so you can run this command.
+```bash
+chown -R 1001:0 mydata
+```
+
+To start using the app from `http://localhost:8080` run this command:
 ```bash
 docker-compose up
 ```
+
+**this compose file + Nginx config allows **you and everyone else** to access this application from all 
+devices within the network, make sure that your router is configured properly.**
 
 ### Install locally with pip
 
