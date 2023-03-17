@@ -63,7 +63,9 @@ Docker Compose script provides production-ready stack consisting of the followin
 - [Nginx](https://www.nginx.com/) - proxy web server used to load various static data, including uploaded audio, images, etc.
 - [PostgreSQL](https://www.postgresql.org/) - production-ready database that replaces less performant SQLite3.
 
-Before the first startup **you must** assign the data folder to the correct user, to do so you can run this command.
+- If you are running this on Linux before the first startup **you must** assign the data folder to the correct user,
+  to do so you can run this command.
+
 ```bash
 chown -R 1001:0 mydata
 ```
@@ -72,6 +74,9 @@ To start using the app from `http://localhost:8080` run this command:
 ```bash
 docker-compose up
 ```
+
+If you have created certificates for tls  you have to place them in the [nginx/certs](./deploy/nginx/certs) folder
+the server will then be available at port 8086 instead.
 
 **this compose file + Nginx config allows **you and everyone else** to access this application from all 
 devices within the network, make sure that your router is configured properly.**
