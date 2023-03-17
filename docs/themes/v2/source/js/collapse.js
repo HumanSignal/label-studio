@@ -63,21 +63,35 @@ function onDOMReady() {
   });
   if(location.hash) {
     const header = document.querySelector(location.hash);
-    let sibling = header.nextElementSibling;
-    let nextSibling = getNextHeaderOrSibling(header);
-    while (sibling && sibling !== nextSibling) {
-      openCollapse(header, sibling);
-      sibling = sibling.nextElementSibling;
+    if(header.tagName === "H2") {
+      let sibling = header.nextElementSibling;
+      let nextSibling = getNextHeaderOrSibling(header);
+      while (sibling && sibling !== nextSibling) {
+        openCollapse(header, sibling);
+        sibling = sibling.nextElementSibling;
+      }
+    } else {
+      let previousHeader = getPreviousSibling(header, "h2")
+      if(previousHeader) {
+        let sibling = previousHeader.nextElementSibling;
+        let nextSibling = getNextHeaderOrSibling(previousHeader);
+        while (sibling && sibling !== nextSibling) {
+          openCollapse(previousHeader, sibling);
+          sibling = sibling.nextElementSibling;
+        }
+      }
     }
   }
 
-  window.addEventListener("hashchange", (event) => {
+  window.addEventListener("hashchange", () => {
     const header = document.querySelector(location.hash);
-    let sibling = header.nextElementSibling;
-    let nextSibling = getNextHeaderOrSibling(header);
-    while (sibling && sibling !== nextSibling) {
-      openCollapse(header, sibling);
-      sibling = sibling.nextElementSibling;
+    if (header.tagName === "H2") {
+      let sibling = header.nextElementSibling;
+      let nextSibling = getNextHeaderOrSibling(header);
+      while (sibling && sibling !== nextSibling) {
+        openCollapse(header, sibling);
+        sibling = sibling.nextElementSibling;
+      }
     }
   });
   const collapseExpandBtn = document.createElement("button");
@@ -133,6 +147,22 @@ function getNextHeaderOrSibling(element) {
   }
   return element.nextElementSibling;
 }
+function getPreviousSibling(elem, selector) {
+
+	// Get the next sibling element
+	var sibling = elem.previousElementSibling;
+
+	// If there's no selector, return the first sibling
+	if (!selector) return sibling;
+
+	// If the sibling matches our selector, use it
+	// If not, jump to the next sibling and continue the loop
+	while (sibling) {
+		if (sibling.matches(selector)) return sibling;
+		sibling = sibling.previousElementSibling;
+	}
+
+};
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", onDOMReady);
 } else {
