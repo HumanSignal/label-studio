@@ -76,10 +76,10 @@ docker-compose up
 ```
 
 If you have created certificates for tls  you have to place them in the [nginx/certs](./deploy/nginx/certs) folder
-the server will then be available at port 8086 instead.
+the server will then be available on port 8086 instead.
 
-**this compose file + Nginx config allows **you and everyone else** to access this application from all 
-devices within the network, make sure that your router is configured properly.**
+This compose file + Nginx config allows **you and everyone else** to access this application from all 
+devices within the network, **make sure that your network is configured properly.**
 
 ### Install locally with pip
 
