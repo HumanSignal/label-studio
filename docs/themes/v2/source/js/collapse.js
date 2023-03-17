@@ -66,10 +66,20 @@ function onDOMReady() {
     let sibling = header.nextElementSibling;
     let nextSibling = getNextHeaderOrSibling(header);
     while (sibling && sibling !== nextSibling) {
-      toggleCollapse(header, sibling);
+      openCollapse(header, sibling);
       sibling = sibling.nextElementSibling;
     }
   }
+
+  window.addEventListener("hashchange", (event) => {
+    const header = document.querySelector(location.hash);
+    let sibling = header.nextElementSibling;
+    let nextSibling = getNextHeaderOrSibling(header);
+    while (sibling && sibling !== nextSibling) {
+      openCollapse(header, sibling);
+      sibling = sibling.nextElementSibling;
+    }
+  });
   const collapseExpandBtn = document.createElement("button");
   collapseExpandBtn.textContent = is_collapsed ? "Expand All": "Collapse All";
   const toc = document.querySelector(".content-grid .toc");
@@ -100,6 +110,11 @@ function onDOMReady() {
       }
     });
   });
+}
+function openCollapse(header, content) {
+  content.style.display = "block";
+  header.classList.remove("collapsed");
+  header.classList.add("expanded");
 }
 function toggleCollapse(header, content) {
   if (content.style.display === "none") {
