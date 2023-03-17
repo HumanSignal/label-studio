@@ -1,6 +1,6 @@
 ---
-title: On-Premise Release Notes for Label Studio Enterprise
-short: On-Premise Release Notes
+title: (Concat) On-Premise Release Notes for Label Studio Enterprise
+short: (Concat) On-Premise Release Notes
 type: guide
 tier: enterprise
 order: 221
@@ -9,9 +9,14 @@ section: "Reference"
 meta_title: On-premise Release notes for Label Studio Enterprise
 meta_description: Discover what's new and improved, and review bug fixes, in the release notes and changelog for Label Studio Enterprise.
 ---
-<a name="243md"></a>
 
-# On-premise Release Notes
+!!! info 
+    The release notes for Label Studio Community Edition is available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
+
+!!! info 
+    The release notes for Label Studio Enterprise Cloud (SaaS) is available <a href="https://heartex.com/changelog">here</a>.
+
+<a name="243md"></a>
 
 ## New helm chart
 
@@ -54,8 +59,6 @@ The old chart `heartex/label-studio-enterprise` **has been deprecated**. Support
 
 
 <a name="242md"></a>
-
-# On-premise Release Notes
 
 ## Label Studio 2.4.2
 

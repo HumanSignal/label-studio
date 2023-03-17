@@ -988,6 +988,10 @@ main {
   background-color: var(--color-background);
 }
 
+.content-markdown .admonition + .admonition {
+  margin-top: 2em;
+}
+
 .content-markdown .admonition *:last-child {
   margin-bottom: 0;
 }
