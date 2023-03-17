@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3023: Annotation Tab Carousel (#1188)",
-  "commit": "3d56cefbaac1ea5b53e2cd6c80956f1f457d8be2",
+  "message": "fix: LSDV-4752: Support relations in MIG scenario (#1240)",
+  "commit": "8969ae4509104b38052b153b4bc16052836407ba",
   "branch": "master",
-  "date": "2023-03-15T16:08:54Z"
+  "date": "2023-03-15T18:16:28Z"
 }
