@@ -7,8 +7,8 @@ hexo.extend.filter.register('after_init', async function(){
   const markdownFiles = await concatMd.default("source/guide/release_notes/onprem", { sorter: (a, b) => (a > b ? -1 : 1) });
 
 const frontmatter = `---
-title: (Concat) On-Premise Release Notes for Label Studio Enterprise
-short: (Concat) On-Premise Release Notes
+title: On-Premise Release Notes for Label Studio Enterprise
+short: On-Premise Release Notes
 type: guide
 tier: enterprise
 order: 221
@@ -28,7 +28,7 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
   const finalString = frontmatter + markdownFiles;
 
   //writing to file
-  fs.writeFile("source/guide/release_notes/concat.md", finalString, (err) => {
+  fs.writeFile("source/guide/release_notes.md", finalString, (err) => {
     console.log(err);
   });
 
