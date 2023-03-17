@@ -32,7 +32,7 @@ The migration process can be performed without any downtime. The steps required 
 The old chart, heartex/label-studio-enterprise, **has been deprecated**. Support for as many releases as possible will be provided. A notification will be posted in the Release Notes section when this changes. We hope that this revised chart will meet your technical needs. If you have any questions or concerns, please don't hesitate to reach out to us.
 
 
-## Label Studio 2.4.3
+## Label Studio Enterprise 2.4.3
 
 ### Improvements
 - Support simultaneous render of multi-channel audio with added splitchannels="true" option on Audio config (larger memory requirement) [LSDV-3028](https://labelstudio.aha.io/features/LSDV-3028)
@@ -61,7 +61,7 @@ The old chart, heartex/label-studio-enterprise, **has been deprecated**. Support
 
 
 
-## Label Studio 2.4.2
+## Label Studio Enterprise 2.4.2
 
 ### New Feature
 - Labels are not displayed inside the regions [LSDV-1142](https://labelstudio.aha.io/features/LSDV-1142)
