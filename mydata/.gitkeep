@@ -1,0 +1,3 @@
+This file exists to ensure that the folder is created with the group and permission of the cloning user
+re own this folder with `sudo chown -R 1001:0 mydata`.
+
