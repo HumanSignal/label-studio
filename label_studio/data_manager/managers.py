@@ -4,7 +4,6 @@ import re
 import ujson as json
 import logging
 
-
 from pydantic import BaseModel
 
 from django.db import models
@@ -195,7 +194,13 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
     elif _filter.operator == Operator.NOT_CONTAINS:
         filter_expressions.append(~Q(subquery))
         return 'continue'
-
+    elif _filter.operator == Operator.EMPTY:
+        if cast_bool_from_str(_filter.value):
+            q = Q(annotations__result__isnull=True) | Q(annotations__result=[])
+        else:
+            q = Q(annotations__result__isnull=False) & ~Q(annotations__result=[])
+        filter_expressions.append(q)
+        return 'continue'
 
 
 def add_user_filter(enabled, key, _filter, filter_expressions):
@@ -474,7 +479,6 @@ def annotate_completed_at(queryset):
             When(is_labeled=True, then=Subquery(newest.values("created_at")))
         )
     )
-
 
 def annotate_annotations_results(queryset):
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
