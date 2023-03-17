@@ -11,15 +11,15 @@ services:
       - app
     environment:
       - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
-#   Optional: Specify SSL termination certificate & key
-#   Just drop your cert.pem and cert.key into folder 'deploy/nginx/certs'
-#      - NGINX_SSL_CERT=/certs/cert.pem
-#      - NGINX_SSL_CERT_KEY=/certs/cert.key
+    #   Optional: Specify SSL termination certificate & key
+    #   Just drop your cert.pem and cert.key into folder 'deploy/nginx/certs'
+    #      - NGINX_SSL_CERT=/certs/cert.pem
+    #      - NGINX_SSL_CERT_KEY=/certs/cert.key
     volumes:
       - ./mydata:/label-studio/data:rw
       - ./deploy/nginx/certs:/certs:ro
-#   Optional: Override nginx default conf
-#      - ./deploy/nginx/default.conf:/label-studio/deploy/nginx/default.conf
+    #   Optional: Override nginx default conf
+    #      - ./deploy/nginx/default.conf:/label-studio/deploy/nginx/default.conf
     command: nginx
 
   app:
@@ -31,6 +31,8 @@ services:
       - "8000"
     depends_on:
       - db
+    user: 1001:0
+
     environment:
       - DJANGO_DB=default
       - POSTGRE_NAME=postgres
@@ -40,7 +42,7 @@ services:
       - POSTGRE_HOST=db
       - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
       - JSON_LOG=1
-#      - LOG_LEVEL=DEBUG
+    #      - LOG_LEVEL=DEBUG
     volumes:
       - ./mydata:/label-studio/data:rw
     command: label-studio-uwsgi
@@ -52,10 +54,10 @@ services:
     # Optional: Enable TLS on PostgreSQL
     # Just drop your server.crt and server.key into folder 'deploy/pgsql/certs'
     # NOTE: Both files must have permissions u=rw (0600) or less
-#    command: >
-#      -c ssl=on
-#      -c ssl_cert_file=/var/lib/postgresql/certs/server.crt
-#      -c ssl_key_file=/var/lib/postgresql/certs/server.key
+    #    command: >
+    #      -c ssl=on
+    #      -c ssl_cert_file=/var/lib/postgresql/certs/server.crt
+    #      -c ssl_key_file=/var/lib/postgresql/certs/server.key
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
@@ -63,4 +65,5 @@ services:
       - ./deploy/pgsql/certs:/var/lib/postgresql/certs:ro
 
 volumes:
-  static: {}
+  static: { }
+
