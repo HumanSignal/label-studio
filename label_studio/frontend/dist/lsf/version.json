@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4752: Support relations in MIG scenario",
+  "message": "fix: LSDV-4752: Support relations in MIG scenario (#1240)",
   "commit": "8969ae4509104b38052b153b4bc16052836407ba",
   "branch": "master",
-  "date": "2023/03/15 18:16:28"
+  "date": "2023-03-15T18:16:28Z"
 }
