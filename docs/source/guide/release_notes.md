@@ -1,4 +1,6 @@
 ---
+NOTE: Don't user release_notes.md, it's automatically build from onprem/*.md files!   
+
 title: On-Premise Release Notes for Label Studio Enterprise
 short: On-Premise Release Notes
 type: guide

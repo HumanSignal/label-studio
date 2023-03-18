@@ -41,17 +41,28 @@ style.textContent = `
 `;
 
 document.head.appendChild(style);
+
 function onDOMReady() {
   const headers = document.querySelectorAll(".content-markdown h2");
+
+  // Process each h2 header
   headers.forEach((header) => {
-    header.classList.add("collapsible-header", is_collapsed ? "collapsed" : "expanded");
+    const expandedByDefault = header.classList.contains("expanded-by-default");
+    const initialState = expandedByDefault ? "expanded" : is_collapsed ? "collapsed" : "expanded";
+
+    header.classList.add("collapsible-header", initialState);
+
     let content = header.nextElementSibling;
     let nextHeader = getNextHeaderOrSibling(header);
+
+    // Set initial state for content elements
     while (content && content !== nextHeader) {
       content.classList.add("collapsible-content");
-      content.style.display = is_collapsed ? "none" : "block";
+      content.style.display = initialState === "expanded" ? "block" : "none";
       content = content.nextElementSibling;
     }
+
+    // Attach click event listener to toggle content display
     header.addEventListener("click", () => {
       let sibling = header.nextElementSibling;
       let nextSibling = getNextHeaderOrSibling(header);
@@ -61,6 +72,8 @@ function onDOMReady() {
       }
     });
   });
+
+  // Process hash links
   if(location.hash) {
     const header = document.querySelector(location.hash);
     if(header.tagName === "H2") {
@@ -94,6 +107,8 @@ function onDOMReady() {
       }
     }
   });
+
+  // Create and configure Collapse/Expand button
   const collapseExpandBtn = document.createElement("button");
   collapseExpandBtn.textContent = is_collapsed ? "Expand All": "Collapse All";
   const toc = document.querySelector(".content-grid .toc");
@@ -107,6 +122,8 @@ function onDOMReady() {
       collapseExpandBtn.textContent = 'Collapse All';
     }
     allExpanded = !allExpanded;
+
+    // Toggle content display based on button state
     headers.forEach((header) => {
       let sibling = header.nextElementSibling;
       let nextSibling = getNextHeaderOrSibling(header);
@@ -124,12 +141,17 @@ function onDOMReady() {
       }
     });
   });
-}
+
+  expandSpecificSectionByDefault();
+} // onDOMReady
+
 function openCollapse(header, content) {
   content.style.display = "block";
   header.classList.remove("collapsed");
   header.classList.add("expanded");
 }
+
+// Toggle content display and header state
 function toggleCollapse(header, content) {
   if (content.style.display === "none") {
     content.style.display = "block";
@@ -141,14 +163,16 @@ function toggleCollapse(header, content) {
     header.classList.add("collapsed");
   }
 }
+
+// Get the next h2 header or sibling element
 function getNextHeaderOrSibling(element) {
   while (element.nextElementSibling && element.nextElementSibling.tagName !== "H2") {
     element = element.nextElementSibling;
   }
   return element.nextElementSibling;
 }
-function getPreviousSibling(elem, selector) {
 
+function getPreviousSibling(elem, selector) {
 	// Get the next sibling element
 	var sibling = elem.previousElementSibling;
 
@@ -161,8 +185,26 @@ function getPreviousSibling(elem, selector) {
 		if (sibling.matches(selector)) return sibling;
 		sibling = sibling.previousElementSibling;
 	}
+}
 
-};
+// Expand the second section (with the first release)
+function expandSpecificSectionByDefault() {
+  // Select the first h2 element and add the "expanded-by-default" class
+  const header = document.querySelector(".content-markdown h2:nth-of-type(2)");
+  if (header) {
+    if(header.tagName === "H2") {
+      let sibling = header.nextElementSibling;
+      let nextSibling = getNextHeaderOrSibling(header);
+      while (sibling && sibling !== nextSibling) {
+        openCollapse(header, sibling);
+        sibling = sibling.nextElementSibling;
+      }
+    }
+  }
+}
+
+
+// Initialize the script
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", onDOMReady);
 } else {

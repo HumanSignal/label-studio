@@ -7,6 +7,8 @@ hexo.extend.filter.register('after_init', async function(){
   const markdownFiles = await concatMd.default("source/guide/release_notes/onprem", { sorter: (a, b) => (a > b ? -1 : 1) });
 
 const frontmatter = `---
+NOTE: Don't user release_notes.md, it's automatically built from onprem/*.md files on hexo server run!   
+
 title: On-Premise Release Notes for Label Studio Enterprise
 short: On-Premise Release Notes
 type: guide
