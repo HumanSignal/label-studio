@@ -1,10 +1,13 @@
 ---
-title:
+title: Automatic Speech Recognition with NVIDIA NeMo
 type: blog
+tier: all
 order: 60
+meta_title: Automatic Speech Recognition with NVIDIA NeMo
+meta_description: Label Studio tutorial for Automatic Speech Recognition with NVIDIA NeMo
+
 ---
 
-## Automatic Speech Recognition with NVIDIA NeMo
 
 This an example of using [Nvidia's NeMo toolkit](https://github.com/NVIDIA/NeMo) for creating Automatic Speech Recognition (ASR), Natural Language Understanding (NLU) or Text-to-Speech (TTS) pre-annotations.
 
@@ -57,9 +60,13 @@ label-studio start my_project --init
 </View>
 ```
 10. In your project settings, open the Machine Learning page in the Label Studio UI. 
-    > Note: It takes some time to download models from the NeMo engine. The Label Studio UI might hang until the models finish automatically downloading.
 
-10. Click **Add Model** and add the ML backend using this URL: `http://localhost:9090`
 
-11. Import audio data and start reviewing pre-annotations.
+!!! note 
+    It takes some time to download models from the NeMo engine. The Label Studio UI might hang until the models finish automatically downloading.
+
+
+11. Click **Add Model** and add the ML backend using this URL: `http://localhost:9090`.
+
+12. Import audio data and start reviewing pre-annotations.
 

@@ -303,6 +303,8 @@ jobs:
           AHA_TOKEN: "${{ secrets.AHA_TOKEN }}"
           AHA_PRODUCT: "LSDV"
           AHA_RN_FIELD: "release_notes"
+          AHA_FETCH_STRATEGY: "TAG"
+          AHA_TAG: "LS ${{ steps.create-draft-release.outputs.tag_name }}"
           JIRA_SERVER: "https://heartex.atlassian.net"
           JIRA_USERNAME: "${{ secrets.JIRA_USERNAME }}"
           JIRA_TOKEN: "${{ secrets.JIRA_TOKEN }}"

@@ -32,6 +32,18 @@ jobs:
       version: ${{ github.ref_name }}
     secrets: inherit
 
+  build_hugging_face_docker_image:
+    name: "Build Hugging Face docker image"
+    needs:
+      - promote_docker_image
+    uses: heartexlabs/label-studio/.github/workflows/docker-build-ontop.yml@develop
+    with:
+      base_docker_image_version: ${{ github.ref_name }}
+      tags: "hf-latest,hf-${{ github.ref_name }}"
+      dockerfile_path: Dockerfile.hgface
+      ref: ${{ github.ref_name }}
+    secrets: inherit
+
   build-pypi:
     name: "Build"
     permissions:
@@ -62,7 +74,7 @@ jobs:
               repo: '${{ env.HOMEBREW_TAP_REPO }}',
               event_type: 'upstream_formula_update',
               client_payload: {
-                formula: 'label-studio'
+                formula: 'label-studio',
                 url: '${{ needs.build-pypi.outputs.pipy-artifact-url }}',
                 sha256: '${{ needs.build-pypi.outputs.pipy-artifact-digests-sha256 }}',
               }

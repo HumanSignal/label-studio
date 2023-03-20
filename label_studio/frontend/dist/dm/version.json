@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-12: Frontend spike - adding a new LabelOps page",
-  "commit": "cc0bd41d62dd5e482799be1a72d5137b789671dd",
+  "message": "fix: LSDV-4746-1: Only include limited fields for project when polling",
+  "commit": "9aa96a97e9bcb4154838249dc721efbc724198b7",
   "branch": "master",
-  "date": "2023/02/28 15:44:36"
+  "date": "2023/03/13 15:43:21"
 }
