@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4572: Waveform is offset on some audio files (#1222)",
-  "commit": "2e6d833725fc38d229ddcb3d05c439475dfce90a",
-  "branch": "master",
-  "date": "2023-03-01T15:52:32Z"
+  "message": "fix: LSDV-4740: Video Rectangles are displaying while drawing (#1258)",
+  "commit": "fbb9897b39ac30308878abd468bf80abab69c5e4",
+  "branch": "fb-ls-release-1.7.2-1679318792",
+  "date": "2023/03/20 10:19:20"
 }
