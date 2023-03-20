@@ -1,7 +1,7 @@
 ---
 title: Shortcut
 type: tags
-order: 426
+order: 425
 meta_title: Shortcut Tag to Define Shortcuts
 meta_description: Customize Label Studio to define keyboard shortcuts and hotkeys to accelerate labeling for machine learning and data science projects.
 ---
