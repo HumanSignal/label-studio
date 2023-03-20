@@ -38,8 +38,12 @@ When you annotate image regions with this tag, the annotations are saved as perc
 | [crossOrigin] | <code>string</code> | <code>&quot;\&quot;none\&quot;&quot;</code> | Configures CORS cross domain behavior for this image, either "none", "anonymous", or "use-credentials", similar to [DOM `img` crossOrigin property](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin). |
 
 ### Example
-<!--Labeling configuration to display an image on the labeling interface-->
+
+Labeling configuration to display an image on the labeling interface
+
+```html
 <View>
   <!-- Retrieve the image url from the url field in JSON or column in CSV -->
   <Image name="image" value="$url" rotateControl="true" zoomControl="true"></Image>
 </View>
+```
