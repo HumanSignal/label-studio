@@ -1,9 +1,19 @@
 version: "3.9"
 
+# rotating logs so they do not overflow your dev system in case of crash loops
+x-logging:
+  logging: &default-logging
+    driver: "local"
+    options:
+      max-size: "10m"
+      max-file: "3"
+
 services:
   nginx:
     build: .
     image: heartexlabs/label-studio:latest
+    restart: unless-stopped
+    logging: *default-logging
     ports:
       - "8080:8085"
       - "8081:8086"
@@ -11,15 +21,17 @@ services:
       - app
     environment:
       - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
-#   Optional: Specify SSL termination certificate & key
-#   Just drop your cert.pem and cert.key into folder 'deploy/nginx/certs'
-#      - NGINX_SSL_CERT=/certs/cert.pem
-#      - NGINX_SSL_CERT_KEY=/certs/cert.key
+    #   Optional: Specify SSL termination certificate & key
+    #   Just drop your cert.pem and cert.key into folder 'deploy/nginx/certs'
+    #      - NGINX_SSL_CERT=/certs/cert.pem
+    #      - NGINX_SSL_CERT_KEY=/certs/cert.key
     volumes:
       - ./mydata:/label-studio/data:rw
       - ./deploy/nginx/certs:/certs:ro
-#   Optional: Override nginx default conf
-#      - ./deploy/nginx/default.conf:/label-studio/deploy/nginx/default.conf
+    #   Optional: Override nginx default conf
+    #      - ./deploy/nginx/default.conf:/label-studio/deploy/nginx/default.conf
+    networks:
+      frontend-network:
     command: nginx
 
   app:
@@ -27,6 +39,8 @@ services:
     tty: true
     build: .
     image: heartexlabs/label-studio:latest
+    restart: unless-stopped
+    logging: *default-logging
     expose:
       - "8000"
     depends_on:
@@ -40,27 +54,81 @@ services:
       - POSTGRE_HOST=db
       - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
       - JSON_LOG=1
-#      - LOG_LEVEL=DEBUG
+    #      - LOG_LEVEL=DEBUG
     volumes:
       - ./mydata:/label-studio/data:rw
+    networks:
+      database-network:
+      frontend-network:
     command: label-studio-uwsgi
 
   db:
     image: postgres:11.5
     hostname: db
-    restart: always
+    restart: unless-stopped
+    logging: *default-logging
     # Optional: Enable TLS on PostgreSQL
     # Just drop your server.crt and server.key into folder 'deploy/pgsql/certs'
     # NOTE: Both files must have permissions u=rw (0600) or less
-#    command: >
-#      -c ssl=on
-#      -c ssl_cert_file=/var/lib/postgresql/certs/server.crt
-#      -c ssl_key_file=/var/lib/postgresql/certs/server.key
+    #    command: >
+    #      -c ssl=on
+    #      -c ssl_cert_file=/var/lib/postgresql/certs/server.crt
+    #      -c ssl_key_file=/var/lib/postgresql/certs/server.key
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
       - ${POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql/data
       - ./deploy/pgsql/certs:/var/lib/postgresql/certs:ro
+    networks:
+      database-network:
+
+  # not replicated setup for test setup, use aws S3 or minio cluster in production
+  minio:
+    image: quay.io/minio/minio:RELEASE.2023-03-13T19-46-17Z
+    command: server /data --console-address ":9009"
+    restart: unless-stopped
+    logging: *default-logging
+    # open parts for debugging todo move to nginx
+    ports:
+      - "9000:9000"
+      - "9009:9009"
+    volumes:
+      - minio-data:/data
+    #    env_file:
+    #      - ./.env
+    # configure env vars in .env file or your systems environment
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+
+      - MINIO_PROMETHEUS_URL=${MINIO_PROMETHEUS_URL:-http://prometheus:9090}
+      - MINIO_PROMETHEUS_AUTH_TYPE=${MINIO_PROMETHEUS_AUTH_TYPE:-public}
+    networks:
+      - database-network
+    profiles:
+      - minio
+
+  prometheus:
+    image: quay.io/prometheus/prometheus:v2.37.1
+    restart: unless-stopped
+    logging: *default-logging
+    #    ports:
+    #      - "9090:9090"
+    volumes:
+      - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "prometheus-data:/prometheus"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    networks:
+      - database-network
+    profiles:
+      - minio
 
 volumes:
-  static: {}
+  static: { }
+  minio-data:
+  prometheus-data:
+networks:
+  database-network:
+  frontend-network:
+
