@@ -1052,7 +1052,7 @@ stages:
 - name: Import_Data_With_Embedded_Links
   request:
     headers:
-      content-type: !!str application/json
+      content-type: application/json
     json:
       - pdf: "<embed src='gs://heartex-test/file.pdf'/>"
     method: POST
