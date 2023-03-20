@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4692: Brush segmentation is not supported",
-  "commit": "0988a8e74658089ddc49de804f906884bb76788d",
+  "commit": "369d45274437cd37a2d0b122f432304ac07446a1",
   "branch": "fb-4692/tools-mig",
-  "date": "2023/03/20 14:45:33"
+  "date": "2023/03/20 14:56:31"
 }
