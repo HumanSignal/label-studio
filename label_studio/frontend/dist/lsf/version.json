@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4740: Video Rectangles are displaying while drawing",
-  "commit": "345a1f1897b070f7f471f70961063a925c24129f",
-  "branch": "fb-lsdv-4740",
-  "date": "2023/03/17 14:44:57"
+  "commit": "df15a5455d30cf729b76b94783229f35d581dd5a",
+  "branch": "master",
+  "date": "2023/03/20 10:19:20"
 }
