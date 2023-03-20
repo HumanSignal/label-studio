@@ -2,7 +2,7 @@
 title: Set up an ingress controller for Label Studio Kubernetes deployments
 short: Set up an ingress controller
 type: guide
-tier: enterprise
+tier: all
 order: 112
 order_enterprise: 137
 meta_title: Set up an ingress controller for Label Studio Kubernetes Deployments
@@ -18,7 +18,7 @@ Select the best option for your deployment:
 - Ingress for Microsoft Azure Kubernetes Service (AKS)
 - Ingress using nginx
 
-Configure ingress before or after setting up [persistent storage](persistent_storage.html), but before you [deploy Label Studio](install_enterprise.html).
+Configure ingress before or after setting up [persistent storage](persistent_storage.html), but before you deploy Label Studio.
 
 !!! note 
     You only need to set up an ingress controller if you plan to deploy Label Studio on Kubernetes. 

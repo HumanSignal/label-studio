@@ -1,39 +1,39 @@
 ---
-title: Deploy Label Studio Enterprise on Kubernetes
+title: Deploy Label Studio on Kubernetes
 short: Kubernetes
-tier: enterprise
+tier: all
 type: guide
 order: 108
 order_enterprise: 133
-meta_title: Deploy Label Studio Enterprise on Kubernetes
-meta_description: Deploy Label Studio Enterprise on Kubernetes, such as on Amazon Elastic Container Service for Kubernetes, to create machine learning and data science projects in a scalable containerized environment. 
+meta_title: Deploy Label Studio on Kubernetes
+meta_description: Deploy Label Studio on Kubernetes, such as on Amazon Elastic Container Service for Kubernetes, to create machine learning and data science projects in a scalable containerized environment. 
 section: "Install"
 
 ---
 
-Deploy Label Studio Enterprise on a Kubernetes Cluster using Helm 3. You can use this Helm chart to set up Label Studio Enterprise for deployment onto a Kubernetes cluster and install, upgrade, and manage the application. 
+Deploy Label Studio on a Kubernetes Cluster using Helm 3. You can use this Helm chart to set up Label Studio for deployment onto a Kubernetes cluster and install, upgrade, and manage the application. 
 
 Your Kubernetes cluster can be self-hosted or installed somewhere such as Amazon EKS. See the Amazon tutorial on how to [Deploy a Kubernetes Application with Amazon Elastic Container Service for Kubernetes](https://aws.amazon.com/getting-started/hands-on/deploy-kubernetes-app-amazon-eks/) for more about deploying an app on Amazon EKS.
 
 <div class="enterprise-only">
 
-To install Label Studio Community Edition, see <a href="install.html">Install and Upgrade Label Studio</a>. This page is specific to the Enterprise version of Label Studio.
+To install Label Studio Community Edition, see <a href="install.html">Install and Upgrade Label Studio</a>. This page is specific to the version of Label Studio.
 
 </div>
 
-## Install Label Studio Enterprise on Kubernetes
+## Install Label Studio on Kubernetes
 
-If you want to install Label Studio Enterprise on Kubernetes and you have unrestricted access to the internet from your K8s cluster, follow these steps. 
+If you want to install Label Studio on Kubernetes and you have unrestricted access to the internet from your K8s cluster, follow these steps. 
 
 1. Verify that you meet the [Required software prerequisites](#Required-software-prerequisites) and review the [capacity planning](#Capacity-planning) guidance.
 2. [Prepare the Kubernetes cluster](#Prepare-the-Kubernetes-cluster).
 3. [Add the Helm chart repository to your Kubernetes cluster](#Add-the-Helm-chart-repository-to-your-Kubernetes-cluster).
 4. [Configure Kubernetes secrets](#Configure-Kubernetes-secrets)
-5. [Configure a values.yaml file for your Label Studio Enterprise deployment](#Configure-values-yaml).
+5. [Configure a values.yaml file for your Label Studio deployment](#Configure-values-yaml).
 6. (Optional) [Set up SSL authentication for PostgreSQL](#Set-up-SSL-authentication-for-PostgreSQL)
-7. [Use Helm to install Label Studio Enterprise on your Kubernetes cluster](#Use-Helm-to-install-Label-Studio-Enterprise-on-your-Kubernetes-cluster).
+7. [Use Helm to install Label Studio on your Kubernetes cluster](#Use-Helm-to-install-Label-Studio-Enterprise-on-your-Kubernetes-cluster).
 
-If you use a proxy to access the internet from your Kubernetes cluster, or it is airgapped from the internet, see how to [Install Label Studio Enterprise without public internet access](install_enterprise_airgapped.html).
+If you use a proxy to access the internet from your Kubernetes cluster, or it is airgapped from the internet, see how to [Install Label Studio without public internet access](install_airgapped.html).
 
 ### Required software prerequisites
 
@@ -42,15 +42,32 @@ If you use a proxy to access the internet from your Kubernetes cluster, or it is
 - Redis version 6.0.5 or higher
 - PostgreSQL version 11.9 or higher
 
-This chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) and [cert-manager](https://cert-manager.io/docs/). See [Set up an ingress controller for Label Studio Enterprise Kubernetes deployments](ingress_config.html) for more on ingress settings with Label Studio Enterprise. 
+This chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) and [cert-manager](https://cert-manager.io/docs/). See [Set up an ingress controller for Label Studio Kubernetes deployments](ingress_config.html) for more on ingress settings with Label Studio. 
 
-Your Kubernetes cluster can be self-hosted or installed somewhere such as Amazon EKS. If you're using Amazon Elastic Kubernetes Service (EKS), see [Install Label Studio Enterprise on Amazon Elastic Kubernetes Service (EKS)](install_enterprise_aws_eks.html). 
+Your Kubernetes cluster can be self-hosted or installed somewhere such as Amazon EKS. 
 
 ### Capacity planning
 
 To plan the capacity of your Kubernetes cluster, refer to these guidelines. 
 
-Label Studio Enterprise has the following default configurations for resource requests, resource limits, and replica counts:
+Label Studio has the following default configurations for resource requests, resource limits, and replica counts:
+
+<div class="opensource-only">
+
+```yaml
+app:
+  replicas: 1
+  resources:
+    requests:
+      memory: 1024Mi
+      cpu: 1000m
+    limits:
+      memory: 6144Mi
+      cpu: 4000m
+```
+</div>
+
+<div class="enterprise-only">
 
 ```yaml
 app:
@@ -80,29 +97,30 @@ rqworker:
       memory: 256Mi
       cpu: 100m
     limits:
-      memory: 512Mi
-      cpu: 500m
+      memory: 1024Mi
+      cpu: 1000m
 ```
+</div>
 
 Before you make changes to these values, familiarize yourself with the [Resource Management for Pods and Containers](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) guidelines in the Kubernetes documentation. 
 
 If you choose to make changes to these default settings, consider the following:
 
-| For this case                               | Adjust this                                                                                                                                       |
-|---------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| More than 2 concurrent annotators           | Adjust the requests and limits for `resources` in the `app` pod                                                                                   |
-| Increase fault tolerance                    | Increase the number of replicas of both `app` and `rqworker` services                                                                             |
-| Production deployment (replicas)            | Replicas equivalent or greater than the number of availability zones in your Kubernetes cluster                                                   | 
-| Production deployment (requests and limits) | Refer to the example Helm chart in [Configure the Helm chart for Label Studio Enterprise](#Configure-the-Helm-chart-for-Label-Studio-Enterprise)  |
+| For this case                               | Adjust this                                                                                                                           |
+|---------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| More than 2 concurrent annotators           | Adjust the requests and limits for `resources` in the `app` pod                                                                       |
+| Increase fault tolerance                    | Increase the number of replicas of `app` and/or `rqworker` services                                                                   |
+| Production deployment (replicas)            | Replicas equivalent or greater than the number of availability zones in your Kubernetes cluster                                       | 
+| Production deployment (requests and limits) | Refer to the example Helm chart in [Configure the Helm chart for Label Studio](#Configure-the-Helm-chart-for-Label-Studio-Enterprise) |
 
 ### Prepare the Kubernetes cluster
 
-Before installing Label Studio Enterprise, prepare the Kubernetes cluster with [kubectl](https://kubernetes.io/docs/reference/kubectl/). 
+Before installing Label Studio, prepare the Kubernetes cluster with [kubectl](https://kubernetes.io/docs/reference/kubectl/). 
 
-Install Label Studio Enterprise and set up a PostgreSQL and Redis databases to store relevant Label Studio Enterprise configurations and annotations using the Helm chart. You must configure specific values for your deployment in a YAML file that you specify when installing using Helm.
+Install Label Studio and set up a PostgreSQL and Redis databases to store relevant Label Studio configurations and annotations using the Helm chart. You must configure specific values for your deployment in a YAML file that you specify when installing using Helm.
 
 ### Add the Helm chart repository to your Kubernetes cluster
-Add the Helm chart repository to your Kubernetes cluster to easily install and update Label Studio Enterprise.
+Add the Helm chart repository to your Kubernetes cluster to easily install and update Label Studio.
 
 1. From the command line:
    ```shell
@@ -117,14 +135,14 @@ Add the Helm chart repository to your Kubernetes cluster to easily install and u
 ### Configure Kubernetes secrets
 
 1. Ensure that you have license key and Docker Hub credentials or request them from Heartex Team.
-2. Create a key to pull the latest Label Studio Enterprise image from the Docker registry. From the command line of your cluster, run the following:
+2. Create a key to pull the latest Label Studio image from the Docker registry. From the command line of your cluster, run the following:
     ```shell
     kubectl create secret docker-registry heartex-pull-key \
         --docker-server=https://index.docker.io/v2/ \
         --docker-username=heartexlabs \
         --docker-password=<CUSTOMER_PASSWORD>
     ```
-3. Create the Label Studio Enterprise license as a Kubernetes secret. You can specify it as a file or as a specific URL.
+3. Create the Label Studio license as a Kubernetes secret. You can specify it as a file or as a specific URL.
    From the command line, specify the license as a file:
    ```shell
    kubectl create secret generic lse-license --from-file=license=path/to/lic
@@ -136,9 +154,9 @@ Add the Helm chart repository to your Kubernetes cluster to easily install and u
 
 ### Configure values.yaml 
 
-You must configure a `values.yaml` file for your Label Studio Enterprise deployment. The following file contains default values for a minimal installation of Label Studio Enterprise. This chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) and [cert-manager](https://cert-manager.io/docs/).
+You must configure a `values.yaml` file for your Label Studio deployment. The following file contains default values for a minimal installation of Label Studio. This chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) and [cert-manager](https://cert-manager.io/docs/).
 
-Example `values.yaml` file for a minimal installation of Label Studio Enterprise:
+Example `values.yaml` file for a minimal installation of Label Studio:
 ```yaml
 global:
   image:
@@ -233,7 +251,7 @@ Adjust the included defaults to reflect your environment and copy these into a n
 
 
 ## Set up TLS for PostgreSQL
-To configure Label Studio Enterprise to use TLS for end-client connections with PostgreSQL, do the following:
+To configure Label Studio to use TLS for end-client connections with PostgreSQL, do the following:
 
 1. Enable TLS for your PostgreSQL instance and save Root TLS certificate, client certificate and its key for the next steps.
 2. Create a Kubernetes secret with your certificates, replacing `<PATH_TO_CA>`, `<PATH_TO_CLIENT_CRT>` and `<PATH_TO_CLIENT_KEY>` with paths to your certificates:
@@ -257,10 +275,10 @@ global:
       pgSslKeySecretKey: "client.key"
 ```
 
-4. Install or upgrade Label Studio Enterprise using Helm.
+4. Install or upgrade Label Studio using Helm.
 
 ## Set up TLS for Redis
-To configure Label Studio Enterprise to use TLS for end-client connections with Redis, do the following:
+To configure Label Studio to use TLS for end-client connections with Redis, do the following:
 
 1. Enable TLS for your Redis instance and save Root TLS certificate, client certificate and its key for the next steps.
 2. Create a Kubernetes secret with your certificates, replacing `<PATH_TO_CA>`, `<PATH_TO_CLIENT_CRT>` and `<PATH_TO_CLIENT_KEY>` with paths to your certificates:
@@ -284,11 +302,11 @@ global:
       redisSslKeyFileSecretKey: "client.key"
 ```
 
-4. Install or upgrade Label Studio Enterprise using Helm.
+4. Install or upgrade Label Studio using Helm.
 
-### Use Helm to install Label Studio Enterprise on your Kubernetes cluster
+### Use Helm to install Label Studio on your Kubernetes cluster
 
-Use Helm to install Label Studio Enterprise on your Kubernetes cluster. Provide your custom resource definitions YAML file. Specify any environment variables that you need to set for your Label Studio Enterprise installation using the `--set` argument with the `helm install` command.
+Use Helm to install Label Studio on your Kubernetes cluster. Provide your custom resource definitions YAML file. Specify any environment variables that you need to set for your Label Studio installation using the `--set` argument with the `helm install` command.
 
 From the command line, run the following:
 ```shell
@@ -300,27 +318,27 @@ After installing, check the status of the Kubernetes pod creation:
 kubectl get pods
 ```
 
-## Restart Label Studio Enterprise using Helm
+## Restart Label Studio using Helm
 
 Restart your Helm release by doing the following from the command line:
 
-1. Identify the &lt;RELEASE_NAME&gt; of the latest Label Studio Enterprise release:
+1. Identify the &lt;RELEASE_NAME&gt; of the latest Label Studio release:
 ```shell
 helm list
 ```
-2. Restart the rqworker for Label Studio Enterprise:
+2. Restart the rqworker for Label Studio:
 ```shell
 kubectl rollout restart deployment/<RELEASE_NAME>-ls-rqworker
 ```
-3. Restart the Label Studio Enterprise app:
+3. Restart the Label Studio app:
 ```shell
 kubectl rollout restart deployment/<RELEASE_NAME>-ls-app
 ```
 
 ## Upgrade Label Studio using Helm
-To upgrade Label Studio Enterprise using Helm, do the following.
+To upgrade Label Studio using Helm, do the following.
 
-1. Determine the latest tag version of Label Studio Enterprise and add/replace the following in your `lse-values.yml` file: 
+1. Determine the latest tag version of Label Studio and add/replace the following in your `lse-values.yml` file: 
    ```yaml
    global:
      image:
@@ -343,7 +361,7 @@ To upgrade Label Studio Enterprise using Helm, do the following.
 
 ## Uninstall Label Studio using Helm
 
-To uninstall Label Studio Enterprise using Helm, delete the configuration.
+To uninstall Label Studio using Helm, delete the configuration.
 
 From the command line, run the following:
 ```shell

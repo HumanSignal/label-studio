@@ -32,11 +32,11 @@ Before you deploy Label Studio Enterprise, prepare your environment.
 
 Select the deployment scenario that best fits your labeling use case. 
 
-| How | Who |
-| --- | --- |
-| [Install using Docker Compose](install_enterprise_docker.html) | small-scale production data labeling activities with dozens or hundreds of annotators |
-| [Install using Kubernetes and Helm charts](install_enterprise_k8s.html) | large-scale production-grade data labeling activities with thousands of annotators |
-| [Install Label Studio Enterprise without public internet access](install_enterprise_airgapped.html) | if you use a proxy to access the internet from your Kubernetes cluster, or it is airgapped from the internet |
+| How                                                                                          | Who |
+|----------------------------------------------------------------------------------------------| --- |
+| [Install using Docker Compose](install_enterprise_docker.html)                               | small-scale production data labeling activities with dozens or hundreds of annotators |
+| [Install using Kubernetes and Helm charts](install_k8s.html)                                 | large-scale production-grade data labeling activities with thousands of annotators |
+| [Install Label Studio Enterprise without public internet access](install_k8s_airgapped.html) | if you use a proxy to access the internet from your Kubernetes cluster, or it is airgapped from the internet |
 
 ## More details
 
