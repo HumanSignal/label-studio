@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4752: Support relations in MIG scenario (#1240)",
-  "commit": "8969ae4509104b38052b153b4bc16052836407ba",
+  "message": "fix: LSDV-4740: Video Rectangles are displaying while drawing",
+  "commit": "df15a5455d30cf729b76b94783229f35d581dd5a",
   "branch": "master",
-  "date": "2023-03-15T18:16:28Z"
+  "date": "2023/03/20 10:19:20"
 }
