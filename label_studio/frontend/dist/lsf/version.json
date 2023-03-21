@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4747: Selecting the end character on a Paragraph phrase to the very start of other phrases only includes the first phrase selection",
-  "commit": "3abd7be96dcfd33cb3ead0b4554afad3042dfb27",
+  "commit": "a0129887480a9431bb8a0f86c6ea49b99a5b8396",
   "branch": "fb-lsdv-4747",
-  "date": "2023/03/20 16:47:29"
+  "date": "2023/03/21 14:55:43"
 }
