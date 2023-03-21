@@ -132,6 +132,37 @@ To run Label Studio on Docker with a host and sub-path, just pass `LABEL_STUDIO_
 LABEL_STUDIO_HOST=http://localhost:8080/foo docker-compose up -d
 ```
 
+## Expose a local Label Studio instance outside using ngrok
+
+Sometimes it's useful to have the LabelStudio instance you're running on your local machine to be reachable over the internet.
+
+One way to do that is to use [ngrok](https://ngrok.io/), a reverse proxy that allows you to expose your instance to the Internet.
+
+1. Install `ngrok`: [Follow the official ngrok guidelines](https://ngrok.com/download)
+2. Authenticate the `ngrok` if this is your first time running it (the token can be obtained from [Ngrok dashboard](https://dashboard.ngrok.com/get-started/setup)): `ngrok config add-authtoken <Your token>`
+3. Start `ngrok` and point it at Label Studio: `ngrok http --host-header=rewrite 8080`
+4. Copy the `Forwarding` URL `ngrok` displays. e.g.: `https://xx-xx-xx-xx.eu.ngrok.io`
+5. Pass this url to Label Studio upon startup: 
+
+```bash
+# python instance
+LABEL_STUDIO_HOST=https://xx-xx-xx-xx.eu.ngrok.io label-studio start
+```
+
+```bash
+# docker container
+docker run -it -e LABEL_STUDIO_HOST=https://xx-xx-xx-xx.eu.ngrok.io -p 8080:8080 -v <yourvolume>:/label-studio/data heartexlabs/label-studio:latest
+```
+
+```bash
+# docker-compose
+LABEL_STUDIO_HOST=https://xx-xx-xx-xx.eu.ngrok.io docker-compose up -d
+```
+
+6. Open the ngrok URL in browser to make sure you see your instance
+7. Done
+
+
 ## Run Label Studio on Docker and use Local Storage
 
 To run Label Studio on Docker and reference persistent local storage directories, mount those directories as volumes when you start Label Studio and specify any environment variables you need.

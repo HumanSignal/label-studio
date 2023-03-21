@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4676: Region corruption MIG (#1230)",
-  "commit": "53d62b133de0d439b9f078e442802df3ce2cb129",
+  "message": "fix: LSDV-4740: Video Rectangles are displaying while drawing",
+  "commit": "df15a5455d30cf729b76b94783229f35d581dd5a",
   "branch": "master",
-  "date": "2023-03-10T14:21:12Z"
+  "date": "2023/03/20 10:19:20"
 }
