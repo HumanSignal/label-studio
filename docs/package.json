@@ -12,6 +12,7 @@
   "dependencies": {
     "@sanity/client": "^3.4.1",
     "co": "^4.6.0",
+    "concat-md": "^0.5.1",
     "front-matter": "^4.0.2",
     "hexo": "^6.3.0",
     "hexo-admonition": "^1.1.2",
