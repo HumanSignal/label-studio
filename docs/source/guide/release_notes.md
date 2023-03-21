@@ -1,4 +1,6 @@
 ---
+NOTE: Don't user release_notes.md, it's automatically build from onprem/*.md files!   
+
 title: On-Premise Release Notes for Label Studio Enterprise
 short: On-Premise Release Notes
 type: guide
@@ -12,12 +14,11 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
 
 !!! info 
     The release notes for Label Studio Community Edition is available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
-<br>
-<br>
 
 !!! info 
     The release notes for Label Studio Enterprise Cloud (SaaS) is available <a href="https://heartex.com/changelog">here</a>.
 
+<a name="243md"></a>
 
 ## New helm chart
 
@@ -29,11 +30,9 @@ The migration process can be performed without any downtime. The steps required 
 
 ### Deprecation of the Old Chart
 
-The old chart, heartex/label-studio-enterprise, **has been deprecated**. Support for as many releases as possible will be provided. A notification will be posted in the Release Notes section when this changes. We hope that this revised chart will meet your technical needs. If you have any questions or concerns, please don't hesitate to reach out to us.
-
-
+The old chart `heartex/label-studio-enterprise` **has been deprecated**. Support for as many releases as possible will be provided. A notification will be posted in the Release Notes section when this changes. We hope that this revised chart will meet your technical needs. If you have any questions or concerns, please don't hesitate to reach out to us.
+  
 ## Label Studio Enterprise 2.4.3
-
 ### Improvements
 - Support simultaneous render of multi-channel audio with added splitchannels="true" option on Audio config (larger memory requirement) [LSDV-3028](https://labelstudio.aha.io/features/LSDV-3028)
 - Allow selecting task automatically on Data Manager page whenever the user presses shift+up/down [LSDV-3093](https://labelstudio.aha.io/features/LSDV-3093)
@@ -59,10 +58,9 @@ The old chart, heartex/label-studio-enterprise, **has been deprecated**. Support
 - Migration for fixing organization id in activity logs [LSDV-4629](https://labelstudio.aha.io/features/LSDV-4629)
 - The first Audio V3 region created is not added to the undo stack [LSDV-1138](https://labelstudio.aha.io/features/LSDV-1138)
 
-
+<a name="242md"></a>
 
 ## Label Studio Enterprise 2.4.2
-
 ### New Feature
 - Labels are not displayed inside the regions [LSDV-1142](https://labelstudio.aha.io/features/LSDV-1142)
 - Add YOLO support for PolygonLabels in export options [LSDV-2973](https://labelstudio.aha.io/features/LSDV-2973)
@@ -100,6 +98,7 @@ The old chart, heartex/label-studio-enterprise, **has been deprecated**. Support
 - Saving model version on Machine Learning settings doesn't work [LSDV-966](https://labelstudio.aha.io/features/LSDV-966)
 
 
+<a name="241md"></a>
 
 ## Label Studio Enterprise 2.4.1
 
@@ -133,6 +132,7 @@ The old chart, heartex/label-studio-enterprise, **has been deprecated**. Support
 - Prevent annotation duplicates when 'Re-queue skipped tasks back to the annotator' parameter is selected [DEV-4228]
 - Add Google project ID to Source/Target GCS form [DEV-4058]
 
+<a name="240md"></a>
 
 ## Label Studio Enterprise 2.4.0
 This section highlights the new features and enhancements, and bug fixes in Label Studio Enterprise 2.4.
@@ -212,6 +212,7 @@ This section highlights the new features and enhancements, and bug fixes in Labe
 - Filtering failed to work for Annotation results [DEV-4060].
 - Returned `400` bad requests on incorrect XML [DEV-3812].
 
+<a name="231md"></a>
 
 ## Label Studio Enterprise 2.3.1
 This section highlights the breaking changes, new features and enhancements, and bug fixes in Label Studio Enterprise 2.3.1.
@@ -464,6 +465,7 @@ Label Studio 2.3.1 includes the following bug fixes:
 - Updated swagger docs for `AllStorage` APIs [DEV-2914].
 - Added example output for `HyperTextLabels` in the Label Studio documentation suite [DEV-3632].
 
+<a name="22md"></a>
 
 ## Label Studio Enterprise 2.2 Final
 
@@ -534,6 +536,7 @@ Label Studio 2.2.10 includes the following bug fixes:
 - Fixed an issue when the Safari browser stopped working [DEV-2777].
 - Fixed scrollable area in **Review** mode [DEV-2348].
 
+<a name="229md"></a>
 
 ## Label Studio Enterprise 2.2.9
 
@@ -606,6 +609,7 @@ Label Studio 2.2.9 includes the following bug fixes:
 - Fixed synchronization speed between video and audio [DEV-2207].
 - Fixed an issue with prop `whenChoiceValue` [DEV-1833].
 
+<a name="228md"></a>
 
 ## Label Studio Enterprise 2.2.8
 
@@ -615,8 +619,8 @@ This section highlights the breaking changes, new features and enhancements, and
 Label Studio Enterprise 2.2.8 introduces the following new features and enhancements.
 
 - This release displays comments in **DM** to reviewers [DEV-2598].
-- Support for [Redis Secure Sockets Layer (SSL)](security.html#Secure-access-to-Redis-storage) [DEV-1768].
-- Add tags and prefixes to [AWS metric parameters](custom_metric.html#How-to-write-your-custom-agreement-metric) [DEV-1917].
+- Support for [Redis Secure Sockets Layer (SSL)](#Secure-access-to-Redis-storage) [DEV-1768].
+- Add tags and prefixes to [AWS metric parameters](#How-to-write-your-custom-agreement-metric) [DEV-1917].
 - Change review API to take into account feedback loop [DEV-2198].
 - Notification Center [DEV-1658]
 - Add drafts in Annotation History [DEV-2290].
@@ -677,124 +681,3 @@ Label Studio 2.2.8 includes the following bug fixes:
 - Added command for all orgs and optimize `update_tasks_counters` [DEV-2492].
 - After annotations from predictions `is_labeled` should be recalculated [DEV-2490].
 - Fixed 404 on skip [DEV-2416].
-
-
-
-<script>
-// Set the default state for sections on page load
-const is_collapsed = true;
-
-// Inject styles programmatically
-const style = document.createElement("style");
-style.textContent = `
-.collapsible-content {
-  display: ${is_collapsed ? "none" : "block"};
-}
-.collapsible-header {
-  cursor: pointer;
-  position: relative;
-}
-.collapsible-header::before {
-  content: "${is_collapsed ? "▶" : "▼"}";
-  font-size: 70%;
-  position: absolute;
-  left: -1.25em;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.collapsible-header:hover::before {
-  opacity: 1;
-}
-.collapsible-header.expanded::before {
-  content: "▼";
-}
-.toc button {
-  margin-top: 1.5em;
-  border-radius: 5px;
-  background: none;
-  border: 1px solid #aaa;
-  outline: none;
-  box-shadow: none;
-  cursor: pointer;
-  padding: 3px 10px;
-}
-.toc button:hover {
-  color: var(--color-yellow-120);
-}
-`;
-
-document.head.appendChild(style);
-function onDOMReady() {
-  const headers = document.querySelectorAll(".content-markdown h2");
-  headers.forEach((header) => {
-    header.classList.add("collapsible-header", is_collapsed ? "collapsed" : "expanded");
-    let content = header.nextElementSibling;
-    let nextHeader = getNextHeaderOrSibling(header);
-    while (content && content !== nextHeader) {
-      content.classList.add("collapsible-content");
-      content.style.display = is_collapsed ? "none" : "block";
-      content = content.nextElementSibling;
-    }
-    header.addEventListener("click", () => {
-      let sibling = header.nextElementSibling;
-      let nextSibling = getNextHeaderOrSibling(header);
-      while (sibling && sibling !== nextSibling) {
-        toggleCollapse(header, sibling);
-        sibling = sibling.nextElementSibling;
-      }
-    });
-  });
-  const collapseExpandBtn = document.createElement("button");
-  collapseExpandBtn.textContent = is_collapsed ? "Expand All": "Collapse All";
-  const toc = document.querySelector(".content-grid .toc");
-  toc.appendChild(collapseExpandBtn);
-  let allExpanded = !is_collapsed;
-  collapseExpandBtn.addEventListener("click", () => {
-    if (allExpanded) {
-      collapseExpandBtn.textContent = 'Expand All';
-    }
-    else {
-      collapseExpandBtn.textContent = 'Collapse All';
-    }
-    allExpanded = !allExpanded;
-    headers.forEach((header) => {
-      let sibling = header.nextElementSibling;
-      let nextSibling = getNextHeaderOrSibling(header);
-      while (sibling && sibling !== nextSibling) {
-        if (allExpanded) {
-          sibling.style.display = "block";
-          header.classList.remove("collapsed");
-          header.classList.add("expanded");
-        } else {
-          sibling.style.display = "none";
-          header.classList.remove("expanded");
-          header.classList.add("collapsed");
-        }
-        sibling = sibling.nextElementSibling;
-      }
-    });
-  });
-}
-function toggleCollapse(header, content) {
-  if (content.style.display === "none") {
-    content.style.display = "block";
-    header.classList.remove("collapsed");
-    header.classList.add("expanded");
-  } else {
-    content.style.display = "none";
-    header.classList.remove("expanded");
-    header.classList.add("collapsed");
-  }
-}
-function getNextHeaderOrSibling(element) {
-  while (element.nextElementSibling && element.nextElementSibling.tagName !== "H2") {
-    element = element.nextElementSibling;
-  }
-  return element.nextElementSibling;
-}
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", onDOMReady);
-} else {
-  onDOMReady();
-}
-</script>

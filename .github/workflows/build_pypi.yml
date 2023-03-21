@@ -141,7 +141,7 @@ jobs:
               const {data: pypiPackage} = await github.request('https://pypi.org/pypi/label-studio/json')
               if ('releases' in pypiPackage && version in pypiPackage.releases) {
                 const release = pypiPackage.releases[version]
-                const artifact = release.find(e => e.packagetype === 'bdist_wheel')
+                const artifact = release.find(e => e.packagetype === 'sdist')
                 console.log(artifact);
                 core.setOutput("pipy-artifact-url", artifact.url);
                 core.setOutput("pipy-artifact-digests-sha256", artifact.digests.sha256);
