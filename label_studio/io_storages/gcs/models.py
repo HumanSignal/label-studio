@@ -2,20 +2,8 @@
 """
 import logging
 import json
-import socket
-import google.auth
-import re
-
-from google.auth.exceptions import DefaultCredentialsError
 
 from core.redis import start_job_async_or_sync
-from google.auth import compute_engine
-from google.cloud import storage as google_storage
-from google.cloud.storage.client import _marker
-from google.auth.transport import requests
-from google.oauth2 import service_account
-from urllib.parse import urlparse
-from datetime import datetime, timedelta
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
@@ -92,25 +80,14 @@ class GCSImportStorageBase(GCSStorageMixin, ImportStorage):
 
     def get_data(self, key):
         if self.use_blob_urls:
-            return {settings.DATA_UNDEFINED_NAME: f'{self.url_scheme}://{self.bucket}/{key}'}
-        bucket = self.get_bucket()
-        blob = bucket.blob(key)
-        blob_str = blob.download_as_string()
-        value = json.loads(blob_str)
-        if not isinstance(value, dict):
-            raise ValueError(
-                f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
-        return value
-
-    @classmethod
-    def is_gce_instance(cls):
-        """Check if it's GCE instance via DNS lookup to metadata server"""
-        try:
-            socket.getaddrinfo('metadata.google.internal', 80)
-        except socket.gaierror:
-            return False
-        return True
-
+            return {settings.DATA_UNDEFINED_NAME: GCS.get_uri(self.bucket, key)}
+        return GCS.read_file(
+            client=self.get_client(),
+            bucket_name=self.bucket,
+            key=key,
+            convert_to=GCS.ConvertBlobTo.JSON_DICT
+        )
+        
     def generate_http_url(self, url):
         return GCS.generate_http_url(
             url=url,
