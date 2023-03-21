@@ -42,3 +42,70 @@ jobs:
           config-name: autolabeler.yml
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
+  release_field:
+    name: "Set Aha! Releases field"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v2.1.0
+
+      - name: Set field
+        shell: bash
+        env:
+          COMMIT_MESSAGE: ${{ github.event.pull_request.title }}
+          AHA_SERVER: "https://labelstudio.aha.io"
+          AHA_TOKEN: "${{ secrets.AHA_TOKEN }}"
+          AHA_RELEASES_FIELD: releases
+          TAGS: '["oss"]'
+        run: |
+          set -euo pipefail ${ACTIONS_STEP_DEBUG:+-x}
+          
+          regex="([a-zA-Z]+):[[:space:]]*([a-zA-Z0-9-]+)?:"
+          if [[ $COMMIT_MESSAGE =~ $regex ]]; then
+            export TICKET="${BASH_REMATCH[2]}"
+            if curl -fsSL \
+              --request GET \
+              --url "${AHA_SERVER}/api/v1/features/${TICKET}" \
+              --header "Authorization: Bearer ${AHA_TOKEN}" \
+              --header 'Accept: application/json'; then
+              cur_tags=$(curl -sSL \
+                --request GET \
+                --url "${AHA_SERVER}/api/v1/features/${TICKET}" \
+                --header "Authorization: Bearer ${AHA_TOKEN}" \
+                --header "Content-Type: application/json" \
+                --header 'Accept: application/json' |
+                jq -ecr '[ .feature.custom_fields[] | select(.key=="releases") | .value ]')
+              echo "Current tags: ${cur_tags}"
+              new_tags=$(jq -ecr ". += ${TAGS} | flatten | unique" <<< $cur_tags)
+              echo "New tags: ${new_tags}"
+              curl -sSL \
+                --request PUT \
+                --url "${AHA_SERVER}/api/v1/features/${TICKET}" \
+                --data "{\"feature\":{\"custom_fields\":{\"releases\":${new_tags}}}}" \
+                --header "Authorization: Bearer ${AHA_TOKEN}" \
+                --header "Content-Type: application/json" \
+                --header 'Accept: application/json'
+            elif curl -fsSL \
+              --request GET \
+              --url "${AHA_SERVER}/api/v1/requirements/${TICKET}" \
+              --header "Authorization: Bearer ${AHA_TOKEN}" \
+              --header 'Accept: application/json'; then
+              cur_tags=$(curl -sSL \
+                --request GET \
+                --url "${AHA_SERVER}/api/v1/requirements/${TICKET}" \
+                --header "Authorization: Bearer ${AHA_TOKEN}" \
+                --header "Content-Type: application/json" \
+                --header 'Accept: application/json' |
+                jq -ecr '[ .requirement.custom_fields[] | select(.key=="releases") | .value ]')
+              echo "Current tags: ${cur_tags}"
+              new_tags=$(jq -ecr ". += ${TAGS} | flatten | unique" <<< $cur_tags)
+              echo "New tags: ${new_tags}"
+              curl -sSL \
+                --request PUT \
+                --url "${AHA_SERVER}/api/v1/requirements/${TICKET}" \
+                --data "{\"requirement\":{\"custom_fields\":{\"releases\":${new_tags}}}}" \
+                --header "Authorization: Bearer ${AHA_TOKEN}" \
+                --header "Content-Type: application/json" \
+                --header 'Accept: application/json'
+            fi
+          fi
