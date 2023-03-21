@@ -1,6 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import json
+import ujson as json
 import uuid
 import logging
 import os
@@ -290,6 +290,16 @@ class Task(TaskMixin, models.Model):
             # and 'can_resolve_url' will fail
             if isinstance(url, str) and storage_object.can_resolve_url(url):
                 return storage_object
+
+        # url is list or dict
+        if flag_set('fflag_feat_front_lsdv_4661_full_uri_resolve_15032023_short', user='auto'):
+            if isinstance(url, dict) or isinstance(url, list):
+                for storage_object in storage_objects:
+                    if storage_object.can_resolve_url(url):
+                        # note: only first found storage_object will be used for link resoling
+                        # probably we need to use more advanced can_resolve_url mechanics
+                        # that takes into account not only prefixes, but bucket path too
+                        return storage_object
 
     @property
     def storage(self):
