@@ -363,7 +363,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
-STATIC_URL = '/static/'
+parsed_url = urlparse(HOSTNAME)
+STATIC_URL = parsed_url.path + '/static/'
+NETLOC = parsed_url.scheme + "://" + parsed_url.netloc
+
 # if FORCE_SCRIPT_NAME:
 #    STATIC_URL = FORCE_SCRIPT_NAME + STATIC_URL
 logger.info(f'=> Static URL is set to: {STATIC_URL}')

@@ -16,14 +16,14 @@
   <meta name="msapplication-navbutton-color" content="#272727">  <!-- Windows Phone -->
   <meta name="apple-mobile-web-app-status-bar-style" content="#272727">  <!-- iOS Safari -->
 
-  <link href="{{settings.HOSTNAME}}{% static 'images/favicon.ico' %}" rel="shortcut icon"/>
-  <link href="{{settings.HOSTNAME}}{% static 'css/uikit.css' %}" rel="stylesheet">
-  <link href="{{settings.HOSTNAME}}{% static 'css/main.css' %}" rel="stylesheet">
+  <link href="{{settings.NETLOC}}{% static 'images/favicon.ico' %}" rel="shortcut icon"/>
+  <link href="{{settings.NETLOC}}{% static 'css/uikit.css' %}" rel="stylesheet">
+  <link href="{{settings.NETLOC}}{% static 'css/main.css' %}" rel="stylesheet">
   <link href="{{settings.HOSTNAME}}/static/fonts/roboto/roboto.css" rel="stylesheet">
   <link href="{{settings.HOSTNAME}}/react-app/main.css?v={{ versions.backend.commit }}" rel="stylesheet">
 
-  <script src="{{settings.HOSTNAME}}{% static 'js/jquery.min.js' %}"></script>
-  <script src="{{settings.HOSTNAME}}{% static 'js/helpers.js' %}"></script>
+  <script src="{{settings.NETLOC}}{% static 'js/jquery.min.js' %}"></script>
+  <script src="{{settings.NETLOC}}{% static 'js/helpers.js' %}"></script>
 
   <script>
     EDITOR_JS = "{{settings.HOSTNAME}}/label-studio-frontend/js/main.js?v={{ versions.lsf.commit }}";
@@ -46,8 +46,8 @@
   {% endblock %}
 
   {% block head-toast %}
-    <script src="{{settings.HOSTNAME}}{% static 'js/Toast.min.js' %}"></script>
-    <link href="{{settings.HOSTNAME}}{% static 'css/Toast.min.css' %}" rel="stylesheet">
+    <script src="{{settings.NETLOC}}{% static 'js/Toast.min.js' %}"></script>
+    <link href="{{settings.NETLOC}}{% static 'css/Toast.min.css' %}" rel="stylesheet">
   {% endblock %}
 
   {% get_current_language as LANGUAGE_CODE %}

@@ -4,7 +4,7 @@
 {% load filters %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/login.css' %}"/>
+<link rel="stylesheet" href="{{ settings.NETLOC }}{% static 'css/login.css' %}"/>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-129877673-1"></script>
 <script>
@@ -20,7 +20,7 @@ gtag('config', 'UA-129877673-1');
   <h1>Welcome to Label Studio Community Edition {{versions.package.short_version}}</h1>
   <h2>A full-fledged open source solution for data labeling</h2>
 
-  <img src="{{ settings.HOSTNAME }}{% static 'images/opossum_hanging.svg' %}" height="128px" />
+  <img src="{{ settings.NETLOC }}{% static 'images/opossum_hanging.svg' %}" height="128px" />
 
   <div class="toggle">
     {% if not settings.DISABLE_SIGNUP_WITHOUT_LINK %}

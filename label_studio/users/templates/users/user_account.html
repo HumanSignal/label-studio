@@ -2,8 +2,8 @@
 {% load static %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/uikit.css' %}">
-<link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/users.css' %}">
+<link rel="stylesheet" href="{{ settings.NETLOC }}{% static 'css/uikit.css' %}">
+<link rel="stylesheet" href="{{ settings.NETLOC }}{% static 'css/users.css' %}">
 {% endblock %}
 
 {% block divider %}
@@ -167,7 +167,7 @@
 
           <label for="allow_newsletters_visual" style="display: inline-block; cursor: pointer; margin-top: -10px">
             Get the latest news & tips from Heidi
-            <img src="{{ settings.HOSTNAME }}{% static 'images/heidi.png' %}" alt="Heidi"
+            <img src="{{ settings.NETLOC }}{% static 'images/heidi.png' %}" alt="Heidi"
                  width="25" style="display: inline; margin: 0; position: relative; top: 5px; left: 0">
           </label>
 
