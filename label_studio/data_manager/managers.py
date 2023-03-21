@@ -202,7 +202,6 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
         filter_expressions.append(q)
         return 'continue'
 
-
 def add_user_filter(enabled, key, _filter, filter_expressions):
     if enabled and _filter.operator == Operator.CONTAINS:
         filter_expressions.append(Q(**{key: int(_filter.value)}))
