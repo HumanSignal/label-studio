@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4740: Video Rectangles are displaying while drawing",
-  "commit": "df15a5455d30cf729b76b94783229f35d581dd5a",
-  "branch": "master",
-  "date": "2023/03/20 10:19:20"
+  "message": "fix: LSDV-4708: Scroll page to canvas only if needed",
+  "commit": "b5d65d6b4f48ca04b9571397424c5df08975c406",
+  "branch": "fb-lsdv-4708/scroll-only-if-needed",
+  "date": "2023/03/22 15:29:36"
 }
