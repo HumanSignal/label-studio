@@ -16,7 +16,6 @@
     "concat-md": "^0.5.1",
     "dotenv": "^16.0.3",
     "front-matter": "^4.0.2",
-    "fs-extra": "^11.1.1",
     "hexo": "^6.3.0",
     "hexo-admonition": "^1.1.2",
     "hexo-cli": "^4.3.0",
