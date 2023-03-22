@@ -426,11 +426,7 @@ export const MachineLearningSettings = () => {
                               </table>
                             </div>
                             : ''}
-
-                      
-
                         </div>
-                    
                         :
                         <div style={{ paddingTop: 15 }}>
                           You don't have any information regarding this model <br></br>
@@ -450,7 +446,6 @@ export const MachineLearningSettings = () => {
                                 <tr><td>{i}</td>
                                   <td>{modelsPrecisions[model.label][i]}</td></tr>
                               </tbody>
-
                             ))}
                           </table>
                       </div>:<div>You have no information about this model</div>}</div>}
@@ -458,10 +453,9 @@ export const MachineLearningSettings = () => {
                             <button style={{ marginRight: 10 }} onClick={() => onExportModel(model.value)} className='btn btn-outline-primary'>Export Model</button>
                     {modelsType == 'tao' ? <button onClick={() => onPrune(model.value)} className='btn btn-outline-warning'>Prune/Re-train</button> : ''}
                             <button style={{ marginLeft: 10 }} onClick={() => onDeleteModel(model.value)} className='btn btn-outline-danger'>Delete Model</button>
-
-                          </div>
+            </div>
           </Card>
-                </div>
+        </div>
          ))}
          </div> 
           </div> : ""}

@@ -3,6 +3,7 @@ import { generatePath, useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { Spinner } from '../../components';
 import { Button } from '../../components/Button/Button';
+import { FileUpload } from '../../components/FileUpload/FileUpload';
 import { modal } from '../../components/Modal/Modal';
 import { Space } from '../../components/Space/Space';
 import { useAPI } from '../../providers/ApiProvider';
@@ -198,6 +199,32 @@ DataManagerPage.context = ({ dmRef }) => {
     '/settings': 'Settings',
   };
 
+  const handleClick = (event) => {
+    const hiddenFileInput = useRef(null);
+
+    hiddenFileInput.current.click();
+    console.log(image);
+  };
+  async function blobToBase64(blob) {
+    return new Promise((resolve, _) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  }
+  async function addImage() {
+    if (hiddenFileInput) {
+      console.log("GOT A FILE!");
+      if (typeof image != "undefined") {
+        URL.revokeObjectURL(image);
+        // let base64 = getBase64FromUrl(image);
+        // console.log('base64')
+        // console.log(base64)
+      }
+
+      setImage(URL.createObjectURL(hiddenFileInput.current.files[0]));
+    }
+  }
   const updateCrumbs = (currentMode) => {
     const isExplorer = currentMode === 'explorer';
     const dmPath = location.pathname.replace(DataManagerPage.path, '');
@@ -263,10 +290,10 @@ DataManagerPage.context = ({ dmRef }) => {
           }).catch(err => {
               console.log(err)
               return null
-          })
-      }
+          })      }
     })
   }
+  
   useEffect(() => {
     if (dmRef) {
       dmRef.on('modeChanged', onDMModeChanged);
@@ -279,6 +306,7 @@ DataManagerPage.context = ({ dmRef }) => {
 
   return project && project.id ? (
     <Space size="small">
+      <FileUpload project={project}></FileUpload>
       <Button size = "compact" onClick={() => importAnnotations()}>Import Annotations</Button>
       {(project.expert_instruction && mode !== 'explorer') && (
         <Button size="compact" onClick={() => {

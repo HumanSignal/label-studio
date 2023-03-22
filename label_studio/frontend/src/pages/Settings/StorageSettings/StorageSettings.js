@@ -13,7 +13,6 @@ export const StorageSettings = () => {
       <Description style={{marginTop: 0}}>
         Use cloud or database storage as the source for your labeling tasks or the target of your completed annotations.
       </Description>
-
       <Columns count={2} gap="40px" size="320px" className={rootClass}>
         <StorageSet
           title="Source Cloud Storage"

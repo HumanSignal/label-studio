@@ -17,7 +17,7 @@ export const ChangeLabelName = () => {
   const [selectedLabel, setSelectedLabel] = useState('');
   const [newLabel, setNewLabel] = useState('');
 
-  const [availableLabels, setAvailableLabels] = useState(['label1', 'label2', 'label3']);
+  const [availableLabels, setAvailableLabels] = useState([]);
   useEffect(() => {
     console.log('re-rendering');
     getLabels();
@@ -27,8 +27,9 @@ export const ChangeLabelName = () => {
     axios
       .get(webhook_url + '/get_labels?id=' + project.id)
       .then((response) => {
-        if (response.data.labels!== availableLabels)
-        setAvailableLabels(response.data.labels);
+        if (response.data.labels !== availableLabels && (response.data.labels instanceof Array)) {
+          setAvailableLabels(response.data.labels);
+        }
 
   })
 }
