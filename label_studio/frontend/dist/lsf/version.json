@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3023: Annotation Tab Carousel (#1188)",
-  "commit": "3d56cefbaac1ea5b53e2cd6c80956f1f457d8be2",
+  "message": "fix: LSDV-4801: Better file type playable detection for video",
+  "commit": "b00b0a31217882b61438fc7c5f43ab852fdd9b84",
   "branch": "master",
-  "date": "2023-03-15T16:08:54Z"
+  "date": "2023/03/22 12:59:27"
 }

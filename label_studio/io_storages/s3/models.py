@@ -234,7 +234,7 @@ def delete_annotation_from_s3_storages(sender, instance, **kwargs):
     for link in links:
         storage = link.storage
         if storage.can_delete_objects:
-            logger.debug(f'Delete {instance} from S3 storage {storage}')
+            logger.debug(f'Delete {instance} from S3 storage {storage}')  # nosec
             storage.delete_annotation(instance)
 
 

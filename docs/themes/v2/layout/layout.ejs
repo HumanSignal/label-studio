@@ -209,6 +209,9 @@
     </div>
   </main>
 
+  <% if (page.permalink.includes("concat.html") || page.permalink.includes("release_notes.html")) { %>
+    <%- js('js/collapse.js') %>
+  <% } %>
   <%- partial("partials/footer") %>
 
   <%- js('js/code-tabs.js') %>
@@ -216,5 +219,7 @@
   <%- js('js/feedback-form.js') %>
   <%- js('js/header.js') %>
   <%- js('js/intense.min.js') %>
+
+  
 </body>
 </html>
