@@ -392,7 +392,7 @@ stages:
 
 
 ---
-test_name: resolve_gs_links_by_connected_gcs
+test_name: resolve_gs_links_by_connected_gcs_with_nested_dict_and_array
 strict: false
 marks:
 - usefixtures:
@@ -400,7 +400,8 @@ marks:
 stages:
   - id: signup
     type: ref
-  - name: stage
+
+  - name: setup a project
     request:
       data:
         is_published: true
@@ -414,13 +415,24 @@ stages:
         json:
           project_pk: id
       status_code: 201
-  - name: stage
+
+  - name: import a task with nested dictionary and array
     request:
       headers:
         content-type: application/json
       json:
         data:
           image: gs://whatever-bucket-with/manual.link.jpg
+          dict:
+            key1: gs://whatever-bucket-with/manual.link.jpg
+            array:
+              - gs://whatever-bucket-with/manual.link.jpg
+              - gs://whatever-bucket-with/manual.link.jpg
+          array:
+            - item1: gs://whatever-bucket-with/manual.link.jpg
+              some: 'some text'
+            - item2: gs://whatever-bucket-with/manual.link.jpg
+              some: 'some text'
       method: POST
       url: '{django_live_url}/api/projects/{project_pk}/import'
     response:
@@ -429,6 +441,7 @@ stages:
         prediction_count: 0
         task_count: 1
       status_code: 201
+
   - name: then connect GCS
     request:
       data:
@@ -443,6 +456,7 @@ stages:
         json:
           storage_pk: id
       status_code: 201
+
   - name: url should be resolved
     request:
       method: GET
@@ -451,6 +465,16 @@ stages:
       json:
         data:
           image: !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
+          dict:
+            key1: !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
+            array:
+              - !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
+              - !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
+          array:
+            - item1: !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
+              some: 'some text'
+            - item2: !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
+              some: 'some text'
       status_code: 200
 
 ---
