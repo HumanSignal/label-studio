@@ -51,7 +51,13 @@ project
             title: 'Error',
             text: "This file is already in the project directory. If you wish to upload it again, please change its name",
             icon: 'warning',
-          }).then((result) => {
+          })
+        }
+        else {
+          Swal.fire({
+            title: 'Success',
+            text: "Your file has been uploaded, refresh the page to see it",
+            icon: 'success',
           })
         }
       } catch (error) {
