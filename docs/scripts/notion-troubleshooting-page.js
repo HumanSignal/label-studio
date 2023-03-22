@@ -9,7 +9,13 @@ const notion = new Client({
 
 hexo.extend.filter.register('after_init', async function(){
 
-  const n2m = new NotionToMarkdown({ notionClient: notion, staticFileDir: "./themes/v2/source/images/notion", staticFileDirCustomPath: "/images/notion/" });
+  var imageDirectory = './themes/v2/source/images/notion';
+
+  if (!fs.existsSync(imageDirectory)){
+      fs.mkdirSync(imageDirectory, { recursive: true });
+  }
+
+  const n2m = new NotionToMarkdown({ notionClient: notion, staticFileDir: imageDirectory, staticFileDirCustomPath: "/images/notion/" });
 
   const mdblocks = await n2m.pageToMarkdown("d7a7b662ff9e467da9baa2928863a387");
   const mdString = n2m.toMarkdownString(mdblocks);
