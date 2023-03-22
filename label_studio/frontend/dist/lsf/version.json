@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4740: Video Rectangles are displaying while drawing",
-  "commit": "df15a5455d30cf729b76b94783229f35d581dd5a",
+  "message": "fix: LSDV-4801: Better file type playable detection for video",
+  "commit": "b00b0a31217882b61438fc7c5f43ab852fdd9b84",
   "branch": "master",
-  "date": "2023/03/20 10:19:20"
+  "date": "2023/03/22 12:59:27"
 }
