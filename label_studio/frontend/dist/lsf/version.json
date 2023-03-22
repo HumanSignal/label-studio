@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4740: Video Rectangles are displaying while drawing",
-  "commit": "df15a5455d30cf729b76b94783229f35d581dd5a",
-  "branch": "master",
-  "date": "2023/03/20 10:19:20"
+  "message": "Feat: LSDV-3896: Stacking panels",
+  "commit": "ea586ab37eadedefb89aacec28e263caac00d47e",
+  "branch": "fb-lsdv-3896/stacking-panels",
+  "date": "2023/03/21 22:24:50"
 }
