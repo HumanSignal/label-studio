@@ -1,5 +1,5 @@
 ---
-NOTE: Don't user release_notes.md, it's automatically build from onprem/*.md files!   
+NOTE: Don't user release_notes.md, it's automatically built from onprem/*.md files on hexo server run!   
 
 title: On-Premise Release Notes for Label Studio Enterprise
 short: On-Premise Release Notes
