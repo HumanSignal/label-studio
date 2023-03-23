@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4811: Impossible to select and drag a hidden region",
-  "commit": "f4c2c5c943b7736dc942de8e9009d985ce6186d7",
+  "commit": "396c98e24946494e3ca9781a2c9bbf6efe786a4f",
   "branch": "fb-lsdv-4811",
-  "date": "2023/03/21 12:28:58"
+  "date": "2023/03/23 16:41:39"
 }
