@@ -18,7 +18,7 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
 !!! info 
     The release notes for Label Studio Enterprise Cloud (SaaS) is available <a href="https://heartex.com/changelog">here</a>.
 
-<a name="244md"></a>
+<a name="243md"></a>
 
 ## New helm chart
 
@@ -32,32 +32,6 @@ The migration process can be performed without any downtime. The steps required 
 
 The old chart `heartex/label-studio-enterprise` **has been deprecated**. Support for as many releases as possible will be provided. A notification will be posted in the Release Notes section when this changes. We hope that this revised chart will meet your technical needs. If you have any questions or concerns, please don't hesitate to reach out to us.
   
-
-## Label Studio Enterprise 2.4.4
-### New Feature
-- New parameter skipDuplicates of TextArea allows to keep submissions unique. [LSDV-4659](https://labelstudio.aha.io/features/LSDV-4659)
-
-### Improvement
-- Audio v3 webaudio alternative decoder option [LSDV-4701](https://labelstudio.aha.io/features/LSDV-4701)
-- s3 custom endpoint support for persistent storage [LSDV-4677](https://labelstudio.aha.io/features/LSDV-4677)
-- Table tag ordering items alphabetically [LSDV-4613](https://labelstudio.aha.io/features/LSDV-4613)
-
-### Bug Fixes
-- Fix DM columns visual problems [LSDV-4720](https://labelstudio.aha.io/features/LSDV-4720)
-- Fix column sizes on datamanager [LSDV-4651](https://labelstudio.aha.io/features/LSDV-4651)
-- Hiding an audio region allows selection of regions below. [LSDV-4542](https://labelstudio.aha.io/features/LSDV-4542)
-- Fix Intersection over 1d timeseries spans agreement calculation for Time series [LSDV-4665](https://labelstudio.aha.io/features/LSDV-4665)
-
-- Fixes playback micro-stutters for Video Timeline Segmentation. [LSDV-4706](https://labelstudio.aha.io/features/LSDV-4706)
-- Add error handlers like it is for AudioV1 [LSDV-1023](https://labelstudio.aha.io/features/LSDV-1023)
-- Don't let ghost regions be created [LSDV-4592](https://labelstudio.aha.io/features/LSDV-4592)
-- AttributeError: 'GCSExportStorage' object has no attribute 'links_count' [LSDV-4547](https://labelstudio.aha.io/features/LSDV-4547)
-- Disable file proxy for cloud using FILE_PROXY_ENABLED environment variable [LSDV-4619](https://labelstudio.aha.io/features/LSDV-4619)
-- Audio playback and playhead remain in sync. [LSDV-4572](https://labelstudio.aha.io/features/LSDV-4572)
-
-
-<a name="243md"></a>
-
 ## Label Studio Enterprise 2.4.3
 ### Improvements
 - Support simultaneous render of multi-channel audio with added splitchannels="true" option on Audio config (larger memory requirement) [LSDV-3028](https://labelstudio.aha.io/features/LSDV-3028)
@@ -83,7 +57,6 @@ The old chart `heartex/label-studio-enterprise` **has been deprecated**. Support
 - Unclear error about unknown tag [LSDV-2556](https://labelstudio.aha.io/features/LSDV-2556)
 - Migration for fixing organization id in activity logs [LSDV-4629](https://labelstudio.aha.io/features/LSDV-4629)
 - The first Audio V3 region created is not added to the undo stack [LSDV-1138](https://labelstudio.aha.io/features/LSDV-1138)
-
 
 <a name="242md"></a>
 
