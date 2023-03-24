@@ -52,6 +52,25 @@ label-studio
 The default web browser opens automatically at [http://localhost:8080](http://localhost:8080) with Label Studio. See [start Label Studio](start.html) for more options when starting Label Studio.
 
 
+## Install with Brew
+
+To install Label Studio with Brew, you need to have Brew package manager installed on your system. If you don't have Brew installed, please visit [brew.sh](https://brew.sh/) for installation instructions.
+
+Run the following command to add the Heartexlabs tap:
+```bash
+brew tap heartexlabs/tap
+````
+Run the following command to install Label Studio:
+```bash
+brew install heartexlabs/tap/label-studio
+```
+After you install Label Studio, start the server with the following command:
+```bash
+label-studio
+```
+The default web browser opens automatically at [http://localhost:8080](http://localhost:8080) with Label Studio. See [start Label Studio](start.html) for more options when starting Label Studio.
+
+
 ## Install with Docker
 
 Label Studio is also available as a Docker container. Make sure you have [Docker](https://www.docker.com/) installed on your machine.
