@@ -68,6 +68,8 @@ jobs:
           python-version: '3.10'
 
       - name: Create version_.py
+        env:
+          BRANCH_OVERRIDE: ${{ inputs.branch_name }}
         run: |
           python3 $(pwd)/label_studio/core/version.py
           cat $(pwd)/label_studio/core/version_.py
@@ -114,6 +116,7 @@ jobs:
             const { repo, owner } = context.repo;
             const details = {
               "branch": "${{ inputs.branch_name }}",
+              "pretty_branch_name": "${{ steps.version.outputs.pretty_branch_name }}",
               "image_version": "${{ steps.version.outputs.image_version }}",
               "sha": "${{ steps.version.outputs.sha }}"
             }
