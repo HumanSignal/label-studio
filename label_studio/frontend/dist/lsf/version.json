@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4747: Selecting the end character on a Paragraph phrase to the very start of other phrases only includes the first phrase selection",
-  "commit": "5bf915eeafb42c680882419e8377303b5a16fe2c",
-  "branch": "master",
-  "date": "2023/03/24 10:44:26"
+  "message": "feat: LSDV-3896-5: Panel collapse",
+  "commit": "81f81dd84f8f25b5f36ed4765787fda59fbc1a5a",
+  "branch": "fb-lsdv-3896-5/panel-collapse",
+  "date": "2023/03/24 17:08:11"
 }
