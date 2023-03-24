@@ -52,6 +52,18 @@ jobs:
           fi
           echo "image_version=${image_version}" >> $GITHUB_OUTPUT
           echo "ubi_image_version=ubi_${image_version}" >> $GITHUB_OUTPUT
+          
+          pretty_branch_name="$(echo -n "${BRANCH_NAME#refs/heads/}" | sed 's#/#-#g' | sed 's#_#-#g'| sed 's#\.#-#g' | tr '[:upper:]' '[:lower:]')"
+          echo "pretty_branch_name=$pretty_branch_name" >> $GITHUB_OUTPUT
+          current_time="$(date +'%Y%m%d.%H%M%S')"
+          branch="-${pretty_branch_name}"
+          short_sha="$(git rev-parse --short HEAD)"
+          long_sha="$(git rev-parse HEAD)"
+          echo "sha=$long_sha" >> $GITHUB_OUTPUT
+          short_sha_length="$(echo $short_sha | awk '{print length}')"
+          current_time_length="$(echo $current_time | awk '{print length}')"
+          version="${current_time}$(echo $branch | cut -c1-$((50 - short_sha_length - current_time_length)))-${short_sha}"
+          echo "build_version=$version" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2.5.0
@@ -70,6 +82,7 @@ jobs:
       - name: Create version_.py
         env:
           BRANCH_OVERRIDE: ${{ inputs.branch_name }}
+          VERSION_OVERRIDE: ${{ steps.version.outputs.build_version }}
         run: |
           python3 $(pwd)/label_studio/core/version.py
           cat $(pwd)/label_studio/core/version_.py
