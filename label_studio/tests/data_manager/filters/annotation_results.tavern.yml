@@ -193,3 +193,44 @@ stages:
     status_code: 200
     json:
       total: 0
+
+- name: change filter to equal
+  request:
+    method: PUT
+    url: '{django_live_url}/api/dm/views/{view_pk}?interaction=filter&project={project_pk}'
+    json:
+      project: '{project_pk}'
+      data:
+        filters:
+          conjunction: or
+          items:
+            - filter: "filter:tasks:annotations_results"
+              operator: equal
+              value: "123"
+              type: String
+
+            - filter: "filter:tasks:annotations_results"
+              operator: not_equal
+              value: "456"
+              type: String
+
+            - filter: "filter:tasks:predictions_results"
+              operator: equal
+              value: "789"
+              type: String
+
+            - filter: "filter:tasks:predictions_results"
+              operator: not_equal
+              value: "000"
+              type: String
+  response:
+    status_code: 200
+
+- name: get annotations_results/predictions_results equal/not equal
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks?page=1&page_size=30&view={view_pk}&interaction=filter&project={project_pk}'
+  response:
+    status_code: 200
+    json:
+      total: 0
