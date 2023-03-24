@@ -100,7 +100,6 @@ class ImportStorage(Storage):
                 http_url = self.generate_http_url(extracted_uri)
                 return uri.replace(extracted_uri, http_url)
             except Exception as exc:
-                logger.info(exc)
                 logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
 
     def _scan_and_create_links_v2(self):
