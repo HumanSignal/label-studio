@@ -233,4 +233,4 @@ stages:
   response:
     status_code: 200
     json:
-      total: 0
+      total: 1
