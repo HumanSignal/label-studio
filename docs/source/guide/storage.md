@@ -45,6 +45,90 @@ Task data synced from cloud storage is not stored in Label Studio. Instead, the 
 
 When your users access labeling, the backend will attempt to resolve URI (e.g., s3://) to URL (https://) links. URLs will be returned to the frontend and loaded by the user's browser. To load these URLs, the browser will require HEAD and GET permissions from your Cloud Storage. The HEAD request is made at the beginning and allows the browser to determine the size of the audio, video, or other files. The browser then makes a GET request to retrieve the file body.
 
+#### Source storage Sync and URI resolving
+
+Source storage functionality can be divided into two parts:
+* Sync - when Label Studio scans your storage and imports tasks from it.
+* URI resolving - when the Label Studio backend requests Cloud Storage to resolve URI links (e.g., `s3://bucket/1.jpg`) into HTTPS (`https://aws.amazon.com/bucket/1.jpg`). This way, user's browsers are able to load media. 
+
+<img src="/images/source-cloud-storages.png" class="make-intense-zoom">
+
+#### One Task - One JSON File 
+
+If you plan to load JSON tasks from the Source Storage (`Treat every bucket object as a source file = No`), you must place only one task as the **dict** per one JSON file. Otherwise, Label Studio will not load your data properly.
+
+{% details <b>Example with tasks in separate JSON files</b> %}
+
+
+`task_01.json`
+```
+{
+  "image": "s3://bucket/1.jpg",
+  "text": "opossums are awesome"
+}
+```
+
+`task_02.json`
+```
+{
+  "image": "s3://bucket/2.jpg",
+  "text": "cats are awesome"
+}
+```
+
+{% enddetails %}
+
+<br>
+
+{% details <b>Example with tasks, annotations and predictions in separate JSON files</b> %}
+
+`task_with_predictions_and_annotations_01.json`
+```
+{
+    "data": {
+        "image": "s3://bucket/1.jpg",
+        "text": "opossums are awesome"
+    },
+    "annotations": [...],  
+    "predictions": [...]
+}
+```
+
+`task_with_predictions_and_annotations_02.json`
+```
+{
+    "data": {
+      "image": "s3://bucket/2.jpg",
+      "text": "cats are awesome"
+    }
+    "annotations": [...],  
+    "predictions": [...]
+}
+```
+
+{% enddetails %}
+
+<br>
+
+{% details <b>Python script to split a single JSON file with multiple tasks</b> %}
+
+ Python script to split a single JSON file containing multiple tasks into separate JSON files, each containing one task:
+
+```python
+import sys
+import json
+
+input_json = sys.argv[1]
+with open(input_json) as inp:
+    tasks = json.load(inp)
+
+for i, v in enumerate(tasks):
+    with open(f'task_{i}.json', 'w') as f:
+        json.dump(v, f)
+```
+
+{% enddetails %}
+
 
 ### Target storage
 

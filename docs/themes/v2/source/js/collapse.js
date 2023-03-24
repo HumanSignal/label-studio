@@ -112,7 +112,7 @@ function onDOMReady() {
   const collapseExpandBtn = document.createElement("button");
   collapseExpandBtn.textContent = is_collapsed ? "Expand All": "Collapse All";
   const toc = document.querySelector(".content-grid .toc");
-  toc.appendChild(collapseExpandBtn);
+  toc?.appendChild(collapseExpandBtn);
   let allExpanded = !is_collapsed;
   collapseExpandBtn.addEventListener("click", () => {
     if (allExpanded) {

@@ -31,7 +31,7 @@ If using other web browsers, or older versions of supported web browsers, unexpe
 Install Label Studio in a clean Python environment. We highly recommend using a virtual environment (venv or conda) to reduce the likelihood of package conflicts or missing packages.
 
 
-## Install with pip
+## Install using pip
 
 To install Label Studio with pip and a virtual environment, you need Python version 3.7 or later. Run the following:
 ```bash
@@ -49,7 +49,26 @@ After you install Label Studio, start the server with the following command:
 ```bash
 label-studio
 ```
-The default web browser opens automatically at [http://localhost:8080](http://localhost:8080) with Label Studio. See [start Label Studio](start.html) for more options when starting Label Studio.
+The default web browser will automatically open at [http://localhost:8080](http://localhost:8080) with Label Studio. Please refer to [start Label Studio](start.html) for more options when starting Label Studio.
+
+
+## Install using Homebrew
+
+To install Label Studio with Brew, you need to have Brew package manager installed on your system. If you do not have Brew installed, please visit [brew.sh](https://brew.sh/) for installation instructions.
+
+Execute the following command to add the Heartexlabs tap:
+```bash
+brew tap heartexlabs/tap
+````
+Execute the following command to install Label Studio:
+```bash
+brew install heartexlabs/tap/label-studio
+```
+After you install Label Studio, initiate the server using the following command:
+```bash
+label-studio
+```
+The default web browser will automatically open at [http://localhost:8080](http://localhost:8080) with Label Studio. Please refer to [start Label Studio](start.html) for more options when starting Label Studio.
 
 
 ## Install with Docker
