@@ -175,3 +175,31 @@ class DataExport(object):
             content_type = 'application/zip'
             filename = name + '.zip'
             return out, content_type, filename
+
+
+class ConvertedFormat(models.Model):
+    class Status(models.TextChoices):
+        CREATED = 'created', _('Created')
+        IN_PROGRESS = 'in_progress', _('In progress')
+        FAILED = 'failed', _('Failed')
+        COMPLETED = 'completed', _('Completed')
+
+    export = models.ForeignKey(Export,
+        related_name='converted_formats',
+        on_delete=models.CASCADE,
+        help_text='Export snapshot for this converted file'
+    )
+    file = models.FileField(
+        upload_to=settings.DELAYED_EXPORT_DIR,
+        null=True,
+    )
+    status = models.CharField(
+        max_length=64,
+        choices=Status.choices,
+        default=Status.CREATED,
+    )
+    export_type = models.CharField(
+        max_length=64,
+        choices=Status.choices,
+        default=Status.CREATED,
+    )

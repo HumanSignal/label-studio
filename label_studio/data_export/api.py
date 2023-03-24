@@ -2,9 +2,9 @@
 """
 import os
 import logging
-import pathlib
 
 from django.conf import settings
+from datetime import datetime
 from django.http import HttpResponse
 from django.core.files import File
 from drf_yasg import openapi as openapi
@@ -12,13 +12,17 @@ from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 from rest_framework import status, generics
 from rest_framework.response import Response
+from rest_framework.exceptions import NotFound
 from rest_framework.views import APIView
+from urllib.parse import urlparse
 
 from core.permissions import all_permissions
+from core.redis import start_job_async_or_sync
+from core.feature_flags import flag_set
 from core.utils.common import batch
 from projects.models import Project
 from tasks.models import Task
-from .models import DataExport, Export
+from .models import DataExport, Export, ConvertedFormat
 
 from .serializers import ExportDataSerializer, ExportSerializer, ExportCreateSerializer, ExportParamSerializer
 from ranged_fileresponse import RangedFileResponse
@@ -436,23 +440,73 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
         return super().get_queryset().filter(project=project)
 
     def get(self, request, *args, **kwargs):
-        instance = self.get_object()
+        snapshot = self.get_object()
         export_type = request.GET.get('exportType')
 
-        if instance.status != Export.Status.COMPLETED:
+        if snapshot.status != Export.Status.COMPLETED:
             return HttpResponse('Export is not completed', status=404)
 
-        if export_type is None:
-            file_ = instance.file
+        if flag_set('fflag_fix_back_lsdv_4813_async_export_conversion_22032023_short', request.user):
+            if export_type is not None:
+                converted_file = snapshot.converted_formats.filter(export_type=export_type).first()
+                if converted_file is None:
+                    raise NotFound(f'{export_type} format is not converted yet')
+            url = snapshot.file.storage.url(snapshot.file.name, storage_url=True, http_method=request.method)
+            print(f'############ url: {url}')
+            protocol = urlparse(url).scheme
+
+            # Let NGINX handle it
+            response = HttpResponse()
+            # The below header tells NGINX to catch it and serve, see docker-config/nginx-app.conf
+            redirect = '/file_download/' + protocol + '/' + url.replace(protocol + '://', '')
+            print(f'########### redirect: {redirect}')
+
+            response['X-Accel-Redirect'] = redirect
+            response['Content-Disposition'] = 'attachment; filename="{}"'.format(snapshot.file.name)
+            return response
         else:
-            file_ = instance.convert_file(export_type)
-        
-        if file_ is None:
-            return HttpResponse("Can't get file", status=404)
+            if export_type is None:
+                file_ = snapshot.file
+            else:
+                file_ = snapshot.convert_file(export_type)
 
-        ext = file_.name.split('.')[-1]
+            if file_ is None:
+                return HttpResponse("Can't get file", status=404)
 
-        response = RangedFileResponse(request, file_, content_type=f'application/{ext}')
-        response['Content-Disposition'] = f'attachment; filename="{file_.name}"'
-        response['filename'] = file_.name
-        return response
+            ext = file_.name.split('.')[-1]
+
+            response = RangedFileResponse(request, file_, content_type=f'application/{ext}')
+            response['Content-Disposition'] = f'attachment; filename="{file_.name}"'
+            response['filename'] = file_.name
+            return response
+
+
+def async_convert(snapshot_id, export_type):
+    snapshot = Export.objects.get(pk=snapshot_id)
+    project = snapshot.project
+    converted_format = ConvertedFormat.objects.create(
+        export=snapshot, export_type=export_type, status=ConvertedFormat.Status.COMPLETED
+    )
+    converted_file = snapshot.convert_file(export_type)
+    md5 = Export.eval_md5(converted_file)
+
+    now = datetime.now()
+    file_name = f'project-{project.id}-at-{now.strftime("%Y-%m-%d-%H-%M")}-{md5[0:8]}.json'
+    file_path = (
+        f'{project.id}/{file_name}'
+    )  # finally file will be in settings.DELAYED_EXPORT_DIR/project.id/file_name
+    file_ = File(converted_file, name=file_path)
+    converted_format.file.save(file_path, file_)
+    converted_format.save(update_fields=['file'])
+
+
+class ExportConvertAPI(generics.RetrieveAPIView):
+    queryset = Export.objects.all()
+    lookup_url_kwarg = 'export_pk'
+    permission_required = all_permissions.projects_change
+
+    def post(self, request, *args, **kwargs):
+        snapshot = self.get_object()
+        export_type = request.data['export_type']
+        start_job_async_or_sync(async_convert, snapshot.id, export_type)
+        return Response()

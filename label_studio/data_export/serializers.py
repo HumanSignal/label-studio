@@ -14,7 +14,7 @@ from users.models import User
 from users.serializers import UserSimpleSerializer
 from label_studio_tools.postprocessing.video import extract_key_frames
 
-from .models import Export
+from .models import Export, ConvertedFormat
 
 
 class CompletedBySerializer(serializers.ModelSerializer):
@@ -71,6 +71,12 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
         }
 
 
+class ConvertedFormatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ConvertedFormat
+        fields = ['id', 'status', 'export_type']
+
+
 class ExportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Export
@@ -82,10 +88,12 @@ class ExportSerializer(serializers.ModelSerializer):
             'status',
             'md5',
             'counters',
+            'converted_formats',
         ]
         fields = ['title'] + read_only
 
     created_by = UserSimpleSerializer(required=False)
+    converted_formats = ConvertedFormatSerializer(many=True, required=False)
 
 
 ONLY_OR_EXCLUDE_CHOICE = [
