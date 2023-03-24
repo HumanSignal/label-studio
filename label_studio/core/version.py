@@ -17,7 +17,8 @@ import logging
 import json
 
 VERSION_FILE = 'version_.py'
-
+VERSION_OVERRIDE = os.getenv('VERSION_OVERRIDE', '')
+BRANCH_OVERRIDE = os.getenv('BRANCH_OVERRIDE', '')
 
 def _write_py(info):
     # go to current dir to package __init__.py
@@ -71,8 +72,8 @@ def get_git_commit_info(skip_os=True):
             info = {
                 'message': run('git show -s --format=%s', stderr=STDOUT, shell=True).strip().decode('utf8'),
                 'commit': run('git show -s --format=%H', stderr=STDOUT, shell=True).strip().decode('utf8'),
-                'date': run('git show -s --format=%ai', stderr=STDOUT, shell=True).strip().decode('utf8'),
-                'branch': run('git rev-parse --abbrev-ref HEAD', stderr=STDOUT, shell=True).strip().decode('utf8')
+                'date': run('git log -1 --format="%cd" --date="format:%Y/%m/%d %H:%M:%S"', stderr=STDOUT, shell=True).strip().decode('utf8'),
+                'branch': BRANCH_OVERRIDE if BRANCH_OVERRIDE else run("git branch --sort=committerdate -r --contains | grep -m 1 -v HEAD | cut -d'/' -f2-", stderr=STDOUT, shell=True).strip().decode('utf8')
             }
         except CalledProcessError:
             os.chdir(cwd)
@@ -87,7 +88,7 @@ def get_git_commit_info(skip_os=True):
                 os_version = ''.join(str(s).split("=", 1)[1].rstrip().strip('"').replace('.', '')
                                      for s in f if str(s).startswith(keys))
                 version += '.' + os_version
-        info['version'] = version
+        info['version'] = VERSION_OVERRIDE if VERSION_OVERRIDE else version
 
         _write_py(info)
         return info

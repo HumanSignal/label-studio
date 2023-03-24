@@ -36,11 +36,11 @@ Use the following steps to export data and annotations from the Label Studio UI.
 !!! note
     1. The export will always include the annotated tasks, regardless of filters set on the tab. 
     2. Cancelled annotated tasks will be included in the exported result too.
-    3. If you want to apply tab filters to the export, try to use [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-API).
+    3. If you want to apply tab filters to the export, try to use [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-Snapshot-API).
 
 ### Export timeout in Community Edition
 
-If the export times out, see how to [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-API). You can also use a [console command](#Export-using-console-command) to export your project. For more information, see the following section.
+If the export times out, see how to [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-Snapshot-API). You can also use a [console command](#Export-using-console-command) to export your project. For more information, see the following section.
 
 ### Export using console command
 
@@ -311,7 +311,7 @@ Review the full list of JSON properties in the [API documentation](api.html).
 | result.value | Tag-specific value that includes details of the result of labeling the task. The value structure depends on the tag for the label. For more information, see [Explore each tag](/tags). |
 | annotations.completed_by | User ID of the user that created the annotation. Matches the list order of users on the People page on the Label Studio UI. |
 | annotations.was_cancelled | Boolean. Details about whether or not the annotation was skipped, or cancelled. | 
-| drafts | Array of draft annotations. Follows similar format as the annotations array. Included only for tasks exported as a snapshot [from the UI](#Export-snapshots-using-the-UI) or [using the API](#Export-snapshots-using-the-API).
+| drafts | Array of draft annotations. Follows similar format as the annotations array. Included only for tasks exported as a snapshot [from the UI](#Export-snapshots-using-the-UI) or [using the API](#Export-snapshots-using-the-Snapshot-API).
 | predictions | Array of machine learning predictions. Follows the same format as the annotations array, with one additional parameter. |
 | predictions.score | The overall score of the result, based on the probabilistic output, confidence level, or other. | 
 
