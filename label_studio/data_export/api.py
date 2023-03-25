@@ -446,23 +446,23 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
         if snapshot.status != Export.Status.COMPLETED:
             return HttpResponse('Export is not completed', status=404)
 
-        if flag_set('fflag_fix_back_lsdv_4813_async_export_conversion_22032023_short', request.user):
+        if flag_set('fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short', request.user):
+            file = snapshot.file
             if export_type is not None:
                 converted_file = snapshot.converted_formats.filter(export_type=export_type).first()
                 if converted_file is None:
                     raise NotFound(f'{export_type} format is not converted yet')
-            url = snapshot.file.storage.url(snapshot.file.name, storage_url=True, http_method=request.method)
-            print(f'############ url: {url}')
+                file = converted_file.file
+            url = file.storage.url(file.name, storage_url=True, http_method=request.method)
             protocol = urlparse(url).scheme
 
             # Let NGINX handle it
             response = HttpResponse()
             # The below header tells NGINX to catch it and serve, see docker-config/nginx-app.conf
             redirect = '/file_download/' + protocol + '/' + url.replace(protocol + '://', '')
-            print(f'########### redirect: {redirect}')
 
             response['X-Accel-Redirect'] = redirect
-            response['Content-Disposition'] = 'attachment; filename="{}"'.format(snapshot.file.name)
+            response['Content-Disposition'] = 'attachment; filename="{}"'.format(file.name)
             return response
         else:
             if export_type is None:
