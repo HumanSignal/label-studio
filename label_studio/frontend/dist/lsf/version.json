@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4747: Selecting the end character on a Paragraph phrase to the very start of other phrases only includes the first phrase selection",
-  "commit": "5bf915eeafb42c680882419e8377303b5a16fe2c",
-  "branch": "master",
-  "date": "2023/03/24 10:44:26"
+  "message": "fix: LSDV-4836: Conditional annotation with visibleWhen choice-selected works with Taxonomy",
+  "commit": "193a01b45bfcb4d49facd15138eb2a5c54ada72d",
+  "branch": "fb-lsdv-4836",
+  "date": "2023/03/25 07:34:45"
 }
