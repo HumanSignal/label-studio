@@ -114,6 +114,8 @@ jobs:
           fi
 
       - name: Package
+        env:
+          VERSION_OVERRIDE: ${{ inputs.version }}
         run: python setup.py sdist bdist_wheel
 
       - name: Upload to PYPI

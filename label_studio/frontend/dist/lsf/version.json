@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4801: Better file type playable detection for video",
-  "commit": "b00b0a31217882b61438fc7c5f43ab852fdd9b84",
+  "message": "fix: LSDV-4747: Selecting the end character on a Paragraph phrase to the very start of other phrases only includes the first phrase selection",
+  "commit": "5bf915eeafb42c680882419e8377303b5a16fe2c",
   "branch": "master",
-  "date": "2023/03/22 12:59:27"
+  "date": "2023/03/24 10:44:26"
 }
