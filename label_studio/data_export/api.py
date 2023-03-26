@@ -5,6 +5,7 @@ import logging
 
 from django.conf import settings
 from datetime import datetime
+from django.db import transaction
 from django.http import HttpResponse
 from django.core.files import File
 from drf_yasg import openapi as openapi
@@ -462,6 +463,7 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
             redirect = '/file_download/' + protocol + '/' + url.replace(protocol + '://', '')
 
             response['X-Accel-Redirect'] = redirect
+            print(f'############ filename: {file.name}')
             response['Content-Disposition'] = 'attachment; filename="{}"'.format(file.name)
             return response
         else:
@@ -482,16 +484,27 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
 
 
 def async_convert(snapshot_id, export_type):
-    snapshot = Export.objects.get(pk=snapshot_id)
+    try:
+        snapshot = Export.objects.get(pk=snapshot_id)
+    except Export.DoesNotExist:
+        logger.error(f'Export snapshot with id {snapshot_id} does not exist, converting stopped')
+        return
     project = snapshot.project
-    converted_format = ConvertedFormat.objects.create(
-        export=snapshot, export_type=export_type, status=ConvertedFormat.Status.COMPLETED
-    )
+    with transaction.atomic():
+        converted_format, _ = ConvertedFormat.objects.get_or_create(
+            export=snapshot, export_type=export_type
+        )
+        if converted_format.status != ConvertedFormat.Status.CREATED:
+            logger.error(f'Converson for export id {snapshot_id} to {export_type} already started')
+            return
+        converted_format.status = ConvertedFormat.Status.IN_PROGRESS
+        converted_format.save(updated_fields=['status'])
+
     converted_file = snapshot.convert_file(export_type)
     md5 = Export.eval_md5(converted_file)
 
     now = datetime.now()
-    file_name = f'project-{project.id}-at-{now.strftime("%Y-%m-%d-%H-%M")}-{md5[0:8]}.json'
+    file_name = f'project-{project.id}-at-{now.strftime("%Y-%m-%d-%H-%M")}-{md5[0:8]}.{export_type.lower()}'
     file_path = (
         f'{project.id}/{file_name}'
     )  # finally file will be in settings.DELAYED_EXPORT_DIR/project.id/file_name
@@ -508,5 +521,8 @@ class ExportConvertAPI(generics.RetrieveAPIView):
     def post(self, request, *args, **kwargs):
         snapshot = self.get_object()
         export_type = request.data['export_type']
+        ConvertedFormat.objects.create(
+            export=snapshot, export_type=export_type, status=ConvertedFormat.Status.CREATED
+        )
         start_job_async_or_sync(async_convert, snapshot.id, export_type)
         return Response()
