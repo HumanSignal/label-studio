@@ -11,6 +11,7 @@ from ml.mixins import InteractiveMixin
 from tasks.models import Annotation, Task
 from tasks.serializers import AnnotationDraftSerializer, PredictionSerializer
 from users.models import User
+from data_export.models import DataExport
 from users.serializers import UserSimpleSerializer
 from label_studio_tools.postprocessing.video import extract_key_frames
 
@@ -159,6 +160,17 @@ class SerializationOptionsSerializer(serializers.Serializer):
         help_text='Interpolate video key frames',
         required=False
     )
+
+
+class ExportConvertSerializer(serializers.Serializer):
+    export_type = serializers.CharField(help_text='Export file format.')
+
+    def validate_export_type(self, value):
+        project = self.context.get('project')
+        export_formats = [f['name'] for f in DataExport.get_export_formats(project)]
+        if value not in export_formats:
+            raise serializers.ValidationError(f'{value} is not supported export format')
+        return value
 
 
 class ExportCreateSerializer(ExportSerializer):

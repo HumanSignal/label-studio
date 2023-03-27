@@ -13,7 +13,7 @@ from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 from rest_framework import status, generics
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.views import APIView
 from urllib.parse import urlparse
 
@@ -25,7 +25,7 @@ from projects.models import Project
 from tasks.models import Task
 from .models import DataExport, Export, ConvertedFormat
 
-from .serializers import ExportDataSerializer, ExportSerializer, ExportCreateSerializer, ExportParamSerializer
+from .serializers import ExportDataSerializer, ExportSerializer, ExportCreateSerializer, ExportParamSerializer, ExportConvertSerializer
 from ranged_fileresponse import RangedFileResponse
 
 logger = logging.getLogger(__name__)
@@ -483,23 +483,21 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
             return response
 
 
-def async_convert(snapshot_id, export_type):
-    try:
-        snapshot = Export.objects.get(pk=snapshot_id)
-    except Export.DoesNotExist:
-        logger.error(f'Export snapshot with id {snapshot_id} does not exist, converting stopped')
-        return
-    project = snapshot.project
+def async_convert(converted_format_id, export_type):
     with transaction.atomic():
-        converted_format, _ = ConvertedFormat.objects.get_or_create(
-            export=snapshot, export_type=export_type
-        )
+        try:
+            converted_format = ConvertedFormat.objects.get(id=converted_format_id)
+        except ConvertedFormat.DoesNotExist:
+            logger.error(f'ConvertedFormat with id {converted_format_id} not found, conversion failed')
+            return
         if converted_format.status != ConvertedFormat.Status.CREATED:
             logger.error(f'Converson for export id {snapshot_id} to {export_type} already started')
             return
         converted_format.status = ConvertedFormat.Status.IN_PROGRESS
-        converted_format.save(updated_fields=['status'])
+        converted_format.save(update_fields=['status'])
 
+    snapshot = converted_format.export
+    project = snapshot.project
     converted_file = snapshot.convert_file(export_type)
     md5 = Export.eval_md5(converted_file)
 
@@ -510,7 +508,15 @@ def async_convert(snapshot_id, export_type):
     )  # finally file will be in settings.DELAYED_EXPORT_DIR/project.id/file_name
     file_ = File(converted_file, name=file_path)
     converted_format.file.save(file_path, file_)
-    converted_format.save(update_fields=['file'])
+    converted_format.status = ConvertedFormat.Status.COMPLETED
+    converted_format.save(update_fields=['file', 'status'])
+
+
+def set_convert_background_failure(job, connection, type, value, traceback):
+    from data_export.models import ConvertedFormat
+
+    convert_id = job.args[0]
+    ConvertedFormat.objects.filter(id=convert_id).update(status=Export.Status.FAILED)
 
 
 class ExportConvertAPI(generics.RetrieveAPIView):
@@ -520,9 +526,21 @@ class ExportConvertAPI(generics.RetrieveAPIView):
 
     def post(self, request, *args, **kwargs):
         snapshot = self.get_object()
-        export_type = request.data['export_type']
-        ConvertedFormat.objects.create(
-            export=snapshot, export_type=export_type, status=ConvertedFormat.Status.CREATED
+        serializer = ExportConvertSerializer(data=request.data, context={'project': snapshot.project})
+        serializer.is_valid(raise_exception=True)
+        export_type = serializer.validated_data['export_type']
+
+        with transaction.atomic():
+            converted_format, created = ConvertedFormat.objects.get_or_create(
+                export=snapshot, export_type=export_type
+            )
+            if not created:
+                raise ValidationError(f'Converson to {export_type} already started')
+
+        start_job_async_or_sync(
+            async_convert,
+            converted_format.id,
+            export_type,
+            on_failure=set_convert_background_failure
         )
-        start_job_async_or_sync(async_convert, snapshot.id, export_type)
-        return Response()
+        return Response({'export_type': export_type, 'converted_format': converted_format.id})
