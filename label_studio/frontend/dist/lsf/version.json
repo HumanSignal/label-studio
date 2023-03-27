@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4747: Selecting the end character on a Paragraph phrase to the very start of other phrases only includes the first phrase selection",
-  "commit": "5bf915eeafb42c680882419e8377303b5a16fe2c",
+  "message": "fix: LSDV-4811: Impossible to select and drag a hidden region",
+  "commit": "958cb30a4b36e3e10532aff2be66901ed1390573",
   "branch": "master",
-  "date": "2023/03/24 10:44:26"
+  "date": "2023/03/27 12:28:23"
 }
