@@ -226,4 +226,14 @@ def feature_flags(request):
     user = request.user
     if not user.is_authenticated:
         return HttpResponseForbidden()
-    return HttpResponse(json.dumps(all_flags(request.user), indent=4), status=200)
+
+    flags = all_flags(request.user)
+    flags['SYSTEM'] = {
+        'FEATURE_FLAGS_DEFAULT_VALUE': settings.FEATURE_FLAGS_DEFAULT_VALUE,
+        'FEATURE_FLAGS_FROM_FILE': settings.FEATURE_FLAGS_FROM_FILE,
+        'FEATURE_FLAGS_FILE': settings.FEATURE_FLAGS_FILE,
+        'VERSION_EDITION': settings.VERSION_EDITION,
+        'CLOUD_INSTANCE': settings.CLOUD_INSTANCE if hasattr(settings, 'CLOUD_INSTANCE') else None
+    }
+
+    return HttpResponse(json.dumps(flags, indent=4), status=200)
