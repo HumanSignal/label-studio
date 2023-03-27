@@ -52,6 +52,8 @@ jobs:
             const check = check_runs.find(e => e.name === '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}')
             const details = JSON.parse(check.output.summary)
             console.log(details)
+            core.setOutput("branch", details.branch);
+            core.setOutput("pretty_branch_name", details.pretty_branch_name);
             core.setOutput("image_version", details.image_version);
             core.setOutput("sha", details.sha);
 
@@ -185,6 +187,9 @@ jobs:
 
       - name: Prepare Release Dockerfile
         id: release_dockerfile
+        env:
+          VERSION_OVERRIDE: ${{ inputs.release_tag }}
+          BRANCH_OVERRIDE: ${{ steps.get_info.outputs.branch }}
         shell: bash
         run: |
           set -euo pipefail ${ACTIONS_STEP_DEBUG:+-x}
