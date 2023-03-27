@@ -73,7 +73,7 @@ def get_git_commit_info(skip_os=True):
                 'message': run('git show -s --format=%s', stderr=STDOUT, shell=True).strip().decode('utf8'),
                 'commit': run('git show -s --format=%H', stderr=STDOUT, shell=True).strip().decode('utf8'),
                 'date': run('git log -1 --format="%cd" --date="format:%Y/%m/%d %H:%M:%S"', stderr=STDOUT, shell=True).strip().decode('utf8'),
-                'branch': BRANCH_OVERRIDE if BRANCH_OVERRIDE else run('git rev-parse --abbrev-ref HEAD', stderr=STDOUT, shell=True).strip().decode('utf8')
+                'branch': BRANCH_OVERRIDE if BRANCH_OVERRIDE else run("git branch --sort=committerdate -r --contains | grep -m 1 -v HEAD | cut -d'/' -f2-", stderr=STDOUT, shell=True).strip().decode('utf8')
             }
         except CalledProcessError:
             os.chdir(cwd)
