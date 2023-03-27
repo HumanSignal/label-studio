@@ -9,6 +9,8 @@ import { useAPI } from "../../providers/ApiProvider";
 import { useProject } from "../../providers/ProjectProvider";
 import axios from 'axios'
 import getWebhookUrl from "../../webhooks";
+import Swal from 'sweetalert2'
+
 export const ChangeLabelName = () => {
   const webhook_url = getWebhookUrl();
   const {project} = useProject();
@@ -18,13 +20,16 @@ export const ChangeLabelName = () => {
   const [newLabel, setNewLabel] = useState('');
 
   const [availableLabels, setAvailableLabels] = useState([]);
+  const [functionRunning, setFunctionRunning] = useState(false);
   useEffect(() => {
     console.log('re-rendering');
-    getLabels();
-  }, []);
+    if (project.id) {
+      getLabels();
+    }
+  }, [project.id]);
 
-  function getLabels() {
-    axios
+  async function getLabels() {
+    await axios
       .get(webhook_url + '/get_labels?id=' + project.id)
       .then((response) => {
         if (response.data.labels !== availableLabels && (response.data.labels instanceof Array)) {
@@ -41,19 +46,32 @@ export const ChangeLabelName = () => {
     setNewLabel(event.target.value);
   };
 
-   const handleSubmit = (event) => {
-    event.preventDefault();
+   const handleSubmit = async (event) => {
+     event.preventDefault();
+     setFunctionRunning(true);
+
     const updatedLabels = availableLabels.map((label) => {
       if (label === selectedLabel) {
         return newLabel;
       }
       return label;
     });
-    console.log('Updated labels: ', updatedLabels);
-    setAvailableLabels(updatedLabels);
-     axios.post(webhook_url + '/change_label_name?id=' + project.id + '&current_name=' + selectedLabel + '&new_name=' + newLabel)
+     console.log('Updated labels: ', updatedLabels);
+     Swal.fire({
+      title: 'Running',
+      text: "Your label is being named, this may take some time!",
+      icon: 'info',
+    })
+    await axios.post(webhook_url + '/change_label_name?id=' + project.id + '&current_name=' + selectedLabel + '&new_name=' + newLabel)
     .then((response) => {
       console.log(response);
+      setFunctionRunning(false);
+      setAvailableLabels(updatedLabels);
+      Swal.fire({
+        title: 'Success',
+        text: "Your label has been renamed!",
+        icon: 'success',
+      })
   })
   };
 
@@ -81,7 +99,7 @@ export const ChangeLabelName = () => {
       </label>
       <br />
       <br />
-      <button type="submit">Submit</button>
+      <button disabled={functionRunning} type="submit">Submit</button>
       </form> 
       </div>  
   );
