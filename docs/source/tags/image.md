@@ -35,15 +35,34 @@ When you annotate image regions with this tag, the annotations are saved as perc
 | [horizontalAlignment] | <code>string</code> | <code>&quot;\&quot;left\&quot;&quot;</code> | Where to align image horizontally. Can be one of "left", "center" or "right" |
 | [verticalAlignment] | <code>string</code> | <code>&quot;\&quot;top\&quot;&quot;</code> | Where to align image vertically. Can be one of "top", "center" or "bottom" |
 | [defaultZoom] | <code>string</code> | <code>&quot;\&quot;fit\&quot;&quot;</code> | Specify the initial zoom of the image within the viewport while preserving it’s ratio. Can be one of "auto", "original" or "fit" |
+| [valuelist] | <code>string</code> |  | References a variable that holds a list of image URLs |
 | [crossOrigin] | <code>string</code> | <code>&quot;\&quot;none\&quot;&quot;</code> | Configures CORS cross domain behavior for this image, either "none", "anonymous", or "use-credentials", similar to [DOM `img` crossOrigin property](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin). |
 
 ### Example
-
-Labeling configuration to display an image on the labeling interface
-
-```html
+<!--Labeling configuration to display an image on the labeling interface-->
 <View>
   <!-- Retrieve the image url from the url field in JSON or column in CSV -->
   <Image name="image" value="$url" rotateControl="true" zoomControl="true"></Image>
 </View>
+ * @example
+<!--Labeling configuration to perform multi-image segmentation-->
+
+Config:
+```xml
+<View>
+  <!-- Retrieve the image url from the url field in JSON or column in CSV -->
+  <Image name="image" valueList="$images" rotateControl="true" zoomControl="true"></Image>
+</View>
+```
+
+Data:
+```json
+{
+  "data": {
+    "images": [
+      "https://images.unsplash.com/photo-1556740734-7f3a7d7f0f9c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80",
+      "https://images.unsplash.com/photo-1556740734-7f3a7d7f0f9c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80",
+    ]
+  }
+}
 ```
