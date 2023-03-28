@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4811: Impossible to select and drag a hidden region",
-  "commit": "958cb30a4b36e3e10532aff2be66901ed1390573",
-  "branch": "master",
-  "date": "2023/03/27 12:28:23"
+  "message": "fix: LSDV-4773: Undo history resets in MIG",
+  "commit": "c3dfff8ada97375ef272ae1695c8d62010f883ec",
+  "branch": "fb-lsdv-4773/history-erase-mig",
+  "date": "2023/03/28 14:28:15"
 }
