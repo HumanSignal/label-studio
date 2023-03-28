@@ -80,7 +80,7 @@ jobs:
                 {owner: 'heartexlabs', repo: 'label-studio-frontend'},
                 {owner: 'heartexlabs', repo: 'dm2'}
             ]
-            
+
             async function getLSSubmoduleVersions(sha) {
                 let {data: lsTreeData} = await github.rest.git.getTree({
                     owner,
@@ -145,20 +145,35 @@ jobs:
                 });
             }
 
+      - name: Cut release branch
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          
+          git checkout -b "${{ steps.calculate_branch_name_and_version.outputs.release_branch }}"
+          echo "commit=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          git push origin HEAD:refs/heads/${{ steps.calculate_branch_name_and_version.outputs.release_branch }}
+
   set-version-default-branch:
+    name: 'Set version in default branch'
     uses: heartexlabs/label-studio/.github/workflows/release-set-version.yml@develop
     needs:
       - draft-new-release
     with:
       version: ${{ needs.draft-new-release.outputs.next_develop_version }}
       branch: ${{ github.event.repository.default_branch }}
+    permissions:
+      contents: write
     secrets: inherit
 
   set-version-release-branch:
+    name: 'Set version in release branch'
     uses: heartexlabs/label-studio/.github/workflows/release-set-version.yml@develop
     needs:
       - draft-new-release
     with:
       version: ${{ needs.draft-new-release.outputs.release_version }}
       branch: ${{ needs.draft-new-release.outputs.release_branch }}
+    permissions:
+      contents: write
     secrets: inherit
