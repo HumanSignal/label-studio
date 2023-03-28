@@ -176,17 +176,17 @@ def paginator_help(objects_name, tag):
         page_size_description = f'[or "length"] {objects_name} per page. Max value {settings.TASK_API_PAGE_SIZE_MAX}'
     else:
         page_size_description = f'[or "length"] {objects_name} per page, use -1 to obtain all {objects_name} ' \
-                                 '(in this case "page" has no effect and this operation might be slow)'
+                                '(in this case "page" has no effect and this operation might be slow)'
     return dict(tags=[tag], manual_parameters=[
-            openapi.Parameter(name='page', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY,
-                              description='[or "start"] current page'),
-            openapi.Parameter(name='page_size', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY,
-                              description=page_size_description)
-        ],
-        responses={
-            200: openapi.Response(title='OK', description='')
-            # 404: openapi.Response(title='', description=f'No more {objects_name} found')
-        })
+        openapi.Parameter(name='page', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY,
+                          description='[or "start"] current page'),
+        openapi.Parameter(name='page_size', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY,
+                          description=page_size_description)
+    ],
+                responses={
+                    200: openapi.Response(title='OK', description='')
+                    # 404: openapi.Response(title='', description=f'No more {objects_name} found')
+                })
 
 
 def find_editor_files():
@@ -363,7 +363,7 @@ def check_for_the_latest_version(print_message):
     # prevent excess checks by time intervals
     current_time = time.time()
     if label_studio.__latest_version_check_time__ and \
-       current_time - label_studio.__latest_version_check_time__ < 60:
+            current_time - label_studio.__latest_version_check_time__ < 60:
         return
     label_studio.__latest_version_check_time__ = current_time
 
@@ -422,7 +422,7 @@ def collect_versions(force=False):
             'current_version_is_outdated': label_studio.__current_version_is_outdated__
         },
         # backend full git info
-        'label-studio-os-backend': version.get_git_commit_info()
+        'label-studio-os-backend': version.get_git_commit_info(ls=True)
     }
 
     # label studio frontend
