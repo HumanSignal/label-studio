@@ -224,7 +224,7 @@ After you [configure access to your S3 bucket](#Configure-access-to-your-S3-buck
     - In the **Session Token** field, specify a session token of the temporary security credentials for an AWS account with access to your S3 bucket.
     - (Optional) Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file.
     - (Optional) Enable **Recursive scan** to perform recursive scans over the bucket contents if you have nested folders in your S3 bucket.
-    - Choose whether to disable **Use pre-signed URLs**. For example, if you host Label Studio in the same AWS network as your storage buckets, you can disable presigned URLs and have direct access to the storage using `s3://` links.
+    - Choose whether to disable **Use pre-signed URLs**. If your tasks contain s3://... links, they must be pre-signed in order to be displayed in the browser.
     - Adjust the counter for how many minutes the pre-signed URLs are valid.
 8. Click **Add Storage**.
 
@@ -352,7 +352,7 @@ In the Label Studio UI, do the following to set up the connection:
     - In the **External ID** field, specify the external ID that identifies Label Studio to your AWS account. You can find the external ID on your **Organization** page.
     - Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file.
     - Enable **Recursive scan** to perform recursive scans over the bucket contents if you have nested folders in your S3 bucket.
-    - Choose whether to disable **Use pre-signed URLs**. For example, if you host Label Studio in the same AWS network as your storage buckets, you can disable presigned URLs and have direct access to the storage using `s3://` links.
+    - Choose whether to disable **Use pre-signed URLs**. If your tasks contain s3://... links, they must be pre-signed in order to be displayed in the browser.
     - Adjust the counter for how many minutes the pre-signed URLs are valid.
 8. Click **Add Storage**.
 
@@ -407,7 +407,7 @@ In the Label Studio UI, do the following to set up the connection:
 7. Adjust the remaining optional parameters:
     - In the **File Filter Regex** field, specify a regular expression to filter bucket objects. Use `.*` to collect all objects.
     - Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling, such as `gs://my-gcs-bucket/image.jpg`. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file.
-    - Choose whether to disable **Use pre-signed URLs**. For example, if you host Label Studio in the same network as your storage buckets, you can disable presigned URLs and have direct access to the storage.
+    - Choose whether to disable **Use pre-signed URLs**. If your tasks contain s3://... links, they must be pre-signed in order to be displayed in the browser.
     - Adjust the counter for how many minutes the pre-signed URLs are valid.
 8. In the **Google Application Credentials** field, add a JSON file with the GCS credentials you created to manage authentication for your bucket. You can also use the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to specify this file. For example:
 ```bash
@@ -448,7 +448,7 @@ In the Label Studio UI, do the following to set up the connection:
     - In the **Account Name** field, specify the account name for the Azure storage. You can also set this field as an environment variable,`AZURE_BLOB_ACCOUNT_NAME`.
     - In the **Account Key** field, specify the secret key to access the storage account. You can also set this field as an environment variable,`AZURE_BLOB_ACCOUNT_KEY`.
     - Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling, for example `azure-blob://container-name/image.jpg`. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file. 
-    - Choose whether to disable **Use pre-signed URLs**, or [shared access signatures](https://docs.microsoft.com/en-us/rest/api/storageservices/delegate-access-with-shared-access-signature). For example, if you host Label Studio in the same network as your storage containers, you can disable presigned URLs and have direct access to the storage.
+    - Choose whether to disable **Use pre-signed URLs**, or [shared access signatures](https://docs.microsoft.com/en-us/rest/api/storageservices/delegate-access-with-shared-access-signature). If your tasks contain s3://... links, they must be pre-signed in order to be displayed in the browser.    
     - Adjust the counter for how many minutes the shared access signatures are valid.
 8. Click **Add Storage**.
 9. Repeat these steps for **Target Storage** to sync completed data annotations to a container.
