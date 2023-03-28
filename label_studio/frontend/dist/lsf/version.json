@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4811: Impossible to select and drag a hidden region",
-  "commit": "958cb30a4b36e3e10532aff2be66901ed1390573",
+  "message": "fix: LSDV-4708: Scroll page to canvas only if needed",
+  "commit": "5eb91e6df297be27393dc94fbd1923be52135022",
   "branch": "master",
-  "date": "2023/03/27 12:28:23"
+  "date": "2023/03/28 16:02:23"
 }
