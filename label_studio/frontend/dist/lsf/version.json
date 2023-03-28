@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4708: Scroll page to canvas only if needed",
-  "commit": "b0429cacb28f03d5b93e5b33ddc83a4439db2dd0",
+  "commit": "c5451b4b496b2d31da238b84abb19e00a4f4aae4",
   "branch": "fb-lsdv-4708/scroll-only-if-needed",
-  "date": "2023/03/28 13:03:21"
+  "date": "2023/03/28 15:29:58"
 }
