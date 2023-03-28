@@ -112,7 +112,7 @@ Select the relevant tab and follow the steps for your desired option:
    - In the **Identity Provider** drop-down, select the OpenID Connect provider URL of your EKS and `sts.amazonaws.com` as the Audience.
    - Attach the newly created permission to the Role and name it.
    - Retrieve the Role arn for the next step.
-4. After you create an IAM role, add it as an annotation in your `lse-values.yaml` file.
+4. After you create an IAM role, add it as an annotation in your `ls-values.yaml` file.
    Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 
 ```yaml
@@ -173,7 +173,7 @@ rqworker:
 ```
 
 4. After you create the user, save the username and access key somewhere secure.
-5. Update your `lse-values.yaml` file with your newly-created access key ID and secret key as `<YOUR_ACCESS_KEY_ID>` and `<YOUR_SECRET_ACCESS_KEY>`.
+5. Update your `ls-values.yaml` file with your newly-created access key ID and secret key as `<YOUR_ACCESS_KEY_ID>` and `<YOUR_SECRET_ACCESS_KEY>`.
    Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 
 ```yaml
@@ -199,7 +199,7 @@ global:
 ```shell
 kubectl create secret generic <YOUR_SECRET_NAME> --from-literal=accesskey=<YOUR_ACCESS_KEY_ID> --from-literal=secretkey=<YOUR_SECRET_ACCESS_KEY>
 ```
-2. Update your `lse-values.yaml` file with your newly-created kubernetes secret:
+2. Update your `ls-values.yaml` file with your newly-created kubernetes secret:
 
 ```yaml
 global:
@@ -255,7 +255,7 @@ To create an IAM role without using OIDC in EKS, follow these steps.
 }
 ```
 
-4. After you add an IAM policy, configure your `lse-values.yaml` file.
+4. After you add an IAM policy, configure your `ls-values.yaml` file.
    Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 
 ```yaml
@@ -394,7 +394,7 @@ gcloud iam service-accounts add-iam-policy-binding ${GCP_SA} \
     --member "${WORKER_SA}"
 ```
 
-3. After binding the service accounts, update your `lse-values.yaml` file to include the values for the service account and other configurations. Update the `projectID`, `bucket`, and replace the`<GCP_SERVICE_ACCOUNT>` with the relevant values for your deployment.
+3. After binding the service accounts, update your `ls-values.yaml` file to include the values for the service account and other configurations. Update the `projectID`, `bucket`, and replace the`<GCP_SERVICE_ACCOUNT>` with the relevant values for your deployment.
    Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 
 ```yaml
@@ -425,7 +425,7 @@ You can use a service account key that you create, or if you already have a Kube
 
 #### Create a new service account key
 1. Create a service account key from the UI and download the JSON. Follow the steps for [Creating and managing service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) in the Google Cloud Identity and Access Management guide.
-2. After downloading the JSON for the service account key, update or create references to the JSON, your projectID, and your bucket in your `lse-values.yaml` file.
+2. After downloading the JSON for the service account key, update or create references to the JSON, your projectID, and your bucket in your `ls-values.yaml` file.
    Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 
 ```yaml
@@ -448,7 +448,7 @@ global:
 ```shell
 kubectl create secret generic <YOUR_SECRET_NAME> --from-file=key_json=<PATH_TO_JSON>
 ```
-2. Update your `lse-values.yaml` file with your newly-created Kubernetes secret:
+2. Update your `ls-values.yaml` file with your newly-created Kubernetes secret:
 
 ```yaml
 global:
@@ -540,7 +540,7 @@ You can connect Label Studio to your Azure container using account keys in Kuber
 <div class="code-tabs">
   <div data-name="Kubernetes">
 
-Update your `lse-values.yaml` file with the `YOUR_CONTAINER_NAME`, `YOUR_STORAGE_ACCOUNT`, and `YOUR_STORAGE_KEY` that you created.
+Update your `ls-values.yaml` file with the `YOUR_CONTAINER_NAME`, `YOUR_STORAGE_ACCOUNT`, and `YOUR_STORAGE_KEY` that you created.
 Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 
 ```yaml
@@ -562,7 +562,7 @@ If you have an existing key, you can use that instead to create a Kubernetes sec
 ```shell
 kubectl create secret generic <YOUR_SECRET_NAME> --from-literal=storageaccountname=<YOUR_STORAGE_ACCOUNT> --from-literal=storageaccountkey=<YOUR_STORAGE_KEY>
 ```
-2. Update your `lse-values.yaml` file with your newly-created Kubernetes secret:
+2. Update your `ls-values.yaml` file with your newly-created Kubernetes secret:
 
 ```yaml
 global:

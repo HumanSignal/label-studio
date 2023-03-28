@@ -108,10 +108,9 @@ If you choose to make changes to these default settings, consider the following:
 
 | For this case                               | Adjust this                                                                                                                           |
 |---------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| More than 2 concurrent annotators           | Adjust the requests and limits for `resources` in the `app` pod                                                                       |
+| More than 10 concurrent annotators          | Adjust the requests and limits for `resources` in the `app` pod                                                                       |
 | Increase fault tolerance                    | Increase the number of replicas of `app` and/or `rqworker` services                                                                   |
 | Production deployment (replicas)            | Replicas equivalent or greater than the number of availability zones in your Kubernetes cluster                                       | 
-| Production deployment (requests and limits) | Refer to the example Helm chart in [Configure the Helm chart for Label Studio](#Configure-the-Helm-chart-for-Label-Studio-Enterprise) |
 
 ### Prepare the Kubernetes cluster
 
@@ -132,6 +131,7 @@ Add the Helm chart repository to your Kubernetes cluster to easily install and u
    helm search repo heartex/label-studio
    ```
 
+<div class="enterprise-only">
 ### Configure Kubernetes secrets
 
 1. Ensure that you have license key and Docker Hub credentials or request them from Heartex Team.
@@ -151,17 +151,20 @@ Add the Helm chart repository to your Kubernetes cluster to easily install and u
    ```shell
    kubectl create secret generic lse-license --from-literal=license=https://lic.heartex.ai/db/<CUSTOMER_LICENSE_ID>
    ```
+</div>
+
+<div class="enterprise-only">
 
 ### Configure values.yaml 
 
-You must configure a `values.yaml` file for your Label Studio deployment. The following file contains default values for a minimal installation of Label Studio. This chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) and [cert-manager](https://cert-manager.io/docs/).
+You must configure a `values.yaml` file for your Label Studio Enterprise deployment. The following file contains default values for a minimal installation of Label Studio. This chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) and [cert-manager](https://cert-manager.io/docs/).
 
-Example `values.yaml` file for a minimal installation of Label Studio:
+Example `values.yaml` file for a minimal installation of Label Studio Enterprise:
 ```yaml
 global:
   image:
     repository: heartexlabs/label-studio-enterprise
-    tag: ""
+    tag: REPLACE_ME
   
   imagePullSecrets:
     # Defined with earlier kubectl command
@@ -243,14 +246,15 @@ redis:
   enabled: false
 ```
 
-Adjust the included defaults to reflect your environment and copy these into a new file and save it as `lse-values.yaml`.
+Adjust the included defaults to reflect your environment and copy these into a new file and save it as `ls-values.yaml`.
 
 
 !!! note 
     For more complex configurations, you can create your own file based on the [list of all available Helm values](helm_values.html).
 
+</div>
 
-## Set up TLS for PostgreSQL
+## Optional: set up TLS for PostgreSQL
 To configure Label Studio to use TLS for end-client connections with PostgreSQL, do the following:
 
 1. Enable TLS for your PostgreSQL instance and save Root TLS certificate, client certificate and its key for the next steps.
@@ -259,7 +263,7 @@ To configure Label Studio to use TLS for end-client connections with PostgreSQL,
 ```shell
 kubectl create secret generic <YOUR_SECRET_NAME> --from-file=ca.crt=<PATH_TO_CA> --from-file=client.crt=<PATH_TO_CLIENT_CRT> --from-file=client.key=<PATH_TO_CLIENT_KEY>
 ```
-3. Update your `lse-values.yaml` file with your newly-created Kubernetes secret:
+3. Update your `ls-values.yaml` file with your newly-created Kubernetes secret:
 
 !!! note 
     If `POSTGRE_SSL_MODE: verify-ca`, the server is verified by checking the certificate chain up to the root certificate stored on the client. If `POSTGRE_SSL_MODE: verify-full`, the server host name will be verified to make sure it matches the name stored in the server certificate. The SSL connection will fail if the server certificate cannot be verified. `verify-full` is recommended in most security-sensitive environments.
@@ -277,7 +281,7 @@ global:
 
 4. Install or upgrade Label Studio using Helm.
 
-## Set up TLS for Redis
+## Optional: set up TLS for Redis
 To configure Label Studio to use TLS for end-client connections with Redis, do the following:
 
 1. Enable TLS for your Redis instance and save Root TLS certificate, client certificate and its key for the next steps.
@@ -286,7 +290,7 @@ To configure Label Studio to use TLS for end-client connections with Redis, do t
 ```shell
 kubectl create secret generic <YOUR_SECRET_NAME> --from-file=ca.crt=<PATH_TO_CA> --from-file=client.crt=<PATH_TO_CLIENT_CRT> --from-file=client.key=<PATH_TO_CLIENT_KEY>
 ```
-3. Update your `lse-values.yaml` file with your newly-created Kubernetes secret:
+3. Update your `ls-values.yaml` file with your newly-created Kubernetes secret:
 
 !!! note 
     In the case if you are using self-signed certificates that host cannot verify you have to set `redisSslCertReqs` to `None`
@@ -310,7 +314,7 @@ Use Helm to install Label Studio on your Kubernetes cluster. Provide your custom
 
 From the command line, run the following:
 ```shell
-helm install lse heartex/label-studio -f lse-values.yaml
+helm install lse heartex/label-studio -f ls-values.yaml
 ```
 
 After installing, check the status of the Kubernetes pod creation:
@@ -338,7 +342,7 @@ kubectl rollout restart deployment/<RELEASE_NAME>-ls-app
 ## Upgrade Label Studio using Helm
 To upgrade Label Studio using Helm, do the following.
 
-1. Determine the latest tag version of Label Studio and add/replace the following in your `lse-values.yml` file: 
+1. Determine the latest tag version of Label Studio and add/replace the following in your `ls-values.yaml` file: 
    ```yaml
    global:
      image:
@@ -350,13 +354,13 @@ To upgrade Label Studio using Helm, do the following.
    ```
 3. Run the following from the command line to upgrade your deployment:
    ```shell
-   helm upgrade lse heartex/label-studio -f lse-values.yaml
+   helm upgrade ls heartex/label-studio -f ls-values.yaml
    ```
    If you want, you can specify a version from the command line:
    ```shell
-   helm upgrade lse heartex/label-studio -f lse-values.yaml --set global.image.tag=20210914.154442-d2d1935
+   helm upgrade ls heartex/label-studio -f ls-values.yaml --set global.image.tag=20210914.154442-d2d1935
    ```
-   This command overrides the tag value stored in `lse-values.yaml`. You must update the tag value when you upgrade or redeploy your instance to avoid version downgrades.
+   This command overrides the tag value stored in `ls-values.yaml`. You must update the tag value when you upgrade or redeploy your instance to avoid version downgrades.
 
 
 ## Uninstall Label Studio using Helm
@@ -365,5 +369,5 @@ To uninstall Label Studio using Helm, delete the configuration.
 
 From the command line, run the following:
 ```shell
-helm delete lse
+helm delete ls
 ```

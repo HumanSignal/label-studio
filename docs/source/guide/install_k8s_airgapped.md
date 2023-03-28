@@ -45,7 +45,7 @@ If you can't access the internet using a proxy supported by Helm or at all, foll
    ```
 2. Transfer the downloaded `tar.gz` archive to the host that has `kubectl` and `helm` installed.
 3. Expand the `tar.gz` archive.
-4. [Install Label Studio](install_k8s.html#Use-Helm-to-install-Label-Studio-Enterprise-on-your-Kubernetes-cluster), updating the path in the `helm` commands to reference the relative path of the folder where you expanded Label Studio Helm cahrt. For example, if you expanded the archive file in the current directory, run the following:
+4. Install Label Studio, updating the path in the `helm` commands to reference the relative path of the folder where you expanded Label Studio Helm cahrt. For example, if you expanded the archive file in the current directory, run the following:
 ```shell
 helm install ls ./label-studio -f ls-values.yaml
 ```
