@@ -10,8 +10,11 @@
     "version": "6.3.0"
   },
   "dependencies": {
+    "@notionhq/client": "^2.2.3",
     "@sanity/client": "^3.4.1",
     "co": "^4.6.0",
+    "concat-md": "^0.5.1",
+    "dotenv": "^16.0.3",
     "front-matter": "^4.0.2",
     "hexo": "^6.3.0",
     "hexo-admonition": "^1.1.2",
@@ -34,9 +37,11 @@
     "hexo-server": "^0.3.3",
     "hexo-tag-details": "https://github.com/nicholasrq/hexo-tag-details.git",
     "node-html-parser": "^6.1.4",
+    "notion-to-md": "github:huguestennier/notion-to-md",
     "save": "^2.4.0"
   },
   "scripts": {
+    "clean": "hexo clean && touch db.json",
     "start": "hexo clean && touch db.json && hexo serve --config opensource.yml,_config.yml",
     "start:enterprise": "hexo clean && touch db.json && hexo serve --config enterprise.yml,_config.yml",
     "server": "hexo clean && touch db.json && hexo serve --config opensource.yml,_config.yml",

@@ -119,8 +119,7 @@
       <script>
         let sidebar = document.querySelector(".page-sidebar");
         let activeSidebarLink = sidebar.querySelector("[aria-current]");
-        console.log(activeSidebarLink.getBoundingClientRect().y);
-        sidebar.scrollTop = activeSidebarLink.getBoundingClientRect().y - 120;
+        if(activeSidebarLink) sidebar.scrollTop = activeSidebarLink.getBoundingClientRect().y - 120;
       </script>
     <% } %>
     <div class="content">
@@ -209,6 +208,9 @@
     </div>
   </main>
 
+  <% if (page.permalink.includes("concat.html") || page.permalink.includes("release_notes.html")) { %>
+    <%- js('js/collapse.js') %>
+  <% } %>
   <%- partial("partials/footer") %>
 
   <%- js('js/code-tabs.js') %>
@@ -216,5 +218,14 @@
   <%- js('js/feedback-form.js') %>
   <%- js('js/header.js') %>
   <%- js('js/intense.min.js') %>
+
+  <script>
+    window.addEventListener('load', function () {
+      const htmlElement = document.querySelector("html");
+
+      htmlElement.classList.add("js-enhanced");
+    })
+</script>
+
 </body>
 </html>
