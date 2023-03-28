@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load filters %}
+
+{% block content %}
+
+
+<style>
+    table {
+        font-family: Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+    td, th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+    tr:nth-child(even){
+        background-color: #f2f2f2;
+    }
+    th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #04AA6D !important;
+        color: white;
+    }
+    .tables {
+        margin: 1em;
+    }
+    input[type=submit] {
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 1em;
+    }
+
+    input[type=submit]:hover {
+        background-color: #45a049;
+    }
+</style>
+
+<head>
+    <title>Sensors</title>
+</head>
+<body>
+    <div class="buttons">
+        <form action="/landingpage/">
+            <input type="submit" value="Go back to landingpage" style="background-color: #c4862b; width:25%"/>
+        </form>
+    </div>
+    <div class="sensors">
+      <h2>Sensors</h2>
+      <table class=" tables">
+          <tr>
+              <th>Sensor ID</th>
+              <th>Description</th>
+              <th>Sensor type</th>
+              <th></th>
+              <th></th>
+          </tr>
+          {% for sensor in sensors %}
+          <tr>
+              <td>{{ sensor.sensor_id }}</td>
+              <td>{{ sensor.description }}</td> 
+              <td>{{ sensor.sensortype }}</td>
+              <td><a href="{% url 'sensormodel:adjust_sensor' sensor.id %}"> [Edit] </a></td>
+              <td><a href="{% url 'sensormodel:delete_sensor' sensor.id %}">[Delete]</a></td>
+          </tr> 
+         {% endfor %} 
+      </table>
+    </div>
+    <div class="sensortypes">
+      <h2>Sensor types</h2>
+      <table class=" tables">
+          <tr>
+              <th>Manufacturer</th>
+              <th>Name</th>
+              <th>Version</th>
+              <th>ID</th>
+          </tr>
+          {% for sensortype in sensortypes %}
+          <tr>
+              <td>{{ sensortype.manufacturer }}</td>
+              <td>{{ sensortype.name }}</td> 
+              <td>{{ sensortype.version }}</td>
+              <td>{{ sensortype.id }}</td>
+          </tr> 
+         {% endfor %} 
+      </table>
+    </div>
+    <div class="forms">
+        <h2>Add sensor</h2>
+        <form action="/sensormodel/add" method="post">
+            <table>
+            {{ sensorform.as_table }}
+            </table>
+            <input type="submit" value="Create sensor">
+        </form>
+    </div>
+    <div class="buttons">
+      <form action="/sensormodel/sync" method='post'>
+          <input type="submit" value="Synchronize sensor parser templates" />
+      </form>
+    </div>
+</body>
+
+{% endblock %}

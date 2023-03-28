@@ -75,10 +75,14 @@
                 <td><a href="{% url 'sensormodel:delete_deployment' deployment.id %}">[Delete]</a></td>
             </tr> 
             {% endfor %} 
-        </table>
-        
-        
+        </table>    
     </div>
+    <div class="buttons">
+        <form action="/sensormodel/deployment">
+            <input type="submit" value="Add Deployment" />
+        </form>
+    </div>
+
     <div class="sensors">
         <h2>Sensors</h2>
         <table class=" tables">
@@ -99,7 +103,11 @@
             </tr> 
            {% endfor %} 
         </table>
-        
+    </div>
+    <div class="buttons">
+        <form action="/sensormodel/sensor">
+            <input type="submit" value="Add Sensor" />
+        </form>
     </div>
 
     <div class="sensortypes">
@@ -145,12 +153,14 @@
             </tr> 
            {% endfor %} 
         </table>
-        
     </div>
     <div class="buttons">
-        <form action="/sensormodel/add">
-            <input type="submit" value="Add" />
+        <form action="/sensormodel/subject">
+            <input type="submit" value="Add Subject" />
         </form>
+    </div>
+
+    <div class="buttons">
         <form action="/sensormodel/sync" method='post'>
             <input type="submit" value="Synchronize sensor parser templates" />
         </form>
