@@ -5,7 +5,9 @@ app_name = 'sensormodel'
 
 urlpatterns = [
     path('', views.tablepage, name= 'tablepage'),
-    path('add', views.add, name= 'add'),
+    path('deployment', views.addDeployment, name = 'addDeployment'),
+    path('sensor', views.addSensor, name = 'addSensor'),
+    path('subject', views.addSubject, name = 'addSubject'),
     
     path('sync', views.sync_sensor_parser_templates, name= 'sync'),
 

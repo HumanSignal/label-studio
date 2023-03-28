@@ -1690,5 +1690,59 @@
       "module": "sensormodel.views.delete_subject",
       "name": "sensormodel:delete_subject",
       "decorators": ""
+  },
+  {
+      "url": "/sensormodel/",
+      "module": "sensormodel.views.tablepage",
+      "name": "sensormodel:tablepage",
+      "decorators": ""
+  },
+  {
+      "url": "/sensormodel/add",
+      "module": "sensormodel.views.add",
+      "name": "sensormodel:add",
+      "decorators": ""
+  },
+  {
+      "url": "/sensormodel/sync",
+      "module": "sensormodel.views.sync_sensor_parser_templates",
+      "name": "sensormodel:sync",
+      "decorators": ""
+  },
+  {
+      "url": "/sensormodel/deployment/adjust/<int:id>/",
+      "module": "sensormodel.views.adjust_deployment",
+      "name": "sensormodel:adjust_deployment",
+      "decorators": ""
+  },
+  {
+      "url": "/sensormodel/sensor/adjust/<int:id>",
+      "module": "sensormodel.views.adjust_sensor",
+      "name": "sensormodel:adjust_sensor",
+      "decorators": ""
+  },
+  {
+      "url": "/sensormodel/subjects/adjust/<int:id>",
+      "module": "sensormodel.views.adjust_subject",
+      "name": "sensormodel:adjust_subject",
+      "decorators": ""
+  },
+  {
+      "url": "/sensormodel/deployment/delete/<int:id>",
+      "module": "sensormodel.views.delete_deployment",
+      "name": "sensormodel:delete_deployment",
+      "decorators": ""
+  },
+  {
+      "url": "/sensormodel/sensor/delete/<int:id>",
+      "module": "sensormodel.views.delete_sensor",
+      "name": "sensormodel:delete_sensor",
+      "decorators": ""
+  },
+  {
+      "url": "/sensormodel/subjects/delete/<int:id>",
+      "module": "sensormodel.views.delete_subject",
+      "name": "sensormodel:delete_subject",
+      "decorators": ""
   }
 ]
