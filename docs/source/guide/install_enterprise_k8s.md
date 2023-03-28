@@ -65,6 +65,7 @@ app:
       memory: 6144Mi
       cpu: 4000m
 ```
+
 </div>
 
 <div class="enterprise-only">
@@ -100,6 +101,7 @@ rqworker:
       memory: 1024Mi
       cpu: 1000m
 ```
+
 </div>
 
 Before you make changes to these values, familiarize yourself with the [Resource Management for Pods and Containers](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) guidelines in the Kubernetes documentation. 
@@ -132,6 +134,7 @@ Add the Helm chart repository to your Kubernetes cluster to easily install and u
    ```
 
 <div class="enterprise-only">
+
 ### Configure Kubernetes secrets
 
 1. Ensure that you have license key and Docker Hub credentials or request them from Heartex Team.
@@ -151,6 +154,7 @@ Add the Helm chart repository to your Kubernetes cluster to easily install and u
    ```shell
    kubectl create secret generic lse-license --from-literal=license=https://lic.heartex.ai/db/<CUSTOMER_LICENSE_ID>
    ```
+   
 </div>
 
 <div class="enterprise-only">
