@@ -348,7 +348,7 @@ Set up CORS access to your bucket. See [Configuring cross-origin resource sharin
 echo '[
    {
       "origin": ["*"],
-      "method": ["GET","POST","PATCH","PUT","DELETE","OPTIONS"],
+      "method": ["GET","PUT","POST","DELETE","HEAD"],
       "responseHeader": ["Content-Type"],
       "maxAgeSeconds": 3600
    }
@@ -525,7 +525,7 @@ Set up CORS access to your bucket. See [Configuring cross-origin resource sharin
 <Cors>
     <CorsRule>
         <AllowedOrigins>*</AllowedOrigins>
-        <AllowedMethods>GET,POST,PATCH,PUT,DELETE,OPTIONS</AllowedMethods>
+        <AllowedMethods>GET,PUT,POST,DELETE,HEAD</AllowedMethods>
         <AllowedHeaders>x-ms-blob-content-type</AllowedHeaders>
         <ExposedHeaders>x-ms-*</ExposedHeaders>
         <MaxAgeInSeconds>3600</MaxAgeInSeconds>
