@@ -104,6 +104,14 @@ stages:
       method: GET
     response:
       status_code: 200
+  - name: make conversion
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}/convert"
+      method: POST
+      json:
+        export_type: "CSV"
+    response:
+      status_code: 200
   - name: download export CSV
     request:
       url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}/download"

@@ -184,6 +184,18 @@ class ConvertedFormat(models.Model):
         FAILED = 'failed', _('Failed')
         COMPLETED = 'completed', _('Completed')
 
+    project = models.ForeignKey(
+        'projects.Project',
+        null=True,
+        related_name='export_conversions',
+        on_delete=models.CASCADE,
+    )
+    organization = models.ForeignKey(
+        'organizations.Organization',
+        null=True,
+        on_delete=models.CASCADE,
+        related_name='export_conversions',
+    )
     export = models.ForeignKey(Export,
         related_name='converted_formats',
         on_delete=models.CASCADE,
@@ -202,4 +214,29 @@ class ConvertedFormat(models.Model):
         max_length=64,
         choices=Status.choices,
         default=Status.CREATED,
+    )
+    created_at = models.DateTimeField(
+        _('created at'),
+        null=True,
+        auto_now_add=True,
+        help_text='Creation time',
+    )
+    updated_at = models.DateTimeField(
+        _('updated at'),
+        null=True,
+        auto_now_add=True,
+        help_text='Updated time',
+    )
+    finished_at = models.DateTimeField(
+        _('finished at'),
+        help_text='Complete or fail time',
+        null=True,
+        default=None,
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='+',
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name=_('created by'),
     )

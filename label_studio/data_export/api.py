@@ -8,6 +8,7 @@ from datetime import datetime
 from django.db import transaction
 from django.http import HttpResponse
 from django.core.files import File
+from django.core.files.storage import FileSystemStorage
 from drf_yasg import openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
@@ -454,7 +455,11 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
                 if converted_file is None:
                     raise NotFound(f'{export_type} format is not converted yet')
                 file = converted_file.file
-            url = file.storage.url(file.name, storage_url=True, http_method=request.method)
+
+            if isinstance(file.storage, FileSystemStorage):
+                url = file.storage.url(file.name)
+            else:
+                url = file.storage.url(file.name, storage_url=True, http_method=request.method)
             protocol = urlparse(url).scheme
 
             # Let NGINX handle it
@@ -463,7 +468,6 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
             redirect = '/file_download/' + protocol + '/' + url.replace(protocol + '://', '')
 
             response['X-Accel-Redirect'] = redirect
-            print(f'############ filename: {file.name}')
             response['Content-Disposition'] = 'attachment; filename="{}"'.format(file.name)
             return response
         else:
@@ -483,7 +487,7 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
             return response
 
 
-def async_convert(converted_format_id, export_type):
+def async_convert(converted_format_id, export_type, **kwargs):
     with transaction.atomic():
         try:
             converted_format = ConvertedFormat.objects.get(id=converted_format_id)
