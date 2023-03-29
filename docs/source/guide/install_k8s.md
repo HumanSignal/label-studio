@@ -29,7 +29,7 @@ If you want to install Label Studio on Kubernetes and you have unrestricted acce
 1. Verify that you meet the [Required software prerequisites](#Required-software-prerequisites) and review the [capacity planning](#Capacity-planning) guidance.
 2. [Prepare the Kubernetes cluster](#Prepare-the-Kubernetes-cluster).
 3. [Add the Helm chart repository](#Add-the-Helm-chart-repository).
-5. (Opional) Set up [persistent storage](persistent_storage.html).
+5. (Optional) Set up [persistent storage](persistent_storage.html).
 6. (Optional) Configure [ingress](ingress_config.html).
 7. [Configure a values.yaml file](#Configure-values-yaml).
 8. (Optional) [Set up TLS for PostgreSQL](#Optional-set-up-TLS-for-PostgreSQL)
