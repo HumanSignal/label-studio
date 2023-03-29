@@ -1,4 +1,4 @@
-name: Sync PR
+name: 'Follow Merge: Upstream repo sync'
 
 on:
   repository_dispatch:
@@ -77,6 +77,10 @@ jobs:
         working-directory: tmp
 
       - name: Build module
+        working-directory: tmp
+        env:
+          CI: false # on true webpack breaks on warnings, and we have them a lot
+          NODE_ENV: 'production'
         run: |
           yarn run build:module
           if [[ "${{ github.event.client_payload.event_action }}" == 'merged' ]]; then 
@@ -93,10 +97,72 @@ jobs:
           }
           EOF
 
-        working-directory: tmp
-        env:
-          CI: false # on true webpack breaks on warnings, and we have them a lot
-          NODE_ENV: 'production'
+      - name: "LSF Docs: Cache node modules"
+        if: github.event.client_payload.repo_name == "heartexlabs/label-studio-frontend"
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: npm-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-jsdoc-to-markdown
+
+      - name: "LSF Docs: Install NPM deps"
+        if: github.event.client_payload.repo_name == "heartexlabs/label-studio-frontend"
+        working-directory: tmp/scripts
+        run: npm install jsdoc-to-markdown node-fetch
+
+      - name: "LSF Docs: Build"
+        if: github.event.client_payload.repo_name == "heartexlabs/label-studio-frontend"
+        working-directory: tmp/scripts
+        run: node create-docs.js
+
+      - name: Create branch
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          
+          branch_name='${{ steps.get-pr.outputs.branch-name }}'
+          
+          if grep -q '^${{ env.RELEASE_BRANCH_PREFIX }}.*$' <<< '${{ github.event.client_payload.base_branch_name }}'; then
+            git checkout '${{ github.event.client_payload.base_branch_name }}'
+          else
+            git checkout '${{ github.event.repository.default_branch }}'
+          fi
+
+          git checkout "${branch_name}" || true
+          git checkout -b "${branch_name}" || true
+
+      - name: Commit static
+        shell: bash
+        run: |
+          set -xeuo pipefail
+
+          if [[ "${{ github.event.client_payload.repo_name }}" == */dm2* ]]; then 
+            module_dist="${{ env.STATIC_DIST }}/dm"
+          elif [[ "${{ github.event.client_payload.repo_name }}" == */label-studio-frontend* ]]; then
+            module_dist="${{ env.STATIC_DIST }}/lsf"
+          else
+            echo "Repo ${{ github.event.client_payload.repo_name }} is not supported"
+            exit 1
+          fi
+          
+          rm -rf "${module_dist}"
+          mkdir -p "${module_dist}"
+          cp -r tmp/build/static/* "${module_dist}"
+
+          git add "${{ env.STATIC_DIST }}"
+          git status -s
+          git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}'
+          git push origin HEAD
+
+      - name: "LSF Docs: Commit"
+        if: github.event.client_payload.repo_name == "heartexlabs/label-studio-frontend"
+        continue-on-error: true
+        run: |
+          set -xeuo pipefail
+          cp -Rf tmp/docs/* docs/source/tags/
+          git status
+          git add docs/source/tags
+          git commit -m 'docs: LSF Update'
+          git push origin HEAD
 
       - name: Get PR
         uses: actions/github-script@v6
@@ -133,43 +199,6 @@ jobs:
               core.setOutput("branch-name", branchNameLowerCase);
               return listPullsResponseLowerCase
             }
-
-      - name: Create branch
-        shell: bash
-        run: |
-          set -xeuo pipefail
-          
-          branch_name='${{ steps.get-pr.outputs.branch-name }}'
-          
-          if grep -q '^${{ env.RELEASE_BRANCH_PREFIX }}.*$' <<< '${{ github.event.client_payload.base_branch_name }}'; then
-            git checkout '${{ github.event.client_payload.base_branch_name }}'
-          else
-            git checkout '${{ github.event.repository.default_branch }}'
-          fi
-
-          git checkout "${branch_name}" || true
-          git checkout -b "${branch_name}" || true
-
-          if [[ "${{ github.event.client_payload.repo_name }}" == */dm2* ]]; then 
-            module_dist="${{ env.STATIC_DIST }}/dm"
-          elif [[ "${{ github.event.client_payload.repo_name }}" == */label-studio-frontend* ]]; then
-            module_dist="${{ env.STATIC_DIST }}/lsf"
-          else
-            echo "Repo ${{ github.event.client_payload.repo_name }} is not supported"
-            exit 1
-          fi
-          
-          rm -rf "${module_dist}"
-          mkdir -p "${module_dist}"
-          cp -r tmp/build/static/* "${module_dist}"
-
-          ls tmp/build/static/
-          ls "${module_dist}"
-
-          git add "${{ env.STATIC_DIST }}"
-          git status -s
-          git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}'
-          git push origin HEAD
 
       - name: Create PR
         id: create-pr
