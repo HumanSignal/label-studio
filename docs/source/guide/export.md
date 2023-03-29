@@ -389,7 +389,9 @@ First check the network access to your Label Studio instance when you send API r
 
 2. Check `LOCAL_FILES_DOCUMENT_ROOT` environment variable in your Label Studio instance and add it to your accessing data script.
 
-3. Labels are sorted in alphabetical order, that is default behavior. If you want to modify that, please add `category` attribute to modify that behaviour. For example:
+
+#### Question #3: How to modify order of labels for COCO and YOLO exports? 
+1.  Labels are sorted in alphabetical order, that is default behavior. If you want to modify that, please add `category` attribute to modify that behaviour. For example: 
 ```xml
 <Label value="abc" category="1" />
 <Label value="def" category="2" />
