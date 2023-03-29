@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4708: Scroll page to canvas only if needed",
-  "commit": "5eb91e6df297be27393dc94fbd1923be52135022",
+  "message": "fix: LSDV-4692: Brush segmentation is not supported",
+  "commit": "f08871a3e70026b12cad502552251db1fba1619e",
   "branch": "master",
-  "date": "2023/03/28 16:02:23"
+  "date": "2023/03/29 14:40:33"
 }

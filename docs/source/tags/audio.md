@@ -15,16 +15,16 @@ Use with the following data types: audio
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | name | <code>string</code> |  | Name of the element |
-| value | <code>string</code> |  | Data field containing path or a URL to the audio |
-| [defaultspeed] | <code>string</code> | <code>1</code> | Default speed level (from 0.5 to 2) |
-| [defaultscale] | <code>string</code> | <code>1</code> | Audio pane default y-scale for waveform |
-| [defaultzoom] | <code>string</code> | <code>1</code> | Default zoom level for waveform (from 1 to 1500) |
-| [defaultvolume] | <code>string</code> | <code>1</code> | Default volume level (from 0 to 1) |
-| [hotkey] | <code>string</code> |  | Hotkey used to play or pause audio |
-| [sync] | <code>string</code> |  | object name to sync with |
-| [height] | <code>string</code> | <code>96</code> | Total height of the audio player |
-| [waveheight] | <code>string</code> | <code>32</code> | Minimum height of a waveform when in splitchannel mode with multiple channels |
-| [splitchannels] | <code>boolean</code> | <code>false</code> | Display multichannel separately (if supported by the file) |
+| value | <code>string</code> |  | Data field containing path or a URL to the audio. |
+| [defaultspeed] | <code>string</code> | <code>1</code> | Default speed level (from 0.5 to 2). |
+| [defaultscale] | <code>string</code> | <code>1</code> | Audio pane default y-scale for waveform. |
+| [defaultzoom] | <code>string</code> | <code>1</code> | Default zoom level for waveform (from 1 to 1500); |
+| [defaultvolume] | <code>string</code> | <code>1</code> | Default volume level (from 0 to 1). |
+| [hotkey] | <code>string</code> |  | Hotkey used to play or pause audio. |
+| [sync] | <code>string</code> |  | Object name to sync with. |
+| [height] | <code>string</code> | <code>96</code> | Total height of the audio player. |
+| [waveheight] | <code>string</code> | <code>32</code> | Minimum height of a waveform when in `splitchannels` mode with multiple channels to display. |
+| [splitchannels] | <code>boolean</code> | <code>false</code> | Display multiple audio channels separately, if the audio file has more than one channel. (**NOTE: Requires more memory to operate.**) |
 | [decoder] | <code>string</code> | <code>&quot;webaudio&quot;</code> | Decoder type to use to decode audio data. (`"webaudio"` or `"ffmpeg"`) |
 
 ### Sample Results JSON
