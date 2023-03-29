@@ -24,12 +24,13 @@ AHA_PRODUCT = os.getenv("AHA_PRODUCT", "LSDV").strip('\"')
 AHA_RN_FIELD = os.getenv("AHA_RN_FIELD", "release_notes").strip('\"')
 AHA_FETCH_STRATEGY = os.getenv("AHA_FETCH_STRATEGY", "PARKING_LOT").strip('\"')  # PARKING_LOT or TAG
 AHA_TAG = os.getenv("AHA_TAG", "").strip('\"')
+AHA_ADDITIONAL_RELEASES_TAG = os.getenv("AHA_ADDITIONAL_RELEASES_TAG", "").strip('\"')
 
-GH_REPO = os.getenv("GH_REPO", "heartexlabs/label-studio").strip('\"')
+GH_REPO = os.getenv("GH_REPO", "").strip('\"')
 GH_TOKEN = os.getenv("GH_TOKEN").strip('\"')  # https://github.com/settings/tokens/new
 
 LAUNCHDARKLY_SDK_KEY = os.getenv("LAUNCHDARKLY_SDK_KEY", '').strip('\"')
-LAUNCHDARKLY_ENVIRONMENT = os.getenv("LAUNCHDARKLY_ENVIRONMENT", 'community').strip('\"')
+LAUNCHDARKLY_ENVIRONMENT = os.getenv("LAUNCHDARKLY_ENVIRONMENT", '').strip('\"')
 
 OUTPUT_FILE_MD = os.getenv("OUTPUT_FILE_MD", 'output.md')
 OUTPUT_FILE_JSON = os.getenv("OUTPUT_FILE_JSON", 'output.json')
@@ -116,6 +117,15 @@ class AhaFeature:
             (f.get('value') for f in feature.get('custom_fields', []) if f.get('key') == AHA_RN_FIELD), None)
         self.desc = self.release_note if self.release_note else self.summary
         self.link = str(feature.get('url'))
+        self.releases_tags = next(
+            (f.get('value') for f in feature.get('custom_fields', []) if f.get('key') == 'releases'), [])
+
+    def set_releases_tags(self, tags: list[str]):
+        aha_client.query(
+            url=f'api/v1/features/{self.key}',
+            data={"feature": {"custom_fields": {"releases": tags}}},
+            method='PUT',
+        )
 
     def __str__(self):
         return f"<{self.link}|[{self.key}]>: {self.desc} -- *{self.status}*"
@@ -146,6 +156,15 @@ class AhaRequirement(AhaFeature):
             (f.get('value') for f in feature.get('custom_fields', []) if f.get('key') == AHA_RN_FIELD), None)
         self.desc = self.release_note if self.release_note else self.summary
         self.link = str(feature.get('url'))
+        self.releases_tags = next(
+            (f.get('value') for f in feature.get('custom_fields', []) if f.get('key') == 'releases'), [])
+
+    def set_releases_tags(self, tags: list[str]):
+        aha_client.query(
+            url=f'api/v1/requirements/{self.key}',
+            data={"feature": {"custom_fields": {"releases": tags}}},
+            method='PUT',
+        )
 
 
 class JiraIssue(AhaFeature):
@@ -160,12 +179,16 @@ class JiraIssue(AhaFeature):
         self.release_note = issue.get_field(JIRA_RN_FIELD)
         self.desc = self.release_note if self.release_note else self.summary
         self.link = f"{JIRA_SERVER}/browse/{self.key}"
+        self.releases_tags = []
+
+    def set_releases_tags(self, tags: list[str]):
+        pass
 
 
 TASK_CACHE = {}
 
 
-def get_task(task_number: str, pr: int = None) -> AhaFeature or JiraIssue:
+def get_task(task_number: str, pr: int = None) -> AhaFeature or None:
     if task_number in TASK_CACHE.keys():
         return TASK_CACHE.get(task_number)
     try:
@@ -248,6 +271,8 @@ def get_github_release_tasks(commits) -> list[AhaFeature]:
                     print(f'Could no parse pr from "{message_first_line}": {str(e)}')
                 if task := get_task(task_key, pr):
                     tasks.add(task)
+                    if AHA_ADDITIONAL_RELEASES_TAG:
+                        task.set_releases_tags(list(set(task.releases_tags + [AHA_ADDITIONAL_RELEASES_TAG])))
     return list(tasks)
 
 
@@ -346,6 +371,11 @@ def render_output_md(
         comment.append(f'[Aha! Release {RELEASE_VERSION}]({aha_release.get("url", "")})')
     else:
         comment.append(f'Aha! Release not found')
+
+    if len(missing_in_tracker) == 0:
+        comment.append('Release Notes are generated based on git log: No tasks found in Task Tracker.')
+    else:
+        comment.append('Release Notes are generated based on Task Tracker.')
 
     if missing_in_gh:
         comment.extend(
