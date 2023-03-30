@@ -2,6 +2,7 @@
 """
 import os
 import logging
+from core.feature_flags import flag_set
 import pathlib
 
 from django.conf import settings
@@ -369,6 +370,22 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
     serializer_class = ExportSerializer
     lookup_url_kwarg = 'export_pk'
     permission_required = all_permissions.projects_change
+
+    def delete(self, *args, **kwargs):
+        if flag_set('ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short'):
+            try:
+                export = self.get_object()
+                export.file.delete()
+            except Exception:
+                return Response(
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    data={
+                        'detail':
+                            'Could not delete file from storage. Check that your user has permissions to delete files'
+                    }
+                )
+
+        return super().delete(*args, **kwargs)
 
     def _get_project(self):
         project_pk = self.kwargs.get('pk')

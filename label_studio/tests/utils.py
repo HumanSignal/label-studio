@@ -9,6 +9,7 @@ import pytest
 import requests_mock
 import requests
 import tempfile
+import os.path
 
 from contextlib import contextmanager
 from unittest import mock
@@ -23,6 +24,8 @@ from ml.models import MLBackend
 from tasks.serializers import TaskWithAnnotationsSerializer
 from organizations.models import Organization
 from users.models import User
+from data_export.models import Export
+
 
 try:
     from businesses.models import Business, BillingPlan
@@ -317,3 +320,12 @@ def verify_docs(response):
 
 def empty_list(response):
     assert len(response.json()) == 0, f'Response should be empty, but is {response.json()}'
+
+
+def file_exists_in_storage(response):
+    export_id = response.json.id
+    export = Export.objects.get(id=export_id)
+
+    file_path = export.export.file.path
+
+    assert os.path.isfile(file_path) == True
