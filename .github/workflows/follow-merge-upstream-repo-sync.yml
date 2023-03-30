@@ -98,19 +98,19 @@ jobs:
           EOF
 
       - name: "LSF Docs: Cache node modules"
-        if: github.event.client_payload.repo_name == "heartexlabs/label-studio-frontend"
+        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
         uses: actions/cache@v3
         with:
           path: ~/.npm
           key: npm-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-jsdoc-to-markdown
 
       - name: "LSF Docs: Install NPM deps"
-        if: github.event.client_payload.repo_name == "heartexlabs/label-studio-frontend"
+        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
         working-directory: tmp/scripts
         run: npm install jsdoc-to-markdown node-fetch
 
       - name: "LSF Docs: Build"
-        if: github.event.client_payload.repo_name == "heartexlabs/label-studio-frontend"
+        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
         working-directory: tmp/scripts
         run: node create-docs.js
 
@@ -154,7 +154,7 @@ jobs:
           git push origin HEAD
 
       - name: "LSF Docs: Commit"
-        if: github.event.client_payload.repo_name == "heartexlabs/label-studio-frontend"
+        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
         continue-on-error: true
         run: |
           set -xeuo pipefail
