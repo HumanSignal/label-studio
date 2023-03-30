@@ -448,7 +448,7 @@ def main():
             print(f"Aha! Release not found")
     else:
         if AHA_TAG:
-            aha_release = {'url': f'{AHA_SERVER}/api/v1/features?tag={AHA_TAG.replace(" ", "%20")}'}
+            aha_release = {'url': f'{AHA_SERVER}/api/v1/features?releases={AHA_TAG.replace(" ", "%20")}'}
             aha_release_features = get_aha_release_features_by_tag(AHA_TAG)
         else:
             print("AHA TAG is not specified")
