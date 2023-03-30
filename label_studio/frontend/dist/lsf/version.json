@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4692: Brush segmentation is not supported",
-  "commit": "f08871a3e70026b12cad502552251db1fba1619e",
+  "message": "docs: LSDV-4874: Update audio documentation to outline splitchannels usage (#1277)",
+  "commit": "cdc27bdce902d8e65177d79ba2afd506201b071d",
   "branch": "master",
-  "date": "2023/03/29 14:40:33"
+  "date": "2023/03/30 06:49:50"
 }
