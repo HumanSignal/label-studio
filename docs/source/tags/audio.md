@@ -18,7 +18,7 @@ Use with the following data types: audio
 | value | <code>string</code> |  | Data field containing path or a URL to the audio. |
 | [defaultspeed] | <code>string</code> | <code>1</code> | Default speed level (from 0.5 to 2). |
 | [defaultscale] | <code>string</code> | <code>1</code> | Audio pane default y-scale for waveform. |
-| [defaultzoom] | <code>string</code> | <code>1</code> | Default zoom level for waveform (from 1 to 1500); |
+| [defaultzoom] | <code>string</code> | <code>1</code> | Default zoom level for waveform. (from 1 to 1500). |
 | [defaultvolume] | <code>string</code> | <code>1</code> | Default volume level (from 0 to 1). |
 | [hotkey] | <code>string</code> |  | Hotkey used to play or pause audio. |
 | [sync] | <code>string</code> |  | Object name to sync with. |
