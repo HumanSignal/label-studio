@@ -24,7 +24,6 @@ AHA_PRODUCT = os.getenv("AHA_PRODUCT", "LSDV").strip('\"')
 AHA_RN_FIELD = os.getenv("AHA_RN_FIELD", "release_notes").strip('\"')
 AHA_FETCH_STRATEGY = os.getenv("AHA_FETCH_STRATEGY", "PARKING_LOT").strip('\"')  # PARKING_LOT or TAG
 AHA_TAG = os.getenv("AHA_TAG", "").strip('\"')
-AHA_TAG_FIELD = os.getenv("AHA_TAG_FIELD", "releases").strip('\"')
 AHA_ADDITIONAL_RELEASES_TAG = os.getenv("AHA_ADDITIONAL_RELEASES_TAG", "").strip('\"')
 
 GH_REPO = os.getenv("GH_REPO", "").strip('\"')
@@ -229,7 +228,7 @@ def get_aha_release_features(release_num: str) -> list[AhaFeature]:
 
 
 def get_aha_release_features_by_tag(tag: str) -> list[AhaFeature]:
-    features = aha_client.paginate(f'api/v1/features', 'features', data={AHA_TAG_FIELD: tag})
+    features = aha_client.paginate(f'api/v1/features', 'features', data={"tag": tag})
     tasks = set()
     for feature in features:
         if task := get_task(feature.get('reference_num')):
@@ -449,7 +448,7 @@ def main():
             print(f"Aha! Release not found")
     else:
         if AHA_TAG:
-            aha_release = {'url': f'{AHA_SERVER}/api/v1/features?{AHA_TAG_FIELD}={AHA_TAG.replace(" ", "%20")}'}
+            aha_release = {'url': f'{AHA_SERVER}/api/v1/features?tag={AHA_TAG.replace(" ", "%20")}'}
             aha_release_features = get_aha_release_features_by_tag(AHA_TAG)
         else:
             print("AHA TAG is not specified")
