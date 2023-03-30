@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4801: Better file type playable detection for video",
-  "commit": "b00b0a31217882b61438fc7c5f43ab852fdd9b84",
+  "message": "fix: LSDV-4692: Brush segmentation is not supported",
+  "commit": "f08871a3e70026b12cad502552251db1fba1619e",
   "branch": "master",
-  "date": "2023/03/22 12:59:27"
+  "date": "2023/03/29 14:40:33"
 }

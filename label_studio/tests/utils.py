@@ -84,6 +84,7 @@ def gcs_client_mock():
         def __init__(self, bucket_name, key, is_json):
             self.key = key
             self.bucket_name = bucket_name
+            self.name = f"{bucket_name}/{key}"
             self.is_json = is_json
         def download_as_string(self):
             data = f'test_blob_{self.key}'
@@ -115,7 +116,10 @@ def gcs_client_mock():
             return DummyGCSBucket(bucket_name, is_json)
 
         def list_blobs(self, bucket_name, prefix):
-            return [File('abc'), File('def'), File('ghi')]
+            is_json = bucket_name.endswith('_JSON')
+            return [DummyGCSBlob(bucket_name, 'abc', is_json),
+                    DummyGCSBlob(bucket_name, 'def', is_json),
+                    DummyGCSBlob(bucket_name, 'ghi', is_json)]
 
     with mock.patch.object(google_storage, 'Client', return_value=DummyGCSClient()):
         yield
