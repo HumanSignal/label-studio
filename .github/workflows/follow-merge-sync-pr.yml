@@ -1,4 +1,4 @@
-name: Sync PR
+name: 'Follow Merge: Sync PR'
 
 on:
   pull_request_target:

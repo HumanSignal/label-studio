@@ -2,7 +2,7 @@ name: Algolia Indexer
 
 on:
   push:
-    branches: [ 'ht/add-new-theme' ]
+    branches: [ 'develop' ]
     paths:
       - 'docs/**'
       - '.github/workflows/algolia-crawler.yml'
