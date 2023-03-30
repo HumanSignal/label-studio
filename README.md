@@ -80,7 +80,7 @@ label-studio
 ### Install locally with Anaconda
 
 ```bash
-conda create --name label-studio
+conda create --name label-studio python=3.7
 conda activate label-studio
 pip install label-studio
 ```
