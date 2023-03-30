@@ -114,56 +114,6 @@ jobs:
         working-directory: tmp/scripts
         run: node create-docs.js
 
-      - name: Create branch
-        shell: bash
-        run: |
-          set -xeuo pipefail
-          
-          branch_name='${{ steps.get-pr.outputs.branch-name }}'
-          
-          if grep -q '^${{ env.RELEASE_BRANCH_PREFIX }}.*$' <<< '${{ github.event.client_payload.base_branch_name }}'; then
-            git checkout '${{ github.event.client_payload.base_branch_name }}'
-          else
-            git checkout '${{ github.event.repository.default_branch }}'
-          fi
-
-          git checkout "${branch_name}" || true
-          git checkout -b "${branch_name}" || true
-
-      - name: Commit static
-        shell: bash
-        run: |
-          set -xeuo pipefail
-
-          if [[ "${{ github.event.client_payload.repo_name }}" == */dm2* ]]; then 
-            module_dist="${{ env.STATIC_DIST }}/dm"
-          elif [[ "${{ github.event.client_payload.repo_name }}" == */label-studio-frontend* ]]; then
-            module_dist="${{ env.STATIC_DIST }}/lsf"
-          else
-            echo "Repo ${{ github.event.client_payload.repo_name }} is not supported"
-            exit 1
-          fi
-          
-          rm -rf "${module_dist}"
-          mkdir -p "${module_dist}"
-          cp -r tmp/build/static/* "${module_dist}"
-
-          git add "${{ env.STATIC_DIST }}"
-          git status -s
-          git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}'
-          git push origin HEAD
-
-      - name: "LSF Docs: Commit"
-        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
-        continue-on-error: true
-        run: |
-          set -xeuo pipefail
-          cp -Rf tmp/docs/* docs/source/tags/
-          git status
-          git add docs/source/tags
-          git commit -m 'docs: LSF Update'
-          git push origin HEAD
-
       - name: Get PR
         uses: actions/github-script@v6
         id: get-pr
@@ -211,12 +161,13 @@ jobs:
           script: |
             const { repo, owner } = context.repo;
             const branchName = '${{ steps.get-pr.outputs.branch-name }}';
+            core.setOutput("branch-name", branchName);
             const listPullsResponse = ${{ steps.get-pr.outputs.result }}
             if (listPullsResponse.length) {
               core.info(`PR already exist ${ listPullsResponse[0].html_url }`)
               if ( listPullsResponse[0].body.includes('${{ github.event.client_payload.html_url }}') ) {
                 core.info(`${{ github.event.client_payload.html_url }} already referenced in PR description`)
-                return listPullsResponse
+                return listPullsResponse[0]
               } else {
                 core.info(`Adding new ref on ${{ github.event.client_payload.html_url }} to PR`)
                 const newBody = listPullsResponse[0].body + `\n- ${{ github.event.client_payload.html_url }}`
@@ -227,7 +178,7 @@ jobs:
                   pull_number: listPullsResponse[0].number,
                   body: newBody
                 });
-                return updatePullResponse
+                return updatePullResponse.data
               }
             } else {
               let base = '${{ github.event.repository.default_branch }}'
@@ -248,8 +199,58 @@ jobs:
                   '- ${{ github.event.client_payload.html_url }}',
                 ].join('\n')
               });
-              return createPullResponse
+              return createPullResponse.data
             }
+
+      - name: Create branch
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          
+          branch_name='${{ steps.create-pr.outputs.branch-name }}'
+          
+          if grep -q '^${{ env.RELEASE_BRANCH_PREFIX }}.*$' <<< '${{ github.event.client_payload.base_branch_name }}'; then
+            git checkout '${{ github.event.client_payload.base_branch_name }}'
+          else
+            git checkout '${{ github.event.repository.default_branch }}'
+          fi
+
+          git checkout "${branch_name}" || true
+          git checkout -b "${branch_name}" || true
+
+      - name: Commit static
+        shell: bash
+        run: |
+          set -xeuo pipefail
+
+          if [[ "${{ github.event.client_payload.repo_name }}" == */dm2* ]]; then 
+            module_dist="${{ env.STATIC_DIST }}/dm"
+          elif [[ "${{ github.event.client_payload.repo_name }}" == */label-studio-frontend* ]]; then
+            module_dist="${{ env.STATIC_DIST }}/lsf"
+          else
+            echo "Repo ${{ github.event.client_payload.repo_name }} is not supported"
+            exit 1
+          fi
+          
+          rm -rf "${module_dist}"
+          mkdir -p "${module_dist}"
+          cp -r tmp/build/static/* "${module_dist}"
+
+          git add "${{ env.STATIC_DIST }}"
+          git status -s
+          git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}'
+          git push origin HEAD
+
+      - name: "LSF Docs: Commit"
+        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+        continue-on-error: true
+        run: |
+          set -xeuo pipefail
+          cp -Rf tmp/docs/* docs/source/tags/
+          git status
+          git add docs/source/tags
+          git commit -m 'docs: LSF Update'
+          git push origin HEAD
 
       - name: Check all submodules
         id: check-all-submodules
@@ -279,7 +280,7 @@ jobs:
                 },
                 (response) => response.data
               );
-              
+            
               const listOpenPulls = listAllOpenPulls.filter(e => e.head.ref.toLowerCase() === branchNameLowerCase)
 
               for (let pr of listOpenPulls) {
@@ -321,11 +322,11 @@ jobs:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
             const { repo, owner } = context.repo;
-            const listPullsResponse = ${{ steps.get-pr.outputs.result }}
+            const pr = ${{ steps.create-pr.outputs.result }}
             github.rest.issues.createComment({
               owner,
               repo,
-              issue_number: listPullsResponse[0].number,
+              issue_number: pr.number,
               body: `${{ steps.check-all-submodules.outputs.result }}`,
             });
 
@@ -339,7 +340,7 @@ jobs:
           GIT_PAT: ${{ secrets.GIT_PAT }}
         run: |
           echo "$GIT_PAT" | gh auth login --with-token
-          gh api graphql -F id='${{ fromJson(steps.get-pr.outputs.result)[0].node_id }}' -f query='
+          gh api graphql -F id='${{ fromJson(steps.create-pr.outputs.result).node_id }}' -f query='
             mutation($id: ID!) {
               markPullRequestReadyForReview(input: { pullRequestId: $id }) {
                 pullRequest {
@@ -359,7 +360,7 @@ jobs:
           GIT_PAT: ${{ secrets.GIT_PAT }}
         run: |
           echo "$GIT_PAT" | gh auth login --with-token
-          gh api graphql -f pull='${{ fromJson(steps.get-pr.outputs.result)[0].node_id }}' -f query='
+          gh api graphql -f pull='${{ fromJson(steps.create-pr.outputs.result).node_id }}' -f query='
             mutation($pull: ID!) {
               enablePullRequestAutoMerge(input: {pullRequestId: $pull, mergeMethod: SQUASH}) {
                 pullRequest {
@@ -379,7 +380,7 @@ jobs:
           else
             target_branch='origin/${{ github.event.repository.default_branch }}'
           fi
-          branch='${{ steps.get-pr.outputs.branch-name }}'
+          branch='${{ steps.create-pr.outputs.branch-name }}'
           
           lsf_path='label_studio/frontend/dist/lsf/'
           dm_path='label_studio/frontend/dist/dm/'
