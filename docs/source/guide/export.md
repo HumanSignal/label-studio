@@ -388,3 +388,13 @@ First check the network access to your Label Studio instance when you send API r
 1. Check that you have mounted the same disk as your Label Studio instance. Then check your files' existence in Label Studio instance first. 
 
 2. Check `LOCAL_FILES_DOCUMENT_ROOT` environment variable in your Label Studio instance and add it to your accessing data script.
+
+
+#### Question #3: How to modify order of categories for COCO and YOLO exports? 
+
+Labels are sorted in alphabetical order, that is default behavior. If you want to modify that, please add **category** attribute in `<Label>` to modify that behaviour. For example: 
+    
+```xml
+<Label value="abc" category="1" />
+<Label value="def" category="2" />
+```

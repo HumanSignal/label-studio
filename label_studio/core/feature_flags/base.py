@@ -14,6 +14,14 @@ from label_studio.core.current_request import get_current_request
 logger = logging.getLogger(__name__)
 
 
+def get_feature_file_path():
+    package_name = 'label_studio' if settings.VERSION_EDITION == 'Community' else 'label_studio_enterprise'
+    if settings.FEATURE_FLAGS_FILE.startswith('/'):
+        return settings.FEATURE_FLAGS_FILE
+    else:
+        return find_node(package_name, settings.FEATURE_FLAGS_FILE, 'file')
+
+
 if settings.FEATURE_FLAGS_FROM_FILE:
     # Feature flags from file
     if not settings.FEATURE_FLAGS_FILE:
@@ -22,11 +30,7 @@ if settings.FEATURE_FLAGS_FROM_FILE:
             'FEATURE_FLAGS_FILE=my_flags.yml'
         )
 
-    package_name = 'label_studio' if settings.VERSION_EDITION == 'Community' else 'label_studio_enterprise'
-    if settings.FEATURE_FLAGS_FILE.startswith('/'):
-        feature_flags_file = settings.FEATURE_FLAGS_FILE
-    else:
-        feature_flags_file = find_node(package_name, settings.FEATURE_FLAGS_FILE, 'file')
+    feature_flags_file = get_feature_file_path()
 
     logger.info(f'Read flags from file {feature_flags_file}')
     data_source = Files.new_data_source(paths=[feature_flags_file])
