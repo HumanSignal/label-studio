@@ -6,23 +6,22 @@ on:
       - upstream_repo_update
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.client_payload.branch_name || 'schedule' }}
+  group: ${{ github.workflow }}-${{ github.event.client_payload.branch_name }}
 
 env:
   NODE: 14
   CACHE_NAME_PREFIX: v1
   STATIC_DIST: 'label_studio/frontend/dist'
   RELEASE_BRANCH_PREFIX: "ls-release/"
+  DOCS_TARGET_DIR: "docs/source/tags/"
 
 jobs:
   open:
     name: Sync PR
     if: |
-      github.event_name != 'schedule' && (
       github.event.client_payload.event_action == 'opened' ||
       github.event.client_payload.event_action == 'synchronize' ||
       github.event.client_payload.event_action == 'merged'
-      )
     runs-on: ubuntu-latest
     steps:
       - uses: hmarr/debug-action@v2.1.0
@@ -63,7 +62,7 @@ jobs:
             const {data: default_commit} = await github.rest.repos.getCommit({
               owner,
               repo,
-              ref: baseName
+              ref: base_name
             });
             
             let branch = branches.find(e => e.name === branch_name || e.name === branch_name.toLowerCase())
@@ -83,76 +82,6 @@ jobs:
               core.setOutput('name', branch.name);
             }
 
-      - name: Find or Create PR
-        id: get-pr
-        uses: actions/github-script@v6
-        env:
-          TITLE: "${{ github.event.client_payload.title }}"
-          HTML_URL: "${{ github.event.client_payload.html_url }}"
-          ACTOR: "${{ github.event.client_payload.actor }}"
-          BRANCH_NAME: "${{ steps.get-branch.outputs.name }}"
-          BASE_BRANCH_NAME: "${{ steps.get-branch.outputs.base_name }}"
-        with:
-          github-token: ${{ secrets.GIT_PAT }}
-          script: |
-            const { repo, owner } = context.repo;
-            
-            const title = process.env.TITLE;
-            const html_url = process.env.HTML_URL;
-            const actor = process.env.ACTOR;
-            const branch_name = process.env.BRANCH_NAME;
-            const base_branch_name = process.env.BASE_BRANCH_NAME;
-            
-            const {data: listPulls} = await github.rest.pulls.list({
-              owner,
-              repo,
-              head: `${owner}:${branch_name}`,
-              base: base_branch_name,
-              per_page: 1
-            });
-            
-            let pull;
-            
-            if (listPulls.length !== 0) {
-              console.log(`Found PR for branch '${branch_name}'`)
-              pull = listPulls[0];
-            } else {
-              console.log(`PR for branch '${branch_name}' is not created yet`)
-              pull = (await github.rest.pulls.create({
-                owner,
-                repo,
-                title: title,
-                head: branch_name,
-                base: base_branch_name,
-                draft: true,
-                body: [
-                  `Hi @${actor}!`,
-                  '',
-                  'This PR was created in response to a PRs in upstream repo:',
-                  `- ${html_url}`,
-                ].join('\n')
-              })).data;
-            }
-            
-            if (pull.body.includes(html_url)) {
-              console.log(`${html_url} already referenced in PR description`)
-            } else {
-              console.log(`Adding a new reference to ${html_url} to PR`)
-              const new_body = pull.body + `\n- ${html_url}`
-              pull = (await github.rest.pulls.update({
-                title: process.env.TITLE,
-                owner,
-                repo,
-                pull_number: pull.number,
-                body: new_body
-              })).data;
-            }
-            
-            core.setOutput('pull', pull);
-            core.setOutput('number', pull.number);
-            core.setOutput('node_id', pull.node_id);
-
-
       - name: Configure git
         shell: bash
         run: |
@@ -165,7 +94,7 @@ jobs:
         with:
           token: ${{ secrets.GIT_PAT }}
           fetch-depth: 1
-          ref: ${{ steps.get-branch.outputs.baseName }}
+          ref: ${{ steps.get-branch.outputs.name }}
 
       - name: Checkout module
         uses: actions/checkout@v3
@@ -268,9 +197,11 @@ jobs:
         continue-on-error: true
         run: |
           set -xeuo pipefail
-          cp -Rf tmp/docs/* docs/source/tags/
+          docs_target_dir='${{ env.DOCS_TARGET_DIR }}'
+          mkdir -p "${docs_target_dir}"
+          cp -Rf tmp/docs/* "${docs_target_dir}"
           git status
-          git add docs/source/tags
+          git add "${docs_target_dir}"
           git commit -m 'docs: LSF Update'
           git push origin HEAD
 
@@ -308,6 +239,74 @@ jobs:
             echo "Skipping push"
             exit 0
           fi
+
+      - name: Find or Create PR
+        id: get-pr
+        uses: actions/github-script@v6
+        env:
+          TITLE: "${{ github.event.client_payload.title }}"
+          HTML_URL: "${{ github.event.client_payload.html_url }}"
+          ACTOR: "${{ github.event.client_payload.actor }}"
+          BRANCH_NAME: "${{ steps.get-branch.outputs.name }}"
+          BASE_BRANCH_NAME: "${{ steps.get-branch.outputs.base_name }}"
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            
+            const title = process.env.TITLE;
+            const html_url = process.env.HTML_URL;
+            const actor = process.env.ACTOR;
+            const branch_name = process.env.BRANCH_NAME;
+            const base_branch_name = process.env.BASE_BRANCH_NAME;
+            
+            const {data: listPulls} = await github.rest.pulls.list({
+              owner,
+              repo,
+              head: `${owner}:${branch_name}`,
+              base: base_branch_name,
+              per_page: 1
+            });
+            
+            let pull;
+            
+            if (listPulls.length !== 0) {
+              console.log(`Found PR for branch '${branch_name}'`)
+              pull = listPulls[0];
+            } else {
+              console.log(`PR for branch '${branch_name}' is not created yet`)
+              pull = (await github.rest.pulls.create({
+                owner,
+                repo,
+                title: title,
+                head: branch_name,
+                base: base_branch_name,
+                body: [
+                  `Hi @${actor}!`,
+                  '',
+                  'This PR was created in response to a PRs in upstream repo:',
+                  `- ${html_url}`,
+                ].join('\n')
+              })).data;
+            }
+            
+            if (pull.body.includes(html_url)) {
+              console.log(`${html_url} already referenced in PR description`)
+            } else {
+              console.log(`Adding a new reference to ${html_url} to PR`)
+              const new_body = pull.body + `\n- ${html_url}`
+              pull = (await github.rest.pulls.update({
+                title: process.env.TITLE,
+                owner,
+                repo,
+                pull_number: pull.number,
+                body: new_body
+              })).data;
+            }
+            
+            core.setOutput('pull', pull);
+            core.setOutput('number', pull.number);
+            core.setOutput('node_id', pull.node_id);
 
       - name: Check all submodules
         id: check-all-submodules
@@ -431,11 +430,9 @@ jobs:
   others:
     name: Other actions with PR
     if: |
-      github.event_name != 'schedule' && (
       github.event.client_payload.event_action == 'converted_to_draft' ||
       github.event.client_payload.event_action == 'ready_for_review' ||
       github.event.client_payload.event_action == 'closed'
-      )
     runs-on: ubuntu-latest
     steps:
       - uses: hmarr/debug-action@v2.1.0
