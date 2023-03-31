@@ -49,6 +49,41 @@ When you start Label Studio using Docker Compose, you start it using a PostgreSQ
 docker-compose up -d
 ```
 
+## Minio Blob Storage
+Minio is a blob storage that is compatible with Amazon S3. You can use Minio to store your labeling tasks.
+
+### starting the containers
+For local development you can host a local minio server to emulate a S3 based production environment more closely.
+an example docker-compose file for this is available in the [label-studio repository](/docker-compose.minio.yml).
+
+To run minion with your lable studio instance you can use the following command:
+````bash
+# add sudo on linux if you are not a member of the docker group
+docker compose -f docker-compose.yml -f docker-compose.minio.yml up -d
+````
+The minio server will be available at http://localhost:9000.
+to configure minio settings you can create a .env file. Please remember to override the default credentials.
+
+````.dotenv
+MINIO_ROOT_USER=minio_admin_do_not_use_in_production
+MINIO_ROOT_PASSWORD=minio_admin_do_not_use_in_production
+````
+
+### connecting LS to local minio
+
+If you do not have a static ip address you should create an entry in your hosts file, so that both the label studio 
+container and your browser can find minio at the same hostname.
+
+The following entry redirects all requests to minio to your local system:
+``127.0.0.1 minio``
+
+On Widows you can find your host file at `C:\Windows\System32\drivers\etc\hosts`
+On Linux you can find your host file at `/etc/hosts`
+On mac you can find your host file at `/private/etc/hosts`
+
+After altering your host file you can connect to your minio server with your browser at http://minio:9000.
+
+
 ## Data persistence
 
 If you're using a Docker container, Heroku, or another cloud provider, you might want your data to persist after shutting down Label Studio. You can [export your data](export.html) to persist your labeling task data and annotations, but to preserve the state of Label Studio and assets such as files that you uploaded for labeling, set up data persistence. 

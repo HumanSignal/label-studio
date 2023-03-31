@@ -67,6 +67,18 @@ To start using the app from `http://localhost` run this command:
 docker-compose up
 ```
 
+You can also run it with an additional minio server for local s3 storage. This is particularily usefull when you want to 
+test the behaviour with S3 storage on your local system. 
+To start LS in this way you have to run the following command.
+````bash
+# add sudo on linux if you are not a member of the docker group
+docker compose -f docker-compose.yml -f docker-compose.minio.yml up -d
+````
+if you do not have a static ip address you must create an entry in your hosts file, so that both the label studio and 
+your browser can reach the minio server [for more detailed instructions see](docs/source/guide/storedata.md).
+
+
+
 ### Install locally with pip
 
 ```bash
