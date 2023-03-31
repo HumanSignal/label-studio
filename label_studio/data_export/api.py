@@ -487,7 +487,7 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
             return response
 
 
-def async_convert(converted_format_id, export_type, **kwargs):
+def async_convert(converted_format_id, export_type, project, **kwargs):
     with transaction.atomic():
         try:
             converted_format = ConvertedFormat.objects.get(id=converted_format_id)
@@ -501,7 +501,6 @@ def async_convert(converted_format_id, export_type, **kwargs):
         converted_format.save(update_fields=['status'])
 
     snapshot = converted_format.export
-    project = snapshot.project
     converted_file = snapshot.convert_file(export_type)
     md5 = Export.eval_md5(converted_file)
 
@@ -523,6 +522,29 @@ def set_convert_background_failure(job, connection, type, value, traceback):
     ConvertedFormat.objects.filter(id=convert_id).update(status=Export.Status.FAILED)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
+@method_decorator(
+    name='post',
+    decorator=swagger_auto_schema(
+        tags=['Export'],
+        operation_summary='Export conversion',
+        operation_description="""
+        Convert export snapshot to selected format
+        """,
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project.'),
+            openapi.Parameter(
+                name='export_pk',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_PATH,
+                description='Primary key identifying the export file.'),
+        ]
+    ),
+)
 class ExportConvertAPI(generics.RetrieveAPIView):
     queryset = Export.objects.all()
     lookup_url_kwarg = 'export_pk'
@@ -545,6 +567,7 @@ class ExportConvertAPI(generics.RetrieveAPIView):
             async_convert,
             converted_format.id,
             export_type,
+            snapshot.project,
             on_failure=set_convert_background_failure
         )
         return Response({'export_type': export_type, 'converted_format': converted_format.id})
