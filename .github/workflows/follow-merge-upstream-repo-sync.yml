@@ -150,6 +150,56 @@ jobs:
               return listPullsResponseLowerCase
             }
 
+      - name: Create branch
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          
+          branch_name='${{ steps.get-pr.outputs.branch-name }}'
+          
+          if grep -q '^${{ env.RELEASE_BRANCH_PREFIX }}.*$' <<< '${{ github.event.client_payload.base_branch_name }}'; then
+            git checkout '${{ github.event.client_payload.base_branch_name }}'
+          else
+            git checkout '${{ github.event.repository.default_branch }}'
+          fi
+
+          git checkout "${branch_name}" || true
+          git checkout -b "${branch_name}" || true
+
+      - name: Commit static
+        shell: bash
+        run: |
+          set -xeuo pipefail
+
+          if [[ "${{ github.event.client_payload.repo_name }}" == */dm2* ]]; then 
+            module_dist="${{ env.STATIC_DIST }}/dm"
+          elif [[ "${{ github.event.client_payload.repo_name }}" == */label-studio-frontend* ]]; then
+            module_dist="${{ env.STATIC_DIST }}/lsf"
+          else
+            echo "Repo ${{ github.event.client_payload.repo_name }} is not supported"
+            exit 1
+          fi
+          
+          rm -rf "${module_dist}"
+          mkdir -p "${module_dist}"
+          cp -r tmp/build/static/* "${module_dist}"
+
+          git add "${{ env.STATIC_DIST }}"
+          git status -s
+          git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}'
+          git push origin HEAD
+
+      - name: "LSF Docs: Commit"
+        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+        continue-on-error: true
+        run: |
+          set -xeuo pipefail
+          cp -Rf tmp/docs/* docs/source/tags/
+          git status
+          git add docs/source/tags
+          git commit -m 'docs: LSF Update'
+          git push origin HEAD
+
       - name: Create PR
         id: create-pr
         uses: actions/github-script@v6
@@ -201,56 +251,6 @@ jobs:
               });
               return createPullResponse.data
             }
-
-      - name: Create branch
-        shell: bash
-        run: |
-          set -xeuo pipefail
-          
-          branch_name='${{ steps.create-pr.outputs.branch-name }}'
-          
-          if grep -q '^${{ env.RELEASE_BRANCH_PREFIX }}.*$' <<< '${{ github.event.client_payload.base_branch_name }}'; then
-            git checkout '${{ github.event.client_payload.base_branch_name }}'
-          else
-            git checkout '${{ github.event.repository.default_branch }}'
-          fi
-
-          git checkout "${branch_name}" || true
-          git checkout -b "${branch_name}" || true
-
-      - name: Commit static
-        shell: bash
-        run: |
-          set -xeuo pipefail
-
-          if [[ "${{ github.event.client_payload.repo_name }}" == */dm2* ]]; then 
-            module_dist="${{ env.STATIC_DIST }}/dm"
-          elif [[ "${{ github.event.client_payload.repo_name }}" == */label-studio-frontend* ]]; then
-            module_dist="${{ env.STATIC_DIST }}/lsf"
-          else
-            echo "Repo ${{ github.event.client_payload.repo_name }} is not supported"
-            exit 1
-          fi
-          
-          rm -rf "${module_dist}"
-          mkdir -p "${module_dist}"
-          cp -r tmp/build/static/* "${module_dist}"
-
-          git add "${{ env.STATIC_DIST }}"
-          git status -s
-          git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}'
-          git push origin HEAD
-
-      - name: "LSF Docs: Commit"
-        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
-        continue-on-error: true
-        run: |
-          set -xeuo pipefail
-          cp -Rf tmp/docs/* docs/source/tags/
-          git status
-          git add docs/source/tags
-          git commit -m 'docs: LSF Update'
-          git push origin HEAD
 
       - name: Check all submodules
         id: check-all-submodules
