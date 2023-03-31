@@ -281,6 +281,7 @@ jobs:
                 title: title,
                 head: branch_name,
                 base: base_branch_name,
+                draft: true,
                 body: [
                   `Hi @${actor}!`,
                   '',
