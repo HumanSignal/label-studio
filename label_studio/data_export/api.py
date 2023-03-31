@@ -519,7 +519,7 @@ def set_convert_background_failure(job, connection, type, value, traceback):
     from data_export.models import ConvertedFormat
 
     convert_id = job.args[0]
-    ConvertedFormat.objects.filter(id=convert_id).update(status=Export.Status.FAILED)
+    ConvertedFormat.objects.filter(id=convert_id).update(status=Export.Status.FAILED, traceback=str(traceback))
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
