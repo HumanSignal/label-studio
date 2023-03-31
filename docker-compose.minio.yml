@@ -30,8 +30,6 @@ services:
       - MINIO_PROMETHEUS_AUTH_TYPE=${MINIO_PROMETHEUS_AUTH_TYPE:-public}
     networks:
       - database-network
-    profiles:
-      - minio
 
   prometheus:
     image: quay.io/prometheus/prometheus:v2.37.1
@@ -46,8 +44,6 @@ services:
       - "--config.file=/etc/prometheus/prometheus.yml"
     networks:
       - database-network
-    profiles:
-      - minio
 
 volumes:
   static: { }
