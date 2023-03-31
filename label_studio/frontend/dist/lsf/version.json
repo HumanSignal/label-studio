@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3896: Stacking panels full",
-  "commit": "35f22dc31b6828f1694d99d741d1873a7096a32d",
-  "branch": "master",
-  "date": "2023/03/30 17:10:29"
+  "message": "feat: LSDV-4634: Annotation instructions modal",
+  "commit": "fcb7c010b976c48a5f75c57d3334b01d29e85230",
+  "branch": "fb-lsdv-4634/anotation-instructions-modal",
+  "date": "2023/03/31 14:52:43"
 }
