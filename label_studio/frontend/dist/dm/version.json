@@ -1,6 +1,6 @@
 {
   "message": "feat: LOPS-33: UI page to view listing of CandidateTasks in Dataset",
-  "commit": "e1900536481445d22dc5e51ad0a5262f21094c50",
-  "branch": "fb-lops-33/candidate-task-explorer",
-  "date": "2023/03/31 09:25:29"
+  "commit": "50899bc740fd5bc33a51f2fdf5bedd533a9d1799",
+  "branch": "master",
+  "date": "2023/03/31 12:48:12"
 }
