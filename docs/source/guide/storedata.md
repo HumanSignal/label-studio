@@ -83,6 +83,13 @@ On mac you can find your host file at `/private/etc/hosts`
 
 After altering your host file you can connect to your minio server with your browser at http://minio:9000.
 
+### removing minio data,
+You can remove your minio installation by removing the containers and the associated volumes.
+This operation is destructive and will remove all data stored in minio.
+```bash
+docker compose-f docker-compose.minio.yml down  --volumes
+````
+
 
 ## Data persistence
 
