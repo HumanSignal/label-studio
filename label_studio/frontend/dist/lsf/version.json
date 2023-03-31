@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4692: Brush segmentation is not supported",
-  "commit": "f08871a3e70026b12cad502552251db1fba1619e",
+  "message": "feat: LSDV-3896: Stacking panels full",
+  "commit": "35f22dc31b6828f1694d99d741d1873a7096a32d",
   "branch": "master",
-  "date": "2023/03/29 14:40:33"
+  "date": "2023/03/30 17:10:29"
 }
