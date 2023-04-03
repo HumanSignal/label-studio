@@ -1,4 +1,4 @@
-name: Follow Merge - LSF Sync
+name: 'Follow Merge: LSF Sync'
 
 on:
   schedule:
