@@ -322,10 +322,12 @@ def empty_list(response):
     assert len(response.json()) == 0, f'Response should be empty, but is {response.json()}'
 
 
-def file_exists_in_storage(response):
-    export_id = response.json.id
+def file_exists_in_storage(response, exists=True, export_id=None):
+    if not export_id:
+        export_id = response.json().get('id')
+
     export = Export.objects.get(id=export_id)
 
-    file_path = export.export.file.path
+    file_path = export.file.path
 
-    assert os.path.isfile(file_path) == True
+    assert os.path.isfile(file_path) == exists

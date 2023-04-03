@@ -375,6 +375,9 @@ stages:
         task_filter_options:
           only_with_annotations: true
     response:
+      status_code: 404
       verify_response_with:
         function: label_studio.tests.utils:file_exists_in_storage
----
+        extra_kwargs:
+          exists: false
+          export_id: "{export_id}"
