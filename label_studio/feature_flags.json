@@ -1301,22 +1301,8 @@
       "key": "ff_front_dev_2186_comments_for_update",
       "on": false,
       "prerequisites": [],
-      "targets": [
-        {
-          "contextKind": "user",
-          "variation": 0,
-          "values": [
-            "makseq@gmail.com"
-          ]
-        }
-      ],
-      "contextTargets": [
-        {
-          "contextKind": "user",
-          "variation": 0,
-          "values": []
-        }
-      ],
+      "targets": [],
+      "contextTargets": [],
       "rules": [],
       "fallthrough": {
         "variation": 1
@@ -1335,7 +1321,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 5,
+      "version": 6,
       "deleted": false
     },
     "ff_front_dev_2244_nested_choices_des_107_160522_short": {
@@ -1664,7 +1650,7 @@
     },
     "fflag-feat-dev-2887-comments-ui-editor-short": {
       "key": "fflag-feat-dev-2887-comments-ui-editor-short",
-      "on": true,
+      "on": false,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -1686,7 +1672,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 6,
+      "version": 9,
       "deleted": false
     },
     "fflag-feat-dev-3034-comments-with-drafts-short": {
@@ -1907,10 +1893,24 @@
     },
     "fflag_feat_all_lops_e_3_datasets_short": {
       "key": "fflag_feat_all_lops_e_3_datasets_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
+      "targets": [
+        {
+          "contextKind": "user",
+          "variation": 0,
+          "values": [
+            "yousif@heartex.com"
+          ]
+        }
+      ],
+      "contextTargets": [
+        {
+          "contextKind": "user",
+          "variation": 0,
+          "values": []
+        }
+      ],
       "rules": [],
       "fallthrough": {
         "variation": 1
@@ -1929,7 +1929,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_feat_back_dev_3756_queue_enrollment_min_short": {
@@ -2499,6 +2499,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_fix_all_lsdv_4896_dm_actions_to_reviewers_20230403_short": {
+      "key": "fflag_fix_all_lsdv_4896_dm_actions_to_reviewers_20230403_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "76c7753b7a984dac8845a7673ee2dc06",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_fix_back_LSDV_4748_annotate_task_number_14032023_short": {
       "key": "fflag_fix_back_LSDV_4748_annotate_task_number_14032023_short",
       "on": true,
@@ -2763,6 +2790,33 @@
       },
       "clientSide": false,
       "salt": "35e14138b01448b4884842bf4e70a403",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "fflag_fix_back_lsdv_4826_annotation_history_20230331_short": {
+      "key": "fflag_fix_back_lsdv_4826_annotation_history_20230331_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "4f718ebf33a749b596b408d6b04798d8",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
