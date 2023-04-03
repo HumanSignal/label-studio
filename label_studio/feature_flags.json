@@ -1301,22 +1301,8 @@
       "key": "ff_front_dev_2186_comments_for_update",
       "on": false,
       "prerequisites": [],
-      "targets": [
-        {
-          "contextKind": "user",
-          "variation": 0,
-          "values": [
-            "makseq@gmail.com"
-          ]
-        }
-      ],
-      "contextTargets": [
-        {
-          "contextKind": "user",
-          "variation": 0,
-          "values": []
-        }
-      ],
+      "targets": [],
+      "contextTargets": [],
       "rules": [],
       "fallthrough": {
         "variation": 1
@@ -1335,7 +1321,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 5,
+      "version": 6,
       "deleted": false
     },
     "ff_front_dev_2244_nested_choices_des_107_160522_short": {
@@ -1686,7 +1672,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 7,
+      "version": 9,
       "deleted": false
     },
     "fflag-feat-dev-3034-comments-with-drafts-short": {
