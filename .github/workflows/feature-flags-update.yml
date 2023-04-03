@@ -19,7 +19,7 @@ concurrency:
 
 env:
   LAUNCHDARKLY_DOWNLOAD_PATH: "label_studio/feature_flags.json"
-  FEATURE_FLAGS_COMMIT_MESSAGE: "Update Feature Flags"
+  FEATURE_FLAGS_COMMIT_MESSAGE: "ci: Update Feature Flags"
 
 jobs:
   commit-feature-flags:

@@ -17,7 +17,7 @@ env:
   NODE: 14
   CACHE_NAME_PREFIX: v1
   FRONTEND_DIR: label_studio/frontend
-  FRONTEND_BUILD_COMMIT_MESSAGE: Build frontend
+  FRONTEND_BUILD_COMMIT_MESSAGE: "ci: Build frontend"
 
 jobs:
   build:
