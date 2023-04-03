@@ -419,8 +419,8 @@ Form.Builder = React.forwardRef(({
         return currentValue ?? field.value;
       };
 
-      const commonProps = {};
-
+      const commonProps = { value: currentValue };
+      
       if (triggerUpdate) {
         commonProps.onChange = async () => {
           await formRef.current.submit({
