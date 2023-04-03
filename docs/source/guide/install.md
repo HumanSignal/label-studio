@@ -225,6 +225,9 @@ Upgrade Docker Engine to the latest available version(>= [20.10.12](https://docs
 
 ### PermissionError: [Errno 13] Permission denied: `/label-studio/data/media`
 
+!!! warning
+    Starting with Label Studio 1.7.0 release, the application run using a non-root docker user with ID `1001`.
+
 You may already be aware that Docker containers generally operate with root privileges by default. This unrestricted container management permits actions like installing system packages, modifying configuration files, and binding privileged ports, which are all beneficial for development purposes. However, this can lead to significant risks when containers are deployed in a production environment.
 
 This is because anyone who gains access to your root-running container could initiate undesirable processes, such as injecting malicious code. Running a process in your container as root also enables altering the user id (UID) or group id (GID) when launching the container, making your application more vulnerable.
@@ -237,13 +240,12 @@ It is advised to use non-root containers for the following reasons:
 
 Our [Dockerfile](https://github.com/heartexlabs/label-studio/blob/develop/Dockerfile) contains the line `USER 1001` which assigns a non-root user UID to the image, enabling the container to run as an unprivileged user. This implementation applies the security enhancements and other restrictions mentioned above to the container.
 
-#### Quick Overview: non-root docker images
+#### File permissions for non-root user
 By default, Label Studio container images operate as non-root. As a result, any directory requiring write access must be assigned to the root group (`GID 0`). This ensures that the arbitrary user (default `UID 1001`) can write to the directory, as this user is always part of the root group. To achieve this, simply set the ownership of the local directory to the root group (GID 0), which will be enough regardless of the UID:
 ```bash
 mkdir mydata
 sudo chown :0 mydata
 ```
-
 
 !!! note
     If you want to learn more about non-root containers and Docker and Kubernetes security, check out the following articles:
