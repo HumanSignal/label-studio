@@ -127,7 +127,7 @@ class GCSExportStorage(GCSStorageMixin, ExportStorage):
         GCSExportStorageLink.create(annotation, self)
 
 
-def async_export_annotation_to_gcs_storages(annotation):
+def async_export_annotation_to_gcs_storages(annotation, project, organization):
     project = annotation.project
     if hasattr(project, 'io_storages_gcsexportstorages'):
         for storage in project.io_storages_gcsexportstorages.all():
