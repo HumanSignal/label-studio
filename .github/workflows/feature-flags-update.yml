@@ -13,10 +13,6 @@ on:
         required: true
         type: string
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.pull_request.head.ref || github.ref }}
-  cancel-in-progress: true
-
 env:
   LAUNCHDARKLY_DOWNLOAD_PATH: "label_studio/feature_flags.json"
   FEATURE_FLAGS_COMMIT_MESSAGE: "ci: Update Feature Flags"
