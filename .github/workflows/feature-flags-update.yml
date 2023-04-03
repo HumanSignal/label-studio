@@ -1,4 +1,4 @@
-name: "Frontend build"
+name: "Update Feature Flags"
 
 on:
   workflow_call:
@@ -13,16 +13,18 @@ on:
         required: true
         type: string
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
+
 env:
-  NODE: 14
-  CACHE_NAME_PREFIX: v1
-  FRONTEND_DIR: label_studio/frontend
-  FRONTEND_BUILD_COMMIT_MESSAGE: "ci: Build frontend"
+  LAUNCHDARKLY_DOWNLOAD_PATH: "label_studio/feature_flags.json"
+  FEATURE_FLAGS_COMMIT_MESSAGE: "ci: Update Feature Flags"
 
 jobs:
-  build:
-    name: "Frontend"
-    timeout-minutes: 15
+  commit-feature-flags:
+    name: "Commit Feature Flags"
+
     runs-on: ubuntu-latest
     steps:
       - uses: hmarr/debug-action@v2.1.0
@@ -63,34 +65,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
+          fetch-depth: 1
           ref: ${{ inputs.ref }}
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "${{ env.NODE }}"
-
-      - name: Get npm cache directory path
-        id: npm-cache
-        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
-
-      - name: Configure npm cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.npm-cache.outputs.dir }}
-          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-${{ hashFiles('**/package.json') }}-${{ hashFiles('**/yarn.lock') }}
-
-      - name: Print Yarn cache size
-        run: du -d 0 -h ${{ steps.npm-cache.outputs.dir }} || true
-
-      - name: Build
+      - name: Download feature flags
+        env:
+          LAUNCHDARKLY_COMMUNITY_SDK_KEY: ${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}
         run: |
-          npm ci
-          npm run build:production
-        working-directory: ${{ env.FRONTEND_DIR }}
+          set -xeuo pipefail
+          curl \
+            --connect-timeout 30 \
+            --retry 5 \
+            --retry-delay 10 \
+            -H "Authorization: $LAUNCHDARKLY_COMMUNITY_SDK_KEY" \
+            "https://sdk.launchdarkly.com/sdk/latest-all" >"${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }}"
+          if [ "$(jq 'has("flags")' <<< cat ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }})" = "true" ]; then 
+            echo "feature_flags.json is valid"
+          else
+            echo "feature_flags.json is invalid"
+            cat ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }}
+            exit 1
+          fi
 
       - name: Commit and Push
         run: |
-          git add "${{ env.FRONTEND_DIR }}"
+          git add "${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }}"
           git status -s
-          git commit -m '${{ env.FRONTEND_BUILD_COMMIT_MESSAGE }}' || true
+          git commit -m '${{ env.FEATURE_FLAGS_COMMIT_MESSAGE }}' || true
           git push origin HEAD
