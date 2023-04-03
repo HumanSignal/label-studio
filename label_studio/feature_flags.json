@@ -1664,7 +1664,7 @@
     },
     "fflag-feat-dev-2887-comments-ui-editor-short": {
       "key": "fflag-feat-dev-2887-comments-ui-editor-short",
-      "on": true,
+      "on": false,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -1686,7 +1686,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 6,
+      "version": 7,
       "deleted": false
     },
     "fflag-feat-dev-3034-comments-with-drafts-short": {
