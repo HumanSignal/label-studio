@@ -1,6 +1,6 @@
 {
-  "message": "docs: LSDV-4874: Update audio documentation to outline splitchannels usage (#1277)",
-  "commit": "cdc27bdce902d8e65177d79ba2afd506201b071d",
+  "message": "feat: LSDV-3025-5: Create the filtering functionality in the new filter component (#1282)",
+  "commit": "7716e1f538aa9c8bf5eb240e561a8ddb64f3cc67",
   "branch": "master",
-  "date": "2023/03/30 06:49:50"
+  "date": "2023/03/31 15:17:05"
 }
