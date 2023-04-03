@@ -119,6 +119,7 @@ jobs:
     uses: heartexlabs/label-studio/.github/workflows/feature-flags-update.yml@develop
     with:
       ref: ${{ github.event.pull_request.head.ref || github.ref }}
+    secrets: inherit
 
   build-docker:
     name: "Build"
