@@ -260,6 +260,12 @@ jobs:
             const branch_name = process.env.BRANCH_NAME;
             const base_branch_name = process.env.BASE_BRANCH_NAME;
             
+            const pr_header = [
+              `Hi @${actor}!`,
+              '',
+              'This PR was created in response to a PRs in upstream repo:',
+            ].join('\n')
+            
             const {data: listPulls} = await github.rest.pulls.list({
               owner,
               repo,
@@ -282,20 +288,16 @@ jobs:
                 head: branch_name,
                 base: base_branch_name,
                 draft: true,
-                body: [
-                  `Hi @${actor}!`,
-                  '',
-                  'This PR was created in response to a PRs in upstream repo:',
-                  `- ${html_url}`,
-                ].join('\n')
+                body: pr_header + `\n- ${html_url}`
               })).data;
             }
             
-            if (pull.body.includes(html_url)) {
+            if (pull.body && pull.body.includes(html_url)) {
               console.log(`${html_url} already referenced in PR description`)
             } else {
               console.log(`Adding a new reference to ${html_url} to PR`)
-              const new_body = pull.body + `\n- ${html_url}`
+              const body = pull.body || pr_header
+              const new_body = body + `\n- ${html_url}`
               pull = (await github.rest.pulls.update({
                 title: process.env.TITLE,
                 owner,
