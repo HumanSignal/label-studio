@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4898: Fix quick view is brotken when FF_DEV_3873 is on",
-  "commit": "995d6e25270c536e23c1eb8d6d6a8e0bd64a657e",
+  "message": "feat: LSDV-3025-9: Add the remaining filters to filter component",
+  "commit": "d326e1ba894853153d9545373a1502e2a4a265d8",
   "branch": "master",
-  "date": "2023/04/04 11:49:08"
+  "date": "2023/04/04 15:18:56"
 }
