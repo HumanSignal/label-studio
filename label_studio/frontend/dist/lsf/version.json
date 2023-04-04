@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3025-7: Add filter that is equal or not equal as the speci…",
-  "commit": "8197b36c3a2c75384bfe6ef57e926ef0768e66db",
+  "message": "fix: LSDV-4898: Fix quick view is brotken when FF_DEV_3873 is on",
+  "commit": "995d6e25270c536e23c1eb8d6d6a8e0bd64a657e",
   "branch": "master",
-  "date": "2023/04/03 18:33:18"
+  "date": "2023/04/04 11:49:08"
 }
