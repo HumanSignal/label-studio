@@ -544,7 +544,6 @@ Click **Add Storage**, but not use synchronization (don't touch button **Sync St
 When referencing your files within a task, adhere to the following guidelines:
 * "Absolute local path" must be a sub-directory of LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT (see [6](https://labelstud.io/guide/storage.html#Set-up-connection-in-the-Label-Studio-UI-4)). 
 * All file paths must begin with `/data/local-files/?d=`.
-* Append the full path of each file, starting from the first directory in the "Absolute local path" of the local storage, following the LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT.
 * In the following example, the first directory is `dataset1`. For instance, if you have mixed data types in tasks, including 
     - audio files `1.wav`, `2.wav` within an `audio` folder and 
     - image files `1.jpg`, `2.jpg` within an `images` folder, 
