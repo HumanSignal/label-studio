@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4898: Fix quick view is brotken when FF_DEV_3873 is on",
-  "commit": "995d6e25270c536e23c1eb8d6d6a8e0bd64a657e",
-  "branch": "master",
-  "date": "2023/04/04 11:49:08"
+  "message": "LSDV-4832: New Ranker tag [internal PR]",
+  "commit": "3de0fd50ee77eed933cecf8561469e06683410cc",
+  "branch": "fb-lsdv-4832/new-ranker",
+  "date": "2023/04/04 19:10:02"
 }
