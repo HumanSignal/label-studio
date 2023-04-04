@@ -58,6 +58,12 @@ def check_tasks_max_file_size(value):
         raise ValidationError(f'Maximum total size of all files is {settings.TASKS_MAX_FILE_SIZE} bytes, '
                               f'current size is {total} bytes')
 
+def check_extensions(files):
+    for filename, file_obj in files.items():
+        _, ext = os.path.splitext(file_obj.name)
+        if ext.lower() not in settings.SUPPORTED_EXTENSIONS:
+            raise ValidationError(f'{ext} extension is not supported')
+
 
 def check_request_files_size(files):
     total = sum([file.size for _, file in files.items()])
@@ -161,6 +167,7 @@ def load_tasks(request, project):
     # take tasks from request FILES
     if len(request.FILES):
         check_request_files_size(request.FILES)
+        check_extensions(request.FILES)
         for filename, file in request.FILES.items():
             file_upload = create_file_upload(request, project, file)
             if file_upload.format_could_be_tasks_list:

@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3896: Stacking panels full",
-  "commit": "35f22dc31b6828f1694d99d741d1873a7096a32d",
+  "message": "feat: LSDV-3025-7: Add filter that is equal or not equal as the speci…",
+  "commit": "8197b36c3a2c75384bfe6ef57e926ef0768e66db",
   "branch": "master",
-  "date": "2023/03/30 17:10:29"
+  "date": "2023/04/03 18:33:18"
 }
