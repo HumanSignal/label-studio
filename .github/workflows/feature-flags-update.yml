@@ -25,37 +25,12 @@ jobs:
     steps:
       - uses: hmarr/debug-action@v2.1.0
 
-      - name: Get GitHub user details
-        id: get-github-user
-        uses: actions/github-script@v6
-        env:
-          ACTOR_USERNAME: ${{ github.event.sender.login }}
-        with:
-          script: |
-            const actor_username = process.env.ACTOR_USERNAME;
-            
-            let user_name = 'robot-ci-heartex';
-            let user_email = 'robot-ci-heartex@users.noreply.github.com';
-            
-            try {
-              const {data: user} = await github.rest.users.getByUsername({
-                username: actor_username,
-              });
-              user_name = user.login;
-              user_email = user.email;
-            } catch (e) {
-              console.log(e)
-            }
-            
-            core.setOutput('user_name', user_name);
-            core.setOutput('user_email', user_email);
-
       - name: Configure git
         shell: bash
         run: |
           set -xeuo pipefail
-          git config --global user.name '${{ steps.get-github-user.outputs.user_name }}'
-          git config --global user.email '${{ steps.get-github-user.outputs.user_email }}'
+          git config --global user.name 'robot-ci-heartex'
+          git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
 
       - name: Checkout
         uses: actions/checkout@v3
