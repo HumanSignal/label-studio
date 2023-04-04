@@ -8,7 +8,7 @@ meta_description: Customize Label Studio with multiple choice labels for machine
 
 The `Choices` tag is used to create a group of choices, with radio buttons or checkboxes. It can be used for single or multi-class classification. Also, it is used for advanced classification tasks where annotators can choose one or multiple answers.
 
-Choices can have dynamic value to load labels from task. This task data should contain a list of options to create underlying <Choice>s. All the parameters from options will be transferred to corresponding tags.
+Choices can have dynamic value to load labels from task. This task data should contain a list of options to create underlying `<Choice>`s. All the parameters from options will be transferred to corresponding tags.
 
 The `Choices` tag can be used with any data types.
 
@@ -46,6 +46,12 @@ Basic text classification labeling configuration
 </View>
 ```
 **Example** *(This config with dynamic labels)*  
+
+`Choice`s can be loaded dynamically from task data. It should be an array of objects with attributes.
+  `html` can be used to show enriched content, it has higher priority than `value`, however `value` will be used in the exported result.
+  *ff_dev_2007_dev_2008_dynamic_tag_children_250322_short* should be enabled to use dynamic options.
+  *ff_dev_2007_rework_choices_280322_short* should be enabled to use `html` attribute.
+
 ```html
 <View>
   <Audio name="audio" value="$audio" />
@@ -54,8 +60,8 @@ Basic text classification labeling configuration
 <!-- {
   "data": {
     "variants": [
-      { "value": "Do or doughnut. There is no try." },
-      { "value": "Do or do not. There is no trial." },
+      { "value": "Do or doughnut. There is no try.", "html": "<img src='https://labelstud.io/images/logo.png'>" },
+      { "value": "Do or do not. There is no trial.", "html": "<h1>You can use hypertext here</h2>" },
       { "value": "Do or do not. There is no try." },
       { "value": "Duo do not. There is no try." }
     ]

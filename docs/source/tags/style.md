@@ -1,7 +1,7 @@
 ---
 title: Style
 type: tags
-order: 505
+order: 504
 meta_title: Style Tag to use CSS Styles
 meta_description: Customize Label Studio with CSS styles to modify the labeling interface for machine learning and data science projects.
 ---
