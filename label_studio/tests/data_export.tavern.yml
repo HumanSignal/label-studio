@@ -363,21 +363,23 @@ stages:
     response:
       status_code: 201
       save:
+        $ext:
+          function: label_studio.tests.utils:save_export_file_path
         json:
           export_id: id
       verify_response_with:
         function: label_studio.tests.utils:file_exists_in_storage
   - name: delete export
     request:
-      url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}/"
-      method: POST
+      url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}"
+      method: DELETE
       json:
         task_filter_options:
           only_with_annotations: true
     response:
-      status_code: 404
+      status_code: 204
       verify_response_with:
         function: label_studio.tests.utils:file_exists_in_storage
         extra_kwargs:
           exists: false
-          export_id: "{export_id}"
+          file_path: "{file_path}"

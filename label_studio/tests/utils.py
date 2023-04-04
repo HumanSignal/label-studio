@@ -309,6 +309,7 @@ def os_independent_path(_, path, add_tempdir=False):
         }
     )
 
+
 def verify_docs(response):
     for _, path in response.json()['paths'].items():
         print(path)
@@ -322,12 +323,17 @@ def empty_list(response):
     assert len(response.json()) == 0, f'Response should be empty, but is {response.json()}'
 
 
-def file_exists_in_storage(response, exists=True, export_id=None):
-    if not export_id:
-        export_id = response.json().get('id')
-
+def save_export_file_path(response):
+    export_id = response.json().get('id')
     export = Export.objects.get(id=export_id)
-
     file_path = export.file.path
+    return Box({'file_path': file_path})
+
+
+def file_exists_in_storage(response, exists=True, file_path=None):
+    if not file_path:
+        export_id = response.json().get('id')
+        export = Export.objects.get(id=export_id)
+        file_path = export.file.path
 
     assert os.path.isfile(file_path) == exists
