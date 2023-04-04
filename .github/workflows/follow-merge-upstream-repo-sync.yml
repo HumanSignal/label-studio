@@ -1,4 +1,4 @@
-name: Sync PR
+name: 'Follow Merge: Upstream repo sync'
 
 on:
   repository_dispatch:
@@ -6,26 +6,81 @@ on:
       - upstream_repo_update
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.client_payload.branch_name || 'schedule' }}
+  group: ${{ github.workflow }}-${{ github.event.client_payload.branch_name }}
 
 env:
   NODE: 14
   CACHE_NAME_PREFIX: v1
   STATIC_DIST: 'label_studio/frontend/dist'
   RELEASE_BRANCH_PREFIX: "ls-release/"
+  DOCS_TARGET_DIR: "docs/source/tags/"
 
 jobs:
   open:
     name: Sync PR
     if: |
-      github.event_name != 'schedule' && (
       github.event.client_payload.event_action == 'opened' ||
       github.event.client_payload.event_action == 'synchronize' ||
       github.event.client_payload.event_action == 'merged'
-      )
     runs-on: ubuntu-latest
     steps:
       - uses: hmarr/debug-action@v2.1.0
+
+      - name: Find or Create branch
+        uses: actions/github-script@v6
+        id: get-branch
+        env:
+          RELEASE_BRANCH_PREFIX: "${{ env.RELEASE_BRANCH_PREFIX }}"
+          BRANCH_NAME: "${{ github.event.client_payload.branch_name }}"
+          BASE_BRANCH_NAME: "${{ github.event.client_payload.base_branch_name }}"
+          DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const {repo, owner} = context.repo;
+
+            const branch_name = process.env.BRANCH_NAME;
+            const default_branch = process.env.DEFAULT_BRANCH;
+            const base_branch_name = process.env.BASE_BRANCH_NAME;
+            const release_branch_prefix = process.env.RELEASE_BRANCH_PREFIX;
+            
+            let base_name = default_branch;
+            if (branch_name.startsWith(release_branch_prefix)) {
+              base_name = base_branch_name;
+            }
+            core.setOutput('base_name', base_name);
+            
+            const branches = await github.paginate(
+              github.rest.repos.listBranches,
+              {
+                owner,
+                repo,
+                per_page: 100
+              },
+              (response) => response.data
+            );
+            const {data: default_commit} = await github.rest.repos.getCommit({
+              owner,
+              repo,
+              ref: base_name
+            });
+            
+            let branch = branches.find(e => e.name === branch_name || e.name === branch_name.toLowerCase())
+            
+            if (branch === undefined) {
+              console.log('Branch not found. Creating a new one.');
+              const ref_branch_prefix = 'refs/heads/';
+              branch = (await github.rest.git.createRef({
+                owner,
+                repo,
+                ref: `${ref_branch_prefix}${branch_name}`,
+                sha: default_commit.sha,
+              })).data;
+              core.setOutput('name', branch.ref.replace(ref_branch_prefix, ''));
+            } else {
+              console.log('Branch found.');
+              core.setOutput('name', branch.name);
+            }
 
       - name: Configure git
         shell: bash
@@ -38,8 +93,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GIT_PAT }}
-          fetch-depth: 0
-          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 1
+          ref: ${{ steps.get-branch.outputs.name }}
 
       - name: Checkout module
         uses: actions/checkout@v3
@@ -77,6 +132,10 @@ jobs:
         working-directory: tmp
 
       - name: Build module
+        working-directory: tmp
+        env:
+          CI: false # on true webpack breaks on warnings, and we have them a lot
+          NODE_ENV: 'production'
         run: |
           yarn run build:module
           if [[ "${{ github.event.client_payload.event_action }}" == 'merged' ]]; then 
@@ -93,62 +152,27 @@ jobs:
           }
           EOF
 
-        working-directory: tmp
-        env:
-          CI: false # on true webpack breaks on warnings, and we have them a lot
-          NODE_ENV: 'production'
-
-      - name: Get PR
-        uses: actions/github-script@v6
-        id: get-pr
+      - name: "LSF Docs: Cache node modules"
+        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+        uses: actions/cache@v3
         with:
-          github-token: ${{ secrets.GIT_PAT }}
-          script: |
-            const {repo, owner} = context.repo;
-            const branchName = '${{ github.event.client_payload.branch_name }}';
-            const branchNameLowerCase = branchName.toLowerCase();
-            const {data: listPullsResponse} = await github.rest.pulls.list({
-              owner,
-              repo,
-              head: `${owner}:${branchName}`,
-              per_page: 1
-            });
-            const {data: listPullsResponseLowerCase} = await github.rest.pulls.list({
-              owner,
-              repo,
-              head: `${owner}:${branchNameLowerCase}`,
-              per_page: 1
-            });
-            
-            if (listPullsResponse.length !== 0) {
-              console.log(`Found PR for branch '${branchName}'`)
-              core.setOutput("branch-name", branchName);
-              return listPullsResponse
-            } else if (listPullsResponseLowerCase.length !== 0) {
-              console.log(`Found PR for branch '${branchNameLowerCase}'`)
-              core.setOutput("branch-name", branchNameLowerCase);
-              return listPullsResponseLowerCase
-            } else {
-              console.log(`PR for branch '${branchNameLowerCase}' is not created yet`)
-              core.setOutput("branch-name", branchNameLowerCase);
-              return listPullsResponseLowerCase
-            }
+          path: ~/.npm
+          key: npm-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-jsdoc-to-markdown
 
-      - name: Create branch
+      - name: "LSF Docs: Install NPM deps"
+        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+        working-directory: tmp/scripts
+        run: npm install jsdoc-to-markdown node-fetch
+
+      - name: "LSF Docs: Build"
+        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+        working-directory: tmp/scripts
+        run: node create-docs.js
+
+      - name: Commit static
         shell: bash
         run: |
           set -xeuo pipefail
-          
-          branch_name='${{ steps.get-pr.outputs.branch-name }}'
-          
-          if grep -q '^${{ env.RELEASE_BRANCH_PREFIX }}.*$' <<< '${{ github.event.client_payload.base_branch_name }}'; then
-            git checkout '${{ github.event.client_payload.base_branch_name }}'
-          else
-            git checkout '${{ github.event.repository.default_branch }}'
-          fi
-
-          git checkout "${branch_name}" || true
-          git checkout -b "${branch_name}" || true
 
           if [[ "${{ github.event.client_payload.repo_name }}" == */dm2* ]]; then 
             module_dist="${{ env.STATIC_DIST }}/dm"
@@ -163,64 +187,127 @@ jobs:
           mkdir -p "${module_dist}"
           cp -r tmp/build/static/* "${module_dist}"
 
-          ls tmp/build/static/
-          ls "${module_dist}"
-
           git add "${{ env.STATIC_DIST }}"
           git status -s
           git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}'
           git push origin HEAD
 
-      - name: Create PR
-        id: create-pr
+      - name: "LSF Docs: Commit"
+        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+        continue-on-error: true
+        run: |
+          set -xeuo pipefail
+          docs_target_dir='${{ env.DOCS_TARGET_DIR }}'
+          mkdir -p "${docs_target_dir}"
+          cp -Rf tmp/docs/* "${docs_target_dir}"
+          git status
+          git add "${docs_target_dir}"
+          git commit -m 'docs: LSF Update'
+          git push origin HEAD
+
+      - name: Merge develop
+        shell: bash
+        continue-on-error: true
+        run: |
+          set -xeuo pipefail
+          branch='${{ steps.get-branch.outputs.name }}'
+          base_branch='${{ steps.get-branch.outputs.base_name }}'
+          
+          lsf_path='label_studio/frontend/dist/lsf/'
+          dm_path='label_studio/frontend/dist/dm/'
+          
+          git merge "${base_branch}" --message "Merge branch '${base_branch}' into '${branch}'" || true
+
+          git diff --name-only --diff-filter=U --relative
+          
+          git checkout --ours "${lsf_path}"
+          git add "${lsf_path}" || ture
+          
+          git checkout --ours "${dm_path}"
+          git add "${dm_path}" || ture
+          
+          unmerged_files=$(git diff --name-only --diff-filter=U --relative)
+          
+          if [ -z "${unmerged_files}" ]; then
+            echo "No unmerged files found"
+            echo "Pushing merge commit"
+            git commit --message "Merge branch '${base_branch}' into '${branch}'" || true
+            git push origin HEAD
+          else
+            echo "Unmerged files found:"
+            echo "${unmerged_files}"  
+            echo "Skipping push"
+            exit 0
+          fi
+
+      - name: Find or Create PR
+        id: get-pr
         uses: actions/github-script@v6
         env:
-          TITLE: ${{ github.event.client_payload.title }}
-          RELEASE_BRANCH_PREFIX: "${{ env.RELEASE_BRANCH_PREFIX }}"
+          TITLE: "${{ github.event.client_payload.title }}"
+          HTML_URL: "${{ github.event.client_payload.html_url }}"
+          ACTOR: "${{ github.event.client_payload.actor }}"
+          BRANCH_NAME: "${{ steps.get-branch.outputs.name }}"
+          BASE_BRANCH_NAME: "${{ steps.get-branch.outputs.base_name }}"
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
             const { repo, owner } = context.repo;
-            const branchName = '${{ steps.get-pr.outputs.branch-name }}';
-            const listPullsResponse = ${{ steps.get-pr.outputs.result }}
-            if (listPullsResponse.length) {
-              core.info(`PR already exist ${ listPullsResponse[0].html_url }`)
-              if ( listPullsResponse[0].body.includes('${{ github.event.client_payload.html_url }}') ) {
-                core.info(`${{ github.event.client_payload.html_url }} already referenced in PR description`)
-                return listPullsResponse
-              } else {
-                core.info(`Adding new ref on ${{ github.event.client_payload.html_url }} to PR`)
-                const newBody = listPullsResponse[0].body + `\n- ${{ github.event.client_payload.html_url }}`
-                const updatePullResponse = await github.rest.pulls.update({
-                  title: process.env.TITLE,
-                  owner,
-                  repo,
-                  pull_number: listPullsResponse[0].number,
-                  body: newBody
-                });
-                return updatePullResponse
-              }
+            
+            const title = process.env.TITLE;
+            const html_url = process.env.HTML_URL;
+            const actor = process.env.ACTOR;
+            const branch_name = process.env.BRANCH_NAME;
+            const base_branch_name = process.env.BASE_BRANCH_NAME;
+            
+            const {data: listPulls} = await github.rest.pulls.list({
+              owner,
+              repo,
+              head: `${owner}:${branch_name}`,
+              base: base_branch_name,
+              per_page: 1
+            });
+            
+            let pull;
+            
+            if (listPulls.length !== 0) {
+              console.log(`Found PR for branch '${branch_name}'`)
+              pull = listPulls[0];
             } else {
-              let base = '${{ github.event.repository.default_branch }}'
-              if ( '${{ github.event.client_payload.base_branch_name }}'.startsWith(process.env.RELEASE_BRANCH_PREFIX) ) {
-                base = '${{ github.event.client_payload.base_branch_name }}'
-              }
-              const createPullResponse = await github.rest.pulls.create({
+              console.log(`PR for branch '${branch_name}' is not created yet`)
+              pull = (await github.rest.pulls.create({
+                owner,
+                repo,
+                title: title,
+                head: branch_name,
+                base: base_branch_name,
+                draft: true,
+                body: [
+                  `Hi @${actor}!`,
+                  '',
+                  'This PR was created in response to a PRs in upstream repo:',
+                  `- ${html_url}`,
+                ].join('\n')
+              })).data;
+            }
+            
+            if (pull.body.includes(html_url)) {
+              console.log(`${html_url} already referenced in PR description`)
+            } else {
+              console.log(`Adding a new reference to ${html_url} to PR`)
+              const new_body = pull.body + `\n- ${html_url}`
+              pull = (await github.rest.pulls.update({
                 title: process.env.TITLE,
                 owner,
                 repo,
-                head: branchName,
-                base: base,
-                draft: true,
-                body: [
-                  'Hi @${{ github.event.client_payload.actor }}!',
-                  '',
-                  'This PR was created in response to a PRs in upstream repo:',
-                  '- ${{ github.event.client_payload.html_url }}',
-                ].join('\n')
-              });
-              return createPullResponse
+                pull_number: pull.number,
+                body: new_body
+              })).data;
             }
+            
+            core.setOutput('pull', pull);
+            core.setOutput('number', pull.number);
+            core.setOutput('node_id', pull.node_id);
 
       - name: Check all submodules
         id: check-all-submodules
@@ -230,7 +317,7 @@ jobs:
           github-token: ${{ secrets.GIT_PAT }}
           result-encoding: string
           script: |
-            const branchName = '${{ github.event.client_payload.branch_name }}';
+            const branchName = '${{ steps.get-branch.outputs.name }}';
             const branchNameLowerCase = branchName.toLowerCase();
 
             const submodules = [
@@ -250,7 +337,7 @@ jobs:
                 },
                 (response) => response.data
               );
-              
+            
               const listOpenPulls = listAllOpenPulls.filter(e => e.head.ref.toLowerCase() === branchNameLowerCase)
 
               for (let pr of listOpenPulls) {
@@ -292,11 +379,11 @@ jobs:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
             const { repo, owner } = context.repo;
-            const listPullsResponse = ${{ steps.get-pr.outputs.result }}
+            const pr_number = ${{ steps.get-pr.outputs.number }}
             github.rest.issues.createComment({
               owner,
               repo,
-              issue_number: listPullsResponse[0].number,
+              issue_number: pr_number,
               body: `${{ steps.check-all-submodules.outputs.result }}`,
             });
 
@@ -310,7 +397,7 @@ jobs:
           GIT_PAT: ${{ secrets.GIT_PAT }}
         run: |
           echo "$GIT_PAT" | gh auth login --with-token
-          gh api graphql -F id='${{ fromJson(steps.get-pr.outputs.result)[0].node_id }}' -f query='
+          gh api graphql -F id='${{ steps.get-pr.outputs.node_id }}' -f query='
             mutation($id: ID!) {
               markPullRequestReadyForReview(input: { pullRequestId: $id }) {
                 pullRequest {
@@ -330,7 +417,7 @@ jobs:
           GIT_PAT: ${{ secrets.GIT_PAT }}
         run: |
           echo "$GIT_PAT" | gh auth login --with-token
-          gh api graphql -f pull='${{ fromJson(steps.get-pr.outputs.result)[0].node_id }}' -f query='
+          gh api graphql -f pull='${{ steps.get-pr.outputs.node_id }}' -f query='
             mutation($pull: ID!) {
               enablePullRequestAutoMerge(input: {pullRequestId: $pull, mergeMethod: SQUASH}) {
                 pullRequest {
@@ -340,54 +427,13 @@ jobs:
               }
             }'
 
-      - name: Merge develop
-        shell: bash
-        continue-on-error: true
-        run: |
-          set -xeuo pipefail
-          if grep -q '^lse-release/.*$' <<< '${{ github.event.client_payload.base_branch_name }}'; then
-            target_branch='origin/${{ github.event.client_payload.base_branch_name }}'
-          else
-            target_branch='origin/${{ github.event.repository.default_branch }}'
-          fi
-          branch='${{ steps.get-pr.outputs.branch-name }}'
-          
-          lsf_path='label_studio/frontend/dist/lsf/'
-          dm_path='label_studio/frontend/dist/dm/'
-          
-          git merge "${target_branch}" --message "Merge branch '${target_branch}' into '${branch}'" || true
-
-          git diff --name-only --diff-filter=U --relative
-          
-          git checkout --ours "${lsf_path}"
-          git add "${lsf_path}" || ture
-          
-          git checkout --ours "${dm_path}"
-          git add "${dm_path}" || ture
-          
-          unmerged_files=$(git diff --name-only --diff-filter=U --relative)
-          
-          if [ -z "${unmerged_files}" ]; then
-            echo "No unmerged files found"
-            echo "Pushing merge commit"
-            git commit --message "Merge branch '${target_branch}' into '${branch}'" || true
-            git push origin HEAD
-          else
-            echo "Unmerged files found:"
-            echo "${unmerged_files}"  
-            echo "Skipping push"
-            exit 0
-          fi
-
 
   others:
     name: Other actions with PR
     if: |
-      github.event_name != 'schedule' && (
       github.event.client_payload.event_action == 'converted_to_draft' ||
       github.event.client_payload.event_action == 'ready_for_review' ||
       github.event.client_payload.event_action == 'closed'
-      )
     runs-on: ubuntu-latest
     steps:
       - uses: hmarr/debug-action@v2.1.0
