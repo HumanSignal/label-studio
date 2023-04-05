@@ -1,7 +1,9 @@
+import logging
 from django.db import connections
 from django.conf import settings
 from django.core.management.commands.migrate import Command as MigrateCommand
 
+logger = logging.getLogger(__name__)
 
 DEFAULT_LOCK_ID = getattr(settings, "MIGRATE_LOCK_ID", 1000)
 
@@ -31,7 +33,10 @@ class Command(MigrateCommand):
         lock_id = options["migrate_lock_id"]
         with connection.cursor() as cursor:
             try:
+                logger.debug(f"Trying to acquire lock: {lock_id}")
                 cursor.execute(f"SELECT pg_advisory_lock({lock_id})")
+                logger.debug(f"Successfully acquired lock. Starting migrations...")
                 MigrateCommand.handle(self, *args, **options)
             finally:
                 cursor.execute(f"SELECT pg_advisory_unlock({lock_id})")
+                logger.debug(f"Lock released.")
