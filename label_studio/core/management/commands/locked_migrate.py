@@ -34,9 +34,8 @@ class Command(MigrateCommand):
         with connection.cursor() as cursor:
             try:
                 logger.debug(f"Trying to acquire lock: {lock_id}")
-                cursor.execute(f"SELECT pg_advisory_lock({lock_id})")
+                cursor.execute(f"SELECT pg_advisory_xact_lock({lock_id})")
                 logger.debug(f"Successfully acquired lock. Starting migrations...")
                 MigrateCommand.handle(self, *args, **options)
             finally:
-                cursor.execute(f"SELECT pg_advisory_unlock({lock_id})")
                 logger.debug(f"Lock released.")
