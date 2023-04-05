@@ -72,8 +72,14 @@ export const ChangeLabelName = () => {
       title: 'Running',
       text: "Your label is being named, this may take some time!",
       icon: 'info',
-    })
-    await axios.post(webhook_url + '/change_label_name?id=' + project.id + '&current_name=' + selectedLabel + '&new_name=' + newLabel)
+     })
+     
+     const requestBody = {
+      id: project.id,
+      current_name: selectedLabel,
+      new_name: newLabel
+    };
+    await axios.post(webhook_url + '/change_label_name', requestBody)
     .then((response) => {
       console.log(response);
       setFunctionRunning(false);

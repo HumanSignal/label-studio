@@ -65,17 +65,17 @@ export const ProjectsPage = () => {
     setProjectsList(data.results ?? []);
     setNetworkState('loaded');
 
-    if (isFF(FF_DEV_2575) && data?.results?.length) {
-      const additionalData = await api.callApi("projects", {
-        params: { ids: data?.results?.map(({ id }) => id).join(',') },
-        signal: abortController.controller.current.signal,
-        errorFilter: (e) => e.error.includes('aborted'), 
-      });
+    // if (isFF(FF_DEV_2575) && data?.results?.length) {
+    //   const additionalData = await api.callApi("projects", {
+    //     params: { ids: data?.results?.map(({ id }) => id).join(',') },
+    //     signal: abortController.controller.current.signal,
+    //     errorFilter: (e) => e.error.includes('aborted'), 
+    //   });
+    //   if (additionalData?.results?.length) {
+    //     setProjectsList(additionalData.results);
+    //   }
 
-      if (additionalData?.results?.length) {
-        setProjectsList(additionalData.results);
-      }
-    }
+    // }
   };
 
   const loadNextPage = async (page, pageSize) => {
