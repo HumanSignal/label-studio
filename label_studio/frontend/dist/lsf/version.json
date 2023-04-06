@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4906: Fix classnames overlap in TopBar",
-  "commit": "de078aef3926e12e552b18a5609968b1652359f1",
-  "branch": "master",
-  "date": "2023/04/05 15:49:52"
+  "message": "fix: LSDV-4711: CORS error accessing previously annotated data",
+  "commit": "52177a3b66bd116b0b9dbe8cd4b69c3d11ca51e0",
+  "branch": "fb-lsdv-4711",
+  "date": "2023/04/06 08:43:25"
 }
