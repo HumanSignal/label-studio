@@ -349,10 +349,13 @@ marks:
 stages:
   - id: signup
     type: ref
+
   - id: create_project
     type: ref
+
   - id: create_task
     type: ref
+
   - name: create export
     request:
       url: "{django_live_url}/api/projects/{project_pk}/exports/"
@@ -369,6 +372,7 @@ stages:
           export_id: id
       verify_response_with:
         function: label_studio.tests.utils:file_exists_in_storage
+
   - name: delete export
     request:
       url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}"
