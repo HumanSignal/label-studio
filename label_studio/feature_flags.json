@@ -2391,6 +2391,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_front_lsdv_4620_richtext_opimization_060423_short": {
+      "key": "fflag_feat_front_lsdv_4620_richtext_opimization_060423_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "2c2ed07a8de34f04a424dcf78eaa8b1c",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_front_lsdv_4659_skipduplicates_060323_short": {
       "key": "fflag_feat_front_lsdv_4659_skipduplicates_060323_short",
       "on": false,
