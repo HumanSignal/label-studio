@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4747: Selecting the end character on a Paragraph phrase to the very start of other phrases only includes the first phrase selection",
-  "commit": "5bf915eeafb42c680882419e8377303b5a16fe2c",
+  "message": "fix: LSDV-4906: Fix classnames overlap in TopBar",
+  "commit": "de078aef3926e12e552b18a5609968b1652359f1",
   "branch": "master",
-  "date": "2023/03/24 10:44:26"
+  "date": "2023/04/05 15:49:52"
 }
