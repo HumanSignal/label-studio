@@ -577,6 +577,13 @@ class AnnotationDraft(models.Model):
         user.project = self.task.project  # link for activity log
         return self.task.project.has_permission(user)
 
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            project = self.task.project
+            if hasattr(project, 'summary'):
+                project.summary.update_created_labels_drafts([self])
+
 
 class Prediction(models.Model):
     """ ML backend predictions
