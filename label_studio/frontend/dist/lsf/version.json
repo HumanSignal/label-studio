@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4906: Fix classnames overlap in TopBar",
-  "commit": "de078aef3926e12e552b18a5609968b1652359f1",
-  "branch": "master",
-  "date": "2023/04/05 15:49:52"
+  "message": "fix: LSDV-4620-3: Fix Richtext performance and functional",
+  "commit": "cd0f637dbc05e7192db2fd3c78f7663dd939c2fb",
+  "branch": "fb-lsdv-4620-3/richtext-improvements",
+  "date": "2023/04/06 05:40:14"
 }
