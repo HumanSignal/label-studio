@@ -2391,6 +2391,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_front_lsdv_4620_richtext_opimization_060423_short": {
+      "key": "fflag_feat_front_lsdv_4620_richtext_opimization_060423_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "2c2ed07a8de34f04a424dcf78eaa8b1c",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_front_lsdv_4659_skipduplicates_060323_short": {
       "key": "fflag_feat_front_lsdv_4659_skipduplicates_060323_short",
       "on": false,
@@ -2472,9 +2499,36 @@
       "version": 4,
       "deleted": false
     },
+    "fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short": {
+      "key": "fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "73eefabc9339475a972105320feba11a",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short": {
       "key": "fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -2496,7 +2550,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_fix_all_lsdv_4896_dm_actions_to_reviewers_20230403_short": {
