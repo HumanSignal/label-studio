@@ -346,7 +346,7 @@ def add_data_field_form(user, project):
 actions = [
     {
         'entry_point': add_data_field,
-        'permission': all_permissions.tasks_change,
+        'permission': all_permissions.projects_change,
         'title': 'Add Or Modify Data Field',
         'order': 1,
         'experimental': True,
@@ -378,7 +378,7 @@ actions = [
 
     {
         'entry_point': remove_duplicates,
-        'permission': all_permissions.tasks_change,
+        'permission': all_permissions.projects_change,
         'title': 'Remove Duplicated Tasks',
         'order': 1,
         'experimental': True,
