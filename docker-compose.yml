@@ -1,19 +1,9 @@
 version: "3.9"
-
-# rotating logs, so they do not overflow
-x-logging:
-  logging: &default-logging
-    driver: "local"
-    options:
-      max-size: "10m"
-      max-file: "3"
-
 services:
   nginx:
     build: .
     image: heartexlabs/label-studio:latest
     restart: unless-stopped
-    logging: *default-logging
     ports:
       - "8080:8085"
       - "8081:8086"
@@ -30,8 +20,6 @@ services:
       - ./deploy/nginx/certs:/certs:ro
     #   Optional: Override nginx default conf
     #      - ./deploy/nginx/default.conf:/label-studio/deploy/nginx/default.conf
-    networks:
-      frontend-network:
     command: nginx
 
   app:
@@ -40,7 +28,6 @@ services:
     build: .
     image: heartexlabs/label-studio:latest
     restart: unless-stopped
-    logging: *default-logging
     expose:
       - "8000"
     depends_on:
@@ -57,16 +44,12 @@ services:
     #      - LOG_LEVEL=DEBUG
     volumes:
       - ./mydata:/label-studio/data:rw
-    networks:
-      database-network:
-      frontend-network:
     command: label-studio-uwsgi
 
   db:
     image: postgres:11.5
     hostname: db
     restart: unless-stopped
-    logging: *default-logging
     # Optional: Enable TLS on PostgreSQL
     # Just drop your server.crt and server.key into folder 'deploy/pgsql/certs'
     # NOTE: Both files must have permissions u=rw (0600) or less
@@ -79,13 +62,6 @@ services:
     volumes:
       - ${POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql/data
       - ./deploy/pgsql/certs:/var/lib/postgresql/certs:ro
-    networks:
-      database-network:
 
 volumes:
   static: { }
-
-networks:
-  database-network:
-  frontend-network:
-

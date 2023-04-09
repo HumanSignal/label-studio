@@ -15,7 +15,6 @@ services:
     command: server /data --console-address ":9009"
     restart: unless-stopped
     logging: *default-logging
-
     ports:
       - "9000:9000"
       - "9009:9009"
@@ -27,9 +26,6 @@ services:
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minio_admin_do_not_use_in_production}
       - MINIO_PROMETHEUS_URL=${MINIO_PROMETHEUS_URL:-http://prometheus:9090}
       - MINIO_PROMETHEUS_AUTH_TYPE=${MINIO_PROMETHEUS_AUTH_TYPE:-public}
-    networks:
-      - database-network
-
   prometheus:
     image: quay.io/prometheus/prometheus:v2.37.1
     restart: unless-stopped
@@ -41,14 +37,9 @@ services:
       - "prometheus-data:/prometheus"
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
-    networks:
-      - database-network
-
 volumes:
-  static: { }
+  static: {}
   minio-data:
   prometheus-data:
-networks:
-  database-network:
-  frontend-network:
+
 
