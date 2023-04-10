@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3025-5: Create the filtering functionality in the new filter component (#1282)",
-  "commit": "7716e1f538aa9c8bf5eb240e561a8ddb64f3cc67",
+  "message": "fix: LSDV-4906: Fix classnames overlap in TopBar (#1295)",
+  "commit": "de078aef3926e12e552b18a5609968b1652359f1",
   "branch": "master",
-  "date": "2023/03/31 15:17:05"
+  "date": "2023/04/05 15:49:52"
 }
