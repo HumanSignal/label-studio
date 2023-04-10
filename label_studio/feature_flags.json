@@ -2877,6 +2877,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_fix_back_lsdv_4929_limit_exports_10042023_short": {
+      "key": "fflag_fix_back_lsdv_4929_limit_exports_10042023_short",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "bb069bd904a64607b36ea05d01651565",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "fflag_fix_font_lsdv_1148_hotkeys_namespaces_01022023_short": {
       "key": "fflag_fix_font_lsdv_1148_hotkeys_namespaces_01022023_short",
       "on": true,
