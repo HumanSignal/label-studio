@@ -14,7 +14,6 @@ from rest_framework.response import Response
 
 from core.feature_flags import flag_set
 from core.permissions import all_permissions, ViewClassPermission
-from core.utils.common import get_object_with_check_and_log
 from projects.models import Project, Task
 from ml.serializers import MLBackendSerializer, MLInteractiveAnnotatingRequest
 from ml.models import MLBackend
@@ -84,7 +83,7 @@ class MLBackendListAPI(generics.ListCreateAPIView):
 
     def get_queryset(self):
         project_pk = self.request.query_params.get('project')
-        project = get_object_with_check_and_log(self.request, Project, pk=project_pk)
+        project = generics.get_object_or_404(Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
         ml_backends = MLBackend.objects.filter(project_id=project.id)
         for mlb in ml_backends:
@@ -203,7 +202,7 @@ class MLBackendTrainAPI(APIView):
     permission_required = all_permissions.projects_change
 
     def post(self, request, *args, **kwargs):
-        ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
+        ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)
 
         ml_backend.train()
@@ -218,7 +217,7 @@ class MLBackendTrainAPI(APIView):
         operation_description="""
         Send a request to the machine learning backend set up to be used for interactive preannotations to retrieve a
         predicted region based on annotator input. 
-        See [set up machine learning](labelstud.io/guide/ml.html#Get-interactive-preannotations) for more.
+        See [set up machine learning](https://labelstud.io/guide/ml.html#Get-interactive-preannotations) for more.
         """,
         manual_parameters=[
             openapi.Parameter(
@@ -238,13 +237,13 @@ class MLBackendInteractiveAnnotating(APIView):
     permission_required = all_permissions.tasks_view
 
     def post(self, request, *args, **kwargs):
-        ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
+        ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)
         serializer = MLInteractiveAnnotatingRequest(data=request.data)
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
 
-        task = get_object_with_check_and_log(request, Task, pk=validated_data['task'], project=ml_backend.project)
+        task = generics.get_object_or_404(Task, pk=validated_data['task'], project=ml_backend.project)
         context = validated_data.get('context')
 
         if flag_set('ff_back_dev_2362_project_credentials_060722_short', request.user):
@@ -273,7 +272,7 @@ class MLBackendVersionsAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
 
     def get(self, request, *args, **kwargs):
-        ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
+        ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)
         versions_response = ml_backend.get_versions()
         if versions_response.status_code == 200:

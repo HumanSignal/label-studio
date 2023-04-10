@@ -1,10 +1,13 @@
 ---
 title: Database setup 
 type: guide
-order: 205
+tier: opensource
+order: 104
 meta_title: Database Storage Setup
-meta_description: Configure the database storage used by Label Studio in your data labeling and machine learning projects to ensure performant and scalable data and configuration storage.
+meta_description: Configure the database storage used by Label Studio to ensure performant and scalable data and configuration storage.
+section: "Install"
 ---
+
 Label Studio uses a database to store project data and configuration information.
 
 ## Labeling performance
@@ -59,6 +62,9 @@ If you're starting a Docker container from the command line, use volumes to pers
 docker run -it -p 8080:8080 -v <yourvolume>:/label-studio/data heartexlabs/label-studio:latest
 ```
 
+!!! attention "important"
+    As this is a non-root container, the mounted files and directories must have the proper permissions for the `UID 1001`.
+
 If you're using Docker Compose with the [config included in the Label Studio repository](https://github.com/heartexlabs/label-studio/blob/master/docker-compose.yml), you can set up Docker volumes in the `docker-compose.yml` file for Label Studio:
 ```
 version: "3.3"
@@ -74,6 +80,10 @@ services:
 volumes:
   mydata:
 ```
+
+!!! attention "important"
+    As this is a non-root container, the mounted files and directories must have the proper permissions for the `UID 1001`.
+
 For more about specifying volumes in Docker Compose, see the volumes section of the [Docker Compose file documentation](https://docs.docker.com/compose/compose-file/compose-file-v3/#volumes).
 
 ### Persist data with a cloud provider

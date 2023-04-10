@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-4008: Allow quickly select tasks using hotkeys",
-  "commit": "6013c846d13cf1c212257c4536223e04fc70e161",
+  "message": "feat: LOPS-33: UI page to view listing of CandidateTasks in Dataset",
+  "commit": "50899bc740fd5bc33a51f2fdf5bedd533a9d1799",
   "branch": "master",
-  "date": "2023/02/15 04:11:11"
+  "date": "2023/03/31 12:48:12"
 }

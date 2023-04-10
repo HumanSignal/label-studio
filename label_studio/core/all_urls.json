@@ -354,6 +354,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/projects/<int:pk>/exports/<int:export_pk>/convert",
+        "module": "data_export.api.ExportConvertAPI",
+        "name": "data_export:api-projects:project-exports-convert",
+        "decorators": ""
+    },
+    {
         "url": "/api/auth/export/",
         "module": "data_export.api.ProjectExportFilesAuthCheck",
         "name": "data_export:project-export-files-auth-check",
@@ -564,7 +570,7 @@
         "decorators": ""
     },
     {
-        "url": "/api/storages/s3",
+        "url": "/api/storages/s3/",
         "module": "io_storages.s3.api.S3ImportStorageListAPI",
         "name": "storages:api:storage-s3-list",
         "decorators": ""
@@ -624,7 +630,7 @@
         "decorators": ""
     },
     {
-        "url": "/api/storages/azure",
+        "url": "/api/storages/azure/",
         "module": "io_storages.azure_blob.api.AzureBlobImportStorageListAPI",
         "name": "storages:api:storage-azure-list",
         "decorators": ""
@@ -684,7 +690,7 @@
         "decorators": ""
     },
     {
-        "url": "/api/storages/gcs",
+        "url": "/api/storages/gcs/",
         "module": "io_storages.gcs.api.GCSImportStorageListAPI",
         "name": "storages:api:storage-gcs-list",
         "decorators": ""
@@ -744,7 +750,7 @@
         "decorators": ""
     },
     {
-        "url": "/api/storages/redis",
+        "url": "/api/storages/redis/",
         "module": "io_storages.redis.api.RedisImportStorageListAPI",
         "name": "storages:api:storage-redis-list",
         "decorators": ""
@@ -804,7 +810,7 @@
         "decorators": ""
     },
     {
-        "url": "/api/storages/localfiles",
+        "url": "/api/storages/localfiles/",
         "module": "io_storages.localfiles.api.LocalFilesImportStorageListAPI",
         "name": "storages:api:storage-localfiles-list",
         "decorators": ""

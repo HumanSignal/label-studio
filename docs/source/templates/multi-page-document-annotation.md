@@ -1,6 +1,6 @@
 ---
 title: Multi-page Document Annotation 
-type: templates
+
 category: Computer Vision
 cat: computer-vision
 badge: <i class='ent'></i>

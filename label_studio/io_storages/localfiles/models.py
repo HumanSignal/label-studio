@@ -14,13 +14,14 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
-from io_storages.base_models import (
-      ExportStorage,
-      ExportStorageLink,
-      ImportStorage,
-      ImportStorageLink,
-)
 from tasks.models import Annotation
+from io_storages.base_models import (
+    ExportStorage,
+    ExportStorageLink,
+    ImportStorage,
+    ImportStorageLink,
+    ProjectStorageMixin
+)
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ class LocalFilesMixin(models.Model):
                                   'please check docs: https://labelstud.io/guide/storage.html#Local-storage')
 
 
-class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):
+class LocalFilesImportStorageBase(LocalFilesMixin, ImportStorage):
     url_scheme = 'https'
 
     def can_resolve_url(self, url):
@@ -93,6 +94,14 @@ class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):
 
     def scan_and_create_links(self):
         return self._scan_and_create_links(LocalFilesImportStorageLink)
+
+    class Meta:
+        abstract = True
+
+
+class LocalFilesImportStorage(ProjectStorageMixin, LocalFilesImportStorageBase):
+    class Meta:
+        abstract = False
 
 
 class LocalFilesExportStorage(ExportStorage, LocalFilesMixin):

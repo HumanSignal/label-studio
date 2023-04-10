@@ -17,6 +17,9 @@ import logging
 import json
 
 VERSION_FILE = 'version_.py'
+LS_VERSION_FILE = 'ls-version_.py'
+VERSION_OVERRIDE = os.getenv('VERSION_OVERRIDE', '')
+BRANCH_OVERRIDE = os.getenv('BRANCH_OVERRIDE', '')
 
 
 def _write_py(info):
@@ -36,7 +39,7 @@ def _write_py(info):
                 '\n# Do not include it to git!\n')
 
 
-def _read_py():
+def _read_py(ls=False):
     # go to current dir to package __init__.py
     cwd = os.getcwd()
     d = os.path.dirname(__file__)
@@ -45,19 +48,30 @@ def _read_py():
     os.chdir(d)
 
     # read version
+    def import_version_module(file_path):
+        try:
+            return __import__(os.path.splitext(file_path)[0])
+        except ImportError:
+            return None
+
     try:
-        version_module = __import__(os.path.splitext(VERSION_FILE)[0])
-        return version_module.info
-    except ImportError as e:
-        logging.warning("Can't read version file: " + VERSION_FILE)
-        logging.warning(e)
-        return {}
+        version_module = import_version_module(LS_VERSION_FILE if ls else VERSION_FILE)
+
+        if not version_module and ls:
+            logging.warning(f"Can't read version file: {LS_VERSION_FILE}. Fall back to: {VERSION_FILE}")
+            version_module = import_version_module(VERSION_FILE)
+
+        if version_module:
+            return version_module.info
+        else:
+            logging.warning(f"Can't read version file: {VERSION_FILE}")
+            return {}
     finally:
-        os.chdir(cwd)  # back current dir
+        os.chdir(cwd)  # back to current dir
 
 
 # get commit info: message, date, hash, branch
-def get_git_commit_info(skip_os=True):
+def get_git_commit_info(skip_os=True, ls=False):
 
     cwd = os.getcwd()
     d = os.path.dirname(__file__)
@@ -71,12 +85,12 @@ def get_git_commit_info(skip_os=True):
             info = {
                 'message': run('git show -s --format=%s', stderr=STDOUT, shell=True).strip().decode('utf8'),
                 'commit': run('git show -s --format=%H', stderr=STDOUT, shell=True).strip().decode('utf8'),
-                'date': run('git show -s --format=%ai', stderr=STDOUT, shell=True).strip().decode('utf8'),
-                'branch': run('git rev-parse --abbrev-ref HEAD', stderr=STDOUT, shell=True).strip().decode('utf8')
+                'date': run('git log -1 --format="%cd" --date="format:%Y/%m/%d %H:%M:%S"', stderr=STDOUT, shell=True).strip().decode('utf8'),
+                'branch': BRANCH_OVERRIDE if BRANCH_OVERRIDE else run("git branch --sort=committerdate -r --contains | grep -m 1 -v HEAD | cut -d'/' -f2-", stderr=STDOUT, shell=True).strip().decode('utf8')
             }
         except CalledProcessError:
             os.chdir(cwd)
-            return _read_py()
+            return _read_py(ls=True)
 
         # create package version
         version = desc.lstrip('v').rstrip().replace('-', '+', 1).replace('-', '.')
@@ -87,7 +101,7 @@ def get_git_commit_info(skip_os=True):
                 os_version = ''.join(str(s).split("=", 1)[1].rstrip().strip('"').replace('.', '')
                                      for s in f if str(s).startswith(keys))
                 version += '.' + os_version
-        info['version'] = version
+        info['version'] = VERSION_OVERRIDE if VERSION_OVERRIDE else version
 
         _write_py(info)
         return info
