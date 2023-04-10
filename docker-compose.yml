@@ -63,5 +63,3 @@ services:
       - ${POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql/data
       - ./deploy/pgsql/certs:/var/lib/postgresql/certs:ro
 
-volumes:
-  static: { }
