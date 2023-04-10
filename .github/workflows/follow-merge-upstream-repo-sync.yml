@@ -211,7 +211,7 @@ jobs:
         run: |
           set -xeuo pipefail
           branch='${{ steps.get-branch.outputs.name }}'
-          base_branch='${{ steps.get-branch.outputs.base_name }}'
+          base_branch='origin/${{ steps.get-branch.outputs.base_name }}'
           
           lsf_path='label_studio/frontend/dist/lsf/'
           dm_path='label_studio/frontend/dist/dm/'
