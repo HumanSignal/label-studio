@@ -52,11 +52,11 @@ docker-compose up -d
 ## Minio Blob Storage
 Minio is a blob storage that is compatible with Amazon S3. You can use Minio to store your labeling tasks.
 
-### starting the containers
+### Starting the containers
 For local development you can host a local minio server to emulate a S3 based production environment more closely.
 an example docker-compose file for this is available in the [label-studio repository](/docker-compose.minio.yml).
 
-To run minion with your lable studio instance you can use the following command:
+To run Minio with your lable studio instance you can use the following command:
 ````bash
 # add sudo on linux if you are not a member of the docker group
 docker compose -f docker-compose.yml -f docker-compose.minio.yml up -d
@@ -69,7 +69,7 @@ MINIO_ROOT_USER=minio_admin_do_not_use_in_production
 MINIO_ROOT_PASSWORD=minio_admin_do_not_use_in_production
 ````
 
-### connecting LS to local minio
+### Connect LS to local minio
 
 If you do not have a static ip address you should create an entry in your hosts file, so that both the label studio 
 container and your browser can find minio at the same hostname.
@@ -83,7 +83,7 @@ On mac you can find your host file at `/private/etc/hosts`
 
 After altering your host file you can connect to your minio server with your browser at http://minio:9000.
 
-### removing minio data,
+### Remove Minio data
 You can remove your minio installation by removing the containers and the associated volumes.
 This operation is destructive and will remove all data stored in minio.
 ```bash
