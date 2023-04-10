@@ -321,8 +321,14 @@ class ExportListAPI(generics.ListCreateAPIView):
         )
 
     def get_queryset(self):
-        project = self._get_project()
-        return super().get_queryset().filter(project=project)
+        if flag_set('fflag_fix_back_lsdv_4929_limit_exports_10042023_short', user='auto'):
+            latest_exports = super().get_queryset().filter(project=project).order_by('-created_at')[:100]
+            return latest_exports
+        else:
+            project = self._get_project()
+            return super().get_queryset().filter(project=project)
+        
+    
 
 
 @method_decorator(
