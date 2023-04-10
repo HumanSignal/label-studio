@@ -210,6 +210,9 @@ jobs:
         continue-on-error: true
         run: |
           set -xeuo pipefail
+          
+          git fetch origin ${{ steps.get-branch.outputs.base_name }}:refs/remotes/origin/${{ steps.get-branch.outputs.base_name }}
+          
           branch='${{ steps.get-branch.outputs.name }}'
           base_branch='origin/${{ steps.get-branch.outputs.base_name }}'
           
