@@ -1,6 +1,6 @@
 {
-  "message": "Fb lsdv 4887",
-  "commit": "dff74361820e3989cd74818af3d3e7cbbec71be9",
+  "message": "fix: LSDV-4887: Task view group bug fix",
+  "commit": "abe2242a77df8131fec8b42833de780b367c205b",
   "branch": "fb-lsdv-4887",
-  "date": "2023/04/11 00:09:19"
+  "date": "2023/04/11 09:43:52"
 }
