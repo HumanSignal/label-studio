@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-33: UI page to view listing of CandidateTasks in Dataset",
-  "commit": "50899bc740fd5bc33a51f2fdf5bedd533a9d1799",
-  "branch": "master",
-  "date": "2023/03/31 12:48:12"
+  "message": "fix: LSDV-4711: CORS error accessing previously annotated data",
+  "commit": "cf77d5e055df257d58fd88d40a408acd7c1b0490",
+  "branch": "fb-lsdv-4711",
+  "date": "2023/04/11 16:39:37"
 }
