@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4906: Fix classnames overlap in TopBar",
-  "commit": "de078aef3926e12e552b18a5609968b1652359f1",
-  "branch": "master",
-  "date": "2023/04/05 15:49:52"
+  "message": "feat: LSDV-4712: Add effect of skipDuplicates parameter on results editing",
+  "commit": "9ac233832697c9b0d41b1baedf157f8daf38a263",
+  "branch": "fb-lsdv-4712/skip-duplicates-editing",
+  "date": "2023/04/11 22:41:57"
 }
