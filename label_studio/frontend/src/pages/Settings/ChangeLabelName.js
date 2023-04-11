@@ -82,13 +82,22 @@ export const ChangeLabelName = () => {
     await axios.post(webhook_url + '/change_label_name', requestBody)
     .then((response) => {
       console.log(response);
-      setFunctionRunning(false);
-      setAvailableLabels(updatedLabels);
-      Swal.fire({
-        title: 'Success',
-        text: "Your label has been renamed!",
-        icon: 'success',
-      })
+      if (response.data.changingLabel) {
+        Swal.fire({
+          title: 'Success',
+          text: "Your label has been renamed!",
+          icon: 'success',
+        });
+        setAvailableLabels(updatedLabels);
+        setFunctionRunning(false);
+      }
+      else {
+        Swal.fire({
+          title: 'Error',
+          text: response.data.error,
+          icon: 'error',
+        }) 
+      }
   })
   };
 
