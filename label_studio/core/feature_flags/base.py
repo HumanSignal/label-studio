@@ -74,7 +74,6 @@ def _get_user_repr(user):
         user_data['custom'] = {'organization': user.active_organization.created_by.email}
     else:
         user_data['custom'] = {'organization': None}
-    logger.debug(f'Read user properties: {user_data}')
     return user_data
 
 
