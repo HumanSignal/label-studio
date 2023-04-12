@@ -437,6 +437,8 @@ def local_files_document_root_subdir(settings):
 
 @pytest.fixture(name="testing_session_timeouts")
 def set_testing_session_timeouts(settings):
-    # TODO: MemoryProfilerMiddleware adds additional seconds to exec time - avoid tests with strict timings
-    settings.MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(seconds=7).total_seconds()))
+    # TODO: functional tests should not rely on exact timings
+    # disabling memory profiler here to avoid 1-2 sec slowdowns
+    os.environ['fflag_feat_back_lsdv_4932_enable_memory_profiler'] = '1'
+    settings.MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(seconds=5).total_seconds()))
     settings.MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(seconds=2).total_seconds()))
