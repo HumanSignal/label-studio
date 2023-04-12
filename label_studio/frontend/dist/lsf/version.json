@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-3012: Syncable with new simple approach",
-  "commit": "ca3586fc80041909eff39bd71df22ca10e633661",
+  "message": "feat: LSDV-3025-3: Integrate filter component into outliner",
+  "commit": "2acc4f32d350bc3f49abc3f57e4ca8f89acfea47",
   "branch": "master",
-  "date": "2023/04/11 20:09:24"
+  "date": "2023/04/12 14:56:25"
 }
