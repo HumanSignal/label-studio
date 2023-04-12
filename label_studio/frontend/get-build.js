@@ -64,12 +64,13 @@ async function get(projectName, ref = 'master') {
 
   console.info(`Build link: ${REPO}@${sha}`);
 
-  const artifactsUrl = `https://api.github.com/repos/${REPO}/actions/artifacts`;
+  const artifactName = `LSF-${sha}`;
+  const artifactsUrl = `https://api.github.com/repos/${REPO}/actions/artifacts?name=${artifactName}`;
 
   res = await fetch(artifactsUrl, { headers: { Authorization: `token ${TOKEN}` } });
   json = await res.json();
 
-  const artifact = json.artifacts.find(art => art.name.match(sha) !== null && art.name.startsWith('LSF'));
+  const artifact = json.artifacts.at(0);
 
   if (!artifact) throw new Error(`Artifact for commit ${sha} was not found. Build failed?`);
   const buildUrl = artifact.archive_download_url;

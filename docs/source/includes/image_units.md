@@ -1,36 +1,19 @@
-<!-- Unfortunately included md files doesn't support code highlighting, do it manually -->
-<script src="/js/highlight.min.js"></script>
-<script>
-    hljs.highlightAll();
-    $(function() {
-      $('.code-badge-language').each(function (o, v) {
-        console.log(o)
-        if ($(v).html() === 'undefined')
-          $(v).html('')
-        if ($(v).html() === 'bash')
-          $(v).html('shell')
-        if ($(v).html() === 'html')
-          $(v).html('xml')
-      })
-    });
-</script>
-
-## Units of image annotations
+### Units of image annotations
 
 The units the x, y, width and height of image annotations are provided in percentages of overall image dimension. 
 
 Use the following conversion formulas for `x, y, width, height`:
 
-```python
+{% codeblock lang:python %}
 pixel_x = x / 100.0 * original_width
 pixel_y = y / 100.0 * original_height
 pixel_width = width / 100.0 * original_width
 pixel_height = height / 100.0 * original_height
-```
+{% endcodeblock %}
 
 For example: 
 
-```python
+{% codeblock lang:python %}
 task = {
     "annotations": [{
         "result": [
@@ -86,4 +69,4 @@ print(pixel_x, pixel_y, pixel_width, pixel_height)
 # convert back to LS 
 x, y, width, height = convert_to_ls(pixel_x, pixel_y, pixel_width, pixel_height, 600, 403)
 print(x, y, width, height)
-```
+{% endcodeblock %}

@@ -52,6 +52,8 @@ jobs:
             const check = check_runs.find(e => e.name === '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}')
             const details = JSON.parse(check.output.summary)
             console.log(details)
+            core.setOutput("branch", details.branch);
+            core.setOutput("pretty_branch_name", details.pretty_branch_name);
             core.setOutput("image_version", details.image_version);
             core.setOutput("sha", details.sha);
 
@@ -168,7 +170,7 @@ jobs:
           fi
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2.4.1
+        uses: docker/setup-buildx-action@v2.5.0
 
       - name: Login to DockerHub
         uses: docker/login-action@v2.1.0
@@ -185,6 +187,9 @@ jobs:
 
       - name: Prepare Release Dockerfile
         id: release_dockerfile
+        env:
+          VERSION_OVERRIDE: ${{ inputs.release_tag }}
+          BRANCH_OVERRIDE: ${{ steps.get_info.outputs.branch }}
         shell: bash
         run: |
           set -euo pipefail ${ACTIONS_STEP_DEBUG:+-x}
@@ -205,24 +210,9 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
-      - name: Build Release Ubuntu Docker image
+      - name: Build and Push Release Ubuntu Docker image
         uses: docker/build-push-action@v4.0.0
         id: docker_build
-        with:
-          context: ${{ steps.release_dockerfile.outputs.release_dir }}
-          file: ${{ steps.release_dockerfile.outputs.release_dir }}/${{ env.RELEASE_DOCKERFILE }}
-          load: true
-          tags: ${{ steps.generate-tags.outputs.ubuntu-tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64
-
-      - name: Copy compiled static from builded Docker image
-        run: docker run -v ${{ github.workspace }}:/workspace:rw -u root --rm ${{ env.IMAGE_NAME }}:${{ inputs.release_tag }} cp -r /label-studio/label_studio/frontend/ /workspace/label_studio/
-
-      - name: Push Release Ubuntu Docker image
-        uses: docker/build-push-action@v4.0.0
-        id: docker_push
         with:
           context: ${{ steps.release_dockerfile.outputs.release_dir }}
           file: ${{ steps.release_dockerfile.outputs.release_dir }}/${{ env.RELEASE_DOCKERFILE }}
@@ -230,6 +220,14 @@ jobs:
           tags: ${{ steps.generate-tags.outputs.ubuntu-tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Copy compiled static from builded Docker image
+        run: |
+          # Usually it takes 10-20 sec so the image becomes available
+          sleep 10s
+          docker pull ${{ env.IMAGE_NAME }}:${{ inputs.release_tag }}
+          docker run -v ${{ github.workspace }}:/workspace:rw -u root --rm ${{ env.IMAGE_NAME }}:${{ inputs.release_tag }} cp -r /label-studio/label_studio/frontend/ /workspace/label_studio/
 
       - name: Create Sentry release @ backend
         uses: getsentry/action-release@v1

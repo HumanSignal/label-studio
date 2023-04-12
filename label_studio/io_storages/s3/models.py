@@ -12,10 +12,16 @@ from django.utils.translation import gettext_lazy as _
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_delete
 
-from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from io_storages.s3.utils import get_client_and_resource, resolve_s3_url
 from tasks.validation import ValidationError as TaskValidationError
 from tasks.models import Annotation
+from io_storages.base_models import (
+    ExportStorage,
+    ExportStorageLink,
+    ImportStorage,
+    ImportStorageLink,
+    ProjectStorageMixin
+)
 
 logger = logging.getLogger(__name__)
 logging.getLogger('botocore').setLevel(logging.CRITICAL)
@@ -101,7 +107,7 @@ class S3StorageMixin(models.Model):
         abstract = True
 
 
-class S3ImportStorage(S3StorageMixin, ImportStorage):
+class S3ImportStorageBase(S3StorageMixin, ImportStorage):
 
     url_scheme = 's3'
 
@@ -166,6 +172,14 @@ class S3ImportStorage(S3StorageMixin, ImportStorage):
     def generate_http_url(self, url):
         return resolve_s3_url(url, self.get_client(), self.presign, expires_in=self.presign_ttl * 60)
 
+    class Meta:
+        abstract = True
+
+
+class S3ImportStorage(ProjectStorageMixin, S3ImportStorageBase):
+    class Meta:
+        abstract = False
+
 
 class S3ExportStorage(S3StorageMixin, ExportStorage):
 
@@ -220,7 +234,7 @@ def delete_annotation_from_s3_storages(sender, instance, **kwargs):
     for link in links:
         storage = link.storage
         if storage.can_delete_objects:
-            logger.debug(f'Delete {instance} from S3 storage {storage}')
+            logger.debug(f'Delete {instance} from S3 storage {storage}')  # nosec
             storage.delete_annotation(instance)
 
 

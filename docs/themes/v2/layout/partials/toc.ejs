@@ -1,0 +1,87 @@
+<% const isEnterpriseTheme = theme.tier === "enterprise" %>
+  <ul class="page-sidebar-list">
+    <% const pages = site.pages.filter(page => !page.hide_menu && page.type === type && (page.tier === theme.tier || page.tier === "all" || page.type === "tags" || page.type === "playground" || page.type === "templates")); %>
+    <% if(isEnterpriseTheme) pages.forEach(page => page.order = page.order_enterprise ? page.order_enterprise : page.order) %>
+    <% const orderedPages = pages.sort('order') %>
+    <% const parentPages = orderedPages.filter(page => page.parent === undefined) %>
+    <% const childrenPages = orderedPages.filter(page => page.parent !== undefined) %>
+
+    <% const pagesArray = parentPages.map(page => {
+      var fileName = page.path.replace(/^.+?\/([\w-]+)\.html/, '$1')
+      let childPages = childrenPages.filter(child => child.parent === fileName);
+
+      return {
+        page: page,
+        fileName: fileName,
+        childPages: childPages
+      }
+    }) %>
+
+    <%
+      const headers = [
+        {
+          type: "tags",
+          headers: {
+            "audio": "Object Tags",
+            "brush": "Control Tags",
+            "collapse": "Visual & Experience Tags"
+          }
+        },
+        {
+          type: "templates",
+          headers: {
+            "image_polygons": "Computer Vision",
+            "question_answering": "Natural Language Processing",
+            "transcribe_audio": "Audio/Speech Processing",
+            "response_generation": "Conversational AI",
+            "freeform_metadata": "Structured Data Parsing",
+            "pairwise_regression": "Ranking and Scoring",
+            "time_series_forecasting": "Time Series Analysis",
+            "video_classification": "Videos",
+            "gallery_cv": "Template Galleries"
+          }
+        }
+      ]
+    %>
+
+    <% var tocHeader = pagesArray[0].page.section %>
+    <% pagesArray.forEach(function (p, index) { %>
+      <% const tocHeaderFileName = headers.find(headerType => headerType.type === type)?.headers[p.fileName] %>
+      <% if(((p.page.type === "guide" && index === 0) || (p.page.section && tocHeader !== p.page.section) || tocHeaderFileName)) { %>
+        </ul>
+          <% if(locals.component === "nav") { %>
+            <button>
+              <%- p.page.section || tocHeaderFileName %>
+              <svg width="13" height="8" viewBox="0 0 13 8" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292969 0.805007L1.00008 0.0979004L6.64652 5.74435L12.293 0.0979004L13.0001 0.805007L6.64652 7.15856L0.292969 0.805007Z" />
+              </svg>
+            </button>
+          <% } else { %>
+            <%- partial("component/text", {text: p.page.section || tocHeaderFileName, size: "Eyebrow", tag: "h3"}) %>
+          <% } %>
+        <ul class="page-sidebar-list">
+      <% }
+      tocHeader = p.page.section;
+      %>
+      <li>
+        <a href="<%- url_for(p.page.path) %>" class="<%- p.page.is_new ? ' new' : '' %>" <%- page.title === p.page.title ? 'aria-current="page"' : '' %>>
+        <%- p.page.short ? p.page.short: p.page.title %></a>
+        <% if(p.childPages.length > 0) {%>
+          <% const activeChildPage = p.childPages.filter(child => page.title === child.title || page.title === p.page.title) %>
+          <button class="page-sidebar-toggle-children-list<%- activeChildPage.length > 0 ? ' active' : ''%>">
+            <svg width="13" height="8" viewBox="0 0 13 8" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292969 0.805007L1.00008 0.0979004L6.64652 5.74435L12.293 0.0979004L13.0001 0.805007L6.64652 7.15856L0.292969 0.805007Z" />
+            </svg>
+          </button>
+          <ul class="page-sidebar-children-list<%- activeChildPage.length > 0 ? ' page-sidebar-children-list-active' : ''%>">
+          <% p.childPages.forEach(child => { %>
+            <li>
+              <a href="<%- url_for(child.path) %>" class="<%- child.is_new ? ' new' : '' %>" <%- page.title === child.title ? 'aria-current="page"' : '' %>>
+              <%- child.short ? child.short: child.title %></a>
+            </li>
+          <% }) %>
+          </ul>
+        <% } %>
+      </li>
+    <% }) %>
+</ul>
