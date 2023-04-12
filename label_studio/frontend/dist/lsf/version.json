@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4906: Fix classnames overlap in TopBar",
-  "commit": "de078aef3926e12e552b18a5609968b1652359f1",
+  "message": "fix: LSDV-3012: Syncable with new simple approach",
+  "commit": "ca3586fc80041909eff39bd71df22ca10e633661",
   "branch": "master",
-  "date": "2023/04/05 15:49:52"
+  "date": "2023/04/11 20:09:24"
 }
