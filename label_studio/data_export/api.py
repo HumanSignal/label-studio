@@ -502,7 +502,7 @@ def async_convert(converted_format_id, export_type, project, **kwargs):
             logger.error(f'ConvertedFormat with id {converted_format_id} not found, conversion failed')
             return
         if converted_format.status != ConvertedFormat.Status.CREATED:
-            logger.error(f'Converson for export id {snapshot_id} to {export_type} already started')
+            logger.error(f'Conversion for export id {converted_format.export.id} to {export_type} already started')
             return
         converted_format.status = ConvertedFormat.Status.IN_PROGRESS
         converted_format.save(update_fields=['status'])
@@ -568,7 +568,7 @@ class ExportConvertAPI(generics.RetrieveAPIView):
                 export=snapshot, export_type=export_type
             )
             if not created:
-                raise ValidationError(f'Converson to {export_type} already started')
+                raise ValidationError(f'Conversion to {export_type} already started')
 
         start_job_async_or_sync(
             async_convert,
