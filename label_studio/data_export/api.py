@@ -510,9 +510,10 @@ def async_convert(converted_format_id, export_type, project, **kwargs):
     snapshot = converted_format.export
     converted_file = snapshot.convert_file(export_type)
     md5 = Export.eval_md5(converted_file)
+    ext = converted_file.name.split('.')[-1]
 
     now = datetime.now()
-    file_name = f'project-{project.id}-at-{now.strftime("%Y-%m-%d-%H-%M")}-{md5[0:8]}.{export_type.lower()}'
+    file_name = f'project-{project.id}-at-{now.strftime("%Y-%m-%d-%H-%M")}-{md5[0:8]}.{ext}'
     file_path = (
         f'{project.id}/{file_name}'
     )  # finally file will be in settings.DELAYED_EXPORT_DIR/project.id/file_name
