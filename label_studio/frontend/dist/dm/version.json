@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-33: UI page to view listing of CandidateTasks in Dataset",
-  "commit": "50899bc740fd5bc33a51f2fdf5bedd533a9d1799",
-  "branch": "master",
-  "date": "2023/03/31 12:48:12"
+  "message": "fix: LOPS-97: Update frontend Source icon on Data Explorer to match d…",
+  "commit": "0b6dd2525409ad05d288c2e1c8c4ab853f8397b6",
+  "branch": "fb-lops-97/data-explorer-source",
+  "date": "2023/04/13 16:22:44"
 }
