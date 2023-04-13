@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4684: Fix check for image boundaries",
-  "commit": "7a93c341f0b9b72de56b89f62f354b9887936e89",
+  "commit": "69302d06969320c2dd7f544b0673332536a5490a",
   "branch": "fb-lsdv-4684/out-of-the-box",
-  "date": "2023/04/13 18:05:27"
+  "date": "2023/04/13 19:03:59"
 }
