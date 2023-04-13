@@ -1,6 +1,6 @@
 {
   "message": "ci: LSDV-4734: Setup Cypress integration tests",
-  "commit": "acf2e70b1752771f927cc4f2834873b5770f36e7",
+  "commit": "5097e3bc70cfd50779b6c73b80d548b98557cc89",
   "branch": "fb-lsdv-4734/cypress-init",
-  "date": "2023/04/12 19:58:43"
+  "date": "2023/04/13 18:18:21"
 }
