@@ -31,27 +31,26 @@ Label Studio is also available in Enterprise and Cloud editions with additional 
 <div class="opensource-only">
 
 ## Quick start
+> **NOTE:** For Label Studio 1.7.2 you have to to confirm the dependencies `libpq-dev` and `python3-dev` are installed. As an example, to install on a Debian-based distro:
+> ```bash
+> sudo apt install libpq-dev python3-dev
+> ```
 
-1. Confirm the dependencies `libpq-dev` and  `python3-dev` are installed. As an example, to install on a Debian-based distro:
-```bash
-sudo apt install libpq-dev python3-dev
-```
-  
-2. Install Label Studio:
+1. Install Label Studio:
 ```bash
 pip install label-studio
 ```
-3. Start Label Studio
+2. Start Label Studio
 ```bash
 label-studio start
 ```
-4. Open the Label Studio UI at http://localhost:8080. 
-5. Sign up with an email address and password that you create.
-6. Click **Create** to create a project and start labeling data.
-7. Name the project, and if you want, type a description and select a color.
-8. Click **Data Import** and upload the data files that you want to use. If you want to use data from a local directory, cloud storage bucket, or database, skip this step for now.
-9. Click **Labeling Setup** and choose a template and customize the label names for your use case. 
-10. Click **Save** to save your project. 
+3. Open the Label Studio UI at http://localhost:8080. 
+4. Sign up with an email address and password that you create.
+5. Click **Create** to create a project and start labeling data.
+6. Name the project, and if you want, type a description and select a color.
+7. Click **Data Import** and upload the data files that you want to use. If you want to use data from a local directory, cloud storage bucket, or database, skip this step for now.
+8. Click **Labeling Setup** and choose a template and customize the label names for your use case. 
+9. Click **Save** to save your project. 
 
 You're ready to start [labeling and annotating your data](labeling.html)!
 
