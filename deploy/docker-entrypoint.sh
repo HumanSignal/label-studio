@@ -68,7 +68,7 @@ elif [ "$1" = "label-studio-uwsgi" ]; then
   exec_or_wrap_n_exec uwsgi --ini /label-studio/deploy/uwsgi.ini
 elif [ "$1" = "label-studio-migrate" ]; then
   exec_entrypoint "$ENTRYPOINT_PATH/app-init/"
-  exec python3 /label-studio/label_studio/manage.py migrate >&3
+  exec python3 /label-studio/label_studio/manage.py locked_migrate >&3
 else
   exec_or_wrap_n_exec "$@"
 fi
