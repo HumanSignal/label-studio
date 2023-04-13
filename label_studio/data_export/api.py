@@ -509,6 +509,8 @@ def async_convert(converted_format_id, export_type, project, **kwargs):
 
     snapshot = converted_format.export
     converted_file = snapshot.convert_file(export_type)
+    if converted_file is None:
+        raise ValidationError('No converted file found, probably there are no annotations in the export snapshot')
     md5 = Export.eval_md5(converted_file)
     ext = converted_file.name.split('.')[-1]
 
