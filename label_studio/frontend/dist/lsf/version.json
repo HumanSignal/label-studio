@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-4832: New Ranker tag [internal PR]",
-  "commit": "5dc9e0ed1f123d578701bb223eb00928fa2005d8",
+  "message": "fix: LSDV-4903: Fix Video tag null rendering",
+  "commit": "08c72c372b92d7bf0381c59e993c893d1d72d61e",
   "branch": "master",
-  "date": "2023/04/14 11:07:46"
+  "date": "2023/04/14 20:06:01"
 }
