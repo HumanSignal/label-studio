@@ -570,7 +570,8 @@ class ExportConvertAPI(generics.RetrieveAPIView):
             converted_format, created = ConvertedFormat.objects.get_or_create(
                 export=snapshot, export_type=export_type
             )
-            if not created:
+            
+            if not created and converted_format.status == ConvertedFormat.Status.IN_PROGRESS:
                 raise ValidationError(f'Conversion to {export_type} already started')
 
         start_job_async_or_sync(
