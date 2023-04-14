@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4903: Fix Video tag null rendering",
-  "commit": "08c72c372b92d7bf0381c59e993c893d1d72d61e",
+  "message": "fix: LSDV-4887: Task view group bug fix",
+  "commit": "965ad3e4f0ae2c169943c6539f1d99c629477f34",
   "branch": "master",
-  "date": "2023/04/14 20:06:01"
+  "date": "2023/04/14 15:46:09"
 }
