@@ -71,8 +71,8 @@ def check_request_files_size(files):
     check_tasks_max_file_size(total)
 
 
-def create_file_upload(request, project, file):
-    instance = FileUpload(user=request.user, project=project, file=file)
+def create_file_upload(user, project, file):
+    instance = FileUpload(user=user, project=project, file=file)
     if settings.SVG_SECURITY_CLEANUP:
         content_type, encoding = mimetypes.guess_type(str(instance.file.name))
         if content_type in ['image/svg+xml']:
@@ -123,7 +123,7 @@ def str_to_json(data):
         return None
 
 
-def tasks_from_url(file_upload_ids, project, request, url, could_be_tasks_lists):
+def tasks_from_url(file_upload_ids, project, request, url, could_be_task_list):
     """ Download file using URL and read tasks from it
     """
     # process URL with tasks
@@ -145,9 +145,9 @@ def tasks_from_url(file_upload_ids, project, request, url, could_be_tasks_lists)
                 file_content = file.read()
                 if isinstance(file_content, str):
                     file_content = file_content.encode()
-        file_upload = create_file_upload(request, project, SimpleUploadedFile(filename, file_content))
+        file_upload = create_file_upload(request.user, project, SimpleUploadedFile(filename, file_content))
         if flag_set('fflag_fix_back_lsdv_4568_import_csv_links_03032023_short') and file_upload.format_could_be_tasks_list:
-            could_be_tasks_lists = True
+            could_be_task_list = True
         file_upload_ids.append(file_upload.id)
         tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(project, file_upload_ids)
 
@@ -155,23 +155,85 @@ def tasks_from_url(file_upload_ids, project, request, url, could_be_tasks_lists)
         raise e
     except Exception as e:
         raise ValidationError(str(e))
-    return data_keys, found_formats, tasks, file_upload_ids, could_be_tasks_lists
+    return data_keys, found_formats, tasks, file_upload_ids, could_be_task_list
+
+
+def create_file_uploads(user, project, FILES):
+    could_be_task_list = False
+    file_upload_ids = []
+    check_request_files_size(FILES)
+    check_extensions(FILES)
+    for _, file in FILES.items():
+        file_upload = create_file_upload(user, project, file)
+        if file_upload.format_could_be_tasks_list:
+            could_be_task_list = True
+        file_upload_ids.append(file_upload.id)
+
+    logger.debug(f'created file uploads: {file_upload_ids} could_be_task_list: {could_be_task_list}')
+    return file_upload_ids, could_be_task_list
+
+
+def load_tasks_for_async_import(project_import):
+    """ Load tasks from different types of request.data / request.files
+    """
+    file_upload_ids, found_formats, data_keys = [], [], set()
+    could_be_task_list = False
+
+    if project_import.file_upload_ids:
+        file_upload_ids = project_import.file_upload_ids
+        tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(project_import.project, file_upload_ids)
+
+    # take tasks from url address
+    elif project_import.url:
+        url = project_import.url
+        # try to load json with task or tasks from url as string
+        json_data = str_to_json(url)
+        if json_data:
+            file_upload = create_file_upload(request, project_import.project, SimpleUploadedFile('inplace.json', url.encode()))
+            file_upload_ids.append(file_upload.id)
+            tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(project_import.project, file_upload_ids)
+
+        # download file using url and read tasks from it
+        else:
+            if settings.SSRF_PROTECTION_ENABLED and url_is_local(url):
+                raise ImportFromLocalIPError
+
+            if url.strip().startswith('file://'):
+                raise ValidationError('"url" is not valid')
+
+            data_keys, found_formats, tasks, file_upload_ids, could_be_task_list = tasks_from_url(
+                file_upload_ids, project_import.project, request, url, could_be_task_list
+            )
+
+    elif project_import.tasks:
+        tasks = project_import.tasks
+
+    # check is data root is list
+    if not isinstance(tasks, list):
+        raise ValidationError('load_tasks: Data root must be list')
+
+    # empty tasks error
+    if not tasks:
+        raise ValidationError('load_tasks: No tasks added')
+
+    check_max_task_number(tasks)
+    return tasks, file_upload_ids, could_be_task_list, found_formats, list(data_keys)
 
 
 def load_tasks(request, project):
     """ Load tasks from different types of request.data / request.files
     """
     file_upload_ids, found_formats, data_keys = [], [], set()
-    could_be_tasks_lists = False
+    could_be_task_list = False
 
     # take tasks from request FILES
     if len(request.FILES):
         check_request_files_size(request.FILES)
         check_extensions(request.FILES)
         for filename, file in request.FILES.items():
-            file_upload = create_file_upload(request, project, file)
+            file_upload = create_file_upload(request.user, project, file)
             if file_upload.format_could_be_tasks_list:
-                could_be_tasks_lists = True
+                could_be_task_list = True
             file_upload_ids.append(file_upload.id)
         tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(project, file_upload_ids)
 
@@ -185,7 +247,7 @@ def load_tasks(request, project):
         # try to load json with task or tasks from url as string
         json_data = str_to_json(url)
         if json_data:
-            file_upload = create_file_upload(request, project, SimpleUploadedFile('inplace.json', url.encode()))
+            file_upload = create_file_upload(request.user, project, SimpleUploadedFile('inplace.json', url.encode()))
             file_upload_ids.append(file_upload.id)
             tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(project, file_upload_ids)
             
@@ -197,8 +259,8 @@ def load_tasks(request, project):
             if url.strip().startswith('file://'):
                 raise ValidationError('"url" is not valid')
 
-            data_keys, found_formats, tasks, file_upload_ids, could_be_tasks_lists = tasks_from_url(
-                file_upload_ids, project, request, url, could_be_tasks_lists
+            data_keys, found_formats, tasks, file_upload_ids, could_be_task_list = tasks_from_url(
+                file_upload_ids, project, request, url, could_be_task_list
             )
 
     # take one task from request DATA
@@ -222,5 +284,5 @@ def load_tasks(request, project):
         raise ValidationError('load_tasks: No tasks added')
 
     check_max_task_number(tasks)
-    return tasks, file_upload_ids, could_be_tasks_lists, found_formats, list(data_keys)
+    return tasks, file_upload_ids, could_be_task_list, found_formats, list(data_keys)
 
