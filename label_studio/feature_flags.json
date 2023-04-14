@@ -2582,7 +2582,7 @@
     },
     "fflag_feat_front_lsdv_4832_new_ranker_tag_120423_short": {
       "key": "fflag_feat_front_lsdv_4832_new_ranker_tag_120423_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -2604,7 +2604,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 4,
       "deleted": false
     },
     "fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short": {
