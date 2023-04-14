@@ -196,7 +196,8 @@ class ConvertedFormat(models.Model):
         on_delete=models.CASCADE,
         related_name='export_conversions',
     )
-    export = models.ForeignKey(Export,
+    export = models.ForeignKey(
+        Export,
         related_name='converted_formats',
         on_delete=models.CASCADE,
         help_text='Export snapshot for this converted file'
@@ -210,7 +211,11 @@ class ConvertedFormat(models.Model):
         choices=Status.choices,
         default=Status.CREATED,
     )
-    traceback = models.TextField(null=True, blank=True)
+    traceback = models.TextField(
+        null=True,
+        blank=True,
+        help_text='Traceback report in case of errors'
+    )
     export_type = models.CharField(
         max_length=64,
         choices=Status.choices,
