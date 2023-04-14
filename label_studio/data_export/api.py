@@ -501,7 +501,7 @@ def async_convert(converted_format_id, export_type, project, **kwargs):
         except ConvertedFormat.DoesNotExist:
             logger.error(f'ConvertedFormat with id {converted_format_id} not found, conversion failed')
             return
-        if converted_format.status != ConvertedFormat.Status.CREATED:
+        if converted_format.status != ConvertedFormat.Status.IN_PROGRESS:
             logger.error(f'Conversion for export id {converted_format.export.id} to {export_type} already started')
             return
         converted_format.status = ConvertedFormat.Status.IN_PROGRESS
