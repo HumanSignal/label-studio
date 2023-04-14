@@ -530,8 +530,8 @@ def set_convert_background_failure(job, connection, type, value, traceback_obj):
     from data_export.models import ConvertedFormat
 
     convert_id = job.args[0]
-    trace = tb.format_exception(type, value, traceback_obj).join('')
-    ConvertedFormat.objects.filter(id=convert_id).update(status=Export.Status.FAILED, traceback=trace)
+    trace = tb.format_exception(type, value, traceback_obj)
+    ConvertedFormat.objects.filter(id=convert_id).update(status=Export.Status.FAILED, traceback=''.join(trace))
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
