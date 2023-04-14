@@ -31,6 +31,10 @@ Label Studio is also available in Enterprise and Cloud editions with additional 
 <div class="opensource-only">
 
 ## Quick start
+> **NOTE:** For Label Studio 1.7.2 you have to to confirm the dependencies `libpq-dev` and `python3-dev` are installed. As an example, to install on a Debian-based distro:
+> ```bash
+> sudo apt install libpq-dev python3-dev
+> ```
 
 1. Install Label Studio:
 ```bash
