@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3025-3: Integrate filter component into outliner",
-  "commit": "2acc4f32d350bc3f49abc3f57e4ca8f89acfea47",
-  "branch": "master",
-  "date": "2023/04/12 14:56:25"
+  "message": "fix: LSDV-4881: Fix missed points in optimized timeseries",
+  "commit": "b7242ffbdeb20478948791968952d5c9c5c37e6a",
+  "branch": "fb-lsdv-4881/timeseries-missed-points",
+  "date": "2023/04/14 00:57:51"
 }
