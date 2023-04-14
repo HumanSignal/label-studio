@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-4832: New Ranker tag [internal PR]",
-  "commit": "5dc9e0ed1f123d578701bb223eb00928fa2005d8",
-  "branch": "master",
-  "date": "2023/04/14 11:07:46"
+  "message": "docs: LSDV-4964: Remove old Ranker; fix docs",
+  "commit": "e7ff0a8614ad37d8ef23e7f161b08136758ba76e",
+  "branch": "fb-lsdv-4964/ranker-docs",
+  "date": "2023/04/14 12:40:09"
 }
