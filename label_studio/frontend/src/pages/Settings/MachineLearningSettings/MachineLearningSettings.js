@@ -45,20 +45,7 @@ export const MachineLearningSettings = () => {
 
 
   async function mod()  {
-    // await axios
-    //   .get(webhook_url + '/get_available_models?id=' + project.id)
-    //   .then((response) => {
-    //     console.log(response);
-    //     setAvailableModels(response.data.models);
-    //     setModelToPredictOn(response.data.model_path);
-    //     console.log(availableModels);
-    //     setFetchModels(true);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
-    console.log('mod is called');
-    await axios
+      await axios
     .get(webhook_url + '/get_training_types?id=' + project.id)
       .then((response) => {
         const training_types = response.data.training_types;
@@ -166,7 +153,11 @@ export const MachineLearningSettings = () => {
           }
           else if (can_press == true) {
             Swal('Training has started');
-            axios.post(webhook_url + '/train?id=' + project.id+'&generateSpecs='+generateSpecs+'&type='+selectedTrainingType).then((response) => {
+            let trainingType = "tao";
+            if (selectedTrainingType == "PVT") {
+              trainingType = "pvt";
+            }
+            axios.post(webhook_url + '/train?id=' + project.id+'&generateSpecs='+generateSpecs+'&type='+trainingType).then((response) => {
               console.log(response);
             })
           }
@@ -458,7 +449,8 @@ export const MachineLearningSettings = () => {
         </div>
          ))}
          </div> 
-          </div> : ""}
+          </div> 
+          : ""}
 
         <Form.Actions>
           <Form.Indicator>
