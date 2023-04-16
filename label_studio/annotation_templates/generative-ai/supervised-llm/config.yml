@@ -70,7 +70,7 @@ config: |
                     maxSubmissions="1"
                     required="true"
                     requiredMessage="You must provide the response to the prompt"
-                    placeholder="def sum_even_numbers(numbers_list):"
+                    placeholder="Type your answer here..."
                     rows="10"
           />
         </View>
