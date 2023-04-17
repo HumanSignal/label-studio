@@ -110,6 +110,7 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
         )
         return job
     else:
+        kwargs.pop('on_failure', None)
         return job(*args, **kwargs)
 
 
