@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4906: Fix classnames overlap in TopBar (#1295)",
-  "commit": "de078aef3926e12e552b18a5609968b1652359f1",
+  "message": "ci: LSDV-4734: Setup Cypress integration tests (#1236)",
+  "commit": "a087162a8f4ba3441501313fda4e54a746df7449",
   "branch": "master",
-  "date": "2023/04/05 15:49:52"
+  "date": "2023/04/14 21:46:54"
 }
