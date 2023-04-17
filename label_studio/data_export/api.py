@@ -457,7 +457,7 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
 
         if flag_set('fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short', request.user):
             file = snapshot.file
-            if export_type is not None:
+            if export_type is not None and export_type != 'JSON':
                 converted_file = snapshot.converted_formats.filter(export_type=export_type).first()
                 if converted_file is None:
                     raise NotFound(f'{export_type} format is not converted yet')
@@ -541,6 +541,7 @@ def set_convert_background_failure(job, connection, type, value, traceback):
         operation_description="""
         Convert export snapshot to selected format
         """,
+        request_body=ExportConvertSerializer,
         manual_parameters=[
             openapi.Parameter(
                 name='id',
