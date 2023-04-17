@@ -1,6 +1,6 @@
 {
   "message": "fix: LOPS-97: Update frontend Source icon on Data Explorer to match d…",
-  "commit": "0b6dd2525409ad05d288c2e1c8c4ab853f8397b6",
+  "commit": "3005133b76431a24dbb9a1e51bd84db8ef92ee89",
   "branch": "fb-lops-97/data-explorer-source",
-  "date": "2023/04/13 16:22:44"
+  "date": "2023/04/17 12:20:26"
 }
