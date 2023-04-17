@@ -82,6 +82,7 @@ label-studio
 ```bash
 conda create --name label-studio
 conda activate label-studio
+conda install psycopg2
 pip install label-studio
 ```
 
@@ -94,6 +95,7 @@ You can run the latest Label Studio version locally without installing the packa
 pip install -e .
 # Run database migrations
 python label_studio/manage.py migrate
+python label_studio/manage.py collectstatic
 # Start the server in development mode at http://localhost:8080
 python label_studio/manage.py runserver
 ```

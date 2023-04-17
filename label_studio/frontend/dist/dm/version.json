@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4720: Fix datamanager column styles",
-  "commit": "61bf89222d51d4c78d397082e6ff383a832269f9",
+  "message": "feat: LOPS-33: UI page to view listing of CandidateTasks in Dataset",
+  "commit": "50899bc740fd5bc33a51f2fdf5bedd533a9d1799",
   "branch": "master",
-  "date": "2023/03/09 08:40:24"
+  "date": "2023/03/31 12:48:12"
 }

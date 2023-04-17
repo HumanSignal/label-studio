@@ -78,11 +78,24 @@ Then, start Label Studio and log in with the username and password that you set 
 
 ## Invite collaborators to a project
 
+<img src="/images/invite-collaborators-ls-single-server.png" class="gif-border"/>
+
+!!! note
+    To invite collaborators, you only need a single Label Studio instance, and all your team members should have access to it. If you want to build a simple solution that exposes Label Studio outside of your local network, you can [try ngrock](https://labelstud.io/guide/start.html#Expose-a-local-Label-Studio-instance-outside-using-ngrok). 
+
 After you [set up a labeling project](setup.html), invite annotators to the project to start collaborating on labeling tasks. Inviting people to your Label Studio instance with a link does not restrict access to the signup page unless you also set an environment variable. See how to [Restrict signup for local deployments](#Restrict-signup-for-local-deployments) and [Restrict signup for cloud deployments](#Restrict-signup-for-cloud-deployments) on this page.
 
 1. In the Label Studio UI, click the hamburger icon and click **People**.
 2. Click **+ Add People**.
 3. Copy the invitation link and share it with those that you want to invite to Label Studio. If you need to update the link and deactivate the old one, return to this page and click **Reset Link**. The link only resets if the signup page is also disabled.
+
+<div class="opensource-only">
+    
+## Team Member Permissions in Label Studio Community Edition
+    
+In the opensource version of Label Studio, all members have administrator rights and are granted full access to all features and functions. If you require role-based access control, consider using Label Studio Enterprise, [see more details here](https://docs.heartex.com/guide/manage_users.html#Roles-in-Label-Studio-Enterprise). 
+    
+</div>    
 
 ## Manage your account in Label Studio
 After you create an account in Label Studio, you can make changes to it as needed.

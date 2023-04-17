@@ -217,7 +217,7 @@ class MLBackendTrainAPI(APIView):
         operation_description="""
         Send a request to the machine learning backend set up to be used for interactive preannotations to retrieve a
         predicted region based on annotator input. 
-        See [set up machine learning](labelstud.io/guide/ml.html#Get-interactive-preannotations) for more.
+        See [set up machine learning](https://labelstud.io/guide/ml.html#Get-interactive-preannotations) for more.
         """,
         manual_parameters=[
             openapi.Parameter(
