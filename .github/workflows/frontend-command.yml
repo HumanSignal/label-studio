@@ -89,7 +89,7 @@ jobs:
 
       - name: Add reaction to command comment on nothing to do
         if: steps.commit_and_push.outputs.changes == 'no'
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@v3
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
@@ -102,7 +102,7 @@ jobs:
 
       - name: Add reaction to command comment on success
         if: steps.commit_and_push.outputs.changes != 'no'
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@v3
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
@@ -115,7 +115,7 @@ jobs:
           reactions: "+1"
 
       - name: Add reaction to command comment on failure
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@v3
         if: failure()
         with:
           token: ${{ secrets.GIT_PAT }}
@@ -133,7 +133,7 @@ jobs:
     timeout-minutes: 1
     steps:
       - name: Update comment
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@v3
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}

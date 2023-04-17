@@ -18,12 +18,7 @@ Set up the following cloud and other storage systems with Label Studio:
 - [Google Cloud Storage](#Google-Cloud-Storage)
 - [Microsoft Azure Blob storage](#Microsoft-Azure-Blob-storage)
 - [Redis database](#Redis-database)
-
-<div class="opensource-only">
-
-- [Local storage](#Local-storage)
-
-</div>
+- [Local storage](#Local-storage) <div class="enterprise-only">(for On-premise only)</div>
 
 If something goes wrong, check the [troubleshooting section](#Troubleshoot-CORS-and-access-problems). 
 
@@ -52,6 +47,23 @@ Source storage functionality can be divided into two parts:
 * URI resolving - when the Label Studio backend requests Cloud Storage to resolve URI links (e.g., `s3://bucket/1.jpg`) into HTTPS (`https://aws.amazon.com/bucket/1.jpg`). This way, user's browsers are able to load media. 
 
 <img src="/images/source-cloud-storages.png" class="make-intense-zoom">
+
+#### Treat every bucket object as a source file
+
+Label Studio Source Storages feature an option called "Treat every bucket object as a source file." This option enables two different methods of loading tasks into Label Studio.
+
+###### Off
+
+When disabled, tasks in JSON format can be loaded directly from storage buckets into Label Studio. This approach is particularly helpful when dealing with complex tasks that involve multiple media sources.
+
+<img src="/images/source-storages-treat-off.png" class="make-intense-zoom">
+
+###### On
+
+When enabled, Label Studio automatically lists files from the storage bucket and constructs tasks. This is only possible for simple labeling tasks that involve a single media source (such as an image, text, etc.).* 
+
+<img src="/images/source-storages-treat-on.png" class="make-intense-zoom">
+
 
 #### One Task - One JSON File 
 
@@ -224,7 +236,9 @@ After you [configure access to your S3 bucket](#Configure-access-to-your-S3-buck
     - In the **Session Token** field, specify a session token of the temporary security credentials for an AWS account with access to your S3 bucket.
     - (Optional) Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file.
     - (Optional) Enable **Recursive scan** to perform recursive scans over the bucket contents if you have nested folders in your S3 bucket.
-    - Choose whether to disable **Use pre-signed URLs**. If your tasks contain s3://... links, they must be pre-signed in order to be displayed in the browser.
+    - Choose whether to disable **Use pre-signed URLs**. 
+        - All s3://... links will be resolved on the fly and converted to https URLs, if this option is on. 
+        - All s3://... objects will be preloaded into Label Studio tasks as base64 codes, if this option is off. It's not recommended way, because Label Studio task payload will be huge and UI will slow down. Also it requires GET permissions from your storage. 
     - Adjust the counter for how many minutes the pre-signed URLs are valid.
 8. Click **Add Storage**.
 
@@ -407,7 +421,7 @@ In the Label Studio UI, do the following to set up the connection:
 7. Adjust the remaining optional parameters:
     - In the **File Filter Regex** field, specify a regular expression to filter bucket objects. Use `.*` to collect all objects.
     - Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling, such as `gs://my-gcs-bucket/image.jpg`. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file.
-    - Choose whether to disable **Use pre-signed URLs**. If your tasks contain s3://... links, they must be pre-signed in order to be displayed in the browser.
+    - Choose whether to disable **Use pre-signed URLs**. If your tasks contain gs://... links, they must be pre-signed in order to be displayed in the browser.
     - Adjust the counter for how many minutes the pre-signed URLs are valid.
 8. In the **Google Application Credentials** field, add a JSON file with the GCS credentials you created to manage authentication for your bucket. You can also use the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to specify this file. For example:
 ```bash
@@ -448,7 +462,7 @@ In the Label Studio UI, do the following to set up the connection:
     - In the **Account Name** field, specify the account name for the Azure storage. You can also set this field as an environment variable,`AZURE_BLOB_ACCOUNT_NAME`.
     - In the **Account Key** field, specify the secret key to access the storage account. You can also set this field as an environment variable,`AZURE_BLOB_ACCOUNT_KEY`.
     - Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling, for example `azure-blob://container-name/image.jpg`. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file. 
-    - Choose whether to disable **Use pre-signed URLs**, or [shared access signatures](https://docs.microsoft.com/en-us/rest/api/storageservices/delegate-access-with-shared-access-signature). If your tasks contain s3://... links, they must be pre-signed in order to be displayed in the browser.    
+    - Choose whether to disable **Use pre-signed URLs**, or [shared access signatures](https://docs.microsoft.com/en-us/rest/api/storageservices/delegate-access-with-shared-access-signature). If your tasks contain azure-blob://... links, they must be pre-signed in order to be displayed in the browser.    
     - Adjust the counter for how many minutes the shared access signatures are valid.
 8. Click **Add Storage**.
 9. Repeat these steps for **Target Storage** to sync completed data annotations to a container.
@@ -493,9 +507,16 @@ You can also create a storage connection using the Label Studio API.
 - See [Create new import storage](/api#operation/api_storages_redis_create) then [sync the import storage](/api#operation/api_storages_redis_sync_create). 
 - See [Create export storage](/api#operation/api_storages_export_redis_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_redis_sync_create).
 
-<div class="opensource-only">
 
 ## Local storage
+
+<div class="enterprise-only">
+
+!!! note
+    Local Storages are available for On-premise deployments only. The cloud version (app.heartex.com) doesn't support them.
+  
+</div>
+  
 If you have local files that you want to add to Label Studio from a specific directory, you can set up a specific local directory on the machine where LS is running as source or target storage. Label Studio steps through the directory recursively to read tasks.
 
 ### Prerequisites
@@ -511,7 +532,9 @@ In the Label Studio UI, do the following to set up the connection:
 1. Open Label Studio in your web browser.
 2. For a specific project, open **Settings > Cloud Storage**.
 3. Click **Add Source Storage**.
-   <img src="/images/local-storage-settings.png" alt="Screenshot of the storage settings modal described in the preceding steps." width=670 height=490 style="border: 1px solid #eee">
+  
+<img src="/images/local-storage-settings.png" alt="Screenshot of the storage settings modal described in the preceding steps." width=670 height=490 style="border: 1px solid #eee">
+  
 4. In the dialog box that appears, select **Local Files** as the storage type.
 5. In the **Storage Title** field, type a name for the storage to appear in the Label Studio UI.
 6. Specify an **Absolute local path** to the directory with your files. The local path must be an absolute path and include the `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` value. 
@@ -535,11 +558,18 @@ Differences with instruction above:
 - **8. Treat every bucket object as a source file** - switch off (because you will specify it inside tasks)
 
 Your window will look like this:
-<img src="/images/local-storage-settings2.png" alt="Screenshot of the local storage settings for user task." width=670 height=490 style="border: 1px solid #eee">
+<img src="/images/local-storage-settings2.png" alt="Screenshot of the local storage settings for user task." class="gif-border">
 
-Click **Add Storage**, but not use synchronization (don't touch button **Sync Storage**) after storage creation, to avoid automatic task creation from storage files.
+Click **Add Storage**, but not use synchronization (don't touch button **Sync Storage**) after the storage creation, to avoid automatic task creation from storage files.
 
-Path to all your files inside task will start with string `/data/local-files/?d=`, also you have to add to this string full path to each file, that start from the first directory in **Absolute local path** of local storage after your `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT`. In our example it is `dataset1`. For example, to specify multiple data types in the Label Studio JSON format, specifically an audio files `1.wav`, `2.wav` inside `audio` folder and an image files `1.jpg`, `2.jpg` inside `images` folder:
+When referencing your files within a task, adhere to the following guidelines:
+* "Absolute local path" must be a sub-directory of LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT (see [6](https://labelstud.io/guide/storage.html#Set-up-connection-in-the-Label-Studio-UI-4)). 
+* All file paths must begin with `/data/local-files/?d=`.
+* In the following example, the first directory is `dataset1`. For instance, if you have mixed data types in tasks, including 
+    - audio files `1.wav`, `2.wav` within an `audio` folder and 
+    - image files `1.jpg`, `2.jpg` within an `images` folder, 
+  construct the paths as follows:
+
 ```
 [{
  "id": 1,
@@ -556,23 +586,24 @@ Path to all your files inside task will start with string `/data/local-files/?d=
   }
 }]
 ```
-There are several ways to add your hand made task: API, web interface, another storage. The simplest one is to use **Import** button inside project main page. Drag and drop your json file inside window, after this push blue button **Import**.
-<img src="/images/upload-task.png" alt="Task upload via web." width="100%">
 
-#### Add storage with the Label Studio API
+There are several ways to add your custom task: API, web interface, another storage. The simplest one is to use **Import** button on the Data Manager page. Drag and drop your json file inside the window, then click the blue **Import** button .
+
+<img class="gif-border" src="/images/upload-task.png" alt="Task upload via web." width="100%">
+
+
+### Local Storage with Custom Task Format
+This video tutorial demonstrates how to setup Local Storage from scratch and import json tasks in a complex task format that are linked to the Local Storage files.
+
+<iframe class="video-border" width="100%" height="400vh" src="https://www.youtube.com/embed/lo6ncQajbdU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>  
+
+### Add storage with the Label Studio API
 You can also create a storage connection using the Label Studio API. 
 - See [Create new import storage](/api#operation/api_storages_localfiles_create) then [sync the import storage](/api#operation/api_storages_localfiles_sync_create). 
 - See [Create export storage](/api#operation/api_storages_export_localfiles_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_localfiles_sync_create).
 
 ### Set up local storage with Docker
 If you're using Label Studio in Docker, you need to mount the local directory that you want to access as a volume when you start the Docker container. See [Run Label Studio on Docker and use local storage](start.html#Run-Label-Studio-on-Docker-and-use-local-storage).
-
-### Local Storage with Custom Task Format
-This video tutorial demonstrates how to setup Local Storage from scratch and import json tasks in a complex task format that are linked to the Local Storage files.
-
-<iframe class="video-border" width="100%" height="400vh" src="https://www.youtube.com/embed/lo6ncQajbdU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-</div>
 
 ## Troubleshoot CORS and access problems
 

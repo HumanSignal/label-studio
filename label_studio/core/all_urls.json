@@ -354,6 +354,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/projects/<int:pk>/exports/<int:export_pk>/convert",
+        "module": "data_export.api.ExportConvertAPI",
+        "name": "data_export:api-projects:project-exports-convert",
+        "decorators": ""
+    },
+    {
         "url": "/api/auth/export/",
         "module": "data_export.api.ProjectExportFilesAuthCheck",
         "name": "data_export:project-export-files-auth-check",
