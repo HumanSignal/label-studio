@@ -5,15 +5,9 @@ order: 1
 image: /static/templates/generative-supervised-llm.png
 details: Collecting labeled text data for training an initial LLM, focusing on task-specific performance improvement. This stage involves gathering instructions and responses to adapt the base model to a wide range of tasks, enhancing its ability to generate more accurate and useful responses.
 config: |
-  <View>
+  <View className="root">
     <Style>
-    
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
+    .root {
       font-family: 'Roboto', sans-serif;
       line-height: 1.6;
       background-color: #f0f0f0;
@@ -57,7 +51,7 @@ config: |
     .lsf-richtext__line:hover {
       background: unset;
     }
-    .answer-box .lsf-object {
+    .answer-box {
       padding: 20px;
     }
     </Style>

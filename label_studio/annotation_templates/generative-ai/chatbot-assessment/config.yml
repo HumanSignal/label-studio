@@ -5,14 +5,12 @@ order: 3
 image: /static/templates/generative-chatbot-assessment.png
 details: Collecting expert assessments of LLM-generated responses for quality assurance and model evaluation. This stage involves evaluating the model's responses based on criteria like correctness, relevance, and safety, which provides valuable feedback for further model refinement and helps ensure the final LLM meets desired performance standards.
 config: |
-  <View>
+  <View className="root">
       <Style>
-          * {
+          .root {
               box-sizing: border-box;
               margin: 0;
               padding: 0;
-          }
-          body {
               font-family: 'Roboto', sans-serif;
               line-height: 1.6;
               background-color: #f0f0f0;
@@ -38,7 +36,7 @@ config: |
               gap: 20px;
           }
           .assessment-item {
-              background-color: rgba(44, 62, 80, 0.9);
+              background-color: rgba(44, 62, 80, 0.6);
               padding: 1px;
               border-radius: 5px;
               box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1), 0 3px 10px 0 rgba(0, 0, 0, 0.1);
