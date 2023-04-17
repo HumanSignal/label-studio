@@ -34,7 +34,7 @@ def async_import_background(import_id, user_id):
     tasks = None
     # upload files from request, and parse all tasks
     # TODO: Stop passing request to load_tasks function, make all validation before
-    parsed_data, file_upload_ids, could_be_tasks_lists, found_formats, data_columns = load_tasks_for_async_import(project_import)
+    parsed_data, file_upload_ids, could_be_tasks_lists, found_formats, data_columns = load_tasks_for_async_import(project_import, user)
 
     if project_import.preannotated_from_fields:
         # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]  # noqa

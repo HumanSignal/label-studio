@@ -123,7 +123,7 @@ def str_to_json(data):
         return None
 
 
-def tasks_from_url(file_upload_ids, project, request, url, could_be_task_list):
+def tasks_from_url(file_upload_ids, project, user, url, could_be_task_list):
     """ Download file using URL and read tasks from it
     """
     # process URL with tasks
@@ -145,7 +145,7 @@ def tasks_from_url(file_upload_ids, project, request, url, could_be_task_list):
                 file_content = file.read()
                 if isinstance(file_content, str):
                     file_content = file_content.encode()
-        file_upload = create_file_upload(request.user, project, SimpleUploadedFile(filename, file_content))
+        file_upload = create_file_upload(user, project, SimpleUploadedFile(filename, file_content))
         if flag_set('fflag_fix_back_lsdv_4568_import_csv_links_03032023_short') and file_upload.format_could_be_tasks_list:
             could_be_task_list = True
         file_upload_ids.append(file_upload.id)
@@ -173,8 +173,8 @@ def create_file_uploads(user, project, FILES):
     return file_upload_ids, could_be_task_list
 
 
-def load_tasks_for_async_import(project_import):
-    """ Load tasks from different types of request.data / request.files
+def load_tasks_for_async_import(project_import, user):
+    """ Load tasks from different types of request.data / request.files saved in project_import model
     """
     file_upload_ids, found_formats, data_keys = [], [], set()
     could_be_task_list = False
@@ -189,7 +189,7 @@ def load_tasks_for_async_import(project_import):
         # try to load json with task or tasks from url as string
         json_data = str_to_json(url)
         if json_data:
-            file_upload = create_file_upload(request, project_import.project, SimpleUploadedFile('inplace.json', url.encode()))
+            file_upload = create_file_upload(request.user, project_import.project, SimpleUploadedFile('inplace.json', url.encode()))
             file_upload_ids.append(file_upload.id)
             tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(project_import.project, file_upload_ids)
 
@@ -202,7 +202,7 @@ def load_tasks_for_async_import(project_import):
                 raise ValidationError('"url" is not valid')
 
             data_keys, found_formats, tasks, file_upload_ids, could_be_task_list = tasks_from_url(
-                file_upload_ids, project_import.project, request, url, could_be_task_list
+                file_upload_ids, project_import.project, user, url, could_be_task_list
             )
 
     elif project_import.tasks:
@@ -260,7 +260,7 @@ def load_tasks(request, project):
                 raise ValidationError('"url" is not valid')
 
             data_keys, found_formats, tasks, file_upload_ids, could_be_task_list = tasks_from_url(
-                file_upload_ids, project, request, url, could_be_task_list
+                file_upload_ids, project, request.user, url, could_be_task_list
             )
 
     # take one task from request DATA
