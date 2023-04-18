@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-4832: New Ranker tag [internal PR]",
-  "commit": "5dc9e0ed1f123d578701bb223eb00928fa2005d8",
+  "message": "fix: LSDV-4776: Fix interpolating a video region rotation prop",
+  "commit": "ee6ed696e484ce965f7ad05b04e315120dbdb663",
   "branch": "master",
-  "date": "2023/04/14 11:07:46"
+  "date": "2023/04/18 15:39:53"
 }
