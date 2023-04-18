@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4684: Fix check for image boundaries",
-  "commit": "eac80ba09c3d675a4621c7f9403b09736a50f8b2",
+  "message": "fix: LSDV-4757: Fix brush crashing",
+  "commit": "f58da512c7e8d8ca0b7e749f694550035db6ae7a",
   "branch": "master",
-  "date": "2023/04/18 18:16:23"
+  "date": "2023/04/18 18:53:50"
 }
