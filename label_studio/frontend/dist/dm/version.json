@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-73: Candidate task frontend display UI",
-  "commit": "f9f5955d950ec30edfd918d15c18099fdadcb67a",
-  "branch": "master",
-  "date": "2023/04/17 10:56:57"
+  "message": "chore: LSDV-4894: Update to NodeJS LTS",
+  "commit": "3d6efd2477cb4f99e8ccc77837bd3cf2a6282e67",
+  "branch": "fb-lsdv-4894/update-node",
+  "date": "2023/04/18 18:23:22"
 }
