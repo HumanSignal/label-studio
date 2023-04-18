@@ -1144,6 +1144,7 @@ class ProjectImport(models.Model):
     status = models.CharField(max_length=64, choices=Status.choices, default=Status.CREATED)
     url = models.CharField(max_length=2048, null=True, blank=True)
     traceback = models.TextField(null=True, blank=True)
+    error = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(_('created at'), null=True, auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), null=True, auto_now_add=True, help_text='Updated time')
     finished_at = models.DateTimeField(_('finished at'), help_text='Complete or fail time', null=True, default=None)

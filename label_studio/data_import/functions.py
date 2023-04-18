@@ -87,7 +87,11 @@ def async_import_background(import_id, user_id):
 
 def set_import_background_failure(job, connection, type, value, _):
     import_id = job.args[0]
-    ProjectImport.objects.filter(id=import_id).update(status=ProjectImport.Status.FAILED, traceback=traceback.format_exc())
+    ProjectImport.objects.filter(id=import_id).update(
+        status=ProjectImport.Status.FAILED,
+        traceback=traceback.format_exc(),
+        error=str(value)
+    )
 
 
 def reformat_predictions(tasks, preannotated_from_fields):
