@@ -389,6 +389,26 @@ stages:
       verify_response_with:
         function: label_studio.tests.utils:file_exists_in_storage
 
+  - name: make conversion
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}/convert/api/projects/{project_pk}/exports/{export_id}/convert"
+      method: POST
+      json:
+        export_type: "CSV"
+    response:
+      status_code: 200
+    delay_after: 2
+
+  - name: get exports list
+    request:
+      url: "{django_live_url}/api/projects/{project_pk}/exports/"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        $ext:
+          function: label_studio.tests.utils:save_convert_file_path
+
   - name: delete export
     request:
       url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}"
@@ -401,5 +421,5 @@ stages:
       verify_response_with:
         function: label_studio.tests.utils:file_exists_in_storage
         extra_kwargs:
-          exists: false
-          file_path: "{file_path}"
+          exists: true # false
+          file_path: "{convert_file_path}"
