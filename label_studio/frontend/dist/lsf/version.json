@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4776: Fix interpolating a video region rotation prop",
-  "commit": "ee6ed696e484ce965f7ad05b04e315120dbdb663",
+  "message": "fix: LSDV-4684: Fix check for image boundaries",
+  "commit": "eac80ba09c3d675a4621c7f9403b09736a50f8b2",
   "branch": "master",
-  "date": "2023/04/18 15:39:53"
+  "date": "2023/04/18 18:16:23"
 }
