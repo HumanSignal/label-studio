@@ -113,7 +113,7 @@ If you choose to make changes to these default settings, consider the following:
 
 #### RQ worker replicas
 
-The default queue is the most extensive queue. It is recommended to use 4 times more replicas for the default queue compared to the other queues. The other queues (critical, high, low) can have the same number of replicas. You can start with 1 replica for each of them. 
+The `default` queue is the most extensive queue. It is recommended to use 4 times more replicas for the `default` queue compared to the other queues. The other queues (`critical`, `high`, `low`) can have the same number of replicas. You can start with 1 replica for each of them. 
 
 ### Prepare the Kubernetes cluster
 
