@@ -27,17 +27,48 @@ logger = logging.getLogger(__name__)
 
 
 class Storage(models.Model):
+    class Status(models.TextChoices):
+        CREATED = 'created', _('Created')
+        IN_PROGRESS = 'in_progress', _('In progress')
+        FAILED = 'failed', _('Failed')
+        COMPLETED = 'completed', _('Completed')
+
     url_scheme = ''
 
     title = models.CharField(_('title'), null=True, blank=True, max_length=256, help_text='Cloud storage title')
     description = models.TextField(_('description'), null=True, blank=True, help_text='Cloud storage description')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
-    last_sync = models.DateTimeField(_('last sync'), null=True, blank=True, help_text='Last sync finished time')
+
+    last_sync = models.DateTimeField(
+        _('last sync'),
+        null=True,
+        blank=True,
+        help_text='Last sync finished time'
+    )
     last_sync_count = models.PositiveIntegerField(
-        _('last sync count'), null=True, blank=True, help_text='Count of tasks synced last time'
+        _('last sync count'),
+        null=True,
+        blank=True,
+        help_text='Count of tasks synced last time'
+    )
+    last_sync_job = models.CharField(
+        _('last_sync_job'),
+        null=True,
+        blank=True,
+        max_length=256,
+        help_text='Last sync job ID'
     )
 
-    last_sync_job = models.CharField(_('last_sync_job'), null=True, blank=True, max_length=256, help_text='Last sync job ID')
+    status = models.CharField(
+        max_length=64,
+        choices=Status.choices,
+        default=Status.CREATED,
+    )
+    traceback = models.TextField(
+        null=True,
+        blank=True,
+        help_text='Traceback report in case of errors'
+    )
 
     def validate_connection(self, client=None):
         pass
@@ -223,8 +254,14 @@ class ImportStorage(Storage):
             meta = {'project': self.project.id, 'storage': self.id}
             if not is_job_in_queue(queue, "sync_background", meta=meta) and \
                     not is_job_on_worker(job_id=self.last_sync_job, queue_name='default'):
-                job = queue.enqueue(sync_background, self.__class__, self.id,
-                                    meta=meta)
+                job = queue.enqueue(
+                    sync_background,
+                    self.__class__,
+                    self.id,
+                    meta=meta,
+                    project_id=self.project.id,
+                    organization_id=self.project.organization.id
+                )
                 self.last_sync_job = job.id
                 self.save()
                 # job_id = sync_background.delay()  # TODO: @niklub: check this fix
@@ -289,7 +326,15 @@ class ExportStorage(Storage, ProjectStorageMixin):
     def sync(self):
         if redis_connected():
             queue = django_rq.get_queue('low')
-            job = queue.enqueue(export_sync_background, self.__class__, self.id, job_timeout=settings.RQ_LONG_JOB_TIMEOUT)
+            job = queue.enqueue(
+                export_sync_background,
+                self.__class__,
+                self.id,
+                job_timeout=settings.RQ_LONG_JOB_TIMEOUT,
+                project_id=self.project.id,
+                organization_id=self.project.organization.id,
+                on_failure=set_import_storage_background_failure
+            )
             logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
         else:
             logger.info(f'Start syncing storage {self}')
@@ -300,9 +345,20 @@ class ExportStorage(Storage, ProjectStorageMixin):
 
 
 @job('low', timeout=settings.RQ_LONG_JOB_TIMEOUT)
-def export_sync_background(storage_class, storage_id):
+def export_sync_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.save_all_annotations()
+
+
+def set_import_storage_background_failure(job, connection, type, value, traceback):
+    _class = job.args[0]
+    storage_id = job.args[1]
+    _class.objects.filter(id=storage_id).update(status=Export.Status.FAILED, traceback=str(traceback))
+
+
+def set_export_storage_background_failure(job, connection, type, value, traceback):
+    storage_id = job.args[1]
+    ConvertedFormat.objects.filter(id=storage_id).update(status=Export.Status.FAILED, traceback=str(traceback))
 
 
 class ImportStorageLink(models.Model):
