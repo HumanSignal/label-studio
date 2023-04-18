@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into fb-lsdv-4684/out-of-the-box",
-  "commit": "c30300de3dee16591caab1db9c2822404d187645",
-  "branch": "fb-lsdv-4684/out-of-the-box",
-  "date": "2023-04-14T21:02:36Z"
+  "message": "fix: LSDV-4684: Fix check for image boundaries",
+  "commit": "eac80ba09c3d675a4621c7f9403b09736a50f8b2",
+  "branch": "master",
+  "date": "2023/04/18 18:16:23"
 }
