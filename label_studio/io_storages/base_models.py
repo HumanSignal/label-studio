@@ -9,6 +9,7 @@ from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django_rq import job
+from django.db.models import JSONField
 
 from core.feature_flags import flag_set
 from tasks.models import Task, Annotation
@@ -69,6 +70,13 @@ class Storage(models.Model):
         blank=True,
         help_text='Traceback report in case of errors'
     )
+    meta = JSONField(
+        'meta',
+        null=True,
+        default=dict,
+        help_text='Meta and debug information about storage processes'
+    )
+
 
     def validate_connection(self, client=None):
         pass
@@ -295,7 +303,19 @@ class ProjectStorageMixin(models.Model):
 @job('low')
 def sync_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
+    storage.status = storage.Status.IN_PROGRESS
+    storage.save(update_fields=['status'])
+
     storage.scan_and_create_links()
+
+    storage.status = storage.Status.COPLETED
+    storage.save(update_fields=['status'])
+
+
+def set_import_storage_background_failure(job, connection, type, value, traceback):
+    _class = job.args[0]
+    storage_id = job.args[1]
+    _class.objects.filter(id=storage_id).update(status=_class.Status.FAILED, traceback=str(traceback))
 
 
 class ExportStorage(Storage, ProjectStorageMixin):
@@ -333,7 +353,7 @@ class ExportStorage(Storage, ProjectStorageMixin):
                 job_timeout=settings.RQ_LONG_JOB_TIMEOUT,
                 project_id=self.project.id,
                 organization_id=self.project.organization.id,
-                on_failure=set_import_storage_background_failure
+                on_failure=set_export_storage_background_failure
             )
             logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
         else:
@@ -347,18 +367,19 @@ class ExportStorage(Storage, ProjectStorageMixin):
 @job('low', timeout=settings.RQ_LONG_JOB_TIMEOUT)
 def export_sync_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
+    storage.status = storage.Status.IN_PROGRESS
+    storage.save(update_fields=['status'])
+
     storage.save_all_annotations()
 
-
-def set_import_storage_background_failure(job, connection, type, value, traceback):
-    _class = job.args[0]
-    storage_id = job.args[1]
-    _class.objects.filter(id=storage_id).update(status=Export.Status.FAILED, traceback=str(traceback))
+    storage.status = storage.Status.COMPLETED
+    storage.save(update_fields=['status'])
 
 
 def set_export_storage_background_failure(job, connection, type, value, traceback):
+    _class = job.args[0]
     storage_id = job.args[1]
-    ConvertedFormat.objects.filter(id=storage_id).update(status=Export.Status.FAILED, traceback=str(traceback))
+    _class.objects.filter(id=storage_id).update(status=_class.Status.FAILED, traceback=str(traceback))
 
 
 class ImportStorageLink(models.Model):
