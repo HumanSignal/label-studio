@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4776: Fix interpolating a video region rotation prop",
-  "commit": "f3bac401efa14dcdf38735a12383cbf99604b7c1",
-  "branch": "fb-lsdv-4776/rotation-interpolation",
-  "date": "2023/04/18 01:14:06"
+  "commit": "ee6ed696e484ce965f7ad05b04e315120dbdb663",
+  "branch": "master",
+  "date": "2023/04/18 15:39:53"
 }
