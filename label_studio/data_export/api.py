@@ -457,7 +457,7 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
 
         if flag_set('fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short', request.user):
             file = snapshot.file
-            if export_type is not None:
+            if export_type is not None and export_type != 'JSON':
                 converted_file = snapshot.converted_formats.filter(export_type=export_type).first()
                 if converted_file is None:
                     raise NotFound(f'{export_type} format is not converted yet')
@@ -502,17 +502,20 @@ def async_convert(converted_format_id, export_type, project, **kwargs):
             logger.error(f'ConvertedFormat with id {converted_format_id} not found, conversion failed')
             return
         if converted_format.status != ConvertedFormat.Status.CREATED:
-            logger.error(f'Converson for export id {snapshot_id} to {export_type} already started')
+            logger.error(f'Conversion for export id {converted_format.export.id} to {export_type} already started')
             return
         converted_format.status = ConvertedFormat.Status.IN_PROGRESS
         converted_format.save(update_fields=['status'])
 
     snapshot = converted_format.export
     converted_file = snapshot.convert_file(export_type)
+    if converted_file is None:
+        raise ValidationError('No converted file found, probably there are no annotations in the export snapshot')
     md5 = Export.eval_md5(converted_file)
+    ext = converted_file.name.split('.')[-1]
 
     now = datetime.now()
-    file_name = f'project-{project.id}-at-{now.strftime("%Y-%m-%d-%H-%M")}-{md5[0:8]}.{export_type.lower()}'
+    file_name = f'project-{project.id}-at-{now.strftime("%Y-%m-%d-%H-%M")}-{md5[0:8]}.{ext}'
     file_path = (
         f'{project.id}/{file_name}'
     )  # finally file will be in settings.DELAYED_EXPORT_DIR/project.id/file_name
@@ -538,6 +541,7 @@ def set_convert_background_failure(job, connection, type, value, traceback):
         operation_description="""
         Convert export snapshot to selected format
         """,
+        request_body=ExportConvertSerializer,
         manual_parameters=[
             openapi.Parameter(
                 name='id',
@@ -567,8 +571,9 @@ class ExportConvertAPI(generics.RetrieveAPIView):
             converted_format, created = ConvertedFormat.objects.get_or_create(
                 export=snapshot, export_type=export_type
             )
+            
             if not created:
-                raise ValidationError(f'Converson to {export_type} already started')
+                raise ValidationError(f'Conversion to {export_type} already started')
 
         start_job_async_or_sync(
             async_convert,
