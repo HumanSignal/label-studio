@@ -1,6 +1,6 @@
 {
-  "message": "ci: bump codecov/codecov-action from 3.1.1 to 3.1.2 (#1319)",
-  "commit": "edc6da5eb05230575b1809d0a779b3f021c35e44",
+  "message": "fix: LSDV-4776: Fix interpolating a video region rotation prop",
+  "commit": "ee6ed696e484ce965f7ad05b04e315120dbdb663",
   "branch": "master",
-  "date": "2023-04-17T09:16:04Z"
+  "date": "2023/04/18 15:39:53"
 }
