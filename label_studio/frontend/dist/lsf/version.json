@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4757: Fix brush crashing",
-  "commit": "f58da512c7e8d8ca0b7e749f694550035db6ae7a",
+  "message": "feat: LSDV-4712: Add effect of skipDuplicates parameter on results editing",
+  "commit": "c38c288c4945bfa5f4325349c94f6082eef97503",
   "branch": "master",
-  "date": "2023/04/18 18:53:50"
+  "date": "2023/04/18 21:15:58"
 }
