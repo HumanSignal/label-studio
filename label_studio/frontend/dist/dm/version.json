@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-33: UI page to view listing of CandidateTasks in Dataset",
-  "commit": "50899bc740fd5bc33a51f2fdf5bedd533a9d1799",
+  "message": "feat: LOPS-73: Candidate task frontend display UI",
+  "commit": "f9f5955d950ec30edfd918d15c18099fdadcb67a",
   "branch": "master",
-  "date": "2023/03/31 12:48:12"
+  "date": "2023/04/17 10:56:57"
 }
