@@ -189,7 +189,7 @@ def load_tasks_for_async_import(project_import, user):
         # try to load json with task or tasks from url as string
         json_data = str_to_json(url)
         if json_data:
-            file_upload = create_file_upload(request.user, project_import.project, SimpleUploadedFile('inplace.json', url.encode()))
+            file_upload = create_file_upload(user, project_import.project, SimpleUploadedFile('inplace.json', url.encode()))
             file_upload_ids.append(file_upload.id)
             tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(project_import.project, file_upload_ids)
 
