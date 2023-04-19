@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4836: Conditional annotation with visibleWhen choice-selected works with Taxonomy",
-  "commit": "791b7135d7a37db382bae18e473b14ba39bdd966",
-  "branch": "master",
-  "date": "2023/04/19 12:13:15"
+  "message": "fix: LSDV-4864: Magic Wand doesn't work with MIG ",
+  "commit": "cf94623481e21b57001b753ef5538857db532b90",
+  "branch": "fb-lsdv-4864/magic-wand-mig",
+  "date": "2023/04/19 21:33:38"
 }
