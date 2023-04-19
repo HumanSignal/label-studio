@@ -14,7 +14,7 @@ from core.utils.common import load_func
 from core.utils.io import get_all_files_from_dir, get_temp_dir, read_bytes_stream
 from django.conf import settings
 from django.db import models
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import post_save, pre_delete, post_delete
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from label_studio_converter import Converter
@@ -249,7 +249,7 @@ class ConvertedFormat(models.Model):
     )
 
 
-@receiver(post_save, sender=ConvertedFormat)
+@receiver(post_delete, sender=ConvertedFormat)
 def delete_storage_file(sender, instance, **kwargs):
     if flag_set('ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short'):
         try:
