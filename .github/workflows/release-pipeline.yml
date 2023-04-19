@@ -64,7 +64,7 @@ jobs:
     steps:
       - uses: hmarr/debug-action@v2.1.0
 
-      - name: DispatchEvent
+      - name: Delete Release Candidate Assets
         uses: actions/github-script@v6
         env:
           RELEASE_ID: "${{ github.event.release.id }}"
@@ -73,7 +73,7 @@ jobs:
           script: |
             const { repo, owner } = context.repo;
             const release_id = process.env.RELEASE_ID;
-            const rc_regexp = /label-studio-\d+.\d+.\d+rc\d+/;
+            const rc_regexp = /label[-_]studio-\d+.\d+.\d+rc\d+/;
             const {data: release} = await github.rest.repos.getRelease({
               owner,
               repo,
