@@ -388,7 +388,9 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
                 export = self.get_object()
                 export.file.delete()
 
-                # export.converted_formats.all().delete()
+                for converted_format in export.converted_formats.all():
+                    if converted_format.file:
+                        converted_format.file.delete()
             except Exception as e:
                 return Response(
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
