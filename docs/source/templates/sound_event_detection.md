@@ -24,7 +24,7 @@ For cases when you need to improve sound event detection, use this template to p
     <Label value="Event A" background="red"/>
     <Label value="Event B" background="green"/>
   </Labels>
-  <AudioPlus name="audio" value="$audio"/>
+  <Audio name="audio" value="$audio"/>
 </View>
 ```
 
@@ -40,12 +40,12 @@ Use the [Labels](/tags/labels.html) control tag to highlight spans of audio with
   </Labels>
 ```
 
-Use the AudioPlus object tag to display audio with a waveform, segment the audio clip, and provide annotators the option to change the speed of the audio playback.
+Use the Audio object tag to display audio with a waveform, segment the audio clip, and provide annotators the option to change the speed of the audio playback.
 ```xml
-<AudioPlus name="audio" value="$audio" />
+<Audio name="audio" value="$audio" />
 ```
 
 ## Related tags
 
 - [Labels](/tags/labels.html)
-- [AudioPlus](/tags/audioplus.html)
+- [Audio](/tags/audio.html)
