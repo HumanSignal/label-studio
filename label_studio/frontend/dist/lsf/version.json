@@ -1,6 +1,6 @@
 {
-  "message": "chore: LSDV-4727: Remove any AudioPlus mentions",
-  "commit": "4100d96da1c3ae2d6265f10b6447b5abca47b243",
-  "branch": "master",
-  "date": "2023/04/18 15:29:48"
+  "message": "feat: LSDV-3025-11: Add functionality to filter with multiple rules",
+  "commit": "0bb1c2e03a80dab04d0a8f884ca3ba7f20825995",
+  "branch": "fb-lsdv-3025-11",
+  "date": "2023/04/18 20:54:14"
 }
