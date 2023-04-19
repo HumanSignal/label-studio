@@ -1,6 +1,6 @@
 {
-  "message": "chore: LSDV-4727: Remove any AudioPlus mentions",
-  "commit": "4100d96da1c3ae2d6265f10b6447b5abca47b243",
+  "message": "fix: LSDV-4953: Filter cut off at default panel width",
+  "commit": "ffd3f4c1a6c090eb9e99d0e0a0f76452262a57cf",
   "branch": "master",
-  "date": "2023/04/18 15:29:48"
+  "date": "2023/04/19 08:39:37"
 }
