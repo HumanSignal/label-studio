@@ -3,6 +3,7 @@
 import logging
 import django_rq
 import json
+import traceback as tb
 
 from django.utils import timezone
 from django.db import models, transaction
@@ -268,7 +269,8 @@ class ImportStorage(Storage):
                     self.id,
                     meta=meta,
                     project_id=self.project.id,
-                    organization_id=self.project.organization.id
+                    organization_id=self.project.organization.id,
+                    on_failure=set_import_storage_background_failure
                 )
                 self.last_sync_job = job.id
                 self.save()
@@ -304,18 +306,19 @@ class ProjectStorageMixin(models.Model):
 def sync_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.status = storage.Status.IN_PROGRESS
-    storage.save(update_fields=['status'])
+    storage.last_sync = None
+    storage.last_sync_count = None
+    storage.save(update_fields=['status', 'last_sync_count', 'last_sync'])
 
     storage.scan_and_create_links()
 
-    storage.status = storage.Status.COPLETED
+    storage.status = storage.Status.COMPLETED
     storage.save(update_fields=['status'])
-
 
 def set_import_storage_background_failure(job, connection, type, value, traceback):
     _class = job.args[0]
     storage_id = job.args[1]
-    _class.objects.filter(id=storage_id).update(status=_class.Status.FAILED, traceback=str(traceback))
+    _class.objects.filter(id=storage_id).update(status=_class.Status.FAILED, traceback=str(tb.format_exc()))
 
 
 class ExportStorage(Storage, ProjectStorageMixin):
@@ -368,7 +371,9 @@ class ExportStorage(Storage, ProjectStorageMixin):
 def export_sync_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.status = storage.Status.IN_PROGRESS
-    storage.save(update_fields=['status'])
+    storage.last_sync = None
+    storage.last_sync_count = None
+    storage.save(update_fields=['status', 'last_sync_count', 'last_sync'])
 
     storage.save_all_annotations()
 
@@ -379,7 +384,7 @@ def export_sync_background(storage_class, storage_id, **kwargs):
 def set_export_storage_background_failure(job, connection, type, value, traceback):
     _class = job.args[0]
     storage_id = job.args[1]
-    _class.objects.filter(id=storage_id).update(status=_class.Status.FAILED, traceback=str(traceback))
+    _class.objects.filter(id=storage_id).update(status=_class.Status.FAILED, traceback=str(tb.format_exc()))
 
 
 class ImportStorageLink(models.Model):
