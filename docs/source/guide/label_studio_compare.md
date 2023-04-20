@@ -1,6 +1,6 @@
 ---
-title: Compare Community and Enterprise
-short: Community vs Enterprise
+title: Compare Community and Enterprise Features
+short: Enterprise vs Community
 type: guide
 tier: all
 order: 100
