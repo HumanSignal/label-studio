@@ -248,11 +248,8 @@ class ConvertedFormat(models.Model):
         verbose_name=_('created by'),
     )
 
-
-@receiver(post_delete, sender=ConvertedFormat)
-def delete_storage_file(sender, instance, **kwargs):
-    if flag_set('ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short'):
-        try:
-            instance.file.delete()
-        except Exception as e:
-            raise e
+    def delete(self, *args, **kwargs):
+        if flag_set('ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short'):
+            if self.file:
+                self.file.delete()
+        super().delete(*args, **kwargs)

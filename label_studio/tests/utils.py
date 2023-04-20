@@ -332,59 +332,24 @@ def save_export_file_path(response):
 
 def save_convert_file_path(response, export_id=None):
     export = response.json()[0]
-    print('Export', export)
     convert = export['converted_formats'][0]
 
-    print("ALL CONVERSIONS ", export.get('converted_formats'))
 
-    """
-    print('response.json()', response.json())
-    export = export.get('id')
-    export = Export.objects.get(id=export_id)
-
-    converted = export.converted_formats.all()[0]
-
-    #print('CONVERT ID ' + str(convert_id))
-    """
-    print('convert', convert)
     converted = ConvertedFormat.objects.get(id=convert['id'])
-    print('WES convert', converted.file.path)
-    print('converted.file.name', converted.file.storage.location)
 
-    print('converted', converted)
-    print('converted.file', converted.file.name)
     dir_path = os.path.join(settings.MEDIA_ROOT, settings.DELAYED_EXPORT_DIR)
     files = os.listdir(dir_path)
-    print('files', files)
     try:
         file_path = converted.file.path
-        print("Filepath " + str(file_path))
         return Box({'convert_file_path': file_path})
     except ValueError:
-        print("NO FILE PATH")
         return Box({'convert_file_path': None})
 
 
 def file_exists_in_storage(response, exists=True, file_path=None):
-    print('convert_file_path', file_path)
     if not file_path:
-        print("NOT FILE PATH")
-        export_id = response.json().get('id')
-        export = Export.objects.get(id=export_id)
-        file_path = export.file.path
-
-    print("checking that %s exists" % file_path)
-    assert os.path.isfile(file_path) == exists
-
-
-"""
-def export_file_exists_in_storage(response, exists=True, file_path=None):
-    print('convert_file_path', file_path)
-    if not file_path:
-        print("NOT FILE PATH")
         export_id = response.json().get('id')
         export = Export.objects.get(id=export_id)
         file_path = export.file.path
 
     assert os.path.isfile(file_path) == exists
-"""

@@ -391,7 +391,7 @@ stages:
 
   - name: make conversion
     request:
-      url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}/convert/api/projects/{project_pk}/exports/{export_id}/convert"
+      url: "{django_live_url}/api/projects/{project_pk}/exports/{export_id}/convert"
       method: POST
       json:
         export_type: "CSV"
@@ -421,5 +421,5 @@ stages:
       verify_response_with:
         function: label_studio.tests.utils:file_exists_in_storage
         extra_kwargs:
-          exists: true # false
+          exists: false
           file_path: "{convert_file_path}"
