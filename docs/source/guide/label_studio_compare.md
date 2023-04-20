@@ -1,5 +1,5 @@
 ---
-title: Compare OSS and Enterprise
+title: Compare Community and Enterprise
 type: guide
 tier: all
 order: 100
@@ -16,52 +16,9 @@ Label Studio is available as a Community edition open source data labeling tool.
     <th>Community</th>
     <th>Enterprise</th>
   </tr>
-  <tr>
-    <td colspan="4"><b>User Management</b></td>
-  </tr>
-  <tr>
-    <td><a href="signup.html">User accounts to assign labeling tasks to specific users.</a></td>
-    <td style="text-align:center">✔️</td>
-    <td style="text-align:center">✔️</td>
-  </tr>
-  <tr>
-    <td><a href="manage_users.html">Manage user access by roles.</a></td>
-    <td style="text-align:center">❌</td>
-    <td style="text-align:center">✔️</td>
-  </tr>
-  <tr>
-    <td><a href="manage_users.html">Separation of workspaces and projects by user role.</a></td>
-    <td style="text-align:center">❌</td>
-    <td style="text-align:center">✔️</td>
-  </tr>
-   
+  
 
-  <tr>
-    <td colspan="3"><b>Project Management</b></td>
-  </tr>
-  <tr>
-    <td><a href="setup_project.html">Projects to manage data labeling activities.</a></td>
-    <td style="text-align:center">✔️</td>
-    <td style="text-align:center">✔️</td>
-  </tr>
-  <tr>
-    <td><a href="setup.html">Templates to set up data labeling projects faster.</a></td>
-    <td style="text-align:center">✔️</td>
-    <td style="text-align:center">✔️</td>
-  </tr>
-  <tr>
-    <td>Dashboards for monitoring progress of projects and annotator performance statistics.</td>
-    <td style="text-align:center">❌</td>
-    <td style="text-align:center">✔️</td>
-  </tr>
-   <tr>
-    <td><a href="setup.html">Team collaboration features like comments and notifications on annotation tasks.</a></td>
-    <td style="text-align:center">❌</td>
-    <td style="text-align:center">✔️</td>
-  </tr>
-
-
-  <tr>
+<tr>
     <td colspan="3"><b>Dataset Management</b></td>
   </tr>
   <tr>
@@ -82,6 +39,50 @@ Label Studio is available as a Community edition open source data labeling tool.
   <tr>
     <td><a href="storage.html">Synchronize new and labeled data between projects and your remote data storage.</a></td>
     <td style="text-align:center">✔️</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td colspan="3"><b>Project Management</b></td>
+  </tr>
+  <tr>
+    <td><a href="setup_project.html">Projects to manage data labeling activities.</a></td>
+    <td style="text-align:center">✔️</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td><a href="setup.html">Templates to set up data labeling projects faster.</a></td>
+    <td style="text-align:center">✔️</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+    <tr>
+    <td><a href = "https://labelstud.io/guide/api.html"> APIs for programmatically accessing Label Studio.</a></td>
+    <td style="text-align:center">✔️</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td>Dashboards for monitoring progress of projects and annotator performance statistics.</td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+   <tr>
+    <td><a href="https://docs.heartex.com/guide/comments_notifications.html">Team collaboration features like comments and notifications on annotation tasks.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+
+
+  <tr>
+    <td colspan="4"><b>User Management</b></td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://docs.heartex.com/guide/manage_users.html#Roles-in-Label-Studio-Enterprise">Role-based automated workflows for annotators and reviewers.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+   <tr>
+    <td><a href="https://docs.heartex.com/guide/manage_users.html#Roles-and-workspaces">Role-based access control into workspaces and projects.</a></td>
+    <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
@@ -108,24 +109,7 @@ Label Studio is available as a Community edition open source data labeling tool.
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
-  <tr>
-    <td colspan="3"><b>Annotator Performance</b></td>
-  </tr>
-  <tr>
-    <td><a href="quality.html#Review-annotator-agreement-matrix">Annotator agreement metrics to monitor and improve label quality.</a></td>
-    <td style="text-align:center">❌</td>
-    <td style="text-align:center">✔️</td>
-  </tr>
-  <tr>
-    <td><a href="quality.html">Compare ML model predictions with annotations to identify low quality data.</a></td>
-    <td style="text-align:center">❌</td>
-    <td style="text-align:center">✔️</td>
-  </tr>
-  <tr>
-    <td><a href="guide/quality.html#Review-annotator-performance">Assign reviewers to review, fix and update annotations.</a></td>
-    <td style="text-align:center">❌</td>
-    <td style="text-align:center">✔️</td>
-  </tr>
+  
   <tr>
     <td colspan="3"><b>Machine Learning</b></td>
   </tr>
@@ -158,8 +142,26 @@ Label Studio is available as a Community edition open source data labeling tool.
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td><a href = "https://labelstud.io/guide/api.html"> APIs for generating custom reports or programmatically accessing Label Studio.</a></td>
+    <td><a href = "https://labelstud.io/guide/api.html"> APIs for generating custom reports.</a></td>
     <td style="text-align:center">✔️</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td colspan="3"><b>Annotator Performance</b></td>
+  </tr>
+  <tr>
+    <td><a href="quality.html#Review-annotator-agreement-matrix">Annotator agreement metrics to monitor and improve label quality.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td><a href="quality.html">Compare ML model predictions with annotations to identify low quality data.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td><a href="guide/quality.html#Review-annotator-performance">Assign reviewers to review, fix and update annotations.</a></td>
+    <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
@@ -171,7 +173,7 @@ Label Studio is available as a Community edition open source data labeling tool.
     <td style="text-align:center">✔️</td>
    </tr>
   <tr>
-    <td><a href ="https://heartex.com/security"> Secured and managed cloud or on-premise hosted service</a></td>
+    <td><a href ="https://heartex.com/security"> SOC2-compliant hosted cloud service or on-premise availability</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
