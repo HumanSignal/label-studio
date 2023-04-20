@@ -30,7 +30,8 @@ logger = logging.getLogger(__name__)
 
 class Storage(models.Model):
     class Status(models.TextChoices):
-        CREATED = 'created', _('Created')
+        INITIALIZED = 'initialized', _('Initialized')
+        QUEUED = 'queued', _('Queued')
         IN_PROGRESS = 'in_progress', _('In progress')
         FAILED = 'failed', _('Failed')
         COMPLETED = 'completed', _('Completed')
@@ -64,7 +65,7 @@ class Storage(models.Model):
     status = models.CharField(
         max_length=64,
         choices=Status.choices,
-        default=Status.CREATED,
+        default=Status.INITIALIZED,
     )
     traceback = models.TextField(
         null=True,
@@ -273,9 +274,9 @@ class ImportStorage(Storage):
                     on_failure=set_import_storage_background_failure
                 )
                 self.last_sync_job = job.id
-                self.status = self.Status.CREATED  # TODO: use QUEUED
                 self.last_sync = None
                 self.last_sync_count = None
+                self.status = self.Status.QUEUED
                 self.save()
                 # job_id = sync_background.delay()  # TODO: @niklub: check this fix
                 logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
@@ -309,11 +310,7 @@ class ProjectStorageMixin(models.Model):
 def sync_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.status = storage.Status.IN_PROGRESS
-    storage.last_sync = None
-    storage.last_sync_count = None
     storage.save(update_fields=['status', 'last_sync_count', 'last_sync'])
-
-    blabla
 
     storage.scan_and_create_links()
 
@@ -332,6 +329,8 @@ class ExportStorage(Storage, ProjectStorageMixin):
     def _get_serialized_data(self, annotation):
         if settings.FUTURE_SAVE_TASK_TO_STORAGE:
             # export task with annotations
+            # TODO: we have to rewrite save_all_annotations, because this func will be called for each annotation
+            # TODO: instead of each task, however, we have to call it only once per task
             return ExportDataSerializer(annotation.task).data
         else:
             serializer_class = load_func(settings.STORAGE_ANNOTATION_SERIALIZER)
@@ -363,10 +362,10 @@ class ExportStorage(Storage, ProjectStorageMixin):
                 organization_id=self.project.organization.id,
                 on_failure=set_export_storage_background_failure
             )
-            self.status = self.Status.CREATED  # TODO: use QUEUED
             self.last_sync = None
             self.last_sync_count = None
-            logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
+            self.status = self.Status.QUEUED
+            logger.info(f'Storage sync background job {job.id} for storage {self} has been queued')
         else:
             logger.info(f'Start syncing storage {self}')
             self.save_all_annotations()
@@ -379,8 +378,6 @@ class ExportStorage(Storage, ProjectStorageMixin):
 def export_sync_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.status = storage.Status.IN_PROGRESS
-    storage.last_sync = None
-    storage.last_sync_count = None
     storage.save(update_fields=['status', 'last_sync_count', 'last_sync'])
 
     storage.save_all_annotations()
