@@ -95,7 +95,7 @@ Label Studio is available as a Community edition open source data labeling tool.
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td><a href="setup_project.html">Set rules and automate how tasks are distributed to annotators.</a></td>
+    <td><a href="https://docs.heartex.com/guide/setup_project.html#Set-up-annotation-settings-for-your-project">Set rules and automate how tasks are distributed to annotators.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
@@ -125,7 +125,7 @@ Label Studio is available as a Community edition open source data labeling tool.
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td><a href="ml.html">Automatically label and sort tasks by prediction score with the ML model backend.</a></td>
+    <td><a href="https://docs.heartex.com/guide/active_learning.html#Set-up-task-sampling-with-prediction-scores">Automatically label and sort tasks by prediction score with the ML model backend.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
@@ -133,7 +133,7 @@ Label Studio is available as a Community edition open source data labeling tool.
     <td colspan="3"><b>Analytics and Reporting</b></td>
   </tr>
   <tr>
-    <td><a href="quality.html#Verify-model-and-annotator-performance">Project management dashboards display analytics and activity history.</a></td>
+    <td>Project management dashboards display analytics and activity history.</td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
@@ -161,7 +161,7 @@ Label Studio is available as a Community edition open source data labeling tool.
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td><a href="guide/quality.html#Review-annotator-performance">Assign reviewers to review, fix and update annotations.</a></td>
+    <td><a href="guide/quality.html#Assign-reviewers-to-tasks">Assign reviewers to review, fix and update annotations.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
