@@ -90,7 +90,7 @@ export const DisplayLogs = () => {
               <div className="col-10">
                   <p>These are the logs, check here when you train or predict</p>
                 </div>
-                <div onClick={() => getLogs()} className="col-2"><button className="btn btn-danger float-right">Update Logs</button></div>
+                <div onClick={() => getLogs()} style={{marginBottom: 10}} className="col-2"><button className="btn btn-success float-right">Update Logs</button></div>
           </div>
         <div className="logs" style={{ backgroundColor: 'black', color: 'white', overflowY: 'scroll', borderRadius: 4, height: 500, padding: 5 }}>
         </div>

@@ -33,7 +33,7 @@ export const MachineLearningSettings = () => {
   const [selectedTrainingType, setSelectedTrainingType] = useState('');
   const [trainingTypes, setTrainingTypes] = useState([]);
   const [modelsType, setModelsType] = useState('tao');
-
+  const [keepChecks, setKeepChecks] = useState(false);
 
   const handleChange = event => {
     setGenerateSpecs(event.target.checked);
@@ -51,6 +51,10 @@ export const MachineLearningSettings = () => {
         const training_types = response.data.training_types;
         setTrainingTypes(training_types);
         setSelectedTrainingType(training_types[0]);
+        console.log(training_types.indexOf("Tao Training"));
+        if (training_types.indexOf("Tao Training") !== -1) { 
+          setKeepChecks(true);
+        }
     })
       await axios
       .get(webhook_url + '/get_models_info?id=' + project.id)
@@ -307,16 +311,19 @@ export const MachineLearningSettings = () => {
             />
           </div>
         </Form.Row>
-        <div style={{marginTop: 20}}>
-          <label>
-      <input
-        type="checkbox"
-        checked={generateSpecs}
-        onChange={handleChange}
-        style={{marginRight: 5}}
-      />
-      Generate new specs for training
-    </label></div>
+        <div style={{ marginTop: 20 }}>
+          {keepChecks ?
+            <label>
+              <input
+                type="checkbox"
+                checked={generateSpecs}
+                onChange={handleChange}
+                style={{ marginRight: 5 }}
+            />
+              Generate new specs for training
+            </label>
+            :
+            ''}</div>
         <div style={{marginTop: 10}}>
       <label htmlFor="training-type-select">Select Training Type:</label>
             <select
