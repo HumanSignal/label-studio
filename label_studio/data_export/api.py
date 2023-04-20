@@ -470,14 +470,24 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
                 url = file.storage.url(file.name, storage_url=True, http_method=request.method)
             protocol = urlparse(url).scheme
 
-            # Let NGINX handle it
-            response = HttpResponse()
-            # The below header tells NGINX to catch it and serve, see docker-config/nginx-app.conf
-            redirect = '/file_download/' + protocol + '/' + url.replace(protocol + '://', '')
+            # NGINX downloads are a solid way to make uwsgi workers free
+            if settings.USE_NGINX_FOR_EXPORT_DOWNLOADS:
+                # let NGINX handle it
+                response = HttpResponse()
+                # below header tells NGINX to catch it and serve, see docker-config/nginx-app.conf
+                redirect = '/file_download/' + protocol + '/' + url.replace(protocol + '://', '')
+                response['X-Accel-Redirect'] = redirect
+                response['Content-Disposition'] = 'attachment; filename="{}"'.format(file.name)
+                response['filename'] = os.path.basename(file.name)
+                return response
 
-            response['X-Accel-Redirect'] = redirect
-            response['Content-Disposition'] = 'attachment; filename="{}"'.format(file.name)
-            return response
+            # No NGINX: standard way for export downloads in the community edition
+            else:
+                ext = file.name.split('.')[-1]
+                response = RangedFileResponse(request, file, content_type=f'application/{ext}')
+                response['Content-Disposition'] = f'attachment; filename="{file.name}"'
+                response['filename'] = os.path.basename(file.name)
+                return response
         else:
             if export_type is None:
                 file_ = snapshot.file
