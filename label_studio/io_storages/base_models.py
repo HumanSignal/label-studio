@@ -273,6 +273,9 @@ class ImportStorage(Storage):
                     on_failure=set_import_storage_background_failure
                 )
                 self.last_sync_job = job.id
+                self.status = self.Status.CREATED  # TODO: use QUEUED
+                self.last_sync = None
+                self.last_sync_count = None
                 self.save()
                 # job_id = sync_background.delay()  # TODO: @niklub: check this fix
                 logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
@@ -309,6 +312,8 @@ def sync_background(storage_class, storage_id, **kwargs):
     storage.last_sync = None
     storage.last_sync_count = None
     storage.save(update_fields=['status', 'last_sync_count', 'last_sync'])
+
+    blabla
 
     storage.scan_and_create_links()
 
@@ -358,6 +363,9 @@ class ExportStorage(Storage, ProjectStorageMixin):
                 organization_id=self.project.organization.id,
                 on_failure=set_export_storage_background_failure
             )
+            self.status = self.Status.CREATED  # TODO: use QUEUED
+            self.last_sync = None
+            self.last_sync_count = None
             logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
         else:
             logger.info(f'Start syncing storage {self}')
