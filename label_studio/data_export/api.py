@@ -476,6 +476,7 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
 
             response['X-Accel-Redirect'] = redirect
             response['Content-Disposition'] = 'attachment; filename="{}"'.format(file.name)
+            response['filename'] = file.name
             return response
         else:
             if export_type is None:
