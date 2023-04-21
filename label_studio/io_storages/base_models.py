@@ -1,8 +1,10 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import datetime
 import logging
 import django_rq
 import json
+import time
 import traceback as tb
 
 from django.utils import timezone
@@ -262,23 +264,25 @@ class ImportStorage(Storage):
         if redis_connected():
             queue = django_rq.get_queue('low')
             meta = {'project': self.project.id, 'storage': self.id}
-            if not is_job_in_queue(queue, "sync_background", meta=meta) and \
+            if not is_job_in_queue(queue, "import_sync_background", meta=meta) and \
                     not is_job_on_worker(job_id=self.last_sync_job, queue_name='default'):
                 job = queue.enqueue(
-                    sync_background,
+                    import_sync_background,
                     self.__class__,
                     self.id,
                     meta=meta,
                     project_id=self.project.id,
                     organization_id=self.project.organization.id,
-                    on_failure=set_import_storage_background_failure
+                    on_failure=set_storage_background_failure
                 )
                 self.last_sync_job = job.id
                 self.last_sync = None
                 self.last_sync_count = None
                 self.status = self.Status.QUEUED
+                self.meta['time_queued'] = str(datetime.datetime.now())
+                self.meta['attempts'] = self.meta.get('attempts', 0) + 1
                 self.save()
-                # job_id = sync_background.delay()  # TODO: @niklub: check this fix
+                # job_id = import_sync_background.delay()  # TODO: @niklub: check this fix
                 logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
         else:
             logger.info(f'Start syncing storage {self}')
@@ -307,20 +311,49 @@ class ProjectStorageMixin(models.Model):
 
 
 @job('low')
-def sync_background(storage_class, storage_id, **kwargs):
+def import_sync_background(storage_class, storage_id, **kwargs):
+    start = time.time()
     storage = storage_class.objects.get(id=storage_id)
     storage.status = storage.Status.IN_PROGRESS
-    storage.save(update_fields=['status', 'last_sync_count', 'last_sync'])
+    storage.meta['time_in_progress'] = str(datetime.datetime.now())
+    storage.save(update_fields=['status', 'meta'])
 
     storage.scan_and_create_links()
 
     storage.status = storage.Status.COMPLETED
-    storage.save(update_fields=['status'])
+    storage.meta['time_completed'] = str(datetime.datetime.now())
+    storage.meta['duration'] = time.time() - start
+    storage.save(update_fields=['status', 'meta'])
 
-def set_import_storage_background_failure(job, connection, type, value, traceback):
+
+@job('low', timeout=settings.RQ_LONG_JOB_TIMEOUT)
+def export_sync_background(storage_class, storage_id, **kwargs):
+    start = time.time()
+    storage = storage_class.objects.get(id=storage_id)
+    storage.status = storage.Status.IN_PROGRESS
+    storage.meta['time_in_progress'] = str(datetime.datetime.now())
+    storage.save(update_fields=['status', 'meta'])
+
+    storage.save_all_annotations()
+
+    storage.status = storage.Status.COMPLETED
+    storage.meta['time_completed'] = str(datetime.datetime.now())
+    storage.meta['duration'] = time.time() - start
+    storage.save(update_fields=['status', 'meta'])
+
+
+def set_storage_background_failure(job, connection, type, value, traceback):
     _class = job.args[0]
     storage_id = job.args[1]
-    _class.objects.filter(id=storage_id).update(status=_class.Status.FAILED, traceback=str(tb.format_exc()))
+    storage = _class.objects.filter(id=storage_id).first()
+    if storage is None:
+        logger.info(f'Storage {_class} {storage_id} not found at job {job} failure')
+        return
+
+    storage.status = storage.Status.FAILED
+    storage.traceback = str(tb.format_exc())
+    storage.meta['time_failure'] = str(datetime.datetime.now())
+    storage.save(update_fields=['status', 'traceback', 'meta'])
 
 
 class ExportStorage(Storage, ProjectStorageMixin):
@@ -360,11 +393,15 @@ class ExportStorage(Storage, ProjectStorageMixin):
                 job_timeout=settings.RQ_LONG_JOB_TIMEOUT,
                 project_id=self.project.id,
                 organization_id=self.project.organization.id,
-                on_failure=set_export_storage_background_failure
+                on_failure=set_storage_background_failure
             )
+            self.last_sync_job = job.id
             self.last_sync = None
             self.last_sync_count = None
             self.status = self.Status.QUEUED
+            self.meta['time_queued'] = str(datetime.datetime.now())
+            self.meta['attempts'] = self.meta.get('attempts', 0) + 1
+            self.save()
             logger.info(f'Storage sync background job {job.id} for storage {self} has been queued')
         else:
             logger.info(f'Start syncing storage {self}')
@@ -372,24 +409,6 @@ class ExportStorage(Storage, ProjectStorageMixin):
 
     class Meta:
         abstract = True
-
-
-@job('low', timeout=settings.RQ_LONG_JOB_TIMEOUT)
-def export_sync_background(storage_class, storage_id, **kwargs):
-    storage = storage_class.objects.get(id=storage_id)
-    storage.status = storage.Status.IN_PROGRESS
-    storage.save(update_fields=['status', 'last_sync_count', 'last_sync'])
-
-    storage.save_all_annotations()
-
-    storage.status = storage.Status.COMPLETED
-    storage.save(update_fields=['status'])
-
-
-def set_export_storage_background_failure(job, connection, type, value, traceback):
-    _class = job.args[0]
-    storage_id = job.args[1]
-    _class.objects.filter(id=storage_id).update(status=_class.Status.FAILED, traceback=str(tb.format_exc()))
 
 
 class ImportStorageLink(models.Model):
