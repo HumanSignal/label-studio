@@ -275,7 +275,6 @@ class Task(TaskMixin, models.Model):
                         task_data[field] = task_data[field] + '?not_uploaded_project_file'
                     continue
 
-
                 # project storage
                 # TODO: to resolve nested lists and dicts we should improve _get_storage_by_url(),
                 # TODO: problem with current approach: it can be used only the first storage that _get_storage_by_url
