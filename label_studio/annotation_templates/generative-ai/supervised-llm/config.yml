@@ -52,21 +52,20 @@ config: |
       background: unset;
     }
     </Style>
-        <View className="container">
-        <View className="prompt">
-            <Text name="prompt" value="$prompt"/>
-        </View>
-        <View className="answer-input">
-          <TextArea name="instruction" toName="prompt"
-                    maxSubmissions="1"
-                    required="true"
-                    requiredMessage="You must provide the response to the prompt"
-                    placeholder="Type your answer here..."
-                    rows="10"
-          />
-        </View>
+    <View className="container">
+      <View className="prompt">
+        <Text name="prompt" value="$prompt" />
       </View>
+      <View className="answer-input">
+        <TextArea name="instruction" toName="prompt"
+                  maxSubmissions="1" required="true"
+                  requiredMessage="You must provide the response to the prompt"
+                  placeholder="Type your answer here..."
+                  rows="10"
+        />
       </View>
+    </View>
+  </View>
   
   <!-- {"data" : {
     "prompt": "Generate a Python function that takes a list of integers as input and returns the sum of all even numbers in the list."
