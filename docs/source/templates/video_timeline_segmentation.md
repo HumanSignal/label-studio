@@ -20,14 +20,14 @@ To more easily identify video timelines, label segments alongside the audio chan
 
 ```html
 <View>
-  <Header value="Video timeline segmentation via AudioPlus sync trick"/>
+  <Header value="Video timeline segmentation via Audio sync trick"/>
   <Video name="video" value="$video_url" sync="audio"/>
   <Labels name="tricks" toName="audio" choice="multiple">
     <Label value="Kickflip" background="#1BB500"/>
     <Label value="360 Flip" background="#FFA91D"/>
     <Label value="Trick" background="#358EF3"/>
   </Labels>
-  <AudioPlus name="audio" value="$video_url" sync="video" speed="false"/>
+  <Audio name="audio" value="$video_url" sync="video" speed="false"/>
 </View>
 ```
 
@@ -37,7 +37,7 @@ All labeling configurations must be wrapped in [View](/tags/view.html) tags.
 
 You can add a [header](/tags/header.html) to provide instructions to the annotator:
 ```xml
-<Header value="Video timeline segmentation via AudioPlus sync trick"/>
+<Header value="Video timeline segmentation via Audio sync trick"/>
 ```
 
 Use the Video object tag to provide a video clip and sync it with the audio clip:
@@ -54,9 +54,9 @@ Use the Labels control tag to highlight the video clip with specific actions:
 </Labels>
 ```
 
-Use the AudioPlus object tag to play the audio from the video clip with the video:
+Use the Audio object tag to play the audio from the video clip with the video:
 ```xml
-<AudioPlus name="audio" value="$video_url" sync="video" speed="false"/>
+<Audio name="audio" value="$video_url" sync="video" speed="false"/>
 ```
 
 ## Related tags
@@ -64,4 +64,4 @@ Use the AudioPlus object tag to play the audio from the video clip with the vide
 - [Header](/tags/header.html)
 - [Video](/tags/video.html)
 - [Labels](/tags/labels.html)
-- [AudioPlus](/tags/audioplus.html)
+- [Audio](/tags/audio.html)
