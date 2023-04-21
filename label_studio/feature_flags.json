@@ -1932,6 +1932,33 @@
       "version": 3,
       "deleted": false
     },
+    "fflag_feat_all_lsdv_4915_async_task_import_13042023_short": {
+      "key": "fflag_feat_all_lsdv_4915_async_task_import_13042023_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "838fc12f47a84129bb42f3935db8f389",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_back_dev_3756_queue_enrollment_min_short": {
       "key": "fflag_feat_back_dev_3756_queue_enrollment_min_short",
       "on": false,
@@ -2038,6 +2065,33 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 3,
+      "deleted": false
+    },
+    "fflag_feat_back_lsdv_4932_enable_memory_profiler": {
+      "key": "fflag_feat_back_lsdv_4932_enable_memory_profiler",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "5b7df006ae16414982f3395daadc9245",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
       "deleted": false
     },
     "fflag_feat_back_lsdv_4932_enable_memory_profiler": {
@@ -2582,7 +2636,7 @@
     },
     "fflag_feat_front_lsdv_4832_new_ranker_tag_120423_short": {
       "key": "fflag_feat_front_lsdv_4832_new_ranker_tag_120423_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -2604,7 +2658,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 4,
       "deleted": false
     },
     "fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short": {
