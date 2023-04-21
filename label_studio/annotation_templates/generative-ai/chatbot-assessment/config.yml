@@ -5,16 +5,8 @@ order: 3
 image: /static/templates/generative-chatbot-assessment.png
 details: Collecting expert assessments of LLM-generated responses for quality assurance and model evaluation. This stage involves evaluating the model's responses based on criteria like correctness, relevance, and safety, which provides valuable feedback for further model refinement and helps ensure the final LLM meets desired performance standards.
 config: |
-  <View className="root">
+  <View>
       <Style>
-          .root {
-              box-sizing: border-box;
-              margin: 0;
-              padding: 0;
-              font-family: 'Roboto', sans-serif;
-              line-height: 1.6;
-              background-color: #f0f0f0;
-          }
           .container {
               display: flex;
               justify-content: space-between;
@@ -44,7 +36,7 @@ config: |
               word-wrap: break-word;
           }
       </Style>
-    <Header style="margin: 0 auto; width: 50%">InstructGPT Assessment</Header>
+    <Header style="margin: 0 auto; width: 50%; margin-bottom: 0.5em;">InstructGPT Assessment</Header>
     <View className="container">
         <View className="text-block">
         <Paragraphs 
@@ -152,8 +144,7 @@ config: |
           </Choices>
         </View>
       </View>
-    </View>
-    
+    </View>    
     </View>
   
   <!-- { "data" : {
@@ -192,5 +183,6 @@ config: |
       }
   ]}}
   -->
+
 
 

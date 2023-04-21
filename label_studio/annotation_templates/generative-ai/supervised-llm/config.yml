@@ -51,9 +51,6 @@ config: |
     .lsf-richtext__line:hover {
       background: unset;
     }
-    .answer-box {
-      padding: 20px;
-    }
     </Style>
         <View className="container">
         <View className="prompt">
