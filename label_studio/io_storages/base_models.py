@@ -4,6 +4,8 @@ import logging
 import django_rq
 import json
 
+from urllib.parse import urljoin, quote
+
 from django.utils import timezone
 from django.db import models, transaction
 from django.shortcuts import reverse
@@ -99,7 +101,7 @@ class ImportStorage(Storage):
                     return
 
                 if self.presign and task is not None:
-                    proxy_url = reverse("data_import:storage-data-presign", kwargs={ "task_id": task.id }) + f'?uri={extracted_uri}'
+                    proxy_url = urljoin(settings.HOSTNAME, reverse("data_import:storage-data-presign", kwargs={ "task_id": task.id }) + f'?uri={quote(extracted_uri)}')
                     return uri.replace(extracted_uri, proxy_url)
                 else:
                     # resolve uri to url using storages
