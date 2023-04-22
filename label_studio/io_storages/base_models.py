@@ -215,9 +215,11 @@ class ImportStorage(Storage):
         TODO: deprecate this function and transform it to "pipeline" version  _scan_and_create_links_v2
         """
         tasks_created = 0
+        tasks_existed = 0
         maximum_annotations = self.project.maximum_annotations
         task = self.project.tasks.order_by('-inner_id').first()
         max_inner_id = (task.inner_id + 1) if task else 1
+        current_time = time.time()
 
         for key in self.iterkeys():
             # w/o Dataflow
@@ -229,6 +231,7 @@ class ImportStorage(Storage):
             # skip if task already exists
             if link_class.exists(key, self):
                 logger.debug(f'{self.__class__.__name__} link {key} already exists')
+                tasks_existed += 1
                 continue
 
             logger.debug(f'{self}: found new key {key}')
@@ -246,8 +249,16 @@ class ImportStorage(Storage):
             max_inner_id += 1
             tasks_created += 1
 
+            # update db counter once per 5 seconds to avid db overloads
+            if time.time() - current_time > 10.0:
+                self.last_sync_count = tasks_created
+                self.meta['tasks_existed'] = tasks_existed
+                self.save(update_fields=['last_sync_count', 'meta'])
+                current_time = time.time()
+
         self.last_sync = timezone.now()
         self.last_sync_count = tasks_created
+        self.meta['tasks_existed'] = tasks_existed
         self.save()
 
         self.project.update_tasks_states(
@@ -282,7 +293,6 @@ class ImportStorage(Storage):
                 self.meta['time_queued'] = str(datetime.datetime.now())
                 self.meta['attempts'] = self.meta.get('attempts', 0) + 1
                 self.save()
-                # job_id = import_sync_background.delay()  # TODO: @niklub: check this fix
                 logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
         else:
             logger.info(f'Start syncing storage {self}')
@@ -375,9 +385,19 @@ class ExportStorage(Storage, ProjectStorageMixin):
 
     def save_all_annotations(self):
         annotation_exported = 0
+        current_time = time.time()
+        self.meta['total_annotations'] = Annotation.objects.filter(project=self.project).count()
+        self.save(update_fields=['meta'])
+
         for annotation in Annotation.objects.filter(project=self.project):
             self.save_annotation(annotation)
             annotation_exported += 1
+
+            # update db counter once per 5 seconds to avid db overloads
+            if time.time() - current_time > 10.0:
+                self.last_sync_count = annotation_exported
+                self.save(update_fields=['last_sync_count'])
+                current_time = time.time()
 
         self.last_sync = timezone.now()
         self.last_sync_count = annotation_exported

@@ -26,11 +26,15 @@ class ImportStorageListAPI(generics.ListCreateAPIView):
     serializer_class = ImportStorageSerializer
 
     def get_queryset(self):
+        from io_storages.functions import ensure_job_and_storage_status
+
         project_pk = self.request.query_params.get('project')
         project = generics.get_object_or_404(Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
-        ImportStorageClass = self.serializer_class.Meta.model
-        return ImportStorageClass.objects.filter(project_id=project.id)
+        StorageClass = self.serializer_class.Meta.model
+        storages = StorageClass.objects.filter(project_id=project.id)
+        ensure_job_and_storage_status(storages)  # check failed jobs and sync their statuses
+        return storages
 
 
 class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
@@ -51,11 +55,15 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
     serializer_class = ExportStorageSerializer
 
     def get_queryset(self):
+        from io_storages.functions import ensure_job_and_storage_status
+
         project_pk = self.request.query_params.get('project')
         project = generics.get_object_or_404(Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
-        ImportStorageClass = self.serializer_class.Meta.model
-        return ImportStorageClass.objects.filter(project_id=project.id)
+        StorageClass = self.serializer_class.Meta.model
+        storages = StorageClass.objects.filter(project_id=project.id)
+        ensure_job_and_storage_status(storages)  # check failed jobs and sync their statuses
+        return storages
 
     def perform_create(self, serializer):
         storage = serializer.save()
