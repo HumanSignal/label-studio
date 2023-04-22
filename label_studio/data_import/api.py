@@ -536,9 +536,9 @@ class PresignStorageData(DownloadStorageData):
         if fileuri is None or task_id is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        task = Task.objects.get(pk=task_id)
-
-        if task is None:
+        try:
+            task = Task.objects.get(pk=task_id)
+        except Task.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         project = task.project
