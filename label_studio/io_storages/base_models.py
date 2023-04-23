@@ -1,36 +1,39 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import datetime
+import rq
+import json
 import logging
 import django_rq
-import json
-import time
+import rq.exceptions
 import traceback as tb
 
+from rq.job import Job
+from django_rq import job
 from django.utils import timezone
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from django_rq import job
 from django.db.models import JSONField
+from django.contrib.auth.models import AnonymousUser
+from datetime import datetime
 
-from core.feature_flags import flag_set
 from tasks.models import Task, Annotation
 from tasks.serializers import PredictionSerializer, AnnotationSerializer
 from data_export.serializers import ExportDataSerializer
-
 from core.redis import is_job_in_queue, redis_connected, is_job_on_worker
 from core.utils.common import load_func
-from core.utils.params import get_bool_env
-from label_studio_tools.core.utils.params import get_bool_env
-
+from core.feature_flags import flag_set
 from io_storages.utils import get_uri_via_regex
-from django.contrib.auth.models import AnonymousUser
+
 
 logger = logging.getLogger(__name__)
 
 
-class Storage(models.Model):
+class StorageInfo(models.Model):
+    """
+    StorageInfo helps to understand storage status and progress
+    that happens in background jobs
+    """
     class Status(models.TextChoices):
         INITIALIZED = 'initialized', _('Initialized')
         QUEUED = 'queued', _('Queued')
@@ -38,11 +41,8 @@ class Storage(models.Model):
         FAILED = 'failed', _('Failed')
         COMPLETED = 'completed', _('Completed')
 
-    url_scheme = ''
-
-    title = models.CharField(_('title'), null=True, blank=True, max_length=256, help_text='Cloud storage title')
-    description = models.TextField(_('description'), null=True, blank=True, help_text='Cloud storage description')
-    created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
+    class Meta:
+        abstract = True
 
     last_sync = models.DateTimeField(
         _('last sync'),
@@ -81,15 +81,143 @@ class Storage(models.Model):
         help_text='Meta and debug information about storage processes'
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # start datetime for statuses
+        self.time_in_progress = None
+        self.time_queued = None
+
+    def info_set_queued(self, job_id):
+        self.last_sync = None
+        self.last_sync_count = None
+        self.last_sync_job = job_id
+        self.status = self.Status.QUEUED
+
+        # reset and init meta
+        self.time_queued = datetime.now()
+        self.meta = {
+            'attempts': self.meta.get('attempts', 0) + 1,
+            'time_queued': str(self.time_queued)
+        }
+
+        self.save(update_fields=['last_sync_job', 'last_sync', 'last_sync_count', 'status', 'meta'])
+
+    def info_set_in_progress(self):
+        # only QUEUED => IN_PROGRESS transition is possible, because in QUEUED we reset states
+        if self.status != self.Status.QUEUED:
+            raise ValueError(f'Storage status ({self.status}) must be QUEUED to move it IN_PROGRESS')
+        self.status = self.Status.IN_PROGRESS
+
+        self.time_in_progress = datetime.now()
+        self.meta['time_in_progress'] = str(self.time_in_progress)
+
+        self.save(update_fields=['status', 'meta'])
+
+    def info_set_completed(self, last_sync_count, **kwargs):
+        self.status = self.Status.COMPLETED
+        self.last_sync = timezone.now()
+        self.last_sync_count = last_sync_count
+
+        time_completed = datetime.now()
+        self.meta['time_completed'] = str(time_completed)
+        self.meta['duration'] = (self.time_in_progress - time_completed).total_seconds()
+        self.meta.update(kwargs)
+
+        self.save(update_fields=['status', 'meta', 'last_sync', 'last_sync_count'])
+
+    def info_set_failed(self):
+        self.status = self.Status.FAILED
+        self.traceback = str(tb.format_exc())
+
+        time_failure = datetime.now()
+        self.meta['time_failure'] = str(time_failure)
+        self.meta['duration'] = (self.time_in_progress - time_failure).total_seconds()
+
+        self.save(update_fields=['status', 'traceback', 'meta'])
+
+    def info_update_progress(self, last_sync_count, **kwargs):
+        # update db counter once per 5 seconds to avid db overloads
+        last_ping = datetime.now()
+        delta = (self.time_in_progress - last_ping).total_seconds()
+
+        if delta > settings.STORAGE_IN_PROGRESS_TIMER:
+            self.last_sync_count = last_sync_count
+            self.meta['time_last_ping'] = str(last_ping)
+            self.meta['duration'] = delta
+            self.meta.update(kwargs)
+
+            self.save(update_fields=['last_sync_count', 'meta'])
+
+    @staticmethod
+    def ensure_storage_statuses(storages):
+        """Check failed jobs and set storage status as failed if job is failed
+
+        :param storages: Import or Export storages
+        """
+        # iterate over all storages
+        storages = storages.only('id', 'last_sync_job', 'status', 'meta')
+        for storage in storages:
+            storage.health_check()
+
+    def health_check(self):
+        now = datetime.now()
+        delta = (datetime.fromisoformat(self.meta.get('time_last_ping', str(now))) - now).total_seconds()
+
+        # check redis connection
+        if redis_connected():
+            self.job_health_check()
+
+        # in progress last ping time, job is not needed here
+        if self.status == 'in_progress' and delta > settings.STORAGE_IN_PROGRESS_TIMER * 2:
+            self.status = self.Status.FAILED
+            self.traceback = "It appears the job was failed because the last ping time is too old, " \
+                             "and no traceback information is available.\n" \
+                             "This typically occurs if job was manually removed " \
+                             "or workers reloaded unexpectedly."
+            self.save(update_fields=['status', 'traceback'])
+            logger.info(f'Storage {self} status moved to `failed` '
+                        f'because the job {self.last_sync_job} has too old ping time')
+
+    def job_health_check(self):
+        Status = self.Status
+        queue = django_rq.get_queue('low')
+        try:
+            sync_job = Job.fetch(self.last_sync_job, connection=queue.connection)
+            status = sync_job.get_status()
+        except rq.exceptions.NoSuchJobError:
+            status = 'not found'
+        # broken synchronization between storage and job
+        # this might happen when job was stopped because of OOM and on_failure wasn't called
+        if status == 'failed' and self.status != Status.FAILED:
+            self.status = Status.FAILED
+            self.traceback = "It appears the job was terminated unexpectedly, " \
+                             "and no traceback information is available.\n" \
+                             "This typically occurs due to an out-of-memory (OOM) error."
+            self.save(update_fields=['status', 'traceback'])
+            logger.info(f'Storage {self} status moved to `failed` '
+                        f'because of the failed job {self.last_sync_job}')
+
+        # job is not found in redis (maybe deleted while redeploy), storage status is still active
+        elif status == 'not found' and self.status in [Status.IN_PROGRESS, Status.QUEUED]:
+            self.status = Status.FAILED
+            self.traceback = "It appears the job was not found in redis, " \
+                             "and no traceback information is available.\n" \
+                             "This typically occurs if job was manually removed " \
+                             "or workers reloaded unexpectedly."
+            self.save(update_fields=['status', 'traceback'])
+            logger.info(f'Storage {self} status moved to `failed` '
+                        f'because the job {self.last_sync_job} was not found')
+
+
+class Storage(StorageInfo):
+    url_scheme = ''
+
+    title = models.CharField(_('title'), null=True, blank=True, max_length=256, help_text='Cloud storage title')
+    description = models.TextField(_('description'), null=True, blank=True, help_text='Cloud storage description')
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
 
     def validate_connection(self, client=None):
         pass
-
-    def has_permission(self, user):
-        user.project = self.project  # link for activity log
-        if self.project.has_permission(user):
-            return True
-        return False
 
     class Meta:
         abstract = True
@@ -150,7 +278,8 @@ class ImportStorage(Storage):
         # e.g. GCS example
         # | "GetKey" >>  --> read file content into label_studio_semantic_search.indexer.RawDataObject repr
         # | "AggregateBatch" >> beam.Combine      --> combine read objects into a batch
-        # | "AddObjects" >> label_studio_semantic_search.indexer.add_objects_from_bucket --> add objects from batch to Vector DB
+        # | "AddObjects" >> label_studio_semantic_search.indexer.add_objects_from_bucket 
+        # --> add objects from batch to Vector DB
         # or for project task creation last step would be
         # | "AddObject" >> ImportStorage.add_task
 
@@ -212,26 +341,27 @@ class ImportStorage(Storage):
 
     def _scan_and_create_links(self, link_class):
         """
-        TODO: deprecate this function and transform it to "pipeline" version  _scan_and_create_links_v2
+        TODO: deprecate this function and transform it to "pipeline" version  _scan_and_create_links_v2,
+        TODO: it must be compatible with opensource, so old version is needed as well
         """
-        tasks_created = 0
-        tasks_existed = 0
+        # set in progress status for storage info
+        self.info_set_in_progress()
+
+        tasks_existed = tasks_created = 0
         maximum_annotations = self.project.maximum_annotations
         task = self.project.tasks.order_by('-inner_id').first()
         max_inner_id = (task.inner_id + 1) if task else 1
-        current_time = time.time()
 
         for key in self.iterkeys():
             # w/o Dataflow
             # pubsub.push(topic, key)
             # -> GF.pull(topic, key) + env -> add_task()
-
             logger.debug(f'Scanning key {key}')
 
             # skip if task already exists
             if link_class.exists(key, self):
                 logger.debug(f'{self.__class__.__name__} link {key} already exists')
-                tasks_existed += 1
+                tasks_existed += 1  # update progress counter
                 continue
 
             logger.debug(f'{self}: found new key {key}')
@@ -247,25 +377,19 @@ class ImportStorage(Storage):
 
             self.add_task(data, self.project, maximum_annotations, max_inner_id, self, key, link_class)
             max_inner_id += 1
+
+            # update progress counters for storage info
             tasks_created += 1
-
-            # update db counter once per 5 seconds to avid db overloads
-            if time.time() - current_time > 10.0:
-                self.last_sync_count = tasks_created
-                self.meta['tasks_existed'] = tasks_existed
-                self.save(update_fields=['last_sync_count', 'meta'])
-                current_time = time.time()
-
-        self.last_sync = timezone.now()
-        self.last_sync_count = tasks_created
-        self.meta['tasks_existed'] = tasks_existed
-        self.save()
+            self.info_update_progress(last_sync_count=tasks_created, tasks_existed=tasks_existed)
 
         self.project.update_tasks_states(
-                maximum_annotations_changed=False,
-                overlap_cohort_percentage_changed=False,
-                tasks_number_changed=True
-            )
+            maximum_annotations_changed=False,
+            overlap_cohort_percentage_changed=False,
+            tasks_number_changed=True
+        )
+
+        # sync is finished, set completed status for storage info
+        self.info_set_completed(last_sync_count=tasks_created, tasks_existed=tasks_existed)
 
     def scan_and_create_links(self):
         """This is proto method - you can override it, or just replace ImportStorageLink by your own model"""
@@ -275,28 +399,28 @@ class ImportStorage(Storage):
         if redis_connected():
             queue = django_rq.get_queue('low')
             meta = {'project': self.project.id, 'storage': self.id}
-            if not is_job_in_queue(queue, "import_sync_background", meta=meta) and \
-                    not is_job_on_worker(job_id=self.last_sync_job, queue_name='default'):
-                job = queue.enqueue(
+            if (
+                    not is_job_in_queue(queue, "import_sync_background", meta=meta) and
+                    not is_job_on_worker(job_id=self.last_sync_job, queue_name='low')
+            ):
+                sync_job = queue.enqueue(
                     import_sync_background,
                     self.__class__,
                     self.id,
                     meta=meta,
                     project_id=self.project.id,
                     organization_id=self.project.organization.id,
-                    on_failure=set_storage_background_failure
+                    on_failure=storage_background_failure
                 )
-                self.last_sync_job = job.id
-                self.last_sync = None
-                self.last_sync_count = None
-                self.status = self.Status.QUEUED
-                self.meta['time_queued'] = str(datetime.datetime.now())
-                self.meta['attempts'] = self.meta.get('attempts', 0) + 1
-                self.save()
-                logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
+                self.info_set_queued(sync_job.id)
+                logger.info(f'Storage sync background job {sync_job.id} for storage {self} has been started')
         else:
-            logger.info(f'Start syncing storage {self}')
-            self.scan_and_create_links()
+            try:
+                logger.info(f'Start syncing storage {self}')
+                self.info_set_queued(None)
+                import_sync_background(self.__class__, self.id)
+            except Exception:
+                storage_background_failure(self)
 
     class Meta:
         abstract = True
@@ -322,48 +446,35 @@ class ProjectStorageMixin(models.Model):
 
 @job('low')
 def import_sync_background(storage_class, storage_id, **kwargs):
-    start = time.time()
     storage = storage_class.objects.get(id=storage_id)
-    storage.status = storage.Status.IN_PROGRESS
-    storage.meta['time_in_progress'] = str(datetime.datetime.now())
-    storage.save(update_fields=['status', 'meta'])
-
     storage.scan_and_create_links()
-
-    storage.status = storage.Status.COMPLETED
-    storage.meta['time_completed'] = str(datetime.datetime.now())
-    storage.meta['duration'] = time.time() - start
-    storage.save(update_fields=['status', 'meta'])
 
 
 @job('low', timeout=settings.RQ_LONG_JOB_TIMEOUT)
 def export_sync_background(storage_class, storage_id, **kwargs):
-    start = time.time()
     storage = storage_class.objects.get(id=storage_id)
-    storage.status = storage.Status.IN_PROGRESS
-    storage.meta['time_in_progress'] = str(datetime.datetime.now())
-    storage.save(update_fields=['status', 'meta'])
-
     storage.save_all_annotations()
 
-    storage.status = storage.Status.COMPLETED
-    storage.meta['time_completed'] = str(datetime.datetime.now())
-    storage.meta['duration'] = time.time() - start
-    storage.save(update_fields=['status', 'meta'])
 
+def storage_background_failure(*args, **kwargs):
+    # job is used in rqworker failure
+    if isinstance(args[0], rq.job.Job):
+        sync_job = args[0]
+        _class = sync_job.args[0]
+        storage_id = sync_job.args[1]
+        storage = _class.objects.filter(id=storage_id).first()
+        if storage is None:
+            logger.info(f'Storage {_class} {storage_id} not found at job {sync_job} failure')
+            return
 
-def set_storage_background_failure(job, connection, type, value, traceback):
-    _class = job.args[0]
-    storage_id = job.args[1]
-    storage = _class.objects.filter(id=storage_id).first()
-    if storage is None:
-        logger.info(f'Storage {_class} {storage_id} not found at job {job} failure')
-        return
+    # storage is used when redis and rqworkers are not available (e.g. in opensource)
+    elif isinstance(args[0], Storage):
+        storage = args[0]
+    else:
+        raise ValueError(f"Unknown storage in {args}")
 
-    storage.status = storage.Status.FAILED
-    storage.traceback = str(tb.format_exc())
-    storage.meta['time_failure'] = str(datetime.datetime.now())
-    storage.save(update_fields=['status', 'traceback', 'meta'])
+    # save info about failure for storage info
+    storage.info_set_failed()
 
 
 class ExportStorage(Storage, ProjectStorageMixin):
@@ -385,47 +496,45 @@ class ExportStorage(Storage, ProjectStorageMixin):
 
     def save_all_annotations(self):
         annotation_exported = 0
-        current_time = time.time()
-        self.meta['total_annotations'] = Annotation.objects.filter(project=self.project).count()
-        self.save(update_fields=['meta'])
+        total_annotations = Annotation.objects.filter(project=self.project).count()
+        self.info_set_in_progress()
 
         for annotation in Annotation.objects.filter(project=self.project):
             self.save_annotation(annotation)
+
+            # update progress counters
             annotation_exported += 1
+            self.info_update_progress(
+                last_sync_count=annotation_exported,
+                total_annotations=total_annotations
+            )
 
-            # update db counter once per 5 seconds to avid db overloads
-            if time.time() - current_time > 10.0:
-                self.last_sync_count = annotation_exported
-                self.save(update_fields=['last_sync_count'])
-                current_time = time.time()
-
-        self.last_sync = timezone.now()
-        self.last_sync_count = annotation_exported
-        self.save()
+        self.info_set_completed(
+            last_sync_count=annotation_exported,
+            total_annotations=total_annotations
+        )
 
     def sync(self):
         if redis_connected():
             queue = django_rq.get_queue('low')
-            job = queue.enqueue(
+            sync_job = queue.enqueue(
                 export_sync_background,
                 self.__class__,
                 self.id,
                 job_timeout=settings.RQ_LONG_JOB_TIMEOUT,
                 project_id=self.project.id,
                 organization_id=self.project.organization.id,
-                on_failure=set_storage_background_failure
+                on_failure=storage_background_failure
             )
-            self.last_sync_job = job.id
-            self.last_sync = None
-            self.last_sync_count = None
-            self.status = self.Status.QUEUED
-            self.meta['time_queued'] = str(datetime.datetime.now())
-            self.meta['attempts'] = self.meta.get('attempts', 0) + 1
-            self.save()
-            logger.info(f'Storage sync background job {job.id} for storage {self} has been queued')
+            self.info_set_queued(sync_job.id)
+            logger.info(f'Storage sync background job {sync_job.id} for storage {self} has been queued')
         else:
-            logger.info(f'Start syncing storage {self}')
-            self.save_all_annotations()
+            try:
+                logger.info(f'Start syncing storage {self}')
+                self.info_set_queued(None)
+                export_sync_background(self.__class__, self.id)
+            except Exception:
+                storage_background_failure(self)
 
     class Meta:
         abstract = True

@@ -24,7 +24,7 @@ export const unique = <T>(list: T[] | undefined, expression: Uniqueness<T>): T[]
   }, []);
 };
 
-export const isDefined = <T>(value: T | null | undefined): value is T => {
+export const isDefined = <T>(value: T | undefined | null): value is T => {
   return value !== null && value !== undefined;
 };
 
@@ -64,7 +64,7 @@ export const humanReadableNumber = (n: number) => {
   const abs = Math.abs(n);
 
   if (isNaN(abs) || n === null) return "—";
-  const normalizeNumber = (num: number) => numberWithPrecision(num, 1, true);
+  const normalizeNumber = (n: number) => numberWithPrecision(n, 1, true);
 
   let result;
 
@@ -123,4 +123,12 @@ export const delay = (time = 0) => {
 
 export const clamp = (value: number, min: number, max: number) => {
   return Math.max(min, Math.min(value, max));
+};
+
+export const lastTwoLines = (s: string | null): string => {
+  if (s === null) {
+    return '';
+  }
+
+  return s.trim().split('\n').slice(-2).map(s => s.trim()).join('\n');
 };
