@@ -1,6 +1,6 @@
 {
   "message": "chore: LSDV-4993: Fix ESLint to target changed files only",
-  "commit": "7fa95febd2786443e296584070d49ccc405c8c6f",
-  "branch": "fb-lsdv-4993/ci-linter-on-changed-filed",
-  "date": "2023/04/24 18:21:33"
+  "commit": "18992af8a55d6eec99b36aa600c6519217f7e70b",
+  "branch": "master",
+  "date": "2023/04/24 18:22:32"
 }
