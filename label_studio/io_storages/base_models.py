@@ -132,8 +132,11 @@ class StorageInfo(models.Model):
         self.traceback = str(tb.format_exc())
 
         time_failure = datetime.now()
+        # we can't use self.time_in_progress,
+        # because it's handled by another rqworker thread and time_in_progress will be None there
+        time_in_progress = datetime.fromisoformat(self.meta['time_in_progress'])
         self.meta['time_failure'] = str(time_failure)
-        self.meta['duration'] = (time_failure - self.time_in_progress).total_seconds()
+        self.meta['duration'] = (time_failure - time_in_progress).total_seconds()
 
         self.save(update_fields=['status', 'traceback', 'meta'])
 
@@ -162,6 +165,7 @@ class StorageInfo(models.Model):
             storage.health_check()
 
     def health_check(self):
+        # get duration between last ping time and now
         now = datetime.now()
         last_ping = datetime.fromisoformat(self.meta.get('time_last_ping', str(now)))
         delta = (now - last_ping).total_seconds()
@@ -171,7 +175,7 @@ class StorageInfo(models.Model):
             self.job_health_check()
 
         # in progress last ping time, job is not needed here
-        if self.status == 'in_progress' and delta > settings.STORAGE_IN_PROGRESS_TIMER * 2:
+        if self.status == self.Status.IN_PROGRESS and delta > settings.STORAGE_IN_PROGRESS_TIMER * 2:
             self.status = self.Status.FAILED
             self.traceback = "It appears the job was failed because the last ping time is too old, " \
                              "and no traceback information is available.\n" \
@@ -183,15 +187,19 @@ class StorageInfo(models.Model):
 
     def job_health_check(self):
         Status = self.Status
+        if self.status not in [Status.IN_PROGRESS, Status.QUEUED]:
+            return
+
         queue = django_rq.get_queue('low')
         try:
             sync_job = Job.fetch(self.last_sync_job, connection=queue.connection)
             job_status = sync_job.get_status()
         except rq.exceptions.NoSuchJobError:
             job_status = 'not found'
+
         # broken synchronization between storage and job
         # this might happen when job was stopped because of OOM and on_failure wasn't called
-        if job_status == 'failed' and self.status != Status.FAILED:
+        if job_status == 'failed':
             self.status = Status.FAILED
             self.traceback = "It appears the job was terminated unexpectedly, " \
                              "and no traceback information is available.\n" \
@@ -201,7 +209,7 @@ class StorageInfo(models.Model):
                         f'because of the failed job {self.last_sync_job}')
 
         # job is not found in redis (maybe deleted while redeploy), storage status is still active
-        elif job_status == 'not found' and self.status in [Status.IN_PROGRESS, Status.QUEUED]:
+        elif job_status == 'not found':
             self.status = Status.FAILED
             self.traceback = "It appears the job was not found in redis, " \
                              "and no traceback information is available.\n" \
