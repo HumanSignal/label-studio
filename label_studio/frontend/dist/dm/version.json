@@ -1,6 +1,6 @@
 {
-  "message": "chore: LSDV-4727: Remove any AudioPlus mentions",
-  "commit": "bebdff88fba8aa0b167b5475e8d77009a3bbd895",
+  "message": "fix: LSDV-4711: CORS error accessing previously annotated data",
+  "commit": "266346025bdd6b9189eb44a21a68dbe7ec8775cf",
   "branch": "master",
-  "date": "2023/04/18 15:30:26"
+  "date": "2023/04/24 08:21:41"
 }
