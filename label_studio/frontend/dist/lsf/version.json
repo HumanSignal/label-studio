@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4711: CORS error accessing previously annotated data",
-  "commit": "235ae39338b6e727c79323854974d2425c9575cc",
+  "message": "feat: LSDV-3025-11: Add functionality to filter with multiple rules",
+  "commit": "40b9311d8712f1abdc053b864227398e532861be",
   "branch": "master",
-  "date": "2023/04/24 09:24:01"
+  "date": "2023/04/24 13:18:17"
 }
