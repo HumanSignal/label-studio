@@ -10,7 +10,7 @@ import mimetypes
 
 from django.conf import settings
 from django.db import transaction
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 from rest_framework import generics, status
@@ -523,3 +523,40 @@ class DownloadStorageData(APIView):
         response['X-Accel-Redirect'] = redirect
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filepath)
         return response
+
+
+class PresignStorageData(DownloadStorageData):
+    def get(self, request, *args, **kwargs):
+        """ Get export files list
+        """
+        request = self.request
+        task_id = kwargs.get("task_id")
+        fileuri = request.GET.get('uri')
+
+        if fileuri is None or task_id is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            task = Task.objects.get(pk=task_id)
+        except Task.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        project = task.project
+
+        if not project.has_permission(request.user):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        # TODO: cache the presigned storage url by taskId 
+        # cache ttl should be 10s less than presigned ttl so we can reuse as much of that work
+        # as possible and limit the amount of times we are calling out to cloud storages.
+        fileuri = unquote(request.GET['uri'])
+
+        url = task.resolve_storage_uri(fileuri, project)
+
+        if url is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # Proxy to presigned url
+        return HttpResponseRedirect(redirect_to=url, status=status.HTTP_303_SEE_OTHER)
+
+
