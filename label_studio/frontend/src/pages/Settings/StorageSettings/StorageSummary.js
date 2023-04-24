@@ -9,10 +9,12 @@ import { lastTwoLines } from '../../../utils/helpers';
 export const StorageSummary = ({ target, storage, className, storageTypes = [] }) => {
   const storageStatus = storage.status.replace(/_/g, ' ').replace(/(^\w)/, match => match.toUpperCase());
   const last_sync_count = storage.last_sync_count ? storage.last_sync_count: '0';
-  const total_annotations = storage.meta?.total_annotations !== null ?
-    'There are ' + storage.meta.total_annotations + ' total annotations in the current project.': '';
-  const tasks_existed = storage.meta?.tasks_existed !== null ?
-    '(' + storage.meta.tasks_existed + ') ': '';
+  const total_annotations = typeof storage.meta?.total_annotations !== 'undefined'
+    ? `There were ${storage.meta.total_annotations} total annotations in the project at the sync moment.`
+    : '';
+  const tasks_existed = typeof storage.meta?.tasks_existed !== 'undefined'
+    ? `(${storage.meta.tasks_existed}) `
+    : '';
 
   const handleButtonClick = () => {
     const msg = `Error logs for ${target==='export' ? 'export ': ''}${storage.type} ` +
@@ -81,16 +83,16 @@ export const StorageSummary = ({ target, storage, className, storageTypes = [] }
         <DescriptionList.Item
           term={target === 'export' ? 'Annotations' : 'Tasks' }
           help={
-            target === 'export' ?
-              'Number of annotations (' + last_sync_count + ') ' +
-              'successfully saved during the last sync.\n' + total_annotations:
+            target === 'export'
+              ? 'Number of annotations (' + last_sync_count + ') ' +
+              'successfully saved during the last sync.\n' + total_annotations
 
-              'Number of new tasks (' + last_sync_count + ') successfully added during the last sync.\n' +
+              : 'Number of new tasks (' + last_sync_count + ') successfully added during the last sync.\n' +
               "Tasks that have already been synced " + tasks_existed +
               "won't be added to the project and included in this counter."
           }
         >
-          {}
+          {last_sync_count}
         </DescriptionList.Item>
 
         <DescriptionList.Item term="Last Sync">
