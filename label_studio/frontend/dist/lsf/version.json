@@ -1,6 +1,6 @@
 {
-  "message": "ci: LSDV-4734: Setup Cypress integration tests (#1236)",
-  "commit": "a087162a8f4ba3441501313fda4e54a746df7449",
+  "message": "fix: LSDV-4836: Conditional annotation with visibleWhen choice-selected works with Taxonomy (#1273)",
+  "commit": "791b7135d7a37db382bae18e473b14ba39bdd966",
   "branch": "master",
-  "date": "2023/04/14 21:46:54"
+  "date": "2023/04/19 12:13:15"
 }
