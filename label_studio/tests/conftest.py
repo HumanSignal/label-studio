@@ -10,6 +10,7 @@ import logging
 import shutil
 import tempfile
 
+from unittest import mock
 from moto import mock_s3
 from copy import deepcopy
 from pathlib import Path
@@ -410,6 +411,28 @@ def configured_project(business_client, annotator_client):
 @pytest.fixture(name="django_live_url")
 def get_server_url(live_server):
     yield live_server.url
+
+
+@pytest.fixture(name="fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on")
+def fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on():
+    from core.feature_flags import flag_set
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short':
+            return True
+        return flag_set(*args, **kwargs)
+    with mock.patch('tasks.models.flag_set', wraps=fake_flag_set):
+        yield
+
+
+@pytest.fixture(name="fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off")
+def fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off():
+    from core.feature_flags import flag_set
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short':
+            return False
+        return flag_set(*args, **kwargs)
+    with mock.patch('tasks.models.flag_set', wraps=fake_flag_set):
+        yield
 
 
 @pytest.fixture(name="local_files_storage")

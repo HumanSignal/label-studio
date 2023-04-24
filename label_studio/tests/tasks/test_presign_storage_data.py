@@ -50,7 +50,7 @@ class TestPresignStorageData:
 
     def test_task_not_found(self, view, user):
         request = APIRequestFactory().get(reverse("data_import:storage-data-presign",
-                                                  kwargs={"task_id": 2}) + "?uri=fileuri")
+                                                  kwargs={"task_id": 2}) + "?fileuri=fileuri")
         request.user = user
         force_authenticate(request, user)
         response = view(request, task_id=2)
@@ -73,7 +73,7 @@ class TestPresignStorageData:
         monkeypatch.setattr('tasks.models.Task.objects', obj)
 
         request = APIRequestFactory().get(reverse("data_import:storage-data-presign",
-                                                  kwargs={"task_id": 1}) + "?uri=fileuri")
+                                                  kwargs={"task_id": 1}) + "?fileuri=fileuri")
         request.user = user
         force_authenticate(request, user)
         response = view(request, task_id=1)
@@ -96,7 +96,7 @@ class TestPresignStorageData:
         monkeypatch.setattr('tasks.models.Task.objects', obj)
 
         request = APIRequestFactory().get(reverse("data_import:storage-data-presign",
-                                                  kwargs={"task_id": 1}) + "?uri=fileuri")
+                                                  kwargs={"task_id": 1}) + "?fileuri=fileuri")
         request.user = user
         force_authenticate(request, user)
 

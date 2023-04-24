@@ -525,13 +525,18 @@ class DownloadStorageData(APIView):
         return response
 
 
-class PresignStorageData(DownloadStorageData):
+class PresignStorageData(APIView):
+    """ A file proxy to presign storage urls.
+    """
+    swagger_schema = None
+    permission_classes = (IsAuthenticated, )
+
     def get(self, request, *args, **kwargs):
-        """ Get export files list
+        """ Get the presigned url for a given fileuri
         """
         request = self.request
         task_id = kwargs.get("task_id")
-        fileuri = request.GET.get('uri')
+        fileuri = request.GET.get('fileuri')
 
         if fileuri is None or task_id is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -549,7 +554,7 @@ class PresignStorageData(DownloadStorageData):
         # TODO: cache the presigned storage url by taskId 
         # cache ttl should be 10s less than presigned ttl so we can reuse as much of that work
         # as possible and limit the amount of times we are calling out to cloud storages.
-        fileuri = unquote(request.GET['uri'])
+        fileuri = unquote(fileuri)
 
         url = task.resolve_storage_uri(fileuri, project)
 
