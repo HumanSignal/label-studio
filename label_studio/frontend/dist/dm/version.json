@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4711: CORS error accessing previously annotated data",
-  "commit": "266346025bdd6b9189eb44a21a68dbe7ec8775cf",
+  "message": "feat: LOPS-116: Update frontend candidate task view to show File attributes",
+  "commit": "75f6bbbf030c41b310e5e931c330486fb2f3a0b4",
   "branch": "master",
-  "date": "2023/04/24 08:21:41"
+  "date": "2023/04/24 11:26:47"
 }
