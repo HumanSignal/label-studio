@@ -2,408 +2,409 @@
 test_name: test_import_from_s3_storage
 strict: false
 marks:
-- usefixtures:
-  - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - usefixtures:
+      - django_live_url
+      - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
 stages:
-- id: signup
-  type: ref
-- name: stage
-  request:
-    data:
-      is_published: true
-      label_config: <View><Image name="image" value="$image_url"/><Choices name="label"
-        toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
-      title: test_s3_storage
-    method: POST
-    url: '{django_live_url}/api/projects'
-  response:
-    save:
-      json:
-        project_pk: id
-    status_code: 201
-- name: stage
-  request:
-    data:
-      bucket: pytest-s3-images
-      project: '{project_pk}'
-      title: Testing S3 storage (bucket from conftest.py)
-      use_blob_urls: true
-      presign_ttl: 3600
-    method: POST
-    url: '{django_live_url}/api/storages/s3'
-  response:
-    save:
-      json:
-        storage_pk: id
-    status_code: 201
-- name: stage
-  request:
-    data:
-      title: Testing S3 storage (bucket from conftest.py) changed
-    method: PATCH
-    url: '{django_live_url}/api/storages/s3/{storage_pk}'
-  response:
-    status_code: 200
-- name: stage
-  request:
-    method: POST
-    url: '{django_live_url}/api/storages/s3/{storage_pk}/sync'
-  response:
-    json:
-      last_sync_count: 4
-    status_code: 200
-- name: stage
-  request:
-    method: GET
-    url: '{django_live_url}/api/projects/{project_pk}/next'
-  response:
-    json:
+  - id: signup
+    type: ref
+  - name: stage
+    request:
       data:
-        image_url: !re_match "https://pytest-s3-images.s3.amazonaws.com.+X-Amz-Security-Token=testing"
-    status_code: 200
-- name: stage
-  request:
-    method: POST
-    url: '{django_live_url}/api/dm/views?project={project_pk}'
-    json:
-      project: '{project_pk}'
-  response:
-    status_code: 201
-    save:
+        is_published: true
+        label_config:
+          <View><Image name="image" value="$image_url"/><Choices name="label"
+          toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        title: test_s3_storage
+      method: POST
+      url: "{django_live_url}/api/projects"
+    response:
+      save:
+        json:
+          project_pk: id
+      status_code: 201
+  - name: stage
+    request:
+      data:
+        bucket: pytest-s3-images
+        project: "{project_pk}"
+        title: Testing S3 storage (bucket from conftest.py)
+        use_blob_urls: true
+        presign_ttl: 3600
+      method: POST
+      url: "{django_live_url}/api/storages/s3"
+    response:
+      save:
+        json:
+          storage_pk: id
+      status_code: 201
+  - name: stage
+    request:
+      data:
+        title: Testing S3 storage (bucket from conftest.py) changed
+      method: PATCH
+      url: "{django_live_url}/api/storages/s3/{storage_pk}"
+    response:
+      status_code: 200
+  - name: stage
+    request:
+      method: POST
+      url: "{django_live_url}/api/storages/s3/{storage_pk}/sync"
+    response:
       json:
-        view_pk: id
-- name: stage
-  request:
-    method: GET
-    url: '{django_live_url}/api/tasks?view={view_pk}'
-  response:
-    json:
-      tasks:
-        - data:
-            image_url: !re_match "https://pytest-s3-images.s3.amazonaws.com.+X-Amz-Security-Token=testing"
-    status_code: 200
-- name: stage
-  request:
-    data:
-      project: '{project_pk}'
-    method: GET
-    url: '{django_live_url}/api/storages'
-  response:
-    status_code: 200
-- name: stage
-  request:
-    headers:
-      content-type: application/json
-    json:
-      presign: false
-    method: PATCH
-    url: '{django_live_url}/api/storages/s3/{storage_pk}'
-  response:
-    status_code: 200
-- name: stage
-  request:
-    data:
-      id: !int "{storage_pk}"
-      bucket: pytest-s3-images
-      project: '{project_pk}'
-      title: Testing S3 storage (bucket from conftest.py)
-      use_blob_urls: true
-    method: POST
-    url: '{django_live_url}/api/storages/s3/validate'
-  response:
-    status_code: 200
-- name: stage
-  request:
-    data:
-      project: '{project_pk}'
-    method: GET
-    url: '{django_live_url}/api/storages'
-  response:
-    status_code: 200
-
+        last_sync_count: 4
+      status_code: 200
+  - name: stage
+    request:
+      method: GET
+      url: "{django_live_url}/api/projects/{project_pk}/next"
+    response:
+      json:
+        data:
+          image_url: !re_match "/tasks/\\d+/presign/\\?fileuri=s3.*//pytest-s3-images.+"
+      status_code: 200
+  - name: stage
+    request:
+      method: POST
+      url: "{django_live_url}/api/dm/views?project={project_pk}"
+      json:
+        project: "{project_pk}"
+    response:
+      status_code: 201
+      save:
+        json:
+          view_pk: id
+  - name: stage
+    request:
+      method: GET
+      url: "{django_live_url}/api/tasks?view={view_pk}"
+    response:
+      json:
+        tasks:
+          - data:
+              image_url: !re_match "/tasks/\\d+/presign/\\?fileuri=s3.*//pytest-s3-images.+"
+      status_code: 200
+  - name: stage
+    request:
+      data:
+        project: "{project_pk}"
+      method: GET
+      url: "{django_live_url}/api/storages"
+    response:
+      status_code: 200
+  - name: stage
+    request:
+      headers:
+        content-type: application/json
+      json:
+        presign: false
+      method: PATCH
+      url: "{django_live_url}/api/storages/s3/{storage_pk}"
+    response:
+      status_code: 200
+  - name: stage
+    request:
+      data:
+        id: !int "{storage_pk}"
+        bucket: pytest-s3-images
+        project: "{project_pk}"
+        title: Testing S3 storage (bucket from conftest.py)
+        use_blob_urls: true
+      method: POST
+      url: "{django_live_url}/api/storages/s3/validate"
+    response:
+      status_code: 200
+  - name: stage
+    request:
+      data:
+        project: "{project_pk}"
+      method: GET
+      url: "{django_live_url}/api/storages"
+    response:
+      status_code: 200
 ---
 test_name: test_import_from_s3_storage_recursive_scan
 strict: false
 marks:
-- usefixtures:
-  - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - usefixtures:
+      - django_live_url
+      - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
 stages:
-- id: signup
-  type: ref
-- name: stage
-  request:
-    data:
-      is_published: true
-      label_config: <View><Image name="image" value="$image_url"/><Choices name="label"
-        toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
-      title: test_s3_storage
-    method: POST
-    url: '{django_live_url}/api/projects'
-  response:
-    save:
+  - id: signup
+    type: ref
+  - name: stage
+    request:
+      data:
+        is_published: true
+        label_config:
+          <View><Image name="image" value="$image_url"/><Choices name="label"
+          toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        title: test_s3_storage
+      method: POST
+      url: "{django_live_url}/api/projects"
+    response:
+      save:
+        json:
+          project_pk: id
+      status_code: 201
+  - name: stage
+    request:
+      data:
+        bucket: pytest-s3-images
+        prefix: subdir
+        project: "{project_pk}"
+        title: Testing S3 storage (bucket from conftest.py)
+        use_blob_urls: true
+      method: POST
+      url: "{django_live_url}/api/storages/s3"
+    response:
+      save:
+        json:
+          storage_pk: id
+      status_code: 201
+  - name: stage
+    request:
+      method: POST
+      url: "{django_live_url}/api/storages/s3/{storage_pk}/sync"
+    response:
       json:
-        project_pk: id
-    status_code: 201
-- name: stage
-  request:
-    data:
-      bucket: pytest-s3-images
-      prefix: subdir
-      project: '{project_pk}'
-      title: Testing S3 storage (bucket from conftest.py)
-      use_blob_urls: true
-    method: POST
-    url: '{django_live_url}/api/storages/s3'
-  response:
-    save:
+        last_sync_count: 2
+      status_code: 200
+
+  # now update storage to do recursive scan
+  - name: stage
+    request:
+      method: PATCH
+      url: "{django_live_url}/api/storages/s3/{storage_pk}"
       json:
-        storage_pk: id
-    status_code: 201
-- name: stage
-  request:
-    method: POST
-    url: '{django_live_url}/api/storages/s3/{storage_pk}/sync'
-  response:
-    json:
-      last_sync_count: 2
-    status_code: 200
+        recursive_scan: true
+    response:
+      status_code: 200
 
-# now update storage to do recursive scan
-- name: stage
-  request:
-    method: PATCH
-    url: '{django_live_url}/api/storages/s3/{storage_pk}'
-    json:
-      recursive_scan: true
-  response:
-    status_code: 200
-
-# and sync - the last subdir/another image should be returned
-- name: stage
-  request:
-    method: POST
-    url: '{django_live_url}/api/storages/s3/{storage_pk}/sync'
-  response:
-    json:
-      last_sync_count: 1
-    status_code: 200
-
+  # and sync - the last subdir/another image should be returned
+  - name: stage
+    request:
+      method: POST
+      url: "{django_live_url}/api/storages/s3/{storage_pk}/sync"
+    response:
+      json:
+        last_sync_count: 1
+      status_code: 200
 
 ---
 test_name: test_import_from_s3_storage_recursive_scan_straigtaway
 strict: false
 marks:
-- usefixtures:
-  - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - usefixtures:
+      - django_live_url
+      - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
 stages:
-- id: signup
-  type: ref
-- name: stage
-  request:
-    data:
-      is_published: true
-      label_config: <View><Image name="image" value="$image_url"/><Choices name="label"
-        toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
-      title: test_s3_storage
-    method: POST
-    url: '{django_live_url}/api/projects'
-  response:
-    save:
+  - id: signup
+    type: ref
+  - name: stage
+    request:
+      data:
+        is_published: true
+        label_config:
+          <View><Image name="image" value="$image_url"/><Choices name="label"
+          toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        title: test_s3_storage
+      method: POST
+      url: "{django_live_url}/api/projects"
+    response:
+      save:
+        json:
+          project_pk: id
+      status_code: 201
+  - name: stage
+    request:
+      data:
+        bucket: pytest-s3-images
+        prefix: subdir
+        project: "{project_pk}"
+        title: Testing S3 storage (bucket from conftest.py)
+        use_blob_urls: true
+        recursive_scan: true
+      method: POST
+      url: "{django_live_url}/api/storages/s3"
+    response:
+      save:
+        json:
+          storage_pk: id
+      status_code: 201
+  - name: stage
+    request:
+      method: POST
+      url: "{django_live_url}/api/storages/s3/{storage_pk}/sync"
+    response:
       json:
-        project_pk: id
-    status_code: 201
-- name: stage
-  request:
-    data:
-      bucket: pytest-s3-images
-      prefix: subdir
-      project: '{project_pk}'
-      title: Testing S3 storage (bucket from conftest.py)
-      use_blob_urls: true
-      recursive_scan: true
-    method: POST
-    url: '{django_live_url}/api/storages/s3'
-  response:
-    save:
-      json:
-        storage_pk: id
-    status_code: 201
-- name: stage
-  request:
-    method: POST
-    url: '{django_live_url}/api/storages/s3/{storage_pk}/sync'
-  response:
-    json:
-      last_sync_count: 3
-    status_code: 200
-    
+        last_sync_count: 3
+      status_code: 200
+
 ---
 test_name: test_import_from_gcs_storage
 strict: false
 marks:
-- usefixtures:
-  - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - usefixtures:
+      - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
+      - django_live_url
 stages:
-- id: signup
-  type: ref
-- name: stage
-  request:
-    data:
-      is_published: true
-      label_config: <View><Image name="image" value="$image_url"/><Choices name="label"
-        toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
-      title: test_import_from_gcs_storage
-    method: POST
-    url: '{django_live_url}/api/projects'
-  response:
-    save:
-      json:
-        project_pk: id
-    status_code: 201
-- name: stage
-  request:
-    data:
-      bucket: test-gs-bucket
-      project: '{project_pk}'
-      title: Test GCS storage import (mocked GCS client from conftest.py)
-      use_blob_urls: true
-    method: POST
-    url: '{django_live_url}/api/storages/gcs'
-  response:
-    save:
-      json:
-        storage_pk: id
-    status_code: 201
-- name: stage
-  request:
-    data:
-      title: Test GCS storage import (mocked GCS client from conftest.py) changed
-    method: PATCH
-    url: '{django_live_url}/api/storages/gcs/{storage_pk}'
-  response:
-    status_code: 200
-- name: stage
-  request:
-    method: POST
-    url: '{django_live_url}/api/storages/gcs/{storage_pk}/sync'
-  response:
-    json:
-      last_sync_count: 3
-    status_code: 200
-- name: stage
-  request:
-    method: GET
-    url: '{django_live_url}/api/projects/{project_pk}/next'
-  response:
-    json:
+  - id: signup
+    type: ref
+  - name: stage
+    request:
       data:
-        image_url: !re_match "https://storage.googleapis.com/test-gs-bucket/.+"
-    status_code: 200
-
-
+        is_published: true
+        label_config:
+          <View><Image name="image" value="$image_url"/><Choices name="label"
+          toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        title: test_import_from_gcs_storage
+      method: POST
+      url: "{django_live_url}/api/projects"
+    response:
+      save:
+        json:
+          project_pk: id
+      status_code: 201
+  - name: stage
+    request:
+      data:
+        bucket: test-gs-bucket
+        project: "{project_pk}"
+        title: Test GCS storage import (mocked GCS client from conftest.py)
+        use_blob_urls: true
+      method: POST
+      url: "{django_live_url}/api/storages/gcs"
+    response:
+      save:
+        json:
+          storage_pk: id
+      status_code: 201
+  - name: stage
+    request:
+      data:
+        title: Test GCS storage import (mocked GCS client from conftest.py) changed
+      method: PATCH
+      url: "{django_live_url}/api/storages/gcs/{storage_pk}"
+    response:
+      status_code: 200
+  - name: stage
+    request:
+      method: POST
+      url: "{django_live_url}/api/storages/gcs/{storage_pk}/sync"
+    response:
+      json:
+        last_sync_count: 3
+      status_code: 200
+  - name: stage
+    request:
+      method: GET
+      url: "{django_live_url}/api/projects/{project_pk}/next"
+    response:
+      json:
+        data:
+          image_url: !re_match "/tasks/\\d+/presign/\\?fileuri=gs.*//test-gs-bucket.+"
+      status_code: 200
 ---
 test_name: test_invalidate_gcs_storage
 strict: false
 marks:
-- usefixtures:
-  - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - usefixtures:
+      - django_live_url
+      - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
 stages:
-- id: signup
-  type: ref
-- name: stage
-  request:
-    data:
-      is_published: true
-      label_config: <View><Image name="image" value="$image_url"/><Choices name="label"
-        toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
-      title: test_invalidate_gcs_storage
-    method: POST
-    url: '{django_live_url}/api/projects'
-  response:
-    save:
-      json:
-        project_pk: id
-    status_code: 201
+  - id: signup
+    type: ref
+  - name: stage
+    request:
+      data:
+        is_published: true
+        label_config:
+          <View><Image name="image" value="$image_url"/><Choices name="label"
+          toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        title: test_invalidate_gcs_storage
+      method: POST
+      url: "{django_live_url}/api/projects"
+    response:
+      save:
+        json:
+          project_pk: id
+      status_code: 201
 
-- name: stage
-  request:
-    data:
-      bucket: test-gs-bucket
-      project: '{project_pk}'
-      title: Test Invalidate GCS storage (mocked GCS client from conftest.py)
-      use_blob_urls: true
-      google_application_credentials: '{{"wrong": "service account info"}}'
-    method: POST
-    url: '{django_live_url}/api/storages/gcs/validate'
-  response:
-    status_code: 400
+  - name: stage
+    request:
+      data:
+        bucket: test-gs-bucket
+        project: "{project_pk}"
+        title: Test Invalidate GCS storage (mocked GCS client from conftest.py)
+        use_blob_urls: true
+        google_application_credentials: '{{"wrong": "service account info"}}'
+      method: POST
+      url: "{django_live_url}/api/storages/gcs/validate"
+    response:
+      status_code: 400
 
 ---
 test_name: test_import_from_gcs_storage_json
 strict: false
 marks:
-- usefixtures:
-  - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - usefixtures:
+      - django_live_url
+      - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
 stages:
-- id: signup
-  type: ref
-- name: stage
-  request:
-    data:
-      is_published: true
-      label_config: <View><Image name="image" value="$image_url"/><Choices name="label"
-        toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
-      title: test_import_from_gcs_storage
-    method: POST
-    url: '{django_live_url}/api/projects'
-  response:
-    save:
+  - id: signup
+    type: ref
+  - name: stage
+    request:
+      data:
+        is_published: true
+        label_config:
+          <View><Image name="image" value="$image_url"/><Choices name="label"
+          toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        title: test_import_from_gcs_storage
+      method: POST
+      url: "{django_live_url}/api/projects"
+    response:
+      save:
+        json:
+          project_pk: id
+      status_code: 201
+  - name: stage
+    request:
+      data:
+        bucket: test-gs-bucket_JSON
+        project: "{project_pk}"
+        title: Test GCS storage import (mocked GCS client from conftest.py)
+        use_blob_urls: false
+      method: POST
+      url: "{django_live_url}/api/storages/gcs"
+    response:
+      save:
+        json:
+          storage_pk: id
+      status_code: 201
+  - name: stage
+    request:
+      method: POST
+      url: "{django_live_url}/api/storages/gcs/{storage_pk}/sync"
+    response:
       json:
-        project_pk: id
-    status_code: 201
-- name: stage
-  request:
-    data:
-      bucket: test-gs-bucket_JSON
-      project: '{project_pk}'
-      title: Test GCS storage import (mocked GCS client from conftest.py)
-      use_blob_urls: false
-    method: POST
-    url: '{django_live_url}/api/storages/gcs'
-  response:
-    save:
-      json:
-        storage_pk: id
-    status_code: 201
-- name: stage
-  request:
-    method: POST
-    url: '{django_live_url}/api/storages/gcs/{storage_pk}/sync'
-  response:
-    json:
-      last_sync_count: 3
-    status_code: 200
-- name: stage
-  request:
-    method: GET
-    url: '{django_live_url}/api/projects/{project_pk}/next'
-  response:
-    status_code: 200
-
+        last_sync_count: 3
+      status_code: 200
+  - name: stage
+    request:
+      method: GET
+      url: "{django_live_url}/api/projects/{project_pk}/next"
+    response:
+      status_code: 200
 
 ---
 test_name: resolve_gs_links_by_connected_gcs_with_nested_dict_and_array
 strict: false
 marks:
-- usefixtures:
-  - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - usefixtures:
+      - django_live_url
+      - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
 stages:
   - id: signup
     type: ref
@@ -412,11 +413,12 @@ stages:
     request:
       data:
         is_published: true
-        label_config: <View><Image name="image" value="$image"/><Choices name="label"
+        label_config:
+          <View><Image name="image" value="$image"/><Choices name="label"
           toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
         title: test_import_from_gcs_storage
       method: POST
-      url: '{django_live_url}/api/projects'
+      url: "{django_live_url}/api/projects"
     response:
       save:
         json:
@@ -437,11 +439,11 @@ stages:
               - gs://whatever-bucket-with/manual.link.jpg
           array:
             - item1: gs://whatever-bucket-with/manual.link.jpg
-              some: 'some text'
+              some: "some text"
             - item2: gs://whatever-bucket-with/manual.link.jpg
-              some: 'some text'
+              some: "some text"
       method: POST
-      url: '{django_live_url}/api/projects/{project_pk}/import'
+      url: "{django_live_url}/api/projects/{project_pk}/import"
     response:
       json:
         annotation_count: 0
@@ -453,11 +455,11 @@ stages:
     request:
       data:
         bucket: test-gs-bucket_JSON
-        project: '{project_pk}'
+        project: "{project_pk}"
         title: Test GCS storage import (mocked GCS client from conftest.py)
         use_blob_urls: false
       method: POST
-      url: '{django_live_url}/api/storages/gcs'
+      url: "{django_live_url}/api/storages/gcs"
     response:
       save:
         json:
@@ -467,30 +469,29 @@ stages:
   - name: url should be resolved
     request:
       method: GET
-      url: '{django_live_url}/api/projects/{project_pk}/next'
+      url: "{django_live_url}/api/projects/{project_pk}/next"
     response:
       json:
         data:
-          image: !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
+          image: !re_match "/tasks/\\d+/presign/\\?fileuri=gs.*//whatever-bucket-with/manual.link.+"
           dict:
-            key1: !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
+            key1: !re_match "/tasks/\\d+/presign/\\?fileuri=gs.*//whatever-bucket-with/manual.link.+"
             array:
-              - !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
-              - !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
+              - !re_match "/tasks/\\d+/presign/\\?fileuri=gs.*//whatever-bucket-with/manual.link.+"
+              - !re_match "/tasks/\\d+/presign/\\?fileuri=gs.*//whatever-bucket-with/manual.link.+"
           array:
-            - item1: !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
-              some: 'some text'
-            - item2: !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
-              some: 'some text'
+            - item1: !re_match "/tasks/\\d+/presign/\\?fileuri=gs.*//whatever-bucket-with/manual.link.+"
+              some: "some text"
+            - item2: !re_match "/tasks/\\d+/presign/\\?fileuri=gs.*//whatever-bucket-with/manual.link.+"
+              some: "some text"
       status_code: 200
-
 ---
 test_name: get_import_export_storage_types
 strict: true
 marks:
 - usefixtures:
   - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
 stages:
 - id: signup
   type: ref
@@ -535,7 +536,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
 stages:
 - id: signup
   type: ref
@@ -618,7 +619,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
 stages:
 - id: signup
   type: ref
@@ -714,7 +715,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
 stages:
 - id: signup
   type: ref
@@ -741,7 +742,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
 stages:
 - id: signup
   type: ref
@@ -794,7 +795,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
 stages:
 - id: signup
   type: ref
@@ -841,7 +842,7 @@ stages:
   response:
     json:
       data:
-        image_url: !re_match "https://testing.blob.core.windows.net/pytest-azure-images/.+"
+        image_url: !re_match "/tasks/\\d+/presign/\\?fileuri=azure-blob.*//pytest-azure-images.+"
     status_code: 200
 - name: stage
   request:
@@ -876,7 +877,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
 stages:
 - id: signup
   type: ref
@@ -958,7 +959,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
 stages:
 - id: signup
   type: ref
@@ -1015,7 +1016,6 @@ stages:
         image_url: "http://ggg.com/image.jpg"
     status_code: 200
 
-
 ---
 
 test_name: test_resolving_embedded_links
@@ -1023,7 +1023,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
 stages:
 - id: signup
   type: ref
@@ -1087,7 +1087,7 @@ stages:
   response:
     json:
       data:
-        pdf: !re_match "<embed src='https://storage.googleapis.com/heartex-test/file.pdf?.*"
+        pdf: !re_match "<embed src='/tasks/\\d+/presign/\\?fileuri=gs.*//heartex-test/file.pdf?.*"
     status_code: 200
 
 ---
@@ -1099,7 +1099,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
 stages:
 - id: signup
   type: ref
@@ -1153,7 +1153,7 @@ stages:
   response:
     json:
       data:
-        text: !re_match "<a href=\"https://hypertext-bucket.s3.amazonaws.com/file%20with%20/spaces%20and%27%20/%20%27%20/%20quotes.jpg.+X-Amz-Security-Token=testing"
+        text: !re_match "<a href=\"/tasks/\\d+/presign/\\?fileuri=s3.*//hypertext-bucket/file%20with%20/spaces%20and%27%20/%20%27%20/%20quotes.jpg"
     status_code: 200
 
 ---
@@ -1163,7 +1163,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
 stages:
 - id: signup
   type: ref
@@ -1221,7 +1221,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
-  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
 stages:
 - id: signup
   type: ref
