@@ -55,7 +55,7 @@ export const StorageSummary = ({ target, storage, className, storageTypes = [] }
 
         <DescriptionList.Item
           term="Status"
-          help={'Initialized: storage was added, but never synced \n' +
+          help={'Initialized: storage was added, but never synced, it is enough to start URI links resolving \n' +
                 'Queued: sync job is in the queue, but not yet started \n'+
                 'In progress: sync job is running \n' +
                 'Failed: sync job stopped, some errors occurred \n' +
