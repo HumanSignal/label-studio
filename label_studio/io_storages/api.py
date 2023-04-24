@@ -7,7 +7,7 @@ import os
 from rest_framework import generics
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from drf_yasg import openapi as openapi
 from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
@@ -135,6 +135,13 @@ class StorageValidateAPI(generics.CreateAPIView):
                 raise PermissionDenied()
         serializer = self.get_serializer(instance=instance, data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        # not all storages validate connection in serializer, just make another explicit check here
+        try:
+            instance.validate_connection()
+        except Exception as exc:
+            raise ValidationError(exc)
+
         return Response()
 
 
