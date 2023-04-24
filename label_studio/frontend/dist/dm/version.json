@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4711: CORS error accessing previously annotated data",
-  "commit": "524796fd7c8b0689a2f51688a438c7ed29cf2331",
-  "branch": "fb-lsdv-4711",
-  "date": "2023/04/21 15:10:10"
+  "commit": "266346025bdd6b9189eb44a21a68dbe7ec8775cf",
+  "branch": "master",
+  "date": "2023/04/24 08:21:41"
 }
