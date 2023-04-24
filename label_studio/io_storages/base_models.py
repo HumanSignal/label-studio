@@ -186,12 +186,12 @@ class StorageInfo(models.Model):
         queue = django_rq.get_queue('low')
         try:
             sync_job = Job.fetch(self.last_sync_job, connection=queue.connection)
-            status = sync_job.get_status()
+            job_status = sync_job.get_status()
         except rq.exceptions.NoSuchJobError:
-            status = 'not found'
+            job_status = 'not found'
         # broken synchronization between storage and job
         # this might happen when job was stopped because of OOM and on_failure wasn't called
-        if status == 'failed' and self.status != Status.FAILED:
+        if job_status == 'failed' and self.status != Status.FAILED:
             self.status = Status.FAILED
             self.traceback = "It appears the job was terminated unexpectedly, " \
                              "and no traceback information is available.\n" \
@@ -201,7 +201,7 @@ class StorageInfo(models.Model):
                         f'because of the failed job {self.last_sync_job}')
 
         # job is not found in redis (maybe deleted while redeploy), storage status is still active
-        elif status == 'not found' and self.status in [Status.IN_PROGRESS, Status.QUEUED]:
+        elif job_status == 'not found' and self.status in [Status.IN_PROGRESS, Status.QUEUED]:
             self.status = Status.FAILED
             self.traceback = "It appears the job was not found in redis, " \
                              "and no traceback information is available.\n" \
