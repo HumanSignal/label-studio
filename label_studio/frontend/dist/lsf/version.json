@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4711: CORS error accessing previously annotated data",
-  "commit": "235ae39338b6e727c79323854974d2425c9575cc",
-  "branch": "master",
-  "date": "2023/04/24 09:24:01"
+  "message": "chore: LSDV-4993: Fix ESLint to target changed files only",
+  "commit": "f6d2b7371273953efc4110dbcf02f65567b38ac1",
+  "branch": "fb-lsdv-4993/ci-linter-on-changed-filed",
+  "date": "2023/04/24 16:08:21"
 }
