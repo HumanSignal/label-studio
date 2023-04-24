@@ -133,15 +133,15 @@ class StorageValidateAPI(generics.CreateAPIView):
             instance = generics.get_object_or_404(self.serializer_class.Meta.model.objects.all(), pk=storage_id)
             if not instance.has_permission(request.user):
                 raise PermissionDenied()
+            
+            # not all storages validate connection in serializer, just make another explicit check here
+            try:
+                instance.validate_connection()
+            except Exception as exc:
+                raise ValidationError(exc)
+
         serializer = self.get_serializer(instance=instance, data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        # not all storages validate connection in serializer, just make another explicit check here
-        try:
-            instance.validate_connection()
-        except Exception as exc:
-            raise ValidationError(exc)
-
         return Response()
 
 
