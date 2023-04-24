@@ -68,6 +68,7 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         storage = serializer.save()
         if settings.SYNC_ON_TARGET_STORAGE_CREATION:
+            storage.validate_connection()
             storage.sync()
 
 
