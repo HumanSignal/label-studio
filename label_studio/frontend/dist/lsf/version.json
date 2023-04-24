@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4836: Conditional annotation with visibleWhen choice-selected works with Taxonomy",
-  "commit": "791b7135d7a37db382bae18e473b14ba39bdd966",
+  "message": "fix: LSDV-4711: CORS error accessing previously annotated data",
+  "commit": "235ae39338b6e727c79323854974d2425c9575cc",
   "branch": "master",
-  "date": "2023/04/19 12:13:15"
+  "date": "2023/04/24 09:24:01"
 }
