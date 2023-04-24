@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4711: CORS error accessing previously annotated data",
-  "commit": "235ae39338b6e727c79323854974d2425c9575cc",
-  "branch": "master",
-  "date": "2023/04/24 09:24:01"
+  "message": "fix: LSDV-4930: Fix selection tool",
+  "commit": "9cbb20784f1bd906cd09afce0ccf01f394545dfb",
+  "branch": "fb-lsdv-4930/selection-tool-fixes",
+  "date": "2023/04/24 15:30:41"
 }
