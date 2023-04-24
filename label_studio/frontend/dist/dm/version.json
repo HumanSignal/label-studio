@@ -1,6 +1,6 @@
 {
   "message": "feat: LOPS-116: Update frontend candidate task view to show File attributes",
-  "commit": "032836fc92b9a7ca96297d5445ad713c57176231",
-  "branch": "fb-lops-116/field-attributes",
-  "date": "2023/04/24 10:59:47"
+  "commit": "75f6bbbf030c41b310e5e931c330486fb2f3a0b4",
+  "branch": "master",
+  "date": "2023/04/24 11:26:47"
 }
