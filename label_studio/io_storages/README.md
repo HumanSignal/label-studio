@@ -36,11 +36,11 @@ This diagram is based on Google Cloud Storage (GCS) and other storages are imple
 
 Storage (Import and Export) have different statuses of synchronization (see `class StorageInfo.Status`):
 
-1. Initialized
-2. Queued
-3. In progress
-4. Failed
-5. Completed
+1. Initialized: storage was added, but never synced, it is enough to start using URI links resolving
+2. Queued: sync job is in the queue, but not yet started
+3. In progress: sync job is running
+4. Failed: sync job stopped, some errors occurred
+5. Completed: sync job completed successfully
 
 ```mermaid
     graph TD;
