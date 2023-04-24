@@ -110,6 +110,8 @@ class StorageInfo(models.Model):
 
         self.time_in_progress = datetime.now()
         self.meta['time_in_progress'] = str(self.time_in_progress)
+        # at the very beginning it's the same as in progress time
+        self.meta['time_last_ping'] = str(self.time_in_progress)
 
         self.save(update_fields=['status', 'meta'])
 
@@ -120,7 +122,7 @@ class StorageInfo(models.Model):
 
         time_completed = datetime.now()
         self.meta['time_completed'] = str(time_completed)
-        self.meta['duration'] = (self.time_in_progress - time_completed).total_seconds()
+        self.meta['duration'] = (time_completed - self.time_in_progress).total_seconds()
         self.meta.update(kwargs)
 
         self.save(update_fields=['status', 'meta', 'last_sync', 'last_sync_count'])
@@ -131,7 +133,7 @@ class StorageInfo(models.Model):
 
         time_failure = datetime.now()
         self.meta['time_failure'] = str(time_failure)
-        self.meta['duration'] = (self.time_in_progress - time_failure).total_seconds()
+        self.meta['duration'] = (time_failure - self.time_in_progress).total_seconds()
 
         self.save(update_fields=['status', 'traceback', 'meta'])
 
