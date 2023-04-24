@@ -42,6 +42,15 @@ Storage (Import and Export) have different statuses of synchronization (see `cla
 4. Failed
 5. Completed
 
+```mermaid
+    graph TD;
+
+    Initialized-->Queued;
+    Queued-->InProgress;
+    InProgress-->Failed;
+    InProgress-->Completed; 
+```
+
 Also StorageInfo contains counters and some debug info that will be displayed in storages:
 * last_sync - time of the successful last sync 
 * last_sync_count - objects that were synced successfully
