@@ -32,7 +32,7 @@ This diagram is based on Google Cloud Storage (GCS) and other storages are imple
     end
 ```
 
-## Storage status and how they are processed
+## Storage statuses and how they are processed
 
 Storage (Import and Export) have different statuses of synchronization (see `class StorageInfo.Status`):
 
