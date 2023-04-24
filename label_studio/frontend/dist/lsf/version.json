@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4801: Better file type playable detection for video",
-  "commit": "b00b0a31217882b61438fc7c5f43ab852fdd9b84",
+  "message": "fix: LSDV-4711: CORS error accessing previously annotated data",
+  "commit": "235ae39338b6e727c79323854974d2425c9575cc",
   "branch": "master",
-  "date": "2023/03/22 12:59:27"
+  "date": "2023/04/24 09:24:01"
 }

@@ -234,6 +234,16 @@ class Task(TaskMixin, models.Model):
             return filename.replace(settings.MEDIA_URL, '')
         return filename
 
+    def resolve_storage_uri(self, url, project):
+        if not self.storage:
+            storage_objects = project.get_all_storage_objects(type_='import')
+            self.storage = self._get_storage_by_url(url, storage_objects)
+
+        if self.storage:
+            return self.storage.generate_http_url(url)
+
+        return null
+
     def resolve_uri(self, task_data, project):
         if project.task_data_login and project.task_data_password:
             protected_data = {}
@@ -273,7 +283,12 @@ class Task(TaskMixin, models.Model):
                 storage = self.storage or self._get_storage_by_url(task_data[field], storage_objects)
                 if storage:
                     try:
-                        resolved_uri = storage.resolve_uri(task_data[field])
+                        proxy_task = None
+                        if flag_set('fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short',
+                                    self.project.organization.created_by):
+                            proxy_task = self
+
+                        resolved_uri = storage.resolve_uri(task_data[field], proxy_task)
                     except Exception as exc:
                         logger.debug(exc, exc_info=True)
                         resolved_uri = None
