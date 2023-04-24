@@ -138,7 +138,7 @@ class StorageInfo(models.Model):
     def info_update_progress(self, last_sync_count, **kwargs):
         # update db counter once per 5 seconds to avid db overloads
         last_ping = datetime.now()
-        delta = (self.time_in_progress - last_ping).total_seconds()
+        delta = (last_ping - self.time_in_progress).total_seconds()
 
         if delta > settings.STORAGE_IN_PROGRESS_TIMER:
             self.last_sync_count = last_sync_count
@@ -161,7 +161,8 @@ class StorageInfo(models.Model):
 
     def health_check(self):
         now = datetime.now()
-        delta = (datetime.fromisoformat(self.meta.get('time_last_ping', str(now))) - now).total_seconds()
+        last_ping = datetime.fromisoformat(self.meta.get('time_last_ping', str(now)))
+        delta = (now - last_ping).total_seconds()
 
         # check redis connection
         if redis_connected():
