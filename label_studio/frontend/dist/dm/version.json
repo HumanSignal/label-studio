@@ -1,6 +1,6 @@
 {
-  "message": "chore: LSDV-4727: Remove any AudioPlus mentions",
-  "commit": "bebdff88fba8aa0b167b5475e8d77009a3bbd895",
-  "branch": "master",
-  "date": "2023/04/18 15:30:26"
+  "message": "fix: LSDV-4864: Magic Wand doesn't work with MIG ",
+  "commit": "4aa915fba01ee0a093844ad3e7cee0b1e36b6f73",
+  "branch": "fb-lsdv-4864/magic-wand-mig",
+  "date": "2023/04/24 14:39:53"
 }
