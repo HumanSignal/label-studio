@@ -61,11 +61,10 @@ jobs:
       - name: Print Yarn cache size
         run: du -d 0 -h ${{ steps.yarn-cache-dir-path.outputs.dir }}
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
       - name: Build
-        run: yarn run build:production
+        run: |
+          yarn install --frozen-lockfile
+          yarn run build:production
         working-directory: ${{ env.FRONTEND_DIR }}
 
       - name: Commit and Push
