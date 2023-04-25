@@ -238,7 +238,9 @@ REST_FRAMEWORK = {
     ],
     'EXCEPTION_HANDLER': 'core.utils.common.custom_exception_handler',
     'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),
-    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.AcceptHeaderVersioning',
+    'ALLOWED_VERSIONS': ['1'],
+    'VERSION_PARAMETER': 'version',
     'PAGE_SIZE': 100,
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination'
 }

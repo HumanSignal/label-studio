@@ -70,7 +70,8 @@ def version_page(request):
                                   if not key.startswith('_') and not hasattr(getattr(settings, key), '__call__')}
 
         result = json.dumps(result, indent=2)
-        result = result.replace('},', '},\n').replace('\\n', ' ').replace('\\r', '')
+        result = result.replace('},', '},\n').replace(
+            '\\n', ' ').replace('\\r', '')
         return HttpResponse('<pre>' + result + '</pre>')
     else:
         return JsonResponse(result)
@@ -138,7 +139,8 @@ def samples_time_series(request):
         value_columns = range(1, max_column_n+1)
 
     ts = generate_time_series_json(time_column, value_columns, time_format)
-    csv_data = pd.DataFrame.from_dict(ts).to_csv(index=False, header=header, sep=separator).encode('utf-8')
+    csv_data = pd.DataFrame.from_dict(ts).to_csv(
+        index=False, header=header, sep=separator).encode('utf-8')
 
     # generate response data as file
     filename = 'time-series.csv'
@@ -188,7 +190,8 @@ def localfiles_data(request):
             .annotate(_full_path=Value(os.path.dirname(full_path), output_field=CharField())) \
             .filter(_full_path__startswith=F('path'))
         if localfiles_storage.exists():
-            user_has_permissions = any(storage.project.has_permission(user) for storage in localfiles_storage)
+            user_has_permissions = any(storage.project.has_permission(
+                user) for storage in localfiles_storage)
 
         if user_has_permissions and os.path.exists(full_path):
             content_type, encoding = mimetypes.guess_type(str(full_path))
@@ -237,3 +240,17 @@ def feature_flags(request):
     }
 
     return HttpResponse('<pre>' + json.dumps(flags, indent=4) + '</pre>', status=200)
+
+
+class VersionedAPIView(APIView):
+    versions = {}
+
+    def dispatch(self, request, *args, **kwargs):
+        version = request.version
+
+        if version not in self.versions:
+            return HttpResponseNotFound()
+
+        view_class = self.versions[version]
+        view = view_class.as_view()
+        return view(request, *args, **kwargs)
