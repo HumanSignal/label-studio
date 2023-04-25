@@ -124,6 +124,8 @@ def apply_ordering(queryset, ordering, project, request):
     if ordering:
         preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
         field_name, ascending = preprocess_field_name(ordering[0], only_undefined_field=False)
+        if field_name == 'storage_filename': 
+            field_name = 'io_storages_localfilesimportstoragelink'
         if field_name.startswith('data__'):
             # annotate task with data field for float/int/bool ordering support
             json_field = field_name.replace('data__', '')
@@ -132,6 +134,7 @@ def apply_ordering(queryset, ordering, project, request):
 
         else:
             f = F(field_name).asc(nulls_last=True) if ascending else F(field_name).desc(nulls_last=True)
+        
         queryset = queryset.order_by(f)
     else:
         queryset = queryset.order_by("id")
