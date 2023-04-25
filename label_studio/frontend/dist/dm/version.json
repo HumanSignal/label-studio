@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-116: Update frontend candidate task view to show File attributes",
-  "commit": "75f6bbbf030c41b310e5e931c330486fb2f3a0b4",
-  "branch": "master",
-  "date": "2023/04/24 11:26:47"
+  "message": "feat: LOPS-127: Update frontend SemanticSearch component to leverage views and tasks endpoint",
+  "commit": "ae49073a89b9df28a57d42ea3b7337bab65715e5",
+  "branch": "fb-lops-127/semantic-search",
+  "date": "2023/04/25 15:54:14"
 }
