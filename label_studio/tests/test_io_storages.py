@@ -9,7 +9,7 @@ def test_gcs_storage_credentials_validation(business_client):
     project = make_project({}, business_client.user, use_ml_backend=False)
 
     data = {
-        "project": "1",
+        "project": project.id,
         "title": "Test",
         "bucket": "Test",
         "prefix": "Test",
