@@ -228,6 +228,12 @@
         "decorators": ""
     },
     {
+        "url": "/tasks/<int:task_id>/presign/",
+        "module": "data_import.api.PresignStorageData",
+        "name": "data_import:storage-data-presign",
+        "decorators": ""
+    },
+    {
         "url": "/api/dm/views/",
         "module": "data_manager.api.ViewAPI",
         "name": "data_manager:api:view-list",
