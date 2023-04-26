@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-116: Update frontend candidate task view to show File attributes",
-  "commit": "75f6bbbf030c41b310e5e931c330486fb2f3a0b4",
-  "branch": "master",
-  "date": "2023/04/24 11:26:47"
+  "message": "feat: LOPS-72: Create range slider frontend component and add to Semantic Search",
+  "commit": "e10a895f3063b3c63cf0aee58a1d2920f27f4eac",
+  "branch": "fb-lops-72/slider",
+  "date": "2023/04/26 10:19:18"
 }
