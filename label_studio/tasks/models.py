@@ -242,8 +242,6 @@ class Task(TaskMixin, models.Model):
         if self.storage:
             return self.storage.generate_http_url(url)
 
-        return null
-
     def resolve_uri(self, task_data, project):
         if project.task_data_login and project.task_data_password:
             protected_data = {}
