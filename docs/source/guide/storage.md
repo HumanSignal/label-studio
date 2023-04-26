@@ -48,6 +48,23 @@ Source storage functionality can be divided into two parts:
 
 <img src="/images/source-cloud-storages.png" class="make-intense-zoom">
 
+#### Treat every bucket object as a source file
+
+Label Studio Source Storages feature an option called "Treat every bucket object as a source file." This option enables two different methods of loading tasks into Label Studio.
+
+###### Off
+
+When disabled, tasks in JSON format can be loaded directly from storage buckets into Label Studio. This approach is particularly helpful when dealing with complex tasks that involve multiple media sources.
+
+<img src="/images/source-storages-treat-off.png" class="make-intense-zoom">
+
+###### On
+
+When enabled, Label Studio automatically lists files from the storage bucket and constructs tasks. This is only possible for simple labeling tasks that involve a single media source (such as an image, text, etc.).* 
+
+<img src="/images/source-storages-treat-on.png" class="make-intense-zoom">
+
+
 #### One Task - One JSON File 
 
 If you plan to load JSON tasks from the Source Storage (`Treat every bucket object as a source file = No`), you must place only one task as the **dict** per one JSON file. Otherwise, Label Studio will not load your data properly.

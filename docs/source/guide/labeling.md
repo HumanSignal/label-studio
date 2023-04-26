@@ -172,7 +172,7 @@ When labeling image data types with the `Rectangle`, `BrushLabels`, `Ellipse`, `
 | `]` | When the brush or eraser option is selected, increase the size of the brush or eraser. |
 
 ### Audio-specific hotkeys
-When labeling audio data types with the `Audio` or `AudioPlus` tags, you can use specific hotkeys to take audio-specific actions.
+When labeling audio data types with the `Audio` tag, you can use specific hotkeys to take audio-specific actions.
 
 | Key | Description |
 | --- | --- | 

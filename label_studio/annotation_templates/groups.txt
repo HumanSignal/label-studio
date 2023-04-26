@@ -6,3 +6,4 @@ Ranking & Scoring
 Structured Data Parsing
 Time Series Analysis
 Videos
+Generative AI
