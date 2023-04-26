@@ -559,6 +559,14 @@ class PresignStorageData(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         # Proxy to presigned url
-        return HttpResponseRedirect(redirect_to=url, status=status.HTTP_303_SEE_OTHER)
+        response = HttpResponseRedirect(redirect_to=url, status=status.HTTP_303_SEE_OTHER)
+
+        # NOTE: Temporary workaround:
+        # For some reason even though this is using a 303 which should never cache
+        # it at the moment will cache the redirect when running the python server directly.
+        # This is not an issue when running behind nginx and a more comprehensive solution to this will be coming.
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+
+        return response
 
 
