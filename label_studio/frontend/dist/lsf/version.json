@@ -1,6 +1,6 @@
 {
-  "message": "ci: bump codecov/codecov-action from 3.1.1 to 3.1.2 (#1319)",
-  "commit": "edc6da5eb05230575b1809d0a779b3f021c35e44",
+  "message": "feat: LSDV-3025-11: Add functionality to filter with multiple rules",
+  "commit": "40b9311d8712f1abdc053b864227398e532861be",
   "branch": "master",
-  "date": "2023-04-17T09:16:04Z"
+  "date": "2023/04/24 13:18:17"
 }
