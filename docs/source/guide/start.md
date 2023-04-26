@@ -6,8 +6,7 @@ order: 110
 order_enterprise: 99
 meta_title: Start Commands for Label Studio
 meta_description: Documentation for starting Label Studio and configuring the environment to use Label Studio with your machine learning or data science project. 
-section: "Install"
-
+section: "Get started"
 ---
 
 After you install Label Studio, start the server to start using it. 
