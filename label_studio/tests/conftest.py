@@ -422,6 +422,7 @@ def async_import_off():
             return False
         return flag_set(*args, **kwargs)
     with mock.patch('data_import.api.flag_set', wraps=fake_flag_set):
+        yield
 
 
 @pytest.fixture(name="fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on")
