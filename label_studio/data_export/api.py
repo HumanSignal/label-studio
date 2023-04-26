@@ -2,6 +2,7 @@
 """
 import os
 import logging
+import traceback as tb
 
 from django.conf import settings
 from datetime import datetime
@@ -525,11 +526,12 @@ def async_convert(converted_format_id, export_type, project, **kwargs):
     converted_format.save(update_fields=['file', 'status'])
 
 
-def set_convert_background_failure(job, connection, type, value, traceback):
+def set_convert_background_failure(job, connection, type, value, traceback_obj):
     from data_export.models import ConvertedFormat
 
     convert_id = job.args[0]
-    ConvertedFormat.objects.filter(id=convert_id).update(status=Export.Status.FAILED, traceback=str(traceback))
+    trace = tb.format_exception(type, value, traceback_obj)
+    ConvertedFormat.objects.filter(id=convert_id).update(status=Export.Status.FAILED, traceback=''.join(trace))
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
