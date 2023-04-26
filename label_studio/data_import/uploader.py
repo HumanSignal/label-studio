@@ -177,7 +177,6 @@ def load_tasks_for_async_import(project_import, user):
     """ Load tasks from different types of request.data / request.files saved in project_import model
     """
     file_upload_ids, found_formats, data_keys = [], [], set()
-    could_be_tasks_list = False
 
     if project_import.file_upload_ids:
         file_upload_ids = project_import.file_upload_ids
@@ -201,9 +200,13 @@ def load_tasks_for_async_import(project_import, user):
             if url.strip().startswith('file://'):
                 raise ValidationError('"url" is not valid')
 
+            could_be_tasks_list = False
             data_keys, found_formats, tasks, file_upload_ids, could_be_tasks_list = tasks_from_url(
                 file_upload_ids, project_import.project, user, url, could_be_tasks_list
             )
+            if could_be_tasks_list:
+                project_import.could_be_tasks_list = True
+                project_import.save(update_fields=['could_be_tasks_list'])
 
     elif project_import.tasks:
         tasks = project_import.tasks
@@ -217,7 +220,7 @@ def load_tasks_for_async_import(project_import, user):
         raise ValidationError('load_tasks: No tasks added')
 
     check_max_task_number(tasks)
-    return tasks, file_upload_ids, could_be_tasks_list, found_formats, list(data_keys)
+    return tasks, file_upload_ids, found_formats, list(data_keys)
 
 
 def load_tasks(request, project):

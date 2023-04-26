@@ -34,7 +34,7 @@ def async_import_background(import_id, user_id, **kwargs):
     tasks = None
     # upload files from request, and parse all tasks
     # TODO: Stop passing request to load_tasks function, make all validation before
-    parsed_data, file_upload_ids, could_be_tasks_lists, found_formats, data_columns = load_tasks_for_async_import(project_import, user)
+    parsed_data, file_upload_ids, found_formats, data_columns = load_tasks_for_async_import(project_import, user)
 
     if project_import.preannotated_from_fields:
         # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]  # noqa
@@ -74,7 +74,6 @@ def async_import_background(import_id, user_id, **kwargs):
     project_import.prediction_count = prediction_count or 0
     project_import.duration = duration
     project_import.file_upload_ids = file_upload_ids
-    project_import.could_be_tasks_list = could_be_tasks_lists
     project_import.found_formats = found_formats
     project_import.data_columns = data_columns
     if project_import.return_task_ids:
