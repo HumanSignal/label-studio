@@ -383,7 +383,7 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
 class ProjectImportAPI(generics.RetrieveAPIView):
     parser_classes = (JSONParser,)
     serializer_class = ProjectImportSerializer
-    permission_required = all_permissions.projects_view
+    permission_required = all_permissions.projects_change
     queryset = ProjectImport.objects.all()
     lookup_url_kwarg = 'import_pk'
 

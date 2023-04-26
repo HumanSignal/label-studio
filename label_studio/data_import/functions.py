@@ -14,7 +14,7 @@ from webhooks.models import WebhookAction
 logger = logging.getLogger(__name__)
 
 
-def async_import_background(import_id, user_id):
+def async_import_background(import_id, user_id, **kwargs):
     with transaction.atomic():
         try:
             project_import = ProjectImport.objects.get(id=import_id)
