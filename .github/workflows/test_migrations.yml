@@ -14,7 +14,7 @@ env:
 jobs:
   migrations:
     name: "migrations"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     timeout-minutes: 20
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
