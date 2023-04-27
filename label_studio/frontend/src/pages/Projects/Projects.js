@@ -67,13 +67,36 @@ export const ProjectsPage = () => {
 
     if (isFF(FF_DEV_2575) && data?.results?.length) {
       const additionalData = await api.callApi("projects", {
-        params: { ids: data?.results?.map(({ id }) => id).join(','), page_size: pageSize },
+        params: {
+          ids: data?.results?.map(({ id }) => id).join(','),
+          include: [
+            'id',
+            'description',
+            'num_tasks_with_annotations',
+            'task_number',
+            'skipped_annotations_number',
+            'total_annotations_number',
+            'total_predictions_number',
+            'ground_truth_number',
+            'finished_task_number',
+          ].join(','),
+          page_size: pageSize,
+        },
         signal: abortController.controller.current.signal,
         errorFilter: (e) => e.error.includes('aborted'), 
       });
 
       if (additionalData?.results?.length) {
-        setProjectsList(additionalData.results);
+        setProjectsList(prev =>
+          additionalData.results.map((project) => {
+            const prevProject = prev.find(({ id }) => id === project.id);
+
+            return {
+              ...prevProject,
+              ...project,
+            };
+          }),
+        );
       }
     }
   };
