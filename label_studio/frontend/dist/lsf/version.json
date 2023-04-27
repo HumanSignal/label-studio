@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3025-11: Add functionality to filter with multiple rules",
-  "commit": "40b9311d8712f1abdc053b864227398e532861be",
-  "branch": "master",
-  "date": "2023/04/24 13:18:17"
+  "message": "fix: LSDV-4766: Toggle selected region visibility with hotkeys",
+  "commit": "fb4c41fcdadc634223e36f06e621b8673a22046d",
+  "branch": "fb-lsdv-4766",
+  "date": "2023/04/27 15:44:02"
 }
