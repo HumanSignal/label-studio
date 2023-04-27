@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3025-11: Add functionality to filter with multiple rules",
-  "commit": "40b9311d8712f1abdc053b864227398e532861be",
-  "branch": "master",
-  "date": "2023/04/24 13:18:17"
+  "message": "fix: LSDV-5010: View all panel padding removed",
+  "commit": "5b6c51ee7aef7c3b46325c98aa14141e61676666",
+  "branch": "fb-lsdv-5010/quickview-view-all-padding",
+  "date": "2023/04/27 16:26:43"
 }
