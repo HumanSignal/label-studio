@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4766: Toggle selected region visibility with hotkeys",
-  "commit": "fb4c41fcdadc634223e36f06e621b8673a22046d",
+  "commit": "2fe657421e031d4e63599f32cc279c4ec6fc0912",
   "branch": "fb-lsdv-4766",
-  "date": "2023/04/27 15:44:02"
+  "date": "2023/04/27 16:10:17"
 }
