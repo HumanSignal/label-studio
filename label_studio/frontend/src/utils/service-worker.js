@@ -4,28 +4,28 @@ function registerServiceWorker(serviceWorkerFileName) {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
       .register(serviceWorkerFileName)
-      .then(function (registration) {
+      .then(function(registration) {
         console.log(
           "Service Worker registered with scope:",
-          registration.scope
+          registration.scope,
         );
       })
-      .catch(function (error) {
+      .catch(function(error) {
         console.log("Service Worker registration failed:", error);
       });
   }
 }
 
+function awakenServiceWorker() {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.ready.then((registration) => {
+      registration.active.postMessage({ type: "awaken" });
+    });
+  }
+}
+
 if (isFF(FF_LSDV_4711)) {
   registerServiceWorker("/sw.js");
-
-  function awakenServiceWorker() {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.ready.then((registration) => {
-        registration.active.postMessage({ type: "awaken" });
-      });
-    }
-  }
 
   // Wake up the service worker when the page becomes visible
   // This is needed to ensure we are cleaning up cache when the user is using the application
