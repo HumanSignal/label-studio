@@ -1,6 +1,6 @@
 {
   "message": "feat:  LSDV-4708:  Removed FF_DEV_1170 outliner feature flag and corresponding components",
-  "commit": "2b5d2b580a941204dc2e49e1df0b9920a8e7b506",
+  "commit": "fcc192da3423fafb2cb3dfda7ce1c9fd6778005e",
   "branch": "fb-lsdv-4708-1/enable-outliner-by-default",
-  "date": "2023/04/27 09:40:04"
+  "date": "2023/04/27 13:29:22"
 }
