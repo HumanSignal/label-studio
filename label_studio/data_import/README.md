@@ -9,7 +9,7 @@ flowchart TD
     A[HTTP api_project_import] --> B[async import]
     A --> C[sync_import]
     B --> D[store uploaded files]
-    D --> E[run backgroud job]
+    D --> E[run background job]
     E --> F[parse uploaded files]
     F --> G[validate tasks]
     G --> H[store tasks info, make job as completed]
