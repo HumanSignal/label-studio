@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3025-11: Add functionality to filter with multiple rules",
-  "commit": "40b9311d8712f1abdc053b864227398e532861be",
-  "branch": "master",
-  "date": "2023/04/24 13:18:17"
+  "message": "feat:  LSDV-4708:  Removed FF_DEV_1170 outliner feature flag and corresponding components",
+  "commit": "2b5d2b580a941204dc2e49e1df0b9920a8e7b506",
+  "branch": "fb-lsdv-4708-1/enable-outliner-by-default",
+  "date": "2023/04/27 09:40:04"
 }
