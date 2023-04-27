@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3025-11: Add functionality to filter with multiple rules",
-  "commit": "40b9311d8712f1abdc053b864227398e532861be",
-  "branch": "master",
-  "date": "2023/04/24 13:18:17"
+  "message": "fix: LSDV-5011: In view all mode there should be no bottom bar",
+  "commit": "dfd50726539814f193ed893274bac5809e2dc852",
+  "branch": "fb-lsdv-5011/no-bottom-bar-view-all",
+  "date": "2023/04/27 16:46:22"
 }
