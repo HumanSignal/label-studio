@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-116: Update frontend candidate task view to show File attributes",
-  "commit": "75f6bbbf030c41b310e5e931c330486fb2f3a0b4",
-  "branch": "master",
-  "date": "2023/04/24 11:26:47"
+  "message": "fix: LSDV-4987: Line breaks on instructions modal",
+  "commit": "8e657c3d3d6b0aa6984c1e3d09bd69ebe33d59c4",
+  "branch": "fb-lsdv-4987/line-breaks-formatting",
+  "date": "2023/04/27 17:15:55"
 }
