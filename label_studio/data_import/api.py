@@ -23,7 +23,7 @@ from urllib.parse import unquote, urlparse
 from ranged_fileresponse import RangedFileResponse
 
 from core.permissions import all_permissions, ViewClassPermission
-from core.utils.common import retry_database_locked
+from core.utils.common import retry_database_locked, timeit
 from core.utils.params import list_of_strings_from_request, bool_from_request
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.redis import start_job_async_or_sync
@@ -242,6 +242,7 @@ class ImportAPI(generics.CreateAPIView):
 
         return Response(response, status=status.HTTP_201_CREATED)
 
+    @timeit
     def async_import(self, request, project, preannotated_from_fields, commit_to_project, return_task_ids):
 
         project_import = ProjectImport.objects.create(

@@ -22,6 +22,7 @@ from urllib.request import urlopen
 
 from .models import FileUpload
 from core.utils.io import url_is_local
+from core.utils.common import timeit
 from core.feature_flags import flag_set
 from core.utils.exceptions import ImportFromLocalIPError
 
@@ -158,6 +159,7 @@ def tasks_from_url(file_upload_ids, project, user, url, could_be_tasks_list):
     return data_keys, found_formats, tasks, file_upload_ids, could_be_tasks_list
 
 
+@timeit
 def create_file_uploads(user, project, FILES):
     could_be_tasks_list = False
     file_upload_ids = []
