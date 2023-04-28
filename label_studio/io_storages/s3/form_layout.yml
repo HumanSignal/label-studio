@@ -82,7 +82,7 @@ ImportStorage:
             name: presign_ttl
             label: Expiration minutes
             min: 1
-            max: 15
+            value: 15
             dependency: presign
 
 ExportStorage:
