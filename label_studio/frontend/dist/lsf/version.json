@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5010: View all panel padding removed",
-  "commit": "f44a935b1ccd5cd5bae7eda69cab319ca8fd4568",
-  "branch": "master",
-  "date": "2023/04/30 20:39:52"
+  "message": "Fb lsdv 5016/sort arrow",
+  "commit": "8b1f43dd4f70bf2ecbf5d8ccf0c51595e3e3ee96",
+  "branch": "fb-lsdv-5016/sort-arrow",
+  "date": "2023/05/01 12:04:40"
 }
