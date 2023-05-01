@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4836: Conditional annotation with visibleWhen choice-selected works with Taxonomy (#1273)",
-  "commit": "791b7135d7a37db382bae18e473b14ba39bdd966",
+  "message": "fix: LSDV-5010: View all panel padding removed (#1339)",
+  "commit": "f44a935b1ccd5cd5bae7eda69cab319ca8fd4568",
   "branch": "master",
-  "date": "2023/04/19 12:13:15"
+  "date": "2023/04/30 20:39:52"
 }
