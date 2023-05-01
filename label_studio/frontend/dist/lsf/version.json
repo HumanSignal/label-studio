@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5010: View all panel padding removed",
-  "commit": "5b6c51ee7aef7c3b46325c98aa14141e61676666",
-  "branch": "fb-lsdv-5010/quickview-view-all-padding",
-  "date": "2023/04/27 16:26:43"
+  "commit": "f44a935b1ccd5cd5bae7eda69cab319ca8fd4568",
+  "branch": "master",
+  "date": "2023/04/30 20:39:52"
 }
