@@ -4,6 +4,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
 - id: signup
   type: ref
@@ -127,6 +128,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
 - id: signup
   type: ref
@@ -195,6 +197,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
 - id: signup
   type: ref
@@ -243,6 +246,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
 - id: signup
   type: ref
@@ -307,6 +311,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
 - id: signup
   type: ref
@@ -344,6 +349,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
 - id: signup
   type: ref
@@ -397,6 +403,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
   - id: signup
     type: ref
@@ -483,6 +490,7 @@ strict: true
 marks:
 - usefixtures:
   - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
 - id: signup
   type: ref
@@ -527,6 +535,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
 - id: signup
   type: ref
@@ -609,6 +618,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
 - id: signup
   type: ref
@@ -704,6 +714,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
 - id: signup
   type: ref
@@ -730,6 +741,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
 - id: signup
   type: ref
@@ -782,6 +794,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
 - id: signup
   type: ref
@@ -863,6 +876,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
 - id: signup
   type: ref
@@ -944,6 +958,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
 - id: signup
   type: ref
@@ -1006,8 +1021,9 @@ stages:
 test_name: test_resolving_embedded_links
 strict: false
 marks:
-  - usefixtures:
-      - django_live_url
+- usefixtures:
+  - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
 - id: signup
   type: ref
@@ -1083,6 +1099,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
 - id: signup
   type: ref
@@ -1146,6 +1163,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
 - id: signup
   type: ref
@@ -1203,6 +1221,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off
 stages:
 - id: signup
   type: ref

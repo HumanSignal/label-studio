@@ -1,6 +1,6 @@
 {
-  "message": "chore: LSDV-4727: Remove any AudioPlus mentions",
-  "commit": "bebdff88fba8aa0b167b5475e8d77009a3bbd895",
+  "message": "feat: LOPS-116: Update frontend candidate task view to show File attributes",
+  "commit": "75f6bbbf030c41b310e5e931c330486fb2f3a0b4",
   "branch": "master",
-  "date": "2023/04/18 15:30:26"
+  "date": "2023/04/24 11:26:47"
 }
