@@ -256,8 +256,7 @@ Depending on the type of object tag, Label Studio interprets field values differ
 - `<Text value="$key">`: `value` is interpreted as plain text.
 - `<HyperText value="$key">`: `value` is interpreted as HTML markup.
 - `<HyperText value="$key" encoding="base64">`: `value` is interpreted as a base64 encoded HTML markup.
-- `<Audio value="$key">`: `value` is interpreted as a valid URL to an audio file.
-- `<AudioPlus value="$key">`: `value` is interpreted as a valid URL to an audio file with CORS policy enabled on the server side.
+- `<Audio value="$key">`: `value` is interpreted as a valid URL to an audio file with CORS policy enabled on the server side.
 - `<Image value="$key">`: `value` is interpreted as a valid URL to an image file
 - `<TimeSeries value="$key">`: `value` is interpreted as a valid URL to a CSV/TSV file if `valueType="url"`, otherwise it is interpreted as a JSON dictionary with column arrays: `"value": {"first_column": [...], ...}` if `valueType="json"`. See more about [how to use valueType](#How-to-import-your-data).
     

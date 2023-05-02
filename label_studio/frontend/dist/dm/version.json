@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-33: UI page to view listing of CandidateTasks in Dataset",
-  "commit": "50899bc740fd5bc33a51f2fdf5bedd533a9d1799",
+  "message": "feat: LOPS-116: Update frontend candidate task view to show File attributes",
+  "commit": "75f6bbbf030c41b310e5e931c330486fb2f3a0b4",
   "branch": "master",
-  "date": "2023/03/31 12:48:12"
+  "date": "2023/04/24 11:26:47"
 }

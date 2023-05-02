@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-4832: New Ranker tag [internal PR]",
-  "commit": "5dc9e0ed1f123d578701bb223eb00928fa2005d8",
+  "message": "fix: LSDV-5010: View all panel padding removed",
+  "commit": "f44a935b1ccd5cd5bae7eda69cab319ca8fd4568",
   "branch": "master",
-  "date": "2023/04/14 11:07:46"
+  "date": "2023/04/30 20:39:52"
 }

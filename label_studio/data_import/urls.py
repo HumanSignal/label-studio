@@ -27,4 +27,5 @@ urlpatterns = [
     # special endpoints for serving imported files
     path('data/upload/<path:filename>', api.UploadedFileResponse.as_view(), name='data-upload'),
     path('storage-data/uploaded/', api.DownloadStorageData.as_view(), name='storage-data-upload'),
+    path('tasks/<int:task_id>/presign/', api.PresignStorageData.as_view(), name='storage-data-presign'),
 ]
