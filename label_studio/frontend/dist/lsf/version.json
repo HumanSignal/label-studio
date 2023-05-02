@@ -1,6 +1,6 @@
 {
-  "message": "chore: LSDV-4727: Remove any AudioPlus mentions",
-  "commit": "4100d96da1c3ae2d6265f10b6447b5abca47b243",
+  "message": "fix: LSDV-5010: View all panel padding removed",
+  "commit": "f44a935b1ccd5cd5bae7eda69cab319ca8fd4568",
   "branch": "master",
-  "date": "2023/04/18 15:29:48"
+  "date": "2023/04/30 20:39:52"
 }
