@@ -62,13 +62,13 @@ def version_page(request):
     http_page = request.path == '/version/'
     result = collect_versions(force=http_page)
 
+    # other settings from backend
+    if request.user.is_superuser:
+        result['settings'] = {key: str(getattr(settings, key)) for key in dir(settings)
+                              if not key.startswith('_') and not hasattr(getattr(settings, key), '__call__')}
+
     # html / json response
     if request.path == '/version/':
-        # other settings from backend
-        if request.user.is_superuser:
-            result['settings'] = {key: str(getattr(settings, key)) for key in dir(settings)
-                                  if not key.startswith('_') and not hasattr(getattr(settings, key), '__call__')}
-
         result = json.dumps(result, indent=2)
         result = result.replace('},', '},\n').replace('\\n', ' ').replace('\\r', '')
         return HttpResponse('<pre>' + result + '</pre>')
