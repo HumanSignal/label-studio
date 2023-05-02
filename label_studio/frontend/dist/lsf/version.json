@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5010: View all panel padding removed",
-  "commit": "f44a935b1ccd5cd5bae7eda69cab319ca8fd4568",
-  "branch": "master",
-  "date": "2023/04/30 20:39:52"
+  "message": "fix: LSDV-3025-12: Fully hide the dropdown component when closing it",
+  "commit": "14ec33b47560f5720777f4f813a62e7dab9cb725",
+  "branch": "fb-lsdv-3025-12",
+  "date": "2023/05/02 15:35:54"
 }
