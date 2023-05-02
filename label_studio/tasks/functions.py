@@ -9,7 +9,7 @@ from core.models import AsyncMigrationStatus
 from core.redis import start_job_async_or_sync
 from core.utils.common import batch
 from data_export.models import DataExport
-from data_export.serializers import ExportDataSerializer
+from data_export.v1.serializers import ExportDataSerializer
 from organizations.models import Organization
 from projects.models import Project
 from tasks.models import Task, Annotation

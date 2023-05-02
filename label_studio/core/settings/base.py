@@ -239,7 +239,8 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'core.utils.common.custom_exception_handler',
     'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.AcceptHeaderVersioning',
-    'ALLOWED_VERSIONS': ['1'],
+    'DEFAULT_VERSION': 'v1',
+    'ALLOWED_VERSIONS': ['v1', 'v2'],
     'VERSION_PARAMETER': 'version',
     'PAGE_SIZE': 100,
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination'
@@ -344,7 +345,7 @@ SWAGGER_SETTINGS = {
     'APIS_SORTER': 'alpha',
     'SUPPORTED_SUBMIT_METHODS': ['get', 'post', 'put', 'delete', 'patch'],
     'OPERATIONS_SORTER': 'alpha',
-
+    'DEFAULT_AUTO_SCHEMA_CLASS': 'core.custom_schema_generator.CustomSwaggerAutoSchema',
 }
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)
@@ -507,7 +508,7 @@ CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 SAVE_USER = 'users.functions.save_user'
 USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
 TASK_SERIALIZER = 'tasks.serializers.BaseTaskSerializer'
-EXPORT_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializer'
+EXPORT_DATA_SERIALIZER = 'data_export.v1.serializers.BaseExportDataSerializer'
 DATA_MANAGER_GET_ALL_COLUMNS = 'data_manager.functions.get_all_columns'
 DATA_MANAGER_ANNOTATIONS_MAP = {}
 DATA_MANAGER_ACTIONS = {}
@@ -523,7 +524,7 @@ GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
 STORAGE_ANNOTATION_SERIALIZER = 'io_storages.serializers.StorageAnnotationSerializer'
 TASK_SERIALIZER_BULK = 'tasks.serializers.BaseTaskSerializerBulk'
 PREPROCESS_FIELD_NAME = 'data_manager.functions.preprocess_field_name'
-INTERACTIVE_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializerForInteractive'
+INTERACTIVE_DATA_SERIALIZER = 'data_export.v1.serializers.BaseExportDataSerializerForInteractive'
 DELETE_TASKS_ANNOTATIONS_POSTPROCESS = None
 
 

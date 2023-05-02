@@ -15,7 +15,7 @@ from data_export.models import DataExport
 from users.serializers import UserSimpleSerializer
 from label_studio_tools.postprocessing.video import extract_key_frames
 
-from .models import Export, ConvertedFormat
+from data_export.models import Export, ConvertedFormat
 
 
 class CompletedBySerializer(serializers.ModelSerializer):

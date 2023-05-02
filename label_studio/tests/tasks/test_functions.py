@@ -5,7 +5,7 @@ import psutil
 
 from django.conf import settings
 
-from data_export.serializers import ExportDataSerializer
+from data_export.v1.serializers import ExportDataSerializer
 from tasks.functions import export_project
 
 pytestmark = pytest.mark.django_db

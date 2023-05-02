@@ -9,6 +9,7 @@ import pandas as pd
 import posixpath
 import mimetypes
 
+from functools import wraps
 from pathlib import Path
 from django.utils._os import safe_join
 from django.conf import settings
@@ -240,17 +241,3 @@ def feature_flags(request):
     }
 
     return HttpResponse('<pre>' + json.dumps(flags, indent=4) + '</pre>', status=200)
-
-
-class VersionedAPIView(APIView):
-    versions = {}
-
-    def dispatch(self, request, *args, **kwargs):
-        version = request.version
-
-        if version not in self.versions:
-            return HttpResponseNotFound()
-
-        view_class = self.versions[version]
-        view = view_class.as_view()
-        return view(request, *args, **kwargs)

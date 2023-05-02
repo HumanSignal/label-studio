@@ -16,7 +16,7 @@ from django_rq import job
 from core.feature_flags import flag_set
 from tasks.models import Task, Annotation
 from tasks.serializers import PredictionSerializer, AnnotationSerializer
-from data_export.serializers import ExportDataSerializer
+from data_export.v1.serializers import ExportDataSerializer
 
 from core.redis import is_job_in_queue, redis_connected, is_job_on_worker
 from core.utils.common import load_func

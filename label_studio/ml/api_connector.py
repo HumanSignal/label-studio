@@ -11,7 +11,7 @@ from django.db.models import Q, F, Count
 from django.conf import settings
 from requests.adapters import HTTPAdapter
 from core.version import get_git_version
-from data_export.serializers import ExportDataSerializer
+from data_export.v1.serializers import ExportDataSerializer
 from label_studio.core.utils.params import get_env
 from core.feature_flags import flag_set
 from core.utils.common import load_func
