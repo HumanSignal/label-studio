@@ -1,6 +1,6 @@
 {
   "message": "feat: LOPS-127: Update frontend SemanticSearch component to leverage views and tasks endpoint",
-  "commit": "f0dbce4c3af875cf7fea9aaff1e0982599787433",
+  "commit": "eab2128873a398297a3923735f3216d1f5ef0107",
   "branch": "fb-lops-127/semantic-search",
-  "date": "2023/05/02 14:20:32"
+  "date": "2023/05/02 14:27:37"
 }
