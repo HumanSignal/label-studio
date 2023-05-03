@@ -5,7 +5,7 @@ on:
     types: [ frontend-command ]
 
 env:
-  NODE: '14'
+  NODE: '18'
 
 jobs:
   build:

@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.3
-FROM node:14 AS frontend-builder
+FROM node:18 AS frontend-builder
 
 ENV NPM_CACHE_LOCATION=$HOME/.npm \
     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
