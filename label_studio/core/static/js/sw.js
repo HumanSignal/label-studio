@@ -69,8 +69,8 @@ async function handlePresignedUrl(event) {
           // Check if the expiration timestamp has passed
           const { expirationTimestamp } = parseCacheHeaders(cachedResponse);
 
-          const now = Date.now();
-          const valid = !expirationTimestamp || expirationTimestamp > now;
+          const valid =
+            !expirationTimestamp || expirationTimestamp > Date.now();
           const url = cachedResponse.headers.get("Location");
 
           if (valid && url) {
