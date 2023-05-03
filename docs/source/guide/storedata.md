@@ -50,44 +50,46 @@ docker-compose up -d
 ```
 
 ## Minio Blob Storage
-Minio is a blob storage that is compatible with Amazon S3. You can use Minio to store your labeling tasks.
+MinIO is a blob storage solution that is compatible with Amazon S3. You can use MinIO to store your labeling tasks.
 
 ### Starting the containers
-For local development you can host a local minio server to emulate a S3 based production environment more closely.
-an example docker-compose file for this is available in the [label-studio repository](/docker-compose.minio.yml).
+For local development, you can host a local MinIO server to emulate an S3-based production environment more closely. 
+An example docker-compose file for this is available in the [Label Studio repository](https://github.com/heartexlabs/label-studio).
 
-To run Minio with your lable studio instance you can use the following command:
+To run MinIO alongside your Label Studio instance, use the following command:
 ````bash
-# add sudo on linux if you are not a member of the docker group
+# Add sudo on Linux if you are not a member of the docker group
 docker compose -f docker-compose.yml -f docker-compose.minio.yml up -d
 ````
-The minio server will be available at http://localhost:9000.
-to configure minio settings you can create a .env file. Please remember to override the default credentials.
+The MinIO server will be accessible at http://localhost:9000. 
+To configure MinIO settings, create a `.env` file. Remember to override the default credentials.
 
 ````.dotenv
 MINIO_ROOT_USER=minio_admin_do_not_use_in_production
 MINIO_ROOT_PASSWORD=minio_admin_do_not_use_in_production
 ````
 
-### Connect LS to local minio
+### Connect Label Studio to local MinIO
 
-If you do not have a static ip address you should create an entry in your hosts file, so that both the label studio 
-container and your browser can find minio at the same hostname.
+If you do not have a static IP address, create an entry in your hosts file so that both the Label Studio container and 
+your browser can find MinIO at the same hostname.
 
-The following entry redirects all requests to minio to your local system:
-``127.0.0.1 minio``
+The following entry redirects all requests to MinIO to your local system:
+```text
+127.0.0.1 minio
+```
 
-On Widows you can find your host file at `C:\Windows\System32\drivers\etc\hosts`
-On Linux you can find your host file at `/etc/hosts`
-On mac you can find your host file at `/private/etc/hosts`
+On Windows, you can find your hosts file at `C:\Windows\System32\drivers\etc\hosts`.
+On Linux, you can find your hosts file at `/etc/hosts`.
+On macOS, you can find your hosts file at `/private/etc/hosts`.
 
-After altering your host file you can connect to your minio server with your browser at http://minio:9000.
+After modifying your hosts file, you can connect to your MinIO server with your browser at http://minio:9000.
 
-### Remove Minio data
-You can remove your minio installation by removing the containers and the associated volumes.
-This operation is destructive and will remove all data stored in minio.
+### Remove MinIO data
+You can remove your MinIO installation by removing the containers and the associated volumes. 
+This operation is destructive and will remove all data stored in MinIO.
 ```bash
-docker compose-f docker-compose.minio.yml down  --volumes
+docker-compose -f docker-compose.minio.yml down --volumes
 ````
 
 
