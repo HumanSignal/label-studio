@@ -504,7 +504,7 @@ class DownloadStorageData(APIView):
             file_upload = FileUpload.objects.filter(file=filepath).last()
 
             if file_upload is not None and file_upload.has_permission(request.user):
-                url = file_upload.file.storage.url(file_upload.file.name, storage_url=True, http_method=request.method)
+                url = file_upload.file.storage.url(file_upload.file.name, storage_url=True)
         elif filepath.startswith(settings.AVATAR_PATH):
             user = User.objects.filter(avatar=filepath).first()
             if user is not None and request.user.active_organization.has_user(user):
