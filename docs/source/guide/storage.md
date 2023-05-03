@@ -446,7 +446,7 @@ You must set two environment variables in Label Studio to connect to Azure Blob 
 - `AZURE_BLOB_ACCOUNT_NAME` to specify the name of the storage account.
 - `AZURE_BLOB_ACCOUNT_KEY` to specify the secret key for the storage account.
 
-Configure the specific Azure Blob container that you want Label Studio to use in the UI. In most cases involving CORS issues, the GET permission is necessary within the Resource Sharing tab:
+Configure the specific Azure Blob container that you want Label Studio to use in the UI. In most cases involving CORS issues, the GET permission (*/GET/*/Access-Control-Allow-Origin/3600) is necessary within the Resource Sharing tab:
 
 <img src="/images/azure-storage-cors.png" class="gif-border">
 
