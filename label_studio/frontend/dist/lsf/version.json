@@ -1,6 +1,6 @@
 {
-  "message": "chore: LSDV-4894: Update to NodeJS LTS",
-  "commit": "aefcfd141aa25f0c0e02fa3ff4e1e4aed8cc52f5",
+  "message": "fix: LSDV-4998: Fix missed dynamic children on task switch",
+  "commit": "1032d93c6c08464bfba30a53be52ec20eb42f625",
   "branch": "master",
-  "date": "2023/05/03 16:01:39"
+  "date": "2023/05/03 18:37:55"
 }

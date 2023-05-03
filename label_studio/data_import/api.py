@@ -525,13 +525,18 @@ class DownloadStorageData(APIView):
         return response
 
 
-class PresignStorageData(DownloadStorageData):
+class PresignStorageData(APIView):
+    """ A file proxy to presign storage urls.
+    """
+    swagger_schema = None
+    permission_classes = (IsAuthenticated, )
+
     def get(self, request, *args, **kwargs):
-        """ Get export files list
+        """ Get the presigned url for a given fileuri
         """
         request = self.request
         task_id = kwargs.get("task_id")
-        fileuri = request.GET.get('uri')
+        fileuri = request.GET.get('fileuri')
 
         if fileuri is None or task_id is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -549,7 +554,7 @@ class PresignStorageData(DownloadStorageData):
         # TODO: cache the presigned storage url by taskId 
         # cache ttl should be 10s less than presigned ttl so we can reuse as much of that work
         # as possible and limit the amount of times we are calling out to cloud storages.
-        fileuri = unquote(request.GET['uri'])
+        fileuri = unquote(fileuri)
 
         url = task.resolve_storage_uri(fileuri, project)
 
@@ -557,6 +562,14 @@ class PresignStorageData(DownloadStorageData):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         # Proxy to presigned url
-        return HttpResponseRedirect(redirect_to=url, status=status.HTTP_303_SEE_OTHER)
+        response = HttpResponseRedirect(redirect_to=url, status=status.HTTP_303_SEE_OTHER)
+
+        # NOTE: Temporary workaround:
+        # For some reason even though this is using a 303 which should never cache
+        # it at the moment will cache the redirect when running the python server directly.
+        # This is not an issue when running behind nginx and a more comprehensive solution to this will be coming.
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+
+        return response
 
 

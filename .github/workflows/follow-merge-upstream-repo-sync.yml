@@ -45,7 +45,7 @@ jobs:
             const release_branch_prefix = process.env.RELEASE_BRANCH_PREFIX;
             
             let base_name = default_branch;
-            if (branch_name.startsWith(release_branch_prefix)) {
+            if (base_branch_name.startsWith(release_branch_prefix)) {
               base_name = base_branch_name;
             }
             core.setOutput('base_name', base_name);
@@ -205,7 +205,7 @@ jobs:
           git commit -m 'docs: LSF Update'
           git push origin HEAD
 
-      - name: Merge develop
+      - name: Merge base branch
         shell: bash
         continue-on-error: true
         run: |

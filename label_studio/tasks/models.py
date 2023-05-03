@@ -242,8 +242,6 @@ class Task(TaskMixin, models.Model):
         if self.storage:
             return self.storage.generate_http_url(url)
 
-        return null
-
     def resolve_uri(self, task_data, project):
         if project.task_data_login and project.task_data_password:
             protected_data = {}
@@ -284,8 +282,7 @@ class Task(TaskMixin, models.Model):
                 if storage:
                     try:
                         proxy_task = None
-                        if flag_set('fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short',
-                                    self.project.organization.created_by):
+                        if flag_set('fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short', user='auto'):
                             proxy_task = self
 
                         resolved_uri = storage.resolve_uri(task_data[field], proxy_task)
