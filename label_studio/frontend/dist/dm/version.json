@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5008: Make DM default width equal to the main menu width in Quick View",
-  "commit": "f4f8923d70624bf6e803d84031d340d588ac5732",
-  "branch": "fb-lsdv-5008",
-  "date": "2023/05/01 13:59:08"
+  "commit": "b91dd013b9d7ed4fa6c73f700e1b25440c7d6c30",
+  "branch": "master",
+  "date": "2023/05/03 10:54:37"
 }
