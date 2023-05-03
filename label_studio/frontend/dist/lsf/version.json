@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5010: View all panel padding removed",
-  "commit": "f44a935b1ccd5cd5bae7eda69cab319ca8fd4568",
-  "branch": "master",
-  "date": "2023/04/30 20:39:52"
+  "message": "feat:  LSDV-4708:  Removed FF_DEV_1170 outliner feature flag and corresponding components",
+  "commit": "a633a8b1484160350780921df5bc3fe3cfed0a09",
+  "branch": "fb-lsdv-4708-1/enable-outliner-by-default",
+  "date": "2023/05/02 11:07:07"
 }
