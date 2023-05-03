@@ -25,6 +25,8 @@ function awakenServiceWorker() {
 }
 
 if (isFF(FF_LSDV_4711)) {
+  // sw.js and sw-fallback.js are part of the label-studio/label_studio/core/static/js/ directory
+  // and are copied with the rest of the static files when running `python manage.py collectstatic`
   registerServiceWorker("/sw.js");
 
   // Wake up the service worker when the page becomes visible
@@ -37,5 +39,5 @@ if (isFF(FF_LSDV_4711)) {
   });
 } else {
   // Fallback service worker to disable all caching and just use the network
-  registerServiceWorker("/sw-inert.js");
+  registerServiceWorker("/sw-fallback.js");
 }
