@@ -482,11 +482,8 @@ class DownloadStorageData(APIView):
     """ Check auth for nginx auth_request
     """
     swagger_schema = None
-    http_method_names = ['get', 'head']
+    http_method_names = ['get']
     permission_classes = (IsAuthenticated, )
-
-    def head(self, request, *args, **kwargs):
-        return self.get(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         """ Get export files list
@@ -529,6 +526,7 @@ class PresignStorageData(APIView):
     """ A file proxy to presign storage urls.
     """
     swagger_schema = None
+    http_method_names = ['get']
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, *args, **kwargs):
