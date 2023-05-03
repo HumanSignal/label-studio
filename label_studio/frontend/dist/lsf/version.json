@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5010: View all panel padding removed",
-  "commit": "f44a935b1ccd5cd5bae7eda69cab319ca8fd4568",
+  "message": "fix: LSDV-4766: Toggle selected region visibility with hotkeys",
+  "commit": "3a122f35253f82a98139fc76ae32c705c1c73f33",
   "branch": "master",
-  "date": "2023/04/30 20:39:52"
+  "date": "2023/05/03 09:55:13"
 }
