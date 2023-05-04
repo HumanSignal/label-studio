@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5010: View all panel padding removed",
-  "commit": "f44a935b1ccd5cd5bae7eda69cab319ca8fd4568",
+  "message": "feat:  LSDV: 5016 Outliner manual group sort order arrow",
+  "commit": "5b1d692835845c121408e0c580ddd8eb164fe4c6",
   "branch": "master",
-  "date": "2023/04/30 20:39:52"
+  "date": "2023/05/03 11:51:54"
 }

@@ -665,3 +665,13 @@ def btree_gin_migration_operations(next_step):
         ops = []
 
     return ops
+
+
+def timeit(func):
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+        logging.debug(f"{func.__name__} execution time: {end-start} seconds")
+        return result
+    return wrapper
