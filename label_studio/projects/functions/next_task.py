@@ -3,6 +3,7 @@ import logging
 
 from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Value, When, Q
 from django.db.models.fields import DecimalField
+from django.utils.timezone import now
 from django.conf import settings
 from core.feature_flags import flag_set
 import numpy as np
@@ -60,7 +61,10 @@ def _try_tasks_with_overlap(tasks):
     """Filter out tasks without overlap (doesn't return next task)"""
     tasks_with_overlap = tasks.filter(overlap__gt=1)
     if tasks_with_overlap.exists():
-        return None, tasks_with_overlap
+        if flag_set('fflag_fix_back_lsdv_4523_show_overlap_first_order_27022023_short'):
+            return None, tasks.order_by('-overlap')
+        else:
+            return None, tasks_with_overlap
     else:
         return None, tasks.filter(overlap=1)
 
