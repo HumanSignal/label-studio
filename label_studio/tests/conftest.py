@@ -2,6 +2,7 @@
 """
 import os
 import pytest
+import mock
 import ujson as json
 import requests_mock
 import re
@@ -411,6 +412,17 @@ def configured_project(business_client, annotator_client):
 @pytest.fixture(name="django_live_url")
 def get_server_url(live_server):
     yield live_server.url
+
+
+@pytest.fixture(name="async_import_off", autouse=True)
+def async_import_off():
+    from core.feature_flags import flag_set
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'fflag_feat_all_lsdv_4915_async_task_import_13042023_short':
+            return False
+        return flag_set(*args, **kwargs)
+    with mock.patch('data_import.api.flag_set', wraps=fake_flag_set):
+        yield
 
 
 @pytest.fixture(name="fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on")
