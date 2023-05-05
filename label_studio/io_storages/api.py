@@ -66,9 +66,15 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
         return storages
 
     def perform_create(self, serializer):
+        # double check: not all storages validate connection in serializer, just make another explicit check here
+        instance = serializer.Meta.model(**serializer.validated_data)
+        try:
+            instance.validate_connection()
+        except Exception as exc:
+            raise ValidationError(exc)
+
         storage = serializer.save()
         if settings.SYNC_ON_TARGET_STORAGE_CREATION:
-            storage.validate_connection()
             storage.sync()
 
 
@@ -127,21 +133,21 @@ class StorageValidateAPI(generics.CreateAPIView):
     permission_required = all_permissions.projects_change
 
     def create(self, request, *args, **kwargs):
-        instance = None
         storage_id = request.data.get('id')
         if storage_id:
             instance = generics.get_object_or_404(self.serializer_class.Meta.model.objects.all(), pk=storage_id)
             if not instance.has_permission(request.user):
                 raise PermissionDenied()
-            
-            # not all storages validate connection in serializer, just make another explicit check here
-            try:
-                instance.validate_connection()
-            except Exception as exc:
-                raise ValidationError(exc)
 
-        serializer = self.get_serializer(instance=instance, data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        # double check: not all storages validate connection in serializer, just make another explicit check here
+        instance = serializer.Meta.model(**serializer.validated_data)
+        try:
+            instance.validate_connection()
+        except Exception as exc:
+            raise ValidationError(exc)
         return Response()
 
 
