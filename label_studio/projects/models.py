@@ -1126,3 +1126,38 @@ class ProjectSummary(models.Model):
         self.created_annotations = created_annotations
         self.created_labels = labels
         self.save(update_fields=['created_annotations', 'created_labels'])
+
+
+class ProjectImport(models.Model):
+    class Status(models.TextChoices):
+        CREATED = 'created', _('Created')
+        IN_PROGRESS = 'in_progress', _('In progress')
+        FAILED = 'failed', _('Failed')
+        COMPLETED = 'completed', _('Completed')
+
+    project = models.ForeignKey(
+        'projects.Project', null=True, related_name='imports', on_delete=models.CASCADE
+    )
+    preannotated_from_fields = models.JSONField(null=True, blank=True)
+    commit_to_project = models.BooleanField(default=False)
+    return_task_ids = models.BooleanField(default=False)
+    status = models.CharField(max_length=64, choices=Status.choices, default=Status.CREATED)
+    url = models.CharField(max_length=2048, null=True, blank=True)
+    traceback = models.TextField(null=True, blank=True)
+    error = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(_('created at'), null=True, auto_now_add=True, help_text='Creation time')
+    updated_at = models.DateTimeField(_('updated at'), null=True, auto_now_add=True, help_text='Updated time')
+    finished_at = models.DateTimeField(_('finished at'), help_text='Complete or fail time', null=True, default=None)
+    task_count = models.IntegerField(default=0)
+    annotation_count = models.IntegerField(default=0)
+    prediction_count = models.IntegerField(default=0)
+    duration = models.IntegerField(default=0)
+    file_upload_ids = models.JSONField(default=list)
+    could_be_tasks_list = models.BooleanField(default=False)
+    found_formats = models.JSONField(default=list)
+    data_columns = models.JSONField(default=list)
+    tasks = models.JSONField(blank=True, null=True)
+    task_ids = models.JSONField(default=list)
+
+    def has_permission(self, user):
+        return self.project.has_permission(user)
