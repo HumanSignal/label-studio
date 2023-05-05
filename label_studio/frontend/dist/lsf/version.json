@@ -1,6 +1,6 @@
 {
-  "message": "feat:  LSDV: 5016 Outliner manual group sort order arrow",
-  "commit": "5b1d692835845c121408e0c580ddd8eb164fe4c6",
+  "message": "fix: LSDV-4960: Sort annotations by creation date instead of pk (#1342)",
+  "commit": "32c3ef4130006a7d59ee8ff77c9b7d139bbf3347",
   "branch": "master",
-  "date": "2023/05/03 11:51:54"
+  "date": "2023-05-04T13:50:07Z"
 }
