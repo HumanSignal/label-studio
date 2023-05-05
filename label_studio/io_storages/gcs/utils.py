@@ -59,7 +59,8 @@ class GCS(object):
         cls,
         bucket_name: str,
         google_project_id: str = None,
-        google_application_credentials: Union[str, dict] = None
+        google_application_credentials: Union[str, dict] = None,
+        prefix: str = None
     ):
         logger.debug('Validating GCS connection')
         client = cls.get_client(
@@ -67,7 +68,12 @@ class GCS(object):
             google_project_id=google_project_id
         )
         logger.debug('Validating GCS bucket')
-        client.get_bucket(bucket_name)
+        bucket = client.get_bucket(bucket_name)
+
+        if prefix:
+            blobs = list(bucket.list_blobs(prefix=prefix, max_results=1))
+            if not blobs:
+                raise ValueError(f"No blobs found in {bucket_name}/{prefix} or prefix doesn't exist")
 
     @classmethod
     def iter_blobs(

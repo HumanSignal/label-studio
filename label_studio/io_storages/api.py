@@ -66,7 +66,8 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
         return storages
 
     def perform_create(self, serializer):
-        # double check: not all storages validate connection in serializer, just make another explicit check here
+        # double check: not export storages don't validate connection in serializer,
+        # just make another explicit check here, note: in this create API we have credentials in request.data
         instance = serializer.Meta.model(**serializer.validated_data)
         try:
             instance.validate_connection()
@@ -134,16 +135,23 @@ class StorageValidateAPI(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         storage_id = request.data.get('id')
+        instance = None
         if storage_id:
             instance = generics.get_object_or_404(self.serializer_class.Meta.model.objects.all(), pk=storage_id)
             if not instance.has_permission(request.user):
                 raise PermissionDenied()
 
+        # combine instance fields with request.data
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        # if storage exists, we have to use instance from DB,
+        # because instance from serializer won't have credentials, they were popped intentionally
+        if instance:
+            instance = serializer.update(instance, serializer.validated_data)
+        else:
+            instance = serializer.Meta.model(**serializer.validated_data)
 
         # double check: not all storages validate connection in serializer, just make another explicit check here
-        instance = serializer.Meta.model(**serializer.validated_data)
         try:
             instance.validate_connection()
         except Exception as exc:
