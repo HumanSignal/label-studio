@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5008: Make DM default width equal to the main menu width in Quick View",
-  "commit": "b91dd013b9d7ed4fa6c73f700e1b25440c7d6c30",
-  "branch": "master",
-  "date": "2023/05/03 10:54:37"
+  "message": "feat: LSDV-3104: Task navigation standardization",
+  "commit": "36c4fcd8f9f385ebb95a21fd4b5a26d0fb9f2432",
+  "branch": "fb-lsdv-3104/task-nav-starnardization",
+  "date": "2023/05/08 08:32:55"
 }
