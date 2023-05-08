@@ -114,3 +114,12 @@ jobs:
                 sha256: '${{ needs.build-pypi.outputs.pipy-artifact-digests-sha256 }}',
               }
             });
+
+  update-helm-chart:
+    name: "Update Helm Chart"
+    needs:
+      - promote_docker_image
+    uses: heartexlabs/label-studio/.github/workflows/bump-helm-chart.yml@develop
+    with:
+      docker_image_version: ${{ github.ref_name }}
+    secrets: inherit
