@@ -5,7 +5,6 @@
 
 {% block content %}
 
-
 <style>
     table {
         font-family: Arial, Helvetica, sans-serif;
@@ -46,47 +45,43 @@
     }
 
 </style>
+
+
 <head>
-    <title>Sensor mapping</title>
+    <title>Sensor offset</title>
 </head>
 <body>
     <div class="buttons">
         <form action="/landingpage/">
             <input type="submit" value="Go back to landing page" style="background-color: #c4862b; width:25%"/>
         </form>
-        <form action="/sensordata/add/">
-            <input type="submit" value="Add sensor data file" style="background-color: #c4862b; width:25%"/>
+    </div>
+    <div class="forms">
+        <h2>Add sensor offset</h2>
+        <form action="/sensordata/offset/" method="post">
+            {{ sensoroffsetform }}
+            <input type="submit" value="Add sensor offset">
         </form>
     </div>
-    <div class="sensordata">
-        <h2>Sensor data</h2>
+    <div class="sensoroffset">
+        <h2>Sensor offsets</h2>
         <table class="tables">
             <tr>
-                <th>Sensor data name</th>
-                <th>Begin Date Time</th>
-                <th>End Date Time</th>
-                <th>Sensor</th>
-                <th>Sensor type</th>
-                {% comment %} <th></th>
-                <th></th> {% endcomment %}
+                <th>Sensor A</th>
+                <th>Sensor B</th>
+                <th>Offset (ms)</th>
+                <th>Start offset</th>
             </tr>
-            {% for sendata in sensordata %}
-            <tr>
-                <td>{{ sendata.name }}</td>
-                <td>{{ sendata.begin_datetime }}</td>
-                <td>{{ sendata.end_datetime }}</td> 
-                <td>{{ sendata.sensor}} </td>
-                <td>{{ sendata.sensor.sensortype.sensortype.get_sensortype_display}} </td>
-                {% comment %} <td><a href="{% url 'sensormodel:adjust_deployment' deployment.id %}">[Edit]</a></td>
-                <td><a href="{% url 'sensormodel:delete_deployment' deployment.id %}">[Delete]</a></td> {% endcomment %}
-            </tr> 
-            {% endfor %} 
+            {% for senoffset in sensoroffset %}
+                <tr>
+                    <td>{{ senoffset.sensor_A }}</td>
+                    <td>{{ senoffset.sensor_B }}</td>
+                    <td>{{ senoffset.offset }}</td> 
+                    <td>{{ senoffset.offset_Date}} </td>
+                </tr> 
+            {% endfor %}
         </table>
-        
-        
     </div>
-
 </body>
-
 
 {% endblock %}
