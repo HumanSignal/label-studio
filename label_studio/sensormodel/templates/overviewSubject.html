@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load filters %}
+
+{% block content %}
+
+
+<style>
+    table {
+        font-family: Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+    td, th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+    tr:nth-child(even){
+        background-color: #f2f2f2;
+    }
+    th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #04AA6D !important;
+        color: white;
+    }
+    .tables {
+        margin: 1em;
+    }
+    input[type=submit] {
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 1em;
+    }
+
+    input[type=submit]:hover {
+        background-color: #45a049;
+    }
+</style>
+
+<head>
+    <title>Subject overview</title>
+</head>
+<body>
+    <div class="forms">
+        <h2>Add subject</h2>
+        <form action="/sensormodel/subject" method="post">
+            <table>
+            {{ subjectform.as_table }}
+            </table>
+            <input type="submit" value="Create subject">
+        </form>
+    </div>
+    <div class="subjects">
+        <h2>Subjects</h2>
+        <table class="tables">
+            <tr>
+                <th>Name</th>
+                <th>Color</th>
+                <th>Size</th>
+                <th>Extra Info</th>
+                <th></th>
+                <th></th>
+            </tr>
+            {% for subject in subjects %}
+            <tr>
+                <td>{{ subject.name }}</td>
+                <td>{{ subject.color }}</td> 
+                <td>{{ subject.size }}</td>
+                <td>{{ subject.extra_info }}</td>
+                <td><a href="{% url 'sensormodel:adjust_subject' subject.id %}"> [Edit] </a></td>
+                <td><a href="{% url 'sensormodel:delete_subject' subject.id %}">[Delete]</a></td>
+            </tr> 
+           {% endfor %} 
+        </table>
+    </div>
+</body>
+
+{% endblock %}

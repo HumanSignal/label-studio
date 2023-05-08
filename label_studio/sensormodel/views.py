@@ -48,7 +48,46 @@ def addSubject(request):
             return redirect('sensormodel:tablepage')
     else:
         subjectform = forms.SubjectForm(request.POST)
-    return render(request, 'addSubject.html', {'subjectform':subjectform})
+        deploymentform = forms.DeploymentForm(request.POST)
+    return render(request, 'add.html', {'sensorform':sensorform, 'subjectform':subjectform, 'deploymentform':deploymentform})
+
+def deployment(request):
+    deployments = Deployment.objects.all().order_by('begin_datetime')
+    for deployment in deployments:
+        # For each deployment create lists of all its sensors and subjects for easier display
+        deployment.CreateLists()
+    if request.method == 'POST':
+        deploymentform = forms.DeploymentForm(request.POST)
+        if deploymentform.is_valid():
+            deploymentform.save()
+            return redirect('sensormodel:deployment')
+    else:
+        deploymentform = forms.DeploymentForm(request.POST)
+    return render(request, 'overviewDeployment.html', {'deploymentform':deploymentform, 'deployments': deployments})
+
+def sensor(request):
+    sensors = Sensor.objects.all().order_by('sensor_id')
+    sensortypes = SensorType.objects.all().order_by('manufacturer')
+    if request.method =='POST':
+        sensorform = forms.SensorForm(request.POST)
+        if sensorform.is_valid():
+            sensorform.save()
+            return redirect('sensormodel:sensor')
+    else:
+        sensorform = forms.SensorForm(request.POST)
+    return render(request, 'overviewSensor.html', {'sensorform':sensorform, 'sensors':sensors, 'sensortypes':sensortypes})
+
+
+def subject(request):
+    subjects = Subject.objects.all().order_by('name')
+    if request.method == 'POST':
+        subjectform = forms.SubjectForm(request.POST)
+        if subjectform.is_valid():
+            subjectform.save()
+            return redirect('sensormodel:subject')
+    else:
+        subjectform = forms.SubjectForm(request.POST)
+    return render(request, 'overviewSubject.html', {'subjectform':subjectform, 'subjects':subjects})
 
 def adjust_deployment(request, id):
     deployment = Deployment.objects.get(id=id)
