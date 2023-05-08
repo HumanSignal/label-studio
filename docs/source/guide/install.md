@@ -277,7 +277,8 @@ sudo chown :0 mydata
 ```
 
 !!! note
-If you want to learn more about non-root containers and Docker and Kubernetes security, check out the following articles:
+
+    If you want to learn more about non-root containers and Docker and Kubernetes security, check out the following articles:
 
     [Docker Security documentation](https://docs.docker.com/engine/security/security/)
 
