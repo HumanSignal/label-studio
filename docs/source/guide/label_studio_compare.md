@@ -6,11 +6,12 @@ tier: all
 order: 100
 section: "Get started"
 meta_title: Label Studio Community and Enterprise Features
-meta_description: Compare the features of Label Studio Community Edition with the paid Label Studio Enterprise Edition so that you can choose the best option for your data labeling and annotation projects. 
+meta_description: Compare the features of Label Studio Community Edition with the paid Label Studio Enterprise Edition so that you can choose the best option for your data labeling and annotation projects.
 ---
 
-Label Studio is available as a Community edition open source data labeling tool. Label Studio Enterprise includes extended functionality and support for teams focused on scalability, quality control and security of their dataset building processes. 
+Label Studio is available as open source software, as well as an [Enterprise cloud service](https://heartex.com/) with enhanced security (SSO, RBAC, SOC2), team management, analytics & reporting, and uptime & support SLAs. A [free trial is available](https://heartex.com/free-trial) to get started quickly and explore the enterprise cloud product.
 
+<a class="Button" href="https://heartex.com/free-trial" target="_blank" style="margin-bottom: 2em;">Free Enterprise Trial</a>
 
 <table>
   <tr>
@@ -18,7 +19,6 @@ Label Studio is available as a Community edition open source data labeling tool.
     <th>Community</th>
     <th>Enterprise</th>
   </tr>
-  
 
 <tr>
     <td colspan="3"><b>Data Management</b></td>
@@ -111,7 +111,6 @@ Label Studio is available as a Community edition open source data labeling tool.
     <td style="text-align:center">✔️</td>
   </tr>
 
-  
   <tr>
     <td colspan="3"><b>Machine Learning</b></td>
   </tr>
@@ -180,7 +179,25 @@ Label Studio is available as a Community edition open source data labeling tool.
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td>Dedicated enterprise support team with service level agreements (SLAs). </a></td>
+    <td>Dedicated enterprise support team with service level agreements (SLAs).</td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td colspan="3"><b>Managed Cloud Service</b></td>
+  </tr>
+  <tr>
+    <td>SOC2-certified cloud platform</td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+   </tr>
+  <tr>
+    <td>99.9% uptime SLA</td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td>Customer success & technical support SLA</td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
