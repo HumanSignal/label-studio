@@ -1,6 +1,6 @@
 {
-  "message": "feat:  LSDV: 5016 Outliner manual group sort order arrow",
-  "commit": "5b1d692835845c121408e0c580ddd8eb164fe4c6",
-  "branch": "master",
-  "date": "2023/05/03 11:51:54"
+  "message": "fix: LSDV-5031: Adding new region after filter it is not filtered",
+  "commit": "1e125d5f9f778201dc5f60925f18545a1430dce7",
+  "branch": "fb-lsdv-5031/new-region-after-filter",
+  "date": "2023/05/09 20:24:40"
 }
