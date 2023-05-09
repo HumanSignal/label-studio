@@ -1,6 +1,6 @@
 {
-  "message": "feat:  LSDV: 5016 Outliner manual group sort order arrow",
-  "commit": "5b1d692835845c121408e0c580ddd8eb164fe4c6",
-  "branch": "master",
-  "date": "2023/05/03 11:51:54"
+  "message": "fix: LSDV-4601: Show correct author of draft",
+  "commit": "5c4dcc0bb11f766f919c3320c0934aa270cc36d7",
+  "branch": "fb-lsdv-4601/draft-user",
+  "date": "2023/05/05 01:20:06"
 }
