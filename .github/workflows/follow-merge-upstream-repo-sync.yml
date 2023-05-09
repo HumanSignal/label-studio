@@ -162,8 +162,7 @@ jobs:
       - name: "LSF Docs: Install NPM deps"
         if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
         continue-on-error: true
-        working-directory: tmp/scripts
-        run: npm install jsdoc-to-markdown node-fetch
+        run: npm install -g jsdoc-to-markdown node-fetch
 
       - name: "LSF Docs: Build"
         if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
