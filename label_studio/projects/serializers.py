@@ -8,7 +8,7 @@ from users.serializers import UserSimpleSerializer
 
 from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS
 
-from projects.models import Project, ProjectOnboarding, ProjectSummary, ProjectImport
+from projects.models import Project, ProjectOnboarding, ProjectSummary, ProjectImport, ProjectReimport
 
 
 class CreatedByFromContext:
@@ -127,6 +127,13 @@ class ProjectImportSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProjectImport
+        fields = '__all__'
+
+
+class ProjectReimportSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ProjectReimport
         fields = '__all__'
 
 
