@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5008: Make DM default width equal to the main menu width in Quick View",
-  "commit": "b91dd013b9d7ed4fa6c73f700e1b25440c7d6c30",
-  "branch": "master",
-  "date": "2023/05/03 10:54:37"
+  "message": "chore: LSDV-5060: Migrate to Yarn",
+  "commit": "4f2d7dd4f85582c92ac85850fadd9c0bdef19508",
+  "branch": "fb-lsdv-5060/migrate-to-yarn",
+  "date": "2023/05/09 17:29:13"
 }
