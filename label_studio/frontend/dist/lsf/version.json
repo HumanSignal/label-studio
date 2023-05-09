@@ -1,6 +1,6 @@
 {
-  "message": "feat:  LSDV: 5016 Outliner manual group sort order arrow",
-  "commit": "5b1d692835845c121408e0c580ddd8eb164fe4c6",
-  "branch": "master",
-  "date": "2023/05/03 11:51:54"
+  "message": "feat: LSDV-3025-13: Add how many filter rules are applied",
+  "commit": "7a6c8b1ff36ad97159b486a5de6975233e346912",
+  "branch": "fb-lsdv-3025-13",
+  "date": "2023/05/09 16:36:52"
 }
