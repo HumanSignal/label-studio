@@ -535,11 +535,8 @@ class DownloadStorageData(APIView):
     """ Check auth for nginx auth_request
     """
     swagger_schema = None
-    http_method_names = ['get', 'head']
+    http_method_names = ['get']
     permission_classes = (IsAuthenticated, )
-
-    def head(self, request, *args, **kwargs):
-        return self.get(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         """ Get export files list
@@ -557,7 +554,7 @@ class DownloadStorageData(APIView):
             file_upload = FileUpload.objects.filter(file=filepath).last()
 
             if file_upload is not None and file_upload.has_permission(request.user):
-                url = file_upload.file.storage.url(file_upload.file.name, storage_url=True, http_method=request.method)
+                url = file_upload.file.storage.url(file_upload.file.name, storage_url=True)
         elif filepath.startswith(settings.AVATAR_PATH):
             user = User.objects.filter(avatar=filepath).first()
             if user is not None and request.user.active_organization.has_user(user):
@@ -582,13 +579,14 @@ class PresignStorageData(APIView):
     """ A file proxy to presign storage urls.
     """
     swagger_schema = None
+    http_method_names = ['get']
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, *args, **kwargs):
         """ Get the presigned url for a given fileuri
         """
         request = self.request
-        task_id = kwargs.get("task_id")
+        task_id = kwargs.get('task_id')
         fileuri = request.GET.get('fileuri')
 
         if fileuri is None or task_id is None:
@@ -604,24 +602,21 @@ class PresignStorageData(APIView):
         if not project.has_permission(request.user):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        # TODO: cache the presigned storage url by taskId 
-        # cache ttl should be 10s less than presigned ttl so we can reuse as much of that work
-        # as possible and limit the amount of times we are calling out to cloud storages.
         fileuri = unquote(fileuri)
 
-        url = task.resolve_storage_uri(fileuri, project)
+        resolved = task.resolve_storage_uri(fileuri, project)
 
-        if url is None:
+        if resolved is None or resolved['url'] is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+        url = resolved['url']
+        maxAge = 0
+        if resolved['presign_ttl']:
+            maxAge = resolved['presign_ttl'] * 60
 
         # Proxy to presigned url
         response = HttpResponseRedirect(redirect_to=url, status=status.HTTP_303_SEE_OTHER)
-
-        # NOTE: Temporary workaround:
-        # For some reason even though this is using a 303 which should never cache
-        # it at the moment will cache the redirect when running the python server directly.
-        # This is not an issue when running behind nginx and a more comprehensive solution to this will be coming.
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Cache-Control'] = f"no-store, max-age={maxAge}"
 
         return response
 

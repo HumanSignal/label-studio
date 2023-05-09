@@ -487,7 +487,7 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
             if isinstance(file.storage, FileSystemStorage):
                 url = file.storage.url(file.name)
             else:
-                url = file.storage.url(file.name, storage_url=True, http_method=request.method)
+                url = file.storage.url(file.name, storage_url=True)
             protocol = urlparse(url).scheme
 
             # Let NGINX handle it
