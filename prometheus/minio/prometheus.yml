@@ -1,0 +1,6 @@
+scrape_configs:
+- job_name: minio-job
+  metrics_path: /minio/v2/metrics/cluster
+  scheme: http
+  static_configs:
+  - targets: ['minio:9000']

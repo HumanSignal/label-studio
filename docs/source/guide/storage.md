@@ -446,7 +446,9 @@ You must set two environment variables in Label Studio to connect to Azure Blob 
 - `AZURE_BLOB_ACCOUNT_NAME` to specify the name of the storage account.
 - `AZURE_BLOB_ACCOUNT_KEY` to specify the secret key for the storage account.
 
-Configure the specific Azure Blob container that you want Label Studio to use in the UI.
+Configure the specific Azure Blob container that you want Label Studio to use in the UI. In most cases involving CORS issues, the GET permission (*/GET/*/Access-Control-Allow-Origin/3600) is necessary within the Resource Sharing tab:
+
+<img src="/images/azure-storage-cors.png" class="gif-border">
 
 ### Set up connection in the Label Studio UI
 In the Label Studio UI, do the following to set up the connection:
@@ -533,7 +535,7 @@ In the Label Studio UI, do the following to set up the connection:
 2. For a specific project, open **Settings > Cloud Storage**.
 3. Click **Add Source Storage**.
   
-<img src="/images/local-storage-settings.png" alt="Screenshot of the storage settings modal described in the preceding steps." width=670 height=490 style="border: 1px solid #eee">
+<img src="/images/local-storage-settings.png" alt="Screenshot of the storage settings modal described in the preceding steps." class="gif-border">
   
 4. In the dialog box that appears, select **Local Files** as the storage type.
 5. In the **Storage Title** field, type a name for the storage to appear in the Label Studio UI.

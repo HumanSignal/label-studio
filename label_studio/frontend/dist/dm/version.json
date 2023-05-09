@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-116: Update frontend candidate task view to show File attributes",
-  "commit": "75f6bbbf030c41b310e5e931c330486fb2f3a0b4",
+  "message": "fix: LSDV-5008: Make DM default width equal to the main menu width in Quick View",
+  "commit": "b91dd013b9d7ed4fa6c73f700e1b25440c7d6c30",
   "branch": "master",
-  "date": "2023/04/24 11:26:47"
+  "date": "2023/05/03 10:54:37"
 }
