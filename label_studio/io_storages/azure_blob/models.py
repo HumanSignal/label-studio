@@ -72,6 +72,25 @@ class AzureBlobStorageMixin(models.Model):
         _, container = self.get_client_and_container()
         return container
 
+    def validate_connection(self, **kwargs):
+        logger.debug('Validating Azure Blob Storage connection')
+        client, container = self.get_client_and_container()
+
+        try:
+            container_properties = container.get_container_properties()
+            logger.debug(f'Container exists: {container_properties.name}')
+        except ResourceNotFoundError:
+            raise KeyError(f'Container not found: {self.container}')
+
+        # Check path existence for Import storages only
+        if self.prefix and 'Export' not in self.__class__.__name__:
+            logger.debug(f'Test connection to container {self.container} with prefix {self.prefix}')
+            prefix = str(self.prefix)
+            blobs = list(container.list_blobs(name_starts_with=prefix, results_per_page=1))
+
+            if not blobs:
+                raise KeyError(f'{self.url_scheme}://{self.container}/{self.prefix} not found.')
+
 
 class AzureBlobImportStorageBase(ImportStorage, AzureBlobStorageMixin):
     url_scheme = 'azure-blob'
@@ -131,25 +150,6 @@ class AzureBlobImportStorageBase(ImportStorage, AzureBlobStorageMixin):
                                       expiry=expiry)
         return 'https://' + self.get_account_name() + '.blob.core.windows.net/' + container + '/' + blob + '?' + sas_token
 
-    def validate_connection(self, **kwargs):
-        logger.debug('Validating Azure Blob Storage connection')
-        client, container = self.get_client_and_container()
-
-        try:
-            container_properties = container.get_container_properties()
-            logger.debug(f'Container exists: {container_properties.name}')
-        except ResourceNotFoundError:
-            raise KeyError(f'Container not found: {self.container}')
-
-        # Check path existence for Import storages only
-        if self.prefix and 'Export' not in self.__class__.__name__:
-            logger.debug(f'Test connection to container {self.container} with prefix {self.prefix}')
-            prefix = str(self.prefix)
-            blobs = list(container.list_blobs(name_starts_with=prefix, results_per_page=1))
-
-            if not blobs:
-                raise KeyError(f'{self.url_scheme}://{self.container}/{self.prefix} not found.')
-
     class Meta:
         abstract = True
 
@@ -159,7 +159,7 @@ class AzureBlobImportStorage(ProjectStorageMixin, AzureBlobImportStorageBase):
         abstract = False
 
 
-class AzureBlobExportStorage(ExportStorage, AzureBlobStorageMixin):
+class AzureBlobExportStorage(AzureBlobStorageMixin, ExportStorage):  # note: order is important!
 
     def save_annotation(self, annotation):
         container = self.get_container()
