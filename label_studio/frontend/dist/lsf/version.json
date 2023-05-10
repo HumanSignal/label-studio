@@ -1,6 +1,6 @@
 {
-  "message": "feat:  LSDV: 5016 Outliner manual group sort order arrow",
-  "commit": "5b1d692835845c121408e0c580ddd8eb164fe4c6",
-  "branch": "master",
-  "date": "2023/05/03 11:51:54"
+  "message": "fix: LSDV-5074: Add a FF to outliner filter",
+  "commit": "4ec89df9f9ae7df51b92a4cfdb7fb64a92b1efba",
+  "branch": "fb-lsdv-5074",
+  "date": "2023/05/10 17:11:29"
 }
