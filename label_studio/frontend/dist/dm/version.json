@@ -1,6 +1,6 @@
 {
   "message": "chore: LSDV-5060: Migrate to Yarn",
-  "commit": "4f2d7dd4f85582c92ac85850fadd9c0bdef19508",
+  "commit": "c217c57868341caf6c6e4b43172cf5bff3acdd4c",
   "branch": "fb-lsdv-5060/migrate-to-yarn",
-  "date": "2023/05/09 17:29:13"
+  "date": "2023/05/10 15:11:36"
 }
