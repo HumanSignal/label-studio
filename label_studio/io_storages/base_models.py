@@ -90,10 +90,14 @@ class StorageInfo(models.Model):
         self.time_in_progress = None
         self.time_queued = None
 
-    def info_set_queued(self, job_id):
+    def info_set_job(self, job_id):
+        self.last_sync_job = job_id
+        self.save(update_fields=['last_sync_job'])
+
+    def info_set_queued(self):
         self.last_sync = None
         self.last_sync_count = None
-        self.last_sync_job = job_id
+        self.last_sync_job = None
         self.status = self.Status.QUEUED
 
         # reset and init meta
@@ -423,6 +427,7 @@ class ImportStorage(Storage):
                     not is_job_in_queue(queue, "import_sync_background", meta=meta) and
                     not is_job_on_worker(job_id=self.last_sync_job, queue_name='low')
             ):
+                self.info_set_queued()
                 sync_job = queue.enqueue(
                     import_sync_background,
                     self.__class__,
@@ -432,12 +437,12 @@ class ImportStorage(Storage):
                     organization_id=self.project.organization.id,
                     on_failure=storage_background_failure
                 )
-                self.info_set_queued(sync_job.id)
+                self.info_set_job(sync_job.id)
                 logger.info(f'Storage sync background job {sync_job.id} for storage {self} has been started')
         else:
             try:
                 logger.info(f'Start syncing storage {self}')
-                self.info_set_queued(None)
+                self.info_set_queued()
                 import_sync_background(self.__class__, self.id)
             except Exception:
                 storage_background_failure(self)
@@ -465,7 +470,7 @@ class ProjectStorageMixin(models.Model):
 
 
 @job('low')
-def import_sync_background(storage_class, storage_id, **kwargs):
+def import_sync_background(storage_class, storage_id, timeout=settings.RQ_LONG_JOB_TIMEOUT, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.scan_and_create_links()
 
@@ -537,6 +542,7 @@ class ExportStorage(Storage, ProjectStorageMixin):
     def sync(self):
         if redis_connected():
             queue = django_rq.get_queue('low')
+            self.info_set_queued()
             sync_job = queue.enqueue(
                 export_sync_background,
                 self.__class__,
@@ -546,12 +552,12 @@ class ExportStorage(Storage, ProjectStorageMixin):
                 organization_id=self.project.organization.id,
                 on_failure=storage_background_failure
             )
-            self.info_set_queued(sync_job.id)
+            self.info_set_job(sync_job.id)
             logger.info(f'Storage sync background job {sync_job.id} for storage {self} has been queued')
         else:
             try:
                 logger.info(f'Start syncing storage {self}')
-                self.info_set_queued(None)
+                self.info_set_queued()
                 export_sync_background(self.__class__, self.id)
             except Exception:
                 storage_background_failure(self)
