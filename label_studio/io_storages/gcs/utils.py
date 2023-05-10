@@ -1,5 +1,7 @@
 import re
 import logging
+from json import JSONDecodeError
+
 import google.cloud.storage as gcs
 import json
 import base64
@@ -46,7 +48,11 @@ class GCS(object):
             if cache_key in GCS._client_cache:
                 return GCS._client_cache[cache_key]
             if isinstance(google_application_credentials, str):
-                google_application_credentials = json.loads(google_application_credentials)
+                try:
+                    google_application_credentials = json.loads(google_application_credentials)
+                except JSONDecodeError:
+                    # change JSON error to human-readable format
+                    raise ValueError('Google Application Credentials must be valid JSON string.')
             credentials = service_account.Credentials.from_service_account_info(google_application_credentials)
             client = gcs.Client(project=google_project_id, credentials=credentials)
             GCS._client_cache[cache_key] = client
@@ -235,3 +241,31 @@ class GCS(object):
     @classmethod
     def read_base64(cls, f: gcs.Blob) -> Base64:
         return base64.b64encode(f.download_as_bytes())
+
+    @classmethod
+    def get_blob_metadata(cls,
+                          url: str,
+                          google_application_credentials: Union[str, dict] = None,
+                          google_project_id: str = None,
+                          properties_name: list = []) -> dict:
+        """
+        Gets object metadata like size and updated date from GCS in dict format
+        :param url: input URI
+        :param google_application_credentials:
+        :param google_project_id:
+        :return: Object metadata dict("name": "value")
+        """
+        r = urlparse(url, allow_fragments=False)
+        bucket_name = r.netloc
+        blob_name = r.path.lstrip('/')
+
+        client = cls.get_client(
+            google_application_credentials=google_application_credentials,
+            google_project_id=google_project_id
+        )
+        bucket = client.get_bucket(bucket_name)
+        # Get blob instead of Blob() is used to make an http request and get metadata
+        blob = bucket.get_blob(blob_name)
+        if not properties_name:
+            return blob._properties
+        return {key: value for key, value in blob._properties.items() if key in properties_name}

@@ -9,8 +9,11 @@ import traceback as tb
 
 from rq.job import Job
 from django_rq import job
+from urllib.parse import urljoin, quote
+
 from django.utils import timezone
 from django.db import models, transaction
+from django.shortcuts import reverse
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.db.models import JSONField
@@ -253,12 +256,12 @@ class ImportStorage(Storage):
         # if not found any occurrences - this Storage can't resolve url
         return False
 
-    def resolve_uri(self, uri):
+    def resolve_uri(self, uri, task=None):
         #  list of objects
         if isinstance(uri, list):
             resolved = []
             for item in uri:
-                result = self.resolve_uri(item)
+                result = self.resolve_uri(item, task)
                 resolved.append(result if result else item)
             return resolved
 
@@ -266,7 +269,7 @@ class ImportStorage(Storage):
         elif isinstance(uri, dict):
             resolved = {}
             for key in uri.keys():
-                result = self.resolve_uri(uri[key])
+                result = self.resolve_uri(uri[key], task)
                 resolved[key] = result if result else uri[key]
             return resolved
 
@@ -278,8 +281,14 @@ class ImportStorage(Storage):
                 if not extracted_storage:
                     logger.debug(f'No storage info found for URI={uri}')
                     return
-                # resolve uri to url using storages
-                http_url = self.generate_http_url(extracted_uri)
+
+                if self.presign and task is not None:
+                    proxy_url = urljoin(settings.HOSTNAME, reverse("data_import:storage-data-presign", kwargs={ "task_id": task.id }) + f'?fileuri={quote(extracted_uri)}')
+                    return uri.replace(extracted_uri, proxy_url)
+                else:
+                    # resolve uri to url using storages
+                    http_url = self.generate_http_url(extracted_uri)
+
                 return uri.replace(extracted_uri, http_url)
             except Exception as exc:
                 logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
@@ -289,7 +298,7 @@ class ImportStorage(Storage):
         # e.g. GCS example
         # | "GetKey" >>  --> read file content into label_studio_semantic_search.indexer.RawDataObject repr
         # | "AggregateBatch" >> beam.Combine      --> combine read objects into a batch
-        # | "AddObjects" >> label_studio_semantic_search.indexer.add_objects_from_bucket 
+        # | "AddObjects" >> label_studio_semantic_search.indexer.add_objects_from_bucket
         # --> add objects from batch to Vector DB
         # or for project task creation last step would be
         # | "AddObject" >> ImportStorage.add_task

@@ -2,6 +2,7 @@
 """
 import os
 import logging
+import traceback as tb
 
 from django.conf import settings
 from datetime import datetime
@@ -383,6 +384,26 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
     lookup_url_kwarg = 'export_pk'
     permission_required = all_permissions.projects_change
 
+    def delete(self, *args, **kwargs):
+        if flag_set('ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short'):
+            try:
+                export = self.get_object()
+                export.file.delete()
+
+                for converted_format in export.converted_formats.all():
+                    if converted_format.file:
+                        converted_format.file.delete()
+            except Exception as e:
+                return Response(
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    data={
+                        'detail':
+                            'Could not delete file from storage. Check that your user has permissions to delete files: %s' % str(e)
+                    }
+                )
+
+        return super().delete(*args, **kwargs)
+
     def _get_project(self):
         project_pk = self.kwargs.get('pk')
         project = generics.get_object_or_404(
@@ -466,7 +487,7 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
             if isinstance(file.storage, FileSystemStorage):
                 url = file.storage.url(file.name)
             else:
-                url = file.storage.url(file.name, storage_url=True, http_method=request.method)
+                url = file.storage.url(file.name, storage_url=True)
             protocol = urlparse(url).scheme
 
             # NGINX downloads are a solid way to make uwsgi workers free
@@ -535,11 +556,12 @@ def async_convert(converted_format_id, export_type, project, **kwargs):
     converted_format.save(update_fields=['file', 'status'])
 
 
-def set_convert_background_failure(job, connection, type, value, traceback):
+def set_convert_background_failure(job, connection, type, value, traceback_obj):
     from data_export.models import ConvertedFormat
 
     convert_id = job.args[0]
-    ConvertedFormat.objects.filter(id=convert_id).update(status=Export.Status.FAILED, traceback=str(traceback))
+    trace = tb.format_exception(type, value, traceback_obj)
+    ConvertedFormat.objects.filter(id=convert_id).update(status=Export.Status.FAILED, traceback=''.join(trace))
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))

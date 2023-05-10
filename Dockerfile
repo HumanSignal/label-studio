@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.3
-FROM node:14 AS frontend-builder
+FROM node:18 AS frontend-builder
 
-ENV NPM_CACHE_LOCATION=$HOME/.npm \
+ENV NPM_CACHE_LOCATION=$HOME/.cache/yarn/v6 \
     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 WORKDIR /label-studio/label_studio/frontend
@@ -10,8 +10,8 @@ COPY --chown=1001:0 label_studio/frontend .
 COPY --chown=1001:0 label_studio/__init__.py /label-studio/label_studio/__init__.py
 
 RUN --mount=type=cache,target=$NPM_CACHE_LOCATION,uid=1001,gid=0 \
-    npm ci \
- && npm run build:production
+    yarn install --frozen-lockfile \
+ && yarn run build:production
 
 FROM ubuntu:22.04
 

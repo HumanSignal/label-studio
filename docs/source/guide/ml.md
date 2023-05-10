@@ -14,9 +14,10 @@ Integrate your model development pipeline with your data labeling workflow by ad
 - **Pre-labeling** by letting models predict labels and then have annotators perform further manual refinements. 
 - **Auto-labeling** by letting models create automatic annotations. 
 - **Online Learning** by simultaneously updating your model while new annotations are created, letting you retrain your model on-the-fly. 
-- [**Active Learning**](active_learning.html) by selecting example tasks that the model is uncertain how to label for your annotators to label manually. 
+- **Active Learning** by selecting example tasks that the model is uncertain how to label for your annotators to label manually.
 
-If you need to load static pre-annotated data into Label Studio, running an ML backend might be more than you need. Instead, you can [import pre-annotated data](predictions.html).
+!!! note
+    Use [Label Studio Enterprise to build an automated active learning loop](https://docs.heartex.com/guide/active_learning.html) with a machine learning model backend. If you use the open source Community Edition of Label Studio, you can manually sort tasks and retrieve predictions to mimic an active learning process.
 
 ## How to set up machine learning with Label Studio
 

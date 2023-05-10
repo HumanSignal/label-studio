@@ -1,6 +1,6 @@
 {
-  "message": "chore: LSDV-4727: Remove any AudioPlus mentions",
-  "commit": "bebdff88fba8aa0b167b5475e8d77009a3bbd895",
+  "message": "fix: LSDV-5008: Make DM default width equal to the main menu width in Quick View",
+  "commit": "b91dd013b9d7ed4fa6c73f700e1b25440c7d6c30",
   "branch": "master",
-  "date": "2023/04/18 15:30:26"
+  "date": "2023/05/03 10:54:37"
 }
