@@ -28,7 +28,7 @@ frontend-watch:
 
 # Build production-ready optimized bundle
 frontend-build:
-	cd label_studio/frontend && yarn intasll --frozen-lockfile && yarn run build:production
+	cd label_studio/frontend && yarn install --frozen-lockfile && yarn run build:production
 
 # Run tests
 test:

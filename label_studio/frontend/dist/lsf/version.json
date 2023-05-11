@@ -1,6 +1,6 @@
 {
-  "message": "feat:  LSDV: 5016 Outliner manual group sort order arrow",
-  "commit": "5b1d692835845c121408e0c580ddd8eb164fe4c6",
+  "message": "feat: LSDV-5069: Create new defaults for panels and tabs",
+  "commit": "6cc186dadf8b44c11522b85ebdf21389e8aa655f",
   "branch": "master",
-  "date": "2023/05/03 11:51:54"
+  "date": "2023/05/11 09:06:01"
 }
