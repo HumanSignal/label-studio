@@ -153,7 +153,7 @@ def azure_client_mock():
             return [File('abc'), File('def'), File('ghi')]
         def get_blob_client(self, key):
             return DummyAzureBlob(self.name, key)
-        def get_container_properties(**kwargs):
+        def get_container_properties(self, **kwargs):
             return SimpleNamespace(
                 name='test-container',
                 last_modified='2022-01-01 01:01:01',
