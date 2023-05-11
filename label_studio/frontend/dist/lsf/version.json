@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4726: DateTime min/max",
-  "commit": "05e3adedc62c6785fc09ea9f4d46662492d1f57b",
+  "message": "fix: LSDV-5074: Add FF to outliner filter",
+  "commit": "8e51769b6ef90588b1433f4c71400164dfbbe398",
   "branch": "master",
-  "date": "2023/05/11 15:51:35"
+  "date": "2023/05/11 13:04:28"
 }
