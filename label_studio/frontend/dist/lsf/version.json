@@ -1,6 +1,6 @@
 {
   "message": "docs: LSDV-4964: Remove old Ranker; fix docs",
-  "commit": "b6c9b92cec2cf6332431b0f25807e2364dcc1663",
-  "branch": "fb-lsdv-4964/ranker-docs",
-  "date": "2023/05/11 16:07:30"
+  "commit": "9b2c63d1fdde03141ac5c10f4723e784e2a7ab51",
+  "branch": "master",
+  "date": "2023/05/11 15:58:38"
 }
