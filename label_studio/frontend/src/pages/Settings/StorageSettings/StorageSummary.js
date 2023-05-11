@@ -4,7 +4,7 @@ import { DescriptionList } from '../../../components/DescriptionList/Description
 import { modal } from '../../../components/Modal/Modal';
 import { Button } from '../../../components';
 import { Oneof } from '../../../components/Oneof/Oneof';
-import { lastTwoLines } from '../../../utils/helpers';
+import { getLastTraceback } from '../../../utils/helpers';
 
 export const StorageSummary = ({ target, storage, className, storageTypes = [] }) => {
   const storageStatus = storage.status.replace(/_/g, ' ').replace(/(^\w)/, match => match.toUpperCase());
@@ -19,7 +19,7 @@ export const StorageSummary = ({ target, storage, className, storageTypes = [] }
   const handleButtonClick = () => {
     const msg = `Error logs for ${target==='export' ? 'export ': ''}${storage.type} ` +
             `storage ${storage.id} in project ${storage.project} and job ${storage.last_sync_job}:\n\n` +
-            `${lastTwoLines(storage.traceback)}\n\n` +
+            `${getLastTraceback(storage.traceback)}\n\n` +
             `meta = ${JSON.stringify(storage.meta)}\n`;
 
     modal({

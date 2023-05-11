@@ -125,10 +125,16 @@ export const clamp = (value: number, min: number, max: number) => {
   return Math.max(min, Math.min(value, max));
 };
 
-export const lastTwoLines = (s: string | null): string => {
-  if (s === null) {
-    return '';
+export const getLastTraceback = (traceback: string): string => {
+  const lines = traceback.split('\n');
+  let lastTraceIndex = -1;
+
+  for (let i = lines.length - 1; i >= 0; i--) {
+    if (lines[i].startsWith('  File')) {
+      lastTraceIndex = i;
+      break;
+    }
   }
 
-  return s.trim().split('\n').slice(-2).map(s => s.trim()).join('\n');
+  return lastTraceIndex >= 0 ? lines.slice(lastTraceIndex).join('\n') : traceback;
 };
