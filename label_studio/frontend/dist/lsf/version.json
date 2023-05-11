@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5074: Add FF to outliner filter",
-  "commit": "8e51769b6ef90588b1433f4c71400164dfbbe398",
+  "message": "feat: PROD-309: Add hint for Choice",
+  "commit": "8d3f6a03aa1cdbfc4ff02f1956313cabb307409a",
   "branch": "master",
-  "date": "2023/05/11 13:04:28"
+  "date": "2023/05/11 19:08:56"
 }
