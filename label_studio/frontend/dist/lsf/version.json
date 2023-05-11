@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5069: Create new defaults for panels and tabs",
-  "commit": "6cc186dadf8b44c11522b85ebdf21389e8aa655f",
+  "message": "fix: LSDV-5074: Add FF to outliner filter",
+  "commit": "8e51769b6ef90588b1433f4c71400164dfbbe398",
   "branch": "master",
-  "date": "2023/05/11 09:06:01"
+  "date": "2023/05/11 13:04:28"
 }
