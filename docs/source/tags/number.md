@@ -19,7 +19,7 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [min] | <code>number</code> |  | Minimum number value |
 | [max] | <code>number</code> |  | Maximum number value |
 | [step] | <code>number</code> | <code>1</code> | Step for value increment/decrement |
-| [defaultValue] | <code>number</code> |  | Default number value; will be added automaticaly to result for required fields |
+| [defaultValue] | <code>number</code> |  | Default number value; will be added automatically to result for required fields |
 | [hotkey] | <code>string</code> |  | Hotkey for increasing number value |
 | [required] | <code>boolean</code> | <code>false</code> | Whether to require number validation |
 | [requiredMessage] | <code>string</code> |  | Message to show if validation fails |
@@ -27,8 +27,10 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [slider] | <code>boolean</code> | <code>false</code> | Use slider look instead of input; use min and max to add your constraints |
 
 ### Example
+
+Basic labeling configuration for numeric classification of text
+
 ```html
-<!--Basic labeling configuration for numeric classification of text -->
 <View>
   <Text name="txt" value="$text" />
   <Number name="number" toName="txt" max="10" />

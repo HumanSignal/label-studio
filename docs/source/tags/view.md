@@ -1,12 +1,12 @@
 ---
 title: View
 type: tags
-order: 506
+order: 505
 meta_title: View Tag for Defining How Blocks are Displayed
 meta_description: Customize how blocks are displayed on the labeling interface in Label Studio for machine learning and data science projects.
 ---
 
-Use the View element to configure the display of blocks, similar to the div tag in HTML.
+The `View` element is used to configure the display of blocks, similar to the div tag in HTML.
 
 ### Parameters
 
