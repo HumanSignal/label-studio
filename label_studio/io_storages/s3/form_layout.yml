@@ -27,20 +27,21 @@ aws_params: &aws_params
     autoComplete: "off"
     skipAutofill: true
     allowEmpty: false
+    protectedValue: true
   - type: password
     name: aws_secret_access_key
     label: Secret Access Key
     autoComplete: "new-password"
     skipAutofill: true
     allowEmpty: false
+    protectedValue: true
   - type: password
     name: aws_session_token
     autoComplete: "new-password"
     label: Session Token
     skipAutofill: true
-    allowEmpty: false
-
-
+    allowEmpty: true
+    protectedValue: true
 
 ImportStorage:
   # Title, Bucket, Prefix
@@ -81,7 +82,7 @@ ImportStorage:
             name: presign_ttl
             label: Expiration minutes
             min: 1
-            value: 1
+            value: 15
             dependency: presign
 
 ExportStorage:

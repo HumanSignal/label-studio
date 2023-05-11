@@ -3,6 +3,7 @@
 import os
 import json
 
+from .settings.base import EXPORT_DIR
 from .utils.io import find_file
 
 
@@ -107,7 +108,13 @@ def parse_input_args(input_args):
 
     parser_init = subparsers.add_parser('init', help='Initialize Label Studio', parents=[root_parser])
     parser_init.add_argument(
-        'project_name', help='Path to directory where project state will be initialized', type=project_name
+        'project_name', help='Path to directory where project state will be initialized', type=project_name,
+        nargs='?'
+    )
+    parser_init.add_argument(
+        '-q', '--quiet', dest='quiet_mode', action='store_true',
+        help='Quiet (silence) mode for init when it does not ask about username and password',
+        default=False
     )
 
     # start sub-command parser
@@ -131,6 +138,22 @@ def parse_input_args(input_args):
     )
     calculate_stats_all_orgs.add_argument(
         '--from-scratch', dest='from_scratch', default=False, action='store_true', help='Recalculate from scratch'
+    )
+
+    # export_project sub-command parser
+    export_project = subparsers.add_parser('export', help='Export project in a specific format', parents=[root_parser])
+    export_project.add_argument('project_id', help='Project ID')
+    export_project.add_argument('export_format', help='Export format (JSON, JSON_MIN, CSV, etc)')
+    export_project.add_argument('--export-path', help='Export file path or directory', default=EXPORT_DIR)
+    default_params = '{"annotations__completed_by": {"only_id": null}, "interpolate_key_frames": true}'
+    export_project.add_argument(
+        '--export-serializer-context',
+        help=f"Export serializer context, default value: '{default_params}'",
+        default=default_params
+    )
+
+    annotation_fill_updated_by = subparsers.add_parser(
+        'annotations_fill_updated_by', help='Fill the updated_by field for Annotations', parents=[root_parser]
     )
 
     args = parser.parse_args(input_args)

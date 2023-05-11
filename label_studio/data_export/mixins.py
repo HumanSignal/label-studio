@@ -40,6 +40,7 @@ logger = logging.getLogger(__name__)
 
 class ExportMixin:
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
     def get_default_title(self):
@@ -75,9 +76,9 @@ class ExportMixin:
         if 'finished' in task_filter_options:
             value = task_filter_options['finished']
             if value == ONLY:
-                tasks = tasks.filter(is_labled=True)
+                tasks = tasks.filter(is_labeled=True)
             elif value == EXCLUDE:
-                tasks = tasks.exclude(is_labled=True)
+                tasks = tasks.exclude(is_labeled=True)
         if 'annotated' in task_filter_options:
             value = task_filter_options['annotated']
             # if any annotation exists and is not cancelled
@@ -115,7 +116,8 @@ class ExportMixin:
         q = reduce(lambda x, y: x | y, q_list)
         return queryset.filter(q)
 
-    def _get_export_serializer_option(self, serialization_options):
+    @staticmethod
+    def _get_export_serializer_option(serialization_options):
         options = {'expand': []}
         if isinstance(serialization_options, dict):
             if (
@@ -148,7 +150,7 @@ class ExportMixin:
                 "annotations",
                 queryset=annotations_qs,
             )
-        ).select_related('project').prefetch_related(
+        ).prefetch_related(
                 'predictions', 'drafts'
             )
 

@@ -46,6 +46,8 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     re_path(r'^$', views.main, name='main'),
+    re_path(r'^sw\.js$', views.static_file_with_host_resolver('static/js/sw.js', content_type='text/javascript')),
+    re_path(r'^sw-fallback\.js$', views.static_file_with_host_resolver('static/js/sw-fallback.js', content_type='text/javascript')),
     re_path(r'^favicon\.ico$', RedirectView.as_view(url='/static/images/favicon.ico', permanent=True)),
     re_path(r'^label-studio-frontend/(?P<path>.*)$', serve, kwargs={'document_root': settings.EDITOR_ROOT, 'show_indexes': True}),
     re_path(r'^dm/(?P<path>.*)$', serve, kwargs={'document_root': settings.DM_ROOT, 'show_indexes': True}),
@@ -81,7 +83,7 @@ urlpatterns = [
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 
     path('docs/api/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('docs/', RedirectView.as_view(url='/static/docs/public/guide/introduction.html', permanent=False)),
+    path('docs/', RedirectView.as_view(url='/static/docs/public/guide/introduction.html', permanent=False), name='docs-redirect'),
 
     path('admin/', admin.site.urls),
     path('django-rq/', include('django_rq.urls')),

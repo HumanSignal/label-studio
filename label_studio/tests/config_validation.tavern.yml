@@ -40,7 +40,7 @@ stages:
     method: POST
     url: '{django_live_url}/api/projects/{pk}/validate'
   response:
-    status_code: 400
+    status_code: 200
 - name: stage
   request:
     headers:
@@ -50,7 +50,7 @@ stages:
     method: POST
     url: '{django_live_url}/api/projects/{pk}/validate'
   response:
-    status_code: 400
+    status_code: 200
 - name: stage
   request:
     headers:
@@ -582,3 +582,47 @@ stages:
     url: '{django_live_url}/api/projects/{pk}/validate'
   response:
     status_code: 400
+
+
+---
+test_name: Taxonomy validation when value is null
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+
+stages:
+
+- id: signup
+  type: ref
+
+- name: Create new project with taxonomy
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+    json:
+      label_config: <View> <Header size="10">Document ID $document_id</Header> <Repeater indexFlag="{{idx}}" on="$images"> <Header value="Labels"/> <RectangleLabels name="labels_{{idx}}" toName="page_{{idx}}"> <Label alias="title" value="Title"/> <Label alias="reference" value="Document reference"/> </RectangleLabels> <RectangleLabels name="taxonomy_{{idx}}" toName="page_{{idx}}"> <Label alias="taxonomy" background="#B2CDFE" selectedColor="#74A7FE" value="Primary taxonomy"/> <Label alias="taxonomy_other" background="#F9AEC8" selectedColor="#FF7FAC" value="Other taxonomies"/> </RectangleLabels> <Taxonomy name="categories_{{idx}}" perRegion="true" sharedStore="taxonomy" toName="page_{{idx}}" value="$taxonomy" visibleWhen="region-selected" whenLabelValue="taxonomy"/> <Taxonomy name="taxonomy_other_{{idx}}" perRegion="true" sharedStore="taxonomy_other" toName="page_{{idx}}" value="$taxonomy_other" visibleWhen="region-selected" whenLabelValue="taxonomy_other"/> <Image maxHeight="auto" name="page_{{idx}}" value="$images[{{idx}}].url"/> </Repeater> </View>
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+
+- name: Import task where taxonomy_other value is null
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+    headers:
+      content-type: application/json
+    json:
+      - images:
+          - url: "https://123.com/1.jpg"
+        taxonomy:
+          - value: ""
+            children:
+              - value: "other"
+          - value: "zzz3"
+        document_id: "xxx"
+        taxonomy_other: null
+  response:
+    status_code: 201

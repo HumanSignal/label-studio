@@ -10,25 +10,25 @@ import json
 import getpass
 
 from colorama import init, Fore
+
 if sys.platform == 'win32':
     init(convert=True)
 
 # on windows there will be problems with sqlite and json1 support, so fix it
 from label_studio.core.utils.windows_sqlite_fix import windows_dll_fix
+
 windows_dll_fix()
 
 from django.core.management import call_command
-from django.db import IntegrityError
 from django.core.wsgi import get_wsgi_application
+from django.db import connections, DEFAULT_DB_ALIAS, IntegrityError
+from django.db.backends.signals import connection_created
 from django.db.migrations.executor import MigrationExecutor
-from django.db import connections, DEFAULT_DB_ALIAS
 
 from label_studio.core.argparser import parse_input_args
 from label_studio.core.utils.params import get_env
 
-
 logger = logging.getLogger(__name__)
-
 
 LS_PATH = str(pathlib.Path(__file__).parent.absolute())
 DEFAULT_USERNAME = 'default_user@localhost'
@@ -45,6 +45,13 @@ def _app_run(host, port):
     call_command('runserver', '--noreload', http_socket)
 
 
+def _set_sqlite_fix_pragma(sender, connection, **kwargs):
+    """Enable integrity constraint with sqlite."""
+    if connection.vendor == 'sqlite' and get_env('AZURE_MOUNT_FIX'):
+        cursor = connection.cursor()
+        cursor.execute('PRAGMA journal_mode=wal;')
+
+
 def is_database_synchronized(database):
     connection = connections[database]
     connection.prepare_database()
@@ -54,6 +61,7 @@ def is_database_synchronized(database):
 
 
 def _apply_database_migrations():
+    connection_created.connect(_set_sqlite_fix_pragma)
     if not is_database_synchronized(DEFAULT_DB_ALIAS):
         print('Initializing database..')
         call_command('migrate', '--no-color', verbosity=0)
@@ -136,11 +144,16 @@ def _create_user(input_args, config):
                 user.save()
                 print(f'User {DEFAULT_USERNAME} password changed')
             return user
+
+        if input_args.quiet_mode:
+            return None
+
         print(f'Please enter default user email, or press Enter to use {DEFAULT_USERNAME}')
         username = input('Email: ')
         if not username:
             username = DEFAULT_USERNAME
-    if not password:
+
+    if not password and not input_args.quiet_mode:
         password = getpass.getpass(f'User password for {username}: ')
 
     try:
@@ -152,7 +165,7 @@ def _create_user(input_args, config):
         if token and len(token) > 5:
             from rest_framework.authtoken.models import Token
             Token.objects.filter(key=user.auth_token.key).update(key=token)
-        else:
+        elif token:
             print(f"Token {token} is not applied to user {DEFAULT_USERNAME} "
                   f"because it's empty or len(token) < 5")
 
@@ -172,11 +185,12 @@ def _create_user(input_args, config):
 
 
 def _init(input_args, config):
-    if not _project_exists(input_args.project_name):
+    user = _create_user(input_args, config)
+
+    if user and input_args.project_name and not _project_exists(input_args.project_name):
         from projects.models import Project
         sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM,
                         'prediction-score-min': Project.UNCERTAINTY}
-        user = _create_user(input_args, config)
         _create_project(
             title=input_args.project_name,
             user=user,
@@ -185,7 +199,7 @@ def _init(input_args, config):
             sampling=sampling_map.get(input_args.sampling, 'sequential'),
             ml_backends=input_args.ml_backends
         )
-    else:
+    elif input_args.project_name:
         print('Project "{0}" already exists'.format(input_args.project_name))
 
 
@@ -298,6 +312,21 @@ def main():
         calculate_stats_all_orgs(input_args.from_scratch, redis=True)
         return
 
+    if input_args.command == 'export':
+        from tasks.functions import export_project
+
+        try:
+            filename = export_project(
+                input_args.project_id, input_args.export_format, input_args.export_path,
+                serializer_context=input_args.export_serializer_context
+            )
+        except Exception as e:
+            logger.exception(f'Failed to export project: {e}')
+        else:
+            logger.info(f'Project exported successfully: {filename}')
+
+        return
+
     # print version
     if input_args.command == 'version' or input_args.version:
         from label_studio import __version__
@@ -315,7 +344,7 @@ def main():
 
         print('')
         print('Label Studio has been successfully initialized.')
-        if input_args.command != 'start':
+        if input_args.command != 'start' and input_args.project_name:
             print('Start the server: label-studio start ' + input_args.project_name)
             return
 
@@ -326,11 +355,11 @@ def main():
         sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM,
                         'prediction-score-min': Project.UNCERTAINTY}
 
-        if not _project_exists(input_args.project_name):
+        if input_args.project_name and not _project_exists(input_args.project_name):
             migrated = False
             project_path = pathlib.Path(input_args.project_name)
             if project_path.exists():
-                print('Project directory from previous verion of label-studio found')
+                print('Project directory from previous version of label-studio found')
                 print('Start migrating..')
                 config_path = project_path / 'config.json'
                 config = _get_config(config_path)

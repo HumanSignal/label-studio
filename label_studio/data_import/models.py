@@ -1,11 +1,9 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import os
-import io
 import uuid
 import logging
 import pandas as pd
-import htmlmin
 from collections import Counter
 try:
     import ujson as json
@@ -13,6 +11,7 @@ except:
     import json
 
 from django.db import models
+from core.feature_flags import flag_set
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
 
@@ -33,6 +32,7 @@ class FileUpload(models.Model):
     file = models.FileField(upload_to=upload_name_generator)
 
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
     @property
@@ -42,7 +42,10 @@ class FileUpload(models.Model):
     @property
     def url(self):
         if settings.HOSTNAME and settings.CLOUD_FILE_STORAGE_ENABLED:
-            return settings.HOSTNAME + self.file.url
+            if flag_set('ff_back_dev_2915_storage_nginx_proxy_26092022_short', self.project.organization.created_by):
+                return self.file.url
+            else:
+                return settings.HOSTNAME + self.file.url
         elif settings.FORCE_SCRIPT_NAME:
             return settings.FORCE_SCRIPT_NAME + '/' + self.file.url.lstrip('/')
         else:
@@ -107,8 +110,7 @@ class FileUpload(models.Model):
 
     def read_task_from_hypertext_body(self):
         logger.debug('Read 1 task from hypertext file {}'.format(self.file.name))
-        data = self.content
-        body = htmlmin.minify(data, remove_all_empty_space=True)
+        body = self.content
         tasks = [{'data': {settings.DATA_UNDEFINED_NAME: body}}]
         return tasks
 

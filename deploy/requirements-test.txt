@@ -10,3 +10,6 @@ fakeredis==1.5.0
 pytest-env==0.6.2
 responses==0.13.0
 pytest-xdist~=2.5.0
+importlib-metadata==4.13.0;python_version < '3.8'
+psutil==5.9.4
+

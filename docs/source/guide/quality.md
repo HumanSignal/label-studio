@@ -1,18 +1,23 @@
 ---
 title: Review annotations in Label Studio
 short: Review annotations
-badge: <i class='ent'></i>
+tier: enterprise
 type: guide
-order: 410
+order: 300
+order_enterprise: 113
 meta_title: Review annotation quality in Label Studio
-meta_description: Review the annotations produced by annotators in your Label Studio data labeling projects and evaluate annotator performance against ground truth annotations, predictions, and other annotator's annotations to produce high-quality data for your machine learning models.
+meta_description: In data labeling projects, start evaluating annotator performance against ground truth annotations, predictions, and other annotator's annotations.
+section: "Quality control"
+
 ---
 
 After multiple labelers have annotated tasks, review their output to validate the quality of the results. You can also perform this task after a model has predicted labels for tasks in your dataset. To configure the settings for reviewing annotations, see [Set up review settings for your project](setup_project.html#Set-up-review-settings-for-your-project).
 
-<div class="enterprise"><p>
-The annotation review workflow is only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
-</p></div>
+<div class="enterprise-only">
+
+The annotation review workflow is only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="https://labelstud.io/guide/label_studio_compare.html">Label Studio Features</a> to learn more.
+
+</div>
 
 ## Why review annotations?
 
@@ -24,13 +29,14 @@ After you [assign reviewers to tasks](#Assign-reviewers-to-tasks), they can revi
 
 1. Reviewers can click **Review Annotations** for a specific project, then click **Review All Tasks** on the Data Manager to start reviewing tasks. Administrators and project managers can click **Explore All Reviews** from the Data Manager or **Explore Review** from the Dashboard to review tasks.
 2. Review the first task and annotation. By default, you view the tasks in numeric order. If you want to change the order that you review tasks, see [Choose what to review](#Choose-what-to-review). You can see the annotator and their annotation. 
-- If the annotation is correct, click **Accept**.
-- If the annotation is mostly correct, you can correct it by selecting a different option, changing the selected region, moving the bounding box, or whichever makes sense for the type of label you're reviewing. After correcting the annotation, click **Fix & Accept**. 
-- If the annotation is completely incorrect, or you don't want to attempt to correct it at all, click **Reject** to reject the annotation. To place a rejected task back in the Label Stream for annotation, you must delete the annotation. Rejecting an annotation does not return it to annotators to re-label.
+    - If the annotation is correct, click **Accept**.
+    - If the annotation is mostly correct, you can correct it by selecting a different option, changing the selected region, moving the bounding box, or whichever makes sense for the type of label you're reviewing. After correcting the annotation, click **Fix & Accept**. 
+    - If the annotation is completely incorrect, or you don't want to attempt to correct it at all, click **Reject** to reject the annotation. To place a rejected task back in the Label Stream for annotation, you must delete the annotation. Rejecting an annotation does not return it to annotators to re-label.
 After you complete a review, the next task appears for your review.
 3. Continue reviewing annotated tasks until you've reviewed all annotated tasks. Click **Data Manager** to return to the list of tasks for the project.
 
-> If there are multiple annotations, you can select the tab of each annotation by annotator and result ID to view them separately. The [annotation result ID](labeling.html#How-Label-Studio-saves-results-in-annotations) is different from the task ID visible in the left menu. To see annotations side-by-side, you can click the task in the Data Manager and view a grid of annotations in the task preview mode.
+!!! note 
+    If there are multiple annotations, you can select the tab of each annotation by annotator and result ID to view them separately. The [annotation result ID](labeling.html#How-Label-Studio-saves-results-in-annotations) is different from the task ID visible in the left menu. To see annotations side-by-side, you can click the task in the Data Manager and view a grid of annotations in the task preview mode.
 
 ### Choose what to review
 
@@ -38,6 +44,49 @@ You can review tasks in random order, or order tasks in the project data manager
 - Order tasks by annotator, to review annotations and assess individual annotator performance at the same time.
 - Order tasks by agreement, to review annotations with more uncertainty among annotators first. 
 - Order tasks by model confidence score, to review the annotations that a machine learning model was less certain about first. 
+
+### Navigate between tasks or annotations
+
+You can now navigate back through the review stream in the same path as moving forward when `Mark task as reviewed after all annotations are processed` option is set. The go back (`<`)functionality takes you back through the same set of annotations as it had moving forward.
+
+1. As an **ADMINISTRATOR**, log in to the [Label Studio app](https://app.heartex.com/projects/?page=1).
+
+2. Navigate to **All Projects** page, if needed.
+
+3. Open any project.
+
+4. Observe that you are taken to **Data Manager**.
+
+5. Navigate to **Settings** >> **Review**.
+
+6. Select `Mark task as reviewed after all annotations are processed` option.
+
+7. Click **SAVE** button.
+
+8. Navigate back to Data Manager.
+
+9. Make sure to have several tasks set up with exactly two annotations each, but no reviews.
+
+10. Click **REVIEW ALL TASKS** button.
+
+11. Observe that you are taken to Review Stream.
+
+12. Note the task or annotation that you are on.
+
+13. Complete review for this annotation.
+
+14. Observe that you are taken to same task (second annotation).
+
+15. Repeat steps 12 to 14 for couple more times.
+
+16. Navigate back through the Review Stream using the go back (`<`) button.
+
+!!! note 
+    Confirm that you are not taken through the same path that you have come through moving forward.
+
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/go-back-reviewstream.png" style="opacity: 0.8"/></div>
+<i>Figure 1: Go back to the previous task. </i>
 
 ### Assign reviewers to tasks
 As an administrator or project manager, you can assign reviewers to tasks, or people with access can review tasks on an ad hoc basis. Anyone who is assigned to a task or who completes a review of a task appears in the **Reviewers** column on the Data Manager. You must first [add a reviewer to the project](setup_project.html#Add-members-to-a-project) or [add members to the project workspace](manage_users.html#Add-or-remove-members-to-a-workspace) before you can assign them as a reviewer.
@@ -99,13 +148,16 @@ To see the specific annotations contributing to the agreement, do the following:
 ### Review agreement distribution across tasks
 You can also review the distribution of agreement percentages across project tasks. A bar chart depicts the number of tasks with a specific agreement percentage. The more tasks with higher agreement, the higher quality your dataset is likely to be. Clusters of agreement percentages for specific tasks might mean that some tasks are easier to label than others, while other tasks are more confusing and difficult to label consistently. 
 
+
 ## Review annotations against ground truth annotations 
 
 Define ground truth annotations in a Label Studio project. Use ground truth annotations to assess the quality of your annotated dataset. Review ground truths to make sure that annotators are accurately labeling data at the start of the project, and continually throughout the lifecycle of the training dataset creation.
 
 Label Studio Enterprise compares annotations from annotators and model predictions against the ground truth annotations for a task to calculate an accuracy score between 0 and 1.
 
-> Ground truth annotations are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Label Studio Features](label_studio_compare.html) to learn more.
+!!! note 
+    Ground truth annotations are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Label Studio Features](https://labelstud.io/guide/label_studio_compare.html) to learn more.
+
 
 ## Define ground truth annotations for a project
 
@@ -116,6 +168,7 @@ Set specific task annotations as ground truth annotations from the **Data Manage
 3. In the annotation sidebar for the task, click the star icon next to the annotation ID to set the annotation result as a ground truth.
 
 A task can only have one annotation set as the ground truth annotation for the task. If you set a new annotation for a task as a ground truth, the previous annotation for that task set as a ground truth is updated to no longer be a ground truth annotation. 
+
 
 ## Manage ground truth annotations for a project
 

@@ -10,6 +10,8 @@ DATABASES = {'default': DATABASES_ALL[DJANGO_DB]}
 
 MIDDLEWARE.append('organizations.middleware.DummyGetSessionMiddleware')
 MIDDLEWARE.append('core.middleware.UpdateLastActivityMiddleware')
+if INACTIVITY_SESSION_TIMEOUT_ENABLED:
+    MIDDLEWARE.append('core.middleware.InactivitySessionTimeoutMiddleWare')
 
 ADD_DEFAULT_ML_BACKENDS = False
 
@@ -19,7 +21,7 @@ DEBUG = get_bool_env('DEBUG', False)
 
 DEBUG_PROPAGATE_EXCEPTIONS = get_bool_env('DEBUG_PROPAGATE_EXCEPTIONS', False)
 
-SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = get_bool_env('SESSION_COOKIE_SECURE', False)
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
@@ -60,5 +62,4 @@ try:
 except IOError:
     FEATURE_FLAGS_FROM_FILE = False
 
-
-
+STORAGE_PERSISTENCE = get_bool_env('STORAGE_PERSISTENCE', True)

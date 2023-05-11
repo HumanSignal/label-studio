@@ -2,6 +2,7 @@
 """
 import os
 import pytest
+import mock
 import ujson as json
 import requests_mock
 import re
@@ -10,9 +11,11 @@ import logging
 import shutil
 import tempfile
 
+from unittest import mock
 from moto import mock_s3
 from copy import deepcopy
 from pathlib import Path
+from datetime import timedelta
 
 from django.conf import settings
 from projects.models import Project
@@ -20,6 +23,8 @@ from tasks.models import Task
 from users.models import User
 from organizations.models import Organization
 from types import SimpleNamespace
+
+from label_studio.core.utils.params import get_bool_env, get_env
 
 # if we haven't this package, pytest.ini::env doesn't work 
 try:
@@ -30,7 +35,7 @@ except ImportError:
 
 from .utils import (
     create_business, signin, gcs_client_mock, ml_backend_mock, register_ml_backend_mock, azure_client_mock,
-    redis_client_mock, make_project
+    redis_client_mock, make_project, import_from_url_mock
 )
 
 boto3.set_stream_logger('botocore.credentials', logging.DEBUG)
@@ -39,6 +44,11 @@ boto3.set_stream_logger('botocore.credentials', logging.DEBUG)
 @pytest.fixture(autouse=False)
 def enable_csrf():
     settings.USE_ENFORCE_CSRF_CHECKS = True
+
+
+@pytest.fixture(autouse=False)
+def label_stream_history_limit():
+    settings.LABEL_STREAM_HISTORY_LIMIT = 1
 
 
 @pytest.fixture(autouse=True)
@@ -152,6 +162,12 @@ def redis_client():
 @pytest.fixture(autouse=True)
 def ml_backend():
     with ml_backend_mock() as m:
+        yield m
+
+
+@pytest.fixture(name='import_from_url')
+def import_from_url():
+    with import_from_url_mock() as m:
         yield m
 
 
@@ -398,6 +414,39 @@ def get_server_url(live_server):
     yield live_server.url
 
 
+@pytest.fixture(name="async_import_off", autouse=True)
+def async_import_off():
+    from core.feature_flags import flag_set
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'fflag_feat_all_lsdv_4915_async_task_import_13042023_short':
+            return False
+        return flag_set(*args, **kwargs)
+    with mock.patch('data_import.api.flag_set', wraps=fake_flag_set):
+        yield
+
+
+@pytest.fixture(name="fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on")
+def fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on():
+    from core.feature_flags import flag_set
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short':
+            return True
+        return flag_set(*args, **kwargs)
+    with mock.patch('tasks.models.flag_set', wraps=fake_flag_set):
+        yield
+
+
+@pytest.fixture(name="fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off")
+def fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off():
+    from core.feature_flags import flag_set
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short':
+            return False
+        return flag_set(*args, **kwargs)
+    with mock.patch('tasks.models.flag_set', wraps=fake_flag_set):
+        yield
+
+
 @pytest.fixture(name="local_files_storage")
 def local_files_storage(settings):
     settings.LOCAL_FILES_SERVING_ENABLED = True
@@ -419,3 +468,10 @@ def local_files_document_root_tempdir(settings):
 def local_files_document_root_subdir(settings):
     tempdir = Path(tempfile.gettempdir()) / Path('files')
     settings.LOCAL_FILES_DOCUMENT_ROOT = str(tempdir)
+
+
+@pytest.fixture(name="testing_session_timeouts")
+def set_testing_session_timeouts(settings):
+    # TODO: functional tests should not rely on exact timings
+    settings.MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(seconds=5).total_seconds()))
+    settings.MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(seconds=2).total_seconds()))

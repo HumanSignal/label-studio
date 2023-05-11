@@ -94,14 +94,11 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: htx
+theme: v2
 
-# Deployment
-deploy:
-  type: aws-s3
-  region: us-east-1
-  bucket: labelstud.io
-
+sitemap:
+  path: 
+    - sitemap-docs.xml
 
 search:
   path: search.xml

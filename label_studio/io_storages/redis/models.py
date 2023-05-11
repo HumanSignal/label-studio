@@ -8,8 +8,16 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
+
 from tasks.models import Annotation
+from io_storages.base_models import (
+    ExportStorage,
+    ExportStorageLink,
+    ImportStorage,
+    ImportStorageLink,
+    ProjectStorageMixin
+)
+
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +59,7 @@ class RedisStorageMixin(models.Model):
             # This should never happen, but better to check than to accidentally
             # overwrite an existing database by choosing a wrong default:
             raise ValueError(
-                "Please explicitely pass a redis db id to prevent accidentally overwriting existing database!")
+                "Please explicitly pass a redis db id to prevent accidentally overwriting existing database!")
 
         # Since tasks are always text, we use StrictRedis with utf-8 decoding.
         r = redis.StrictRedis(db=db, charset="utf-8", decode_responses=True, **redis_config)
@@ -69,7 +77,7 @@ class RedisStorageMixin(models.Model):
         return self.get_redis_connection(db=self.db, redis_config=redis_config)
 
 
-class RedisImportStorage(ImportStorage, RedisStorageMixin):
+class RedisImportStorageBase(ImportStorage, RedisStorageMixin):
     db = models.PositiveSmallIntegerField(
         _('db'), default=1,
         help_text='Server Database')
@@ -98,6 +106,14 @@ class RedisImportStorage(ImportStorage, RedisStorageMixin):
             client = self.get_client()
         client.ping()
 
+    class Meta:
+        abstract = True
+
+
+class RedisImportStorage(ProjectStorageMixin, RedisImportStorageBase):
+    class Meta:
+        abstract = False
+
 
 class RedisExportStorage(ExportStorage, RedisStorageMixin):
     db = models.PositiveSmallIntegerField(
@@ -120,8 +136,8 @@ class RedisExportStorage(ExportStorage, RedisStorageMixin):
 
 
 @receiver(post_save, sender=Annotation)
-def export_annotation_to_s3_storages(sender, instance, **kwargs):
-    project = instance.task.project
+def export_annotation_to_redis_storages(sender, instance, **kwargs):
+    project = instance.project
     if hasattr(project, 'io_storages_redisexportstorages'):
         for storage in project.io_storages_redisexportstorages.all():
             logger.debug(f'Export {instance} to Redis storage {storage}')

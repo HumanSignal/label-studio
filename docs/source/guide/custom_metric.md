@@ -1,24 +1,29 @@
 ---
 title: Add a custom agreement metric to Label Studio
 short: Custom agreement metric
-badge: <i class='ent'></i>
+tier: enterprise
 type: guide
-order: 414
+order: 301
+order_enterprise: 115
 meta_title: Add a Custom Agreement Metric for Labeling
 meta_description: Label Studio Enterprise documentation about how to add a custom agreement metric to use for assessing annotator agreement or the quality of your annotation and prediction results for data labeling and machine learning projects.
+section: "Quality control"
+
 ---
+
 
 Write a custom agreement metric to assess the quality of the predictions and annotations in your Label Studio Enterprise project. Label Studio Enterprise contains a variety of [agreement metrics for your project](stats.html) but if you want to evaluate annotations using a custom metric or a standard metric not available in Label Studio, you can write your own. 
 
 This functionality is only available for Label Studio Enterprise Cloud customers, or for [customers running Label Studio Enterprise in a private cloud](#Set-up-permissions-for-a-private-cloud-custom-agreement-metric) with Amazon Web Services Elastic Compute Cluster [(AWS EC2)](https://aws.amazon.com/ec2/) or Amazon Elastic Kubernetes Service [(EKS)](https://aws.amazon.com/eks/).
 
-<div class="enterprise"><p>
-Label Studio Enterprise Edition includes various annotation and labeling statistics and the ability to add your own. The open source Community Edition of Label Studio does not contain these calculations. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
-</p></div>
+
+Label Studio Enterprise Edition includes various annotation and labeling statistics and the ability to add your own. The open source Community Edition of Label Studio does not contain these calculations. If you're using Label Studio Community Edition, see <a href="https://labelstud.io/guide/label_studio_compare.html">Label Studio Features</a> to learn more.
+
 
 1. Review the [prerequisites](#Prerequisites).
 2. [Write your custom agreement metric](#How-to-write-your-custom-agreement-metric).
 3. [Add your custom agreement metric to Label Studio Enterprise](#Add-your-custom-agreement-metric-to-Label-Studio-Enterprise).
+
 
 ## Prerequisites
 
@@ -94,11 +99,19 @@ def agreement(annotation_1, annotation_2, per_label=False) -> float:
 
 Set up a custom agreement metric for a specific project in Label Studio Enterprise. 
 
-> You must configure the labeling interface before you can add your custom agreement metric. 
+!!! note 
+    You must configure the labeling interface before you can add your custom agreement metric. 
+
+!!! attention "important"
+        [Using tags on Lambda functions](https://docs.aws.amazon.com/lambda/latest/dg/configuration-tags.html) is an on-premise only feature.
+    
 
 1. Within a project on the Label Studio UI, click **Settings**.
 2. Click **Quality**.
-3. Under **Annotation Agreement**, use the drop-down menu to select **Custom agreement metric**.
+3. Under **Annotation Agreement**:
+    - **Metric name**: Use the drop-down menu to select **Custom agreement metric**.
+    - **Lambda Tags**: Add tags to AWS Lambda function using the syntax `tag_name tag_value`.
+    - **Lambda Prefix**: Select a Prefix.
 4. Write or paste code defining a custom agreement metric in the text box. 
 5. Click **Save & Deploy**.
 
@@ -118,9 +131,9 @@ If you have Label Studio Enterprise deployed in a private cloud (self-managed) A
 To set up the permissions, do the following: 
 1. [Create an AWS IAM role](#Create-an-AWS-IAM-role-for-logging) to be used by the custom metric Lambda functions to store logs in Cloudwatch 
 2. Set up permissions that grant access to AWS Lambda. How you do this depends on your deployment scenario:
-   - [Deployed with Docker Compose running in EC2](#Deployed-with-Docker-Compose-running-in-EC2)
-   - [Deployed in EKS with an OIDC provider](#Deployed-in-EKS-with-an-OIDC-provider)
-   - [Deployed in EKS without an OIDC provider](#Deployed-in-EKS-without-an-OIDC-provider)
+   - [Deployed with Docker Compose running in EC2](#Deployed-with-Docker-Compose-running-in-EC2).
+   - [Deployed in EKS with an OIDC provider](#Deployed-in-EKS-with-an-OIDC-provider).
+   - [Deployed in EKS without an OIDC provider](#Deployed-in-EKS-without-an-OIDC-provider).
 
 You must know the AWS account ID for the AWS account that you use to manage Label Studio Enterprise to perform these steps. 
 
@@ -172,7 +185,11 @@ If you deployed Label Studio Enterprise using Docker Compose in an AWS EC2 insta
 3. Select **Create policy** and attach the [`LSE_AllowInteractLambda` policy](#Create-an-IAM-policy-to-grant-AWS-Lambda-permissions).
 4. When you finish creating the user, save the username and access key somewhere secure.
 5. In the `docker-compose.yaml` file that you use to deploy Label Studio Enterprise, add the following environment variables in the `app` and `rqworkers` sections:
-> Update `YOUR_AWS_ACCESS_KEY_ID`, `YOUR_AWS_SECRET_ACCESS_KEY` and `YOUR_AWS_ACCOUNT` with the credentials for the account created in step one, and updating `YOUR_AWS_REGION` with the AWS region that your EC2 instance exists in:
+
+!!! attention "important" 
+    Update:
+    - `YOUR_AWS_ACCESS_KEY_ID`, `YOUR_AWS_SECRET_ACCESS_KEY` and `YOUR_AWS_ACCOUNT` with the credentials for the account created in step 1. 
+    - `YOUR_AWS_REGION` with the AWS region that your EC2 instance exists in the following:
 ```
 AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
@@ -189,8 +206,7 @@ After you set up these permissions in your environment, you're ready to write yo
 If you deployed Label Studio Enterprise in Amazon Elastic Kubernetes Service (EKS) with OpenID Connect (OIDC) for identity and access management (IAM), do the following to finish setting up permissions for the custom agreement metric functionality:
 1. Create an AWS IAM role named `LSE_ServiceAccountApp` following the steps to create a role to delegate permissions to an AWS service in the AWS Identity and Access Management documentation for [Creating a role for an AWS service (console)](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-service.html#roles-creatingrole-service-console).
 2. When relevant, attach the [`LSE_AllowInteractLambda` policy](#Create-an-IAM-policy-to-grant-AWS-Lambda-permissions) to the `LSE_ServiceAccountApp` role. 
-3. Update your helm `values.yaml` file to include the following map. 
-> Replace `YOUR_AWS_ACCOUNT` with your AWS account ID:
+3. Update your helm `values.yaml` file to include the following map. Replace `YOUR_AWS_ACCOUNT` with your AWS account ID:
 ```yaml
 app:
   serviceAccount:
@@ -221,34 +237,46 @@ After you set up these permissions in your environment, you're ready to write yo
 To grant permissions to a specific user, role, or EKS node group used to manage Label Studio Enterprise access to interact with AWS Lambda, use the following IAM policy. Create an IAM policy called `LSE_AllowInteractLambda` and replace `YOUR_AWS_ACCOUNT` with your AWS account ID:
 ```json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "VisualEditor0",
-            "Effect": "Allow",
-            "Action": "iam:PassRole",
-            "Resource": "arn:aws:iam::YOUR_AWS_ACCOUNT:role/LSE_CustomMetricsExecuteRole"
-        },
-        {
-            "Sid": "VisualEditor1",
-            "Effect": "Allow",
-            "Action": [
-                "lambda:CreateFunction",
-                "lambda:UpdateFunctionCode",
-                "lambda:InvokeFunction",
-                "lambda:GetFunction",
-                "lambda:DeleteFunction"
-            ],
-            "Resource": [
-      "arn:aws:lambda:*:YOUR_AWS_ACCOUNT:function:custom-metric-*"
-            ]
-        },
-        {
-            "Sid": "VisualEditor2",
-            "Effect": "Allow",
-            "Action": "lambda:ListFunctions",
-            "Resource": "*"
-        }
-    ]
+   "Version": "2012-10-17",
+   "Statement": [
+      {
+         "Sid": "VisualEditor0",
+         "Effect": "Allow",
+         "Action": "iam:PassRole",
+         "Resource": "arn:aws:iam::YOUR_AWS_ACCOUNT:role/LSE_CustomMetricsExecuteRole"
+      },
+      {
+         "Sid": "VisualEditor1",
+         "Effect": "Allow",
+         "Action": [
+            "lambda:CreateFunction",
+            "lambda:UpdateFunctionCode",
+            "lambda:InvokeFunction",
+            "lambda:GetFunction",
+            "lambda:DeleteFunction",
+            "lambda:TagResource",
+            "lambda:ListTags"
+         ],
+         "Resource": [
+            "arn:aws:lambda:*:YOUR_AWS_ACCOUNT:function:custom-metric-*"
+         ]
+      },
+      {
+         "Sid": "VisualEditor2",
+         "Effect": "Allow",
+         "Action": "lambda:ListFunctions",
+         "Resource": "*"
+      },
+      {
+         "Action": [
+            "logs:StartQuery",
+            "logs:GetQueryResults"
+         ],
+         "Effect": "Allow",
+         "Resource": [
+            "arn:aws:logs:*:YOUR_AWS_ACCOUNT:log-group:/aws/lambda/custom-metric-*"
+         ]
+      }
+   ]
 }
 ```

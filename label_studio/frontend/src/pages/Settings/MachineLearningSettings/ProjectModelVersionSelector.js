@@ -7,13 +7,19 @@ import { ProjectContext } from '../../../providers/ProjectProvider';
 export const ProjectModelVersionSelector = ({
   name = "model_version",
   valueName = "model_version",
-  apiName = "projecModelVersions",
+  apiName = "projectModelVersions",
   placeholder = "No model version selected",
   ...props
 }) => {
   const api = useAPI();
   const { project, updateProject } = useContext(ProjectContext);
+  const [loading, setLoading] = useState(true);
   const [versions, setVersions] = useState([]);
+  const [version, setVersion] = useState(null);
+
+  useEffect(() => {
+    setVersion(project?.[valueName] || null);
+  }, [project?.[valueName]]);
 
   const resetMLVersion = useCallback(async (e) => {
     e.preventDefault();
@@ -35,15 +41,17 @@ export const ProjectModelVersionSelector = ({
       },
     });
 
-    if (!modelVersions) return;
+    if (modelVersions) {
+      setVersions(Object.entries(modelVersions).reduce((v, [key, value]) => [...v, {
+        value: key,
+        label: `${key} (${value} predictions)`,
+      }], []));
+    }
 
-    setVersions(project.entries(modelVersions).reduce((v, [key, value]) => [...v, {
-      value: key,
-      label: key + " (" + value + " predictions)",
-    }], []));
-  }, [api, project?.id, apiName]);
+    setLoading(false);
+  }, [project?.id, apiName]);
 
-  useEffect(fetchMLVersions, []);
+  useEffect(fetchMLVersions, [fetchMLVersions]);
 
   return (
     <Form.Row columnCount={1}>
@@ -52,10 +60,10 @@ export const ProjectModelVersionSelector = ({
         description={(
           <>
             Model version allows you to specify which prediction will be shown to the annotators.
-            {project.model_version && (
+            {version && (
               <>
                 <br />
-                <b>Current project model version: {project.model_version}</b>
+                <b>Current project model version: {version}</b>
               </>
             )}
           </>
@@ -69,9 +77,10 @@ export const ProjectModelVersionSelector = ({
           <Select
             name={name}
             disabled={!versions.length}
-            defaultValue={project?.[valueName] || null}
+            value={version}
+            onChange={e => setVersion(e.target.value)}
             options={versions}
-            placeholder={placeholder}
+            placeholder={loading ? "Loading ..." : placeholder}
             {...props}
           />
         </div>

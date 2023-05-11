@@ -3,6 +3,7 @@ node_modules
 *.pyc
 *.ipynb
 __pycache__
+.local/
 
 # docs
 __generated__
@@ -73,3 +74,8 @@ docker-compose.override.yml
 .config/*
 .python_history
 .viminfo
+.bash_history
+
+# if you want to include feature flags - use 
+# git add -f label_studio/feature_flags.json
+label_studio/feature_flags.json

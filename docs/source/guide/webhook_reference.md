@@ -1,10 +1,14 @@
 ---
 title: Webhook event format reference 
-short: Webhooks Event Reference
+short: Webhook event reference
 type: guide
-order: 653
+tier: all
+order: 218
+order_enterprise: 125
 meta_title: Label Studio Webhook Event Reference 
 meta_description: Label Studio reference documentation for webhook event fields and payloads sent from Label Studio for integration with your machine learning pipeline. 
+section: "Integration and Development"
+
 ---
 
 Label Studio includes several types of webhook events that trigger when specific actions occur. Refer to the details on this page to determine what information is included in the payload of each webhook event. For details about how to use webhooks and to set up webhooks in Label Studio, see [Set up webhooks in Label Studio](webhooks.html). To create your own webhooks in Label Studio to trigger events when specific actions happen, see [Create custom events for webhooks in Label Studio](webhook_create.html). 
@@ -61,7 +65,7 @@ The webhook payload includes the name of the action and some additional task dat
         {
             "id": 21,
             "data": {
-                "ner": "Opossums like to be aloft \n\n\n\n\n\nin trees."
+                "ner": "Opossums like to be aloft \n\n\n\n\n\n in trees."
             },
             "meta": {},
             "created_at": "2021-08-17T13:51:02.590839Z",

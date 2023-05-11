@@ -3,6 +3,8 @@
 import logging
 import ujson as json
 
+from functools import reduce
+from operator import getitem
 from urllib.parse import urlparse
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
@@ -33,7 +35,7 @@ _DATA_TYPES = {
     'ParagraphLabels': [str, list],
     'RectangleLabels': [str, list],
     'TimeSeriesLabels': [str, list],
-    'Taxonomy': [str, list],
+    'Taxonomy': [str, list, type(None)],
 }
 logger = logging.getLogger(__name__)
 
@@ -63,23 +65,31 @@ class TaskValidator:
             is_array = '[' in data_key
             data_key = data_key.split('[')[0]
 
-            if data_key not in data:
-                raise ValidationError('"{data_key}" key is expected in task data'.format(data_key=data_key))
+            if "." in data_key:
+                keys = data_key.split(".")
+                try:
+                    data_item = reduce(getitem, keys, data)
+                except KeyError:
+                    raise ValidationError('"{data_key}" key is expected in task data'.format(data_key=data_key))
+            else:
+                if data_key not in data:
+                    raise ValidationError('"{data_key}" key is expected in task data'.format(data_key=data_key))
+                data_item = data[data_key]
 
             if is_array:
                 expected_types = (list, )
             else:
                 expected_types = _DATA_TYPES.get(data_type, (str,))
 
-            if not isinstance(data[data_key], tuple(expected_types)):
+            if not isinstance(data_item, tuple(expected_types)):
                 raise ValidationError('data[\'{data_key}\']={data_value} is of type \'{type}\', '
                                       "but the object tag {data_type} expects the following types: {expected_types}"
-                                      .format(data_key=data_key, data_value=data[data_key],
-                                              type=type(data[data_key]).__name__, data_type=data_type,
+                                      .format(data_key=data_key, data_value=data_item,
+                                              type=type(data_item).__name__, data_type=data_type,
                                               expected_types=[e.__name__ for e in expected_types]))
 
             if data_type == 'List':
-                for item in data[data_key]:
+                for item in data_item:
                     key = 'text'  # FIXME: read key from config (elementValue from List)
                     if key not in item:
                         raise ValidationError('Each item from List must have key "' + key + '"')
@@ -154,7 +164,7 @@ class TaskValidator:
             self.raise_if_wrong_class(task, 'annotations', list)
             for annotation in task.get('annotations', []):
                 if not isinstance(annotation, dict):
-                    logger.warning('Annotation must be dict, but "%s" found', str(annotation))
+                    logger.warning('Annotation must be dict, but "%s" found', str(type(annotation)))
                     continue
 
                 ok = 'result' in annotation
@@ -169,7 +179,7 @@ class TaskValidator:
             self.raise_if_wrong_class(task, 'predictions', list)
             for prediction in task.get('predictions', []):
                 if not isinstance(prediction, dict):
-                    logger.warning('Prediction must be dict, but "%s" found', str(prediction))
+                    logger.warning('Prediction must be dict, but "%s" found', str(type(prediction)))
                     continue
 
                 ok = 'result' in prediction

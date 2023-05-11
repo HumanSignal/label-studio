@@ -1,0 +1,251 @@
+name: "Docker release promote"
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag for promotion"
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      release_tag:
+        required: true
+        type: string
+
+env:
+  DOCKER_IMAGE_TAG_CHECK_NAME: "Docker image tag"
+  IMAGE_NAME: "heartexlabs/label-studio"
+  RELEASE_DOCKERFILE: "Dockerfile.release"
+  PREFLIGHT_REPO: "quay.io/opdev/preflight:stable"
+  DOCKER_CONFIG_PATH: "/home/runner/.docker/config.json"
+  LAUNCHDARKLY_DOWNLOAD_PATH: "feature_flags.json"
+
+jobs:
+  docker_release_retag:
+    name: "Docker image"
+    timeout-minutes: 45
+    runs-on: ubuntu-latest
+    outputs:
+      image_version: ${{ steps.get_info.outputs.image_version }}
+    steps:
+      - uses: hmarr/debug-action@v2.1.0
+
+      - name: Get an artifact from check suite
+        uses: actions/github-script@v6
+        id: get_info
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const {repo, owner} = context.repo;
+            const check_runs = await github.paginate(
+              github.rest.checks.listForRef,
+              {
+                owner,
+                repo,
+                ref: 'tags/${{ inputs.release_tag }}',
+                status: "completed",
+                per_page: 100
+              },
+              (response) => response.data
+            );
+            const check = check_runs.find(e => e.name === '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}')
+            const details = JSON.parse(check.output.summary)
+            console.log(details)
+            core.setOutput("branch", details.branch);
+            core.setOutput("pretty_branch_name", details.pretty_branch_name);
+            core.setOutput("image_version", details.image_version);
+            core.setOutput("sha", details.sha);
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.release_tag }}
+
+      - name: Check is latest tag needs to be updated
+        uses: actions/github-script@v6
+        id: generate-tags
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const {repo, owner} = context.repo;
+            const newTag = '${{ inputs.release_tag }}';
+            const dockerHubImageName = '${{ env.IMAGE_NAME }}';
+            const redHatImageName = 'quay.io/redhat-isv-containers/${{ secrets.REDHAT_MARKETPLACE_LS_PROJECT_ID }}';
+            const regexp = '^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)(\.post([0-9]+))?$';
+            
+            function compareVersions(a, b) {
+              if (a[1] === b[1])
+                if (a[2] === b[2])
+                  if (a[3] === b[3])
+                    return (+a[5] || -1) - (+b[5] || -1)
+                  else
+                    return +a[3] - b[3]
+                else
+                  return +a[2] - b[2]
+              else
+                return +a[1] - b[1]
+            }
+            
+            const tags = await github.paginate(
+              github.rest.repos.listTags,
+              {
+                owner,
+                repo,
+                per_page: 100
+              },
+              (response) => response.data
+            );
+            const rawTags = tags.map(e => e.name)
+            const filteredTags = rawTags.filter(e => e.match(regexp))
+            const sortedTags = filteredTags
+              .map(e => e.match(regexp))
+              .sort(compareVersions)
+              .reverse()
+            console.log('Sorted tags:')
+            console.log(sortedTags.map(e => e[0]))
+            
+            const newestVersion = sortedTags[0];
+            console.log(`Newest tag: ${newestVersion[0]}`)
+            
+            let dockerHubUbuntuRawTags = [newTag];
+            let dockerHubUbiRawTags = [`ubi_${newTag}`];
+            let redHatUbiRawTags = [newTag];
+            
+            
+            if (compareVersions(newTag.match(regexp), newestVersion) >= 0) {
+              console.log(`new tag ${newTag} is higher that all existing tags`)
+              console.log(dockerHubUbuntuRawTags)
+              dockerHubUbuntuRawTags.push('latest')
+              dockerHubUbiRawTags.push('ubi_latest')
+              redHatUbiRawTags.push('latest')
+              core.setOutput("latest", true);
+            } else {
+              console.log('not latest')
+              core.setOutput("latest", false);
+            }
+            
+            const ubuntuTags = dockerHubUbuntuRawTags.map(e => `${dockerHubImageName}:${e}`)
+            const redHatTags = redHatUbiRawTags.map(e => `${redHatImageName}:${e}`)
+            const ubiTags = redHatTags.concat(
+              dockerHubUbiRawTags.map(e => `${dockerHubImageName}:${e}`)
+            )
+            
+            console.log('Ubuntu tags:')
+            console.log(ubuntuTags)
+            console.log('Ubi tags:')
+            console.log(ubiTags)
+            
+            core.setOutput("ubuntu-tags", ubuntuTags.join(','));
+            core.setOutput("redhat-tags", redHatTags.join(','));
+            core.setOutput("ubi-tags", ubiTags.join(','));
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Create version_.py
+        run: |
+          python3 $(pwd)/label_studio/core/version.py
+          cat $(pwd)/label_studio/core/version_.py
+
+      - name: Download feature flags
+        env:
+          LAUNCHDARKLY_COMMUNITY_SDK_KEY: ${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}
+        run: |
+          set -xeuo pipefail
+          curl \
+            --connect-timeout 30 \
+            --retry 5 \
+            --retry-delay 10 \
+            -H "Authorization: $LAUNCHDARKLY_COMMUNITY_SDK_KEY" \
+            "https://sdk.launchdarkly.com/sdk/latest-all" >"${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }}"
+          if [ "$(jq 'has("flags")' <<< cat ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }})" = "true" ]; then 
+            echo "feature_flags.json is valid"
+          else
+            echo "feature_flags.json is invalid"
+            cat ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }}
+            exit 1
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2.5.0
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2.1.0
+        with:
+          username: heartexlabs
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to RedHat Registry
+        uses: docker/login-action@v2.1.0
+        with:
+          registry: quay.io
+          username: ${{ secrets.REDHAT_REGISTRY_LOGIN }}
+          password: ${{ secrets.REDHAT_REGISTRY_PASSWORD }}
+
+      - name: Prepare Release Dockerfile
+        id: release_dockerfile
+        env:
+          VERSION_OVERRIDE: ${{ inputs.release_tag }}
+          BRANCH_OVERRIDE: ${{ steps.get_info.outputs.branch }}
+        shell: bash
+        run: |
+          set -euo pipefail ${ACTIONS_STEP_DEBUG:+-x}
+
+          release_dir=release_${{ inputs.release_tag }}
+          echo "release_dir=$release_dir" >> $GITHUB_OUTPUT
+          mkdir -p $release_dir
+          cp label_studio/core/version_.py $release_dir/
+          cp ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }} $release_dir/
+          cd $release_dir
+
+          cat <<EOF > "${{ env.RELEASE_DOCKERFILE }}"
+          FROM ${{ env.IMAGE_NAME }}:${{ steps.get_info.outputs.image_version }}
+          COPY --chown=54546:0 version_.py /label-studio/label_studio/core/version_.py
+          COPY --chown=54546:0 ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }} /label-studio/label_studio/feature_flags.json
+          EOF
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Build and Push Release Ubuntu Docker image
+        uses: docker/build-push-action@v4.0.0
+        id: docker_build
+        with:
+          context: ${{ steps.release_dockerfile.outputs.release_dir }}
+          file: ${{ steps.release_dockerfile.outputs.release_dir }}/${{ env.RELEASE_DOCKERFILE }}
+          push: true
+          tags: ${{ steps.generate-tags.outputs.ubuntu-tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Copy compiled static from builded Docker image
+        run: |
+          # Usually it takes 10-20 sec so the image becomes available
+          sleep 10s
+          docker pull ${{ env.IMAGE_NAME }}:${{ inputs.release_tag }}
+          docker run -v ${{ github.workspace }}:/workspace:rw -u root --rm ${{ env.IMAGE_NAME }}:${{ inputs.release_tag }} cp -r /label-studio/label_studio/frontend/ /workspace/label_studio/
+
+      - name: Create Sentry release @ backend
+        uses: getsentry/action-release@v1
+        continue-on-error: true
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+        with:
+          version: label-studio@${{ inputs.release_tag }}
+          projects: opensource-v1-backend
+
+      - name: Create Sentry release @ frontend
+        uses: getsentry/action-release@v1
+        continue-on-error: true
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+        with:
+          version: label-studio@${{ inputs.release_tag }}
+          projects: opensource-v1-frontend
+          sourcemaps: label_studio/frontend/dist

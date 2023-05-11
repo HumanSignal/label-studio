@@ -1,10 +1,13 @@
 ---
-title: 
+title: Chatbot response generation with HuggingFace's GPT2 model
 type: blog
+tier: all
 order: 50
+meta_title: Chatbot response generation with HuggingFace's GPT2 model
+meta_description: Label Studio tutorial for Chatbot response generation with HuggingFace's GPT2 model
+
 ---
 
-## Chatbot response generation with HuggingFace's GPT2 model
 
 If you want to build a new chatbot, or just experiment with GPT-based text generators, this [Machine Learning backend](/guide/ml.html) example is for you! Powered by [HuggingFace's Transformers library](https://github.com/huggingface/transformers), 
 it connects a GPT2-like language model to the Label Studio UI, giving you an opportunity to explore different text responses based on the chat history.

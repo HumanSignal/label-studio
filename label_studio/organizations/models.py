@@ -8,7 +8,7 @@ from django.db.models import Q, Count
 
 from django.utils.translation import gettext_lazy as _
 
-from core.utils.common import create_hash, get_object_with_check_and_log, get_organization_from_request, load_func
+from core.utils.common import create_hash, get_organization_from_request, load_func
 
 logger = logging.getLogger(__name__)
 
@@ -65,14 +65,6 @@ class Organization(OrganizationMixin, models.Model):
         return self.title + ', id=' + str(self.pk)
 
     @classmethod
-    def from_request(cls, request):
-        if 'organization_pk' not in request.session:
-            logger.debug('"organization_pk" is missed in request.session: can\'t get Organization')
-            return
-        pk = get_organization_from_request(request)
-        return get_object_with_check_and_log(request, Organization, pk=pk)
-
-    @classmethod
     def create_organization(cls, created_by=None, title='Your Organization'):
         _create_organization = load_func(settings.CREATE_ORGANIZATION)
         return _create_organization(title=title, created_by=created_by)
@@ -113,6 +105,12 @@ class Organization(OrganizationMixin, models.Model):
             om.save()
 
             return om    
+
+    def remove_user(self, user):
+        OrganizationMember.objects.filter(user=user, organization=self).delete()
+        if user.active_organization_id == self.id:
+            user.active_organization = user.organizations.first()
+            user.save(update_fields=['active_organization'])
     
     def reset_token(self):
         self.token = create_hash()

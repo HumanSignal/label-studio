@@ -1,5 +1,19 @@
 ## Feature flags modes
 
+### Feature flags from environment
+
+1. Prepare env variables using [proper namings](#feature-flags-namings), export these environment variables.
+
+    ```
+    ff_back_dev_123_some_fixed_issue_231221_short=true
+    ff_front_dev_456_my_super_feature_010122_long=true
+    ```
+   or run label-studio this way: 
+   ```
+   ff_back_dev_123_some_fixed_issue_231221_short=true label-studio 
+   ```
+
+
 ### Feature flags from file
 
 1. Prepare `feature_flags.yml` file with flags:
@@ -20,17 +34,6 @@
     FEATURE_FLAGS_FROM_FILE=true
     FEATURE_FLAGS_FILE=feature_flags.yml
     ```
-   
-
-### Feature flags from environment
-
-1. Prepare env variables using [proper namings](#feature-flags-namings), e.g.
-
-    ```
-    ff_back_dev_123_some_fixed_issue_231221_short=true
-    ff_front_dev_456_my_super_feature_010122_long=true
-    ```
-
 
 ### Production mode
 
@@ -40,7 +43,7 @@
 
 ## Feature flags namings
 
-`ff_<back|front|all>_<issue_id>_short_description_<date>_<short|long>`
+`fflag_<back|front|all>_<issue_id>_short_description_<date>_<short|long>`
 
 - *short*: short_term flags
 - *long*: permanent flags or killswitchers
@@ -70,4 +73,4 @@ Feature flags JSON object is available on frontend via
 window.APP_SETTINGS.feature_flags
 ```
 
-To make use flags with LD client, [populate it with bootstap values](https://docs.launchdarkly.com/sdk/features/bootstrapping#javascript)
+To make use flags with LD client, [populate it with bootstrap values](https://docs.launchdarkly.com/sdk/features/bootstrapping#javascript)

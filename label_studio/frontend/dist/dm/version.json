@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2170: On project open set number of tasks defined by task per page",
-  "commit": "864b7d52db9ee07aa78a447b2512468970cca7f1",
+  "message": "fix: LSDV-5008: Make DM default width equal to the main menu width in Quick View",
+  "commit": "b91dd013b9d7ed4fa6c73f700e1b25440c7d6c30",
   "branch": "master",
-  "date": "2022/07/14 12:20:33"
+  "date": "2023/05/03 10:54:37"
 }

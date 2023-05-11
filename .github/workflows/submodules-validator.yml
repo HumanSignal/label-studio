@@ -1,17 +1,19 @@
 name: "Dependencies check"
 
 on:
-  workflow_call:
-    inputs:
-      head_sha:
-        required: true
-        type: string
-      base_sha:
-        required: true
-        type: string
-      target_branch:
-        required: true
-        type: string
+  push:
+    branches:
+      - develop
+      - 'ls-release/**'
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+    branches:
+      - develop
+      - 'ls-release/**'
 
 env:
   ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
@@ -21,17 +23,16 @@ jobs:
     name: "Submodules/deps"
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: Validate
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GIT_PAT }}
           script: |
             const {repo, owner} = context.repo;
-            const head_sha = '${{ inputs.head_sha }}'
-            const base_sha = '${{ inputs.base_sha }}'
-            const targetBranch = '${{ inputs.target_branch }}'.replace('refs/heads/', '')
+            const head_sha = '${{ github.event.pull_request.head.sha || github.event.after }}'
+            const base_sha = '${{ github.event.pull_request.base.sha || github.event.before }}'
+            const targetBranch = '${{ github.event.pull_request.base.ref || github.event.ref }}'.replace('refs/heads/', '')
             const strictCheckBranchPrefixes = ['ls-release/']
 
             let submodules = [

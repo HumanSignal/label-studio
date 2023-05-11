@@ -1,5 +1,5 @@
 ---
-title: Optical Character Recognition
+title: Optical Character Recognition (OCR)
 type: templates
 category: Computer Vision
 cat: computer-vision
@@ -80,6 +80,14 @@ Use the [TextArea](/tags/textarea.html) control tag to add transcripts for each 
             />
 ```
 The `editable="true"` argument allows annotators to edit the text after submitting it, and `displayMode="region-list"` means that the text boxes appear in the region list associated with each rectangle or polygon, to make it easier to update the text. `perRegion="true"` means that each text box applies to a specific region, and `required="true"` means that annotators must add text to each text box before they can submit the annotation. The `placeholder` argument lets you specify placeholder text that is shown to annotators before they edit the text box.
+
+## About the labeling process
+
+1. Select a label (e.g. "Handwriting"), create a new bounding box and select it. 
+2. Open the Outliner panel if it's not yet opened. Usually it's located on the left side.
+3. Add text to each bounding box. Otherwise you will get a warning about missing text because the labeling configuration is using `required="true"`.  
+
+<img src="/images/ocr-template-left-panel.png" class="gif-border">
 
 ## Related tags
 - [Image](/tags/image.html)
