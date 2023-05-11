@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5069: Create new defaults for panels and tabs",
-  "commit": "6cc186dadf8b44c11522b85ebdf21389e8aa655f",
+  "message": "fix: LSDV-4726: DateTime min/max",
+  "commit": "05e3adedc62c6785fc09ea9f4d46662492d1f57b",
   "branch": "master",
-  "date": "2023/05/11 09:06:01"
+  "date": "2023/05/11 15:51:35"
 }
