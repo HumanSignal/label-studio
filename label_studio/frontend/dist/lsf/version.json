@@ -1,6 +1,6 @@
 {
   "message": "feat: LSDV-3025-15: Add a message in the bottom of the outliner when user creates a new rule of filtering",
-  "commit": "df3068b318f57c99c3bc78d21ced72a935669b44",
-  "branch": "fb-lsdv-3025-15",
-  "date": "2023/05/11 10:42:41"
+  "commit": "8368773eab653eaba902eee83e81b16f2d55fb93",
+  "branch": "master",
+  "date": "2023/05/11 09:58:00"
 }
