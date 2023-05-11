@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5074: Add FF to outliner filter",
-  "commit": "8e51769b6ef90588b1433f4c71400164dfbbe398",
-  "branch": "master",
-  "date": "2023/05/11 13:04:28"
+  "message": "feat: DEV-2786: Adjustable draggable spans ",
+  "commit": "1a11b53482eceaeea30ee8a42d4169eab709c904",
+  "branch": "fb-dev-2786/adjustable-draggable-spans",
+  "date": "2023/05/11 18:12:06"
 }
