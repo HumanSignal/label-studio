@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-3025-12: Fully hide the dropdown component when closing it",
-  "commit": "009c6975b50131b506b18aec819ee256f7d1ad42",
-  "branch": "fb-lsdv-3025-12",
-  "date": "2023/05/10 10:40:17"
+  "commit": "8368773eab653eaba902eee83e81b16f2d55fb93",
+  "branch": "master",
+  "date": "2023/05/11 09:58:00"
 }
