@@ -142,7 +142,7 @@ def s3_export_bucket(s3):
 
 
 @pytest.fixture(autouse=True)
-def s3_export_bucket(s3):
+def s3_export_bucket_sse(s3):
     bucket_name = 'pytest-export-s3-bucket-with-sse'
     s3.create_bucket(Bucket=bucket_name)
 
