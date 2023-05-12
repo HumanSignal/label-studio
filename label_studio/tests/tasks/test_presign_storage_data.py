@@ -83,6 +83,7 @@ class TestPresignStorageData:
     def test_successful_request(self, view, task, project, user, monkeypatch):
         task.resolve_storage_uri.return_value = dict(
             url="https://presigned-url.com/file",
+            presign_ttl=3600
         )
         project.has_permission.return_value = True
         task.project = project
