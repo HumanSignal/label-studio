@@ -81,7 +81,10 @@ class TestPresignStorageData:
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_successful_request(self, view, task, project, user, monkeypatch):
-        task.resolve_storage_uri.return_value = "https://presigned-url.com/file"
+        task.resolve_storage_uri.return_value = dict(
+            url="https://presigned-url.com/file",
+            presign_ttl=3600
+        )
         project.has_permission.return_value = True
         task.project = project
 
