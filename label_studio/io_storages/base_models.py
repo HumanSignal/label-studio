@@ -387,6 +387,7 @@ class ImportStorage(Storage):
             # pubsub.push(topic, key)
             # -> GF.pull(topic, key) + env -> add_task()
             logger.debug(f'Scanning key {key}')
+            self.info_update_progress(last_sync_count=tasks_created, tasks_existed=tasks_existed)
 
             # skip if task already exists
             if link_class.exists(key, self):
@@ -410,7 +411,6 @@ class ImportStorage(Storage):
 
             # update progress counters for storage info
             tasks_created += 1
-            self.info_update_progress(last_sync_count=tasks_created, tasks_existed=tasks_existed)
 
         self.project.update_tasks_states(
             maximum_annotations_changed=False,
