@@ -6,6 +6,18 @@
         "decorators": ""
     },
     {
+        "url": "/sw\\.js",
+        "module": "core.views.serve_file",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/sw-fallback\\.js",
+        "module": "core.views.serve_file",
+        "name": "",
+        "decorators": ""
+    },
+    {
         "url": "/favicon\\.ico",
         "module": "django.views.generic.base.RedirectView",
         "name": "",
