@@ -193,7 +193,10 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
         key = str(self.prefix) + '/' + key if self.prefix else key
 
         # put object into storage
-        s3.Object(self.bucket, key).put(Body=json.dumps(ser_annotation))
+        s3.Object(self.bucket, key).put(
+            Body=json.dumps(ser_annotation),
+            ServerSideEncryption='AES256'
+        )
 
         # create link if everything ok
         S3ExportStorageLink.create(annotation, self)
