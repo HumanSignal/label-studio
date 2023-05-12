@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3025-14: Implement empty state when outliner filter returns empty",
-  "commit": "4fc6e341bd785500ceb4aa5a60e5dd0df6da1b9c",
-  "branch": "master",
-  "date": "2023/05/11 15:33:39"
+  "message": "fix: LSDV-4988: Fix No Label for Dynamic Labels",
+  "commit": "821611ba9b8372a3a7ca504e689c2cb7b2365fbc",
+  "branch": "fb-lsdv-4988/dynamic-no-label",
+  "date": "2023/05/12 16:26:22"
 }
