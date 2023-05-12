@@ -84,12 +84,6 @@ class StorageInfo(models.Model):
         help_text='Meta and debug information about storage processes'
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # start datetime for statuses
-        self.time_in_progress = None
-        self.time_queued = None
-
     def info_set_job(self, job_id):
         self.last_sync_job = job_id
         self.save(update_fields=['last_sync_job'])
@@ -101,10 +95,9 @@ class StorageInfo(models.Model):
         self.status = self.Status.QUEUED
 
         # reset and init meta
-        self.time_queued = datetime.now()
         self.meta = {
             'attempts': self.meta.get('attempts', 0) + 1,
-            'time_queued': str(self.time_queued)
+            'time_queued': str(datetime.now())
         }
 
         self.save(update_fields=['last_sync_job', 'last_sync', 'last_sync_count', 'status', 'meta'])
@@ -115,12 +108,15 @@ class StorageInfo(models.Model):
             raise ValueError(f'Storage status ({self.status}) must be QUEUED to move it IN_PROGRESS')
         self.status = self.Status.IN_PROGRESS
 
-        self.time_in_progress = datetime.now()
-        self.meta['time_in_progress'] = str(self.time_in_progress)
+        dt = datetime.now()
+        self.meta['time_in_progress'] = str(dt)
         # at the very beginning it's the same as in progress time
-        self.meta['time_last_ping'] = str(self.time_in_progress)
-
+        self.meta['time_last_ping'] = str(dt)
         self.save(update_fields=['status', 'meta'])
+
+    @property
+    def time_in_progress(self):
+        return datetime.fromisoformat(self.meta['time_in_progress'])
 
     def info_set_completed(self, last_sync_count, **kwargs):
         self.status = self.Status.COMPLETED
@@ -128,10 +124,10 @@ class StorageInfo(models.Model):
         self.last_sync_count = last_sync_count
 
         time_completed = datetime.now()
+
         self.meta['time_completed'] = str(time_completed)
         self.meta['duration'] = (time_completed - self.time_in_progress).total_seconds()
         self.meta.update(kwargs)
-
         self.save(update_fields=['status', 'meta', 'last_sync', 'last_sync_count'])
 
     def info_set_failed(self):
@@ -139,25 +135,22 @@ class StorageInfo(models.Model):
         self.traceback = str(tb.format_exc())
 
         time_failure = datetime.now()
-        # we can't use self.time_in_progress,
-        # because it's handled by another rqworker thread and time_in_progress will be None there
-        time_in_progress = datetime.fromisoformat(self.meta['time_in_progress'])
-        self.meta['time_failure'] = str(time_failure)
-        self.meta['duration'] = (time_failure - time_in_progress).total_seconds()
 
+        self.meta['time_failure'] = str(time_failure)
+        self.meta['duration'] = (time_failure - self.time_in_progress).total_seconds()
         self.save(update_fields=['status', 'traceback', 'meta'])
 
     def info_update_progress(self, last_sync_count, **kwargs):
         # update db counter once per 5 seconds to avid db overloads
-        last_ping = datetime.now()
-        delta = (last_ping - self.time_in_progress).total_seconds()
+        now = datetime.now()
+        last_ping = datetime.fromisoformat(self.meta['time_last_ping'])
+        delta = (now - last_ping).total_seconds()
 
         if delta > settings.STORAGE_IN_PROGRESS_TIMER:
             self.last_sync_count = last_sync_count
-            self.meta['time_last_ping'] = str(last_ping)
-            self.meta['duration'] = delta
+            self.meta['time_last_ping'] = str(now)
+            self.meta['duration'] = (now - self.time_in_progress).total_seconds()
             self.meta.update(kwargs)
-
             self.save(update_fields=['last_sync_count', 'meta'])
 
     @staticmethod
