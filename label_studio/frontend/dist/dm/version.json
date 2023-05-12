@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-33: UI page to view listing of CandidateTasks in Dataset",
-  "commit": "50899bc740fd5bc33a51f2fdf5bedd533a9d1799",
+  "message": "chore: LSDV-5060: Migrate to Yarn",
+  "commit": "ee15a82e9b90a75cda35dfb2d113db39f274997f",
   "branch": "master",
-  "date": "2023/03/31 12:48:12"
+  "date": "2023/05/11 17:58:11"
 }

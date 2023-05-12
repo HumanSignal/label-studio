@@ -85,10 +85,8 @@ rqworker:
     low:
       replicas: 1
     default:
-      replicas: 1
+      replicas: 4
     critical:
-      replicas: 1
-    all:
       replicas: 1
   resources:
     requests:
@@ -110,6 +108,10 @@ If you choose to make changes to these default settings, consider the following:
 | More than 10 concurrent annotators          | Adjust the requests and limits for `resources` in the `app` pod                                                                       |
 | Increase fault tolerance                    | Increase the number of replicas of `app` and/or `rqworker` services                                                                   |
 | Production deployment (replicas)            | Replicas equivalent or greater than the number of availability zones in your Kubernetes cluster                                       | 
+
+#### RQ worker replicas
+
+The `default` queue is the most extensive queue. It is recommended to use 4 times more replicas for the `default` queue compared to the other queues. The other queues (`critical`, `high`, `low`) can have the same number of replicas. You can start with 1 replica for each of them. 
 
 ### Prepare the Kubernetes cluster
 
@@ -236,8 +238,6 @@ rqworker:
       default:
          replicas: 2
       critical:
-         replicas: 2
-      all:
          replicas: 2
 
 postgresql:

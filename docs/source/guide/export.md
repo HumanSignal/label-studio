@@ -110,7 +110,7 @@ Label Studio supports many common and standard formats for exporting completed l
 
 ### ASR_MANIFEST
 
-Export audio transcription labels for automatic speech recognition as the JSON manifest format expected by [NVIDIA NeMo models](https://docs.nvidia.com/deeplearning/nemo/user-guide/docs/en/stable/core/core.html). Supports audio transcription labeling projects that use the `Audio` or `AudioPlus` tags with the `TextArea` tag.
+Export audio transcription labels for automatic speech recognition as the JSON manifest format expected by [NVIDIA NeMo models](https://docs.nvidia.com/deeplearning/nemo/user-guide/docs/en/stable/core/core.html). Supports audio transcription labeling projects that use the `Audio` tag with the `TextArea` tag.
 
 ```json
 {“audio_filepath”: “/path/to/audio.wav”, “text”: “the transcription”, “offset”: 301.75, “duration”: 0.82, “utt”: “utterance_id”, “ctm_utt”: “en_4156”, “side”: “A”}

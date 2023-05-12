@@ -699,3 +699,13 @@ def merge_labels_counters(dict1, dict2):
         result_dict[key] = value
 
     return result_dict
+
+
+def timeit(func):
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+        logging.debug(f"{func.__name__} execution time: {end-start} seconds")
+        return result
+    return wrapper

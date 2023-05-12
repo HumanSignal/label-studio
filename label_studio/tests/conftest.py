@@ -2,6 +2,7 @@
 """
 import os
 import pytest
+import mock
 import ujson as json
 import requests_mock
 import re
@@ -10,6 +11,7 @@ import logging
 import shutil
 import tempfile
 
+from unittest import mock
 from moto import mock_s3
 from copy import deepcopy
 from pathlib import Path
@@ -412,6 +414,39 @@ def get_server_url(live_server):
     yield live_server.url
 
 
+@pytest.fixture(name="async_import_off", autouse=True)
+def async_import_off():
+    from core.feature_flags import flag_set
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'fflag_feat_all_lsdv_4915_async_task_import_13042023_short':
+            return False
+        return flag_set(*args, **kwargs)
+    with mock.patch('data_import.api.flag_set', wraps=fake_flag_set):
+        yield
+
+
+@pytest.fixture(name="fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on")
+def fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on():
+    from core.feature_flags import flag_set
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short':
+            return True
+        return flag_set(*args, **kwargs)
+    with mock.patch('tasks.models.flag_set', wraps=fake_flag_set):
+        yield
+
+
+@pytest.fixture(name="fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off")
+def fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off():
+    from core.feature_flags import flag_set
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short':
+            return False
+        return flag_set(*args, **kwargs)
+    with mock.patch('tasks.models.flag_set', wraps=fake_flag_set):
+        yield
+
+
 @pytest.fixture(name="local_files_storage")
 def local_files_storage(settings):
     settings.LOCAL_FILES_SERVING_ENABLED = True
@@ -437,5 +472,6 @@ def local_files_document_root_subdir(settings):
 
 @pytest.fixture(name="testing_session_timeouts")
 def set_testing_session_timeouts(settings):
+    # TODO: functional tests should not rely on exact timings
     settings.MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(seconds=5).total_seconds()))
     settings.MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(seconds=2).total_seconds()))

@@ -6,7 +6,7 @@
       <Label value="Speaker 2" />
     </Labels>
 
-    <AudioPlus name="audio" value="$audio"/>
+    <Audio name="audio" value="$audio"/>
     <View style="padding: 10px 20px; margin-top: 2em; box-shadow: 2px 2px 8px #AAA; margin-right: 1em;"
           visibleWhen="region-selected">
       <Header value="Provide Transcription" />
