@@ -92,8 +92,7 @@
         "Text": {"$ref": "#/definitions/tags_with_value_required_name"},
         "HyperText": {"$ref": "#/definitions/tags_with_value_required_name"},
         "View": {"$ref": "#/definitions/MaybeMultipleView"},
-        "TextArea": {"$ref": "#/definitions/MaybeMultipleTextAreas"},
-        "Ranker": {"$ref": "#/definitions/MaybeMultipleRankers"}
+        "TextArea": {"$ref": "#/definitions/MaybeMultipleTextAreas"}
       }
     },
     "MaybeMultipleView": {
@@ -205,39 +204,8 @@
         "type": "array",
         "items": {"$ref": "#/definitions/TextArea"}
       }, {"$ref": "#/definitions/TextArea"}]
-    },
-    "Ranker": {
-      "type": "object",
-      "anyOf": [
-        {"required": ["@name", "@value"]}
-      ],
-      "properties": {
-        "@name": {
-          "$ref": "#/definitions/@name"
-        },
-        "@value": {
-          "$ref": "#/definitions/@value"
-        },
-        "@toName": {
-          "$ref": "#/definitions/@toName"
-        },
-        "@mode": {
-          "type": "string",
-          "anyOf": [
-            { "enum": ["select", "rank"] }
-          ]
-        },
-        "$": {
-          "$ref": "#/definitions/$"
-        }
-      }
-    },
-    "MaybeMultipleRankers": {
-      "anyOf": [{
-        "type": "array",
-        "items": {"$ref": "#/definitions/Ranker"}
-      }, {"$ref": "#/definitions/Ranker"}]
     }
+    
   },
   "type": "object",
   "properties": {
@@ -251,8 +219,7 @@
         "Image": {"$ref": "#/definitions/tags_with_value_required_name"},
         "Text": {"$ref": "#/definitions/tags_with_value_required_name"},
         "HyperText": {"$ref": "#/definitions/tags_with_value_required_name"},
-        "TextArea": {"$ref": "#/definitions/MaybeMultipleTextAreas"},
-        "Ranker": {"$ref": "#/definitions/MaybeMultipleRankers"}
+        "TextArea": {"$ref": "#/definitions/MaybeMultipleTextAreas"}
       }
     }
   }
