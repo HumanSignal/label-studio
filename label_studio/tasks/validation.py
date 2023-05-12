@@ -36,6 +36,7 @@ _DATA_TYPES = {
     'RectangleLabels': [str, list],
     'TimeSeriesLabels': [str, list],
     'Taxonomy': [str, list, type(None)],
+    'Ranker': [list, str],
 }
 logger = logging.getLogger(__name__)
 

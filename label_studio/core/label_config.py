@@ -261,7 +261,8 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
 
         elif value == 'video' and p.tag == 'HyperText':
             task[value] = examples.get('$videoHack')
-
+        elif p.tag == 'Ranker':
+            task[value] = examples.get('Ranker')
         elif p.tag == 'Paragraphs':
             # Paragraphs special case - replace nameKey/textKey if presented
             name_key = p.get('nameKey') or p.get('namekey') or 'author'
