@@ -75,7 +75,7 @@ class StorageInfo(models.Model):
     traceback = models.TextField(
         null=True,
         blank=True,
-        help_text='Traceback report in case of errors'
+        help_text='Traceback report for the last failed sync'
     )
     meta = JSONField(
         'meta',
@@ -488,7 +488,7 @@ def export_sync_background(storage_class, storage_id, **kwargs):
 
 
 def storage_background_failure(*args, **kwargs):
-    # job is used in rqworker failure
+    # job is used in rqworker failure, extract storage id from job arguments
     if isinstance(args[0], rq.job.Job):
         sync_job = args[0]
         _class = sync_job.args[0]
@@ -500,7 +500,10 @@ def storage_background_failure(*args, **kwargs):
 
     # storage is used when redis and rqworkers are not available (e.g. in opensource)
     elif isinstance(args[0], Storage):
-        storage = args[0]
+        # we have to load storage with the last states from DB
+        # the current args[0] instance might be outdated
+        storage_id = args[0].id
+        storage = args[0].__class__.objects.filter(id=storage_id).first()
     else:
         raise ValueError(f"Unknown storage in {args}")
 

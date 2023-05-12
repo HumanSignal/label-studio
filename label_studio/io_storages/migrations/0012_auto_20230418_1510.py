@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='azureblobexportstorage',
             name='traceback',
-            field=models.TextField(blank=True, help_text='Traceback report in case of errors', null=True),
+            field=models.TextField(blank=True, help_text='Traceback report for the last failed sync', null=True),
         ),
         migrations.AddField(
             model_name='azureblobimportstorage',
@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='azureblobimportstorage',
             name='traceback',
-            field=models.TextField(blank=True, help_text='Traceback report in case of errors', null=True),
+            field=models.TextField(blank=True, help_text='Traceback report for the last failed sync', null=True),
         ),
         migrations.AddField(
             model_name='gcsexportstorage',
@@ -53,7 +53,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='gcsexportstorage',
             name='traceback',
-            field=models.TextField(blank=True, help_text='Traceback report in case of errors', null=True),
+            field=models.TextField(blank=True, help_text='Traceback report for the last failed sync', null=True),
         ),
         migrations.AddField(
             model_name='gcsimportstorage',
@@ -68,7 +68,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='gcsimportstorage',
             name='traceback',
-            field=models.TextField(blank=True, help_text='Traceback report in case of errors', null=True),
+            field=models.TextField(blank=True, help_text='Traceback report for the last failed sync', null=True),
         ),
         migrations.AddField(
             model_name='localfilesexportstorage',
@@ -83,7 +83,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='localfilesexportstorage',
             name='traceback',
-            field=models.TextField(blank=True, help_text='Traceback report in case of errors', null=True),
+            field=models.TextField(blank=True, help_text='Traceback report for the last failed sync', null=True),
         ),
         migrations.AddField(
             model_name='localfilesimportstorage',
@@ -98,7 +98,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='localfilesimportstorage',
             name='traceback',
-            field=models.TextField(blank=True, help_text='Traceback report in case of errors', null=True),
+            field=models.TextField(blank=True, help_text='Traceback report for the last failed sync', null=True),
         ),
         migrations.AddField(
             model_name='redisexportstorage',
@@ -113,7 +113,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='redisexportstorage',
             name='traceback',
-            field=models.TextField(blank=True, help_text='Traceback report in case of errors', null=True),
+            field=models.TextField(blank=True, help_text='Traceback report for the last failed sync', null=True),
         ),
         migrations.AddField(
             model_name='redisimportstorage',
@@ -128,7 +128,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='redisimportstorage',
             name='traceback',
-            field=models.TextField(blank=True, help_text='Traceback report in case of errors', null=True),
+            field=models.TextField(blank=True, help_text='Traceback report for the last failed sync', null=True),
         ),
         migrations.AddField(
             model_name='s3exportstorage',
@@ -143,7 +143,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='s3exportstorage',
             name='traceback',
-            field=models.TextField(blank=True, help_text='Traceback report in case of errors', null=True),
+            field=models.TextField(blank=True, help_text='Traceback report for the last failed sync', null=True),
         ),
         migrations.AddField(
             model_name='s3importstorage',
@@ -158,6 +158,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='s3importstorage',
             name='traceback',
-            field=models.TextField(blank=True, help_text='Traceback report in case of errors', null=True),
+            field=models.TextField(blank=True, help_text='Traceback report for the last failed sync', null=True),
         ),
     ]
