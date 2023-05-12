@@ -25,8 +25,7 @@ export const StorageSummary = ({ target, storage, className, storageTypes = [] }
   const tasks_help =
     'Number of annotations (' + last_sync_count + ') ' + 'successfully saved during the last sync.';
   const tasks_existed_help =
-    "Tasks that have already been synced " + tasks_existed
-    + "won't be added to the project and included in this counter.";
+    "Tasks that have already been synced " + tasks_existed + "won't be added to the project.";
   const annotations_help =
     'Number of new tasks (' + last_sync_count + ') successfully added during the last sync.';
   const items_help = target === 'export'
@@ -112,7 +111,7 @@ export const StorageSummary = ({ target, storage, className, storageTypes = [] }
           </Tooltip>
           {fraction_text !== '' && (
             <>
-              {' / '}
+              { target === 'export' ? ' / ' : ' + '}
               <Tooltip title={target === 'export' ? total_annotations_text : tasks_existed_help}>
                 <span>{fraction_text}</span>
               </Tooltip>
