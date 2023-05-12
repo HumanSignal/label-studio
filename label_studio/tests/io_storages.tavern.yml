@@ -225,7 +225,7 @@ stages:
   response:
     status_code: 200
     json:
-      status: "failed"
+      status: "completed"
       traceback: null
 
 ---
