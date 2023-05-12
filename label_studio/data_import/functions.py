@@ -136,7 +136,7 @@ def async_reimport_background(reimport_id, organization_id, **kwargs):
 
     with transaction.atomic():
         project.remove_tasks_by_file_uploads(reimport.file_upload_ids)
-        serializer = ImportApiSerializer(data=tasks, many=True)
+        serializer = ImportApiSerializer(data=tasks, many=True, context={'project': project})
         serializer.is_valid(raise_exception=True)
         tasks = serializer.save(project_id=project.id)
         emit_webhooks_for_instance(organization_id, project, WebhookAction.TASKS_CREATED, tasks)
