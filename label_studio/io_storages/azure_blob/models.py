@@ -92,7 +92,7 @@ class AzureBlobStorageMixin(models.Model):
                 raise KeyError(f'{self.url_scheme}://{self.container}/{self.prefix} not found.')
 
 
-class AzureBlobImportStorageBase(ImportStorage, AzureBlobStorageMixin):
+class AzureBlobImportStorageBase(AzureBlobStorageMixin, ImportStorage):
     url_scheme = 'azure-blob'
 
     presign = models.BooleanField(

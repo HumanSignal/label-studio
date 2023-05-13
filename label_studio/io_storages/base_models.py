@@ -228,7 +228,7 @@ class Storage(StorageInfo):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
 
     def validate_connection(self, client=None):
-        pass
+        raise NotImplementedError('validate_connection is not implemented')
 
     class Meta:
         abstract = True
