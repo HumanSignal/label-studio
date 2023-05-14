@@ -9,28 +9,23 @@ import { getLastTraceback } from '../../../utils/helpers';
 
 export const StorageSummary = ({ target, storage, className, storageTypes = [] }) => {
   const storageStatus = storage.status.replace(/_/g, ' ').replace(/(^\w)/, match => match.toUpperCase());
-  const last_sync_count = storage.last_sync_count ? storage.last_sync_count : '0';
+  const last_sync_count = storage.last_sync_count ? storage.last_sync_count : 0;
 
-  const total_annotations_text = typeof storage.meta?.total_annotations !== 'undefined'
-    ? `There were ${storage.meta.total_annotations} total annotations in the project at the sync moment.`
-    : '';
   const tasks_existed = typeof storage.meta?.tasks_existed !== 'undefined'
-    ? `(${storage.meta.tasks_existed}) `
-    : '';
-  const fraction_text = target === 'export'
-    ? (typeof storage.meta?.total_annotations !== 'undefined' ? storage.meta.total_annotations : '')
-    : (typeof storage.meta?.tasks_existed !== 'undefined' ? storage.meta.tasks_existed : '');
+    ? storage.meta.tasks_existed : 0;
+  const total_annotations = typeof storage.meta?.total_annotations !== 'undefined'
+    ? storage.meta.total_annotations : 0;
 
   // help text for tasks and annotations
-  const tasks_help =
-    'Number of annotations (' + last_sync_count + ') ' + 'successfully saved during the last sync.';
-  const tasks_existed_help =
-    "Tasks that have already been synced " + tasks_existed + "won't be added to the project.";
+  const tasks_added_help =
+    last_sync_count + ' new tasks added during the last sync.';
+  const tasks_total_help =
+    tasks_existed + " tasks that have been found and already synced will not be added to the project again.\n" +
+    (tasks_existed + last_sync_count) + " tasks have been added in total for this storage.";
   const annotations_help =
-    'Number of new tasks (' + last_sync_count + ') successfully added during the last sync.';
-  const items_help = target === 'export'
-    ? annotations_help + '\n' + total_annotations_text
-    : tasks_help + '\n' + tasks_existed_help;
+     last_sync_count + ' annotations successfully saved during the last sync.';
+  const total_annotations_help = typeof storage.meta?.total_annotations !== 'undefined'
+    ? (storage.meta.total_annotations + ` total annotations seen in the project at the sync moment.`) : '';
 
   const handleButtonClick = () => {
     const msg = `Error logs for ${target === 'export' ? 'export ' : ''}${storage.type} ` +
@@ -47,13 +42,11 @@ export const StorageSummary = ({ target, storage, className, storageTypes = [] }
             navigator.clipboard.writeText(msg);
           }}>Copy</Button>
           {(target === 'export' ? (
-            <a style={{ float: "right" }} target="_blank"
-               href="https://labelstud.io/guide/storage.html#Target-storage-permissions">
+            <a style={{ float: "right" }} target="_blank" href="https://labelstud.io/guide/storage.html#Target-storage-permissions">
               Check Target Storage documentation
             </a>
           ) : (
-            <a style={{ float: "right" }} target="_blank"
-               href="https://labelstud.io/guide/storage.html#Source-storage-permissions">
+            <a style={{ float: "right" }} target="_blank" href="https://labelstud.io/guide/storage.html#Source-storage-permissions">
               Check Source Storage documentation
             </a>
           ))}
@@ -93,7 +86,7 @@ export const StorageSummary = ({ target, storage, className, storageTypes = [] }
           {
             storageStatus === 'Failed' ? (
               <span
-                style={{cursor: "pointer", borderBottom: "1px dashed gray"}}
+                style={{ cursor: "pointer", borderBottom: "1px dashed gray" }}
                 onClick={handleButtonClick}
               >
                 Failed
@@ -102,22 +95,23 @@ export const StorageSummary = ({ target, storage, className, storageTypes = [] }
           }
         </DescriptionList.Item>
 
-        <DescriptionList.Item
-          term={target === 'export' ? 'Annotations' : 'Tasks'}
-          help={items_help}
-        >
-          <Tooltip title={target === 'export' ? annotations_help : tasks_help}>
-            <span>{last_sync_count}</span>
-          </Tooltip>
-          {fraction_text !== '' && (
-            <>
-              { target === 'export' ? ' / ' : ' + '}
-              <Tooltip title={target === 'export' ? total_annotations_text : tasks_existed_help}>
-                <span>{fraction_text}</span>
-              </Tooltip>
-            </>
-          )}
-        </DescriptionList.Item>
+        {
+          target === 'export'
+            ? (
+              <DescriptionList.Item term="Annotations" help={annotations_help + '\n' + total_annotations_help}>
+                <Tooltip title={annotations_help}><span>{last_sync_count}</span></Tooltip>
+                <Tooltip title={total_annotations_help}><span> ({total_annotations} total)</span></Tooltip>
+              </DescriptionList.Item>
+            )
+            : (
+              <DescriptionList.Item term="Tasks" help={tasks_added_help + '\n' + tasks_total_help}>
+                <Tooltip title={tasks_total_help} style={{ whiteSpace: "pre-wrap" }}>
+                  <span>{last_sync_count + tasks_existed}</span>
+                </Tooltip>
+                <Tooltip title={tasks_added_help}><span> ({last_sync_count} new)</span></Tooltip>
+              </DescriptionList.Item>
+            )
+        }
 
         <DescriptionList.Item term="Last Sync">
           {storage.last_sync
