@@ -539,7 +539,8 @@ marks:
 stages:
 - id: signup
   type: ref
-- name: stage
+
+- name: Create a project
   request:
     data:
       is_published: true
@@ -553,7 +554,8 @@ stages:
       json:
         project_pk: id
     status_code: 201
-- name: stage
+
+- name: Create target storage
   request:
     data:
       bucket: pytest-export-s3-bucket
@@ -566,7 +568,8 @@ stages:
       json:
         storage_pk: id
     status_code: 201
-- name: stage
+
+- name: Create a task
   request:
     headers:
       content-type: application/json
@@ -580,7 +583,8 @@ stages:
       json:
         task_pk: id
     status_code: 201
-- name: stage
+
+- name: Create an annotation
   request:
     headers:
       content-type: application/json
@@ -601,7 +605,8 @@ stages:
       json:
         annotation_pk: id
     status_code: 201
-- name: sync
+
+- name: Sync with target storage
   request:
     method: POST
     url: '{django_live_url}/api/storages/export/s3/{storage_pk}/sync'
@@ -624,7 +629,8 @@ marks:
 stages:
 - id: signup
   type: ref
-- name: stage
+
+- name: Create a project
   request:
     data:
       is_published: true
@@ -638,7 +644,8 @@ stages:
       json:
         project_pk: id
     status_code: 201
-- name: stage
+
+- name: Create a storage with SSE enabled
   request:
     data:
       bucket: pytest-export-s3-bucket-with-sse
@@ -651,7 +658,8 @@ stages:
       json:
         storage_pk: id
     status_code: 201
-- name: stage
+
+- name: Create a task
   request:
     headers:
       content-type: application/json
@@ -665,7 +673,8 @@ stages:
       json:
         task_pk: id
     status_code: 201
-- name: stage
+
+- name: Create an annotation
   request:
     headers:
       content-type: application/json
@@ -686,7 +695,8 @@ stages:
       json:
         annotation_pk: id
     status_code: 201
-- name: sync
+
+- name: Sync with target storage
   request:
     method: POST
     url: '{django_live_url}/api/storages/export/s3/{storage_pk}/sync'

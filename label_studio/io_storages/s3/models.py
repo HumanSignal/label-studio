@@ -195,7 +195,7 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
 
         # put object into storage
         additional_params = {}
-        if flag_set('fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short', user=annotation.completed_by):
+        if flag_set('fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short', user='auto'):
             additional_params = {'ServerSideEncryption': 'AES256'}
         s3.Object(self.bucket, key).put(
             Body=json.dumps(ser_annotation),
