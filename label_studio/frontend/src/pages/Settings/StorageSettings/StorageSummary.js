@@ -11,9 +11,9 @@ export const StorageSummary = ({ target, storage, className, storageTypes = [] }
   const storageStatus = storage.status.replace(/_/g, ' ').replace(/(^\w)/, match => match.toUpperCase());
   const last_sync_count = storage.last_sync_count ? storage.last_sync_count : 0;
 
-  const tasks_existed = typeof storage.meta?.tasks_existed !== 'undefined'
+  const tasks_existed = typeof storage.meta?.tasks_existed !== 'undefined' && storage.meta?.tasks_existed !== null
     ? storage.meta.tasks_existed : 0;
-  const total_annotations = typeof storage.meta?.total_annotations !== 'undefined'
+  const total_annotations = typeof storage.meta?.total_annotations !== 'undefined' && storage.meta?.total_annotations !== null
     ? storage.meta.total_annotations : 0;
 
   // help text for tasks and annotations
