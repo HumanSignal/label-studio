@@ -97,7 +97,7 @@ class StorageInfo(models.Model):
         # reset and init meta
         self.meta = {
             'attempts': self.meta.get('attempts', 0) + 1,
-            'time_queued': str(datetime.now())
+            'time_queued': str(timezone.now())
         }
 
         self.save(update_fields=['last_sync_job', 'last_sync', 'last_sync_count', 'status', 'meta'])
@@ -108,7 +108,7 @@ class StorageInfo(models.Model):
             raise ValueError(f'Storage status ({self.status}) must be QUEUED to move it IN_PROGRESS')
         self.status = self.Status.IN_PROGRESS
 
-        dt = datetime.now()
+        dt = timezone.now()
         self.meta['time_in_progress'] = str(dt)
         # at the very beginning it's the same as in progress time
         self.meta['time_last_ping'] = str(dt)
@@ -123,7 +123,7 @@ class StorageInfo(models.Model):
         self.last_sync = timezone.now()
         self.last_sync_count = last_sync_count
 
-        time_completed = datetime.now()
+        time_completed = timezone.now()
 
         self.meta['time_completed'] = str(time_completed)
         self.meta['duration'] = (time_completed - self.time_in_progress).total_seconds()
@@ -134,7 +134,7 @@ class StorageInfo(models.Model):
         self.status = self.Status.FAILED
         self.traceback = str(tb.format_exc())
 
-        time_failure = datetime.now()
+        time_failure = timezone.now()
 
         self.meta['time_failure'] = str(time_failure)
         self.meta['duration'] = (time_failure - self.time_in_progress).total_seconds()
@@ -142,7 +142,7 @@ class StorageInfo(models.Model):
 
     def info_update_progress(self, last_sync_count, **kwargs):
         # update db counter once per 5 seconds to avid db overloads
-        now = datetime.now()
+        now = timezone.now()
         last_ping = datetime.fromisoformat(self.meta['time_last_ping'])
         delta = (now - last_ping).total_seconds()
 
@@ -166,7 +166,7 @@ class StorageInfo(models.Model):
 
     def health_check(self):
         # get duration between last ping time and now
-        now = datetime.now()
+        now = timezone.now()
         last_ping = datetime.fromisoformat(self.meta.get('time_last_ping', str(now)))
         delta = (now - last_ping).total_seconds()
 
