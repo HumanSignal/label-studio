@@ -20,7 +20,7 @@ Base64 = bytes
 
 class GCS(object):
     _client_cache = {}
-    _credentials_cache = {}
+    _credentials_cache = None
     DEFAULT_GOOGLE_PROJECT_ID = gcs.client._marker
 
     class ConvertBlobTo(Enum):
@@ -110,25 +110,33 @@ class GCS(object):
                 break
 
     @classmethod
-    def _get_signing_kwargs(cls, google_application_credentials):
+    def _get_default_credentials(cls):
+        """ Get default GCS credentials for LS Cloud Storages
+        """
         try:
-            cache_key = google_application_credentials
-            credentials = GCS._credentials_cache.get(cache_key)
-            if credentials is None or credentials.expired:
+            # check if GCS._credentials_cache is None, we don't want to try getting default credentials again
+            credentials = GCS._credentials_cache.get('credentials') if GCS._credentials_cache else None
+            if GCS._credentials_cache is None or (credentials and credentials.expired):
+                # try to get credentials from the current environment
                 credentials, _ = google.auth.default(['https://www.googleapis.com/auth/cloud-platform'])
+                # apply & refresh credentials
                 auth_req = google.auth.transport.requests.Request()
                 credentials.refresh(auth_req)
-                GCS._credentials_cache[cache_key] = credentials
-            out = {
-                "service_account_email": credentials.service_account_email,
-                "access_token": credentials.token,
-                "credentials": credentials
-            }
+                # set cache
+                GCS._credentials_cache = {
+                    "service_account_email": credentials.service_account_email,
+                    "access_token": credentials.token,
+                    "credentials": credentials
+                }
+
         except DefaultCredentialsError as exc:
-            logger.error(f"Label studio couldn't load default GCS credentials from env. {exc}",
-                         exc_info=True)
-            out = {}
-        return out
+            logger.warning(
+                f"Label studio could not load default GCS credentials from env. {exc}",
+                exc_info=True
+            )
+            GCS._credentials_cache = {}
+
+        return GCS._credentials_cache
 
     @classmethod
     def generate_http_url(
@@ -149,14 +157,13 @@ class GCS(object):
         r = urlparse(url, allow_fragments=False)
         bucket_name = r.netloc
         blob_name = r.path.lstrip('/')
+
         """Generates a v4 signed URL for downloading a blob.
 
         Note that this method requires a service account key file. You can not use
         this if you are using Application Default Credentials from Google Compute
         Engine or from the Google Cloud SDK.
         """
-        # bucket_name = 'your-bucket-name'
-        # blob_name = 'your-object-name'
 
         client = cls.get_client(
             google_application_credentials=google_application_credentials,
@@ -171,7 +178,7 @@ class GCS(object):
             expiration=timedelta(minutes=presign_ttl),
             # Allow GET requests using this URL.
             method="GET",
-            **cls._get_signing_kwargs(google_application_credentials)
+            **cls._get_default_credentials()
         )
 
         logger.debug('Generated GCS signed url: ' + url)
