@@ -177,6 +177,9 @@ class GCS(object):
         )
         bucket = client.get_bucket(bucket_name)
         blob = bucket.blob(blob_name)
+        # google_application_credentials has higher priority,
+        # use Application Default Credentials (ADC) when google_application_credentials is empty only
+        kwargs = {} if google_application_credentials else cls._get_default_credentials()
 
         url = blob.generate_signed_url(
             version="v4",
@@ -184,7 +187,7 @@ class GCS(object):
             expiration=timedelta(minutes=presign_ttl),
             # Allow GET requests using this URL.
             method="GET",
-            **cls._get_default_credentials()
+            **kwargs
         )
 
         logger.debug('Generated GCS signed url: ' + url)
