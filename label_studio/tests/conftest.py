@@ -142,6 +142,65 @@ def s3_export_bucket(s3):
 
 
 @pytest.fixture(autouse=True)
+def s3_export_bucket_sse(s3):
+    bucket_name = 'pytest-export-s3-bucket-with-sse'
+    s3.create_bucket(Bucket=bucket_name)
+
+    # Set the bucket policy
+    policy = {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:PutObject",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket_name}",
+                    f"arn:aws:s3:::{bucket_name}/*"
+                ],
+                "Condition": {
+                    "StringNotEquals": {
+                        "s3:x-amz-server-side-encryption": "AES256"
+                    }
+                }
+            },
+            {
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:PutObject",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket_name}",
+                    f"arn:aws:s3:::{bucket_name}/*"
+                ],
+                "Condition": {
+                    "Null": {
+                        "s3:x-amz-server-side-encryption": "true"
+                    }
+                }
+            },
+            {
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:*",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket_name}",
+                    f"arn:aws:s3:::{bucket_name}/*"
+                ],
+                "Condition": {
+                    "Bool": {
+                        "aws:SecureTransport": "false"
+                    }
+                }
+            }
+        ]
+    }
+
+    s3.put_bucket_policy(Bucket=bucket_name, Policy=json.dumps(policy))
+
+    yield s3
+
+
+@pytest.fixture(autouse=True)
 def gcs_client():
     with gcs_client_mock():
         yield
