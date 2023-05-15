@@ -2,6 +2,7 @@
 """
 import os
 import pytest
+import mock
 import ujson as json
 import requests_mock
 import re
@@ -137,6 +138,65 @@ def s3_with_unexisted_links(s3):
 def s3_export_bucket(s3):
     bucket_name = 'pytest-export-s3-bucket'
     s3.create_bucket(Bucket=bucket_name)
+    yield s3
+
+
+@pytest.fixture(autouse=True)
+def s3_export_bucket_sse(s3):
+    bucket_name = 'pytest-export-s3-bucket-with-sse'
+    s3.create_bucket(Bucket=bucket_name)
+
+    # Set the bucket policy
+    policy = {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:PutObject",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket_name}",
+                    f"arn:aws:s3:::{bucket_name}/*"
+                ],
+                "Condition": {
+                    "StringNotEquals": {
+                        "s3:x-amz-server-side-encryption": "AES256"
+                    }
+                }
+            },
+            {
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:PutObject",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket_name}",
+                    f"arn:aws:s3:::{bucket_name}/*"
+                ],
+                "Condition": {
+                    "Null": {
+                        "s3:x-amz-server-side-encryption": "true"
+                    }
+                }
+            },
+            {
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:*",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket_name}",
+                    f"arn:aws:s3:::{bucket_name}/*"
+                ],
+                "Condition": {
+                    "Bool": {
+                        "aws:SecureTransport": "false"
+                    }
+                }
+            }
+        ]
+    }
+
+    s3.put_bucket_policy(Bucket=bucket_name, Policy=json.dumps(policy))
+
     yield s3
 
 
@@ -411,6 +471,17 @@ def configured_project(business_client, annotator_client):
 @pytest.fixture(name="django_live_url")
 def get_server_url(live_server):
     yield live_server.url
+
+
+@pytest.fixture(name="async_import_off", autouse=True)
+def async_import_off():
+    from core.feature_flags import flag_set
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'fflag_feat_all_lsdv_4915_async_task_import_13042023_short':
+            return False
+        return flag_set(*args, **kwargs)
+    with mock.patch('data_import.api.flag_set', wraps=fake_flag_set):
+        yield
 
 
 @pytest.fixture(name="fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on")
