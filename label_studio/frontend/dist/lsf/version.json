@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4601: Show correct author of draft",
-  "commit": "6436e4e80a1f302be0b0997180139485bf4c1fe8",
+  "message": "feat: LSDV-5033: Add the option to use WebAudioPlayer for Audio",
+  "commit": "46c1bea57893643aa5c920eb3735c53ea5b69494",
   "branch": "master",
-  "date": "2023/05/15 01:23:49"
+  "date": "2023/05/15 10:02:47"
 }
