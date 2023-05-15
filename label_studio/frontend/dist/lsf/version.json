@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5010: View all panel padding removed (#1339)",
-  "commit": "f44a935b1ccd5cd5bae7eda69cab319ca8fd4568",
+  "message": "fix: LSDV-4601: Show correct author of draft (#1351)",
+  "commit": "6436e4e80a1f302be0b0997180139485bf4c1fe8",
   "branch": "master",
-  "date": "2023/04/30 20:39:52"
+  "date": "2023/05/15 01:23:49"
 }
