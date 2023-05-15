@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3025-14: Implement empty state when outliner filter returns empty",
-  "commit": "4fc6e341bd785500ceb4aa5a60e5dd0df6da1b9c",
+  "message": "fix: LSDV-4601: Show correct author of draft",
+  "commit": "6436e4e80a1f302be0b0997180139485bf4c1fe8",
   "branch": "master",
-  "date": "2023/05/11 15:33:39"
+  "date": "2023/05/15 01:23:49"
 }
