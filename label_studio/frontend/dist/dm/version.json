@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-116: Update frontend candidate task view to show File attributes",
-  "commit": "75f6bbbf030c41b310e5e931c330486fb2f3a0b4",
+  "message": "chore: LSDV-5060: Migrate to Yarn",
+  "commit": "ee15a82e9b90a75cda35dfb2d113db39f274997f",
   "branch": "master",
-  "date": "2023/04/24 11:26:47"
+  "date": "2023/05/11 17:58:11"
 }

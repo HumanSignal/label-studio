@@ -1,5 +1,7 @@
 import re
 import logging
+from json import JSONDecodeError
+
 import google.cloud.storage as gcs
 import json
 import base64
@@ -46,7 +48,11 @@ class GCS(object):
             if cache_key in GCS._client_cache:
                 return GCS._client_cache[cache_key]
             if isinstance(google_application_credentials, str):
-                google_application_credentials = json.loads(google_application_credentials)
+                try:
+                    google_application_credentials = json.loads(google_application_credentials)
+                except JSONDecodeError:
+                    # change JSON error to human-readable format
+                    raise ValueError('Google Application Credentials must be valid JSON string.')
             credentials = service_account.Credentials.from_service_account_info(google_application_credentials)
             client = gcs.Client(project=google_project_id, credentials=credentials)
             GCS._client_cache[cache_key] = client
