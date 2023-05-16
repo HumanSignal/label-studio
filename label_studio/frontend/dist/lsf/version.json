@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5065: Set filter button active when dropdown is opened",
-  "commit": "d84f8887d85e27e1fe33b78e7488fbc1a468e055",
+  "commit": "f1e703932841cf04c1660b74d73944efc9d8627c",
   "branch": "fb-lsdv-5065",
-  "date": "2023/05/16 13:31:24"
+  "date": "2023/05/16 14:04:26"
 }
