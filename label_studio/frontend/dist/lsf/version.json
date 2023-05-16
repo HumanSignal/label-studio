@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5033: Add the option to use WebAudioPlayer for Audio",
-  "commit": "46c1bea57893643aa5c920eb3735c53ea5b69494",
+  "message": "fix: LSDV-5090: Hidden regions notifications is displaying when filter is applied",
+  "commit": "a7d121cec7dff42421bbcd7b3ac17e83543bbf6b",
   "branch": "master",
-  "date": "2023/05/15 10:02:47"
+  "date": "2023/05/16 11:29:35"
 }
