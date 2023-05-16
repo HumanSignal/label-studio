@@ -1,6 +1,6 @@
 {
-  "message": "chore: LSDV-5060: Migrate to Yarn",
-  "commit": "ee15a82e9b90a75cda35dfb2d113db39f274997f",
-  "branch": "master",
-  "date": "2023/05/11 17:58:11"
+  "message": "feat: LOPS-155: [FE] Select and export CandidateTasks to a new Project",
+  "commit": "dc5b214c58d194c2a838b2983bd46daf2ddaf159",
+  "branch": "fb-lops-155",
+  "date": "2023/05/16 11:23:37"
 }
