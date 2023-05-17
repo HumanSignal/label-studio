@@ -13,7 +13,7 @@ from datetime import timedelta
 from typing import Union
 from google.oauth2 import service_account
 from google.auth.exceptions import DefaultCredentialsError
-from core.feature_flags import flag_set
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -183,7 +183,7 @@ class GCS(object):
         blob = bucket.blob(blob_name)
 
         # this flag should be OFF, maybe we need to enable it for 1-2 customers, we have to check it
-        if flag_set('fflag_fix_back_lsdv_4902_force_google_adc_16052023_short', user='auto'):
+        if settings.GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS:
             # google_application_credentials has higher priority,
             # use Application Default Credentials (ADC) when google_application_credentials is empty only
             kwargs = {} if google_application_credentials else cls._get_default_credentials()
