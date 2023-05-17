@@ -2,10 +2,10 @@ import re
 import logging
 from json import JSONDecodeError
 
-import google.cloud.storage as gcs
 import json
 import base64
 import google.auth
+import google.cloud.storage as gcs
 
 from enum import Enum
 from urllib.parse import urlparse
@@ -13,7 +13,7 @@ from datetime import timedelta
 from typing import Union
 from google.oauth2 import service_account
 from google.auth.exceptions import DefaultCredentialsError
-
+from core.feature_flags import flag_set
 
 logger = logging.getLogger(__name__)
 
@@ -43,22 +43,26 @@ class GCS(object):
         :return:
         """
         google_project_id = google_project_id or GCS.DEFAULT_GOOGLE_PROJECT_ID
-        if google_application_credentials:
-            cache_key = google_application_credentials
-            if cache_key in GCS._client_cache:
-                return GCS._client_cache[cache_key]
-            if isinstance(google_application_credentials, str):
-                try:
-                    google_application_credentials = json.loads(google_application_credentials)
-                except JSONDecodeError:
-                    # change JSON error to human-readable format
-                    raise ValueError('Google Application Credentials must be valid JSON string.')
-            credentials = service_account.Credentials.from_service_account_info(google_application_credentials)
-            client = gcs.Client(project=google_project_id, credentials=credentials)
-            GCS._client_cache[cache_key] = client
-            return client
+        cache_key = google_application_credentials
 
-        return gcs.Client(project=google_project_id)
+        if cache_key not in GCS._client_cache:
+
+            # use credentials from LS Cloud Storage settings
+            if google_application_credentials:
+                if isinstance(google_application_credentials, str):
+                    try:
+                        google_application_credentials = json.loads(google_application_credentials)
+                    except JSONDecodeError as e:
+                        # change JSON error to human-readable format
+                        raise ValueError(f'Google Application Credentials must be valid JSON string: {e}')
+                credentials = service_account.Credentials.from_service_account_info(google_application_credentials)
+                GCS._client_cache[cache_key] = gcs.Client(project=google_project_id, credentials=credentials)
+
+            # use Google Application Default Credentials (ADC)
+            else:
+                GCS._client_cache[cache_key] = gcs.Client(project=google_project_id)
+
+        return GCS._client_cache[cache_key]
 
     @classmethod
     def validate_connection(
@@ -119,6 +123,7 @@ class GCS(object):
     def _get_default_credentials(cls):
         """ Get default GCS credentials for LS Cloud Storages
         """
+        # TODO: remove this func with fflag_fix_back_lsdv_4902_force_google_adc_16052023_short
         try:
             # check if GCS._credentials_cache is None, we don't want to try getting default credentials again
             credentials = GCS._credentials_cache.get('credentials') if GCS._credentials_cache else None
@@ -170,16 +175,20 @@ class GCS(object):
         this if you are using Application Default Credentials from Google Compute
         Engine or from the Google Cloud SDK.
         """
-
         client = cls.get_client(
             google_application_credentials=google_application_credentials,
             google_project_id=google_project_id
         )
         bucket = client.get_bucket(bucket_name)
         blob = bucket.blob(blob_name)
-        # google_application_credentials has higher priority,
-        # use Application Default Credentials (ADC) when google_application_credentials is empty only
-        kwargs = {} if google_application_credentials else cls._get_default_credentials()
+
+        # this flag should be OFF, maybe we need to enable it for 1-2 customers, we have to check it
+        if flag_set('fflag_fix_back_lsdv_4902_force_google_adc_16052023_short', user='auto'):
+            # google_application_credentials has higher priority,
+            # use Application Default Credentials (ADC) when google_application_credentials is empty only
+            kwargs = {} if google_application_credentials else cls._get_default_credentials()
+        else:
+            kwargs = {}
 
         url = blob.generate_signed_url(
             version="v4",
