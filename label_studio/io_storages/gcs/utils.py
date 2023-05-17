@@ -65,7 +65,8 @@ class GCS(object):
         cls,
         bucket_name: str,
         google_project_id: str = None,
-        google_application_credentials: Union[str, dict] = None
+        google_application_credentials: Union[str, dict] = None,
+        prefix: str = None
     ):
         logger.debug('Validating GCS connection')
         client = cls.get_client(
@@ -73,7 +74,12 @@ class GCS(object):
             google_project_id=google_project_id
         )
         logger.debug('Validating GCS bucket')
-        client.get_bucket(bucket_name)
+        bucket = client.get_bucket(bucket_name)
+
+        if prefix:
+            blobs = list(bucket.list_blobs(prefix=prefix, max_results=1))
+            if not blobs:
+                raise ValueError(f"No blobs found in {bucket_name}/{prefix} or prefix doesn't exist")
 
     @classmethod
     def iter_blobs(
@@ -225,7 +231,7 @@ class GCS(object):
             json_data = cls._try_read_json(blob_str)
             if not isinstance(json_data, dict):
                 raise ValueError(
-                    f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
+                    f"Error on key {key}: For {cls.__name__} your JSON file must be a dictionary with one task.")  # noqa
             return json_data
         elif convert_to == cls.ConvertBlobTo.BASE64:
             return base64.b64encode(blob_str)
