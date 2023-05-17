@@ -54,7 +54,7 @@ class GCS(object):
                         google_application_credentials = json.loads(google_application_credentials)
                     except JSONDecodeError as e:
                         # change JSON error to human-readable format
-                        raise ValueError(f'Google Application Credentials must be valid JSON string: {e}')
+                        raise ValueError(f'Google Application Credentials must be valid JSON string. {e}')
                 credentials = service_account.Credentials.from_service_account_info(google_application_credentials)
                 GCS._client_cache[cache_key] = gcs.Client(project=google_project_id, credentials=credentials)
 
