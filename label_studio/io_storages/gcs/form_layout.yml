@@ -15,7 +15,7 @@ gcs_credentials: &gcs_credentials
   - type: password
     name: google_application_credentials
     label: Google Application Credentials
-    placeholder: Paste here the content of credentials.json OR leave blank to use ADC
+    placeholder: Paste the contents of credentials.json here OR leave blank to use ADC
     autoComplete: "new-password"
     skipAutofill: true
     allowEmpty: false
