@@ -45,7 +45,7 @@ When you label with bounding boxes and other image segmentation tasks, or when y
 1. Select the label that you want to apply to the region.
 2. Draw the bounding box or highlight the text that you want to label. 
 3. In the **Regions** or **Labels** sidebar, locate and select the region that you labeled and click the eye icon to hide the region.
-4. Or press cmd or ctrl to draw over the **Regions** or **Labels**
+4. Or press cmd or ctrl to draw over the **Regions** or **Labels** (NOTE: This do not work for Keypoints)
 5. Select the next label that you want to apply to the overlapping region.
 6. Draw the bounding box or highlight the text that you want to label.
 7. Continue hiding and labeling regions until you've completed annotating the task. If you want, select the eye icon next to **Regions** to hide and then show all regions labeled on the task to confirm the end result.
