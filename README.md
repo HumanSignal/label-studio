@@ -62,7 +62,7 @@ Docker Compose script provides production-ready stack consisting of the followin
 - [Nginx](https://www.nginx.com/) - proxy web server used to load various static data, including uploaded audio, images, etc.
 - [PostgreSQL](https://www.postgresql.org/) - production-ready database that replaces less performant SQLite3.
 
-To start using the app from `http://localhost` run this command:
+To start using the app from `http://localhost:8080` run this command:
 ```bash
 docker-compose up
 ```
