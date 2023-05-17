@@ -16,7 +16,8 @@ def update_storage(storage):
         prefix = f'Project ID={instance.project.id} {instance}'
 
         if 'import' in storage._meta.label_lower:
-            instance.meta['tasks_existed'] = instance.links.count()
+            count = instance.links.count() - instance.last_sync_count
+            instance.meta['tasks_existed'] = count if count > 0 else 0
             if instance.meta['tasks_existed'] and instance.meta['tasks_existed'] > 0:
                 instance.status = 'completed'
             logger.info(f'{prefix} tasks_existed = {instance.meta["tasks_existed"]}')
