@@ -104,7 +104,7 @@ class LocalFilesImportStorage(ProjectStorageMixin, LocalFilesImportStorageBase):
         abstract = False
 
 
-class LocalFilesExportStorage(ExportStorage, LocalFilesMixin):
+class LocalFilesExportStorage(LocalFilesMixin, ExportStorage):
 
     def save_annotation(self, annotation):
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')

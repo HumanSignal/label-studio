@@ -21,7 +21,7 @@ export const StorageSet = ({title, target, rootClass, buttonLabel}) => {
         target,
       },
     }).then(types => {
-      setStorageTypes(types);
+      setStorageTypes(types ?? []);
     });
   }, []);
 
