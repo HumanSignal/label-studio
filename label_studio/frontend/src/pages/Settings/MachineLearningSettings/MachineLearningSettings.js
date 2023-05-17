@@ -130,22 +130,27 @@ export const MachineLearningSettings = () => {
 
   }
   async function onExportModel(model_version) {
-            Swal('Exporting Model, it may take some time')
-            axios.post(webhook_url + '/export?id=' + project.id +'&model_version=' + model_version)
-              .then((data) => {
-                console.log('export result');
-                if (data.data.message) {
-                  Swal(data.data.message)
-                }
-                const link = document.createElement('a');
-                var zipFile = new Blob([atob(data.data)], {"type": "application/zip"})               
-              var url = window.URL.createObjectURL(zipFile)
-              link.href = "data:application/zip;base64," + data.data;
-              console.log(url);
-              link.download = model_version+'.zip';
-              link.click();
-             })
-          }
+    Swal('Exporting Model, it may take some time');
+    axios.post(webhook_url + '/export?id=' + project.id +'&model_version=' + model_version)
+    .then((response) => {
+        if (response.data.message) {
+          Swal(response.data.message);
+        } else {
+          const blob = new Blob([response.data.model], { type: 'application/zip' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = model_version + '.zip';
+          link.click();
+        }
+      })
+      .catch((error) => {
+        console.error('export error');
+        console.error(error);
+        Swal('Failed to export the model');
+      });
+  }
+
   const trainModel = useCallback(async () => {
     await axios
     .get(webhook_url + '/can_press')
