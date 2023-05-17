@@ -43,9 +43,11 @@ export const StorageCard = ({
     setStorageData(storage);
   }, [storage]);
 
+  const notSyncedYet = synced !== null || ['in_progress', 'queued'].includes(storageData.status);
+
   return (
     <Card
-      header={storageData.title ?? `Untitled ${storageData.type}`}
+      header={storageData.title.slice(0, 70) ?? `Untitled ${storageData.type}`}
       extra={(
         <Dropdown.Trigger align="right" content={(
           <Menu size="compact" style={{ width: 110 }}>
@@ -58,21 +60,26 @@ export const StorageCard = ({
       )}
     >
       <StorageSummary
+        target={target}
         storage={storageData}
         className={rootClass.elem('summary')}
         storageTypes={storageTypes}
       />
       <div className={rootClass.elem('sync')}>
-        <Space size="small">
-          <Button waiting={syncing} onClick={startSync}>
+        <div>
+          <Button
+            waiting={syncing}
+            onClick={startSync}
+            disabled={notSyncedYet}
+          >
               Sync Storage
           </Button>
-          {synced !== null ? (
+          {notSyncedYet && (
             <div className={rootClass.elem('sync-count')}>
-                Synced {synced} task(s)
+              Syncing may take some time, please refresh the page to see the current status.
             </div>
-          ) : null}
-        </Space>
+          )}
+        </div>
       </div>
     </Card>
   );

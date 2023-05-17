@@ -86,7 +86,8 @@ class S3StorageMixin(models.Model):
         logger.debug('validate_connection')
         if client is None:
             client = self.get_client()
-        if self.prefix:
+        # we need to check path existence for Import storages only
+        if self.prefix and 'Export' not in self.__class__.__name__:
             logger.debug(f'Test connection to bucket {self.bucket} with prefix {self.prefix}')
             result = client.list_objects_v2(Bucket=self.bucket, Prefix=self.prefix, MaxKeys=1)
             if not result.get('KeyCount'):
