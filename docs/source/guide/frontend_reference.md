@@ -15,7 +15,7 @@ Label Studio Frontend (LSF) includes several UI options and callbacks that you c
 ## Updates to LSF in version 1.0.0
 
 !!! warning
-LSF version 1.0.0 is not compatible with earlier versions of Label Studio.
+    LSF version 1.0.0 is not compatible with earlier versions of Label Studio.
 
 If you use LSF with a custom backend, you must make changes to the API callbacks that you use as follows:
 

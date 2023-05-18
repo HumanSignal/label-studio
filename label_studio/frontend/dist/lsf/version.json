@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5090: Hidden regions notifications is displaying when filter is applied",
-  "commit": "a7d121cec7dff42421bbcd7b3ac17e83543bbf6b",
+  "message": "fix: LSDV-5065: Set filter button active when dropdown is opened",
+  "commit": "e811425285cab225273c24a19831e11314086436",
   "branch": "master",
-  "date": "2023/05/16 11:29:35"
+  "date": "2023/05/17 13:44:15"
 }
