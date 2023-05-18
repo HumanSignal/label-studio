@@ -115,7 +115,7 @@ class RedisImportStorage(ProjectStorageMixin, RedisImportStorageBase):
         abstract = False
 
 
-class RedisExportStorage(ExportStorage, RedisStorageMixin):
+class RedisExportStorage(RedisStorageMixin, ExportStorage):
     db = models.PositiveSmallIntegerField(
         _('db'), default=2,
         help_text='Server Database')
