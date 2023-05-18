@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5058: Outliner filter filtering empty labels",
-  "commit": "0dbba66307903acdc2288787d9a4024f5384a829",
-  "branch": "master",
-  "date": "2023/05/18 13:41:22"
+  "message": "fix: LSDV-5119: Minor improvements on labeling ui",
+  "commit": "47203fae65bf06dcd29fb5c39ea7c84ce43162ab",
+  "branch": "fb-lsdv-5119",
+  "date": "2023/05/18 18:40:26"
 }
