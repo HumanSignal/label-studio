@@ -1,6 +1,6 @@
 {
-  "message": "chore: LSDV-5060: Migrate to Yarn",
-  "commit": "ee15a82e9b90a75cda35dfb2d113db39f274997f",
-  "branch": "master",
-  "date": "2023/05/11 17:58:11"
+  "message": "fix: LSDV-5115: Fix height of tasks header row on quick view",
+  "commit": "34476133d3487660e7848018aa355338a0262a8b",
+  "branch": "fb-lsdv-5115",
+  "date": "2023/05/18 20:21:49"
 }
