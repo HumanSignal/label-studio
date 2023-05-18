@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5058: Outliner filter filtering empty labels",
-  "commit": "0dbba66307903acdc2288787d9a4024f5384a829",
-  "branch": "master",
-  "date": "2023/05/18 13:41:22"
+  "message": "fix: LSDV-5115: Fix height of tasks header row on quick view",
+  "commit": "98b72d8522fbb86a70afbd0c807742d19984fe66",
+  "branch": "fb-lsdv-5115",
+  "date": "2023/05/18 20:22:53"
 }
