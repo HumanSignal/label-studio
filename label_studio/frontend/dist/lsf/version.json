@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5058: Outliner filter filtering empty labels",
-  "commit": "0dbba66307903acdc2288787d9a4024f5384a829",
-  "branch": "master",
-  "date": "2023/05/18 13:41:22"
+  "message": "fix: LSDV-5066: Filter row validation to set filter just if value is added",
+  "commit": "8dca317f31e822a3556e92d7e255202f134b192d",
+  "branch": "fb-lsdv-5066",
+  "date": "2023/05/18 14:08:37"
 }
