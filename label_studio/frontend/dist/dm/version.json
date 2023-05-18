@@ -1,6 +1,6 @@
 {
   "message": "feat: LOPS-155: [FE] Select and export CandidateTasks to a new Project",
-  "commit": "84977e1a13094cb55a5ba2b58abefdf05de5f0af",
+  "commit": "fe8e86ad873d443fa81752f4b390ade019c0c5af",
   "branch": "fb-lops-155",
-  "date": "2023/05/18 11:15:01"
+  "date": "2023/05/18 11:16:41"
 }
