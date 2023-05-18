@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5058: Outliner filter filtering empty labels",
-  "commit": "0dbba66307903acdc2288787d9a4024f5384a829",
-  "branch": "master",
-  "date": "2023/05/18 13:41:22"
+  "message": "fix: LOPS-170: Labeling ui annotation tab improvements",
+  "commit": "8f664eb85d5944705e2b162f665862ccc9ab79fe",
+  "branch": "fb-lops-170",
+  "date": "2023/05/18 19:39:37"
 }
