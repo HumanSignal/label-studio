@@ -9,6 +9,7 @@ meta_description: Customize Label Studio with choice tags for simple classificat
 The `Choice` tag represents a single choice for annotations. Use with the `Choices` tag or `Taxonomy` tag to provide specific choice options.
 
 [^1]: `ff_dev_2007_rework_choices_280322_short` should be enabled to use `html` attribute
+
 [^2]: The `hint` attribute works only when `fflag_feat_front_prod_309_choice_hint_080523_short` is enabled
 
 ### Parameters
