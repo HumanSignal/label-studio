@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5058: Outliner filter filtering empty labels",
-  "commit": "0dbba66307903acdc2288787d9a4024f5384a829",
-  "branch": "master",
-  "date": "2023/05/18 13:41:22"
+  "message": "fix: LSDV-5120: Confidence score icon is being showed always",
+  "commit": "064dfc39c310f74d46c99935e9d1fc0e51354479",
+  "branch": "fb-lsdv-5120",
+  "date": "2023/05/19 11:08:27"
 }
