@@ -7,7 +7,7 @@ order: 405
 The DateTime tag adds date and time selection to the labeling interface. Use this tag to add a date, timestamp, month, or year to an annotation.
 
 Use with the following data types: audio, image, HTML, paragraph, text, time series, video
-[^FF_LSDV_4583]: feat_front_lsdv_4583_multi_image_segmentation_short - should be enable for `perItem` functionality
+[^1]: feat_front_lsdv_4583_multi_image_segmentation_short - should be enable for `perItem` functionality
 
 ### Parameters
 
@@ -22,7 +22,7 @@ Use with the following data types: audio, image, HTML, paragraph, text, time ser
 | [required] | <code>boolean</code> | <code>false</code> | Whether datetime is required or not |
 | [requiredMessage] | <code>string</code> |  | Message to show if validation fails |
 | [perRegion] | <code>boolean</code> |  | Use this option to label regions instead of the whole object |
-| [perItem] | <code>boolean</code> |  | Use this option to label items inside object instead of the whole object [^FF_LSDV_4583] |
+| [perItem] | <code>boolean</code> |  | Use this option to label items inside object instead of the whole object [^1] |
 
 ### Example
 ```html
