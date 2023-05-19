@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5115: Fix height of tasks header row on quick view",
-  "commit": "079c99c89041777d435600e95cb874d7573e1dd1",
+  "commit": "ab88f95d9e1b21724189d041bf626b09d9bf8fcc",
   "branch": "fb-lsdv-5115",
-  "date": "2023/05/18 22:41:41"
+  "date": "2023/05/19 18:20:51"
 }
