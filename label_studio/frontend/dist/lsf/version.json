@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5058: Outliner filter filtering empty labels",
-  "commit": "0dbba66307903acdc2288787d9a4024f5384a829",
-  "branch": "master",
-  "date": "2023/05/18 13:41:22"
+  "message": "fix: LSDV-5112: Fix the disable state of submission button",
+  "commit": "f94233100cc378dca047237d7a3ba424b822c0f7",
+  "branch": "fb-lsdv-5112",
+  "date": "2023/05/18 22:00:54"
 }
