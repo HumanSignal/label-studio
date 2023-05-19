@@ -65,7 +65,7 @@ LOGGING = {
         },
         'ldclient.util': {
             'handlers': ['console'],
-            'level': 'WARNING',
+            'level': 'ERROR',
         },
     },
 }
@@ -587,6 +587,9 @@ BATCH_JOB_RETRY_TIMEOUT = int(get_env('BATCH_JOB_RETRY_TIMEOUT', 60))
 
 FUTURE_SAVE_TASK_TO_STORAGE = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False)
 FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT', default=True)
+STORAGE_IN_PROGRESS_TIMER = get_env('STORAGE_IN_PROGRESS_TIMER', 5.0)
+
+USE_NGINX_FOR_EXPORT_DOWNLOADS = get_bool_env('USE_NGINX_FOR_EXPORT_DOWNLOADS', False)
 
 if get_env('MINIO_STORAGE_ENDPOINT') and not get_bool_env('MINIO_SKIP', False):
     CLOUD_FILE_STORAGE_ENABLED = True
@@ -642,3 +645,4 @@ if CSRF_TRUSTED_ORIGINS:
     CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS.split(",")
 
 REAL_HOSTNAME = os.getenv('HOSTNAME')  # we have to use getenv, because we don't use LABEL_STUDIO_ prefix
+GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS = get_bool_env('GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS', False)

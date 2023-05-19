@@ -153,6 +153,22 @@ def azure_client_mock():
             return [File('abc'), File('def'), File('ghi')]
         def get_blob_client(self, key):
             return DummyAzureBlob(self.name, key)
+        def get_container_properties(self, **kwargs):
+            return SimpleNamespace(
+                name='test-container',
+                last_modified='2022-01-01 01:01:01',
+                etag='test-etag',
+                lease='test-lease',
+                public_access='public',
+                has_immutability_policy=True,
+                has_legal_hold=True,
+                immutable_storage_with_versioning_enabled=True,
+                metadata={'key': 'value'},
+                encryption_scope='test-scope',
+                deleted=False,
+                version='1.0.0'
+            )
+
 
     class DummyAzureClient():
         def get_container_client(self, container_name):

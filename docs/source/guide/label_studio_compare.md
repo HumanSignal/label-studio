@@ -76,7 +76,7 @@ Label Studio is available as open source software, as well as an [Enterprise cl
     <td colspan="3"><b>Data Labeling Workflows</b></td>
   </tr>
    <tr>
-    <td><a href=”https://labelstud.io/playground/”> Label any data type from text, images, audio, time series data to multimodality.</a></td>
+    <td><a href="https://labelstud.io/playground/"> Label any data type from text, images, audio, time series data to multimodality.</a></td>
     <td style="text-align:center">✔️</td>
     <td style="text-align:center">✔️</td>
   </tr>
