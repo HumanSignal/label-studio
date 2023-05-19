@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5117: Revert labeling editor CTA buttons color",
-  "commit": "ad43c245ed07447ef6a46b8b1b06dd24837ab1f0",
+  "commit": "aea7f4ba5b8d68459e82cf3981fa5da0255f94ef",
   "branch": "fb-lsdv-5117",
-  "date": "2023/05/18 14:48:55"
+  "date": "2023/05/19 12:32:23"
 }
