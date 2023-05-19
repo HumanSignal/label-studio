@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5058: Outliner filter filtering empty labels",
-  "commit": "0dbba66307903acdc2288787d9a4024f5384a829",
+  "message": "fix: LSDV-5117: Revert labeling editor CTA buttons color",
+  "commit": "c4b9340db83dc852b68db23e7c0c8de1a09d865b",
   "branch": "master",
-  "date": "2023/05/18 13:41:22"
+  "date": "2023/05/19 13:20:44"
 }
