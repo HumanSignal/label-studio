@@ -1,4 +1,4 @@
-wheel
+wheel>=0.38.1,<=0.40.0
 appdirs>=1.4.3
 attr==0.3.1
 attrs>=19.2.0
@@ -10,8 +10,8 @@ boto3~=1.16.28
 botocore~=1.19.28
 bleach~=5.0.0
 
-google-api-core==2.10.0
-google-auth==2.11.0
+google-api-core==2.11.0
+google-auth==2.14.1
 google-cloud-appengine-logging==1.1.0
 google-cloud-audit-log==0.2.0
 google-cloud-core==2.3.2
@@ -19,9 +19,9 @@ google-cloud-storage~=2.5.0
 google-cloud-logging~=2.7.0
 google-resumable-media==2.3.3
 googleapis-common-protos==1.56.4
-grpc-google-iam-v1==0.12.3
+grpc-google-iam-v1==0.12.4
 
-Django==3.2.16
+Django==3.2.18
 django-storages==1.12.3
 django_annoying==0.10.6
 django_debug_toolbar==3.2.1
@@ -50,7 +50,7 @@ protobuf>=3.15.5
 psycopg2-binary==2.9.6
 pydantic>=1.7.3,<=1.11.0
 python_dateutil==2.8.1
-pytz ~=2019.3
+pytz ~=2022.1
 requests>=2.22.0,<=2.28
 rq==1.10.1
 rules==2.2
@@ -58,7 +58,7 @@ ujson>=3.0.0
 xmljson==0.2.0
 colorama>=0.4.4
 boxing>=0.1.4
-redis>=4.2.0
+redis~=3.5
 sentry-sdk>=1.1.0
 launchdarkly-server-sdk==7.5.0
 python-json-logger==2.0.4
