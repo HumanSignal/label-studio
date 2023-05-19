@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5058: Outliner filter filtering empty labels",
-  "commit": "0dbba66307903acdc2288787d9a4024f5384a829",
-  "branch": "master",
-  "date": "2023/05/18 13:41:22"
+  "message": "fix: LSDV-5001: Skip comments panel focus",
+  "commit": "b1ea8dc6df9614753eb54b0e6fc31dd7fe3e4070",
+  "branch": "fb-lsdv-5001/skip-comments-panel-focus",
+  "date": "2023/05/16 16:03:53"
 }
