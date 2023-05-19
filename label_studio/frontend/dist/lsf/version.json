@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5117: Revert labeling editor CTA buttons color",
-  "commit": "c4b9340db83dc852b68db23e7c0c8de1a09d865b",
+  "message": "fix: LSDV-5116: Change ground truth color to dark",
+  "commit": "19ce9d73194ef9126bc5130f069d99e91a2c56e9",
   "branch": "master",
-  "date": "2023/05/19 13:20:44"
+  "date": "2023/05/19 14:05:56"
 }
