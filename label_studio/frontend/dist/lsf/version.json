@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5001: Skip comments panel focus",
-  "commit": "5bcd36eccee4550d8843031429d83a7c473186fe",
+  "commit": "3b010c707aa1d29c077520ae95349b5a502ac524",
   "branch": "fb-lsdv-5001/skip-comments-panel-focus",
-  "date": "2023/05/19 10:20:28"
+  "date": "2023/05/19 11:00:19"
 }
