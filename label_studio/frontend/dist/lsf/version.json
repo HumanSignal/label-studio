@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5058: Outliner filter filtering empty labels",
-  "commit": "0dbba66307903acdc2288787d9a4024f5384a829",
-  "branch": "master",
-  "date": "2023/05/18 13:41:22"
+  "message": "feat: LSDV-4654: Allow per-image classification",
+  "commit": "a2a645cb1721648c135157ddebc4b75f126bc3ea",
+  "branch": "fb-lsdv-4654/per-item",
+  "date": "2023/05/19 16:04:25"
 }
