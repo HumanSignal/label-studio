@@ -18,7 +18,6 @@ Items can be styled in `Style` tag by using `.htx-ranker-item` class.
 | name | <code>string</code> | Name of the element |
 | value | <code>string</code> | Data field containing a JSON with array of objects (id, title, body) to rank |
 | [title] | <code>string</code> | Title of the list |
-| [useBucket] | <code>string</code> | Which Bucket will be used to display results by default; see `Ranker` tag for more details |
 
 ### Example
 
