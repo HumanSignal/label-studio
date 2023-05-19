@@ -1,6 +1,6 @@
 {
   "message": "fix: LOPS-170: Labeling ui annotation tab improvements",
-  "commit": "8f664eb85d5944705e2b162f665862ccc9ab79fe",
+  "commit": "90daf0b1f36d504a41ef91ab857eaee9a5e1b7ed",
   "branch": "fb-lops-170",
-  "date": "2023/05/18 19:39:37"
+  "date": "2023/05/18 21:18:59"
 }
