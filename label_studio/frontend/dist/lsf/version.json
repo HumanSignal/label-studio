@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5116: Change ground truth color to dark",
-  "commit": "cbf8930499fabdef66731fe752ec7bd05a2ab9c5",
+  "commit": "20496c586cad7528edffb7272e1299971caf7241",
   "branch": "fb-lsdv-5116",
-  "date": "2023/05/18 15:07:23"
+  "date": "2023/05/19 16:22:09"
 }
