@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5116: Change ground truth color to dark",
-  "commit": "19ce9d73194ef9126bc5130f069d99e91a2c56e9",
+  "message": "fix: LSDV-5119: Minor improvements on labeling ui",
+  "commit": "9edda24573f8584b39596941cef3ff3a543ac4c5",
   "branch": "master",
-  "date": "2023/05/19 14:05:56"
+  "date": "2023/05/19 17:17:04"
 }
