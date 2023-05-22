@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5120: Confidence score icon is being shown always",
-  "commit": "ccea70b67799e5cc7f719a5ae087b2d915d503bf",
-  "branch": "fb-lsdv-5120",
-  "date": "2023/05/22 13:51:42"
+  "commit": "64f949266e0255ce716b3b587d4f5000c126f037",
+  "branch": "master",
+  "date": "2023/05/22 11:28:35"
 }
