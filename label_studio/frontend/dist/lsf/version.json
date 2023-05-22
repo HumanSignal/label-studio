@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-170: Labeling ui annotation tab improvements",
-  "commit": "ee882b78383307b3364ac60e4318a85e62bc4c00",
+  "message": "chore: LSDV-5109: Rename MIG FF key",
+  "commit": "01cf4fec96b2829f745fb8e63abf31f8bd2f50c4",
   "branch": "master",
-  "date": "2023/05/22 12:11:47"
+  "date": "2023/05/22 16:29:57"
 }
