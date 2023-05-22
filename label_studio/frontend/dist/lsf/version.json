@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5120: Confidence score icon is being shown always",
-  "commit": "64f949266e0255ce716b3b587d4f5000c126f037",
+  "message": "fix: LOPS-170: Labeling ui annotation tab improvements",
+  "commit": "ee882b78383307b3364ac60e4318a85e62bc4c00",
   "branch": "master",
-  "date": "2023/05/22 11:28:35"
+  "date": "2023/05/22 12:11:47"
 }
