@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5115: Fix height of tasks header row on quick view",
-  "commit": "336d9cbfdf1197b3bd12b448561d4cebc644e534",
+  "message": "fix: LSDV-5120: Confidence score icon is being shown always",
+  "commit": "64f949266e0255ce716b3b587d4f5000c126f037",
   "branch": "master",
-  "date": "2023/05/22 10:51:53"
+  "date": "2023/05/22 11:28:35"
 }
