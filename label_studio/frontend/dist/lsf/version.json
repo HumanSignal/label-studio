@@ -1,6 +1,6 @@
 {
-  "message": "chore: LSDV-5109: Rename MIG FF key",
-  "commit": "01cf4fec96b2829f745fb8e63abf31f8bd2f50c4",
+  "message": "fix: LSDV-5112: Fix the disable state of submission button",
+  "commit": "159f1a2b7dfbee80bd4bafed523fc0ba59d4ff10",
   "branch": "master",
-  "date": "2023/05/22 16:29:57"
+  "date": "2023/05/22 12:50:36"
 }
