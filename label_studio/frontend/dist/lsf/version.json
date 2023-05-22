@@ -1,5 +1,5 @@
 {
-  "message": "fix: LSDV-5119: Minor improvements on labeling ui",
+  "message": "fix: LSDV-5119: Minor improvements on labeling ui (#1375)",
   "commit": "9edda24573f8584b39596941cef3ff3a543ac4c5",
   "branch": "master",
   "date": "2023/05/19 17:17:04"
