@@ -253,7 +253,7 @@ Upgrade Docker Engine to the latest available version(>= [20.10.12](https://docs
 ### PermissionError: [Errno 13] Permission denied: `/label-studio/data/media`
 
 !!! warning
-Starting with Label Studio 1.7.0 release, the application run using a non-root docker user with ID `1001`.
+    Starting with Label Studio 1.7.0 release, the application run using a non-root docker user with ID `1001`.
 
 You may already be aware that Docker containers generally operate with root privileges by default. This unrestricted container management permits actions like installing system packages, modifying configuration files, and binding privileged ports, which are all beneficial for development purposes. However, this can lead to significant risks when containers are deployed in a production environment.
 

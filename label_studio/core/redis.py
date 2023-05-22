@@ -3,6 +3,7 @@
 from datetime import timedelta
 from functools import partial
 
+import sys
 import redis
 import logging
 import django_rq
