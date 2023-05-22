@@ -108,6 +108,20 @@ def s3_with_images(s3):
     yield s3
 
 
+def s3_remove_bucket():
+    """
+    Remove pytest-s3-images
+    """
+    bucket_name = 'pytest-s3-images'
+    _s3 = boto3.client('s3', region_name='us-east-1')
+    _s3.delete_object(Bucket=bucket_name, Key='image1.jpg')
+    _s3.delete_object(Bucket=bucket_name, Key='subdir/image1.jpg')
+    _s3.delete_object(Bucket=bucket_name, Key='subdir/image2.jpg')
+    _s3.delete_object(Bucket=bucket_name, Key='subdir/another/image2.jpg')
+    _s3.delete_bucket(Bucket=bucket_name)
+    return ""
+
+
 @pytest.fixture(autouse=True)
 def s3_with_jsons(s3):
     bucket_name = 'pytest-s3-jsons'
@@ -138,6 +152,65 @@ def s3_with_unexisted_links(s3):
 def s3_export_bucket(s3):
     bucket_name = 'pytest-export-s3-bucket'
     s3.create_bucket(Bucket=bucket_name)
+    yield s3
+
+
+@pytest.fixture(autouse=True)
+def s3_export_bucket_sse(s3):
+    bucket_name = 'pytest-export-s3-bucket-with-sse'
+    s3.create_bucket(Bucket=bucket_name)
+
+    # Set the bucket policy
+    policy = {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:PutObject",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket_name}",
+                    f"arn:aws:s3:::{bucket_name}/*"
+                ],
+                "Condition": {
+                    "StringNotEquals": {
+                        "s3:x-amz-server-side-encryption": "AES256"
+                    }
+                }
+            },
+            {
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:PutObject",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket_name}",
+                    f"arn:aws:s3:::{bucket_name}/*"
+                ],
+                "Condition": {
+                    "Null": {
+                        "s3:x-amz-server-side-encryption": "true"
+                    }
+                }
+            },
+            {
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:*",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket_name}",
+                    f"arn:aws:s3:::{bucket_name}/*"
+                ],
+                "Condition": {
+                    "Bool": {
+                        "aws:SecureTransport": "false"
+                    }
+                }
+            }
+        ]
+    }
+
+    s3.put_bucket_policy(Bucket=bucket_name, Policy=json.dumps(policy))
+
     yield s3
 
 
