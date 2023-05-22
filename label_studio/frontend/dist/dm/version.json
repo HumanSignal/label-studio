@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-3859: Update outdated thirdparty js dependencies",
-  "commit": "38e6ee603a82dcf8fbc0a2908fcb58c9825bde00",
-  "branch": "fb-lsdv-3859",
-  "date": "2023/05/22 15:34:14"
+  "commit": "235d685c30d19fdc06fb7ebcc548b3adfb8d07df",
+  "branch": "master",
+  "date": "2023/05/22 09:49:20"
 }
