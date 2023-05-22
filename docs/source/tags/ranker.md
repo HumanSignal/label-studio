@@ -1,62 +1,52 @@
 ---
 title: Ranker
 type: tags
-order: 420
-meta_title: Ranker Tag for Model Ranking
-meta_description: Customize Label Studio with the Ranker tag to rank the predictions from different models to rank model quality in your machine learning and data science projects.
+order: 305
+meta_title: Ranker Tag displays items that can be dragged and dropped between columns
+meta_description: Customize Label Studio by displaying and sorting results for machine learning and data science projects.
 ---
 
-The `Ranker` tag is used to rank the results from models. This tag uses the "prediction" field from a labeling task instead of the "data" field to display content for labeling on the interface. Carefully structure your labeling tasks to work with this tag. See [import pre-annotated data](../guide/predictions.html).
-
-Use with the following data types: text.
-
-The Ranker tag renders a given list of strings and allows you to drag and reorder them.
-To see this tag in action:
-1. Save the example JSON below as a file called <code>example_ranker_tag.json</code>.
-2. Upload it as a task on the Label Studio UI.
-3. Set up a project with the given labeling configuration.
+The `Ranker` tag is used to rank items in a list or pick relevant items from a list, depending on `mode` parameter. Task data referred in `value` parameter should be an array of objects with `id`, `title`, and `body` fields.
+Results are saved as an array of `id`s in `result` field.
+Columns and items can be styled in `Style` tag by using respective `.htx-ranker-column` and `.htx-ranker-item` classes. Titles of one or two columns are defined in single `title` parameter.
 
 ### Parameters
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| name | <code>string</code> |  | Name of group |
-| [axis] | <code>y</code> \| <code>x</code> | <code>y</code> | Whether to use a vertical or horizantal axis direction for ranking |
-| lockAxis | <code>x</code> \| <code>y</code> |  | Lock axis |
-| sortedHighlightColor | <code>string</code> |  | Sorted color in HTML color name |
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>string</code> | Data field containing a JSON with array of objects (id, title, body) to rank |
+| [mode] | <code>rank</code> \| <code>select</code> | rank: 1 column, reorder to rank, select: 2 columns, drag results to second column to select |
+| [title] | <code>string</code> | Title(s) of the column(s), separate them by `|` symbol for `mode="select" |
 
 ### Example
 
-Labeling configuration for ranking predicted text output from a model
+Visual appearance can be changed via Style tag with these classnames
 
 ```html
 <View>
-  <Text name="txt-1" value="$text"></Text>
-  <Ranker name="ranker-1" toName="txt-1" ranked="true" sortedHighlightColor="red"></Ranker>
+  <Style>
+    .htx-ranker-column { background: cornflowerblue; }
+    .htx-ranker-item { background: lightgoldenrodyellow; }
+  </Style>
+  <Ranker name="ranker" value="$items" mode="rank" title="Search Results"/>
 </View>
 ```
 ### Example
 
-Example JSON task to use to see the Ranker tag in action
+Example data and result for Ranker tag
 
 ```json
-[{
-  "data": {
-    "text": "Some text for the ranker tag"
-  },
-  "predictions": [{
-    "model_version": "1564027355",
-    "result": [{
-      "from_name": "ranker-1",
-      "to_name": "ranker-1",
-      "type": "ranker",
-      "value": {
-        "items": ["abc", "def", "ghk", "more more more", "really long text"],
-        "weights": [1.00, 0.78, 0.75, 0.74, 0.74],
-        "selected": [false, false, false, false, false]
-      }
-    }],
-    "score": 1.0
-  }]
-}]
+{
+  "items": [
+    { "id": "blog", "title": "10 tips to write a better function", "body": "There is nothing worse than being left in the lurch when it comes to writing a function!" },
+    { "id": "mdn", "title": "Arrow function expressions", "body": "An arrow function expression is a compact alternative to a traditional function" },
+    { "id": "wiki", "title": "Arrow (computer science)", "body": "In computer science, arrows or bolts are a type class..." },
+  ]
+}
+{
+  "from_name": "ranker",
+  "to_name": "ranker",
+  "type": "ranker",
+  "value": { "ranker": ["mdn", "wiki", "blog"] }
+}
 ```

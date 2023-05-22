@@ -17,6 +17,7 @@ The `Choice` tag represents a single choice for annotations. Use with the `Choic
 | [alias] | <code>string</code> | Alias for the choice. If used, the alias replaces the choice value in the annotation results. Alias does not display in the interface. |
 | [style] | <code>style</code> | CSS style of the checkbox element |
 | [hotkey] | <code>string</code> | Hotkey for the selection |
+| [hint] | <code>string</code> | Hint for choice on hover (it works when fflag_feat_front_prod_309_choice_hint_080523_short is enabled) |
 
 ### Example
 
