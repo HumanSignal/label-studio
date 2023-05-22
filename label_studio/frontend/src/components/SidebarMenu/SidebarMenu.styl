@@ -4,7 +4,7 @@
   max-height calc(100vh - var(--header-height))
 
   &__navigation
-    width 241px // to match the 1px border of the logo in header
+    width calc(var(--menu-sidebar-width) + 1px) // to match the 1px border of the logo in header
     display flex
 
   &__content

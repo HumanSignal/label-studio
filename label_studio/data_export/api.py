@@ -384,6 +384,26 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
     lookup_url_kwarg = 'export_pk'
     permission_required = all_permissions.projects_change
 
+    def delete(self, *args, **kwargs):
+        if flag_set('ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short'):
+            try:
+                export = self.get_object()
+                export.file.delete()
+
+                for converted_format in export.converted_formats.all():
+                    if converted_format.file:
+                        converted_format.file.delete()
+            except Exception as e:
+                return Response(
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    data={
+                        'detail':
+                            'Could not delete file from storage. Check that your user has permissions to delete files: %s' % str(e)
+                    }
+                )
+
+        return super().delete(*args, **kwargs)
+
     def _get_project(self):
         project_pk = self.kwargs.get('pk')
         project = generics.get_object_or_404(
@@ -467,17 +487,27 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
             if isinstance(file.storage, FileSystemStorage):
                 url = file.storage.url(file.name)
             else:
-                url = file.storage.url(file.name, storage_url=True, http_method=request.method)
+                url = file.storage.url(file.name, storage_url=True)
             protocol = urlparse(url).scheme
 
-            # Let NGINX handle it
-            response = HttpResponse()
-            # The below header tells NGINX to catch it and serve, see docker-config/nginx-app.conf
-            redirect = '/file_download/' + protocol + '/' + url.replace(protocol + '://', '')
+            # NGINX downloads are a solid way to make uwsgi workers free
+            if settings.USE_NGINX_FOR_EXPORT_DOWNLOADS:
+                # let NGINX handle it
+                response = HttpResponse()
+                # below header tells NGINX to catch it and serve, see docker-config/nginx-app.conf
+                redirect = '/file_download/' + protocol + '/' + url.replace(protocol + '://', '')
+                response['X-Accel-Redirect'] = redirect
+                response['Content-Disposition'] = 'attachment; filename="{}"'.format(file.name)
+                response['filename'] = os.path.basename(file.name)
+                return response
 
-            response['X-Accel-Redirect'] = redirect
-            response['Content-Disposition'] = 'attachment; filename="{}"'.format(file.name)
-            return response
+            # No NGINX: standard way for export downloads in the community edition
+            else:
+                ext = file.name.split('.')[-1]
+                response = RangedFileResponse(request, file, content_type=f'application/{ext}')
+                response['Content-Disposition'] = f'attachment; filename="{file.name}"'
+                response['filename'] = os.path.basename(file.name)
+                return response
         else:
             if export_type is None:
                 file_ = snapshot.file

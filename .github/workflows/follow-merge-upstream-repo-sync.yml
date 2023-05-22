@@ -9,7 +9,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.client_payload.branch_name }}
 
 env:
-  NODE: 14
+  NODE: 18
   CACHE_NAME_PREFIX: v1
   STATIC_DIST: 'label_studio/frontend/dist'
   RELEASE_BRANCH_PREFIX: "ls-release/"
@@ -161,11 +161,12 @@ jobs:
 
       - name: "LSF Docs: Install NPM deps"
         if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
-        working-directory: tmp/scripts
-        run: npm install jsdoc-to-markdown node-fetch
+        continue-on-error: true
+        run: npm install -g jsdoc-to-markdown node-fetch
 
       - name: "LSF Docs: Build"
         if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+        continue-on-error: true
         working-directory: tmp/scripts
         run: node create-docs.js
 
