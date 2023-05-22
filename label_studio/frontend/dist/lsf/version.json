@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5119: Minor improvements on labeling ui",
-  "commit": "9edda24573f8584b39596941cef3ff3a543ac4c5",
+  "message": "fix: LSDV-5115: Fix height of tasks header row on quick view",
+  "commit": "336d9cbfdf1197b3bd12b448561d4cebc644e534",
   "branch": "master",
-  "date": "2023/05/19 17:17:04"
+  "date": "2023/05/22 10:51:53"
 }
