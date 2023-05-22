@@ -6,6 +6,18 @@
         "decorators": ""
     },
     {
+        "url": "/sw\\.js",
+        "module": "core.views.serve_file",
+        "name": "",
+        "decorators": ""
+    },
+    {
+        "url": "/sw-fallback\\.js",
+        "module": "core.views.serve_file",
+        "name": "",
+        "decorators": ""
+    },
+    {
         "url": "/favicon\\.ico",
         "module": "django.views.generic.base.RedirectView",
         "name": "",
@@ -153,6 +165,12 @@
         "url": "/api/projects/<int:pk>/summary/",
         "module": "projects.api.ProjectSummaryAPI",
         "name": "projects:api:project-summary",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/imports/<int:import_pk>/",
+        "module": "projects.api.ProjectImportAPI",
+        "name": "projects:api:project-imports",
         "decorators": ""
     },
     {

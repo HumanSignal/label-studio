@@ -2,11 +2,12 @@ import { Children, cloneElement, forwardRef, useCallback, useEffect, useMemo, us
 import { createPortal } from "react-dom";
 import { Block, Elem } from "../../utils/bem";
 import { alignElements } from "../../utils/dom";
+import { isDefined } from "../../utils/helpers";
 import { aroundTransition } from "../../utils/transition";
 import "./Tooltip.styl";
 
 export const Tooltip = forwardRef(
-  ({ title, children, defaultVisible, disabled, style }, ref) => {
+  ({ title, children, alignment, defaultVisible, disabled, style }, ref) => {
     if (!children || Array.isArray(children)) {
       throw new Error("Tooltip does accept a single child only");
     }
@@ -18,18 +19,23 @@ export const Tooltip = forwardRef(
       defaultVisible ? "visible" : null,
     );
     const [injected, setInjected] = useState(false);
-    const [align, setAlign] = useState('top-center');
+    const [align, setAlign] = useState(alignment ?? 'top-center');
 
     const calculatePosition = useCallback(() => {
-      const { left, top, align: resultAlign } = alignElements(
-        triggerElement.current,
-        tooltipElement.current,
-        align,
-        10,
-      );
+      const parent = triggerElement.current;
+      const target = tooltipElement.current;
 
-      setOffset({ left, top });
-      setAlign(resultAlign);
+      if (isDefined(parent) && isDefined(target)) {
+        const { left, top, align: resultAlign } = alignElements(
+          parent,
+          target,
+          align,
+          10,
+        );
+
+        setOffset({ left, top });
+        setAlign(resultAlign);
+      }
     }, [triggerElement.current, tooltipElement.current]);
 
     const performAnimation = useCallback(

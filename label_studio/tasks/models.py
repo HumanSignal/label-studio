@@ -240,7 +240,7 @@ class Task(TaskMixin, models.Model):
             self.storage = self._get_storage_by_url(url, storage_objects)
 
         if self.storage:
-            return self.storage.generate_http_url(url)
+            return { "url": self.storage.generate_http_url(url), "presign_ttl": self.storage.presign_ttl }
 
     def resolve_uri(self, task_data, project):
         if project.task_data_login and project.task_data_password:

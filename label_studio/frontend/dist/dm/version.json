@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-116: Update frontend candidate task view to show File attributes",
-  "commit": "75f6bbbf030c41b310e5e931c330486fb2f3a0b4",
+  "message": "fix: LSDV-5115: Fix height of tasks header row on quick view",
+  "commit": "c5fa5573711df9b5a9c6e519e263cd673ff37e6c",
   "branch": "master",
-  "date": "2023/04/24 11:26:47"
+  "date": "2023/05/22 10:51:34"
 }
