@@ -24,7 +24,7 @@ export const unique = <T>(list: T[] | undefined, expression: Uniqueness<T>): T[]
   }, []);
 };
 
-export const isDefined = <T>(value: T | null | undefined): value is T => {
+export const isDefined = <T>(value: T | undefined | null): value is T => {
   return value !== null && value !== undefined;
 };
 
@@ -64,7 +64,7 @@ export const humanReadableNumber = (n: number) => {
   const abs = Math.abs(n);
 
   if (isNaN(abs) || n === null) return "—";
-  const normalizeNumber = (num: number) => numberWithPrecision(num, 1, true);
+  const normalizeNumber = (n: number) => numberWithPrecision(n, 1, true);
 
   let result;
 
@@ -123,4 +123,18 @@ export const delay = (time = 0) => {
 
 export const clamp = (value: number, min: number, max: number) => {
   return Math.max(min, Math.min(value, max));
+};
+
+export const getLastTraceback = (traceback: string): string => {
+  const lines = traceback.split('\n');
+  let lastTraceIndex = -1;
+
+  for (let i = lines.length - 1; i >= 0; i--) {
+    if (lines[i].startsWith('  File')) {
+      lastTraceIndex = i;
+      break;
+    }
+  }
+
+  return lastTraceIndex >= 0 ? lines.slice(lastTraceIndex).join('\n') : traceback;
 };

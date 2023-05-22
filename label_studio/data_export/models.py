@@ -218,9 +218,7 @@ class ConvertedFormat(models.Model):
         help_text='Traceback report in case of errors'
     )
     export_type = models.CharField(
-        max_length=64,
-        choices=Status.choices,
-        default=Status.CREATED,
+        max_length=64
     )
     created_at = models.DateTimeField(
         _('created at'),
