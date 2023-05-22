@@ -1,0 +1,3 @@
+[submodule "sensortypes"]
+	path = sensortypes
+	url = https://github.com/AI-Sensus/sensortypes.git

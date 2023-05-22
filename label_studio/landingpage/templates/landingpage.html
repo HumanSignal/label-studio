@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load filters %}
+
+{% block content %}
+
+<head>
+    <title>Landingpage</title>
+</head>
+<body>
+    <h1>Project overview</h1>
+    <ol>
+        <li>Name project</li>
+        <li><a href="/sensormodel/sensor">Manage sensors</a></li>
+        <li><a href="/sensormodel/subject">Manage subjects</a></li>
+        <li><a href="/sensormodel/deployment">Manage deployments</a></li>
+        <li><a href="/sensordata/">Manage data</a></li>
+        <li><a href="/sensordata/offset">Synchronize sensors</a></li>
+        <li><a href="/subjectannotation/">Annotate videos</a></li>
+        <li><a href="/projects/">Add labels</a></li>
+        <li>Annotate</li>
+        <li>Export annotations</li>
+    </ol>
+</body>
+
+{% endblock %}
+
+
