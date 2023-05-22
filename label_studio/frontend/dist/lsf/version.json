@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4601: Show correct author of draft (#1351)",
-  "commit": "6436e4e80a1f302be0b0997180139485bf4c1fe8",
+  "message": "fix: LSDV-5119: Minor improvements on labeling ui (#1375)",
+  "commit": "9edda24573f8584b39596941cef3ff3a543ac4c5",
   "branch": "master",
-  "date": "2023/05/15 01:23:49"
+  "date": "2023/05/19 17:17:04"
 }
