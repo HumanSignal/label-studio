@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5119: Minor improvements on labeling ui",
-  "commit": "9edda24573f8584b39596941cef3ff3a543ac4c5",
-  "branch": "master",
-  "date": "2023/05/19 17:17:04"
+  "message": "fix: ls-release: 1.8.0 hotfix",
+  "commit": "22fc21f806a13fbb148d4c0e636bb9a008a5d5e3",
+  "branch": "ls-release/1.8.0",
+  "date": "2023/05/23 09:55:30"
 }
