@@ -65,20 +65,18 @@
                 <th>Sensor data name</th>
                 <th>Begin Date Time</th>
                 <th>End Date Time</th>
-                <th>Sensor</th>
+                <th>Project ID</th>
                 <th>Sensor type</th>
-                {% comment %} <th></th>
-                <th></th> {% endcomment %}
+                <th></th>
             </tr>
             {% for sendata in sensordata %}
             <tr>
                 <td>{{ sendata.name }}</td>
                 <td>{{ sendata.begin_datetime }}</td>
                 <td>{{ sendata.end_datetime }}</td> 
-                <td>{{ sendata.sensor}} </td>
-                <td>{{ sendata.sensor.sensortype.sensortype.get_sensortype_display}} </td>
-                {% comment %} <td><a href="{% url 'sensormodel:adjust_deployment' deployment.id %}">[Edit]</a></td>
-                <td><a href="{% url 'sensormodel:delete_deployment' deployment.id %}">[Delete]</a></td> {% endcomment %}
+                <td>{{ sendata.project_id}} </td>
+                <td>{{ sendata.sensortype}} </td>
+                <td><a href="{% url 'sensordata:delete' sendata.id %}">[Delete]</a></td>
             </tr> 
             {% endfor %} 
         </table>
