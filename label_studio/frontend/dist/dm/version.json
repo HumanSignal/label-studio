@@ -1,6 +1,6 @@
 {
-  "message": "Revert "feat: LSDV-3104: Task navigation standardization (#181)"",
-  "commit": "245115496ab8db050ae4cf47d3d51bb8e59f6b6b",
-  "branch": "fb-lsdv-3104/revert-task-nav-starnardization",
-  "date": "2023/05/23 15:37:55"
+  "message": "feat: LSDV-3104: Revert task navigation standardization",
+  "commit": "deb6a614f73d5a0dc06b463127dfde568b4c66c8",
+  "branch": "master",
+  "date": "2023/05/23 16:23:07"
 }
