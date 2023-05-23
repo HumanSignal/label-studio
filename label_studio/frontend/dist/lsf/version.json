@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5112: Fix the disable state of submission button (#1378)",
-  "commit": "159f1a2b7dfbee80bd4bafed523fc0ba59d4ff10",
+  "message": "fix: LSDV-5131: Fix broken styles for controls",
+  "commit": "7b5decf462134d825f4a30a96034c249f6181fa6",
   "branch": "master",
-  "date": "2023-05-22T15:50:36Z"
+  "date": "2023/05/23 16:32:03"
 }
