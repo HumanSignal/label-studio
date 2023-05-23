@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5131: Fix broken styles for controls",
-  "commit": "7b5decf462134d825f4a30a96034c249f6181fa6",
+  "message": "feat: LSDV-3104: Revert task navigation standardization",
+  "commit": "6a6a53ebb5c6bf23d7474fd6baa85a040794e4cc",
   "branch": "master",
-  "date": "2023/05/23 16:32:03"
+  "date": "2023/05/23 17:44:36"
 }
