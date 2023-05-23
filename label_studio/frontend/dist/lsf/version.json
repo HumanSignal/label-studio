@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5112: Fix the disable state of submission button",
+  "message": "fix: LSDV-5112: Fix the disable state of submission button (#1378)",
   "commit": "159f1a2b7dfbee80bd4bafed523fc0ba59d4ff10",
   "branch": "master",
-  "date": "2023/05/22 12:50:36"
+  "date": "2023-05-22T15:50:36Z"
 }
