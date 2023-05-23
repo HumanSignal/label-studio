@@ -105,7 +105,7 @@ export const StorageSummary = ({ target, storage, className, storageTypes = [] }
             )
             : (
               <DescriptionList.Item term="Tasks" help={tasks_added_help + '\n' + tasks_total_help}>
-                <Tooltip title={tasks_total_help} style={{ whiteSpace: "pre-wrap" }}>
+                <Tooltip title={tasks_added_help + '\n' + tasks_total_help} style={{ whiteSpace: "pre-wrap" }}>
                   <span>{last_sync_count + tasks_existed}</span>
                 </Tooltip>
                 <Tooltip title={tasks_added_help}><span> ({last_sync_count} new)</span></Tooltip>

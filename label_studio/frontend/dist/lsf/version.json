@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5058: Outliner filter filtering empty labels",
-  "commit": "0dbba66307903acdc2288787d9a4024f5384a829",
+  "message": "fix: LSDV-5131: Fix broken styles for controls",
+  "commit": "7b5decf462134d825f4a30a96034c249f6181fa6",
   "branch": "master",
-  "date": "2023/05/18 13:41:22"
+  "date": "2023/05/23 16:32:03"
 }
