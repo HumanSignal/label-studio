@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3025-14: Implement empty state when outliner filter returns empty",
-  "commit": "4fc6e341bd785500ceb4aa5a60e5dd0df6da1b9c",
+  "message": "fix: LSDV-5112: Fix the disable state of submission button (#1378)",
+  "commit": "159f1a2b7dfbee80bd4bafed523fc0ba59d4ff10",
   "branch": "master",
-  "date": "2023/05/11 15:33:39"
+  "date": "2023-05-22T15:50:36Z"
 }
