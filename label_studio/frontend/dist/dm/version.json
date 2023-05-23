@@ -1,6 +1,6 @@
 {
-  "message": "chore: LSDV-5060: Migrate to Yarn",
-  "commit": "ee15a82e9b90a75cda35dfb2d113db39f274997f",
-  "branch": "master",
-  "date": "2023/05/11 17:58:11"
+  "message": "fix: ls-release: 1.8.0 hotfix ",
+  "commit": "d5c82c841c448f928764aa60875433696192003e",
+  "branch": "ls-release/1.8.0",
+  "date": "2023/05/23 09:54:42"
 }
