@@ -1,0 +1,52 @@
+# A sensor can be a IMU sensor, Camera or a Microphone (more can be added later)
+
+#Select sensortype
+sensortype: 'I'   # 'I','C','M'
+
+# Sensor devices may timestamp the start of the datafile in the metadata. The labeling app uses this timestamp to synchronize with the videos. (row and column indexation starts at 1)
+
+# Select row that contains the date of the file
+
+date_row :  2  #0-…
+
+# Select row that contains the time of the file
+
+time_row :  2  #0-…
+
+# The information in the timestamp columns is used to correctly plot the data
+
+# Select column that denotes the timestamps
+
+timestamp_column :  0  #0-…
+
+# Are the timestamps relative or absolute?
+
+relative_absolute :  'relative'   #relative/absolute 
+
+# Unit of the timestamp
+
+timestamp_unit : 'seconds'   #'days', 'hours', 'minutes', 'seconds', 'milliseconds', 'microseconds', 'nanoseconds'
+
+# Format string of the timestamps
+
+format_string : #'%d/%m/%Y,'%m/%d/%Y','%Y-%d-%m','%Y-%m-%d' 
+
+# Most sensordata files print the ID of the sensor as the metadata in the headers of each file. The labelling programme can parse the ID to automathically recognize the sensor and link the data to a subject. (Optional)
+
+# Select row that contains the sensor ID 
+
+sensor_id_row :  1   #0-…
+
+# Select row that contains the sensor ID (Optional)
+
+sensor_id_column :  4  #0-…
+
+# Regex of sensor ID (Optional)
+
+sensor_id_regex :     
+
+# Select row that contains the names of eacht column
+col_names_row :  7  #0-…
+
+# ; , #, / (Optional)
+comment_style :
