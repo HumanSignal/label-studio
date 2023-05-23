@@ -1,6 +1,6 @@
 {
-  "message": "fix: ls-release: 1.8.0 hotfix",
-  "commit": "22fc21f806a13fbb148d4c0e636bb9a008a5d5e3",
-  "branch": "ls-release/1.8.0",
-  "date": "2023/05/23 09:55:30"
+  "message": "Fb ls release 1.8.0 fixes",
+  "commit": "ab46a4e20120fdd6f297c5f3755a9b2c290c8cc5",
+  "branch": "fb-ls-release-1.8.0-fixes",
+  "date": "2023/05/23 16:32:03"
 }
