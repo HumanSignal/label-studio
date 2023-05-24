@@ -1,20 +1,6 @@
 {
-<<<<<<< HEAD
-  "message": "fix: LSDV-3859: Update outdated thirdparty js dependencies",
-  "commit": "235d685c30d19fdc06fb7ebcc548b3adfb8d07df",
-||||||| 9aeb3ad3f
-  "message": "chore: LSDV-5060: Migrate to Yarn",
-  "commit": "ee15a82e9b90a75cda35dfb2d113db39f274997f",
-=======
-  "message": "fix: LSDV-5115: Fix height of tasks header row on quick view",
-  "commit": "c5fa5573711df9b5a9c6e519e263cd673ff37e6c",
->>>>>>> develop
+  "message": "feat: LSDV-3104: Revert task navigation standardization",
+  "commit": "deb6a614f73d5a0dc06b463127dfde568b4c66c8",
   "branch": "master",
-<<<<<<< HEAD
-  "date": "2023/05/22 09:49:20"
-||||||| 9aeb3ad3f
-  "date": "2023/05/11 17:58:11"
-=======
-  "date": "2023/05/22 10:51:34"
->>>>>>> develop
+  "date": "2023/05/23 16:23:07"
 }
