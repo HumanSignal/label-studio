@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4992: Fix missed hide all regions button",
-  "commit": "6b1cc88253f21a231e80123a4ff83fc843eb5737",
+  "commit": "ec4fa424fe21152f5585498759b6e47aa1bf2679",
   "branch": "fb-lsdv-4992/hide-all",
-  "date": "2023/05/24 13:42:06"
+  "date": "2023/05/24 16:12:53"
 }
