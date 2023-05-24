@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3104: Revert task navigation standardization",
-  "commit": "6a6a53ebb5c6bf23d7474fd6baa85a040794e4cc",
+  "message": "fix: LSDV-5131: Fix Submit button disabled state",
+  "commit": "4c163b42a8695e1e55f1bec4617d45d11c50ae15",
   "branch": "master",
-  "date": "2023/05/23 17:44:36"
+  "date": "2023/05/24 11:32:20"
 }
