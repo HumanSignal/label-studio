@@ -200,7 +200,7 @@ jobs:
         run: |
           set -xeuo pipefail
           docs_target_dir='${{ env.DOCS_TARGET_DIR }}'
-          rm -rf "${docs_target_dir}" || true
+          # rm -rf "${docs_target_dir}" || true
           mkdir -p "${docs_target_dir}"
           cp -Rf tmp/docs/* "${docs_target_dir}"
           git status
