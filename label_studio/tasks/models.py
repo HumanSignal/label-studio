@@ -596,6 +596,13 @@ class AnnotationDraft(models.Model):
             if hasattr(project, 'summary'):
                 project.summary.update_created_labels_drafts([self])
 
+    def delete(self, *args, **kwargs):
+        with transaction.atomic():
+            project = self.task.project
+            if hasattr(project, 'summary'):
+                project.summary.remove_created_drafts_and_labels([self])
+            super().delete(*args, **kwargs)
+
 
 class Prediction(models.Model):
     """ ML backend predictions

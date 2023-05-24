@@ -629,7 +629,7 @@ class Project(ProjectMixin, models.Model):
             # Ensure project.summary is consistent with current tasks / annotations
             if self.num_tasks == 0:
                 self.summary.reset()
-            elif self.num_annotations == 0:
+            elif self.num_annotations == 0 and self.num_drafts == 0:
                 self.summary.reset(tasks_data_based=False)
 
     def get_member_ids(self):
@@ -1150,6 +1150,30 @@ class ProjectSummary(models.Model):
                 for label in self._get_labels(result):
                     labels[from_name][label] = labels[from_name].get(label, 0) + 1
 
+        logger.debug(f'summary.created_labels = {labels}')
+        self.created_labels_drafts = labels
+        self.save(update_fields=['created_labels_drafts'])
+
+    def remove_created_drafts_and_labels(self, drafts):
+        labels = dict(self.created_labels_drafts)
+        for draft in drafts:
+            results = get_attr_or_item(draft, 'result') or []
+            if not isinstance(results, list):
+                continue
+
+            for result in results:
+                # reduce labels counters
+                from_name = result.get('from_name', None)
+                if from_name not in labels:
+                    continue
+                for label in self._get_labels(result):
+                    label = str(label)
+                    if label in labels[from_name]:
+                        labels[from_name][label] -= 1
+                        if labels[from_name][label] == 0:
+                            labels[from_name].pop(label)
+                if not labels[from_name]:
+                    labels.pop(from_name)
         logger.debug(f'summary.created_labels = {labels}')
         self.created_labels_drafts = labels
         self.save(update_fields=['created_labels_drafts'])
