@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4992: Fix missed hide all regions button",
-  "commit": "3470be637f28540e9663e1e87149ec2b1757a010",
-  "branch": "master",
-  "date": "2023/05/24 21:04:01"
+  "message": "fix: LSDV-5162: Fix shifting of annotation tabs on hover",
+  "commit": "e432670763b5020958c572c477197dc04fccbb6e",
+  "branch": "fb-lsdv-5162/annotation-button-shift",
+  "date": "2023/05/24 23:11:34"
 }
