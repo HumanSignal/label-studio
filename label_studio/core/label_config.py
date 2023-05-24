@@ -261,7 +261,8 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
 
         elif value == 'video' and p.tag == 'HyperText':
             task[value] = examples.get('$videoHack')
-        elif p.tag == 'Ranker':
+        # List with a matching Ranker tag pair 
+        elif p.tag == 'List' and any([c.tag == 'Ranker' and c.get('toname') == p.get('name') or c.get('toName') == p.get('name') for c in xml.findall('.//Ranker')]):
             task[value] = examples.get('Ranker')
         elif p.tag == 'Paragraphs':
             # Paragraphs special case - replace nameKey/textKey if presented
