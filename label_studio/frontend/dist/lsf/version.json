@@ -1,6 +1,6 @@
 {
-  "message": "Fb ls release 1.8.0 fixes",
-  "commit": "ab46a4e20120fdd6f297c5f3755a9b2c290c8cc5",
-  "branch": "fb-ls-release-1.8.0-fixes",
-  "date": "2023/05/23 16:32:03"
+  "message": "feat: LSDV-3104: Revert task navigation standardization (#1390)",
+  "commit": "d7b0f7c3554dd7e2e4eab346464d26ab6208ebae",
+  "branch": "ls-release/1.8.0",
+  "date": "2023-05-23T23:18:02Z"
 }
