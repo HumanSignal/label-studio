@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5115: Fix height of tasks header row on quick view",
-  "commit": "c5fa5573711df9b5a9c6e519e263cd673ff37e6c",
+  "message": "feat: LSDV-3104: Revert task navigation standardization",
+  "commit": "deb6a614f73d5a0dc06b463127dfde568b4c66c8",
   "branch": "master",
-  "date": "2023/05/22 10:51:34"
+  "date": "2023/05/23 16:23:07"
 }

@@ -234,6 +234,7 @@ class TaskListAPI(generics.ListCreateAPIView):
             if not review and project.evaluate_predictions_automatically:
                 tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
                 evaluate_predictions(tasks_for_predictions)
+                [tasks_by_ids[_id].refresh_from_db() for _id in ids]
 
             serializer = self.task_serializer_class(page, many=True, context=context)
             return self.get_paginated_response(serializer.data)
