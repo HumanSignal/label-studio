@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5131: Fix broken styles for controls",
-  "commit": "7b5decf462134d825f4a30a96034c249f6181fa6",
+  "message": "fix: LSDV-5131: Fix Submit button disabled state",
+  "commit": "4c163b42a8695e1e55f1bec4617d45d11c50ae15",
   "branch": "master",
-  "date": "2023/05/23 16:32:03"
+  "date": "2023/05/24 11:32:20"
 }

@@ -180,6 +180,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         if (project.evaluate_predictions_automatically or project.show_collab_predictions) \
                 and not self.task.predictions.exists():
             evaluate_predictions([self.task])
+            self.task.refresh_from_db()
 
         serializer = self.get_serializer_class()(self.task, many=False, context=context, expand=['annotations.completed_by'])
         data = serializer.data
