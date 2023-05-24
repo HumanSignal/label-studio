@@ -1,6 +1,6 @@
 {
-  "message": "fix: ls-release: 1.8.0 hotfix",
-  "commit": "22fc21f806a13fbb148d4c0e636bb9a008a5d5e3",
+  "message": "feat: LSDV-3104: Revert task navigation standardization (#1390)",
+  "commit": "d7b0f7c3554dd7e2e4eab346464d26ab6208ebae",
   "branch": "ls-release/1.8.0",
-  "date": "2023/05/23 09:55:30"
+  "date": "2023-05-23T23:18:02Z"
 }
