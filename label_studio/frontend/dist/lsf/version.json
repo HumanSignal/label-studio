@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5131: Fix Submit button disabled state",
-  "commit": "4c163b42a8695e1e55f1bec4617d45d11c50ae15",
+  "message": "fix: LSDV-4992: Fix missed hide all regions button",
+  "commit": "3470be637f28540e9663e1e87149ec2b1757a010",
   "branch": "master",
-  "date": "2023/05/24 11:32:20"
+  "date": "2023/05/24 21:04:01"
 }
