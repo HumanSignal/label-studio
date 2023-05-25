@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5136: Navigate between tabs in the side panels is not reseting the comments",
-  "commit": "5f853c3866a36f84b647aefccf2c64cdf0099695",
+  "message": "fix: LSDV-5162: Fix shifting of annotation tabs on hover",
+  "commit": "3c1f6d58941ffb03a6e5b6fd7af4d3a9673e428e",
   "branch": "master",
-  "date": "2023/05/25 10:11:18"
+  "date": "2023/05/25 21:06:41"
 }
