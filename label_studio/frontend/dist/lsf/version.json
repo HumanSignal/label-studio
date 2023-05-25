@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3104: Revert task navigation standardization (#1390)",
-  "commit": "d7b0f7c3554dd7e2e4eab346464d26ab6208ebae",
+  "message": "fix: 1.8.0 cherrypick 2023 05 24",
+  "commit": "ccbc15530bc0547dff9d570f37752daf26739d07",
   "branch": "ls-release/1.8.0",
-  "date": "2023-05-23T23:18:02Z"
+  "date": "2023/05/24 21:10:03"
 }
