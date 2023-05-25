@@ -36,7 +36,7 @@ export const Preview = ({ config, data, error, loading }) => {
       return new window.LabelStudio(rootRef.current, {
         config,
         task,
-        interfaces: ["side-column"],
+        interfaces: ["side-column", "annotations:comments"],
         onLabelStudioLoad(LS) {
           LS.settings.bottomSidePanel = true;
 
