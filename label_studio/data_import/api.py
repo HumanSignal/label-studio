@@ -11,6 +11,7 @@ import mimetypes
 from django.conf import settings
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseRedirect
+from django.core.cache import cache
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 from rest_framework import generics, status
@@ -602,21 +603,38 @@ class PresignStorageData(APIView):
         if not project.has_permission(request.user):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        fileuri = unquote(fileuri)
+        """ Use a cache to avoid hitting the storage http api too often, as it increases latency and can cause timeouts.
+         This helps with the case where a task has many nested or many task data uris (ie. images) being accessed.
+         We don't want to presign the same url multiple times across requests inside the valid expiry ttl.
+        """
+        cache_key = f'presign:{fileuri}'
+        presigned_data = cache.get(cache_key)
 
-        resolved = task.resolve_storage_uri(fileuri, project)
+        if presigned_data is None:
+            fileuri = unquote(fileuri)
 
-        if resolved is None or resolved['url'] is None:
+            resolved = task.resolve_storage_uri(fileuri, project)
+
+            if resolved is None or resolved.get('url') is None:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+            url = resolved.get('url')
+            max_age = 0
+            if resolved.get('presign_ttl'):
+                max_age = resolved.get('presign_ttl') * 60
+
+            # Cache the presigned url for the ttl -10 seconds to allow for some drift
+            cache.set(cache_key, {'url': url, 'max_age': max_age}, timeout=max_age - 10)
+        else:
+            url = presigned_data.get('url')
+            max_age = presigned_data.get('max_age') or 0
+
+        if not url:
             return Response(status=status.HTTP_404_NOT_FOUND)
-
-        url = resolved['url']
-        maxAge = 0
-        if resolved['presign_ttl']:
-            maxAge = resolved['presign_ttl'] * 60
 
         # Proxy to presigned url
         response = HttpResponseRedirect(redirect_to=url, status=status.HTTP_303_SEE_OTHER)
-        response.headers['Cache-Control'] = f"no-store, max-age={maxAge}"
+        response.headers['Cache-Control'] = f"no-store, max-age={max_age}"
 
         return response
 
