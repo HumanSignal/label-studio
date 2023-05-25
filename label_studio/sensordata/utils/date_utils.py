@@ -15,7 +15,7 @@ def naive_to_utc(naive_dt: dt.datetime, timezone) -> dt.datetime:
     """
 
     if naive_dt.tzinfo is None:
-        return timezone.localize(naive_dt, is_dst=None).astimezone(pytz.UTC).replace(tzinfo=None)
+        return pytz.utc.localize(naive_dt, is_dst=None).astimezone(pytz.UTC).replace(tzinfo=None)
     else:
         return local_to_utc(naive_dt)
 
