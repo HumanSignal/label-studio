@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4992: Fix missed hide all regions button",
-  "commit": "3470be637f28540e9663e1e87149ec2b1757a010",
+  "message": "fix: LSDV-5136: Navigate between tabs in the side panels is not reseting the comments",
+  "commit": "5f853c3866a36f84b647aefccf2c64cdf0099695",
   "branch": "master",
-  "date": "2023/05/24 21:04:01"
+  "date": "2023/05/25 10:11:18"
 }
