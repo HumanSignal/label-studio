@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5162: Fix shifting of annotation tabs on hover",
-  "commit": "6fd4cc16ed612e5f43cb457ddc26d04663eb0e05",
-  "branch": "fb-lsdv-5162/annotation-button-shift",
-  "date": "2023/05/24 23:31:43"
+  "commit": "3c1f6d58941ffb03a6e5b6fd7af4d3a9673e428e",
+  "branch": "master",
+  "date": "2023/05/25 21:06:41"
 }
