@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3104: Revert task navigation standardization",
-  "commit": "deb6a614f73d5a0dc06b463127dfde568b4c66c8",
-  "branch": "master",
-  "date": "2023/05/23 16:23:07"
+  "message": "fix: LSDV-5177:Fix draft loss on switching tasks in quick view mode",
+  "commit": "1c04d0f022ee3a348e672f3a5896cfb782ed869c",
+  "branch": "fb-lsdv-5177",
+  "date": "2023/05/25 23:10:47"
 }
