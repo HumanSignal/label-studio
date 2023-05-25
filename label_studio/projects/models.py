@@ -1183,6 +1183,7 @@ class ProjectReimport(models.Model):
     files_as_tasks_list = models.BooleanField(default=False)
     found_formats = models.JSONField(default=list)
     data_columns = models.JSONField(default=list)
+    traceback = models.TextField(null=True, blank=True)
 
     def has_permission(self, user):
         return self.project.has_permission(user)
