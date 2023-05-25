@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5136: Navigate between tabs in the side panels is not reseting the comments",
-  "commit": "16a1c92c216d41086db8ea60cc8d0726df67e9b7",
-  "branch": "fb-lsdv-5136",
-  "date": "2023/05/24 17:06:00"
+  "commit": "5f853c3866a36f84b647aefccf2c64cdf0099695",
+  "branch": "master",
+  "date": "2023/05/25 10:11:18"
 }
