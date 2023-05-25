@@ -163,6 +163,11 @@ def delete_subject(request, id):
 def sync_sensor_parser_templates(request):
     # Search sensortypes repo for (new) config .yaml files and add them to DB
     if request.method == 'POST':
+
+        # # Reset the sensortypes
+        # SensorType.objects.all().delete()
+        
+        # Get submodule path
         path = Path(__file__).parents[2]/ 'sensortypes' # Path of subrepo
         # Extract file names and (temporarily) store only .yaml files
         parser_files = []

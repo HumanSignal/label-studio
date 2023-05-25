@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pandas as pd
 import pytz
-from PyQt5.QtWidgets import QMessageBox
+# from PyQt5.QtWidgets import QMessageBox
 
 from .parse_function import custom_function_parser as  parser
 from .constants import ABSOLUTE_DATETIME, RELATIVE_TIME_ITEM, ABSOLUTE_TIME_ITEM
@@ -96,14 +96,15 @@ class SensorDataParser:
                 try:
                     self.normalize_rel_datetime_column()
                 except TypeError:
-                    msg = QMessageBox()
-                    msg.setIcon(QMessageBox.Critical)
-                    msg.setWindowTitle("Could not parse timestamps")
-                    msg.setText("The timestamps in your sensor data file could not be parsed."
-                                "Please verify that all settings are correct, including the "
-                                "absolute/relative time option and the comment style.")
-                    msg.setStandardButtons(QMessageBox.Ok)
-                    msg.exec()
+                    # msg = QMessageBox()
+                    # msg.setIcon(QMessageBox.Critical)
+                    # msg.setWindowTitle("Could not parse timestamps")
+                    # msg.setText("The timestamps in your sensor data file could not be parsed."
+                    #             "Please verify that all settings are correct, including the "
+                    #             "absolute/relative time option and the comment style.")
+                    # msg.setStandardButtons(QMessageBox.Ok)
+                    # msg.exec()
+                    pass
 
     def set_column_metadata(self, columns):
         """
@@ -193,15 +194,15 @@ class SensorDataParser:
                         utc_to_local(self.metadata.utc_dt, self.project_timezone) + \
                         pd.to_timedelta(self._df.iloc[:, time_col], unit=time_unit)
                 except ValueError as e:
-                    msg = QMessageBox()
-                    msg.setIcon(QMessageBox.Critical)
-                    msg.setWindowTitle("Invalid datetime string format")
-                    msg.setText("Error: " + str(e))
-                    msg.setInformativeText("The sensor datetime string format you entered is invalid. "
-                                           f"Please change it to the correct format under Sensor > Sensor models > "
-                                           f"[sensor model name] > View settings.")
-                    msg.setStandardButtons(QMessageBox.Ok)
-                    msg.exec()
+                    # msg = QMessageBox()
+                    # msg.setIcon(QMessageBox.Critical)
+                    # msg.setWindowTitle("Invalid datetime string format")
+                    # msg.setText("Error: " + str(e))
+                    # msg.setInformativeText("The sensor datetime string format you entered is invalid. "
+                    #                        f"Please change it to the correct format under Sensor > Sensor models > "
+                    #                        f"[sensor model name] > View settings.")
+                    # msg.setStandardButtons(QMessageBox.Ok)
+                    # msg.exec()
                     return False
                 except AttributeError:
                     # Relative time format could not be parsed.
@@ -223,14 +224,14 @@ class SensorDataParser:
                     )
 
                 except ValueError as e:
-                    msg = QMessageBox()
-                    msg.setIcon(QMessageBox.Critical)
-                    msg.setWindowTitle("Parse DateTime Error")
-                    msg.setText("Error: " + str(e))
-                    msg.setInformativeText("Could not add datetime column in data. Please verify "
-                                           "the format string in the sensor model settings. ")
-                    msg.setStandardButtons(QMessageBox.Ok)
-                    msg.exec()
+                    # msg = QMessageBox()
+                    # msg.setIcon(QMessageBox.Critical)
+                    # msg.setWindowTitle("Parse DateTime Error")
+                    # msg.setText("Error: " + str(e))
+                    # msg.setInformativeText("Could not add datetime column in data. Please verify "
+                    #                        "the format string in the sensor model settings. ")
+                    # msg.setStandardButtons(QMessageBox.Ok)
+                    # msg.exec()
                     return False
                 except:
                     return False

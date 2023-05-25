@@ -6,7 +6,7 @@ def createSubjectAnnotationTemplate(subjectlist):
         :return: String containing XML markup that can be used by LS
     """
     colors = ['#000000', '#0000FF','#808080','#008000','#800080','#FF0000','#FFFFFF']
-    head = '<View><Header value="Subject presence annotation"/><Video name="video" value="$video_url" sync="sensor"/>'
+    head = '<View><Header value="Subject presence annotation"/><Video name="video" value="$video_url" sync="audio"/>'
     
     labelsstart = f'<Labels name="subjects" toName="audio" choice="multiple">'
     labels =  ''

@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 from os import getenv
 
-from PyQt5.QtWidgets import QFileDialog
+# from PyQt5.QtWidgets import QFileDialog
 
 from ..constants import PROJECT_CONFIG_FILE, PREVIOUS_SENSOR_DATA_FILE, PLOT_HEIGHT_FACTOR, PROJECT_DATABASE_FILE, \
     PREVIOUS_PROJECT_DIR, PROJECTS, APP_CONFIG_FILE, PROJECT_NAME, PROJECT_DIR
@@ -74,12 +74,12 @@ class ProjectController:
 
     def create_new_project(self, new_project_name, new_project_dir=None):
         if new_project_name is not None:
-            if new_project_dir is None:
-                new_project_dir = QFileDialog.getExistingDirectory(
-                    self.gui,
-                    caption="Select new project directory. A folder will be created.",
-                    options=QFileDialog.ShowDirsOnly
-                )
+            # if new_project_dir is None:
+            #     new_project_dir = QFileDialog.getExistingDirectory(
+            #         self.gui,
+            #         caption="Select new project directory. A folder will be created.",
+            #         options=QFileDialog.ShowDirsOnly
+            #     )
 
             # Add project name to project directory
             new_project_dir = Path(new_project_dir).joinpath(new_project_name)
