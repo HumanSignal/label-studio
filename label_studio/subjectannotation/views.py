@@ -20,7 +20,7 @@ def createannotationtask(request):
             deployment.CreateLists()
             sensorlist, subjectlist = deployment.sensorlist, deployment.subjectlist
             # Create a XML markup for annotating
-            template = createSubjectAnnotationTemplate(subjectlist)
+            template = createSubjectAnnotationTemplate(sensorlist,subjectlist)
             title = str(deployment)
             
             # Get url for displaying all projects
