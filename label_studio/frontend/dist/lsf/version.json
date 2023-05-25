@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5162: Fix shifting of annotation tabs on hover",
-  "commit": "3c1f6d58941ffb03a6e5b6fd7af4d3a9673e428e",
-  "branch": "master",
-  "date": "2023/05/25 21:06:41"
+  "message": "fix: LSDV-5132: Fix the font color on button hover",
+  "commit": "2a389e42553ab3c6797290d270bd82cd4b99260d",
+  "branch": "fb-lsdv-5132",
+  "date": "2023/05/25 16:36:01"
 }
