@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5162: Fix shifting of annotation tabs on hover",
-  "commit": "3c1f6d58941ffb03a6e5b6fd7af4d3a9673e428e",
-  "branch": "master",
-  "date": "2023/05/25 21:06:41"
+  "message": "fix: LSDV-5134: Unhoist unfreeze command on page resize",
+  "commit": "1b4aabdc48815d4c076bb5def285b920a8819de4",
+  "branch": "fb-lsdv-5134",
+  "date": "2023/05/25 18:34:01"
 }
