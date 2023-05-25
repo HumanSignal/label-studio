@@ -235,12 +235,14 @@ class Task(TaskMixin, models.Model):
         return filename
 
     def resolve_storage_uri(self, url, project):
-        if not self.storage:
-            storage_objects = project.get_all_storage_objects(type_='import')
-            self.storage = self._get_storage_by_url(url, storage_objects)
+        storage = self.storage
 
-        if self.storage:
-            return { "url": self.storage.generate_http_url(url), "presign_ttl": self.storage.presign_ttl }
+        if not storage:
+            storage_objects = project.get_all_storage_objects(type_='import')
+            storage = self._get_storage_by_url(url, storage_objects)
+
+        if storage:
+            return { "url": storage.generate_http_url(url), "presign_ttl": storage.presign_ttl }
 
     def resolve_uri(self, task_data, project):
         if project.task_data_login and project.task_data_password:
