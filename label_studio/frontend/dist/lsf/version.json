@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5162: Fix shifting of annotation tabs on hover",
-  "commit": "3c1f6d58941ffb03a6e5b6fd7af4d3a9673e428e",
-  "branch": "master",
-  "date": "2023/05/25 21:06:41"
+  "message": "fix: LSDV-5177: Fix storing Image regions in history",
+  "commit": "fc8cf01364bcf7c56d15148f862d5f9be793173e",
+  "branch": "fb-lsdv-5177",
+  "date": "2023/05/26 10:49:36"
 }
