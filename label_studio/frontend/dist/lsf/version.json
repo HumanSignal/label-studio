@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5132: Fix the font color on button hover",
-  "commit": "6d3c4019c66740e9e31986346abeb1055ad71ee3",
-  "branch": "master",
-  "date": "2023/05/26 10:00:41"
+  "message": "fix: LSDV-5161: Fix confidence score design to match with new labeling ui",
+  "commit": "7d5acb49eb520f7a07f252a023a97ac69bf93b7c",
+  "branch": "fb-lsdv-5161",
+  "date": "2023/05/26 11:21:29"
 }
