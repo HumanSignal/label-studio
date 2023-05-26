@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5132: Fix the font color on button hover",
-  "commit": "6d3c4019c66740e9e31986346abeb1055ad71ee3",
-  "branch": "master",
-  "date": "2023/05/26 10:00:41"
+  "message": "fix: LSDV-5153: Change icon sort",
+  "commit": "6263984fc75105fe7c67e01b5edebda0969de453",
+  "branch": "fb-lsdv-5153",
+  "date": "2023/05/26 16:24:10"
 }
