@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5132: Fix the font color on button hover",
-  "commit": "6d3c4019c66740e9e31986346abeb1055ad71ee3",
+  "message": "fix: LSDV-5148: Runtime error when user tries to update/submit duplicated annotation while original is already deleted",
+  "commit": "5e7bf4438db01da428b35a18986ec6d0db01d0c5",
   "branch": "master",
-  "date": "2023/05/26 10:00:41"
+  "date": "2023/05/26 17:15:20"
 }
