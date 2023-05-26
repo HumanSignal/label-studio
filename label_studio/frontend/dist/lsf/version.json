@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5132: Fix the font color on button hover",
-  "commit": "6d3c4019c66740e9e31986346abeb1055ad71ee3",
-  "branch": "master",
-  "date": "2023/05/26 10:00:41"
+  "message": "fix: LSDV-5155: Panel Hover color, button style improvements ",
+  "commit": "714f4c522de7646431623b0f30e792afd0240c73",
+  "branch": "fb-lsdv-5155",
+  "date": "2023/05/26 13:45:48"
 }
