@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5162: Fix shifting of annotation tabs on hover",
-  "commit": "3c1f6d58941ffb03a6e5b6fd7af4d3a9673e428e",
+  "message": "fix: LSDV-5160: Hide comments tab on UI Preview",
+  "commit": "9f8d7b380c53b67617b1cc7655f319ebbe101d06",
   "branch": "master",
-  "date": "2023/05/25 21:06:41"
+  "date": "2023/05/26 09:20:34"
 }
