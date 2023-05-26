@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5177:Fix draft loss on switching tasks in quick view mode",
-  "commit": "1c04d0f022ee3a348e672f3a5896cfb782ed869c",
+  "commit": "1dda282a4402e9039da18e4348d28d43dcaeb2cf",
   "branch": "fb-lsdv-5177",
-  "date": "2023/05/25 23:10:47"
+  "date": "2023/05/26 01:49:27"
 }
