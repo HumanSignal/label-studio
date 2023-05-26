@@ -1,6 +1,6 @@
 {
-  "message": "chore: LSDV-5060: Migrate to Yarn",
-  "commit": "ee15a82e9b90a75cda35dfb2d113db39f274997f",
+  "message": "feat: LSDV-3104: Revert task navigation standardization",
+  "commit": "deb6a614f73d5a0dc06b463127dfde568b4c66c8",
   "branch": "master",
-  "date": "2023/05/11 17:58:11"
+  "date": "2023/05/23 16:23:07"
 }

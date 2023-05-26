@@ -165,6 +165,7 @@ jobs:
         run: npm install -g jsdoc-to-markdown node-fetch
 
       - name: "LSF Docs: Build"
+        id: lsf-docs-build
         if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
         continue-on-error: true
         working-directory: tmp/scripts
@@ -194,11 +195,12 @@ jobs:
           git push origin HEAD
 
       - name: "LSF Docs: Commit"
-        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend' && steps.lsf-docs-build.conclusion == 'success'
         continue-on-error: true
         run: |
           set -xeuo pipefail
           docs_target_dir='${{ env.DOCS_TARGET_DIR }}'
+          # rm -rf "${docs_target_dir}" || true
           mkdir -p "${docs_target_dir}"
           cp -Rf tmp/docs/* "${docs_target_dir}"
           git status

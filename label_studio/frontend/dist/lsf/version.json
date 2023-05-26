@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3025-14: Implement empty state when outliner filter returns empty",
-  "commit": "4fc6e341bd785500ceb4aa5a60e5dd0df6da1b9c",
+  "message": "fix: LSDV-5132: Fix the font color on button hover",
+  "commit": "6d3c4019c66740e9e31986346abeb1055ad71ee3",
   "branch": "master",
-  "date": "2023/05/11 15:33:39"
+  "date": "2023/05/26 10:00:41"
 }
