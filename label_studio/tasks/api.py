@@ -405,16 +405,17 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
 
         draft_id = self.request.data.get('draft_id')
 
-        if flag_set('fflag_feat_back_lsdv_5035_use_created_at_from_draft_for_annotation_256052023_short', user='auto'):
-            # if the annotation will be created from draft - get created_at from draft to keep continuity of history
-            if draft_id is not None:
-                draft = AnnotationDraft.objects.filter(id=draft_id).first()
-                if draft is not None:
-                    extra_args['created_at'] = draft.created_at
-
         # create annotation
         logger.debug(f'User={self.request.user}: save annotation')
         annotation = ser.save(**extra_args)
+
+        if draft_id is not None and flag_set('fflag_feat_back_lsdv_5035_use_created_at_from_draft_for_annotation_256052023_short', user='auto'):
+            # if the annotation will be created from draft - get created_at from draft to keep continuity of history
+            draft = AnnotationDraft.objects.filter(id=draft_id).first()
+            if draft is not None:
+                annotation.created_at = draft.created_at
+                annotation.save(update_fields=['created_at'])
+
         logger.debug(f'Save activity for user={self.request.user}')
         self.request.user.activity_at = timezone.now()
         self.request.user.save()
