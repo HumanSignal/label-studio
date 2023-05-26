@@ -98,7 +98,6 @@ def set_reimport_background_failure(job, connection, type, value, _):
         status=ProjectReimport.Status.FAILED,
         traceback=traceback.format_exc(),
         error=str(value),
-        error_type=type
     )
 
 
@@ -156,6 +155,6 @@ def async_reimport_background(reimport_id, organization_id, **kwargs):
     reimport.annotation_count = len(serializer.db_annotations)
     reimport.prediction_count = len(serializer.db_predictions)
     reimport.found_formats = found_formats
-    reimport.data_columns = data_columns
+    reimport.data_columns = list(data_columns)
     reimport.status = ProjectReimport.Status.COMPLETED
     reimport.save()
