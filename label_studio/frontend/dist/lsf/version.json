@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5160: Hide comments tab on UI Preview",
-  "commit": "9f8d7b380c53b67617b1cc7655f319ebbe101d06",
-  "branch": "master",
-  "date": "2023/05/26 09:20:34"
+  "message": "fix: LSDV-5165: Number indices in List data",
+  "commit": "11305f9eecdffa372fa68739220f44ff27805007",
+  "branch": "fb-lsdv-5165/ranker-preview",
+  "date": "2023/05/26 13:47:43"
 }
