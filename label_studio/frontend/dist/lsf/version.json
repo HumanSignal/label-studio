@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5132: Fix the font color on button hover",
-  "commit": "6d3c4019c66740e9e31986346abeb1055ad71ee3",
-  "branch": "master",
-  "date": "2023/05/26 10:00:41"
+  "message": "fix: LSDV-5192: Change quick view icon and change hover color",
+  "commit": "10cf68b2389154ed7690760d87a48272392be33c",
+  "branch": "fb-lsdv-5192",
+  "date": "2023/05/26 18:56:42"
 }
