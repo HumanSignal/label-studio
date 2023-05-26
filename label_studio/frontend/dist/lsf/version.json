@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5177: Fix storing Image regions in history",
-  "commit": "fc8cf01364bcf7c56d15148f862d5f9be793173e",
+  "commit": "16751b8a86e0b1fa2c7ae5151cfd2500ae384725",
   "branch": "fb-lsdv-5177",
-  "date": "2023/05/26 10:49:36"
+  "date": "2023/05/26 12:10:04"
 }
