@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5148: Runtime error when user tries to update/submit duplicated annotation while original is already deleted",
-  "commit": "5e7bf4438db01da428b35a18986ec6d0db01d0c5",
-  "branch": "master",
-  "date": "2023/05/26 17:15:20"
+  "message": "fix: LSDV-5194: Add annotation tab indicator tooltip",
+  "commit": "371cafdd3290410c8031904c6d13501e68325f17",
+  "branch": "fb-lsdv-5194",
+  "date": "2023/05/29 18:20:36"
 }
