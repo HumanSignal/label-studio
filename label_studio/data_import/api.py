@@ -613,7 +613,7 @@ class PresignStorageData(APIView):
         if resolved is None or resolved.get('url') is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        url = resolved.get('url')
+        url = resolved['url']
         max_age = 0
         if resolved.get('presign_ttl'):
             max_age = resolved.get('presign_ttl') * 60
