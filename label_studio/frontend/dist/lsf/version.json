@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5148: Runtime error when user tries to update/submit duplicated annotation while original is already deleted",
-  "commit": "5e7bf4438db01da428b35a18986ec6d0db01d0c5",
+  "message": "fix: LSDV-5161: Fix confidence score design to match with new labeling ui",
+  "commit": "f01bd9544c4ed4b611cfdbea25bae08c4f66db23",
   "branch": "master",
-  "date": "2023/05/26 17:15:20"
+  "date": "2023/05/29 18:43:00"
 }
