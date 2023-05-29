@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5192: Change quick view icon and change hover color",
-  "commit": "6d61cdc8d192decfab98d5b0a4f259534cb9ebef",
+  "commit": "38c3138c8bf2ce4b18bcea73642e90f40d8b6c6a",
   "branch": "fb-lsdv-5192",
-  "date": "2023/05/26 18:58:26"
+  "date": "2023/05/29 11:08:19"
 }
