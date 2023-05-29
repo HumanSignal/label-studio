@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3104: Revert task navigation standardization",
-  "commit": "deb6a614f73d5a0dc06b463127dfde568b4c66c8",
-  "branch": "master",
-  "date": "2023/05/23 16:23:07"
+  "message": "feat: LOPS-159: [FE] Candidate task front end needs to show associated projects",
+  "commit": "29cb66576d3fe861ac6f77a90a63602aa30e50c4",
+  "branch": "fb-lops-159",
+  "date": "2023/05/25 09:50:23"
 }
