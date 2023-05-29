@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5198: Fix the annotation name line height",
-  "commit": "02b00110ac5c372399e7c6666d705bc22056caa3",
+  "commit": "18ddb7796ac6d57a8451723d3e1225a08ad42941",
   "branch": "fb-lsdv-5198",
-  "date": "2023/05/29 18:18:58"
+  "date": "2023/05/29 18:39:51"
 }
