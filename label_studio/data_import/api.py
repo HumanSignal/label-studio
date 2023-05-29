@@ -604,19 +604,23 @@ class PresignStorageData(APIView):
 
         fileuri = unquote(fileuri)
 
-        resolved = task.resolve_storage_uri(fileuri, project)
+        try:
+            resolved = task.resolve_storage_uri(fileuri, project)
+        except Exception as exc:
+            logger.error(f'Failed to resolve storage uri {fileuri} for task {task_id}: {exc}')
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
-        if resolved is None or resolved['url'] is None:
+        if resolved is None or resolved.get('url') is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         url = resolved['url']
-        maxAge = 0
-        if resolved['presign_ttl']:
-            maxAge = resolved['presign_ttl'] * 60
+        max_age = 0
+        if resolved.get('presign_ttl'):
+            max_age = resolved.get('presign_ttl') * 60
 
         # Proxy to presigned url
         response = HttpResponseRedirect(redirect_to=url, status=status.HTTP_303_SEE_OTHER)
-        response.headers['Cache-Control'] = f"no-store, max-age={maxAge}"
+        response.headers['Cache-Control'] = f"no-store, max-age={max_age}"
 
         return response
 
