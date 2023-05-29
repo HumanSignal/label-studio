@@ -104,6 +104,11 @@ def get_all_columns(project, *_):
             }
         }]
 
+    if flag_set('fflag_fix_back_lsdv_4648_annotator_filter_29052023_short', user=project.organization.created_by):
+        annotators = project.get_all_members().values_list('id', flat=True)
+    else:
+        annotators = project.organization.members.values_list('user__id', flat=True)
+
     result['columns'] += [
         {
             'id': 'completed_at',
@@ -155,7 +160,7 @@ def get_all_columns(project, *_):
             'type': 'List',
             'target': 'tasks',
             'help': 'All users who completed the task',
-            'schema': {'items': project.organization.members.values_list('user__id', flat=True)},
+            'schema': {'items': annotators},
             'visibility_defaults': {
                 'explore': True,
                 'labeling': False

@@ -71,3 +71,12 @@ class ProjectMixin:
         :return:
         """
         return True
+
+    def get_all_members(self):
+        """
+        Returns all members of project
+        :return:
+        """
+        from users.models import User
+
+        return User.objects.filter(project_memberships__project=self)
