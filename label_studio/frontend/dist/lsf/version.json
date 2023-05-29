@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5145: Regions hover lock consistency",
-  "commit": "d8d16e54682efaf4fa6c7bc9c45d2ba88f8e4bc7",
+  "commit": "0c6fea4390e19a6c9bdf9fb070ef8ae11b6a4f33",
   "branch": "fb-lsdv-5145",
-  "date": "2023/05/26 15:44:40"
+  "date": "2023/05/29 15:27:14"
 }
