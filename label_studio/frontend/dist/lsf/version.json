@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5119: Minor improvements on labeling ui (#1375)",
-  "commit": "9edda24573f8584b39596941cef3ff3a543ac4c5",
+  "message": "fix: LSDV-5148: Runtime error when user tries to update/submit duplicated annotation while original is already deleted (#1402)",
+  "commit": "5e7bf4438db01da428b35a18986ec6d0db01d0c5",
   "branch": "master",
-  "date": "2023/05/19 17:17:04"
+  "date": "2023/05/26 17:15:20"
 }
