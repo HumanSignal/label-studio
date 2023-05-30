@@ -13,6 +13,7 @@ from rest_framework import generics, viewsets, views
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
+from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import DjangoFilterDescriptionInspector
 from core.utils.params import bool_from_request
@@ -401,9 +402,18 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
         if 'completed_by' not in ser.validated_data:
             extra_args['completed_by'] = self.request.user
 
+        draft_id = self.request.data.get('draft_id')
+
+        if draft_id is not None and flag_set('fflag_feat_back_lsdv_5035_use_created_at_from_draft_for_annotation_256052023_short', user='auto'):
+            # if the annotation will be created from draft - get created_at from draft to keep continuity of history
+            draft = AnnotationDraft.objects.filter(id=draft_id).first()
+            if draft is not None:
+                extra_args['draft_created_at'] = draft.created_at
+
         # create annotation
         logger.debug(f'User={self.request.user}: save annotation')
         annotation = ser.save(**extra_args)
+
         logger.debug(f'Save activity for user={self.request.user}')
         self.request.user.activity_at = timezone.now()
         self.request.user.save()
@@ -413,7 +423,6 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
         task.release_lock(user)
 
         # if annotation created from draft - remove this draft
-        draft_id = self.request.data.get('draft_id')
         if draft_id is not None:
             logger.debug(f'Remove draft {draft_id} after creating annotation {annotation.id}')
             self.delete_draft(draft_id, annotation.id)
