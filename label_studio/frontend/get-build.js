@@ -28,7 +28,7 @@ const DIST_DIR = "/dist";
  */
 async function get(projectName, ref = 'master') {
   /** @type {Response} */
-  let res
+  let res;
   let json, sha, branch = '';
 
   const REPO = PROJECTS[projectName || 'lsf'];
