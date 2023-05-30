@@ -235,12 +235,14 @@ class Task(TaskMixin, models.Model):
         return filename
 
     def resolve_storage_uri(self, url, project):
-        if not self.storage:
-            storage_objects = project.get_all_storage_objects(type_='import')
-            self.storage = self._get_storage_by_url(url, storage_objects)
+        storage = self.storage
 
-        if self.storage:
-            return { "url": self.storage.generate_http_url(url), "presign_ttl": self.storage.presign_ttl }
+        if not storage:
+            storage_objects = project.get_all_storage_objects(type_='import')
+            storage = self._get_storage_by_url(url, storage_objects)
+
+        if storage:
+            return { "url": storage.generate_http_url(url), "presign_ttl": storage.presign_ttl }
 
     def resolve_uri(self, task_data, project):
         if project.task_data_login and project.task_data_password:
@@ -424,6 +426,7 @@ class Annotation(models.Model):
     ground_truth = models.BooleanField(_('ground_truth'), default=False, help_text='This annotation is a Ground Truth (ground_truth)')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last updated time')
+    draft_created_at = models.DateTimeField(_('draft created at'), null=True, default=None, help_text='Draft creation time')
     lead_time = models.FloatField(_('lead time'), null=True, default=None, help_text='How much time it took to annotate the task')
     prediction = JSONField(
         _('prediction'),

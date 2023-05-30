@@ -1,6 +1,6 @@
 {
-  "message": "fix: 1.8.0 cherrypick 2023 05 26",
-  "commit": "8f4b15aecf916c468124e9cd12f868cf6f35a679",
+  "message": "chore: 1.8.0 cherrypick 2023 05 30",
+  "commit": "fb21e6cdb577dade39258dfd7b3aecae188ae206",
   "branch": "ls-release/1.8.0",
-  "date": "2023/05/26 17:49:24"
+  "date": "2023/05/30 17:22:30"
 }
