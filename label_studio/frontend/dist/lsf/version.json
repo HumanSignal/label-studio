@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5161: Fix confidence score design to match with new labeling ui",
-  "commit": "f01bd9544c4ed4b611cfdbea25bae08c4f66db23",
+  "message": "fix: LSDV-5165: Number indices in List data",
+  "commit": "9a06717d462079ecc29297a241e124e1929c29ae",
   "branch": "master",
-  "date": "2023/05/29 18:43:00"
+  "date": "2023/05/30 13:44:56"
 }
