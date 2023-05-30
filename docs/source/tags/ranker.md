@@ -11,6 +11,7 @@ In simple case of `List` + `Ranker` tags the first one becomes interactive and s
 With `Bucket`s any items from the `List` can be moved to these buckets, and resulting groups will be exported as a dict `{ bucket-name-1: [array of ids in this bucket], ... }`
 By default all items will sit in `List` and will not be exported, unless they are moved to a bucket. But with `default="true"` parameter you can specify a bucket where all items will be placed by default, so exported result will always have all items from the list, grouped by buckets.
 Columns and items can be styled in `Style` tag by using respective `.htx-ranker-column` and `.htx-ranker-item` classes. Titles of columns are defined in `title` parameter of `Bucket` tag.
+Note: When `Bucket`s used without `default` param, the original list will also be stored as "_" named column in results, but that's internal value and this may be changed later.
 
 ### Parameters
 
