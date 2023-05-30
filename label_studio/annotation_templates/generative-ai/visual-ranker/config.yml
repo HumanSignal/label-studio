@@ -22,7 +22,7 @@ config: |
           .product-panel:hover {
             transform: scale(1.01);
           }
-          .htx-ranker-item { padding: 0; border: 0; margin: 0 auto;}
+          .htx-ranker-item { padding: 0; border: 0; align-self: center; }
           .htx-ranker-item [class^=itemLine]:last-child { display: none }
         </Style>
   
