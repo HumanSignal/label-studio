@@ -2,7 +2,7 @@ title: "Visual Ranker"
 type: community
 group: Generative AI
 order: 5
-image: /static/templates/llm-ranker.png
+image: /static/templates/visual-ranker.png
 details: Here is a demo that showcases how to construct an interface enabling users to drag, arrange, and rank responses from different Large Language Models (LLMs) and chatbot systems based on their relevance to a specified prompt and their perceived bias, thus facilitating an intuitive and visual understanding of how well these AI systems align with the topic and the degree of subjective interpretation they exhibit.
 config: |
   <View>
