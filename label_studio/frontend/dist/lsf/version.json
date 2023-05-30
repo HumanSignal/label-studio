@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5165: Number indices in List data",
-  "commit": "9a06717d462079ecc29297a241e124e1929c29ae",
+  "message": "fix: LSDV-5167: Ranker undo/redo",
+  "commit": "de72fb9b6121efd58a25529c1a6addb72ecde283",
   "branch": "master",
-  "date": "2023/05/30 13:44:56"
+  "date": "2023/05/30 14:43:07"
 }
