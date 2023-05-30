@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5194: Add annotation tab indicator tooltip",
-  "commit": "697dd8f3e6056fbdbeaaae18e6657e95b8995618",
+  "commit": "6da1ff07ba116ec6d1ed7e61a28e66445117bee5",
   "branch": "fb-lsdv-5194",
-  "date": "2023/05/29 18:40:45"
+  "date": "2023/05/30 15:07:27"
 }
