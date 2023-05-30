@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5198: Fix the annotation name line height",
-  "commit": "885f28ac510067b65a1f1393fa2a9131c7e8a2f2",
-  "branch": "master",
-  "date": "2023/05/30 12:06:17"
+  "message": "fix: LSDV-5202: Fix Ranker d-n-d in Preview",
+  "commit": "a799587dd6d98c5a9b40cfcc0e334cec87b910be",
+  "branch": "fb-lsdv-5202/ranker-preview",
+  "date": "2023/05/30 18:04:06"
 }
