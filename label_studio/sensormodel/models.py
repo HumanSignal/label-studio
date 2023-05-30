@@ -1,4 +1,5 @@
 from django.db import models
+from sensordata.models import SensorData
 
 class SensorType(models.Model):
     SENSOR_CHOICES = (
@@ -55,24 +56,28 @@ class Deployment(models.Model):
     name = models.CharField(max_length=50, blank=True)
     begin_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
-    location = models.TextField(max_length=50)
+    location = models.TextField(max_length=50, blank=True)
     position = models.TextField(max_length=50, blank=True)
     
-    sensor = models.ManyToManyField(Sensor,blank=True)
-    subject = models.ManyToManyField(Subject,blank=True) 
-    sensorlist = models.TextField(max_length=500,blank=True)
-    subjectlist = models.TextField(max_length=500,blank =True)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, blank=True) 
+    sensor = models.ManyToManyField(Sensor, on_delete=models.CASCADE, blank=True)
+    sensordata = models.ForeignKey(SensorData, on_delete=models.CASCADE, blank=True)
+    subjectpresence = models.JSONField(blank=True) 
 
-    # Function that puts all sensors and all subjects in two list, for easier display in HTML table
-    def CreateLists(self):
-        sensList = self.sensor.all()
-        for sens in sensList:
-            self.sensorlist += str(sens) + ', '
-        self.sensorlist = self.sensorlist[:-2]
-        subjlist = self.subject.all()
-        for subj in subjlist:
-            self.subjectlist += str(subj)+ ', '
-        self.subjectlist = self.subjectlist[:-2]
+
+    # sensorlist = models.TextField(max_length=500,blank=True)
+    # subjectlist = models.TextField(max_length=500,blank =True)
+
+    # # Function that puts all sensors and all subjects in two list, for easier display in HTML table
+    # def CreateLists(self):
+    #     sensList = self.sensor.all()
+    #     for sens in sensList:
+    #         self.sensorlist += str(sens) + ', '
+    #     self.sensorlist = self.sensorlist[:-2]
+    #     subjlist = self.subject.all()
+    #     for subj in subjlist:
+    #         self.subjectlist += str(subj)+ ', '
+    #     self.subjectlist = self.subjectlist[:-2]
         
     def __str__(self):
         return 'Deployment: ' + self.name

@@ -12,19 +12,25 @@
     <h1>Project overview</h1>
     <ol>
         <li>Name project</li>
-        <li><a href="/sensormodel/sensor">Manage sensors</a></li>
-        <li><a href="/sensormodel/subject">Manage subjects</a></li>
-        <li><a href="/sensormodel/deployment">Manage deployments</a></li>
-        <li><a href="/sensordata/">Manage data</a></li>
-        <li><a href="/sensordata/offset">Synchronize sensors</a></li>
-        <li><a href="/subjectannotation/">Annotate videos</a></li>
-        <li><a href="/projects/">Add labels</a></li>
+        <li><a href="/sensormodel/sensor" onclick="refreshPage(event)">Manage sensors</a></li>
+        <li><a href="/sensormodel/subject" onclick="refreshPage(event)">Manage subjects</a></li>
+        <li><a href="/sensordata/" onclick="refreshPage(event)">Manage data</a></li>
+        <li><a href="/sensordata/subjectpresence/" onclick="refreshPage(event)">Indicate which subjects are present in video</a></li>
+        <li><a href="/subjectannotation/" onclick="refreshPage(event)">Annotate videos</a></li>
+        <li><a href="/sensormodel/deployment" onclick="refreshPage(event)">Manage deployments</a></li>
+        <li><a href="/sensordata/offset" onclick="refreshPage(event)">Synchronize sensors</a></li>
+        <li><a href="/sensormodel/tasks" onclick="refreshPage(event)">Generate annotation tasks</a></li>
+        <li><a href="/projects/" onclick="refreshPage(event)">Add labels</a></li>
         <li>Annotate</li>
         <li>Export annotations</li>
     </ol>
+
+    <script>
+      function refreshPage(event) {
+        event.preventDefault();
+        window.location.href = event.target.getAttribute('href');
+      }
+    </script>
 </body>
 
 {% endblock %}
-
-
- 

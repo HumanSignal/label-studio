@@ -1,5 +1,6 @@
 from django.db import models
-from sensormodel.models import SensorType, Sensor
+from sensormodel.models import SensorType, Sensor, Subject
+from sensordata.models import SensorData
 
 
 
@@ -17,3 +18,8 @@ class SensorOffset(models.Model):
     sensor_B = models.ForeignKey(Sensor, on_delete=models.CASCADE, null=True, related_name='SensorB_offsets')
     offset = models.IntegerField(blank=True, null=True)
     offset_Date = models.DateTimeField(blank=True, null=True)
+
+
+class SubjectsInVideo(models.Model):
+    sensordata = models.ForeignKey(SensorData, on_delete=models.CASCADE, null=True,)
+    subject = models.ManyToManyField(Subject, on_delete=models.CASCADE, null=True,)
