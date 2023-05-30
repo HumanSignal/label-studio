@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5161: Fix confidence score design to match with new labeling ui",
-  "commit": "f01bd9544c4ed4b611cfdbea25bae08c4f66db23",
-  "branch": "master",
-  "date": "2023/05/29 18:43:00"
+  "message": "feat: LSDV-5121: User Setting Improvements",
+  "commit": "d2b553df43af4fdbef67c26697faead97cfdb3db",
+  "branch": "fb-lsdv-5121",
+  "date": "2023/05/29 22:43:09"
 }
