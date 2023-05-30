@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5198: Fix the annotation name line height",
-  "commit": "885f28ac510067b65a1f1393fa2a9131c7e8a2f2",
+  "message": "fix: LSDV-5194: Add annotation tab indicator tooltip",
+  "commit": "353bc32c4128c119b7c80e8076b6762b21dff235",
   "branch": "master",
-  "date": "2023/05/30 12:06:17"
+  "date": "2023/05/30 14:08:48"
 }
