@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5194: Add annotation tab indicator tooltip",
-  "commit": "353bc32c4128c119b7c80e8076b6762b21dff235",
+  "message": "fix: LSDV-5145: Regions hover lock consistency",
+  "commit": "ee9cfa5cbaa6ffeb768864cdbd39d43a05c01caf",
   "branch": "master",
-  "date": "2023/05/30 14:08:48"
+  "date": "2023/05/30 15:13:05"
 }
