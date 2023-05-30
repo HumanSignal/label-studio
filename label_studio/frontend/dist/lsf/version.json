@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5132: Fix the font color on button hover",
-  "commit": "6d3c4019c66740e9e31986346abeb1055ad71ee3",
+  "message": "fix: LSDV-5145: Regions hover lock consistency",
+  "commit": "ee9cfa5cbaa6ffeb768864cdbd39d43a05c01caf",
   "branch": "master",
-  "date": "2023/05/26 10:00:41"
+  "date": "2023/05/30 15:13:05"
 }
