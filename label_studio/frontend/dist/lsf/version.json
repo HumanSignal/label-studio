@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5131: Fix Submit button disabled state",
-  "commit": "4c163b42a8695e1e55f1bec4617d45d11c50ae15",
+  "message": "fix: LSDV-5194: Add annotation tab indicator tooltip",
+  "commit": "353bc32c4128c119b7c80e8076b6762b21dff235",
   "branch": "master",
-  "date": "2023/05/24 11:32:20"
+  "date": "2023/05/30 14:08:48"
 }
