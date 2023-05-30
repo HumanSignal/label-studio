@@ -3,9 +3,9 @@
  * This script automatically takes the latest build from given repo and branch
  * and places it to label_studio/static/<REPO>
 */
-const fetch = require('node-fetch');
-
 const fs = require('fs');
+const { Readable } = require("stream")
+const { finished } = require('stream/promises')
 const { spawn } = require('child_process');
 const path = require('path');
 
@@ -27,7 +27,9 @@ const DIST_DIR = "/dist";
  * @param {string} ref commit or branch
  */
 async function get(projectName, ref = 'master') {
-  let res, json, sha, branch = '';
+  /** @type {Response} */
+  let res;
+  let json, sha, branch = '';
 
   const REPO = PROJECTS[projectName || 'lsf'];
 
@@ -84,16 +86,18 @@ async function get(projectName, ref = 'master') {
   console.info('Create write stream:', filename);
   const fileStream = fs.createWriteStream(filename);
 
-  await new Promise((resolve, reject) => {
-    res.body.pipe(fileStream);
-    fileStream.on('error', reject);
-    fileStream.on('finish', () => {
-      console.info('Downloaded:', filename);
-      const unzip = spawn('unzip', ['-d', dir, '-o', filename]);
+  await new Promise(async (resolve, reject) => {
+    try {
+      await finished(Readable.fromWeb(res.body).pipe(fileStream)) 
+    } catch (err) {
+      reject(err)
+    }
+    
+    console.info('Downloaded:', filename);
+    const unzip = spawn('unzip', ['-d', dir, '-o', filename]);
 
-      unzip.stderr.on('data', reject);
-      unzip.on('close', resolve);
-    });
+    unzip.stderr.on('data', reject);
+    unzip.on('close', resolve);
   }).then(() => console.log('Build unpacked'));
 
   const commitInfoUrl = `https://api.github.com/repos/${REPO}/git/commits/${sha}`;
