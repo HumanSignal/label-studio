@@ -23,6 +23,7 @@ config: |
             transform: scale(1.01);
           }
           .htx-ranker-item { padding: 0; border: 0; align-self: center; }
+          .htx-ranker-item img { width: 100%; }
           .htx-ranker-item [class^=itemLine]:last-child { display: none }
         </Style>
   
