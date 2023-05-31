@@ -1141,6 +1141,8 @@ class ProjectSummary(models.Model):
                 continue
 
             for result in results:
+                if 'from_name' not in result:
+                    continue
                 from_name = result['from_name']
 
                 # aggregate labels
