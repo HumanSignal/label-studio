@@ -14,6 +14,9 @@ import { DataManagerPage } from '../DataManager/DataManager';
 import { SettingsPage } from '../Settings';
 import './Projects.styl';
 import { EmptyProjectsList, ProjectsList } from './ProjectsList';
+import Swal from 'sweetalert2';
+import axios from "axios";
+import getWebhookUrl from '../../webhooks';
 
 const getCurrentPage = () => {
   const pageNumberFromURL = new URLSearchParams(location.search).get("page");
@@ -30,10 +33,11 @@ export const ProjectsPage = () => {
   const [totalItems, setTotalItems] = useState(1);
   const setContextProps = useContextProps();
   const defaultPageSize = parseInt(localStorage.getItem('pages:projects-list') ?? 30);
-
+  const [availableProjects, setAvailableProjects] = useState({});
   const [modal, setModal] = React.useState(false);
   const openModal = setModal.bind(null, true);
   const closeModal = setModal.bind(null, false);
+  const webhook_url = getWebhookUrl();
 
   const fetchProjects = async (page  = currentPage, pageSize = defaultPageSize) => {
     setNetworkState('loading');
@@ -65,19 +69,60 @@ export const ProjectsPage = () => {
     setProjectsList(data.results ?? []);
     setNetworkState('loaded');
 
-    // if (isFF(FF_DEV_2575) && data?.results?.length) {
-    //   const additionalData = await api.callApi("projects", {
-    //     params: { ids: data?.results?.map(({ id }) => id).join(',') },
-    //     signal: abortController.controller.current.signal,
-    //     errorFilter: (e) => e.error.includes('aborted'), 
-    //   });
-    //   if (additionalData?.results?.length) {
-    //     setProjectsList(additionalData.results);
-    //   }
+    if (isFF(FF_DEV_2575) && data?.results?.length) {
+      const additionalData = await api.callApi("projects", {
+        params: { ids: data?.results?.map(({ id }) => id).join(',') },
+        signal: abortController.controller.current.signal,
+        errorFilter: (e) => e.error.includes('aborted'), 
+      });
+      if (additionalData?.results?.length) {
+        setProjectsList(additionalData.results);
+      }
 
-    // }
+    }
   };
+  async function CloneExistingProject() {
+    console.log("Cloning existing project");
+    await axios
+    .get(webhook_url + '/get_available_projects')
+      .then((response) => {
+        console.log(response);
+        const available_projects = response.data;
+        console.log(available_projects);
+        const modified_projects = {};
+        Object.keys(available_projects).forEach((key) => {
+          modified_projects[parseInt(key)] = available_projects[key];
+        });
+        setAvailableProjects(modified_projects);
+        const { value: project } = Swal.fire({
+          title: 'Select a Project to Clone',
+          input: 'select',
+          inputOptions: available_projects,
+          inputPlaceholder: 'Select a project',
+          showCancelButton: true,
+          inputValidator: (value) => {
+            return new Promise(async (resolve) => {
+              console.log(value);
+              await axios.post(webhook_url + "/clone_existing_project?id=" + value).then((cloneResponse) => {
+                const cloned = cloneResponse.data.clone;
+                if (cloned) {
+                  window.location.reload();
+                }
+                else {
+                  Swal.fire("Error", "An error occurred while trying to clone the project", "error");
+                }
+              })
+              resolve();
+            })
+          }
+        })   
+    if (project) {
+      Swal.fire(`Cloning Project ${project}`)
+    }
+    })
+    
 
+  }
   const loadNextPage = async (page, pageSize) => {
     setCurrentPage(page);
     await fetchProjects(page, pageSize);
@@ -90,7 +135,7 @@ export const ProjectsPage = () => {
   React.useEffect(() => {
     // there is a nice page with Create button when list is empty
     // so don't show the context button in that case
-    setContextProps({ openModal, showButton: projectsList.length > 0 });
+    setContextProps({ openModal, showButton: projectsList.length > 0, CloneExistingProject});
   }, [projectsList.length]);
 
   return (
@@ -137,7 +182,11 @@ ProjectsPage.routes = ({ store }) => [
     },
   },
 ];
-ProjectsPage.context = ({ openModal, showButton }) => {
+ProjectsPage.context = ({ openModal, showButton, CloneExistingProject }) => {
   if (!showButton) return null;
-  return <Button onClick={openModal} look="primary" size="compact">Create</Button>;
+  return (
+    <Block>
+    <Button onClick={CloneExistingProject} size="compact" style={{marginRight: 5}}>Clone Existing Project</Button>
+    <Button onClick={openModal} look="primary" size="compact">Create</Button></Block>
+)
 };
