@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5192: Change quick view icon and change hover color",
-  "commit": "bb2acdcf56f79050c841c4c4a816360372c6a22b",
-  "branch": "master",
-  "date": "2023/05/31 10:07:44"
+  "message": "fix: LSDV-4673: Fix drawing with Rect3Point tool in relative coords",
+  "commit": "f8a41bb005f34f1b213a3b9d6195cad5383564ac",
+  "branch": "fb-lsdv-4673/rect3point-relative",
+  "date": "2023/05/31 16:05:04"
 }
