@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5192: Change quick view icon and change hover color",
-  "commit": "bb2acdcf56f79050c841c4c4a816360372c6a22b",
+  "message": "fix: LSDV-5202: Fix Ranker d-n-d in Preview",
+  "commit": "e11265aea1bba0420538fc9a41cfab1c9d08955e",
   "branch": "master",
-  "date": "2023/05/31 10:07:44"
+  "date": "2023/05/31 19:44:34"
 }
