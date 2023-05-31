@@ -107,6 +107,7 @@ export const ProjectsPage = () => {
                 const cloned = cloneResponse.data.clone;
                 if (cloned) {
                   window.location.reload();
+                  Swal.fire("Success", "Your project has been cloned!", "success");
                 }
                 else {
                   Swal.fire("Error", "An error occurred while trying to clone the project", "error");
