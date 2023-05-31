@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5145: Regions hover lock consistency",
-  "commit": "ee9cfa5cbaa6ffeb768864cdbd39d43a05c01caf",
-  "branch": "master",
-  "date": "2023/05/30 15:13:05"
+  "message": "fix: LSDV-5213: Fix Ranker format for rank mode",
+  "commit": "1810e9dbca86102edd283534fd03dfb04912d676",
+  "branch": "fb-lsdv-5213/ranker-result",
+  "date": "2023/05/31 02:29:32"
 }
