@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5035: Use created_at from draft as the annotation draft_created_at",
-  "commit": "6dff59ab76ac9fe11e082517b3f97e34c6635cf4",
+  "message": "fix: LSDV-5192: Change quick view icon and change hover color",
+  "commit": "d2e8485cdc3aa0a01c83115ab96fdc606ddfbce9",
   "branch": "master",
-  "date": "2023/05/30 16:34:57"
+  "date": "2023/05/31 10:07:39"
 }
