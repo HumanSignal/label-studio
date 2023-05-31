@@ -106,8 +106,11 @@ export const ProjectsPage = () => {
               await axios.post(webhook_url + "/clone_existing_project?id=" + value).then((cloneResponse) => {
                 const cloned = cloneResponse.data.clone;
                 if (cloned) {
-                  window.location.reload();
-                  Swal.fire("Success", "Your project has been cloned!", "success");
+                  Swal.fire("Success", "Your project has been cloned!", "success").then(() => {
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 0);
+                  });
                 }
                 else {
                   Swal.fire("Error", "An error occurred while trying to clone the project", "error");
