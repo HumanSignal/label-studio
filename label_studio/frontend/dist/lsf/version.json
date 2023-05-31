@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5145: Regions hover lock consistency",
-  "commit": "ee9cfa5cbaa6ffeb768864cdbd39d43a05c01caf",
-  "branch": "master",
-  "date": "2023/05/30 15:13:05"
+  "message": "fix: LSDV-5214: Multi-word labels containing spaces in regions list are broken down into multiple rows on every space character",
+  "commit": "674743cf84e94a90f63cf9e88c5c542abd169cbf",
+  "branch": "fb-lsdv-5214",
+  "date": "2023/05/31 06:54:31"
 }
