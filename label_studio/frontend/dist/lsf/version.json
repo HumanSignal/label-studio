@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5145: Regions hover lock consistency",
-  "commit": "ee9cfa5cbaa6ffeb768864cdbd39d43a05c01caf",
+  "message": "fix: LSDV-5192: Change quick view icon and change hover color",
+  "commit": "bb2acdcf56f79050c841c4c4a816360372c6a22b",
   "branch": "master",
-  "date": "2023/05/30 15:13:05"
+  "date": "2023/05/31 10:07:44"
 }
