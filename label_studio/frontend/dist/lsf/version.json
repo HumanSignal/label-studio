@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5214: Multi-word labels containing spaces in regions list are broken down into multiple rows on every space character",
-  "commit": "674743cf84e94a90f63cf9e88c5c542abd169cbf",
+  "commit": "b9e8d921fce33a67a6030ee9a5307285d75b38e1",
   "branch": "fb-lsdv-5214",
-  "date": "2023/05/31 06:54:31"
+  "date": "2023/05/31 14:01:57"
 }
