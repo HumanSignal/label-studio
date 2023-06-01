@@ -19,7 +19,7 @@ config: |
         <Text name="prompt" value="$prompt"/>
       </View>
       <View>
-        <List name="answers" value="$items" title="Search Results" />
+        <List name="answers" value="$items" title="All Results" />
         <Style>
           .htx-ranker-column {
             background: #f8f8f8;
