@@ -47,12 +47,13 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
             'active_organization',
             'allow_newsletters'
         )
+        read_only_fields = ('email',)
 
 
 class UserSimpleSerializer(BaseUserSerializer):
     class Meta:
         model = User
         fields = ('id', 'first_name', 'last_name', 'email', 'avatar')
-
+        read_only_fields = ('email',)
 
 UserSerializer = load_func(settings.USER_SERIALIZER)
