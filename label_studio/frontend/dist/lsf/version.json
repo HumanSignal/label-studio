@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5202: Fix Ranker d-n-d in Preview",
-  "commit": "e11265aea1bba0420538fc9a41cfab1c9d08955e",
-  "branch": "master",
-  "date": "2023/05/31 19:44:34"
+  "message": "fix: LSDV-5158: Hide prediction delete button as it doesn't actually allow prediction deletions at this time",
+  "commit": "23bd99d3f40c511b517ea3cbd7c797e7d4396c56",
+  "branch": "fb-lsdv-5158",
+  "date": "2023/05/31 21:14:17"
 }
