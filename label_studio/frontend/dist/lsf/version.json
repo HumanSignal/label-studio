@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5214: Multi-word labels containing spaces in regions list are broken down into multiple rows on every space character",
-  "commit": "90e598406c7629653eb2601565dd13da8f26068c",
+  "message": "fix: LSDV-5158: Hide prediction delete button as it doesn't actually allow prediction deletions at this time",
+  "commit": "a370e8a23d1a9d4b2e5f3e09001b343580d779a0",
   "branch": "master",
-  "date": "2023/06/01 07:57:04"
+  "date": "2023/06/01 08:21:48"
 }
