@@ -71,6 +71,8 @@
                 <th>Sensor B</th>
                 <th>Offset (ms)</th>
                 <th>Start offset</th>
+                <th></th>
+                <th></th>
             </tr>
             {% for senoffset in sensoroffset %}
                 <tr>
@@ -78,6 +80,8 @@
                     <td>{{ senoffset.sensor_B }}</td>
                     <td>{{ senoffset.offset }}</td> 
                     <td>{{ senoffset.offset_Date}} </td>
+                    <td><a href="{% url 'sensordata:adjust_offset' senoffset.id %}"> [Edit] </a></td>
+                    <td><a href="{% url 'sensordata:delete_offset' senoffset.id %}"> [Delete] </a></td>
                 </tr> 
             {% endfor %}
         </table>

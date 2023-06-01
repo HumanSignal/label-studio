@@ -35,16 +35,16 @@ input[type=submit]:hover {
 </head>
 <body>
     <div class="buttons">
-        <form action="/sensormodel/subject">
-            <input type="submit" value="Go back to subject page" />
+        <form action="/sensordata/offset">
+            <input type="submit" value="Go back to sensor offset page" />
         </form>
     </div>
     <div class="forms">
         <form action="" method="post">
             <table>
-            {{ subjectform.as_table }}
+            {{ offsetform.as_table }}
             </table>
-            <input type="submit" value="Adjust subject">
+            <input type="submit" value="Adjust sensor offset">
         </form>
     </div>
 

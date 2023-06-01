@@ -14,8 +14,7 @@ from rest_framework.authtoken.models import Token
 import requests
 from tempfile import NamedTemporaryFile
 from django.conf import settings
-import os
-import fnmatch
+
 
 UNITS = {'days': 86400, 'hours': 3600, 'minutes': 60, 'seconds':1, 'milliseconds':0.001}
 
@@ -79,10 +78,33 @@ def offset(request):
     else:
         sensoroffsetform = SensorOffsetForm()
     return render(request, 'offset.html', {'sensoroffsetform':sensoroffsetform, 'sensoroffset':sensoroffset})
+def delete_offset(request, id):
+    offset = SensorOffset.objects.get(id=id)
+    if request.method == 'POST':
+        # Send POST to delete a sensor
+        offset.delete()
+        return redirect('sensordata:offset')
+    else:
+        # Go to delete confirmation page
+        return render(request, 'deleteOffset.html')
+
+def adjust_offset(request, id):
+    offset = SensorOffset.objects.get(id=id)
+    if request.method == 'POST':
+        # Send POST to adjust a subject
+        offsetform = SensorOffsetForm(request.POST, instance=offset)
+        if offsetform.is_valid():
+            offsetform.save()
+            return redirect('sensordata:offset')
+    else:
+        # Go to subject adjustment page
+        offsetform = SensorOffsetForm(instance=offset)
+    return render(request, 'editOffset.html', {'offsetform':offsetform})
 
 def parse_IMU(request, file_path, sensor_type_id, name, project_id):
     sensortype = SensorType.objects.get(id=sensor_type_id)
     # Parse data
+
     project_controller = ProjectController()
     sensor_data = SensorDataParser(project_controller, Path(file_path),sensortype.id)
     # Get parsed data

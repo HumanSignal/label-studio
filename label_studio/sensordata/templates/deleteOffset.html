@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load filters %}
+
+
+{% block content %}
+
+<style>
+    input[type=submit] {
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    input[type=submit]:hover {
+        background-color: #45a049;
+    }
+</style>
+
+
+<h1>Delete confirmation</h1>
+
+<p>Are you sure you want to delete this?</p>
+
+<form action="" method="post">
+    <input type="submit" value="Delete">
+</form>
+<form action="/sensordata/offset"> 
+    <input type="submit" value="No, go back to sensor offset page!" />
+</form>
+
+{% endblock %}

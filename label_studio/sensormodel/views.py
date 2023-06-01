@@ -8,49 +8,6 @@ import yaml
 from yaml.loader import SafeLoader
 import json
 
-def tablepage(request):
-    # Get all objects
-    sensors = Sensor.objects.all().order_by('sensor_id')
-    subjects = Subject.objects.all().order_by('name')
-    deployments = Deployment.objects.all().order_by('begin_datetime')
-    sensortypes = SensorType.objects.all().order_by('manufacturer')
-
-    for deployment in deployments:
-        # For each deployment create lists of all its sensors and subjects for easier display
-        deployment.CreateLists()
-    return render(request, 'tablepage.html', {'sensors': sensors, 'subjects': subjects, 'deployments': deployments, 'sensortypes': sensortypes})
-
-def addDeployment(request):
-    if request.method == 'POST':
-        deploymentform = forms.DeploymentForm(request.POST)
-        if deploymentform.is_valid():
-            deploymentform.save()
-            return redirect('sensormodel:tablepage')
-    else:
-        deploymentform = forms.DeploymentForm(request.POST)
-    return render(request, 'addDeployment.html', {'deploymentform':deploymentform})
-
-def addSensor(request):
-    if request.method == 'POST':
-        sensorform = forms.SensorForm(request.POST)
-        if sensorform.is_valid():
-            sensorform.save()
-            return redirect('sensormodel:tablepage')
-    else:
-        sensorform = forms.SensorForm(request.POST)
-    return render(request, 'addSensor.html', {'sensorform':sensorform})
-
-def addSubject(request):
-    if request.method == 'POST':
-        subjectform = forms.SubjectForm(request.POST)
-        if subjectform.is_valid():
-            subjectform.save()
-            return redirect('sensormodel:tablepage')
-    else:
-        subjectform = forms.SubjectForm(request.POST)
-        deploymentform = forms.DeploymentForm(request.POST)
-    return render(request, 'add.html', {'sensorform':sensorform, 'subjectform':subjectform, 'deploymentform':deploymentform})
-
 def deployment(request):
     deployments = Deployment.objects.all().order_by('begin_datetime')
     for deployment in deployments:
@@ -93,13 +50,13 @@ def adjust_deployment(request, id):
     deployment = Deployment.objects.get(id=id)
     if request.method == 'POST':
         # Send POST to adjust a deployment
-        deploymentform = forms.DeploymentForm(request.POST, instance=deployment)
+        deploymentform = forms.DeploymentForm2(request.POST, instance=deployment)
         if deploymentform.is_valid():
             deploymentform.save()
-            return redirect('sensormodel:tablepage')
+            return redirect('sensormodel:deployment')
     else:
         # Go to deployment adjustment page
-        deploymentform = forms.DeploymentForm(instance=deployment)
+        deploymentform = forms.DeploymentForm2(instance=deployment)
     return render(request, 'deployment.html', {'deploymentform':deploymentform})
     
 def adjust_sensor(request, id):
@@ -109,7 +66,7 @@ def adjust_sensor(request, id):
         sensorform = forms.SensorForm(request.POST,instance=sensor)
         if sensorform.is_valid():
             sensorform.save()
-            return redirect('sensormodel:tablepage')
+            return redirect('sensormodel:sensor')
     else:
         # Go to sensor adjustment page
         sensorform = forms.SensorForm(instance=sensor)
@@ -123,7 +80,7 @@ def adjust_subject(request, id):
         subjectform = forms.SubjectForm(request.POST, instance=subject)
         if subjectform.is_valid():
             subjectform.save()
-            return redirect('sensormodel:tablepage')
+            return redirect('sensormodel:subject')
     else:
         # Go to subject adjustment page
         subjectform = forms.SubjectForm(instance=subject)
@@ -134,20 +91,20 @@ def delete_deployment(request, id):
     if request.method == 'POST':
         # Send POST to delete a deployment
         deployment.delete()
-        return redirect('sensormodel:tablepage')
+        return redirect('sensormodel:deployment')
     else:
         # Go to delete confirmation page
-        return render(request, 'deleteconfirmation.html')
+        return render(request, 'deleteDeployment.html')
     
 def delete_sensor(request, id):
     sensor = Sensor.objects.get(id=id)
     if request.method == 'POST':
         # Send POST to delete a sensor
         sensor.delete()
-        return redirect('sensormodel:tablepage')
+        return redirect('sensormodel:sensor')
     else:
         # Go to delete confirmation page
-        return render(request, 'deleteconfirmation.html')
+        return render(request, 'deleteSensor.html')
 
 
 def delete_subject(request, id):
@@ -155,10 +112,10 @@ def delete_subject(request, id):
     if request.method == 'POST':
         # Send POST to delete a subject
         subject.delete()
-        return redirect('sensormodel:tablepage')
+        return redirect('sensormodel:subject')
     else:
         # Go to delete confirmation page
-        return render(request, 'deleteconfirmation.html')
+        return render(request, 'deleteSubject.html')
 
 def sync_sensor_parser_templates(request):
     # Search sensortypes repo for (new) config .yaml files and add them to DB
@@ -193,6 +150,6 @@ def sync_sensor_parser_templates(request):
                     # If the config is valid add to DB
                     config = json.loads(config)
                     SensorType.objects.create(manufacturer=manufacturer,name=name, version=version, **config).save()
-    return redirect('sensormodel:tablepage')
+    return redirect('sensormodel:sensor')
 
 

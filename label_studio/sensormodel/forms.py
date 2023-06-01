@@ -58,3 +58,21 @@ class DeploymentForm(forms.ModelForm):
 
           
         return cleaned_data
+    
+class DeploymentForm2(DeploymentForm):
+    def clean(self):
+        # Function used for form validation
+        cleaned_data = super(DeploymentForm, self).clean()
+        
+        begin_datetime = cleaned_data.get('begin_datetime')
+        end_datetime = cleaned_data.get('end_datetime')
+        
+        #Check if begin_datetime is before end_datetime
+        if begin_datetime and end_datetime:
+            if  begin_datetime >= end_datetime:
+                self.add_error('begin_datetime','Begin date time must be before end date time.')
+
+        sensors = cleaned_data.get('sensor')
+        deployments = Deployment.objects.all()
+        
+        return cleaned_data
