@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5213: Fix Ranker format for rank mode",
-  "commit": "3161d10ced14bc516da16d6e91380cfb65e08dee",
+  "message": "fix: LSDV-5214: Multi-word labels containing spaces in regions list are broken down into multiple rows on every space character",
+  "commit": "90e598406c7629653eb2601565dd13da8f26068c",
   "branch": "master",
-  "date": "2023/06/01 13:02:58"
+  "date": "2023/06/01 07:57:04"
 }
