@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5158: Hide prediction delete button as it doesn't actually allow prediction deletions at this time",
-  "commit": "a370e8a23d1a9d4b2e5f3e09001b343580d779a0",
+  "message": "feat: LSDV-5121: User Setting Improvements",
+  "commit": "e45dea20b70f7ab001feccfebadd947104bab2ae",
   "branch": "master",
-  "date": "2023/06/01 08:21:48"
+  "date": "2023/06/01 08:59:52"
 }
