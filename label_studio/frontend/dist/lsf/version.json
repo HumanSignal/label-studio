@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5202: Fix Ranker d-n-d in Preview",
-  "commit": "e11265aea1bba0420538fc9a41cfab1c9d08955e",
+  "message": "fix: LSDV-5213: Fix Ranker format for rank mode",
+  "commit": "3161d10ced14bc516da16d6e91380cfb65e08dee",
   "branch": "master",
-  "date": "2023/05/31 19:44:34"
+  "date": "2023/06/01 13:02:58"
 }
