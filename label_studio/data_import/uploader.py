@@ -4,8 +4,6 @@ import os
 import io
 import csv
 import ssl
-import uuid
-import pickle
 import requests
 import logging
 import mimetypes
@@ -14,7 +12,6 @@ try:
 except:
     import json
 
-from dateutil import parser
 from rest_framework.exceptions import ValidationError
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
