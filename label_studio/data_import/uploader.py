@@ -57,7 +57,7 @@ def check_max_task_number(tasks):
 def check_tasks_max_file_size(value):
     if value >= settings.TASKS_MAX_FILE_SIZE:
         raise ValidationError(f'Maximum total size of all files is {settings.TASKS_MAX_FILE_SIZE} bytes, '
-                              f'current size is {total} bytes')
+                              f'current size is {value} bytes')
 
 def check_extensions(files):
     for filename, file_obj in files.items():
@@ -255,7 +255,7 @@ def load_tasks(request, project):
             file_upload = create_file_upload(request.user, project, SimpleUploadedFile('inplace.json', url.encode()))
             file_upload_ids.append(file_upload.id)
             tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(project, file_upload_ids)
-            
+
         # download file using url and read tasks from it
         else:
             if settings.SSRF_PROTECTION_ENABLED and url_is_local(url):
@@ -290,4 +290,3 @@ def load_tasks(request, project):
 
     check_max_task_number(tasks)
     return tasks, file_upload_ids, could_be_tasks_list, found_formats, list(data_keys)
-
