@@ -14,8 +14,4 @@ class Migration(migrations.Migration):
             model_name='task',
             index=models.Index(fields=['overlap'], name='task_overlap_6a196e_idx'),
         ),
-        migrations.AddIndex(
-            model_name='task',
-            index=models.Index(fields=['is_labeled'], name='task_is_labe_215a18_idx'),
-        ),
     ]

@@ -10,14 +10,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveIndex(
-            model_name='annotation',
-            name='task_comple_last_cr_dedad7_idx',
-        ),
-        migrations.RemoveIndex(
-            model_name='task',
-            name='task_is_labe_215a18_idx',
-        ),
         migrations.AlterField(
             model_name='annotation',
             name='ground_truth',

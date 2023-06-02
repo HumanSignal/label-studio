@@ -46,6 +46,9 @@ _api_urlpatterns = [
 
     # List available model versions
     path('<int:pk>/model-versions/', api.ProjectModelVersions.as_view(), name='project-model-versions'),
+    
+    # 项目成员
+    path('<int:pk>/member/', api.ProjectMemberAPI.as_view(), name='project-member'),
 
 ]
 

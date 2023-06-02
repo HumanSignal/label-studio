@@ -296,8 +296,8 @@ def get_prepare_params(request, project):
         * view_id if it's inside of request data
         * selectedItems, filters, ordering if they are in request and there is no view id
     """
-    # use filters and selected items from view
-    view_id = int_from_request(request.GET, 'view', 0) or int_from_request(request.data, 'view', 0)
+    # dm组件action：next_task时字段可能叫tabID
+    view_id = int_from_request(request.GET, 'view', 0) or int_from_request(request.data, 'view', 0) or int_from_request(request.GET, 'tabID', 0)
     if view_id > 0:
         view = get_object_or_404(View, pk=view_id)
         if view.project.pk != project.pk:

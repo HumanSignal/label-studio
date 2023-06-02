@@ -624,6 +624,66 @@
         "decorators": ""
     },
     {
+        "url": "/api/storages/oss/",
+        "module": "io_storages.oss.api.OSSImportStorageListAPI",
+        "name": "storages:api:storage-oss-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/oss/<int:pk>",
+        "module": "io_storages.oss.api.OSSImportStorageDetailAPI",
+        "name": "storages:api:storage-oss-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/oss/<int:pk>/sync",
+        "module": "io_storages.oss.api.OSSImportStorageSyncAPI",
+        "name": "storages:api:storage-oss-sync",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/oss/validate",
+        "module": "io_storages.oss.api.OSSImportStorageValidateAPI",
+        "name": "storages:api:storage-oss-validate",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/oss/form",
+        "module": "io_storages.oss.api.OSSImportStorageFormLayoutAPI",
+        "name": "storages:api:storage-oss-form",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/oss",
+        "module": "io_storages.oss.api.OSSExportStorageListAPI",
+        "name": "storages:api:export-storage-oss-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/oss/<int:pk>",
+        "module": "io_storages.oss.api.OSSExportStorageDetailAPI",
+        "name": "storages:api:export-storage-oss-detail",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/oss/<int:pk>/sync",
+        "module": "io_storages.oss.api.OSSExportStorageSyncAPI",
+        "name": "storages:api:export-storage-oss-sync",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/oss/validate",
+        "module": "io_storages.oss.api.OSSExportStorageValidateAPI",
+        "name": "storages:api:export-storage-oss-validate",
+        "decorators": ""
+    },
+    {
+        "url": "/api/storages/export/oss/form",
+        "module": "io_storages.oss.api.OSSExportStorageFormLayoutAPI",
+        "name": "storages:api:export-storage-oss-form",
+        "decorators": ""
+    },
+    {
         "url": "/api/storages/azure/",
         "module": "io_storages.azure_blob.api.AzureBlobImportStorageListAPI",
         "name": "storages:api:storage-azure-list",

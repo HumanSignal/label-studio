@@ -2,7 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { Spinner } from '../../components';
-import { Button } from '../../components/Button/Button';
+import { Button, Button2 } from '../../components/Button/Button';
+import { Form, Input } from "../../components/Form";
+import { Select } from '../../components/Form/Elements';
+import { useConfig } from '../../providers/ConfigProvider';
 import { modal } from '../../components/Modal/Modal';
 import { Space } from '../../components/Space/Space';
 import { useAPI } from '../../providers/ApiProvider';
@@ -24,10 +27,18 @@ const initializeDataManager = async (root, props, params) => {
   root.dataset.dmInitialized = true;
 
   const { ...settings } = root.dataset;
+  let toolbarStr = ""
+  // 不同权限，看到按钮不一致
+  if (params.manager == true){
+    toolbarStr = "actions columns filters ordering owner-button label-button | import-button export-button refresh view-toggle"
+  } else {
+    toolbarStr = "columns label-button | refresh view-toggle"
+  }
 
   const dmConfig = {
     root,
     projectId: params.id,
+    toolbar: toolbarStr,
     apiGateway: `${window.APP_SETTINGS.hostname}/api/dm`,
     apiVersion: 2,
     project: params.project,
@@ -44,6 +55,11 @@ const initializeDataManager = async (root, props, params) => {
     labelStudio: {
       keymap: window.APP_SETTINGS.editor_keymap,
     },
+    instruments: {
+      'owner-button': () => {
+        return () => <Button2 name="分配任务" onClick={()=>tabOwnerClick(params.id, params.projectMembers)}></Button2>;
+      }
+    },
     ...props,
     ...settings,
   };
@@ -55,9 +71,57 @@ const buildLink = (path, params) => {
   return generatePath(`/projects/:id${path}`, params);
 };
 
+const tabOwnerClick = (project_id, projectMembers) => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const tabId = urlParams.get('tab');
+  fetch(`/api/dm/views/${tabId}`)
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('请求tab详情失败');
+    }
+    return response;
+  })
+  .then(response => response.json())
+  .then(
+    data => {
+      const jsonData = data;
+      const value = data.user?.id
+      const props = {
+        title: "添加协作人员",
+        style: { width: 640, height: 230 },
+        body: () => (
+          <Form action={"updateTabs"} params={{pk: tabId}}
+          onSubmit={async (response) => {
+            if (!response.error_message) {
+              modalRef.close();
+            }
+          }}>
+            <Form.Row columnCount={2} rowGap="32px">
+              <Select
+                name="tab_owner"
+                value={value}
+                options={projectMembers.map(v => ({ label: v.first_name + v.last_name , value: v.id }))}
+                onChange={(e) => {console.log(1234, e)}}
+                style={{ width: '100%' }}
+              />
+            </Form.Row>
+            <Form.Actions>
+            <Button type="submit" look="primary" style={{width: 120}}>保存</Button>
+            </Form.Actions>
+          </Form>
+        ),
+        bareFooter: true,
+      }
+      const modalRef = modal(props)
+      return modalRef;
+    }
+  )
+};
+
 export const DataManagerPage = ({ ...props }) => {
   const root = useRef();
   const params = useParams();
+  const config = useConfig();
   const history = useHistory();
   const api = useAPI();
   const { project } = useProject();
@@ -79,6 +143,12 @@ export const DataManagerPage = ({ ...props }) => {
       params: { project: project.id },
     });
 
+    // const projectMembers = await api.callApi("getProjectMember", {
+    //   params: { pk: project.id },
+    // });
+    const projectMembers = await api.callApi("users", {});
+    console.log(projectMembers)
+
     const interactiveBacked = (mlBackends ?? []).find(({ is_interactive }) => is_interactive);
 
     const dataManager = (dataManagerRef.current = dataManagerRef.current ?? await initializeDataManager(
@@ -88,6 +158,8 @@ export const DataManagerPage = ({ ...props }) => {
         ...params,
         project,
         autoAnnotation: isDefined(interactiveBacked),
+        manager: config.user.permissions.search("projects.change") > 0,
+        projectMembers: projectMembers
       },
     ));
 
@@ -188,11 +260,15 @@ DataManagerPage.pages = {
 DataManagerPage.context = ({ dmRef }) => {
   const location = useFixedLocation();
   const { project } = useProject();
+  const config = useConfig();
   const [mode, setMode] = useState(dmRef?.mode ?? "explorer");
 
-  const links = {
-    '/settings': 'Settings',
-  };
+  var links = {}
+  if (config.user.permissions.search("projects.change") > 0){
+    links = {
+      '/settings': 'Settings',
+    };
+  }
 
   const updateCrumbs = (currentMode) => {
     const isExplorer = currentMode === 'explorer';

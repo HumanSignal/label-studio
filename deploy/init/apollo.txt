@@ -1,0 +1,11 @@
+atta.security.oauth2.client-details[10].autoApproveScopes[0] = openid
+atta.security.oauth2.client-details[10].authorizedGrantTypes[0] = authorization_code
+atta.security.oauth2.client-details[10].scope[0] = openid
+atta.security.oauth2.client-details[10].clientId = label_studio
+atta.security.oauth2.client-details[10].registeredRedirectUri = http://192.168.147.203:8000/user/oauth-authorized/boss/
+atta.security.oauth2.client-details[10].autoApproveScopes[1] = user
+atta.security.oauth2.client-details[10].scope[1] = user
+atta.security.oauth2.client-details[10].authorizedGrantTypes[1] = refresh_token
+atta.security.oauth2.client-details[10].accessTokenValiditySeconds = 1200
+atta.security.oauth2.client-details[10].refreshTokenValiditySeconds = 2400
+atta.security.oauth2.client-details[10].clientSecret = label_studio

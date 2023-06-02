@@ -8,7 +8,7 @@ from users.serializers import UserSimpleSerializer
 
 from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS
 
-from projects.models import Project, ProjectOnboarding, ProjectSummary
+from projects.models import Project, ProjectOnboarding, ProjectSummary, ProjectMember
 
 
 class CreatedByFromContext:
@@ -135,3 +135,11 @@ class GetFieldsSerializer(serializers.Serializer):
     def validate_filter(self, value):
         if value in ['all', 'pinned_only', 'exclude_pinned']:
             return value
+
+
+class ProjectMemberSerializer(serializers.ModelSerializer):
+    user = UserSimpleSerializer()
+    
+    class Meta:
+        model = ProjectMember
+        fields = '__all__'

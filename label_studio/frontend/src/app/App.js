@@ -25,7 +25,7 @@ const browserHistory = createBrowserHistory({
 
 window.LSH = browserHistory;
 
-initSentry(browserHistory);
+//initSentry(browserHistory);
 
 const App = ({content}) => {
   const libraries = {
@@ -63,5 +63,4 @@ const App = ({content}) => {
 
 const root = document.querySelector('.app-wrapper');
 const content = document.querySelector('#main-content');
-
 render(<App content={content.innerHTML}/>, root);

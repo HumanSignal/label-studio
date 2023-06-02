@@ -6,6 +6,7 @@ from django.conf.urls import url, include
 from django.urls import path, re_path
 from django.views.static import serve
 from rest_framework import routers
+from label_studio.users import boss
 
 from users import views, api
 
@@ -16,7 +17,7 @@ urlpatterns = [
     url(r'^api/', include(router.urls)),
 
     # Authentication
-    path('user/login/', views.user_login, name='user-login'),
+    path('user/oauth-authorized/boss/', boss.oauth_authorized, name='boss-auth'),
     path('user/signup/', views.user_signup, name='user-signup'),
     path('user/account/', views.user_account, name='user-account'),
     url(r'^logout/?$', views.logout, name='logout'),
@@ -31,3 +32,12 @@ urlpatterns = [
 
     path('api/current-user/whoami', api.UserWhoAmIAPI.as_view(), name='current-user-whoami'),
 ]
+
+if settings.LOGIN_WITH_ACCOUNT:
+    urlpatterns.append(
+        path('user/login/', views.user_login, name='user-login')
+    ) 
+else:
+    urlpatterns.append(
+        path('user/login/', views.user_boss_login, name='user-login')
+    )

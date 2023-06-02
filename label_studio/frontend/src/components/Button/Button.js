@@ -92,3 +92,55 @@ Button.Group = ({ className, children, collapsed }) => {
     </Block>
   );
 };
+
+export const Button2 = React.forwardRef(
+  (
+    {
+      name,
+      type,
+      extra,
+      className,
+      size,
+      waiting,
+      icon,
+      tag,
+      look,
+      ...rest
+    },
+    ref,
+  ) => {
+    const finalTag = tag ?? (rest.href ? "a" : "button");
+
+    const mods = {
+      size: "compact",
+      waiting,
+      type,
+      look: look ?? [],
+      withIcon: !!icon,
+      withExtra: !!extra,
+    };
+
+    return (
+      <Block
+        name="button"
+        mod={mods}
+        mix={className}
+        ref={ref}
+        tag={finalTag}
+        type={type}
+        {...rest}
+      >
+        {name}
+      </Block>
+    );
+  },
+);
+Button2.displayName = "Button";
+
+Button2.Group = ({ className, children, collapsed }) => {
+  return (
+    <Block name="button-group" mod={{ collapsed }} mix={className}>
+      {children}
+    </Block>
+  );
+};

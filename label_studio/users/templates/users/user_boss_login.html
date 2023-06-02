@@ -1,0 +1,9 @@
+{% extends 'users/user_base.html' %}
+
+{% block user_content %}
+  <form id="login-form" action="{% url 'user-login' %}{% if next %}?next={{ next }}{% endif %}" method="post">
+    {% csrf_token %}
+    <p><button type="submit" aria-label="Log In BOSS" class="ls-button ls-button_look_primary">Log In BOSS</button></p>
+  </form>
+
+{% endblock %}

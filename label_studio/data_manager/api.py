@@ -9,6 +9,7 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.exceptions import NotFound, PermissionDenied
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.conf import settings
@@ -23,8 +24,10 @@ from tasks.models import Task, Annotation, Prediction
 from data_manager.functions import get_prepared_queryset, evaluate_predictions, get_prepare_params
 from data_manager.models import View
 from data_manager.managers import get_fields_for_evaluation
-from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, ViewResetSerializer
+from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, ViewResetSerializer, ViewChangeSerializer
 from data_manager.actions import get_all_actions, perform_action
+
+from users.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -103,6 +106,15 @@ class ViewAPI(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+        
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        if not request.user.has_perm(all_permissions.tasks_change):
+            queryset = queryset.filter(user_id=request.user.id)
+        serializer = self.get_serializer(queryset, many=True)
+        if not serializer.data and not request.user.has_perm(all_permissions.projects_change):
+            raise PermissionDenied("当前项目中你还没有被分配任务")
+        return Response(serializer.data)
 
     @swagger_auto_schema(
         tags=['Data Manager'],
@@ -120,7 +132,8 @@ class ViewAPI(viewsets.ModelViewSet):
         return Response(status=204)
 
     def get_queryset(self):
-        return View.objects.filter(project__organization=self.request.user.active_organization).order_by('id')
+        # 管理员可以操作所有view
+        return View.objects.select_related('user').filter(project__organization=self.request.user.active_organization).order_by('id')
 
 
 class TaskPagination(PageNumberPagination):
@@ -334,3 +347,24 @@ class ProjectActionsAPI(APIView):
         code = result.pop('response_code', 200)
 
         return Response(result, status=code)
+
+
+class TabChangeAPI(APIView):
+    permission_required = ViewClassPermission(
+        POST=all_permissions.projects_change,
+    )
+        
+    def post(self, request, pk):
+        serializer = ViewChangeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        queryset = View.objects.filter(id=pk).first()
+        if not queryset:
+            raise NotFound(f"当前操作的视图不存在，请尝试刷新页面")
+        # 检查用户
+        user = User.objects.filter(id=serializer.validated_data['tab_owner']).first()
+        if not user:
+            raise NotFound(f"请检查所选用户是否存在")
+        data = queryset.data
+        data["title"] = f"{user.first_name}{user.last_name}"
+        View.objects.filter(id=pk).update(user_id=user.id, data=data)
+        return Response(status=200)

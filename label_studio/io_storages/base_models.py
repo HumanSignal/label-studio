@@ -219,7 +219,7 @@ class ImportStorage(Storage):
 
     def sync(self):
         if redis_connected():
-            queue = django_rq.get_queue('low')
+            queue = django_rq.get_queue('default')
             meta = {'project': self.project.id, 'storage': self.id}
             if not is_job_in_queue(queue, "sync_background", meta=meta) and \
                     not is_job_on_worker(job_id=self.last_sync_job, queue_name='default'):
@@ -255,7 +255,7 @@ class ProjectStorageMixin(models.Model):
         abstract = True
 
 
-@job('low')
+@job('default')
 def sync_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.scan_and_create_links()
@@ -288,7 +288,7 @@ class ExportStorage(Storage, ProjectStorageMixin):
 
     def sync(self):
         if redis_connected():
-            queue = django_rq.get_queue('low')
+            queue = django_rq.get_queue('default')
             job = queue.enqueue(export_sync_background, self.__class__, self.id, job_timeout=settings.RQ_LONG_JOB_TIMEOUT)
             logger.info(f'Storage sync background job {job.id} for storage {self} has been started')
         else:

@@ -233,7 +233,7 @@ export class APIProxy {
         } else {
           rawResponse = await fetch(apiCallURL, requestParams);
         }
-
+        console.log(rawResponse)
         responseMeta = {
           headers: new Map(Array.from(rawResponse.headers)),
           status: rawResponse.status,
@@ -427,7 +427,7 @@ export class APIProxy {
         return text;
       }
     })();
-
+    console.log(exception)
     return {
       status: fetchResponse.status,
       error: (exception?.message ?? fetchResponse.statusText) || "Server Error",

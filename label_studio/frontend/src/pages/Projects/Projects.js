@@ -14,6 +14,7 @@ import { DataManagerPage } from '../DataManager/DataManager';
 import { SettingsPage } from '../Settings';
 import './Projects.styl';
 import { EmptyProjectsList, ProjectsList } from './ProjectsList';
+import { useConfig } from '../../providers/ConfigProvider';
 
 const getCurrentPage = () => {
   const pageNumberFromURL = new URLSearchParams(location.search).get("page");
@@ -86,12 +87,16 @@ export const ProjectsPage = () => {
   React.useEffect(() => {
     fetchProjects();
   }, []);
-
+  const config = useConfig()
   React.useEffect(() => {
+    var showB = config.user.permissions.search("projects.change") > 0
+    if (projectsList.length <= 0){
+      showB = false
+    }
     // there is a nice page with Create button when list is empty
     // so don't show the context button in that case
-    setContextProps({ openModal, showButton: projectsList.length > 0 });
-  }, [projectsList.length]);
+    setContextProps({ openModal, showButton: showB });
+  }, [projectsList.length, config.user.permissions]);
 
   return (
     <Block name="projects-page">

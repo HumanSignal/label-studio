@@ -2,11 +2,12 @@
 """
 import os
 import pathlib
+import re
 
 from core.settings.base import *
+from label_studio.core.settings.apollo import ApolloBaseConfig
 
-DJANGO_DB = get_env('DJANGO_DB', DJANGO_DB_SQLITE)
-DATABASES = {'default': DATABASES_ALL[DJANGO_DB]}
+DJANGO_DB = get_env('DJANGO_DB', DJANGO_DB_MYSQL)
 
 MIDDLEWARE.append('organizations.middleware.DummyGetSessionMiddleware')
 MIDDLEWARE.append('core.middleware.UpdateLastActivityMiddleware')
@@ -17,7 +18,7 @@ ADD_DEFAULT_ML_BACKENDS = False
 
 LOGGING['root']['level'] = get_env('LOG_LEVEL', 'WARNING')
 
-DEBUG = get_bool_env('DEBUG', False)
+DEBUG = get_bool_env('LABEL_STUDIO_DEBUG', True)
 
 DEBUG_PROPAGATE_EXCEPTIONS = get_bool_env('DEBUG_PROPAGATE_EXCEPTIONS', False)
 
@@ -63,3 +64,67 @@ except IOError:
     FEATURE_FLAGS_FROM_FILE = False
 
 STORAGE_PERSISTENCE = get_bool_env('STORAGE_PERSISTENCE', True)
+
+# 开放账号密码登录
+LOGIN_WITH_ACCOUNT = get_bool_env('LOGIN_WITH_ACCOUNT', True)
+
+# 默认组
+DEFAULT_GROUPS = get_env('DEFAULT_GROUPS', "annotator")
+
+# 生成标注结果目录文件名
+SYNC_ANNOTATION_DIR = get_env('SYNC_ANNOTATION_DIR', "result")
+
+# 当前服务对外暴露域名
+SERVER_HOST = ""
+
+APOLLO_APPLICATION = "machine-learning"
+APOLLO_NAMESPACE = "mlflow"
+
+# MLFLOW_APOLLO_CONFIG_DICT = ApolloBaseConfig().get_apollo_configs(
+#     app=APOLLO_APPLICATION, namespace=APOLLO_NAMESPACE
+# )
+MLFLOW_APOLLO_CONFIG_DICT = {}
+# OSS config
+MLFLOW_OSS_ENDPOINT_URL = MLFLOW_APOLLO_CONFIG_DICT.get("mlflow.oss.attaAiModel.ro.endPoint", "")
+MLFLOW_OSS_KEY_ID = MLFLOW_APOLLO_CONFIG_DICT.get("mlflow.oss.attaAiModel.ro.accessKeyId", "")
+MLFLOW_OSS_KEY_SECRET = MLFLOW_APOLLO_CONFIG_DICT.get("mlflow.oss.attaAiModel.ro.accessKeySecret", "")
+MLFLOW_OSS_BUCKET_NAME = MLFLOW_APOLLO_CONFIG_DICT.get("mlflow.oss.attaAiModel.ro.bucketRoot", "")
+
+# 标准话BUCKET NAME
+if MLFLOW_OSS_BUCKET_NAME.startswith("oss://"):
+    MLFLOW_OSS_BUCKET_NAME = MLFLOW_OSS_BUCKET_NAME.replace("oss://", "").strip("/")
+
+
+DATABASES_ALL[DJANGO_DB_MYSQL] = {
+    'ENGINE': 'django.db.backends.mysql',
+    'USER': MLFLOW_APOLLO_CONFIG_DICT.get('label_studio.mysql.username', 'root'),
+    'PASSWORD': MLFLOW_APOLLO_CONFIG_DICT.get('label_studio.mysql.password', '111111'),
+    'NAME': MLFLOW_APOLLO_CONFIG_DICT.get('label_studio.mysql.database', 'label_studio2'),
+    'HOST': MLFLOW_APOLLO_CONFIG_DICT.get('label_studio.mysql.host', '127.0.0.1'),
+    'PORT': MLFLOW_APOLLO_CONFIG_DICT.get('label_studio.mysql.port', '3306'),
+}
+
+DATABASES = {'default': DATABASES_ALL[DJANGO_DB]}
+
+# Boss登录校验权限
+BOSS_PERMISSION_CODE = get_env('BOSS_PERMISSION_CODE', '')
+# Boss配置
+OAUTH_APP_CONFIG = {
+    'boss': {
+        'client_id': get_env('CLIENT_SECRET', 'label_studio'),
+        'client_secret': get_env('CLIENT_SECRET', 'label_studio'),
+        'access_token_url': get_env('BOSS_PERMISSION_CODE', 'https://dev8.xtrfr.cn/oauth/token'),
+        'authorize_url': get_env('AUTHORIZE_URL', 'https://dev8.xtrfr.cn/oauth/authorize'),
+        'api_base_url': get_env('API_BASE_URL', 'https://dev8.xtrfr.cn/oauth'),
+    }
+}
+
+RQ_QUEUES = {
+    'default': {
+        'HOST': MLFLOW_APOLLO_CONFIG_DICT.get("mlflow.redis.uri", ""),
+        'PORT': int(MLFLOW_APOLLO_CONFIG_DICT.get("mlflow.redis.port", 10033)),
+        'DB': MLFLOW_APOLLO_CONFIG_DICT.get("mlflow.redis.database", ""),
+        'PASSWORD': MLFLOW_APOLLO_CONFIG_DICT.get("mlflow.redis.password"),
+        'DEFAULT_TIMEOUT': 360,
+    }
+}

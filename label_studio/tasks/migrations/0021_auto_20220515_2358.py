@@ -26,9 +26,5 @@ class Migration(migrations.Migration):
         migrations.AddIndex(
             model_name='annotation',
             index=models.Index(fields=['last_action'], name='task_comple_last_ac_777e69_idx'),
-        ),
-        migrations.AddIndex(
-            model_name='annotation',
-            index=models.Index(fields=['last_created_by'], name='task_comple_last_cr_dedad7_idx'),
-        ),
+        )
     ]

@@ -104,7 +104,7 @@ INTERNAL_PORT = '8080'
 SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = get_bool_env('DEBUG', True)
+DEBUG = get_bool_env('LABEL_STUDIO_DEBUG', True)
 DEBUG_MODAL_EXCEPTIONS = get_bool_env('DEBUG_MODAL_EXCEPTIONS', True)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -135,9 +135,9 @@ DATABASES_ALL = {
     DJANGO_DB_MYSQL: {
         'ENGINE': 'django.db.backends.mysql',
         'USER': get_env('MYSQL_USER', 'root'),
-        'PASSWORD': get_env('MYSQL_PASSWORD', ''),
-        'NAME': get_env('MYSQL_NAME', 'labelstudio'),
-        'HOST': get_env('MYSQL_HOST', 'localhost'),
+        'PASSWORD': get_env('MYSQL_PASSWORD', '111111'),
+        'NAME': get_env('MYSQL_NAME', 'label_studio2'),
+        'HOST': get_env('MYSQL_HOST', '127.0.0.1'),
         'PORT': int(get_env('MYSQL_PORT', '3306')),
     },
     DJANGO_DB_SQLITE: {
@@ -258,7 +258,8 @@ ALLOWED_HOSTS = ['*']
 
 # Auth modules
 AUTH_USER_MODEL = 'users.User'
-AUTHENTICATION_BACKENDS = ['rules.permissions.ObjectPermissionBackend', 'django.contrib.auth.backends.ModelBackend', ]
+#AUTHENTICATION_BACKENDS = ['rules.permissions.ObjectPermissionBackend', 'django.contrib.auth.backends.AllowAllUsersModelBackend', ]
+AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend', ]
 USE_USERNAME_FOR_LOGIN = False
 
 DISABLE_SIGNUP_WITHOUT_LINK = get_bool_env('DISABLE_SIGNUP_WITHOUT_LINK', False)
@@ -427,7 +428,7 @@ TASK_API_PAGE_SIZE_MAX = int(get_env('TASK_API_PAGE_SIZE_MAX', 0)) or None
 FROM_EMAIL = get_env('FROM_EMAIL', 'Label Studio <hello@labelstud.io>')
 EMAIL_BACKEND = get_env('EMAIL_BACKEND', 'django.core.mail.backends.dummy.EmailBackend')
 
-ENABLE_LOCAL_FILES_STORAGE = get_bool_env('ENABLE_LOCAL_FILES_STORAGE', default=True)
+ENABLE_LOCAL_FILES_STORAGE = get_bool_env('ENABLE_LOCAL_FILES_STORAGE', default=False)
 LOCAL_FILES_SERVING_ENABLED = get_bool_env('LOCAL_FILES_SERVING_ENABLED', default=False)
 LOCAL_FILES_DOCUMENT_ROOT = get_env('LOCAL_FILES_DOCUMENT_ROOT', default=os.path.abspath(os.sep))
 

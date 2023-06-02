@@ -114,6 +114,11 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         default=None,
         help_text=_('Allow sending newsletters to user')
     )
+    
+    # 缓存bossid和钉id
+    ding_user_id = models.CharField('钉钉UserID', max_length=64, blank=True)
+    boss_id = models.CharField('BossID', max_length=64, blank=True)
+    
 
     objects = UserManager()
 
@@ -198,6 +203,9 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         elif self.first_name and self.last_name:
             initials = self.first_name[0:1] + self.last_name[0:1]
         return initials
+
+    def get_permissions(self):
+        return ["a"]
 
 
 @receiver(post_save, sender=User)

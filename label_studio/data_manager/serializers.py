@@ -8,6 +8,7 @@ from rest_framework import serializers
 from django.db import transaction
 
 from data_manager.models import View, Filter, FilterGroup
+from users.serializers import UserSimpleSerializer
 from tasks.models import Task
 from tasks.serializers import TaskSerializer, AnnotationSerializer, PredictionSerializer, AnnotationDraftSerializer
 from projects.models import Project
@@ -30,6 +31,7 @@ class FilterGroupSerializer(serializers.ModelSerializer):
 
 class ViewSerializer(serializers.ModelSerializer):
     filter_group = FilterGroupSerializer(required=False)
+    user = UserSimpleSerializer(required=False)
 
     class Meta:
         model = View
@@ -311,3 +313,7 @@ class SelectedItemsSerializer(serializers.Serializer):
 
 class ViewResetSerializer(serializers.Serializer):
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all())
+
+
+class ViewChangeSerializer(serializers.Serializer):
+    tab_owner = serializers.CharField()

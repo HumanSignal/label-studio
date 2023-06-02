@@ -17,6 +17,8 @@ export const API_CONFIG = {
     updateProject: "PATCH:/projects/:pk",
     createProject: "POST:/projects",
     deleteProject: "DELETE:/projects/:pk",
+    getProjectMember: "GET:/projects/:pk/member",
+    postProjectMember: "POST:/projects/:pk/member",
 
     // Config and Import
     configTemplates: "/templates",
@@ -30,6 +32,7 @@ export const API_CONFIG = {
 
     // DM
     deleteTabs: 'DELETE:/dm/views/reset',
+    updateTabs: 'POST:/dm/views/:pk/change',
 
     // Storages
     listStorages: "/storages/:target?",

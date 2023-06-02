@@ -22,7 +22,7 @@ def next_task(project, queryset, **kwargs):
 
     request = kwargs['request']
     dm_queue = filters_ordering_selected_items_exist(request.data)
-    next_task, queue_info = get_next_task(request.user, queryset, project, dm_queue)
+    next_task, queue_info = get_next_task(request.user, queryset, project, dm_queue, assigned_flag=True)
 
     if next_task is None:
         raise NotFound(

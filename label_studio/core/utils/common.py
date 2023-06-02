@@ -324,7 +324,8 @@ def retry_database_locked():
 
 
 def get_app_version():
-    version = pkg_resources.get_distribution('label-studio').version
+    # version = pkg_resources.get_distribution('label-studio').version
+    version = label_studio.__version__
     if isinstance(version, str):
         return version
     elif isinstance(version, dict):
@@ -392,8 +393,9 @@ def check_for_the_latest_version(print_message):
 
 # check version ASAP while package loading
 # skip notification for uwsgi, as we're running in production ready mode
-if settings.APP_WEBSERVER != 'uwsgi':
-    check_for_the_latest_version(print_message=True)
+# 不再检查最新版本
+# if settings.APP_WEBSERVER != 'uwsgi':
+#     check_for_the_latest_version(print_message=True)
 
 
 def collect_versions(force=False):

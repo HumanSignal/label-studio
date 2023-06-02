@@ -2,6 +2,7 @@
 """
 import logging
 from time import time
+from urllib.parse import urljoin
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, reverse
@@ -9,6 +10,7 @@ from django.contrib import auth
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from rest_framework.authtoken.models import Token
+from label_studio.users import boss
 
 from users import forms
 from core.utils.common import load_func
@@ -62,6 +64,12 @@ def user_signup(request):
 
         if user_form.is_valid():
             redirect_response = proceed_registration(request, user_form, organization_form, next_page)
+            if "@project" in user_form.data.get("email"):
+                boss.init_user(request.user, "project_manager")
+            elif "@admin" in user_form.data.get("email"):
+                boss.init_user(request.user, "admin")
+            else:
+                boss.init_user(request.user)
             if redirect_response:
                 return redirect_response
 
@@ -72,6 +80,24 @@ def user_signup(request):
         'token': token,
     })
 
+
+@enforce_csrf_checks
+def user_boss_login(request):
+    """ Login page
+    """
+    user = request.user
+    next_page = request.GET.get('next')
+    next_page = next_page if next_page else reverse('projects:project-index')
+
+    if user.is_authenticated:
+        return redirect(next_page)
+
+    if request.method == 'POST':
+        return boss.boss_login(request)
+
+    return render(request, 'users/user_boss_login.html', {
+        'next': next_page
+    })
 
 @enforce_csrf_checks
 def user_login(request):

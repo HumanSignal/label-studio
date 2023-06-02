@@ -25,6 +25,7 @@ export default class ErrorBoundary extends Component {
   }
 
   render() {
+    console.log(123, this.state.hasError)
     if (this.state.hasError) {
       const {error, errorInfo} = this.state;
 

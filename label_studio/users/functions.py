@@ -54,6 +54,8 @@ def save_user(request, next_page, user_form):
     """
     user = user_form.save()
     user.username = user.email.split('@')[0]
+    if not user.first_name:
+        user.first_name = user.username
     user.save()
 
     if Organization.objects.exists():

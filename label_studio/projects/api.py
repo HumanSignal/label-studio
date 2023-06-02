@@ -25,10 +25,10 @@ from core.utils.common import temporary_disconnect_all_signals
 from core.mixins import GetParentObjectMixin
 from core.label_config import config_essential_data_has_changed
 from projects.models import (
-    Project, ProjectSummary, ProjectManager
+    Project, ProjectSummary, ProjectManager, ProjectMember
 )
 from projects.serializers import (
-    ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer, GetFieldsSerializer
+    ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer, GetFieldsSerializer, ProjectMemberSerializer
 )
 from projects.functions.next_task import get_next_task
 from tasks.models import Task
@@ -45,6 +45,7 @@ from projects.functions.stream_history import get_label_stream_history
 
 from data_manager.functions import get_prepared_queryset, filters_ordering_selected_items_exist
 from data_manager.models import View
+from users.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -162,11 +163,33 @@ class ProjectListAPI(generics.ListCreateAPIView):
             raise LabelStudioDatabaseException('Database error during project creation. Try again.')
 
     def get(self, request, *args, **kwargs):
-        return super(ProjectListAPI, self).get(request, *args, **kwargs)
+        queryset = self.filter_queryset(self.get_queryset())
+        if request.user.has_perm(all_permissions.organizations_change):
+            queryset = queryset
+        else:
+            p_ids = ProjectMember.objects.filter(user_id=request.user.id).values_list("project_id", flat=True)
+            if p_ids:
+                queryset = queryset.filter(id__in=p_ids)
+            else:
+                queryset = []
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @api_webhook(WebhookAction.PROJECT_CREATED)
     def post(self, request, *args, **kwargs):
-        return super(ProjectListAPI, self).post(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        # 将创建人员加入到member
+        serializer.instance.add_collaborator(request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
@@ -504,3 +527,27 @@ class ProjectModelVersions(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         project = self.get_object()
         return Response(data=project.get_model_versions(with_counters=True))
+
+
+class ProjectMemberAPI(generics.ListAPIView):
+    """ Validate label config
+    """
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
+    serializer_class = ProjectMemberSerializer
+    permission_required = all_permissions.projects_view
+    queryset = ProjectMember.objects.select_related("user").all()
+
+    def post(self, request, *args, **kwargs):
+        
+        project = Project.objects.filter(id=kwargs.get('pk')).first()
+        if not project:
+            raise RestValidationError('项目不存在')
+        user_ids = request.data.get("members")
+        users = User.objects.filter(id__in=user_ids)
+        for user in users:
+            project.add_collaborator(user)
+        return Response({'status': "success"}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(auto_schema=None)
+    def get(self, request, *args, **kwargs):
+        return super(ProjectMemberAPI, self).get(request, *args, **kwargs)

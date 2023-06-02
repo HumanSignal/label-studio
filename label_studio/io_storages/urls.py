@@ -3,6 +3,7 @@
 from django.urls import path, include
 
 from .s3.api import *
+from .oss.api import *
 from .azure_blob.api import *
 from .gcs.api import *
 from .redis.api import *
@@ -62,6 +63,17 @@ _api_urlpatterns = [
     path('export/redis/<int:pk>/sync', RedisExportStorageSyncAPI.as_view(), name='export-storage-redis-sync'),
     path('export/redis/validate', RedisExportStorageValidateAPI.as_view(), name='export-storage-redis-validate'),
     path('export/redis/form', RedisExportStorageFormLayoutAPI.as_view(), name='export-storage-redis-form'),
+    # ali OSS
+    path('oss/', OSSImportStorageListAPI.as_view(), name='storage-oss-list'),
+    path('oss/<int:pk>', OSSImportStorageDetailAPI.as_view(), name='storage-oss-detail'),
+    path('oss/<int:pk>/sync', OSSImportStorageSyncAPI.as_view(), name='storage-oss-sync'),
+    path('oss/validate', OSSImportStorageValidateAPI.as_view(), name='storage-oss-validate'),
+    path('oss/form', OSSImportStorageFormLayoutAPI.as_view(), name='storage-oss-form'),
+    path('export/oss', OSSExportStorageListAPI.as_view(), name='export-storage-oss-list'),
+    path('export/oss/<int:pk>', OSSExportStorageDetailAPI.as_view(), name='export-storage-oss-detail'),
+    path('export/oss/<int:pk>/sync', OSSExportStorageSyncAPI.as_view(), name='export-storage-oss-sync'),
+    path('export/oss/validate', OSSExportStorageValidateAPI.as_view(), name='export-storage-oss-validate'),
+    path('export/oss/form', OSSExportStorageFormLayoutAPI.as_view(), name='export-storage-oss-form'),
 ]
 if settings.ENABLE_LOCAL_FILES_STORAGE:
     _api_urlpatterns += [

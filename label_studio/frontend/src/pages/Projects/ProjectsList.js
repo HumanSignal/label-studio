@@ -6,6 +6,7 @@ import { LsBulb, LsCheck, LsEllipsis, LsMinus } from '../../assets/icons';
 import { Button, Dropdown, Menu, Pagination, Userpic } from '../../components';
 import { Block, Elem } from '../../utils/bem';
 import { absoluteURL } from '../../utils/helpers';
+import { useConfig } from '../../providers/ConfigProvider';
 
 export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, pageSize }) => {
   return (
@@ -32,17 +33,19 @@ export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, 
 };
 
 export const EmptyProjectsList = ({ openModal }) => {
+  const config = useConfig();
   return (
     <Block name="empty-projects-page">
       <Elem name="heidi" tag="img" src={absoluteURL("/static/images/opossum_looking.png")} />
       <Elem name="header" tag="h1">Heidi doesn’t see any projects here</Elem>
       <p>Create one and start labeling your data</p>
-      <Elem name="action" tag={Button} onClick={openModal} look="primary">Create Project</Elem>
+      { config.user.permissions.search("projects.change") > 0 ? <Elem name="action" tag={Button} onClick={openModal} look="primary">Create Project</Elem> : null}
     </Block>
   );
 };
 
 const ProjectCard = ({ project }) => {
+  const config = useConfig();
   const color = useMemo(() => {
     return project.color === '#FFFFFF' ? null : project.color;
   }, [project]);
@@ -69,7 +72,12 @@ const ProjectCard = ({ project }) => {
             }}>
               <Dropdown.Trigger content={(
                 <Menu>
-                  <Menu.Item href={`/projects/${project.id}/settings`}>Settings</Menu.Item>
+                  {
+                    config.user.permissions.search("projects.change") > 0 ? 
+                    <Menu.Item href={`/projects/${project.id}/settings`}>Settings</Menu.Item> :
+                    null
+                  }
+                  
                   <Menu.Item href={`/projects/${project.id}/data?labeling=1`}>Label</Menu.Item>
                 </Menu>
               )}>

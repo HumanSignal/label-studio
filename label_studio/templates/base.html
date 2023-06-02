@@ -33,7 +33,6 @@
   </script>
 
   <script
-   src="https://browser.sentry-cdn.com/5.17.0/bundle.min.js"
    integrity="sha384-lowBFC6YTkvMIWPORr7+TERnCkZdo5ab00oH5NkFLeQUAmBTLGwJpFjF6djuxJ/5"
    crossorigin="anonymous"></script>
 
@@ -95,6 +94,7 @@
       firstName: "{{user.first_name}}",
       lastName: "{{user.last_name}}",
       initials: "{{user.get_initials}}",
+      permissions: "{{user.get_all_permissions}}",
       email: "{{user.email}}",
       allow_newsletters: {% if user.allow_newsletters is None %}null{% else %}{{user.allow_newsletters|yesno:"true,false"}}{% endif %},
       {% if user.avatar %}

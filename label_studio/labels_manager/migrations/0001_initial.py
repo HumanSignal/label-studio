@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True, help_text='Time of label creation', verbose_name='Created at')),
                 ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Updated at')),
                 ('value', models.JSONField(verbose_name='value')),
-                ('title', models.CharField(help_text='Label title', max_length=2048, verbose_name='Title')),
+                ('title', models.CharField(help_text='Label title', max_length=512, verbose_name='Title')),
                 ('description', models.TextField(blank=True, help_text='Label description', null=True, verbose_name='Description')),
                 ('approved', models.BooleanField(default=False, help_text='Status of label')),
                 ('approved_by', models.ForeignKey(help_text='User who approved this label', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='labels_approved', to=settings.AUTH_USER_MODEL)),

@@ -1,0 +1,88 @@
+# 1x3 grid
+title_bucket_prefix: &title_bucket_prefix
+  - type: text
+    name: title
+    label: 存储名称
+  # - type: text
+  #   name: bucket
+  #   label: Bucket名称
+  #   placeholder: "oss-bucket-name"
+  - type: text
+    name: prefix
+    label: 数据集
+    required: true
+    placeholder: "Apply ID或者bucket下路径"
+
+# 2x3 grid
+# oss_params: &oss_params
+#   - type: text
+#     name: region_name
+#     label: 地区
+#   - type: text
+#     name: oss_endpoint
+#     label: OSS Endpoint
+#     placeholder: "oss-endpoint-url"
+#   - null
+#   - type: password
+#     name: oss_access_key_id
+#     label: Access Key ID
+#     autoComplete: "off"
+#     skipAutofill: true
+#     allowEmpty: true
+#     protectedValue: true
+#   - type: password
+#     name: oss_secret_access_key
+#     label: Secret Access Key
+#     autoComplete: "new-password"
+#     skipAutofill: true
+#     allowEmpty: true
+#     protectedValue: true
+
+ImportStorage:
+  # Title, Bucket, Prefix
+  - columnCount: 2
+    fields: *title_bucket_prefix
+  # Regex filter
+  - columnCount: 1
+    fields:
+      - type: text
+        name: regex_filter
+        label: 文件正则筛选
+        placeholder: '.*csv or .*(jpe?g|png|tiff) or .\w+-\d+.text'
+        validators:
+          - regexp
+  # OSS specific params
+  # - columnCount: 3
+  #   fields: *oss_params
+
+  # 2 columns grid
+  - columnCount: 2
+    columns:
+      - width: 345
+        fields:
+          - type: toggle
+            name: use_blob_urls
+            label: 路径下的每一个对象作为源文件
+            description: 关闭该选项，则代表路径下的每一个文件是一个json格式的文本
+          - type: toggle
+            name: recursive_scan
+            label: 递归扫描
+            description: 递归扫描该路径下的文件
+      - fields:
+          - type: toggle
+            name: presign
+            label: Use pre-signed URLs
+            value: true
+          - type: counter
+            name: presign_ttl
+            label: Expiration minutes
+            min: 1
+            value: 15
+            dependency: presign
+
+ExportStorage:
+  - columnCount: 2
+    fields: *title_bucket_prefix
+  # - columnCount: 3
+  #   fields: *oss_params
+  # 1 columns grid
