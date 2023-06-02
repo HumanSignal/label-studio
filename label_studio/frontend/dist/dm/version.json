@@ -1,6 +1,6 @@
 {
-  "message": "chore: 1.8.0 cherrypick 2023 05 30",
-  "commit": "4ebb69ea8cabe0803222c2a0cc15f11931a82035",
+  "message": "fix: LSDV-5192: Change quick view icon and change hover color (#196)",
+  "commit": "6175d9dc27547a3a76a5809880f48774810d5bc2",
   "branch": "ls-release/1.8.0",
-  "date": "2023/05/30 17:18:53"
+  "date": "2023/06/02 08:52:09"
 }
