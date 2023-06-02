@@ -346,12 +346,12 @@ Set up Google Cloud Storage (GCS) as the persistent storage for Label Studio hos
 Set up CORS access to your bucket. See [Configuring cross-origin resource sharing (CORS)](https://cloud.google.com/storage/docs/configuring-cors#configure-cors-bucket) in the Google Cloud User Guide. Use or modify the following example:
 ```shell
 echo '[
-   {
-      "origin": ["*"],
-      "method": ["GET","PUT","POST","DELETE","HEAD"],
-      "responseHeader": ["Content-Type"],
-      "maxAgeSeconds": 3600
-   }
+  {
+    "origin": ["*"],
+    "method": ["GET"],
+    "responseHeader": ["Content-Type", "Access-Control-Allow-Origin"],
+    "maxAgeSeconds": 3600
+  }
 ]' > cors-config.json
 ```
 
