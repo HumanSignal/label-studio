@@ -1,17 +1,17 @@
 # syntax=docker/dockerfile:1.3
-FROM node:14 AS frontend-builder
+# FROM node:14 AS frontend-builder
 
-ENV NPM_CACHE_LOCATION=$HOME/.npm \
-    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+# ENV NPM_CACHE_LOCATION=$HOME/.npm \
+#     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-WORKDIR /label-studio/label_studio/frontend
+# WORKDIR /label-studio/label_studio/frontend
 
-COPY --chown=1001:0 label_studio/frontend .
-COPY --chown=1001:0 label_studio/__init__.py /label-studio/label_studio/__init__.py
+# COPY --chown=1001:0 label_studio/frontend .
+# COPY --chown=1001:0 label_studio/__init__.py /label-studio/label_studio/__init__.py
 
-RUN --mount=type=cache,target=$NPM_CACHE_LOCATION,uid=1001,gid=0 \
-    npm ci \
- && npm run build:production
+# RUN --mount=type=cache,target=$NPM_CACHE_LOCATION,uid=1001,gid=0 \
+#     npm ci \
+#  && npm run build:production
 
 FROM ubuntu:22.04
 
@@ -34,8 +34,7 @@ RUN set -eux \
     apt-get purge --assume-yes --auto-remove --option APT::AutoRemove::RecommendsImportant=false \
      --option APT::AutoRemove::SuggestsImportant=false && rm -rf /var/lib/apt/lists/* /tmp/*
 
-RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install --upgrade pip setuptools && pip3 install uwsgi uwsgitop
+RUN pip3 install --upgrade pip setuptools && pip3 install uwsgi uwsgitop -i https://pypi.douban.com/simple
 
 # incapsulate nginx install & configure to a single layer
 RUN set -eux; \
@@ -54,22 +53,19 @@ RUN set -eux; \
 
 # Copy and install middleware dependencies
 COPY --chown=1001:0 deploy/requirements-mw.txt .
-RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install -r requirements-mw.txt
+RUN pip3 install -r requirements-mw.txt -i https://pypi.douban.com/simple
 
 # Copy and install requirements.txt first for caching
 COPY --chown=1001:0 deploy/requirements.txt .
-RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install -r requirements.txt
+RUN pip3 install -r requirements.txt -i https://pypi.douban.com/simple
 
 COPY --chown=1001:0 . .
-RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
-    pip3 install -e . && \
+RUN pip3 install -i https://pypi.douban.com/simple -e . && \
     chown -R 1001:0 $LS_DIR && \
     chmod -R g=u $LS_DIR
 
-RUN rm -rf ./label_studio/frontend
-COPY --chown=1001:0 --from=frontend-builder /label-studio/label_studio/frontend/dist ./label_studio/frontend/dist
+# RUN rm -rf ./label_studio/frontend
+# COPY --chown=1001:0 --from=frontend-builder /label-studio/label_studio/frontend/dist ./label_studio/frontend/dist
 
 RUN python3 label_studio/manage.py collectstatic --no-input && \
     chown -R 1001:0 $LS_DIR && \

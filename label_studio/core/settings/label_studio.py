@@ -62,6 +62,10 @@ try:
     find_node('label_studio', FEATURE_FLAGS_FILE, 'file')
 except IOError:
     FEATURE_FLAGS_FROM_FILE = False
+    
+##############
+# 改造引入配置 #
+##############
 
 STORAGE_PERSISTENCE = get_bool_env('STORAGE_PERSISTENCE', True)
 
@@ -80,10 +84,10 @@ SERVER_HOST = ""
 APOLLO_APPLICATION = "machine-learning"
 APOLLO_NAMESPACE = "mlflow"
 
-# MLFLOW_APOLLO_CONFIG_DICT = ApolloBaseConfig().get_apollo_configs(
-#     app=APOLLO_APPLICATION, namespace=APOLLO_NAMESPACE
-# )
-MLFLOW_APOLLO_CONFIG_DICT = {}
+MLFLOW_APOLLO_CONFIG_DICT = ApolloBaseConfig().get_apollo_configs(
+    app=APOLLO_APPLICATION, namespace=APOLLO_NAMESPACE
+)
+
 # OSS config
 MLFLOW_OSS_ENDPOINT_URL = MLFLOW_APOLLO_CONFIG_DICT.get("mlflow.oss.attaAiModel.ro.endPoint", "")
 MLFLOW_OSS_KEY_ID = MLFLOW_APOLLO_CONFIG_DICT.get("mlflow.oss.attaAiModel.ro.accessKeyId", "")
