@@ -86,9 +86,7 @@ export const ProjectsPage = () => {
     await axios
     .get(webhook_url + '/get_available_projects')
       .then((response) => {
-        console.log(response);
         const available_projects = response.data;
-        console.log(available_projects);
         const modified_projects = {};
         Object.keys(available_projects).forEach((key) => {
           modified_projects[parseInt(key)] = available_projects[key];

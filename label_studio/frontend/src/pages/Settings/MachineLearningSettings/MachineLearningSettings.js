@@ -16,7 +16,7 @@ import './MachineLearningSettings.styl';
 import Select from 'react-select';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios'
-import Swal from 'sweetalert'
+import Swal from 'sweetalert2'
 import getWebhookUrl from '../../../webhooks';
 
 export const MachineLearningSettings = () => {
@@ -32,9 +32,9 @@ export const MachineLearningSettings = () => {
   const [generateSpecs, setGenerateSpecs] = useState(true);
   const [selectedTrainingType, setSelectedTrainingType] = useState('');
   const [trainingTypes, setTrainingTypes] = useState([]);
-  const [modelsType, setModelsType] = useState('tao');
+  const [modelsType, setModelsType] = useState('object_detection');
   const [keepChecks, setKeepChecks] = useState(false);
-
+  const [availableProjects, setAvailableProjects] = useState([]);
   const handleChange = event => {
     setGenerateSpecs(event.target.checked);
   };
@@ -51,7 +51,6 @@ export const MachineLearningSettings = () => {
         const training_types = response.data.training_types;
         setTrainingTypes(training_types);
         setSelectedTrainingType(training_types[0]);
-        console.log(training_types.indexOf("Tao Training"));
         if (training_types.indexOf("Tao Training") !== -1) { 
           setKeepChecks(true);
         }
@@ -59,7 +58,7 @@ export const MachineLearningSettings = () => {
       await axios
       .get(webhook_url + '/get_models_info?id=' + project.id)
         .then((response) => {
-          console.log(response);
+          console.log(response.data);
           setModelsPrecisions(response.data.models_info);
           setModelsType(response.data.models_type);
           setFetchModels(true)
@@ -72,9 +71,15 @@ export const MachineLearningSettings = () => {
         setModelToPredictOn(response.data.current_model_version)
         setAvailableModels(response.data.model_versions)
     })
+    await axios
+    .get(webhook_url + '/get_available_projects')
+      .then((response) => {
+        setAvailableProjects(response.data);
+      })
   };
-  const saveInferencePath = useCallback(async () => {
-    await axios.post(webhook_url + '/change_current_model_version?id=' + project.id + '&model_version=' + modelToPredictOn)
+  const saveInferencePath = useCallback(async (modelChosen = null, projectId= null) => {
+    if (modelChosen == null) modelChosen = modelToPredictOn;
+    await axios.post(webhook_url + '/change_current_model_version?id=' + project.id + '&model_version=' + modelChosen+"&model_project_id=" + projectId)
       .then((response) => {
         console.log(response);
     })
@@ -94,7 +99,7 @@ export const MachineLearningSettings = () => {
     axios.post(webhook_url + '/prune?id=' + project.id + "&model_version="+model_version)
     .then((response) => {
       if (response.data.unprune === false){
-        Swal("The unpruned model wasn't found in the project. Please train a model or add one first")
+        Swal("The unpruned model wasn't found in the project. Please train a model or add one first!")
       }
       else if (response.data.prune == false) {
         Swal("An error occured when running the prune_and_retrain_fixed function, please check the logs")
@@ -147,7 +152,7 @@ export const MachineLearningSettings = () => {
       .catch((error) => {
         console.error('export error');
         console.error(error);
-        Swal('Failed to export the model');
+        Swal('Error', 'Failed to export the model', 'error');
       });
   }
 
@@ -158,10 +163,10 @@ export const MachineLearningSettings = () => {
           console.log(response);
           let can_press = response.data.can_press;
           if (can_press == undefined) {
-            Swal('Someone has just trained or predicted, please wait for a moment')
+            Swal.fire('Error', 'Someone has just trained or predicted, please wait for a moment', 'error')
           }
           else if (can_press == true) {
-            Swal('Training has started');
+            Swal.fire('Success', 'Training has started', 'success');
             let trainingType = "tao";
             if (selectedTrainingType == "PVT") {
               trainingType = "pvt";
@@ -171,97 +176,96 @@ export const MachineLearningSettings = () => {
             })
           }
           else {
-            Swal(`All Gpus are occupied, your training didn't start`)
+            Swal.fire('Error', `All Gpus are occupied, your training didn't start`, 'error')
           }
         })
   })
 
-  const showMLFormModal = useCallback((backend) => {
-    const action = backend ? "updateMLBackend" : "addMLBackend";
+  const changeModelToPredictOn = async () => {
+    console.log("changing model");
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton: 'btn btn-success m-2',
+        cancelButton: 'btn btn-info',
 
-    const modalProps = {
-      title: `${backend ? 'Edit' : 'Add'} model`,
-      style: { width: 760 },
-      closeOnClickOutside: false,
-      body: (
-        <Form
-          action={action}
-          formData={{ ...(backend ?? {}) }}
-          params={{ pk: backend?.id }}
-          onSubmit={async (response) => {
-            if (!response.error_message) {
-              await fetchBackends();
-              modalRef.close();
-            }
-          }}
-        >
-          <Input type="hidden" name="project" value={project.id}/>
+      },
+      buttonsStyling: false
+    })
+    
+    swalWithBootstrapButtons.fire({
+      title: 'Model Directory',
+      text: "Please choose the directory of your model",
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonText: 'Local Project',
+      cancelButtonText: 'Other Projects',
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const { value: version } = await Swal.fire({
+          title: 'Select model version',
+          input: 'select',
+          inputOptions: availableModels.map(function(availableModels) {return availableModels.label}),
+          inputPlaceholder: 'Select a version',
+          showCancelButton: true,
+          inputValidator: (modelChosenIndex) => {
+            return new Promise((resolve) => {
+              resolve();
+              const modelChosen = availableModels.map(function (availableModels) { return availableModels.label })[modelChosenIndex];
+              setModelToPredictOn(modelChosen);
+              saveInferencePath(modelChosen, project.id);
+            })
+          }
+        })
+      } else if (
+        result.dismiss === Swal.DismissReason.cancel
+      ) {
+        const available_projects = availableProjects;
+      
+        if(modelsType == "object_detection"){
+          delete available_projects["Segmentation"]
+        }
+        else{
+          delete available_projects["Object Detection"]
+        }
+        const { value: project } = Swal.fire({
+          title: 'Select a project to choose a model from',
+          input: 'select',
+          inputOptions: available_projects,
+          inputPlaceholder: 'Select a project',
+          showCancelButton: true,
+          inputValidator: (projectId) => {
+            return new Promise(async (resolve) => {
+              await axios.get(webhook_url+ '/get_available_model_versions?id=' + projectId)
+              .then((response) => {
+                const availableModelsFromOtherProject = response.data.model_versions;
+                const { value: version } = Swal.fire({
+                  title: 'Select model version',
+                  input: 'select',
+                  inputOptions: availableModelsFromOtherProject.map(function(availableModelsFromOtherProject) {return availableModelsFromOtherProject.label}),
+                  inputPlaceholder: 'Select a version',
+                  showCancelButton: true,
+                  inputValidator: (modelChosenIndex) => {
+                    return new Promise((resolve) => {
+                      resolve();
+                      const modelChosen = availableModelsFromOtherProject.map(function (availableModelsFromOtherProject) { return availableModelsFromOtherProject.label })[modelChosenIndex];
+                      saveInferencePath(modelChosen, projectId);
+                      setModelToPredictOn(modelChosen);
+                    })
+                  }
+                })
+            })
+              resolve();
+            })
+          }
+        })   
+    if (project) {
+      Swal.fire(`Cloning Project ${project}`)
+    }
 
-          <Form.Row columnCount={2}>
-            <Input name="title" label="Title" placeholder="ML Model"/>
-            <Input name="url" label="URL" required/>
-          </Form.Row>
-
-          <Form.Row columnCount={1}>
-            <TextArea name="description" label="Description" style={{ minHeight: 120 }}/>
-          </Form.Row>
-
-          {isFF(FF_DEV_1682) && !!backend && (
-            <Form.Row columnCount={2}>
-              <ModelVersionSelector
-                object={backend}
-                apiName="modelVersions"
-                label="Version"
-              />
-            </Form.Row>
-          )}
-
-          {isFF(FF_DEV_1682) && (
-            <Form.Row columnCount={1}>
-              <div>
-                <Toggle
-                  name="auto_update"
-                  label="Allow version auto-update"
-                />
-              </div>
-            </Form.Row>
-          )}
-
-          <Form.Row columnCount={1}>
-            <div>
-              <Toggle
-                name="is_interactive"
-                label="Use for interactive preannotations"
-              />
-            </div>
-          </Form.Row>
-
-          <Form.Actions>
-            <Button type="submit" look="primary" onClick={() => setMLError(null)}>
-              Validate and Save
-            </Button>
-          </Form.Actions>
-
-          <Form.ResponseParser>{response => (
-            <>
-              {response.error_message && (
-                <ErrorWrapper error={{
-                  response: {
-                    detail: `Failed to ${backend ? 'save' : 'add new'} ML backend.`,
-                    exc_info: response.error_message,
-                  },
-                }}/>
-              )}
-            </>
-          )}</Form.ResponseParser>
-
-          <InlineError/>
-        </Form>
-      ),
-    };
-
-    const modalRef = modal(modalProps);
-  }, [project, fetchBackends, mlError]);
+      }
+    })
+  };
 
   useEffect(() => {
     if (project.id) {
@@ -286,12 +290,6 @@ export const MachineLearningSettings = () => {
 
       <Divider height={32}/>
 
-      <Form action="updateProject"
-        formData={{ ...project }}
-        params={{ pk: project.id }}
-        onSubmit={() => fetchProject()}
-        autosubmit
-      >
         <Form.Row columnCount={1}>
           <Label text="ML-Assisted Labeling" large/>
 
@@ -348,20 +346,11 @@ export const MachineLearningSettings = () => {
       <Button style={{ marginTop: 10 }} onClick={() => trainModel()}>Train New Model</Button>
 
     </div>
-        {/* <Button style={{marginLeft: 20}} onClick={() => onExportModel()}>
-        Export Model
-      </Button>
-      <Button style={{marginLeft: 20}} onClick={() => onPrune()}>
-      Prune/Re-train
-      </Button> */}
-        {/* {!isFF(FF_DEV_1682) && (
-          <ProjectModelVersionSelector />
-        )} */}
-          <div className="row" style={{ paddingTop: 20 }} key={'chosenModel'}>
-          <h5>Choose the model version you want to use when retrieving predictions:</h5>
-            <div className="">
-              <Select onChange={(model)=>setModelToPredictOn(model.value)} options={availableModels} placeholder={modelToPredictOn} />
-            </div>
+        <div className="row" style={{ paddingTop: 20 }} key={'chosenModel'}>
+          <label htmlFor="prediction-model">Model used to predict on: <strong>{modelToPredictOn}</strong>
+            <Button onClick={() => changeModelToPredictOn()} look="primary" style={{ width: '10%', marginLeft: 10 }}>Change Model</Button>
+          </label>
+ 
               </div>
         {fetchedModels?
           <div>
@@ -373,16 +362,6 @@ export const MachineLearningSettings = () => {
           </li>
         ))}
             </div>
-        {/* {modelToPredictOn.length >0 && availableModels.length>0?
-          <div className="row" style={{ paddingTop: 20 }} key={'chosenModel'}>
-          <h5>Choose the model you want to use when retrieving predictions:</h5>
-            <div className="">
-              <Select onChange={(model)=>setModelToPredictOn(model.label)} options={availableModels} placeholder={modelToPredictOn} />
-            </div>
-              </div> :
-              <div>
-          You have no specs file available, please set your classes in the labeling interface in order to create the specs for Tao Trainer
-          </div>} */}
           </div>
           : ''}
         {modelsPrecisions != [] ?
@@ -393,7 +372,7 @@ export const MachineLearningSettings = () => {
               <div className='col-6' key={model.value} style={{marginBottom: 10}}>
               <Card  key={model.value}>
                   Model Version: {model.label}
-                  {modelsType == 'tao' ?
+                  {modelsType != 'segmentation' ?
                     <div>
                     {
                       Object.keys(modelsPrecisions).includes(model.label) ?
@@ -454,7 +433,7 @@ export const MachineLearningSettings = () => {
                       </div>:<div>You have no information about this model</div>}</div>}
                       <div style={{ marginTop: 20 }}>
                             <button style={{ marginRight: 10 }} onClick={() => onExportModel(model.value)} className='btn btn-outline-primary'>Export Model</button>
-                    {modelsType == 'tao' ? <button onClick={() => onPrune(model.value)} className='btn btn-outline-warning'>Prune/Re-train</button> : ''}
+                    {modelsType == 'object_detection' ? <button onClick={() => onPrune(model.value)} className='btn btn-outline-warning'>Prune/Re-train</button> : ''}
                             <button style={{ marginLeft: 10 }} onClick={() => onDeleteModel(model.value)} className='btn btn-outline-danger'>Delete Model</button>
             </div>
           </Card>
@@ -464,20 +443,7 @@ export const MachineLearningSettings = () => {
           </div> 
           : ""}
 
-        <Form.Actions>
-          <Form.Indicator>
-            <span case="success">Saved!</span>
-          </Form.Indicator>
           <Button onClick={saveInferencePath} type="submit" look="primary" style={{ width: 120 }}>Save</Button>
-        </Form.Actions>
-      </Form>
-
-      {/* <MachineLearningList
-        onEdit={(backend) => showMLFormModal(backend)}
-        fetchBackends={fetchBackends}
-        backends={backends}
-        project = {project.id}
-      /> */}
 
     </>
   );
