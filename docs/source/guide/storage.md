@@ -413,7 +413,7 @@ To connect your [GCS](https://cloud.google.com/storage) bucket with Label Studio
 echo '[
    {
       "origin": ["*"],
-      "method": ["GET","PUT","POST","DELETE","HEAD"],
+      "method": ["GET"],
       "responseHeader": ["Content-Type","Access-Control-Allow-Origin"],
       "maxAgeSeconds": 3600
    }
