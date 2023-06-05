@@ -469,7 +469,7 @@ class ProjectStorageMixin(models.Model):
 
 
 @job('low', timeout=settings.RQ_LONG_JOB_TIMEOUT)
-def import_sync_background(storage_class, storage_id, timeout=settings.RQ_LONG_JOB_TIMEOUT, **kwargs):
+def import_sync_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.scan_and_create_links()
 
