@@ -1,13 +1,12 @@
 ## How Label Studio saves results in annotations
 
-Each annotation that you create when you label a task contains regions and results.
+Each annotation result consists of list or items, also called _regions_, stored under `annotation.result` field:
+```json
+{"result": [{"id": "123", ...}, {"id": "456", ...}], ...}
+```
+Regions can represent any annotation action - drawn bounding box, created relation, assigned category etc. Each `"id"` field formed as a string with the characters `A-Za-z0-9_-` is assigned according to the structure of annotation: each individual labeling entity gets its own IDs, and same IDs are used to link different entities together - for example, relate them with `<Relation>`, or assign conditional annotation by using `"perRegion"` attribute.
 
-- **Region** is marked area on object tag, like bbox, text span, audio region.
-
-- **Result** is label or classification assigned to this region. OR object classification (not per-region `Choices`, `Textarea`, etc.)
-
-Each region has unique ID (unique across the annotation), formed as a string with the characters `A-Za-z0-9_-`. Each result ID is the same as the region ID that it applies to. If there are more than one labeling tag or classification connected to the region, each control tag will have corresponding result and they will have the same ID as they are connected to one region.
-
+The format is inferred by the following priniples:
 - there is always should be at least 1 object tag
 - object tags define data types used (image, html, video, etc.)
 - at least 1 control tag should be attached to object tag to create regions on that object
@@ -19,11 +18,12 @@ When a prediction is used to create an annotation, the result IDs stay the same 
 
 ## Examples
 
-Different combinations of controls and their respective results generated. All examples point to image object tag `<Image name="image"/>`
 
 ### per-regions
+Example of result format when conditional `"perRegion"` structure is enforced:
 
 ```xml
+<Image name="image" value="$image"/>
 <RectangleLabels name="product" toName="image">
 	<Label value="Some label" />
   ...
@@ -60,6 +60,7 @@ Different combinations of controls and their respective results generated. All e
 ### optional labels
 
 ```xml
+<Image name="image" value="$image"/>
 <Rectangle name="product" toName="image" />
 <Labels name="kind" toName="image">
   <Label value="Tea" />
@@ -96,6 +97,7 @@ Different combinations of controls and their respective results generated. All e
 ### multi-labels
 
 ```xml
+<Image name="image" value="$image"/>
 <Rectangle name="product" toName="image" />
 <Labels name="kind" toName="image">
   <Label value="Tea" />
@@ -150,5 +152,33 @@ Different combinations of controls and their respective results generated. All e
     "number": 12.5,
     // rectangle sizes
   }
+}]
+```
+### relations
+You can draw relation arrow between two objects. For example, object detection configuration
+```xml
+<Image name="image" value="$image"/>
+<RectangleLabels name="kind" toName="image">
+  <Label value="Car" />
+  <Label value="Airplaine" />
+</RectangleLabels>
+```
+```
+```json
+[{
+  "id": "oid67",
+  "type": "rectanglelabels",
+  // ...
+},
+{
+  "id": "RQbW3Sj_Zr",
+  "type": "rectanglelabels",
+  // ...
+},
+{
+  "type": "relation",
+  "to_id": "RQbW3Sj_Zr",
+  "from_id": "oid66",
+  "direction": "right"
 }]
 ```
