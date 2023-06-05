@@ -78,7 +78,8 @@ Example of result format when conditional `"perRegion"` structure is enforced:
   "type": "rectangle",
   // ...
   "value": {
-    "labels": ["Some label"],
+    "x": 100,
+    "y": 200,
     // ...
   }
 }, {
