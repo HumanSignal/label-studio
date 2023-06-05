@@ -1,6 +1,6 @@
 {
-  "message": "chore: 1.8.0 cherrypick 2023 06 01",
-  "commit": "3813660175f20a55ab8c705c87ebd79b83479bab",
+  "message": "fix: LSDV-5235: Postpone should not require FF to operate",
+  "commit": "715d8b75340cc7421927dbb940d1f443304ad085",
   "branch": "ls-release/1.8.0",
-  "date": "2023/06/01 08:59:52"
+  "date": "2023/06/05 11:31:57"
 }
