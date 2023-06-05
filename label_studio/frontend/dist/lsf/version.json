@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5235: Postpone should not require FF to operate",
-  "commit": "2445c11befeebf25532764c24445d7bcc7c6ea8b",
-  "branch": "fb-ls-release-1.8.0-lsdv-5235",
-  "date": "2023/06/05 11:24:37"
+  "commit": "715d8b75340cc7421927dbb940d1f443304ad085",
+  "branch": "ls-release/1.8.0",
+  "date": "2023/06/05 11:31:57"
 }
