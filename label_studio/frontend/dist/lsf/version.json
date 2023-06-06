@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5235: Postpone should not require FF to operate",
-  "commit": "01769ec41352217ebb476d581ad0ed6941e16bf2",
+  "message": "fix: LSDV-5235: Use alternate check for postpone based on presence of interfaces instead of FF",
+  "commit": "3c5a48d51b0fb4d6d24777aa6bb5e61f82e6e8f4",
   "branch": "master",
-  "date": "2023/06/05 11:24:37"
+  "date": "2023/06/06 09:32:04"
 }
