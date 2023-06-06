@@ -1,6 +1,6 @@
 {
-  "message": "fix:  LSDV-E-135: Dependabot updates",
-  "commit": "5d856e67df9d755a4da7c4ba760d9124d68f26f7",
-  "branch": "master",
-  "date": "2023/06/05 18:39:58"
+  "message": "fix: LSDV-3861: XSS in error messages (#1419)",
+  "commit": "8f9631953d152f596a63f379fab75a5505a8fdeb",
+  "branch": "",
+  "date": "2023-06-06T19:36:21Z"
 }
