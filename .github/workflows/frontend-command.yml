@@ -38,11 +38,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-${{ env.NODE }}-
 
-      - name: Install node-fetch
-        run: |
-          npm install -g node-fetch@^2.6.1
-          npm link node-fetch
-
       - name: Get build
         id: get_build
         env:
