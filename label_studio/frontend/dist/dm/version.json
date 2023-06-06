@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5192: Change quick view icon and change hover color",
-  "commit": "d2e8485cdc3aa0a01c83115ab96fdc606ddfbce9",
+  "message": "fix: LSDV-E-135: Dependabot updates",
+  "commit": "d989b823e44a585872b27c54676bf931eda46eb9",
   "branch": "master",
-  "date": "2023/05/31 10:07:39"
+  "date": "2023/06/05 18:40:16"
 }

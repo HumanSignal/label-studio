@@ -29,6 +29,7 @@
     "hexo-generator-tag": "^0.2.0",
     "hexo-include": "^1.1.0",
     "hexo-include-markdown": "^1.0.2",
+    "hexo-insert-markdown": "^1.4.4",
     "hexo-ipynb": "^0.2.4",
     "hexo-jupyter-notebook": "0.0.3",
     "hexo-renderer-ejs": "^0.3.1",
