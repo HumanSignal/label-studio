@@ -7,7 +7,7 @@ meta_description: Customize Label Studio by sorting results for machine learning
 ---
 
 The `Ranker` tag is used to rank items in a `List` tag or pick relevant items from a `List`, depending on using nested `Bucket` tags.
-In simple case of `List` + `Ranker` tags the first one becomes interactive and saved result is a dict with the only key of tag's name and with value of array of ids in new order.
+In simple case of `List` + `Ranker` tags the first one becomes interactive and saved result is an array of ids in new order.
 With `Bucket`s any items from the `List` can be moved to these buckets, and resulting groups will be exported as a dict `{ bucket-name-1: [array of ids in this bucket], ... }`
 By default all items will sit in `List` and will not be exported, unless they are moved to a bucket. But with `default="true"` parameter you can specify a bucket where all items will be placed by default, so exported result will always have all items from the list, grouped by buckets.
 Columns and items can be styled in `Style` tag by using respective `.htx-ranker-column` and `.htx-ranker-item` classes. Titles of columns are defined in `title` parameter of `Bucket` tag.
@@ -50,7 +50,7 @@ Example data and result for Ranker tag
   "from_name": "rank",
   "to_name": "results",
   "type": "ranker",
-  "value": { "ranker": { "rank": ["mdn", "wiki", "blog"] } }
+  "value": { "ranker": ["mdn", "wiki", "blog"] }
 }
 ```
 ### Example
