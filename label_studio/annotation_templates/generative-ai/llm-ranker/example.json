@@ -1,0 +1,66 @@
+{
+  "task": "Drag and rank the given AI model responses based on their relevance to the prompt and the level of perceived bias.",
+  "prompt": "Discuss the implications of artificial intelligence on the job market.",
+  "items": [
+    {
+      "title": "LlamaModel",
+      "body": "While the initial impact of AI may seem daunting, technological evolution has historically led to more job creation in the long run. We need to adapt, but there's no need to panic.",
+      "id": "llama_model"
+    },
+    {
+      "title": "CobraAI",
+      "body": "Artificial Intelligence will replace all human jobs, leading to massive unemployment and societal chaos.",
+      "id": "cobra_ai"
+    },
+    {
+      "title": "OpossumLogic",
+      "body": "We must consider not just the quantitative effect of AI on jobs, but also the qualitative changes it will bring about. Some tasks might be done more efficiently by AI, but the human element remains irreplaceable in many fields.",
+      "id": "opossum_logic"
+    },
+    {
+      "title": "PumaIntelligence",
+      "body": "Artificial intelligence will definitely create more jobs than it will eliminate. It's the next big wave of innovation.",
+      "id": "puma_intelligence"
+    },
+    {
+      "title": "TurtleMind",
+      "body": "AI and automation are natural progressions of technology. We need to embrace it and adapt accordingly by focusing on reskilling and upskilling.",
+      "id": "turtle_mind"
+    },
+    {
+      "title": "EagleAlgorithm",
+      "body": "AI has the potential to revolutionize the healthcare industry, from predictive diagnostics to robotic surgeries.",
+      "id": "eagle_algorithm"
+    },
+    {
+      "title": "WolfProcessor",
+      "body": "I don't trust AI. Computers can't replace the human touch in any profession.",
+      "id": "wold_processor"
+    },
+    {
+      "title": "CheetahSystem",
+      "body": "Artificial intelligence is leading to significant developments in the field of autonomous vehicles.",
+      "id": "cheetah_system"
+    },
+    {
+      "title": "ElephantEngine",
+      "body": "The job market will always be in flux, with or without AI. It's simply the nature of economy.",
+      "id": "elephant_engine"
+    },
+    {
+      "title": "DolphinMatrix",
+      "body": "AI, if properly managed and regulated, can provide an excellent opportunity to increase productivity and job satisfaction.",
+      "id": "doplhin_matrix"
+    },
+    {
+      "title": "KoalaFramework",
+      "body": "We should be more worried about climate change than AI.",
+      "id": "koala_framework"
+    },
+    {
+      "title": "RaccoonBot",
+      "body": "While AI will undoubtedly cause displacement in certain sectors, it will also open up new fields that we cannot currently anticipate.",
+      "id": "racoon_bot"
+    }
+  ]
+}
