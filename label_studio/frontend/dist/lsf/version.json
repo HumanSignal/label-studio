@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5192: Change quick view icon and change hover color",
-  "commit": "bb2acdcf56f79050c841c4c4a816360372c6a22b",
+  "message": "fix: LSDV-5235: Use alternate check for postpone based on presence of interfaces instead of FF",
+  "commit": "3c5a48d51b0fb4d6d24777aa6bb5e61f82e6e8f4",
   "branch": "master",
-  "date": "2023/05/31 10:07:44"
+  "date": "2023/06/06 09:32:04"
 }
