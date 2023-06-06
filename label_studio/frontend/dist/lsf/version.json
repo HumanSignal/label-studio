@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-E-35: Manual security updates",
-  "commit": "fe1207aaf8f82eed94964e9227ff37770fd2dbd7",
+  "message": "fix: LSDV-E-135: Manual security updates",
+  "commit": "fe8ee9da6c72cfa06cddf4681da13f706e52f560",
   "branch": "fb-lsdv-e-135/manual-updates",
-  "date": "2023/06/05 14:36:17"
+  "date": "2023/06/06 12:28:27"
 }
