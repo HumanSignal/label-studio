@@ -95,47 +95,54 @@ export const MachineLearningSettings = () => {
   }, [project, setBackends]);
 
   async function onPrune(model_version) {
-    Swal('Pruning model, this may take some time')
+    Swal.fire('Pruning model, this may take some time')
     axios.post(webhook_url + '/prune?id=' + project.id + "&model_version="+model_version)
     .then((response) => {
       if (response.data.unprune === false){
-        Swal("The unpruned model wasn't found in the project. Please train a model or add one first!")
+        Swal.fire("The unpruned model wasn't found in the project. Please train a model or add one first!")
       }
       else if (response.data.prune == false) {
-        Swal("An error occured when running the prune_and_retrain_fixed function, please check the logs")
+        Swal.fire("An error occured when running the prune_and_retrain_fixed function, please check the logs")
       }
       else{
-        Swal("The model was pruned, you can find it here: "+ response.data.pruned_path)
+        Swal.fire("The model was pruned, you can find it here: "+ response.data.pruned_path)
       }
     })
   }
   async function onDeleteModel(model_version) {
+
     console.log('delete model')
-    Swal({
-      title: "Are you sure?",
-      text: "Once deleted, you will not be able to recover this model!",
-      icon: "warning",
-      buttons: true,
-      dangerMode: true,
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton: 'btn btn-success m-2',
+        cancelButton: 'btn btn-info',
+
+      },
+      buttonsStyling: false
     })
-    .then((willDelete) => {
-      if (willDelete) {
+    
+    swalWithBootstrapButtons.fire({
+      title: 'Are you sure? ',
+      text: "Once deleted, you will not be able to recover this model!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'No',
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
         axios.post(webhook_url + '/deleteModel?id=' + project.id + '&model_version=' + model_version)
           .then((data) => {
           if (data.delete == true)
-            Swal('Model is successfully deleted');
-        });
-        Swal("Your model has been deleted!", {
-          icon: "success",
+            Swal.fire('Success', 'Model is successfully deleted', 'success');
         });
       } else {
-        Swal("Your model is safe!");
+        Swal.fire('Safe', "Your model is safe!", "info");
       }
     });
-
   }
   async function onExportModel(model_version) {
-    Swal('Exporting Model, it may take some time');
+    Swal.fire('Export', 'Exporting Model, it may take some time', 'info');
     axios.post(webhook_url + '/export?id=' + project.id +'&model_version=' + model_version)
     .then((response) => {
         if (response.data.message) {
@@ -152,7 +159,7 @@ export const MachineLearningSettings = () => {
       .catch((error) => {
         console.error('export error');
         console.error(error);
-        Swal('Error', 'Failed to export the model', 'error');
+        Swal.fire('Error', 'Failed to export the model', 'error');
       });
   }
 
