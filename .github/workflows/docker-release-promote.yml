@@ -207,8 +207,10 @@ jobs:
           COPY --chown=54546:0 ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }} /label-studio/label_studio/feature_flags.json
           EOF
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+      #      - name: Set up QEMU
+      #        uses: docker/setup-qemu-action@v2
+
+      #      TODO: platforms: linux/amd64,linux/arm64
 
       - name: Build and Push Release Ubuntu Docker image
         uses: docker/build-push-action@v4.0.0
@@ -220,7 +222,7 @@ jobs:
           tags: ${{ steps.generate-tags.outputs.ubuntu-tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
 
       - name: Copy compiled static from builded Docker image
         run: |

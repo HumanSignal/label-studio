@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5194: Add annotation tab indicator tooltip",
-  "commit": "353bc32c4128c119b7c80e8076b6762b21dff235",
+  "message": "fix: LSDV-5235: Use alternate check for postpone based on presence of interfaces instead of FF",
+  "commit": "3c5a48d51b0fb4d6d24777aa6bb5e61f82e6e8f4",
   "branch": "master",
-  "date": "2023/05/30 14:08:48"
+  "date": "2023/06/06 09:32:04"
 }

@@ -426,6 +426,7 @@ class Annotation(models.Model):
     ground_truth = models.BooleanField(_('ground_truth'), default=False, help_text='This annotation is a Ground Truth (ground_truth)')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last updated time')
+    draft_created_at = models.DateTimeField(_('draft created at'), null=True, default=None, help_text='Draft creation time')
     lead_time = models.FloatField(_('lead time'), null=True, default=None, help_text='How much time it took to annotate the task')
     prediction = JSONField(
         _('prediction'),

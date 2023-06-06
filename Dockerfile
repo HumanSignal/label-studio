@@ -9,6 +9,10 @@ WORKDIR /label-studio/label_studio/frontend
 COPY --chown=1001:0 label_studio/frontend .
 COPY --chown=1001:0 label_studio/__init__.py /label-studio/label_studio/__init__.py
 
+# Fix Docker Arm64 Build
+RUN yarn config set registry https://registry.npmjs.org/
+RUN yarn config set network-timeout 1200000 # HTTP timeout used when downloading packages, set to 20 minutes
+
 RUN --mount=type=cache,target=$NPM_CACHE_LOCATION,uid=1001,gid=0 \
     yarn install --frozen-lockfile \
  && yarn run build:production
