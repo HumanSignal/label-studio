@@ -3,13 +3,13 @@ title: Installation overview
 short: Overview
 tier: enterprise
 type: guide
-order: 133
+order: 134
 order_enterprise: 117
 meta_title: Set up an active learning loop with Label Studio
 meta_description: Set up an end-to-end active learning loop with Label Studio using the ML backend SDK and webhooks to perform model training and predictions and labeling.
 section: "Install"
-
 ---
+
 Main Label Studio Enterprise components:
 <img src="https://docs.heartex.com/images/LSE_k8s_scheme.png" class="gif-border"/>
 
