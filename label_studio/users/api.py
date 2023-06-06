@@ -138,6 +138,14 @@ class UserAPI(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         result = super(UserAPI, self).partial_update(request, *args, **kwargs)
 
+        # throw MethodNotAllowed if read-only fields are attempted to be updated
+        read_only_fields = self.get_serializer_class().Meta.read_only_fields
+        for field in read_only_fields:
+            if field in request.data:
+                raise MethodNotAllowed(
+                    'PATCH', detail=f'Cannot update read-only field: {field}'
+                )
+
         # newsletters
         if 'allow_newsletters' in request.data:
             user = User.objects.get(id=request.user.id)  # we need an updated user
