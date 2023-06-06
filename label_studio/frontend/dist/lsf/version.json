@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-3861: XSS in error messages",
-  "commit": "37ca5ff84ab481b49f1bdb7f7fbe335856a77cb9",
-  "branch": "fb-lsdv-3861/xss-error",
-  "date": "2023/06/06 14:51:52"
+  "commit": "8f9631953d152f596a63f379fab75a5505a8fdeb",
+  "branch": "master",
+  "date": "2023/06/06 20:36:21"
 }
