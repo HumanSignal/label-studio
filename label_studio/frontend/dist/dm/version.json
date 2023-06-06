@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5192: Change quick view icon and change hover color",
-  "commit": "d2e8485cdc3aa0a01c83115ab96fdc606ddfbce9",
+  "message": "feat: LOPS-155: [FE] Select and export CandidateTasks to a new Project",
+  "commit": "6c32e3745b98f09aad27217c346a0ac486c32cbb",
   "branch": "master",
-  "date": "2023/05/31 10:07:39"
+  "date": "2023/06/06 09:17:38"
 }
