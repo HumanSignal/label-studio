@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5235: Use alternate check for postpone based on presence of interfaces instead of FF",
-  "commit": "66666fec5db390ae49d46c533dbb2a0ce12dda44",
-  "branch": "fb-lsdv-5235-fix",
-  "date": "2023/06/05 13:38:02"
+  "commit": "3c5a48d51b0fb4d6d24777aa6bb5e61f82e6e8f4",
+  "branch": "master",
+  "date": "2023/06/06 09:32:04"
 }
