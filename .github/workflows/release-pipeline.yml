@@ -110,6 +110,8 @@ jobs:
               event_type: 'upstream_formula_update',
               client_payload: {
                 formula: 'label-studio',
+                version: '${{ github.ref_name }}',
+                actor: '${{ github.actor }}',
                 url: '${{ needs.build-pypi.outputs.pipy-artifact-url }}',
                 sha256: '${{ needs.build-pypi.outputs.pipy-artifact-digests-sha256 }}',
               }

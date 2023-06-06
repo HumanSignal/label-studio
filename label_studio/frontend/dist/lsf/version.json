@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5202: Fix Ranker d-n-d in Preview",
-  "commit": "e11265aea1bba0420538fc9a41cfab1c9d08955e",
+  "message": "fix: LSDV-5235: Postpone should not require FF to operate",
+  "commit": "01769ec41352217ebb476d581ad0ed6941e16bf2",
   "branch": "master",
-  "date": "2023/05/31 19:44:34"
+  "date": "2023/06/05 11:24:37"
 }
