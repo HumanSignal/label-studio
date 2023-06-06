@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5192: Change quick view icon and change hover color",
-  "commit": "bb2acdcf56f79050c841c4c4a816360372c6a22b",
+  "message": "fix: LSDV-5235: Postpone should not require FF to operate",
+  "commit": "01769ec41352217ebb476d581ad0ed6941e16bf2",
   "branch": "master",
-  "date": "2023/05/31 10:07:44"
+  "date": "2023/06/05 11:24:37"
 }

@@ -90,8 +90,10 @@ jobs:
           username: heartexlabs
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+      #      - name: Set up QEMU
+      #        uses: docker/setup-qemu-action@v2
+
+      #      TODO: platforms: linux/amd64,linux/arm64
 
       - name: Push Docker image
         uses: docker/build-push-action@v4.0.0
@@ -99,7 +101,7 @@ jobs:
         with:
           context: .
           file: ${{ inputs.dockerfile_path }}
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
           tags: ${{ steps.calculate-docker-tags.outputs.docker-tags }}
           cache-from: type=gha
