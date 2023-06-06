@@ -38,6 +38,9 @@ _api_urlpatterns = [
     # Project summary
     path('<int:pk>/summary/', api.ProjectSummaryAPI.as_view(), name='project-summary'),
 
+    # Project import
+    path('<int:pk>/imports/<int:import_pk>/', api.ProjectImportAPI.as_view(), name='project-imports'),
+
     # Tasks list for the project: get and destroy
     path('<int:pk>/tasks/', api.ProjectTaskListAPI.as_view(), name='project-tasks-list'),
 

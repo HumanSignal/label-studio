@@ -29,7 +29,7 @@ There are 3 ways to reset a password:
 1. Using email by “Forgot password” link on the login page. It works in SaaS by default. It can work in on-premise deployments, but you need to set up the email backend.
 2. Login as a superuser, go to `/admin/users/user` page, find your user and reset password:
 
-![](/images/notion/2b2224e9a8b54bb.png)
+![](/images/notion/3044adad48e84db.png)
 
 1. Go to LS terminal, run  `/label-studio-enterprise/label_studio_enterprise && python3` [`manage.py`](http://manage.py) `shell_plus`
 
@@ -48,7 +48,28 @@ u.save()
 - By default owner email is used as organization title. It can be fixed using `/admin/organizations/` page.
 - Or customers can do it through API: `{”title”: “new title”} PATCH api/organization/`
 
-![](/images/notion/420a3db26e6f4c0.png)
+```bash
+curl -X PATCH -H "Content-Type: application/json" -H "Authorization: Token your_api_token" -d '{"title": "new title"}' https://your-api-url.com/api/organization/
+```
+
+
+![](/images/notion/f282bdcae17649e.png)
+
+
+### Disable payload data in activity logs
+
+
+If it is important to follow CCPA / other complaints, it might be necessary to disable extra payload data in activity logs, so this data won’t be saved in DB. You can do this using terminal inside of app container:
+
+
+```python
+x = LseOrganization.objects.get(organization=<id>)
+x.extra_data_on_activity_logs=False
+x.save()
+```
+
+
+We will add this toggle as organization settings later. 
 
 
 ## Common LDAP & SAML SSO Questions
@@ -68,12 +89,12 @@ This action can only be performed using the /admin page because of security reas
 1. Go to SAML settings page
 2. Find organization you need
 
-![](/images/notion/807d52a6750d434.png)
+![](/images/notion/ea0e34caf078483.png)
 
 1. Click on the pk
 2. Change the domain
 
-![](/images/notion/a805ae911a9c4b1.png)
+![](/images/notion/b9b6bc5c20e745c.png)
 
 
 ### Is the Organization Owner role required to setup LDAP?
@@ -128,13 +149,13 @@ For LDAP there is one way only:
 The most frequent problem when you see “Bad request 400” on SAML login is improperly configured attributes in SAML. Check SAML Attributes mapping in your Identity Provider: it’s very important to have the correct Email field. For example how it looks in Google SAML Identity Provider settings: 
 
 
-![](/images/notion/33f2429f54624a3.png)
+![](/images/notion/d42c6de480d443d.png)
 
 
 Also you can check them on LSE SAML settings page `/saml/settings`:
 
 
-![](/images/notion/29f4732404634be.png)
+![](/images/notion/9a46e2edfcfa449.png)
 
 
 ## Unable to import data from Cloud Storage
@@ -156,7 +177,7 @@ Go to the cloud storage settings page, click on **Edit** cloud storage connectio
 3. Sometimes the sync process doesn’t start immediately. That is because syncing process is based on internal job scheduler. Please wait, if nothing happens during long period of time - contact us via  form, and please provide the time when you launched the “Sync” job
 4. An easy way to check rq workers is to run an export: go to the Data manager, click Export, and create a new snapshot and download the JSON file. If you see an Error, most likely your rq workers have problems. Another way to check rq workers - login as a superuser and go to /django-rq page. You should see a `workers` column, `workers` values shouldn’t be 0 as far as failed column should be empty (0).
 
-![](/images/notion/e0841f2ccad54bb.png)
+![](/images/notion/79a0397231b6469.png)
 
 
 ### JSON files from a cloud storage are not synced, the data manager is empty
@@ -173,7 +194,7 @@ Why does it happen? Because for (1) Label Studio scans bucket and doesn’t read
 ### When I click Sync, I see my tasks in the Data Manager, but there is the CORS error inside of tasks
 
 
-It’s a problem with permissions in your bucket. 
+It’s a problem with permissions in your bucket. Check this section [https://labelstud.io/guide/storage.html#Source-storage-permissions](https://labelstud.io/guide/storage.html#Source-storage-permissions) carefully. 
 
 
 ## Data is not shown on the labeling screen
@@ -188,7 +209,7 @@ You access the labeling data via navigating to the next task while clicking on s
 Without an internet connection, you will receive a “Failed to fetch” message each time you try opening the data labeling screen. This is because data content is fetched on the client side at the time you load the app, ensuring secure data flow. Please check your internet connection and reload the page again.
 
 
-![](/images/notion/6658da1d8d9345a.png)
+![](/images/notion/5d0c670a88864fd.png)
 
 
 ### Check data access
@@ -200,7 +221,7 @@ It is a common scenario when working with external storage that the URLs provide
 To locate this source of error, try navigating to your browser’s _Network_ panel and check to see if there are 403 or 404 errors.
 
 
-![](/images/notion/b06b8ce963c7484.png)
+![](/images/notion/536a49a936024e2.png)
 
 
 To validate the link doesn’t work - copy it and try opening in a separate browser tab.
@@ -306,23 +327,29 @@ In some cases, the data is provided original content (e.g. text) or a URL pointe
 1. You run **simple http server** with basic auth on the machine where your local storage is.
 
 
-`pip install sauth  # sauth - simple http file server with auth
-sauth admin 12345 -d /path/to/storage`
+```python
+pip install sauth  # sauth - simple http file server with auth
+sauth admin 12345 -d /path/to/storage
+```
 
 
 2. Now you can have access to images from your storage this way:
 
 
-`http://localhost:8333/image.jpg  # image is stored as /path/to/storage/image.jpg`
+```python
+http://localhost:8333/image.jpg  # image is stored as /path/to/storage/image.jpg
+```
 
 
 3. Let’s assume your storage server has an IP address 192.168.1.42, so the file name will be
 
 
-`http://192.168.1.42/image.jpg`
+```python
+http://192.168.1.42/image.jpg
+```
 
 
-4. LSE server has API in the same network, let it be 192.168.1.77. So, files from storage 192.168.77.42 will be accessible from LSE 192.168.1.77.
+4. LSE server has API in the same network, let it be `192.168.1.77`. So, files from storage `192.168.77.42` will be accessible from LSE `192.168.1.77`.
 
 
 5. Let’s expose your storage files to annotators by enabling the basic auth proxy on LSE side:
@@ -345,7 +372,9 @@ sauth admin 12345 -d /path/to/storage`
 8. LSE will download this image and return to annotators it using its own proxy by this url:
 
 
-`https://app.heartex.com/api/projects/<project-id>/file-proxy/?url=http%3A//192.168.1.42/image.jpg`
+```python
+https://app.heartex.com/api/projects/<project-id>/file-proxy/?url=http%3A//192.168.1.42/image.jpg
+```
 
 
 ## UI elements are broken
@@ -439,7 +468,7 @@ Most likely RQ Workers are
 To inspect this issue you should open `/django-rq` page and see number of workers in Workers column:
 
 
-![](/images/notion/6bfd8f8f5e5549b.png)
+![](/images/notion/bd09fc74ffc14cd.png)
 
 
 If you see 0, it’s definitely a problem with your rq worker setup, you have to connect with your devops team and check what **rqworker containers** are running. 
@@ -458,6 +487,24 @@ Try upgrading to the most recent version of Label Studio Enterprise. This filter
 
 
 [Try to run postgresql VACUUM, ANALYZE and REINDEX](https://confluence.atlassian.com/kb/optimize-and-improve-postgresql-performance-with-vacuum-analyze-and-reindex-885239781.html)
+
+
+### Export conversion to other formats ends with Gateway Timeout error
+
+
+As a workaround you can convert JSON manually on your local machine. [Follow this link for instructions](/d7a7b662ff9e467da9baa2928863a387#4f56bdc89b8e4ef290b8d47a75295299).
+
+
+## Annotation history is disappeared after LSE 2.4.5 upgrade
+
+
+This might happen if you are using blue/green deployment and annotation history async migration `0015_get_organizations_and_projects_async_20230330_0100` started on old version rqworker. To fix this issue you have to run this migration via command in the app container:
+
+
+```python
+cd /label-studio-enterprise/label_studio_enterprise
+python3 manage.py annotation_history_get_organizations_and_projects
+```
 
 
 ## Other issues
@@ -480,6 +527,35 @@ Try upgrading to the most recent version of Label Studio Enterprise. This filter
 2. Always follow the Heartex’s guidelines and recommendations for upgrading software. This may include specific steps or prerequisites, compatibility requirements, or recommended configurations.
 
 ## Post-processing for exports 
+
+
+### Manual conversion to external formats
+
+
+You can convert Label Studio JSON snapshots to other external formats like CSV, YOLO, COCO, etc manually. For this you need to install `label-studio-converter` python lib and call it. There is an example of TSV conversion:
+
+1. Install label-studio-converter
+
+```text
+pip install -U label-studio-converter
+```
+
+
+2. Download JSON snapshot from LSE and save e.g. as `snapshot.json`
+
+
+3. Copy your labeling config from the project and save it as `config.xml`
+
+
+4. Convert
+
+
+```text
+label-studio-converter export -i snapshot.json -o snapshot -f TSV -c config.xml
+```
+
+
+`snapshot` directory will be created with `result.csv` file in `TSV` format.
 
 
 ## How to calculate annotator distribution over annotations

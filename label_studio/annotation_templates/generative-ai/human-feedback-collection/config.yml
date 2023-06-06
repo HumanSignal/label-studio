@@ -1,0 +1,92 @@
+title: "Human Preference collection for RLHF"
+type: community
+group: Generative AI
+order: 2
+image: /static/templates/generative-pairwise-human-preference.png
+details:  Gathering comparison data to establish human preferences for model-generated responses. This stage involves ranking multiple responses based on quality, which are then used to train a reward model. The reward model captures human preferences and helps in reinforcement learning to optimize the LLM's performance.
+config: |
+  <View className="root">
+    <Style>
+      .root {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Roboto',
+          sans-serif;
+        line-height: 1.6;
+        background-color: #f0f0f0;
+      }
+
+      .container {
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 20px 0 rgba(0, 0, 0, 0.1);
+      }
+
+      .prompt {
+        padding: 20px;
+        background-color: #0084ff;
+        color: #ffffff;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1), 0 3px 10px 0 rgba(0, 0, 0, 0.1);
+      }
+
+      .answers {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .answer-box {
+        flex-basis: 49%;
+        padding: 20px;
+        background-color: rgba(44, 62, 80, 0.9);
+        color: #ffffff;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1), 0 3px 10px 0 rgba(0, 0, 0, 0.1);
+      }
+
+      .answer-box p {
+        word-wrap: break-word;
+      }
+
+      .answer-box:hover {
+        background-color: rgba(52, 73, 94, 0.9);
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .lsf-richtext__line:hover {
+        background: unset;
+      }
+
+      .answer-box .lsf-object {
+        padding: 20px
+      }
+    </Style>
+    <View className="container">
+      <View className="prompt">
+        <Text name="prompt" value="$prompt" />
+      </View>
+      <View className="answers">
+        <Pairwise name="comparison" toName="answer1,answer2"
+                  selectionStyle="background-color: #27ae60; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.2); border: 2px solid #2ecc71; cursor: pointer; transition: all 0.3s ease;" />
+        <View className="answer-box">
+          <Text name="answer1" value="$answer1" />
+        </View>
+        <View className="answer-box">
+          <Text name="answer2" value="$answer2" />
+        </View>
+      </View>
+    </View>
+  </View>
+  <!--{ "data" : {
+    "prompt": "What are the key benefits of using Reinforcement Learning from Human Feedback (RLHF) for dataset collection in the context of Large Language Model (LLM) generation?",
+    "answer1": "Reinforcement Learning from Human Feedback (RLHF) for dataset collection in Large Language Model (LLM) generation provides key benefits such as improved model performance through direct optimization, better alignment with human values by incorporating human feedback, and the ability to iteratively refine the model based on user interactions, resulting in a more user-friendly and efficient language model.",
+    "answer2": "Using Reinforcement Learning from Human Feedback (RLHF) for dataset collection in Large Language Model (LLM) generation offers advantages such as enhanced model capabilities by optimizing for desired outcomes, greater adaptability to human preferences through the inclusion of human feedback, and the opportunity to continuously improve the model based on user experiences, ultimately leading to a more effective and responsive language model."
+  }}
+  -->

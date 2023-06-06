@@ -69,6 +69,7 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
         expandable_fields = {
             'drafts': (AnnotationDraftSerializer, {'many': True}),
             'predictions': (PredictionSerializer, {'many': True}),
+            'annotations': (AnnotationSerializer, {'many': True})
         }
 
 

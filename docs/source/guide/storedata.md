@@ -49,6 +49,50 @@ When you start Label Studio using Docker Compose, you start it using a PostgreSQ
 docker-compose up -d
 ```
 
+## Minio Blob Storage
+MinIO is a blob storage solution that is compatible with Amazon S3. You can use MinIO to store your labeling tasks.
+
+### Starting the containers
+For local development, you can host a local MinIO server to emulate an S3-based production environment more closely. 
+An example docker-compose file for this is available in the [Label Studio repository](https://github.com/heartexlabs/label-studio).
+
+To run MinIO alongside your Label Studio instance, use the following command:
+````bash
+# Add sudo on Linux if you are not a member of the docker group
+docker compose -f docker-compose.yml -f docker-compose.minio.yml up -d
+````
+The MinIO server will be accessible at http://localhost:9000. 
+To configure MinIO settings, create a `.env` file. Remember to override the default credentials.
+
+````.dotenv
+MINIO_ROOT_USER=minio_admin_do_not_use_in_production
+MINIO_ROOT_PASSWORD=minio_admin_do_not_use_in_production
+````
+
+### Connect Label Studio to local MinIO
+
+If you do not have a static IP address, create an entry in your hosts file so that both the Label Studio container and 
+your browser can find MinIO at the same hostname.
+
+The following entry redirects all requests to MinIO to your local system:
+```text
+127.0.0.1 minio
+```
+
+On Windows, you can find your hosts file at `C:\Windows\System32\drivers\etc\hosts`.
+On Linux, you can find your hosts file at `/etc/hosts`.
+On macOS, you can find your hosts file at `/private/etc/hosts`.
+
+After modifying your hosts file, you can connect to your MinIO server with your browser at http://minio:9000.
+
+### Remove MinIO data
+You can remove your MinIO installation by removing the containers and the associated volumes. 
+This operation is destructive and will remove all data stored in MinIO.
+```bash
+docker-compose -f docker-compose.minio.yml down --volumes
+````
+
+
 ## Data persistence
 
 If you're using a Docker container, Heroku, or another cloud provider, you might want your data to persist after shutting down Label Studio. You can [export your data](export.html) to persist your labeling task data and annotations, but to preserve the state of Label Studio and assets such as files that you uploaded for labeling, set up data persistence. 

@@ -88,8 +88,6 @@ rqworker:
       replicas: 4
     critical:
       replicas: 1
-    all:
-      replicas: 1
   resources:
     requests:
       memory: 256Mi
@@ -240,8 +238,6 @@ rqworker:
       default:
          replicas: 2
       critical:
-         replicas: 2
-      all:
          replicas: 2
 
 postgresql:

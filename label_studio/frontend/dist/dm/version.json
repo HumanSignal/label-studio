@@ -1,6 +1,6 @@
 {
-  "message": "chore: LSDV-4727: Remove any AudioPlus mentions",
-  "commit": "bebdff88fba8aa0b167b5475e8d77009a3bbd895",
+  "message": "fix: LSDV-5192: Change quick view icon and change hover color",
+  "commit": "d2e8485cdc3aa0a01c83115ab96fdc606ddfbce9",
   "branch": "master",
-  "date": "2023/04/18 15:30:26"
+  "date": "2023/05/31 10:07:39"
 }

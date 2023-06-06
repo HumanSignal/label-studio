@@ -55,7 +55,13 @@ class GCSStorageMixin(models.Model):
         return client.get_bucket(bucket_name or self.bucket)
 
     def validate_connection(self):
-        GCS.validate_connection(self.bucket, self.google_project_id, self.google_application_credentials)
+        GCS.validate_connection(
+            self.bucket,
+            self.google_project_id,
+            self.google_application_credentials,
+            # we don't need to validate path for export storage, it will be created automatically
+            None if 'Export' in self.__class__.__name__ else self.prefix
+        )
 
 
 class GCSImportStorageBase(GCSStorageMixin, ImportStorage):
