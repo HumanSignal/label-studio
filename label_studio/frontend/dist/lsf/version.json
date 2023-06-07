@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-E-135: Manual security updates",
-  "commit": "1a5e28a80ffc0c1ab161b85691d77b31a6fb8026",
-  "branch": "fb-lsdv-e-135/manual-updates",
-  "date": "2023/06/07 12:27:06"
+  "message": "fix: LSDV-4968: Fix remaining transformer of selected region outside of lifespan (#1345)",
+  "commit": "9b1f3c7170ca354bc986906c3092c60856da2d60",
+  "branch": "master",
+  "date": "2023-06-07T05:50:10Z"
 }
