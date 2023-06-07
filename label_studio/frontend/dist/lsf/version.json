@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5235: Postpone should not require FF to operate",
-  "commit": "01769ec41352217ebb476d581ad0ed6941e16bf2",
+  "message": "fix: LSDV-4968: Fix remaining transformer of selected region outside of lifespan",
+  "commit": "9b1f3c7170ca354bc986906c3092c60856da2d60",
   "branch": "master",
-  "date": "2023/06/05 11:24:37"
+  "date": "2023/06/07 08:50:10"
 }
