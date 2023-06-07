@@ -408,6 +408,22 @@ To connect your [GCS](https://cloud.google.com/storage) bucket with Label Studio
 - **Enable programmatic access to your bucket.** See [Cloud Storage Client Libraries](https://cloud.google.com/storage/docs/reference/libraries) in the Google Cloud Storage documentation for how to set up access to your GCS bucket.
 - **Set up authentication to your bucket.** Your account must have the **Service Account Token Creator** and **Storage Object Viewer** roles and **storage.buckets.get** access permission. See [Setting up authentication](https://cloud.google.com/storage/docs/reference/libraries#setting_up_authentication) and [IAM permissions for Cloud Storage](https://cloud.google.com/storage/docs/access-control/iam-permissions) in the Google Cloud Storage documentation. 
 - If you're using a service account to authorize access to the Google Cloud Platform, make sure to activate it. See [gcloud auth activate-service-account](https://cloud.google.com/sdk/gcloud/reference/auth/activate-service-account) in the Google Cloud SDK: Command Line Interface documentation.
+- Set up cross-origin resource sharing (CORS) access to your bucket, using a policy that allows GET access from the same host name as your Label Studio deployment. See [Configuring cross-origin resource sharing (CORS)](https://cloud.google.com/storage/docs/configuring-cors#configure-cors-bucket) in the Google Cloud User Guide. Use or modify the following example:
+```shell
+echo '[
+   {
+      "origin": ["*"],
+      "method": ["GET"],
+      "responseHeader": ["Content-Type","Access-Control-Allow-Origin"],
+      "maxAgeSeconds": 3600
+   }
+]' > cors-config.json
+```
+
+Replace `YOUR_BUCKET_NAME` with your actual bucket name in the following command to update CORS for your bucket:
+```shell
+gsutil cors set cors-config.json gs://YOUR_BUCKET_NAME
+```
 
 ### Set up connection in the Label Studio UI
 In the Label Studio UI, do the following to set up the connection:

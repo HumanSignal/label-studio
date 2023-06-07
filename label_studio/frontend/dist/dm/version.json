@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5115: Fix height of tasks header row on quick view",
-  "commit": "c5fa5573711df9b5a9c6e519e263cd673ff37e6c",
+  "message": "feat: LOPS-155: [FE] Select and export CandidateTasks to a new Project",
+  "commit": "6c32e3745b98f09aad27217c346a0ac486c32cbb",
   "branch": "master",
-  "date": "2023/05/22 10:51:34"
+  "date": "2023/06/06 09:17:38"
 }
