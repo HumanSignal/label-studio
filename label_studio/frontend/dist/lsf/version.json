@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4968: Fix remaining transformer of selected region outside of lifespan (#1345)",
-  "commit": "9b1f3c7170ca354bc986906c3092c60856da2d60",
+  "message": "fix: LSDV-5089: Manual security updates",
+  "commit": "1bfd5b89c40faf3726939ca77b2fdeef329ed7a4",
   "branch": "master",
-  "date": "2023-06-07T05:50:10Z"
+  "date": "2023/06/07 17:04:54"
 }
