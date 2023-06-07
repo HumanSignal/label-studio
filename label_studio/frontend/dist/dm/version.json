@@ -1,13 +1,6 @@
 {
-<<<<<<< HEAD
-  "message": "fix: LSDV-E-135: Dependabot updates",
-  "commit": "d989b823e44a585872b27c54676bf931eda46eb9",
-  "branch": "master",
-  "date": "2023/06/05 18:40:16"
-=======
   "message": "feat: LOPS-155: [FE] Select and export CandidateTasks to a new Project",
   "commit": "6c32e3745b98f09aad27217c346a0ac486c32cbb",
   "branch": "master",
   "date": "2023/06/06 09:17:38"
->>>>>>> origin/develop
 }
