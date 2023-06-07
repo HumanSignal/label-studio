@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-155: [FE] Select and export CandidateTasks to a new Project",
-  "commit": "6c32e3745b98f09aad27217c346a0ac486c32cbb",
+  "message": "feat: LOPS-159: [FE] Candidate task front end needs to show associated projects",
+  "commit": "24cbaf7948e25e1cb7a9eb592ad61b00c6e22b10",
   "branch": "master",
-  "date": "2023/06/06 09:17:38"
+  "date": "2023/06/07 16:32:20"
 }
