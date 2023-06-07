@@ -1,6 +1,6 @@
 {
   "message": "feat: LOPS-157: Update Actions dropdown in Data explorer to support multi-level dropdown",
-  "commit": "bc9ba9b7f9aa3fd55210a63948cabe19bab31bee",
+  "commit": "2be4a54cd9f077ecf224490a7648c999701c3c2e",
   "branch": "fb-lops-157",
-  "date": "2023/06/06 13:51:57"
+  "date": "2023/06/07 09:43:53"
 }
