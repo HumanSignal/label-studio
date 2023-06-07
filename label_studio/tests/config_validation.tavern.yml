@@ -63,6 +63,110 @@ stages:
     status_code: 200
 
 ---
+test_name: try_removing_created_labels_drafts
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+  
+stages:
+- # Signup to the system
+  id: signup
+  type: ref
+
+- # Create a project with a specific labeling configuration
+  name: create project
+  request:
+    data:
+      label_config: ' <View><Text name="text" value="$text"/><Choices name="sentiment" toName="text" choice="single" showInLine="true"> <Choice value="1"/>
+    </Choices></View>'
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+
+- # Import a task to the project
+  name: import task
+  request:
+    headers:
+      content-type: application/json
+    json:
+    - text: Example task sentence
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+
+- # Get the next task
+  name: get next task
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/next'
+  response:
+    save:
+      json:
+        task_id: id
+    status_code: 200
+
+- # Submit the draft for the task
+  name: submit draft
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+        - value:
+            choices:
+            - 1
+          id: HyhYO_s9cc
+          from_name: sentiment
+          to_name: text
+          type: choices
+          origin: manual
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_id}/drafts'
+  response:
+    status_code: 201
+
+- # Try to remove an existing in draft label from the config
+  name: remove existing label
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View><Text name="text" value="$text"/><Choices name="sentiment" toName="text" choice="single" showInLine="true"> <Choice value="2"/>
+    </Choices></View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400
+
+- # Delete all tasks of the project
+  name: delete tasks
+  request:
+    method: DELETE
+    url: '{django_live_url}/api/projects/{pk}/tasks'
+  response:
+    status_code: 204
+
+- # Try to remove an existing label from the config successfully
+  name: remove existing label successfully
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View><Text name="text" value="$text"/><Choices name="sentiment" toName="text" choice="single" showInLine="true"> <Choice value="2"/>
+    </Choices></View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 200
+
+
+---
 test_name: try_removing_created_labels
 strict: false
 marks:
