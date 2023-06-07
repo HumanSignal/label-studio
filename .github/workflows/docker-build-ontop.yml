@@ -45,7 +45,7 @@ env:
 jobs:
   docker_build_and_push:
     name: "Docker image"
-    timeout-minutes: 30
+    timeout-minutes: 90
     runs-on: ubuntu-latest
     steps:
       - uses: hmarr/debug-action@v2.1.0
@@ -90,10 +90,8 @@ jobs:
           username: heartexlabs
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      #      - name: Set up QEMU
-      #        uses: docker/setup-qemu-action@v2
-
-      #      TODO: platforms: linux/amd64,linux/arm64
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
 
       - name: Push Docker image
         uses: docker/build-push-action@v4.0.0
@@ -101,7 +99,7 @@ jobs:
         with:
           context: .
           file: ${{ inputs.dockerfile_path }}
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.calculate-docker-tags.outputs.docker-tags }}
           cache-from: type=gha
