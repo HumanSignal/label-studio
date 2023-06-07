@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4673: Fix drawing with Rect3Point tool in relative coords",
-  "commit": "6a1515c729cb7603bf10a2808e12060f86dd1340",
+  "commit": "16872163afd49ef47011f2d9097458c3cbc198ca",
   "branch": "fb-lsdv-4673/rect3point-relative",
-  "date": "2023/06/06 14:42:23"
+  "date": "2023/06/07 15:45:01"
 }
