@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5235: Use alternate check for postpone based on presence of interfaces instead of FF",
-  "commit": "3c5a48d51b0fb4d6d24777aa6bb5e61f82e6e8f4",
+  "message": "fix: LSDV-4968: Fix remaining transformer of selected region outside of lifespan",
+  "commit": "9b1f3c7170ca354bc986906c3092c60856da2d60",
   "branch": "master",
-  "date": "2023/06/06 09:32:04"
+  "date": "2023/06/07 08:50:10"
 }

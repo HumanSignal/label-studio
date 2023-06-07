@@ -516,7 +516,7 @@ class ExportStorage(Storage, ProjectStorageMixin):
         else:
             serializer_class = load_func(settings.STORAGE_ANNOTATION_SERIALIZER)
             # deprecated functionality - save only annotation
-            return serializer_class(annotation).data
+            return serializer_class(annotation, context={'project': self.project}).data
 
     def save_annotation(self, annotation):
         raise NotImplementedError
