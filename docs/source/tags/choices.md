@@ -12,7 +12,7 @@ Choices can have dynamic value to load labels from task. This task data should c
 
 The `Choices` tag can be used with any data types.
 
-[^1]: `feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality.
+[^1]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality.
 
 [^2]: `ff_dev_2007_dev_2008_dynamic_tag_children_250322_short` should be enabled to use dynamic options.
 

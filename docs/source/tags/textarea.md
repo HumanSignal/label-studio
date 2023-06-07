@@ -14,7 +14,7 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 
 [^2]: `fflag_feat_front_lsdv_4712_skipduplicates_editing_110423_short` should be enabled to keep submissions unique during editing existed results
 
-[^3]: `feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality
+[^3]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality
 
 ### Parameters
 

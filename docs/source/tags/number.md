@@ -10,7 +10,7 @@ The Number tag supports numeric classification. Use to classify tasks using numb
 
 Use with the following data types: audio, image, HTML, paragraphs, text, time series, video
 
-[^1]: `feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality
+[^1]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality
 
 ### Parameters
 
