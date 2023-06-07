@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-159: [FE] Candidate task front end needs to show associated projects",
-  "commit": "24cbaf7948e25e1cb7a9eb592ad61b00c6e22b10",
+  "message": "fix: LSDV-5249: Manual security updates",
+  "commit": "9b44981768d0e6f22e4df462719ae41d903a2065",
   "branch": "master",
-  "date": "2023/06/07 16:32:20"
+  "date": "2023/06/07 15:45:50"
 }
