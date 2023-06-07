@@ -1,6 +1,6 @@
 {
   "message": "feat: LSDV-4654: Allow per-image classification",
-  "commit": "45ea0f7ea09e4e4dbbd2fb97ab41fa253e692bf0",
+  "commit": "41ee1b83b06d28decc52e9856e06f5176b38dc11",
   "branch": "fb-lsdv-4654/per-item",
-  "date": "2023/06/07 21:27:44"
+  "date": "2023/06/07 22:48:26"
 }
