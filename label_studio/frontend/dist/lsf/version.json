@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5249: Manual security updates",
-  "commit": "6440beb046b0bc3a55edbbd4d7ccb03b4327e434",
+  "commit": "d8b74a56f4f1cd8d554d437180bc07cb134d4ea0",
   "branch": "fb-lsdv-5089/manual-updates",
-  "date": "2023/06/07 13:19:10"
+  "date": "2023/06/07 15:02:57"
 }
