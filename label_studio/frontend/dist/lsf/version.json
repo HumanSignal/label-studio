@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5089: Manual security updates",
-  "commit": "1bfd5b89c40faf3726939ca77b2fdeef329ed7a4",
-  "branch": "master",
-  "date": "2023/06/07 17:04:54"
+  "message": "fix: LSDV-5089: Bump loader-utils",
+  "commit": "aafda5fe94541921d28280d088542fd58ce1cb26",
+  "branch": "fb-lsdv-5089/loader-utils-bump",
+  "date": "2023/06/07 19:17:16"
 }
