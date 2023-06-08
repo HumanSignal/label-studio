@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5192: Change quick view icon and change hover color",
-  "commit": "d2e8485cdc3aa0a01c83115ab96fdc606ddfbce9",
+  "message": "fix: LSDV-5249: Manual security updates",
+  "commit": "a9539713eac9b61c0647b8a7c5dd22fe44d8bb22",
   "branch": "master",
-  "date": "2023/05/31 10:07:39"
+  "date": "2023/06/07 23:45:34"
 }
