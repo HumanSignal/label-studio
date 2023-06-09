@@ -26,4 +26,5 @@ def test_gcs_storage_credentials_validation(business_client):
         f'/api/storages/gcs?project={project.id}',
         data=json.dumps(data), content_type='application/json')
     assert r.status_code == 400
-    assert 'Google Application Credentials must be valid JSON string.' in r.json()['validation_errors']['non_field_errors']
+    assert 'Google Application Credentials must be valid JSON string.' \
+           in r.json()['validation_errors']['non_field_errors'][0]

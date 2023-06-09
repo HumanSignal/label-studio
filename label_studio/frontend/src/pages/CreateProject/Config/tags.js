@@ -46,14 +46,17 @@ const OBJECTS = {
   AudioPlus: {
     type: 'Audio',
   },
-  TimeSeries: {
-    type: 'TimeSeries',
+  List: {
+    type: 'List',
   },
   Paragraphs: {
     type: 'Paragraphs',
   },
   Table: {
     type: 'Table',
+  },
+  TimeSeries: {
+    type: 'TimeSeries',
   },
   Video: {
     type: 'Video',

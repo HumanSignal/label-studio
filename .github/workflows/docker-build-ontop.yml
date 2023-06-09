@@ -45,7 +45,7 @@ env:
 jobs:
   docker_build_and_push:
     name: "Docker image"
-    timeout-minutes: 30
+    timeout-minutes: 90
     runs-on: ubuntu-latest
     steps:
       - uses: hmarr/debug-action@v2.1.0

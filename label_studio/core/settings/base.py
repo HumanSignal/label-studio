@@ -504,6 +504,7 @@ IO_STORAGES_IMPORT_LINK_NAMES = [
 CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 SAVE_USER = 'users.functions.save_user'
 USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
+USER_SERIALIZER_UPDATE = 'users.serializers.BaseUserSerializerUpdate'
 TASK_SERIALIZER = 'tasks.serializers.BaseTaskSerializer'
 EXPORT_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializer'
 DATA_MANAGER_GET_ALL_COLUMNS = 'data_manager.functions.get_all_columns'
@@ -645,3 +646,4 @@ if CSRF_TRUSTED_ORIGINS:
     CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS.split(",")
 
 REAL_HOSTNAME = os.getenv('HOSTNAME')  # we have to use getenv, because we don't use LABEL_STUDIO_ prefix
+GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS = get_bool_env('GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS', False)
