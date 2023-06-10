@@ -148,7 +148,13 @@ export const MachineLearningSettings = () => {
         if (response.data.message) {
           Swal(response.data.message);
         } else {
-          const blob = new Blob([response.data.model], { type: 'application/zip' });
+          const decodedData = atob(response.data.model);
+          const arrayBuffer = new ArrayBuffer(decodedData.length);
+          const uint8Array = new Uint8Array(arrayBuffer);
+          for (let i = 0; i < decodedData.length; i++) {
+            uint8Array[i] = decodedData.charCodeAt(i);
+          }
+          const blob = new Blob([arrayBuffer], { type: 'application/zip' });
           const url = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
@@ -378,13 +384,16 @@ export const MachineLearningSettings = () => {
             // {model.}
               <div className='col-6' key={model.value} style={{marginBottom: 10}}>
               <Card  key={model.value}>
-                  Model Version: {model.label}
+                  Model Version: {model.label}           
                   {modelsType != 'segmentation' ?
                     <div>
                     {
                       Object.keys(modelsPrecisions).includes(model.label) ?
                         <div style={{ paddingTop: 15 }}>
+                          <h4>Project Type: {modelsPrecisions[model.label]['model_type']}</h4>
                           <h5>Mean Average Precision <strong>(mAp)</strong>: {modelsPrecisions[model.label]['mAp']}</h5>
+                          {modelsPrecisions[model.label]['model_type'] == "tao"?
+                          
                           <table>
                             <thead>
                               <tr><th style={{ paddingRight: 50 }}>Class Name</th>
@@ -397,6 +406,7 @@ export const MachineLearningSettings = () => {
 
                             ))}
                           </table>
+                          :''}
                           {modelsPrecisions[model.label]['score'] && Object.keys(modelsPrecisions[model.label]['score']).length > 0 ?
                             <div>
                               <h5 style={{ marginTop: 20 }}>Beta Score</h5>
@@ -440,7 +450,7 @@ export const MachineLearningSettings = () => {
                       </div>:<div>You have no information about this model</div>}</div>}
                       <div style={{ marginTop: 20 }}>
                             <button style={{ marginRight: 10 }} onClick={() => onExportModel(model.value)} className='btn btn-outline-primary'>Export Model</button>
-                    {modelsType == 'object_detection' ? <button onClick={() => onPrune(model.value)} className='btn btn-outline-warning'>Prune/Re-train</button> : ''}
+                    {modelsType == 'object_detection' && modelsPrecisions[model.label]["model_type"]== "tao" ? <button onClick={() => onPrune(model.value)} className='btn btn-outline-warning'>Prune/Re-train</button> : ''}
                             <button style={{ marginLeft: 10 }} onClick={() => onDeleteModel(model.value)} className='btn btn-outline-danger'>Delete Model</button>
             </div>
           </Card>

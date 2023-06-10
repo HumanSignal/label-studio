@@ -18,33 +18,36 @@ export const DisplayLogs = () => {
   const [gotLogs, setGotLogs] = useState(false);
   const [selectedModelVersion, setSelectedModelVersion] = useState('');
   const [modelVersions, setModelVersions] = useState([]);
-  const [type, setType] = useState("tao");
+  const [type, setType] = useState("object_detection");
   useEffect(() => {
-    if (project.id) {
+    if (project.id && ! gotLogs) {
       console.log('re-rendering');
-      getLogs();
       getModelVersions();
       }
-    }, [project.id]);
+    if(selectedModelVersion){
+      getLogs(selectedModelVersion);
+    }
+    }, [project.id, selectedModelVersion]);
   async function getModelVersions() {
     await axios.get(webhook_url + '/get_available_model_versions?id=' + project.id)
       .then((response) => {
         setSelectedModelVersion(response.data.current_model_version);
         setModelVersions(response.data.model_versions);
+        setType(response.data.project_type);
+
       });
       
   }
   const handleSelect = (event) => {
     setSelectedModelVersion(event.target.value);
-    getLogs(event.target.value);
   };
-  function getLogs(model_version = null) {
+  function getLogs() {
+        const model_version = selectedModelVersion;
         let url = webhook_url + "/stream?id=" + project.id + (model_version == null? "":"&model_version=" + model_version)
         axios
         .get(url)
           .then((response) => {
             setLogs(response.data.logs);
-            setType(response.data.type);
             var x = document.querySelector(".logs");
             x.innerHTML = ''
               for (var i = 0; i < response.data.logs.length; i++) {
@@ -56,7 +59,6 @@ export const DisplayLogs = () => {
                   'color: white'
                 )
                 x.appendChild(p);
-                console.log(line)
               }
           
             setGotLogs(true);
