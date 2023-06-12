@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5089: Manual security updates",
-  "commit": "1bfd5b89c40faf3726939ca77b2fdeef329ed7a4",
+  "message": "fix: LSDV-5001: Skip comments panel focus",
+  "commit": "a297fe97abdde7764fdd48b78cac441d3090a4a0",
   "branch": "master",
-  "date": "2023/06/07 17:04:54"
+  "date": "2023/06/11 21:11:46"
 }
