@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5001: Skip comments panel focus",
-  "commit": "a297fe97abdde7764fdd48b78cac441d3090a4a0",
+  "message": "chore: LSDV-4983: Consistent feature flags",
+  "commit": "64c2db46bf68b5cb602e2906f720361180cb88ac",
   "branch": "master",
-  "date": "2023/06/11 21:11:46"
+  "date": "2023/06/12 13:39:43"
 }
