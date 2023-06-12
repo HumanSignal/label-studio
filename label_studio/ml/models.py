@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.conf import settings
+from django.db.models import Count, Q
 
 from core.utils.common import safe_float, conditional_atomic, load_func
 
@@ -141,8 +142,8 @@ class MLBackend(models.Model):
                 model_version = setup_response.response.get('model_version')
                 logger.info(f'ML backend responds with success: {setup_response.response}')
                 if self.auto_update:
-                    self.model_version = model_version
                     logger.debug(f'Changing model version: {self.model_version} -> {model_version}')
+                    self.model_version = model_version
                 self.error_message = None
         self.save()
 
@@ -169,6 +170,12 @@ class MLBackend(models.Model):
 
             tasks = Task.objects.filter(id__in=[task.id for task in tasks])
 
+        # Filter tasks that already contain the current model version in predictions
+        tasks = tasks.annotate(predictions_count=Count('predictions')).exclude(
+            Q(predictions_count__gt=0) & Q(predictions__model_version=self.model_version))
+        if not tasks.exists():
+            logger.debug(f'All tasks already have prediction from model version={self.model_version}')
+            return
         tasks_ser = TaskSimpleSerializer(tasks, many=True).data
         ml_api_result = self.api.make_predictions(tasks_ser, self.model_version, self.project)
         if ml_api_result.is_error:
@@ -226,6 +233,7 @@ class MLBackend(models.Model):
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready to predict {task}')
             return
+
         if task.predictions.filter(model_version=self.model_version).exists():
             # prediction already exists
             logger.info(
@@ -300,7 +308,6 @@ class MLBackend(models.Model):
             result['errors'] = ['Incorrect response from ML service: '
                                 'ML backend has to return list with more than 1 result.']
             return result
-
         result['data'] = ml_results[0]
         return result
 

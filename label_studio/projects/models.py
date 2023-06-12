@@ -785,6 +785,10 @@ class Project(ProjectMixin, models.Model):
         else:
             return list(output)
 
+    def get_active_ml_backends(self):
+        from ml.models import MLBackend, MLBackendState
+        return MLBackend.objects.filter(project=self, state=MLBackendState.CONNECTED)
+
     def get_all_storage_objects(self, type_='import'):
         from io_storages.models import get_storage_classes
 
