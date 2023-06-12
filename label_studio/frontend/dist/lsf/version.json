@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5121: User Setting Improvements (#1420)",
-  "commit": "e45dea20b70f7ab001feccfebadd947104bab2ae",
+  "message": "fix: LSDV-5001: Skip comments panel focus (#1379)",
+  "commit": "a297fe97abdde7764fdd48b78cac441d3090a4a0",
   "branch": "master",
-  "date": "2023/06/01 08:59:52"
+  "date": "2023/06/11 21:11:46"
 }
