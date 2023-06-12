@@ -137,9 +137,16 @@ def apply_ordering(queryset, ordering, project, request, view_data=None):
         if field_name.startswith('data__'):
             # annotate task with data field for float/int/bool ordering support
             json_field = field_name.replace('data__', '')
+            numeric_ordering_applied = False
             if numeric_ordering is True:
                 queryset = queryset.annotate(ordering_field=Cast(KeyTextTransform(json_field, 'data'), output_field=FloatField()))
-            else:
+                # for non numeric values we need fallback to string ordering
+                try:
+                    queryset.first()
+                    numeric_ordering_applied = True
+                except Exception as e:
+                    logger.warning(f'Failed to apply numeric ordering for field {json_field}: {e}')
+            if not numeric_ordering_applied:
                 queryset = queryset.annotate(ordering_field=KeyTextTransform(json_field, 'data'))
             f = F('ordering_field').asc(nulls_last=True) if ascending else F('ordering_field').desc(nulls_last=True)
 

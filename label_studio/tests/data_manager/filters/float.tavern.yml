@@ -12,7 +12,8 @@ stages:
   - id: create_project_empty_config
     type: ref
 
-  - name: create_tasks
+  - &create_tasks
+    name: create_tasks
     request:
       files:
         json_file: tests/data_manager/filters/float_tasks.json
@@ -232,4 +233,53 @@ stages:
         }
         ]
       }
+      status_code: 200
+---
+test_name: ordering-unsupported-values
+strict: false
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+
+  - id: signup
+    type: ref
+
+  - id: create_project_empty_config
+    type: ref
+
+  - *create_tasks
+  - name: setup_views
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "columnsDisplayType": {
+            "tasks:data.a": "Number",
+            "tasks:data.b": "Number",
+            "tasks:data.c": "Number",
+            "tasks:data.d": "String",
+            "tasks:data.e": "Number"
+          },
+          "filters": {
+            "conjunction": "and",
+            "items": []
+          },
+          "ordering": [
+            "tasks:data.e"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+  - name: get_tasks
+    request:
+      method: GET
+      url: '{django_live_url}/api/tasks?fields=all&view={view.id}'
+    response:
       status_code: 200
