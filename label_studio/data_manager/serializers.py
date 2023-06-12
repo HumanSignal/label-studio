@@ -125,7 +125,7 @@ class ViewSerializer(serializers.ModelSerializer):
                 self._create_filters(filter_group=filter_group, filters_data=filters_data)
 
                 validated_data["filter_group_id"] = filter_group.id
-            view = View.objects.create(**validated_data)
+            view = self.Meta.model.objects.create(**validated_data)
 
             return view
 

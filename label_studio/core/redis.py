@@ -3,6 +3,7 @@
 from datetime import timedelta
 from functools import partial
 
+import sys
 import redis
 import logging
 import django_rq
@@ -81,6 +82,7 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
     Start job async with redis or sync if redis is not connected
     :param job: Job function
     :param args: Function arguments
+    :param in_seconds: Job will be delayed for in_seconds
     :param kwargs: Function keywords arguments
     :return: Job or function result
     """
@@ -100,7 +102,7 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
         queue = django_rq.get_queue(queue_name)
         enqueue_method = queue.enqueue
         if in_seconds > 0:
-            enqueue_method = partial(queue.enqueue_in, time_delta=timedelta(in_seconds))
+            enqueue_method = partial(queue.enqueue_in, timedelta(seconds=in_seconds))
         job = enqueue_method(
             job,
             *args,
@@ -109,7 +111,14 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
         )
         return job
     else:
-        return job(*args, **kwargs)
+        on_failure = kwargs.pop('on_failure', None)
+        try:
+            return job(*args, **kwargs)
+        except Exception:
+            exc_info = sys.exc_info()
+            if on_failure:
+                on_failure(job, *exc_info)
+            raise e
 
 
 def is_job_in_queue(queue, func_name, meta):

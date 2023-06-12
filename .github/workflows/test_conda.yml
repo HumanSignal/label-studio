@@ -1,0 +1,69 @@
+name: "Conda"
+
+on:
+  workflow_call:
+    inputs:
+      head_sha:
+        required: true
+        type: string
+
+env:
+  NODE: '14'
+  CACHE_NAME_PREFIX: v1
+  PIP_VERSION: "20.2"
+
+jobs:
+  conda:
+    name: Conda
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ "ubuntu-latest", "windows-latest" ]
+        python-version: [ "3.9" ]
+        include:
+          - os: "ubuntu-latest"
+            pip-cache-path: "~/.cache/pip"
+          - os: "windows-latest"
+            pip-cache-path: "~\\AppData\\Local\\pip\\Cache"
+
+    steps:
+      - uses: hmarr/debug-action@v2.1.0
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          ref: ${{ inputs.head_sha }}
+
+      - name: Setup Conda
+        uses: conda-incubator/setup-miniconda@v2.2.0
+        with:
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+          activate-environment: test-environment
+
+      - name: Install dependencies
+        shell: bash -l {0}
+        run: |
+          conda install pip=${{ env.PIP_VERSION }} cython
+
+      - uses: actions/cache@v3
+        name: Configure pip cache
+        id: pip-cache
+        with:
+          path: ${{ matrix.pip-cache-path }}
+          key: Conda-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/requirements-test.txt') }}
+          restore-keys: |
+            Conda-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-pip-${{ matrix.python-version }}-
+
+      - name: Install dependencies
+        run: |
+          pip install -r deploy/requirements-mw.txt
+          pip install -r deploy/requirements.txt
+          pip install -e .
+
+      - name: Conda info
+        shell: bash -el {0}
+        run: |
+          conda info
+          conda list

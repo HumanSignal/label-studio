@@ -47,6 +47,9 @@ To install and start Label Studio at [http://localhost:8080](http://localhost:80
 docker run -it -p 8080:8080 -v $(pwd)/mydata:/label-studio/data heartexlabs/label-studio:latest
 ```
 
+!!! attention "important"
+    As this is a non-root container, the mounted files and directories must have the proper permissions for the `UID 1001`.
+
 ### Install with Docker on Windows
 Or for Windows, you have to modify the volumes paths set by `-v` option.
 

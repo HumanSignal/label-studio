@@ -1,0 +1,65 @@
+name: "Update Feature Flags"
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Ref"
+        required: true
+        type: string
+
+env:
+  LAUNCHDARKLY_DOWNLOAD_PATH: "label_studio/feature_flags.json"
+  FEATURE_FLAGS_COMMIT_MESSAGE: "ci: Update Feature Flags"
+
+jobs:
+  commit-feature-flags:
+    name: "Commit Feature Flags"
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v2.1.0
+
+      - name: Configure git
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          git config --global user.name 'robot-ci-heartex'
+          git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          ref: ${{ inputs.ref }}
+
+      - name: Download feature flags
+        env:
+          LAUNCHDARKLY_COMMUNITY_SDK_KEY: ${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}
+        run: |
+          set -xeuo pipefail
+          curl \
+            --connect-timeout 30 \
+            --retry 5 \
+            --retry-delay 10 \
+            -H "Authorization: $LAUNCHDARKLY_COMMUNITY_SDK_KEY" \
+            "https://sdk.launchdarkly.com/sdk/latest-all" | jq >"${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }}"
+          if [ "$(jq 'has("flags")' <<< cat ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }})" = "true" ]; then 
+            echo "feature_flags.json is valid"
+          else
+            echo "feature_flags.json is invalid"
+            cat ${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }}
+            exit 1
+          fi
+
+      - name: Commit and Push
+        run: |
+          git add "${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }}"
+          git status -s
+          git commit -m '${{ env.FEATURE_FLAGS_COMMIT_MESSAGE }}' || true
+          git push origin HEAD

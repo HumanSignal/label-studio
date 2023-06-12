@@ -36,11 +36,11 @@ Use the following steps to export data and annotations from the Label Studio UI.
 !!! note
     1. The export will always include the annotated tasks, regardless of filters set on the tab. 
     2. Cancelled annotated tasks will be included in the exported result too.
-    3. If you want to apply tab filters to the export, try to use [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-API).
+    3. If you want to apply tab filters to the export, try to use [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-Snapshot-API).
 
 ### Export timeout in Community Edition
 
-If the export times out, see how to [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-API). You can also use a [console command](#Export-using-console-command) to export your project. For more information, see the following section.
+If the export times out, see how to [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-Snapshot-API). You can also use a [console command](#Export-using-console-command) to export your project. For more information, see the following section.
 
 ### Export using console command
 
@@ -110,7 +110,7 @@ Label Studio supports many common and standard formats for exporting completed l
 
 ### ASR_MANIFEST
 
-Export audio transcription labels for automatic speech recognition as the JSON manifest format expected by [NVIDIA NeMo models](https://docs.nvidia.com/deeplearning/nemo/user-guide/docs/en/stable/core/core.html). Supports audio transcription labeling projects that use the `Audio` or `AudioPlus` tags with the `TextArea` tag.
+Export audio transcription labels for automatic speech recognition as the JSON manifest format expected by [NVIDIA NeMo models](https://docs.nvidia.com/deeplearning/nemo/user-guide/docs/en/stable/core/core.html). Supports audio transcription labeling projects that use the `Audio` tag with the `TextArea` tag.
 
 ```json
 {“audio_filepath”: “/path/to/audio.wav”, “text”: “the transcription”, “offset”: 301.75, “duration”: 0.82, “utt”: “utterance_id”, “ctm_utt”: “en_4156”, “side”: “A”}
@@ -311,7 +311,7 @@ Review the full list of JSON properties in the [API documentation](api.html).
 | result.value | Tag-specific value that includes details of the result of labeling the task. The value structure depends on the tag for the label. For more information, see [Explore each tag](/tags). |
 | annotations.completed_by | User ID of the user that created the annotation. Matches the list order of users on the People page on the Label Studio UI. |
 | annotations.was_cancelled | Boolean. Details about whether or not the annotation was skipped, or cancelled. | 
-| drafts | Array of draft annotations. Follows similar format as the annotations array. Included only for tasks exported as a snapshot [from the UI](#Export-snapshots-using-the-UI) or [using the API](#Export-snapshots-using-the-API).
+| drafts | Array of draft annotations. Follows similar format as the annotations array. Included only for tasks exported as a snapshot [from the UI](#Export-snapshots-using-the-UI) or [using the API](#Export-snapshots-using-the-Snapshot-API).
 | predictions | Array of machine learning predictions. Follows the same format as the annotations array, with one additional parameter. |
 | predictions.score | The overall score of the result, based on the probabilistic output, confidence level, or other. | 
 
@@ -388,3 +388,13 @@ First check the network access to your Label Studio instance when you send API r
 1. Check that you have mounted the same disk as your Label Studio instance. Then check your files' existence in Label Studio instance first. 
 
 2. Check `LOCAL_FILES_DOCUMENT_ROOT` environment variable in your Label Studio instance and add it to your accessing data script.
+
+
+#### Question #3: How to modify order of categories for COCO and YOLO exports? 
+
+Labels are sorted in alphabetical order, that is default behavior. If you want to modify that, please add **category** attribute in `<Label>` to modify that behaviour. For example: 
+    
+```xml
+<Label value="abc" category="1" />
+<Label value="def" category="2" />
+```

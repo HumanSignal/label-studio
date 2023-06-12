@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4676: Region corruption MIG (#1230)",
-  "commit": "53d62b133de0d439b9f078e442802df3ce2cb129",
+  "message": "fix: LSDV-5001: Skip comments panel focus",
+  "commit": "a297fe97abdde7764fdd48b78cac441d3090a4a0",
   "branch": "master",
-  "date": "2023-03-10T14:21:12Z"
+  "date": "2023/06/11 21:11:46"
 }

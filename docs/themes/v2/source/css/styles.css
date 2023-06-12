@@ -11,7 +11,7 @@ html {
   --color-orange-30: #FFDAD1;
   --color-orange-10: #FFF3F0;
 
-  --color-yellow-120: #df9750;
+  --color-yellow-120: #de9750;
   --color-yellow-100: #FFB156;
   --color-yellow-90: #FDB515;
   --color-yellow-30: #FFEDD8;
@@ -38,6 +38,9 @@ html {
 
   color: var(--color-gray-900);
   font-family: var(--font-family-secondary);
+}
+
+html.js-enhanced {
   scroll-behavior: smooth;
 }
 
@@ -845,6 +848,27 @@ main {
   display: flex;
 }
 
+.notion-grid {
+  --toc-size: 0px;
+  max-width: 97ch;
+  margin: 0 auto;
+}
+
+.notion-grid .content-markdown {
+  width: calc(100vw - var(--sidebar-size) - var(--toc-size) - calc(2 * var(--page-padding)) - 0px)
+}
+
+@media (max-width: 800px) {
+  .notion-grid .content-markdown {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .notion-grid .content-markdown * {
+    word-break: break-all;
+  }
+}
+
 .make-intense-zoom {
   cursor: url("/images/plus_cursor.png") 25 25, auto;
 }
@@ -863,6 +887,18 @@ main {
   margin-top: 0;
 }
 
+.notion-toc {
+  background-color: var(--color-gray-10);
+  padding: 2em;
+  margin-top: 2em;
+  font-size: 1.25em;
+}
+
+.notion-toc h3 {
+  color: var(--color-gray-600);
+  margin-top: 0;
+}
+
 .toc-list {
   list-style: none;
   margin: 0;
@@ -870,24 +906,38 @@ main {
   font-weight: 500;
 }
 
-.toc-list a {
+.toc .toc-list a,
+.notion-toc .toc-list a,
+.toc-ent-trial a {
   color: var(--color-gray-900);
   text-decoration: none;
   font-size: 0.875rem;
 }
 
-.toc-list a:hover {
+.toc-list a:hover,
+.toc-ent-trial a:hover {
   color: var(--color-main-accent);
 }
 
-.toc-list li + li {
+.toc-list > li + li {
   margin-top: 1em;
+}
+
+.notion-toc .toc-list-child {
+  list-style: none;
+  padding-left: 1em;
 }
 
 @media (max-width: 1150px) {
   .toc {
     display: none;
   }
+}
+
+.toc-ent-trial {
+  margin-top: 1em;
+  padding-top: 1em;
+  border-top: 1px var(--color-gray-900) solid;
 }
 
 /****************************
@@ -981,11 +1031,15 @@ main {
   --color-border: var(--color-gray-200);
   --color-title: var(--color-gray-900);
   --color-title-background: var(--color-gray-200);
-  --color-background: transparent;
+  --color-background: var(--color-gray-10);
 
   border: 1px var(--color-border) solid;
   padding: 1em;
   background-color: var(--color-background);
+}
+
+.content-markdown .admonition + .admonition {
+  margin-top: 2em;
 }
 
 .content-markdown .admonition *:last-child {
@@ -1141,6 +1195,19 @@ main {
 .video-border {
   border: 1px #f1f1f1 solid;
 }
+
+/* Expand on click element used for examples */
+details {
+  padding: 10px 15px;
+  border-radius: 8px;
+  display: block;
+  background: var(--color-gray-50);
+}
+
+details summary {
+  cursor: pointer;
+}
+
 
 /****************************
   Templates
@@ -1813,7 +1880,7 @@ pre code.hljs{display:block;overflow-x:auto;padding:2em 1em}code.hljs{padding:3p
 ****************************/
 
 .page-tier-enterprise {
-  --color-main-accent: var(--color-yellow-90);
+  --color-main-accent: var(--color-yellow-120);
 }
 
 .page-tier-enterprise .page-header {

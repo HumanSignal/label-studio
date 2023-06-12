@@ -24,7 +24,7 @@ _DATA_TYPES = {
     'Table': [dict, str],
     'TimeSeries': [dict, list, str],
     'TimeSeriesChannel': [dict, list, str],
-    'List': [list],
+    'List': [list, str],
     'Choices': [str, list],
     'PolygonLabels': [str, list],
     'Labels': [str, list],
@@ -35,7 +35,8 @@ _DATA_TYPES = {
     'ParagraphLabels': [str, list],
     'RectangleLabels': [str, list],
     'TimeSeriesLabels': [str, list],
-    'Taxonomy': [str, list],
+    'Taxonomy': [str, list, type(None)],
+    'Ranker': [list, str],
 }
 logger = logging.getLogger(__name__)
 
@@ -87,12 +88,6 @@ class TaskValidator:
                                       .format(data_key=data_key, data_value=data_item,
                                               type=type(data_item).__name__, data_type=data_type,
                                               expected_types=[e.__name__ for e in expected_types]))
-
-            if data_type == 'List':
-                for item in data_item:
-                    key = 'text'  # FIXME: read key from config (elementValue from List)
-                    if key not in item:
-                        raise ValidationError('Each item from List must have key "' + key + '"')
 
         return data
 

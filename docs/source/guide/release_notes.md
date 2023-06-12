@@ -1,4 +1,6 @@
 ---
+NOTE: Don't user release_notes.md, it's automatically built from onprem/*.md files on hexo server run!   
+
 title: On-Premise Release Notes for Label Studio Enterprise
 short: On-Premise Release Notes
 type: guide
@@ -12,8 +14,6 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
 
 !!! info 
     The release notes for Label Studio Community Edition is available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
-<br>
-<br>
 
 !!! info 
     The release notes for Label Studio Enterprise Cloud (SaaS) is available <a href="https://heartex.com/changelog">here</a>.
@@ -29,8 +29,129 @@ The migration process can be performed without any downtime. The steps required 
 
 ### Deprecation of the Old Chart
 
-The old chart, heartex/label-studio-enterprise, **has been deprecated**. Support for as many releases as possible will be provided. A notification will be posted in the Release Notes section when this changes. We hope that this revised chart will meet your technical needs. If you have any questions or concerns, please don't hesitate to reach out to us.
+The old chart `heartex/label-studio-enterprise` **has been deprecated**. Support for as many releases as possible will be provided. A notification will be posted in the Release Notes section when this changes. We hope that this revised chart will meet your technical needs. If you have any questions or concerns, please don't hesitate to reach out to us.
 
+
+<a name="245md"></a>
+
+*Apr 10, 2023*
+
+## Label Studio Enterprise 2.4.5
+
+### Improvements
+- Performance optimization for api/projects with task number
+- Storage link resolver in nested task data fields
+
+### Bug Fixes
+- Fixed a problem where filtering by empty or not empty in annotation results and prediction results would not work
+- Start, end and offset of paragraph selection should not include empty or newline 
+- Fixed an issue with regrouping regions after annotations switching
+- Opening video in tasks should not trigger a CORS issue in HEAD response
+- Can't patch tasks when task data has a taxonomy null-values
+- Fix error on duplicating Project with external storage when it wasn't synced
+- Improved filetype playable detection for video sources 
+- Proper unhandled exceptions processing in *_from_request functions. Activity log middleware fix for project id. Warning: Some of 500 errors about validation are 400 errors now.
+- CORS errors on valid audio files occur sometimes when accessed in succession
+- Fix Video Rectangles to display while drawing
+- Fixed import several tasks from one csv file
+
+
+
+<a name="244md"></a>
+
+## Label Studio Enterprise 2.4.4
+### New Feature
+- New parameter skipDuplicates of TextArea allows to keep submissions unique. [LSDV-4659](https://labelstudio.aha.io/features/LSDV-4659)
+
+### Improvement
+- Audio v3 webaudio alternative decoder option [LSDV-4701](https://labelstudio.aha.io/features/LSDV-4701)
+- s3 custom endpoint support for persistent storage [LSDV-4677](https://labelstudio.aha.io/features/LSDV-4677)
+- Table tag ordering items alphabetically [LSDV-4613](https://labelstudio.aha.io/features/LSDV-4613)
+
+### Bug Fixes
+- Fix DM columns visual problems [LSDV-4720](https://labelstudio.aha.io/features/LSDV-4720)
+- Fix column sizes on datamanager [LSDV-4651](https://labelstudio.aha.io/features/LSDV-4651)
+- Hiding an audio region allows selection of regions below. [LSDV-4542](https://labelstudio.aha.io/features/LSDV-4542)
+- Fix Intersection over 1d timeseries spans agreement calculation for Time series [LSDV-4665](https://labelstudio.aha.io/features/LSDV-4665)
+
+- Fixes playback micro-stutters for Video Timeline Segmentation. [LSDV-4706](https://labelstudio.aha.io/features/LSDV-4706)
+- Add error handlers like it is for AudioV1 [LSDV-1023](https://labelstudio.aha.io/features/LSDV-1023)
+- Don't let ghost regions be created [LSDV-4592](https://labelstudio.aha.io/features/LSDV-4592)
+- AttributeError: 'GCSExportStorage' object has no attribute 'links_count' [LSDV-4547](https://labelstudio.aha.io/features/LSDV-4547)
+- Disable file proxy for cloud using FILE_PROXY_ENABLED environment variable [LSDV-4619](https://labelstudio.aha.io/features/LSDV-4619)
+- Audio playback and playhead remain in sync. [LSDV-4572](https://labelstudio.aha.io/features/LSDV-4572)
+
+
+<a name="243md"></a>
+
+## Label Studio Enterprise 2.4.3
+### Improvements
+- Support simultaneous render of multi-channel audio with added splitchannels="true" option on Audio config (larger memory requirement) [LSDV-3028](https://labelstudio.aha.io/features/LSDV-3028)
+- Allow selecting task automatically on Data Manager page whenever the user presses shift+up/down [LSDV-3093](https://labelstudio.aha.io/features/LSDV-3093)
+- Restore locked annotations [LSDV-3062](https://labelstudio.aha.io/features/LSDV-3062)
+- Navigation back to previous tasks in labeling stream is now persistent against page reloads and user labeling sessions [LSDV-3936](https://labelstudio.aha.io/features/LSDV-3936)
+- Add sync update of is_labeled field [LSDV-2981](https://labelstudio.aha.io/features/LSDV-2981)
+- Improved responsiveness for image regions selection [LSDV-3871](https://labelstudio.aha.io/features/LSDV-3871)
+
+### Bug Fixes
+- Fixed bug with presigned TTL setting in cloud storage connection being not persistent [LSDV-2836](https://labelstudio.aha.io/features/LSDV-2836)
+- Slider follows the positional seeker in video when using the step forward or backward buttons. [LSDV-983](https://labelstudio.aha.io/features/LSDV-983)
+- Now it is possible to retrieve the list of uploaded files with `api/projects/<project-id>/file-uploads&all=true` request [LSDV-4614](https://labelstudio.aha.io/features/LSDV-4614)
+- Improved performance for projects page and annotation-related API [LSDV-961](https://labelstudio.aha.io/features/LSDV-961)
+- Setting - Quality - Custom weights: UI too limited [LSDV-4535](https://labelstudio.aha.io/features/LSDV-4535)
+- Wrong xpath in annotation result (remove FF) [LSDV-1376](https://labelstudio.aha.io/features/LSDV-1376)
+- Fixed an issue with missed step of setting password for invited users [LSDV-1530](https://labelstudio.aha.io/features/LSDV-1530)
+- AnnotationReview stats are calculated in 2 separate jobs [LSDV-4632](https://labelstudio.aha.io/features/LSDV-4632)
+- Task data with dicts in array are incorrectly resolved [LSDV-4621](https://labelstudio.aha.io/features/LSDV-4621)
+- Fixed authorization check for roles change [LSDV-3856](https://labelstudio.aha.io/features/LSDV-3856)
+- Prevent persistent Cross-Site Scripting (XSS) in Activity Log [LSDV-3855](https://labelstudio.aha.io/features/LSDV-3855)
+- Fixed issue with saving empty drafts [LSDV-3009](https://labelstudio.aha.io/features/LSDV-3009)
+- Unclear error about unknown tag [LSDV-2556](https://labelstudio.aha.io/features/LSDV-2556)
+- Migration for fixing organization id in activity logs [LSDV-4629](https://labelstudio.aha.io/features/LSDV-4629)
+- The first Audio V3 region created is not added to the undo stack [LSDV-1138](https://labelstudio.aha.io/features/LSDV-1138)
+
+
+<a name="242md"></a>
+
+## Label Studio Enterprise 2.4.2
+### New Feature
+- Labels are not displayed inside the regions [LSDV-1142](https://labelstudio.aha.io/features/LSDV-1142)
+- Add YOLO support for PolygonLabels in export options [LSDV-2973](https://labelstudio.aha.io/features/LSDV-2973)
+
+### Improvement
+- Backend: Update invite url to send user to new password page [LSDV-3029](https://labelstudio.aha.io/features/LSDV-3029)
+- Postpone button is disabled if there is no new comments on label steam [LSDV-2976](https://labelstudio.aha.io/features/LSDV-2976)
+- Rendering performance improvements for large-duration audio [LSDV-3082](https://labelstudio.aha.io/features/LSDV-3082)
+- Variable frame rate for videos using frameRate="$fps" doesn't work [LSDV-3036](https://labelstudio.aha.io/features/LSDV-3036)
+- Display correct docs links in LSE/LS [LSDV-2999](https://labelstudio.aha.io/features/LSDV-2999)
+
+### Bug fixes
+- User can resize bbox as he wants if ImageView is zoomed. [LSDV-1066](https://labelstudio.aha.io/features/LSDV-1066)
+- Fixed issue with keeping zoom position on resize of working area [LSDV-967](https://labelstudio.aha.io/features/LSDV-967)
+- Fix appearance of all the connected labels to region in Details view [LSDV-1050](https://labelstudio.aha.io/features/LSDV-1050)
+- Text and HyperText elements can be added without value and name [LSDV-1037](https://labelstudio.aha.io/features/LSDV-1037)
+- Datetime annotation produces empty payload for the value: {} [LSDV-1015](https://labelstudio.aha.io/features/LSDV-1015)
+- Page breaks on completing audio Annotation (when using large audio files in a ParagraphLabels project) [LSDV-2191](https://labelstudio.aha.io/features/LSDV-2191)
+- In data manager UI, the moving and resize are mixed, resize is not usable [LSDV-1083](https://labelstudio.aha.io/features/LSDV-1083)
+- Postpone mode reverts task back and forces user to create 10 annotations in a row [LSDV-1044](https://labelstudio.aha.io/features/LSDV-1044)
+- Quick View breaks when navigating between annotations [LSDV-1098](https://labelstudio.aha.io/features/LSDV-1098)
+- Video zoom doesn't follow the cursor pointer location [LSDV-1298](https://labelstudio.aha.io/features/LSDV-1298)
+- Task locks missed in postponed / skipped queue [LSDV-960](https://labelstudio.aha.io/features/LSDV-960)
+- Taxonomy titles clash (reappearing bug) [LSDV-1056](https://labelstudio.aha.io/features/LSDV-1056)
+- Administrator can't be removed from project members [LSDV-1167](https://labelstudio.aha.io/features/LSDV-1167)
+- Four digits added at the end of image file_name in outputted COCO jsons   [LSDV-1311](https://labelstudio.aha.io/features/LSDV-1311)
+- Optimize memory and speed during exports [LSDV-1010](https://labelstudio.aha.io/features/LSDV-1010)
+- maxUsages for KeyPointLabels and RectangleLabels doesn't work [LSDV-1322](https://labelstudio.aha.io/features/LSDV-1322)
+- Fixed an issue with backspace hotkey in Audio [LSDV-1148](https://labelstudio.aha.io/features/LSDV-1148)
+- Import jobs are submitted twice (or more) times [LSDV-992](https://labelstudio.aha.io/features/LSDV-992)
+- Details section layout is broken when long named labels are used  [LSDV-1038](https://labelstudio.aha.io/features/LSDV-1038)
+- Second click on label unselects it and creates 'No label' [LSDV-3004](https://labelstudio.aha.io/features/LSDV-3004)
+- Fix missing tasks in Data Manager upon upload [LSDV-1058](https://labelstudio.aha.io/features/LSDV-1058)
+- Region is selected when user drag the region [LSDV-1140](https://labelstudio.aha.io/features/LSDV-1140)
+- Saving model version on Machine Learning settings doesn't work [LSDV-966](https://labelstudio.aha.io/features/LSDV-966)
+
+
+<a name="241md"></a>
 
 ## Label Studio Enterprise 2.4.1
 
@@ -64,6 +185,7 @@ The old chart, heartex/label-studio-enterprise, **has been deprecated**. Support
 - Prevent annotation duplicates when 'Re-queue skipped tasks back to the annotator' parameter is selected [DEV-4228]
 - Add Google project ID to Source/Target GCS form [DEV-4058]
 
+<a name="240md"></a>
 
 ## Label Studio Enterprise 2.4.0
 This section highlights the new features and enhancements, and bug fixes in Label Studio Enterprise 2.4.
@@ -143,83 +265,7 @@ This section highlights the new features and enhancements, and bug fixes in Labe
 - Filtering failed to work for Annotation results [DEV-4060].
 - Returned `400` bad requests on incorrect XML [DEV-3812].
 
-
-### New features and enhancements 
-- The [Comments and Notifications](https://labelstud.io/guide/comments_notifications.html) feature allows you to discuss task issues and other problems during labeling and reviewing processes.
-- The new Audio Player feature provides a new configurable UI that improves the audio labeling efficiency and usability [DEV-2715].
-- Add `updated_at` field to comments API [DEV-3715].
-- Cancel old import jobs when a new one is created [DEV-2075].
-- Support for numpad hotkeys (letter/number keys and keyboard shortcuts) that allows you to label or classify the materials faster in productivity/metrics [DEV-3638].
-- Support for environment files from Vault ca-injector [SRE-380].
-
-
-### Bug Fixes
-- Accept/Reject action does not update `updated_by` field of task [DEV-3259].
-- Fixed the `terms of service` link on sign up page [DEV-3726].
-- Fixed an issue where the notification about annotator's comment in draft was not sent to anyone [DEV-3339].
-- Show/hide toggle on the Outliner worked with all region types [DEV-3742].
-- Used Hotkey for label assignment to selected regions (`rectanglelabels`, `polygonlabels`,`keypoints`, `brushes`, `audio`, `timeseries`, `text`, `html`, `paragraph`, and so on) [DEV-3672].
-- Added boundaries that limited the working area for video regions [DEV-3350].
-- Fixed an issue where CSV exports incorrectly serialized complex data types [DEV-3578].
-- Fixed the **Show labels inside the regions** option to work in the video template [DEV-1852].
-- Fixed import tasks data validation for nested fields with repeater [DEV-3744].
-- Fixed an issue when clicking the **Update** button in Label Stream lead the annotator to the next task [DEV-3773].
-- Comments were associated with the current draft even when the draft was in pending save state [DEV-3733].
-- Comment edited session state was displayed accurately in the updated form. (For example, `Updated 10 minutes ago`)[DEV-3692].
-- Fixed an issue with the **Review** stream performance optimization [DEV-3668].
-- Fixed errors on task switching after notification link [DEV-3802].
-- Fixed an issue where the lack of network connection caused infinite loop of requests [DEV-3780].
-- Resolved an issue for read-only file system (FS) [SRE-348].
-- Fixed an issue where the Google Cloud Storage (GCS) persistent storage was broken [SRE-351].
-- Fixed the issue with spam requests [DEV-3874].
-- Avoided the creation of `pg_trgm` in Postgres if it existed [DEV-3839].
-- Fixed review stream tasks ordering [DEV-3821].
-- Informed users about invalidated control tag names when there was a mismatch between labels in configuration and labels in data [DEV-3779].
-- Fixed CSV export when a few rows did not have the column values [DEV-3764].
-- Unfinished regions were easily detected using the sidebar or outliner so they were completed before the task was submitted [DEV-3693].
-- Changed color when a user changed the label [DEV-3490].
-- Removed `MEDIA_URL` from the uploaded file path [SRE-330].
-- Improved the initialization of annotation configurations to reduce the memory used by complex cases such as the `Repeater` tag [DEV-3754].
-- Set the numbering of the first frame of the video timeline to be consistent  [DEV-2706].
-- Fixed page crashes with enabled **Interactive View All** mode for review [DEV-3867].
-- Added a fix for read-only file structure (FS) [SRE-348].
-- GCS persistent storage was broken [SRE-351].
-- Fixed the issue with data corruption using region manual editing through the **Details** panel [DEV-3835].
-- Fixed the issue with spam requests [DEV-3874].
-- Failed export in CSV: UnicodeEncodeError: `ASCII` codec failed to encode character [DEV-3852].
-- Fixed `update_tasks_counters` call with DM filters [DEV-3814].
-- Review statistics on the dashboard were correct when the feedback loop was enabled, and the reviewing options for the Reviewed counter on Dashboard were counted [DEV-3689].
-- Fixed dashboard-members API with "action=updated" for annotation review [DEV-3789].
-- Improved project duplication speed [DEV-2869].
-- Admin users were not able to access the project activity logs [DEV-3240].
-- Resolved a visual bug affecting overflowing text that passed the sidebar on the right [DEV-3901].
-- Fixed annotation disappears on undo [DEV-2113].
-- Fixed the `showSubmitButton="false"` to work correctly [DEV-3892].
-- Removed WASD (W, A, S, and D represent up, left, down, and right) shortcuts from DM navigation [DEV-3958].
-- Avoided the creation of `pg_trgm` in Postgres if it already existed [DEV-3839].
-- Added test coverage for new project template functionality [DEV-3717].
-- Users were able to pan images if an annotation history item was selected [DEV-3719].
-- Correctly undo actions over the fresh loaded draft with audio [DEV-3917].
-- Fixed label configuration validation for several `Choices` tags in a single view [DEV-4035].
-- Allowed clearing `DateTime` values [DEV-3904].
-- Exported consistency check [DEV-4021].
-- Fixed an issue where the Outliner grouping changed when the task annotations were changed [DEV-3664].
-- Fixed the issue with the inability to change the S3 session token once set. [DEV-1101]
-- Filtered with the specific annotator worked very slowly [DEV-3865].
-- Added validation for project name length in duplicate dialog [DEV-3813].
-- Disabled task counter in **Label** or **Review** stream [DEV-3734].
-- Downloaded storage empty path [DEV-4039].
-- Fixed the broken **Review** stream on the second task using Audio v3 [DEV-3933].
-- SSO failed to work with capitalized emails. Use this environment variable to enable autofix: `ALLOW_FIX_LOWERCASE_USER=true` [DEV-3988].
-- Removed duplicated PDF template [DEV-4094].
-- Supported copying regions in the Outliner [DEV-3646].
-- Fixed an issue with undoing closed polygons by Hotkey [DEV-3896].
-- Time Series truncate signal and triangle marks disappeared [DEV-3748].
-- SCIM was broken and always returned a logout page [DEV-4000].
-- Filtering failed to work for Annotation results [DEV-4060].
-- Returned `400` bad requests on incorrect XML [DEV-3812].
-    
-    
+<a name="231md"></a>
 
 ## Label Studio Enterprise 2.3.1
 This section highlights the breaking changes, new features and enhancements, and bug fixes in Label Studio Enterprise 2.3.1.
@@ -472,8 +518,9 @@ Label Studio 2.3.1 includes the following bug fixes:
 - Updated swagger docs for `AllStorage` APIs [DEV-2914].
 - Added example output for `HyperTextLabels` in the Label Studio documentation suite [DEV-3632].
 
+<a name="22md"></a>
 
-## Label Studio Enterprise 2.2
+## Label Studio Enterprise 2.2 Final
 
 This section highlights the new features and enhancements in Label Studio Enterprise 2.2.
 
@@ -524,7 +571,7 @@ Label Studio Enterprise 2.2 introduces the following new features and enhancemen
     <br>
     <div style="margin:auto; text-align:center;"><img src="/images/lead-time.png" style="opacity: 0.8"/></div>
     <i>Figure 5: Lead Time column in Data Manager. </i>
-
+    
 
 ## Label Studio Enterprise 2.2.10 
 
@@ -542,6 +589,7 @@ Label Studio 2.2.10 includes the following bug fixes:
 - Fixed an issue when the Safari browser stopped working [DEV-2777].
 - Fixed scrollable area in **Review** mode [DEV-2348].
 
+<a name="229md"></a>
 
 ## Label Studio Enterprise 2.2.9
 
@@ -614,6 +662,7 @@ Label Studio 2.2.9 includes the following bug fixes:
 - Fixed synchronization speed between video and audio [DEV-2207].
 - Fixed an issue with prop `whenChoiceValue` [DEV-1833].
 
+<a name="228md"></a>
 
 ## Label Studio Enterprise 2.2.8
 
@@ -623,8 +672,8 @@ This section highlights the breaking changes, new features and enhancements, and
 Label Studio Enterprise 2.2.8 introduces the following new features and enhancements.
 
 - This release displays comments in **DM** to reviewers [DEV-2598].
-- Support for [Redis Secure Sockets Layer (SSL)](security.html#Secure-access-to-Redis-storage) [DEV-1768].
-- Add tags and prefixes to [AWS metric parameters](custom_metric.html#How-to-write-your-custom-agreement-metric) [DEV-1917].
+- Support for [Redis Secure Sockets Layer (SSL)](#Secure-access-to-Redis-storage) [DEV-1768].
+- Add tags and prefixes to [AWS metric parameters](#How-to-write-your-custom-agreement-metric) [DEV-1917].
 - Change review API to take into account feedback loop [DEV-2198].
 - Notification Center [DEV-1658]
 - Add drafts in Annotation History [DEV-2290].

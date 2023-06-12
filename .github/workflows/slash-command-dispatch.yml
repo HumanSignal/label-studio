@@ -50,7 +50,7 @@ jobs:
 
       - name: Edit comment with error message
         if: ${{ steps.determine_command.outputs.command_state == 'unknown' }}
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@v3
         with:
           comment-id: ${{ github.event.comment.id }}
           body: |

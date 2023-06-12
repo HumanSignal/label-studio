@@ -100,11 +100,11 @@ meta_description: Get started with Label Studio by creating projects to label an
     <div class="card">
     <%- partial("component/heading", {text: "Install", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
     <ul class="card-links-list">
-      <li>
+      <li class="opensource-only">
         <%- partial("component/link", { url: "/guide/install.html", label: "Install and Upgrade", size: "Full" }) %>
       </li>
-      <li class="enterprise-only">
-        <%- partial("component/link", { url: "/guide/install_enterprise.html", label: "Install and Deploy", size: "Full" }) %>
+      <li class="opensource-only">
+        <%- partial("component/link", { url: "/guide/install_k8s.html", label: "Kubernetes", size: "Full" }) %>
       </li>
     </ul>
     </div>
@@ -318,14 +318,14 @@ meta_description: Get started with Label Studio by creating projects to label an
           </ul>
     </div>
 
-    <div class="card">
+    <div class="card" class="enterprise-only">
           <%- partial("component/heading", {text: "Install", tag: "h2", size: "XSmall", customClass: "card-title"}) %>
           <ul class="card-links-list">
-            <li class="opensource-only">
-              <%- partial("component/link", { url: "/guide/install.html", label: "Install and Upgrade", size: "Full" }) %>
+            <li>
+              <%- partial("component/link", { url: "/guide/install_enterprise_docker.html", label: "Docker Compose", size: "Full" }) %>
             </li>
-            <li class="enterprise-only">
-              <%- partial("component/link", { url: "/guide/install_enterprise.html", label: "Install and Deploy", size: "Full" }) %>
+            <li>
+              <%- partial("component/link", { url: "/guide/install_enterprise_k8s.html", label: "Kubernetes", size: "Full" }) %>
             </li>
           </ul>
     </div>

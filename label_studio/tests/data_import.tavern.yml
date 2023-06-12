@@ -733,3 +733,75 @@ stages:
     json:
       id: !int '{first_task}'
       is_labeled: true
+---
+test_name: extension_check
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      label_config: <View></View>
+      title: Check consistency of imported data columns
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: stage
+  request:
+    files:
+      file: tests/test_suites/samples/test.wrong_ext
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/import?commit_to_project=false'
+  response:
+    json:
+      validation_errors:
+        non_field_errors:
+          - '.wrong_ext extension is not supported'
+
+    status_code: 400
+---
+test_name: extension_check_empty
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      label_config: <View></View>
+      title: Check consistency of imported data columns
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: stage
+  request:
+    files:
+      file: tests/test_suites/samples/test_file_without_extension
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/import?commit_to_project=false'
+  response:
+    json:
+      validation_errors:
+        non_field_errors:
+          - ' extension is not supported'
+
+    status_code: 400

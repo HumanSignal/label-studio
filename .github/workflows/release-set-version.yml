@@ -1,0 +1,101 @@
+name: "Release: Set version"
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      branch:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'
+        required: true
+        type: string
+      branch:
+        description: 'Branch reference'
+        required: true
+        default: 'develop'
+        type: string
+
+env:
+  PYTHON_VERSION_FILE: "label_studio/__init__.py"
+
+jobs:
+  commit-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: hmarr/debug-action@v2.1.0
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          ref: ${{ inputs.branch }}
+          fetch-depth: 1
+
+      - name: Get GitHub user details
+        id: get-github-user
+        uses: actions/github-script@v6
+        env:
+          ACTOR_USERNAME: ${{ github.event.sender.login }}
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const actor_username = process.env.ACTOR_USERNAME;
+            
+            let user_name = 'robot-ci-heartex';
+            let user_email = 'robot-ci-heartex@users.noreply.github.com';
+            
+            try {
+              const {data: user} = await github.rest.users.getByUsername({
+                username: actor_username,
+              });
+              user_name = user.login;
+              user_email = user.email;
+            } catch (e) {
+              console.log(e)
+            }
+            
+            core.setOutput('user_name', user_name);
+            core.setOutput('user_email', user_email);
+
+      - name: Configure git
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          git config --global user.name '${{ steps.get-github-user.outputs.user_name }}'
+          git config --global user.email '${{ steps.get-github-user.outputs.user_email }}'
+
+      - name: Validate user input
+        id: validate-user-input
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          
+          regexp='^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)[a-zA-Z0-9-]*$'
+          
+          if [[ "${{ inputs.version }}" =~ $regexp ]]; then
+              echo "${{ inputs.version }} does match the regexp ${regexp}"
+          else
+              echo "${{ inputs.version }} does not match the regexp ${regexp}"
+              exit 1
+          fi
+
+      - name: Commit version file
+        id: make-commit
+        run: |
+          set -euo pipefail
+          
+          sed -i "s/^__version__[ ]*=.*/__version__ = '${{ inputs.version }}'/g" ${{ env.PYTHON_VERSION_FILE }}
+          
+          git add ${{ env.PYTHON_VERSION_FILE }}
+          git commit --message "chore: Bump version to ${{ inputs.version }}"
+
+          echo "commit=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          git push origin HEAD:refs/heads/${{ inputs.branch }}

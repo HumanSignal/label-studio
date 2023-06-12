@@ -4,6 +4,7 @@ import pytest
 import types
 from core.utils.common import int_from_request
 from core.utils.params import bool_from_request
+from rest_framework.exceptions import ValidationError
 
 
 @pytest.mark.parametrize('param, result', [
@@ -52,7 +53,7 @@ def test_core_int_from_request(param, result):
         error = False
         try:
             int_from_request(params, 'test', 0)
-        except ValueError:
+        except ValidationError:
             error = True
 
         assert error

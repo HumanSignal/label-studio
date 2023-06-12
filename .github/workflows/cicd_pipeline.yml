@@ -99,12 +99,27 @@ jobs:
       github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.fork == false &&
       needs.changed_files.outputs.frontend == 'true' &&
-      needs.changed_files.outputs.commit-message != 'Build frontend'
+      needs.changed_files.outputs.commit-message != 'ci: Build frontend'
     permissions:
       contents: write
     uses: heartexlabs/label-studio/.github/workflows/frontend-build.yml@develop
     with:
       ref: ${{ github.event.pull_request.head.ref || github.ref }}
+
+#  update-feature-flags:
+#    name: "Build"
+#    needs:
+#      - changed_files
+#    if: |
+#      github.event_name == 'pull_request' &&
+#      github.event.pull_request.head.repo.fork == false &&
+#      needs.changed_files.outputs.commit-message != 'ci: Update Feature Flags'
+#    permissions:
+#      contents: write
+#    uses: heartexlabs/label-studio/.github/workflows/feature-flags-update.yml@develop
+#    with:
+#      ref: ${{ github.event.pull_request.head.ref || github.ref }}
+#    secrets: inherit
 
   build-docker:
     name: "Build"
@@ -139,6 +154,16 @@ jobs:
       - changed_files
     if: needs.changed_files.outputs.src == 'true'
     uses: heartexlabs/label-studio/.github/workflows/test_migrations.yml@develop
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+    secrets: inherit
+
+  conda-test:
+    name: "Tests"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.src == 'true'
+    uses: heartexlabs/label-studio/.github/workflows/test_conda.yml@develop
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
     secrets: inherit
@@ -305,13 +330,14 @@ jobs:
           AHA_RN_FIELD: "release_notes"
           AHA_FETCH_STRATEGY: "TAG"
           AHA_TAG: "LS ${{ steps.create-draft-release.outputs.tag_name }}"
+          AHA_ADDITIONAL_RELEASES_TAG: "oss"
           JIRA_SERVER: "https://heartex.atlassian.net"
           JIRA_USERNAME: "${{ secrets.JIRA_USERNAME }}"
           JIRA_TOKEN: "${{ secrets.JIRA_TOKEN }}"
           JIRA_PROJECT: "DEV"
           JIRA_RN_FIELD: "customfield_10064"
           LAUNCHDARKLY_SDK_KEY: "${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}"
-          LAUNCHDARKLY_ENVIRONMENT:  "community"
+          LAUNCHDARKLY_ENVIRONMENT: "community"
           OUTPUT_FILE_MD: "${{ github.workspace }}/output.md"
           OUTPUT_FILE_JSON: "${{ github.workspace }}/output.json"
           WORKFLOW_RUN_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"

@@ -14,8 +14,8 @@ title_bucket_prefix: &title_bucket_prefix
 gcs_credentials: &gcs_credentials
   - type: password
     name: google_application_credentials
-    label: Google Application Credentials
-    placeholder: Copy and paste here the content of credentials.json
+    label: Google Application Credentials, leave blank to use default credentials (ADC)
+    placeholder: Paste the contents of credentials.json here OR leave blank to use ADC
     autoComplete: "new-password"
     skipAutofill: true
     allowEmpty: false
