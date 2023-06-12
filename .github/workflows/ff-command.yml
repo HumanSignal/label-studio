@@ -49,7 +49,7 @@ jobs:
           PR_HEAD: ${{ github.event.client_payload.pull_request.head.ref }}
         run: |
           reaction='-1'
-          if [[ '${{ needs.update.result }}' == 'success' ]]; then
+          if [[ '${{ needs.update-update-ff.result }}' == 'success' ]]; then
             reaction='+1'
           fi
           echo "reaction=${reaction}" >> $GITHUB_OUTPUT
