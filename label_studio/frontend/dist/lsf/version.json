@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-1666: Fix lock option isn't locking audio regions",
-  "commit": "62d2543251cdc1d04c053697141ab30de1a5339a",
+  "commit": "9717cc03d823f8651c58adf6618c1c72de43409d",
   "branch": "fb-lsdv-1666",
-  "date": "2023/06/12 16:39:01"
+  "date": "2023/06/12 16:42:19"
 }
