@@ -1,15 +1,19 @@
 name: "Update Feature Flags"
 
 on:
+  schedule:
+    - cron: '0 6 * * 1-5'
   workflow_call:
     inputs:
       ref:
+        default: develop
         required: true
         type: string
   workflow_dispatch:
     inputs:
       ref:
         description: "Ref"
+        default: develop
         required: true
         type: string
 
