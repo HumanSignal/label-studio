@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5560: Fix plus and minus hotkeys",
-  "commit": "d34cf03f9e80085857f228c6766ec1f76b0e7770",
-  "branch": "master",
-  "date": "2023/09/28 15:09:56"
+  "message": "ci: TEST",
+  "commit": "260e8ae573e6a0ca8e3039410e4ec92b309334ce",
+  "branch": "fb-ci-test",
+  "date": "2023/06/13 16:44:54"
 }
