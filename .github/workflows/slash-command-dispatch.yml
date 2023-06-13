@@ -7,6 +7,7 @@ env:
   commands_list: |
     help
     frontend
+    ff
     git
 
 jobs:
