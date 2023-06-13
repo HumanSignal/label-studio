@@ -76,6 +76,3 @@ docker-compose.override.yml
 .viminfo
 .bash_history
 
-# if you want to include feature flags - use 
-# git add -f label_studio/feature_flags.json
-label_studio/feature_flags.json
