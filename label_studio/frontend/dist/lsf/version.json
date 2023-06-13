@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5262: Save draft on postpone",
-  "commit": "2d2d044d1bb6bbc33a9bbe65c9155cfda037df1f",
+  "message": "fix: LSDV-4673: Fix drawing with Rect3Point tool in relative coords",
+  "commit": "6a8b37986bc84f8b033a3ae86fd4d951f89f79a1",
   "branch": "master",
-  "date": "2023/06/12 17:06:14"
+  "date": "2023/06/13 16:21:26"
 }
