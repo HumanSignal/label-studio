@@ -166,10 +166,22 @@ jobs:
       contents: write
     secrets: inherit
 
+  update-feature-flags:
+    name: "Update feature flags in release branch"
+    needs:
+      - draft-new-release
+    permissions:
+      contents: write
+    uses: heartexlabs/label-studio/.github/workflows/feature-flags-update.yml@develop
+    with:
+      ref: ${{ needs.draft-new-release.outputs.release_branch }}
+    secrets: inherit
+
   set-version-release-branch:
     name: 'Set version in release branch'
     uses: heartexlabs/label-studio/.github/workflows/release-set-version.yml@develop
     needs:
+      - update-feature-flags
       - draft-new-release
     with:
       version: ${{ needs.draft-new-release.outputs.release_version }}
