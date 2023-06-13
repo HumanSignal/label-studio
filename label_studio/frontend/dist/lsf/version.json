@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4673: Fix drawing with Rect3Point tool in relative coords",
-  "commit": "6a8b37986bc84f8b033a3ae86fd4d951f89f79a1",
-  "branch": "master",
-  "date": "2023/06/13 16:21:26"
+  "message": "fix: LSDV-5260: Selected region can not be moved / resized when it's under another region",
+  "commit": "4bdca75339b7077a52cad12772193c6ea7195fb7",
+  "branch": "fb-lsdv-5260",
+  "date": "2023/06/13 17:08:40"
 }
