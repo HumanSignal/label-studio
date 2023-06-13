@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-155: [FE] Select and export CandidateTasks to a new Project",
-  "commit": "6c32e3745b98f09aad27217c346a0ac486c32cbb",
+  "message": "fix: LSDV-5249: Manual security updates",
+  "commit": "a9539713eac9b61c0647b8a7c5dd22fe44d8bb22",
   "branch": "master",
-  "date": "2023/06/06 09:17:38"
+  "date": "2023/06/07 23:45:34"
 }
