@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5262: Save draft on postpone",
-  "commit": "2d2d044d1bb6bbc33a9bbe65c9155cfda037df1f",
-  "branch": "master",
+  "message": "chore: cherry-pick LSDV-5259 LSDV-5001 into lse-release/2.4.8",
+  "commit": "fd5305e05a94b0af915f3f8dfa9334bed0b1ba09",
+  "branch": "fb-lsdv-5262-5001-lse-248",
   "date": "2023/06/12 17:06:14"
 }
