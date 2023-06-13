@@ -103,16 +103,16 @@ module.exports = {
       {
         test: /\.svg$/,
         use: [{
-            loader: '@svgr/webpack',
-            options: {
-              ref: true,
-              svgo: {
-                plugins: [{
-                  removeViewBox: false
-                }]
-              }
+          loader: '@svgr/webpack',
+          options: {
+            ref: true,
+            svgo: {
+              plugins: [{
+                removeViewBox: false,
+              }],
             },
-          }],
+          },
+        }],
       },
     ],
   },
