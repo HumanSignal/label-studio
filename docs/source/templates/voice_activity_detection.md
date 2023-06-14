@@ -21,7 +21,7 @@ If you want to train a voice activity detection (VAD) model for automating call 
 ```html
 <View>
   <Header value="Listen to the audio:"></Header>
-  <AudioPlus name="audio" value="$url" zoom="true"></AudioPlus>    
+  <Audio name="audio" value="$url" zoom="true"></Audio>    
   <Header value="Highlight segments with sound louder than baseline:"></Header>
   <Labels name="label" toName="audio" choice="multiple">
     <Label value="Above Baseline Sound" background="green" alias="possible-speech"></Label>
@@ -43,9 +43,9 @@ You can add a [header](/tags/header.html) to provide instructions to the annotat
 <Header value="Listen to the audio:"></Header>
 ```
 
-Use the [AudioPlus](/tags/audioplus.html) object tag to specify the location of the audio file to process:
+Use the [Audio](/tags/audio.html) object tag to specify the location of the audio file to process:
 ```xml
-<AudioPlus name="audio" value="$url"></AudioPlus>
+<Audio name="audio" value="$url"></Audio>
 ```
 
 Use the [Labels](/tags/labels.html) control tag to allow annotators to segment the audio and identify possible spots where speech might be present. 
@@ -68,7 +68,7 @@ The `choice="multiple"` parameter allows annotators to select both "Speech" and 
 
 ## Related tags
 - [Header](/tags/header.html)
-- [AudioPlus](/tags/audioplus.html)
+- [Audio](/tags/audio.html)
 - [Labels](/tags/labels.html)
 - [Choices](/tags/choices.html)
 

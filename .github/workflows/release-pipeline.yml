@@ -64,7 +64,7 @@ jobs:
     steps:
       - uses: hmarr/debug-action@v2.1.0
 
-      - name: DispatchEvent
+      - name: Delete Release Candidate Assets
         uses: actions/github-script@v6
         env:
           RELEASE_ID: "${{ github.event.release.id }}"
@@ -73,7 +73,7 @@ jobs:
           script: |
             const { repo, owner } = context.repo;
             const release_id = process.env.RELEASE_ID;
-            const rc_regexp = /label-studio-\d+.\d+.\d+rc\d+/;
+            const rc_regexp = /label[-_]studio-\d+.\d+.\d+rc\d+/;
             const {data: release} = await github.rest.repos.getRelease({
               owner,
               repo,
@@ -110,7 +110,18 @@ jobs:
               event_type: 'upstream_formula_update',
               client_payload: {
                 formula: 'label-studio',
+                version: '${{ github.ref_name }}',
+                actor: '${{ github.actor }}',
                 url: '${{ needs.build-pypi.outputs.pipy-artifact-url }}',
                 sha256: '${{ needs.build-pypi.outputs.pipy-artifact-digests-sha256 }}',
               }
             });
+
+  update-helm-chart:
+    name: "Update Helm Chart"
+    needs:
+      - promote_docker_image
+    uses: heartexlabs/label-studio/.github/workflows/bump-helm-chart.yml@develop
+    with:
+      docker_image_version: ${{ github.ref_name }}
+    secrets: inherit

@@ -13,8 +13,8 @@ from annoying.fields import AutoOneToOneField
 
 from data_manager.managers import TaskQuerySet
 from projects.functions.utils import make_queryset_from_iterable
-from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks
-from core.utils.common import create_hash, get_attr_or_item, load_func
+from tasks.models import Task, Prediction, Annotation, AnnotationDraft, Q_task_finished_annotations, bulk_update_stats_project_tasks
+from core.utils.common import create_hash, get_attr_or_item, load_func, merge_labels_counters
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.label_config import (
     validate_label_config,
@@ -260,6 +260,10 @@ class Project(ProjectMixin, models.Model):
         return Annotation.objects.filter(project=self).count()
 
     @property
+    def num_drafts(self):
+        return AnnotationDraft.objects.filter(task__project=self).count()
+
+    @property
     def has_predictions(self):
         return self.get_current_predictions().exists()
 
@@ -490,9 +494,9 @@ class Project(ProjectMixin, models.Model):
                 f'These fields are not present in the data: {",".join(different_fields)}'
             )'''
 
-        if self.num_annotations == 0:
+        if self.num_annotations == 0 and self.num_drafts == 0:
             logger.debug(
-                f'Project {self} has no annotations: nothing to validate here. '
+                f'Project {self} has no annotations and drafts: nothing to validate here. '
                 f'Ensure annotations-related project summary is empty'
             )
             self.summary.reset(tasks_data_based=False)
@@ -527,7 +531,7 @@ class Project(ProjectMixin, models.Model):
 
         # validate labels consistency
         labels_from_config, dynamic_label_from_config = get_all_labels(config_string)
-        created_labels = self.summary.created_labels
+        created_labels = merge_labels_counters(self.summary.created_labels, self.summary.created_labels_drafts)
         for control_tag_from_data, labels_from_data in created_labels.items():
             # Check if labels created in annotations, and their control tag has been removed
             if labels_from_data and ((control_tag_from_data not in labels_from_config) and (
@@ -556,7 +560,7 @@ class Project(ProjectMixin, models.Model):
                         (not check_control_in_config_by_regex(config_string, control_tag_from_data, filter=dynamic_label_from_config.keys()))):
                     # raise error if labels not dynamic and not in regex rules
                     raise LabelStudioValidationErrorSentryIgnored(
-                        f'These labels still exist in annotations:\n{diff_str}.'
+                        f'These labels still exist in annotations or drafts:\n{diff_str}.'
                         f'Please add labels to tag with name="{str(control_tag_from_data)}".')
                 else:
                     logger.info(f'project_id={self.id} inconsistent labels in config and annotations: {diff_str}')
@@ -625,7 +629,7 @@ class Project(ProjectMixin, models.Model):
             # Ensure project.summary is consistent with current tasks / annotations
             if self.num_tasks == 0:
                 self.summary.reset()
-            elif self.num_annotations == 0:
+            elif self.num_annotations == 0 and self.num_drafts == 0:
                 self.summary.reset(tasks_data_based=False)
 
     def get_member_ids(self):
@@ -969,6 +973,7 @@ class ProjectSummary(models.Model):
     )  # noqa
     # { from_name: {label1: task_count_with_label1, label2: task_count_with_label2} }
     created_labels = JSONField(_('created labels'), null=True, default=dict, help_text='Unique labels')
+    created_labels_drafts = JSONField(_('created labels in drafts'), null=True, default=dict, help_text='Unique drafts labels')
 
     def has_permission(self, user):
         user.project = self.project  # link for activity log
@@ -980,6 +985,7 @@ class ProjectSummary(models.Model):
             self.common_data_columns = []
         self.created_annotations = {}
         self.created_labels = {}
+        self.created_labels_drafts = {}
         self.save()
 
     def update_data_columns(self, tasks):
@@ -1126,3 +1132,85 @@ class ProjectSummary(models.Model):
         self.created_annotations = created_annotations
         self.created_labels = labels
         self.save(update_fields=['created_annotations', 'created_labels'])
+
+    def update_created_labels_drafts(self, drafts):
+        labels = dict(self.created_labels_drafts)
+        for draft in drafts:
+            results = get_attr_or_item(draft, 'result') or []
+            if not isinstance(results, list):
+                continue
+
+            for result in results:
+                if 'from_name' not in result:
+                    continue
+                from_name = result['from_name']
+
+                # aggregate labels
+                if from_name not in self.created_labels_drafts:
+                    labels[from_name] = dict()
+
+                for label in self._get_labels(result):
+                    labels[from_name][label] = labels[from_name].get(label, 0) + 1
+
+        logger.debug(f'summary.created_labels = {labels}')
+        self.created_labels_drafts = labels
+        self.save(update_fields=['created_labels_drafts'])
+
+    def remove_created_drafts_and_labels(self, drafts):
+        labels = dict(self.created_labels_drafts)
+        for draft in drafts:
+            results = get_attr_or_item(draft, 'result') or []
+            if not isinstance(results, list):
+                continue
+
+            for result in results:
+                # reduce labels counters
+                from_name = result.get('from_name', None)
+                if from_name not in labels:
+                    continue
+                for label in self._get_labels(result):
+                    label = str(label)
+                    if label in labels[from_name]:
+                        labels[from_name][label] -= 1
+                        if labels[from_name][label] == 0:
+                            labels[from_name].pop(label)
+                if not labels[from_name]:
+                    labels.pop(from_name)
+        logger.debug(f'summary.created_labels = {labels}')
+        self.created_labels_drafts = labels
+        self.save(update_fields=['created_labels_drafts'])
+
+
+class ProjectImport(models.Model):
+    class Status(models.TextChoices):
+        CREATED = 'created', _('Created')
+        IN_PROGRESS = 'in_progress', _('In progress')
+        FAILED = 'failed', _('Failed')
+        COMPLETED = 'completed', _('Completed')
+
+    project = models.ForeignKey(
+        'projects.Project', null=True, related_name='imports', on_delete=models.CASCADE
+    )
+    preannotated_from_fields = models.JSONField(null=True, blank=True)
+    commit_to_project = models.BooleanField(default=False)
+    return_task_ids = models.BooleanField(default=False)
+    status = models.CharField(max_length=64, choices=Status.choices, default=Status.CREATED)
+    url = models.CharField(max_length=2048, null=True, blank=True)
+    traceback = models.TextField(null=True, blank=True)
+    error = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(_('created at'), null=True, auto_now_add=True, help_text='Creation time')
+    updated_at = models.DateTimeField(_('updated at'), null=True, auto_now_add=True, help_text='Updated time')
+    finished_at = models.DateTimeField(_('finished at'), help_text='Complete or fail time', null=True, default=None)
+    task_count = models.IntegerField(default=0)
+    annotation_count = models.IntegerField(default=0)
+    prediction_count = models.IntegerField(default=0)
+    duration = models.IntegerField(default=0)
+    file_upload_ids = models.JSONField(default=list)
+    could_be_tasks_list = models.BooleanField(default=False)
+    found_formats = models.JSONField(default=list)
+    data_columns = models.JSONField(default=list)
+    tasks = models.JSONField(blank=True, null=True)
+    task_ids = models.JSONField(default=list)
+
+    def has_permission(self, user):
+        return self.project.has_permission(user)

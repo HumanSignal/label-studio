@@ -9,7 +9,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.client_payload.branch_name }}
 
 env:
-  NODE: 14
+  NODE: 18
   CACHE_NAME_PREFIX: v1
   STATIC_DIST: 'label_studio/frontend/dist'
   RELEASE_BRANCH_PREFIX: "ls-release/"
@@ -45,7 +45,7 @@ jobs:
             const release_branch_prefix = process.env.RELEASE_BRANCH_PREFIX;
             
             let base_name = default_branch;
-            if (branch_name.startsWith(release_branch_prefix)) {
+            if (base_branch_name.startsWith(release_branch_prefix)) {
               base_name = base_branch_name;
             }
             core.setOutput('base_name', base_name);
@@ -93,7 +93,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GIT_PAT }}
-          fetch-depth: 1
+          fetch-depth: 0
           ref: ${{ steps.get-branch.outputs.name }}
 
       - name: Checkout module
@@ -161,11 +161,13 @@ jobs:
 
       - name: "LSF Docs: Install NPM deps"
         if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
-        working-directory: tmp/scripts
-        run: npm install jsdoc-to-markdown node-fetch
+        continue-on-error: true
+        run: npm install -g jsdoc-to-markdown node-fetch
 
       - name: "LSF Docs: Build"
+        id: lsf-docs-build
         if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+        continue-on-error: true
         working-directory: tmp/scripts
         run: node create-docs.js
 
@@ -193,25 +195,27 @@ jobs:
           git push origin HEAD
 
       - name: "LSF Docs: Commit"
-        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend' && steps.lsf-docs-build.conclusion == 'success'
         continue-on-error: true
         run: |
           set -xeuo pipefail
           docs_target_dir='${{ env.DOCS_TARGET_DIR }}'
+          find "${docs_target_dir}" ! -name 'index.md' -type f -exec rm -rf {} +
           mkdir -p "${docs_target_dir}"
           cp -Rf tmp/docs/* "${docs_target_dir}"
           git status
           git add "${docs_target_dir}"
-          git commit -m 'docs: LSF Update'
+          git commit -m 'docs: LSF Update' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin HEAD
 
-      - name: Merge develop
+      - name: Merge base branch
         shell: bash
         continue-on-error: true
         run: |
           set -xeuo pipefail
+          
           branch='${{ steps.get-branch.outputs.name }}'
-          base_branch='${{ steps.get-branch.outputs.base_name }}'
+          base_branch='origin/${{ steps.get-branch.outputs.base_name }}'
           
           lsf_path='label_studio/frontend/dist/lsf/'
           dm_path='label_studio/frontend/dist/dm/'

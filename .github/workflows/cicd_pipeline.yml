@@ -106,21 +106,6 @@ jobs:
     with:
       ref: ${{ github.event.pull_request.head.ref || github.ref }}
 
-  update-feature-flags:
-    name: "Build"
-    needs:
-      - changed_files
-    if: |
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.head.repo.fork == false &&
-      needs.changed_files.outputs.commit-message != 'ci: Update Feature Flags'
-    permissions:
-      contents: write
-    uses: heartexlabs/label-studio/.github/workflows/feature-flags-update.yml@develop
-    with:
-      ref: ${{ github.event.pull_request.head.ref || github.ref }}
-    secrets: inherit
-
   build-docker:
     name: "Build"
     needs:
@@ -154,6 +139,16 @@ jobs:
       - changed_files
     if: needs.changed_files.outputs.src == 'true'
     uses: heartexlabs/label-studio/.github/workflows/test_migrations.yml@develop
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+    secrets: inherit
+
+  conda-test:
+    name: "Tests"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.src == 'true'
+    uses: heartexlabs/label-studio/.github/workflows/test_conda.yml@develop
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
     secrets: inherit

@@ -4,7 +4,12 @@ title = "LS"
 useDefault = true
 
 [allowlist]
+description = "Global allow list"
 stopwords = [
     '''keyEntities''',
     '''shiftKey''',
+]
+paths = [
+    '''gitleaks\.toml''',
+    '''label_studio\/feature_flags\.json'''
 ]

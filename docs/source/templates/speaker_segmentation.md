@@ -24,7 +24,7 @@ When preparing audio transcripts or training a machine learning model to differe
     <Label value="Speaker one" background="#00FF00"/>
     <Label value="Speaker two" background="#12ad59"/>
   </Labels>
-  <AudioPlus name="audio" value="$audio" />
+  <Audio name="audio" value="$audio" />
 </View>
 ```
 
@@ -40,13 +40,13 @@ Use the [Labels](/tags/labels.html) control tag to allow annotators to highlight
 </Labels>
 ```
 
-Use the [AudioPlus](/tags/audioplus.html) object tag to display a waveform of audio and allow annotators to change the speed of the audio playback:
+Use the [Audio](/tags/audio.html) object tag to display a waveform of audio and allow annotators to change the speed of the audio playback:
 ```xml
-<AudioPlus name="audio" value="$audio" />
+<Audio name="audio" value="$audio" />
 ```
 
 ## Related tags
 
 - [Labels](/tags/labels.html)
-- [AudioPlus](/tags/audioplus.html)
+- [Audio](/tags/audio.html)
 

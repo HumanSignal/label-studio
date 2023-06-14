@@ -16,7 +16,8 @@ Select the best option for your deployment:
 - Ingress for Amazon Elastic Kubernetes Service (EKS)
 - Ingress for Google Kubernetes Engine (GKE)
 - Ingress for Microsoft Azure Kubernetes Service (AKS)
-- Ingress using nginx
+- Ingress using nginx (cloud-agnostic)
+- Terminate TLS on the Load Balancer (cloud-agnostic)
 
 Configure ingress before or after setting up [persistent storage](persistent_storage.html), but before you deploy Label Studio.
 
@@ -117,4 +118,15 @@ app:
       - secretName: <CERTIFICATE_NAME>
         hosts:
           - "your_domain_name"
+```
+
+## Terminate TLS on the Load Balancer
+
+If SSL termination is happening on a Load Balancer before traffic is forwarded to the Ingress, you'll need to set the LABEL_STUDIO_HOST environment variable.
+
+Update your `ls-values.yaml` file with the LABEL_STUDIO_HOST environment variable like the following example. Replace `"your_domain_name"` with your hostname.
+```yaml
+global:
+  extraEnvironmentVars:
+    LABEL_STUDIO_HOST: https://your_domain_name
 ```

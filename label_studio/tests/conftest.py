@@ -2,6 +2,7 @@
 """
 import os
 import pytest
+import mock
 import ujson as json
 import requests_mock
 import re
@@ -10,6 +11,7 @@ import logging
 import shutil
 import tempfile
 
+from unittest import mock
 from moto import mock_s3
 from copy import deepcopy
 from pathlib import Path
@@ -106,6 +108,20 @@ def s3_with_images(s3):
     yield s3
 
 
+def s3_remove_bucket():
+    """
+    Remove pytest-s3-images
+    """
+    bucket_name = 'pytest-s3-images'
+    _s3 = boto3.client('s3', region_name='us-east-1')
+    _s3.delete_object(Bucket=bucket_name, Key='image1.jpg')
+    _s3.delete_object(Bucket=bucket_name, Key='subdir/image1.jpg')
+    _s3.delete_object(Bucket=bucket_name, Key='subdir/image2.jpg')
+    _s3.delete_object(Bucket=bucket_name, Key='subdir/another/image2.jpg')
+    _s3.delete_bucket(Bucket=bucket_name)
+    return ""
+
+
 @pytest.fixture(autouse=True)
 def s3_with_jsons(s3):
     bucket_name = 'pytest-s3-jsons'
@@ -136,6 +152,65 @@ def s3_with_unexisted_links(s3):
 def s3_export_bucket(s3):
     bucket_name = 'pytest-export-s3-bucket'
     s3.create_bucket(Bucket=bucket_name)
+    yield s3
+
+
+@pytest.fixture(autouse=True)
+def s3_export_bucket_sse(s3):
+    bucket_name = 'pytest-export-s3-bucket-with-sse'
+    s3.create_bucket(Bucket=bucket_name)
+
+    # Set the bucket policy
+    policy = {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:PutObject",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket_name}",
+                    f"arn:aws:s3:::{bucket_name}/*"
+                ],
+                "Condition": {
+                    "StringNotEquals": {
+                        "s3:x-amz-server-side-encryption": "AES256"
+                    }
+                }
+            },
+            {
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:PutObject",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket_name}",
+                    f"arn:aws:s3:::{bucket_name}/*"
+                ],
+                "Condition": {
+                    "Null": {
+                        "s3:x-amz-server-side-encryption": "true"
+                    }
+                }
+            },
+            {
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:*",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket_name}",
+                    f"arn:aws:s3:::{bucket_name}/*"
+                ],
+                "Condition": {
+                    "Bool": {
+                        "aws:SecureTransport": "false"
+                    }
+                }
+            }
+        ]
+    }
+
+    s3.put_bucket_policy(Bucket=bucket_name, Policy=json.dumps(policy))
+
     yield s3
 
 
@@ -412,6 +487,39 @@ def get_server_url(live_server):
     yield live_server.url
 
 
+@pytest.fixture(name="async_import_off", autouse=True)
+def async_import_off():
+    from core.feature_flags import flag_set
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'fflag_feat_all_lsdv_4915_async_task_import_13042023_short':
+            return False
+        return flag_set(*args, **kwargs)
+    with mock.patch('data_import.api.flag_set', wraps=fake_flag_set):
+        yield
+
+
+@pytest.fixture(name="fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on")
+def fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on():
+    from core.feature_flags import flag_set
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short':
+            return True
+        return flag_set(*args, **kwargs)
+    with mock.patch('tasks.models.flag_set', wraps=fake_flag_set):
+        yield
+
+
+@pytest.fixture(name="fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off")
+def fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off():
+    from core.feature_flags import flag_set
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short':
+            return False
+        return flag_set(*args, **kwargs)
+    with mock.patch('tasks.models.flag_set', wraps=fake_flag_set):
+        yield
+
+
 @pytest.fixture(name="local_files_storage")
 def local_files_storage(settings):
     settings.LOCAL_FILES_SERVING_ENABLED = True
@@ -437,5 +545,6 @@ def local_files_document_root_subdir(settings):
 
 @pytest.fixture(name="testing_session_timeouts")
 def set_testing_session_timeouts(settings):
+    # TODO: functional tests should not rely on exact timings
     settings.MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(seconds=5).total_seconds()))
     settings.MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(seconds=2).total_seconds()))

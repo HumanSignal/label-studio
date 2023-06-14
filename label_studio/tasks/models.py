@@ -234,6 +234,16 @@ class Task(TaskMixin, models.Model):
             return filename.replace(settings.MEDIA_URL, '')
         return filename
 
+    def resolve_storage_uri(self, url, project):
+        storage = self.storage
+
+        if not storage:
+            storage_objects = project.get_all_storage_objects(type_='import')
+            storage = self._get_storage_by_url(url, storage_objects)
+
+        if storage:
+            return { "url": storage.generate_http_url(url), "presign_ttl": storage.presign_ttl }
+
     def resolve_uri(self, task_data, project):
         if project.task_data_login and project.task_data_password:
             protected_data = {}
@@ -273,7 +283,11 @@ class Task(TaskMixin, models.Model):
                 storage = self.storage or self._get_storage_by_url(task_data[field], storage_objects)
                 if storage:
                     try:
-                        resolved_uri = storage.resolve_uri(task_data[field])
+                        proxy_task = None
+                        if flag_set('fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short', user='auto'):
+                            proxy_task = self
+
+                        resolved_uri = storage.resolve_uri(task_data[field], proxy_task)
                     except Exception as exc:
                         logger.debug(exc, exc_info=True)
                         resolved_uri = None
@@ -412,6 +426,7 @@ class Annotation(models.Model):
     ground_truth = models.BooleanField(_('ground_truth'), default=False, help_text='This annotation is a Ground Truth (ground_truth)')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last updated time')
+    draft_created_at = models.DateTimeField(_('draft created at'), null=True, default=None, help_text='Draft creation time')
     lead_time = models.FloatField(_('lead time'), null=True, default=None, help_text='How much time it took to annotate the task')
     prediction = JSONField(
         _('prediction'),
@@ -576,6 +591,20 @@ class AnnotationDraft(models.Model):
     def has_permission(self, user):
         user.project = self.task.project  # link for activity log
         return self.task.project.has_permission(user)
+
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            project = self.task.project
+            if hasattr(project, 'summary'):
+                project.summary.update_created_labels_drafts([self])
+
+    def delete(self, *args, **kwargs):
+        with transaction.atomic():
+            project = self.task.project
+            if hasattr(project, 'summary'):
+                project.summary.remove_created_drafts_and_labels([self])
+            super().delete(*args, **kwargs)
 
 
 class Prediction(models.Model):

@@ -105,6 +105,12 @@ class Organization(OrganizationMixin, models.Model):
             om.save()
 
             return om    
+
+    def remove_user(self, user):
+        OrganizationMember.objects.filter(user=user, organization=self).delete()
+        if user.active_organization_id == self.id:
+            user.active_organization = user.organizations.first()
+            user.save(update_fields=['active_organization'])
     
     def reset_token(self):
         self.token = create_hash()

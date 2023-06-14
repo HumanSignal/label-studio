@@ -1,9 +1,11 @@
 import re
 import logging
-import google.cloud.storage as gcs
+from json import JSONDecodeError
+
 import json
 import base64
 import google.auth
+import google.cloud.storage as gcs
 
 from enum import Enum
 from urllib.parse import urlparse
@@ -11,7 +13,7 @@ from datetime import timedelta
 from typing import Union
 from google.oauth2 import service_account
 from google.auth.exceptions import DefaultCredentialsError
-
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +22,7 @@ Base64 = bytes
 
 class GCS(object):
     _client_cache = {}
-    _credentials_cache = {}
+    _credentials_cache = None
     DEFAULT_GOOGLE_PROJECT_ID = gcs.client._marker
 
     class ConvertBlobTo(Enum):
@@ -41,25 +43,34 @@ class GCS(object):
         :return:
         """
         google_project_id = google_project_id or GCS.DEFAULT_GOOGLE_PROJECT_ID
-        if google_application_credentials:
-            cache_key = google_application_credentials
-            if cache_key in GCS._client_cache:
-                return GCS._client_cache[cache_key]
-            if isinstance(google_application_credentials, str):
-                google_application_credentials = json.loads(google_application_credentials)
-            credentials = service_account.Credentials.from_service_account_info(google_application_credentials)
-            client = gcs.Client(project=google_project_id, credentials=credentials)
-            GCS._client_cache[cache_key] = client
-            return client
+        cache_key = google_application_credentials
 
-        return gcs.Client(project=google_project_id)
+        if cache_key not in GCS._client_cache:
+
+            # use credentials from LS Cloud Storage settings
+            if google_application_credentials:
+                if isinstance(google_application_credentials, str):
+                    try:
+                        google_application_credentials = json.loads(google_application_credentials)
+                    except JSONDecodeError as e:
+                        # change JSON error to human-readable format
+                        raise ValueError(f'Google Application Credentials must be valid JSON string. {e}')
+                credentials = service_account.Credentials.from_service_account_info(google_application_credentials)
+                GCS._client_cache[cache_key] = gcs.Client(project=google_project_id, credentials=credentials)
+
+            # use Google Application Default Credentials (ADC)
+            else:
+                GCS._client_cache[cache_key] = gcs.Client(project=google_project_id)
+
+        return GCS._client_cache[cache_key]
 
     @classmethod
     def validate_connection(
         cls,
         bucket_name: str,
         google_project_id: str = None,
-        google_application_credentials: Union[str, dict] = None
+        google_application_credentials: Union[str, dict] = None,
+        prefix: str = None
     ):
         logger.debug('Validating GCS connection')
         client = cls.get_client(
@@ -67,7 +78,12 @@ class GCS(object):
             google_project_id=google_project_id
         )
         logger.debug('Validating GCS bucket')
-        client.get_bucket(bucket_name)
+        bucket = client.get_bucket(bucket_name)
+
+        if prefix:
+            blobs = list(bucket.list_blobs(prefix=prefix, max_results=1))
+            if not blobs:
+                raise ValueError(f"No blobs found in {bucket_name}/{prefix} or prefix doesn't exist")
 
     @classmethod
     def iter_blobs(
@@ -110,25 +126,34 @@ class GCS(object):
                 break
 
     @classmethod
-    def _get_signing_kwargs(cls, google_application_credentials):
+    def _get_default_credentials(cls):
+        """ Get default GCS credentials for LS Cloud Storages
+        """
+        # TODO: remove this func with fflag_fix_back_lsdv_4902_force_google_adc_16052023_short
         try:
-            cache_key = google_application_credentials
-            credentials = GCS._credentials_cache.get(cache_key)
-            if credentials is None or credentials.expired:
+            # check if GCS._credentials_cache is None, we don't want to try getting default credentials again
+            credentials = GCS._credentials_cache.get('credentials') if GCS._credentials_cache else None
+            if GCS._credentials_cache is None or (credentials and credentials.expired):
+                # try to get credentials from the current environment
                 credentials, _ = google.auth.default(['https://www.googleapis.com/auth/cloud-platform'])
+                # apply & refresh credentials
                 auth_req = google.auth.transport.requests.Request()
                 credentials.refresh(auth_req)
-                GCS._credentials_cache[cache_key] = credentials
-            out = {
-                "service_account_email": credentials.service_account_email,
-                "access_token": credentials.token,
-                "credentials": credentials
-            }
+                # set cache
+                GCS._credentials_cache = {
+                    "service_account_email": credentials.service_account_email,
+                    "access_token": credentials.token,
+                    "credentials": credentials
+                }
+
         except DefaultCredentialsError as exc:
-            logger.error(f"Label studio couldn't load default GCS credentials from env. {exc}",
-                         exc_info=True)
-            out = {}
-        return out
+            logger.warning(
+                f"Label studio could not load default GCS credentials from env. {exc}",
+                exc_info=True
+            )
+            GCS._credentials_cache = {}
+
+        return GCS._credentials_cache
 
     @classmethod
     def generate_http_url(
@@ -149,15 +174,13 @@ class GCS(object):
         r = urlparse(url, allow_fragments=False)
         bucket_name = r.netloc
         blob_name = r.path.lstrip('/')
+
         """Generates a v4 signed URL for downloading a blob.
 
         Note that this method requires a service account key file. You can not use
         this if you are using Application Default Credentials from Google Compute
         Engine or from the Google Cloud SDK.
         """
-        # bucket_name = 'your-bucket-name'
-        # blob_name = 'your-object-name'
-
         client = cls.get_client(
             google_application_credentials=google_application_credentials,
             google_project_id=google_project_id
@@ -165,13 +188,21 @@ class GCS(object):
         bucket = client.get_bucket(bucket_name)
         blob = bucket.blob(blob_name)
 
+        # this flag should be OFF, maybe we need to enable it for 1-2 customers, we have to check it
+        if settings.GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS:
+            # google_application_credentials has higher priority,
+            # use Application Default Credentials (ADC) when google_application_credentials is empty only
+            kwargs = {} if google_application_credentials else cls._get_default_credentials()
+        else:
+            kwargs = {}
+
         url = blob.generate_signed_url(
             version="v4",
             # This URL is valid for 15 minutes
             expiration=timedelta(minutes=presign_ttl),
             # Allow GET requests using this URL.
             method="GET",
-            **cls._get_signing_kwargs(google_application_credentials)
+            **kwargs
         )
 
         logger.debug('Generated GCS signed url: ' + url)
@@ -219,7 +250,7 @@ class GCS(object):
             json_data = cls._try_read_json(blob_str)
             if not isinstance(json_data, dict):
                 raise ValueError(
-                    f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
+                    f"Error on key {key}: For {cls.__name__} your JSON file must be a dictionary with one task.")  # noqa
             return json_data
         elif convert_to == cls.ConvertBlobTo.BASE64:
             return base64.b64encode(blob_str)
@@ -229,3 +260,31 @@ class GCS(object):
     @classmethod
     def read_base64(cls, f: gcs.Blob) -> Base64:
         return base64.b64encode(f.download_as_bytes())
+
+    @classmethod
+    def get_blob_metadata(cls,
+                          url: str,
+                          google_application_credentials: Union[str, dict] = None,
+                          google_project_id: str = None,
+                          properties_name: list = []) -> dict:
+        """
+        Gets object metadata like size and updated date from GCS in dict format
+        :param url: input URI
+        :param google_application_credentials:
+        :param google_project_id:
+        :return: Object metadata dict("name": "value")
+        """
+        r = urlparse(url, allow_fragments=False)
+        bucket_name = r.netloc
+        blob_name = r.path.lstrip('/')
+
+        client = cls.get_client(
+            google_application_credentials=google_application_credentials,
+            google_project_id=google_project_id
+        )
+        bucket = client.get_bucket(bucket_name)
+        # Get blob instead of Blob() is used to make an http request and get metadata
+        blob = bucket.get_blob(blob_name)
+        if not properties_name:
+            return blob._properties
+        return {key: value for key, value in blob._properties.items() if key in properties_name}

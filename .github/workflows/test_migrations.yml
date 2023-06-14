@@ -8,13 +8,13 @@ on:
         type: string
 
 env:
-  NODE: '14'
+  NODE: '18'
   CACHE_NAME_PREFIX: v1
 
 jobs:
   migrations:
     name: "migrations"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio

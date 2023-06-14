@@ -24,7 +24,7 @@ Listen to an audio file and segment it, then transcribe the contents of each seg
     <Label value="Speech" />
     <Label value="Noise" />
   </Labels>
-  <AudioPlus name="audio" value="$audio"/>
+  <Audio name="audio" value="$audio"/>
   <TextArea name="transcription" toName="audio"
             rows="2" editable="true"
             perRegion="true" required="true" />
@@ -43,9 +43,9 @@ Use the [Labels](/tags/labels.html) control tag to allow annotators to highlight
 </Labels>
 ```
 
-Use the [AudioPlus](/tags/audioplus.html) object tag to display a waveform of audio that can be labeled:
+Use the [Audio](/tags/audio.html) object tag to display a waveform of audio that can be labeled:
 ```xml
-<AudioPlus name="audio" value="$audio"/>
+<Audio name="audio" value="$audio"/>
 ```
 
 Use the [TextArea](/tags/textarea.html) control tag to prompt annotators to provide a transcript for each segment of audio:
@@ -76,7 +76,6 @@ The `visibleWhen` parameter for the [View](/tags/view.html) tag means that the c
 
 ## Related tags
 
-- [AudioPlus](/tags/audioplus.html)
 - [Audio](/tags/audio.html)
 - [Labels](/tags/labels.html)
 - [TextArea](/tags/textarea.html)

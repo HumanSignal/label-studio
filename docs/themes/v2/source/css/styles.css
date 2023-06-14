@@ -907,13 +907,15 @@ main {
 }
 
 .toc .toc-list a,
-.notion-toc .toc-list a {
+.notion-toc .toc-list a,
+.toc-ent-trial a {
   color: var(--color-gray-900);
   text-decoration: none;
   font-size: 0.875rem;
 }
 
-.toc-list a:hover {
+.toc-list a:hover,
+.toc-ent-trial a:hover {
   color: var(--color-main-accent);
 }
 
@@ -930,6 +932,12 @@ main {
   .toc {
     display: none;
   }
+}
+
+.toc-ent-trial {
+  margin-top: 1em;
+  padding-top: 1em;
+  border-top: 1px var(--color-gray-900) solid;
 }
 
 /****************************
