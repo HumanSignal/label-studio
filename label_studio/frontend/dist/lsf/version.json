@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-1666: Fix lock option isn't locking audio regions",
-  "commit": "ccc18c48990505568bf05e71667a6cf0f176e23c",
-  "branch": "master",
-  "date": "2023/06/14 15:40:36"
+  "message": "fix: LSDV-5259: Duplication of annotations can only happen if creation is allowed.",
+  "commit": "4f21c5ebb18d4e1516e88422b8b29c152874c009",
+  "branch": "fb-lsdv-5259",
+  "date": "2023/06/14 14:04:01"
 }
