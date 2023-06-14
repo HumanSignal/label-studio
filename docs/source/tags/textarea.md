@@ -1,7 +1,7 @@
 ---
 title: TextArea
 type: tags
-order: 428
+order: 427
 meta_title: Textarea Tag for Text areas
 meta_description: Customize Label Studio with the TextArea tag to support audio transcription, image captioning, and OCR tasks for machine learning and data science projects.
 ---
@@ -57,6 +57,7 @@ You can combine the `TextArea` tag with other tags for OCR or other transcriptio
 
 You can keep submissions unique
  - `fflag_feat_front_lsdv_4659_skipduplicates_060323_short` should be enabled to use `skipDuplicates` attribute.
+ - `fflag_feat_front_lsdv_4712_skipduplicates_editing_110423_short` should be enabled to keep submissions unique during editing existed results
 
 ```html
 <View>

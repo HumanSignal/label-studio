@@ -1,7 +1,7 @@
 ---
 title: Table
 type: tags
-order: 305
+order: 306
 meta_title: Table Tag to Display Keys & Values in Tables
 meta_description: Customize Label Studio by displaying key-value pairs in tasks for machine learning and data science projects.
 ---
