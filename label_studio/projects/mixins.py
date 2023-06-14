@@ -72,7 +72,7 @@ class ProjectMixin:
         """
         return True
 
-    def get_all_members(self):
+    def get_all_members(self, *args, **kwargs):
         """
         Returns all members of project
         :return:
