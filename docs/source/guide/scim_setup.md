@@ -26,8 +26,10 @@ SCIM interacts with your SSO integration.
 !!! attention "important"
     If you do not have SSO set up yet, then follow [Set up SSO](auth_setup.html).
 
-!!! atttention "important"
+
+!!! attention "important"
     Only owner's access token can be used for SCIM Identity Provider.
+
 
 Label Studio Enterprise uses SCIM Version 2.0 standard. As an example, this page uses integration with [Okta](https://www.okta.com/integrate/). However, Label Studio Enterprise follows [SCIM RFC 5741](https://datatracker.ietf.org/doc/html/rfc7644#section-3.2) and can be integrated with any access management services that support the standard.
 
