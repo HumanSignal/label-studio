@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5148: Runtime error when user tries to update/submit duplicated annotation while original is already deleted",
-  "commit": "5e7bf4438db01da428b35a18986ec6d0db01d0c5",
+  "message": "fix: LSDV-4673: Fix drawing with Rect3Point tool in relative coords",
+  "commit": "6a8b37986bc84f8b033a3ae86fd4d951f89f79a1",
   "branch": "master",
-  "date": "2023/05/26 17:15:20"
+  "date": "2023/06/13 16:21:26"
 }

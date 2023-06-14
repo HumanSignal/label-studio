@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3104: Revert task navigation standardization",
-  "commit": "deb6a614f73d5a0dc06b463127dfde568b4c66c8",
+  "message": "feat: LOPS-157: Update Actions dropdown in Data explorer to support multi-level dropdown",
+  "commit": "97e26e05ac631af093789761bbe827aaf4e04128",
   "branch": "master",
-  "date": "2023/05/23 16:23:07"
+  "date": "2023/06/14 08:40:14"
 }

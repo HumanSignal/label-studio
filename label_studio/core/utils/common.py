@@ -667,6 +667,40 @@ def btree_gin_migration_operations(next_step):
     return ops
 
 
+def merge_labels_counters(dict1, dict2):
+    """
+    Merge two dictionaries with nested dictionary values into a single dictionary.
+
+    Args:
+        dict1 (dict): The first dictionary to merge.
+        dict2 (dict): The second dictionary to merge.
+
+    Returns:
+        dict: A new dictionary with the merged nested dictionaries.
+
+    Example:
+        dict1 = {'sentiment': {'Negative': 1, 'Positive': 1}}
+        dict2 = {'sentiment': {'Positive': 2, 'Neutral': 1}}
+        result_dict = merge_nested_dicts(dict1, dict2)
+        # {'sentiment': {'Negative': 1, 'Positive': 3, 'Neutral': 1}}
+    """
+    result_dict = {}
+
+    # iterate over keys in both dictionaries
+    for key in set(dict1.keys()) | set(dict2.keys()):
+        # add the corresponding values if they exist in both dictionaries
+        value = {}
+        if key in dict1:
+            value.update(dict1[key])
+        if key in dict2:
+            for subkey in dict2[key]:
+                value[subkey] = value.get(subkey, 0) + dict2[key][subkey]
+        # add the key-value pair to the result dictionary
+        result_dict[key] = value
+
+    return result_dict
+
+
 def timeit(func):
     def wrapper(*args, **kwargs):
         start = time.time()
