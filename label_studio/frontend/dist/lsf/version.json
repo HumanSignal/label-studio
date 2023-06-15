@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5259: Duplication of annotations can only happen if creation is allowed.",
-  "commit": "92c4922d1ef62f222deb34990eabdb0eb541b94f",
-  "branch": "master",
-  "date": "2023/06/15 11:41:00"
+  "message": "Fb lsdv 5164/unselect labels with tools",
+  "commit": "3f62a04c441605f57d8719d9536f256ff6981f4e",
+  "branch": "fb-lsdv-5164/unselect-labels-with-tools",
+  "date": "2023/06/15 12:23:50"
 }
