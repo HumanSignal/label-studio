@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5259: Duplication of annotations can only happen if creation is allowed.",
-  "commit": "4f21c5ebb18d4e1516e88422b8b29c152874c009",
-  "branch": "fb-lsdv-5259",
-  "date": "2023/06/14 14:04:01"
+  "commit": "92c4922d1ef62f222deb34990eabdb0eb541b94f",
+  "branch": "master",
+  "date": "2023/06/15 11:41:00"
 }
