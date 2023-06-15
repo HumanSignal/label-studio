@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5260: Selected region can not be moved / resized when it's under another region",
-  "commit": "3c9e00da7437c4d97e41ee26f011585330f7a6bb",
-  "branch": "fb-lsdv-5260",
-  "date": "2023/06/13 17:35:30"
+  "commit": "cc44fcc48efe8842daf5c0ab145d68ea7472d960",
+  "branch": "master",
+  "date": "2023/06/15 11:41:33"
 }
