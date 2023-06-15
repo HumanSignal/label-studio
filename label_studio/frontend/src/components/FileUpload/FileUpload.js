@@ -33,9 +33,9 @@ project
     const webhook_url = getWebhookUrl();
     const formData = new FormData();
     Swal.fire({
-      title: 'Success',
+      title: 'Uploading',
       text: "Your file is being uploaded, please wait a bit",
-      icon: 'success',
+      icon: 'info',
     })
     formData.append('file', file);
     formData.append('project_id', project.id)
@@ -75,7 +75,7 @@ project
       
       Swal.fire({
         title: 'Attention',
-        text: "Please choose an image or a zip file that contains multiple images to be imported (The zip file can support subfolder structure).",
+        text: "Please choose an image or a compressed file (zip, tar.xz, 7z) that contains multiple images to be imported (The compressed file can support subfolder structure).",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
