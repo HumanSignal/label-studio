@@ -68,6 +68,8 @@ date_format: YYYY-MM-DD
 time_format: HH:mm:ss
 per_page: 10
 pagination_dir: page
+plugins:
+  - hexo-footnote
 theme: v2
 sitemap:
   path:
@@ -78,3 +80,5 @@ search:
   content: true
 include_markdown:
   dir: source/includes
+footnote:
+  location_target_class: location-target

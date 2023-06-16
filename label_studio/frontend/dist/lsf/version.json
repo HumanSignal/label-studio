@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5259: Duplication of annotations can only happen if creation is allowed.",
-  "commit": "92c4922d1ef62f222deb34990eabdb0eb541b94f",
+  "message": "feat: LSDV-4654: Allow per-image classification",
+  "commit": "9578b82ec8882d4dca943ba49c801adcf455a203",
   "branch": "master",
-  "date": "2023/06/15 11:41:00"
+  "date": "2023/06/16 19:28:57"
 }
