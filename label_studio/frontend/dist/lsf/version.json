@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4988: Fix No Label for Dynamic Labels",
-  "commit": "de5807f8f6b3e9e0da85b4c01782df209cede7a2",
+  "commit": "254765931689d95fee0280b879258f12cf04a7be",
   "branch": "fb-lsdv-4988/dynamic-no-label",
-  "date": "2023/05/15 11:50:23"
+  "date": "2023/06/16 12:49:19"
 }
