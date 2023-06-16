@@ -205,7 +205,7 @@ jobs:
           cp -Rf tmp/docs/* "${docs_target_dir}"
           git status
           git add "${docs_target_dir}"
-          git commit -m 'docs: LSF Update'
+          git commit -m 'docs: LSF Update' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin HEAD
 
       - name: Merge base branch
