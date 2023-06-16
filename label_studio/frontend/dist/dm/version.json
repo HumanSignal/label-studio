@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-157: Update Actions dropdown in Data explorer to support multi-level dropdown",
-  "commit": "97e26e05ac631af093789761bbe827aaf4e04128",
-  "branch": "master",
-  "date": "2023/06/14 08:40:14"
+  "message": "feat: LOPS-88: [FE] Milvus filtering does not allow 'Not contains', 'Contains' and Regex",
+  "commit": "1b3f3fa5101c55ea167ca2be744b71ef8c154431",
+  "branch": "fb-lops-188",
+  "date": "2023/06/16 12:28:01"
 }
