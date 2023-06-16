@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5033: Add the option to use WebAudioPlayer for Audio",
-  "commit": "46c1bea57893643aa5c920eb3735c53ea5b69494",
+  "message": "fix: LSDV-5259: Duplication of annotations can only happen if creation is allowed.",
+  "commit": "92c4922d1ef62f222deb34990eabdb0eb541b94f",
   "branch": "master",
-  "date": "2023/05/15 10:02:47"
+  "date": "2023/06/15 11:41:00"
 }

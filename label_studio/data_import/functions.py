@@ -34,21 +34,19 @@ def async_import_background(import_id, user_id, **kwargs):
     tasks = None
     # upload files from request, and parse all tasks
     # TODO: Stop passing request to load_tasks function, make all validation before
-    parsed_data, file_upload_ids, found_formats, data_columns = load_tasks_for_async_import(project_import, user)
+    tasks, file_upload_ids, found_formats, data_columns = load_tasks_for_async_import(project_import, user)
 
     if project_import.preannotated_from_fields:
         # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]  # noqa
-        parsed_data = reformat_predictions(parsed_data, project_import.preannotated_from_fields)
+        tasks = reformat_predictions(tasks, project_import.preannotated_from_fields)
 
     if project_import.commit_to_project:
         # Immediately create project tasks and update project states and counters
-        serializer = ImportApiSerializer(data=tasks, many=True)
+        serializer = ImportApiSerializer(data=tasks, many=True, context={'project': project})
         serializer.is_valid(raise_exception=True)
         tasks = serializer.save(project_id=project.id)
         emit_webhooks_for_instance(user.active_organization, project, WebhookAction.TASKS_CREATED, tasks)
 
-        # return tasks, serializer
-        # tasks, serializer = self._save(parsed_data)
         task_count = len(tasks)
         annotation_count = len(serializer.db_annotations)
         prediction_count = len(serializer.db_predictions)
@@ -59,11 +57,11 @@ def async_import_background(import_id, user_id, **kwargs):
                                                       tasks_number_changed=True)
         logger.info('Tasks bulk_update finished')
 
-        project.summary.update_data_columns(parsed_data)
+        project.summary.update_data_columns(tasks)
         # TODO: project.summary.update_created_annotations_and_labels
     else:
         # Do nothing - just output file upload ids for further use
-        task_count = len(parsed_data)
+        task_count = len(tasks)
         annotation_count = None
         prediction_count = None
 

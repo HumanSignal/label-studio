@@ -108,6 +108,20 @@ def s3_with_images(s3):
     yield s3
 
 
+def s3_remove_bucket():
+    """
+    Remove pytest-s3-images
+    """
+    bucket_name = 'pytest-s3-images'
+    _s3 = boto3.client('s3', region_name='us-east-1')
+    _s3.delete_object(Bucket=bucket_name, Key='image1.jpg')
+    _s3.delete_object(Bucket=bucket_name, Key='subdir/image1.jpg')
+    _s3.delete_object(Bucket=bucket_name, Key='subdir/image2.jpg')
+    _s3.delete_object(Bucket=bucket_name, Key='subdir/another/image2.jpg')
+    _s3.delete_bucket(Bucket=bucket_name)
+    return ""
+
+
 @pytest.fixture(autouse=True)
 def s3_with_jsons(s3):
     bucket_name = 'pytest-s3-jsons'
