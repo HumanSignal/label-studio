@@ -165,6 +165,7 @@ jobs:
         run: npm install -g jsdoc-to-markdown node-fetch
 
       - name: "LSF Docs: Build"
+        id: lsf-docs-build
         if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
         continue-on-error: true
         working-directory: tmp/scripts
@@ -194,16 +195,17 @@ jobs:
           git push origin HEAD
 
       - name: "LSF Docs: Commit"
-        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend' && steps.lsf-docs-build.conclusion == 'success'
         continue-on-error: true
         run: |
           set -xeuo pipefail
           docs_target_dir='${{ env.DOCS_TARGET_DIR }}'
+          find "${docs_target_dir}" ! -name 'index.md' -type f -exec rm -rf {} +
           mkdir -p "${docs_target_dir}"
           cp -Rf tmp/docs/* "${docs_target_dir}"
           git status
           git add "${docs_target_dir}"
-          git commit -m 'docs: LSF Update'
+          git commit -m 'docs: LSF Update' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin HEAD
 
       - name: Merge base branch

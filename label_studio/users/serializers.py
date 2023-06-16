@@ -49,6 +49,11 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
         )
 
 
+class BaseUserSerializerUpdate(BaseUserSerializer):
+    class Meta(BaseUserSerializer.Meta):
+        read_only_fields = ('email',)
+
+
 class UserSimpleSerializer(BaseUserSerializer):
     class Meta:
         model = User
@@ -56,3 +61,4 @@ class UserSimpleSerializer(BaseUserSerializer):
 
 
 UserSerializer = load_func(settings.USER_SERIALIZER)
+UserSerializerUpdate = load_func(settings.USER_SERIALIZER_UPDATE)
