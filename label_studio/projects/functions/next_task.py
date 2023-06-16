@@ -3,14 +3,12 @@ import logging
 
 from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Value, When, Q
 from django.db.models.fields import DecimalField
-from django.utils.timezone import now
+from django.db import transaction
 from django.conf import settings
 from core.feature_flags import flag_set
-import numpy as np
 
 from core.utils.common import conditional_atomic
 from tasks.models import Annotation, Task
-from projects.models import LabelStreamHistory
 from projects.functions.stream_history import add_stream_history
 
 logger = logging.getLogger(__name__)
@@ -23,26 +21,34 @@ def get_next_task_logging_level(user):
     return level
 
 
+def get_unlocked_task_by_id(task_id, user, set_lock=False):
+    try:
+        task = Task.objects.select_for_update(skip_locked=True).get(pk=task_id)
+        if not task.has_lock(user):
+            if set_lock:
+                task.set_lock(user)
+            return task
+    except Task.DoesNotExist:
+        logger.debug('Task with id {} locked'.format(task_id))
+
+
 def _get_random_unlocked(task_query, user, upper_limit=None):
     for task in task_query.order_by('?').only('id')[:settings.RANDOM_NEXT_TASK_SAMPLE_SIZE]:
-        try:
-            task = Task.objects.select_for_update(skip_locked=True).get(pk=task.id)
-            if not task.has_lock(user):
-                return task
-        except Task.DoesNotExist:
-            logger.debug('Task with id {} locked'.format(task.id))
+        if flag_set('fflag_fix_back_lsdv_5289_prevent_db_deadlocks_16062023_short', user):
+            with transaction.atomic():
+                return get_unlocked_task_by_id(task.id, user, set_lock=True)
+        else:
+            return get_unlocked_task_by_id(task.id, user)
 
 
 def _get_first_unlocked(tasks_query, user):
     # Skip tasks that are locked due to being taken by collaborators
     for task_id in tasks_query.values_list('id', flat=True):
-        try:
-            task = Task.objects.select_for_update(skip_locked=True).get(pk=task_id)
-            if not task.has_lock(user):
-                return task
-
-        except Task.DoesNotExist:
-            logger.debug('Task with id {} locked'.format(task_id))
+        if flag_set('fflag_fix_back_lsdv_5289_prevent_db_deadlocks_16062023_short', user):
+            with transaction.atomic():
+                return get_unlocked_task_by_id(task_id, user, set_lock=True)
+        else:
+            return get_unlocked_task_by_id(task_id, user)
 
 
 def _try_ground_truth(tasks, project, user):
