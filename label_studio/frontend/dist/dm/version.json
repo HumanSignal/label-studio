@@ -1,6 +1,6 @@
 {
   "message": "feat: LOPS-188: [FE] Milvus filtering does not allow 'Not contains', 'Contains' and Regex",
-  "commit": "645c843f945aaa3c847e117c72bc87873c450103",
+  "commit": "4dafc6c7376675ee969c81430d4db3c9d8a8ec35",
   "branch": "fb-lops-188",
-  "date": "2023/06/16 12:28:01"
+  "date": "2023/06/16 13:11:50"
 }
