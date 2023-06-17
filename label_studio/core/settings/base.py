@@ -415,6 +415,7 @@ SUPPORTED_EXTENSIONS = set(
         '.htm',
         '.html',
         '.jpg',
+        '.jpeg',
         '.json',
         '.m4a',
         '.mp3',
@@ -424,10 +425,11 @@ SUPPORTED_EXTENSIONS = set(
         '.tsv',
         '.txt',
         '.wav',
-        '.webp',
         '.xml',
         '.mp4',
         '.webm',
+        '.webp',
+        '.pdf'
     ]
 )
 

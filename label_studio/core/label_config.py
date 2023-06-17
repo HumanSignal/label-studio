@@ -131,8 +131,13 @@ def extract_data_types(label_config):
         if not match.get('name'):
             continue
         name = match.get('value')
-        if len(name) > 1 and name[0] == '$':
-            name = name[1:]
+
+        pattern = r'\$\w+'
+        regex = re.findall(pattern, name)
+        first = regex[0][1:] if len(regex) > 0 else ''
+
+        if len(name) > 1 and (name[0] == '$' or first):
+            name = first if first else name[1:]
             # video has highest priority, e.g.
             # for <Video value="url"/> <Audio value="url"> it must be data_type[url] = Video
             if data_type.get(name) != 'Video':
