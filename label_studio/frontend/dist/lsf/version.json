@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-4654: Allow per-image classification",
+  "message": "ci: TEST DO NOT MERGE",
   "commit": "9578b82ec8882d4dca943ba49c801adcf455a203",
-  "branch": "master",
+  "branch": "fb-ci-test-1",
   "date": "2023/06/16 19:28:57"
 }
