@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4930: Fix selection tool",
-  "commit": "cc058c94b8216689247f2f7ba41abf72ff2928f2",
-  "branch": "master",
-  "date": "2023/06/19 17:18:36"
+  "message": "fix: LSDV-4853: Add warning message when user selects more choices th…",
+  "commit": "e7edfaf0f6f63fe61039eeaed42f3dd1bd8811a6",
+  "branch": "fb-lsdv-4853",
+  "date": "2023/06/19 13:41:52"
 }
