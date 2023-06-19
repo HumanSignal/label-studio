@@ -257,10 +257,25 @@ def get_task_from_qs_with_sampling(not_solved_tasks, user_solved_tasks_array, pr
     return next_task, queue_info
 
 
+class no_atomic:
+    # context manager for disabling atomic
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        pass
+
+
 def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
     logger.debug(f'get_next_task called. user: {user}, project: {project}, dm_queue: {dm_queue}')
 
-    with conditional_atomic():
+    if flag_set('fflag_fix_back_lsdv_5289_prevent_db_deadlocks_16062023_short'):
+        # with flag we cover by transaction only select_for_update part
+        _atomic = no_atomic
+    else:
+        _atomic = conditional_atomic
+
+    with _atomic():
         next_task = None
         use_task_lock = True
         queue_info = ''
