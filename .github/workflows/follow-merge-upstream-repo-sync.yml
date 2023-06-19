@@ -191,7 +191,7 @@ jobs:
 
           git add "${{ env.STATIC_DIST }}"
           git status -s
-          git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}'
+          git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin HEAD
 
       - name: "LSF Docs: Commit"
@@ -235,7 +235,7 @@ jobs:
           if [ -z "${unmerged_files}" ]; then
             echo "No unmerged files found"
             echo "Pushing merge commit"
-            git commit --message "Merge branch '${base_branch}' into '${branch}'" || true
+            git commit -m "Merge branch '${base_branch}' into '${branch}'" -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}' || true
             git push origin HEAD
           else
             echo "Unmerged files found:"

@@ -42,7 +42,7 @@ jobs:
                 base_branch_name: lsf_repo_data.default_branch,
                 repo_name: lsf_repo_data.full_name,
                 commit_sha: lsf_commit.sha,
-                title: lsf_commit.commit.message.split('\n')[0],
+                title: "feat: Scheduled LSF sync",
                 html_url: lsf_commit.html_url,
                 actor: lsf_commit.commit.author.name,
                 author_username: lsf_commit.commit.author.name,

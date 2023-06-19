@@ -24,8 +24,10 @@ exec_entrypoint() {
       *) echo >&3 "$0: Ignoring $f" ;;
       esac
     done
-    if [ -f $OPT_DIR/config_env ]; then
-      . $OPT_DIR/config_env
+    CONFIG_ENV=$OPT_DIR/config_env
+    if [ -f "$CONFIG_ENV" ]; then
+      echo >&3 "$0: Sourcing $CONFIG_ENV"
+      . $CONFIG_ENV
     fi
     echo >&3 "$0: Configuration complete; ready for start up"
   else
@@ -57,6 +59,11 @@ exec_or_wrap_n_exec() {
 }
 
 source_inject_envvars
+
+if [ -f "$OPT_DIR"/config_env ]; then
+  echo >&3 "$0: Remove config_env"
+  rm -f "$OPT_DIR"/config_env
+fi
 
 if [ "$1" = "nginx" ]; then
   # in this mode we're running in a separate container
