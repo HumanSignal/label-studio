@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5249: Manual security updates",
-  "commit": "a9539713eac9b61c0647b8a7c5dd22fe44d8bb22",
+  "message": "fix: LOPS-185: [FE] resolve issue affecting semantic search when selecting items then changing text in semantic search",
+  "commit": "3c6db5291966757accd3c2fa6220a37fc08a7053",
   "branch": "master",
-  "date": "2023/06/07 23:45:34"
+  "date": "2023/06/16 13:10:19"
 }

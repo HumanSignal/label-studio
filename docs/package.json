@@ -20,6 +20,7 @@
     "hexo-admonition": "^1.1.2",
     "hexo-cli": "^4.3.0",
     "hexo-deployer-git": "^3.0.0",
+    "hexo-footnote": "^1.0.4",
     "hexo-fs": "^4.1.1",
     "hexo-generator-archive": "^0.1.5",
     "hexo-generator-category": "^0.1.3",

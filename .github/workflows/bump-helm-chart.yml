@@ -56,5 +56,5 @@ jobs:
       - name: Commit and Push
         run: |
           git add "${LS_CHART_PATH}"
-          git commit -m 'Bump Label Studio to ${{ inputs.docker_image_version }}'
+          git commit -m 'Bump Label Studio to ${{ inputs.docker_image_version }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin

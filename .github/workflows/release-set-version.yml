@@ -95,7 +95,7 @@ jobs:
           sed -i "s/^__version__[ ]*=.*/__version__ = '${{ inputs.version }}'/g" ${{ env.PYTHON_VERSION_FILE }}
           
           git add ${{ env.PYTHON_VERSION_FILE }}
-          git commit --message "chore: Bump version to ${{ inputs.version }}"
+          git commit -m "chore: Bump version to ${{ inputs.version }}" -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
 
           echo "commit=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
           git push origin HEAD:refs/heads/${{ inputs.branch }}
