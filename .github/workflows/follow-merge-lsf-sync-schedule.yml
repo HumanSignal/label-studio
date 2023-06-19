@@ -19,7 +19,7 @@ jobs:
           script: |
             const { repo, owner } = context.repo;
             
-            const lsf_owner = 'heartexlabs';
+            const lsf_owner = owner;
             const lsf_repo = 'label-studio-frontend';
             
             const {data: lsf_repo_data} = await github.rest.repos.get({
