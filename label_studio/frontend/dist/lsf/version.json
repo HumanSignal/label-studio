@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-4654: Allow per-image classification",
-  "commit": "9578b82ec8882d4dca943ba49c801adcf455a203",
+  "message": "fix: LSDV-5066: Filter row validation to set filter just if value is added",
+  "commit": "93f2982a5a12b36ace81988bafde6a2410804984",
   "branch": "master",
-  "date": "2023/06/16 19:28:57"
+  "date": "2023/06/19 12:45:23"
 }
