@@ -8,6 +8,10 @@ meta_description: Customize Label Studio with choice tags for simple classificat
 
 The `Choice` tag represents a single choice for annotations. Use with the `Choices` tag or `Taxonomy` tag to provide specific choice options.
 
+[^1]: `ff_dev_2007_rework_choices_280322_short` should be enabled to use `html` attribute
+
+[^2]: The `hint` attribute works only when `fflag_feat_front_prod_309_choice_hint_080523_short` is enabled
+
 ### Parameters
 
 | Param | Type | Description |
@@ -17,7 +21,8 @@ The `Choice` tag represents a single choice for annotations. Use with the `Choic
 | [alias] | <code>string</code> | Alias for the choice. If used, the alias replaces the choice value in the annotation results. Alias does not display in the interface. |
 | [style] | <code>style</code> | CSS style of the checkbox element |
 | [hotkey] | <code>string</code> | Hotkey for the selection |
-| [hint] | <code>string</code> | Hint for choice on hover (it works when fflag_feat_front_prod_309_choice_hint_080523_short is enabled) |
+| [html] | <code>string</code> | can be used to show enriched content[^1], it has higher priority than `value`, however `value` will be used in the exported result (should be properly escaped) |
+| [hint] | <code>string</code> | Hint for choice on hover[^2] |
 
 ### Example
 
