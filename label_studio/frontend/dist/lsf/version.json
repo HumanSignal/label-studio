@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4930: Fix selection tool",
-  "commit": "50de612027f4ad3a6b92f627643cc4d08f530ef4",
+  "commit": "cb0a0e63cc1e5ddf1c9867dcfb71e22d2cd42ba0",
   "branch": "fb-lsdv-4930/selection-tool-fixes",
-  "date": "2023/06/13 17:39:54"
+  "date": "2023/06/19 15:29:55"
 }
