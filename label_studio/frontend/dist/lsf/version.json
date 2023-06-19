@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-4654: Allow per-image classification",
-  "commit": "9578b82ec8882d4dca943ba49c801adcf455a203",
-  "branch": "master",
-  "date": "2023/06/16 19:28:57"
+  "message": "feat: LSDV-5296: Scroll container max height",
+  "commit": "72d1b0e9af14c872c9b1e7e4ba2d7bef42a3f6c1",
+  "branch": "fb-lsdv-5296/scroll-container-max-height",
+  "date": "2023/06/19 08:57:41"
 }
