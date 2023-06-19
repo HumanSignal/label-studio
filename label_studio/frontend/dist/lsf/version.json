@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5001: Skip comments panel focus (#1379)",
-  "commit": "a297fe97abdde7764fdd48b78cac441d3090a4a0",
+  "message": "feat: LSDV-4654: Allow per-image classification (#1381)",
+  "commit": "9578b82ec8882d4dca943ba49c801adcf455a203",
   "branch": "master",
-  "date": "2023/06/11 21:11:46"
+  "date": "2023/06/16 19:28:57"
 }
