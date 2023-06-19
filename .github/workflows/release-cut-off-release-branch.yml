@@ -77,8 +77,8 @@ jobs:
             const release = '${{ steps.calculate_branch_name_and_version.outputs.release_branch }}'
 
             let submodules = [
-                {owner: 'heartexlabs', repo: 'label-studio-frontend'},
-                {owner: 'heartexlabs', repo: 'dm2'}
+                {owner: owner, repo: 'label-studio-frontend'},
+                {owner: owner, repo: 'dm2'}
             ]
 
             async function getLSSubmoduleVersions(sha) {
