@@ -18,14 +18,14 @@ jobs:
     permissions:
       contents: read
       checks: read
-    uses: heartexlabs/label-studio/.github/workflows/docker-release-promote.yml@develop
+    uses: ./.github/workflows/docker-release-promote.yml
     with:
       release_tag: ${{ github.ref_name }}
     secrets: inherit
 
   build_ubi_docker_image:
     name: "Build UBI docker image"
-    uses: heartexlabs/label-studio/.github/workflows/docker-build-ubi.yml@develop
+    uses: ./.github/workflows/docker-build-ubi.yml
     with:
       sha: ${{ github.ref_name }}
       version: ${{ github.ref_name }}
@@ -35,7 +35,7 @@ jobs:
     name: "Build Hugging Face docker image"
     needs:
       - promote_docker_image
-    uses: heartexlabs/label-studio/.github/workflows/docker-build-ontop.yml@develop
+    uses: ./.github/workflows/docker-build-ontop.yml
     with:
       base_docker_image_version: ${{ github.ref_name }}
       tags: "hf-latest,hf-${{ github.ref_name }}"
@@ -47,7 +47,7 @@ jobs:
     name: "Build"
     permissions:
       contents: write
-    uses: heartexlabs/label-studio/.github/workflows/build_pypi.yml@develop
+    uses: ./.github/workflows/build_pypi.yml
     with:
       version: ${{ github.ref_name }}
       ref: ${{ github.ref_name }}
@@ -121,7 +121,7 @@ jobs:
     name: "Update Helm Chart"
     needs:
       - promote_docker_image
-    uses: heartexlabs/label-studio/.github/workflows/bump-helm-chart.yml@develop
+    uses: ./.github/workflows/bump-helm-chart.yml
     with:
       docker_image_version: ${{ github.ref_name }}
     secrets: inherit

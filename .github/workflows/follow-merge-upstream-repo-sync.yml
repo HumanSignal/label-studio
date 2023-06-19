@@ -195,7 +195,7 @@ jobs:
           git push origin HEAD
 
       - name: "LSF Docs: Commit"
-        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend' && steps.lsf-docs-build.conclusion == 'success'
+        if: endsWith( github.event.client_payload.repo_name, '/label-studio-frontend') && steps.lsf-docs-build.conclusion == 'success'
         continue-on-error: true
         run: |
           set -xeuo pipefail
