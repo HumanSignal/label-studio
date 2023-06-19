@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4620-3: Fix Richtext performance and functional",
-  "commit": "f1dcbb814173a11b058ad6824d9ce550172358ba",
+  "commit": "94c96e1030438af9fa4cffc4ad84e709d4a68541",
   "branch": "fb-lsdv-4620-3/richtext-improvements",
-  "date": "2023/06/20 00:00:29"
+  "date": "2023/06/20 00:01:56"
 }
