@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5066: Filter row validation to set filter just if value is added",
-  "commit": "54b0acfc058b3c192eae1d80487c9cc1d0022e55",
-  "branch": "fb-lsdv-5066",
-  "date": "2023/06/14 18:41:34"
+  "commit": "93f2982a5a12b36ace81988bafde6a2410804984",
+  "branch": "master",
+  "date": "2023/06/19 12:45:23"
 }
