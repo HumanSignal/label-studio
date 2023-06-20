@@ -29,7 +29,7 @@ There are 3 ways to reset a password:
 1. Using email by “Forgot password” link on the login page. It works in SaaS by default. It can work in on-premise deployments, but you need to set up the email backend.
 2. Login as a superuser, go to `/admin/users/user` page, find your user and reset password:
 
-![](/images/notion/7dab080456954fa.png)
+![](/images/notion/2601538b2446437.png)
 
 1. Go to LS terminal, run  `/label-studio-enterprise/label_studio_enterprise && python3` [`manage.py`](http://manage.py) `shell_plus`
 
@@ -53,7 +53,7 @@ curl -X PATCH -H "Content-Type: application/json" -H "Authorization: Token your_
 ```
 
 
-![](/images/notion/5599994053ef4a4.png)
+![](/images/notion/6f296ee616c5446.png)
 
 
 ### Disable payload data in activity logs
@@ -118,12 +118,12 @@ This action can only be performed using the /admin page because of security reas
 1. Go to SAML settings page
 2. Find organization you need
 
-![](/images/notion/0c9a5041fa4740c.png)
+![](/images/notion/709cab27dbe84aa.png)
 
 1. Click on the pk
 2. Change the domain
 
-![](/images/notion/096d01e3b7994fb.png)
+![](/images/notion/e9c3f273eee84b6.png)
 
 
 ### Is the Organization Owner role required to setup LDAP?
@@ -189,13 +189,13 @@ For LDAP there is one way only:
 The most frequent problem when you see “Bad request 400” on SAML login is improperly configured attributes in SAML. Check SAML Attributes mapping in your Identity Provider: it’s very important to have the correct Email field. For example how it looks in Google SAML Identity Provider settings: 
 
 
-![](/images/notion/e5690b35767642e.png)
+![](/images/notion/9d3523a073f64ef.png)
 
 
 Also you can check them on LSE SAML settings page `/saml/settings`:
 
 
-![](/images/notion/5466e101d8414a5.png)
+![](/images/notion/4a59a5302aea40d.png)
 
 
 ### How to force users to login via SAML SSO only?
@@ -316,7 +316,7 @@ Go to the cloud storage settings page, click on **Edit** cloud storage connectio
 3. Sometimes the sync process doesn’t start immediately. That is because syncing process is based on internal job scheduler. Please wait, if nothing happens during long period of time - contact us via  form, and please provide the time when you launched the “Sync” job
 4. An easy way to check rq workers is to run an export: go to the Data manager, click Export, and create a new snapshot and download the JSON file. If you see an Error, most likely your rq workers have problems. Another way to check rq workers - login as a superuser and go to /django-rq page. You should see a `workers` column, `workers` values shouldn’t be 0 as far as failed column should be empty (0).
 
-![](/images/notion/8bfa75d8678247f.png)
+![](/images/notion/c1494b2442c3499.png)
 
 
 ### JSON files from a cloud storage are not synced, the data manager is empty
@@ -348,7 +348,7 @@ You access the labeling data via navigating to the next task while clicking on s
 Without an internet connection, you will receive a “Failed to fetch” message each time you try opening the data labeling screen. This is because data content is fetched on the client side at the time you load the app, ensuring secure data flow. Please check your internet connection and reload the page again.
 
 
-![](/images/notion/b123f01980164d5.png)
+![](/images/notion/97ed0d9cc21642a.png)
 
 
 ### Check data access
@@ -360,7 +360,7 @@ It is a common scenario when working with external storage that the URLs provide
 To locate this source of error, try navigating to your browser’s _Network_ panel and check to see if there are 403 or 404 errors.
 
 
-![](/images/notion/4dc4588039c4445.png)
+![](/images/notion/90efaaf9814b461.png)
 
 
 To validate the link doesn’t work - copy it and try opening in a separate browser tab.
@@ -607,7 +607,7 @@ Most likely RQ Workers are
 To inspect this issue you should open `/django-rq` page and see number of workers in Workers column:
 
 
-![](/images/notion/7217c9e12c58459.png)
+![](/images/notion/8c65c6c5c61e4dd.png)
 
 
 If you see 0, it’s definitely a problem with your rq worker setup, you have to connect with your devops team and check what **rqworker containers** are running. 
