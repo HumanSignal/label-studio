@@ -153,20 +153,20 @@ jobs:
           EOF
 
       - name: "LSF Docs: Cache node modules"
-        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+        if: endsWith( github.event.client_payload.repo_name, '/label-studio-frontend')
         uses: actions/cache@v3
         with:
           path: ~/.npm
           key: npm-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-jsdoc-to-markdown
 
       - name: "LSF Docs: Install NPM deps"
-        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+        if: endsWith( github.event.client_payload.repo_name, '/label-studio-frontend')
         continue-on-error: true
         run: npm install -g jsdoc-to-markdown node-fetch
 
       - name: "LSF Docs: Build"
         id: lsf-docs-build
-        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+        if: endsWith( github.event.client_payload.repo_name, '/label-studio-frontend')
         continue-on-error: true
         working-directory: tmp/scripts
         run: node create-docs.js
@@ -195,7 +195,7 @@ jobs:
           git push origin HEAD
 
       - name: "LSF Docs: Commit"
-        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend' && steps.lsf-docs-build.conclusion == 'success'
+        if: endsWith( github.event.client_payload.repo_name, '/label-studio-frontend') && steps.lsf-docs-build.conclusion == 'success'
         continue-on-error: true
         run: |
           set -xeuo pipefail
@@ -323,12 +323,13 @@ jobs:
           github-token: ${{ secrets.GIT_PAT }}
           result-encoding: string
           script: |
+            const { repo, owner } = context.repo;
             const branchName = '${{ steps.get-branch.outputs.name }}';
             const branchNameLowerCase = branchName.toLowerCase();
 
             const submodules = [
-              { owner: 'heartexlabs', repo: 'label-studio-frontend' },
-              { owner: 'heartexlabs', repo: 'dm2' }
+              { owner: owner, repo: 'label-studio-frontend' },
+              { owner: owner, repo: 'dm2' }
             ]
             let openPRs = []  
             for (let submodule of submodules) {
