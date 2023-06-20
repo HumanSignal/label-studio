@@ -50,6 +50,8 @@ async function handlePresignedUrl(event) {
   if (
     !event.request.url.startsWith(self.location.origin) ||
     !event.request.url.includes(requestPathToCache) ||
+    // This is to avoid an error trying to load a direct presign URL in a new tab
+    !event.request.referrer ||
     // Easier to leave this uncached as if we were to handle this caching
     // it would be more complex and not really worth the effort as it is not the most repeated
     // request and it is not a big deal if it is not cached.
