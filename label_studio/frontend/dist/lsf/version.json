@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4930: Fix selection tool",
-  "commit": "cc058c94b8216689247f2f7ba41abf72ff2928f2",
+  "message": "fix: LSDV-4988: Fix No Label for Dynamic Labels",
+  "commit": "b2b2048c962cdc86fe8c31c84e9342be879f4992",
   "branch": "master",
-  "date": "2023/06/19 17:18:36"
+  "date": "2023/06/20 13:20:43"
 }
