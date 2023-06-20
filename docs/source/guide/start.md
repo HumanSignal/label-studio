@@ -2,12 +2,11 @@
 title: Start Label Studio
 type: guide
 tier: opensource
-order: 110
+order: 99
 order_enterprise: 99
 meta_title: Start Commands for Label Studio
 meta_description: Documentation for starting Label Studio and configuring the environment to use Label Studio with your machine learning or data science project. 
-section: "Install"
-
+section: "Get started"
 ---
 
 After you install Label Studio, start the server to start using it. 
@@ -113,6 +112,9 @@ To run Label Studio on Docker with a port other than the default of 8080, use th
 docker run -it -p 9001:8080 -v $(pwd)/mydata:/label-studio/data heartexlabs/label-studio:latest label-studio
 ```
 
+!!! attention "important"
+    As this is a non-root container, the mounted files and directories must have the proper permissions for the `UID 1001`.
+
 Or, if you're using Docker Compose, update the `docker-compose.yml` file that you're using to expose a different port for the NGINX server used to proxy the connection to Label Studio. For example, this portion of the [`docker-compose.yml`](https://github.com/heartexlabs/label-studio/blob/master/docker-compose.yml) file exposes port 9001 instead of port 80 for proxying Label Studio:
 ```
 ...
@@ -154,6 +156,9 @@ LABEL_STUDIO_HOST=https://xx-xx-xx-xx.eu.ngrok.io label-studio start
 docker run -it -e LABEL_STUDIO_HOST=https://xx-xx-xx-xx.eu.ngrok.io -p 8080:8080 -v <yourvolume>:/label-studio/data heartexlabs/label-studio:latest
 ```
 
+!!! attention "important"
+    As this is a non-root container, the mounted files and directories must have the proper permissions for the `UID 1001`.
+
 ```bash
 # docker-compose
 LABEL_STUDIO_HOST=https://xx-xx-xx-xx.eu.ngrok.io docker-compose up -d
@@ -175,6 +180,9 @@ docker run -it -p 8080:8080 -v $(pwd)/mydata:/label-studio/data \
 -v $(pwd)/myfiles:/label-studio/files \
 heartexlabs/label-studio:latest label-studio
 ```
+
+!!! attention "important"
+    As this is a non-root container, the mounted files and directories must have the proper permissions for the `UID 1001`.
 
 By specifying the environment variable `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/label-studio/files`, Label Studio only scans this directory for local files. It's highly recommended to explicitly specify a `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` path to secure the volume access from the Docker container to your local machine.
 

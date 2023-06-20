@@ -63,6 +63,10 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'WARNING',
         },
+        'ldclient.util': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+        },
     },
 }
 
@@ -400,6 +404,33 @@ MEDIA_URL = '/data/'
 UPLOAD_DIR = 'upload'
 AVATAR_PATH = 'avatars'
 
+SUPPORTED_EXTENSIONS = set(
+    [
+        '.aiff',
+        '.au',
+        '.bmp',
+        '.csv',
+        '.flac',
+        '.gif',
+        '.htm',
+        '.html',
+        '.jpg',
+        '.json',
+        '.m4a',
+        '.mp3',
+        '.ogg',
+        '.png',
+        '.svg',
+        '.tsv',
+        '.txt',
+        '.wav',
+        '.webp',
+        '.xml',
+        '.mp4',
+        '.webm',
+    ]
+)
+
 # project exports
 EXPORT_DIR = os.path.join(BASE_DATA_DIR, 'export')
 EXPORT_URL_ROOT = '/export/'
@@ -473,6 +504,7 @@ IO_STORAGES_IMPORT_LINK_NAMES = [
 CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 SAVE_USER = 'users.functions.save_user'
 USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
+USER_SERIALIZER_UPDATE = 'users.serializers.BaseUserSerializerUpdate'
 TASK_SERIALIZER = 'tasks.serializers.BaseTaskSerializer'
 EXPORT_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializer'
 DATA_MANAGER_GET_ALL_COLUMNS = 'data_manager.functions.get_all_columns'
@@ -556,6 +588,9 @@ BATCH_JOB_RETRY_TIMEOUT = int(get_env('BATCH_JOB_RETRY_TIMEOUT', 60))
 
 FUTURE_SAVE_TASK_TO_STORAGE = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False)
 FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT', default=True)
+STORAGE_IN_PROGRESS_TIMER = get_env('STORAGE_IN_PROGRESS_TIMER', 5.0)
+
+USE_NGINX_FOR_EXPORT_DOWNLOADS = get_bool_env('USE_NGINX_FOR_EXPORT_DOWNLOADS', False)
 
 if get_env('MINIO_STORAGE_ENDPOINT') and not get_bool_env('MINIO_SKIP', False):
     CLOUD_FILE_STORAGE_ENABLED = True
@@ -580,6 +615,8 @@ if get_env('STORAGE_TYPE') == "s3":
     AWS_STORAGE_BUCKET_NAME = get_env('STORAGE_AWS_BUCKET_NAME')
     AWS_S3_REGION_NAME = get_env('STORAGE_AWS_REGION_NAME', None)
     AWS_S3_ENDPOINT_URL = get_env('STORAGE_AWS_ENDPOINT_URL', None)
+    if get_env('STORAGE_AWS_OBJECT_PARAMETERS'):
+        AWS_S3_OBJECT_PARAMETERS = json.loads(get_env('STORAGE_AWS_OBJECT_PARAMETERS'))
     AWS_QUERYSTRING_EXPIRE = int(get_env('STORAGE_AWS_X_AMZ_EXPIRES', '86400'))
     AWS_LOCATION = get_env('STORAGE_AWS_FOLDER', default='')
     AWS_S3_USE_SSL = get_bool_env('STORAGE_AWS_S3_USE_SSL', True)
@@ -609,3 +646,6 @@ if get_env('STORAGE_TYPE') == "gcs":
 CSRF_TRUSTED_ORIGINS = get_env('CSRF_TRUSTED_ORIGINS', [])
 if CSRF_TRUSTED_ORIGINS:
     CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS.split(",")
+
+REAL_HOSTNAME = os.getenv('HOSTNAME')  # we have to use getenv, because we don't use LABEL_STUDIO_ prefix
+GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS = get_bool_env('GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS', False)

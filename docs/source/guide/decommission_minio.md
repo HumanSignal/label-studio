@@ -16,7 +16,7 @@ To configure Persistent Storage, follow the instructions in [Set up persistent s
 
 ## Upgrade to the latest available Release
 
-1. Add `MINIO_MIGRATION: true` into `global.extraEnvironmentVars` section of your `lse-values.yaml` file:
+1. Add `MINIO_MIGRATION: true` into `global.extraEnvironmentVars` section of your `ls-values.yaml` file:
 ```shell
 global:
   extraEnvironmentVars:
@@ -52,12 +52,12 @@ JSON_LOG=0 python3 $LSE_DIR/label_studio_enterprise/manage.py minio-migrate
 
 ## Completely remove Minio service
 
-1. Add the following map to your `lse-values.yaml` file:
+1. Add the following map to your `ls-values.yaml` file:
 ```yaml
 minio:
   enabled: false
 ```
 
-2. Remove `MINIO_MIGRATION: true` from `global.extraEnvironmentVars` section of your `lse-values.yaml` file.
+2. Remove `MINIO_MIGRATION: true` from `global.extraEnvironmentVars` section of your `ls-values.yaml` file.
 
 3. Redeploy a release by following steps from [Upgrade Label Studio Enterprise](install_enterprise_k8s.html#Upgrade-Label-Studio-using-Helm).

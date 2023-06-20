@@ -1,20 +1,5 @@
 import os
-
-
-def bool_from_request(params, key, default):
-    """ Get boolean value from request GET, POST, etc
-
-    :param params: dict POST, GET, etc
-    :param key: key to find
-    :param default: default value
-    :return: boolean
-    """
-    value = params.get(key, default)
-
-    if isinstance(value, str):
-        value = cast_bool_from_str(value)
-
-    return bool(int(value))
+from rest_framework.exceptions import ValidationError
 
 
 def cast_bool_from_str(value):
@@ -27,6 +12,24 @@ def cast_bool_from_str(value):
             raise ValueError(f'Incorrect bool value "{value}". '
                              f'It should be one of [1, 0, true, false, yes, no]')
     return value
+
+
+def bool_from_request(params, key, default):
+    """ Get boolean value from request GET, POST, etc
+
+    :param params: dict POST, GET, etc
+    :param key: key to find
+    :param default: default value
+    :return: boolean
+    """
+    value = params.get(key, default)
+
+    try:
+        if isinstance(value, str):
+            value = cast_bool_from_str(value)
+        return bool(int(value))
+    except Exception as e:
+        raise ValidationError({key: str(e)})
 
 
 def int_from_request(params, key, default):
@@ -44,13 +47,16 @@ def int_from_request(params, key, default):
         try:
             return int(value)
         except ValueError:
-            raise ValueError(f'Incorrect value in key "{key}" = "{value}". It should be digit string.')
+            raise ValidationError({key: f'Incorrect value in key "{key}" = "{value}". It should be digit string.'})
+        except Exception as e:
+            raise ValidationError({key: str(e)})
     # int
     elif isinstance(value, int):
         return value
     # other
     else:
-        raise ValueError(f'Incorrect value type in key "{key}" = "{value}". It should be digit string or integer.')
+        raise ValidationError({key: f'Incorrect value type in key "{key}" = "{value}". '
+                                    f'It should be digit string or integer.'})
 
 
 def float_from_request(params, key, default):
@@ -68,13 +74,14 @@ def float_from_request(params, key, default):
         try:
             return float(value)
         except ValueError:
-            raise ValueError(f'Incorrect value in key "{key}" = "{value}". It should be digit string.')
+            raise ValidationError({key: f'Incorrect value in key "{key}" = "{value}". It should be digit string.'})
     # float
     elif isinstance(value, float) or isinstance(value, int):
         return float(value)
     # other
     else:
-        raise ValueError(f'Incorrect value type in key "{key}" = "{value}". It should be digit string or float.')
+        raise ValidationError({key: f'Incorrect value type in key "{key}" = "{value}". '
+                                    f'It should be digit string or float.'})
 
 
 def list_of_strings_from_request(params, key, default):
@@ -96,7 +103,8 @@ def list_of_strings_from_request(params, key, default):
                 return value.split(splitter)
         return [value]
     else:
-        raise ValueError(f'Incorrect value type in key "{key}" = "{value}". It should be digit string or float.')
+        raise ValidationError({key: f'Incorrect value type in key "{key}" = "{value}". '
+                                    f'It should be digit string or float.'})
 
 
 def get_env(name, default=None, is_bool=False):

@@ -77,7 +77,7 @@ jobs:
   gitleaks:
     name: "Linter"
     if: github.event_name == 'pull_request'
-    uses: heartexlabs/label-studio/.github/workflows/gitleaks.yml@develop
+    uses: ./.github/workflows/gitleaks.yml
     with:
       head_sha: ${{ github.sha }}
       base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
@@ -87,7 +87,7 @@ jobs:
     needs:
       - changed_files
     if: needs.changed_files.outputs.src == 'true'
-    uses: heartexlabs/label-studio/.github/workflows/bandit.yml@develop
+    uses: ./.github/workflows/bandit.yml
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
 
@@ -99,10 +99,10 @@ jobs:
       github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.fork == false &&
       needs.changed_files.outputs.frontend == 'true' &&
-      needs.changed_files.outputs.commit-message != 'Build frontend'
+      needs.changed_files.outputs.commit-message != 'ci: Build frontend'
     permissions:
       contents: write
-    uses: heartexlabs/label-studio/.github/workflows/frontend-build.yml@develop
+    uses: ./.github/workflows/frontend-build.yml
     with:
       ref: ${{ github.event.pull_request.head.ref || github.ref }}
 
@@ -117,7 +117,7 @@ jobs:
     permissions:
       contents: read
       checks: write
-    uses: heartexlabs/label-studio/.github/workflows/docker-build.yml@develop
+    uses: ./.github/workflows/docker-build.yml
     with:
       sha: ${{ github.event.pull_request.head.sha || github.event.after }}
       branch_name: ${{ github.event.pull_request.head.ref || github.ref_name }}
@@ -128,7 +128,7 @@ jobs:
     needs:
       - changed_files
     if: needs.changed_files.outputs.src == 'true'
-    uses: heartexlabs/label-studio/.github/workflows/tests.yml@develop
+    uses: ./.github/workflows/tests.yml
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
     secrets: inherit
@@ -138,7 +138,17 @@ jobs:
     needs:
       - changed_files
     if: needs.changed_files.outputs.src == 'true'
-    uses: heartexlabs/label-studio/.github/workflows/test_migrations.yml@develop
+    uses: ./.github/workflows/test_migrations.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+    secrets: inherit
+
+  conda-test:
+    name: "Tests"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.src == 'true'
+    uses: ./.github/workflows/test_conda.yml
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
     secrets: inherit
@@ -305,13 +315,14 @@ jobs:
           AHA_RN_FIELD: "release_notes"
           AHA_FETCH_STRATEGY: "TAG"
           AHA_TAG: "LS ${{ steps.create-draft-release.outputs.tag_name }}"
+          AHA_ADDITIONAL_RELEASES_TAG: "oss"
           JIRA_SERVER: "https://heartex.atlassian.net"
           JIRA_USERNAME: "${{ secrets.JIRA_USERNAME }}"
           JIRA_TOKEN: "${{ secrets.JIRA_TOKEN }}"
           JIRA_PROJECT: "DEV"
           JIRA_RN_FIELD: "customfield_10064"
           LAUNCHDARKLY_SDK_KEY: "${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}"
-          LAUNCHDARKLY_ENVIRONMENT:  "community"
+          LAUNCHDARKLY_ENVIRONMENT: "community"
           OUTPUT_FILE_MD: "${{ github.workspace }}/output.md"
           OUTPUT_FILE_JSON: "${{ github.workspace }}/output.json"
           WORKFLOW_RUN_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
@@ -368,7 +379,7 @@ jobs:
       startsWith(github.ref_name, 'ls-release/')
     permissions:
       contents: write
-    uses: heartexlabs/label-studio/.github/workflows/build_pypi.yml@develop
+    uses: ./.github/workflows/build_pypi.yml
     with:
       version: ${{ needs.draft-release.outputs.rc-version }}
       ref: ${{ github.ref_name }}

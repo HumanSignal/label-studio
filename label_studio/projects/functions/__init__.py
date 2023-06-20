@@ -30,7 +30,7 @@ def annotate_total_annotations_number(queryset):
         subquery = Annotation.objects.filter(
             Q(project=OuterRef('pk'))
             & Q(was_cancelled=False)
-        ).values('id').distinct()
+        ).values('id')
         return queryset.annotate(total_annotations_number=SQCount(subquery))
     else:
         return queryset.annotate(total_annotations_number=Count(
@@ -39,6 +39,9 @@ def annotate_total_annotations_number(queryset):
 
 
 def annotate_num_tasks_with_annotations(queryset):
+    # @todo: check do we really need this counter?
+    # this function is very slow because of tasks__id and distinct
+
     if flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):
         subquery = Annotation.objects.filter(
             Q(project=OuterRef('pk'))
@@ -65,7 +68,7 @@ def annotate_useful_annotation_number(queryset):
             & Q(was_cancelled=False)
             & Q(ground_truth=False)
             & Q(result__isnull=False)
-        ).values('id').distinct()
+        ).values('id')
         return queryset.annotate(useful_annotation_number=SQCount(subquery))
     else:
         return queryset.annotate(useful_annotation_number=Count(
@@ -82,7 +85,7 @@ def annotate_ground_truth_number(queryset):
         subquery = Annotation.objects.filter(
             Q(project=OuterRef('pk'))
             & Q(ground_truth=True)
-        ).values('id').distinct()
+        ).values('id')
         return queryset.annotate(ground_truth_number=SQCount(subquery))
     else:
         return queryset.annotate(ground_truth_number=Count(
@@ -95,7 +98,7 @@ def annotate_skipped_annotations_number(queryset):
         subquery = Annotation.objects.filter(
             Q(project=OuterRef('pk'))
             & Q(was_cancelled=True)
-        ).values('id').distinct()
+        ).values('id')
         return queryset.annotate(skipped_annotations_number=SQCount(subquery))
     else:
         return queryset.annotate(skipped_annotations_number=Count(

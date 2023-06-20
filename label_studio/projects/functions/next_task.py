@@ -3,6 +3,7 @@ import logging
 
 from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Value, When, Q
 from django.db.models.fields import DecimalField
+from django.utils.timezone import now
 from django.conf import settings
 from core.feature_flags import flag_set
 import numpy as np
@@ -149,12 +150,13 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
     if not assigned_flag:
         not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
 
-    # show tasks with overlap > 1 first
-    if project.show_overlap_first:
-        # don't output anything - just filter tasks with overlap
-        logger.debug(f'User={user} tries overlap first from prepared tasks')
-        _, not_solved_tasks = _try_tasks_with_overlap(not_solved_tasks)
-        queue_info += 'Show overlap first'
+    if not flag_set('fflag_fix_back_lsdv_4523_show_overlap_first_order_27022023_short'):
+        # show tasks with overlap > 1 first
+        if project.show_overlap_first:
+            # don't output anything - just filter tasks with overlap
+            logger.debug(f'User={user} tries overlap first from prepared tasks')
+            _, not_solved_tasks = _try_tasks_with_overlap(not_solved_tasks)
+            queue_info += 'Show overlap first'
 
     return not_solved_tasks, user_solved_tasks_array, queue_info
 
@@ -225,6 +227,30 @@ def postponed_queue(next_task, prepared_tasks, project, user, queue_info):
     return next_task, queue_info
 
 
+def get_task_from_qs_with_sampling(not_solved_tasks, user_solved_tasks_array, prepared_tasks, user, project, queue_info):
+    if project.sampling == project.SEQUENCE:
+        logger.debug(f'User={user} tries sequence sampling from prepared tasks')
+        next_task = _get_first_unlocked(not_solved_tasks, user)
+        if next_task:
+            queue_info += (' & ' if queue_info else '') + 'Sequence queue'
+
+    elif project.sampling == project.UNCERTAINTY:
+        logger.debug(f'User={user} tries uncertainty sampling from prepared tasks')
+        next_task = _try_uncertainty_sampling(
+            not_solved_tasks, project, user_solved_tasks_array, user, prepared_tasks
+        )
+        if next_task:
+            queue_info += (' & ' if queue_info else '') + 'Active learning or random queue'
+
+    elif project.sampling == project.UNIFORM:
+        logger.debug(f'User={user} tries random sampling from prepared tasks')
+        next_task = _get_random_unlocked(not_solved_tasks, user)
+        if next_task:
+            queue_info += (' & ' if queue_info else '') + 'Uniform random queue'
+
+    return next_task, queue_info
+
+
 def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
     logger.debug(f'get_next_task called. user: {user}, project: {project}, dm_queue: {dm_queue}')
 
@@ -242,28 +268,23 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
                 user, project, not_solved_tasks, assigned_flag
             )
 
+        if flag_set('fflag_fix_back_lsdv_4523_show_overlap_first_order_27022023_short'):
+            # show tasks with overlap > 1 first
+            if not next_task and project.show_overlap_first:
+                # don't output anything - just filter tasks with overlap
+                logger.debug(f'User={user} tries overlap first from prepared tasks')
+                _, tasks_with_overlap = _try_tasks_with_overlap(not_solved_tasks)
+                queue_info += 'Show overlap first'
+                next_task, queue_info = get_task_from_qs_with_sampling(tasks_with_overlap, user_solved_tasks_array, prepared_tasks, user, project, queue_info)
+
         if not next_task:
             if dm_queue:
                 queue_info += (' & ' if queue_info else '') + 'Data manager queue'
                 logger.debug(f'User={user} tries sequence sampling from prepared tasks')
                 next_task = not_solved_tasks.first()
 
-            elif project.sampling == project.SEQUENCE:
-                queue_info += (' & ' if queue_info else '') + 'Sequence queue'
-                logger.debug(f'User={user} tries sequence sampling from prepared tasks')
-                next_task = _get_first_unlocked(not_solved_tasks, user)
-
-            elif project.sampling == project.UNCERTAINTY:
-                queue_info += (' & ' if queue_info else '') + 'Active learning or random queue'
-                logger.debug(f'User={user} tries uncertainty sampling from prepared tasks')
-                next_task = _try_uncertainty_sampling(
-                    not_solved_tasks, project, user_solved_tasks_array, user, prepared_tasks
-                )
-
-            elif project.sampling == project.UNIFORM:
-                queue_info += (' & ' if queue_info else '') + 'Uniform random queue'
-                logger.debug(f'User={user} tries random sampling from prepared tasks')
-                next_task = _get_random_unlocked(not_solved_tasks, user)
+            else:
+                next_task, queue_info = get_task_from_qs_with_sampling(not_solved_tasks, user_solved_tasks_array, prepared_tasks, user, project, queue_info)
 
 
         next_task, queue_info = postponed_queue(next_task, prepared_tasks, project, user, queue_info)

@@ -1,0 +1,62 @@
+title: "Visual Ranker"
+type: community
+group: Generative AI
+order: 5
+image: /static/templates/visual-ranker.png
+details: Here is a demo that showcases how to construct an interface enabling users to drag, arrange, and rank responses from different Large Language Models (LLMs) and chatbot systems based on their relevance to a specified prompt and their perceived bias, thus facilitating an intuitive and visual understanding of how well these AI systems align with the topic and the degree of subjective interpretation they exhibit.
+config: |
+  <View>
+        <Style>
+          .product-panel {
+            display: flex;
+            align-items: center;
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f8f8f8;
+            font-size: 1.3em;
+            transition: transform .2s; 
+            color: #333;
+          }
+        
+          .product-panel:hover {
+            transform: scale(1.01);
+          }
+          .htx-ranker-item { padding: 0; border: 0; align-self: center; }
+          .htx-ranker-item img { width: 100%; }
+          .htx-ranker-item [class^=itemLine]:last-child { display: none }
+        </Style>
+  
+     <View className="product-panel">
+        <Text name="prompt" value="$prompt"/>
+      </View>
+      <View>
+        <List name="generated_images" value="$images" title="Generated Images" />
+        <Ranker name="rank" toName="generated_images">
+    </Ranker> 
+      </View>
+    </View>
+    <!-- { 
+        "data": {
+            "prompt": "Generate a high-quality image of a stylish, ergonomic chair for a home office. The chair should have a modern design and be upholstered in forest green fabric. It should be set against a contrasting, simple, stark white background to make the product stand out. The lighting should be soft and evenly distributed, and the focus should be sharp to emphasize the details of the chair's design.",
+            "images": [
+                {
+                    "id": "chair_1",
+                    "html": "<img src='/static/samples/chairs/chair1.png'/>"
+                },
+                  {
+                    "id": "chair_2",
+                    "html": "<img src='/static/samples/chairs/chair2.png'/>"
+                },
+                  {
+                    "id": "chair_3",
+                    "html": "<img src='/static/samples/chairs/chair3.png'/>"
+                },
+                  {
+                    "id": "chair_4",
+                    "html": "<img src='/static/samples/chairs/chair4.png'/>"
+                }
+            ]
+        }
+    } -->
+

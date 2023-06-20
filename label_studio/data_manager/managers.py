@@ -4,7 +4,6 @@ import re
 import ujson as json
 import logging
 
-
 from pydantic import BaseModel
 
 from django.db import models
@@ -164,16 +163,18 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
     from django.db.models.expressions import RawSQL
     from tasks.models import Annotation, Prediction
 
-    flag = flag_set('ff_back_dev_3865_filters_anno_171222_short', project.organization.created_by)
-    if field_name == 'annotations_results' and flag:
+    _class = Annotation if field_name == 'annotations_results' else Prediction
+
+    # Annotation
+    if field_name == 'annotations_results':
         subquery = Q(id__in=
             Annotation.objects
                 .annotate(json_str=RawSQL('cast(result as text)', ''))
                 .filter(Q(project=project) & Q(json_str__contains=_filter.value))
                 .values_list('task', flat=True)
         )
+    # Predictions: they don't have `project` yet
     else:
-        _class = Annotation if field_name == 'annotations_results' else Prediction
         subquery = Exists(
             _class.objects
             .annotate(json_str=RawSQL('cast(result as text)', ''))
@@ -195,8 +196,13 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
     elif _filter.operator == Operator.NOT_CONTAINS:
         filter_expressions.append(~Q(subquery))
         return 'continue'
-
-
+    elif _filter.operator == Operator.EMPTY:
+        if cast_bool_from_str(_filter.value):
+            q = Q(annotations__result__isnull=True) | Q(annotations__result=[])
+        else:
+            q = Q(annotations__result__isnull=False) & ~Q(annotations__result=[])
+        filter_expressions.append(q)
+        return 'continue'
 
 def add_user_filter(enabled, key, _filter, filter_expressions):
     if enabled and _filter.operator == Operator.CONTAINS:
@@ -474,7 +480,6 @@ def annotate_completed_at(queryset):
             When(is_labeled=True, then=Subquery(newest.values("created_at")))
         )
     )
-
 
 def annotate_annotations_results(queryset):
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:

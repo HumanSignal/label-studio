@@ -94,13 +94,13 @@ You can also specify other parameters when you start this ML backend to fit your
 Addionaly check our [Quickstart](/guide/ml.html#Quickstart-with-an-example-ML-backend).
 
 #### GPU support
-If you have a GPU available, you can specify that with `device=cuda:0` when you start the ML backend to significantly speed up pre-annotation of images. For example:
+If you have a GPU available, you can specify that with `device=gpu:0` (or `cuda:0` for newer versions of pytorch and mmdetection) when you start the ML backend to significantly speed up pre-annotation of images. For example:
 
  ```bash
    label-studio-ml start coco-detector --with \
    config_file=mmdetection/configs/faster_rcnn/faster_rcnn_r50_fpn_1x_coco.py \
    checkpoint_file=/absolute/path/to/downloaded/checkpoint.pth \
-   device=cuda:0
+   device=gpu:0
    ```
 
 #### Bounding box thresholding

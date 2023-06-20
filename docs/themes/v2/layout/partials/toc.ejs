@@ -1,7 +1,6 @@
 <% const isEnterpriseTheme = theme.tier === "enterprise" %>
-
   <ul class="page-sidebar-list">
-    <% const pages = site.pages.filter(page => page.type === type && (page.tier === theme.tier || page.tier === "all" || page.type === "tags" || page.type === "playground" || page.type === "templates")); %>
+    <% const pages = site.pages.filter(page => !page.hide_menu && page.type === type && (page.tier === theme.tier || page.tier === "all" || page.type === "tags" || page.type === "playground" || page.type === "templates")); %>
     <% if(isEnterpriseTheme) pages.forEach(page => page.order = page.order_enterprise ? page.order_enterprise : page.order) %>
     <% const orderedPages = pages.sort('order') %>
     <% const parentPages = orderedPages.filter(page => page.parent === undefined) %>

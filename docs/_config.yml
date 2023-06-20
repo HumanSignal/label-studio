@@ -93,6 +93,8 @@ pagination_dir: page
 
 # Extensions
 ## Plugins: https://hexo.io/plugins/
+plugins:
+  - hexo-footnote
 ## Themes: https://hexo.io/themes/
 theme: v2
 
@@ -108,3 +110,6 @@ search:
 # plugin to include md into md: https://github.com/tea3/hexo-include-markdown
 include_markdown:
   dir: source/includes
+
+footnote:
+  location_target_class: location-target

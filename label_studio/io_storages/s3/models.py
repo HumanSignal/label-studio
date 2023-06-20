@@ -15,6 +15,7 @@ from django.db.models.signals import post_save, pre_delete
 from io_storages.s3.utils import get_client_and_resource, resolve_s3_url
 from tasks.validation import ValidationError as TaskValidationError
 from tasks.models import Annotation
+from core.feature_flags import flag_set
 from io_storages.base_models import (
     ExportStorage,
     ExportStorageLink,
@@ -85,7 +86,8 @@ class S3StorageMixin(models.Model):
         logger.debug('validate_connection')
         if client is None:
             client = self.get_client()
-        if self.prefix:
+        # we need to check path existence for Import storages only
+        if self.prefix and 'Export' not in self.__class__.__name__:
             logger.debug(f'Test connection to bucket {self.bucket} with prefix {self.prefix}')
             result = client.list_objects_v2(Bucket=self.bucket, Prefix=self.prefix, MaxKeys=1)
             if not result.get('KeyCount'):
@@ -193,7 +195,13 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
         key = str(self.prefix) + '/' + key if self.prefix else key
 
         # put object into storage
-        s3.Object(self.bucket, key).put(Body=json.dumps(ser_annotation))
+        additional_params = {}
+        if flag_set('fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short', user='auto'):
+            additional_params = {'ServerSideEncryption': 'AES256'}
+        s3.Object(self.bucket, key).put(
+            Body=json.dumps(ser_annotation),
+            **additional_params
+        )
 
         # create link if everything ok
         S3ExportStorageLink.create(annotation, self)
@@ -234,7 +242,7 @@ def delete_annotation_from_s3_storages(sender, instance, **kwargs):
     for link in links:
         storage = link.storage
         if storage.can_delete_objects:
-            logger.debug(f'Delete {instance} from S3 storage {storage}')
+            logger.debug(f'Delete {instance} from S3 storage {storage}')  # nosec
             storage.delete_annotation(instance)
 
 

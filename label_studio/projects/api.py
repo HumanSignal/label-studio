@@ -25,10 +25,10 @@ from core.utils.common import temporary_disconnect_all_signals
 from core.mixins import GetParentObjectMixin
 from core.label_config import config_essential_data_has_changed
 from projects.models import (
-    Project, ProjectSummary, ProjectManager
+    Project, ProjectSummary, ProjectManager, ProjectImport
 )
 from projects.serializers import (
-    ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer, GetFieldsSerializer
+    ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer, GetFieldsSerializer, ProjectImportSerializer
 )
 from projects.functions.next_task import get_next_task
 from tasks.models import Task
@@ -366,6 +366,26 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
     @swagger_auto_schema(auto_schema=None)
     def get(self, *args, **kwargs):
         return super(ProjectSummaryAPI, self).get(*args, **kwargs)
+
+
+@method_decorator(name='get', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Get project import info',
+        operation_description='Return data related to async project import operation',
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project import.'),
+        ],
+    ))
+class ProjectImportAPI(generics.RetrieveAPIView):
+    parser_classes = (JSONParser,)
+    serializer_class = ProjectImportSerializer
+    permission_required = all_permissions.projects_change
+    queryset = ProjectImport.objects.all()
+    lookup_url_kwarg = 'import_pk'
 
 
 @method_decorator(name='delete', decorator=swagger_auto_schema(

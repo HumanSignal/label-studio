@@ -28,7 +28,7 @@ from core.utils.io import find_file
 from core.label_config import generate_time_series_json
 from core.utils.common import collect_versions
 from io_storages.localfiles.models import LocalFilesImportStorage
-from core.feature_flags import all_flags
+from core.feature_flags import all_flags, get_feature_file_path
 
 
 logger = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ def main(request):
 def version_page(request):
     """ Get platform version
     """
-    # update latest version from pypi response
+    # update the latest version from pypi response
     # from label_studio.core.utils.common import check_for_the_latest_version
     # check_for_the_latest_version(print_message=False)
     http_page = request.path == '/version/'
@@ -226,4 +226,14 @@ def feature_flags(request):
     user = request.user
     if not user.is_authenticated:
         return HttpResponseForbidden()
-    return HttpResponse(json.dumps(all_flags(request.user), indent=4), status=200)
+
+    flags = all_flags(request.user)
+    flags['$system'] = {
+        'FEATURE_FLAGS_DEFAULT_VALUE': settings.FEATURE_FLAGS_DEFAULT_VALUE,
+        'FEATURE_FLAGS_FROM_FILE': settings.FEATURE_FLAGS_FROM_FILE,
+        'FEATURE_FLAGS_FILE': get_feature_file_path(),
+        'VERSION_EDITION': settings.VERSION_EDITION,
+        'CLOUD_INSTANCE': settings.CLOUD_INSTANCE if hasattr(settings, 'CLOUD_INSTANCE') else None
+    }
+
+    return HttpResponse('<pre>' + json.dumps(flags, indent=4) + '</pre>', status=200)
