@@ -40,7 +40,7 @@ on:
         default: develop
 
 env:
-  IMAGE_NAME: heartexlabs/label-studio
+  IMAGE_NAME: "${{ vars.DOCKERHUB_ORG }}/label-studio"
 
 jobs:
   docker_build_and_push:
@@ -87,7 +87,7 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v2.2.0
         with:
-          username: heartexlabs
+          username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Set up QEMU

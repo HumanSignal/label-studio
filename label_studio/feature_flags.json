@@ -2850,6 +2850,33 @@
       "version": 4,
       "deleted": false
     },
+    "fflag_feat_front_lsdv_e_278_contextual_scrolling_short": {
+      "key": "fflag_feat_front_lsdv_e_278_contextual_scrolling_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "04cfe1dec05344db9c20e81663546744",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_front_lsdv_e_278_continuous_scrolling_of_paragraph_segments_with_audio": {
       "key": "fflag_feat_front_lsdv_e_278_continuous_scrolling_of_paragraph_segments_with_audio",
       "on": false,

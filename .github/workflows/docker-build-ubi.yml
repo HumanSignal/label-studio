@@ -12,7 +12,7 @@ on:
 
 env:
   DOCKER_CLI_EXPERIMENTAL: enabled
-  IMAGE_NAME: heartexlabs/label-studio
+  IMAGE_NAME: "${{ vars.DOCKERHUB_ORG }}/label-studio"
   PREFLIGHT_REPO: quay.io/opdev/preflight:stable
   DOCKER_CONFIG_PATH: /home/runner/.docker/config.json
 
