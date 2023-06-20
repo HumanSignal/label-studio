@@ -77,6 +77,5 @@ class ProjectMixin:
         Returns all members of project
         :return:
         """
-        from users.models import User
+        return self.organization.members.values_list('user__id', flat=True)
 
-        return User.objects.filter(project_memberships__project=self)
