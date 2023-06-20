@@ -137,6 +137,6 @@ jobs:
             > Command | Description
             > --- | ---
             > /frontend build           | Get build frontend static for all repos
-            > /frontend build lsf [sha] | Get build frontend static for heartexlabs/label-studio-frontend only
-            > /frontend build dm [sha]  | Get build frontend static for heartexlabs/dm2 only
+            > /frontend build lsf [sha] | Get build frontend static for ${{ github.repository_owner }}/label-studio-frontend only
+            > /frontend build dm [sha]  | Get build frontend static for ${{ github.repository_owner }}/dm2 only
           reaction-type: hooray
