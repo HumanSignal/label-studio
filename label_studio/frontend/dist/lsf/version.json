@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-1666: Fix lock option isn't locking audio regions",
-  "commit": "ccc18c48990505568bf05e71667a6cf0f176e23c",
+  "message": "fix: LSDV-4930: Fix selection tool",
+  "commit": "cc058c94b8216689247f2f7ba41abf72ff2928f2",
   "branch": "master",
-  "date": "2023/06/14 15:40:36"
+  "date": "2023/06/19 17:18:36"
 }

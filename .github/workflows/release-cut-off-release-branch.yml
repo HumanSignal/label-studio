@@ -77,8 +77,8 @@ jobs:
             const release = '${{ steps.calculate_branch_name_and_version.outputs.release_branch }}'
 
             let submodules = [
-                {owner: 'heartexlabs', repo: 'label-studio-frontend'},
-                {owner: 'heartexlabs', repo: 'dm2'}
+                {owner: owner, repo: 'label-studio-frontend'},
+                {owner: owner, repo: 'dm2'}
             ]
 
             async function getLSSubmoduleVersions(sha) {
@@ -156,7 +156,7 @@ jobs:
 
   set-version-default-branch:
     name: 'Set version in default branch'
-    uses: heartexlabs/label-studio/.github/workflows/release-set-version.yml@develop
+    uses: ./.github/workflows/release-set-version.yml
     needs:
       - draft-new-release
     with:
@@ -172,14 +172,14 @@ jobs:
       - draft-new-release
     permissions:
       contents: write
-    uses: heartexlabs/label-studio/.github/workflows/feature-flags-update.yml@develop
+    uses: ./.github/workflows/feature-flags-update.yml
     with:
       ref: ${{ needs.draft-new-release.outputs.release_branch }}
     secrets: inherit
 
   set-version-release-branch:
     name: 'Set version in release branch'
-    uses: heartexlabs/label-studio/.github/workflows/release-set-version.yml@develop
+    uses: ./.github/workflows/release-set-version.yml
     needs:
       - update-feature-flags
       - draft-new-release

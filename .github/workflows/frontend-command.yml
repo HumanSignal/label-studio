@@ -78,7 +78,7 @@ jobs:
             echo "changes=no" >> $GITHUB_OUTPUT
             exit 0
           else 
-            git commit -m "[frontend] Get build ${REPO}"
+            git commit -m "[frontend] Get build ${REPO}" -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           fi
           git push origin HEAD
 
