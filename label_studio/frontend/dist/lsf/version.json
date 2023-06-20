@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4930: Fix selection tool",
-  "commit": "cc058c94b8216689247f2f7ba41abf72ff2928f2",
+  "message": "fix: LSDV-5250: Hotkey for creating relations not working",
+  "commit": "04c7c24a32cd977991c5fbf8e4f84df7916d1375",
   "branch": "master",
-  "date": "2023/06/19 17:18:36"
+  "date": "2023/06/20 09:20:21"
 }
