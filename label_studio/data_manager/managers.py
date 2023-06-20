@@ -125,11 +125,12 @@ def apply_ordering(queryset, ordering, project, request, view_data=None):
         preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
         raw_field_name = ordering[0]
         numeric_ordering = False
+        unsigned_field_name = raw_field_name.lstrip('-+')
         if (
             view_data is not None and
             'columnsDisplayType' in view_data and
-            raw_field_name in view_data['columnsDisplayType'] and
-            view_data['columnsDisplayType'][raw_field_name] == 'Number'
+            unsigned_field_name in view_data['columnsDisplayType'] and
+            view_data['columnsDisplayType'][unsigned_field_name] == 'Number'
         ):
             numeric_ordering = True
         field_name, ascending = preprocess_field_name(raw_field_name, only_undefined_field=project.only_undefined_field)
