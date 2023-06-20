@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5250: Hotkey for creating relations not working",
-  "commit": "bcae12bf511c0258482a741be72562da607bb6b9",
-  "branch": "fb-lsdv-5250",
-  "date": "2023/06/19 16:40:24"
+  "commit": "04c7c24a32cd977991c5fbf8e4f84df7916d1375",
+  "branch": "master",
+  "date": "2023/06/20 09:20:21"
 }
