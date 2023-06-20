@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5259: Duplication of annotations can only happen if creation is allowed.",
-  "commit": "92c4922d1ef62f222deb34990eabdb0eb541b94f",
+  "message": "fix: LSDV-4930: Fix selection tool",
+  "commit": "cc058c94b8216689247f2f7ba41abf72ff2928f2",
   "branch": "master",
-  "date": "2023/06/15 11:41:00"
+  "date": "2023/06/19 17:18:36"
 }
