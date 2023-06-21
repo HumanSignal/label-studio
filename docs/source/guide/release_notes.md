@@ -32,6 +32,57 @@ The migration process can be performed without any downtime. The steps required 
 The old chart `heartex/label-studio-enterprise` **has been deprecated**. Support for as many releases as possible will be provided. A notification will be posted in the Release Notes section when this changes. We hope that this revised chart will meet your technical needs. If you have any questions or concerns, please don't hesitate to reach out to us.
 
 
+<a name="247md"></a>
+
+*May 18, 2023*
+
+## Label Studio Enterprise 2.4.7
+
+### New Feature
+- Update content when users don't have any projects created yet
+
+### Improvement
+- UI changes to support async export conversion.
+
+### Bug Fixes
+- Validate email domains for trial signups only
+- Limit export number for api/project/id/exports for better performance
+- CSV and TSV exports work incorrectly with JSONs and tab/commas/others symbols in labeling
+- Fixed an issue with null appearing while using video config
+- Conversion of project exports are now async
+
+
+
+<a name="246md"></a>
+
+*Apr 27, 2023*
+
+## Label Studio Enterprise 2.4.6
+
+### Improvements
+- Show DM actions to reviewers (works only with feature flag, contact your customer success manager to have it enabled)
+- Annotation instructions are a modal instead of a top bar
+- Allow to use list of emails in Members Invitation dialog
+- AnnotationHistory should be removable via API
+
+### Bug Fixes
+- No review object in review webhook payload
+- Properly handle missing keywords: reviewed
+- Hidden video regions do not move when adding new visible regions above
+- Scroll to image regions if needed, but don’t scroll unnecessarily (UX improved)
+
+
+
+<a name="246-1md"></a>
+
+*May 09, 2023*
+
+## Label Studio Enterprise 2.4.6-1
+### Bug Fix
+- Fixes an issue with using local file upload with cloud storage urls causing errors.
+
+
+
 <a name="245md"></a>
 
 *Apr 10, 2023*
