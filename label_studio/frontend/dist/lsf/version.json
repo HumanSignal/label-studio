@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5250: Hotkey for creating relations not working",
-  "commit": "04c7c24a32cd977991c5fbf8e4f84df7916d1375",
+  "message": "fix: LSDV-5314: Persist collapse panel state",
+  "commit": "c1f97121ffe5e57d6a61c1ff22aa5289fa8c7edd",
   "branch": "master",
-  "date": "2023/06/20 09:20:21"
+  "date": "2023/06/21 14:45:51"
 }
