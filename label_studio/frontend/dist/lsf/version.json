@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5314: Persist collapse panel state",
-  "commit": "6abe0a8ea3797ed905d3d8656e05e18bb8b80977",
+  "commit": "1a4711e006f4bff3d9554e01aed3da5a15f7a837",
   "branch": "fb-lsdv-5314/persist-collapse-panel-state",
-  "date": "2023/06/20 22:16:57"
+  "date": "2023/06/21 08:48:52"
 }
