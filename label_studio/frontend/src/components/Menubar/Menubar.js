@@ -224,7 +224,7 @@ export const Menubar = ({
                 />
                 <Menu.Item
                   label="Slack Community"
-                  href="https://slack.labelstudio.heartex.com/?source=product-menu"
+                  href="https://slack.labelstud.io/?source=product-menu"
                   icon={<LsSlack/>}
                   target="_blank"
                 />

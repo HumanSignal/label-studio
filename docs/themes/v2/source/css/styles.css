@@ -1352,6 +1352,11 @@ Footer
   margin-top: 4px;
 }
 
+.FooterSocialsLogoHumanSignal {
+  width: 15em;
+  height: auto;
+}
+
 .FooterSocials {
   margin-top:clamp(1em,7vw,2em)
 }
