@@ -62,7 +62,7 @@ stages:
           overlap: 1
           predictions_model_versions: ''
           predictions_results: ''
-          project: 1
+          project: {project_pk}
           storage_filename: null
           total_annotations: 0
           total_predictions: 0
