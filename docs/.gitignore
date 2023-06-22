@@ -6,7 +6,7 @@ node_modules/
 public/
 .deploy*/
 _multiconfig.yml
-docs/package-lock.json
+package-lock.json
 docs/source/guide/release_notes.md
 docs/source/guide/notion-faq.md
 
