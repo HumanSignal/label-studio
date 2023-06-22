@@ -1,7 +1,7 @@
 from django.db.models import Count, Q, OuterRef
 
 from core.utils.db import SQCount
-from tasks.models import Annotation, Task
+from tasks.models import Annotation, Task, Prediction
 from core.feature_flags import flag_set
 
 
@@ -22,8 +22,8 @@ def annotate_finished_task_number(queryset):
 
 
 def annotate_total_predictions_number(queryset):
-    return queryset.annotate(total_predictions_number=Count('tasks__predictions', distinct=True))
-
+    predictions = Prediction.objects.filter(task__project=OuterRef('id')).values('id')
+    return queryset.annotate(total_predictions_number=SQCount(predictions))
 
 def annotate_total_annotations_number(queryset):
     if flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):
