@@ -57,7 +57,8 @@ def check_max_task_number(tasks):
 def check_tasks_max_file_size(value):
     if value >= settings.TASKS_MAX_FILE_SIZE:
         raise ValidationError(f'Maximum total size of all files is {settings.TASKS_MAX_FILE_SIZE} bytes, '
-                              f'current size is {total} bytes')
+                              f'current size is {value} bytes')
+
 
 def check_extensions(files):
     for filename, file_obj in files.items():
