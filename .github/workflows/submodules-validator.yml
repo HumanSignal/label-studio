@@ -36,8 +36,8 @@ jobs:
             const strictCheckBranchPrefixes = ['ls-release/']
 
             let submodules = [
-                {owner: 'heartexlabs', repo: 'label-studio-frontend'},
-                {owner: 'heartexlabs', repo: 'dm2'}
+                {owner: owner, repo: 'label-studio-frontend'},
+                {owner: owner, repo: 'dm2'}
             ]
             
             

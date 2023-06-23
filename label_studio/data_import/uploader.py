@@ -61,7 +61,6 @@ def check_tasks_max_file_size(value):
             f'current size is {value} bytes'
         )
 
-
 def check_extensions(files):
     for filename, file_obj in files.items():
         _, ext = os.path.splitext(file_obj.name)

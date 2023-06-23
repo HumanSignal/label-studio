@@ -153,20 +153,20 @@ jobs:
           EOF
 
       - name: "LSF Docs: Cache node modules"
-        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+        if: endsWith( github.event.client_payload.repo_name, '/label-studio-frontend')
         uses: actions/cache@v3
         with:
           path: ~/.npm
           key: npm-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-jsdoc-to-markdown
 
       - name: "LSF Docs: Install NPM deps"
-        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+        if: endsWith( github.event.client_payload.repo_name, '/label-studio-frontend')
         continue-on-error: true
         run: npm install -g jsdoc-to-markdown node-fetch
 
       - name: "LSF Docs: Build"
         id: lsf-docs-build
-        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend'
+        if: endsWith( github.event.client_payload.repo_name, '/label-studio-frontend')
         continue-on-error: true
         working-directory: tmp/scripts
         run: node create-docs.js
@@ -191,21 +191,21 @@ jobs:
 
           git add "${{ env.STATIC_DIST }}"
           git status -s
-          git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}'
+          git commit --allow-empty -m '[submodules] Build static ${{ github.event.client_payload.repo_name }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin HEAD
 
       - name: "LSF Docs: Commit"
-        if: github.event.client_payload.repo_name == 'heartexlabs/label-studio-frontend' && steps.lsf-docs-build.conclusion == 'success'
+        if: endsWith( github.event.client_payload.repo_name, '/label-studio-frontend') && steps.lsf-docs-build.conclusion == 'success'
         continue-on-error: true
         run: |
           set -xeuo pipefail
           docs_target_dir='${{ env.DOCS_TARGET_DIR }}'
-          # rm -rf "${docs_target_dir}" || true
+          find "${docs_target_dir}" ! -name 'index.md' -type f -exec rm -rf {} +
           mkdir -p "${docs_target_dir}"
           cp -Rf tmp/docs/* "${docs_target_dir}"
           git status
           git add "${docs_target_dir}"
-          git commit -m 'docs: LSF Update'
+          git commit -m 'docs: LSF Update' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin HEAD
 
       - name: Merge base branch
@@ -235,7 +235,7 @@ jobs:
           if [ -z "${unmerged_files}" ]; then
             echo "No unmerged files found"
             echo "Pushing merge commit"
-            git commit --message "Merge branch '${base_branch}' into '${branch}'" || true
+            git commit -m "Merge branch '${base_branch}' into '${branch}'" -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}' || true
             git push origin HEAD
           else
             echo "Unmerged files found:"
@@ -323,12 +323,13 @@ jobs:
           github-token: ${{ secrets.GIT_PAT }}
           result-encoding: string
           script: |
+            const { repo, owner } = context.repo;
             const branchName = '${{ steps.get-branch.outputs.name }}';
             const branchNameLowerCase = branchName.toLowerCase();
 
             const submodules = [
-              { owner: 'heartexlabs', repo: 'label-studio-frontend' },
-              { owner: 'heartexlabs', repo: 'dm2' }
+              { owner: owner, repo: 'label-studio-frontend' },
+              { owner: owner, repo: 'dm2' }
             ]
             let openPRs = []  
             for (let submodule of submodules) {

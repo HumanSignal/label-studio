@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5121: User Setting Improvements",
-  "commit": "e45dea20b70f7ab001feccfebadd947104bab2ae",
+  "message": "fix: LSDV-5314: Persist collapse panel state",
+  "commit": "c1f97121ffe5e57d6a61c1ff22aa5289fa8c7edd",
   "branch": "master",
-  "date": "2023/06/01 08:59:52"
+  "date": "2023/06/21 14:45:51"
 }
