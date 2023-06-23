@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4937: Label missing from outliner when multiple labels are selected",
-  "commit": "402e1adcc3f47c719a02d5a62b478c1b52b2870d",
+  "commit": "fdba677dde5ef1ab501c42c1dcb5c2fb5358230e",
   "branch": "fb-lsdv-4937",
-  "date": "2023/06/21 16:32:26"
+  "date": "2023/06/23 17:14:49"
 }
