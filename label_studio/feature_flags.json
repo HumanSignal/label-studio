@@ -2526,6 +2526,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_front_lops_75_pretty_select_short": {
+      "key": "fflag_feat_front_lops_75_pretty_select_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "8a02a151f48749b0b04ca753b85bb9a3",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_front_lops_86_datasets_storage_edit_short": {
       "key": "fflag_feat_front_lops_86_datasets_storage_edit_short",
       "on": false,
