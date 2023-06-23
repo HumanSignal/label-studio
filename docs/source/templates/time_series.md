@@ -232,4 +232,4 @@ The `value` parameter in the [TimeSeries](/tags/timeseries.html) tag is used to 
 
 ### Video & audio sync with time series
 
-It's possible to synchronize TimeSeries with video and audio in Label Studio. Right now you can do this using the [HyperText](/tags/hypertext.html) tag with HTML objects `<audio src="path">`/`<video src="path">` and TimeSeries together. [Contact us](https://slack.labelstudio.heartex.com/?source=template-timeseries) in Slack to learn more about this experimental functionality.
+It's possible to synchronize TimeSeries with video and audio in Label Studio. Right now you can do this using the [HyperText](/tags/hypertext.html) tag with HTML objects `<audio src="path">`/`<video src="path">` and TimeSeries together. [Contact us](https://slack.labelstud.io/?source=template-timeseries) in Slack to learn more about this experimental functionality.

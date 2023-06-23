@@ -592,7 +592,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 5,
+      "version": 6,
       "deleted": false
     },
     "ff_dev_2007_rework_choices_280322_short": {
@@ -619,7 +619,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 5,
+      "version": 6,
       "deleted": false
     },
     "ff_dev_2100_clean_unnecessary_areas_140422_short": {
@@ -673,7 +673,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 4,
+      "version": 5,
       "deleted": false
     },
     "ff_dev_2128_html_in_labels_150422_short": {
@@ -1375,7 +1375,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 3,
+      "version": 4,
       "deleted": false
     },
     "ff_front_dev_2290_draft_in_annotation_history_short": {
@@ -3630,7 +3630,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 3,
+      "version": 4,
       "deleted": false
     },
     "fflag_fix_front_dev_3666_max_usages_on_region_creation_171122_short": {
@@ -3792,7 +3792,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 3,
+      "version": 4,
       "deleted": false
     },
     "fflag_fix_front_lsdv_4673_rect3point_relative_310523_short": {

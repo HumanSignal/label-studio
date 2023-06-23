@@ -1,5 +1,4 @@
 node_modules
-*.lock
 *.pyc
 *.ipynb
 __pycache__
