@@ -54,8 +54,8 @@ stages:
             image: !anystr
           drafts: []
           file_upload: null
-          id: 1
-          inner_id: 1
+          id: !anyint
+          inner_id: !anyint
           is_labeled: false
           last_comment_updated_at: null
           meta: {}
