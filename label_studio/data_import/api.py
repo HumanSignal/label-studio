@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import base64
 import time
 import requests
 import logging
@@ -602,7 +603,7 @@ class PresignStorageData(APIView):
         if not project.has_permission(request.user):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        fileuri = unquote(fileuri)
+        fileuri = base64.urlsafe_b64decode(fileuri.encode()).decode()
 
         try:
             resolved = task.resolve_storage_uri(fileuri, project)
