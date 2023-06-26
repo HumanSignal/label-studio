@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5314: Persist collapse panel state",
-  "commit": "c1f97121ffe5e57d6a61c1ff22aa5289fa8c7edd",
-  "branch": "master",
-  "date": "2023/06/21 14:45:51"
+  "message": "fix: LSDV-5343: Docs for visibleWhen; fix for incorrect whenChoiceValue",
+  "commit": "f33fdd6c06c78de68155d8ed7db1044cc87db9e5",
+  "branch": "fb-lsdv-5343/visible-when",
+  "date": "2023/06/26 14:49:42"
 }
