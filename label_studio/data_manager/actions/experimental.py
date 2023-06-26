@@ -12,8 +12,14 @@ from tasks.serializers import TaskSerializerBulk
 from data_manager.functions import DataManagerException
 from data_manager.actions.basic import delete_tasks
 from core.permissions import AllPermissions
+from core.label_config import replace_task_data_undefined_with_config_field
 from collections import defaultdict
 from core.redis import start_job_async_or_sync
+
+from io_storages.s3.models import S3ImportStorageLink
+from io_storages.gcs.models import GCSImportStorageLink
+from io_storages.azure_blob.models import AzureBlobImportStorageLink
+from io_storages.localfiles.models import LocalFilesImportStorage
 
 logger = logging.getLogger(__name__)
 all_permissions = AllPermissions()
@@ -70,12 +76,57 @@ def propagate_annotations_form(user, project):
 
 
 def remove_duplicates(project, queryset, **kwargs):
-    tasks = list(queryset.values('data', 'id', 'total_annotations'))
+    # get io_storage_* links for tasks, we need to copy them
+    storages = []
+    for field in dir(Task):
+        if field.startswith('io_storages_'):
+            storages += [field]
+
+    tasks = list(queryset.values(
+        'data', 'id', 'total_annotations', *storages
+    ))
     duplicates = defaultdict(list)
     for task in list(tasks):
+        replace_task_data_undefined_with_config_field(task['data'], project)
         task['data'] = json.dumps(task['data'])
         duplicates[task['data']].append(task)
 
+    ### build storage links for duplicates ###
+    classes = {
+        'io_storages_s3importstoragelink': S3ImportStorageLink,
+        'io_storages_gcsimportstoragelink': GCSImportStorageLink,
+        'io_storages_azureblobimportstoragelink': AzureBlobImportStorageLink,
+        'io_storages_localfilesimportstoragelink': LocalFilesImportStorage,
+        # 'io_storages_redisimportstoragelink',
+        # 'lse_io_storages_lses3importstoragelink'  # not supported yet
+    }
+    for data in list(duplicates):
+        tasks = duplicates[data]
+        source = None
+
+        # find first task with existing storage link
+        for task in tasks:
+            for link in classes:
+                if link in task and task[link] is not None:
+                    # we don't support case when there are many storage links in duplicated tasks
+                    if source is not None:
+                        source = None
+                        break
+                    source = (task, classes[link], task[link])  # last arg is a storage link id
+
+        # add storage links to duplicates
+        if source:
+            _class = source[1]  # get link name
+            for task in tasks:
+                if task['id'] != source[0]['id']:
+                    link_instance = _class.objects.get(id=source[2])
+                    _class.create(
+                        task=Task.objects.get(id=task['id']),
+                        key=link_instance.key,
+                        storage=link_instance.storage
+                    )
+
+    ### remove duplicates ###
     removing = []
 
     # prepare main tasks which won't be deleted
