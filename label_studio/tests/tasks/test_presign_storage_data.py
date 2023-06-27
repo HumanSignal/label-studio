@@ -118,7 +118,7 @@ class TestPresignStorageData:
 
     def test_successful_request(self, view, task, project, user, monkeypatch):
         task.resolve_storage_uri.return_value = dict(
-            url="https://presigned-url.com/czM6Ly9oeXBlcnRleHQtYnVja2V0L2ZpbGUgd2l0aCAvc3BhY2VzIGFuZCcgLyAnIC8gcXVvdGVzLmpwZw==",
+            url="https://presigned-url.com/fileuri",
             presign_ttl=3600,
         )
         project.has_permission.return_value = True
@@ -144,10 +144,7 @@ class TestPresignStorageData:
         response = view(request, task_id=1)
 
         assert response.status_code == status.HTTP_303_SEE_OTHER
-        assert (
-            response.url
-            == "https://presigned-url.com/czM6Ly9oeXBlcnRleHQtYnVja2V0L2ZpbGUgd2l0aCAvc3BhY2VzIGFuZCcgLyAnIC8gcXVvdGVzLmpwZw=="
-        )
+        assert response.url == "https://presigned-url.com/fileuri"
 
     def test_successful_request_with_long_fileuri(
         self, view, task, project, user, monkeypatch
