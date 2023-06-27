@@ -10,7 +10,7 @@ import traceback as tb
 
 from rq.job import Job
 from django_rq import job
-from urllib.parse import urljoin, quote, unquote
+from urllib.parse import urljoin
 
 from django.utils import timezone
 from django.db import models, transaction
