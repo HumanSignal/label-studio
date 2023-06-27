@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5314: Persist collapse panel state",
-  "commit": "c1f97121ffe5e57d6a61c1ff22aa5289fa8c7edd",
-  "branch": "master",
-  "date": "2023/06/21 14:45:51"
+  "message": "fix: LSDV-5296: Disconnect observer",
+  "commit": "c6eae0edbcb121e3a312531c3921b19a18fa6481",
+  "branch": "fb-lsdv-5296/disconnect-observer",
+  "date": "2023/06/27 16:48:24"
 }
