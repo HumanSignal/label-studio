@@ -173,7 +173,7 @@ class TestPresignStorageData:
         # The total length of the fileuri can not be more than 1024 characters
         # The length of the fileuri below is 1024 characters including the extension
         longest_allowable_cloud_storage_path = "is/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/long/path/that/needs/to/be/1024/characters.png"
-        longest_uri = f"azure-blob://{longest_allowable_cloud_storage_path}"
+        longest_uri = f"aaaaa-bbbb://{longest_allowable_cloud_storage_path}"
 
         base64_encoded_uri = base64.urlsafe_b64encode(longest_uri.encode()).decode()
 
