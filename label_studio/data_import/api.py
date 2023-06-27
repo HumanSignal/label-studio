@@ -603,7 +603,13 @@ class PresignStorageData(APIView):
         if not project.has_permission(request.user):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        fileuri = base64.urlsafe_b64decode(fileuri.encode()).decode()
+        # Attempt to base64 decode the fileuri
+        try:
+            fileuri = base64.urlsafe_b64decode(fileuri.encode()).decode()
+        # For backwards compatibility, try unquote if this fails
+        except Exception as exc:
+            logger.debug(f'Failed to decode base64 {fileuri} for task {task_id}: {exc} falling back to unquote')
+            fileuri = unquote(fileuri)
 
         try:
             resolved = task.resolve_storage_uri(fileuri, project)
