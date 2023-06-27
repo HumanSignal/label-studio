@@ -22,8 +22,12 @@ def annotate_finished_task_number(queryset):
 
 
 def annotate_total_predictions_number(queryset):
-    predictions = Prediction.objects.filter(task__project=OuterRef('id')).values('id')
-    return queryset.annotate(total_predictions_number=SQCount(predictions))
+    if flag_set("fflag_fix_back_lsdv_4719_improve_performance_of_project_annotations", user='auto'):
+        predictions = Prediction.objects.filter(task__project=OuterRef('id')).values('id')
+        return queryset.annotate(total_predictions_number=SQCount(predictions))
+    else:
+        return queryset.annotate(total_predictions_number=Count('tasks__predictions', distinct=True))
+
 
 def annotate_total_annotations_number(queryset):
     if flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):
