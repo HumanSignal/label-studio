@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5314: Persist collapse panel state",
-  "commit": "c1f97121ffe5e57d6a61c1ff22aa5289fa8c7edd",
-  "branch": "master",
-  "date": "2023/06/21 14:45:51"
+  "message": "feat: LSDV-5298: Paragraphs must sync seek, play and pause with Audio in both directions",
+  "commit": "a99de7d9d740ec90adba70bc741e2a152e1a8d65",
+  "branch": "fb-lsdv-5298",
+  "date": "2023/06/28 14:46:54"
 }
