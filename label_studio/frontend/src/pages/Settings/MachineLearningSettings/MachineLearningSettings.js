@@ -35,6 +35,7 @@ export const MachineLearningSettings = () => {
   const [modelsType, setModelsType] = useState('object_detection');
   const [keepChecks, setKeepChecks] = useState(false);
   const [availableProjects, setAvailableProjects] = useState([]);
+  const [currentlyTrainingModel, setCurrentlyTrainingModel]  = useState(null);
   const handleChange = event => {
     setGenerateSpecs(event.target.checked);
   };
@@ -53,6 +54,16 @@ export const MachineLearningSettings = () => {
         setSelectedTrainingType(training_types[0]);
         if (training_types.indexOf("Tao Training") !== -1) { 
           setKeepChecks(true);
+        }
+    })
+    await axios
+    .get(webhook_url + '/get_currently_training_model?id=' + project.id)
+      .then((response) => {
+        console.log(response);
+        if(response.data && response.data.model_version){
+          const trainingModel = response.data.model_version;
+          setCurrentlyTrainingModel(trainingModel);
+
         }
     })
       await axios
@@ -146,7 +157,7 @@ export const MachineLearningSettings = () => {
     axios.post(webhook_url + '/export?id=' + project.id +'&model_version=' + model_version)
     .then((response) => {
         if (response.data.message) {
-          Swal(response.data.message);
+          Swal.fire("Error", response.data.message, 'error');
         } else {
           const decodedData = atob(response.data.model);
           const arrayBuffer = new ArrayBuffer(decodedData.length);
@@ -163,12 +174,25 @@ export const MachineLearningSettings = () => {
         }
       })
       .catch((error) => {
-        console.error('export error');
+        console.error('Export error');
         console.error(error);
         Swal.fire('Error', 'Failed to export the model', 'error');
       });
   }
 
+  const onAbortTraining = useCallback(async (model) => {
+    await axios
+    .post(webhook_url + "/abort_training?id=" + project.id+"&model_version=" + model)
+    .then((response) => {
+      console.log(response);
+      if(response.data.message){
+        Swal.fire("Success", response.data.message, 'success');
+      }
+      else{
+        Swal.fire("Error", response.data.error, "error");
+      }
+    })
+  })
   const trainModel = useCallback(async () => {
     await axios
     .get(webhook_url + '/can_press')
@@ -179,10 +203,13 @@ export const MachineLearningSettings = () => {
             Swal.fire('Error', 'Someone has just trained or predicted, please wait for a moment', 'error')
           }
           else if (can_press == true) {
-            Swal.fire('Success', 'Training has started', 'success');
+            Swal.fire('Start', 'Training has started', 'info');
             let trainingType = "tao";
             if (selectedTrainingType == "PVT") {
               trainingType = "pvt";
+            }
+            if(selectedTrainingType == "segmentation"){
+              trainingType = "segmentation";
             }
             axios.post(webhook_url + '/train?id=' + project.id+'&generateSpecs='+generateSpecs+'&type='+trainingType).then((response) => {
               console.log(response);
@@ -194,6 +221,28 @@ export const MachineLearningSettings = () => {
         })
   })
 
+  const generatePredictionZipFile = async () => {
+    console.log("Generating prediction zip file");
+    Swal.fire("Please wait", "We are currently generating the zip file, it will be downloaded shortly", "info")
+    await axios.post(webhook_url + "/prediction_tool?project_id="+project.id).then((response) => {
+      if (response.data.message) {
+        Swal.fire("Error",response.data.message, "error");
+      } else {
+        const decodedData = atob(response.data.zip_file);
+        const arrayBuffer = new ArrayBuffer(decodedData.length);
+        const uint8Array = new Uint8Array(arrayBuffer);
+        for (let i = 0; i < decodedData.length; i++) {
+          uint8Array[i] = decodedData.charCodeAt(i);
+        }
+        const blob = new Blob([arrayBuffer], { type: 'application/zip' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = "predictionToolProject_"+project.id + '.zip';
+        link.click();
+      }
+    })
+  }
   const changeModelToPredictOn = async () => {
     console.log("changing model");
     const swalWithBootstrapButtons = Swal.mixin({
@@ -291,7 +340,7 @@ export const MachineLearningSettings = () => {
     <>
       <Description style={{ marginTop: 0, maxWidth: 680 }}>
         Add one or more machine learning models to predict labels for your data.
-        To import predictions without connecting a model,ss
+        To import predictions without connecting a model,
         {" "}
         <a href="https://labelstud.io/guide/predictions.html" target="_blank">
           see the documentation
@@ -365,6 +414,8 @@ export const MachineLearningSettings = () => {
           </label>
  
               </div>
+              <button onClick={() => generatePredictionZipFile()} style={{ width: '20%', marginTop: 20, color: 'white', borderRadius: 5, backgroundColor: 'green' }}>Generate Prediction Zip File</button>
+              <label>By clicking on this button, you will get a zip file containing predictions for the already annotated images in this project. The predictions will be divided into correct and incorrect folders (correct images are the ones where the number of objects detected is equal to the number of objects annotated)</label>
         {fetchedModels?
           <div>
           <div key={'models'}>
@@ -451,6 +502,7 @@ export const MachineLearningSettings = () => {
                       <div style={{ marginTop: 20 }}>
                             <button style={{ marginRight: 10 }} onClick={() => onExportModel(model.value)} className='btn btn-outline-primary'>Export Model</button>
                     {modelsType == 'object_detection' && modelsPrecisions[model.label]["model_type"]== "tao" ? <button onClick={() => onPrune(model.value)} className='btn btn-outline-warning'>Prune/Re-train</button> : ''}
+                    {currentlyTrainingModel == model.label ? <button onClick={() => onAbortTraining(model.value)} className='btn btn-outline-warning'>Abort Training</button> : ""}
                             <button style={{ marginLeft: 10 }} onClick={() => onDeleteModel(model.value)} className='btn btn-outline-danger'>Delete Model</button>
             </div>
           </Card>
