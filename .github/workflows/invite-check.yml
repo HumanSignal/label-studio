@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  INVITE_LINK: 'https://slack.labelstudio.heartex.com/'
+  INVITE_LINK: 'https://slack.labelstud.io/'
 
 jobs:
   check:
@@ -23,7 +23,7 @@ jobs:
         uses: slackapi/slack-github-action@v1.24
         with:
           channel-id: '${{ secrets.SLACK_LS_MONITORING_CHANNEL }}'
-          slack-message: "Our <${{ env.INVITE_LINK }}|public invite link> has expired and needs to be manually updated:\n1. <https://slack.com/intl/en-es/help/articles/201330256-Invite-new-members-to-your-workspace#share-an-invite-link|Generate a new link> without expiry date; you may need to deactivate the previous one first.\n2. Update the permanent redirect link <https://s3.console.aws.amazon.com/s3/bucket/slack.labelstudio.heartex.com/property/website/edit?region=us-east-1|on the S3 dashboard> with newly generated link WITHOUT URL SCHEME."
+          slack-message: "Our <${{ env.INVITE_LINK }}|public invite link> has expired and needs to be manually updated:\n1. <https://slack.com/intl/en-es/help/articles/201330256-Invite-new-members-to-your-workspace#share-an-invite-link|Generate a new link> without expiry date; you may need to deactivate the previous one first.\n2. Update the permanent redirect link <https://s3.console.aws.amazon.com/s3/bucket/slack.labelstud.io/property/website/edit?region=us-east-1|on the S3 dashboard> with newly generated link WITHOUT URL SCHEME."
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_LS_BOT_TOKEN }}
 

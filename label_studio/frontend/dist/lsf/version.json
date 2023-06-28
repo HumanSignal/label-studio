@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4930: Fix selection tool",
-  "commit": "cc058c94b8216689247f2f7ba41abf72ff2928f2",
+  "message": "fix: LSDV-5314: Persist collapse panel state",
+  "commit": "c1f97121ffe5e57d6a61c1ff22aa5289fa8c7edd",
   "branch": "master",
-  "date": "2023/06/19 17:18:36"
+  "date": "2023/06/21 14:45:51"
 }
