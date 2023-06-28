@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5296: Disconnect observer",
-  "commit": "119b2fdc4cec8118185f941d4527b924e7f3ef95",
-  "branch": "fb-lsdv-5296/disconnect-observer",
-  "date": "2023/06/27 17:35:04"
+  "commit": "18fa5c2a380ebc36deb72df718def914cd9bcc76",
+  "branch": "master",
+  "date": "2023/06/27 23:01:48"
 }
