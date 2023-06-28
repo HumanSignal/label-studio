@@ -3363,6 +3363,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_fix_back_lsdv_4719_improve_performance_of_project_annotations": {
+      "key": "fflag_fix_back_lsdv_4719_improve_performance_of_project_annotations",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "cb84db3bb0c24695808cbcda2dab7ca9",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_fix_back_lsdv_4826_annotation_history_20230331_short": {
       "key": "fflag_fix_back_lsdv_4826_annotation_history_20230331_short",
       "on": false,
