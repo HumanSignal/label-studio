@@ -415,6 +415,7 @@ SUPPORTED_EXTENSIONS = set(
         '.htm',
         '.html',
         '.jpg',
+        '.jpeg',
         '.json',
         '.m4a',
         '.mp3',
@@ -424,10 +425,10 @@ SUPPORTED_EXTENSIONS = set(
         '.tsv',
         '.txt',
         '.wav',
-        '.webp',
         '.xml',
         '.mp4',
         '.webm',
+        '.webp',
     ]
 )
 
@@ -615,6 +616,8 @@ if get_env('STORAGE_TYPE') == "s3":
     AWS_STORAGE_BUCKET_NAME = get_env('STORAGE_AWS_BUCKET_NAME')
     AWS_S3_REGION_NAME = get_env('STORAGE_AWS_REGION_NAME', None)
     AWS_S3_ENDPOINT_URL = get_env('STORAGE_AWS_ENDPOINT_URL', None)
+    if get_env('STORAGE_AWS_OBJECT_PARAMETERS'):
+        AWS_S3_OBJECT_PARAMETERS = json.loads(get_env('STORAGE_AWS_OBJECT_PARAMETERS'))
     AWS_QUERYSTRING_EXPIRE = int(get_env('STORAGE_AWS_X_AMZ_EXPIRES', '86400'))
     AWS_LOCATION = get_env('STORAGE_AWS_FOLDER', default='')
     AWS_S3_USE_SSL = get_bool_env('STORAGE_AWS_S3_USE_SSL', True)

@@ -45,7 +45,7 @@ jobs:
           sed -i "s/^${{ github.event.client_payload.dependency_name }}==.*/${{ github.event.client_payload.dependency_name }}==${{ github.event.client_payload.version }}/g" ${{ env.PYTHON_VERSION_FILE }}
 
           git add ${{ env.PYTHON_VERSION_FILE }}
-          git commit --message "chore: Bump ${{ github.event.client_payload.dependency_name }} version to ${{ github.event.client_payload.version }}"
+          git commit -m "chore: Bump ${{ github.event.client_payload.dependency_name }} version to ${{ github.event.client_payload.version }}" -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
 
           echo "commit=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
           git push origin HEAD:refs/heads/${branch}

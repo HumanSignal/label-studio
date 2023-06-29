@@ -26,6 +26,11 @@ SCIM interacts with your SSO integration.
 !!! attention "important"
     If you do not have SSO set up yet, then follow [Set up SSO](auth_setup.html).
 
+
+!!! attention "important"
+    Only owner's access token can be used for SCIM Identity Provider.
+
+
 Label Studio Enterprise uses SCIM Version 2.0 standard. As an example, this page uses integration with [Okta](https://www.okta.com/integrate/). However, Label Studio Enterprise follows [SCIM RFC 5741](https://datatracker.ietf.org/doc/html/rfc7644#section-3.2) and can be integrated with any access management services that support the standard.
 
 ## Set up SCIM integration
@@ -33,7 +38,7 @@ Label Studio Enterprise uses SCIM Version 2.0 standard. As an example, this page
 <i>Check this video tutorial about SCIM and Okta setup.</i>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/MA3de3gu18A" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-To manage access to Label Studio Enterprise, add the application to your SCIM provider (Okta). Okta uses OAuth token to interact with REST API endpoints of the application to provision and deprovision access.
+To manage access to Label Studio Enterprise, add the application to your SCIM provider (Okta). Okta uses Bearer (request header should be `Authorization: Bearer <token>`) token to interact with REST API endpoints of the application to provision and deprovision access.
 
 ### Add Label Studio Enterprise (if not complete)
 
@@ -59,7 +64,7 @@ Fill in the fields:
    - Push New Users
    - Push Profile Updates
    - Push Groups
- - **HTTP Header → Authorization**: Put the OAuth token from the **Settings** page.
+ - **HTTP Header → `Authorization: Bearer <token>`**: Put the Bearer token from the LSE owner's account profile. In case of Label Studio `Token` and `Bearer` are the same tokens. However, it's important to use `Bearer` instead of `Token` in the request header. 
 
 ### SCIM settings and application triggers
 
