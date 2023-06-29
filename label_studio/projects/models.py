@@ -412,7 +412,8 @@ class Project(ProjectMixin, models.Model):
         logger.info(f"Required tasks {must_tasks} and left required tasks {left_must_tasks}")
         if left_must_tasks > 0:
             # if there are unfinished tasks update tasks with count(annotations) >= overlap
-            tasks_with_max_annotations.update(overlap=max_annotations, is_labeled=True)
+            ids = tasks_with_max_annotations.values_list('id', flat=True)
+            all_project_tasks.filter(id__in=ids).update(overlap=max_annotations, is_labeled=True)
             # order other tasks by count(annotations)
             tasks_with_min_annotations = tasks_with_min_annotations.annotate(
                 anno=Count('annotations')
@@ -426,8 +427,10 @@ class Project(ProjectMixin, models.Model):
             min_tasks_to_update = all_project_tasks.filter(id__in=ids)
             min_tasks_to_update.update(overlap=1)
         else:
-            tasks_with_max_annotations.update(overlap=max_annotations)
-            tasks_with_min_annotations.update(overlap=1)
+            ids = tasks_with_max_annotations.values_list('id', flat=True)
+            all_project_tasks.filter(id__in=ids).update(overlap=max_annotations)
+            ids = tasks_with_min_annotations.values_list('id', flat=True)
+            all_project_tasks.filter(id__in=ids).update(overlap=1)
         # update is labeled after tasks rearrange overlap
         bulk_update_stats_project_tasks(all_project_tasks, project=self)
 
