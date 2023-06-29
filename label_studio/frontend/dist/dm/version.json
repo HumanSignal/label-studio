@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-185: [FE] resolve issue affecting semantic search when selecting items then changing text in semantic search",
-  "commit": "3c6db5291966757accd3c2fa6220a37fc08a7053",
-  "branch": "master",
-  "date": "2023/06/16 13:10:19"
+  "message": "fix: LSDV-5355: Check before using column id in DM column creation",
+  "commit": "65991f82238980100a04dfab9207d78cfdbfd793",
+  "branch": "fb-lsdv-5355",
+  "date": "2023/06/29 12:27:20"
 }
