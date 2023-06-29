@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5314: Persist collapse panel state",
-  "commit": "c1f97121ffe5e57d6a61c1ff22aa5289fa8c7edd",
+  "message": "fix: LSDV-4853: Add warning message when user selects more choices than maxUsages",
+  "commit": "3655c3f89dbaaff00de48895fffb4606186f1374",
   "branch": "master",
-  "date": "2023/06/21 14:45:51"
+  "date": "2023/06/29 10:02:36"
 }
