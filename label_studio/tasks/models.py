@@ -884,9 +884,10 @@ def bulk_update_stats_project_tasks(tasks, project=None):
             # finished tasks
             finished_tasks = tasks.filter(Q(total_annotations__gte=maximum_annotations) |
                                           Q(total_annotations__gte=1, overlap=1))
-            finished_tasks.update(is_labeled=True)
+            ids = finished_tasks.values_list('id', flat=True)
+            tasks.filter(id__in=ids).update(is_labeled=True)
             # unfinished tasks
-            tasks.exclude(id__in=finished_tasks).update(is_labeled=False)
+            tasks.exclude(id__in=ids).update(is_labeled=False)
         else:
             # update objects without saving if we can't use overlap
             for task in tasks:
