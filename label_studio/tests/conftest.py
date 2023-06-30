@@ -139,6 +139,14 @@ def s3_with_hypertext_s3_links(s3):
     }))
     yield s3
 
+@pytest.fixture(autouse=True)
+def s3_with_partially_encoded_s3_links(s3):
+    bucket_name = 'pytest-s3-json-partially-encoded'
+    s3.create_bucket(Bucket=bucket_name)
+    s3.put_object(Bucket=bucket_name, Key='test.json', Body=json.dumps({
+        'text': "<a href=\"s3://hypertext-bucket/file with /spaces and' / ' / %2Bquotes%3D.jpg\"/>"
+    }))
+    yield s3
 
 @pytest.fixture(autouse=True)
 def s3_with_unexisted_links(s3):
