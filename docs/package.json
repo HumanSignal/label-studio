@@ -42,6 +42,10 @@
     "notion-to-md": "github:huguestennier/notion-to-md",
     "save": "^2.4.0"
   },
+  "resolutions": {
+    "hexo-footnote/hexo-util": "3.0.1",
+    "markdown-it": "13.0.1"
+  },
   "scripts": {
     "clean": "hexo clean && touch db.json",
     "start": "hexo clean && touch db.json && hexo serve --config opensource.yml,_config.yml",

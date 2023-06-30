@@ -663,7 +663,7 @@ python3 manage.py annotation_history_get_organizations_and_projects
 ### On-premise production upgrades
 
 1. Use a staging environment to test the upgrade process before performing it on the production environment. This can help identify and fix any issues before they affect production systems.
-2. Always follow the Heartex’s guidelines and recommendations for upgrading software. This may include specific steps or prerequisites, compatibility requirements, or recommended configurations.
+2. Always follow the HumanSignal’s guidelines and recommendations for upgrading software. This may include specific steps or prerequisites, compatibility requirements, or recommended configurations.
 
 ## Post-processing for exports 
 
