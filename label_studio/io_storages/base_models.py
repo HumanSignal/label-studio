@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import base64
 import rq
 import json
 import logging
@@ -9,7 +10,7 @@ import traceback as tb
 
 from rq.job import Job
 from django_rq import job
-from urllib.parse import urljoin, quote
+from urllib.parse import urljoin
 
 from django.utils import timezone
 from django.db import models, transaction
@@ -285,7 +286,7 @@ class ImportStorage(Storage):
                         reverse(
                             "data_import:storage-data-presign",
                             kwargs={"task_id": task.id}
-                        ) + f'?fileuri={quote(extracted_uri)}'
+                        ) + f"?fileuri={base64.urlsafe_b64encode(extracted_uri.encode()).decode()}"
                     )
                     return uri.replace(extracted_uri, proxy_url)
                 else:
