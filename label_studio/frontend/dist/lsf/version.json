@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5343: Docs for visibleWhen; fix for incorrect whenChoiceValue",
-  "commit": "67588cf6a24f3abee08f287154c94ac9d1557d57",
+  "message": "docs: LSDV-5343: Docs for visibleWhen; remove FF_DEV_1372",
+  "commit": "133223a0bb4ff62820bce91fcc74709abe53b7fc",
   "branch": "fb-lsdv-5343/visible-when",
-  "date": "2023/06/26 23:17:36"
+  "date": "2023/06/30 12:52:19"
 }
