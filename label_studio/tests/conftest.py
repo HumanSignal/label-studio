@@ -139,6 +139,14 @@ def s3_with_hypertext_s3_links(s3):
     }))
     yield s3
 
+@pytest.fixture(autouse=True)
+def s3_with_partially_encoded_s3_links(s3):
+    bucket_name = 'pytest-s3-json-partially-encoded'
+    s3.create_bucket(Bucket=bucket_name)
+    s3.put_object(Bucket=bucket_name, Key='test.json', Body=json.dumps({
+        'text': "<a href=\"s3://hypertext-bucket/file with /spaces and' / ' / %2Bquotes%3D.jpg\"/>"
+    }))
+    yield s3
 
 @pytest.fixture(autouse=True)
 def s3_with_unexisted_links(s3):
@@ -517,6 +525,28 @@ def fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off():
             return False
         return flag_set(*args, **kwargs)
     with mock.patch('tasks.models.flag_set', wraps=fake_flag_set):
+        yield
+
+
+@pytest.fixture(name="fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short_on")
+def fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short_on():
+    from core.feature_flags import flag_set
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short':
+            return True
+        return flag_set(*args, **kwargs)
+    with mock.patch('data_export.api.flag_set', wraps=fake_flag_set):
+        yield
+
+
+@pytest.fixture(name="ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short_on")
+def ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short_on():
+    from core.feature_flags import flag_set
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short':
+            return True
+        return flag_set(*args, **kwargs)
+    with mock.patch('data_export.api.flag_set', wraps=fake_flag_set):
         yield
 
 
