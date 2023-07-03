@@ -52,9 +52,9 @@ def addsensordata(request):
             match sensortype.sensortype:
                 # Parse and upload the data
                 case 'I':
-                    parse_IMU(request=request, file_path=file_path,sensor_type_id=sensortype.id,name=name,project_id=project_id)
+                    parse_IMU(request=request, file_path=file_path,sensor=sensor,name=name,project_id=project_id)
                 case 'C':
-                    parse_camera(request=request, file_path=file_path,sensor_type_id=sensortype.id,name=name,project_id=project_id)
+                    parse_camera(request=request, file_path=file_path,sensor=sensor,name=name,project_id=project_id)
                 case 'M':
                     pass
         return redirect('sensordata:sensordatapage')
@@ -101,8 +101,8 @@ def adjust_offset(request, id):
         offsetform = SensorOffsetForm(instance=offset)
     return render(request, 'editOffset.html', {'offsetform':offsetform})
 
-def parse_IMU(request, file_path, sensor_type_id, name, project_id):
-    sensortype = SensorType.objects.get(id=sensor_type_id)
+def parse_IMU(request, file_path, sensor, name, project_id):
+    sensortype = SensorType.objects.get(id=sensor.sensortype)
     # Parse data
 
     project_controller = ProjectController()
@@ -146,16 +146,16 @@ def parse_IMU(request, file_path, sensor_type_id, name, project_id):
         # end_datetime = begin_datetime + end_time
 
     # Create SensorData object with parsed data
-    SensorData.objects.create(name=name, sensortype=sensortype,\
+    SensorData.objects.create(name=name, sensor=sensor,\
         begin_datetime=begin_datetime, end_datetime=end_datetime, project_id=project_id).save()
     
 
 
-def parse_camera(request, file_path, sensor_type_id, name, project_id):
+def parse_camera(request, file_path, sensor, name, project_id):
     # Upload video to project
     upload_sensor_data(request=request, name=name, file_path=file_path ,project_id=project_id)
     # Get sensortype config
-    sensortype = SensorType.objects.get(id=sensor_type_id)
+    sensortype = SensorType.objects.get(id=sensor.sensortype)
     sensor_timezone = sensortype.timezone
     # Parse video meta data
     videometadata = VideoMetaData(file_path=file_path,sensor_timezone=sensor_timezone)
@@ -168,7 +168,7 @@ def parse_camera(request, file_path, sensor_type_id, name, project_id):
     end_datetime =  begin_datetime + delta
 
     # Create SensorData object with parsed data
-    SensorData.objects.create(name=name, sensortype=sensortype,\
+    SensorData.objects.create(name=name, sensor=sensor,\
         begin_datetime=begin_datetime, end_datetime=end_datetime, project_id=project_id).save()
     
 def upload_sensor_data(request, name, file_path, project_id):

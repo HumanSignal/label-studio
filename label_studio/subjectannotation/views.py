@@ -4,6 +4,9 @@ from .forms import SubjectAnnotationForm
 from .utils.annotationtemplate import createSubjectAnnotationTemplate
 import requests
 from rest_framework.authtoken.models import Token
+from tasks.models import Task, Annotation
+from subjectannotation.models import SubjectPresence
+from sensormodel.models import Subject
 
 # Create your views here.
 def annotationtaskpage(request):
@@ -31,7 +34,8 @@ def createannotationtask(request):
             token = Token.objects.get(user=user)
 
             # Create project using LS API
-            requests.post(projects_url, headers={'Authorization': f'Token {token}'}, data={'label_config':template, 'title':title})
+            requests.post(projects_url, headers={'Authorization': f'Token {token}'}, 
+                          data={'label_config':template, 'title':title})
             
             ## Import data
             # Get ID of last created project    
@@ -39,7 +43,8 @@ def createannotationtask(request):
             last_project_id = list_projects_response.json()["results"][0]["id"]
 
             # Get url for importing data to the correct project
-            import_url = request.build_absolute_uri(reverse('data_import:api-projects:project-import',kwargs={'pk':last_project_id}))
+            import_url = request.build_absolute_uri(reverse('data_import:api-projects:project-import',
+                                                            kwargs={'pk':last_project_id}))
             # Get temporary file URL from the form
             file_url = request.FILES['file'].temporary_file_path()
             files = {f'{request.FILES["file"]}': open(file_url, 'rb')}
@@ -50,3 +55,19 @@ def createannotationtask(request):
 
     subjectannotationform = SubjectAnnotationForm()
     return render(request, 'annotationtaskpage.html', {'subjectannotationform':subjectannotationform})
+
+
+def exportannotations(request, project_id):
+    annotations = Annotation.objects.filter(project= project_id)
+    for annotation in annotations:
+        file_upload = Task.objects.get(id=annotation.task_id).file_upload
+        results= annotation.result
+        for result in results:
+            labels = result['value']['labels']
+            start_time = result['value']['start']
+            end_time = result['value']['end']
+            for label in labels:
+                subject = Subject.objects.get(name=label.replace('Subject: ',''))
+                SubjectPresence.objects.create(file_upload=file_upload,project_id=project_id,subject=subject,
+                                                 start_time=start_time,end_time=end_time)
+
