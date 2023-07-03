@@ -79,3 +79,7 @@ docker-compose.override.yml
 # if you want to include feature flags - use 
 # git add -f label_studio/feature_flags.json
 label_studio/feature_flags.json
+
+
+models.dot
+models.dot.png
