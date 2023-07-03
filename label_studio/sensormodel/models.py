@@ -58,10 +58,9 @@ class Deployment(models.Model):
     location = models.TextField(max_length=50)
     position = models.TextField(max_length=50, blank=True)
     
-    sensor = models.ManyToManyField(Sensor,blank=True)
-    subject = models.ManyToManyField(Subject,blank=True) 
-    sensorlist = models.TextField(max_length=500,blank=True)
-    subjectlist = models.TextField(max_length=500,blank =True)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, blank=True) 
+    sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, blank=True)
+    subjectpresence = models.JSONField(blank=True) 
 
     # Function that puts all sensors and all subjects in two list, for easier display in HTML table
     def CreateLists(self):
