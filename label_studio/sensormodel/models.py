@@ -1,5 +1,4 @@
 from django.db import models
-from sensordata.models import SensorData
 
 class SensorType(models.Model):
     SENSOR_CHOICES = (
@@ -60,8 +59,7 @@ class Deployment(models.Model):
     position = models.TextField(max_length=50, blank=True)
     
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, blank=True) 
-    sensor = models.ManyToManyField(Sensor, on_delete=models.CASCADE, blank=True)
-    sensordata = models.ForeignKey(SensorData, on_delete=models.CASCADE, blank=True)
+    sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, blank=True)
     subjectpresence = models.JSONField(blank=True) 
 
 

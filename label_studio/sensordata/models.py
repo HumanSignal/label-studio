@@ -1,7 +1,6 @@
 from django.db import models
 from sensormodel.models import Sensor
 
-
 class SensorData(models.Model):
     name = models.CharField(blank=True,null=True, max_length=100)
     project_id = models.IntegerField(blank=True,null=True)
