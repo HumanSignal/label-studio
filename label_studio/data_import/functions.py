@@ -8,6 +8,8 @@ from projects.models import ProjectImport, ProjectReimport
 from .serializers import ImportApiSerializer
 from .uploader import load_tasks_for_async_import
 from users.models import User
+from core.utils.common import load_func
+from django.conf import settings
 from webhooks.utils import emit_webhooks_for_instance
 from webhooks.models import WebhookAction
 from .models import FileUpload
@@ -113,6 +115,8 @@ def reformat_predictions(tasks, preannotated_from_fields):
         })
     return new_tasks
 
+post_process_reimport = load_func(settings.POST_PROCESS_REIMPORT)
+
 
 def async_reimport_background(reimport_id, organization_id, **kwargs):
 
@@ -158,3 +162,5 @@ def async_reimport_background(reimport_id, organization_id, **kwargs):
     reimport.data_columns = list(data_columns)
     reimport.status = ProjectReimport.Status.COMPLETED
     reimport.save()
+
+    post_process_reimport(reimport)

@@ -503,6 +503,7 @@ IO_STORAGES_IMPORT_LINK_NAMES = [
 
 CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 SAVE_USER = 'users.functions.save_user'
+POST_PROCESS_REIMPORT = 'core.utils.empty'
 USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
 TASK_SERIALIZER = 'tasks.serializers.BaseTaskSerializer'
 EXPORT_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializer'
