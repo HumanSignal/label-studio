@@ -5,6 +5,7 @@
 !deploy/docker-entrypoint.d/**
 !deploy/docker-entrypoint.sh
 !deploy/requirements-mw.txt
+!deploy/requirements-test.txt
 !deploy/requirements.txt
 !deploy/heroku_run.sh
 !deploy/uwsgi.ini

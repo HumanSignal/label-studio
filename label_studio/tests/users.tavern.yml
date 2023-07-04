@@ -53,3 +53,33 @@ stages:
       content-type: application/json
   response:
     status_code: 405
+
+---
+test_name: test_users_malicious_redirect
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+  - name: malicious_signup
+    request:
+      url: "{django_live_url}/user/signup?next=http://malicious.com"
+      data:
+        email: test_second_org@heartex.com
+        password: 12345678
+      method: POST
+    response:
+      status_code: 302
+      headers:
+        location: "/projects/" # redirect to projects page rather than malicious.com
+  - name: malicious_login
+    request:
+      url: "{django_live_url}/user/login?next=http://malicious.com"
+      data:
+        email: test_second_org@heartex.com
+        password: 12345678
+      method: POST
+    response:
+      status_code: 302
+      headers:
+        location: "/projects/" # redirect to projects page rather than malicious.com
