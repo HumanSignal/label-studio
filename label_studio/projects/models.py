@@ -412,7 +412,8 @@ class Project(ProjectMixin, models.Model):
         logger.info(f"Required tasks {must_tasks} and left required tasks {left_must_tasks}")
         if left_must_tasks > 0:
             # if there are unfinished tasks update tasks with count(annotations) >= overlap
-            tasks_with_max_annotations.update(overlap=max_annotations, is_labeled=True)
+            ids = tasks_with_max_annotations.values_list('id', flat=True)
+            all_project_tasks.filter(id__in=ids).update(overlap=max_annotations, is_labeled=True)
             # order other tasks by count(annotations)
             tasks_with_min_annotations = tasks_with_min_annotations.annotate(
                 anno=Count('annotations')
@@ -426,8 +427,10 @@ class Project(ProjectMixin, models.Model):
             min_tasks_to_update = all_project_tasks.filter(id__in=ids)
             min_tasks_to_update.update(overlap=1)
         else:
-            tasks_with_max_annotations.update(overlap=max_annotations)
-            tasks_with_min_annotations.update(overlap=1)
+            ids = tasks_with_max_annotations.values_list('id', flat=True)
+            all_project_tasks.filter(id__in=ids).update(overlap=max_annotations)
+            ids = tasks_with_min_annotations.values_list('id', flat=True)
+            all_project_tasks.filter(id__in=ids).update(overlap=1)
         # update is labeled after tasks rearrange overlap
         bulk_update_stats_project_tasks(all_project_tasks, project=self)
 
@@ -844,17 +847,25 @@ class Project(ProjectMixin, models.Model):
             bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
         return len(objs)
 
-    def _update_tasks_counters_and_is_labeled(self, queryset, from_scratch=True):
+    def _update_tasks_counters_and_is_labeled(self, task_ids, from_scratch=True):
         """
-        Update tasks counters and is_labeled in a single operation
-        :param queryset: Tasks to update queryset
+        Update tasks counters and is_labeled in batches of size settings.BATCH_SIZE.
+        :param task_ids: List of task ids to be updated
         :param from_scratch: Skip calculated tasks
         :return: Count of updated tasks
         """
-        queryset = make_queryset_from_iterable(queryset)
-        objs = self._update_tasks_counters(queryset, from_scratch)
-        bulk_update_stats_project_tasks(queryset, self)
-        return objs
+        num_tasks_updated = 0
+        page_idx = 0
+
+        while (task_ids_slice := task_ids[page_idx * settings.BATCH_SIZE:(page_idx + 1) * settings.BATCH_SIZE]):
+            with transaction.atomic():
+                # If counters are updated, is_labeled must be updated as well. Hence, if either fails, we
+                # will roll back.
+                queryset = make_queryset_from_iterable(task_ids_slice)
+                num_tasks_updated += self._update_tasks_counters(queryset, from_scratch)
+                bulk_update_stats_project_tasks(queryset, self)
+            page_idx += 1
+        return num_tasks_updated
 
     def _update_tasks_counters_and_task_states(self, queryset, maximum_annotations_changed,
                                                overlap_cohort_percentage_changed, tasks_number_changed,
