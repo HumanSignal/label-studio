@@ -315,7 +315,7 @@ jobs:
           pip install -e .
 
       - name: Fix sqlite.dll for python < 3.9
-        if: ${{ contains(matrix.python-version, '3.7') || contains(matrix.python-version, '3.8') }}
+        if: ${{ contains(matrix.python-version, '3.8') }}
         run: |
           set PYTHONIOENCODING=utf-8
           set PYTHONLEGACYWINDOWSSTDIO=utf-8
