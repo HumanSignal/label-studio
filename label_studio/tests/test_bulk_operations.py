@@ -7,6 +7,7 @@ import datetime
 from users.models import User
 from projects.models import Project
 from label_studio.tests.test_data.gen_tasks_and_annotations import gen_tasks
+from django.conf import settings
 
 
 @pytest.mark.django_db
@@ -42,7 +43,7 @@ def test_load_tasks_and_annotations(business_client, annotator_client, configure
 
     dt1 = datetime.datetime.now()
     filename = 'tasks_and_annotations.json'
-    filepath = os.path.join(os.path.dirname(__file__), 'test_data/', filename)
+    filepath = os.path.join(settings.TEST_DATA_ROOT, filename)
 
     data = { filename: (open(filepath, 'rb'), filename) }
     url = '/api/projects/{}/tasks/bulk/'.format(project_id)
