@@ -1394,11 +1394,12 @@ hexo-generator-index@^0.2.1:
     hexo-pagination "0.0.2"
     object-assign "^4.0.1"
 
-"hexo-generator-search@https://github.com/nicholasrq/hexo-generator-search.git":
+hexo-generator-search@^2.4.3:
   version "2.4.3"
-  resolved "git+ssh://git@github.com/nicholasrq/hexo-generator-search.git#c7285fe8c00a44ad020e49cc1d56f6cfc094b9f3"
+  resolved "https://registry.yarnpkg.com/hexo-generator-search/-/hexo-generator-search-2.4.3.tgz#c4f35c8b8429355612dd1cdf5a18de3568166f99"
+  integrity sha512-Z5hfZq2g3np/Tgdp2q9HobfIvU6Pdz89tnTurc1IIq/vW0MHgDynk0Aiv6kvMtKWthnZ5l0iEMT3YLN35NdYwQ==
   dependencies:
-    nunjucks "^3.2.3"
+    nunjucks "^3.0.1"
     utils-merge "^1.0.0"
 
 hexo-generator-sitemap@^3.0.1:
@@ -1517,11 +1518,12 @@ hexo-server@^3.0.0:
     picocolors "^1.0.0"
     serve-static "^1.14.1"
 
-"hexo-tag-details@https://github.com/nicholasrq/hexo-tag-details.git":
-  version "0.1.8"
-  resolved "git+ssh://git@github.com/nicholasrq/hexo-tag-details.git#4af52dc689ffebec772d60920795ac8dd0e8333e"
+hexo-tag-details@^0.1.7:
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/hexo-tag-details/-/hexo-tag-details-0.1.7.tgz#dcc2ff00157abc07f1a9421db89853271fdc6080"
+  integrity sha512-wjt5OLJKvhaqnjj3HaOWVRrRaAlLeV/YWq5CpyRzIqZ+K7lvuWXf4dTjzzb46NrENaiRLE4saENyDVK0jOWUbw==
   dependencies:
-    hexo-util "^2.5.0"
+    hexo-util "^0.6.3"
 
 hexo-util@3.0.1, hexo-util@^0.6.3, hexo-util@^3.0.1:
   version "3.0.1"
@@ -1537,7 +1539,7 @@ hexo-util@3.0.1, hexo-util@^0.6.3, hexo-util@^3.0.1:
     prismjs "^1.29.0"
     strip-indent "^3.0.0"
 
-hexo-util@^2.0.0, hexo-util@^2.1.0, hexo-util@^2.5.0, hexo-util@^2.7.0:
+hexo-util@^2.0.0, hexo-util@^2.1.0, hexo-util@^2.7.0:
   version "2.7.0"
   resolved "https://registry.npmjs.org/hexo-util/-/hexo-util-2.7.0.tgz"
   integrity sha512-hQM3h34nhDg0bSe/Tg1lnpODvNkz7h2u0+lZGzlKL0Oufp+5KCAEUX9wal7/xC7ax3/cwEn8IuoU75kNpZLpJQ==
@@ -2438,9 +2440,9 @@ normalize-path@^3.0.0, normalize-path@~3.0.0:
   resolved "https://registry.npmjs.org/normalize-path/-/normalize-path-3.0.0.tgz"
   integrity sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
 
-"notion-to-md@github:huguestennier/notion-to-md":
+"notion-to-md@https://github.com/huguestennier/notion-to-md.git":
   version "2.5.5"
-  resolved "git+ssh://git@github.com/huguestennier/notion-to-md.git#28f2b7c827e783316cb588636314ce3a251c7edf"
+  resolved "https://github.com/huguestennier/notion-to-md.git#28f2b7c827e783316cb588636314ce3a251c7edf"
   dependencies:
     markdown-table "^2.0.0"
 
@@ -2451,7 +2453,7 @@ nth-check@^2.0.1:
   dependencies:
     boolbase "^1.0.0"
 
-nunjucks@^3.1.6, nunjucks@^3.2.1, nunjucks@^3.2.3:
+nunjucks@^3.0.1, nunjucks@^3.1.6, nunjucks@^3.2.1, nunjucks@^3.2.3:
   version "3.2.4"
   resolved "https://registry.npmjs.org/nunjucks/-/nunjucks-3.2.4.tgz"
   integrity sha512-26XRV6BhkgK0VOxfbU5cQI+ICFUtMLixv1noZn1tGU38kQH5A5nmmbk/O45xdyBhD1esk47nKrY0mvQpZIhRjQ==
