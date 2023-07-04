@@ -415,6 +415,7 @@ SUPPORTED_EXTENSIONS = set(
         '.htm',
         '.html',
         '.jpg',
+        '.jpeg',
         '.json',
         '.m4a',
         '.mp3',
@@ -424,12 +425,16 @@ SUPPORTED_EXTENSIONS = set(
         '.tsv',
         '.txt',
         '.wav',
-        '.webp',
         '.xml',
         '.mp4',
         '.webm',
+        '.webp',
     ]
 )
+
+# directory for files created during unit tests
+TEST_DATA_ROOT = os.path.join(BASE_DATA_DIR, 'test_data')
+os.makedirs(TEST_DATA_ROOT, exist_ok=True)
 
 # project exports
 EXPORT_DIR = os.path.join(BASE_DATA_DIR, 'export')
@@ -505,6 +510,7 @@ CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 SAVE_USER = 'users.functions.save_user'
 POST_PROCESS_REIMPORT = 'core.utils.empty'
 USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
+USER_SERIALIZER_UPDATE = 'users.serializers.BaseUserSerializerUpdate'
 TASK_SERIALIZER = 'tasks.serializers.BaseTaskSerializer'
 EXPORT_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializer'
 DATA_MANAGER_GET_ALL_COLUMNS = 'data_manager.functions.get_all_columns'
@@ -615,6 +621,8 @@ if get_env('STORAGE_TYPE') == "s3":
     AWS_STORAGE_BUCKET_NAME = get_env('STORAGE_AWS_BUCKET_NAME')
     AWS_S3_REGION_NAME = get_env('STORAGE_AWS_REGION_NAME', None)
     AWS_S3_ENDPOINT_URL = get_env('STORAGE_AWS_ENDPOINT_URL', None)
+    if get_env('STORAGE_AWS_OBJECT_PARAMETERS'):
+        AWS_S3_OBJECT_PARAMETERS = json.loads(get_env('STORAGE_AWS_OBJECT_PARAMETERS'))
     AWS_QUERYSTRING_EXPIRE = int(get_env('STORAGE_AWS_X_AMZ_EXPIRES', '86400'))
     AWS_LOCATION = get_env('STORAGE_AWS_FOLDER', default='')
     AWS_S3_USE_SSL = get_bool_env('STORAGE_AWS_S3_USE_SSL', True)

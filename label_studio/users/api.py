@@ -3,7 +3,6 @@
 import logging
 import drf_yasg.openapi as openapi
 
-from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 
@@ -19,7 +18,7 @@ from rest_framework.exceptions import MethodNotAllowed
 
 from core.permissions import all_permissions, ViewClassPermission
 from users.models import User
-from users.serializers import UserSerializer
+from users.serializers import UserSerializer, UserSerializerUpdate
 from users.functions import check_avatar
 
 
@@ -119,6 +118,11 @@ class UserAPI(viewsets.ModelViewSet):
             request.user.save()
             return Response(status=204)
 
+    def get_serializer_class(self):
+        if self.request.method in {'PUT', 'PATCH'}:
+            return UserSerializerUpdate
+        return super().get_serializer_class()
+
     def update(self, request, *args, **kwargs):
         return super(UserAPI, self).update(request, *args, **kwargs)
 
@@ -137,6 +141,14 @@ class UserAPI(viewsets.ModelViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         result = super(UserAPI, self).partial_update(request, *args, **kwargs)
+
+        # throw MethodNotAllowed if read-only fields are attempted to be updated
+        read_only_fields = self.get_serializer_class().Meta.read_only_fields
+        for field in read_only_fields:
+            if field in request.data:
+                raise MethodNotAllowed(
+                    'PATCH', detail=f'Cannot update read-only field: {field}'
+                )
 
         # newsletters
         if 'allow_newsletters' in request.data:
