@@ -857,7 +857,9 @@ class Project(ProjectMixin, models.Model):
         num_tasks_updated = 0
         page_idx = 0
 
-        while (task_ids_slice := task_ids[page_idx * settings.BATCH_SIZE:(page_idx + 1) * settings.BATCH_SIZE]):
+        batch_size = settings.BATCH_SIZE or len(task_ids)
+
+        while (task_ids_slice := task_ids[page_idx * batch_size:(page_idx + 1) * batch_size]):
             with transaction.atomic():
                 # If counters are updated, is_labeled must be updated as well. Hence, if either fails, we
                 # will roll back.
