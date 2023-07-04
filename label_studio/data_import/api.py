@@ -400,6 +400,7 @@ class ReImportAPI(ImportAPI):
             async_reimport_background,
             project_reimport.id,
             organization_id,
+            self.request.user,
             on_failure=set_reimport_background_failure,
             project_id=project.id,
         )
