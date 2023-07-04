@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5164: Unselect labels with tools",
-  "commit": "907eac575728cf38b5d0533e218d1161bb46cbb4",
+  "commit": "29b98f0af37b144953388ee4ae5cb5466203f12a",
   "branch": "fb-lsdv-5164/unselect-labels-with-tools",
-  "date": "2023/06/29 21:52:03"
+  "date": "2023/07/04 11:04:17"
 }
