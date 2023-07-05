@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5316: Fix Ctrl/Cmd+X in Config Editor ",
-  "commit": "0c801430fa7033c3e3f78eda1b4d4231af11bf9d",
-  "branch": "master",
-  "date": "2023/06/30 23:07:52"
+  "message": "feat: LSDV-5295: Scroll managemente of paragraph transcriptions",
+  "commit": "da4d440bcdf6280231b84a92b03025eb7b070fb8",
+  "branch": "fb-lsdv-5295",
+  "date": "2023/07/05 20:47:34"
 }
