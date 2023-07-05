@@ -16,7 +16,6 @@ stages:
     method: POST
   response:
     status_code: 302
-
 - id: login
   name: Login
   request:
