@@ -12,6 +12,8 @@ to be bulk imported in project
 import random as r
 import os
 
+from django.conf import settings
+
 task_template_start = """{"id": %s,"predictions":[],"annotations":["""
 
 label_choices = ["Neutral", "Positive", "Negative"]
@@ -41,7 +43,7 @@ def gen_tasks(user_id):
             tasks.append(',')
         i += 1
 
-    with open(os.path.join(os.path.dirname(__file__), 'tasks_and_annotations.json'), 'w+', encoding='utf-8') as f:
+    with open(os.path.join(settings.TEST_DATA_ROOT, 'tasks_and_annotations.json'), 'w+', encoding='utf-8') as f:
         f.write('[' + ''.join(tasks) + ']')
 
 
