@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5355: Check before using column id in DM column creation",
-  "commit": "ea6d4a45189e17b894d89a968b3a02ac17fcbcae",
-  "branch": "master",
-  "date": "2023/06/29 13:12:32"
+  "message": "fix: LSDV-4620-3: Fix Richtext performance and functional",
+  "commit": "96255d12419fc37365a6509217e264c1f1edee2b",
+  "branch": "fb-lsdv-4620-3/richtext-improvements",
+  "date": "2023/07/06 23:40:24"
 }
