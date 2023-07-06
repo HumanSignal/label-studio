@@ -126,7 +126,7 @@ The frontend part of Label Studio app lies in the `frontend/` folder and written
 
 ```
 cd label_studio/frontend/
-npm ci
+yarn install --frozen-lockfile
 npx webpack
 cd ../..
 python label_studio/manage.py collectstatic --no-input
