@@ -49,7 +49,7 @@ If you have access to multiple organizations, use the **Organizations** page to 
 
 Workspaces are a key differentiating factor between open-source and enterprise versions, providing powerful capabilities to organize, categorize and manage projects at different stages of their lifecycle or use case. 
 
-While projects contain tasks, workspaces contain projects. Besides using workspaces to organize projects, you can also  <a href="manage_users.html">manage user access</a> to workspaces or to specific projects contained in workspaces (). 
+While projects contain tasks, workspaces contain projects. Besides using workspaces to organize projects, you can also  <a href="manage_users.html">manage user access</a> to workspaces or to specific projects contained in workspaces. 
 
 ### Create workspaces to organize projects
 
@@ -194,7 +194,7 @@ To duplicate a project:
 
 To reduce clutter in the workspace sidebar you can archive one or more workspaces from view, allowing you to easily locate high-priority labeling initiatives. You’ll still have complete access to workspaces that have been archived and you can unarchive them at any time. 
 
-### Archiving a workspace
+#### Archiving a workspace
 
 Archived workspaces and the projects they contain can be referenced or worked on as normal, even when hidden from the main view. Simply click the menu next to a workspace name and click “Archive” to hide it from view.
 
@@ -205,13 +205,13 @@ You can also archive a workspace from the gear icon next to the current workspac
 
   <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/workspace-edit-modal.png" style="opacity: 0.8"/></div>
 
-### View archived workspace
+#### View archived workspace
 
 To view archived workspaces, expand the archived workspaces toggle at the bottom of the project page sidebar.
 
   <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/workspace-archive-expand.png" style="opacity: 0.8"/></div>
 
-### Unarchiving a workspace
+#### Unarchiving a workspace
 
 To unarchive a workspace, use the same menu where you initially archived it and click “Unarchive” which will bring the workspace into the normal workspace view.
 
