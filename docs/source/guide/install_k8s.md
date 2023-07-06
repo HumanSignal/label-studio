@@ -30,7 +30,7 @@ If you want to install Label Studio on Kubernetes and you have unrestricted acce
 3. [Add the Helm chart repository](#Add-the-Helm-chart-repository).
 4. (Optional) Set up [persistent storage](persistent_storage.html).
 5. (Optional) Configure [ingress](ingress_config.html).
-6. [Configure a values.yaml file](#Configure-values-yaml).
+6. (Optional) Configure [values.yaml](helm_values.html).
 7. (Optional) [Set up TLS for PostgreSQL](#Optional-set-up-TLS-for-PostgreSQL)
 8. (Optional) [Set up TLS for Redis](#Optional-set-up-TLS-for-Redis)
 9. [Use Helm to install Label Studio on your Kubernetes cluster](#Use-Helm-to-install-Label-Studio-on-your-Kubernetes-cluster).
