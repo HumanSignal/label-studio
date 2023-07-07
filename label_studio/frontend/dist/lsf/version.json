@@ -1,6 +1,6 @@
 {
-  "message": "Add comment about fixed updateValue()",
+  "message": "fix: LSDV-1476: Fix selected=true for Taxonomy",
   "commit": "c592549d0c3a99f3223ef2e50035ae4efc2ceb3f",
-  "branch": "",
-  "date": "2023-06-30T23:45:00Z"
+  "branch": "fb-lsdv-1476/preselected-taxonomy",
+  "date": "2023/07/01 00:45:00"
 }
