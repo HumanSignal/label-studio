@@ -59,7 +59,7 @@ def import_from_url_mock(**kwargs):
             url='https://data.heartextest.net'
 
             with open('./tests/test_suites/samples/test_1.csv', 'rb') as f:
-                matcher = re.compile('data.heartextest.net/test_1.csv')
+                matcher = re.compile('data\.heartextest\.net/test_1\.csv')
 
                 m.get(matcher, body=f, headers={'Content-Length': '100'})
                 yield m
