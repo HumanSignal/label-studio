@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5298: Paragraphs must sync seek, play and pause with Audio in both directions",
-  "commit": "cf560171e5f3db9cf0d365302056538bb456defe",
-  "branch": "master",
-  "date": "2023/07/06 09:59:44"
+  "message": "feat: LSDV-5297: Sort phrases",
+  "commit": "4905324016ef34195ee1fa38bcd07cab7382740a",
+  "branch": "fb-lsdv-5297/sort-phrases",
+  "date": "2023/07/07 10:20:24"
 }
