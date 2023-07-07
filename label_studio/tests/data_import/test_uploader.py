@@ -3,6 +3,7 @@ import pytest
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
 
+from core.utils.exceptions import InvalidUploadUrlError
 from data_import.uploader import load_tasks, check_tasks_max_file_size
 
 pytestmark = pytest.mark.django_db
@@ -25,7 +26,8 @@ class MockedRequest:
 
 class TestUploader:
     @pytest.fixture
-    def project(self, configured_project):
+    def project(self, configured_project, settings):
+        settings.SSRF_PROTECTION_ENABLED = True
         return configured_project
 
     class TestLoadTasks:
@@ -33,10 +35,23 @@ class TestUploader:
         def test_raises_for_local_files(self, url, project):
             request = MockedRequest(url=url)
 
-            with pytest.raises(ValidationError) as e:
+            with pytest.raises(InvalidUploadUrlError) as e:
                 load_tasks(request, project)
 
-            assert '"url" is not valid' in str(e.value)
+        @pytest.mark.parametrize("url", ("http://0.0.0.0", " https://0.0.0.0 "))
+        def test_raises_for_local_urls(self, url, project):
+            request = MockedRequest(url="http://0.0.0.0")
+
+            with pytest.raises(InvalidUploadUrlError) as e:
+                load_tasks(request, project)
+
+        @pytest.mark.parametrize("url", ("ftp://example.org", "jdni://example.org"))
+        def test_raises_for_non_http_schemas(self, url, project):
+            request = MockedRequest(url="http://0.0.0.0")
+
+            with pytest.raises(InvalidUploadUrlError) as e:
+                load_tasks(request, project)
+
 
 
 class TestTasksFileChecks:
