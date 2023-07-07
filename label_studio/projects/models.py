@@ -1225,3 +1225,29 @@ class ProjectImport(models.Model):
 
     def has_permission(self, user):
         return self.project.has_permission(user)
+
+
+class ProjectReimport(models.Model):
+    class Status(models.TextChoices):
+        CREATED = 'created', _('Created')
+        IN_PROGRESS = 'in_progress', _('In progress')
+        FAILED = 'failed', _('Failed')
+        COMPLETED = 'completed', _('Completed')
+
+    project = models.ForeignKey(
+        'projects.Project', null=True, related_name='reimports', on_delete=models.CASCADE
+    )
+    status = models.CharField(max_length=64, choices=Status.choices, default=Status.CREATED)
+    error = models.TextField(null=True, blank=True)
+    task_count = models.IntegerField(default=0)
+    annotation_count = models.IntegerField(default=0)
+    prediction_count = models.IntegerField(default=0)
+    duration = models.IntegerField(default=0)
+    file_upload_ids = models.JSONField(default=list)
+    files_as_tasks_list = models.BooleanField(default=False)
+    found_formats = models.JSONField(default=list)
+    data_columns = models.JSONField(default=list)
+    traceback = models.TextField(null=True, blank=True)
+
+    def has_permission(self, user):
+        return self.project.has_permission(user)
