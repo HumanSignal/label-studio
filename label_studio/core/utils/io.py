@@ -18,7 +18,8 @@ from tempfile import mkstemp, mkdtemp
 from django.conf import settings
 from appdirs import user_config_dir, user_data_dir, user_cache_dir
 
-from label_studio.core.utils.exceptions import InvalidUploadUrlError
+# full path import results in unit test failures
+from .exceptions import InvalidUploadUrlError
 
 
 _DIR_APP_NAME = 'label-studio'
