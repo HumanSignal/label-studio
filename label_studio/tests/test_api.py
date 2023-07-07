@@ -3,6 +3,7 @@
 import pytest
 import json
 import requests_mock
+from unittest import mock
 
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
@@ -128,18 +129,22 @@ def test_patch_project(client_and_token, configured_project, payload, response, 
         else:
             assert response_data == response
 
-
+@mock.patch('ml.serializers.validate_upload_url')
 @pytest.mark.parametrize('external_status_code, current_active_ml_backend_url, ml_backend_call_count', [
     (201, 'http://my.super.ai', 4),
 ])
 @pytest.mark.django_db
 def test_creating_activating_new_ml_backend(
-    client_and_token, configured_project, external_status_code, current_active_ml_backend_url,
-    ml_backend_call_count
+    mock_validate_upload_url, client_and_token, configured_project, external_status_code,
+    current_active_ml_backend_url, ml_backend_call_count, settings
 ):
+    # Turn off telemetry to avoid requests mock receiving requests from it, to
+    # eliminate flakes. TODO(jo): consider implementing this more broadly in test.
+    settings.COLLECT_ANALYTICS = False
+
     business_client, token = client_and_token
     with requests_mock.Mocker() as m:
-        my_url = 'http://my.super.ai'
+        my_url = current_active_ml_backend_url
         m.post(f'{my_url}/setup', text=json.dumps({'model_version': 'Version from My Super AI'}))
         m.get(f'{my_url}/health', text=json.dumps({'status': 'UP'}))
         r = business_client.post(
@@ -152,6 +157,7 @@ def test_creating_activating_new_ml_backend(
             content_type='application/json',
             headers={'Authorization': f'Token {token}'}
         )
+
         assert r.status_code == external_status_code
         assert m.called
         assert m.call_count == ml_backend_call_count
@@ -159,6 +165,7 @@ def test_creating_activating_new_ml_backend(
         all_urls = [m.url for m in project.ml_backends.all()]
         connected_ml = [url for url in all_urls if url == current_active_ml_backend_url]
         assert len(connected_ml) == 1, '\n'.join(all_urls)
+        mock_validate_upload_url.assert_called_once_with(my_url, block_local_urls=False)
 
 
 @pytest.mark.django_db

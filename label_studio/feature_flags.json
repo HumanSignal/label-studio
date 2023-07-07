@@ -3336,33 +3336,6 @@
       "version": 2,
       "deleted": false
     },
-    "fflag_fix_back_lsdv_4568_import_csv_links_03032023_short": {
-      "key": "fflag_fix_back_lsdv_4568_import_csv_links_03032023_short",
-      "on": true,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "4d6e875af4b3453a827a94db5eb8a88d",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
-      "deleted": false
-    },
     "fflag_fix_back_lsdv_4648_annotator_filter_29052023_short": {
       "key": "fflag_fix_back_lsdv_4648_annotator_filter_29052023_short",
       "on": false,

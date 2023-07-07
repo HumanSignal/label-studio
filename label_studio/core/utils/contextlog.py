@@ -15,6 +15,7 @@ from uuid import uuid4
 from .common import get_app_version, get_client_ip
 from .params import get_bool_env
 from .io import get_config_dir, find_file
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +42,7 @@ class ContextLog(object):
     _log_payloads = _load_log_payloads()
 
     def __init__(self):
-        self.collect_analytics = get_bool_env('collect_analytics', True)
+        self.collect_analytics = settings.COLLECT_ANALYTICS
         self.version = get_app_version()
         self.server_id = self._get_server_id()
 
