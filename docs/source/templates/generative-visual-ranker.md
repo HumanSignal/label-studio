@@ -3,7 +3,7 @@ title: Visual Ranker
 type: templates
 category: Generative AI
 cat: generative-ai
-order: 905
+order: 907
 is_new: t
 meta_title: Create a ranked dataset for text-to-image models with Label Studio
 meta_description: Template for creating a ranked dataset for text-to-image models with Label Studio for your machine learning and data science projects.

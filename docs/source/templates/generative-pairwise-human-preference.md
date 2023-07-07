@@ -3,7 +3,7 @@ title: Human Preferences collection for RLHF
 type: templates
 category: Generative AI
 cat: generative-ai
-order: 903
+order: 904
 is_new: t
 meta_title: Create dataset for human preferences collection for RLHF
 meta_description: Template for creating dataset for human preferences collection for RLHF with Label Studio for your machine learning and data science projects.

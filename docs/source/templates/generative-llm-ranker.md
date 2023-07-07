@@ -3,7 +3,7 @@ title: LLM Ranker
 type: templates
 category: Generative AI
 cat: generative-ai
-order: 905
+order: 906
 is_new: t
 meta_title: Create a ranked dataset for LLMs with Label Studio
 meta_description: Create a ranked dataset for LLMs with Label Studio for your machine learning and data science projects.

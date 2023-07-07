@@ -3,7 +3,7 @@ title: Chatbot Assessment
 type: templates
 category: Generative AI
 cat: generative-ai
-order: 904
+order: 905
 is_new: t
 meta_title: Create dataset for human preferences collection for RLHF
 meta_description: Template for creating dataset for human preferences collection for RLHF with Label Studio for your machine learning and data science projects.
