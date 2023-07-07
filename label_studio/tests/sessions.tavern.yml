@@ -108,7 +108,7 @@ stages:
       json:
         pk: id
     status_code: 201
-  delay_after: 1
+  delay_after: 3
 
 # and by now we reach MAX_SESSION_AGE and hte session end even if we were active
 - name: get_projects_5
