@@ -154,16 +154,32 @@ pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl
 pip install label-studio
 ```
 
-#### Run test suite
+### Run test suite
+To add the tests' dependencies to your local install:
+
 ```bash
 pip install -r deploy/requirements-test.txt
+```
+
+Alternatively, it is possible to run the unit tests from a Docker container in which the test dependencies are installed:
+
+
+```bash
+make build-testing-image
+make docker-testing-shell
+```
+
+In either case, to run the unit tests:
+
+```bash
 cd label_studio
 
-# postgres (assumes default postgres user,db,pass)
-DJANGO_DB=default DJANGO_SETTINGS_MODULE=core.settings.label_studio python -m pytest -vv -n auto
-
 # sqlite3
-DJANGO_DB=sqlite DJANGO_SETTINGS_MODULE=core.settings.label_studio python -m pytest -vv -n auto
+DJANGO_DB=sqlite DJANGO_SETTINGS_MODULE=core.settings.label_studio pytest -vv
+
+# postgres (assumes default postgres user,db,pass. Will not work in Docker
+# testing container without additional configuration)
+DJANGO_DB=default DJANGO_SETTINGS_MODULE=core.settings.label_studio pytest -vv
 ```
 
 
