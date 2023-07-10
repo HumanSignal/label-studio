@@ -54,14 +54,15 @@ def register_ml_backend_mock(m, url='http://localhost:9090', predictions=None, h
 
 @contextmanager
 def import_from_url_mock(**kwargs):
-    with requests_mock.Mocker(real_http=True) as m:
-        url='https://data.heartextest.net'
+    with mock.patch('data_import.uploader.validate_upload_url'):
+        with requests_mock.Mocker(real_http=True) as m:
+            url='https://data.heartextest.net'
 
-        with open('./tests/test_suites/samples/test_1.csv', 'rb') as f:
-            matcher = re.compile('data.heartextest.net/test_1.csv')
+            with open('./tests/test_suites/samples/test_1.csv', 'rb') as f:
+                matcher = re.compile('data\.heartextest\.net/test_1\.csv')
 
-            m.get(matcher, body=f, headers={'Content-Length': '100'})
-            yield m
+                m.get(matcher, body=f, headers={'Content-Length': '100'})
+                yield m
 
 
 class _TestJob(object):
