@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5335: Account for hidden scroll-space in preview",
-  "commit": "8380c5f18ba1b2d17565e905157ceee4b630db22",
+  "commit": "3bdb920faf2974f550104fecebc90dce223f8818",
   "branch": "fb-lsdv-5335/scrollable-preview",
-  "date": "2023/07/10 13:39:16"
+  "date": "2023/07/10 17:06:37"
 }
