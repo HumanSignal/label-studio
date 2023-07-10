@@ -10,6 +10,7 @@ meta_description: Template for creating a ranked dataset for text-to-image model
 ---
 
 The template provides the worklow to rank the quality of the text-to-image models responses, like Dall-E, Midjourney, Stable Diffusion etc.
+
 It gives the ability to compare the quality of the responses from different models, rank the dynamic set of items with handy drag-and-drop interface.
 
 This is helpful for the following use cases:
@@ -115,7 +116,7 @@ Note that `"_"` is a special key that represents the original, non-categorized l
 
 Labeling results can be exported in JSON format. To export the dataset, go to `Export` in the project settings and download the file.
 
-Using python SDK you can export the dataset with annotations from Label Studio
+Using the Python SDK you can export the dataset with annotations from Label Studio.
 
 ```python
 annotations = project.export_tasks(format='JSON')
