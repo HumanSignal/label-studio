@@ -45,6 +45,11 @@ When you assign a user role to an organization member, they hold that role for a
 Managers within an organization can see all workspaces in that organization, even if they don't have access to perform actions in them. Annotators and reviewers can only see projects, not workspaces.
 
 If you have access to multiple organizations, use the **Organizations** page to switch between the organizations that you are a member of.
+### Workspaces
+
+Workspaces are a key differentiating factor between open-source and enterprise versions, providing powerful capabilities to organize, categorize and manage projects at different stages of their lifecycle or use case. 
+
+While projects contain tasks, workspaces contain projects. Besides using workspaces to organize projects, you can also  <a href="manage_users.html">manage user access</a> to workspaces or to specific projects contained in workspaces. 
 
 ### Create workspaces to organize projects
 
@@ -184,6 +189,33 @@ To duplicate a project:
 - Finally, the duplicated project is created. 
     <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/created-a-duplicated-project.png" style="opacity: 0.8"/></div>
     <i>Figure 19: Create a duplicate project.</i>
+
+### Working with Archived Workspaces
+
+To reduce clutter in the workspace sidebar you can archive one or more workspaces from view, allowing you to easily locate high-priority labeling initiatives. You’ll still have complete access to workspaces that have been archived and you can unarchive them at any time. 
+
+#### Archiving a workspace
+
+Archived workspaces and the projects they contain can be referenced or worked on as normal, even when hidden from the main view. Simply click the menu next to a workspace name and click “Archive” to hide it from view.
+
+  <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/workspace-dropdown-menu.png" style="opacity: 0.8"/></div>
+
+
+You can also archive a workspace from the gear icon next to the current workspace name which brings up the modal to edit a workspace.
+
+  <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/workspace-edit-modal.png" style="opacity: 0.8"/></div>
+
+#### View archived workspace
+
+To view archived workspaces, expand the archived workspaces toggle at the bottom of the project page sidebar.
+
+  <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/workspace-archive-expand.png" style="opacity: 0.8"/></div>
+
+#### Unarchiving a workspace
+
+To unarchive a workspace, use the same menu where you initially archived it and click “Unarchive” which will bring the workspace into the normal workspace view.
+
+  <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/workspace-unarchive-menu.png" style="opacity: 0.8"/></div>
 
 ### Delete a workspace
 
