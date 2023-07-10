@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5298: Paragraphs must sync seek, play and pause with Audio in both directions",
-  "commit": "cf560171e5f3db9cf0d365302056538bb456defe",
+  "message": "fix: LSDV-5164: Unselect labels with tools",
+  "commit": "511a0e8db7e5148b77401cabb9ab3191288e1899",
   "branch": "master",
-  "date": "2023/07/06 09:59:44"
+  "date": "2023/07/10 11:34:43"
 }
