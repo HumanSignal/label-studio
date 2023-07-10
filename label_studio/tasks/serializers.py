@@ -16,7 +16,6 @@ from rest_flex_fields import FlexFieldsModelSerializer
 
 from projects.models import Project
 from tasks.models import Task, Annotation, AnnotationDraft, Prediction
-from reviews.models import AnnotationReview
 from tasks.validation import TaskValidator
 from tasks.exceptions import AnnotationDuplicateError
 from core.utils.common import retry_database_locked

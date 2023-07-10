@@ -452,7 +452,7 @@ class Annotation(models.Model):
         _('last action'),
         max_length=128,
         choices=ActionType.choices,
-        help_text='Acti1on which was performed in the last annotation history item',
+        help_text='Action which was performed in the last annotation history item',
         default=None,
         null=True,
     )
