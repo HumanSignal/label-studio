@@ -5,12 +5,13 @@ category: Generative AI
 cat: generative-ai
 order: 905
 is_new: t
-meta_title: Create dataset for human preferences collection for RLHF
-meta_description: Template for creating dataset for human preferences collection for RLHF with Label Studio for your machine learning and data science projects.
+meta_title: Create Dataset for Collection of Human Preference for RLHF
+meta_description: Template for creating dataset for collection of human preference for RLHF with Label Studio for your machine learning and data science projects.
 ---
 
 The template provides the worklow to assess the quality of the chatbot responses.
 There are different types of errors you should tackle with to ensure AI safety:
+
 - hallucinations
 - misinformation
 - offensive language
@@ -18,12 +19,15 @@ There are different types of errors you should tackle with to ensure AI safety:
 - personal and sensitive information disclosure
 - etc.
 
-The template is based on the original paper [Training language models to follow instructions
+The template is based on the paper [Training language models to follow instructions
 with human feedback](https://arxiv.org/pdf/2203.02155.pdf), which proposes a set of human evaluation metrics for the LLMs responses.
 
-## How to collect the dataset
+## How to Collect the Dataset
 
-The input for this template is list of dialogues between `"user"` and `"assistant"`, packed in `"messages"` For example:
+The input for this template is a list of dialogues between `"user"` and `"assistant"`, packed in `"messages"`
+
+For example:
+
 ```json
 [{
   "messages": [
@@ -45,7 +49,7 @@ The input for this template is list of dialogues between `"user"` and `"assistan
 
 Collect dataset examples and store them in `dataset.json` file.
 
-## How to configure the labeling interface
+## How to Configure the Labeling Interface
 
 The `Chatbot Model Assessment` template includes the following labeling interface in XML format:
 
@@ -161,15 +165,18 @@ The `Chatbot Model Assessment` template includes the following labeling interfac
 
 <!-- {"data": {"messages": [...]}} - Modify the variables in comments see how it looks with your data -->
 ```
-In this config, there are few blocks each of which represents binary choice question. Feel free add more blocks or remove some of them.
 
-To start your labeling project:
+In this configuration, there are few blocks each of which represents binary choice question. Feel free add more blocks or remove some of them as your needs require.
+
+## Starting your labeling project
+
+*Need a hand getting started with Label Studio? Check out our [Zero to One Tutorial](https://labelstud.io/blog/zero-to-one-getting-started-with-label-studio/).*
 
 1. Create new project in Label Studio
 2. Go to `Settings > Labeling Interface > Browse Templates > Generative AI > Chatbot Model Assessment`
 3. Save the project
 
-Alternatively, you can create project by using python SDK:
+Alternatively, you can create a new project by using our Python SDK:
 
 ```python
 import label_studio_sdk
@@ -180,10 +187,11 @@ project = ls.create_project(title='Chatbot Model Assessment', label_config='<Vie
 
 ## Import the dataset
 
-To import dataset, in the project settings go to `Import` and upload the dataset file `dataset.json`.
+To import your dataset, in the project settings go to `Import` and upload the dataset file `dataset.json`.
 
-Using python SDK you can import the dataset with input prompts into Label Studio. With the `PROJECT_ID` of the project
-you've just created, run the following code:
+Using the Python SDK, import the dataset with input prompts into Label Studio using the `PROJECT_ID` of the project you've just created.
+
+Run the following code:
 
 ```python
 from label_studio_sdk import Client
@@ -194,19 +202,20 @@ project = ls.get_project(id=PROJECT_ID)
 project.import_tasks('dataset.json')
 ```
 
-Then you can start annotating the dataset by assessing the quality of the generated responses in dialogues.
+This will allow you to start annotating the dataset by assessing the quality of the generated responses in dialogues.
 
 ## Export the dataset
 
 Labeling results can be exported in JSON format. To export the dataset, go to `Export` in the project settings and download the file.
 
-Using python SDK you can export the dataset with annotations from Label Studio
+Using the Python SDK, export the dataset with annotations from Label Studio through running the following:
 
 ```python
 annotations = project.export_tasks(format='JSON')
 ```
 
 The exported JSON file will look like this:
+
 ```json
 [
   {
