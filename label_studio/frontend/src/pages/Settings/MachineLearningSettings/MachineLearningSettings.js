@@ -35,7 +35,7 @@ export const MachineLearningSettings = () => {
   const [modelsType, setModelsType] = useState('object_detection');
   const [keepChecks, setKeepChecks] = useState(false);
   const [availableProjects, setAvailableProjects] = useState([]);
-  const [currentlyTrainingModel, setCurrentlyTrainingModel]  = useState(null);
+  const [currentlyTrainingModel, setCurrentlyTrainingModel]  = useState('');
   const handleChange = event => {
     setGenerateSpecs(event.target.checked);
   };
@@ -56,16 +56,7 @@ export const MachineLearningSettings = () => {
           setKeepChecks(true);
         }
     })
-    await axios
-    .get(webhook_url + '/get_currently_training_model?id=' + project.id)
-      .then((response) => {
-        console.log(response);
-        if(response.data && response.data.model_version){
-          const trainingModel = response.data.model_version;
-          setCurrentlyTrainingModel(trainingModel);
 
-        }
-    })
       await axios
       .get(webhook_url + '/get_models_info?id=' + project.id)
         .then((response) => {
@@ -86,6 +77,19 @@ export const MachineLearningSettings = () => {
     .get(webhook_url + '/get_available_projects')
       .then((response) => {
         setAvailableProjects(response.data);
+      })
+      
+      await axios
+      .get(webhook_url + '/get_currently_training_model?id=' + project.id)
+        .then((response) => {
+          console.log(response);
+          if(response && response.data && response.data.model_version){
+            const trainingModel = response.data.model_version;
+            setCurrentlyTrainingModel(trainingModel);
+  
+          }
+      }).error(() => {
+        console.log("error");
       })
   };
   const saveInferencePath = useCallback(async (modelChosen = null, projectId= null) => {
@@ -222,27 +226,56 @@ export const MachineLearningSettings = () => {
   })
 
   const generatePredictionZipFile = async () => {
-    console.log("Generating prediction zip file");
-    Swal.fire("Please wait", "We are currently generating the zip file, it will be downloaded shortly", "info")
-    await axios.post(webhook_url + "/prediction_tool?project_id="+project.id).then((response) => {
-      if (response.data.message) {
-        Swal.fire("Error",response.data.message, "error");
-      } else {
-        const decodedData = atob(response.data.zip_file);
-        const arrayBuffer = new ArrayBuffer(decodedData.length);
-        const uint8Array = new Uint8Array(arrayBuffer);
-        for (let i = 0; i < decodedData.length; i++) {
-          uint8Array[i] = decodedData.charCodeAt(i);
-        }
-        const blob = new Blob([arrayBuffer], { type: 'application/zip' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = "predictionToolProject_"+project.id + '.zip';
-        link.click();
+    Swal.fire({
+      title: 'Prediction Tool',
+      text: 'Please specify if you want to extract predictions for all images or only the annotated ones',
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'All Tasks',
+      denyButtonText: `Annotated Taks`,
+    }).then( async (result) => {
+      /* Read more about isConfirmed, isDenied below */
+      let allTasks= true;
+      if (result.isDenied) {
+        allTasks= false;
       }
+      if (result.isConfirmed || result.isDenied){
+        console.log("Generating prediction zip file");
+        Swal.fire("Please wait", "We are currently generating the zip file, it will be downloaded shortly", "info");
+        document.getElementById("generateButton").disabled = true;
+        document.getElementById("generateButton").style.backgroundColor = 'gray';
+    
+        await axios.post(webhook_url + "/prediction_tool?project_id="+project.id+"&all_tasks=" + allTasks).then((response) => {
+          if (response.data.message) {
+            Swal.fire("Error",response.data.message, "error");
+          } else {
+            const decodedData = atob(response.data.zip_file);
+            const arrayBuffer = new ArrayBuffer(decodedData.length);
+            const uint8Array = new Uint8Array(arrayBuffer);
+            for (let i = 0; i < decodedData.length; i++) {
+              uint8Array[i] = decodedData.charCodeAt(i);
+            }
+            const blob = new Blob([arrayBuffer], { type: 'application/zip' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = "predictionToolProject_"+project.id + '.zip';
+            link.click();
+          }
+    
+        }).catch((error) => {
+          Swal.fire("Error", "An error occured while trying to run the prediction, make sure that the processes are running (tao pyro, pvt, segmentation)", "error");
+        }).finally(()=> {
+          document.getElementById("generateButton").disabled = false;
+          document.getElementById("generateButton").style.backgroundColor = 'green';
+        })
+      }
+
     })
+
   }
+
+
   const changeModelToPredictOn = async () => {
     console.log("changing model");
     const swalWithBootstrapButtons = Swal.mixin({
@@ -414,7 +447,7 @@ export const MachineLearningSettings = () => {
           </label>
  
               </div>
-              <button onClick={() => generatePredictionZipFile()} style={{ width: '20%', marginTop: 20, color: 'white', borderRadius: 5, backgroundColor: 'green' }}>Generate Prediction Zip File</button>
+              <button id="generateButton" onClick={() => generatePredictionZipFile()} style={{ width: '20%', marginTop: 20, color: 'white', borderRadius: 5, backgroundColor: 'green' }}>Generate Prediction Zip File</button>
               <label>By clicking on this button, you will get a zip file containing predictions for the already annotated images in this project. The predictions will be divided into correct and incorrect folders (correct images are the ones where the number of objects detected is equal to the number of objects annotated)</label>
         {fetchedModels?
           <div>

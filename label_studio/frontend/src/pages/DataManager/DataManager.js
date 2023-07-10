@@ -263,6 +263,58 @@ DataManagerPage.context = ({ dmRef }) => {
     updateCrumbs(currentMode);
     showLabelingInstruction(currentMode);
   };
+  const exportData = async () => {
+    const webhook_url = getWebhookUrl();
+    console.log("Exporting data");
+    await axios.get(webhook_url + "/export_options?id=" + project.id).then((response) => {
+      console.log(response);
+      if(response.data.options){
+        const { value: option } = Swal.fire({
+          title: 'Select an export option',
+          input: 'select',
+          inputOptions: response.data.options,
+          inputPlaceholder: 'Select an option',
+          showCancelButton: true,
+          inputValidator: (value) => {
+            return new Promise(async (resolve) => {
+              console.log("export data");
+              resolve();
+              await axios.post(webhook_url +"/export_data?id="+ project.id + "&export_type=" + value)
+              .then((response) => {
+                if (response.data.message) {
+                  Swal.fire("Error", response.data.message, 'error');
+                } else {
+                  console.log(response.data.data);
+                  const decodedData = atob(response.data.data);
+                  const arrayBuffer = new ArrayBuffer(decodedData.length);
+                  const uint8Array = new Uint8Array(arrayBuffer);
+                  for (let i = 0; i < decodedData.length; i++) {
+                    uint8Array[i] = decodedData.charCodeAt(i);
+                  }
+                  const blob = new Blob([arrayBuffer], { type: 'application/zip' });
+                  const url = URL.createObjectURL(blob);
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.download = 'exported_data_project_id_' + project.id + '.zip';
+                  link.click();
+                }
+              })
+              .catch((error) => {
+                console.error('Export error');
+                console.error(error);
+                Swal.fire('Error', 'Failed to export the data', 'error');
+              });
+            })
+          }
+        })   
+      }
+      else{
+        Swal.fire("Error", "Error retrieving options from the backend, please make sure that the webhook server is on", "error");
+      }
+
+    });
+
+  }
   const importAnnotations = () => {
     const webhook_url = getWebhookUrl();
 
@@ -308,6 +360,7 @@ DataManagerPage.context = ({ dmRef }) => {
     <Space size="small">
       <FileUpload project={project}></FileUpload>
       <Button size = "compact" onClick={() => importAnnotations()}>Import Annotations</Button>
+      <Button size = "compact" onClick={() => exportData()}>Export Data</Button>
       {(project.expert_instruction && mode !== 'explorer') && (
         <Button size="compact" onClick={() => {
           modal({
