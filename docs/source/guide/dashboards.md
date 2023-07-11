@@ -15,6 +15,8 @@ Manage project timelines, improve [resource allocation](/guide/setup_project.htm
 
 Navigate to your project’s Dashboard tab to discover the project’s progress at a holistic level and use the date time selector to discover trends for key performance indicators such as lead time or submitted annotations and to discover insights through time series charts for tasks, annotations, reviews, and label distributions.
 
+<img src="/images/FullDashboardPage.png" alt="" class="gif-border" />
+
 ## Review dataset progress
 
 The dataset progress bar displays the number of tasks considered to be fully annotated for the project and the number of tasks remaining to be annotated. If the project requires a minimum annotation per task of more than one, some tasks might not appear as “annotated” because they are not yet fully annotated by the project standards. [Learn more](/guide/setup_project.html#Set-minimum-annotations-per-task) about minimum annotation and task overlap settings.
@@ -23,9 +25,13 @@ The dataset progress bar displays the number of tasks considered to be fully ann
 
 Choose from the list of preset time periods or define custom date ranges with or without a timestamp to update the KPI cards and time series charts and discover your project’s trends in performance and progress over time.
 
+<img src="/images/dateTimePicker.png" alt="" class="gif-border" />
+
 ## Understand progress and identify bottlenecks
 
 Monitor your project’s key performance indicators to understand the progress and status of your dataset development initiatives. Make data-informed decisions for efficient resource allocation and update stakeholders on your project’s progress and milestones.
+
+<img src="/images/KPICarousel.png" alt="" class="gif-border" />
 
 Use the carousel to click through the KPI cards which you can drag and drop to keep the highest impact metrics front and center.
 
@@ -50,6 +56,8 @@ Use the carousel to click through the KPI cards which you can drag and drop to k
 ## Charts:
 
 Each time series chart can be viewed as is or can be customized by clicking on the colored circle next to each metric’s name in the chart legend. For instance, click on “Annotated” in Task Chart to view only the reviewed tasks over time. You can also change the chart granularity for each chart using the dropdown menu which provides time range presets that are most appropriate for the time period selected in the date time selector. To reset the charts back to the default view, use the flyout menu next to the date time selector.
+
+<img src="/images/Charts.png" alt="" class="gif-border" />
 
 ## Annotations distribution
 
