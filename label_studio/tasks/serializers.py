@@ -265,34 +265,54 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             annotation.pop('completed_by', None)
 
     @staticmethod
-    def _insert_valid_user_reviews(dicts, members_email_to_id, default_user, source_field):
+    def _insert_valid_user_reviews(dicts, members_email_to_id, default_user):
         """ Insert correct user id by email from snapshot
 
         :param dicts: draft or review dicts from snapshot
         :param members_email_to_id: mapping from emails to current LS instance user IDs
         :param default_user: if email is not found in membr_email_to_id, this user will be used
-        :param source_field: field name for email source
         :return:
         """
-        dest_field = source_field + '_id'
-
         for obj in dicts:
-            src = obj['created_by']
-
-            email = obj.get(source_field)
+            email = obj.get('created_by', {}).get('email')
             if email is None:
-                raise ValidationError(f"Object must have `{source_field}` field and it should contain email: {email}")
+                raise ValidationError(f"Object must have created_by field and it should contain dict with email")
 
             # user default user
             if email not in members_email_to_id:
-                obj[dest_field] = default_user.id
+                obj['created_by_id'] = default_user.id
                 logger.warning('Email not found in members_email_to_id, default user used instead')
                 
             # resolve annotators by email
             else:
-                obj[dest_field] = members_email_to_id[email]
+                obj['created_by_id'] = members_email_to_id[email]
 
-            obj.pop(source_field, None)
+            obj.pop('created_by', None)
+
+    @staticmethod
+    def _insert_valid_user_drafts(dicts, members_email_to_id, default_user):
+        """ Insert correct user id by email from snapshot
+
+        :param dicts: draft or review dicts from snapshot
+        :param members_email_to_id: mapping from emails to current LS instance user IDs
+        :param default_user: if email is not found in membr_email_to_id, this user will be used
+        :return:
+        """
+        for obj in dicts:
+            email = obj.get('user')
+            if email is None:
+                raise ValidationError(f"Object must have user field and it should contain email")
+
+            # user default user
+            if email not in members_email_to_id:
+                obj['user_id'] = default_user.id
+                logger.warning('Email not found in members_email_to_id, default user used instead')
+
+            # resolve annotators by email
+            else:
+                obj['user_id'] = members_email_to_id[email]
+
+            obj.pop('user', None)
 
     @retry_database_locked()
     def create(self, validated_data):
@@ -331,13 +351,13 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 if flag_set('fflag_feat_back_lsdv_5307_import_reviews_drafts_29062023_short', user='auto'):
                     # extract drafts from snapshot
                     drafts = task.pop('drafts', [])
-                    self._insert_valid_user(drafts, members_email_to_id, default_user, source_field='user')
+                    self._insert_valid_user_drafts(drafts, members_email_to_id, default_user)
                     task_drafts.append(drafts)
 
                     # extract reviews from snapshot annotations
                     for annotation in annotations:
                         reviews = annotation.get('reviews', [])
-                        self._insert_valid_user(reviews, members_email_to_id, default_user, 'email', 'created_by')
+                        self._insert_valid_user_reviews(reviews, members_email_to_id, default_user)
                         task_reviews.append(reviews)
 
             db_tasks = self.add_tasks(task_annotations, task_predictions, validated_tasks)
