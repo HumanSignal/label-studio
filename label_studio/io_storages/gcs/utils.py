@@ -70,7 +70,8 @@ class GCS(object):
         bucket_name: str,
         google_project_id: str = None,
         google_application_credentials: Union[str, dict] = None,
-        prefix: str = None
+        prefix: str = None,
+        use_glob_syntax: bool = False
     ):
         logger.debug('Validating GCS connection')
         client = cls.get_client(
@@ -80,10 +81,15 @@ class GCS(object):
         logger.debug('Validating GCS bucket')
         bucket = client.get_bucket(bucket_name)
 
-        if prefix:
-            blobs = list(bucket.list_blobs(prefix=prefix, max_results=1))
-            if not blobs:
-                raise ValueError(f"No blobs found in {bucket_name}/{prefix} or prefix doesn't exist")
+        # Dataset storages uses glob syntax and we want to add explicit checks
+        # In the future when GCS lib supports it
+        if use_glob_syntax:
+            pass
+        else:
+            if prefix:
+                blobs = list(bucket.list_blobs(prefix=prefix, max_results=1))
+                if not blobs:
+                    raise ValueError(f"No blobs found in {bucket_name}/{prefix} or prefix doesn't exist")
 
     @classmethod
     def iter_blobs(
