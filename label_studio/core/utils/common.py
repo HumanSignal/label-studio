@@ -709,3 +709,7 @@ def timeit(func):
         logging.debug(f"{func.__name__} execution time: {end-start} seconds")
         return result
     return wrapper
+
+
+def empty(*args, **kwargs):
+    pass

@@ -13,7 +13,7 @@ layout: "notion"
 
 ### User can’t login, or password doesn’t work
 
-1. If the user registered with capitalized email letters, it might lead to this issue. To fix it, you should login as a superuser and replace their email with lowercase letters. Also you can achieve this using LS shell in the terminal (`python3` [`manage.py`](http://manage.py) `shell_plus`):
+1. If the user registered with capitalized email letters, it might lead to this issue. To fix it, you should login as a superuser and replace their email with lowercase letters. Also you can achieve this using LS shell in the terminal (`python3` [`manage.py`](http://manage.py/) `shell_plus`):
 
 ```python
 User.objects.get(email='Capita@Lized.xx').update(email='capita@lized.xx')
@@ -29,9 +29,9 @@ There are 3 ways to reset a password:
 1. Using email by “Forgot password” link on the login page. It works in SaaS by default. It can work in on-premise deployments, but you need to set up the email backend.
 2. Login as a superuser, go to `/admin/users/user` page, find your user and reset password:
 
-![](/images/notion/3044adad48e84db.png)
+![](/images/notion/a26c8792c2f8453.png)
 
-1. Go to LS terminal, run  `/label-studio-enterprise/label_studio_enterprise && python3` [`manage.py`](http://manage.py) `shell_plus`
+1. Go to LS terminal, run  `/label-studio-enterprise/label_studio_enterprise && python3` [`manage.py`](http://manage.py/) `shell_plus`
 
 ```python
 u = User.objects.get(email='test@test.te')
@@ -53,7 +53,7 @@ curl -X PATCH -H "Content-Type: application/json" -H "Authorization: Token your_
 ```
 
 
-![](/images/notion/f282bdcae17649e.png)
+![](/images/notion/3e7afb558647471.png)
 
 
 ### Disable payload data in activity logs
@@ -81,6 +81,35 @@ We will add this toggle as organization settings later.
 Please reference the guide [Setup SAML SSO](https://docs.heartex.com/guide/auth_setup.html#Set-up-SAML-SSO). 
 
 
+### SAML attributes
+
+
+The most of 400 errors during SAML login tries are connected with improperly configured SAML attributes (On LSE they are `Email`, `FirstName`, `LastName`, `Groups`). There are two ways to fix this problem:
+
+1. Change SAML attribute mapping on the LSE side (Organization ⇒ SAML & SSO)
+	- How to know attribute names?
+		- Enable DEBUG=1, LOG_LEVEL=DEBUG environment vars
+		- Try to login with SAML SSO
+		- Get 400 error
+		- Check LSE app logs, find `acs` keyword, there should be written all metadata about your user that was sent from the Identity Provider.
+	- Now go to Organization ⇒ SAML & SSO ⇒ SAML Attributes and use retrieved names to build the correct mapping.
+2. Change SAML attribute mapping on the Identity Provider (IdP) side.
+	- How to know attribute names? You have to go to your IdP SAML SSO settings for LSE and check `attributes` there. For example, some of Azude IdPs have attributes like `user.mail`, `user.given_name`, `user.groups`, etc.
+	- You need to create a mapping
+		- `user.mail` ⇒ `Email`,
+		- `user.given_name` ⇒ `FirstName`,
+		- `user.surname` ⇒ `LastName`,
+		- `user.groups` ⇒ `Groups`.
+
+### SAML NameID Format
+
+
+This SAML assertion helps to identify user. Different IdP uses different user fields to distinguish users. Label Studio uses email as the main unique user identified, so it’s very important to properly configure `Email` attribute in the SAML mapping. 
+
+
+Sometimes you can face with situations where IdP doesn’t support `NameID transient`. It’s not a big problem, you can select almost any available item: undefined, username or other. However, you should guarantee that **all user emails** in your IdP are unique. `Email` mapping is the decisive thing here.
+
+
 ### Change SAML domain name
 
 
@@ -89,12 +118,12 @@ This action can only be performed using the /admin page because of security reas
 1. Go to SAML settings page
 2. Find organization you need
 
-![](/images/notion/ea0e34caf078483.png)
+![](/images/notion/e41d9fd12c24430.png)
 
 1. Click on the pk
 2. Change the domain
 
-![](/images/notion/b9b6bc5c20e745c.png)
+![](/images/notion/e19bad0bcc4d419.png)
 
 
 ### Is the Organization Owner role required to setup LDAP?
@@ -110,6 +139,17 @@ The article below should help to figure out how to setup SAML SSO with Azure Act
 
 
 [https://medium.com/the-new-control-plane/getting-the-required-information-for-a-sp-from-azure-ad-metadata-65c898396ce9](https://medium.com/the-new-control-plane/getting-the-required-information-for-a-sp-from-azure-ad-metadata-65c898396ce9)
+
+
+### How to set SAML for Azure?
+
+
+```bash
+{'http://schemas.microsoft.com/identity/claims/tenantid': ['6fbe8b87-65e1-4833-9a56-661a5c842ecc'], 'http://schemas.microsoft.com/identity/claims/objectidentifier': ['ab264a22-f724-4015-b81b-beb16b10280e'], 'http://schemas.microsoft.com/identity/claims/displayname': ['Yaqub Omofoyewa'], 'http://schemas.microsoft.com/ws/2008/06/identity/claims/**groups**': ['label_studio_group'], 'http://schemas.microsoft.com/identity/claims/identityprovider': ['https://sts.windows.net/6fbe8b87-65e1-4833-9a56-661a5c842ecc/'], 'http://schemas.microsoft.com/claims/authnmethodsreferences': ['http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password', 'http://schemas.microsoft.com/claims/multipleauthn'], '**givenName**': ['User'], '**surname**': ['Surname'], '**emailAddress**': ['user@email.com'], 'name': ['user@email.com']}
+```
+
+
+Field mapping should be set accordingly with this SAML assertion. Certificate signing should be set on response only. `Groups` mapping field will be the whole URL: [`http://schemas.microsoft.com/ws/2008/06/identity/claims/`](http://schemas.microsoft.com/ws/2008/06/identity/claims/groups)[**`groups`**](http://schemas.microsoft.com/ws/2008/06/identity/claims/groups)
 
 
 ### Where can you get SAML metadata for Okta?
@@ -149,13 +189,112 @@ For LDAP there is one way only:
 The most frequent problem when you see “Bad request 400” on SAML login is improperly configured attributes in SAML. Check SAML Attributes mapping in your Identity Provider: it’s very important to have the correct Email field. For example how it looks in Google SAML Identity Provider settings: 
 
 
-![](/images/notion/d42c6de480d443d.png)
+![](/images/notion/b5f702273ce9405.png)
 
 
 Also you can check them on LSE SAML settings page `/saml/settings`:
 
 
-![](/images/notion/9a46e2edfcfa449.png)
+![](/images/notion/4e6c33c39a444c2.png)
+
+
+### How to force users to login via SAML SSO only?
+
+
+Reset their passwords to empty value None in shell_plus. 
+
+
+### How user roles are affected when they are mapped using SAML groups?
+
+- If a user doesn’t have any user group in IdP, his role won’t be touched at LSE login.
+- If use has a group and this group is mapped to LSE role (in SAML settings), his role will be changed.
+- These variables can help with user/workspace/project managing:
+
+```text
+MANUAL_PROJECT_MEMBER_MANAGEMENT=true/false
+MANUAL_WORKSPACE_MANAGEMENT=true/false
+MANUAL_ROLE_MANAGEMENT=true/false
+```
+
+
+## How to track all user role changes in time?
+
+
+To track all user role changes in time for Label Studio Enterprise (LSE), you can use the Activity Log. Follow these steps:
+
+1. Access the Activity Log in LSE.
+2. Filter all API requests by the PATCH method and the Request URL `organizations/<organization-id>/memberships`. This will display all the requests where administrators have altered user roles.
+3. Export this table to a CSV file for further analysis, which will include the timestamps of when the role changes occurred.
+
+Remember that you must know the AWS account ID for the AWS account that you use to manage Label Studio Enterprise to perform these steps. By following this process, you can effectively track all user role changes in LSE over time.
+
+
+OR you can use this script if you have LSE shell_plus access in the terminal:
+
+
+```python
+import os
+import django
+import json
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "htx.settings.label_studio")
+django.setup()
+
+
+from users.models import User
+from organizations.models import OrganizationMember
+from activity_log.models import ActivityLog
+from collections import defaultdict
+
+
+
+if __name__ == '__main__':
+  organization = 123
+  users = list(OrganizationMember.objects.filter(organization=organization).values('user__email', 'user__id'))
+  users = {user['user__id']:user['user__email'] for user in users}
+  logs = list(ActivityLog.objects.filter(organization_id=organization, request_url__contains='771/memberships', request_method='PATCH').order_by('datetime'))
+  roles = defaultdict(list)
+
+  for log in logs:
+    j = json.loads(log.extra_data['BODY'])
+    roles[users.get(j['user_id'], j['user_id'])] += [{'role': j['role'], 'datetime': str(log.datetime)}]
+
+  print(json.dumps(roles, indent=2))
+  with open('user-roles.json', 'w') as f:
+    json.dump(roles, f, indent=2)
+```
+
+
+Output will look like:
+
+
+```python
+{
+  "email1@example.com": [
+    {
+      "role": "AD",
+      "datetime": "2022-07-12 13:28:31.612237+00:00"
+    },
+    {
+      "role": "DI",
+      "datetime": "2022-09-19 20:33:29.809241+00:00"
+    }
+  ],
+  "email2@example.com": [
+    {
+      "role": "AN",
+      "datetime": "2022-07-12 14:26:04.319126+00:00"
+    },
+    {
+      "role": "RE",
+      "datetime": "2022-07-22 13:54:10.954919+00:00"
+    },
+    {
+      "role": "DI",
+      "datetime": "2023-01-12 11:55:29.906135+00:00"
+    }
+  ],
+  ...
+```
 
 
 ## Unable to import data from Cloud Storage
@@ -177,7 +316,7 @@ Go to the cloud storage settings page, click on **Edit** cloud storage connectio
 3. Sometimes the sync process doesn’t start immediately. That is because syncing process is based on internal job scheduler. Please wait, if nothing happens during long period of time - contact us via  form, and please provide the time when you launched the “Sync” job
 4. An easy way to check rq workers is to run an export: go to the Data manager, click Export, and create a new snapshot and download the JSON file. If you see an Error, most likely your rq workers have problems. Another way to check rq workers - login as a superuser and go to /django-rq page. You should see a `workers` column, `workers` values shouldn’t be 0 as far as failed column should be empty (0).
 
-![](/images/notion/79a0397231b6469.png)
+![](/images/notion/c1212782da42432.png)
 
 
 ### JSON files from a cloud storage are not synced, the data manager is empty
@@ -209,7 +348,7 @@ You access the labeling data via navigating to the next task while clicking on s
 Without an internet connection, you will receive a “Failed to fetch” message each time you try opening the data labeling screen. This is because data content is fetched on the client side at the time you load the app, ensuring secure data flow. Please check your internet connection and reload the page again.
 
 
-![](/images/notion/5d0c670a88864fd.png)
+![](/images/notion/50b7fce956f2470.png)
 
 
 ### Check data access
@@ -221,7 +360,7 @@ It is a common scenario when working with external storage that the URLs provide
 To locate this source of error, try navigating to your browser’s _Network_ panel and check to see if there are 403 or 404 errors.
 
 
-![](/images/notion/536a49a936024e2.png)
+![](/images/notion/0d2949cd14a94a8.png)
 
 
 To validate the link doesn’t work - copy it and try opening in a separate browser tab.
@@ -439,7 +578,7 @@ Sometimes page slowness can be affected by local network provider latency. Open 
 ### High traffic
 
 
-When there is high traffic to [app.heartex.com](http://app.heartex.com) , you may experience temporary page slowdowns. Typically it takes no longer than a few minutes to restore to the normal condition. Please be patient, as we’re working on enhancing predictability of scaling up the workflow in these cases. Please contact us in case you see some unusual slowdowns, by providing the exact time, project and user account  
+When there is high traffic to [app.heartex.com](http://app.heartex.com/) , you may experience temporary page slowdowns. Typically it takes no longer than a few minutes to restore to the normal condition. Please be patient, as we’re working on enhancing predictability of scaling up the workflow in these cases. Please contact us in case you see some unusual slowdowns, by providing the exact time, project and user account  
 
 
 ### Data-related pages: Data Manager, Reports
@@ -468,7 +607,7 @@ Most likely RQ Workers are
 To inspect this issue you should open `/django-rq` page and see number of workers in Workers column:
 
 
-![](/images/notion/bd09fc74ffc14cd.png)
+![](/images/notion/9d51d7f8a44a4b6.png)
 
 
 If you see 0, it’s definitely a problem with your rq worker setup, you have to connect with your devops team and check what **rqworker containers** are running. 
