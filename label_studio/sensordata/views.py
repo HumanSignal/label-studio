@@ -13,15 +13,12 @@ from sensormodel.models import SensorType
 from rest_framework.authtoken.models import Token
 import requests
 from tempfile import NamedTemporaryFile
-from django.conf import settings
-import os
-import fnmatch
 
 UNITS = {'days': 86400, 'hours': 3600, 'minutes': 60, 'seconds':1, 'milliseconds':0.001}
 
 # Create your views here.
 def sensordatapage(request):
-    sensordata = SensorData.objects.all().order_by('project_id')
+    sensordata = SensorData.objects.all().order_by('project')
     return render(request, 'sensordatapage.html', {'sensordata':sensordata})
 
 def addsensordata(request):
@@ -31,7 +28,7 @@ def addsensordata(request):
             # Get form data
             name = sensordataform.cleaned_data['name']
             uploaded_file = sensordataform.cleaned_data['file']
-            project_id = sensordataform.cleaned_data['project'].id
+            project = sensordataform.cleaned_data['project']
             sensor = sensordataform.cleaned_data.get('sensor')
 
             # Django typically stores files smaller than 5MB as a InMemoryUploadedInstance, if this is not the case create a NamedTemporaryFile object
@@ -53,9 +50,9 @@ def addsensordata(request):
             match sensortype.sensortype:
                 # Parse and upload the data
                 case 'I':
-                    parse_IMU(request=request, file_path=file_path,sensor=sensor,name=name,project_id=project_id)
+                    parse_IMU(request=request, file_path=file_path,sensor=sensor,name=name,project=project)
                 case 'C':
-                    parse_camera(request=request, file_path=file_path,sensor=sensor,name=name,project_id=project_id)
+                    parse_camera(request=request, file_path=file_path,sensor=sensor,name=name,project=project)
                 case 'M':
                     pass
         return redirect('sensordata:sensordatapage')
@@ -80,7 +77,7 @@ def offset(request):
         sensoroffsetform = SensorOffsetForm()
     return render(request, 'offset.html', {'sensoroffsetform':sensoroffsetform, 'sensoroffset':sensoroffset})
 
-def parse_IMU(request, file_path, sensor, name, project_id):
+def parse_IMU(request, file_path, sensor, name, project):
     sensortype = SensorType.objects.get(id=sensor.sensortype)
     # Parse data
     project_controller = ProjectController()
@@ -95,7 +92,7 @@ def parse_IMU(request, file_path, sensor, name, project_id):
         file_path=csv_file.name
 
     # Upload parsed sensor(IMU) data to corresponding project
-    upload_sensor_data(request=request, name=name, file_path=file_path ,project_id=project_id)
+    upload_sensor_data(request=request, name=name, file_path=file_path ,project=project)
  
     # Parse to JSON to get begin and end datetime   
     sensor_data_json_string = sensor_df.to_json()
@@ -125,13 +122,13 @@ def parse_IMU(request, file_path, sensor, name, project_id):
 
     # Create SensorData object with parsed data
     SensorData.objects.create(name=name, sensor=sensor,\
-        begin_datetime=begin_datetime, end_datetime=end_datetime, project_id=project_id).save()
+        begin_datetime=begin_datetime, end_datetime=end_datetime, project=project).save()
     
 
 
-def parse_camera(request, file_path, sensor, name, project_id):
+def parse_camera(request, file_path, sensor, name, project):
     # Upload video to project
-    upload_sensor_data(request=request, name=name, file_path=file_path ,project_id=project_id)
+    upload_sensor_data(request=request, name=name, file_path=file_path ,project=project)
     # Get sensortype config
     sensortype = SensorType.objects.get(id=sensor.sensortype)
     sensor_timezone = sensortype.timezone
@@ -147,13 +144,13 @@ def parse_camera(request, file_path, sensor, name, project_id):
 
     # Create SensorData object with parsed data
     SensorData.objects.create(name=name, sensor=sensor,\
-        begin_datetime=begin_datetime, end_datetime=end_datetime, project_id=project_id).save()
+        begin_datetime=begin_datetime, end_datetime=end_datetime, project=project).save()
     
-def upload_sensor_data(request, name, file_path, project_id):
+def upload_sensor_data(request, name, file_path, project):
     user = request.user
     token = Token.objects.get(user=user)
     # Get url for importing data to the correct project
-    import_url = request.build_absolute_uri(reverse('data_import:api-projects:project-import',kwargs={'pk':project_id}))
+    import_url = request.build_absolute_uri(reverse('data_import:api-projects:project-import',kwargs={'pk':project}))
     # Get temporary file URL from the form
     files = {f'{name}': open(file_path, 'rb')}
     # Import the video to the correct project

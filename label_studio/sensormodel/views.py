@@ -48,8 +48,7 @@ def addSubject(request):
             return redirect('sensormodel:tablepage')
     else:
         subjectform = forms.SubjectForm(request.POST)
-        deploymentform = forms.DeploymentForm(request.POST)
-    return render(request, 'add.html', {'sensorform':sensorform, 'subjectform':subjectform, 'deploymentform':deploymentform})
+    return render(request, 'addSubject.html', {'subjectform':subjectform})
 
 def deployment(request):
     deployments = Deployment.objects.all().order_by('begin_datetime')
