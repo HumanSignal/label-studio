@@ -10,9 +10,10 @@ meta_description: Template for creating a ranked dataset for text-to-image model
 ---
 
 The template provides the worklow to rank the quality of the text-to-image models responses, like Dall-E, Midjourney, Stable Diffusion etc.
+
 It gives the ability to compare the quality of the responses from different models, rank the dynamic set of items with handy drag-and-drop interface.
 
-Various use cases are possible:
+This is helpful for the following use cases:
 
 1. Categorize the responses by different types: relevant, irrelevant, biased, offensive, etc.
 2. Compare and rank the quality of the responses from different models.
@@ -22,7 +23,9 @@ Various use cases are possible:
 ## How to create the dataset
 
 Collect a prompt and a list of images you want to display in each task in the following form:
+
 ```json
+
 [{
   "prompt": "Generate a high-quality image of a stylish, ergonomic chair for a home office. ",
   "images": [
@@ -51,53 +54,11 @@ This is a generic HTML renderer, so you can use any HTML tags here.
 
 Collect dataset examples and store them in `dataset.json` file.
 
-## How to configure the labeling interface
+## Starting your labeling project
 
-The `LLM Ranker` template includes the following labeling interface in XML format:
+*Need a hand getting started with Label Studio? Check out our [Zero to One Tutorial](https://labelstud.io/blog/zero-to-one-getting-started-with-label-studio/).*
 
-```xml
-<View>
-      <Style>
-        .product-panel {
-          display: flex;
-          align-items: center;
-          box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
-          padding: 20px;
-          border-radius: 10px;
-          background-color: #f8f8f8;
-          font-size: 1.3em;
-          transition: transform .2s; 
-          color: #333;
-        }
-      
-        .product-panel:hover {
-          transform: scale(1.01);
-        }
-        .htx-ranker-item { padding: 0; border: 0; align-self: center; }
-        .htx-ranker-item img { width: 100%; }
-        .htx-ranker-item [class^=itemLine]:last-child { display: none }
-      </Style>
-
-   <View className="product-panel">
-      <Text name="prompt" value="$prompt"/>
-    </View>
-    <View>
-      <List name="generated_images" value="$images" title="Generated Images" />
-      <Ranker name="rank" toName="generated_images">
-  </Ranker> 
-    </View>
-  </View>
-```
-The config includes the following elements:
-- `<Text>` - the prompt to be displayed. The `value` attribute should be set to the name of the prompt element, i.e. `prompt` in this case.
-- `<List>` - the tag that instructs to display the list of images. The `value` attribute should be set to the name of the list element (in this case `items`, where each item contains HTML code to display the image).
-- `<Ranker>` - the tag that instructs to ranker the items in the list. The `toName` attribute should be set to the name of the list element.
-
-Items can be styled in Style tag by using `.htx-ranker-item` class. Other CSS styles can be optionally applied here, for example, to display the images in a grid as with `product-panel` CSS class.
-
-To start your labeling project:
-
-1. Create new project in Label Studio
+1. Createa  new project in Label Studio
 2. Go to `Settings > Labeling Interface > Browse Templates > Generative AI > LLM Ranker`
 3. Save the project
 
@@ -151,18 +112,18 @@ project.import_tasks([{
 
 Note that `"_"` is a special key that represents the original, non-categorized list.
 
-
 ## Export the dataset
 
 Labeling results can be exported in JSON format. To export the dataset, go to `Export` in the project settings and download the file.
 
-Using python SDK you can export the dataset with annotations from Label Studio
+Using the Python SDK you can export the dataset with annotations from Label Studio.
 
 ```python
 annotations = project.export_tasks(format='JSON')
 ```
 
 The output of annotations in `"value"` is expected to contain the following structure:
+
 ```json
 "value": {
     "ranker": {
@@ -175,6 +136,7 @@ The output of annotations in `"value"` is expected to contain the following stru
     }
 }
 ```
+
 The items in the list are "id" of the images, sorted in the ranked order
 
 ## Related tags
