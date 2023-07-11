@@ -3876,6 +3876,33 @@
       "version": 4,
       "deleted": false
     },
+    "fflag_fix_front_lsdv_4620_memory_leaks_100723_short": {
+      "key": "fflag_fix_front_lsdv_4620_memory_leaks_100723_short",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "991cf0497e2b4505a928709b04218633",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "fflag_fix_front_lsdv_4673_rect3point_relative_310523_short": {
       "key": "fflag_fix_front_lsdv_4673_rect3point_relative_310523_short",
       "on": true,
