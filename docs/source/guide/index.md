@@ -1,4 +1,5 @@
 ---
+title: "Label Studio Docs"
 type: guide
 tier: all
 layout: home
