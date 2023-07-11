@@ -13,7 +13,7 @@ layout: "notion"
 
 ### User can’t login, or password doesn’t work
 
-1. If the user registered with capitalized email letters, it might lead to this issue. To fix it, you should login as a superuser and replace their email with lowercase letters. Also you can achieve this using LS shell in the terminal (`python3` [`manage.py`](http://manage.py) `shell_plus`):
+1. If the user registered with capitalized email letters, it might lead to this issue. To fix it, you should login as a superuser and replace their email with lowercase letters. Also you can achieve this using LS shell in the terminal (`python3` [`manage.py`](http://manage.py/) `shell_plus`):
 
 ```python
 User.objects.get(email='Capita@Lized.xx').update(email='capita@lized.xx')
@@ -29,9 +29,9 @@ There are 3 ways to reset a password:
 1. Using email by “Forgot password” link on the login page. It works in SaaS by default. It can work in on-premise deployments, but you need to set up the email backend.
 2. Login as a superuser, go to `/admin/users/user` page, find your user and reset password:
 
-![](/images/notion/2601538b2446437.png)
+![](/images/notion/a26c8792c2f8453.png)
 
-1. Go to LS terminal, run  `/label-studio-enterprise/label_studio_enterprise && python3` [`manage.py`](http://manage.py) `shell_plus`
+1. Go to LS terminal, run  `/label-studio-enterprise/label_studio_enterprise && python3` [`manage.py`](http://manage.py/) `shell_plus`
 
 ```python
 u = User.objects.get(email='test@test.te')
@@ -53,7 +53,7 @@ curl -X PATCH -H "Content-Type: application/json" -H "Authorization: Token your_
 ```
 
 
-![](/images/notion/6f296ee616c5446.png)
+![](/images/notion/3e7afb558647471.png)
 
 
 ### Disable payload data in activity logs
@@ -118,12 +118,12 @@ This action can only be performed using the /admin page because of security reas
 1. Go to SAML settings page
 2. Find organization you need
 
-![](/images/notion/709cab27dbe84aa.png)
+![](/images/notion/e41d9fd12c24430.png)
 
 1. Click on the pk
 2. Change the domain
 
-![](/images/notion/e9c3f273eee84b6.png)
+![](/images/notion/e19bad0bcc4d419.png)
 
 
 ### Is the Organization Owner role required to setup LDAP?
@@ -189,13 +189,13 @@ For LDAP there is one way only:
 The most frequent problem when you see “Bad request 400” on SAML login is improperly configured attributes in SAML. Check SAML Attributes mapping in your Identity Provider: it’s very important to have the correct Email field. For example how it looks in Google SAML Identity Provider settings: 
 
 
-![](/images/notion/9d3523a073f64ef.png)
+![](/images/notion/b5f702273ce9405.png)
 
 
 Also you can check them on LSE SAML settings page `/saml/settings`:
 
 
-![](/images/notion/4a59a5302aea40d.png)
+![](/images/notion/4e6c33c39a444c2.png)
 
 
 ### How to force users to login via SAML SSO only?
@@ -316,7 +316,7 @@ Go to the cloud storage settings page, click on **Edit** cloud storage connectio
 3. Sometimes the sync process doesn’t start immediately. That is because syncing process is based on internal job scheduler. Please wait, if nothing happens during long period of time - contact us via  form, and please provide the time when you launched the “Sync” job
 4. An easy way to check rq workers is to run an export: go to the Data manager, click Export, and create a new snapshot and download the JSON file. If you see an Error, most likely your rq workers have problems. Another way to check rq workers - login as a superuser and go to /django-rq page. You should see a `workers` column, `workers` values shouldn’t be 0 as far as failed column should be empty (0).
 
-![](/images/notion/c1494b2442c3499.png)
+![](/images/notion/c1212782da42432.png)
 
 
 ### JSON files from a cloud storage are not synced, the data manager is empty
@@ -348,7 +348,7 @@ You access the labeling data via navigating to the next task while clicking on s
 Without an internet connection, you will receive a “Failed to fetch” message each time you try opening the data labeling screen. This is because data content is fetched on the client side at the time you load the app, ensuring secure data flow. Please check your internet connection and reload the page again.
 
 
-![](/images/notion/97ed0d9cc21642a.png)
+![](/images/notion/50b7fce956f2470.png)
 
 
 ### Check data access
@@ -360,7 +360,7 @@ It is a common scenario when working with external storage that the URLs provide
 To locate this source of error, try navigating to your browser’s _Network_ panel and check to see if there are 403 or 404 errors.
 
 
-![](/images/notion/90efaaf9814b461.png)
+![](/images/notion/0d2949cd14a94a8.png)
 
 
 To validate the link doesn’t work - copy it and try opening in a separate browser tab.
@@ -578,7 +578,7 @@ Sometimes page slowness can be affected by local network provider latency. Open 
 ### High traffic
 
 
-When there is high traffic to [app.heartex.com](http://app.heartex.com) , you may experience temporary page slowdowns. Typically it takes no longer than a few minutes to restore to the normal condition. Please be patient, as we’re working on enhancing predictability of scaling up the workflow in these cases. Please contact us in case you see some unusual slowdowns, by providing the exact time, project and user account  
+When there is high traffic to [app.heartex.com](http://app.heartex.com/) , you may experience temporary page slowdowns. Typically it takes no longer than a few minutes to restore to the normal condition. Please be patient, as we’re working on enhancing predictability of scaling up the workflow in these cases. Please contact us in case you see some unusual slowdowns, by providing the exact time, project and user account  
 
 
 ### Data-related pages: Data Manager, Reports
@@ -607,7 +607,7 @@ Most likely RQ Workers are
 To inspect this issue you should open `/django-rq` page and see number of workers in Workers column:
 
 
-![](/images/notion/8c65c6c5c61e4dd.png)
+![](/images/notion/9d51d7f8a44a4b6.png)
 
 
 If you see 0, it’s definitely a problem with your rq worker setup, you have to connect with your devops team and check what **rqworker containers** are running. 
@@ -663,7 +663,7 @@ python3 manage.py annotation_history_get_organizations_and_projects
 ### On-premise production upgrades
 
 1. Use a staging environment to test the upgrade process before performing it on the production environment. This can help identify and fix any issues before they affect production systems.
-2. Always follow the HumanSignal’s guidelines and recommendations for upgrading software. This may include specific steps or prerequisites, compatibility requirements, or recommended configurations.
+2. Always follow the Heartex’s guidelines and recommendations for upgrading software. This may include specific steps or prerequisites, compatibility requirements, or recommended configurations.
 
 ## Post-processing for exports 
 
