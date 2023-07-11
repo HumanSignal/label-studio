@@ -73,3 +73,6 @@ docker-compose.override.yml
 .viminfo
 .bash_history
 
+
+# Local Netlify folder
+.netlify

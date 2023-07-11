@@ -20,3 +20,11 @@
   from = "/*"
   to = "/404.html"
   status = 404
+
+[dev]
+  command = "yarn start"
+  targetPort = 4000
+
+[[edge_functions]]
+function = "og-image"
+path = "/og-image"
