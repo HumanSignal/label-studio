@@ -53,7 +53,7 @@ Use the carousel to click through the KPI cards which you can drag and drop to k
 
 - **Average Time Per Label**: The average time (sum of all annotations’ lead time divided by all annotations ) in seconds that it has taken to annotate a label for the time period selected.
 
-## Charts:
+## Charts
 
 Each time series chart can be viewed as is or can be customized by clicking on the colored circle next to each metric’s name in the chart legend. For instance, click on “Annotated” in Task Chart to view only the reviewed tasks over time. You can also change the chart granularity for each chart using the dropdown menu which provides time range presets that are most appropriate for the time period selected in the date time selector. To reset the charts back to the default view, use the flyout menu next to the date time selector.
 
