@@ -1,6 +1,6 @@
 theme_config:
   tier: enterprise
-  root_domain: "heartex.com"
+  root_domain: "humansignal.com"
 
 # Deployment
 deploy:
