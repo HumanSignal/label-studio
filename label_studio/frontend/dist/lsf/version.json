@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5164: Unselect labels with tools",
-  "commit": "511a0e8db7e5148b77401cabb9ab3191288e1899",
+  "message": "feat: LSDV-5295: Scroll management of paragraph transcriptions",
+  "commit": "083ca0a0232ef8c6cd1eaabd40efab8eecf456d0",
   "branch": "master",
-  "date": "2023/07/10 11:34:43"
+  "date": "2023/07/12 11:50:26"
 }
