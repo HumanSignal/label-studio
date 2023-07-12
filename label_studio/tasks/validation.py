@@ -120,6 +120,10 @@ class TaskValidator:
     @staticmethod
     def raise_if_wrong_class(task, key, class_def):
         if key in task and not isinstance(task[key], class_def):
+            if isinstance(class_def, tuple):
+                class_def = ' or '.join([c.__name__ for c in class_def])
+            else:
+                class_def = class_def.__name__
             raise ValidationError('Task[{key}] must be {class_def}'.format(key=key, class_def=class_def))
 
     def validate(self, task):
