@@ -89,30 +89,30 @@ project = ls.get_project(id=PROJECT_ID)
 project.import_tasks('dataset.json')
 ```
 
-If you want to create prelabeled data (for example, ranked order of the items produced by LLM), you can import the dataset with pre-annotations:
+## Setup the labeling interface
 
-```python
-project.import_tasks([{
-    "data": {"prompt": "...", "items": [...]},
-    "predictions": [{
-          "type": "ranker",
-          "value": {
-            "ranker": {
-              "_": [
-                "llm_2",
-                "llm_1"
-              ],
-              "biased_results": ["llm_3"],
-              "relevant_results": []
-            }
-          },
-          "to_name": "prompt",
-          "from_name": "rank"
-        }]
-}])
+Use the following configuration for the labeling interface:
+
+```xml
+<View>
+      <Style>
+          <!-- Customize your CSS styles here -->
+      </Style>
+
+   <View className="product-panel">
+      <Text name="prompt" value="$prompt"/>
+    </View>
+    <View>
+      <List name="generated_images" value="$images" title="Generated Images" />
+      <Ranker name="rank" toName="generated_images">
+  </Ranker> 
+    </View>
+  </View>
 ```
-
-Note that `"_"` is a special key that represents the original, non-categorized list.
+It includes the following elements:
+- `<Text>` that defines the prompt for the task
+- `<List>` that displays the list of generated images to assess
+- `<Ranker>` that adds functionality to rerank the images
 
 ## Export the dataset
 
