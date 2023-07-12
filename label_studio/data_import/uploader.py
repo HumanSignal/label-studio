@@ -3,7 +3,6 @@
 import os
 import io
 import csv
-import ssl
 import requests
 import logging
 import mimetypes
@@ -16,13 +15,11 @@ except:
 from rest_framework.exceptions import ValidationError
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
-from urllib.request import urlopen
 
 from .models import FileUpload
-from core.utils.io import url_is_local
+from core.utils.io import validate_upload_url
 from core.utils.common import timeit
 from core.feature_flags import flag_set
-from core.utils.exceptions import ImportFromLocalIPError
 
 logger = logging.getLogger(__name__)
 csv.field_size_limit(131072 * 10)
@@ -133,30 +130,18 @@ def tasks_from_url(file_upload_ids, project, user, url, could_be_tasks_list):
     try:
         filename = url.rsplit('/', 1)[-1]
 
-        if flag_set('fflag_fix_back_lsdv_4568_import_csv_links_03032023_short'):
-            response = requests.get(
-                url, verify=False, headers={'Accept-Encoding': None}
-            )  # nosec
-            file_content = response.content
-            check_tasks_max_file_size(int(response.headers['content-length']))
-        else:
-            ctx = ssl.create_default_context()
-            ctx.check_hostname = False
-            ctx.verify_mode = ssl.CERT_NONE
-            with urlopen(url, context=ctx) as file:  # nosec
-                # check size
-                meta = file.info()
-                check_tasks_max_file_size(int(meta.get("Content-Length")))
-                file_content = file.read()
-                if isinstance(file_content, str):
-                    file_content = file_content.encode()
+        validate_upload_url(url, block_local_urls=settings.SSRF_PROTECTION_ENABLED)
+        # Reason for #nosec: url has been validated as SSRF safe by the
+        # validation check above.
+        response = requests.get(
+            url, verify=False, headers={'Accept-Encoding': None}
+        )  # nosec
+        file_content = response.content
+        check_tasks_max_file_size(int(response.headers['content-length']))
         file_upload = create_file_upload(
             user, project, SimpleUploadedFile(filename, file_content)
         )
-        if (
-            flag_set('fflag_fix_back_lsdv_4568_import_csv_links_03032023_short')
-            and file_upload.format_could_be_tasks_list
-        ):
+        if file_upload.format_could_be_tasks_list:
             could_be_tasks_list = True
         file_upload_ids.append(file_upload.id)
         tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(
@@ -216,12 +201,6 @@ def load_tasks_for_async_import(project_import, user):
 
         # download file using url and read tasks from it
         else:
-            if settings.SSRF_PROTECTION_ENABLED and url_is_local(url):
-                raise ImportFromLocalIPError
-
-            if url.strip().startswith('file://'):
-                raise ValidationError('"url" is not valid')
-
             could_be_tasks_list = False
             (
                 data_keys,
@@ -289,12 +268,6 @@ def load_tasks(request, project):
 
         # download file using url and read tasks from it
         else:
-            if settings.SSRF_PROTECTION_ENABLED and url_is_local(url):
-                raise ImportFromLocalIPError
-
-            if url.strip().startswith('file://'):
-                raise ValidationError('"url" is not valid')
-
             (
                 data_keys,
                 found_formats,

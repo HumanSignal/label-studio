@@ -15,9 +15,6 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
 !!! info 
     The release notes for Label Studio Community Edition is available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
 
-!!! info 
-    The release notes for Label Studio Enterprise Cloud (SaaS) is available <a href="https://heartex.com/changelog">here</a>.
-
 
 ## New helm chart
 
@@ -134,6 +131,15 @@ The old chart `heartex/label-studio-enterprise` **has been deprecated**. Support
 - Insufficient Protection Against Malicious Software
 - Fix XSS in wrong task data
 - Shorten ordered by title in outliner to allow for filters
+
+
+<a name="248-1md"></a>
+
+*Jun 26, 2023*
+
+## Label Studio Enterprise 2.4.8-1
+### Bug fix
+- Fix Review N Tasks with URI too long [LOPS-185](https://labelstudio.aha.io/features/LOPS-185)
 
 
 <a name="247md"></a>

@@ -13,7 +13,7 @@ section: "Install"
 Main Label Studio Enterprise components:
 <img src="https://docs.heartex.com/images/LSE_k8s_scheme.png" class="gif-border"/>
 
-There are different ways you can setup Label Studio Enterprise:
+There are different ways you can set up Label Studio Enterprise:
 
 <ul class="page-sidebar-list">
       <li>

@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4853: Add warning message when user selects more choices than maxUsages",
-  "commit": "3655c3f89dbaaff00de48895fffb4606186f1374",
+  "message": "feat: LSDV-5295: Scroll management of paragraph transcriptions",
+  "commit": "083ca0a0232ef8c6cd1eaabd40efab8eecf456d0",
   "branch": "master",
-  "date": "2023/06/29 10:02:36"
+  "date": "2023/07/12 11:50:26"
 }
