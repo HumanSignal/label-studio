@@ -9,7 +9,7 @@ meta_title: Create dataset for supervised LLM fine-tuning
 meta_description: Template for creating dataset for supervised LLM fine-tuning with Label Studio for your machine learning and data science projects.
 ---
 
-## About the Supervised LLM Fine-Tuning Template
+## Overview
 
 This template is designed for you to get started with the process of supervised LLM fine-tuning.
 

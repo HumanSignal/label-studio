@@ -9,7 +9,7 @@ meta_title: Create Dataset for Collection of Human Preference for RLHF
 meta_description: Template for creating dataset for collection of human preference for RLHF with Label Studio for your machine learning and data science projects.
 ---
 
-## About Label Studio's Chatbot Assessment Labeling Template
+## Overview
 
 Looking to get started fine-tuning your own chatbot based off of your company's data? This template provides you with a workflow to get started! With this data labeling template you can collect human preference data with ease to better assess the quality of chatbot responses. This is helpful when adding context-specific details to a chatbot.
 
