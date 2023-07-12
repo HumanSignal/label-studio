@@ -9,8 +9,13 @@ meta_title: Create Dataset for Collection of Human Preference for RLHF
 meta_description: Template for creating dataset for collection of human preference for RLHF with Label Studio for your machine learning and data science projects.
 ---
 
-The template provides the worklow to assess the quality of the chatbot responses.
-There are different types of errors you should tackle with to ensure AI safety:
+## About Label Studio's Chatbot Assessment Labeling Template
+
+Looking to get started fine-tuning your own chatbot based off of your company's data? This template provides you with a workflow to get started! With this data labeling template you can collect human preference data with ease to better assess the quality of chatbot responses. This is helpful when adding context-specific details to a chatbot.
+
+When evaluating the quality of chatbot responses, there are a few different errors that you should tackle to ensure AI safety but also integrity of the data as well.
+
+Areas to look out for include:
 
 - hallucinations
 - misinformation
@@ -21,6 +26,8 @@ There are different types of errors you should tackle with to ensure AI safety:
 
 The template is based on the paper [Training language models to follow instructions
 with human feedback](https://arxiv.org/pdf/2203.02155.pdf), which proposes a set of human evaluation metrics for the LLMs responses.
+
+Curious to find a Large Language Model (LLM) to fine tune? Check out [our guide on the Label Studio blog](https://labelstud.io/blog/five-large-language-models-you-can-fine-tune-today/).
 
 ## How to Collect the Dataset
 

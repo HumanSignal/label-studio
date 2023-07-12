@@ -9,8 +9,11 @@ meta_title: Create a Ranked Dataset for LLMs with Label Studio
 meta_description: Create a ranked dataset for LLMs with Label Studio for your machine learning and data science projects.
 ---
 
-The template provides you with a worklow to rank the quality of a large language model (LLM) responses.
-Usign this template will give you the ability to compare the quality of the responses from different LLMs,and rank the dynamic set of items with a handy drag-and-drop interface.
+## About the LLM Ranker Labeling Template
+
+This template provides you with a worklow to rank the quality of a large language model (LLM) responses.
+
+Using this template will give you the ability to compare the quality of the responses from different LLMs,and rank the dynamic set of items with a handy drag-and-drop interface.
 
 This enables the following use cases:
 
@@ -20,6 +23,8 @@ This enables the following use cases:
 4. Build the preference model for RLHF
 5. Evaluate results of semantic search
 6. [LLM routing](https://betterprogramming.pub/unifying-llm-powered-qa-techniques-with-routing-abstractions-438e2499a0d0)
+
+Looking for a model to get started with the fine-tuning process? Check out [our guide on the Label Studio Blog](https://labelstud.io/blog/five-large-language-models-you-can-fine-tune-today/).
 
 ## How to create the dataset
 

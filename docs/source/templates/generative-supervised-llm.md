@@ -1,5 +1,5 @@
 ---
-title: Supervised LLM Fine-tuning
+title: Supervised LLM Fine-Tuning
 type: templates
 category: Generative AI
 cat: generative-ai
@@ -9,7 +9,13 @@ meta_title: Create dataset for supervised LLM fine-tuning
 meta_description: Template for creating dataset for supervised LLM fine-tuning with Label Studio for your machine learning and data science projects.
 ---
 
-The goal of Supervised LLM Fine-tuning is to optimize your Large Language Model (LLM) to generate responses given user-defined prompts. There are multiple scenarios where you might want to use this approach:
+## About the Supervised LLM Fine-Tuning Template
+
+This template is designed for you to get started with the process of supervised LLM fine-tuning.
+
+The goal of supervised LLM fine-tuning is to optimize your large language model (LLM) to generate responses given user-defined prompts which are more context specific than the original foundation model.
+
+There are multiple scenarios where you might want to use this approach:
 
 - Document classification
 - General Question-Answering (QA) systems
@@ -18,7 +24,7 @@ The goal of Supervised LLM Fine-tuning is to optimize your Large Language Model 
 
 Normally the need for this dataset collection template arise when you want:
 
-- train the large Foundation Models to follow your instructions;
+- train the large foundation model to follow your instructions;
 - create any Natural Language Processing (NLP) type of model, such as Sentiment Analysis, Text Summarization, Question-Answering, Named-entity recognition tailored to your domain;
 - fix the model's mistakes in the generated responses;
 - generate responses in a specific style;
