@@ -20,7 +20,7 @@ This is helpful for the following use cases:
 1. Categorize the responses by different types: relevant, irrelevant, biased, offensive, etc.
 2. Compare and rank the quality of the responses from different models.
 3. Evaluate results of semantic search
-4. Personalisation and recommendation systems
+4. Personalisation and recommendation systems, marketplace product search
 
 ## How to create the dataset
 
