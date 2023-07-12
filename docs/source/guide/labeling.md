@@ -172,13 +172,6 @@ When labeling image data types with the `Rectangle`, `BrushLabels`, `Ellipse`, `
 | `[` | When the brush or eraser option is selected, decrease the size of the brush or eraser. |
 | `]` | When the brush or eraser option is selected, increase the size of the brush or eraser. |
 
-### Audio-specific hotkeys
-When labeling audio data types with the `Audio` tag, you can use specific hotkeys to take audio-specific actions.
-
-| Key | Description |
-| --- | --- | 
-| `ctrl` + `b` OR `cmd` + `b` | Rewind audio 1 second. |
-
 ### Time series-specific hotkeys
 When labeling timeseries data with the `TimeSeries` tag, you can use specific hotkeys to take actions on a selected region on the time series data.
 

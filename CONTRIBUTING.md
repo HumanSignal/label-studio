@@ -15,7 +15,7 @@ You can contribute to Label Studio by submitting [bug reports and feature reques
 
 We also welcome contributions to [the documentation](https://github.com/heartexlabs/label-studio/tree/master/docs/source)! 
 
-Please don't use the issue tracker to ask questions. Instead, join the [Label Studio Slack Community](https://slack.labelstudio.heartex.com/?source=github-contrib) to get help!
+Please don't use the issue tracker to ask questions. Instead, join the [Label Studio Slack Community](https://slack.labelstud.io/?source=github-contrib) to get help!
 
 If you're not sure whether an idea you have for Label Studio matches up with our planned direction, check out the [public roadmap](https://github.com/heartexlabs/label-studio/blob/master/roadmap.md) first. 
 
@@ -60,4 +60,4 @@ Follow these code formatting guidelines:
 
 ### Additional questions
 
-If you have any questions that aren't answered in these guidelines, please find us in the #contributor channel of the [Label Studio Slack Community](https://slack.labelstudio.heartex.com/?source=github-contrib).
+If you have any questions that aren't answered in these guidelines, please find us in the #contributor channel of the [Label Studio Slack Community](https://slack.labelstud.io/?source=github-contrib).

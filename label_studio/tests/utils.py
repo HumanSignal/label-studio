@@ -54,14 +54,15 @@ def register_ml_backend_mock(m, url='http://localhost:9090', predictions=None, h
 
 @contextmanager
 def import_from_url_mock(**kwargs):
-    with requests_mock.Mocker(real_http=True) as m:
-        url='https://data.heartextest.net'
+    with mock.patch('data_import.uploader.validate_upload_url'):
+        with requests_mock.Mocker(real_http=True) as m:
+            url='https://data.heartextest.net'
 
-        with open('./tests/test_suites/samples/test_1.csv', 'rb') as f:
-            matcher = re.compile('data.heartextest.net/test_1.csv')
+            with open('./tests/test_suites/samples/test_1.csv', 'rb') as f:
+                matcher = re.compile('data\.heartextest\.net/test_1\.csv')
 
-            m.get(matcher, body=f, headers={'Content-Length': '100'})
-            yield m
+                m.get(matcher, body=f, headers={'Content-Length': '100'})
+                yield m
 
 
 class _TestJob(object):
@@ -294,20 +295,9 @@ def _client_is_annotator(client):
 
 
 def save_response(response):
-    filename = 'tavern-output.json'
-    with open(filename, 'w') as f:
+    fp = os.path.join(settings.TEST_DATA_ROOT, 'tavern-output.json')
+    with open(fp, 'w') as f:
         json.dump(response.json(), f)
-
-
-def check_response_with_json_file(response, json_file):
-    response = response.json()
-    filename = 'tavern-output.json'
-    with open(filename, 'w') as f:
-        json.dump(response, f, indent=4)
-
-    with open(json_file, 'r') as f:
-        true = json.load(f)
-        assert response == true
 
 
 def os_independent_path(_, path, add_tempdir=False):
