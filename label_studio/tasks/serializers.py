@@ -475,7 +475,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                     'completed_by_id': annotation['completed_by_id'],
                     'result': annotation['result'],
                     'lead_time': lead_time,
-                    'import_id': annotation['id'],
+                    'import_id': annotation.get('id'),
                 }
                 db_annotations.append(Annotation(**body))
 
