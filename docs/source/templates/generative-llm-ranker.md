@@ -20,7 +20,7 @@ This enables the following use cases:
 1. Categorize the LLM responses by different types: relevant, irrelevant, biased, offensive, etc.
 2. Compare and rank the quality of the responses from different models.
 3. Rank contextual items for retrieval-augmented generation based chat bots and in-context learning.
-4. Build the preference model for RLHF
+4. Build [the preference model for RLHF](https://github.com/heartexlabs/RLHF)
 5. Evaluate results of semantic search
 6. [LLM routing](https://betterprogramming.pub/unifying-llm-powered-qa-techniques-with-routing-abstractions-438e2499a0d0)
 
@@ -135,7 +135,7 @@ project = ls.get_project(id=PROJECT_ID)
 project.import_tasks('dataset.json')
 ```
 
-Import the dataset with pre-annotations using the following snippet to create prelabeled data. This is helpful whenIf you want to create prelabeled data (for example, ranked order of the items produced by LLM), you can import the dataset with pre-annotations:
+If you want to create prelabeled data (for example, ranked order of the items produced by LLM), you can import the dataset with pre-annotations:
 
 ```python
 project.import_tasks([{
@@ -157,8 +157,7 @@ project.import_tasks([{
         }]
 }])
 ```
-
-Note that `"_"` is a special key that represents the original, non-categorized list.
+Under `"value"` group, you can specify different bucket names. Note `"_"` used as a special key that represents the original, non-categorized list.
 
 ## Export the dataset
 
@@ -187,9 +186,8 @@ The output of annotations in `"value"` is expected to contain the following stru
 
 where:
 
-`"_"` is a special key that represents the original, non-categorized list (same as in the import preannotations example above).
-
-`"biased_results"` and `"relevant_results"` are the names of the buckets defined in the labeling interface.
+- `"_"` is a special key that represents the original, non-categorized list (same as in the import preannotations example above).
+- `"biased_results"` and `"relevant_results"` are the names of the buckets defined in the labeling interface.
 
 ## Related tags
 
