@@ -26,6 +26,7 @@ Use with the following data types: text.
 | [layout] | <code>none</code> \| <code>dialogue</code> | <code>none</code> | Whether to use a dialogue-style layout or not |
 | [nameKey] | <code>string</code> | <code>&quot;author&quot;</code> | The key field to use for name |
 | [textKey] | <code>string</code> | <code>&quot;text&quot;</code> | The key field to use for the text |
+| [contextScroll] | <code>boolean</code> | <code>false</code> | Turn on contextual scroll mode |
 
 ### Sample Results JSON
 

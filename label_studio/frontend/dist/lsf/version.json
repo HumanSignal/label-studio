@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5262: Save draft on postpone",
-  "commit": "2d2d044d1bb6bbc33a9bbe65c9155cfda037df1f",
+  "message": "fix: LSDV-5164: Unselect labels with tools",
+  "commit": "511a0e8db7e5148b77401cabb9ab3191288e1899",
   "branch": "master",
-  "date": "2023/06/12 17:06:14"
+  "date": "2023/07/10 11:34:43"
 }

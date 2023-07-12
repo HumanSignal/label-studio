@@ -66,5 +66,5 @@ jobs:
         run: |
           git add "${{ env.LAUNCHDARKLY_DOWNLOAD_PATH }}"
           git status -s
-          git commit -m '${{ env.FEATURE_FLAGS_COMMIT_MESSAGE }}' || true
+          git commit -m '${{ env.FEATURE_FLAGS_COMMIT_MESSAGE }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}' || true
           git push origin HEAD

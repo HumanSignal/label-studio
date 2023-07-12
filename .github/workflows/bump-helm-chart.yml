@@ -15,7 +15,7 @@ on:
         required: true
 
 env:
-  HELM_CHART_REPO: 'heartexlabs/charts'
+  HELM_CHART_REPO_NAME: 'charts'
   LS_CHART_PATH: 'heartex/label-studio/Chart.yaml'
 
 jobs:
@@ -35,7 +35,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          repository: ${{ env.HELM_CHART_REPO }}
+          repository: "${{ github.repository_owner }}/${{ env.HELM_CHART_REPO_NAME }}"
           token: ${{ secrets.GIT_PAT }}
 
       - name: Edit Label Studio Chart
@@ -56,5 +56,5 @@ jobs:
       - name: Commit and Push
         run: |
           git add "${LS_CHART_PATH}"
-          git commit -m 'Bump Label Studio to ${{ inputs.docker_image_version }}'
+          git commit -m 'Bump Label Studio to ${{ inputs.docker_image_version }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin

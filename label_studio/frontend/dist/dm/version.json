@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5249: Manual security updates",
-  "commit": "a9539713eac9b61c0647b8a7c5dd22fe44d8bb22",
+  "message": "fix: LSDV-5355: Check before using column id in DM column creation",
+  "commit": "ea6d4a45189e17b894d89a968b3a02ac17fcbcae",
   "branch": "master",
-  "date": "2023/06/07 23:45:34"
+  "date": "2023/06/29 13:12:32"
 }
