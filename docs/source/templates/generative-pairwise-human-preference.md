@@ -214,7 +214,7 @@ prompt,instruction
 ## How to fine-tune the model
 
 You generated examples can be used to finetune the opensource LLM models like GPT-2, T5, Falcon, LLaMa, etc. You can check the complete list of models on [HuggingFace LLM leaderboard](https://huggingface.co/spaces/HuggingFaceH4/open_llm_leaderboard), download and finetune the model from [Model Hub](https://huggingface.co/models).
-Alternatively, there are finetuning services available: OpenAI, CoHere, [MosaicML](https://www.mosaicml.com/), AI21, Google Cloud AI Platform, AzureML, etc.
+Alternatively, there are finetuning services available: [OpenAI](https://platform.openai.com/), [CoHere](https://cohere.com/), (AI21 Studio)[https://www.ai21.com/studio/foundation-models], [MosaicML](https://www.mosaicml.com/), [Google Cloud AI Platform](https://cloud.google.com/products/ai), [AzureML](https://azure.microsoft.com/en-us/free/machine-learning/search/), etc.
 
 ## Related tags
 
