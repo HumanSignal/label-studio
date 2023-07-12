@@ -142,6 +142,7 @@ The old chart `heartex/label-studio-enterprise` **has been deprecated**. Support
 - Fix Review N Tasks with URI too long [LOPS-185](https://labelstudio.aha.io/features/LOPS-185)
 
 
+
 <a name="247md"></a>
 
 *May 18, 2023*

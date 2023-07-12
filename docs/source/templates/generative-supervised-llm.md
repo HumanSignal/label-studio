@@ -154,50 +154,7 @@ The `Supervised Language Model Fine-tuning` template includes the following labe
 
 <View className="root">
     <Style>
-        .root {
-        font-family: 'Roboto', sans-serif;
-        line-height: 1.6;
-        background-color: #f0f0f0;
-        }
-        .container {
-        margin: 0 auto;
-        padding: 20px;
-        background-color: #ffffff;
-        border-radius: 5px;
-        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 20px 0 rgba(0, 0, 0, 0.1);
-        }
-        .prompt {
-        padding: 20px;
-        background-color: #0084ff;
-        color: #ffffff;
-        border-radius: 5px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1), 0 3px 10px 0 rgba(0, 0, 0, 0.1);
-        }
-        .answer-input {
-        flex-basis: 49%;
-        padding: 20px;
-        background-color: rgba(44, 62, 80, 0.9);
-        color: #ffffff;
-        border-radius: 5px;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1), 0 3px 10px 0 rgba(0, 0, 0, 0.1);
-        width: 100%;
-        border: none;
-        font-family: 'Roboto', sans-serif;
-        font-size: 16px;
-        outline: none;
-        }
-        .answer-input:focus {
-        outline: none;
-        }
-        .answer-input:hover {
-        background-color: rgba(52, 73, 94, 0.9);
-        cursor: pointer;
-        transition: all 0.3s ease;
-        }
-        .lsf-richtext__line:hover {
-        background: unset;
-        }
+        <!-- Different CSS styles for the prompt and the answer input -->
     </Style>
     <View className="container">
         <View className="prompt">
@@ -213,11 +170,6 @@ The `Supervised Language Model Fine-tuning` template includes the following labe
         </View>
     </View>
 </View>
-
-        <!-- {"data" : {
-          "prompt": "Generate a Python function that takes a list of integers as input and returns the sum of all even numbers in the list."
-        }}
-        -->
 ```
 
 Here it takes input prompt in `"$prompt"` variable and renders it as a text block with a blue background defined
