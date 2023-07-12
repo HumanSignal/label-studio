@@ -843,8 +843,7 @@ class Project(ProjectMixin, models.Model):
             task.total_predictions = task.new_total_predictions
             objs.append(task)
 
-        with transaction.atomic():
-            bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
+        bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
         return len(objs)
 
     def _update_tasks_counters_and_is_labeled(self, task_ids, from_scratch=True):
@@ -858,12 +857,9 @@ class Project(ProjectMixin, models.Model):
         page_idx = 0
 
         while (task_ids_slice := task_ids[page_idx * settings.BATCH_SIZE:(page_idx + 1) * settings.BATCH_SIZE]):
-            with transaction.atomic():
-                # If counters are updated, is_labeled must be updated as well. Hence, if either fails, we
-                # will roll back.
-                queryset = make_queryset_from_iterable(task_ids_slice)
-                num_tasks_updated += self._update_tasks_counters(queryset, from_scratch)
-                bulk_update_stats_project_tasks(queryset, self)
+            queryset = make_queryset_from_iterable(task_ids_slice)
+            num_tasks_updated += self._update_tasks_counters(queryset, from_scratch)
+            bulk_update_stats_project_tasks(queryset, self)
             page_idx += 1
         return num_tasks_updated
 

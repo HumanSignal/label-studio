@@ -6,9 +6,7 @@ from tasks.models import Task, Annotation, Prediction, bulk_update_stats_project
 
 
 @pytest.mark.django_db
-def test_export(
-        business_client, configured_project
-):
+def test_export(business_client, configured_project):
     task_query = Task.objects.filter(project=configured_project.id)
     task_query.update(is_labeled=True)
     t = threading.Thread(target=worker_change_stats, args=(task_query.values_list('id', flat=True),))
@@ -22,6 +20,6 @@ def test_export(
     assert Task.objects.filter(is_labeled=True).count() == 0
 
 
-def worker_change_stats(time_seconds, tasks):
+def worker_change_stats(tasks):
     tasks = Task.objects.filter(id__in=tasks)
     bulk_update_stats_project_tasks(tasks)
