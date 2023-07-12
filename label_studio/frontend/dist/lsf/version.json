@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5164: Unselect labels with tools",
-  "commit": "511a0e8db7e5148b77401cabb9ab3191288e1899",
+  "message": "feat: LSDV-5252: Audio player segment visual identification",
+  "commit": "9a1a0d3f51a96b3867426cd09ba4836c68207055",
   "branch": "master",
-  "date": "2023/07/10 11:34:43"
+  "date": "2023/07/12 07:14:18"
 }
