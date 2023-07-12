@@ -18,7 +18,7 @@ Through ranking multiple responses based on quality, you can train a reward mode
 
 - [Gathering Human Feedback Tutorial](https://github.com/heartexlabs/RLHF/blob/master/tutorials/RLHF_with_Custom_Datasets.ipynb) A Jupyter Notebook tutorial that will guide you through the step-by-step process of collecting comparison data, establishing human preferences, and incorporating this feedback into the reward model training.
 - [RLHF Resources](https://github.com/heartexlabs/RLHF): A collection of links, tutorials and best practices on how collect data and build an end-to-end Reinforcement Learning from Human Feedback (RLHF) system to fine-tune Generative AI models.
-- [Awesome-Human-in-the-Loop List](https://github.com/heartexlabs/awesome-human-in-th,e-loop): An awesome list of human in the loop resources and references for retraining models.
+- [Awesome-Human-in-the-Loop List](https://github.com/heartexlabs/awesome-human-in-the-loop): An awesome list of human in the loop resources and references for retraining models.
 - [Talk: Improving Machine Learning from Human Feedback](https://youtu.be/nx_vJpux_Sg) : A talk from PyData Berlin on how to improve machine learning from Human Feedback using RLHF.
 - [Workshop: Getting Started with Reinforcement Learning](https://youtu.be/Oqo8k8SyMX4) : A workshop on how to get started with Reinforcement Learning.
 - [Guide: Five Large Language Models you can Fine-Tune Today](https://labelstud.io/blog/five-large-language-models-you-can-fine-tune-today/)
