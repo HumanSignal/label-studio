@@ -60,7 +60,7 @@ Collect dataset examples and store them in `dataset.json` file.
 
 *Need a hand getting started with Label Studio? Check out our [Zero to One Tutorial](https://labelstud.io/blog/zero-to-one-getting-started-with-label-studio/).*
 
-1. Createa  new project in Label Studio
+1. Create a  new project in Label Studio
 2. Go to `Settings > Labeling Interface > Browse Templates > Generative AI > LLM Ranker`
 3. Save the project
 

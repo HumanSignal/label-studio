@@ -97,7 +97,7 @@ The configuration includes the following elements:
 - `<Text>` - the tag that instructs to display the prompt. The `value` attribute should be set to the name of the prompt element, i.e. `prompt` in this case.
 - `<List>` - the tag that instructs to display the list of items. The `value` attribute should be set to the name of the list element (in this case `items`).
 - `<Ranker>` - the tag that instructs to ranker the items in the list. The `toName` attribute should be set to the name of the list element.
-- `<Bucket>` - the tag that instructs to create a bucket for the ranked items. Each bucket reprepresents the high-level category of items to be ranked inside this category. The `name` attribute should be set to the name of the bucket.
+- `<Bucket>` - the tag that instructs to create a bucket for the ranked items. Each bucket represents the high-level category of items to be ranked inside this category. The `name` attribute should be set to the name of the bucket.
 
 Items can be styled in Style tag by using `.htx-ranker-item` class.
 
