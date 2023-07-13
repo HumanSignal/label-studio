@@ -35,6 +35,7 @@ meta_description: Template annotating transcriptions in their audio context.
 </View>
 ```
 
+
 ## About the labeling configuration
 
 All labeling configurations must be wrapped in [View](/tags/view.html) tags.
@@ -57,7 +58,40 @@ Use the [Paragraph Lables](/tags/paragraphlabels.html) control tag with the [Lab
   <Label value="Negative" background="#ff0000"/>
 </ParagraphLabels>
 ```
+## Transcription Data
 
+The transcription data should have a start and either an end or a duration
+
+```json
+{
+    "text": [
+      {
+        "end": 1.5,
+        "text": "Dont you hate that?",
+        "start": 0,
+        "author": "Mia Wallace"
+      },
+      {
+        "text": "Hate what?",
+        "start": 1.5,
+        "author": "Vincent Vega:",
+        "duration": 3
+      },
+      {
+        "end": 7,
+        "text": "Uncomfortable silences. Why do we feel its necessary to yak about bullshit in order to be comfortable?",
+        "start": 4.5,
+        "author": "Mia Wallace:"
+      },
+      {
+        "end": 10,
+        "text": "I dont know. Thats a good question.",
+        "start": 8,
+        "author": "Vincent Vega:"
+      },
+    ],
+  },
+```
 ## Enhance this template
 This template can be enhanced in many ways.
 
@@ -77,9 +111,6 @@ A number of tags can be added to this template to add more data points to the an
 </View>
 
 ```
-
-<!-- md nested-classification.md -->
-
 ## Related tags
 
 - [Audio](/tags/audio.html)
