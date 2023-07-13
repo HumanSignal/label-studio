@@ -4,7 +4,7 @@ import { FormField } from '../../FormField';
 import { default as Label } from '../Label/Label';
 import './Select.styl';
 
-const Select = ({ label, className, options, validate, required, skip, labelProps, ghost, ...props }) => {
+const Select = ({ label = undefined, className = undefined, options = [], validate = undefined, required = undefined, skip = undefined, labelProps = undefined, ghost = undefined, ...props }) => {
   const rootClass = cn('select');
   const initialValue = useMemo(() => props.value ?? "", [props.value]);
   const [value, setValue] = useState(initialValue);

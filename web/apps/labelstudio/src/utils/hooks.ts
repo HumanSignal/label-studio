@@ -1,20 +1,20 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, EffectCallback, DependencyList } from 'react';
 import { useHistory } from 'react-router';
 import { useFixedLocation } from '../providers/RoutesProvider';
 
 export const useSet = <T>(initialSet: Set<T> = new Set()) => {
-  const [set, setSet] = useState(initialSet);
+  const [set, setSet] = useState<Set<T>>(initialSet);
 
   const stableActions = useMemo(() => {
-    const add = (item: T) => setSet((prevSet) => {
+    const add = (item: T) => setSet((prevSet: Set<T>) => {
       return new Set([...Array.from(prevSet), item]);
     });
 
-    const remove = (item: T) => setSet((prevSet) => {
+    const remove = (item: T) => setSet((prevSet: Set<T>) => {
       return new Set(Array.from(prevSet).filter((i) => i !== item));
     });
 
-    const toggle = (item: T) => setSet((prevSet) => {
+    const toggle = (item: T) => setSet((prevSet: Set<T>) => {
       return prevSet.has(item)
         ? new Set(Array.from(prevSet).filter((i) => i !== item))
         : new Set([...Array.from(prevSet), item]);
@@ -24,7 +24,7 @@ export const useSet = <T>(initialSet: Set<T> = new Set()) => {
   }, [setSet]);
 
   const utils = {
-    has: useCallback((item) => set.has(item), [set]),
+    has: useCallback((item: T) => set.has(item), [set]),
     ...stableActions,
   };
 
@@ -35,7 +35,7 @@ export const useRefresh = () => {
   const history = useHistory();
   const { pathname } = useFixedLocation();
 
-  const refresh = useCallback((redirectPath) => {
+  const refresh = useCallback((redirectPath?: string|null) => {
     history.replace("/");
 
     setTimeout(() => {
@@ -60,7 +60,7 @@ export function useFirstMountState(): boolean {
   return isFirst.current;
 }
 
-export const useUpdateEffect: typeof useEffect = (effect, deps) => {
+export const useUpdateEffect: typeof useEffect = (effect: EffectCallback, deps?: DependencyList) => {
   const isFirstMount = useFirstMountState();
 
   useEffect(() => {

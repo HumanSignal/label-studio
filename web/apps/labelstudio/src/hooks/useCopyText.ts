@@ -4,7 +4,7 @@ import { copyText, isDefined } from "../utils/helpers";
 export const useCopyText = ({ defaultText = "", timeout = 1200 }) => {
   const [copied, setCopied] = useState(false);
 
-  const copyTextCallback = useCallback((text?) => {
+  const copyTextCallback = useCallback((text?: string) => {
     setCopied(true);
     copyText(isDefined(text) ? text : defaultText);
     setTimeout(() => setCopied(false), timeout);

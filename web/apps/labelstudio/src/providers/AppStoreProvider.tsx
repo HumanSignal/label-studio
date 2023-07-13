@@ -11,7 +11,7 @@ type Context = {
 const AppStoreContext = React.createContext<Context>({} as Context);
 AppStoreContext.displayName = 'AppStoreContext';
 
-export const AppStoreProvider: React.FunctionComponent = ({children}) => {
+export const AppStoreProvider: React.FunctionComponent<any> = ({children}) => {
   const [store, setStore] = React.useState({} as Store);
 
   const update = React.useCallback((newData: Partial<Store>) => {
