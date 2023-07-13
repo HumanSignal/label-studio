@@ -8,7 +8,7 @@ meta_title: Audio Transcription Context
 meta_description: Template annotating transcriptions in their audio context.
 ---
 
-<img src="/images/templates-misc/audio_transcription_context.png" alt="" class="gif-border" width="482px" height="282px" />
+<img src="/images/templates-misc/audio-transcription-context.png" alt="" class="gif-border" width="482px" height="282px" />
 
  The context scroll feature of paragraphs allows for playback synchronization between audio segments and corresponding paragraph segments, enabling users to control the audio player with the relevant paragraph segment and see which segment is related to which section of the audio file. 
 
