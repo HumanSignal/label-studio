@@ -1,0 +1,21 @@
+.input {
+  width: 100%;
+  padding: 0.4em 1em;
+  display: block;
+}
+
+.editing {
+  padding: 0;
+  position: relative;
+
+  .enter {
+    pointer-events: all;
+  }
+}
+
+.delete {
+  color: #1890ff;
+  padding-top: 0.5em;
+  padding-left: 1em;
+  line-height: 1.8em;
+}

@@ -1,0 +1,7 @@
+<View>
+  <Style>
+    .htx-ranker-column { background: cornflowerblue; }
+    .htx-ranker-item { background: lightgoldenrodyellow; }
+  </Style>
+  <Ranker name="ranker" value="$items" mode="rank" title="Search Results"/>
+</View>

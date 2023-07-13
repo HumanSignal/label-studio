@@ -1,0 +1,75 @@
+.richtext
+  position: relative;
+
+  &__container
+    overflow auto
+    fontSize 16
+    lineHeight 26px
+  &__orig-container
+    display: none !important
+  &__work-container
+    display: none !important
+
+  &__iframe
+    border none
+    width 100%
+
+  &__orig-iframe
+    display: none !important
+  &__work-iframe
+    display: none !important
+
+  &__loading
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    background: rgba(125,125,125,.15);
+    font-size: 24px;
+
+  &__container[data-linenumbers=enabled]
+    padding-left 3em // 3em for line numbers
+    counter-reset line-number
+
+    ~/__line
+      position relative // to position line numbers
+      display inline-block // for alignment and hover highlight
+      min-height 1.2em // for styling numbers for empty lines
+      padding-left 8px
+
+      &::before
+        counter-increment line-number
+        content counter(line-number)
+        position absolute
+        top 0
+        left -3em
+        height 100%
+        min-height 2.2em // for straight separator even on empty lines (they have wrong height)
+        width 3em // for 4 digits
+        border-right 1px solid lightgray
+        padding-right 4px
+        font-size 0.8em
+        line-height 2em // = 1.6em as usual text
+        text-align right
+        z-index 1
+
+      &:last-child::before
+        min-height 1em // to not overgrow container's height
+
+      &:hover,
+      &:hover::before
+        background #f4f4f4
+
+      &:empty
+        background none // empty lines have broken height and almost zero width, so don't highlight
+
+
+// global.scss is not included to final build, so define it here
+:global(.htx-no-label)::after {
+  display: none;
+}

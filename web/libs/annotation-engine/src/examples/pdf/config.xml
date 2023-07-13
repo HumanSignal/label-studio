@@ -1,0 +1,3 @@
+<View>
+  <Pdf name="pdf" value="$pdf" />
+</View>

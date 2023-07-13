@@ -1,0 +1,20 @@
+<View>
+  <Text name="text" value="Hello"></Text>
+
+  <Number name="num" toName="text" min="1" max="10"/>
+  <DateTime name="dt" toName="text" showDate="true" showTime="true"/>
+  <TextArea name="txt" toName="text" editable="true"/>
+
+  <Choices name="choices" toName="text">
+    <Choice value="Choice 1" background="#5b5"/>
+    <Choice value="Choice 2" background="#55f"/>
+  </Choices>
+
+  <Taxonomy name="taxonomy" toName="text">
+    <Choice value="Choice 1" background="#5b5"/>
+    <Choice value="Choice 2" background="#55f">
+      <Choice value="Choice 2.1" background="#5b5"/>
+      <Choice value="Choice 2.2" background="#55f"/>
+    </Choice>
+  </Taxonomy>
+</View>

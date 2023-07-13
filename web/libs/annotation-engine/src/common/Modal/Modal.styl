@@ -1,0 +1,108 @@
+.modal
+  --transition-duration 100ms
+
+  top 0
+  left 0
+  width 100%
+  height 100%
+  z-index 1000
+  display flex
+  position absolute
+  align-items center
+  justify-content center
+  background-color rgba(#000, 0.3)
+  will-change opacity
+  overflow hidden
+
+  &__wrapper
+    width 100%
+    max-height 100%
+    padding 40px 0
+    overflow auto
+    box-sizing border-box
+    will-change transform
+
+  &__content
+    width 400px
+    min-width 400px
+    min-height 100px
+    margin 0 auto
+    background-color #fff
+    border-radius 5px
+    box-shadow 0 10px 30px rgba(#000, 0.3)
+
+  &__header
+    display flex
+    min-height 40px
+    align-items center
+    justify-content space-between
+    padding 16px 40px
+    box-sizing content-box
+
+    &_divided
+      border-bottom 1px solid rgba(0, 0, 0, 0.05)
+
+  &__title
+    margin 0
+    margin-right auto
+    font-size 20px
+
+  &__body
+    padding 0 40px 32px
+    &_bare
+      padding 0
+      height 100%
+      display flex
+      flex-direction column
+
+  &__footer
+    padding 16px 40px
+    background rgba(0, 0, 0, 0.03)
+    box-shadow inset 0px 1px 0px rgba(0, 0, 0, 0.05)
+    text-align center
+    font-size 14px
+    line-height 22px
+
+  &_fullscreen &__content
+    width calc(100vw - 80px)
+    height calc(100vh - 80px)
+
+  &_visible
+    opacity 0
+    transition opacity var(--transition-duration) ease
+
+  &_visible &__wrapper
+    transform scale(1.05)
+    transition transform var(--transition-duration) ease
+
+  &.visible
+    opacity 1
+
+  &.visible &__wrapper
+    transform none
+
+  // Appearing
+  &.before-appear
+    opacity 0
+
+  &.before-appear &__wrapper
+    transform scale(1.05)
+
+  &.appear
+    opacity 1
+
+  &.appear &__wrapper
+    transform scale(1)
+
+  // Disappearing
+  &.before-disappear
+    opacity 1
+
+  &.before-disappear &__wrapper
+    transform scale(1)
+
+  &.disappear
+    opacity 0
+
+  &.disappear &__wrapper
+    transform scale(1.05)

@@ -1,0 +1,32 @@
+.tag
+  --height 22px
+  --radius 5px
+  --shadow-color #ccc
+  --font-size 14px
+  --padding 0 12px
+  --background #efefef
+  --color #ccc
+
+  font-weight 500
+  padding var(--padding)
+  height var(--height)
+  color var(--color)
+  background-color var(--background)
+  border-radius var(--radius)
+  font-size var(--font-size)
+  line-height var(--height)
+  display inline-block
+  box-shadow 0 0 0 1px var(--shadow-color) inset
+
+  &_size
+    &_small
+      --padding 0 5px
+      --height 18px
+      --radius 3px
+      --font-size 12px
+
+    &_compact
+      --padding 0 8px
+      --height 28px
+      --radius 4px
+      --font-size 14px

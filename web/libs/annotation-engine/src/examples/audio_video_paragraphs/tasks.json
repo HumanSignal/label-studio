@@ -1,0 +1,35 @@
+[
+   {
+      "data":{
+         "video": "https://app.heartex.ai/static/samples/opossum_snow.mp4",
+         "dialogue":[
+            {
+               "start": 3.1,
+               "end": 5.6,
+               "author":"Mia Wallace",
+               "text":"Dont you hate that?"
+            },
+            {
+               "start": 10.2,
+               "duration": 3.1,
+               "author":"Vincent Vega:",
+               "text":"Hate what?"
+            },
+            {
+               "author":"Mia Wallace:",
+               "text":"Uncomfortable silences. Why do we feel its necessary to yak about bullshit in order to be comfortable?"
+            },
+            {
+               "start": 20,
+               "author":"Vincent Vega:",
+               "text":"I dont know. Thats a good question."
+            },
+            {
+               "author":"Mia Wallace:",
+               "text":"Thats when you know you found somebody really special. When you can just shut the fuck up for a minute, and comfortably share silence."
+            }
+         ]
+      }
+   }
+]
+

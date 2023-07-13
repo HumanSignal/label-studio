@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@heartexlabs/annotation-engine": ["libs/annotation-engine/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -1,0 +1,320 @@
+.panel
+  --header-height: 24px
+  --header-border-radius 0
+  --header-background rgb(242, 242, 242)
+
+  height 100%
+  z-index 10
+  background-color #fff
+  pointer-events all
+
+  &_newLabelingUI
+     --header-background-new #e1e0e2
+     --icon-color #898098 
+    .panel
+      &__header
+        background var(--header-background-new)
+        color var(--icon-color)
+        &:hover
+          --icon-color #096DD9
+          --header-background-new #d8e7f9
+          
+    &.panel
+      &_alignment
+        &_left, &_right
+          .panel__header
+            flex-direction row
+            padding 4px
+            padding-left 9px
+
+      &__header
+        color var(--icon-color)
+        padding-left: 24px
+
+      &_hidden:not(&_detached)
+        margin 0;
+        border-radius 0
+        height 100%
+        
+        .panel
+          &__header
+            height 100%
+            justify-content space-between
+            padding 0 4px
+            --header-border-radius 0
+
+      &_hidden &__header
+        padding 0
+        width 100%
+        height 100%
+        cursor pointer
+        line-height normal
+        justify-content center
+        border-radius var(--header-border-radius)
+
+  &_alignment
+    &_left
+      border-right 1px solid rgba(#000, 0.1)
+      --header-border-radius 0 4px 4px 0
+
+    &_right
+      border-left 1px solid rgba(#000, 0.1)
+      --header-border-radius 4px 0 0 4px
+
+  &_detached
+    top 0
+    left 0
+    position absolute
+    border 1px solid rgba(137, 128, 152, 0.16)
+    box-shadow: 0px 6px 10px 4px rgba(38, 38, 38, 0.15), 0px 2px 3px rgba(38, 38, 38, 0.3);
+
+  &_hidden:not(&_detached)
+    top 0
+    width 22px
+    border none
+    margin 8px 0
+    background none
+    height calc(100% - 16px)
+
+    --header-background rgba(#413C4A, 0.08)
+    --icon-color #898098
+
+    ~/_detached &
+      margin 0
+
+    &:hover
+      --icon-color #096DD9
+      --header-background rgba(#096DD9, 0.16)
+
+  &__header
+    top 0
+    height var(--header-height)
+    z-index 2
+    display flex
+    cursor move
+    font-size 13px
+    font-weight 700
+    line-height 16px
+    color rgba(#000, 0.5)
+    user-select none
+    position sticky
+    align-items center
+    justify-content space-between
+    background-color var(--header-background)
+
+    ~/_alignment_left &
+      text-align left
+      flex-direction row
+      padding 4px 0 4px 12px
+
+    ~/_alignment_right &
+      text-align right
+      flex-direction row-reverse
+      padding 4px 12px 4px 0
+
+  &_hidden:not(&_detached) &__header
+    padding 0
+    width 100%
+    height 100%
+    cursor pointer
+    line-height normal
+    justify-content center
+    border-radius var(--header-border-radius)
+
+  &__toggle
+    width 24px
+    height 24px
+    display flex
+    position relative
+    align-items center
+    justify-content center
+    color var(--icon-color)
+
+    svg
+      display block
+
+    &:hover
+      background-color rgba(#096DD9, 0.16)
+
+  &:not(&_detached)&_hidden &__toggle
+    pointer-events none
+
+  &_hidden:not(&_detached) &__toggle
+    background-color transparent
+
+  // Toggle button tooltip styles
+  &:not(&_hidden) &__toggle:hover,
+  &_hidden&&_detached &__toggle:hover,
+  &_hidden:not(&_detached) &__header:hover &__toggle
+    &::before
+      color #fff
+      font-size 16px
+      font-weight 500
+      padding 4px 16px
+      position absolute
+      white-space nowrap
+      border-radius 4px
+      background-color #262626
+      content attr(data-tooltip)
+
+  // Panel is hidden and snapped to one of the sides
+  &_hidden&:not(&_detached)&_alignment_left &__toggle,
+  &_hidden&:not(&_detached)&_alignment_right &__toggle
+    &::before
+      top 50%
+      transform translate(0, -50%)
+
+  &_hidden&:not(&_detached)&_alignment_left &__toggle
+    &::before
+      left calc(100% + 4px)
+
+  &_hidden&:not(&_detached)&_alignment_right &__toggle
+    &::before
+      right calc(100% + 4px)
+
+  // Panel is visible and snapped to one of the sides
+  &:not(&_hidden):not(&_detached) &__toggle
+    &::before
+      left 50%
+      top calc(100% + 4px)
+      transform translate(-50%, 0)
+
+  // Panel is visible and floating
+  &_detached &__toggle
+    &::before
+      left 50%
+      bottom calc(100% + 4px)
+      transform translate(-50%, 0)
+
+  &__content
+    width 100%
+    height 100%
+
+    ~/_resizing
+      pointer-events none
+
+  &__body
+    z-index 1
+    overflow-y auto
+    overflow-x hidden
+    height calc(100% - var(--header-height))
+    position relative
+    styled-scrollbars()
+
+  &__resizer
+    --size 12px
+    --visual-size 2px
+
+    z-index 10
+    position absolute
+    background-color transparent
+    user-select none
+
+    // Top and bottom
+    &[data-resize=top],
+    &[data-resize=bottom]
+      left calc(var(--size) / 2)
+      height var(--size)
+      width calc(100% - var(--size))
+      cursor ns-resize
+
+    &[data-resize=top]
+      top 0
+      transform translate(0, -50%)
+
+    &[data-resize=bottom]
+      bottom 0
+      transform translate(0, 50%)
+
+    // Left and right
+    &[data-resize=left],
+    &[data-resize=right]
+      top calc(var(--size) / 2)
+      width var(--size)
+      height calc(100% - var(--size))
+      cursor ew-resize
+
+    &[data-resize=left]
+      left 0
+      transform translate(-50%, 0)
+
+    &[data-resize=right]
+      right 0
+      transform translate(50%, 0)
+
+    // Corners
+    &[data-resize=top-left],
+    &[data-resize=top-right],
+    &[data-resize=bottom-left],
+    &[data-resize=bottom-right]
+      width var(--size)
+      height var(--size)
+
+    &[data-resize=top-left]
+    &[data-resize=top-right]
+      top 0
+
+    &[data-resize=bottom-left]
+    &[data-resize=bottom-right]
+      bottom 0
+
+    &[data-resize=top-left]
+      left 0
+      transform translate(-50%, -50%)
+      cursor nwse-resize
+
+    &[data-resize=top-right]
+      right 0
+      transform translate(50%, -50%)
+      cursor nesw-resize
+
+    &[data-resize=bottom-left]
+      left 0
+      transform translate(-50%, 50%)
+      cursor nesw-resize
+
+    &[data-resize=bottom-right]
+      right 0
+      transform translate(50%, 50%)
+      cursor nwse-resize
+
+
+    &::before
+      top 50%
+      left 50%
+      transform translate(-50%, -50%)
+      content ''
+      width 6px
+      height 6px
+      display none
+      position absolute
+      background-color $accent_color
+      border-radius 100%
+
+    &[data-resize=top]::before,
+    &[data-resize=bottom]::before,
+    &[data-resize=left]::before,
+    &[data-resize=right]::before
+      border-radius 20px
+
+    &[data-resize=top]::before,
+    &[data-resize=bottom]::before
+      left 0
+      top 50%
+      height var(--visual-size)
+      transform translate(0, -50%)
+      width calc(100% + var(--size))
+      left calc(var(--size) / 2 * -1)
+
+    &[data-resize=left]::before,
+    &[data-resize=right]::before
+      top 0
+      left 50%
+      width var(--visual-size)
+      transform translate(-50%, 0)
+      height calc(100% + var(--size))
+      top calc(var(--size) / 2 * -1)
+
+    &:hover::before,
+    &_drag::before
+      display block

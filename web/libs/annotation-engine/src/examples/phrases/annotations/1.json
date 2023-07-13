@@ -1,0 +1,35 @@
+{
+    "annotations": [
+        {
+            "result": [
+                {"id":"ryzr4QdL93","from_name":"ner","to_name":"text","source":"$dialogue","type":"paragraphlabels","value":{"start":"2","end":"4","startOffset":0,"endOffset":134,"paragraphlabels":["Important Stuff"]}}
+            ]
+        }
+    ],
+    "data": {
+        "dialogue":[
+            {
+               "author":"Mia Wallace",
+               "text":"Dont you hate that?"
+            },
+            {
+               "author":"Vincent Vega:",
+               "text":"Hate what?"
+            },
+            {
+               "author":"Mia Wallace:",
+               "text":"Uncomfortable silences. Why do we feel its necessary to yak about bullshit in order to be comfortable?"
+            },
+            {
+               "author":"Vincent Vega:",
+               "text":"I dont know. Thats a good question."
+            },
+            {
+               "author":"Mia Wallace:",
+               "text":"Thats when you know you found somebody really special. When you can just shut the fuck up for a minute, and comfortably share silence."
+            }
+         ]
+    },
+    "id": 0,
+    "task_path": "../examples/phrases/tasks.json"
+}

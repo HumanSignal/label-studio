@@ -1,0 +1,83 @@
+.textarea-tag
+  margin-bottom: 12px
+  &:last-child
+    margin-bottom: 0
+
+  &__form
+    margin-bottom: 12px
+    &:last-child
+      margin-bottom: 0
+    &_hidden
+      display none
+
+  &__item
+    position: relative
+    margin-bottom 12px
+
+    &:last-child
+      margin-bottom 0
+
+    button
+      width auto !important
+
+  &__input
+    color #666
+    background transparent
+    font-size: 16px
+    line-height: 22px
+    height: 22px
+    padding: 0 24px 0 0
+    margin-bottom: 0
+
+    &.ant-input
+      border none
+      box-shadow none
+      outline none
+
+  &__action
+    position: absolute
+    right: 0;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    & :global(.anticon)
+      margin: 0  !important
+
+  &_outliner
+    --border-color rgba(#000, 0.2)
+
+  &_outliner &__item,
+  &_outliner &__form
+    margin 0 0 0 -8px
+
+  &_outliner &__item + &__item,
+  &_outliner &__item + &__form,
+  &_outliner &__form + &__item,
+  &_outliner &__form + &__form
+    margin-top 8px
+
+  &_outliner &__input
+    display block
+    background none
+    font-size 14px
+    line-height normal
+    padding 8px
+    box-sizing border-box
+    border-radius 4px
+    border 1px solid transparent
+    background-color rgba(#000, 0.05)
+
+    &::placeholder
+      color rgba(#000, 0.5)
+
+  &_outliner &__input:focus
+    background-color #fff
+    box-sizing border-box
+    border-color rgba(#000, 0.1)
+    box-shadow 0 0 0 3px var(--border-color)
+
+  &_outliner &__action
+    margin 4px
+    margin-top 5px
