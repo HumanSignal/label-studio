@@ -8,9 +8,9 @@ meta_title: Audio Transcription Context
 meta_description: Template annotating transcriptions in their audio context.
 ---
 
-<img src="/images/templates-misc/audio-classification.png" alt="" class="gif-border" width="482px" height="282px" />
+<img src="/images/templates-misc/audio_transcription_context.png" alt="" class="gif-border" width="482px" height="282px" />
 
-If you want to perform audio classification tasks, such as intent or sentiment classification, you can use this template to listen to an audio file and classify the topic of the clip.
+ The context scroll feature of paragraphs allows for playback synchronization between audio segments and corresponding paragraph segments, enabling users to control the audio player with the relevant paragraph segment and see which segment is related to which section of the audio file. 
 
 ## Interactive Template Preview
 
@@ -32,9 +32,6 @@ If you want to perform audio classification tasks, such as intent or sentiment c
         <Label value="Negative" background="#ff0000"/>
       </ParagraphLabels>
     </View>
-  <View visibleWhen="region-selected" whenTagName="label">
-  <DateTime name="datetime" toName="text" only="date" perRegion="true" />
-</View>
 </View>
 ```
 
@@ -53,37 +50,32 @@ Use the [Audio](/tags/audio.html) object tag to specify the type and the locatio
 <Paragraphs audioUrl="$audio" contextScroll="true" sync="audio" name="text" value="$text" layout="dialogue" textKey="text" nameKey="author" granularity="paragraph"/>
 ```
 
-Use the [Choices](/tags/choices.html) control tag to manage how the classification choices appear to annotators with `showInline="true"` and what selection option is used on the interface with `choice="single-radio"`. The `toName="audio"` option associates the choices with the audio clip. 
+Use the [Paragraph Lables](/tags/paragraphlabels.html) control tag with the [Label](/tags/label.html) tag to annotate sections of the paragraph transcriptions.
 ```xml
-<Choices name="label" toName="audio" choice="single-radio" showInline="true">
-```
-You must use the Choices tag in combination with the [Choice](/tags/choice.html) to specify the available choices to classify the audio, then close the Choices tag:
-```xml
-    <Choice value="Politics"></Choice>
-    <Choice value="Business"></Choice>
-    <Choice value="Education"></Choice>
-    <Choice value="Other"></Choice>
-</Choices>
+<ParagraphLabels  name="label" toName="text">
+  <Label value="Positive" background="#00ff00"/>
+  <Label value="Negative" background="#ff0000"/>
+</ParagraphLabels>
 ```
 
 ## Enhance this template
 This template can be enhanced in many ways.
 
-### Change the appearance of choices
+### Add additional data points
 
-If you want to make the classification section visually distinct from the rest of the labeling interface, you can add styling to the [View](/tags/view.html) tag. Wrap the [Choices](/tags/choices.html) and [Header](/tags/header.html) in their own View tag:
+A number of tags can be added to this template to add more data points to the annotation. Here we added [Choices](/tags/choices.html) and [TextArea](/tags/textarea.html) tags to give speaker context and a text responsce to the transcription:
 ```xml
-<View style="box-shadow: 2px 2px 5px #999;
-             padding: 20px; margin-top: 2em;
-             border-radius: 5px;">
-  <Header value="Select the topic of the audio clip"/>
-  <Choices name="label" toName="audio" choice="single-radio" showInline="true">
-    <Choice value="Politics"></Choice>
-    <Choice value="Business"></Choice>
-    <Choice value="Education"></Choice>
-    <Choice value="Other"></Choice>
-  </Choices>
+<View>
+  <Choices name="speakers" toName="audio" choice="multiple" showInline="true">
+  <Choice value="speaker_1"/>
+  <Choice value="speaker_2"/>
+</Choices>
 </View>
+<View>
+  <Header value="Provide your response:"/>  
+  <TextArea name="response" toName="text"/>
+</View>
+
 ```
 
 <!-- md nested-classification.md -->
@@ -91,9 +83,11 @@ If you want to make the classification section visually distinct from the rest o
 ## Related tags
 
 - [Audio](/tags/audio.html)
+- [Paragraphs](/tags/paragraphs.html)
 - [Choices](/tags/choices.html)
+- [TextArea](/tags/textarea.html)
 
 ## Related templates
 
-- [Intent Classification](intent_classification.html)
+- [Audio Classification](audio_classification.html)
 - [Audio Classification with Segments](audio_regions.html)
