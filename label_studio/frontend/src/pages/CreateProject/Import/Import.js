@@ -13,6 +13,24 @@ function flatten(nested) {
   return [].concat(...nested);
 }
 
+const supportedFormats = {
+  text: ['txt'],
+  audio: ['wav', 'aiff', 'mp3', 'au', 'flac', 'm4a', 'ogg'],
+  video: ['mp4', 'webp', 'webm'],
+  image: ['jpg', 'png', 'gif', 'bmp', 'svg', 'webp'],
+  html: ['html', 'htm', 'xml'],
+  timeSeries: ['csv', 'tsv'],
+  common: ['csv', 'tsv', 'txt', 'json'],
+}
+const allSupportedFormats = flatten(Object.values(supportedFormats))
+
+function getFileExtension(fileName) {
+  if (!fileName) {
+    return fileName
+  }
+  return fileName.split('.').pop().toLowerCase()
+}
+
 function traverseFileTree(item, path) {
   return new Promise((resolve) => {
     path = path || "";
@@ -223,7 +241,13 @@ export const ImportPage = ({
     files = [...files]; // they can be array-like object
     const fd = new FormData;
 
-    for (let f of files) fd.append(f.name, f);
+    for (let f of files) {
+      if (!allSupportedFormats.includes(getFileExtension(f.name))) {
+        onError(new Error(`The filetype of file "${f.name}" is not supported.`))
+        return
+      }
+      fd.append(f.name, f);
+    }
     return importFiles(files, fd);
   }, [importFiles, onStart]);
 
@@ -308,13 +332,13 @@ export const ImportPage = ({
                 <header>Drag & drop files here<br/>or click to browse</header>
                 <IconUpload height="64" className={dropzoneClass.elem("icon")} />
                 <dl>
-                  <dt>Text</dt><dd>txt</dd>
-                  <dt>Audio</dt><dd>wav, aiff, mp3, au, flac, m4a, ogg</dd>
-                  <dt>Video</dt><dd>mpeg4/H.264 webp, webm*</dd>
-                  <dt>Images</dt><dd>jpg, png, gif, bmp, svg, webp</dd>
-                  <dt>HTML</dt><dd>html, htm, xml</dd>
-                  <dt>Time Series</dt><dd>csv, tsv</dd>
-                  <dt>Common Formats</dt><dd>csv, tsv, txt, json</dd>
+                  <dt>Text</dt><dd>{supportedFormats.text.join(', ')}</dd>
+                  <dt>Audio</dt><dd>{supportedFormats.audio.join(', ')}</dd>
+                  <dt>Video</dt><dd>mpeg4/H.264 webp, webm* {/* Keep in sync with supportedFormats.video */}</dd>
+                  <dt>Images</dt><dd>{supportedFormats.image.join(', ')}</dd>
+                  <dt>HTML</dt><dd>{supportedFormats.html.join(', ')}</dd>
+                  <dt>Time Series</dt><dd>{supportedFormats.timeSeries.join(', ')}</dd>
+                  <dt>Common Formats</dt><dd>{supportedFormats.common.join(', ')}</dd>
                 </dl>
                 <b>
                    * – Support depends on the browser<br/>
