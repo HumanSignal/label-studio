@@ -879,8 +879,8 @@ def bulk_update_stats_project_tasks(tasks, project=None):
 
     with conditional_atomic(
         predicate=flag_set,
-        predicate_args=['fflag_fix_back_lsdv_5289_run_bulk_updates_in_transactions_short']
-        predicate_kwargs={'user': project.organization.created_by}
+        predicate_args=['fflag_fix_back_lsdv_5289_run_bulk_updates_in_transactions_short'],
+        predicate_kwargs={'user': project.organization.created_by},
     ):
         use_overlap = project._can_use_overlap()
         maximum_annotations = project.maximum_annotations
