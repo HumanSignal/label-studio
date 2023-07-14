@@ -860,7 +860,7 @@ class Project(ProjectMixin, models.Model):
         """
         num_tasks_updated = 0
         page_idx = 0
-        organization_created_by = self.organization.created_by}
+        organization_created_by = self.organization.created_by
 
         while (task_ids_slice := task_ids[page_idx * settings.BATCH_SIZE:(page_idx + 1) * settings.BATCH_SIZE]):
             with conditional_atomic(
