@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5295: Scroll management of paragraph transcriptions",
-  "commit": "083ca0a0232ef8c6cd1eaabd40efab8eecf456d0",
+  "message": "fix: LSDV-5335: Account for hidden scroll-space in preview",
+  "commit": "ccf87de82d631d487a282790164cd8195b632c39",
   "branch": "master",
-  "date": "2023/07/12 11:50:26"
+  "date": "2023/07/14 10:39:14"
 }
