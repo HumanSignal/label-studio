@@ -36,7 +36,6 @@ For content moderation and other use cases where you want to classify HTML conte
   </View>
 </View>
 ```
-
 ## About the labeling configuration
 
 All labeling configurations must be wrapped in [View](/tags/view.html) tags.
