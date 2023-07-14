@@ -21,14 +21,14 @@ const supportedFormats = {
   html: ['html', 'htm', 'xml'],
   timeSeries: ['csv', 'tsv'],
   common: ['csv', 'tsv', 'txt', 'json'],
-}
-const allSupportedFormats = flatten(Object.values(supportedFormats))
+};
+const allSupportedFormats = flatten(Object.values(supportedFormats));
 
 function getFileExtension(fileName) {
   if (!fileName) {
-    return fileName
+    return fileName;
   }
-  return fileName.split('.').pop().toLowerCase()
+  return fileName.split('.').pop().toLowerCase();
 }
 
 function traverseFileTree(item, path) {
@@ -243,8 +243,8 @@ export const ImportPage = ({
 
     for (let f of files) {
       if (!allSupportedFormats.includes(getFileExtension(f.name))) {
-        onError(new Error(`The filetype of file "${f.name}" is not supported.`))
-        return
+        onError(new Error(`The filetype of file "${f.name}" is not supported.`));
+        return;
       }
       fd.append(f.name, f);
     }
