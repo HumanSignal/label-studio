@@ -877,27 +877,32 @@ def bulk_update_stats_project_tasks(tasks, project=None):
     if project is None:
         project = tasks[0].project
 
-    use_overlap = project._can_use_overlap()
-    maximum_annotations = project.maximum_annotations
-    # update filters if we can use overlap
-    if use_overlap:
-        # finished tasks
-        finished_tasks = tasks.filter(Q(total_annotations__gte=maximum_annotations) |
-                                        Q(total_annotations__gte=1, overlap=1))
-        finished_tasks_ids = finished_tasks.values_list('id', flat=True)
-        tasks.update(is_labeled=Q(id__in=finished_tasks_ids))
+    with conditional_atomic(
+        predicate=flag_set,
+        predicate_args=['fflag_fix_back_lsdv_5289_run_bulk_updates_in_transactions_short']
+        predicate_kwargs={'user': project.organization.created_by}
+    ):
+        use_overlap = project._can_use_overlap()
+        maximum_annotations = project.maximum_annotations
+        # update filters if we can use overlap
+        if use_overlap:
+            # finished tasks
+            finished_tasks = tasks.filter(Q(total_annotations__gte=maximum_annotations) |
+                                            Q(total_annotations__gte=1, overlap=1))
+            finished_tasks_ids = finished_tasks.values_list('id', flat=True)
+            tasks.update(is_labeled=Q(id__in=finished_tasks_ids))
 
-    else:
-        # update objects without saving if we can't use overlap
-        for task in tasks:
-            update_task_stats(task, save=False)
-        try:
-            # start update query batches
-            bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
-        except OperationalError as exp:
-            logger.error("Operational error while updating tasks: {exc}", exc_info=True)
-            # try to update query batches one more time
-            start_job_async_or_sync(bulk_update, tasks, in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+        else:
+            # update objects without saving if we can't use overlap
+            for task in tasks:
+                update_task_stats(task, save=False)
+            try:
+                # start update query batches
+                bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+            except OperationalError as exp:
+                logger.error("Operational error while updating tasks: {exc}", exc_info=True)
+                # try to update query batches one more time
+                start_job_async_or_sync(bulk_update, tasks, in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
 
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
