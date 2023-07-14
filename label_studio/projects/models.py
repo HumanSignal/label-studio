@@ -874,7 +874,7 @@ class Project(ProjectMixin, models.Model):
                 queryset = make_queryset_from_iterable(task_ids_slice)
                 num_tasks_updated += self._update_tasks_counters(queryset, from_scratch)
                 bulk_update_stats_project_tasks(queryset, self)
-                page_idx += 1
+            page_idx += 1
         return num_tasks_updated
 
     def _update_tasks_counters_and_task_states(self, queryset, maximum_annotations_changed,
