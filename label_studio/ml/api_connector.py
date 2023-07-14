@@ -238,7 +238,7 @@ class MLApi(BaseHTTPAPI):
     def get_versions(self, project):
         return self._request('versions', request={
             'project': self._create_project_uid(project)
-        }, timeout=TIMEOUT_SETUP, method='POST')
+        }, timeout=TIMEOUT_SETUP, method='GET')
 
 
 def get_ml_api(project):

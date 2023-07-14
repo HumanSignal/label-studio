@@ -45,7 +45,7 @@ To start an example machine learning backend with Docker Compose, do the followi
    ```
 3. Change to the directory with the Docker Compose configuration file. From the command line, run the following:
    ```bash
-   cd label-studio-ml-backend/label_studio_ml/examples/simple_text_classifier
+   cd label-studio-ml-backend/label_studio_ml/examples/the_simplest_ml_backend
    ```
 4. Start Docker Compose. From the command line, run the following:
     ```bash
@@ -103,8 +103,9 @@ After you start a machine learning backend server, add it to your Label Studio p
 3. Click **Add Model**. 
 4. Type a **Title** for the model and provide the URL for the ML backend. For example, `http://localhost:9090`. 
 5. (Optional) Type a description.
-6. (Optional) Select **Use for interactive preannotation**. See [Get interactive pre-annotations](#Get-interactive-preannotations) for more. 
-7. Click **Validate and Save**. 
+6. (Optional) Select **Allow version auto-update**. See [Version auto-update](#Enable-auto-update-for-a-model) for more.
+7. (Optional) Select **Use for interactive preannotation**. See [Get interactive pre-annotations](#Get-interactive-preannotations) for more.
+8. Click **Validate and Save**. 
 
 If you see any errors, see [Troubleshoot machine learning](ml_troubleshooting.html).
 
@@ -150,6 +151,15 @@ If you want to retrieve predictions manually for a list of tasks **using only an
   ]
 }
 ```
+### Enable auto-update for a model
+Enabling model auto-update allows automatic retraining of your model every time a new annotation is submitted. To enable auto-update, do the following:
+
+Either toggle the **Allow version auto-update** option when adding a model in the **Add Model** modal, or:
+1. In the Label Studio UI, open the project that you want to use with your ML backend.
+2. Click **Settings > Machine Learning**.
+3. For the connected model you wish to enable, click **Edit** in the three dot menu.
+4. Select **Allow version auto-update**.
+5. Click **Validate and Save**.
 
 ### Get interactive preannotations
 
