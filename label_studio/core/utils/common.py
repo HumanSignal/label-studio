@@ -304,7 +304,7 @@ def db_is_not_sqlite() -> bool:
 def conditional_atomic(
         predicate: Callable[..., bool] = db_is_not_sqlite,
         predicate_args: Optional[Iterable[Any]] = None,
-        predicate_kwargs: Optional[Mapping[str, Any]]) = None,
+        predicate_kwargs: Optional[Mapping[str, Any]] = None,
     ) -> Generator[None, None, None]:
     """Use transaction if and only if the passed predicate function returns true
 
