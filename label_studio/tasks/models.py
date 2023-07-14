@@ -158,6 +158,10 @@ class Task(TaskMixin, models.Model):
                     num_annotations=num_annotations,
                 )
             )
+            if self.is_labeled == False:
+                self.update_is_labeled()
+                if self.is_labeled == True:
+                    self.save(update_fields=['is_labeled'])
         result = bool(num >= self.overlap)
         logger.log(
             get_next_task_logging_level(user),
