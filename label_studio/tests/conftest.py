@@ -581,8 +581,9 @@ def set_testing_session_timeouts(settings):
 
 @pytest.fixture
 def mock_ml_auto_update(name="mock_ml_auto_update"):
+    url = 'http://localhost:9090'
     with requests_mock.Mocker(real_http=True) as m:
-        m.register_uri('POST', f'http://localhost:9090/setup', [
+        m.register_uri('POST', f'{url}/setup', [
             {'json': {'model_version': 'version1', 'status': 'ok'}, 'status_code': 200},
             {'json': {'model_version': 'version1', 'status': 'ok'}, 'status_code': 200},
             {'json': {'model_version': 'version1', 'status': 'ok'}, 'status_code': 200},
@@ -591,6 +592,7 @@ def mock_ml_auto_update(name="mock_ml_auto_update"):
 
 
         ])
+        m.get(f'{url}/health', text=json.dumps({'status': 'UP'}))
         yield m
 
 @pytest.fixture(name="mock_ml_backend_auto_update_disabled")
