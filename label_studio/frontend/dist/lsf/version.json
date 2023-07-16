@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5316: Fix Ctrl/Cmd+X in Config Editor ",
-  "commit": "0c801430fa7033c3e3f78eda1b4d4231af11bf9d",
+  "message": "fix: LSDV-5335: Account for hidden scroll-space in preview",
+  "commit": "ccf87de82d631d487a282790164cd8195b632c39",
   "branch": "master",
-  "date": "2023/06/30 23:07:52"
+  "date": "2023/07/14 10:39:14"
 }

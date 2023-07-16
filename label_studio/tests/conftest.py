@@ -576,5 +576,31 @@ def local_files_document_root_subdir(settings):
 @pytest.fixture(name="testing_session_timeouts")
 def set_testing_session_timeouts(settings):
     # TODO: functional tests should not rely on exact timings
-    settings.MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(seconds=5).total_seconds()))
+    settings.MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(seconds=6).total_seconds()))
     settings.MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(seconds=2).total_seconds()))
+
+@pytest.fixture
+def mock_ml_auto_update(name="mock_ml_auto_update"):
+    url = 'http://localhost:9090'
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', f'{url}/setup', [
+            {'json': {'model_version': 'version1', 'status': 'ok'}, 'status_code': 200},
+            {'json': {'model_version': 'version1', 'status': 'ok'}, 'status_code': 200},
+            {'json': {'model_version': 'version1', 'status': 'ok'}, 'status_code': 200},
+            {'json': {'model_version': 'version2', 'status': 'ok'}, 'status_code': 200},
+            {'json': {'model_version': 'version3', 'status': 'ok'}, 'status_code': 200},
+
+
+        ])
+        m.get(f'{url}/health', text=json.dumps({'status': 'UP'}))
+        yield m
+
+@pytest.fixture(name="mock_ml_backend_auto_update_disabled")
+def mock_ml_backend_auto_update_disabled():
+    with ml_backend_mock(setup_model_version='version1') as m:
+        m.register_uri('GET', f'http://localhost:9090/setup', [
+            {'json': {'model_version': '', 'status': 'ok'}, 'status_code': 200},
+            {'json': {'model_version': '2', 'status': 'ok'}, 'status_code': 200},
+
+        ])
+        yield m

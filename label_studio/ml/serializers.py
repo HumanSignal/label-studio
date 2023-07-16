@@ -3,14 +3,12 @@
 from django.conf import settings
 from rest_framework import serializers
 from ml.models import MLBackend
-from core.utils.io import url_is_local
-from core.utils.exceptions import MLModelLocalIPError
-
+from core.utils.io import validate_upload_url
 
 class MLBackendSerializer(serializers.ModelSerializer):
     def validate_url(self, value):
-        if settings.ML_BLOCK_LOCAL_IP and url_is_local(value):
-            raise MLModelLocalIPError
+        validate_upload_url(value, block_local_urls=settings.ML_BLOCK_LOCAL_IP)
+
         return value
 
     def validate(self, attrs):
