@@ -5,7 +5,7 @@
 <div class="templates-grid">
   <% page.cards.forEach(function(card) { %>
     <div class="templates-card">
-      <img src="<%= card.image %>" alt="" />
+      <div class="templates-card-image"><img src="<%= card.image %>" alt="" /></div>
       <a href="<%= card.url %>"><%- partial("component/heading", {text: card.title, size: "XXSmall", tag: "span" }) %></a>
       <%- partial("component/text", {text: card.categories, tag: "p", size: "Eyebrow"}) %>
     </div>

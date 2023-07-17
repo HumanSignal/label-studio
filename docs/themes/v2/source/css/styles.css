@@ -1239,16 +1239,24 @@ details summary {
   color: var(--color-main-accent);
 }
 
-.templates-card:hover img {
+.templates-card:hover .templates-card-image {
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
 }
 
-.templates-card img {
-  width: calc(var(--padding) * 2 + 100%);
-  height: auto;
+.templates-card-image {
+  aspect-ratio: 318/235;
   margin: calc(-1 * var(--padding)) calc(-1 * var(--padding)) 0.75em calc(-1 * var(--padding));
   transition: border-radius 200ms;
+  overflow: hidden;
+}
+
+.templates-card img {
+  width: 100%;
+  height: 100%;
+  
+  
+  object-fit: contain;
 }
 
 .templates-card p {
