@@ -446,6 +446,13 @@ class Annotation(models.Model):
                                           null=True,
                                           help_text='Points to the parent annotation from which this annotation was created')
     unique_id = models.UUIDField(default=uuid.uuid4, null=True, blank=True, unique=True, editable=False)
+    import_id = models.BigIntegerField(
+        default=None,
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="Original annotation ID that was at the import step or NULL if this annotation wasn't imported"
+    )
     last_action = models.CharField(
         _('last action'),
         max_length=128,
@@ -584,6 +591,13 @@ class AnnotationDraft(models.Model):
         default=False,
         help_text='User postponed this draft (clicked a forward button) in the label stream',
         db_index=True
+    )
+    import_id = models.BigIntegerField(
+        default=None,
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="Original draft ID that was at the import step or NULL if this draft wasn't imported"
     )
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
