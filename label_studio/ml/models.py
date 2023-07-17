@@ -9,7 +9,7 @@ from django.db.models.signals import post_save
 from django.conf import settings
 from django.db.models import Count, Q
 
-from core.utils.common import safe_float, conditional_atomic, load_func
+from core.utils.common import safe_float, conditional_atomic, load_func, db_is_not_sqlite
 
 from ml.api_connector import MLApi
 from projects.models import Project
@@ -223,7 +223,7 @@ class MLBackend(models.Model):
                     'model_version': ml_api_result.response.get('model_version', self.model_version),
                 }
             )
-        with conditional_atomic():
+        with conditional_atomic(predicate=db_is_not_sqlite):
             prediction_ser = PredictionSerializer(data=predictions, many=True)
             prediction_ser.is_valid(raise_exception=True)
             prediction_ser.save()
@@ -256,7 +256,7 @@ class MLBackend(models.Model):
         task_id = task_ser['id']
         r = prediction_response['result']
         score = prediction_response.get('score')
-        with conditional_atomic():
+        with conditional_atomic(predicate=db_is_not_sqlite):
             prediction = Prediction.objects.create(
                 result=r,
                 score=safe_float(score),

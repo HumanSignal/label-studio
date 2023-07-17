@@ -8,7 +8,7 @@ from django.conf import settings
 from core.feature_flags import flag_set
 import numpy as np
 
-from core.utils.common import conditional_atomic
+from core.utils.common import conditional_atomic, db_is_not_sqlite
 from tasks.models import Annotation, Task
 from projects.models import LabelStreamHistory
 from projects.functions.stream_history import add_stream_history
@@ -254,7 +254,7 @@ def get_task_from_qs_with_sampling(not_solved_tasks, user_solved_tasks_array, pr
 def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
     logger.debug(f'get_next_task called. user: {user}, project: {project}, dm_queue: {dm_queue}')
 
-    with conditional_atomic():
+    with conditional_atomic(predicate=db_is_not_sqlite):
         next_task = None
         use_task_lock = True
         queue_info = ''
