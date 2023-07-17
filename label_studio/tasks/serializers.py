@@ -365,16 +365,19 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             db_annotations = self.add_annotations(task_annotations, user)
             self.add_predictions(task_predictions)
 
-            if flag_set('fflag_feat_back_lsdv_5307_import_reviews_drafts_29062023_short', user='auto'):
+        self.post_process_annotations(user, db_annotations, 'imported')
+        self.post_process_tasks(self.project.id, [t.id for t in self.db_tasks])
+
+        if flag_set('fflag_feat_back_lsdv_5307_import_reviews_drafts_29062023_short', user='auto'):
+            with transaction.atomic():
                 # build mapping between new and old ids in annotations,
                 # we need it because annotation ids will be known only after saving to db
                 annotation_mapping = {v.import_id: v.id for v in db_annotations}
+                annotation_mapping[None] = None
                 # the sequence of add_ functions is very important because of references to ids
                 self.add_drafts(task_drafts, db_tasks, annotation_mapping, self.project)
                 self.add_reviews(task_reviews, annotation_mapping, self.project)
 
-        self.post_process_annotations(user, db_annotations, 'imported')
-        self.post_process_tasks(self.project.id, [t.id for t in self.db_tasks])
         return db_tasks
 
     def add_predictions(self, task_predictions):
@@ -440,12 +443,15 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
                 draft.update({
                     'task_id': db_tasks[i].id,
-                    'annotation_id': annotation_mapping[draft['annotation']],
+                    'annotation_id': annotation_mapping[draft.get('annotation')],
                     'project': self.project,
-                    'import_id': draft['id'],
+                    'import_id': draft.get('id'),
                 })
                 # remove redundant fields
-                [draft.pop(field, None) for field in ['task', 'annotation', 'project']]
+                [
+                    draft.pop(field, None) for field in
+                    ['id', 'task', 'annotation', 'project', 'created_username', 'created_ago']
+                ]
                 db_drafts.append(AnnotationDraft(**draft))
 
         self.db_drafts = AnnotationDraft.objects.bulk_create(db_drafts, batch_size=settings.BATCH_SIZE)
