@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5188: Fix show/hide icon that wasn't working if regions was grouped by tools",
-  "commit": "1ec3e71914cd180017b2c16b384c811b14d17908",
+  "commit": "8187b0d945411d2b6a1ae8506bf638521d5f9103",
   "branch": "fb-lsdv-5188",
-  "date": "2023/07/17 18:34:18"
+  "date": "2023/07/17 18:52:19"
 }
