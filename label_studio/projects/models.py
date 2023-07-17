@@ -412,7 +412,7 @@ class Project(ProjectMixin, models.Model):
         logger.info(f"Required tasks {must_tasks} and left required tasks {left_must_tasks}")
         if left_must_tasks > 0:
             # if there are unfinished tasks update tasks with count(annotations) >= overlap
-            ids = tasks_with_max_annotations.values_list('id', flat=True)
+            ids = list(tasks_with_max_annotations.values_list('id', flat=True))
             all_project_tasks.filter(id__in=ids).update(overlap=max_annotations, is_labeled=True)
             # order other tasks by count(annotations)
             tasks_with_min_annotations = tasks_with_min_annotations.annotate(
@@ -420,16 +420,16 @@ class Project(ProjectMixin, models.Model):
             ).order_by('-anno').distinct()
             # assign overlap depending on annotation count
             # assign max_annotations and update is_labeled
-            ids = tasks_with_min_annotations[:left_must_tasks].values_list('id', flat=True)
+            ids = list(tasks_with_min_annotations[:left_must_tasks].values_list('id', flat=True))
             all_project_tasks.filter(id__in=ids).update(overlap=max_annotations)
             # assign 1 to left
-            ids = tasks_with_min_annotations[left_must_tasks:].values_list('id', flat=True)
+            ids = list(tasks_with_min_annotations[left_must_tasks:].values_list('id', flat=True))
             min_tasks_to_update = all_project_tasks.filter(id__in=ids)
             min_tasks_to_update.update(overlap=1)
         else:
-            ids = tasks_with_max_annotations.values_list('id', flat=True)
+            ids = list(tasks_with_max_annotations.values_list('id', flat=True))
             all_project_tasks.filter(id__in=ids).update(overlap=max_annotations)
-            ids = tasks_with_min_annotations.values_list('id', flat=True)
+            ids = list(tasks_with_min_annotations.values_list('id', flat=True))
             all_project_tasks.filter(id__in=ids).update(overlap=1)
         # update is labeled after tasks rearrange overlap
         bulk_update_stats_project_tasks(all_project_tasks, project=self)
@@ -788,6 +788,10 @@ class Project(ProjectMixin, models.Model):
         else:
             return list(output)
 
+    def get_active_ml_backends(self):
+        from ml.models import MLBackend, MLBackendState
+        return MLBackend.objects.filter(project=self, state=MLBackendState.CONNECTED)
+
     def get_all_storage_objects(self, type_='import'):
         from io_storages.models import get_storage_classes
 
@@ -847,17 +851,25 @@ class Project(ProjectMixin, models.Model):
             bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
         return len(objs)
 
-    def _update_tasks_counters_and_is_labeled(self, queryset, from_scratch=True):
+    def _update_tasks_counters_and_is_labeled(self, task_ids, from_scratch=True):
         """
-        Update tasks counters and is_labeled in a single operation
-        :param queryset: Tasks to update queryset
+        Update tasks counters and is_labeled in batches of size settings.BATCH_SIZE.
+        :param task_ids: List of task ids to be updated
         :param from_scratch: Skip calculated tasks
         :return: Count of updated tasks
         """
-        queryset = make_queryset_from_iterable(queryset)
-        objs = self._update_tasks_counters(queryset, from_scratch)
-        bulk_update_stats_project_tasks(queryset, self)
-        return objs
+        num_tasks_updated = 0
+        page_idx = 0
+
+        while (task_ids_slice := task_ids[page_idx * settings.BATCH_SIZE:(page_idx + 1) * settings.BATCH_SIZE]):
+            with transaction.atomic():
+                # If counters are updated, is_labeled must be updated as well. Hence, if either fails, we
+                # will roll back.
+                queryset = make_queryset_from_iterable(task_ids_slice)
+                num_tasks_updated += self._update_tasks_counters(queryset, from_scratch)
+                bulk_update_stats_project_tasks(queryset, self)
+            page_idx += 1
+        return num_tasks_updated
 
     def _update_tasks_counters_and_task_states(self, queryset, maximum_annotations_changed,
                                                overlap_cohort_percentage_changed, tasks_number_changed,
@@ -1214,6 +1226,32 @@ class ProjectImport(models.Model):
     data_columns = models.JSONField(default=list)
     tasks = models.JSONField(blank=True, null=True)
     task_ids = models.JSONField(default=list)
+
+    def has_permission(self, user):
+        return self.project.has_permission(user)
+
+
+class ProjectReimport(models.Model):
+    class Status(models.TextChoices):
+        CREATED = 'created', _('Created')
+        IN_PROGRESS = 'in_progress', _('In progress')
+        FAILED = 'failed', _('Failed')
+        COMPLETED = 'completed', _('Completed')
+
+    project = models.ForeignKey(
+        'projects.Project', null=True, related_name='reimports', on_delete=models.CASCADE
+    )
+    status = models.CharField(max_length=64, choices=Status.choices, default=Status.CREATED)
+    error = models.TextField(null=True, blank=True)
+    task_count = models.IntegerField(default=0)
+    annotation_count = models.IntegerField(default=0)
+    prediction_count = models.IntegerField(default=0)
+    duration = models.IntegerField(default=0)
+    file_upload_ids = models.JSONField(default=list)
+    files_as_tasks_list = models.BooleanField(default=False)
+    found_formats = models.JSONField(default=list)
+    data_columns = models.JSONField(default=list)
+    traceback = models.TextField(null=True, blank=True)
 
     def has_permission(self, user):
         return self.project.has_permission(user)

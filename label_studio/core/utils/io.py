@@ -11,11 +11,15 @@ import ujson as json
 import itertools
 import yaml
 
-from urllib.parse import urlparse
+from urllib3.util import parse_url
 from contextlib import contextmanager
 from tempfile import mkstemp, mkdtemp
 
+from django.conf import settings
 from appdirs import user_config_dir, user_data_dir, user_cache_dir
+
+# full path import results in unit test failures
+from .exceptions import InvalidUploadUrlError
 
 
 _DIR_APP_NAME = 'label-studio'
@@ -167,26 +171,40 @@ class SerializableGenerator(list):
     def __iter__(self):
         return itertools.chain(self._head, *self[:1])
 
+def validate_upload_url(url, block_local_urls=True):
+    """Utility function for defending against SSRF attacks. Raises
+        - InvalidUploadUrlError if the url is not HTTP[S], or if block_local_urls is enabled
+          and the URL resolves to a local address.
+        - LabelStudioApiException if the hostname cannot be resolved
 
-def url_is_local(url):
-    domain = urlparse(url).hostname
+    :param url: Url to be checked for validity/safety,
+    :param block_local_urls: Whether urls that resolve to local/private networks should be allowed.
+    """
+
+    parsed_url = parse_url(url)
+
+    if parsed_url.scheme not in ('http', 'https'):
+        raise InvalidUploadUrlError
+
+    domain = parsed_url.host
     try:
         ip = socket.gethostbyname(domain)
     except socket.error:
         from core.utils.exceptions import LabelStudioAPIException
         raise LabelStudioAPIException(f"Can't resolve hostname {domain}")
-    else:
-        if ip in (
-            '0.0.0.0', # nosec
-        ):
-            return True
-        local_subnets = [
-            '127.0.0.0/8',
-            '10.0.0.0/8',
-            '172.16.0.0/12',
-            '192.168.0.0/16',
-        ]
-        for subnet in local_subnets:
-            if ipaddress.ip_address(ip) in ipaddress.ip_network(subnet):
-                return True
-        return False
+
+    if not block_local_urls:
+        return
+
+    if ip == '0.0.0.0':  # nosec
+        raise InvalidUploadUrlError
+    local_subnets = [
+        '127.0.0.0/8',
+        '10.0.0.0/8',
+        '172.16.0.0/12',
+        '192.168.0.0/16',
+    ]
+    for subnet in local_subnets:
+        if ipaddress.ip_address(ip) in ipaddress.ip_network(subnet):
+            raise InvalidUploadUrlError
+
