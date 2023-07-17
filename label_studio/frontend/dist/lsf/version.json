@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5242: TextArea Suggestions for LLM labeling",
-  "commit": "c8417d53463d87e4d54bf44d0508351973435a7e",
-  "branch": "master",
-  "date": "2023/07/17 18:22:28"
+  "message": "fix: LSDV-5188: Fix show/hide icon that wasn't working if regions was grouped by tools",
+  "commit": "149a5ad0968363568b46d54363417432cfb79d3d",
+  "branch": "fb-lsdv-5188",
+  "date": "2023/07/17 15:45:21"
 }
