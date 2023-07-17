@@ -3525,6 +3525,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_fix_back_lsdv_5289_run_bulk_updates_in_transactions_short": {
+      "key": "fflag_fix_back_lsdv_5289_run_bulk_updates_in_transactions_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 1
+      },
+      "offVariation": 0,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "4775bd37b64b4470924d6a686537120f",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "fflag_fix_font_lsdv_1148_hotkeys_namespaces_01022023_short": {
       "key": "fflag_fix_font_lsdv_1148_hotkeys_namespaces_01022023_short",
       "on": true,
