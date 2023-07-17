@@ -20,6 +20,7 @@ from tasks.validation import TaskValidator
 from tasks.exceptions import AnnotationDuplicateError
 from core.utils.common import retry_database_locked
 from core.label_config import replace_task_data_undefined_with_config_field
+from core.feature_flags import flag_set
 from users.serializers import UserSerializer
 from users.models import User
 from core.utils.common import load_func
@@ -527,9 +528,19 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
     def get_updated_by(self, task):
         return [{'user_id': task.updated_by_id}] if task.updated_by_id else []
 
+    def _get_user(self):
+        if 'request' in self.context and hasattr(self.context['request'], 'user'):
+            return self.context['request'].user
+
     def get_predictions(self, task):
         predictions = task.predictions
-        if task.project.model_version:
+        user = self._get_user()
+        if flag_set('ff_front_dev_1682_model_version_dropdown_070622_short', user=user or 'auto'):
+            active_ml_backends = task.project.get_active_ml_backends()
+            model_versions = active_ml_backends.values_list('model_version', flat=True)
+            logger.debug(f'Selecting predictions from active ML backend model versions: {model_versions}')
+            predictions = predictions.filter(model_version__in=model_versions)
+        elif task.project.model_version:
             predictions = predictions.filter(model_version=task.project.model_version)
         return PredictionSerializer(predictions, many=True, read_only=True, default=[], context=self.context).data
 
@@ -537,10 +548,9 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
         """Return annotations only for the current user"""
         annotations = task.annotations
 
-        if 'request' in self.context and hasattr(self.context['request'], 'user'):
-            user = self.context['request'].user
-            if user.is_annotator:
-                annotations = annotations.filter(completed_by=user)
+        user = self._get_user()
+        if user and user.is_annotator:
+            annotations = annotations.filter(completed_by=user)
 
         return AnnotationSerializer(annotations, many=True, read_only=True, default=[], context=self.context).data
 
