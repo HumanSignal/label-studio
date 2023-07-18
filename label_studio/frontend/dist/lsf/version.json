@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5242: TextArea Suggestions for LLM labeling",
-  "commit": "c8417d53463d87e4d54bf44d0508351973435a7e",
-  "branch": "master",
-  "date": "2023/07/17 18:22:28"
+  "message": "fix: LSDV-5400: Auto accept all annotations",
+  "commit": "6e1916a2e1e9c42b59bc49f651017c5ad8f567b7",
+  "branch": "fb-lsdv-5400/auto-accept",
+  "date": "2023/07/18 11:30:30"
 }
