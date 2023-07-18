@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5400: LLM suggestions from textarea",
-  "commit": "d7f85563bdc9ff5b76a8863cd31621339c031e71",
+  "message": "fix: LSDV-5188: Fix show/hide icon that wasn't working if regions was grouped by tools",
+  "commit": "c776ea763cc4eeb1e7cd1de75aae28fa958e60a9",
   "branch": "master",
-  "date": "2023/07/17 21:09:51"
+  "date": "2023/07/18 10:19:00"
 }
