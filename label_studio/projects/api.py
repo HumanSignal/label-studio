@@ -11,7 +11,7 @@ from django.db.models import F
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
-from django_filters import FilterSet
+from django_filters import FilterSet, CharFilter
 from rest_framework import generics, status, filters
 from rest_framework.exceptions import NotFound, ValidationError as RestValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -97,6 +97,7 @@ class ProjectListPagination(PageNumberPagination):
 
 class ProjectFilterSet(FilterSet):
     ids = ListFilter(field_name="id", lookup_expr="in")
+    title = CharFilter(field_name="title", lookup_expr="icontains")
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(

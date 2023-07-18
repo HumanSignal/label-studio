@@ -26,8 +26,13 @@ from rest_framework.exceptions import ValidationError
 
 from core.feature_flags import flag_set
 from core.redis import start_job_async_or_sync
-from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func, \
-    temporary_disconnect_list_signal
+from core.utils.common import (
+    conditional_atomic,
+    find_first_one_to_one_related_field_by_prefix,
+    load_func,
+    string_is_url,
+    temporary_disconnect_list_signal,
+)
 from core.utils.params import get_env
 from core.label_config import SINGLE_VALUED_TAGS
 from core.current_request import get_current_request
@@ -441,6 +446,13 @@ class Annotation(models.Model):
                                           null=True,
                                           help_text='Points to the parent annotation from which this annotation was created')
     unique_id = models.UUIDField(default=uuid.uuid4, null=True, blank=True, unique=True, editable=False)
+    import_id = models.BigIntegerField(
+        default=None,
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="Original annotation ID that was at the import step or NULL if this annotation wasn't imported"
+    )
     last_action = models.CharField(
         _('last action'),
         max_length=128,
@@ -579,6 +591,13 @@ class AnnotationDraft(models.Model):
         default=False,
         help_text='User postponed this draft (clicked a forward button) in the label stream',
         db_index=True
+    )
+    import_id = models.BigIntegerField(
+        default=None,
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="Original draft ID that was at the import step or NULL if this draft wasn't imported"
     )
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
@@ -876,18 +895,22 @@ def bulk_update_stats_project_tasks(tasks, project=None):
     # get project if it's not in params
     if project is None:
         project = tasks[0].project
-    with transaction.atomic():
+
+    with conditional_atomic(
+        predicate=flag_set,
+        predicate_args=['fflag_fix_back_lsdv_5289_run_bulk_updates_in_transactions_short'],
+        predicate_kwargs={'user': project.organization.created_by},
+    ):
         use_overlap = project._can_use_overlap()
         maximum_annotations = project.maximum_annotations
         # update filters if we can use overlap
         if use_overlap:
             # finished tasks
             finished_tasks = tasks.filter(Q(total_annotations__gte=maximum_annotations) |
-                                          Q(total_annotations__gte=1, overlap=1))
-            ids = finished_tasks.values_list('id', flat=True)
-            tasks.filter(id__in=ids).update(is_labeled=True)
-            # unfinished tasks
-            tasks.exclude(id__in=ids).update(is_labeled=False)
+                                            Q(total_annotations__gte=1, overlap=1))
+            finished_tasks_ids = finished_tasks.values_list('id', flat=True)
+            tasks.update(is_labeled=Q(id__in=finished_tasks_ids))
+
         else:
             # update objects without saving if we can't use overlap
             for task in tasks:

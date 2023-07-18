@@ -2,6 +2,8 @@
 """
 from __future__ import unicode_literals
 
+from typing import Generator, Iterable, Mapping, Callable, Optional, Any
+
 import os
 import io
 import time
@@ -289,12 +291,33 @@ def start_browser(ls_url, no_browser):
     logger.info('Start browser at URL: ' + browser_url)
 
 
-@contextlib.contextmanager
-def conditional_atomic():
-    """Skip opening transaction for sqlite database backend
-    for performance improvement"""
+def db_is_not_sqlite() -> bool:
+    """
+    A common predicate for use with conditional_atomic.
 
-    if settings.DJANGO_DB != settings.DJANGO_DB_SQLITE:
+    Checks if the DB is NOT sqlite, because sqlite dbs are locked during any write.
+    """
+
+    return settings.DJANGO_DB != settings.DJANGO_DB_SQLITE
+
+@contextlib.contextmanager
+def conditional_atomic(
+        predicate: Callable[..., bool] = db_is_not_sqlite,
+        predicate_args: Optional[Iterable[Any]] = None,
+        predicate_kwargs: Optional[Mapping[str, Any]] = None,
+    ) -> Generator[None, None, None]:
+    """Use transaction if and only if the passed predicate function returns true
+
+    Params:
+        predicate: function taking any combination of args and kwargs
+          defaults to `db_is_not_sqlite` for historical/compatibility reasons.
+        predicate_args: optional array of positional args for the predicate
+        predicate_kwargs: optional map of keyword args for the predicate
+    """
+
+    should_use_transaction = predicate(*(predicate_args or []), **(predicate_kwargs or {}))
+
+    if should_use_transaction:
         with transaction.atomic():
             yield
     else:
