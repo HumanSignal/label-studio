@@ -14,7 +14,13 @@ from annoying.fields import AutoOneToOneField
 from data_manager.managers import TaskQuerySet
 from projects.functions.utils import make_queryset_from_iterable
 from tasks.models import Task, Prediction, Annotation, AnnotationDraft, Q_task_finished_annotations, bulk_update_stats_project_tasks
-from core.utils.common import create_hash, get_attr_or_item, load_func, merge_labels_counters
+from core.utils.common import (
+    conditional_atomic,
+    create_hash,
+    get_attr_or_item,
+    load_func,
+    merge_labels_counters,
+)
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.label_config import (
     validate_label_config,
@@ -27,6 +33,7 @@ from core.label_config import (
     get_annotation_tuple, check_control_in_config_by_regex, check_toname_in_config_by_regex,
     get_original_fromname_by_regex, get_all_types,
 )
+from core.feature_flags import flag_set
 from core.bulk_update_utils import bulk_update
 from label_studio_tools.core.label_config import parse_config
 from projects.functions import (
@@ -788,6 +795,10 @@ class Project(ProjectMixin, models.Model):
         else:
             return list(output)
 
+    def get_active_ml_backends(self):
+        from ml.models import MLBackend, MLBackendState
+        return MLBackend.objects.filter(project=self, state=MLBackendState.CONNECTED)
+
     def get_all_storage_objects(self, type_='import'):
         from io_storages.models import get_storage_classes
 
@@ -842,8 +853,11 @@ class Project(ProjectMixin, models.Model):
             task.cancelled_annotations = task.new_cancelled_annotations
             task.total_predictions = task.new_total_predictions
             objs.append(task)
-
-        with transaction.atomic():
+        with conditional_atomic(
+            predicate=flag_set,
+            predicate_args=['fflag_fix_back_lsdv_5289_run_bulk_updates_in_transactions_short'],
+            predicate_kwargs={'user': self.organization.created_by},
+        ):
             bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
         return len(objs)
 
@@ -856,11 +870,17 @@ class Project(ProjectMixin, models.Model):
         """
         num_tasks_updated = 0
         page_idx = 0
+        organization_created_by = self.organization.created_by
 
         while (task_ids_slice := task_ids[page_idx * settings.BATCH_SIZE:(page_idx + 1) * settings.BATCH_SIZE]):
-            with transaction.atomic():
+            with conditional_atomic(
+                predicate=flag_set,
+                predicate_args=['fflag_fix_back_lsdv_5289_run_bulk_updates_in_transactions_short'],
+                predicate_kwargs={'user': organization_created_by},
+            ):
                 # If counters are updated, is_labeled must be updated as well. Hence, if either fails, we
-                # will roll back.
+                # will roll back. NB: as part of LSDV-5289, we are considering eliminating this transaction
+                # behavior for performance reasons (see conditional_atomic call above).
                 queryset = make_queryset_from_iterable(task_ids_slice)
                 num_tasks_updated += self._update_tasks_counters(queryset, from_scratch)
                 bulk_update_stats_project_tasks(queryset, self)
