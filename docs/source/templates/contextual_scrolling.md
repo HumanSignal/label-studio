@@ -10,7 +10,7 @@ meta_description: Template annotating transcriptions in their audio context.
 
 <img src="/images/templates-misc/contextual-scrolling.png" alt="" class="gif-border" width="482px" height="282px" />
 
-Playback synchronization between audio and corresponding paragraph segments provides users with enhanced context and control resulting in high-quality annotated datasets and increased productivity when performing conversational analysis.
+Playback synchronization between audio and corresponding paragraph segments provides you with enhanced context and control resulting in high-quality annotated datasets and increased productivity when performing conversational analysis.
 
 ## Interactive Template Preview
 
