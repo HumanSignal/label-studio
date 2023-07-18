@@ -406,8 +406,6 @@ AVATAR_PATH = 'avatars'
 
 SUPPORTED_EXTENSIONS = set(
     [
-        '.aiff',
-        '.au',
         '.bmp',
         '.csv',
         '.flac',
