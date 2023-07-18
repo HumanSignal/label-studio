@@ -15,7 +15,7 @@ function flatten(nested) {
 
 const supportedFormats = {
   text: ['txt'],
-  audio: ['wav', 'aiff', 'mp3', 'au', 'flac', 'm4a', 'ogg'],
+  audio: ['wav', 'mp3', 'flac', 'm4a', 'ogg'],
   video: ['mp4', 'webp', 'webm'],
   image: ['jpg', 'png', 'gif', 'bmp', 'svg', 'webp'],
   html: ['html', 'htm', 'xml'],
