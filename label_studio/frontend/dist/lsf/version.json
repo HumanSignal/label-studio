@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5242: TextArea Suggestions for LLM labeling",
-  "commit": "c8417d53463d87e4d54bf44d0508351973435a7e",
+  "message": "fix: LSDV-5400: LLM suggestions from textarea",
+  "commit": "d7f85563bdc9ff5b76a8863cd31621339c031e71",
   "branch": "master",
-  "date": "2023/07/17 18:22:28"
+  "date": "2023/07/17 21:09:51"
 }
