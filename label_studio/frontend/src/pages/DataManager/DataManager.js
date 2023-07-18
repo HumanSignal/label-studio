@@ -315,35 +315,71 @@ DataManagerPage.context = ({ dmRef }) => {
     });
 
   }
-  const importAnnotations = () => {
+  const importAnnotations = async () => {
     const webhook_url = getWebhookUrl();
+    await axios.get(webhook_url + "/export_options?id=" + project.id).then((response) => {
+      console.log(response);
+      if(response.data.options){
+        const { value: option } = Swal.fire({
+          title: 'Select an import option',
+          input: 'select',
+          inputOptions: response.data.options,
+          inputPlaceholder: 'Select an option',
+          showCancelButton: true,
+          inputValidator: (value) => {
+            return new Promise(async (resolve) => {
+              console.log("export data");
+              resolve();
+              axios.post(webhook_url + '/import_annotations?id='+project.id)
+              .then(response => {
+                let number_of_annotations = response.data.annotations;
+                let project_id = response.data.project_id;
+                Swal.fire({
+                  title: 'Annotations are imported',
+                  text: number_of_annotations + " annotations are imported for project id " + project_id,
+                  icon: 'success'
+                })
+              })
+              .catch((error) => {
+                console.error('Import error');
+                console.error(error);
+                Swal.fire('Error', 'Failed to import the data', 'error');
+              });
+            })
+          }
+        })   
+      }
+      else{
+        Swal.fire("Error", "Error retrieving options from the backend, please make sure that the webhook server is on", "error");
+      }
 
+    });
     console.log('Import Annotations')
 
-    Swal.fire({
-      title: 'Attention',
-      text: "We will import annotations from the annotations folder in your project local directory, please make sure to add them there!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, Import them!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        axios.post(webhook_url + '/import_annotations?id='+project.id)
-          .then(response => {
-            let number_of_annotations = response.data.annotations;
-            let project_id = response.data.project_id;
-            Swal.fire({
-              title: 'Annotations are imported',
-              text: number_of_annotations + " annotations are imported for project id " + project_id,
-              icon: 'success'
-            })
-          }).catch(err => {
-              console.log(err)
-              return null
-          })      }
-    })
+    // Swal.fire({
+    //   title: 'Attention',
+    //   text: "We will import annotations from the annotations folder in your project local directory, please make sure to add them there!",
+    //   icon: 'warning',
+    //   showCancelButton: true,
+    //   confirmButtonColor: '#3085d6',
+    //   cancelButtonColor: '#d33',
+    //   confirmButtonText: 'Yes, Import them!'
+    // }).then((result) => {
+    //   if (result.isConfirmed) {
+    //     axios.post(webhook_url + '/import_annotations?id='+project.id)
+    //       .then(response => {
+    //         let number_of_annotations = response.data.annotations;
+    //         let project_id = response.data.project_id;
+    //         Swal.fire({
+    //           title: 'Annotations are imported',
+    //           text: number_of_annotations + " annotations are imported for project id " + project_id,
+    //           icon: 'success'
+    //         })
+    //       }).catch(err => {
+    //           console.log(err)
+    //           return null
+    //       })      }
+    // })
   }
   
   useEffect(() => {
