@@ -13,7 +13,8 @@ function flatten(nested) {
   return [].concat(...nested);
 }
 
-const supportedFormats = {
+// Keep in sync with core.settings.SUPPORTED_EXTENSIONS on the BE.
+const supportedExtensions = {
   text: ['txt'],
   audio: ['wav', 'mp3', 'flac', 'm4a', 'ogg'],
   video: ['mp4', 'webp', 'webm'],
@@ -22,7 +23,7 @@ const supportedFormats = {
   timeSeries: ['csv', 'tsv'],
   common: ['csv', 'tsv', 'txt', 'json'],
 };
-const allSupportedFormats = flatten(Object.values(supportedFormats));
+const allSupportedExtensions = flatten(Object.values(supportedExtensions));
 
 function getFileExtension(fileName) {
   if (!fileName) {
@@ -242,7 +243,7 @@ export const ImportPage = ({
     const fd = new FormData;
 
     for (let f of files) {
-      if (!allSupportedFormats.includes(getFileExtension(f.name))) {
+      if (!allSupportedExtensions.includes(getFileExtension(f.name))) {
         onError(new Error(`The filetype of file "${f.name}" is not supported.`));
         return;
       }
@@ -332,13 +333,13 @@ export const ImportPage = ({
                 <header>Drag & drop files here<br/>or click to browse</header>
                 <IconUpload height="64" className={dropzoneClass.elem("icon")} />
                 <dl>
-                  <dt>Text</dt><dd>{supportedFormats.text.join(', ')}</dd>
-                  <dt>Audio</dt><dd>{supportedFormats.audio.join(', ')}</dd>
-                  <dt>Video</dt><dd>mpeg4/H.264 webp, webm* {/* Keep in sync with supportedFormats.video */}</dd>
-                  <dt>Images</dt><dd>{supportedFormats.image.join(', ')}</dd>
-                  <dt>HTML</dt><dd>{supportedFormats.html.join(', ')}</dd>
-                  <dt>Time Series</dt><dd>{supportedFormats.timeSeries.join(', ')}</dd>
-                  <dt>Common Formats</dt><dd>{supportedFormats.common.join(', ')}</dd>
+                  <dt>Text</dt><dd>{supportedExtensions.text.join(', ')}</dd>
+                  <dt>Audio</dt><dd>{supportedExtensions.audio.join(', ')}</dd>
+                  <dt>Video</dt><dd>mpeg4/H.264 webp, webm* {/* Keep in sync with supportedExtensions.video */}</dd>
+                  <dt>Images</dt><dd>{supportedExtensions.image.join(', ')}</dd>
+                  <dt>HTML</dt><dd>{supportedExtensions.html.join(', ')}</dd>
+                  <dt>Time Series</dt><dd>{supportedExtensions.timeSeries.join(', ')}</dd>
+                  <dt>Common Formats</dt><dd>{supportedExtensions.common.join(', ')}</dd>
                 </dl>
                 <b>
                    * – Support depends on the browser<br/>
