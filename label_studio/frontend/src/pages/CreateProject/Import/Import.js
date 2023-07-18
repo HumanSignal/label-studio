@@ -18,7 +18,7 @@ const supportedExtensions = {
   text: ['txt'],
   audio: ['wav', 'mp3', 'flac', 'm4a', 'ogg'],
   video: ['mp4', 'webp', 'webm'],
-  image: ['jpg', 'png', 'gif', 'bmp', 'svg', 'webp'],
+  image: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'],
   html: ['html', 'htm', 'xml'],
   timeSeries: ['csv', 'tsv'],
   common: ['csv', 'tsv', 'txt', 'json'],
