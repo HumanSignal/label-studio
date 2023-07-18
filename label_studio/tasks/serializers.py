@@ -275,9 +275,8 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         :return:
         """
         for obj in dicts:
-            email = obj.get('created_by', {}).get('email')
-            if email is None:
-                raise ValidationError(f"Object must have created_by field and it should contain dict with email")
+            created_by = obj.get('created_by', {})
+            email = created_by.get('email') if isinstance(created_by, dict) else None
 
             # user default user
             if email not in members_email_to_id:
@@ -301,8 +300,6 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         """
         for obj in dicts:
             email = obj.get('user')
-            if email is None:
-                raise ValidationError(f"Object must have user field and it should contain email")
 
             # user default user
             if email not in members_email_to_id:
