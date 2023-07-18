@@ -1,16 +1,16 @@
 ---
-title: Audio Transcription Context
+title: Contextual Scrolling
 type: templates
 category: Audio/Speech Processing
 cat: audio-speech-processing
 order: 307
-meta_title: Audio Transcription Context 
+meta_title: Contextual Scrolling 
 meta_description: Template annotating transcriptions in their audio context.
 ---
 
-<img src="/images/templates-misc/audio-transcription-context.png" alt="" class="gif-border" width="482px" height="282px" />
+<img src="/images/templates-misc/contextual-scrolling.png" alt="" class="gif-border" width="482px" height="282px" />
 
- The context scroll feature of paragraphs allows for playback synchronization between audio segments and corresponding paragraph segments, enabling users to control the audio player with the relevant paragraph segment and see which segment is related to which section of the audio file. 
+Playback synchronization between audio and corresponding paragraph segments provides users with enhanced context and control resulting in high-quality annotated datasets and increased productivity when performing conversational analysis.
 
 ## Interactive Template Preview
 
@@ -51,7 +51,7 @@ Use the [Audio](/tags/audio.html) object tag to specify the type and the locatio
 <Paragraphs audioUrl="$audio" contextScroll="true" sync="audio" name="text" value="$text" layout="dialogue" textKey="text" nameKey="author" granularity="paragraph"/>
 ```
 
-Use the [Paragraph Lables](/tags/paragraphlabels.html) control tag with the [Label](/tags/label.html) tag to annotate sections of the paragraph transcriptions.
+Use the [Paragraph Labels](/tags/paragraphlabels.html) control tag with the [Label](/tags/label.html) tag to annotate sections of the paragraph transcriptions.
 ```xml
 <ParagraphLabels  name="label" toName="text">
   <Label value="Positive" background="#00ff00"/>
@@ -79,13 +79,13 @@ The transcription data should have a start and either an end or a duration
       },
       {
         "end": 7,
-        "text": "Uncomfortable silences. Why do we feel its necessary to yak about bullshit in order to be comfortable?",
+        "text": "Uncomfortable silences. Why do we feel its necessary to yak to feel comfortable?",
         "start": 4.5,
         "author": "Mia Wallace:"
       },
       {
         "end": 10,
-        "text": "I dont know. Thats a good question.",
+        "text": "I dont know. That's a good question.",
         "start": 8,
         "author": "Vincent Vega:"
       },

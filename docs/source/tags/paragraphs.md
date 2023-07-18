@@ -76,6 +76,6 @@ Sync audio with paragraphs
     <Label value="Drums" />
   </Labels>
   <Audio name="audio-1" value="$audio" sync="txt-1" />
-  <Paragraphs audioUrl="$audio" sync="audio-1" name="txt-1" value="$text" layout="dialogue" showplayer="true" />
+  <Paragraphs audioUrl="$audio" sync="audio-1" name="txt-1" value="$text" layout="dialogue" />
 </View>
 ```
