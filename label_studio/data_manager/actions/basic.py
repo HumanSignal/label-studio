@@ -35,7 +35,7 @@ def retrieve_tasks_predictions(project, queryset, **kwargs):
         result['async'] = isinstance(job, Job)
     else:
         evaluate_predictions(queryset)
-        return result
+    return result
 
 
 def delete_tasks(project, queryset, **kwargs):
