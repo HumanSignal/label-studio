@@ -8,7 +8,6 @@ from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import load_func
 from projects.models import Project
-from core.feature_flags import flag_set
 
 from tasks.models import (
     Annotation, Prediction, Task
@@ -16,7 +15,6 @@ from tasks.models import (
 from webhooks.utils import emit_webhooks_for_instance
 from webhooks.models import WebhookAction
 from data_manager.functions import evaluate_predictions
-from rq.job import Job
 
 all_permissions = AllPermissions()
 logger = logging.getLogger(__name__)
@@ -28,14 +26,8 @@ def retrieve_tasks_predictions(project, queryset, **kwargs):
     :param project: project instance
     :param queryset: filtered tasks db queryset
     """
-    items_count = queryset.count()
-    result = {'processed_items': items_count, 'detail': 'Retrieved ' + str(items_count) + ' predictions'}
-    if flag_set('fflag_fix_back_lsdv_5410_temporary_disable_auto_inference_jobs_short', user='auto'):
-        job = start_job_async_or_sync(evaluate_predictions, queryset)
-        result['async'] = isinstance(job, Job)
-    else:
-        evaluate_predictions(queryset)
-    return result
+    evaluate_predictions(queryset)
+    return {'processed_items': queryset.count(), 'detail': 'Retrieved ' + str(queryset.count()) + ' predictions'}
 
 
 def delete_tasks(project, queryset, **kwargs):
