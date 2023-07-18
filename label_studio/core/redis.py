@@ -118,7 +118,7 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
             exc_info = sys.exc_info()
             if on_failure:
                 on_failure(job, *exc_info)
-            raise e
+            raise
 
 
 def is_job_in_queue(queue, func_name, meta):
