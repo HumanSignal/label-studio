@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-280: UI changes for Data Explorer are also affecting Data Manager",
-  "commit": "f0b9df2106debf4e30850579bb6e74ecf0ff995d",
+  "message": "fix: LOPS-280: UI changes for Data Explorer are also affecting Data Manager",
+  "commit": "f63b10fcc9f0ac2c33fd99d90fc91046e99a99ee",
   "branch": "master",
-  "date": "2023/07/19 09:41:26"
+  "date": "2023/07/19 15:57:27"
 }
