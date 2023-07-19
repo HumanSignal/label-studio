@@ -24,7 +24,7 @@ You can import many types of data, including text, timeseries, audio, and image 
 
 | Data type | Supported file types |
 | --- | --- |
-| Audio | .aiff, .au, .flac, .m4a, .mp3, .ogg, .wav |
+| Audio | .flac, .m4a, .mp3, .ogg, .wav |
 | [HyperText (HTML)](#Import-HTML-data) | .html, .htm, .xml |
 | Images | .bmp, .gif, .jpg, .png, .svg, .webp |
 | Paragraphs (Dialogue) | .json |
