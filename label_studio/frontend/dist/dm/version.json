@@ -1,6 +1,6 @@
 {
   "message": "feat: LOPS-280: UI changes for Data Explorer are also affecting Data Manager",
-  "commit": "0e1ed2093e3bcf4443601fe088df3b0e6667e6d4",
+  "commit": "985c53036a97cab785d48742df92ec4bc736d406",
   "branch": "fb-lops-280/ff-split",
-  "date": "2023/07/19 08:06:08"
+  "date": "2023/07/19 08:10:45"
 }
