@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4937: Label missing from outliner when multiple labels are selected",
-  "commit": "a7f7bda1fe183cb2ce2815df2ce58032ed0eab52",
+  "message": "fix: LSDV-5400: Auto accept all annotations",
+  "commit": "954b41946fe8a44abc89297ac7185a00dfdc67ee",
   "branch": "master",
-  "date": "2023/07/18 13:36:54"
+  "date": "2023/07/19 16:09:01"
 }
