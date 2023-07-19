@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5355: Check before using column id in DM column creation",
-  "commit": "ea6d4a45189e17b894d89a968b3a02ac17fcbcae",
+  "message": "feat: LOPS-280: UI changes for Data Explorer are also affecting Data Manager",
+  "commit": "f0b9df2106debf4e30850579bb6e74ecf0ff995d",
   "branch": "master",
-  "date": "2023/06/29 13:12:32"
+  "date": "2023/07/19 09:41:26"
 }
