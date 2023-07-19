@@ -29,7 +29,7 @@ label-studio start --username <username> --password <password> [--user-token <to
 ```
 
 !!! note
-The `--user-token` argument is optional. If you don't set the user token, one is automatically generated for the user. Use the user token for API access. The minimum token length is 5 characters.
+    The `--user-token` argument is optional. If you don't set the user token, one is automatically generated for the user. Use the user token for API access. The minimum token length is 5 characters.
 
 ### Retrieve user info from the command line
 

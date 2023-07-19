@@ -27,7 +27,7 @@ Configure the labels and task type for annotators using the templates included w
 You can make changes to the labeling interface and configuration in the project settings.
 
 !!! note
-You cannot remove labels or change the type of labeling being performed unless you delete existing annotations using those labels.
+    You cannot remove labels or change the type of labeling being performed unless you delete existing annotations using those labels.
 
 1. In Label Studio UI, open the project you want to modify.
 2. Click **Settings**.
@@ -35,7 +35,7 @@ You cannot remove labels or change the type of labeling being performed unless y
 4. Browse templates, update the available labels, or use the `Code` option to further customize the interface using [tags](/tags).
 
 !!! note
-If you make changes to the labeling configuration, any tabs that you might have created in the data manager are removed.
+    If you make changes to the labeling configuration, any tabs that you might have created in the data manager are removed.
 
 ## Customize a template
 
