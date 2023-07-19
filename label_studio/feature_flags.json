@@ -1945,6 +1945,33 @@
       "version": 4,
       "deleted": false
     },
+    "fflag_feat_all_lops_315_temp_datasets_limitations_short": {
+      "key": "fflag_feat_all_lops_315_temp_datasets_limitations_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "2fe0488c9cf342f3a4d2b21ca8a39f77",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_all_lops_e_3_datasets_short": {
       "key": "fflag_feat_all_lops_e_3_datasets_short",
       "on": true,
@@ -2065,6 +2092,33 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 2,
+      "deleted": false
+    },
+    "fflag_feat_all_lsdv_e_294_llm_annotations_180723_long": {
+      "key": "fflag_feat_all_lsdv_e_294_llm_annotations_180723_long",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "640d40057d9f408587c8996ac2d3710c",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
       "deleted": false
     },
     "fflag_feat_back_dev_3756_queue_enrollment_min_short": {
@@ -3573,6 +3627,33 @@
       },
       "clientSide": false,
       "salt": "9484d71f2a3e41618df0806245c7a662",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "fflag_fix_back_lsdv_5410_temporary_disable_auto_inference_jobs_short": {
+      "key": "fflag_fix_back_lsdv_5410_temporary_disable_auto_inference_jobs_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "7e7cc435d6114f029d1f9f1eec6ff9eb",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
