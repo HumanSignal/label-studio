@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-280: UI changes for Data Explorer are also affecting Data Manager",
-  "commit": "f63b10fcc9f0ac2c33fd99d90fc91046e99a99ee",
+  "message": "fix: LSDV-4620-3: Fix Richtext performance and functional",
+  "commit": "b4e2ddbc428bfd112a2dc6b2f7098ccca2a231b4",
   "branch": "master",
-  "date": "2023/07/19 15:57:27"
+  "date": "2023/07/19 23:38:47"
 }
