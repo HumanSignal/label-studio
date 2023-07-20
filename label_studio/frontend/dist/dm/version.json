@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4620-3: Fix Richtext performance and functional",
-  "commit": "b4e2ddbc428bfd112a2dc6b2f7098ccca2a231b4",
+  "message": "feat: LOPS-247: Disallow Filtering my vectorized columns (image or text)",
+  "commit": "df19c4c8046d2a49f102afdaeb8dc2d1c15796cb",
   "branch": "master",
-  "date": "2023/07/19 23:38:47"
+  "date": "2023/07/20 06:26:44"
 }
