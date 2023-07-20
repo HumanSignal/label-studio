@@ -1,6 +1,6 @@
 {
   "message": "feat: LOPS-247: Disallow Filtering my vectorized columns (image or text)",
-  "commit": "b48697c8365a685f97f5c8f2f73ecea2479cfcdb",
+  "commit": "b71816504cd2cc941a4412e3931b2bf657eb17a7",
   "branch": "fb-LOPS-247",
-  "date": "2023/07/18 10:19:17"
+  "date": "2023/07/20 06:24:34"
 }
