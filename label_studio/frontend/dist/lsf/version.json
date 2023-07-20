@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5188: Fix show/hide icon that wasn't working if regions was grouped by tools",
-  "commit": "c776ea763cc4eeb1e7cd1de75aae28fa958e60a9",
+  "message": "fix: LSDV-4620-3: Fix Richtext performance and functional (#1297)",
+  "commit": "d1bba996ec9aeffc142a779216287fded2ff3055",
   "branch": "master",
-  "date": "2023/07/18 10:19:00"
+  "date": "2023-07-19T20:38:40Z"
 }
