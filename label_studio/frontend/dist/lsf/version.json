@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4620-3: Fix Richtext performance and functional (#1297)",
-  "commit": "d1bba996ec9aeffc142a779216287fded2ff3055",
+  "message": "fix: LSDV-5409: Existing text range cannot be changed into a different label",
+  "commit": "64c2c147c52d92373ba26d9fe3bc59e73edfd1f7",
   "branch": "master",
-  "date": "2023-07-19T20:38:40Z"
+  "date": "2023/07/20 13:13:10"
 }
