@@ -121,7 +121,7 @@ As an **Organization Admin** and **Reviewer** in Label Studio UI, you can do the
 - View projects by workspace, including projects that you and other administrators have pinned.
 
 !!! note
-  If there are no available pinned projects, all other projects will display.
+    If there are no available pinned projects, all other projects will display.
 
 As an **Annotator** in Label Studio UI, you can do the following:
 
