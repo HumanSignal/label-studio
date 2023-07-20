@@ -1,6 +1,6 @@
 {
   "message": "fix: LOPS-322: [FE] Update CandidateTask preview to handle text",
-  "commit": "31cdf52db22076e18927722cfcb38f7b5b1f346d",
+  "commit": "e4412a54e48fdbd9baee4ac455ac2486c1936d21",
   "branch": "fb-lops-322/text-file-handling",
-  "date": "2023/07/19 14:17:47"
+  "date": "2023/07/20 07:11:14"
 }
