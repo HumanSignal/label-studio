@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5400: Auto accept all annotations",
-  "commit": "954b41946fe8a44abc89297ac7185a00dfdc67ee",
+  "message": "fix: LSDV-4620-3: Fix Richtext performance and functional (#1297)",
+  "commit": "d1bba996ec9aeffc142a779216287fded2ff3055",
   "branch": "master",
-  "date": "2023/07/19 16:09:01"
+  "date": "2023-07-19T20:38:40Z"
 }
