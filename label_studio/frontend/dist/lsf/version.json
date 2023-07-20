@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5409: Existing text range cannot be changed into a different label",
-  "commit": "4bee7ddbb0e20c2b411812ec0e4aa31ac2238ff0",
-  "branch": "fb-lsdv-5409",
-  "date": "2023/07/18 19:44:57"
+  "commit": "64c2c147c52d92373ba26d9fe3bc59e73edfd1f7",
+  "branch": "master",
+  "date": "2023/07/20 13:13:10"
 }
