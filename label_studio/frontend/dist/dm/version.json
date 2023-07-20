@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5355: Check before using column id in DM column creation",
-  "commit": "ea6d4a45189e17b894d89a968b3a02ac17fcbcae",
+  "message": "feat: LOPS-247: Disallow Filtering my vectorized columns (image or text)",
+  "commit": "df19c4c8046d2a49f102afdaeb8dc2d1c15796cb",
   "branch": "master",
-  "date": "2023/06/29 13:12:32"
+  "date": "2023/07/20 06:26:44"
 }
