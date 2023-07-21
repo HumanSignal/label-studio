@@ -83,8 +83,8 @@
                 <td>{{ deployment.begin_datetime }}</td>
                 <td>{{ deployment.end_datetime }}</td> 
                 <td>{{ deployment.location}} </td>
-                <td>{{ deployment.sensorlist }}</td>
-                <td>{{ deployment.subjectlist }}</td>
+                <td>{{ deployment.sensor }}</td>
+                <td>{{ deployment.subject }}</td>
                 <td><a href="{% url 'sensormodel:adjust_deployment' deployment.id %}">[Edit]</a></td>
                 <td><a href="{% url 'sensormodel:delete_deployment' deployment.id %}">[Delete]</a></td>
             </tr> 

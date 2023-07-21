@@ -29,7 +29,7 @@ class DeploymentForm(forms.ModelForm):
             if  begin_datetime >= end_datetime:
                 self.add_error('begin_datetime','Begin date time must be before end date time.')
 
-        sensors = cleaned_data.get('sensor')
+        sensor = cleaned_data.get('sensor')
         deployments = Deployment.objects.all()
 
         overlap_begin, overlapping_deployment_begin  = False, []
@@ -37,15 +37,15 @@ class DeploymentForm(forms.ModelForm):
 
         # Check if there are other deployments that include the same sensor or subject during the same datetime,
         # this may not be possible
-        for sensor in sensors:
-            for deployment in deployments:
-                if sensor in deployment.sensor.all():
-                    if deployment.begin_datetime >= begin_datetime and deployment.begin_datetime <= end_datetime:
-                        overlapping_deployment_begin.append(str(deployment))
-                        overlap_begin = True
-                    if deployment.end_datetime >= begin_datetime and deployment.end_datetime <= end_datetime:
-                        overlapping_deployment_end.append(str(deployment))
-                        overlap_end = True                   
+        
+        for deployment in deployments:
+            if deployment.sensor == sensor:
+                if deployment.begin_datetime >= begin_datetime and deployment.begin_datetime <= end_datetime:
+                    overlapping_deployment_begin.append(str(deployment))
+                    overlap_begin = True
+                if deployment.end_datetime >= begin_datetime and deployment.end_datetime <= end_datetime:
+                    overlapping_deployment_end.append(str(deployment))
+                    overlap_end = True                   
 
         # Displaying the correct error for the user
         if overlap_begin:
