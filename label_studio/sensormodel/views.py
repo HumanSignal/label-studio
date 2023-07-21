@@ -10,9 +10,6 @@ import json
 
 def deployment(request):
     deployments = Deployment.objects.all().order_by('begin_datetime')
-    for deployment in deployments:
-        # For each deployment create lists of all its sensors and subjects for easier display
-        deployment.CreateLists()
     if request.method == 'POST':
         deploymentform = forms.DeploymentForm(request.POST)
         if deploymentform.is_valid():

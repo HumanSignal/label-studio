@@ -63,21 +63,6 @@ class Deployment(models.Model):
     
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, blank=True, null=True) 
     sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, blank=True, null=True)
-
-
-    # sensorlist = models.TextField(max_length=500,blank=True)
-    # subjectlist = models.TextField(max_length=500,blank =True)
-
-    # # Function that puts all sensors and all subjects in two list, for easier display in HTML table
-    # def CreateLists(self):
-    #     sensList = self.sensor.all()
-    #     for sens in sensList:
-    #         self.sensorlist += str(sens) + ', '
-    #     self.sensorlist = self.sensorlist[:-2]
-    #     subjlist = self.subject.all()
-    #     for subj in subjlist:
-    #         self.subjectlist += str(subj)+ ', '
-    #     self.subjectlist = self.subjectlist[:-2]
         
     def __str__(self):
         return 'Deployment: ' + self.name
