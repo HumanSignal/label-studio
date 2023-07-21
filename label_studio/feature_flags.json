@@ -2096,7 +2096,7 @@
     },
     "fflag_feat_all_lsdv_e_294_llm_annotations_180723_long": {
       "key": "fflag_feat_all_lsdv_e_294_llm_annotations_180723_long",
-      "on": true,
+      "on": false,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -2118,7 +2118,34 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 3,
+      "version": 4,
+      "deleted": false
+    },
+    "fflag_feat_all_lsdv_e_295_project_level_roles_via_saml_scim_ldap_short": {
+      "key": "fflag_feat_all_lsdv_e_295_project_level_roles_via_saml_scim_ldap_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "ca5b9081fa654bc08621311cc409a341",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
       "deleted": false
     },
     "fflag_feat_back_dev_3756_queue_enrollment_min_short": {
@@ -2987,7 +3014,7 @@
     },
     "fflag_feat_front_lsdv_e_278_contextual_scrolling_short": {
       "key": "fflag_feat_front_lsdv_e_278_contextual_scrolling_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -3009,7 +3036,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_feat_front_lsdv_e_278_continuous_scrolling_of_paragraph_segments_with_audio": {
@@ -3033,6 +3060,33 @@
       },
       "clientSide": false,
       "salt": "a7af149aacf1455ea28da219498748e1",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "fflag_feat_front_prod_281_project_list_search_19072023_short": {
+      "key": "fflag_feat_front_prod_281_project_list_search_19072023_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "0fc1088b43f04858ac2e98e141a46559",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
@@ -4121,7 +4175,7 @@
     },
     "fflag_fix_front_lsdv_4930_selection_tool_fixes_240423_short": {
       "key": "fflag_fix_front_lsdv_4930_selection_tool_fixes_240423_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -4143,7 +4197,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_fix_front_lsdv_4988_dynamic_no_label_120523_short": {

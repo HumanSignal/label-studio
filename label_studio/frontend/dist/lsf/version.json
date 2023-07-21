@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5400: Auto accept all annotations",
-  "commit": "954b41946fe8a44abc89297ac7185a00dfdc67ee",
+  "message": "fix: LSDV-5409: Existing text range cannot be changed into a different label",
+  "commit": "64c2c147c52d92373ba26d9fe3bc59e73edfd1f7",
   "branch": "master",
-  "date": "2023/07/19 16:09:01"
+  "date": "2023/07/20 13:13:10"
 }
