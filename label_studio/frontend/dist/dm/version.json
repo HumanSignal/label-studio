@@ -1,6 +1,6 @@
 {
-  "message": "feat: LOPS-247: Disallow Filtering my vectorized columns (image or text)",
-  "commit": "df19c4c8046d2a49f102afdaeb8dc2d1c15796cb",
+  "message": "fix: LOPS-322: [FE] Update CandidateTask preview to handle text",
+  "commit": "2482dd2ae31f4c7fe77caa8b8159471ec4d0b413",
   "branch": "master",
-  "date": "2023/07/20 06:26:44"
+  "date": "2023/07/21 06:32:37"
 }
