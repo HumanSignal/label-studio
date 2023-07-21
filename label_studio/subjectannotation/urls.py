@@ -6,5 +6,5 @@ app_name = 'subjectannotation'
 urlpatterns = [
     path('', views.annotationtaskpage, name= 'annotationtaskpage'),
     path('create/', views.createannotationtask, name='create'),
-    path('export/<int:project_id>',views.exportannotations,name='export')
+    path('export/<int:project>',views.exportannotations,name='export')
 ]

@@ -1,9 +1,10 @@
 from django.db import models
+from projects.models import Project
 from sensormodel.models import Sensor
 
 class SensorData(models.Model):
     name = models.CharField(blank=True,null=True, max_length=100)
-    project_id = models.IntegerField(blank=True,null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
     begin_datetime = models.DateTimeField(blank=True,null=True)
     end_datetime = models.DateTimeField(blank=True,null=True)
     file_hash = models.CharField(max_length=10,blank=True,null=True)

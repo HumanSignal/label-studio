@@ -22,9 +22,13 @@
         <li>Annotate</li>
         <li>Export annotations</li>
     </ol>
+
+    <script>
+      function refreshPage(event) {
+        event.preventDefault();
+        window.location.href = event.target.getAttribute('href');
+      }
+    </script>
 </body>
 
 {% endblock %}
-
-
- 
