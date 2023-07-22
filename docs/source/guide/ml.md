@@ -117,6 +117,10 @@ Using the project ID and the URL for the machine learning backend, you can also 
 
 After you [connect a model to Label Studio as a machine learning backend](#Add-an-ML-backend-to-Label-Studio) and annotate at least one task, you can start training the model. 
 
+### Classical training approach
+
+The classical training approach is applicable when you add annotations to your project and then train your model with this batch of annotations.
+
 You can prompt your model to train in several ways: 
 - Manually using the Label Studio UI. Click the **Start Training** button on the **Machine Learning** settings for your project.
 - Manually using the API, cURL the API from the command line. Specify the ID of the machine learning backend and run the following command: 
@@ -127,6 +131,27 @@ You can prompt your model to train in several ways:
 - (Deprecated in version 1.4.1) Automatically after any annotations are submitted or updated. Enable the option `Start model training after annotations submit or update` on the **Machine Learning** settings for your project. This option will be removed in a future version of Label Studio because you can [trigger training with webhooks](ml_create.html#Trigger-training-with-webhooks).
 
 In development mode, training logs appear in the web browser console. In production mode, you can find runtime logs in `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log` on the server running the ML backend, which might be different from the Label Studio server. To see more detailed logs, start the ML backend server with the `--debug` option. 
+
+### Active learning approach
+
+The active learning approach is a training method with model fine-tuning opposite to the classical approach when you train models in batches.
+
+For more information, see [Webhooks section](/guide/webhooks.html#What-to-use-Label-Studio-webhooks-for) to identify which events should trigger your model training. 
+
+### Train method specification
+(Deprecated in version 1.4.1)
+
+Your Machine Learning train method signature:
+
+```python
+def fit(self, completions, workdir=None, **kwargs)
+```
+
+The **completions** param used in the classical approach is a list of annotations, which can be a list or a single task in a list. Annotations format is common for Label Studio, check the annotations key in task format in [guide](/guide/export.html#Label-Studio-JSON-format-of-annotated-tasks).
+The **completions** param will be empty for the active learning approach. Instead of it use **kwargs** params.
+
+The **event** key in **kwargs** is a Webhook event called the fit method. Machine learning backend is checking these events to train your model: 'ANNOTATION_CREATED', 'ANNOTATION_UPDATED', 'ANNOTATION_DELETED', 'PROJECT_UPDATED'. To override this list set self.TRAIN_EVENTS in your model. Check available events in [webhooks guide.](/guide/webhooks.html#What-to-use-Label-Studio-webhooks-for)
+The **data** key in **kwargs** enriches your event with entities like a project, task, or annotation. Check [API description](/api#tag/Webhooks/) to understand event params.
 
 ## Get predictions from a model
 After you [connect a model to Label Studio as a machine learning backend](#Add-an-ML-backend-to-Label-Studio), you can see model predictions in the labeling interface if the model is pre-trained, or right after it finishes training. 
@@ -160,6 +185,44 @@ Either toggle the **Allow version auto-update** option when adding a model in th
 3. For the connected model you wish to enable, click **Edit** in the three dot menu.
 4. Select **Allow version auto-update**.
 5. Click **Validate and Save**.
+
+Your Machine Learning prediction method signature:
+
+```python
+def predict(self, tasks, **kwargs)
+```
+
+The **tasks** param - list of task for prediction, can be a list or a single task in a list. Tasks format is common for Label Studio, check the format in [guide](/guide/export.html#Label-Studio-JSON-format-of-annotated-tasks).
+
+Additional params in kwargs:
+
+**login** - proxy login in your project.
+**password** - proxy password in your project. Check [guide](/guide/security.html#Secure-database-access). 
+**context** - interactive annotating context, contains selected data in interactive annotating mode. It contains json with result like it's in your  annotations. Context example for rectanglelabels:
+```json
+{
+    'result': [{
+            'original_width': 768,
+            'original_height': 578,
+            'image_rotation': 0,
+            'value': {
+                'x': 22.52747252747253,
+                'y': 26.034063260340634,
+                'width': 26.007326007326014,
+                'height': 28.467153284671532,
+                'rotation': 0,
+                'rectanglelabels': ['Airplane']
+            },
+            'id': 'GjBJ6sESoI',
+            'from_name': 'label',
+            'to_name': 'image',
+            'type': 'rectanglelabels',
+            'origin': 'manual'
+        }
+    ]
+}
+
+```
 
 ### Get interactive preannotations
 
