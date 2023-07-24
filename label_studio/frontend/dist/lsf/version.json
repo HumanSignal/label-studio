@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5409: Existing text range cannot be changed into a different label",
-  "commit": "64c2c147c52d92373ba26d9fe3bc59e73edfd1f7",
+  "message": "feat: LSDV-5297: Sort phrases",
+  "commit": "75f403d3ea3761dac45be7cdc4b2756f0123f405",
   "branch": "master",
-  "date": "2023/07/20 13:13:10"
+  "date": "2023/07/24 10:47:41"
 }
