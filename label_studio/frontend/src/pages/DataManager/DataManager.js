@@ -20,6 +20,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import "./DataManager.styl";
 import getWebhookUrl from '../../webhooks';
+import { AnnotationsUpload } from '../../components/FileUpload/AnnotationsUpload';
 
 const initializeDataManager = async (root, props, params) => {
   if (!window.LabelStudio) throw Error("Label Studio Frontend doesn't exist on the page");
@@ -263,6 +264,7 @@ DataManagerPage.context = ({ dmRef }) => {
     updateCrumbs(currentMode);
     showLabelingInstruction(currentMode);
   };
+  
   const exportData = async () => {
     const webhook_url = getWebhookUrl();
     console.log("Exporting data");
@@ -315,72 +317,7 @@ DataManagerPage.context = ({ dmRef }) => {
     });
 
   }
-  const importAnnotations = async () => {
-    const webhook_url = getWebhookUrl();
-    await axios.get(webhook_url + "/export_options?id=" + project.id).then((response) => {
-      console.log(response);
-      if(response.data.options){
-        const { value: option } = Swal.fire({
-          title: 'Select an import option',
-          input: 'select',
-          inputOptions: response.data.options,
-          inputPlaceholder: 'Select an option',
-          showCancelButton: true,
-          inputValidator: (value) => {
-            return new Promise(async (resolve) => {
-              console.log("export data");
-              resolve();
-              axios.post(webhook_url + '/import_annotations?id='+project.id)
-              .then(response => {
-                let number_of_annotations = response.data.annotations;
-                let project_id = response.data.project_id;
-                Swal.fire({
-                  title: 'Annotations are imported',
-                  text: number_of_annotations + " annotations are imported for project id " + project_id,
-                  icon: 'success'
-                })
-              })
-              .catch((error) => {
-                console.error('Import error');
-                console.error(error);
-                Swal.fire('Error', 'Failed to import the data', 'error');
-              });
-            })
-          }
-        })   
-      }
-      else{
-        Swal.fire("Error", "Error retrieving options from the backend, please make sure that the webhook server is on", "error");
-      }
 
-    });
-    console.log('Import Annotations')
-
-    // Swal.fire({
-    //   title: 'Attention',
-    //   text: "We will import annotations from the annotations folder in your project local directory, please make sure to add them there!",
-    //   icon: 'warning',
-    //   showCancelButton: true,
-    //   confirmButtonColor: '#3085d6',
-    //   cancelButtonColor: '#d33',
-    //   confirmButtonText: 'Yes, Import them!'
-    // }).then((result) => {
-    //   if (result.isConfirmed) {
-    //     axios.post(webhook_url + '/import_annotations?id='+project.id)
-    //       .then(response => {
-    //         let number_of_annotations = response.data.annotations;
-    //         let project_id = response.data.project_id;
-    //         Swal.fire({
-    //           title: 'Annotations are imported',
-    //           text: number_of_annotations + " annotations are imported for project id " + project_id,
-    //           icon: 'success'
-    //         })
-    //       }).catch(err => {
-    //           console.log(err)
-    //           return null
-    //       })      }
-    // })
-  }
   
   useEffect(() => {
     if (dmRef) {
@@ -395,7 +332,7 @@ DataManagerPage.context = ({ dmRef }) => {
   return project && project.id ? (
     <Space size="small">
       <FileUpload project={project}></FileUpload>
-      <Button size = "compact" onClick={() => importAnnotations()}>Import Annotations</Button>
+      <AnnotationsUpload project={project}></AnnotationsUpload>
       <Button size = "compact" onClick={() => exportData()}>Export Data</Button>
       {(project.expert_instruction && mode !== 'explorer') && (
         <Button size="compact" onClick={() => {

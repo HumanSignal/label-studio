@@ -60,7 +60,6 @@ export const MachineLearningSettings = () => {
       await axios
       .get(webhook_url + '/get_models_info?id=' + project.id)
         .then((response) => {
-          console.log(response.data);
           setModelsPrecisions(response.data.models_info);
           setModelsType(response.data.models_type);
           setFetchModels(true)
@@ -201,7 +200,6 @@ export const MachineLearningSettings = () => {
     await axios
     .get(webhook_url + '/can_press')
         .then((response) => {
-          console.log(response);
           let can_press = response.data.can_press;
           if (can_press == undefined) {
             Swal.fire('Error', 'Someone has just trained or predicted, please wait for a moment', 'error')
@@ -209,10 +207,10 @@ export const MachineLearningSettings = () => {
           else if (can_press == true) {
             Swal.fire('Start', 'Training has started', 'info');
             let trainingType = "tao";
-            if (selectedTrainingType == "PVT") {
+            if (selectedTrainingType === "PVT") {
               trainingType = "pvt";
             }
-            if(selectedTrainingType == "segmentation"){
+            if(selectedTrainingType === "Segmentation"){
               trainingType = "segmentation";
             }
             axios.post(webhook_url + '/train?id=' + project.id+'&generateSpecs='+generateSpecs+'&type='+trainingType).then((response) => {
@@ -465,10 +463,9 @@ export const MachineLearningSettings = () => {
           <div>
             <div className='row' style={{paddingTop:20}}>
             {availableModels.map(model => (
-            // {model.}
               <div className='col-6' key={model.value} style={{marginBottom: 10}}>
               <Card  key={model.value}>
-                  Model Version: {model.label}           
+                  Model Version: {model.label}     
                   {modelsType != 'segmentation' ?
                     <div>
                     {
@@ -534,7 +531,7 @@ export const MachineLearningSettings = () => {
                       </div>:<div>You have no information about this model</div>}</div>}
                       <div style={{ marginTop: 20 }}>
                             <button style={{ marginRight: 10 }} onClick={() => onExportModel(model.value)} className='btn btn-outline-primary'>Export Model</button>
-                    {modelsType == 'object_detection' && modelsPrecisions[model.label]["model_type"]== "tao" ? <button onClick={() => onPrune(model.value)} className='btn btn-outline-warning'>Prune/Re-train</button> : ''}
+                    {/* {modelsType == 'object_detection' && modelsPrecisions[model.label]["model_type"]== "tao" ? <button onClick={() => onPrune(model.value)} className='btn btn-outline-warning'>Prune/Re-train</button> : ''} */}
                     {currentlyTrainingModel == model.label ? <button onClick={() => onAbortTraining(model.value)} className='btn btn-outline-warning'>Abort Training</button> : ""}
                             <button style={{ marginLeft: 10 }} onClick={() => onDeleteModel(model.value)} className='btn btn-outline-danger'>Delete Model</button>
             </div>

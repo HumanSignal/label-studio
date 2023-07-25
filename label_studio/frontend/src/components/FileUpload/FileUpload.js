@@ -71,8 +71,7 @@ project
   }
   
     const importImages = () => {  
-      console.log('Import Images')
-      
+      console.log('Import Images');
       Swal.fire({
         title: 'Attention',
         text: "Please choose an image or a compressed file (zip, tar.xz, 7z) that contains multiple images to be imported (The compressed file can support subfolder structure).",
@@ -91,7 +90,7 @@ project
       <form>
         <input
           type="file"
-          style={{ visibility: 'hidden' }}
+          style={{ display: 'none' }}
           ref={fileInputRef}
           onChange={handleFileSelect}
         />
