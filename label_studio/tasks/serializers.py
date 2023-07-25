@@ -320,6 +320,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         logging.info(f'Try to serialize tasks with annotations, data len = {len(validated_data)}')
         user = self.context.get('user', None)
         default_user = user or self.project.created_by
+        ff_user = self.project.organization.created_by
 
         # get members from project, we need them to restore annotation.completed_by etc
         organization = user.active_organization \
@@ -346,7 +347,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 predictions = task.pop('predictions', [])
                 task_predictions.append(predictions)
 
-                if flag_set('fflag_feat_back_lsdv_5307_import_reviews_drafts_29062023_short', user='auto'):
+                if flag_set('fflag_feat_back_lsdv_5307_import_reviews_drafts_29062023_short', user=ff_user):
                     # extract drafts from snapshot
                     drafts = task.pop('drafts', [])
                     self._insert_valid_user_drafts(drafts, members_email_to_id, default_user)
@@ -365,7 +366,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         self.post_process_annotations(user, db_annotations, 'imported')
         self.post_process_tasks(self.project.id, [t.id for t in self.db_tasks])
 
-        if flag_set('fflag_feat_back_lsdv_5307_import_reviews_drafts_29062023_short', user='auto'):
+        if flag_set('fflag_feat_back_lsdv_5307_import_reviews_drafts_29062023_short', user=ff_user):
             with transaction.atomic():
                 # build mapping between new and old ids in annotations,
                 # we need it because annotation ids will be known only after saving to db
