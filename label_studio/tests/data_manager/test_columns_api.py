@@ -1,10 +1,6 @@
 import json
 import pytest
 
-from rest_framework import status
-from pprint import pprint
-from ..utils import project_id
-
 pytestmark = pytest.mark.django_db
 
 
