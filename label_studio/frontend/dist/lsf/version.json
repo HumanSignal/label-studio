@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5432: Fix losing focus in CodeMirror config editor",
-  "commit": "79fdfe24a7814cd4ac7f305679c8880722a1f58a",
-  "branch": "fb-lsdv-5432",
-  "date": "2023/07/25 07:58:32"
+  "commit": "930fc999f3cc415cf81380dcdf1e090f5bb8172e",
+  "branch": "master",
+  "date": "2023/07/25 18:06:41"
 }
