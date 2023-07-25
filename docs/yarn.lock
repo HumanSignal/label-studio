@@ -3261,9 +3261,9 @@ normalize-path@^3.0.0, normalize-path@~3.0.0:
   resolved "https://registry.npmjs.org/normalize-path/-/normalize-path-3.0.0.tgz"
   integrity sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
 
-"notion-to-md@https://github.com/huguestennier/notion-to-md.git":
+"notion-to-md@https://github.com/huguestennier/notion-to-md":
   version "2.5.5"
-  resolved "git+ssh://git@github.com/huguestennier/notion-to-md.git#28f2b7c827e783316cb588636314ce3a251c7edf"
+  resolved "https://github.com/huguestennier/notion-to-md#28f2b7c827e783316cb588636314ce3a251c7edf"
   dependencies:
     markdown-table "^2.0.0"
 
