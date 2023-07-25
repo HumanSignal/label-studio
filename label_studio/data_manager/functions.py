@@ -61,8 +61,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': True,
                 'labeling': key in project_data_types or key == settings.DATA_UNDEFINED_NAME
-            },
-            'project_defined': True,
+            }
         }
         result['columns'].append(column)
         task_data_children.append(column['id'])
@@ -74,8 +73,7 @@ def get_all_columns(project, *_):
         'title': "data",
         'type': "List",
         'target': 'tasks',
-        'children': task_data_children,
-        'project_defined': False,
+        'children': task_data_children
     }
 
     result['columns'] += [
@@ -89,8 +87,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': True,
                 'labeling': False
-            },
-            'project_defined': False,
+            }
         }
     ]
 
@@ -104,8 +101,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
-            },
-            'project_defined': False,
+            }
         }]
 
     result['columns'] += [
@@ -118,8 +114,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': True,
                 'labeling': False
-            },
-            'project_defined': False,
+            }
         },
         {
             'id': 'total_annotations',
@@ -130,8 +125,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': True,
                 'labeling': True
-            },
-            'project_defined': False,
+            }
         },
         {
             'id': 'cancelled_annotations',
@@ -142,8 +136,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': True,
                 'labeling': False
-            },
-            'project_defined': False,
+            }
         },
         {
             'id': 'total_predictions',
@@ -154,8 +147,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': True,
                 'labeling': False
-            },
-            'project_defined': False,
+            }
         },
         {
             'id': 'annotators',
@@ -167,8 +159,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': True,
                 'labeling': False
-            },
-            'project_defined': False,
+            }
         },
         {
             'id': 'annotations_results',
@@ -179,8 +170,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
-            },
-            'project_defined': False,
+            }
         },
         {
             'id': 'annotations_ids',
@@ -191,8 +181,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
-            },
-            'project_defined': False,
+            }
         },
         {
             'id': 'predictions_score',
@@ -203,8 +192,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
-            },
-            'project_defined': False,
+            }
         },
         {
             'id': 'predictions_model_versions',
@@ -216,8 +204,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
-            },
-            'project_defined': False,
+            }
         },
         {
             'id': 'predictions_results',
@@ -228,8 +215,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
-            },
-            'project_defined': False,
+            }
         },
         {
             'id': 'file_upload',
@@ -240,8 +226,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
-            },
-            'project_defined': False,
+            }
         },
         {
             'id': 'storage_filename',
@@ -252,8 +237,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
-            },
-            'project_defined': False,
+            }
         },
         {
             'id': 'created_at',
@@ -264,8 +248,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
-            },
-            'project_defined': False,
+            }
         },
         {
             'id': 'updated_at',
@@ -276,8 +259,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
-            },
-            'project_defined': False,
+            }
         },
         {
             'id': 'updated_by',
@@ -289,8 +271,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
-            },
-            'project_defined': False,
+            }
         },
         {
             'id': 'avg_lead_time',
@@ -301,8 +282,7 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
-            },
-            'project_defined': False,
+            }
         }
     ]
 
