@@ -1,7 +1,7 @@
 ---
 title: ParagraphLabels
 type: tags
-order: 417
+order: 416
 meta_title: Paragraph Label Tag for Paragraph Labels
 meta_description: Customize Label Studio with paragraph labels for machine learning and data science projects.
 ---

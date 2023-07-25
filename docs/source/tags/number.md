@@ -1,7 +1,7 @@
 ---
 title: Number
 type: tags
-order: 415
+order: 414
 meta_title: Number Tag to Numerically Classify
 meta_description: Customize Label Studio with the Number tag to numerically classify tasks in your machine learning and data science projects.
 ---
@@ -9,6 +9,8 @@ meta_description: Customize Label Studio with the Number tag to numerically clas
 The Number tag supports numeric classification. Use to classify tasks using numbers.
 
 Use with the following data types: audio, image, HTML, paragraphs, text, time series, video
+
+[^1]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality
 
 ### Parameters
 
@@ -24,6 +26,7 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [required] | <code>boolean</code> | <code>false</code> | Whether to require number validation |
 | [requiredMessage] | <code>string</code> |  | Message to show if validation fails |
 | [perRegion] | <code>boolean</code> |  | Use this tag to classify specific regions instead of the whole object |
+| [perItem] | <code>boolean</code> |  | Use this tag to classify specific items inside the object instead of the whole object[^1] |
 | [slider] | <code>boolean</code> | <code>false</code> | Use slider look instead of input; use min and max to add your constraints |
 
 ### Example
