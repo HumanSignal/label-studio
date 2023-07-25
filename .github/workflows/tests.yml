@@ -8,7 +8,7 @@ on:
         type: string
 
 env:
-  NODE: '14'
+  NODE: '18'
   CACHE_NAME_PREFIX: v1
 
 jobs:
@@ -19,10 +19,10 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - '3.7'
           - '3.8'
           - '3.9'
           - '3.10'
+          - '3.11'
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
@@ -113,7 +113,7 @@ jobs:
           pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.3
+        uses: codecov/codecov-action@v3.1.4
         with:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
@@ -252,7 +252,7 @@ jobs:
           pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.3
+        uses: codecov/codecov-action@v3.1.4
         with:
           fail_ci_if_error: true
           files: ./label_studio/coverage.xml
@@ -267,10 +267,10 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - '3.7'
           - '3.8'
           - '3.9'
           - '3.10'
+          - '3.11'
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
@@ -317,7 +317,7 @@ jobs:
           pip install -e .
 
       - name: Fix sqlite.dll for python < 3.9
-        if: ${{ contains(matrix.python-version, '3.7') || contains(matrix.python-version, '3.8') }}
+        if: ${{ contains(matrix.python-version, '3.8') }}
         run: |
           set PYTHONIOENCODING=utf-8
           set PYTHONLEGACYWINDOWSSTDIO=utf-8

@@ -408,6 +408,22 @@ To connect your [GCS](https://cloud.google.com/storage) bucket with Label Studio
 - **Enable programmatic access to your bucket.** See [Cloud Storage Client Libraries](https://cloud.google.com/storage/docs/reference/libraries) in the Google Cloud Storage documentation for how to set up access to your GCS bucket.
 - **Set up authentication to your bucket.** Your account must have the **Service Account Token Creator** and **Storage Object Viewer** roles and **storage.buckets.get** access permission. See [Setting up authentication](https://cloud.google.com/storage/docs/reference/libraries#setting_up_authentication) and [IAM permissions for Cloud Storage](https://cloud.google.com/storage/docs/access-control/iam-permissions) in the Google Cloud Storage documentation. 
 - If you're using a service account to authorize access to the Google Cloud Platform, make sure to activate it. See [gcloud auth activate-service-account](https://cloud.google.com/sdk/gcloud/reference/auth/activate-service-account) in the Google Cloud SDK: Command Line Interface documentation.
+- Set up cross-origin resource sharing (CORS) access to your bucket, using a policy that allows GET access from the same host name as your Label Studio deployment. See [Configuring cross-origin resource sharing (CORS)](https://cloud.google.com/storage/docs/configuring-cors#configure-cors-bucket) in the Google Cloud User Guide. Use or modify the following example:
+```shell
+echo '[
+   {
+      "origin": ["*"],
+      "method": ["GET"],
+      "responseHeader": ["Content-Type","Access-Control-Allow-Origin"],
+      "maxAgeSeconds": 3600
+   }
+]' > cors-config.json
+```
+
+Replace `YOUR_BUCKET_NAME` with your actual bucket name in the following command to update CORS for your bucket:
+```shell
+gsutil cors set cors-config.json gs://YOUR_BUCKET_NAME
+```
 
 ### Set up connection in the Label Studio UI
 In the Label Studio UI, do the following to set up the connection:
@@ -446,7 +462,9 @@ You must set two environment variables in Label Studio to connect to Azure Blob 
 - `AZURE_BLOB_ACCOUNT_NAME` to specify the name of the storage account.
 - `AZURE_BLOB_ACCOUNT_KEY` to specify the secret key for the storage account.
 
-Configure the specific Azure Blob container that you want Label Studio to use in the UI.
+Configure the specific Azure Blob container that you want Label Studio to use in the UI. In most cases involving CORS issues, the GET permission (*/GET/*/Access-Control-Allow-Origin/3600) is necessary within the Resource Sharing tab:
+
+<img src="/images/azure-storage-cors.png" class="gif-border">
 
 ### Set up connection in the Label Studio UI
 In the Label Studio UI, do the following to set up the connection:
@@ -533,7 +551,7 @@ In the Label Studio UI, do the following to set up the connection:
 2. For a specific project, open **Settings > Cloud Storage**.
 3. Click **Add Source Storage**.
   
-<img src="/images/local-storage-settings.png" alt="Screenshot of the storage settings modal described in the preceding steps." width=670 height=490 style="border: 1px solid #eee">
+<img src="/images/local-storage-settings.png" alt="Screenshot of the storage settings modal described in the preceding steps." class="gif-border">
   
 4. In the dialog box that appears, select **Local Files** as the storage type.
 5. In the **Storage Title** field, type a name for the storage to appear in the Label Studio UI.

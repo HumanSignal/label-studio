@@ -2,6 +2,8 @@
 """
 from __future__ import unicode_literals
 
+from typing import Generator, Iterable, Mapping, Callable, Optional, Any
+
 import os
 import io
 import time
@@ -289,12 +291,33 @@ def start_browser(ls_url, no_browser):
     logger.info('Start browser at URL: ' + browser_url)
 
 
-@contextlib.contextmanager
-def conditional_atomic():
-    """Skip opening transaction for sqlite database backend
-    for performance improvement"""
+def db_is_not_sqlite() -> bool:
+    """
+    A common predicate for use with conditional_atomic.
 
-    if settings.DJANGO_DB != settings.DJANGO_DB_SQLITE:
+    Checks if the DB is NOT sqlite, because sqlite dbs are locked during any write.
+    """
+
+    return settings.DJANGO_DB != settings.DJANGO_DB_SQLITE
+
+@contextlib.contextmanager
+def conditional_atomic(
+        predicate: Callable[..., bool] = db_is_not_sqlite,
+        predicate_args: Optional[Iterable[Any]] = None,
+        predicate_kwargs: Optional[Mapping[str, Any]] = None,
+    ) -> Generator[None, None, None]:
+    """Use transaction if and only if the passed predicate function returns true
+
+    Params:
+        predicate: function taking any combination of args and kwargs
+          defaults to `db_is_not_sqlite` for historical/compatibility reasons.
+        predicate_args: optional array of positional args for the predicate
+        predicate_kwargs: optional map of keyword args for the predicate
+    """
+
+    should_use_transaction = predicate(*(predicate_args or []), **(predicate_kwargs or {}))
+
+    if should_use_transaction:
         with transaction.atomic():
             yield
     else:
@@ -665,3 +688,51 @@ def btree_gin_migration_operations(next_step):
         ops = []
 
     return ops
+
+
+def merge_labels_counters(dict1, dict2):
+    """
+    Merge two dictionaries with nested dictionary values into a single dictionary.
+
+    Args:
+        dict1 (dict): The first dictionary to merge.
+        dict2 (dict): The second dictionary to merge.
+
+    Returns:
+        dict: A new dictionary with the merged nested dictionaries.
+
+    Example:
+        dict1 = {'sentiment': {'Negative': 1, 'Positive': 1}}
+        dict2 = {'sentiment': {'Positive': 2, 'Neutral': 1}}
+        result_dict = merge_nested_dicts(dict1, dict2)
+        # {'sentiment': {'Negative': 1, 'Positive': 3, 'Neutral': 1}}
+    """
+    result_dict = {}
+
+    # iterate over keys in both dictionaries
+    for key in set(dict1.keys()) | set(dict2.keys()):
+        # add the corresponding values if they exist in both dictionaries
+        value = {}
+        if key in dict1:
+            value.update(dict1[key])
+        if key in dict2:
+            for subkey in dict2[key]:
+                value[subkey] = value.get(subkey, 0) + dict2[key][subkey]
+        # add the key-value pair to the result dictionary
+        result_dict[key] = value
+
+    return result_dict
+
+
+def timeit(func):
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+        logging.debug(f"{func.__name__} execution time: {end-start} seconds")
+        return result
+    return wrapper
+
+
+def empty(*args, **kwargs):
+    pass
