@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5355: Check before using column id in DM column creation",
-  "commit": "ea6d4a45189e17b894d89a968b3a02ac17fcbcae",
+  "message": "fix: LOPS-322: [FE] Update CandidateTask preview to handle text",
+  "commit": "2482dd2ae31f4c7fe77caa8b8159471ec4d0b413",
   "branch": "master",
-  "date": "2023/06/29 13:12:32"
+  "date": "2023/07/21 06:32:37"
 }

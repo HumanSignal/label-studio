@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5164: Unselect labels with tools",
-  "commit": "511a0e8db7e5148b77401cabb9ab3191288e1899",
+  "message": "feat: LSDV-5297: Sort phrases",
+  "commit": "75f403d3ea3761dac45be7cdc4b2756f0123f405",
   "branch": "master",
-  "date": "2023/07/10 11:34:43"
+  "date": "2023/07/24 10:47:41"
 }
