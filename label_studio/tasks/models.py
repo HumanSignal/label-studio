@@ -128,7 +128,11 @@ class Task(TaskMixin, models.Model):
             return lock.task
 
     def has_lock(self, user=None):
-        """Check whether current task has been locked by some user"""
+        """
+            Check whether current task has been locked by some user
+
+            Also has workaround for fixing not consistent is_labeled flag state
+        """
         from projects.functions.next_task import get_next_task_logging_level
         SkipQueue = self.project.SkipQueue
 
@@ -158,6 +162,7 @@ class Task(TaskMixin, models.Model):
                     num_annotations=num_annotations,
                 )
             )
+            # TODO: remove this workaround after fixing the bug with inconsistent is_labeled flag
             if self.is_labeled == False:
                 self.update_is_labeled()
                 if self.is_labeled == True:
