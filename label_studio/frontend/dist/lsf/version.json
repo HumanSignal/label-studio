@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5256: Stop automatically scrolling if current Paragraph is not on the screen",
-  "commit": "c4c042e9a8beffd1cf6691918170529cb2bbc394",
+  "commit": "8ef04aa912c21954c250477dd77468be601c1467",
   "branch": "fb-lsdv-5256",
-  "date": "2023/07/25 12:23:43"
+  "date": "2023/07/25 12:36:32"
 }
