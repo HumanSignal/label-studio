@@ -24,7 +24,7 @@ You can import many types of data, including text, timeseries, audio, and image 
 
 | Data type | Supported file types |
 | --- | --- |
-| Audio | .aiff, .au, .flac, .m4a, .mp3, .ogg, .wav |
+| Audio | .flac, .m4a, .mp3, .ogg, .wav |
 | [HyperText (HTML)](#Import-HTML-data) | .html, .htm, .xml |
 | Images | .bmp, .gif, .jpg, .png, .svg, .webp |
 | Paragraphs (Dialogue) | .json |
@@ -34,7 +34,7 @@ You can import many types of data, including text, timeseries, audio, and image 
 | [Tasks with multiple data types](#Basic-Label-Studio-JSON-format) | .csv, .tsv, .json |
 | Video | .mp4, .webm, .avi |
 
-If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](https://slack.labelstudio.heartex.com/?source=docs-gdi). 
+If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](https://slack.labelstud.io/?source=docs-gdi). 
 
 ### How to import your data
 

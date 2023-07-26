@@ -26,8 +26,13 @@ from rest_framework.exceptions import ValidationError
 
 from core.feature_flags import flag_set
 from core.redis import start_job_async_or_sync
-from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func, \
-    temporary_disconnect_list_signal
+from core.utils.common import (
+    conditional_atomic,
+    find_first_one_to_one_related_field_by_prefix,
+    load_func,
+    string_is_url,
+    temporary_disconnect_list_signal,
+)
 from core.utils.params import get_env
 from core.label_config import SINGLE_VALUED_TAGS
 from core.current_request import get_current_request
@@ -235,12 +240,14 @@ class Task(TaskMixin, models.Model):
         return filename
 
     def resolve_storage_uri(self, url, project):
-        if not self.storage:
-            storage_objects = project.get_all_storage_objects(type_='import')
-            self.storage = self._get_storage_by_url(url, storage_objects)
+        storage = self.storage
 
-        if self.storage:
-            return { "url": self.storage.generate_http_url(url), "presign_ttl": self.storage.presign_ttl }
+        if not storage:
+            storage_objects = project.get_all_storage_objects(type_='import')
+            storage = self._get_storage_by_url(url, storage_objects)
+
+        if storage:
+            return { "url": storage.generate_http_url(url), "presign_ttl": storage.presign_ttl }
 
     def resolve_uri(self, task_data, project):
         if project.task_data_login and project.task_data_password:
@@ -424,6 +431,7 @@ class Annotation(models.Model):
     ground_truth = models.BooleanField(_('ground_truth'), default=False, help_text='This annotation is a Ground Truth (ground_truth)')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last updated time')
+    draft_created_at = models.DateTimeField(_('draft created at'), null=True, default=None, help_text='Draft creation time')
     lead_time = models.FloatField(_('lead time'), null=True, default=None, help_text='How much time it took to annotate the task')
     prediction = JSONField(
         _('prediction'),
@@ -438,6 +446,13 @@ class Annotation(models.Model):
                                           null=True,
                                           help_text='Points to the parent annotation from which this annotation was created')
     unique_id = models.UUIDField(default=uuid.uuid4, null=True, blank=True, unique=True, editable=False)
+    import_id = models.BigIntegerField(
+        default=None,
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="Original annotation ID that was at the import step or NULL if this annotation wasn't imported"
+    )
     last_action = models.CharField(
         _('last action'),
         max_length=128,
@@ -577,6 +592,13 @@ class AnnotationDraft(models.Model):
         help_text='User postponed this draft (clicked a forward button) in the label stream',
         db_index=True
     )
+    import_id = models.BigIntegerField(
+        default=None,
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="Original draft ID that was at the import step or NULL if this draft wasn't imported"
+    )
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last update time')
@@ -588,6 +610,20 @@ class AnnotationDraft(models.Model):
     def has_permission(self, user):
         user.project = self.task.project  # link for activity log
         return self.task.project.has_permission(user)
+
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            project = self.task.project
+            if hasattr(project, 'summary'):
+                project.summary.update_created_labels_drafts([self])
+
+    def delete(self, *args, **kwargs):
+        with transaction.atomic():
+            project = self.task.project
+            if hasattr(project, 'summary'):
+                project.summary.remove_created_drafts_and_labels([self])
+            super().delete(*args, **kwargs)
 
 
 class Prediction(models.Model):
@@ -859,17 +895,22 @@ def bulk_update_stats_project_tasks(tasks, project=None):
     # get project if it's not in params
     if project is None:
         project = tasks[0].project
-    with transaction.atomic():
+
+    with conditional_atomic(
+        predicate=flag_set,
+        predicate_args=['fflag_fix_back_lsdv_5289_run_bulk_updates_in_transactions_short'],
+        predicate_kwargs={'user': project.organization.created_by},
+    ):
         use_overlap = project._can_use_overlap()
         maximum_annotations = project.maximum_annotations
         # update filters if we can use overlap
         if use_overlap:
             # finished tasks
             finished_tasks = tasks.filter(Q(total_annotations__gte=maximum_annotations) |
-                                          Q(total_annotations__gte=1, overlap=1))
-            finished_tasks.update(is_labeled=True)
-            # unfinished tasks
-            tasks.exclude(id__in=finished_tasks).update(is_labeled=False)
+                                            Q(total_annotations__gte=1, overlap=1))
+            finished_tasks_ids = finished_tasks.values_list('id', flat=True)
+            tasks.update(is_labeled=Q(id__in=finished_tasks_ids))
+
         else:
             # update objects without saving if we can't use overlap
             for task in tasks:

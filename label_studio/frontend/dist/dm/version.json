@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-3104: Revert task navigation standardization",
-  "commit": "deb6a614f73d5a0dc06b463127dfde568b4c66c8",
+  "message": "fix: LOPS-322: [FE] Update CandidateTask preview to handle text",
+  "commit": "2482dd2ae31f4c7fe77caa8b8159471ec4d0b413",
   "branch": "master",
-  "date": "2023/05/23 16:23:07"
+  "date": "2023/07/21 06:32:37"
 }
