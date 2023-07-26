@@ -288,7 +288,7 @@ def get_all_columns(project, *_):
             'id': 'draft_exists',
             'title': "Drafts",
             'type': 'Boolean',
-            'help': 'True if draft exists for task',
+            'help': 'True if at least one draft exists for the task',
             'target': 'tasks',
             'visibility_defaults': {
                 'explore': False,
