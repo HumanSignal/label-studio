@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-185: [FE] resolve issue affecting semantic search when selecting items then changing text in semantic search",
-  "commit": "3c6db5291966757accd3c2fa6220a37fc08a7053",
+  "message": "fix: LOPS-322: [FE] Update CandidateTask preview to handle text",
+  "commit": "2482dd2ae31f4c7fe77caa8b8159471ec4d0b413",
   "branch": "master",
-  "date": "2023/06/16 13:10:19"
+  "date": "2023/07/21 06:32:37"
 }

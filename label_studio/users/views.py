@@ -8,6 +8,8 @@ from django.shortcuts import render, redirect, reverse
 from django.contrib import auth
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.utils.http import is_safe_url
+
 from rest_framework.authtoken.models import Token
 
 from users import forms
@@ -40,7 +42,11 @@ def user_signup(request):
     user = request.user
     next_page = request.GET.get('next')
     token = request.GET.get('token')
-    next_page = next_page if next_page else reverse('projects:project-index')
+
+    # checks if the URL is a safe redirection.
+    if not next_page or not is_safe_url(url=next_page, allowed_hosts=request.get_host()):
+        next_page = reverse('projects:project-index')
+
     user_form = forms.UserSignupForm()
     organization_form = OrganizationSignupForm()
 
@@ -79,7 +85,11 @@ def user_login(request):
     """
     user = request.user
     next_page = request.GET.get('next')
-    next_page = next_page if next_page else reverse('projects:project-index')
+
+    # checks if the URL is a safe redirection.
+    if not next_page or not is_safe_url(url=next_page, allowed_hosts=request.get_host()):
+        next_page = reverse('projects:project-index')
+
     login_form = load_func(settings.USER_LOGIN_FORM)
     form = login_form()
 

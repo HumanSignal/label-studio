@@ -11,7 +11,7 @@ from django.db.models import F
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
-from django_filters import FilterSet
+from django_filters import FilterSet, CharFilter
 from rest_framework import generics, status, filters
 from rest_framework.exceptions import NotFound, ValidationError as RestValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -25,10 +25,10 @@ from core.utils.common import temporary_disconnect_all_signals
 from core.mixins import GetParentObjectMixin
 from core.label_config import config_essential_data_has_changed
 from projects.models import (
-    Project, ProjectSummary, ProjectManager, ProjectImport
+    Project, ProjectSummary, ProjectManager, ProjectImport, ProjectReimport
 )
 from projects.serializers import (
-    ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer, GetFieldsSerializer, ProjectImportSerializer
+    ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer, GetFieldsSerializer, ProjectImportSerializer, ProjectReimportSerializer
 )
 from projects.functions.next_task import get_next_task
 from tasks.models import Task
@@ -97,6 +97,7 @@ class ProjectListPagination(PageNumberPagination):
 
 class ProjectFilterSet(FilterSet):
     ids = ListFilter(field_name="id", lookup_expr="in")
+    title = CharFilter(field_name="title", lookup_expr="icontains")
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
@@ -386,6 +387,26 @@ class ProjectImportAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
     queryset = ProjectImport.objects.all()
     lookup_url_kwarg = 'import_pk'
+
+
+@method_decorator(name='get', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Get project reimport info',
+        operation_description='Return data related to async project reimport operation',
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this project reimport.'),
+        ],
+    ))
+class ProjectReimportAPI(generics.RetrieveAPIView):
+    parser_classes = (JSONParser,)
+    serializer_class = ProjectReimportSerializer
+    permission_required = all_permissions.projects_change
+    queryset = ProjectReimport.objects.all()
+    lookup_url_kwarg = 'reimport_pk'
 
 
 @method_decorator(name='delete', decorator=swagger_auto_schema(
