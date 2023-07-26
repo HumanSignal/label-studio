@@ -24,7 +24,7 @@ A common chart for LS and LSE has been released and is available as of LSE versi
 The migration process can be performed without any downtime. The steps required to carry out the migration are documented in the migration guide, available at: https://github.com/heartexlabs/charts/blob/master/heartex/label-studio/FAQs.md#label-studio-enterprise-upgrade-from-decommissioned-label-studio-enterprise-helm-chart.
 
 
-<a name="249md"></a>
+<a name="249-2md"></a>
 
 *July 26, 2023*
 
