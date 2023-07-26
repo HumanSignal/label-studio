@@ -34,13 +34,13 @@ The migration process can be performed without any downtime. The steps required 
 - Workspaces now have a drop down option to allow you to edit, delete, and archive them. This enables you to hide workspaces from view while still allowing access to those workspaces as-needed
 - Per-image classifications are now available. You can use the perItem parameter of classification control tags in Multi-Image Segmentation cases to attach classification to separate images in the set. For now it is supported by `DateTime`, `Number`, `Choices`, `Taxonomy`, `Rating` and `Textarea`
 
-###Improvements
+### Improvements
 - Fixed medium vulnerabilities for Vanta
 - Print more descriptive debug messages for SAML configuration errors on an error page
 - Consistent feature flags for all products
 - New disabled state on date picker buttons
 
-###Bug Fixes
+### Bug Fixes
 - Fixed issue with 3-point rectangle too that it didn't work with relative coords
 - After selecting several tasks in data manager, reviewers get "URL too long" error
 - Persist collapse state of side panels
