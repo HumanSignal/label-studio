@@ -3684,7 +3684,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_fix_back_lsdv_5410_temporary_disable_auto_inference_jobs_short": {
