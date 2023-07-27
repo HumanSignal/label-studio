@@ -72,7 +72,8 @@ class ProjectMixin:
         """
         return True
 
-    def get_all_members(self, *args, **kwargs):
+    @cached_property
+    def all_members(self):
         """
         Returns all members of project
         :return:
