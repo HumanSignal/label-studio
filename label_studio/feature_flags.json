@@ -3039,33 +3039,6 @@
       "version": 4,
       "deleted": false
     },
-    "fflag_feat_front_lsdv_e_278_continuous_scrolling_of_paragraph_segments_with_audio": {
-      "key": "fflag_feat_front_lsdv_e_278_continuous_scrolling_of_paragraph_segments_with_audio",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "a7af149aacf1455ea28da219498748e1",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
-      "deleted": false
-    },
     "fflag_feat_front_prod_281_project_list_search_19072023_short": {
       "key": "fflag_feat_front_prod_281_project_list_search_19072023_short",
       "on": false,
@@ -4090,6 +4063,33 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 4,
+      "deleted": false
+    },
+    "fflag_fix_front_lsdv_4600_lead_time_27072023_short": {
+      "key": "fflag_fix_front_lsdv_4600_lead_time_27072023_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "c732cda2ecf64b589fe2bdc90208e3ec",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
       "deleted": false
     },
     "fflag_fix_front_lsdv_4620_memory_leaks_100723_short": {
