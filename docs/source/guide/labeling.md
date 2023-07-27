@@ -288,7 +288,7 @@ The **Outliner** is a replacement for the existing interface with a multiple-pan
 
 ### Feature capabilities
 
-Outliner is the area where you can see all the details about annotation, regions, and labeling history. It is split into two panels, named **Outliner** and **Details**. Figure 3 shows the appearance of the **Outliner** panel on the left of the image and **Details** panel on the right of the image. 
+Outliner is the area where you can see all the details about annotation, regions, and labeling history. It is split into two panels, named **Outliner** and **Details**. Figure 3 shows the appearance of the **Outliner** panel on the right of the image and **Details** panel on the left of the image. 
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/outliner-details-panels-view.png" style="opacity: 0.8" class="gif-border"/></div>
