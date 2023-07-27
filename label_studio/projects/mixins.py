@@ -1,4 +1,5 @@
 from core.redis import start_job_async_or_sync
+from django.utils.functional import cached_property
 
 
 class ProjectMixin:
