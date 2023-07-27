@@ -67,3 +67,26 @@ def resolve_s3_url(url, client, presign=True, expires_in=3600):
         logger.debug('Presigned URL {presigned_url} generated for {url}'.format(
             presigned_url=presigned_url, url=url))
         return presigned_url
+
+
+class AWS(object):
+
+    @classmethod
+    def get_blob_metadata(cls,
+                          url: str,
+                          bucket_name: str,
+                          client=None,
+                          aws_access_key_id=None,
+                          aws_secret_access_key=None,
+                          aws_session_token=None,
+                          region_name=None,
+                          s3_endpoint=None
+                          ):
+        if client is None:
+            client, _ = get_client_and_resource(aws_access_key_id=aws_access_key_id,
+                                                aws_secret_access_key=aws_secret_access_key,
+                                                aws_session_token=aws_session_token,
+                                                region_name=region_name,
+                                                s3_endpoint=s3_endpoint)
+        object = client.get_object_attributes(Bucket=bucket_name, Key=url)
+        return object
