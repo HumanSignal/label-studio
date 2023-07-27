@@ -161,29 +161,35 @@ Now, you can see all the pinned projects only.
 Use the search box to search for projects by name. This allows partial and case-insensitive matches. The search is performed as you type, and the results are displayed in the project list. For example, if you type `new` in the search box, you will see projects with names such as `New Project`, `New Project 2`, and `New Project 3`.
 
 1. Search for a project by name in a workspace.
+
   <br>
   <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/search-projects-in-workspace.png" style="opacity: 0.8"/></div>
   <i>Figure 12: Search projects within a workspace.</i>
 
 2. To search for a project by name in all workspaces, click **All Projects** from the left navigation pane.
+
   <br>
   <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/search-projects-in-all-workspaces.png" style="opacity: 0.8"/></div>
   <i>Figure 13: Search projects in all workspaces.</i>
    
 3. To clear the search results, click the `x` icon in the Search box.
+
   <br>
   <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/search-clear-results.png" style="opacity: 0.8"/></div>
   <i>Figure 14: Clear search results.</i>
 
 4. Searching for pinned, or unpinned projects just requires selection of `Pinned projects` or `Unpinned projects` from the adjacent dropdown selection.
+
   <br>
   <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/search-pinned-projects.png" style="opacity: 0.8"/></div>
   <i>Figure 15: Search pinned projects.</i>
+
   <br>
   <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/search-unpinned-projects.png" style="opacity: 0.8"/></div>
   <i>Figure 16: Search unpinned projects.</i>
    
 5. In the event of no results found for the search and filter criteria you will be presented with a message indicating that no results were found and allowed to create a new project or update the search criteria.
+
   <br>
   <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/search-criteria-no-results.png" style="opacity: 0.8"/></div>
   <i>Figure 17: No matching results for search criteria.</i>
