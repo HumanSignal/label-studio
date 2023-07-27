@@ -170,7 +170,7 @@ Use the search box to search for projects by name. This allows partial and case-
   <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/search-projects-in-all-workspaces.png" style="opacity: 0.8"/></div>
   <i>Figure 13: Search projects in all workspaces.</i>
    
-3. To clear the search results, click the `x` icon in the search bar.
+3. To clear the search results, click the `x` icon in the Search box.
   <br>
   <div style="margin:auto; text-align:center;"><img class="gif-border" src="/images/search-clear-results.png" style="opacity: 0.8"/></div>
   <i>Figure 14: Clear search results.</i>
