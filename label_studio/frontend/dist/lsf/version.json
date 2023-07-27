@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5432: Fix losing focus in CodeMirror config editor",
-  "commit": "930fc999f3cc415cf81380dcdf1e090f5bb8172e",
+  "message": "fix: LSDV-5256: Stop automatically scrolling if current Paragraph is not on the screen",
+  "commit": "188fb81a6109ff12a0c259eb33ef9ad911dd5405",
   "branch": "master",
-  "date": "2023/07/25 18:06:41"
+  "date": "2023/07/27 16:02:41"
 }
