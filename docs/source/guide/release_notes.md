@@ -1,5 +1,5 @@
 ---
-NOTE: Don't user release_notes.md, it's automatically built from onprem/*.md files on hexo server run!   
+NOTE: Don't change release_notes.md manually, it's automatically built from onprem/*.md files on hexo server run!   
 
 title: On-Premise Release Notes for Label Studio Enterprise
 short: On-Premise Release Notes
@@ -13,20 +13,52 @@ meta_description: Discover what's new and improved, and review bug fixes, in the
 ---
 
 !!! info 
-    The release notes for Label Studio Community Edition is available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
-
+    The release notes for Label Studio Community Edition are available on the <a href="https://github.com/heartexlabs/label-studio/releases"> Label Studio GitHub repository</a>.
 
 ## New helm chart
 
-A common chart for LS and LSE has been released and is available since LSE version 2.3.x. The chart can be accessed at the following repository: https://github.com/heartexlabs/charts/tree/master/heartex/label-studio.
+A common chart for LS and LSE has been released and is available as of LSE version 2.3.x. The chart can be accessed at the following repository: https://github.com/heartexlabs/charts/tree/master/heartex/label-studio.
 
 ### Migration Process
 
 The migration process can be performed without any downtime. The steps required to carry out the migration are documented in the migration guide, available at: https://github.com/heartexlabs/charts/blob/master/heartex/label-studio/FAQs.md#label-studio-enterprise-upgrade-from-decommissioned-label-studio-enterprise-helm-chart.
 
-### Deprecation of the Old Chart
 
-The old chart `heartex/label-studio-enterprise` **has been deprecated**. Support for as many releases as possible will be provided. A notification will be posted in the Release Notes section when this changes. We hope that this revised chart will meet your technical needs. If you have any questions or concerns, please don't hesitate to reach out to us.
+<a name="249-2md"></a>
+
+*July 26, 2023*
+
+## Label Studio Enterprise 2.4.9-2
+
+### New Features
+- Workspaces now have a drop down option to allow you to edit, delete, and archive them. This enables you to hide workspaces from view while still allowing access to those workspaces as-needed
+- Per-image classifications are now available. You can use the perItem parameter of classification control tags in Multi-Image Segmentation cases to attach classification to separate images in the set. For now it is supported by `DateTime`, `Number`, `Choices`, `Taxonomy`, `Rating` and `Textarea`
+
+### Improvements
+- Fixed medium vulnerabilities for Vanta
+- Print more descriptive debug messages for SAML configuration errors on an error page
+- Consistent feature flags for all products
+- New disabled state on date picker buttons
+
+### Bug Fixes
+- Fixed issue with 3-point rectangle too that it didn't work with relative coords
+- After selecting several tasks in data manager, reviewers get "URL too long" error
+- Persist collapse state of side panels
+- Evalme in rqworkers uses error level for logging always
+- Fixed issue where the user is able to move a region even when it's locked
+- When "Must leave a comment" is selected, the comments tab will come to focus
+- Fixed relation hotkeys so that they work with and without relation action buttons
+- Fixed the inability to modify regions which were initially beneath another
+- Fixed sorting by signed numeric values
+- Current draft version is NOT always saved after clicking the 'Postpone' button
+- Fixed issue with selecting hidden regions by selection tool
+- Fixed issue with unavailable regions inside selection area
+- Load Predictions + Dynamic Labels properly, unknown labels are not removed from results now
+- Disallow users from adding users from other organizations to their project
+- Fixes issue where ReviewStream task navigation buttons were missing
+- Fixed data import with SDK and async import
+- Inconsistent behavior when adding New project to the archived workspace
+- Tooltip is missing when expanding / collapsing "Archived Workspaces" section
 
 
 <a name="248md"></a>
