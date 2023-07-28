@@ -7,8 +7,8 @@ from core.utils.params import get_env
 
 logger = logging.getLogger(__name__)
 
-class AZURE(object):
 
+class AZURE(object):
     @classmethod
     def get_client_and_container(cls, container, account_name=None, account_key=None):
         # get account name and key from params or from environment variables
@@ -31,7 +31,12 @@ class AZURE(object):
                           account_name: str = None,
                           account_key: str = None) -> dict:
         """
-        Get blob metadata
+        Get blob metadata by url
+        :param url: Object key
+        :param container: Azure container name
+        :param account_name: Azure account name
+        :param account_key: Azure account key
+        :return: Object metadata dict("name": "value")
         """
         _, container = cls.get_client_and_container(container, account_name=account_name, account_key=account_key)
         blob = container.get_blob_client(url)

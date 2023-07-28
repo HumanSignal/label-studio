@@ -82,6 +82,14 @@ class AWS(object):
                           region_name=None,
                           s3_endpoint=None
                           ):
+        """
+        Get blob metadata by url
+        :param url: Object key
+        :param bucket_name: AWS bucket name
+        :param client: AWS client for batch processing
+        :param account_key: Azure account key
+        :return: Object metadata dict("name": "value")
+        """
         if client is None:
             client, _ = get_client_and_resource(aws_access_key_id=aws_access_key_id,
                                                 aws_secret_access_key=aws_secret_access_key,
