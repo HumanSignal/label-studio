@@ -35,4 +35,4 @@ class AZURE(object):
         """
         _, container = cls.get_client_and_container(container, account_name=account_name, account_key=account_key)
         blob = container.get_blob_client(url)
-        return blob.get_blob_properties()
+        return dict(blob.get_blob_properties())

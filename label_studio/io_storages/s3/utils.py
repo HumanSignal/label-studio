@@ -88,5 +88,9 @@ class AWS(object):
                                                 aws_session_token=aws_session_token,
                                                 region_name=region_name,
                                                 s3_endpoint=s3_endpoint)
-        object = client.get_object_attributes(Bucket=bucket_name, Key=url)
-        return object
+        object = client.get_object(Bucket=bucket_name, Key=url)
+        metadata = dict(object)
+        # remove unused fields
+        metadata.pop("Body", None)
+        metadata.pop("ResponseMetadata", None)
+        return metadata
