@@ -1,6 +1,6 @@
 {
-  "message": "fix: LOPS-322: [FE] Update CandidateTask preview to handle text",
-  "commit": "2482dd2ae31f4c7fe77caa8b8159471ec4d0b413",
-  "branch": "master",
-  "date": "2023/07/21 06:32:37"
+  "message": "fix: LOPS-348: Image should fit viewport regardless of its height",
+  "commit": "f803b6ce6f318228e29feafc5f0e2e7840613e9a",
+  "branch": "fb-lops-348",
+  "date": "2023/07/31 15:06:06"
 }
