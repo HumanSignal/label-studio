@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5256: Stop automatically scrolling if current Paragraph is not on the screen",
-  "commit": "188fb81a6109ff12a0c259eb33ef9ad911dd5405",
-  "branch": "master",
-  "date": "2023/07/27 16:02:41"
+  "message": "fix: LSDV-5459: Fix spacing between Author filter and first Paragraph",
+  "commit": "8b267ee377b420d348e0e89bec697e9def829389",
+  "branch": "fb-lsdv-5459",
+  "date": "2023/07/31 17:05:02"
 }
