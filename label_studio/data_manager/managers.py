@@ -192,6 +192,7 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
             Annotation.objects
                 .annotate(json_str=RawSQL('cast(result as text)', ''))
                 .filter(Q(project=project) & Q(json_str__contains=_filter.value))
+                .filter(task=OuterRef('pk'))
                 .values_list('task', flat=True)
         )
     # Predictions: they don't have `project` yet
@@ -436,7 +437,8 @@ def apply_filters(queryset, filters, project, request):
             cast_value(_filter)
             filter_expressions.append(Q(**{field_name: _filter.value}))
 
-    logger.debug(f'Apply filter: {filter_expressions}')
+    # Do not uncomment this. Stringifying filter_expressions evaluates the (sub)queryset.
+    # logger.debug(f'Apply filter: {filter_expressions}')
     if filters.conjunction == ConjunctionEnum.OR:
         result_filter = Q()
         for filter_expression in filter_expressions:
