@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5256: Stop automatically scrolling if current Paragraph is not on the screen",
-  "commit": "188fb81a6109ff12a0c259eb33ef9ad911dd5405",
-  "branch": "master",
-  "date": "2023/07/27 16:02:41"
+  "message": "fix: LSDV-4620-4: Optimize outliner region tree rendering",
+  "commit": "f8b6f3aa6b1c9d79c5888f16cd1a654bcc6830bd",
+  "branch": "fb-lsdv-4620-4/outliner-fixes",
+  "date": "2023/07/31 06:10:09"
 }
