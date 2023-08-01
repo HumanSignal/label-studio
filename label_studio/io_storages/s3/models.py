@@ -53,6 +53,9 @@ class S3StorageMixin(models.Model):
     aws_session_token = models.TextField(
         _('aws_session_token'), null=True, blank=True,
         help_text='AWS_SESSION_TOKEN')
+    aws_sse_kms_key_id = models.TextField(
+        _('aws_sse_kms_key_id'), null=True, blank=True,
+        help_text='AWS SSE KMS Key ID')
     region_name = models.TextField(
         _('region_name'), null=True, blank=True,
         help_text='AWS Region')
@@ -95,6 +98,11 @@ class S3StorageMixin(models.Model):
         else:
             logger.debug(f'Test connection to bucket {self.bucket}')
             client.head_bucket(Bucket=self.bucket)
+
+    def validate_aws_sse_kms_key_id(self):
+        if self.aws_sse_kms_key_id:
+            client = self.get_client()
+            client.describe_key(KeyId=self.aws_sse_kms_key_id)
 
     @property
     def path_full(self):
@@ -197,7 +205,13 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
         # put object into storage
         additional_params = {}
         if flag_set('fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short', user='auto'):
-            additional_params = {'ServerSideEncryption': 'AES256'}
+
+            if self.aws_sse_kms_key_id:
+                additional_params['SSEKMSKeyId'] = self.aws_sse_kms_key_id
+                additional_params['ServerSideEncryption'] = 'aws:kms'
+            else:
+                additional_params['ServerSideEncryption'] = 'AES256'
+
         s3.Object(self.bucket, key).put(
             Body=json.dumps(ser_annotation),
             **additional_params
