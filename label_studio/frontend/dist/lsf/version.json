@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5256: Stop automatically scrolling if current Paragraph is not on the screen",
-  "commit": "188fb81a6109ff12a0c259eb33ef9ad911dd5405",
+  "message": "fix: LSDV-5460: Paragraph is sync with audio and isn't automatically pausing anymore",
+  "commit": "096576f0201670842606024f6b4f27df9bfb03cd",
   "branch": "master",
-  "date": "2023/07/27 16:02:41"
+  "date": "2023/08/01 12:34:03"
 }
