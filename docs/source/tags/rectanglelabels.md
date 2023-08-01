@@ -38,6 +38,7 @@ Use with the following data types: image.
 | value.width | <code>number</code> | width of the bounding box (0-100) |
 | value.height | <code>number</code> | height of the bounding box (0-100) |
 | value.rotation | <code>number</code> | rotation degree of the bounding box (deg) |
+_Note: rotation is around the value.x and value.y, not around the center of the BBox._
 
 ### Example JSON
 ```json

@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5297: Sort phrases",
-  "commit": "75f403d3ea3761dac45be7cdc4b2756f0123f405",
+  "message": "fix: LSDV-5256: Stop automatically scrolling if current Paragraph is not on the screen",
+  "commit": "188fb81a6109ff12a0c259eb33ef9ad911dd5405",
   "branch": "master",
-  "date": "2023/07/24 10:47:41"
+  "date": "2023/07/27 16:02:41"
 }
