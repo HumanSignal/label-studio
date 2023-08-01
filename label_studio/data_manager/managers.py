@@ -437,8 +437,12 @@ def apply_filters(queryset, filters, project, request):
             cast_value(_filter)
             filter_expressions.append(Q(**{field_name: _filter.value}))
 
-    # Do not uncomment this. Stringifying filter_expressions evaluates the (sub)queryset.
-    # logger.debug(f'Apply filter: {filter_expressions}')
+    """WARNING: Stringifying filter_expressions will evaluate the (sub)queryset.
+        Do not use a log in the following manner:
+        logger.debug(f'Apply filter: {filter_expressions}')
+        Even in DEBUG mode, a subqueryset that has OuterRef will raise an error
+        if evaluated outside a parent queryset.
+    """
     if filters.conjunction == ConjunctionEnum.OR:
         result_filter = Q()
         for filter_expression in filter_expressions:
