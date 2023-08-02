@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5459: Fix spacing between Author filter and first Paragraph",
-  "commit": "d76a864194875ea359b6432b2dfd44aed2d8311a",
-  "branch": "master",
-  "date": "2023/08/02 10:11:38"
+  "message": "fix: LSDV-5446: Fix disappearing icons",
+  "commit": "e6f11c40e58bceeccac1fabb996dc668885d25cf",
+  "branch": "fb-lsdv-5446/disappearing-icons",
+  "date": "2023/08/02 19:39:20"
 }
