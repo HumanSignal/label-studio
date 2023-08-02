@@ -1,6 +1,6 @@
 {
-  "message": "feat: LSDV-5297: Sort phrases",
-  "commit": "75f403d3ea3761dac45be7cdc4b2756f0123f405",
+  "message": "fix: LSDV-5459: Fix spacing between Author filter and first Paragraph",
+  "commit": "d76a864194875ea359b6432b2dfd44aed2d8311a",
   "branch": "master",
-  "date": "2023/07/24 10:47:41"
+  "date": "2023/08/02 10:11:38"
 }

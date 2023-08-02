@@ -93,7 +93,7 @@ logger = logging.getLogger(__name__)
 class UserAPI(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_required = ViewClassPermission(
-        GET=all_permissions.organizations_view,
+        GET=all_permissions.organizations_change,
         PUT=all_permissions.organizations_change,
         POST=all_permissions.organizations_change,
         PATCH=all_permissions.organizations_view,

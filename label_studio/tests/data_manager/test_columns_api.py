@@ -1,10 +1,6 @@
 import json
 import pytest
 
-from rest_framework import status
-from pprint import pprint
-from ..utils import project_id
-
 pytestmark = pytest.mark.django_db
 
 
@@ -51,6 +47,7 @@ def test_columns_api_returns_expected_ids(business_client):
         'updated_at',
         'updated_by',
         'avg_lead_time',
+        'draft_exists',
         'data',
     ]
 
