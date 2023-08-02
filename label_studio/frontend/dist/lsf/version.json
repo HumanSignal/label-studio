@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-5446: Fix disappearing icons",
-  "commit": "a979cf7d0d203c3ddcc14065116f34328a10c417",
+  "commit": "c0c950a46dd2c54fb64a8a29c6273409d4822f1d",
   "branch": "fb-lsdv-5446/disappearing-icons",
-  "date": "2023/08/03 01:49:18"
+  "date": "2023/08/03 01:49:52"
 }
