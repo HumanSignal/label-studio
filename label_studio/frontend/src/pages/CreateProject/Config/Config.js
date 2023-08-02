@@ -2,8 +2,13 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/xml/xml';
 import React, { useEffect, useState } from 'react';
 import { UnControlled as CodeMirror } from 'react-codemirror2';
+import CM from 'codemirror';
+import 'codemirror/addon/hint/show-hint';
+import 'codemirror/addon/hint/show-hint.css';
+
 import { Button, ToggleItems } from '../../../components';
 import { Form } from '../../../components/Form';
+import { useAPI } from '../../../providers/ApiProvider';
 import { cn } from '../../../utils/bem';
 import { Palette } from '../../../utils/colors';
 import { colorNames } from './colors';
@@ -11,33 +16,10 @@ import './Config.styl';
 import { Preview } from './Preview';
 import { DEFAULT_COLUMN, EMPTY_CONFIG, isEmptyConfig, Template } from './Template';
 import { TemplatesList } from './TemplatesList';
-import { useAPI } from '../../../providers/ApiProvider';
 
-// don't do this, kids
-const formatXML = (xml) => {
-  // don't use formatting if the config has new lines
-  if (xml.indexOf("\n") >= 0) {
-    return xml;
-  }
-
-  let depth = 0;
-
-  try {
-    return xml.replace(/<(\/)?.*?(\/)?>[\s\n]*/g, (tag, close1, close2) => {
-      if (!close1) {
-        const res = "  ".repeat(depth) + tag.trim() + "\n";
-
-        if (!close2) depth++;
-        return res;
-      } else {
-        depth--;
-        return "  ".repeat(depth) + tag.trim() + "\n";
-      }
-    });
-  } catch (e) {
-    return xml;
-  }
-};
+import './codemirror.css';
+import './normal-hint';
+import tags from './schema.json';
 
 const wizardClass = cn("wizard");
 const configClass = cn("configure");
@@ -390,6 +372,28 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
     }
   };
 
+  function completeAfter(cm, pred) {
+    if (!pred || pred()) {
+      setTimeout(function() {
+        if (!cm.state.completionActive)
+          cm.showHint({ completeSingle: false });
+      }, 100);
+    }
+    return CM.Pass;
+  }
+
+  function completeIfInTag(cm) {
+    return completeAfter(cm, function() {
+      const token = cm.getTokenAt(cm.getCursor());
+
+      if (token.type === "string" && (!/['"]$/.test(token.string) || token.string.length === 1)) return false;
+
+      const inner = CM.innerMode(cm.getMode(), token.state).state;
+
+      return inner.tagName;
+    });
+  }
+
   const extra = (
     <p className={configClass.elem('tags-link')}>
       Configure the labeling interface with tags.
@@ -412,9 +416,24 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
               <CodeMirror
                 name="code"
                 id="edit_code"
-                value={formatXML(config)}
+                value={config}
+                autoCloseTags={true}
+                smartIndent={true}
                 detach
-                options={{ mode: "xml", theme: "default", lineNumbers: true }}
+                extensions={["hint", "xml-hint"]}
+                options={{
+                  mode: "xml",
+                  theme: "default",
+                  lineNumbers: true,
+                  extraKeys: {
+                    "'<'": completeAfter,
+                    // "'/'": completeIfAfterLt,
+                    "' '": completeIfInTag,
+                    "'='": completeIfInTag,
+                    "Ctrl-Space": "autocomplete",
+                  },
+                  hintOptions: { schemaInfo: tags },
+                }}
                 onChange={(editor, data, value) => onChange(value)}
               />
             </div>
