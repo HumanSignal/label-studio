@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5400: LLM suggestions from textarea",
-  "commit": "d7f85563bdc9ff5b76a8863cd31621339c031e71",
+  "message": "fix: LSDV-5460: Paragraph is sync with audio and isn't automatically pausing anymore",
+  "commit": "096576f0201670842606024f6b4f27df9bfb03cd",
   "branch": "master",
-  "date": "2023/07/17 21:09:51"
+  "date": "2023/08/01 12:34:03"
 }

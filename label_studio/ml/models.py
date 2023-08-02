@@ -199,7 +199,7 @@ class MLBackend(models.Model):
                 f"switched to one-by-one task retrieval"
             )
             for task in tasks:
-                self.__predict_one_task(task)
+                self.predict_one_task(task)
             return
 
         # wrong result number
@@ -214,13 +214,12 @@ class MLBackend(models.Model):
                     f" {response}"
                 )
                 return
-
             predictions.append(
                 {
                     'task': task['id'],
                     'result': response['result'],
                     'score': response.get('score'),
-                    'model_version': ml_api_result.response.get('model_version', self.model_version),
+                    'model_version': response.get('model_version', self.model_version),
                 }
             )
         with conditional_atomic(predicate=db_is_not_sqlite):
@@ -228,11 +227,12 @@ class MLBackend(models.Model):
             prediction_ser.is_valid(raise_exception=True)
             prediction_ser.save()
 
-    def __predict_one_task(self, task):
-        self.update_state()
-        if self.not_ready:
-            logger.debug(f'ML backend {self} is not ready to predict {task}')
-            return
+    def predict_one_task(self, task, check_state=True):
+        if check_state:
+            self.update_state()
+            if self.not_ready:
+                logger.debug(f'ML backend {self} is not ready to predict {task}')
+                return
 
         if task.predictions.filter(model_version=self.model_version).exists():
             # prediction already exists
