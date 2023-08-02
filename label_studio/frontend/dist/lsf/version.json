@@ -1,6 +1,6 @@
 {
   "message": "fix: LSDV-4620-4: Optimize outliner region tree rendering",
-  "commit": "37fb9ab2343312bc06d83641363ba77b9ec24558",
+  "commit": "97197beb78ecbf0a74fa4c8cfad10f546a6ca035",
   "branch": "fb-lsdv-4620-4/outliner-fixes",
-  "date": "2023/08/01 18:34:53"
+  "date": "2023/08/02 19:53:23"
 }
