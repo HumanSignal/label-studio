@@ -47,6 +47,7 @@ def test_columns_api_returns_expected_ids(business_client):
         'updated_at',
         'updated_by',
         'avg_lead_time',
+        'draft_exists',
         'data',
     ]
 
