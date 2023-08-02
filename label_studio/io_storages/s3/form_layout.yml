@@ -20,7 +20,9 @@ aws_params: &aws_params
   - type: text
     name: s3_endpoint
     label: S3 Endpoint
-  - null
+  - type: text
+    name: aws_sse_kms_key_id
+    label: SSE KMS Key ID
   - type: password
     name: aws_access_key_id
     label: Access Key ID
