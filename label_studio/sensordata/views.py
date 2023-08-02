@@ -66,8 +66,8 @@ def offset(request):
     if request.method == 'POST':
         sensoroffsetform = SensorOffsetForm(request.POST)
         if sensoroffsetform.is_valid():
-            sensorA = sensoroffsetform.cleaned_data['sensor_A']
-            sensorB = sensoroffsetform.cleaned_data['sensor_B']
+            camera = sensoroffsetform.cleaned_data['camera']
+            imu = sensoroffsetform.cleaned_data['imu']
             offset = sensoroffsetform.cleaned_data['offset']
             offset_date = sensoroffsetform.cleaned_data['offset_Date']
             # create and save the new SensorOffset instance
@@ -77,6 +77,7 @@ def offset(request):
     else:
         sensoroffsetform = SensorOffsetForm()
     return render(request, 'offset.html', {'sensoroffsetform':sensoroffsetform, 'sensoroffset':sensoroffset})
+
 def delete_offset(request, id):
     offset = SensorOffset.objects.get(id=id)
     if request.method == 'POST':

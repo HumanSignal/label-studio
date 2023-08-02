@@ -65,10 +65,12 @@
     </div>
     <div class="sensoroffset">
         <h2>Sensor offsets</h2>
+        <p>Add the offset between the camera and the IMU. Since the internal time of both devices will never be fully synced there will always be an offset between the two.</p>
+        <p>Here this offset can be added in milliseconds to synchronize the data of the camera and the IMU.</p>
         <table class="tables">
             <tr>
-                <th>Sensor A</th>
-                <th>Sensor B</th>
+                <th>Camera</th>
+                <th>IMU</th>
                 <th>Offset (ms)</th>
                 <th>Start offset</th>
                 <th></th>
@@ -76,8 +78,8 @@
             </tr>
             {% for senoffset in sensoroffset %}
                 <tr>
-                    <td>{{ senoffset.sensor_A }}</td>
-                    <td>{{ senoffset.sensor_B }}</td>
+                    <td>{{ senoffset.camera }}</td>
+                    <td>{{ senoffset.imu }}</td>
                     <td>{{ senoffset.offset }}</td> 
                     <td>{{ senoffset.offset_Date}} </td>
                     <td><a href="{% url 'sensordata:adjust_offset' senoffset.id %}"> [Edit] </a></td>
