@@ -282,8 +282,19 @@ def get_all_columns(project, *_):
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
-            }
-        }
+            },
+        },
+        {
+            'id': 'draft_exists',
+            'title': "Drafts",
+            'type': 'Boolean',
+            'help': 'True if at least one draft exists for the task',
+            'target': 'tasks',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            },
+        },
     ]
 
     result['columns'].append(data_root)

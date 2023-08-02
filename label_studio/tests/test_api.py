@@ -176,7 +176,7 @@ def test_delete_annotations(business_client, configured_project):
          "data": {"text": "text B", "meta_info": "meta info B"}, "meta": {},
          "created_at": "", "updated_at": "", 'updated_by': [], "is_labeled": False, "project": 0,
          'overlap': 1, 'file_upload': None, 'annotations_ids': '', 'annotations_results': '',
-         'annotators': [], 'completed_at': None, 'predictions_model_versions': '',
+         'annotators': [], 'completed_at': None, 'predictions_model_versions': '', 'draft_exists': False,
          'predictions_results': '', 'predictions_score': None, 'total_annotations': 0, 'total_predictions': 0,
          'avg_lead_time': None, 'cancelled_annotations': 0, 'inner_id': 0,'storage_filename': None,
          'comment_authors': [], 'comment_count': 0, 'last_comment_updated_at': None, 'unresolved_comment_count': 0},
