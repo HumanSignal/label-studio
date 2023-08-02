@@ -48,7 +48,12 @@ const Label = ({ label, template, color }) => {
         />
       </label>
       <span>{value}</span>
-      <button type="button" className={configClass.elem("delete-label")} onClick={() => template.removeLabel(label)}>
+      <button
+        type="button"
+        className={configClass.elem("delete-label")}
+        onClick={() => template.removeLabel(label)}
+        aria-label="delete label"
+      >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="red" strokeWidth="2" strokeLinecap="square" xmlns="http://www.w3.org/2000/svg">
           <path d="M2 12L12 2"/>
           <path d="M12 12L2 2"/>
@@ -81,6 +86,7 @@ const ConfigureControl = ({ control, template }) => {
     <div className={configClass.elem("labels")}>
       <form className={configClass.elem("add-labels")} action="">
         <h4>{tagname === "Choices" ? "Add choices" : "Add label names"}</h4>
+        <span>Use new line as a separator to add multiple labels</span>
         <textarea name="labels" id="" cols="30" rows="5" ref={refLabels} onKeyPress={onKeyPress}></textarea>
         <input type="button" value="Add" onClick={onAddLabels} />
       </form>
