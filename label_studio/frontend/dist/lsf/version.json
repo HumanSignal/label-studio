@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5459: Fix spacing between Author filter and first Paragraph",
-  "commit": "d76a864194875ea359b6432b2dfd44aed2d8311a",
+  "message": "fix: LSDV-4620-4: Optimize outliner region tree rendering",
+  "commit": "99dfe7c231ee9a2461f224d2aac14fa40f46ed7b",
   "branch": "master",
-  "date": "2023/08/02 10:11:38"
+  "date": "2023/08/03 01:06:49"
 }
