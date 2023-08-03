@@ -178,6 +178,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     annotations_ids = serializers.SerializerMethodField(required=False)
     predictions_model_versions = serializers.SerializerMethodField(required=False)
     avg_lead_time = serializers.FloatField(required=False)
+    draft_exists = serializers.BooleanField(required=False)
     updated_by = serializers.SerializerMethodField(required=False, read_only=True)
 
     CHAR_LIMITS = 500
