@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-5460: Paragraph is sync with audio and isn't automatically pausing anymore",
-  "commit": "096576f0201670842606024f6b4f27df9bfb03cd",
+  "message": "fix: LSDV-5446: Fix disappearing icons",
+  "commit": "8139d7b800560232b66157871d45c2d524a9f94f",
   "branch": "master",
-  "date": "2023/08/01 12:34:03"
+  "date": "2023/08/03 14:08:19"
 }
