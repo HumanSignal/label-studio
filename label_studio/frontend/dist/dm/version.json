@@ -1,6 +1,6 @@
 {
   "message": "fix: LOPS-348: Image should fit viewport regardless of its height",
-  "commit": "f803b6ce6f318228e29feafc5f0e2e7840613e9a",
-  "branch": "fb-lops-348",
-  "date": "2023/07/31 15:06:06"
+  "commit": "568c0be973c66f89e0407c99bfe7f8fbde4704ed",
+  "branch": "master",
+  "date": "2023/08/03 09:59:30"
 }
