@@ -192,6 +192,7 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
             Annotation.objects
                 .annotate(json_str=RawSQL('cast(result as text)', ''))
                 .filter(Q(project=project) & Q(json_str__contains=_filter.value))
+                .filter(task=OuterRef('pk'))
                 .values_list('task', flat=True)
         )
     # Predictions: they don't have `project` yet
@@ -436,7 +437,12 @@ def apply_filters(queryset, filters, project, request):
             cast_value(_filter)
             filter_expressions.append(Q(**{field_name: _filter.value}))
 
-    logger.debug(f'Apply filter: {filter_expressions}')
+    """WARNING: Stringifying filter_expressions will evaluate the (sub)queryset.
+        Do not use a log in the following manner:
+        logger.debug(f'Apply filter: {filter_expressions}')
+        Even in DEBUG mode, a subqueryset that has OuterRef will raise an error
+        if evaluated outside a parent queryset.
+    """
     if filters.conjunction == ConjunctionEnum.OR:
         result_filter = Q()
         for filter_expression in filter_expressions:
@@ -571,6 +577,12 @@ def annotate_avg_lead_time(queryset):
     return queryset.annotate(avg_lead_time=Avg('annotations__lead_time'))
 
 
+def annotate_draft_exists(queryset):
+    from tasks.models import AnnotationDraft
+
+    return queryset.annotate(draft_exists=Exists(AnnotationDraft.objects.filter(task=OuterRef('pk'))))
+
+
 def file_upload(queryset):
     return queryset.annotate(file_upload_field=F('file_upload__file'))
 
@@ -589,6 +601,7 @@ settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     "annotators": annotate_annotators,
     "annotations_ids": annotate_annotations_ids,
     "file_upload": file_upload,
+    "draft_exists": annotate_draft_exists,
 }
 
 

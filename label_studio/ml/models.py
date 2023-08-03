@@ -214,13 +214,12 @@ class MLBackend(models.Model):
                     f" {response}"
                 )
                 return
-
             predictions.append(
                 {
                     'task': task['id'],
                     'result': response['result'],
                     'score': response.get('score'),
-                    'model_version': ml_api_result.response.get('model_version', self.model_version),
+                    'model_version': response.get('model_version', self.model_version),
                 }
             )
         with conditional_atomic(predicate=db_is_not_sqlite):
