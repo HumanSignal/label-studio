@@ -201,6 +201,8 @@ export const MachineLearningSettings = () => {
     .get(webhook_url + '/can_press')
         .then((response) => {
           let can_press = response.data.can_press;
+          console.log(selectedTrainingType);
+
           if (can_press == undefined) {
             Swal.fire('Error', 'Someone has just trained or predicted, please wait for a moment', 'error')
           }
@@ -210,8 +212,11 @@ export const MachineLearningSettings = () => {
             if (selectedTrainingType === "PVT") {
               trainingType = "pvt";
             }
-            if(selectedTrainingType === "Segmentation"){
-              trainingType = "segmentation";
+            if(selectedTrainingType === "Segmentation Tool"){
+              trainingType = "segmentation_tool";
+            }
+            if(selectedTrainingType === "Segmentation Tao"){
+              trainingType = "segmentation_tao";
             }
             axios.post(webhook_url + '/train?id=' + project.id+'&generateSpecs='+generateSpecs+'&type='+trainingType).then((response) => {
               console.log(response);
