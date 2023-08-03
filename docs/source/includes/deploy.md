@@ -2,7 +2,7 @@
 You can install Label Studio on a Linux, Windows, or MacOSX machine running Python 3.6 or later.
 
 ### Port requirements
-Label Studio expects port 8080 to be open by default. To use a different port, specify it when starting Label Studio. See [Start Label Studio](start.html). 
+Label Studio expects port 8000 to be open by default. To use a different port, specify it when starting Label Studio. See [Start Label Studio](start.html). 
 
 ### Server requirements
 Allocate disk space according to the amount of data you plan to label. As a benchmark, 1 million labeling tasks take up approximately 2.3GB on disk when using the SQLite database. 50GB of disk space is recommended for production instances. 
