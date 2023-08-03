@@ -1,6 +1,6 @@
 {
-  "message": "fix: LSDV-4620-4: Optimize outliner region tree rendering",
-  "commit": "99dfe7c231ee9a2461f224d2aac14fa40f46ed7b",
+  "message": "fix: LSDV-5446: Fix disappearing icons",
+  "commit": "8139d7b800560232b66157871d45c2d524a9f94f",
   "branch": "master",
-  "date": "2023/08/03 01:06:49"
+  "date": "2023/08/03 14:08:19"
 }

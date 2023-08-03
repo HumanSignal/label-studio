@@ -25,6 +25,7 @@ from io_storages.base_models import (
     ProjectStorageMixin
 )
 
+from label_studio.io_storages.azure_blob.utils import AZURE
 
 logger = logging.getLogger(__name__)
 logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(logging.WARNING)
@@ -108,6 +109,7 @@ class AzureBlobImportStorageBase(AzureBlobStorageMixin, ImportStorage):
         prefix = str(self.prefix) if self.prefix else ''
         files = container.list_blobs(name_starts_with=prefix)
         regex = re.compile(str(self.regex_filter)) if self.regex_filter else None
+
         for file in files:
             # skip folder
             if file.name == (prefix.rstrip('/') + '/'):
@@ -116,7 +118,6 @@ class AzureBlobImportStorageBase(AzureBlobStorageMixin, ImportStorage):
             if regex and not regex.match(file.name):
                 logger.debug(file.name + ' is skipped by regex filter')
                 continue
-
             yield file.name
 
     def get_data(self, key):
@@ -149,6 +150,9 @@ class AzureBlobImportStorageBase(AzureBlobStorageMixin, ImportStorage):
                                       permission=BlobSasPermissions(read=True),
                                       expiry=expiry)
         return 'https://' + self.get_account_name() + '.blob.core.windows.net/' + container + '/' + blob + '?' + sas_token
+
+    def get_blob_metadata(self, key):
+        return AZURE.get_blob_metadata(key, self.container, account_name=self.account_name, account_key=self.account_key)
 
     class Meta:
         abstract = True
