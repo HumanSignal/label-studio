@@ -146,8 +146,8 @@ def azure_client_mock():
             print(f'String {string} uploaded to bucket {self.container_name}')
         def generate_signed_url(self, **kwargs):
             return f'https://storage.googleapis.com/{self.container_name}/{self.key}'
-        def content_as_text(self, key):
-            return json.dumps({'str_field': str(key), 'int_field': 123, 'dict_field': {'one': 'wow', 'two': 456}})
+        def content_as_text(self):
+            return json.dumps({'str_field': str(self.key), 'int_field': 123, 'dict_field': {'one': 'wow', 'two': 456}})
 
     class DummyAzureContainer:
         def __init__(self, container_name, **kwargs):
