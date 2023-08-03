@@ -519,7 +519,7 @@ with tt as (
 AnnotationMixin = load_func(settings.ANNOTATION_MIXIN)
 
 
-class Annotation(models.Model):
+class Annotation(AnnotationMixin, models.Model):
     """Annotations & Labeling results"""
 
     objects = AnnotationManager()
@@ -649,7 +649,7 @@ class Annotation(models.Model):
             models.Index(fields=["last_action"]),
             models.Index(fields=["project", "ground_truth"]),
             models.Index(fields=["project", "was_cancelled"]),
-        ] + AnnotationMixin.Meta.indexes
+        ]
 
     def created_ago(self):
         """Humanize date"""
@@ -664,9 +664,11 @@ class Annotation(models.Model):
 
         return len(res)
 
-    def has_permission(self, user):
+    def has_permission(self, user: "User") -> bool:
+        mixin_has_permission = cast(bool, super().has_permission(user))
+
         user.project = self.project  # link for activity log
-        return self.project.has_permission(user)
+        return mixin_has_permission and self.project.has_permission(user)
 
     def increase_project_summary_counters(self):
         if hasattr(self.project, "summary"):

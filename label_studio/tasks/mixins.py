@@ -1,5 +1,3 @@
-from django.db import models
-
 
 class TaskMixin:
     def has_permission(self, user: "User") -> bool:
@@ -18,7 +16,7 @@ class TaskMixin:
         pass
 
 
-class AnnotationMixin(models.Model):
-    class Meta:
-        abstract = True
-        indexes = []
+class AnnotationMixin:
+    def has_permission(self, user: "User") -> bool:
+        """Called by Annotation#has_permission"""
+        return True
