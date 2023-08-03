@@ -3047,7 +3047,7 @@
       "contextTargets": [],
       "rules": [],
       "fallthrough": {
-        "variation": 1
+        "variation": 0
       },
       "offVariation": 1,
       "variations": [
@@ -3063,7 +3063,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 4,
+      "version": 5,
       "deleted": false
     },
     "fflag_feat_front_prod_281_project_list_search_19072023_short": {
@@ -3527,7 +3527,7 @@
     },
     "fflag_fix_back_lsdv_4719_improve_performance_of_project_annotations": {
       "key": "fflag_fix_back_lsdv_4719_improve_performance_of_project_annotations",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -3549,7 +3549,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_fix_back_lsdv_4826_annotation_history_20230331_short": {
@@ -3708,6 +3708,33 @@
       },
       "clientSide": false,
       "salt": "7e7cc435d6114f029d1f9f1eec6ff9eb",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "fflag_fix_back_lsdv_5425_1_kill_permissions_restrictions_for_annotators_short": {
+      "key": "fflag_fix_back_lsdv_5425_1_kill_permissions_restrictions_for_annotators_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "9bf5f3be29614a22b3250c8783d56cd4",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
