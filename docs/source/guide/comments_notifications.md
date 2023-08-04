@@ -10,7 +10,7 @@ meta_title: Comment and notification systems in Label Studio
 meta_description: The Comments and Notifications feature defines how annotators, reviewers and administrators communicate and receive updates on projects and tasks.
 ---
 
-Annotators, reviewers, and administrators can use comments to do the following:
+Annotators, reviewers, and administrators can use comments to do the following: test
 
 - Speed up the labeling process
 - Increase the annotation quality
