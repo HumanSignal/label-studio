@@ -11,7 +11,7 @@ import logging
 import shutil
 import tempfile
 
-from unittest import mock
+from unittest import mock, MagicMock
 from moto import mock_s3
 from copy import deepcopy
 from pathlib import Path
@@ -23,6 +23,7 @@ from tasks.models import Task
 from users.models import User
 from organizations.models import Organization
 from types import SimpleNamespace
+from botocore.exceptions import ClientError
 
 from label_studio.core.utils.params import get_bool_env, get_env
 
@@ -220,6 +221,122 @@ def s3_export_bucket_sse(s3):
     s3.put_bucket_policy(Bucket=bucket_name, Policy=json.dumps(policy))
 
     yield s3
+
+
+@pytest.fixture(autouse=True)
+def s3_export_bucket_kms(s3):
+    bucket_name = 'pytest-export-s3-bucket-with-kms'
+    s3.create_bucket(Bucket=bucket_name)
+
+    # Set the bucket policy
+    policy = {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:PutObject",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket_name}",
+                    f"arn:aws:s3:::{bucket_name}/*"
+                ],
+                "Condition": {
+                    "StringNotEquals": {
+                        "s3:x-amz-server-side-encryption": "aws:kms"
+                    }
+                }
+            },
+            {
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:PutObject",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket_name}",
+                    f"arn:aws:s3:::{bucket_name}/*"
+                ],
+                "Condition": {
+                    "Null": {
+                        "s3:x-amz-server-side-encryption": "true"
+                    }
+                }
+            },
+            {
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:*",
+                "Resource": [
+                    f"arn:aws:s3:::{bucket_name}",
+                    f"arn:aws:s3:::{bucket_name}/*"
+                ],
+                "Condition": {
+                    "Bool": {
+                        "aws:SecureTransport": "false"
+                    }
+                }
+            }
+        ]
+    }
+
+    s3.put_bucket_policy(Bucket=bucket_name, Policy=json.dumps(policy))
+
+    yield s3
+
+
+def mock_put_aes(*args, **kwargs):
+    if 'ServerSideEncryption' not in kwargs or kwargs['ServerSideEncryption'] != 'AES256':
+        raise ClientError(
+            error_response={
+                'Error': {
+                    'Code': 'AccessDenied',
+                    'Message': 'Access Denied'
+                }
+            },
+            operation_name='PutObject'
+        )
+
+
+@pytest.fixture()
+def mock_s3_resource_aes(mocker):
+    mock_object = MagicMock()
+    mock_object.put = mock_put_aes
+
+    mock_object_constructor = MagicMock()
+    mock_object_constructor.return_value = mock_object
+
+    mock_s3_resource = MagicMock()
+    mock_s3_resource.Object = mock_object_constructor
+
+    # Patch boto3.Session.resource to return the mock s3 resource
+    mocker.patch('boto3.Session.resource', return_value=mock_s3_resource)
+
+
+def mock_put_kms(*args, **kwargs):
+    if 'ServerSideEncryption' not in kwargs or kwargs[
+        'ServerSideEncryption'] != 'aws:kms' or 'SSEKMSKeyId' not in kwargs:
+        raise ClientError(
+            error_response={
+                'Error': {
+                    'Code': 'AccessDenied',
+                    'Message': 'Access Denied'
+                }
+            },
+            operation_name='PutObject'
+        )
+
+
+@pytest.fixture()
+def mock_s3_resource_kms(mocker):
+    mock_object = MagicMock()
+    mock_object.put = mock_put_kms
+
+    mock_object_constructor = MagicMock()
+    mock_object_constructor.return_value = mock_object
+
+    mock_s3_resource = MagicMock()
+    mock_s3_resource.Object = mock_object_constructor
+
+    # Patch boto3.Session.resource to return the mock s3 resource
+    mocker.patch('boto3.Session.resource', return_value=mock_s3_resource)
 
 
 @pytest.fixture(autouse=True)
@@ -525,6 +642,17 @@ def fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off():
             return False
         return flag_set(*args, **kwargs)
     with mock.patch('tasks.models.flag_set', wraps=fake_flag_set):
+        yield
+
+@pytest.fixture(name="fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short_on")
+def fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short_on():
+    from core.feature_flags import flag_set
+
+    def fake_flag_set(*args, **kwargs):
+        if args[0] == 'fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short':
+            return True
+        return flag_set(*args, **kwargs)
+    with mock.patch('io_storages.s3.models.flag_set', wraps=fake_flag_set):
         yield
 
 
