@@ -105,6 +105,13 @@ class GCSImportStorageBase(GCSStorageMixin, ImportStorage):
     def scan_and_create_links(self):
         return self._scan_and_create_links(GCSImportStorageLink)
 
+    def get_blob_metadata(self, key):
+        return GCS.get_blob_metadata(
+            url=key,
+            google_application_credentials=self.google_application_credentials,
+            google_project_id=self.google_project_id
+        )
+
     class Meta:
         abstract = True
 

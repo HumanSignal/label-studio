@@ -316,7 +316,7 @@ jobs:
           AHA_FETCH_STRATEGY: "TAG"
           AHA_TAG: "LS ${{ steps.create-draft-release.outputs.tag_name }}"
           AHA_ADDITIONAL_RELEASES_TAG: "oss"
-          JIRA_SERVER: "https://heartex.atlassian.net"
+          JIRA_SERVER: "${{ vars.JIRA_SERVER }}"
           JIRA_USERNAME: "${{ secrets.JIRA_USERNAME }}"
           JIRA_TOKEN: "${{ secrets.JIRA_TOKEN }}"
           JIRA_PROJECT: "DEV"

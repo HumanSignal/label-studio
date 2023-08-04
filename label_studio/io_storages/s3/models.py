@@ -24,6 +24,8 @@ from io_storages.base_models import (
     ProjectStorageMixin
 )
 
+from label_studio.io_storages.s3.utils import AWS
+
 logger = logging.getLogger(__name__)
 logging.getLogger('botocore').setLevel(logging.CRITICAL)
 boto3.set_stream_logger(level=logging.INFO)
@@ -181,6 +183,12 @@ class S3ImportStorageBase(S3StorageMixin, ImportStorage):
 
     def generate_http_url(self, url):
         return resolve_s3_url(url, self.get_client(), self.presign, expires_in=self.presign_ttl * 60)
+
+    def get_blob_metadata(self, key):
+        return AWS.get_blob_metadata(key, self.bucket, aws_access_key_id=self.aws_access_key_id,
+                                     aws_secret_access_key=self.aws_secret_access_key,
+                                     aws_session_token=self.aws_session_token, region_name=self.region_name,
+                                     s3_endpoint=self.s3_endpoint)
 
     class Meta:
         abstract = True
