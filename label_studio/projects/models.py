@@ -593,31 +593,13 @@ class Project(ProjectMixin, models.Model):
             if control_type in exclude_control_types:
                 continue
 
-            def get_label_id(label):
-                # Get label id from the 'labels_attrs' field, return None if 'id' is missing
-                return outputs[control_name]['labels_attrs'].get(label, {}).get('id')
-
-            def get_label_data(label):
-                # Check if id exists for this label
-                label_id = get_label_id(label)
-                if label_id is not None:
-                    # If id exists, try to fetch weight using id
-                    weight = self.control_weights.get(control_name, {}).get('labels', {}).get(label_id, {}).get(
-                        'weight')
-                else:
-                    # If id does not exist, fall back to using label name to fetch weight
-                    weight = self.control_weights.get(control_name, {}).get('labels', {}).get(label, 1.0)
-                    try:
-                        weight = weight['weight']
-                    except TypeError:  # in this case weight is already a float
-                        pass
-                # Return a dictionary with the label's name and its weight
-                return {'name': label, 'weight': weight if weight is not None else 1.0}
+            def get_label(label):
+                return self.control_weights.get(control_name, {}).get('labels', {}).get(label)
 
             control_weights[control_name] = {
                 'overall': self.control_weights.get(control_name, {}).get('overall') or 1.0,
                 'type': control_type,
-                'labels': {get_label_id(label) or label: get_label_data(label) for label in
+                'labels': {label: get_label(label) if get_label(label) is not None else 1.0 for label in
                            outputs[control_name].get('labels', [])},
             }
         return control_weights
