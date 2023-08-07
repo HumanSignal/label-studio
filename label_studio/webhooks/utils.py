@@ -6,31 +6,9 @@ from core.utils.common import load_func
 from django.conf import settings
 from django.db.models import Q
 import django_rq
+from core.feature_flags import flag_set
 
 from .models import Webhook, WebhookAction
-
-
-def run_webhook(webhook, action, payload=None):
-    """Run one webhook for action.
-
-    This function must not raise any exceptions.
-    """
-    data = {
-        'action': action,
-    }
-    if webhook.send_payload and payload:
-        data.update(payload)
-    try:
-        logging.debug('Run webhook %s for action %s', webhook.id, action)
-        return requests.post(
-            webhook.url,
-            headers=webhook.headers,
-            json=data,
-            timeout=settings.WEBHOOK_TIMEOUT,
-        )
-    except requests.RequestException as exc:
-        logging.error(exc, exc_info=True)
-        return
 
 
 def get_active_webhooks(organization, project, action):
@@ -60,17 +38,40 @@ def get_active_webhooks(organization, project, action):
     ).distinct()
 
 
-def emit_webhooks(organization, project, action, payload):
+def run_webhook_sync(webhook, action, payload=None):
+    """Run one webhook for action.
+
+    This function must not raise any exceptions.
+    """
+    data = {
+        'action': action,
+    }
+    if webhook.send_payload and payload:
+        data.update(payload)
+    try:
+        logging.debug('Run webhook %s for action %s', webhook.id, action)
+        return requests.post(
+            webhook.url,
+            headers=webhook.headers,
+            json=data,
+            timeout=settings.WEBHOOK_TIMEOUT,
+        )
+    except requests.RequestException as exc:
+        logging.error(exc, exc_info=True)
+        return
+
+
+def emit_webhooks_sync(organization, project, action, payload):
     """Run all active webhooks for the action."""
     webhooks = get_active_webhooks(organization, project, action)
     if project and payload and webhooks.filter(send_payload=True).exists():
         payload['project'] = load_func(
             settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data
     for wh in webhooks:
-        run_webhook(wh, action, payload)
+        run_webhook_sync(wh, action, payload)
 
 
-def emit_webhooks_for_instance(organization, project, action, instance=None):
+def emit_webhooks_for_instance_sync(organization, project, action, instance=None):
     """Run all active webhooks for the action using instances as payload.
 
     Be sure WebhookAction.ACTIONS contains all required fields.
@@ -96,21 +97,57 @@ def emit_webhooks_for_instance(organization, project, action, instance=None):
                     instance=get_nested_field(instance, value['field']), many=value['many']
                 ).data
     for wh in webhooks:
-        run_webhook(wh, action, payload)
+        run_webhook_sync(wh, action, payload)
 
 
-def emit_webhooks_for_instance_rq(organization, project, action, instance=None):
-    """
-    Emits webhooks in background
-    """
-    queue = django_rq.get_queue('low')
-    queue.enqueue(
-        emit_webhooks_for_instance,
+def run_webhook(webhook, action, payload=None):
+    if flag_set("fflag_fix_back_lsdv_4604_excess_sql_queries_in_api_short"):
+        queue = django_rq.get_queue('low')
+        queue.enqueue(
+            run_webhook_sync,
+            webhook,
+            action,
+            payload,
+        )
+    else:
+        run_webhook(webhook, action, payload)
+
+
+def emit_webhooks_for_instance(
         organization,
         project,
         action,
-        instance
-    )
+        instance=None
+):
+    """
+    Emits webhooks in background
+    """
+    if flag_set("fflag_fix_back_lsdv_4604_excess_sql_queries_in_api_short"):
+        queue = django_rq.get_queue('low')
+        queue.enqueue(
+            emit_webhooks_for_instance_sync,
+            organization,
+            project,
+            action,
+            instance
+        )
+    else:
+        emit_webhooks_for_instance_sync(
+            organization, project, action, instance)
+
+
+def emit_webhooks(organization, project, action, payload):
+    if flag_set("fflag_fix_back_lsdv_4604_excess_sql_queries_in_api_short"):
+        queue = django_rq.get_queue('low')
+        queue.enqueue(
+            emit_webhooks_sync,
+            organization,
+            project,
+            action,
+            payload
+        )
+    else:
+        emit_webhooks_sync(organization, project, action, payload)
 
 
 def api_webhook(action):
@@ -142,7 +179,7 @@ def api_webhook(action):
             if 'project-field' in action_meta:
                 project = get_nested_field(
                     instance, action_meta['project-field'])
-            emit_webhooks_for_instance_rq(
+            emit_webhooks_for_instance(
                 request.user.active_organization,
                 project,
                 action,
