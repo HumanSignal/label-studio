@@ -11,7 +11,8 @@ import logging
 import shutil
 import tempfile
 
-from unittest import mock, MagicMock
+from unittest import mock
+from unittest.mock import MagicMock
 from moto import mock_s3
 from copy import deepcopy
 from pathlib import Path
