@@ -29,3 +29,4 @@ types-setuptools==68.0.0.3
 types-requests==2.31.0.2
 types-jsonschema==4.17.0.10
 appdirs-stubs==0.1.0
+djangorestframework-stubs[compatible-mypy]==3.14.2
