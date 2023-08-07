@@ -5,6 +5,7 @@ import requests
 from core.utils.common import load_func
 from django.conf import settings
 from django.db.models import Q
+import django_rq
 
 from .models import Webhook, WebhookAction
 
@@ -41,7 +42,8 @@ def get_active_webhooks(organization, project, action):
     """
     action_meta = WebhookAction.ACTIONS[action]
     if project and action_meta.get('organization-only'):
-        raise ValueError("There is no project webhooks for organization-only action")
+        raise ValueError(
+            "There is no project webhooks for organization-only action")
 
     return Webhook.objects.filter(
         Q(organization=organization)
@@ -62,7 +64,8 @@ def emit_webhooks(organization, project, action, payload):
     """Run all active webhooks for the action."""
     webhooks = get_active_webhooks(organization, project, action)
     if project and payload and webhooks.filter(send_payload=True).exists():
-        payload['project'] = load_func(settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data
+        payload['project'] = load_func(
+            settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data
     for wh in webhooks:
         run_webhook(wh, action, payload)
 
@@ -82,9 +85,11 @@ def emit_webhooks_for_instance(organization, project, action, instance=None):
     if instance and webhooks.filter(send_payload=True).exists():
         serializer_class = action_meta.get('serializer')
         if serializer_class:
-            payload[action_meta['key']] = serializer_class(instance=instance, many=action_meta['many']).data
+            payload[action_meta['key']] = serializer_class(
+                instance=instance, many=action_meta['many']).data
         if project and payload:
-            payload['project'] = load_func(settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data
+            payload['project'] = load_func(
+                settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data
         if payload and 'nested-fields' in action_meta:
             for key, value in action_meta['nested-fields'].items():
                 payload[key] = value['serializer'](
@@ -92,6 +97,20 @@ def emit_webhooks_for_instance(organization, project, action, instance=None):
                 ).data
     for wh in webhooks:
         run_webhook(wh, action, payload)
+
+
+def emit_webhooks_for_instance_rq(organization, project, action, instance=None):
+    """
+    Emits webhooks in background
+    """
+    queue = django_rq.get_queue('low')
+    queue.enqueue(
+        emit_webhooks_for_instance,
+        organization,
+        project,
+        action,
+        instance
+    )
 
 
 def api_webhook(action):
@@ -115,13 +134,15 @@ def api_webhook(action):
 
             action_meta = WebhookAction.ACTIONS[action]
             many = action_meta['many']
-            instance = action_meta['model'].objects.get(id=response.data.get('id'))
+            instance = action_meta['model'].objects.get(
+                id=response.data.get('id'))
             if many:
                 instance = [instance]
             project = None
             if 'project-field' in action_meta:
-                project = get_nested_field(instance, action_meta['project-field'])
-            emit_webhooks_for_instance(
+                project = get_nested_field(
+                    instance, action_meta['project-field'])
+            emit_webhooks_for_instance_rq(
                 request.user.active_organization,
                 project,
                 action,
@@ -157,7 +178,8 @@ def api_webhook_for_delete(action):
             many = action_meta['many']
             project = None
             if 'project-field' in action_meta:
-                project = get_nested_field(instance, action_meta['project-field'])
+                project = get_nested_field(
+                    instance, action_meta['project-field'])
 
             obj = {'id': instance.pk}
             if many:
@@ -165,7 +187,8 @@ def api_webhook_for_delete(action):
 
             response = func(self, request, *args, **kwargs)
 
-            emit_webhooks_for_instance(request.user.active_organization, project, action, obj)
+            emit_webhooks_for_instance(
+                request.user.active_organization, project, action, obj)
             return response
 
         return wrap
