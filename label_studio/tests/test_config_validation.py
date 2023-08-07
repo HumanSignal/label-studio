@@ -9,7 +9,7 @@ import yaml
 import logging
 
 from core.label_config import parse_config, validate_label_config, parse_config_to_json
-from tests.utils import make_task, make_annotation, make_prediction
+from tests.utils import make_task, make_annotation, make_prediction, project_id
 from projects.models import Project
 
 logger = logging.getLogger(__name__)
