@@ -104,6 +104,9 @@ class ImportStorageSyncAPI(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         storage = self.get_object()
         # check connectivity & access, raise an exception if not satisfied
+        if not storage.synchronizable:
+            response_data = {'message': f'Storage {str(storage.id)} is not synchronizable'}
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
         storage.validate_connection()
         storage.sync()
         storage.refresh_from_db()
