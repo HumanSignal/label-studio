@@ -772,7 +772,7 @@ stages:
     json:
       synchronizable: false
     method: PATCH
-    url: '{django_live_url}/api/storages/s3/{storage_pk}'
+    url: '{django_live_url}/api/storages/export/s3/{storage_pk}'
   response:
     status_code: 200
     json:
@@ -782,7 +782,7 @@ stages:
 - name: Try to Sync S3 storage with synchronizable false
   request:
     method: POST
-    url: '{django_live_url}/api/storages/s3/{storage_pk}/sync'
+    url: '{django_live_url}/api/storages/export/s3/{storage_pk}/sync'
   response:
     status_code: 400
 ---
@@ -979,7 +979,7 @@ stages:
     json:
       synchronizable: false
     method: PATCH
-    url: '{django_live_url}/api/storages/gcs/{storage_pk}'
+    url: '{django_live_url}/api/storages/export/gcs/{storage_pk}'
   response:
     status_code: 200
     json:
@@ -989,7 +989,7 @@ stages:
 - name: Try to Sync GCS storage with synchronizable false
   request:
     method: POST
-    url: '{django_live_url}/api/storages/gcs/{storage_pk}/sync'
+    url: '{django_live_url}/api/storages/export/gcs/{storage_pk}/sync'
   response:
     status_code: 400
 ---
@@ -1262,7 +1262,7 @@ stages:
     json:
       synchronizable: false
     method: PATCH
-    url: '{django_live_url}/api/storages/azure/{storage_pk}'
+    url: '{django_live_url}/api/storages/export/azure/{storage_pk}'
   response:
     status_code: 200
     json:
@@ -1272,7 +1272,7 @@ stages:
 - name: Try to Sync Azure storage with synchronizable false
   request:
     method: POST
-    url: '{django_live_url}/api/storages/azure/{storage_pk}/sync'
+    url: '{django_live_url}/api/storages/export/azure/{storage_pk}/sync'
   response:
     status_code: 400
 
