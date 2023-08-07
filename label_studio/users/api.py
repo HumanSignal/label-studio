@@ -1,9 +1,9 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
-import drf_yasg.openapi as openapi
+import drf_yasg.openapi as openapi  # type: ignore[import, import]
 
-from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.utils import swagger_auto_schema  # type: ignore[import]
 from django.utils.decorators import method_decorator
 
 from rest_framework.views import APIView
@@ -90,7 +90,7 @@ logger = logging.getLogger(__name__)
                 description='User ID'),
         ],
     ))
-class UserAPI(viewsets.ModelViewSet):
+class UserAPI(viewsets.ModelViewSet):  # type: ignore[type-arg]
     serializer_class = UserSerializer
     permission_required = ViewClassPermission(
         GET=all_permissions.organizations_change,
@@ -101,14 +101,14 @@ class UserAPI(viewsets.ModelViewSet):
     )
     http_method_names = ['get', 'post', 'head', 'patch', 'delete']
 
-    def get_queryset(self):
-        return User.objects.filter(organizations=self.request.user.active_organization)
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        return User.objects.filter(organizations=self.request.user.active_organization)  # type: ignore[misc, union-attr]
 
     @swagger_auto_schema(auto_schema=None, methods=['delete', 'post'])
     @action(detail=True, methods=['delete', 'post'], permission_required=all_permissions.avatar_any)
-    def avatar(self, request, pk):
+    def avatar(self, request, pk):  # type: ignore[no-untyped-def]
         if request.method == 'POST':
-            avatar = check_avatar(request.FILES)
+            avatar = check_avatar(request.FILES)  # type: ignore[no-untyped-call]
             request.user.avatar = avatar
             request.user.save()
             return Response({'detail': 'avatar saved'}, status=200)
@@ -118,32 +118,32 @@ class UserAPI(viewsets.ModelViewSet):
             request.user.save()
             return Response(status=204)
 
-    def get_serializer_class(self):
+    def get_serializer_class(self):  # type: ignore[no-untyped-def]
         if self.request.method in {'PUT', 'PATCH'}:
             return UserSerializerUpdate
         return super().get_serializer_class()
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super(UserAPI, self).update(request, *args, **kwargs)
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super(UserAPI, self).list(request, *args, **kwargs)
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super(UserAPI, self).create(request, *args, **kwargs)
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer):  # type: ignore[no-untyped-def]
         instance = serializer.save()
-        self.request.user.active_organization.add_user(instance)
+        self.request.user.active_organization.add_user(instance)  # type: ignore[union-attr, union-attr]
 
-    def retrieve(self, request, *args, **kwargs):
+    def retrieve(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super(UserAPI, self).retrieve(request, *args, **kwargs)
 
-    def partial_update(self, request, *args, **kwargs):
+    def partial_update(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         result = super(UserAPI, self).partial_update(request, *args, **kwargs)
 
         # throw MethodNotAllowed if read-only fields are attempted to be updated
-        read_only_fields = self.get_serializer_class().Meta.read_only_fields
+        read_only_fields = self.get_serializer_class().Meta.read_only_fields  # type: ignore[no-untyped-call]
         for field in read_only_fields:
             if field in request.data:
                 raise MethodNotAllowed(
@@ -159,7 +159,7 @@ class UserAPI(viewsets.ModelViewSet):
             }
         return result
 
-    def destroy(self, request, *args, **kwargs):
+    def destroy(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super(UserAPI, self).destroy(request, *args, **kwargs)
 
 
@@ -186,7 +186,7 @@ class UserResetTokenAPI(APIView):
     queryset = User.objects.all()
     permission_classes = (IsAuthenticated,)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         user = request.user
         token = user.reset_token()
         logger.debug(f'New token for user {user.pk} is {token.key}')
@@ -213,7 +213,7 @@ class UserGetTokenAPI(APIView):
     parser_classes = (JSONParser,)
     permission_classes = (IsAuthenticated,)
     
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         user = request.user
         token = Token.objects.get(user=user)
         return Response({'token': str(token)}, status=200)
@@ -224,14 +224,14 @@ class UserGetTokenAPI(APIView):
         operation_summary='Retrieve my user',
         operation_description='Retrieve details of the account that you are using to access the API.'
     ))
-class UserWhoAmIAPI(generics.RetrieveAPIView):
+class UserWhoAmIAPI(generics.RetrieveAPIView):  # type: ignore[type-arg]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = User.objects.all()
     permission_classes = (IsAuthenticated, )
     serializer_class = UserSerializer
 
-    def get_object(self):
+    def get_object(self):  # type: ignore[no-untyped-def]
         return self.request.user
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super(UserWhoAmIAPI, self).get(request, *args, **kwargs)

@@ -1,8 +1,8 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from django.utils.decorators import method_decorator
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi as openapi
+from drf_yasg.utils import swagger_auto_schema  # type: ignore[import]
+from drf_yasg import openapi as openapi  # type: ignore[import]
 from io_storages.redis.models import RedisImportStorage, RedisExportStorage
 from io_storages.redis.serializers import RedisImportStorageSerializer, RedisExportStorageSerializer
 from io_storages.api import (
@@ -86,7 +86,7 @@ class RedisImportStorageDetailAPI(ImportStorageDetailAPI):
     ),
 )
 class RedisImportStorageSyncAPI(ExportStorageSyncAPI):
-    serializer_class = RedisImportStorageSerializer
+    serializer_class = RedisImportStorageSerializer  # type: ignore[assignment]
 
 
 @method_decorator(

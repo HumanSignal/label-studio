@@ -2,9 +2,9 @@
 """
 import logging
 import base64
-import boto3
+import boto3  # type: ignore[import]
 
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError  # type: ignore[import]
 from urllib.parse import urlparse
 from core.utils.params import get_env
 
@@ -12,16 +12,16 @@ from core.utils.params import get_env
 logger = logging.getLogger(__name__)
 
 
-def get_client_and_resource(
+def get_client_and_resource(  # type: ignore[no-untyped-def]
     aws_access_key_id=None,
     aws_secret_access_key=None,
     aws_session_token=None,
     region_name=None,
     s3_endpoint=None
 ):
-    aws_access_key_id = aws_access_key_id or get_env('AWS_ACCESS_KEY_ID')
-    aws_secret_access_key = aws_secret_access_key or get_env('AWS_SECRET_ACCESS_KEY')
-    aws_session_token = aws_session_token or get_env('AWS_SESSION_TOKEN')
+    aws_access_key_id = aws_access_key_id or get_env('AWS_ACCESS_KEY_ID')  # type: ignore[no-untyped-call]
+    aws_secret_access_key = aws_secret_access_key or get_env('AWS_SECRET_ACCESS_KEY')  # type: ignore[no-untyped-call]
+    aws_session_token = aws_session_token or get_env('AWS_SESSION_TOKEN')  # type: ignore[no-untyped-call]
     logger.debug(f'Create boto3 session with '
                  f'access key id={aws_access_key_id}, '
                  f'secret key={aws_secret_access_key[:4] + "..." if aws_secret_access_key else None}, '
@@ -32,9 +32,9 @@ def get_client_and_resource(
         aws_session_token=aws_session_token
     )
     settings = {
-        'region_name': region_name or get_env('S3_region') or 'us-east-1'
+        'region_name': region_name or get_env('S3_region') or 'us-east-1'  # type: ignore[no-untyped-call]
     }
-    s3_endpoint = s3_endpoint or get_env('S3_ENDPOINT')
+    s3_endpoint = s3_endpoint or get_env('S3_ENDPOINT')  # type: ignore[no-untyped-call]
     if s3_endpoint:
         settings['endpoint_url'] = s3_endpoint
     client = session.client('s3', config=boto3.session.Config(signature_version='s3v4'), **settings)
@@ -42,7 +42,7 @@ def get_client_and_resource(
     return client, resource
 
 
-def resolve_s3_url(url, client, presign=True, expires_in=3600):
+def resolve_s3_url(url, client, presign=True, expires_in=3600):  # type: ignore[no-untyped-def]
     r = urlparse(url, allow_fragments=False)
     bucket_name = r.netloc
     key = r.path.lstrip('/')
@@ -72,7 +72,7 @@ def resolve_s3_url(url, client, presign=True, expires_in=3600):
 class AWS(object):
 
     @classmethod
-    def get_blob_metadata(cls,
+    def get_blob_metadata(cls,  # type: ignore[no-untyped-def, no-untyped-def]
                           url: str,
                           bucket_name: str,
                           client=None,
@@ -91,7 +91,7 @@ class AWS(object):
         :return: Object metadata dict("name": "value")
         """
         if client is None:
-            client, _ = get_client_and_resource(aws_access_key_id=aws_access_key_id,
+            client, _ = get_client_and_resource(aws_access_key_id=aws_access_key_id,  # type: ignore[no-untyped-call]
                                                 aws_secret_access_key=aws_secret_access_key,
                                                 aws_session_token=aws_session_token,
                                                 region_name=region_name,

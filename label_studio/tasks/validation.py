@@ -44,20 +44,20 @@ logger = logging.getLogger(__name__)
 class TaskValidator:
     """ Task Validator with project scheme configs validation. It is equal to TaskSerializer from django backend.
     """
-    def __init__(self, project, instance=None):
+    def __init__(self, project, instance=None):  # type: ignore[no-untyped-def]
         self.project = project
         self.instance = instance
         self.annotation_count = 0
         self.prediction_count = 0
 
     @staticmethod
-    def check_data(project, data):
+    def check_data(project, data):  # type: ignore[no-untyped-def]
         """ Validate data from task['data']
         """
         if data is None:
             raise ValidationError('Task is empty (None)')
 
-        replace_task_data_undefined_with_config_field(data, project)
+        replace_task_data_undefined_with_config_field(data, project)  # type: ignore[no-untyped-call]
 
         # iterate over data types from project
         for data_key, data_type in project.data_types.items():
@@ -80,7 +80,7 @@ class TaskValidator:
             if is_array:
                 expected_types = (list, )
             else:
-                expected_types = _DATA_TYPES.get(data_type, (str,))
+                expected_types = _DATA_TYPES.get(data_type, (str,))  # type: ignore[assignment]
 
             if not isinstance(data_item, tuple(expected_types)):
                 raise ValidationError('data[\'{data_key}\']={data_value} is of type \'{type}\', '
@@ -92,7 +92,7 @@ class TaskValidator:
         return data
 
     @staticmethod
-    def check_data_and_root(project, data, dict_is_root=False):
+    def check_data_and_root(project, data, dict_is_root=False):  # type: ignore[no-untyped-def]
         """ Check data consistent and data is dict with task or dict['task'] is task
 
         :param project:
@@ -101,15 +101,15 @@ class TaskValidator:
         :return:
         """
         try:
-            TaskValidator.check_data(project, data)
+            TaskValidator.check_data(project, data)  # type: ignore[no-untyped-call]
         except ValidationError as e:
             if dict_is_root:
-                raise ValidationError(e.detail[0] + ' [assume: item as is = task root with values] ')
+                raise ValidationError(e.detail[0] + ' [assume: item as is = task root with values] ')  # type: ignore[index, operator, operator]
             else:
-                raise ValidationError(e.detail[0] + ' [assume: item["data"] = task root with values]')
+                raise ValidationError(e.detail[0] + ' [assume: item["data"] = task root with values]')  # type: ignore[index, operator, operator]
 
     @staticmethod
-    def check_allowed(task):
+    def check_allowed(task):  # type: ignore[no-untyped-def]
         # task is required
         if 'data' not in task:
             return False
@@ -118,7 +118,7 @@ class TaskValidator:
         return True
 
     @staticmethod
-    def raise_if_wrong_class(task, key, class_def):
+    def raise_if_wrong_class(task, key, class_def):  # type: ignore[no-untyped-def]
         if key in task and not isinstance(task[key], class_def):
             if isinstance(class_def, tuple):
                 class_def = ' or '.join([c.__name__ for c in class_def])
@@ -126,12 +126,12 @@ class TaskValidator:
                 class_def = class_def.__name__
             raise ValidationError('Task[{key}] must be {class_def}'.format(key=key, class_def=class_def))
 
-    def validate(self, task):
+    def validate(self, task):  # type: ignore[no-untyped-def]
         """ Validate whole task with task['data'] and task['annotations']. task['predictions']
         """
         # task is class
         if hasattr(task, 'data'):
-            self.check_data_and_root(self.project, task.data)
+            self.check_data_and_root(self.project, task.data)  # type: ignore[no-untyped-call]
             return task
 
         # self.instance is loaded by get_object of view
@@ -145,7 +145,7 @@ class TaskValidator:
                     raise ValidationError("Can't parse task data: " + str(e))
             else:
                 raise ValidationError('Field "data" must be string or dict, but not "' + type(self.instance.data) + '"')
-            self.check_data_and_root(self.instance.project, data)
+            self.check_data_and_root(self.instance.project, data)  # type: ignore[no-untyped-call]
             return task
 
         # check task is dict
@@ -153,14 +153,14 @@ class TaskValidator:
             raise ValidationError('Task root must be dict with "data", "meta", "annotations", "predictions" fields')
 
         # task[data] | task[annotations] | task[predictions] | task[meta]
-        if self.check_allowed(task):
+        if self.check_allowed(task):  # type: ignore[no-untyped-call]
             # task[data]
-            self.raise_if_wrong_class(task, 'data', (dict, list))
-            self.check_data_and_root(self.project, task['data'])
+            self.raise_if_wrong_class(task, 'data', (dict, list))  # type: ignore[no-untyped-call]
+            self.check_data_and_root(self.project, task['data'])  # type: ignore[no-untyped-call]
 
             # task[annotations]: we can't use AnnotationSerializer for validation
             # because it's much different with validation we need here
-            self.raise_if_wrong_class(task, 'annotations', list)
+            self.raise_if_wrong_class(task, 'annotations', list)  # type: ignore[no-untyped-call]
             for annotation in task.get('annotations', []):
                 if not isinstance(annotation, dict):
                     logger.warning('Annotation must be dict, but "%s" found', str(type(annotation)))
@@ -175,7 +175,7 @@ class TaskValidator:
                     raise ValidationError('"result" field in annotation must be list')
 
             # task[predictions]
-            self.raise_if_wrong_class(task, 'predictions', list)
+            self.raise_if_wrong_class(task, 'predictions', list)  # type: ignore[no-untyped-call]
             for prediction in task.get('predictions', []):
                 if not isinstance(prediction, dict):
                     logger.warning('Prediction must be dict, but "%s" found', str(type(prediction)))
@@ -186,17 +186,17 @@ class TaskValidator:
                     raise ValidationError('Prediction must have "result" fields')
 
             # task[meta]
-            self.raise_if_wrong_class(task, 'meta', (dict, list))
+            self.raise_if_wrong_class(task, 'meta', (dict, list))  # type: ignore[no-untyped-call]
 
         # task is data as is, validate task as data and move it to task['data']
         else:
-            self.check_data_and_root(self.project, task, dict_is_root=True)
+            self.check_data_and_root(self.project, task, dict_is_root=True)  # type: ignore[no-untyped-call]
             task = {'data': task}
 
         return task
 
     @staticmethod
-    def format_error(i, detail, item):
+    def format_error(i, detail, item):  # type: ignore[no-untyped-def]
         if len(detail) == 1:
             code = (str(detail[0].code + ' ')) if detail[0].code != "invalid" else ''
             return 'Error {code} at item {i}: {detail} :: {item}'\
@@ -207,7 +207,7 @@ class TaskValidator:
             return 'Errors {codes} at item {i}: {errors} :: {item}'\
                 .format(codes=codes, i=i, errors=errors, item=item)
 
-    def to_internal_value(self, data):
+    def to_internal_value(self, data):  # type: ignore[no-untyped-def]
         """ Body of run_validation for all data items
         """
         if data is None:
@@ -223,9 +223,9 @@ class TaskValidator:
         self.annotation_count, self.prediction_count = 0, 0
         for i, item in enumerate(data):
             try:
-                validated = self.validate(item)
+                validated = self.validate(item)  # type: ignore[no-untyped-call]
             except ValidationError as exc:
-                error = self.format_error(i, exc.detail, item)
+                error = self.format_error(i, exc.detail, item)  # type: ignore[no-untyped-call]
                 errors.append(error)
                 # do not print to user too many errors
                 if len(errors) >= 100:
@@ -247,7 +247,7 @@ class TaskValidator:
         return ret
 
 
-def is_url(string):
+def is_url(string):  # type: ignore[no-untyped-def]
     try:
         result = urlparse(string.strip())
         return all([result.scheme, result.netloc])

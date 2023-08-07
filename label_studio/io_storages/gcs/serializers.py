@@ -15,12 +15,12 @@ class GCSImportStorageSerializer(ImportStorageSerializer):
         model = GCSImportStorage
         fields = '__all__'
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # type: ignore[no-untyped-def]
         result = super().to_representation(instance)
         result.pop('google_application_credentials')
         return result
 
-    def validate(self, data):
+    def validate(self, data):  # type: ignore[no-untyped-def]
         data = super().validate(data)
         storage = self.instance
         if storage:
@@ -29,16 +29,16 @@ class GCSImportStorageSerializer(ImportStorageSerializer):
         else:
             storage = self.Meta.model(**data)
         try:
-            storage.validate_connection()
+            storage.validate_connection()  # type: ignore[union-attr]
         except Exception as exc:
-            raise ValidationError(exc)
+            raise ValidationError(exc)  # type: ignore[arg-type]
         return data
 
 
 class GCSExportStorageSerializer(ExportStorageSerializer):
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # type: ignore[no-untyped-def]
         result = super().to_representation(instance)
         result.pop('google_application_credentials')
         return result

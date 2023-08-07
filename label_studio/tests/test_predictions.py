@@ -1,7 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import pytest
-import requests_mock
+import requests_mock  # type: ignore[import]
 import json
 
 from projects.models import Project
@@ -55,16 +55,16 @@ _2_prediction_results_for_textA_textB = [
 ]
 
 
-def run_task_predictions(client, project, mocker):
+def run_task_predictions(client, project, mocker):  # type: ignore[no-untyped-def]
     class TestJob:
-        def __init__(self, job_id):
+        def __init__(self, job_id):  # type: ignore[no-untyped-def]
             self.id = job_id
 
     m = MLBackend.objects.filter(project=project.id).filter(url='http://localhost:8999').first()
-    return client.post(f'/api/ml/{m.id}/predict')
+    return client.post(f'/api/ml/{m.id}/predict')  # type: ignore[union-attr]
 
 
-@pytest.mark.skipif(not redis_healthcheck(), reason='Starting predictions requires Redis server enabled')
+@pytest.mark.skipif(not redis_healthcheck(), reason='Starting predictions requires Redis server enabled')  # type: ignore[no-untyped-call]
 @pytest.mark.parametrize(
     'project_config, tasks, annotations, prediction_results, log_messages, model_version_in_request, use_ground_truth',
     [
@@ -147,7 +147,7 @@ def run_task_predictions(client, project, mocker):
     ],
 )
 @pytest.mark.django_db
-def test_predictions(
+def test_predictions(  # type: ignore[no-untyped-def]
     business_client,
     project_config,
     tasks,
@@ -160,7 +160,7 @@ def test_predictions(
 ):
 
     # create project with predefined task set
-    project = make_project(project_config, business_client.user)
+    project = make_project(project_config, business_client.user)  # type: ignore[no-untyped-call]
 
     for task, annotation in zip(tasks, annotations):
         t = Task.objects.create(data=task, project=project)
@@ -174,7 +174,7 @@ def test_predictions(
             'http://localhost:8999/predict',
             text=json.dumps({'results': prediction_results[:1], 'model_version': model_version_in_request}),
         )
-        r = run_task_predictions(business_client, project, mocker)
+        r = run_task_predictions(business_client, project, mocker)  # type: ignore[no-untyped-call]
         assert r.status_code == 200
         assert m.called
 
@@ -191,7 +191,7 @@ def test_predictions(
         assert ml_backend.model_version == actual_prediction.model_version
 
 
-@pytest.mark.skipif(not redis_healthcheck(), reason='Starting predictions requires Redis server enabled')
+@pytest.mark.skipif(not redis_healthcheck(), reason='Starting predictions requires Redis server enabled')  # type: ignore[no-untyped-call]
 @pytest.mark.parametrize(
     'test_name, project_config, setup_returns_model_version, tasks, annotations, '
     'input_predictions, prediction_call_count, num_project_stats, num_ground_truth_in_stats, '
@@ -630,7 +630,7 @@ def test_predictions(
     ],
 )
 @pytest.mark.django_db
-def test_predictions_with_partially_predicted_tasks(
+def test_predictions_with_partially_predicted_tasks(  # type: ignore[no-untyped-def]
     business_client,
     test_name,
     setup_returns_model_version,
@@ -644,7 +644,7 @@ def test_predictions_with_partially_predicted_tasks(
     num_ground_truth_fit_predictions,
     mocker,
 ):
-    project = make_project(project_config, business_client.user)
+    project = make_project(project_config, business_client.user)  # type: ignore[no-untyped-call]
     ml_backend = MLBackend.objects.get(url='http://localhost:8999')
     ml_backend.model_version = project_config['model_version']
     ml_backend.save()
@@ -683,7 +683,7 @@ def test_predictions_with_partially_predicted_tasks(
             ),
         )
 
-        r = run_task_predictions(business_client, project, mocker)
+        r = run_task_predictions(business_client, project, mocker)  # type: ignore[no-untyped-call]
         assert r.status_code == 200
         assert len(list(filter(lambda h: h.url.endswith('predict'), m.request_history))) == prediction_call_count
 
@@ -694,7 +694,7 @@ def test_predictions_with_partially_predicted_tasks(
 
 
 @pytest.mark.django_db
-def test_interactive_annotating(business_client, configured_project):
+def test_interactive_annotating(business_client, configured_project):  # type: ignore[no-untyped-def]
     # create project with predefined task set
     ml_backend = configured_project.ml_backends.first()
     ml_backend.is_interactive = True
@@ -725,7 +725,7 @@ def test_interactive_annotating(business_client, configured_project):
 
 
 @pytest.mark.django_db
-def test_interactive_annotating_failing(business_client, configured_project):
+def test_interactive_annotating_failing(business_client, configured_project):  # type: ignore[no-untyped-def]
     # create project with predefined task set
     ml_backend = configured_project.ml_backends.first()
     ml_backend.is_interactive = True
@@ -772,7 +772,7 @@ def test_interactive_annotating_failing(business_client, configured_project):
 
 
 @pytest.mark.django_db
-def test_interactive_annotating_with_drafts(business_client, configured_project):
+def test_interactive_annotating_with_drafts(business_client, configured_project):  # type: ignore[no-untyped-def]
     """
     Test interactive annotating with drafts
     :param business_client:

@@ -21,7 +21,7 @@ from core.utils.params import get_env
 
 
 @contextlib.contextmanager
-def suppress_autotime(model, fields):
+def suppress_autotime(model, fields):  # type: ignore[no-untyped-def]
     """ allow to keep original created_at value for auto_now_add=True field
     """
     _original_values = {}
@@ -39,7 +39,7 @@ def suppress_autotime(model, fields):
                 field.auto_now_add = _original_values[field.name]['auto_now_add']
 
 
-def _migrate_tasks(project_path, project):
+def _migrate_tasks(project_path, project):  # type: ignore[no-untyped-def]
     """ Migrate tasks from json file to database objects"""
     tasks_path = project_path / 'tasks.json'
     with io.open(os.path.abspath(tasks_path), encoding='utf-8') as t:
@@ -64,7 +64,7 @@ def _migrate_tasks(project_path, project):
                             task_annotation.created_at = datetime.datetime.fromtimestamp(
                                 annotation['created_at'], tz=datetime.datetime.now().astimezone().tzinfo
                             )
-                            task_annotation.save()
+                            task_annotation.save()  # type: ignore[no-untyped-call]
 
             # migrate predictions
             predictions_data = task_data.get('predictions', [])
@@ -74,10 +74,10 @@ def _migrate_tasks(project_path, project):
                     task_prediction.created_at = datetime.datetime.fromtimestamp(
                         prediction['created_at'], tz=datetime.datetime.now().astimezone().tzinfo
                     )
-                    task_prediction.save()
+                    task_prediction.save()  # type: ignore[no-untyped-call]
 
 
-def _migrate_tabs(project_path, project):
+def _migrate_tabs(project_path, project):  # type: ignore[no-untyped-def]
     """Migrate tabs from tabs.json to Views table"""
     tabs_path = project_path / 'tabs.json'
     if tabs_path.exists():
@@ -105,7 +105,7 @@ def _migrate_tabs(project_path, project):
                                 }
                             )
                             filter_group.filters.add(view_filter)
-                hidden_columns = {'explore': [], 'labeling': []}
+                hidden_columns = {'explore': [], 'labeling': []}  # type: ignore[var-annotated]
                 hidden_columns_data = tab.pop('hiddenColumns', None)
 
                 # apply naming change to tabs internal data
@@ -122,7 +122,7 @@ def _migrate_tabs(project_path, project):
                 view.save()
 
 
-def _migrate_storages(project, config):
+def _migrate_storages(project, config):  # type: ignore[no-untyped-def]
     """Migrate source and target storages from config.json to database"""
 
     # source storages migration
@@ -209,19 +209,19 @@ def _migrate_storages(project, config):
             )
 
 
-def _migrate_ml_backends(project, config):
+def _migrate_ml_backends(project, config):  # type: ignore[no-untyped-def]
     """Migrate ml backend settings from config.json to database"""
     ml_backends = config.get('ml_backends', [])
     for ml_backend in ml_backends:
         MLBackend.objects.create(project=project, url=ml_backend.get('url'), title=ml_backend.get('name'))
 
 
-def _migrate_uploaded_files(project, project_path):
+def _migrate_uploaded_files(project, project_path):  # type: ignore[no-untyped-def]
     """Migrate files uploaded by user"""
     source_upload_path = project_path / 'upload'
     if not source_upload_path.exists():
         return
-    target_upload_path = pathlib.Path(get_env('LABEL_STUDIO_BASE_DATA_DIR', get_data_dir())) / 'upload'
+    target_upload_path = pathlib.Path(get_env('LABEL_STUDIO_BASE_DATA_DIR', get_data_dir())) / 'upload'  # type: ignore[no-untyped-call, no-untyped-call]
     if not target_upload_path.exists():
         os.makedirs(str(target_upload_path), exist_ok=True)
 
@@ -232,12 +232,12 @@ def _migrate_uploaded_files(project, project_path):
             FileUpload.objects.create(user=project.created_by, project=project, file=File(f, name=file_name))
 
 
-def migrate_existing_project(project_path, project, config):
+def migrate_existing_project(project_path, project, config):  # type: ignore[no-untyped-def]
     """Migration projects from previous version of Label Studio"""
 
-    _migrate_tasks(project_path, project)
-    _migrate_tabs(project_path, project)
-    _migrate_storages(project, config)
-    _migrate_ml_backends(project, config)
-    _migrate_uploaded_files(project, project_path)
+    _migrate_tasks(project_path, project)  # type: ignore[no-untyped-call]
+    _migrate_tabs(project_path, project)  # type: ignore[no-untyped-call]
+    _migrate_storages(project, config)  # type: ignore[no-untyped-call]
+    _migrate_ml_backends(project, config)  # type: ignore[no-untyped-call]
+    _migrate_uploaded_files(project, project_path)  # type: ignore[no-untyped-call]
 

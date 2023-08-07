@@ -20,17 +20,17 @@ all_permissions = AllPermissions()
 logger = logging.getLogger(__name__)
 
 
-def retrieve_tasks_predictions(project, queryset, **kwargs):
+def retrieve_tasks_predictions(project, queryset, **kwargs):  # type: ignore[no-untyped-def]
     """ Retrieve predictions by tasks ids
 
     :param project: project instance
     :param queryset: filtered tasks db queryset
     """
-    evaluate_predictions(queryset)
+    evaluate_predictions(queryset)  # type: ignore[no-untyped-call]
     return {'processed_items': queryset.count(), 'detail': 'Retrieved ' + str(queryset.count()) + ' predictions'}
 
 
-def delete_tasks(project, queryset, **kwargs):
+def delete_tasks(project, queryset, **kwargs):  # type: ignore[no-untyped-def]
     """ Delete tasks by ids
 
     :param project: project instance
@@ -45,13 +45,13 @@ def delete_tasks(project, queryset, **kwargs):
     queryset.update(project=None)
     # delete all project tasks
     if count == project_count:
-        start_job_async_or_sync(Task.delete_tasks_without_signals_from_task_ids, tasks_ids_list)
+        start_job_async_or_sync(Task.delete_tasks_without_signals_from_task_ids, tasks_ids_list)  # type: ignore[no-untyped-call]
         project.summary.reset()
 
     # delete only specific tasks
     else:
         # update project summary and delete tasks
-        start_job_async_or_sync(async_project_summary_recalculation, tasks_ids_list, project.id)
+        start_job_async_or_sync(async_project_summary_recalculation, tasks_ids_list, project.id)  # type: ignore[no-untyped-call]
 
     project.update_tasks_states(
         maximum_annotations_changed=False,
@@ -59,7 +59,7 @@ def delete_tasks(project, queryset, **kwargs):
         tasks_number_changed=True
     )
     # emit webhooks for project
-    emit_webhooks_for_instance(project.organization, project, WebhookAction.TASKS_DELETED, tasks_ids)
+    emit_webhooks_for_instance(project.organization, project, WebhookAction.TASKS_DELETED, tasks_ids)  # type: ignore[no-untyped-call]
 
     # remove all tabs if there are no tasks in project
     reload = False
@@ -71,7 +71,7 @@ def delete_tasks(project, queryset, **kwargs):
             'detail': 'Deleted ' + str(count) + ' tasks'}
 
 
-def delete_tasks_annotations(project, queryset, **kwargs):
+def delete_tasks_annotations(project, queryset, **kwargs):  # type: ignore[no-untyped-def]
     """ Delete all annotations by tasks ids
 
     :param project: project instance
@@ -87,7 +87,7 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     # remove deleted annotations from project.summary
     project.summary.remove_created_annotations_and_labels(annotations)
     annotations.delete()
-    emit_webhooks_for_instance(project.organization, project, WebhookAction.ANNOTATIONS_DELETED, annotations_ids)
+    emit_webhooks_for_instance(project.organization, project, WebhookAction.ANNOTATIONS_DELETED, annotations_ids)  # type: ignore[no-untyped-call]
     request = kwargs['request']
 
     tasks = Task.objects.filter(id__in=real_task_ids)
@@ -96,7 +96,7 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     project.update_tasks_counters_and_is_labeled(tasks_queryset=real_task_ids)
 
     # LSE postprocess
-    postprocess = load_func(settings.DELETE_TASKS_ANNOTATIONS_POSTPROCESS)
+    postprocess = load_func(settings.DELETE_TASKS_ANNOTATIONS_POSTPROCESS)  # type: ignore[no-untyped-call]
     if postprocess is not None:
         tasks = Task.objects.filter(id__in=task_ids)
         postprocess(project, tasks, **kwargs)
@@ -105,7 +105,7 @@ def delete_tasks_annotations(project, queryset, **kwargs):
             'detail': 'Deleted ' + str(count) + ' annotations'}
 
 
-def delete_tasks_predictions(project, queryset, **kwargs):
+def delete_tasks_predictions(project, queryset, **kwargs):  # type: ignore[no-untyped-def]
     """ Delete all predictions by tasks ids
 
     :param project: project instance
@@ -120,12 +120,12 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
 
 
-def async_project_summary_recalculation(tasks_ids_list, project_id):
+def async_project_summary_recalculation(tasks_ids_list, project_id):  # type: ignore[no-untyped-def]
     queryset = Task.objects.filter(id__in=tasks_ids_list)
     project = Project.objects.get(id=project_id)
     project.summary.remove_created_annotations_and_labels(Annotation.objects.filter(task__in=queryset))
     project.summary.remove_data_columns(queryset)
-    Task.delete_tasks_without_signals(queryset)
+    Task.delete_tasks_without_signals(queryset)  # type: ignore[no-untyped-call]
 
 
 actions = [

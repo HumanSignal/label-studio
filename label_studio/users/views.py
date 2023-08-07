@@ -4,11 +4,11 @@ import logging
 from time import time
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect, reverse  # type: ignore[attr-defined]
 from django.contrib import auth
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.utils.http import is_safe_url
+from django.utils.http import is_safe_url  # type: ignore[attr-defined]
 
 from rest_framework.authtoken.models import Token
 
@@ -25,7 +25,7 @@ logger = logging.getLogger()
 
 
 @login_required
-def logout(request):
+def logout(request):  # type: ignore[no-untyped-def]
     auth.logout(request)
     if settings.HOSTNAME:
         redirect_url = settings.HOSTNAME
@@ -36,7 +36,7 @@ def logout(request):
 
 
 @enforce_csrf_checks
-def user_signup(request):
+def user_signup(request):  # type: ignore[no-untyped-def]
     """ Sign up page
     """
     user = request.user
@@ -67,7 +67,7 @@ def user_signup(request):
         organization_form = OrganizationSignupForm(request.POST)
 
         if user_form.is_valid():
-            redirect_response = proceed_registration(request, user_form, organization_form, next_page)
+            redirect_response = proceed_registration(request, user_form, organization_form, next_page)  # type: ignore[no-untyped-call]
             if redirect_response:
                 return redirect_response
 
@@ -80,7 +80,7 @@ def user_signup(request):
 
 
 @enforce_csrf_checks
-def user_login(request):
+def user_login(request):  # type: ignore[no-untyped-def]
     """ Login page
     """
     user = request.user
@@ -90,7 +90,7 @@ def user_login(request):
     if not next_page or not is_safe_url(url=next_page, allowed_hosts=request.get_host()):
         next_page = reverse('projects:project-index')
 
-    login_form = load_func(settings.USER_LOGIN_FORM)
+    login_form = load_func(settings.USER_LOGIN_FORM)  # type: ignore[no-untyped-call]
     form = login_form()
 
     if user.is_authenticated:
@@ -100,14 +100,14 @@ def user_login(request):
         form = login_form(request.POST)
         if form.is_valid():
             user = form.cleaned_data['user']
-            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')  # type: ignore[no-untyped-call]
             if form.cleaned_data['persist_session'] is not True:
                 # Set the session to expire when the browser is closed
                 request.session['keep_me_logged_in'] = False
                 request.session.set_expiry(0)
 
             # user is organization member
-            org_pk = Organization.find_by_user(user).pk
+            org_pk = Organization.find_by_user(user).pk  # type: ignore[no-untyped-call]
             user.active_organization_id = org_pk
             user.save(update_fields=['active_organization'])
             return redirect(next_page)
@@ -119,7 +119,7 @@ def user_login(request):
 
 
 @login_required
-def user_account(request):
+def user_account(request):  # type: ignore[no-untyped-def]
     user = request.user
 
     if user.active_organization is None and 'organization_pk' not in request.session:

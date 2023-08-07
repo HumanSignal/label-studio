@@ -20,9 +20,9 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
-def _load_log_payloads():
+def _load_log_payloads():  # type: ignore[no-untyped-def]
     try:
-        all_urls_file = find_file('all_urls.json')
+        all_urls_file = find_file('all_urls.json')  # type: ignore[no-untyped-call]
         with open(all_urls_file) as f:
             log_payloads = json.load(f)
     except Exception as exc:
@@ -39,22 +39,22 @@ def _load_log_payloads():
 
 class ContextLog(object):
 
-    _log_payloads = _load_log_payloads()
+    _log_payloads = _load_log_payloads()  # type: ignore[no-untyped-call]
 
-    def __init__(self):
+    def __init__(self):  # type: ignore[no-untyped-def]
         self.collect_analytics = settings.COLLECT_ANALYTICS
-        self.version = get_app_version()
-        self.server_id = self._get_server_id()
+        self.version = get_app_version()  # type: ignore[no-untyped-call]
+        self.server_id = self._get_server_id()  # type: ignore[no-untyped-call]
 
-    def _get_label_studio_env(self):
+    def _get_label_studio_env(self):  # type: ignore[no-untyped-def]
         env = {}
         for env_key, env_value in os.environ.items():
             if env_key.startswith('LABEL_STUDIO_'):
                 env[env_key] = env_value
         return env
 
-    def _get_server_id(self):
-        user_id_file = os.path.join(get_config_dir(), 'user_id')
+    def _get_server_id(self):  # type: ignore[no-untyped-def]
+        user_id_file = os.path.join(get_config_dir(), 'user_id')  # type: ignore[no-untyped-call]
         if not os.path.exists(user_id_file):
             user_id = str(uuid4())
             try:
@@ -67,40 +67,40 @@ class ContextLog(object):
                 user_id = f.read()
         return user_id
 
-    def _is_docker(self):
+    def _is_docker(self):  # type: ignore[no-untyped-def]
         path = '/proc/self/cgroup'
         return (
             os.path.exists('/.dockerenv') or
             os.path.isfile(path) and any('docker' in line for line in open(path, encoding='utf-8'))
         )
 
-    def _get_timestamp_now(self):
+    def _get_timestamp_now(self):  # type: ignore[no-untyped-def]
         return calendar.timegm(datetime.now().utctimetuple())
 
-    def _get_response_content(self, response):
+    def _get_response_content(self, response):  # type: ignore[no-untyped-def]
         try:
             return json.loads(response.content)
         except:
             return
 
-    def _assert_field_in_test(self, field, payload, view_name):
-        if get_bool_env('TEST_ENVIRONMENT', False):
+    def _assert_field_in_test(self, field, payload, view_name):  # type: ignore[no-untyped-def]
+        if get_bool_env('TEST_ENVIRONMENT', False):  # type: ignore[no-untyped-call]
             assert field in payload, f'The field "{field}" should be presented for "{view_name}"'
 
-    def _assert_type_in_test(self, type, payload, view_name):
-        if get_bool_env('TEST_ENVIRONMENT', False):
+    def _assert_type_in_test(self, type, payload, view_name):  # type: ignore[no-untyped-def]
+        if get_bool_env('TEST_ENVIRONMENT', False):  # type: ignore[no-untyped-call]
             assert isinstance(payload, type), f'The type of payload is not "{type}" for "{view_name}"'
 
-    def _get_fields(self, view_name, payload, fields):
+    def _get_fields(self, view_name, payload, fields):  # type: ignore[no-untyped-def]
         out = {}
         for field in fields:
-            self._assert_field_in_test(field, payload, view_name)
+            self._assert_field_in_test(field, payload, view_name)  # type: ignore[no-untyped-call]
             out[field] = payload.get(field)
         if not out:
             return None
         return out
 
-    def _secure_data(self, payload, request):
+    def _secure_data(self, payload, request):  # type: ignore[no-untyped-def]
         view_name = payload['view_name']
 
         if view_name in ('user-signup', 'user-login') and payload['method'] == 'POST':
@@ -113,38 +113,38 @@ class ContextLog(object):
 
         # ======== CUSTOM ======
         if view_name == 'data_manager:dm-actions' and payload['values'].get('id') == 'next_task':
-            self._assert_type_in_test(dict, payload['response'], view_name)
+            self._assert_type_in_test(dict, payload['response'], view_name)  # type: ignore[no-untyped-call]
             new_response = {}
-            self._assert_field_in_test('drafts', payload['response'], view_name)
+            self._assert_field_in_test('drafts', payload['response'], view_name)  # type: ignore[no-untyped-call]
             new_response['drafts'] = len(payload['response']['drafts']) if isinstance(payload['response']['drafts'], list) else payload['response']['drafts']
             for key in ["id", "inner_id", "cancelled_annotations", "total_annotations", "total_predictions", "updated_by", "created_at", "updated_at", "overlap", "comment_count", "unresolved_comment_count", "last_comment_updated_at", "project", "comment_authors", "queue"]:
-                self._assert_field_in_test(key, payload['response'], view_name)
+                self._assert_field_in_test(key, payload['response'], view_name)  # type: ignore[no-untyped-call]
                 new_response[key] = payload['response'][key]
             payload['response'] = new_response
             return
 
         if view_name == 'user-list' and payload['method'] == 'GET':
-            self._assert_type_in_test(list, payload['response'], view_name)
+            self._assert_type_in_test(list, payload['response'], view_name)  # type: ignore[no-untyped-call]
             payload['response'] = {'count': len(payload['response'])}
             return
 
         if view_name == 'projects:api-templates:template-list' and payload['method'] == 'GET':
-            self._assert_type_in_test(list, payload['response'].get('templates'), view_name)
+            self._assert_type_in_test(list, payload['response'].get('templates'), view_name)  # type: ignore[no-untyped-call]
             payload['response']['templates'] = [t['title'] for t in payload['response']['templates']]
             return
 
         if view_name == 'data_manager:dm-actions' and payload['method'] == 'GET':
-            self._assert_type_in_test(list, payload['response'], view_name)
+            self._assert_type_in_test(list, payload['response'], view_name)  # type: ignore[no-untyped-call]
             payload['response'] = [item.get('id') for item in payload['response']]
             return
 
         if view_name == 'data_manager:dm-columns' and payload['method'] == 'GET':
-            self._assert_field_in_test('columns', payload['response'], view_name)
+            self._assert_field_in_test('columns', payload['response'], view_name)  # type: ignore[no-untyped-call]
             payload['response']['columns'] = [item.get('id') for item in payload['response']['columns']]
             return
 
         if view_name == 'data_export:api-projects:project-export-formats' and payload['method'] == 'GET':
-            self._assert_type_in_test(list, payload['response'], view_name)
+            self._assert_type_in_test(list, payload['response'], view_name)  # type: ignore[no-untyped-call]
             payload['response'] = [item.get('title') for item in payload['response']]
             return
 
@@ -152,11 +152,11 @@ class ContextLog(object):
             (view_name == 'tasks:api-annotations:annotation-detail' and payload['method'] == 'PATCH') or \
             (view_name == 'tasks:api:task-annotations-drafts' and payload['method'] == 'POST') or \
             (view_name == 'tasks:api-drafts:draft-detail' and payload['method'] == 'PATCH'):
-            self._assert_field_in_test('lead_time', payload['json'], view_name)
-            self._assert_field_in_test('result', payload['json'], view_name)
-            self._assert_type_in_test(list, payload['json']['result'], view_name)
+            self._assert_field_in_test('lead_time', payload['json'], view_name)  # type: ignore[no-untyped-call]
+            self._assert_field_in_test('result', payload['json'], view_name)  # type: ignore[no-untyped-call]
+            self._assert_type_in_test(list, payload['json']['result'], view_name)  # type: ignore[no-untyped-call]
             payload['json']['result'] = [
-                self._get_fields(view_name, item, ('from_name', 'to_name', 'type', 'origin'))
+                self._get_fields(view_name, item, ('from_name', 'to_name', 'type', 'origin'))  # type: ignore[no-untyped-call]
                 for item in payload['json']['result']
             ]
 
@@ -173,9 +173,9 @@ class ContextLog(object):
                 continue
             log_fields = log_payloads[payload_key].get(payload['method'])
             if log_fields is not None:
-                payload[payload_key] = self._get_fields(view_name, payload[payload_key], log_fields)
+                payload[payload_key] = self._get_fields(view_name, payload[payload_key], log_fields)  # type: ignore[no-untyped-call]
 
-    def _exclude_endpoint(self, request):
+    def _exclude_endpoint(self, request):  # type: ignore[no-untyped-def]
         if request.resolver_match and request.resolver_match.view_name:
             view_name = request.resolver_match.view_name
             if view_name not in self._log_payloads:
@@ -185,22 +185,22 @@ class ContextLog(object):
         if request.GET.get('interaction', None) == 'timer':
             return True
 
-    def dont_send(self, request):
-        return not self.collect_analytics or self._exclude_endpoint(request)
+    def dont_send(self, request):  # type: ignore[no-untyped-def]
+        return not self.collect_analytics or self._exclude_endpoint(request)  # type: ignore[no-untyped-call]
 
-    def send(self, request=None, response=None, body=None):
-        if self.dont_send(request):
+    def send(self, request=None, response=None, body=None):  # type: ignore[no-untyped-def]
+        if self.dont_send(request):  # type: ignore[no-untyped-call]
             return
         try:
-            payload = self.create_payload(request, response, body)
+            payload = self.create_payload(request, response, body)  # type: ignore[no-untyped-call]
         except Exception as exc:
             logger.debug(exc, exc_info=True)
-            if get_bool_env('TEST_ENVIRONMENT', False):
+            if get_bool_env('TEST_ENVIRONMENT', False):  # type: ignore[no-untyped-call]
                 raise
         else:
-            if get_bool_env('TEST_ENVIRONMENT', False):
+            if get_bool_env('TEST_ENVIRONMENT', False):  # type: ignore[no-untyped-call]
                 pass
-            elif get_bool_env('DEBUG_CONTEXTLOG', False):
+            elif get_bool_env('DEBUG_CONTEXTLOG', False):  # type: ignore[no-untyped-call]
                 logger.debug(f'In DEBUG mode, contextlog is not sent.')
                 logger.debug(json.dumps(payload, indent=2))
             else:
@@ -208,11 +208,11 @@ class ContextLog(object):
                 thread.start()
 
     @staticmethod
-    def browser_exists(request):
+    def browser_exists(request):  # type: ignore[no-untyped-def]
         return hasattr(request, 'user_agent') and request.user_agent and \
                hasattr(request.user_agent, 'browser') and request.user_agent.browser
 
-    def create_payload(self, request, response, body):
+    def create_payload(self, request, response, body):  # type: ignore[no-untyped-def]
         advanced_json = None
         user_id, user_email = None, None
         if hasattr(request, 'user') and hasattr(request.user, 'id'):
@@ -229,12 +229,12 @@ class ContextLog(object):
             'server_id': self.server_id,
             'user_id': user_id,
             'user_email': user_email,
-            'server_time': self._get_timestamp_now(),
+            'server_time': self._get_timestamp_now(),  # type: ignore[no-untyped-call]
             'session_id': request.session.get('uid', None),
-            'client_ip': get_client_ip(request),
-            'is_docker': self._is_docker(),
+            'client_ip': get_client_ip(request),  # type: ignore[no-untyped-call]
+            'is_docker': self._is_docker(),  # type: ignore[no-untyped-call]
             'python': str(sys.version_info[0]) + '.' + str(sys.version_info[1]),
-            'env': self._get_label_studio_env(),
+            'env': self._get_label_studio_env(),  # type: ignore[no-untyped-call]
             'version': self.version,
             'view_name': request.resolver_match.view_name if request.resolver_match else None,
             'namespace': request.resolver_match.namespace if request.resolver_match else None,
@@ -247,9 +247,9 @@ class ContextLog(object):
             'content_type': request.content_type,
             'content_length': int(request.environ.get('CONTENT_LENGTH')) if request.environ.get('CONTENT_LENGTH') else None,
             'status_code': response.status_code,
-            'response': self._get_response_content(response)
+            'response': self._get_response_content(response)  # type: ignore[no-untyped-call]
         }
-        if self.browser_exists(request):
+        if self.browser_exists(request):  # type: ignore[no-untyped-call]
             payload.update({
                 'is_mobile': request.user_agent.is_mobile,
                 'is_tablet': request.user_agent.is_tablet,
@@ -264,14 +264,14 @@ class ContextLog(object):
                 'os_version': request.user_agent.os.version_string,
                 'device': request.user_agent.device.family,
             })
-        self._secure_data(payload, request)
+        self._secure_data(payload, request)  # type: ignore[no-untyped-call]
         for key in ('json', 'response', 'values', 'env'):
             payload[key] = payload[key] or None
         return payload
 
-    def send_job(self, request, response, body):
+    def send_job(self, request, response, body):  # type: ignore[no-untyped-def]
         try:
-            payload = self.create_payload(request, response, body)
+            payload = self.create_payload(request, response, body)  # type: ignore[no-untyped-call]
         except:
             pass
         else:

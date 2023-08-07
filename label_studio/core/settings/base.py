@@ -24,7 +24,7 @@ else:
     from label_studio.core.utils.params import get_bool_env, get_env
 
 formatter = 'standard'
-JSON_LOG = get_bool_env('JSON_LOG', False)
+JSON_LOG = get_bool_env('JSON_LOG', False)  # type: ignore[no-untyped-call]
 if JSON_LOG:
     formatter = 'json'
 
@@ -91,7 +91,7 @@ logger = logging.getLogger(__name__)
 SILENCED_SYSTEM_CHECKS = []
 
 # Hostname is used for proper path generation to the resources, pages, etc
-HOSTNAME = get_env('HOST', '')
+HOSTNAME = get_env('HOST', '')  # type: ignore[no-untyped-call]
 if HOSTNAME:
     if not HOSTNAME.startswith('http://') and not HOSTNAME.startswith('https://'):
         logger.info(
@@ -108,7 +108,7 @@ if HOSTNAME:
             # http[s]://domain.com:8080/script_name => /script_name
             pattern = re.compile(r'^http[s]?:\/\/([^:\/\s]+(:\d*)?)(.*)?')
             match = pattern.match(HOSTNAME)
-            FORCE_SCRIPT_NAME = match.group(3)
+            FORCE_SCRIPT_NAME = match.group(3)  # type: ignore[union-attr]
             if FORCE_SCRIPT_NAME:
                 logger.info("=> Django URL prefix is set to: %s", FORCE_SCRIPT_NAME)
 
@@ -118,14 +118,14 @@ INTERNAL_PORT = '8080'
 SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = get_bool_env('DEBUG', True)
-DEBUG_MODAL_EXCEPTIONS = get_bool_env('DEBUG_MODAL_EXCEPTIONS', True)
+DEBUG = get_bool_env('DEBUG', True)  # type: ignore[no-untyped-call]
+DEBUG_MODAL_EXCEPTIONS = get_bool_env('DEBUG_MODAL_EXCEPTIONS', True)  # type: ignore[no-untyped-call]
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Base path for media root and other uploaded files
-BASE_DATA_DIR = get_env('BASE_DATA_DIR', get_data_dir())
+BASE_DATA_DIR = get_env('BASE_DATA_DIR', get_data_dir())  # type: ignore[no-untyped-call, no-untyped-call]
 os.makedirs(BASE_DATA_DIR, exist_ok=True)
 logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 
@@ -136,23 +136,23 @@ DJANGO_DB_SQLITE = 'sqlite'
 DJANGO_DB_POSTGRESQL = 'postgresql'
 DJANGO_DB = 'default'
 DATABASE_NAME_DEFAULT = os.path.join(BASE_DATA_DIR, 'label_studio.sqlite3')
-DATABASE_NAME = get_env('DATABASE_NAME', DATABASE_NAME_DEFAULT)
+DATABASE_NAME = get_env('DATABASE_NAME', DATABASE_NAME_DEFAULT)  # type: ignore[no-untyped-call]
 DATABASES_ALL = {
     DJANGO_DB_POSTGRESQL: {
         'ENGINE': 'django.db.backends.postgresql',
-        'USER': get_env('POSTGRE_USER', 'postgres'),
-        'PASSWORD': get_env('POSTGRE_PASSWORD', 'postgres'),
-        'NAME': get_env('POSTGRE_NAME', 'postgres'),
-        'HOST': get_env('POSTGRE_HOST', 'localhost'),
-        'PORT': int(get_env('POSTGRE_PORT', '5432')),
+        'USER': get_env('POSTGRE_USER', 'postgres'),  # type: ignore[no-untyped-call]
+        'PASSWORD': get_env('POSTGRE_PASSWORD', 'postgres'),  # type: ignore[no-untyped-call]
+        'NAME': get_env('POSTGRE_NAME', 'postgres'),  # type: ignore[no-untyped-call]
+        'HOST': get_env('POSTGRE_HOST', 'localhost'),  # type: ignore[no-untyped-call]
+        'PORT': int(get_env('POSTGRE_PORT', '5432')),  # type: ignore[no-untyped-call]
     },
     DJANGO_DB_MYSQL: {
         'ENGINE': 'django.db.backends.mysql',
-        'USER': get_env('MYSQL_USER', 'root'),
-        'PASSWORD': get_env('MYSQL_PASSWORD', ''),
-        'NAME': get_env('MYSQL_NAME', 'labelstudio'),
-        'HOST': get_env('MYSQL_HOST', 'localhost'),
-        'PORT': int(get_env('MYSQL_PORT', '3306')),
+        'USER': get_env('MYSQL_USER', 'root'),  # type: ignore[no-untyped-call]
+        'PASSWORD': get_env('MYSQL_PASSWORD', ''),  # type: ignore[no-untyped-call]
+        'NAME': get_env('MYSQL_NAME', 'labelstudio'),  # type: ignore[no-untyped-call]
+        'HOST': get_env('MYSQL_HOST', 'localhost'),  # type: ignore[no-untyped-call]
+        'PORT': int(get_env('MYSQL_PORT', '3306')),  # type: ignore[no-untyped-call]
     },
     DJANGO_DB_SQLITE: {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -163,25 +163,25 @@ DATABASES_ALL = {
     },
 }
 DATABASES_ALL['default'] = DATABASES_ALL[DJANGO_DB_POSTGRESQL]
-DATABASES = {'default': DATABASES_ALL.get(get_env('DJANGO_DB', 'default'))}
+DATABASES = {'default': DATABASES_ALL.get(get_env('DJANGO_DB', 'default'))}  # type: ignore[no-untyped-call]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
-if get_bool_env('GOOGLE_LOGGING_ENABLED', False):
+if get_bool_env('GOOGLE_LOGGING_ENABLED', False):  # type: ignore[no-untyped-call]
     logging.info('Google Cloud Logging handler is enabled.')
     try:
         import google.cloud.logging
-        from google.auth.exceptions import GoogleAuthError
+        from google.auth.exceptions import GoogleAuthError  # type: ignore[import]
 
-        client = google.cloud.logging.Client()
-        client.setup_logging()
+        client = google.cloud.logging.Client()  # type: ignore[no-untyped-call]
+        client.setup_logging()  # type: ignore[no-untyped-call]
 
-        LOGGING['handlers']['google_cloud_logging'] = {
-            'level': get_env('LOG_LEVEL', 'WARNING'),
+        LOGGING['handlers']['google_cloud_logging'] = {  # type: ignore[index]
+            'level': get_env('LOG_LEVEL', 'WARNING'),  # type: ignore[no-untyped-call]
             'class': 'google.cloud.logging.handlers.CloudLoggingHandler',
             'client': client,
         }
-        LOGGING['root']['handlers'].append('google_cloud_logging')
+        LOGGING['root']['handlers'].append('google_cloud_logging')  # type: ignore[index]
     except GoogleAuthError as e:
         logger.exception('Google Cloud Logging handler could not be setup.')
 
@@ -275,7 +275,7 @@ AUTH_USER_MODEL = 'users.User'
 AUTHENTICATION_BACKENDS = ['rules.permissions.ObjectPermissionBackend', 'django.contrib.auth.backends.ModelBackend', ]
 USE_USERNAME_FOR_LOGIN = False
 
-DISABLE_SIGNUP_WITHOUT_LINK = get_bool_env('DISABLE_SIGNUP_WITHOUT_LINK', False)
+DISABLE_SIGNUP_WITHOUT_LINK = get_bool_env('DISABLE_SIGNUP_WITHOUT_LINK', False)  # type: ignore[no-untyped-call]
 
 # Password validation:
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -355,13 +355,13 @@ SWAGGER_SETTINGS = {
 
 }
 
-SENTRY_DSN = get_env('SENTRY_DSN', None)
-SENTRY_RATE = float(get_env('SENTRY_RATE', 0.25))
-SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'stage.opensource')
+SENTRY_DSN = get_env('SENTRY_DSN', None)  # type: ignore[no-untyped-call]
+SENTRY_RATE = float(get_env('SENTRY_RATE', 0.25))  # type: ignore[no-untyped-call]
+SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'stage.opensource')  # type: ignore[no-untyped-call]
 SENTRY_REDIS_ENABLED = False
-FRONTEND_SENTRY_DSN = get_env('FRONTEND_SENTRY_DSN', None)
-FRONTEND_SENTRY_RATE = get_env('FRONTEND_SENTRY_RATE', 0.1)
-FRONTEND_SENTRY_ENVIRONMENT = get_env('FRONTEND_SENTRY_ENVIRONMENT', 'stage.opensource')
+FRONTEND_SENTRY_DSN = get_env('FRONTEND_SENTRY_DSN', None)  # type: ignore[no-untyped-call]
+FRONTEND_SENTRY_RATE = get_env('FRONTEND_SENTRY_RATE', 0.1)  # type: ignore[no-untyped-call]
+FRONTEND_SENTRY_ENVIRONMENT = get_env('FRONTEND_SENTRY_ENVIRONMENT', 'stage.opensource')  # type: ignore[no-untyped-call]
 
 ROOT_URLCONF = 'core.urls'
 WSGI_APPLICATION = 'core.wsgi.application'
@@ -391,21 +391,21 @@ STATICFILES_FINDERS = (
 STATICFILES_STORAGE = 'core.storage.SkipMissedManifestStaticFilesStorage'
 
 # Sessions and CSRF
-SESSION_COOKIE_SECURE = bool(int(get_env('SESSION_COOKIE_SECURE', False)))
-SESSION_COOKIE_SAMESITE = get_env('SESSION_COOKIE_SAMESITE', 'Lax')
+SESSION_COOKIE_SECURE = bool(int(get_env('SESSION_COOKIE_SECURE', False)))  # type: ignore[no-untyped-call]
+SESSION_COOKIE_SAMESITE = get_env('SESSION_COOKIE_SAMESITE', 'Lax')  # type: ignore[no-untyped-call]
 
-CSRF_COOKIE_SECURE = bool(int(get_env('CSRF_COOKIE_SECURE', SESSION_COOKIE_SECURE)))
-CSRF_COOKIE_HTTPONLY = bool(int(get_env('CSRF_COOKIE_HTTPONLY', SESSION_COOKIE_SECURE)))
-CSRF_COOKIE_SAMESITE = get_env('CSRF_COOKIE_SAMESITE', 'Lax')
+CSRF_COOKIE_SECURE = bool(int(get_env('CSRF_COOKIE_SECURE', SESSION_COOKIE_SECURE)))  # type: ignore[no-untyped-call]
+CSRF_COOKIE_HTTPONLY = bool(int(get_env('CSRF_COOKIE_HTTPONLY', SESSION_COOKIE_SECURE)))  # type: ignore[no-untyped-call]
+CSRF_COOKIE_SAMESITE = get_env('CSRF_COOKIE_SAMESITE', 'Lax')  # type: ignore[no-untyped-call]
 
 # Inactivity user sessions
-INACTIVITY_SESSION_TIMEOUT_ENABLED = bool(int(get_env('INACTIVITY_SESSION_TIMEOUT_ENABLED', True)))
+INACTIVITY_SESSION_TIMEOUT_ENABLED = bool(int(get_env('INACTIVITY_SESSION_TIMEOUT_ENABLED', True)))  # type: ignore[no-untyped-call]
 # The most time a login will last, regardless of activity
-MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(days=14).total_seconds()))
+MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(days=14).total_seconds()))  # type: ignore[no-untyped-call]
 # The most time that can elapse between activity with the server before the user is logged out
-MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(days=5).total_seconds()))
+MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(days=5).total_seconds()))  # type: ignore[no-untyped-call]
 
-SSRF_PROTECTION_ENABLED = get_bool_env('SSRF_PROTECTION_ENABLED', False)
+SSRF_PROTECTION_ENABLED = get_bool_env('SSRF_PROTECTION_ENABLED', False)  # type: ignore[no-untyped-call]
 
 # user media files
 MEDIA_ROOT = os.path.join(BASE_DATA_DIR, 'media')
@@ -455,29 +455,29 @@ DELAYED_EXPORT_DIR = 'export'
 os.makedirs(os.path.join(BASE_DATA_DIR, MEDIA_ROOT, DELAYED_EXPORT_DIR), exist_ok=True)
 
 # file / task size limits
-DATA_UPLOAD_MAX_MEMORY_SIZE = int(get_env('DATA_UPLOAD_MAX_MEMORY_SIZE', 250 * 1024 * 1024))
+DATA_UPLOAD_MAX_MEMORY_SIZE = int(get_env('DATA_UPLOAD_MAX_MEMORY_SIZE', 250 * 1024 * 1024))  # type: ignore[no-untyped-call]
 TASKS_MAX_NUMBER = 1000000
 TASKS_MAX_FILE_SIZE = DATA_UPLOAD_MAX_MEMORY_SIZE
 
-TASK_LOCK_TTL = int(get_env('TASK_LOCK_TTL', default=86400))
+TASK_LOCK_TTL = int(get_env('TASK_LOCK_TTL', default=86400))  # type: ignore[no-untyped-call]
 
-LABEL_STREAM_HISTORY_LIMIT = int(get_env('LABEL_STREAM_HISTORY_LIMIT', default=100))
+LABEL_STREAM_HISTORY_LIMIT = int(get_env('LABEL_STREAM_HISTORY_LIMIT', default=100))  # type: ignore[no-untyped-call]
 
-RANDOM_NEXT_TASK_SAMPLE_SIZE = int(get_env('RANDOM_NEXT_TASK_SAMPLE_SIZE', 50))
+RANDOM_NEXT_TASK_SAMPLE_SIZE = int(get_env('RANDOM_NEXT_TASK_SAMPLE_SIZE', 50))  # type: ignore[no-untyped-call]
 
-TASK_API_PAGE_SIZE_MAX = int(get_env('TASK_API_PAGE_SIZE_MAX', 0)) or None
+TASK_API_PAGE_SIZE_MAX = int(get_env('TASK_API_PAGE_SIZE_MAX', 0)) or None  # type: ignore[no-untyped-call]
 
 # Email backend
-FROM_EMAIL = get_env('FROM_EMAIL', 'Label Studio <hello@labelstud.io>')
-EMAIL_BACKEND = get_env('EMAIL_BACKEND', 'django.core.mail.backends.dummy.EmailBackend')
+FROM_EMAIL = get_env('FROM_EMAIL', 'Label Studio <hello@labelstud.io>')  # type: ignore[no-untyped-call]
+EMAIL_BACKEND = get_env('EMAIL_BACKEND', 'django.core.mail.backends.dummy.EmailBackend')  # type: ignore[no-untyped-call]
 
-ENABLE_LOCAL_FILES_STORAGE = get_bool_env('ENABLE_LOCAL_FILES_STORAGE', default=True)
-LOCAL_FILES_SERVING_ENABLED = get_bool_env('LOCAL_FILES_SERVING_ENABLED', default=False)
-LOCAL_FILES_DOCUMENT_ROOT = get_env('LOCAL_FILES_DOCUMENT_ROOT', default=os.path.abspath(os.sep))
+ENABLE_LOCAL_FILES_STORAGE = get_bool_env('ENABLE_LOCAL_FILES_STORAGE', default=True)  # type: ignore[no-untyped-call]
+LOCAL_FILES_SERVING_ENABLED = get_bool_env('LOCAL_FILES_SERVING_ENABLED', default=False)  # type: ignore[no-untyped-call]
+LOCAL_FILES_DOCUMENT_ROOT = get_env('LOCAL_FILES_DOCUMENT_ROOT', default=os.path.abspath(os.sep))  # type: ignore[no-untyped-call]
 
-SYNC_ON_TARGET_STORAGE_CREATION = get_bool_env('SYNC_ON_TARGET_STORAGE_CREATION', default=True)
+SYNC_ON_TARGET_STORAGE_CREATION = get_bool_env('SYNC_ON_TARGET_STORAGE_CREATION', default=True)  # type: ignore[no-untyped-call]
 
-ALLOW_IMPORT_TASKS_WITH_UNKNOWN_EMAILS = get_bool_env('ALLOW_IMPORT_TASKS_WITH_UNKNOWN_EMAILS', default=False)
+ALLOW_IMPORT_TASKS_WITH_UNKNOWN_EMAILS = get_bool_env('ALLOW_IMPORT_TASKS_WITH_UNKNOWN_EMAILS', default=False)  # type: ignore[no-untyped-call]
 
 """ React Libraries: do not forget to change this dir in /etc/nginx/nginx.conf """
 # EDITOR = label-studio-frontend repository
@@ -495,15 +495,15 @@ LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/'
 MIN_GROUND_TRUTH = 10
 DATA_UNDEFINED_NAME = '$undefined$'
-LICENSE = {}
-VERSIONS = {}
+LICENSE = {}  # type: ignore[var-annotated]
+VERSIONS = {}  # type: ignore[var-annotated]
 VERSION_EDITION = 'Community'
 LATEST_VERSION_CHECK = True
 VERSIONS_CHECK_TIME = 0
-ALLOW_ORGANIZATION_WEBHOOKS = get_bool_env('ALLOW_ORGANIZATION_WEBHOOKS', False)
-CONVERTER_DOWNLOAD_RESOURCES = get_bool_env('CONVERTER_DOWNLOAD_RESOURCES', True)
-EXPERIMENTAL_FEATURES = get_bool_env('EXPERIMENTAL_FEATURES', False)
-USE_ENFORCE_CSRF_CHECKS = get_bool_env('USE_ENFORCE_CSRF_CHECKS', True)  # False is for tests
+ALLOW_ORGANIZATION_WEBHOOKS = get_bool_env('ALLOW_ORGANIZATION_WEBHOOKS', False)  # type: ignore[no-untyped-call]
+CONVERTER_DOWNLOAD_RESOURCES = get_bool_env('CONVERTER_DOWNLOAD_RESOURCES', True)  # type: ignore[no-untyped-call]
+EXPERIMENTAL_FEATURES = get_bool_env('EXPERIMENTAL_FEATURES', False)  # type: ignore[no-untyped-call]
+USE_ENFORCE_CSRF_CHECKS = get_bool_env('USE_ENFORCE_CSRF_CHECKS', True)    # type: ignore[no-untyped-call] # False is for tests
 CLOUD_FILE_STORAGE_ENABLED = False
 
 IO_STORAGES_IMPORT_LINK_NAMES = [
@@ -522,8 +522,8 @@ USER_SERIALIZER_UPDATE = 'users.serializers.BaseUserSerializerUpdate'
 TASK_SERIALIZER = 'tasks.serializers.BaseTaskSerializer'
 EXPORT_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializer'
 DATA_MANAGER_GET_ALL_COLUMNS = 'data_manager.functions.get_all_columns'
-DATA_MANAGER_ANNOTATIONS_MAP = {}
-DATA_MANAGER_ACTIONS = {}
+DATA_MANAGER_ANNOTATIONS_MAP = {}  # type: ignore[var-annotated]
+DATA_MANAGER_ACTIONS = {}  # type: ignore[var-annotated]
 DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS = 'data_manager.functions.custom_filter_expressions'
 DATA_MANAGER_PREPROCESS_FILTER = 'data_manager.functions.preprocess_filter'
 USER_LOGIN_FORM = 'users.forms.LoginForm'
@@ -540,15 +540,15 @@ INTERACTIVE_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializerF
 DELETE_TASKS_ANNOTATIONS_POSTPROCESS = None
 
 
-def project_delete(project):
+def project_delete(project):  # type: ignore[no-untyped-def]
     project.delete()
 
 
-def user_auth(user_model, email, password):
+def user_auth(user_model, email, password):  # type: ignore[no-untyped-def]
     return None
 
 
-def collect_versions_dummy(**kwargs):
+def collect_versions_dummy(**kwargs):  # type: ignore[no-untyped-def]
     return {}
 
 
@@ -556,7 +556,7 @@ PROJECT_DELETE = project_delete
 USER_AUTH = user_auth
 COLLECT_VERSIONS = collect_versions_dummy
 
-WEBHOOK_TIMEOUT = float(get_env('WEBHOOK_TIMEOUT', 1.0))
+WEBHOOK_TIMEOUT = float(get_env('WEBHOOK_TIMEOUT', 1.0))  # type: ignore[no-untyped-call]
 WEBHOOK_SERIALIZERS = {
     'project': 'webhooks.serializers_for_hooks.ProjectWebhookSerializer',
     'task': 'webhooks.serializers_for_hooks.TaskWebhookSerializer',
@@ -565,7 +565,7 @@ WEBHOOK_SERIALIZERS = {
     'label_link': 'labels_manager.serializers.LabelLinkSerializer',
 }
 
-EDITOR_KEYMAP = json.dumps(get_env("EDITOR_KEYMAP"))
+EDITOR_KEYMAP = json.dumps(get_env("EDITOR_KEYMAP"))  # type: ignore[no-untyped-call]
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes
@@ -576,93 +576,93 @@ mimetypes.add_type("image/png", ".png", True)
 # fields name was used in DM api before
 REST_FLEX_FIELDS = {"FIELDS_PARAM": "include"}
 
-INTERPOLATE_KEY_FRAMES = get_env('INTERPOLATE_KEY_FRAMES', False)
+INTERPOLATE_KEY_FRAMES = get_env('INTERPOLATE_KEY_FRAMES', False)  # type: ignore[no-untyped-call]
 
 # Feature Flags
-FEATURE_FLAGS_API_KEY = get_env('FEATURE_FLAGS_API_KEY', default='any key')
+FEATURE_FLAGS_API_KEY = get_env('FEATURE_FLAGS_API_KEY', default='any key')  # type: ignore[no-untyped-call]
 
 # we may set feature flags from file
-FEATURE_FLAGS_FROM_FILE = get_bool_env('FEATURE_FLAGS_FROM_FILE', False)
-FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE', 'feature_flags.json')
+FEATURE_FLAGS_FROM_FILE = get_bool_env('FEATURE_FLAGS_FROM_FILE', False)  # type: ignore[no-untyped-call]
+FEATURE_FLAGS_FILE = get_env('FEATURE_FLAGS_FILE', 'feature_flags.json')  # type: ignore[no-untyped-call]
 # or if file is not set, default is using offline mode
-FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)
+FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)  # type: ignore[no-untyped-call]
 # default value for feature flags (if not overridden by environment or client)
 FEATURE_FLAGS_DEFAULT_VALUE = False
 
 # Whether to send analytics telemetry data
-COLLECT_ANALYTICS = get_bool_env('collect_analytics', True)
+COLLECT_ANALYTICS = get_bool_env('collect_analytics', True)  # type: ignore[no-untyped-call]
 
 # Strip harmful content from SVG files by default
-SVG_SECURITY_CLEANUP = get_bool_env('SVG_SECURITY_CLEANUP', False)
+SVG_SECURITY_CLEANUP = get_bool_env('SVG_SECURITY_CLEANUP', False)  # type: ignore[no-untyped-call]
 
-ML_BLOCK_LOCAL_IP = get_bool_env('ML_BLOCK_LOCAL_IP', False)
+ML_BLOCK_LOCAL_IP = get_bool_env('ML_BLOCK_LOCAL_IP', False)  # type: ignore[no-untyped-call]
 
-RQ_LONG_JOB_TIMEOUT = int(get_env('RQ_LONG_JOB_TIMEOUT', 36000))
+RQ_LONG_JOB_TIMEOUT = int(get_env('RQ_LONG_JOB_TIMEOUT', 36000))  # type: ignore[no-untyped-call]
 
-APP_WEBSERVER = get_env('APP_WEBSERVER', 'django')
+APP_WEBSERVER = get_env('APP_WEBSERVER', 'django')  # type: ignore[no-untyped-call]
 
-BATCH_JOB_RETRY_TIMEOUT = int(get_env('BATCH_JOB_RETRY_TIMEOUT', 60))
+BATCH_JOB_RETRY_TIMEOUT = int(get_env('BATCH_JOB_RETRY_TIMEOUT', 60))  # type: ignore[no-untyped-call]
 
-FUTURE_SAVE_TASK_TO_STORAGE = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False)
-FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT', default=True)
-STORAGE_IN_PROGRESS_TIMER = get_env('STORAGE_IN_PROGRESS_TIMER', 5.0)
+FUTURE_SAVE_TASK_TO_STORAGE = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False)  # type: ignore[no-untyped-call]
+FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT', default=True)  # type: ignore[no-untyped-call]
+STORAGE_IN_PROGRESS_TIMER = get_env('STORAGE_IN_PROGRESS_TIMER', 5.0)  # type: ignore[no-untyped-call]
 
-USE_NGINX_FOR_EXPORT_DOWNLOADS = get_bool_env('USE_NGINX_FOR_EXPORT_DOWNLOADS', False)
+USE_NGINX_FOR_EXPORT_DOWNLOADS = get_bool_env('USE_NGINX_FOR_EXPORT_DOWNLOADS', False)  # type: ignore[no-untyped-call]
 
-if get_env('MINIO_STORAGE_ENDPOINT') and not get_bool_env('MINIO_SKIP', False):
+if get_env('MINIO_STORAGE_ENDPOINT') and not get_bool_env('MINIO_SKIP', False):  # type: ignore[no-untyped-call, no-untyped-call]
     CLOUD_FILE_STORAGE_ENABLED = True
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    AWS_STORAGE_BUCKET_NAME = get_env('MINIO_STORAGE_BUCKET_NAME')
-    AWS_ACCESS_KEY_ID = get_env('MINIO_STORAGE_ACCESS_KEY')
-    AWS_SECRET_ACCESS_KEY = get_env('MINIO_STORAGE_SECRET_KEY')
-    AWS_S3_ENDPOINT_URL = get_env('MINIO_STORAGE_ENDPOINT')
+    AWS_STORAGE_BUCKET_NAME = get_env('MINIO_STORAGE_BUCKET_NAME')  # type: ignore[no-untyped-call]
+    AWS_ACCESS_KEY_ID = get_env('MINIO_STORAGE_ACCESS_KEY')  # type: ignore[no-untyped-call]
+    AWS_SECRET_ACCESS_KEY = get_env('MINIO_STORAGE_SECRET_KEY')  # type: ignore[no-untyped-call]
+    AWS_S3_ENDPOINT_URL = get_env('MINIO_STORAGE_ENDPOINT')  # type: ignore[no-untyped-call]
     AWS_QUERYSTRING_AUTH = False
     # make domain for FileUpload.file
     AWS_S3_SECURE_URLS = False
     AWS_S3_URL_PROTOCOL = 'http:' if HOSTNAME.startswith('http://') else 'https:'
     AWS_S3_CUSTOM_DOMAIN = HOSTNAME.replace('http://', '').replace('https://', '') + '/data'
 
-if get_env('STORAGE_TYPE') == "s3":
+if get_env('STORAGE_TYPE') == "s3":  # type: ignore[no-untyped-call]
     CLOUD_FILE_STORAGE_ENABLED = True
     DEFAULT_FILE_STORAGE = 'core.storage.CustomS3Boto3Storage'
-    if get_env('STORAGE_AWS_ACCESS_KEY_ID'):
-        AWS_ACCESS_KEY_ID = get_env('STORAGE_AWS_ACCESS_KEY_ID')
-    if get_env('STORAGE_AWS_SECRET_ACCESS_KEY'):
-        AWS_SECRET_ACCESS_KEY = get_env('STORAGE_AWS_SECRET_ACCESS_KEY')
-    AWS_STORAGE_BUCKET_NAME = get_env('STORAGE_AWS_BUCKET_NAME')
-    AWS_S3_REGION_NAME = get_env('STORAGE_AWS_REGION_NAME', None)
-    AWS_S3_ENDPOINT_URL = get_env('STORAGE_AWS_ENDPOINT_URL', None)
-    if get_env('STORAGE_AWS_OBJECT_PARAMETERS'):
-        AWS_S3_OBJECT_PARAMETERS = json.loads(get_env('STORAGE_AWS_OBJECT_PARAMETERS'))
-    AWS_QUERYSTRING_EXPIRE = int(get_env('STORAGE_AWS_X_AMZ_EXPIRES', '86400'))
-    AWS_LOCATION = get_env('STORAGE_AWS_FOLDER', default='')
-    AWS_S3_USE_SSL = get_bool_env('STORAGE_AWS_S3_USE_SSL', True)
-    AWS_S3_VERIFY = get_env('STORAGE_AWS_S3_VERIFY', None)
+    if get_env('STORAGE_AWS_ACCESS_KEY_ID'):  # type: ignore[no-untyped-call]
+        AWS_ACCESS_KEY_ID = get_env('STORAGE_AWS_ACCESS_KEY_ID')  # type: ignore[no-untyped-call]
+    if get_env('STORAGE_AWS_SECRET_ACCESS_KEY'):  # type: ignore[no-untyped-call]
+        AWS_SECRET_ACCESS_KEY = get_env('STORAGE_AWS_SECRET_ACCESS_KEY')  # type: ignore[no-untyped-call]
+    AWS_STORAGE_BUCKET_NAME = get_env('STORAGE_AWS_BUCKET_NAME')  # type: ignore[no-untyped-call]
+    AWS_S3_REGION_NAME = get_env('STORAGE_AWS_REGION_NAME', None)  # type: ignore[no-untyped-call]
+    AWS_S3_ENDPOINT_URL = get_env('STORAGE_AWS_ENDPOINT_URL', None)  # type: ignore[no-untyped-call]
+    if get_env('STORAGE_AWS_OBJECT_PARAMETERS'):  # type: ignore[no-untyped-call]
+        AWS_S3_OBJECT_PARAMETERS = json.loads(get_env('STORAGE_AWS_OBJECT_PARAMETERS'))  # type: ignore[no-untyped-call]
+    AWS_QUERYSTRING_EXPIRE = int(get_env('STORAGE_AWS_X_AMZ_EXPIRES', '86400'))  # type: ignore[no-untyped-call]
+    AWS_LOCATION = get_env('STORAGE_AWS_FOLDER', default='')  # type: ignore[no-untyped-call]
+    AWS_S3_USE_SSL = get_bool_env('STORAGE_AWS_S3_USE_SSL', True)  # type: ignore[no-untyped-call]
+    AWS_S3_VERIFY = get_env('STORAGE_AWS_S3_VERIFY', None)  # type: ignore[no-untyped-call]
     if AWS_S3_VERIFY == 'false' or AWS_S3_VERIFY == 'False' or AWS_S3_VERIFY == '0':
         AWS_S3_VERIFY = False
 
-if get_env('STORAGE_TYPE') == "azure":
+if get_env('STORAGE_TYPE') == "azure":  # type: ignore[no-untyped-call]
     CLOUD_FILE_STORAGE_ENABLED = True
     DEFAULT_FILE_STORAGE = 'core.storage.CustomAzureStorage'
-    AZURE_ACCOUNT_NAME = get_env('STORAGE_AZURE_ACCOUNT_NAME')
-    AZURE_ACCOUNT_KEY = get_env('STORAGE_AZURE_ACCOUNT_KEY')
-    AZURE_CONTAINER = get_env('STORAGE_AZURE_CONTAINER_NAME')
-    AZURE_URL_EXPIRATION_SECS = int(get_env('STORAGE_AZURE_URL_EXPIRATION_SECS', '86400'))
-    AZURE_LOCATION = get_env('STORAGE_AZURE_FOLDER', default='')
+    AZURE_ACCOUNT_NAME = get_env('STORAGE_AZURE_ACCOUNT_NAME')  # type: ignore[no-untyped-call]
+    AZURE_ACCOUNT_KEY = get_env('STORAGE_AZURE_ACCOUNT_KEY')  # type: ignore[no-untyped-call]
+    AZURE_CONTAINER = get_env('STORAGE_AZURE_CONTAINER_NAME')  # type: ignore[no-untyped-call]
+    AZURE_URL_EXPIRATION_SECS = int(get_env('STORAGE_AZURE_URL_EXPIRATION_SECS', '86400'))  # type: ignore[no-untyped-call]
+    AZURE_LOCATION = get_env('STORAGE_AZURE_FOLDER', default='')  # type: ignore[no-untyped-call]
 
-if get_env('STORAGE_TYPE') == "gcs":
+if get_env('STORAGE_TYPE') == "gcs":  # type: ignore[no-untyped-call]
     CLOUD_FILE_STORAGE_ENABLED = True
     # DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
     DEFAULT_FILE_STORAGE = 'core.storage.AlternativeGoogleCloudStorage'
-    GS_PROJECT_ID = get_env('STORAGE_GCS_PROJECT_ID')
-    GS_BUCKET_NAME = get_env('STORAGE_GCS_BUCKET_NAME')
-    GS_EXPIRATION = timedelta(seconds=int(get_env('STORAGE_GCS_EXPIRATION_SECS', '86400')))
-    GS_LOCATION = get_env('STORAGE_GCS_FOLDER', default='')
-    GS_CUSTOM_ENDPOINT = get_env('STORAGE_GCS_ENDPOINT')
+    GS_PROJECT_ID = get_env('STORAGE_GCS_PROJECT_ID')  # type: ignore[no-untyped-call]
+    GS_BUCKET_NAME = get_env('STORAGE_GCS_BUCKET_NAME')  # type: ignore[no-untyped-call]
+    GS_EXPIRATION = timedelta(seconds=int(get_env('STORAGE_GCS_EXPIRATION_SECS', '86400')))  # type: ignore[no-untyped-call]
+    GS_LOCATION = get_env('STORAGE_GCS_FOLDER', default='')  # type: ignore[no-untyped-call]
+    GS_CUSTOM_ENDPOINT = get_env('STORAGE_GCS_ENDPOINT')  # type: ignore[no-untyped-call]
 
-CSRF_TRUSTED_ORIGINS = get_env('CSRF_TRUSTED_ORIGINS', [])
+CSRF_TRUSTED_ORIGINS = get_env('CSRF_TRUSTED_ORIGINS', [])  # type: ignore[no-untyped-call]
 if CSRF_TRUSTED_ORIGINS:
     CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS.split(",")
 
 REAL_HOSTNAME = os.getenv('HOSTNAME')  # we have to use getenv, because we don't use LABEL_STUDIO_ prefix
-GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS = get_bool_env('GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS', False)
+GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS = get_bool_env('GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS', False)  # type: ignore[no-untyped-call]

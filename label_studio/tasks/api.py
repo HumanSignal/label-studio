@@ -6,21 +6,21 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django_filters.rest_framework import DjangoFilterBackend
-import drf_yasg.openapi as openapi
-from drf_yasg.utils import swagger_auto_schema
+from django_filters.rest_framework import DjangoFilterBackend  # type: ignore[import]
+import drf_yasg.openapi as openapi  # type: ignore[import, import]
+from drf_yasg.utils import swagger_auto_schema  # type: ignore[import]
 from rest_framework import generics, viewsets, views
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
-from core.feature_flags import flag_set
+from core.feature_flags import flag_set  # type: ignore[attr-defined]
 from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import DjangoFilterDescriptionInspector
 from core.utils.params import bool_from_request
 from core.mixins import GetParentObjectMixin
 from data_manager.api import TaskListAPI as DMTaskListAPI
 from data_manager.functions import evaluate_predictions
-from data_manager.models import PrepareParams
+from data_manager.models import PrepareParams  # type: ignore[attr-defined]
 from data_manager.serializers import DataManagerTaskSerializer
 from projects.models import Project
 from projects.functions.stream_history import fill_history_annotation
@@ -81,22 +81,22 @@ class TaskListAPI(DMTaskListAPI):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['project']
 
-    def filter_queryset(self, queryset):
+    def filter_queryset(self, queryset):  # type: ignore[no-untyped-def]
         queryset = super().filter_queryset(queryset)
-        return queryset.filter(project__organization=self.request.user.active_organization)
+        return queryset.filter(project__organization=self.request.user.active_organization)  # type: ignore[union-attr]
 
-    def get_serializer_context(self):
+    def get_serializer_context(self):  # type: ignore[no-untyped-def]
         context = super().get_serializer_context()
         project_id = self.request.data.get('project')
         if project_id:
             context['project'] = generics.get_object_or_404(Project, pk=project_id)
         return context
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer):  # type: ignore[no-untyped-def]
         project_id = self.request.data.get('project')
         project = generics.get_object_or_404(Project, pk=project_id)
         instance = serializer.save(project=project)
-        emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])
+        emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])  # type: ignore[no-untyped-call, union-attr]
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
@@ -139,7 +139,7 @@ class TaskListAPI(DMTaskListAPI):
             ),
         ],
         ))
-class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
+class TaskAPI(generics.RetrieveUpdateDestroyAPIView):  # type: ignore[type-arg]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
@@ -149,7 +149,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     )
 
     @staticmethod
-    def prefetch(queryset):
+    def prefetch(queryset):  # type: ignore[no-untyped-def]
         return queryset.prefetch_related(
             'annotations', 'predictions', 'annotations__completed_by', 'project',
             'io_storages_azureblobimportstoragelink',
@@ -160,7 +160,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             'file_upload', 'project__ml_backends'
         )
 
-    def get_retrieve_serializer_context(self, request):
+    def get_retrieve_serializer_context(self, request):  # type: ignore[no-untyped-def]
         fields = ['drafts', 'predictions', 'annotations']
 
         return {
@@ -171,43 +171,43 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             'request': request
         }
 
-    def get(self, request, pk):
+    def get(self, request, pk):  # type: ignore[no-untyped-def]
         self.task = self.get_object()
 
-        context = self.get_retrieve_serializer_context(request)
+        context = self.get_retrieve_serializer_context(request)  # type: ignore[no-untyped-call]
         context['project'] = project = self.task.project
 
         # get prediction
         if (project.evaluate_predictions_automatically or project.show_collab_predictions) \
                 and not self.task.predictions.exists():
-            evaluate_predictions([self.task])
+            evaluate_predictions([self.task])  # type: ignore[no-untyped-call]
             self.task.refresh_from_db()
 
-        serializer = self.get_serializer_class()(self.task, many=False, context=context, expand=['annotations.completed_by'])
+        serializer = self.get_serializer_class()(self.task, many=False, context=context, expand=['annotations.completed_by'])  # type: ignore[no-untyped-call]
         data = serializer.data
         return Response(data)
 
-    def get_queryset(self):
-        task_id = self.request.parser_context['kwargs'].get('pk')
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        task_id = self.request.parser_context['kwargs'].get('pk')  # type: ignore[index]
         task = generics.get_object_or_404(Task, pk=task_id)
-        review = bool_from_request(self.request.GET, 'review', False)
+        review = bool_from_request(self.request.GET, 'review', False)  # type: ignore[no-untyped-call]
         selected = {"all": False, "included": [self.kwargs.get("pk")]}
         if review:
             kwargs = {
                 'fields_for_evaluation': ['annotators', 'reviewed']
             }
         else:
-            kwargs = {'all_fields': True}
+            kwargs = {'all_fields': True}  # type: ignore[dict-item]
         project = self.request.query_params.get('project') or self.request.data.get('project')
         if not project:
-            project = task.project.id
-        return self.prefetch(
-            Task.prepared.get_queryset(
-                prepare_params=PrepareParams(project=project, selectedItems=selected, request=self.request),
+            project = task.project.id  # type: ignore[union-attr]
+        return self.prefetch(  # type: ignore[no-untyped-call]
+            Task.prepared.get_queryset(  # type: ignore[no-untyped-call]
+                prepare_params=PrepareParams(project=project, selectedItems=selected, request=self.request),  # type: ignore[arg-type, arg-type]
                 **kwargs
             ))
 
-    def get_serializer_class(self):
+    def get_serializer_class(self):  # type: ignore[no-untyped-def]
         # GET => task + annotations + predictions + drafts
         if self.request.method == 'GET':
             return DataManagerTaskSerializer
@@ -216,7 +216,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         else:
             return TaskSimpleSerializer
     
-    def retrieve(self, request, *args, **kwargs):
+    def retrieve(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         task = self.get_object()
         project = task.project
 
@@ -231,15 +231,15 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         result['data'] = task.resolve_uri(result['data'], project)
         return Response(result)
 
-    def patch(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super(TaskAPI, self).patch(request, *args, **kwargs)
 
-    @api_webhook_for_delete(WebhookAction.TASKS_DELETED)
-    def delete(self, request, *args, **kwargs):
+    @api_webhook_for_delete(WebhookAction.TASKS_DELETED)  # type: ignore[no-untyped-call]
+    def delete(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super(TaskAPI, self).delete(request, *args, **kwargs)
 
     @swagger_auto_schema(auto_schema=None)
-    def put(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super(TaskAPI, self).put(request, *args, **kwargs)
 
 
@@ -258,7 +258,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         operation_summary='Delete annotation',
         operation_description='Delete an annotation. This action can\'t be undone!',
         ))
-class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
+class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):  # type: ignore[type-arg]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
         GET=all_permissions.annotations_view,
@@ -270,10 +270,10 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AnnotationSerializer
     queryset = Annotation.objects.all()
 
-    def perform_destroy(self, annotation):
+    def perform_destroy(self, annotation):  # type: ignore[no-untyped-def]
         annotation.delete()
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         # save user history with annotator_id, time & annotation result
         annotation = self.get_object()
         # use updated instead of save to avoid duplicated signals
@@ -291,20 +291,20 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         task.save(update_fields=['updated_at'])  # refresh task metrics
         return result
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super(AnnotationAPI, self).get(request, *args, **kwargs)
 
-    @api_webhook(WebhookAction.ANNOTATION_UPDATED)
+    @api_webhook(WebhookAction.ANNOTATION_UPDATED)  # type: ignore[no-untyped-call]
     @swagger_auto_schema(auto_schema=None)
-    def put(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super(AnnotationAPI, self).put(request, *args, **kwargs)
 
-    @api_webhook(WebhookAction.ANNOTATION_UPDATED)
-    def patch(self, request, *args, **kwargs):
+    @api_webhook(WebhookAction.ANNOTATION_UPDATED)  # type: ignore[no-untyped-call]
+    def patch(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super(AnnotationAPI, self).patch(request, *args, **kwargs)
 
-    @api_webhook_for_delete(WebhookAction.ANNOTATIONS_DELETED)
-    def delete(self, request, *args, **kwargs):
+    @api_webhook_for_delete(WebhookAction.ANNOTATIONS_DELETED)  # type: ignore[no-untyped-call]
+    def delete(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super(AnnotationAPI, self).delete(request, *args, **kwargs)
 
 
@@ -348,32 +348,32 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         ],
         request_body=AnnotationSerializer
         ))
-class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
+class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):  # type: ignore[type-arg]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
         GET=all_permissions.annotations_view,
         POST=all_permissions.annotations_create,
     )
-    parent_queryset = Task.objects.all()
+    parent_queryset = Task.objects.all()  # type: ignore[assignment]
 
     serializer_class = AnnotationSerializer
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super(AnnotationsListAPI, self).get(request, *args, **kwargs)
 
-    @api_webhook(WebhookAction.ANNOTATION_CREATED)
-    def post(self, request, *args, **kwargs):
+    @api_webhook(WebhookAction.ANNOTATION_CREATED)  # type: ignore[no-untyped-call]
+    def post(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super(AnnotationsListAPI, self).post(request, *args, **kwargs)
 
-    def get_queryset(self):
-        task = generics.get_object_or_404(Task.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        task = generics.get_object_or_404(Task.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))  # type: ignore[no-untyped-call]
         return Annotation.objects.filter(Q(task=task) & Q(was_cancelled=False)).order_by('pk')
 
-    def delete_draft(self, draft_id, annotation_id):
+    def delete_draft(self, draft_id, annotation_id):  # type: ignore[no-untyped-def]
         return AnnotationDraft.objects.filter(id=draft_id).delete()
 
-    def perform_create(self, ser):
-        task = self.get_parent_object()
+    def perform_create(self, ser):  # type: ignore[no-untyped-def]
+        task = self.get_parent_object()  # type: ignore[no-untyped-call]
         # annotator has write access only to annotations and it can't be checked it after serializer.save()
         user = self.request.user
 
@@ -386,11 +386,11 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
         if result is not None:
             prediction = Prediction.objects.filter(task=task, model_version=task.project.model_version)
             if prediction.exists():
-                prediction = prediction.first()
+                prediction = prediction.first()  # type: ignore[assignment]
                 prediction_ser = PredictionSerializer(prediction).data
             else:
                 logger.debug(f'User={self.request.user}: there are no predictions for task={task}')
-                prediction_ser = {}
+                prediction_ser = {}  # type: ignore[assignment]
             # serialize annotation
             extra_args.update({
                 'prediction': prediction_ser,
@@ -398,14 +398,14 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
             })
 
         if 'was_cancelled' in self.request.GET:
-            extra_args['was_cancelled'] = bool_from_request(self.request.GET, 'was_cancelled', False)
+            extra_args['was_cancelled'] = bool_from_request(self.request.GET, 'was_cancelled', False)  # type: ignore[no-untyped-call]
 
         if 'completed_by' not in ser.validated_data:
             extra_args['completed_by'] = self.request.user
 
         draft_id = self.request.data.get('draft_id')
 
-        if draft_id is not None and flag_set('fflag_feat_back_lsdv_5035_use_created_at_from_draft_for_annotation_256052023_short', user='auto'):
+        if draft_id is not None and flag_set('fflag_feat_back_lsdv_5035_use_created_at_from_draft_for_annotation_256052023_short', user='auto'):  # type: ignore[no-untyped-call]
             # if the annotation will be created from draft - get created_at from draft to keep continuity of history
             draft = AnnotationDraft.objects.filter(id=draft_id).first()
             if draft is not None:
@@ -416,7 +416,7 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
         annotation = ser.save(**extra_args)
 
         logger.debug(f'Save activity for user={self.request.user}')
-        self.request.user.activity_at = timezone.now()
+        self.request.user.activity_at = timezone.now()  # type: ignore[union-attr]
         self.request.user.save()
 
         # Release task if it has been taken at work (it should be taken by the same user, or it makes sentry error
@@ -426,17 +426,17 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
         # if annotation created from draft - remove this draft
         if draft_id is not None:
             logger.debug(f'Remove draft {draft_id} after creating annotation {annotation.id}')
-            self.delete_draft(draft_id, annotation.id)
+            self.delete_draft(draft_id, annotation.id)  # type: ignore[no-untyped-call]
 
         if self.request.data.get('ground_truth'):
             annotation.task.ensure_unique_groundtruth(annotation_id=annotation.id)
 
-        fill_history_annotation(user, task, annotation)
+        fill_history_annotation(user, task, annotation)  # type: ignore[no-untyped-call]
 
         return annotation
 
 
-class AnnotationDraftListAPI(generics.ListCreateAPIView):
+class AnnotationDraftListAPI(generics.ListCreateAPIView):  # type: ignore[type-arg]
 
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = AnnotationDraftSerializer
@@ -447,11 +447,11 @@ class AnnotationDraftListAPI(generics.ListCreateAPIView):
     queryset = AnnotationDraft.objects.all()
     swagger_schema = None
 
-    def filter_queryset(self, queryset):
+    def filter_queryset(self, queryset):  # type: ignore[no-untyped-def]
         task_id = self.kwargs['pk']
         return queryset.filter(task_id=task_id)
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer):  # type: ignore[no-untyped-def]
         task_id = self.kwargs['pk']
         annotation_id = self.kwargs.get('annotation_id')
         user = self.request.user
@@ -463,7 +463,7 @@ class AnnotationDraftListAPI(generics.ListCreateAPIView):
         )
 
 
-class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
+class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):  # type: ignore[type-arg]
 
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = AnnotationDraftSerializer
@@ -536,14 +536,14 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
             description='Prediction ID'),
     ],
 ))
-class PredictionAPI(viewsets.ModelViewSet):
+class PredictionAPI(viewsets.ModelViewSet):  # type: ignore[type-arg]
     serializer_class = PredictionSerializer
     permission_required = all_permissions.predictions_any
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['task', 'task__project']
 
-    def get_queryset(self):
-        return Prediction.objects.filter(task__project__organization=self.request.user.active_organization)
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        return Prediction.objects.filter(task__project__organization=self.request.user.active_organization)  # type: ignore[misc, union-attr]
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(auto_schema=None))
@@ -552,17 +552,17 @@ class PredictionAPI(viewsets.ModelViewSet):
         operation_summary='Convert annotation to draft',
         operation_description='Convert annotation to draft',
         ))
-class AnnotationConvertAPI(generics.RetrieveAPIView):
+class AnnotationConvertAPI(generics.RetrieveAPIView):  # type: ignore[type-arg]
     permission_required = ViewClassPermission(
         POST=all_permissions.annotations_change
     )
     queryset = Annotation.objects.all()
 
-    def process_intermediate_state(self, annotation, draft):
+    def process_intermediate_state(self, annotation, draft):  # type: ignore[no-untyped-def]
         pass
 
     @swagger_auto_schema(auto_schema=None)
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         annotation = self.get_object()
         organization = annotation.project.organization
         project = annotation.project
@@ -578,11 +578,11 @@ class AnnotationConvertAPI(generics.RetrieveAPIView):
                 user=request.user,
             )
 
-            self.process_intermediate_state(annotation, draft)
+            self.process_intermediate_state(annotation, draft)  # type: ignore[no-untyped-call]
 
             annotation.delete()
 
-        emit_webhooks_for_instance(organization, project, WebhookAction.ANNOTATIONS_DELETED, [pk])
+        emit_webhooks_for_instance(organization, project, WebhookAction.ANNOTATIONS_DELETED, [pk])  # type: ignore[no-untyped-call]
         data = AnnotationDraftSerializer(instance=draft).data
         return Response(status=201, data=data)
 

@@ -11,16 +11,16 @@ from tasks.functions import export_project
 pytestmark = pytest.mark.django_db
 
 
-def memory_limit(max_mem):
+def memory_limit(max_mem):  # type: ignore[no-untyped-def]
     try:
         import resource
     except ImportError:
-        def decorator(f):
+        def decorator(f):  # type: ignore[no-untyped-def]
             return f
         return decorator
 
-    def decorator(f):
-        def wrapper(*args, **kwargs):
+    def decorator(f):  # type: ignore[no-untyped-def, no-redef]
+        def wrapper(*args, **kwargs):  # type: ignore[no-untyped-def]
             process = psutil.Process(os.getpid())
             prev_limits = resource.getrlimit(resource.RLIMIT_AS)
             resource.setrlimit(
@@ -37,17 +37,17 @@ def memory_limit(max_mem):
 
 class TestExportProject:
     @pytest.fixture
-    def generate_export_file(self, mocker):
+    def generate_export_file(self, mocker):  # type: ignore[no-untyped-def]
         return mocker.patch(
             "tasks.functions.DataExport.generate_export_file",
             return_value=(io.BytesIO(b"stream"), "application/json", "project.json"),
         )
 
     @pytest.fixture
-    def project(self, configured_project):
+    def project(self, configured_project):  # type: ignore[no-untyped-def]
         return configured_project
 
-    def test_export_project(self, mocker, generate_export_file, project):
+    def test_export_project(self, mocker, generate_export_file, project):  # type: ignore[no-untyped-def]
         data = ExportDataSerializer(
             project.tasks.all(),
             many=True,
@@ -55,7 +55,7 @@ class TestExportProject:
         ).data
 
         with mocker.patch("builtins.open"):
-            filepath = export_project(project.id, "JSON", settings.EXPORT_DIR)
+            filepath = export_project(project.id, "JSON", settings.EXPORT_DIR)  # type: ignore[no-untyped-call]
 
         assert filepath == os.path.join(settings.EXPORT_DIR, "project.json")
 
@@ -63,9 +63,9 @@ class TestExportProject:
             project, data, "JSON", settings.CONVERTER_DOWNLOAD_RESOURCES, {}
         )
 
-    def test_project_does_not_exist(self, mocker, generate_export_file):
+    def test_project_does_not_exist(self, mocker, generate_export_file):  # type: ignore[no-untyped-def]
         with mocker.patch("builtins.open"):
             with pytest.raises(Exception):
-                export_project(1, "JSON", settings.EXPORT_DIR)
+                export_project(1, "JSON", settings.EXPORT_DIR)  # type: ignore[no-untyped-call]
 
         generate_export_file.assert_not_called()

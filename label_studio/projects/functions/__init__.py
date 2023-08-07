@@ -2,35 +2,35 @@ from django.db.models import Count, Q, OuterRef
 
 from core.utils.db import SQCount
 from tasks.models import Annotation, Task, Prediction
-from core.feature_flags import flag_set
+from core.feature_flags import flag_set  # type: ignore[attr-defined]
 
 
-def annotate_task_number(queryset):
-    if flag_set('fflag_fix_back_LSDV_4748_annotate_task_number_14032023_short', user='auto'):
+def annotate_task_number(queryset):  # type: ignore[no-untyped-def]
+    if flag_set('fflag_fix_back_LSDV_4748_annotate_task_number_14032023_short', user='auto'):  # type: ignore[no-untyped-call]
         tasks = Task.objects.filter(project=OuterRef('id')).values_list('id')
         return queryset.annotate(task_number=SQCount(tasks))
     else:
         return queryset.annotate(task_number=Count('tasks', distinct=True))
 
 
-def annotate_finished_task_number(queryset):
-    if flag_set('fflag_fix_back_LSDV_4748_annotate_task_number_14032023_short', user='auto'):
+def annotate_finished_task_number(queryset):  # type: ignore[no-untyped-def]
+    if flag_set('fflag_fix_back_LSDV_4748_annotate_task_number_14032023_short', user='auto'):  # type: ignore[no-untyped-call]
         tasks = Task.objects.filter(project=OuterRef('id'), is_labeled=True).values_list('id')
         return queryset.annotate(finished_task_number=SQCount(tasks))
     else:
         return queryset.annotate(finished_task_number=Count('tasks', distinct=True, filter=Q(tasks__is_labeled=True)))
 
 
-def annotate_total_predictions_number(queryset):
-    if flag_set("fflag_fix_back_lsdv_4719_improve_performance_of_project_annotations", user='auto'):
+def annotate_total_predictions_number(queryset):  # type: ignore[no-untyped-def]
+    if flag_set("fflag_fix_back_lsdv_4719_improve_performance_of_project_annotations", user='auto'):  # type: ignore[no-untyped-call]
         predictions = Prediction.objects.filter(task__project=OuterRef('id')).values('id')
         return queryset.annotate(total_predictions_number=SQCount(predictions))
     else:
         return queryset.annotate(total_predictions_number=Count('tasks__predictions', distinct=True))
 
 
-def annotate_total_annotations_number(queryset):
-    if flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):
+def annotate_total_annotations_number(queryset):  # type: ignore[no-untyped-def]
+    if flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):  # type: ignore[no-untyped-call]
         subquery = Annotation.objects.filter(
             Q(project=OuterRef('pk'))
             & Q(was_cancelled=False)
@@ -42,11 +42,11 @@ def annotate_total_annotations_number(queryset):
         ))
 
 
-def annotate_num_tasks_with_annotations(queryset):
+def annotate_num_tasks_with_annotations(queryset):  # type: ignore[no-untyped-def]
     # @todo: check do we really need this counter?
     # this function is very slow because of tasks__id and distinct
 
-    if flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):
+    if flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):  # type: ignore[no-untyped-call]
         subquery = Annotation.objects.filter(
             Q(project=OuterRef('pk'))
             & Q(ground_truth=False)
@@ -65,8 +65,8 @@ def annotate_num_tasks_with_annotations(queryset):
         ))
 
 
-def annotate_useful_annotation_number(queryset):
-    if flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):
+def annotate_useful_annotation_number(queryset):  # type: ignore[no-untyped-def]
+    if flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):  # type: ignore[no-untyped-call]
         subquery = Annotation.objects.filter(
             Q(project=OuterRef('pk'))
             & Q(was_cancelled=False)
@@ -84,8 +84,8 @@ def annotate_useful_annotation_number(queryset):
         ))
 
 
-def annotate_ground_truth_number(queryset):
-    if flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):
+def annotate_ground_truth_number(queryset):  # type: ignore[no-untyped-def]
+    if flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):  # type: ignore[no-untyped-call]
         subquery = Annotation.objects.filter(
             Q(project=OuterRef('pk'))
             & Q(ground_truth=True)
@@ -97,8 +97,8 @@ def annotate_ground_truth_number(queryset):
         ))
 
 
-def annotate_skipped_annotations_number(queryset):
-    if flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):
+def annotate_skipped_annotations_number(queryset):  # type: ignore[no-untyped-def]
+    if flag_set('fflag_fix_back_LSDV_961_project_list_09022023_short', user='auto'):  # type: ignore[no-untyped-call]
         subquery = Annotation.objects.filter(
             Q(project=OuterRef('pk'))
             & Q(was_cancelled=True)

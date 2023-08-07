@@ -41,25 +41,25 @@ LS_PATH = str(pathlib.Path(__file__).parent.absolute())
 DEFAULT_USERNAME = 'default_user@localhost'
 
 
-def _setup_env():
+def _setup_env():  # type: ignore[no-untyped-def]
     sys.path.insert(0, LS_PATH)
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "label_studio.core.settings.label_studio")
     application = get_wsgi_application()
 
 
-def _app_run(host, port):
+def _app_run(host, port):  # type: ignore[no-untyped-def]
     http_socket = '{}:{}'.format(host, port)
     call_command('runserver', '--noreload', http_socket)
 
 
-def _set_sqlite_fix_pragma(sender, connection, **kwargs):
+def _set_sqlite_fix_pragma(sender, connection, **kwargs):  # type: ignore[no-untyped-def]
     """Enable integrity constraint with sqlite."""
-    if connection.vendor == 'sqlite' and get_env('AZURE_MOUNT_FIX'):
+    if connection.vendor == 'sqlite' and get_env('AZURE_MOUNT_FIX'):  # type: ignore[no-untyped-call]
         cursor = connection.cursor()
         cursor.execute('PRAGMA journal_mode=wal;')
 
 
-def is_database_synchronized(database):
+def is_database_synchronized(database):  # type: ignore[no-untyped-def]
     connection = connections[database]
     connection.prepare_database()
     executor = MigrationExecutor(connection)
@@ -67,20 +67,20 @@ def is_database_synchronized(database):
     return not executor.migration_plan(targets)
 
 
-def _apply_database_migrations():
+def _apply_database_migrations():  # type: ignore[no-untyped-def]
     connection_created.connect(_set_sqlite_fix_pragma)
-    if not is_database_synchronized(DEFAULT_DB_ALIAS):
+    if not is_database_synchronized(DEFAULT_DB_ALIAS):  # type: ignore[no-untyped-call]
         print('Initializing database..')
         call_command('migrate', '--no-color', verbosity=0)
 
 
-def _get_config(config_path):
+def _get_config(config_path):  # type: ignore[no-untyped-def]
     with io.open(os.path.abspath(config_path), encoding='utf-8') as c:
         config = json.load(c)
     return config
 
 
-def _create_project(title, user, label_config=None, sampling=None, description=None, ml_backends=None):
+def _create_project(title, user, label_config=None, sampling=None, description=None, ml_backends=None):  # type: ignore[no-untyped-def]
     from projects.models import Project
     from organizations.models import Organization
 
@@ -89,7 +89,7 @@ def _create_project(title, user, label_config=None, sampling=None, description=N
         print('Project with title "{}" already exists'.format(title))
     else:
         org = Organization.objects.first()
-        org.add_user(user)
+        org.add_user(user)  # type: ignore[union-attr]
         project = Project.objects.create(title=title, created_by=user, organization=org)
         print('Project with title "{}" successfully created'.format(title))
 
@@ -115,7 +115,7 @@ def _create_project(title, user, label_config=None, sampling=None, description=N
     return project
 
 
-def _get_user_info(username):
+def _get_user_info(username):  # type: ignore[no-untyped-def]
     from users.models import User
     from users.serializers import UserSerializer
     if not username:
@@ -126,22 +126,22 @@ def _get_user_info(username):
         print({'status': 'error', 'message': f"user {username} doesn't exist"})
         return
 
-    user = user.first()
+    user = user.first()  # type: ignore[assignment]
     user_data = UserSerializer(user).data
-    user_data['token'] = user.auth_token.key
+    user_data['token'] = user.auth_token.key  # type: ignore[attr-defined]
     user_data['status'] = 'ok'
     print('=> User info:')
     print(user_data)
     return user_data
 
 
-def _create_user(input_args, config):
+def _create_user(input_args, config):  # type: ignore[no-untyped-def]
     from users.models import User
     from organizations.models import Organization
 
-    username = input_args.username or config.get('username') or get_env('USERNAME')
-    password = input_args.password or config.get('password') or get_env('PASSWORD')
-    token = input_args.user_token or config.get('user_token') or get_env('USER_TOKEN')
+    username = input_args.username or config.get('username') or get_env('USERNAME')  # type: ignore[no-untyped-call]
+    password = input_args.password or config.get('password') or get_env('PASSWORD')  # type: ignore[no-untyped-call]
+    token = input_args.user_token or config.get('user_token') or get_env('USER_TOKEN')  # type: ignore[no-untyped-call]
 
     if not username:
         user = User.objects.filter(email=DEFAULT_USERNAME).first()
@@ -164,7 +164,7 @@ def _create_user(input_args, config):
         password = getpass.getpass(f'User password for {username}: ')
 
     try:
-        user = User.objects.create_user(email=username, password=password)
+        user = User.objects.create_user(email=username, password=password)  # type: ignore[no-untyped-call]
         user.is_staff = True
         user.is_superuser = True
         user.save()
@@ -182,23 +182,23 @@ def _create_user(input_args, config):
     user = User.objects.get(email=username)
     org = Organization.objects.first()
     if not org:
-        org = Organization.create_organization(created_by=user, title='Label Studio')
+        org = Organization.create_organization(created_by=user, title='Label Studio')  # type: ignore[no-untyped-call]
     else:
-        org.add_user(user)
+        org.add_user(user)  # type: ignore[no-untyped-call]
     user.active_organization = org
     user.save(update_fields=['active_organization'])
 
     return user
 
 
-def _init(input_args, config):
-    user = _create_user(input_args, config)
+def _init(input_args, config):  # type: ignore[no-untyped-def]
+    user = _create_user(input_args, config)  # type: ignore[no-untyped-call]
 
-    if user and input_args.project_name and not _project_exists(input_args.project_name):
+    if user and input_args.project_name and not _project_exists(input_args.project_name):  # type: ignore[no-untyped-call]
         from projects.models import Project
         sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM,
                         'prediction-score-min': Project.UNCERTAINTY}
-        _create_project(
+        _create_project(  # type: ignore[no-untyped-call]
             title=input_args.project_name,
             user=user,
             label_config=input_args.label_config,
@@ -210,7 +210,7 @@ def _init(input_args, config):
         print('Project "{0}" already exists'.format(input_args.project_name))
 
 
-def _reset_password(input_args):
+def _reset_password(input_args):  # type: ignore[no-untyped-def]
     from users.models import User
 
     username = input_args.username
@@ -239,19 +239,19 @@ def _reset_password(input_args):
     print('Password successfully changed')
 
 
-def check_port_in_use(host, port):
+def check_port_in_use(host, port):  # type: ignore[no-untyped-def]
     logger.info('Checking if host & port is available :: ' + str(host) + ':' + str(port))
     host = host.replace('https://', '').replace('http://', '')
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex((host, port)) == 0
 
 
-def _get_free_port(port, debug):
+def _get_free_port(port, debug):  # type: ignore[no-untyped-def]
     # check port is busy
     if not debug:
         original_port = port
         # try up to 1000 new ports
-        while check_port_in_use('localhost', port):
+        while check_port_in_use('localhost', port):  # type: ignore[no-untyped-call]
             old_port = port
             port = int(port) + 1
             if port - original_port >= 1000:
@@ -272,14 +272,14 @@ def _get_free_port(port, debug):
     return port
 
 
-def _project_exists(project_name):
+def _project_exists(project_name):  # type: ignore[no-untyped-def]
     from projects.models import Project
 
     return Project.objects.filter(title=project_name).exists()
 
 
-def main():
-    input_args = parse_input_args(sys.argv[1:])
+def main():  # type: ignore[no-untyped-def]
+    input_args = parse_input_args(sys.argv[1:])  # type: ignore[no-untyped-call]
 
     # setup logging level
     if input_args.log_level:
@@ -293,24 +293,24 @@ def main():
         data_dir_path = pathlib.Path(input_args.data_dir)
         os.environ.setdefault("LABEL_STUDIO_BASE_DATA_DIR", str(data_dir_path.absolute()))
 
-    config = _get_config(input_args.config_path)
+    config = _get_config(input_args.config_path)  # type: ignore[no-untyped-call]
 
     # set host name
     host = input_args.host or config.get('host', '')
-    if not get_env('HOST'):
+    if not get_env('HOST'):  # type: ignore[no-untyped-call]
         os.environ.setdefault('HOST', host)  # it will be passed to settings.HOSTNAME as env var
 
-    _setup_env()
-    _apply_database_migrations()
+    _setup_env()  # type: ignore[no-untyped-call]
+    _apply_database_migrations()  # type: ignore[no-untyped-call]
 
     if TYPE_CHECKING:
         from core.utils.common import collect_versions
     else:
         from label_studio.core.utils.common import collect_versions
-    versions = collect_versions()
+    versions = collect_versions()  # type: ignore[no-untyped-call]
 
     if input_args.command == 'reset_password':
-        _reset_password(input_args)
+        _reset_password(input_args)  # type: ignore[no-untyped-call]
         return
 
     if input_args.command == 'shell':
@@ -319,14 +319,14 @@ def main():
 
     if input_args.command == 'calculate_stats_all_orgs':
         from tasks.functions import calculate_stats_all_orgs
-        calculate_stats_all_orgs(input_args.from_scratch, redis=True)
+        calculate_stats_all_orgs(input_args.from_scratch, redis=True)  # type: ignore[no-untyped-call]
         return
 
     if input_args.command == 'export':
         from tasks.functions import export_project
 
         try:
-            filename = export_project(
+            filename = export_project(  # type: ignore[no-untyped-call]
                 input_args.project_id, input_args.export_format, input_args.export_path,
                 serializer_context=input_args.export_serializer_context
             )
@@ -339,18 +339,18 @@ def main():
 
     # print version
     if input_args.command == 'version' or input_args.version:
-        from label_studio import __version__
+        from label_studio import __version__  # type: ignore[import]
         print('\nLabel Studio version:', __version__, '\n')
         print(json.dumps(versions, indent=4))
 
     # init
     elif input_args.command == 'user' or getattr(input_args, 'user', None):
-        _get_user_info(input_args.username)
+        _get_user_info(input_args.username)  # type: ignore[no-untyped-call]
         return
 
     # init
     elif input_args.command == 'init' or getattr(input_args, 'init', None):
-        _init(input_args, config)
+        _init(input_args, config)  # type: ignore[no-untyped-call]
 
         print('')
         print('Label Studio has been successfully initialized.')
@@ -368,24 +368,24 @@ def main():
         sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM,
                         'prediction-score-min': Project.UNCERTAINTY}
 
-        if input_args.project_name and not _project_exists(input_args.project_name):
+        if input_args.project_name and not _project_exists(input_args.project_name):  # type: ignore[no-untyped-call]
             migrated = False
             project_path = pathlib.Path(input_args.project_name)
             if project_path.exists():
                 print('Project directory from previous version of label-studio found')
                 print('Start migrating..')
                 config_path = project_path / 'config.json'
-                config = _get_config(config_path)
-                user = _create_user(input_args, config)
+                config = _get_config(config_path)  # type: ignore[no-untyped-call]
+                user = _create_user(input_args, config)  # type: ignore[no-untyped-call]
                 label_config_path = project_path / 'config.xml'
-                project = _create_project(
+                project = _create_project(  # type: ignore[no-untyped-call]
                     title=input_args.project_name,
                     user=user,
                     label_config=label_config_path,
                     sampling=sampling_map.get(config.get('sampling', 'sequential'), Project.UNIFORM),
                     description=config.get('description', ''),
                 )
-                migrate_existing_project(project_path, project, config)
+                migrate_existing_project(project_path, project, config)  # type: ignore[no-untyped-call]
                 migrated = True
 
                 print(
@@ -412,8 +412,8 @@ def main():
         else:
             from label_studio.core.utils.common import start_browser
 
-        if get_env('USERNAME') and get_env('PASSWORD') or input_args.username:
-            _create_user(input_args, config)
+        if get_env('USERNAME') and get_env('PASSWORD') or input_args.username:  # type: ignore[no-untyped-call]
+            _create_user(input_args, config)  # type: ignore[no-untyped-call]
 
         # ssl not supported from now
         cert_file = input_args.cert_file or config.get('cert')
@@ -425,14 +425,14 @@ def main():
 
         # internal port and internal host for server start
         internal_host = input_args.internal_host or config.get('internal_host', '0.0.0.0')  # nosec
-        internal_port = input_args.port or get_env('PORT') or config.get('port', 8080)
+        internal_port = input_args.port or get_env('PORT') or config.get('port', 8080)  # type: ignore[no-untyped-call]
         try:
             internal_port = int(internal_port)
         except ValueError as e:
             logger.warning(f"Can't parse PORT '{internal_port}': {e}; default value 8080 will be used")
             internal_port = 8080
 
-        internal_port = _get_free_port(internal_port, input_args.debug)
+        internal_port = _get_free_port(internal_port, input_args.debug)  # type: ignore[no-untyped-call]
 
         # save selected port to global settings
         from django.conf import settings
@@ -440,10 +440,10 @@ def main():
 
         # browser
         url = ('http://localhost:' + str(internal_port)) if not host else host
-        start_browser(url, input_args.no_browser)
+        start_browser(url, input_args.no_browser)  # type: ignore[no-untyped-call]
 
-        _app_run(host=internal_host, port=internal_port)
+        _app_run(host=internal_host, port=internal_port)  # type: ignore[no-untyped-call]
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main())  # type: ignore[no-untyped-call]

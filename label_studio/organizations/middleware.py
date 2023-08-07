@@ -9,10 +9,10 @@ logger = logging.getLogger(__name__)
 
 
 class DummyGetSessionMiddleware:
-    def __init__(self, get_response):
+    def __init__(self, get_response):  # type: ignore[no-untyped-def]
         self.get_response = get_response
 
-    def __call__(self, request):
+    def __call__(self, request):  # type: ignore[no-untyped-def]
         org = Organization.objects.first()
         user = request.user
         if user and user.is_authenticated and user.active_organization is None:

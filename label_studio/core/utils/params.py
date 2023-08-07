@@ -2,7 +2,7 @@ import os
 from rest_framework.exceptions import ValidationError
 
 
-def cast_bool_from_str(value):
+def cast_bool_from_str(value):  # type: ignore[no-untyped-def]
     if isinstance(value, str):
         if value.lower() in ['true', 'yes', 'on', '1']:
             value = True
@@ -14,7 +14,7 @@ def cast_bool_from_str(value):
     return value
 
 
-def bool_from_request(params, key, default):
+def bool_from_request(params, key, default):  # type: ignore[no-untyped-def]
     """ Get boolean value from request GET, POST, etc
 
     :param params: dict POST, GET, etc
@@ -26,13 +26,13 @@ def bool_from_request(params, key, default):
 
     try:
         if isinstance(value, str):
-            value = cast_bool_from_str(value)
+            value = cast_bool_from_str(value)  # type: ignore[no-untyped-call]
         return bool(int(value))
     except Exception as e:
         raise ValidationError({key: str(e)})
 
 
-def int_from_request(params, key, default):
+def int_from_request(params, key, default):  # type: ignore[no-untyped-def]
     """ Get integer from request GET, POST, etc
 
     :param params: dict POST, GET, etc
@@ -59,7 +59,7 @@ def int_from_request(params, key, default):
                                     f'It should be digit string or integer.'})
 
 
-def float_from_request(params, key, default):
+def float_from_request(params, key, default):  # type: ignore[no-untyped-def]
     """ Get float from request GET, POST, etc
 
     :param params: dict POST, GET, etc
@@ -84,7 +84,7 @@ def float_from_request(params, key, default):
                                     f'It should be digit string or float.'})
 
 
-def list_of_strings_from_request(params, key, default):
+def list_of_strings_from_request(params, key, default):  # type: ignore[no-untyped-def]
     """ Get list of strings from request GET, POST, etc
 
     :param params: dict POST, GET, etc
@@ -107,26 +107,26 @@ def list_of_strings_from_request(params, key, default):
                                     f'It should be digit string or float.'})
 
 
-def get_env(name, default=None, is_bool=False):
+def get_env(name, default=None, is_bool=False):  # type: ignore[no-untyped-def]
     for env_key in ['LABEL_STUDIO_' + name, 'HEARTEX_' + name, name]:
         value = os.environ.get(env_key)
         if value is not None:
             if is_bool:
-                return bool_from_request(os.environ, env_key, default)
+                return bool_from_request(os.environ, env_key, default)  # type: ignore[no-untyped-call]
             else:
                 return value
     return default
 
 
-def get_bool_env(key, default):
-    return get_env(key, default, is_bool=True)
+def get_bool_env(key, default):  # type: ignore[no-untyped-def]
+    return get_env(key, default, is_bool=True)  # type: ignore[no-untyped-call]
 
 
-def get_env_list_int(key, default=None):
+def get_env_list_int(key, default=None):  # type: ignore[no-untyped-def]
     """
     "1,2,3" in env variable => [1, 2, 3] in python
     """
-    value = get_env(key)
+    value = get_env(key)  # type: ignore[no-untyped-call]
     if not value:
         if default is None:
             return []
@@ -134,13 +134,13 @@ def get_env_list_int(key, default=None):
     return [int(el) for el in value.split(',')]
 
 
-def get_all_env_with_prefix(prefix=None, is_bool=True, default_value=None):
+def get_all_env_with_prefix(prefix=None, is_bool=True, default_value=None):  # type: ignore[no-untyped-def]
     out = {}
     for key in os.environ.keys():
         if not key.startswith(prefix):
             continue
         if is_bool:
-            out[key] = bool_from_request(os.environ, key, default_value)
+            out[key] = bool_from_request(os.environ, key, default_value)  # type: ignore[no-untyped-call]
         else:
             out[key] = os.environ[key]
     return out

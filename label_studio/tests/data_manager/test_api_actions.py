@@ -16,7 +16,7 @@ from projects.models import Project
     ],
 )
 @pytest.mark.django_db
-def test_action_delete_all_tasks(tasks_count, annotations_count, predictions_count, business_client, project_id):
+def test_action_delete_all_tasks(tasks_count, annotations_count, predictions_count, business_client, project_id):  # type: ignore[no-untyped-def]
     # create
     payload = dict(project=project_id, data={"test": 1})
     response = business_client.post(
@@ -30,14 +30,14 @@ def test_action_delete_all_tasks(tasks_count, annotations_count, predictions_cou
 
     project = Project.objects.get(pk=project_id)
     for _ in range(0, tasks_count):
-        task_id = make_task({"data": {}}, project).id
+        task_id = make_task({"data": {}}, project).id  # type: ignore[no-untyped-call]
         print('TASK_ID: %s' % task_id)
         for _ in range(0, annotations_count):
             print('COMPLETION')
-            make_annotation({"result": []}, task_id)
+            make_annotation({"result": []}, task_id)  # type: ignore[no-untyped-call]
 
         for _ in range(0, predictions_count):
-            make_prediction({"result": []}, task_id)
+            make_prediction({"result": []}, task_id)  # type: ignore[no-untyped-call]
     with transaction.atomic():
         business_client.post(f"/api/dm/actions?project={project_id}&id=delete_tasks",
                              json={'selectedItems': {"all": True, "excluded": []}})
@@ -51,7 +51,7 @@ def test_action_delete_all_tasks(tasks_count, annotations_count, predictions_cou
     ],
 )
 @pytest.mark.django_db
-def test_action_delete_all_annotations(tasks_count, annotations_count, predictions_count, business_client, project_id):
+def test_action_delete_all_annotations(tasks_count, annotations_count, predictions_count, business_client, project_id):  # type: ignore[no-untyped-def]
     # create
     payload = dict(project=project_id, data={"test": 1})
     response = business_client.post(
@@ -65,14 +65,14 @@ def test_action_delete_all_annotations(tasks_count, annotations_count, predictio
 
     project = Project.objects.get(pk=project_id)
     for _ in range(0, tasks_count):
-        task_id = make_task({"data": {}}, project).id
+        task_id = make_task({"data": {}}, project).id  # type: ignore[no-untyped-call]
         print('TASK_ID: %s' % task_id)
         for _ in range(0, annotations_count):
             print('COMPLETION')
-            make_annotation({"result": []}, task_id)
+            make_annotation({"result": []}, task_id)  # type: ignore[no-untyped-call]
 
         for _ in range(0, predictions_count):
-            make_prediction({"result": []}, task_id)
+            make_prediction({"result": []}, task_id)  # type: ignore[no-untyped-call]
     # get next task - should be 0
     status = business_client.post(f"/api/dm/actions?project={project_id}&id=next_task",
                          json={'selectedItems': {"all": True, "excluded": []}})

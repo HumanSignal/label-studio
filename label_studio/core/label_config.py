@@ -7,13 +7,13 @@ import json
 import pandas as pd
 import numpy as np
 import os
-import xmljson
+import xmljson  # type: ignore[import]
 import jsonschema
 import re
 
 from urllib.parse import urlencode
 from collections import OrderedDict
-import defusedxml.ElementTree as etree
+import defusedxml.ElementTree as etree  # type: ignore[import, import]
 from collections import defaultdict
 from django.conf import settings
 
@@ -24,7 +24,7 @@ else:
     from label_studio.core.utils.io import find_file
     from label_studio.core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 
-from label_studio_tools.core import label_config
+from label_studio_tools.core import label_config  # type: ignore[import]
 
 logger = logging.getLogger(__name__)
 
@@ -39,12 +39,12 @@ SINGLE_VALUED_TAGS = {
 }
 _NOT_CONTROL_TAGS = {'Filter',}
 # TODO: move configs in right place
-_LABEL_CONFIG_SCHEMA = find_file('label_config_schema.json')
+_LABEL_CONFIG_SCHEMA = find_file('label_config_schema.json')  # type: ignore[no-untyped-call]
 with open(_LABEL_CONFIG_SCHEMA) as f:
     _LABEL_CONFIG_SCHEMA_DATA = json.load(f)
 
 
-def parse_config(config_string):
+def parse_config(config_string):  # type: ignore[no-untyped-def]
     """
     :param config_string: Label config string
     :return: structured config of the form:
@@ -63,7 +63,7 @@ def parse_config(config_string):
     return label_config.parse_config(config_string)
 
 
-def _fix_choices(config):
+def _fix_choices(config):  # type: ignore[no-untyped-def]
     '''
     workaround for single choice
     https://github.com/heartexlabs/label-studio/issues/1259
@@ -80,13 +80,13 @@ def _fix_choices(config):
                     config['Choices'][n]['Choice'] = [config['Choices'][n]['Choice']]
     if 'View' in config:
         if isinstance(config['View'], OrderedDict):
-            config['View'] = _fix_choices(config['View'])
+            config['View'] = _fix_choices(config['View'])  # type: ignore[no-untyped-call]
         else:
-            config['View'] = [_fix_choices(view) for view in config['View']]
+            config['View'] = [_fix_choices(view) for view in config['View']]  # type: ignore[no-untyped-call]
     return config
 
 
-def parse_config_to_json(config_string):
+def parse_config_to_json(config_string):  # type: ignore[no-untyped-def]
     try:
         xml = etree.fromstring(config_string, forbid_dtd=False)
     except TypeError as error:
@@ -94,19 +94,19 @@ def parse_config_to_json(config_string):
     if xml is None:
         raise etree.ParseError('xml is empty or incorrect')
     config = xmljson.badgerfish.data(xml)
-    config = _fix_choices(config)
+    config = _fix_choices(config)  # type: ignore[no-untyped-call]
     return config
 
 
-def validate_label_config(config_string):
+def validate_label_config(config_string):  # type: ignore[no-untyped-def]
     # xml and schema
     try:
-        config = parse_config_to_json(config_string)
+        config = parse_config_to_json(config_string)  # type: ignore[no-untyped-call]
         jsonschema.validate(config, _LABEL_CONFIG_SCHEMA_DATA)
     except (etree.ParseError, ValueError) as exc:
         raise LabelStudioValidationErrorSentryIgnored(str(exc))
     except jsonschema.exceptions.ValidationError as exc:
-        error_message = exc.context[-1].message if len(exc.context) else exc.message
+        error_message = exc.context[-1].message if len(exc.context) else exc.message  # type: ignore[arg-type, index]
         error_message = 'Validation failed on {}: {}'.format('/'.join(map(str, exc.path)), error_message.replace('@', ''))
         raise LabelStudioValidationErrorSentryIgnored(error_message)
 
@@ -124,14 +124,14 @@ def validate_label_config(config_string):
                 raise LabelStudioValidationErrorSentryIgnored(f'toName="{toName}" not found in names: {sorted(names)}')
 
 
-def extract_data_types(label_config):
+def extract_data_types(label_config):  # type: ignore[no-untyped-def]
     # load config
     xml = etree.fromstring(label_config, forbid_dtd=False)
     if xml is None:
         raise etree.ParseError('Project config is empty or incorrect')
 
     # take all tags with values attribute and fit them to tag types
-    data_type = {}
+    data_type = {}  # type: ignore[var-annotated]
     parent = xml.findall('.//*[@value]')
     for match in parent:
         if not match.get('name'):
@@ -159,8 +159,8 @@ def extract_data_types(label_config):
     return data_type
 
 
-def get_all_labels(label_config):
-    outputs = parse_config(label_config)
+def get_all_labels(label_config):  # type: ignore[no-untyped-def]
+    outputs = parse_config(label_config)  # type: ignore[no-untyped-call]
     labels = defaultdict(list)
     dynamic_labels = defaultdict(bool)
     for control_name in outputs:
@@ -171,25 +171,25 @@ def get_all_labels(label_config):
     return labels, dynamic_labels
 
 
-def get_annotation_tuple(from_name, to_name, type):
+def get_annotation_tuple(from_name, to_name, type):  # type: ignore[no-untyped-def]
     if isinstance(to_name, list):
         to_name = ','.join(to_name)
     return '|'.join([from_name, to_name, type.lower()])
 
 
-def get_all_control_tag_tuples(label_config):
-    outputs = parse_config(label_config)
+def get_all_control_tag_tuples(label_config):  # type: ignore[no-untyped-def]
+    outputs = parse_config(label_config)  # type: ignore[no-untyped-call]
     out = []
     for control_name, info in outputs.items():
-        out.append(get_annotation_tuple(control_name, info['to_name'], info['type']))
+        out.append(get_annotation_tuple(control_name, info['to_name'], info['type']))  # type: ignore[no-untyped-call]
     return out
 
 
-def get_all_object_tag_names(label_config):
-    return set(extract_data_types(label_config))
+def get_all_object_tag_names(label_config):  # type: ignore[no-untyped-def]
+    return set(extract_data_types(label_config))  # type: ignore[no-untyped-call]
 
 
-def config_line_stipped(c):
+def config_line_stipped(c):  # type: ignore[no-untyped-def]
     tree = etree.fromstring(c, forbid_dtd=False)
     comments = tree.xpath('//comment()')
 
@@ -202,7 +202,7 @@ def config_line_stipped(c):
     return c.replace('\n', '').replace('\r', '')
 
 
-def get_task_from_labeling_config(config):
+def get_task_from_labeling_config(config):  # type: ignore[no-untyped-def]
     """ Get task, annotations and predictions from labeling config comment,
         it must start from "<!-- {" and end as "} -->"
     """
@@ -228,13 +228,13 @@ def get_task_from_labeling_config(config):
     return task_data, annotations, predictions
 
 
-def data_examples(mode):
+def data_examples(mode):  # type: ignore[no-untyped-def]
     """ Data examples for editor preview and task upload examples
     """
     global _DATA_EXAMPLES
 
     if _DATA_EXAMPLES is None:
-        with open(find_file('data_examples.json'), encoding='utf-8') as f:
+        with open(find_file('data_examples.json'), encoding='utf-8') as f:  # type: ignore[no-untyped-call]
             _DATA_EXAMPLES = json.load(f)
 
         roots = ['editor_preview', 'upload']
@@ -246,7 +246,7 @@ def data_examples(mode):
     return _DATA_EXAMPLES[mode]
 
 
-def generate_sample_task_without_check(label_config, mode='upload', secure_mode=False):
+def generate_sample_task_without_check(label_config, mode='upload', secure_mode=False):  # type: ignore[no-untyped-def]
     """ Generate sample task only
     """
     # load config
@@ -255,7 +255,7 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
         raise etree.ParseError('Project config is empty or incorrect')
 
     # make examples pretty
-    examples = data_examples(mode=mode)
+    examples = data_examples(mode=mode)  # type: ignore[no-untyped-call]
 
     # iterate over xml tree and find values with '$'
     task = {}
@@ -315,7 +315,7 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
                 task[value] = '/samples/time-series.csv?' + urlencode(params)
             else:
                 # data is JSON
-                task[value] = generate_time_series_json(time_column, value_columns, time_format)
+                task[value] = generate_time_series_json(time_column, value_columns, time_format)  # type: ignore[no-untyped-call]
         elif p.tag == 'HyperText':
             if only_urls:
                 task[value] = examples['HyperTextUrl']
@@ -354,16 +354,16 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
     return task
 
 
-def _is_strftime_string(s):
+def _is_strftime_string(s):  # type: ignore[no-untyped-def]
     # simple way to detect strftime format
     return '%' in s
 
 
-def generate_time_series_json(time_column, value_columns, time_format=None):
+def generate_time_series_json(time_column, value_columns, time_format=None):  # type: ignore[no-untyped-def]
     """ Generate sample for time series
     """
     n = 100
-    if time_format is not None and not _is_strftime_string(time_format):
+    if time_format is not None and not _is_strftime_string(time_format):  # type: ignore[no-untyped-call]
         time_fmt_map = {
             'yyyy-MM-dd': '%Y-%m-%d'
         }
@@ -379,21 +379,21 @@ def generate_time_series_json(time_column, value_columns, time_format=None):
     return ts
 
 
-def get_sample_task(label_config, secure_mode=False):
+def get_sample_task(label_config, secure_mode=False):  # type: ignore[no-untyped-def]
     """ Get sample task from labeling config and combine it with generated sample task
     """
-    predefined_task, annotations, predictions = get_task_from_labeling_config(label_config)
-    generated_task = generate_sample_task_without_check(label_config, mode='editor_preview', secure_mode=secure_mode)
+    predefined_task, annotations, predictions = get_task_from_labeling_config(label_config)  # type: ignore[no-untyped-call]
+    generated_task = generate_sample_task_without_check(label_config, mode='editor_preview', secure_mode=secure_mode)  # type: ignore[no-untyped-call]
     if predefined_task is not None:
         generated_task.update(predefined_task)
     return generated_task, annotations, predictions
 
 
-def config_essential_data_has_changed(new_config_str, old_config_str):
+def config_essential_data_has_changed(new_config_str, old_config_str):  # type: ignore[no-untyped-def]
     """ Detect essential changes of the labeling config
     """
-    new_config = parse_config(new_config_str)
-    old_config = parse_config(old_config_str)
+    new_config = parse_config(new_config_str)  # type: ignore[no-untyped-call]
+    old_config = parse_config(old_config_str)  # type: ignore[no-untyped-call]
 
     for tag, new_info in new_config.items():
         if tag not in old_config:
@@ -407,7 +407,7 @@ def config_essential_data_has_changed(new_config_str, old_config_str):
             return True
 
 
-def replace_task_data_undefined_with_config_field(data, project, first_key=None):
+def replace_task_data_undefined_with_config_field(data, project, first_key=None):  # type: ignore[no-untyped-def]
     """ Use first key is passed (for speed up) or project.data.types.keys()[0]
     """
     # assign undefined key name from data to the first key from config, e.g. for txt loading
@@ -417,11 +417,11 @@ def replace_task_data_undefined_with_config_field(data, project, first_key=None)
         del data[settings.DATA_UNDEFINED_NAME]
 
 
-def check_control_in_config_by_regex(config_string, control_type, filter=None):
+def check_control_in_config_by_regex(config_string, control_type, filter=None):  # type: ignore[no-untyped-def]
     """
     Check if control type is in config including regex filter
     """
-    c = parse_config(config_string)
+    c = parse_config(config_string)  # type: ignore[no-untyped-call]
     if filter is not None and len(filter) == 0:
         return False
     if filter:
@@ -438,12 +438,12 @@ def check_control_in_config_by_regex(config_string, control_type, filter=None):
     return False
 
 
-def check_toname_in_config_by_regex(config_string, to_name, control_type=None):
+def check_toname_in_config_by_regex(config_string, to_name, control_type=None):  # type: ignore[no-untyped-def]
     """
     Check if to_name is in config including regex filter
     :return: True if to_name is fullmatch to some pattern ion config
     """
-    c = parse_config(config_string)
+    c = parse_config(config_string)  # type: ignore[no-untyped-call]
     if control_type:
         check_list = [control_type]
     else:
@@ -461,11 +461,11 @@ def check_toname_in_config_by_regex(config_string, to_name, control_type=None):
     return False
 
 
-def get_original_fromname_by_regex(config_string, fromname):
+def get_original_fromname_by_regex(config_string, fromname):  # type: ignore[no-untyped-def]
     """
     Get from_name from config on from_name key from data after applying regex search or original fromname
     """
-    c = parse_config(config_string)
+    c = parse_config(config_string)  # type: ignore[no-untyped-call]
     for control in c:
         item = c[control].get('regex', {})
         expression = control
@@ -478,11 +478,11 @@ def get_original_fromname_by_regex(config_string, fromname):
     return fromname
 
 
-def get_all_types(label_config):
+def get_all_types(label_config):  # type: ignore[no-untyped-def]
     """
     Get all types from label_config
     """
-    outputs = parse_config(label_config)
+    outputs = parse_config(label_config)  # type: ignore[no-untyped-call]
     out = []
     for control_name, info in outputs.items():
         out.append(info['type'].lower())

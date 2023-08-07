@@ -3,16 +3,16 @@
 import logging
 import os
 import threading
-import google.auth
+import google.auth  # type: ignore[import]
 
 from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
 from django.conf import settings
 from urllib.parse import unquote, urldefrag, urlsplit, urlunsplit
 
-from core.feature_flags import flag_set
-from storages.backends.s3boto3 import S3Boto3Storage
-from storages.backends.azure_storage import AzureStorage
-from storages.backends.gcloud import _quote, clean_name, GoogleCloudStorage
+from core.feature_flags import flag_set  # type: ignore[attr-defined]
+from storages.backends.s3boto3 import S3Boto3Storage  # type: ignore[import]
+from storages.backends.azure_storage import AzureStorage  # type: ignore[import]
+from storages.backends.gcloud import _quote, clean_name, GoogleCloudStorage  # type: ignore[import]
 
 
 logger = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ class SkipMissedManifestStaticFilesStorage(ManifestStaticFilesStorage):
     # Disable strict cache manifest checking
     manifest_strict = False
 
-    def hashed_name(self, name, content=None, filename=None):
+    def hashed_name(self, name, content=None, filename=None):  # type: ignore[no-untyped-def]
         # `filename` is the name of file to hash if `content` isn't given.
         # `name` is the base name to construct the new hashed filename from.
         parsed_name = urlsplit(unquote(name))
@@ -64,34 +64,34 @@ class SkipMissedManifestStaticFilesStorage(ManifestStaticFilesStorage):
 
 
 class StorageProxyMixin:
-    def url(self, name, storage_url=False, *args, **kwargs):
-        if flag_set('ff_back_dev_2915_storage_nginx_proxy_26092022_short'):
+    def url(self, name, storage_url=False, *args, **kwargs):  # type: ignore[no-untyped-def]
+        if flag_set('ff_back_dev_2915_storage_nginx_proxy_26092022_short'):  # type: ignore[no-untyped-call]
             if storage_url is True:
-                return super().url(name, *args, **kwargs)
+                return super().url(name, *args, **kwargs)  # type: ignore[misc]
             return f'{settings.HOSTNAME}/storage-data/uploaded/?filepath={name}'
         else:
-            return super().url(name, *args, **kwargs)
+            return super().url(name, *args, **kwargs)  # type: ignore[misc]
 
 
-class CustomS3Boto3Storage(StorageProxyMixin, S3Boto3Storage):
+class CustomS3Boto3Storage(StorageProxyMixin, S3Boto3Storage):  # type: ignore[misc]
     pass
 
 
-class CustomAzureStorage(StorageProxyMixin, AzureStorage):
+class CustomAzureStorage(StorageProxyMixin, AzureStorage):  # type: ignore[misc]
     pass
 
 
-class AlternativeGoogleCloudStorageBase(GoogleCloudStorage):
+class AlternativeGoogleCloudStorageBase(GoogleCloudStorage):  # type: ignore[misc]
     """A subclass to force the use of the IAM signBlob API
     This allows the signing of blob URLs without having to use a credential file.
     The service account must have the iam.serviceAccounts.signBlob permission."""
 
-    def __init__(self, **settings):
+    def __init__(self, **settings):  # type: ignore[no-untyped-def]
         super().__init__(**settings)
         self._signing_credentials = None
         self._signing_credentials_lock = threading.Lock()
 
-    def url(self, name):
+    def url(self, name):  # type: ignore[no-untyped-def]
         """
         Return public url or a signed url for the Blob.
         This DOES NOT check for existence of Blob - that makes codes too slow
@@ -117,7 +117,7 @@ class AlternativeGoogleCloudStorageBase(GoogleCloudStorage):
             out2 = blob.generate_signed_url(
                 expiration=self.expiration,
                 version="v4",
-                **self._get_signing_kwargs()
+                **self._get_signing_kwargs()  # type: ignore[no-untyped-call]
             )
             return out2
         else:
@@ -125,11 +125,11 @@ class AlternativeGoogleCloudStorageBase(GoogleCloudStorage):
                 bucket_bound_hostname=self.custom_endpoint,
                 expiration=self.expiration,
                 version="v4",
-                **self._get_signing_kwargs()
+                **self._get_signing_kwargs()  # type: ignore[no-untyped-call]
             )
             return out3
 
-    def _get_signing_credentials(self):
+    def _get_signing_credentials(self):  # type: ignore[no-untyped-def]
         with self._signing_credentials_lock:
             if self._signing_credentials is None or self._signing_credentials.expired:
                 credentials, _ = google.auth.default(['https://www.googleapis.com/auth/cloud-platform'])
@@ -138,8 +138,8 @@ class AlternativeGoogleCloudStorageBase(GoogleCloudStorage):
                 self._signing_credentials = credentials
         return self._signing_credentials
 
-    def _get_signing_kwargs(self):
-        credentials = self._get_signing_credentials()
+    def _get_signing_kwargs(self):  # type: ignore[no-untyped-def]
+        credentials = self._get_signing_credentials()  # type: ignore[no-untyped-call]
         out = {
             "service_account_email": credentials.service_account_email,
             "access_token": credentials.token,

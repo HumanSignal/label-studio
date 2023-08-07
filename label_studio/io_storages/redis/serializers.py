@@ -14,17 +14,17 @@ class RedisImportStorageSerializer(ImportStorageSerializer):
         model = RedisImportStorage
         fields = '__all__'
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # type: ignore[no-untyped-def]
         result = super().to_representation(instance)
         result.pop('password')
         return result
 
-    def validate(self, data):
+    def validate(self, data):  # type: ignore[no-untyped-def]
         data = super(RedisImportStorageSerializer, self).validate(data)
 
         storage = RedisImportStorage(**data)
         try:
-            storage.validate_connection()
+            storage.validate_connection()  # type: ignore[no-untyped-call]
         except:
             raise ValidationError("Can't connect to Redis server.")
         return data
@@ -32,7 +32,7 @@ class RedisImportStorageSerializer(ImportStorageSerializer):
 class RedisExportStorageSerializer(ExportStorageSerializer):
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # type: ignore[no-untyped-def]
         result = super().to_representation(instance)
         result.pop('password')
         return result

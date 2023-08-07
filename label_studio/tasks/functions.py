@@ -19,7 +19,7 @@ from data_export.mixins import ExportMixin
 logger = logging.getLogger(__name__)
 
 
-def calculate_stats_all_orgs(from_scratch, redis, migration_name='0018_manual_migrate_counters'):
+def calculate_stats_all_orgs(from_scratch, redis, migration_name='0018_manual_migrate_counters'):  # type: ignore[no-untyped-def]
     logger = logging.getLogger(__name__)
     organizations = Organization.objects.order_by('-id')
 
@@ -27,7 +27,7 @@ def calculate_stats_all_orgs(from_scratch, redis, migration_name='0018_manual_mi
         logger.debug(f"Start recalculating stats for Organization {org.id}")
 
         # start async calculation job on redis
-        start_job_async_or_sync(
+        start_job_async_or_sync(  # type: ignore[no-untyped-call]
             redis_job_for_calculation, org, from_scratch,
             redis=redis,
             queue_name='critical',
@@ -40,7 +40,7 @@ def calculate_stats_all_orgs(from_scratch, redis, migration_name='0018_manual_mi
     logger.debug("All organizations were recalculated")
 
 
-def redis_job_for_calculation(org, from_scratch, migration_name='0018_manual_migrate_counters'):
+def redis_job_for_calculation(org, from_scratch, migration_name='0018_manual_migrate_counters'):  # type: ignore[no-untyped-def]
     """
     Recalculate counters for projects list
     :param org: Organization to recalculate
@@ -78,13 +78,13 @@ def redis_job_for_calculation(org, from_scratch, migration_name='0018_manual_mig
         )
 
 
-def export_project(project_id, export_format, path, serializer_context=None):
+def export_project(project_id, export_format, path, serializer_context=None):  # type: ignore[no-untyped-def]
     logger = logging.getLogger(__name__)
 
     project = Project.objects.get(id=project_id)
 
     export_format = export_format.upper()
-    supported_formats = [s['name'] for s in DataExport.get_export_formats(project)]
+    supported_formats = [s['name'] for s in DataExport.get_export_formats(project)]  # type: ignore[no-untyped-call]
     assert export_format in supported_formats, f'Export format is not supported, please use {supported_formats}'
 
     task_ids = (
@@ -98,11 +98,11 @@ def export_project(project_id, export_format, path, serializer_context=None):
     # serializer context
     if isinstance(serializer_context, str):
         serializer_context = json.loads(serializer_context)
-    serializer_options = ExportMixin._get_export_serializer_option(serializer_context)
+    serializer_options = ExportMixin._get_export_serializer_option(serializer_context)  # type: ignore[no-untyped-call]
 
     # export cycle
     tasks = []
-    for _task_ids in batch(task_ids, 1000):
+    for _task_ids in batch(task_ids, 1000):  # type: ignore[no-untyped-call]
         tasks += ExportDataSerializer(
             _task_ids,
             many=True,
@@ -110,7 +110,7 @@ def export_project(project_id, export_format, path, serializer_context=None):
         ).data
 
     # convert to output format
-    export_stream, _, filename = DataExport.generate_export_file(
+    export_stream, _, filename = DataExport.generate_export_file(  # type: ignore[no-untyped-call]
         project, tasks, export_format, settings.CONVERTER_DOWNLOAD_RESOURCES, {}
     )
 
@@ -124,16 +124,16 @@ def export_project(project_id, export_format, path, serializer_context=None):
     return filepath
 
 
-def _fill_annotations_project(project_id):
+def _fill_annotations_project(project_id):  # type: ignore[no-untyped-def]
     Annotation.objects.filter(task__project_id=project_id).update(project_id=project_id)
 
 
-def fill_annotations_project():
+def fill_annotations_project():  # type: ignore[no-untyped-def]
     logger.info('Start filling project field for Annotation model')
 
     projects = Project.objects.all()
     for project in projects:
-        start_job_async_or_sync(_fill_annotations_project, project.id)
+        start_job_async_or_sync(_fill_annotations_project, project.id)  # type: ignore[no-untyped-call]
 
     logger.info('Finished filling project field for Annotation model')
 

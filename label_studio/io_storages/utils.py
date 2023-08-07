@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 uri_regex = r"([\"'])(?P<uri>(?P<storage>{})://[^\1=]*)\1"
 
 
-def get_uri_via_regex(data, prefixes=('s3', 'gs')):
+def get_uri_via_regex(data, prefixes=('s3', 'gs')):  # type: ignore[no-untyped-def]
     data = str(data).strip()
     middle_check = False
 

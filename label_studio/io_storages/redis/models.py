@@ -42,7 +42,7 @@ class RedisStorageMixin(models.Model):
         _('use_blob_urls'), default=False,
         help_text='Interpret objects as BLOBs and generate URLs')
 
-    def get_redis_connection(self, db=None, redis_config={}):
+    def get_redis_connection(self, db=None, redis_config={}):  # type: ignore[no-untyped-def]
         """Get a redis connection from the provided arguments.
 
         Args:
@@ -68,13 +68,13 @@ class RedisStorageMixin(models.Model):
         r.ping()
         return r
 
-    def get_client(self):
+    def get_client(self):  # type: ignore[no-untyped-def]
         redis_config = {}
         if self.host: redis_config["host"] = self.host
         if self.port: redis_config["port"] = self.port
         if self.password: redis_config["password"] = self.password
 
-        return self.get_redis_connection(db=self.db, redis_config=redis_config)
+        return self.get_redis_connection(db=self.db, redis_config=redis_config)  # type: ignore[attr-defined, no-untyped-call]
 
 
 class RedisImportStorageBase(ImportStorage, RedisStorageMixin):
@@ -82,28 +82,28 @@ class RedisImportStorageBase(ImportStorage, RedisStorageMixin):
         _('db'), default=1,
         help_text='Server Database')
 
-    def can_resolve_url(self, url):
+    def can_resolve_url(self, url):  # type: ignore[no-untyped-def]
         return False
 
-    def iterkeys(self):
-        client = self.get_client()
+    def iterkeys(self):  # type: ignore[no-untyped-def]
+        client = self.get_client()  # type: ignore[no-untyped-call]
         path = str(self.path)
         for key in client.keys(path + '*'):
             yield key
 
-    def get_data(self, key):
-        client = self.get_client()
+    def get_data(self, key):  # type: ignore[no-untyped-def]
+        client = self.get_client()  # type: ignore[no-untyped-call]
         value = client.get(key)
         if not value:
             return
         return json.loads(value)
 
-    def scan_and_create_links(self):
-        return self._scan_and_create_links(RedisImportStorageLink)
+    def scan_and_create_links(self):  # type: ignore[no-untyped-def]
+        return self._scan_and_create_links(RedisImportStorageLink)  # type: ignore[no-untyped-call]
 
-    def validate_connection(self, client=None):
+    def validate_connection(self, client=None):  # type: ignore[no-untyped-def]
         if client is None:
-            client = self.get_client()
+            client = self.get_client()  # type: ignore[no-untyped-call]
         client.ping()
 
     class Meta:
@@ -120,23 +120,23 @@ class RedisExportStorage(RedisStorageMixin, ExportStorage):
         _('db'), default=2,
         help_text='Server Database')
 
-    def save_annotation(self, annotation):
-        client = self.get_client()
+    def save_annotation(self, annotation):  # type: ignore[no-untyped-def]
+        client = self.get_client()  # type: ignore[no-untyped-call]
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
-        ser_annotation = self._get_serialized_data(annotation)
+        ser_annotation = self._get_serialized_data(annotation)  # type: ignore[no-untyped-call]
 
         # get key that identifies this object in storage
-        key = RedisExportStorageLink.get_key(annotation)
+        key = RedisExportStorageLink.get_key(annotation)  # type: ignore[no-untyped-call]
 
         # put object into storage
         client.set(key, json.dumps(ser_annotation))
 
         # create link if everything ok
-        RedisExportStorageLink.create(annotation, self)
+        RedisExportStorageLink.create(annotation, self)  # type: ignore[no-untyped-call]
 
 
 @receiver(post_save, sender=Annotation)
-def export_annotation_to_redis_storages(sender, instance, **kwargs):
+def export_annotation_to_redis_storages(sender, instance, **kwargs):  # type: ignore[no-untyped-def]
     project = instance.project
     if hasattr(project, 'io_storages_redisexportstorages'):
         for storage in project.io_storages_redisexportstorages.all():

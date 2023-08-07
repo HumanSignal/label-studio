@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
     ],
 )
 @pytest.mark.django_db
-def test_change_label_config_repeater(tasks_count, annotations_count, predictions_count, business_client, project_id):
+def test_change_label_config_repeater(tasks_count, annotations_count, predictions_count, business_client, project_id):  # type: ignore[no-untyped-def]
     # Change label config to Repeater
     payload = {'label_config': '<View> <Repeater on="$images" indexFlag="{{idx}}"> <Image name="page_{{idx}}" value="$images" maxWidth="100%"/>     <Header value="Utterance Review"/>     <RectangleLabels name="labels_{{idx}}" toName="page_{{idx}}">       <Label value="Header" hotkey="1"/> <Label value="Body" hotkey="2"/> <Label value="Footer" hotkey="3"/> </RectangleLabels> </Repeater> </View>'}
     response = business_client.patch(
@@ -33,7 +33,7 @@ def test_change_label_config_repeater(tasks_count, annotations_count, prediction
     # cr
     project = Project.objects.get(pk=project_id)
     for _ in range(0, tasks_count):
-        task_id = make_task({"data": {
+        task_id = make_task({"data": {  # type: ignore[no-untyped-call]
             "images": [
                 {
                     "url": "https://htx-pub.s3.amazonaws.com/demo/images/demo_stock_purchase_agreement/0001.jpg"
@@ -49,7 +49,7 @@ def test_change_label_config_repeater(tasks_count, annotations_count, prediction
         print('TASK_ID: %s' % task_id)
         for _ in range(0, annotations_count):
             print('COMPLETION')
-            make_annotation({"result": [
+            make_annotation({"result": [  # type: ignore[no-untyped-call]
                 {
                     "id": "_565WKjviN",
                     "type": "rectanglelabels",
@@ -73,7 +73,7 @@ def test_change_label_config_repeater(tasks_count, annotations_count, prediction
             ]}, task_id)
 
         for _ in range(0, predictions_count):
-            make_prediction({"result": []}, task_id)
+            make_prediction({"result": []}, task_id)  # type: ignore[no-untyped-call]
 
     # no changes - no errors
     payload = {'label_config': '<View> <Repeater on="$images" indexFlag="{{idx}}"> <Image name="page_{{idx}}" value="$images" maxWidth="100%"/>     <Header value="Utterance Review"/>     <RectangleLabels name="labels_{{idx}}" toName="page_{{idx}}"> <Label value="Header" hotkey="1"/> <Label value="Body" hotkey="2"/> <Label value="Footer" hotkey="3"/> </RectangleLabels> </Repeater> </View>'}
@@ -104,20 +104,20 @@ def test_change_label_config_repeater(tasks_count, annotations_count, prediction
 
 
 @pytest.mark.django_db
-def test_parse_all_configs():
+def test_parse_all_configs():  # type: ignore[no-untyped-def]
     folder_wildcard = "./label_studio/annotation_templates"
     result = [y for x in os.walk(folder_wildcard) for y in glob.glob(os.path.join(x[0], '*.xml'))]
     for file in result:
         print(f"Parsing config: {file}")
         with open(file, mode='r') as f:
             config = f.read()
-            assert parse_config(config)
-            assert parse_config_to_json(config)
-            validate_label_config(config)
+            assert parse_config(config)  # type: ignore[no-untyped-call]
+            assert parse_config_to_json(config)  # type: ignore[no-untyped-call]
+            validate_label_config(config)  # type: ignore[no-untyped-call]
 
 
 @pytest.mark.django_db
-def test_config_validation_for_choices_workaround(business_client, project_id):
+def test_config_validation_for_choices_workaround(business_client, project_id):  # type: ignore[no-untyped-def]
     """
     Validate Choices tag for 1 choice with workaround
     Example bug DEV-3635
@@ -147,7 +147,7 @@ def test_config_validation_for_choices_workaround(business_client, project_id):
 
 
 @pytest.mark.django_db
-def test_parse_wrong_xml(business_client, project_id):
+def test_parse_wrong_xml(business_client, project_id):  # type: ignore[no-untyped-def]
     # Change label config to Repeater
     payload = {
         'label_config': '<View> <Repeater on="$images" indexFlag="{{idx}}"> <Image name="page_{{idx}}" value="$images" maxWidth="100%"/>     <Header value="Utterance Review"/>     <RectangleLabels name="labels_{{idx}}" toName="page_{{idx}}">       <Label value="Header" hotkey="1"/> <Label value="Body" hotkey="2"/> <Label value="Footer" hotkey="3"/> </RectangleLabels> </Repeater> </View>'}
@@ -168,7 +168,7 @@ def test_parse_wrong_xml(business_client, project_id):
     assert response.status_code == 400
 
 @pytest.mark.django_db
-def test_label_config_versions(business_client, project_id):
+def test_label_config_versions(business_client, project_id):  # type: ignore[no-untyped-def]
     with io.open(os.path.join(os.path.dirname(__file__), 'test_data/data_for_test_label_config_matrix.yml')) as f:
         test_suites = yaml.safe_load(f)
     for test_name, test_content in test_suites.items():

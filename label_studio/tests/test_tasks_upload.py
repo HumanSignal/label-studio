@@ -5,7 +5,7 @@ import copy
 import pytest
 import zipfile
 import ujson as json
-import requests_mock
+import requests_mock  # type: ignore[import]
 
 from rest_framework.authtoken.models import Token
 
@@ -13,7 +13,7 @@ from tasks.models import Task, Annotation, Prediction
 from projects.models import Project
 
 
-def post_data_as_format(setup, format_type, body, archive, multiply_files):
+def post_data_as_format(setup, format_type, body, archive, multiply_files):  # type: ignore[no-untyped-def]
     # post as data
     if format_type == 'json_data':
         return setup.post(setup.urls.task_bulk, data=body, content_type="application/json")
@@ -34,15 +34,15 @@ def post_data_as_format(setup, format_type, body, archive, multiply_files):
     if 'zip' in archive:
         file = io.BytesIO()
         ref = zipfile.ZipFile(file, mode='w', compression=zipfile.ZIP_DEFLATED)
-        [ref.writestr(name, body.read()) for name, body in files.items()]
+        [ref.writestr(name, body.read()) for name, body in files.items()]  # type: ignore[func-returns-value]
 
         ref.close()
         file.seek(0, 0)
-        files = {'upload_file.zip': file}
+        files = {'upload_file.zip': file}  # type: ignore[dict-item]
 
         # replicate zip file x2
         if 'zip_x2' == archive:
-            files.update({'upload_file2.zip': copy.deepcopy(file)})
+            files.update({'upload_file2.zip': copy.deepcopy(file)})  # type: ignore[dict-item]
 
     return setup.post(setup.urls.task_bulk, files)
 
@@ -71,14 +71,14 @@ def post_data_as_format(setup, format_type, body, archive, multiply_files):
     ([{'none': 'some', 'second_field': 123}]*10, 400, 0),
 ])
 @pytest.mark.django_db
-def test_json_task_upload(setup_project_dialog, format_type, tasks, status_code, task_count, multiply_files):
+def test_json_task_upload(setup_project_dialog, format_type, tasks, status_code, task_count, multiply_files):  # type: ignore[no-untyped-def]
     """ Upload JSON as file and data with one task to project.
         Decorator pytest.mark.django_db means it will be clean DB setup_project_dialog for this test.
     """
     if format_type == 'json_data' and multiply_files > 1:
         pytest.skip('Senseless parameter combination')
 
-    r = post_data_as_format(setup_project_dialog, format_type, json.dumps(tasks), 'none', multiply_files)
+    r = post_data_as_format(setup_project_dialog, format_type, json.dumps(tasks), 'none', multiply_files)  # type: ignore[no-untyped-call]
     print(f'Create json {format_type} tasks result:', r.content)
     assert r.status_code == status_code, f'Upload tasks failed. Response data: {r.data}'
     assert Task.objects.filter(project=setup_project_dialog.project.id).count() == task_count * multiply_files
@@ -94,13 +94,13 @@ def test_json_task_upload(setup_project_dialog, format_type, tasks, status_code,
     ([{'data': {'dialog': 'Test'}, 'annotations': [{'trash': '123'}]}] * 10, 400, 0, 0),
 ])
 @pytest.mark.django_db
-def test_json_task_annotation_and_meta_upload(setup_project_dialog, tasks, status_code, task_count, annotation_count):
+def test_json_task_annotation_and_meta_upload(setup_project_dialog, tasks, status_code, task_count, annotation_count):  # type: ignore[no-untyped-def]
     """ Upload JSON task with annotation to project
     """
     format_type = 'json_file'
     multiply_files = 1
 
-    r = post_data_as_format(setup_project_dialog, format_type, json.dumps(tasks), 'none', multiply_files)
+    r = post_data_as_format(setup_project_dialog, format_type, json.dumps(tasks), 'none', multiply_files)  # type: ignore[no-untyped-call]
     print('Create json tasks with annotations result:', r.content)
     assert r.status_code == status_code, 'Upload one task with annotation failed'
 
@@ -122,17 +122,17 @@ def test_json_task_annotation_and_meta_upload(setup_project_dialog, tasks, statu
     ([{'data': {'dialog': 'Test'}, 'predictions': [{'WRONG_FIELD': '123'}]}], 400, 0, 0),
 ])
 @pytest.mark.django_db
-def test_json_task_predictions(setup_project_dialog, tasks, status_code, task_count, prediction_count):
+def test_json_task_predictions(setup_project_dialog, tasks, status_code, task_count, prediction_count):  # type: ignore[no-untyped-def]
     """ Upload JSON task with predictions to project
     """
-    r = post_data_as_format(setup_project_dialog, 'json_file', json.dumps(tasks), 'none', 1)
+    r = post_data_as_format(setup_project_dialog, 'json_file', json.dumps(tasks), 'none', 1)  # type: ignore[no-untyped-call]
     assert r.status_code == status_code, 'Upload one task with prediction failed'
 
     # predictions
     predictions = Prediction.objects.filter(task__project=setup_project_dialog.project.id)
     assert predictions.count() == prediction_count
-    for i, predictions in enumerate(predictions):
-        assert predictions.model_version == 'test'
+    for i, predictions in enumerate(predictions):  # type: ignore[assignment]
+        assert predictions.model_version == 'test'  # type: ignore[attr-defined]
 
 
 @pytest.mark.parametrize('multiply_files', [1, 5])
@@ -143,13 +143,13 @@ def test_json_task_predictions(setup_project_dialog, tasks, status_code, task_co
     ([{'data': {'dialog': 'Test'}, 'annotations': [{'trash': '123'}]}]*10, 400, 0, 0),
 ])
 @pytest.mark.django_db
-def test_archives(setup_project_dialog, format_type, tasks, status_code, task_count,
+def test_archives(setup_project_dialog, format_type, tasks, status_code, task_count,  # type: ignore[no-untyped-def]
                   annotation_count, archive, multiply_files):
     """ Upload JSON task with annotation to project
     """
     multiplier = (2 if 'zip_x2' == archive else 1) * multiply_files
 
-    r = post_data_as_format(setup_project_dialog, format_type, json.dumps(tasks), archive, multiply_files)
+    r = post_data_as_format(setup_project_dialog, format_type, json.dumps(tasks), archive, multiply_files)  # type: ignore[no-untyped-call]
     print('Create json tasks with annotations result:', r.content)
     assert r.status_code == status_code, 'Upload one task with annotation failed'
 
@@ -177,14 +177,14 @@ def test_archives(setup_project_dialog, format_type, tasks, status_code, task_co
     ('', 400, 0)
 ])
 @pytest.mark.django_db
-def test_csv_tsv_task_upload(setup_project_dialog, format_type, tasks, status_code, task_count,
+def test_csv_tsv_task_upload(setup_project_dialog, format_type, tasks, status_code, task_count,  # type: ignore[no-untyped-def]
                              archive, multiply_files):
     """ Upload CSV/TSV with one task to project
     """
     multiplier = (2 if 'zip_x2' == archive else 1) * multiply_files
 
     tasks = tasks if format_type == 'csv_file' else tasks.replace(',', '\t')  # prepare tsv file from csv
-    r = post_data_as_format(setup_project_dialog, format_type, tasks, archive, multiply_files)
+    r = post_data_as_format(setup_project_dialog, format_type, tasks, archive, multiply_files)  # type: ignore[no-untyped-call]
     print(f'Create {format_type} tasks result:', r.content)
 
     assert r.status_code == status_code, f'Upload one task {format_type} failed. Response data: {r.data}'
@@ -198,12 +198,12 @@ def test_csv_tsv_task_upload(setup_project_dialog, format_type, tasks, status_co
     ('', 400, 0)
 ])
 @pytest.mark.django_db
-def test_txt_task_upload(setup_project_dialog, format_type, tasks, status_code, task_count, multiply_files):
+def test_txt_task_upload(setup_project_dialog, format_type, tasks, status_code, task_count, multiply_files):  # type: ignore[no-untyped-def]
     """ Upload CSV/TSV with one task to project
     """
     multiplier = multiply_files
 
-    r = post_data_as_format(setup_project_dialog, format_type, tasks, 'none', multiply_files)
+    r = post_data_as_format(setup_project_dialog, format_type, tasks, 'none', multiply_files)  # type: ignore[no-untyped-call]
     print(f'Create {format_type} tasks result:', r.content)
 
     assert r.status_code == status_code, f'Upload one task {format_type} failed. Response data: {r.data}'
@@ -214,10 +214,10 @@ def test_txt_task_upload(setup_project_dialog, format_type, tasks, status_code, 
     ([{'data': {'dialog': 'Test'}, 'annotations': [{'result': [{'id': '123'}]}]}] * 1000, 201, 1000, 30)
 ])
 @pytest.mark.django_db
-def test_upload_duration(setup_project_dialog, tasks, status_code, task_count, max_duration):
+def test_upload_duration(setup_project_dialog, tasks, status_code, task_count, max_duration):  # type: ignore[no-untyped-def]
     """ Upload JSON task with annotation to project
     """
-    r = post_data_as_format(setup_project_dialog, 'json_data', json.dumps(tasks), 'none', 1)
+    r = post_data_as_format(setup_project_dialog, 'json_data', json.dumps(tasks), 'none', 1)  # type: ignore[no-untyped-call]
     print('Create json tasks with annotations result:', r.content)
     assert r.status_code == status_code, ('Upload one task with annotation failed', r.content)
 
@@ -236,7 +236,7 @@ def test_upload_duration(setup_project_dialog, tasks, status_code, task_count, m
     ([{'data': {'dialog': 'Test'}, 'annotations': [{'result': [{'id': '123'}]}]}] * 100, 201, 100)
 ])
 @pytest.mark.django_db
-def test_url_upload(mocker, setup_project_dialog, tasks, status_code, task_count):
+def test_url_upload(mocker, setup_project_dialog, tasks, status_code, task_count):  # type: ignore[no-untyped-def]
     """ Upload tasks from URL
     """
     with requests_mock.Mocker(real_http=True) as m:
@@ -258,12 +258,12 @@ def test_url_upload(mocker, setup_project_dialog, tasks, status_code, task_count
     ([{'dialog': 'Test'}] * 1, 401, 0, True)
 ])
 @pytest.mark.django_db
-def test_upload_with_token(setup_project_for_token, tasks, status_code, task_count, bad_token):
+def test_upload_with_token(setup_project_for_token, tasks, status_code, task_count, bad_token):  # type: ignore[no-untyped-def]
     """ Upload with Django Token
     """
     setup = setup_project_for_token
     token = Token.objects.get(user=setup.user)
-    token = 'Token ' + str(token)
+    token = 'Token ' + str(token)  # type: ignore[assignment]
     broken_token = 'Token broken'
     data = setup.project_config
     data['organization_pk'] = setup.org.pk
@@ -272,13 +272,13 @@ def test_upload_with_token(setup_project_for_token, tasks, status_code, task_cou
     assert r.status_code == 201, 'Create project result should be redirect to the next page: ' + str(r.content)
 
     project = Project.objects.filter(title=setup.project_config['title']).first()
-    setup.urls.set_project(project.pk)
+    setup.urls.set_project(project.pk)  # type: ignore[union-attr]
 
     r = setup.post(setup.urls.task_bulk, data=json.dumps(tasks), content_type="application/json",
                    HTTP_AUTHORIZATION=broken_token if bad_token else token)
     assert r.status_code == status_code, 'Create json tasks result: ' + str(r.content)
 
     # tasks
-    tasks = Task.objects.filter(project=project.id)
+    tasks = Task.objects.filter(project=project.id)  # type: ignore[union-attr]
     assert tasks.count() == task_count
 

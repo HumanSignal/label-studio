@@ -10,7 +10,7 @@ import mimetypes
 try:
     import ujson as json
 except:
-    import json
+    import json  # type: ignore[no-redef]
 
 from rest_framework.exceptions import ValidationError
 from django.conf import settings
@@ -19,17 +19,17 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from .models import FileUpload
 from core.utils.io import validate_upload_url
 from core.utils.common import timeit
-from core.feature_flags import flag_set
+from core.feature_flags import flag_set  # type: ignore[attr-defined]
 
 logger = logging.getLogger(__name__)
 csv.field_size_limit(131072 * 10)
 
 
-def is_binary(f):
+def is_binary(f):  # type: ignore[no-untyped-def]
     return isinstance(f, (io.RawIOBase, io.BufferedIOBase))
 
 
-def csv_generate_header(file):
+def csv_generate_header(file):  # type: ignore[no-untyped-def]
     """Generate column names for headless csv file"""
     file.seek(0)
     names = []
@@ -42,7 +42,7 @@ def csv_generate_header(file):
     return names
 
 
-def check_max_task_number(tasks):
+def check_max_task_number(tasks):  # type: ignore[no-untyped-def]
     # max tasks
     if len(tasks) > settings.TASKS_MAX_NUMBER:
         raise ValidationError(
@@ -51,32 +51,32 @@ def check_max_task_number(tasks):
         )
 
 
-def check_tasks_max_file_size(value):
+def check_tasks_max_file_size(value):  # type: ignore[no-untyped-def]
     if value >= settings.TASKS_MAX_FILE_SIZE:
         raise ValidationError(
             f'Maximum total size of all files is {settings.TASKS_MAX_FILE_SIZE} bytes, '
             f'current size is {value} bytes'
         )
 
-def check_extensions(files):
+def check_extensions(files):  # type: ignore[no-untyped-def]
     for filename, file_obj in files.items():
         _, ext = os.path.splitext(file_obj.name)
         if ext.lower() not in settings.SUPPORTED_EXTENSIONS:
             raise ValidationError(f'{ext} extension is not supported')
 
 
-def check_request_files_size(files):
+def check_request_files_size(files):  # type: ignore[no-untyped-def]
     total = sum([file.size for _, file in files.items()])
 
-    check_tasks_max_file_size(total)
+    check_tasks_max_file_size(total)  # type: ignore[no-untyped-call]
 
 
-def create_file_upload(user, project, file):
+def create_file_upload(user, project, file):  # type: ignore[no-untyped-def]
     instance = FileUpload(user=user, project=project, file=file)
     if settings.SVG_SECURITY_CLEANUP:
         content_type, encoding = mimetypes.guess_type(str(instance.file.name))
         if content_type in ['image/svg+xml']:
-            clean_xml = allowlist_svg(instance.file.read())
+            clean_xml = allowlist_svg(instance.file.read())  # type: ignore[no-untyped-call]
             instance.file.seek(0)
             instance.file.write(clean_xml)
             instance.file.truncate()
@@ -84,7 +84,7 @@ def create_file_upload(user, project, file):
     return instance
 
 
-def allowlist_svg(dirty_xml):
+def allowlist_svg(dirty_xml):  # type: ignore[no-untyped-def]
     """Filter out malicious/harmful content from SVG files
     by defining allowed tags
     """
@@ -116,7 +116,7 @@ def allowlist_svg(dirty_xml):
     return clean_xml
 
 
-def str_to_json(data):
+def str_to_json(data):  # type: ignore[no-untyped-def]
     try:
         json_acceptable_string = data.replace("'", "\"")
         return json.loads(json_acceptable_string)
@@ -124,27 +124,27 @@ def str_to_json(data):
         return None
 
 
-def tasks_from_url(file_upload_ids, project, user, url, could_be_tasks_list):
+def tasks_from_url(file_upload_ids, project, user, url, could_be_tasks_list):  # type: ignore[no-untyped-def]
     """Download file using URL and read tasks from it"""
     # process URL with tasks
     try:
         filename = url.rsplit('/', 1)[-1]
 
-        validate_upload_url(url, block_local_urls=settings.SSRF_PROTECTION_ENABLED)
+        validate_upload_url(url, block_local_urls=settings.SSRF_PROTECTION_ENABLED)  # type: ignore[no-untyped-call]
         # Reason for #nosec: url has been validated as SSRF safe by the
         # validation check above.
         response = requests.get(
-            url, verify=False, headers={'Accept-Encoding': None}
+            url, verify=False, headers={'Accept-Encoding': None}  # type: ignore[dict-item]
         )  # nosec
         file_content = response.content
-        check_tasks_max_file_size(int(response.headers['content-length']))
-        file_upload = create_file_upload(
+        check_tasks_max_file_size(int(response.headers['content-length']))  # type: ignore[no-untyped-call]
+        file_upload = create_file_upload(  # type: ignore[no-untyped-call]
             user, project, SimpleUploadedFile(filename, file_content)
         )
         if file_upload.format_could_be_tasks_list:
             could_be_tasks_list = True
         file_upload_ids.append(file_upload.id)
-        tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(
+        tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(  # type: ignore[no-untyped-call]
             project, file_upload_ids
         )
 
@@ -156,13 +156,13 @@ def tasks_from_url(file_upload_ids, project, user, url, could_be_tasks_list):
 
 
 @timeit
-def create_file_uploads(user, project, FILES):
+def create_file_uploads(user, project, FILES):  # type: ignore[no-untyped-def]
     could_be_tasks_list = False
     file_upload_ids = []
-    check_request_files_size(FILES)
-    check_extensions(FILES)
+    check_request_files_size(FILES)  # type: ignore[no-untyped-call]
+    check_extensions(FILES)  # type: ignore[no-untyped-call]
     for _, file in FILES.items():
-        file_upload = create_file_upload(user, project, file)
+        file_upload = create_file_upload(user, project, file)  # type: ignore[no-untyped-call]
         if file_upload.format_could_be_tasks_list:
             could_be_tasks_list = True
         file_upload_ids.append(file_upload.id)
@@ -173,13 +173,13 @@ def create_file_uploads(user, project, FILES):
     return file_upload_ids, could_be_tasks_list
 
 
-def load_tasks_for_async_import(project_import, user):
+def load_tasks_for_async_import(project_import, user):  # type: ignore[no-untyped-def]
     """Load tasks from different types of request.data / request.files saved in project_import model"""
     file_upload_ids, found_formats, data_keys = [], [], set()
 
     if project_import.file_upload_ids:
         file_upload_ids = project_import.file_upload_ids
-        tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(
+        tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(  # type: ignore[no-untyped-call]
             project_import.project, file_upload_ids
         )
 
@@ -187,15 +187,15 @@ def load_tasks_for_async_import(project_import, user):
     elif project_import.url:
         url = project_import.url
         # try to load json with task or tasks from url as string
-        json_data = str_to_json(url)
+        json_data = str_to_json(url)  # type: ignore[no-untyped-call]
         if json_data:
-            file_upload = create_file_upload(
+            file_upload = create_file_upload(  # type: ignore[no-untyped-call]
                 user,
                 project_import.project,
                 SimpleUploadedFile('inplace.json', url.encode()),
             )
             file_upload_ids.append(file_upload.id)
-            tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(
+            tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(  # type: ignore[no-untyped-call]
                 project_import.project, file_upload_ids
             )
 
@@ -208,7 +208,7 @@ def load_tasks_for_async_import(project_import, user):
                 tasks,
                 file_upload_ids,
                 could_be_tasks_list,
-            ) = tasks_from_url(
+            ) = tasks_from_url(  # type: ignore[no-untyped-call]
                 file_upload_ids, project_import.project, user, url, could_be_tasks_list
             )
             if could_be_tasks_list:
@@ -226,25 +226,25 @@ def load_tasks_for_async_import(project_import, user):
     if not tasks:
         raise ValidationError('load_tasks: No tasks added')
 
-    check_max_task_number(tasks)
+    check_max_task_number(tasks)  # type: ignore[no-untyped-call]
     return tasks, file_upload_ids, found_formats, list(data_keys)
 
 
-def load_tasks(request, project):
+def load_tasks(request, project):  # type: ignore[no-untyped-def]
     """Load tasks from different types of request.data / request.files"""
     file_upload_ids, found_formats, data_keys = [], [], set()
     could_be_tasks_list = False
 
     # take tasks from request FILES
     if len(request.FILES):
-        check_request_files_size(request.FILES)
-        check_extensions(request.FILES)
+        check_request_files_size(request.FILES)  # type: ignore[no-untyped-call]
+        check_extensions(request.FILES)  # type: ignore[no-untyped-call]
         for filename, file in request.FILES.items():
-            file_upload = create_file_upload(request.user, project, file)
+            file_upload = create_file_upload(request.user, project, file)  # type: ignore[no-untyped-call]
             if file_upload.format_could_be_tasks_list:
                 could_be_tasks_list = True
             file_upload_ids.append(file_upload.id)
-        tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(
+        tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(  # type: ignore[no-untyped-call]
             project, file_upload_ids
         )
 
@@ -256,13 +256,13 @@ def load_tasks(request, project):
             raise ValidationError('"url" is not found in request data')
 
         # try to load json with task or tasks from url as string
-        json_data = str_to_json(url)
+        json_data = str_to_json(url)  # type: ignore[no-untyped-call]
         if json_data:
-            file_upload = create_file_upload(
+            file_upload = create_file_upload(  # type: ignore[no-untyped-call]
                 request.user, project, SimpleUploadedFile('inplace.json', url.encode())
             )
             file_upload_ids.append(file_upload.id)
-            tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(
+            tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(  # type: ignore[no-untyped-call]
                 project, file_upload_ids
             )
 
@@ -274,7 +274,7 @@ def load_tasks(request, project):
                 tasks,
                 file_upload_ids,
                 could_be_tasks_list,
-            ) = tasks_from_url(
+            ) = tasks_from_url(  # type: ignore[no-untyped-call]
                 file_upload_ids, project, request.user, url, could_be_tasks_list
             )
 
@@ -298,5 +298,5 @@ def load_tasks(request, project):
     if not tasks:
         raise ValidationError('load_tasks: No tasks added')
 
-    check_max_task_number(tasks)
+    check_max_task_number(tasks)  # type: ignore[no-untyped-call]
     return tasks, file_upload_ids, could_be_tasks_list, found_formats, list(data_keys)

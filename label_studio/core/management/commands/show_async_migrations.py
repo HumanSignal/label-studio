@@ -10,10 +10,10 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     help = 'Show async migrations'
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser):  # type: ignore[no-untyped-def]
         parser.add_argument('-o', '--organization', type=int, help='organization id', default=-1)
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # type: ignore[no-untyped-def]
         org = options['organization']
         logger.debug(f"===> AsyncMigrationStatus for Organization {org if org > -1 else 'ALL'}")
         if org == -1:

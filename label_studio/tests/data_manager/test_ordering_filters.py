@@ -39,7 +39,7 @@ from django.utils.timezone import now
     ],
 )
 @pytest.mark.django_db
-def test_views_ordering(ordering, element_index, undefined, business_client, project_id):
+def test_views_ordering(ordering, element_index, undefined, business_client, project_id):  # type: ignore[no-untyped-def]
 
     payload = dict(
         project=project_id,
@@ -63,16 +63,16 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
 
     file_upload1 = FileUpload.objects.create(user=project.created_by, project=project, file=ContentFile('', name='file_upload1'))
 
-    task_id_1 = make_task({"data": {task_field_name: 1}, 'file_upload': file_upload1}, project).id
-    make_annotation({"result": [{"1": True}]}, task_id_1)
-    make_prediction({"result": [{"1": True}], "score": 1}, task_id_1)
+    task_id_1 = make_task({"data": {task_field_name: 1}, 'file_upload': file_upload1}, project).id  # type: ignore[no-untyped-call]
+    make_annotation({"result": [{"1": True}]}, task_id_1)  # type: ignore[no-untyped-call]
+    make_prediction({"result": [{"1": True}], "score": 1}, task_id_1)  # type: ignore[no-untyped-call]
 
     file_upload2 = FileUpload.objects.create(user=project.created_by, project=project, file=ContentFile('', name='file_upload2'))
-    task_id_2 = make_task({"data": {task_field_name: 2}, 'file_upload': file_upload2}, project).id
+    task_id_2 = make_task({"data": {task_field_name: 2}, 'file_upload': file_upload2}, project).id  # type: ignore[no-untyped-call]
     for _ in range(0, 2):
-        make_annotation({"result": [{"2": True}], "was_cancelled": True}, task_id_2)
+        make_annotation({"result": [{"2": True}], "was_cancelled": True}, task_id_2)  # type: ignore[no-untyped-call]
     for _ in range(0, 2):
-        make_prediction({"result": [{"2": True}], "score": 2}, task_id_2)
+        make_prediction({"result": [{"2": True}], "score": 2}, task_id_2)  # type: ignore[no-untyped-call]
 
     task_ids = [task_id_1, task_id_2]
 
@@ -296,10 +296,10 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
     ],
 )
 @pytest.mark.django_db
-def test_views_filters(filters, ids, business_client, project_id):
+def test_views_filters(filters, ids, business_client, project_id):  # type: ignore[no-untyped-def]
     project = Project.objects.get(pk=project_id)
-    ann1 = make_annotator({'email': 'ann1@testheartex.com'}, project)
-    ann2 = make_annotator({'email': 'ann2@testheartex.com'}, project)
+    ann1 = make_annotator({'email': 'ann1@testheartex.com'}, project)  # type: ignore[no-untyped-call]
+    ann2 = make_annotator({'email': 'ann2@testheartex.com'}, project)  # type: ignore[no-untyped-call]
 
     ann_ids = {
         '$ANN1_ID': ann1.id,
@@ -325,20 +325,20 @@ def test_views_filters(filters, ids, business_client, project_id):
 
     task_data_field_name = settings.DATA_UNDEFINED_NAME
 
-    task_id_1 = make_task({"data": {task_data_field_name: "some text1"}}, project).id
-    make_annotation({"result": [{"from_name": "1_first", "to_name": "", "value": {}}], "completed_by": ann1}, task_id_1)
-    make_prediction({"result": [{"from_name": "1_first", "to_name": "", "value": {}}], "score": 1}, task_id_1)
+    task_id_1 = make_task({"data": {task_data_field_name: "some text1"}}, project).id  # type: ignore[no-untyped-call]
+    make_annotation({"result": [{"from_name": "1_first", "to_name": "", "value": {}}], "completed_by": ann1}, task_id_1)  # type: ignore[no-untyped-call]
+    make_prediction({"result": [{"from_name": "1_first", "to_name": "", "value": {}}], "score": 1}, task_id_1)  # type: ignore[no-untyped-call]
 
-    task_id_2 = make_task({"data": {task_data_field_name: "some text2"}}, project).id
+    task_id_2 = make_task({"data": {task_data_field_name: "some text2"}}, project).id  # type: ignore[no-untyped-call]
     for ann in (ann1, ann2):
-        make_annotation({"result": [{"from_name": "2_second", "to_name": "", "value": {}}], "was_cancelled": True, "completed_by": ann}, task_id_2)
+        make_annotation({"result": [{"from_name": "2_second", "to_name": "", "value": {}}], "was_cancelled": True, "completed_by": ann}, task_id_2)  # type: ignore[no-untyped-call]
     for _ in range(0, 2):
-        make_prediction({"result": [{"from_name": "2_second", "to_name": "", "value": {}}], "score": 2}, task_id_2)
+        make_prediction({"result": [{"from_name": "2_second", "to_name": "", "value": {}}], "score": 2}, task_id_2)  # type: ignore[no-untyped-call]
 
     task_ids = [0, task_id_1, task_id_2]
 
     for _ in range(0, 2):
-        task_id = make_task({"data": {task_data_field_name: "some text_"}}, project).id
+        task_id = make_task({"data": {task_data_field_name: "some text_"}}, project).id  # type: ignore[no-untyped-call]
         task_ids.append(task_id)
 
     for item in filters['items']:

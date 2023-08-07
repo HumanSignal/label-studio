@@ -9,7 +9,7 @@ from datetime import datetime
 
 import ujson as json
 from core import version
-from core.feature_flags import flag_set
+from core.feature_flags import flag_set  # type: ignore[attr-defined]
 from core.utils.common import load_func
 from core.utils.io import get_all_files_from_dir, get_temp_dir, read_bytes_stream
 from django.conf import settings
@@ -17,17 +17,17 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
-from label_studio_converter import Converter
+from label_studio_converter import Converter  # type: ignore[import]
 from tasks.models import Annotation
 
 
 logger = logging.getLogger(__name__)
 
 
-ExportMixin = load_func(settings.EXPORT_MIXIN)
+ExportMixin = load_func(settings.EXPORT_MIXIN)  # type: ignore[no-untyped-call]
 
 
-class Export(ExportMixin, models.Model):
+class Export(ExportMixin, models.Model):  # type: ignore[misc, valid-type]
     class Status(models.TextChoices):
         CREATED = 'created', _('Created')
         IN_PROGRESS = 'in_progress', _('In progress')
@@ -86,7 +86,7 @@ class Export(ExportMixin, models.Model):
 
 
 @receiver(post_save, sender=Export)
-def set_export_default_name(sender, instance, created, **kwargs):
+def set_export_default_name(sender, instance, created, **kwargs):  # type: ignore[no-untyped-def]
     if created and not instance.title:
         instance.title = instance.get_default_title()
         instance.save()
@@ -95,13 +95,13 @@ def set_export_default_name(sender, instance, created, **kwargs):
 class DataExport(object):
     # TODO: deprecated
     @staticmethod
-    def save_export_files(project, now, get_args, data, md5, name):
+    def save_export_files(project, now, get_args, data, md5, name):  # type: ignore[no-untyped-def]
         """Generate two files: meta info and result file and store them locally for logging"""
         filename_results = os.path.join(settings.EXPORT_DIR, name + '.json')
         filename_info = os.path.join(settings.EXPORT_DIR, name + '-info.json')
         annotation_number = Annotation.objects.filter(project=project).count()
         try:
-            platform_version = version.get_git_version()
+            platform_version = version.get_git_version()  # type: ignore[no-untyped-call]
         except:
             platform_version = 'none'
             logger.error('Version is not detected in save_export_files()')
@@ -130,7 +130,7 @@ class DataExport(object):
         return filename_results
 
     @staticmethod
-    def get_export_formats(project):
+    def get_export_formats(project):  # type: ignore[no-untyped-def]
         converter = Converter(config=project.get_parsed_config(), project_dir=None)
         formats = []
         supported_formats = set(converter.supported_formats)
@@ -143,14 +143,14 @@ class DataExport(object):
         return sorted(formats, key=lambda f: f.get('disabled', False))
 
     @staticmethod
-    def generate_export_file(project, tasks, output_format, download_resources, get_args):
+    def generate_export_file(project, tasks, output_format, download_resources, get_args):  # type: ignore[no-untyped-def]
         # prepare for saving
         now = datetime.now()
         data = json.dumps(tasks, ensure_ascii=False)
         md5 = hashlib.md5(json.dumps(data).encode('utf-8')).hexdigest()   # nosec
         name = 'project-' + str(project.id) + '-at-' + now.strftime('%Y-%m-%d-%H-%M') + f'-{md5[0:8]}'
 
-        input_json = DataExport.save_export_files(project, now, get_args, data, md5, name)
+        input_json = DataExport.save_export_files(project, now, get_args, data, md5, name)  # type: ignore[no-untyped-call]
 
         converter = Converter(
             config=project.get_parsed_config(),
@@ -160,19 +160,19 @@ class DataExport(object):
         )
         with get_temp_dir() as tmp_dir:
             converter.convert(input_json, tmp_dir, output_format, is_dir=False)
-            files = get_all_files_from_dir(tmp_dir)
+            files = get_all_files_from_dir(tmp_dir)  # type: ignore[no-untyped-call]
             # if only one file is exported - no need to create archive
             if len(os.listdir(tmp_dir)) == 1:
                 output_file = files[0]
                 ext = os.path.splitext(output_file)[-1]
                 content_type = f'application/{ext}'
-                out = read_bytes_stream(output_file)
+                out = read_bytes_stream(output_file)  # type: ignore[no-untyped-call]
                 filename = name + os.path.splitext(output_file)[-1]
                 return out, content_type, filename
 
             # otherwise pack output directory into archive
             shutil.make_archive(tmp_dir, 'zip', tmp_dir)
-            out = read_bytes_stream(os.path.abspath(tmp_dir + '.zip'))
+            out = read_bytes_stream(os.path.abspath(tmp_dir + '.zip'))  # type: ignore[no-untyped-call]
             content_type = 'application/zip'
             filename = name + '.zip'
             return out, content_type, filename
@@ -246,8 +246,8 @@ class ConvertedFormat(models.Model):
         verbose_name=_('created by'),
     )
 
-    def delete(self, *args, **kwargs):
-        if flag_set('ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short'):
+    def delete(self, *args, **kwargs):  # type: ignore[no-untyped-def]
+        if flag_set('ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short'):  # type: ignore[no-untyped-call]
             if self.file:
                 self.file.delete()
         super().delete(*args, **kwargs)

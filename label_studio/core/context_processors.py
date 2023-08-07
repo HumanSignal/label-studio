@@ -2,20 +2,20 @@
 """
 from django.conf import settings as django_settings
 from core.utils.common import collect_versions
-from core.feature_flags import all_flags
+from core.feature_flags import all_flags  # type: ignore[attr-defined]
 
 
-def sentry_fe(request):
+def sentry_fe(request):  # type: ignore[no-untyped-def]
     # return the value you want as a dictionary, you may add multiple values in there
     return {
-        'SENTRY_FE': django_settings.SENTRY_FE
+        'SENTRY_FE': django_settings.SENTRY_FE  # type: ignore[misc]
     }
 
 
-def settings(request):
+def settings(request):  # type: ignore[no-untyped-def]
     """ Make available django settings on each template page
     """
-    versions = collect_versions()
+    versions = collect_versions()  # type: ignore[no-untyped-call]
 
     # django templates can't access names with hyphens
     versions['lsf'] = versions.get('label-studio-frontend', {})
@@ -32,7 +32,7 @@ def settings(request):
 
     feature_flags = {}
     if hasattr(request, 'user'):
-        feature_flags = all_flags(request.user)
+        feature_flags = all_flags(request.user)  # type: ignore[no-untyped-call]
 
     return {
         'settings': django_settings,

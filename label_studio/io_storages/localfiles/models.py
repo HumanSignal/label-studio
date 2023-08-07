@@ -37,8 +37,8 @@ class LocalFilesMixin(models.Model):
         _('use_blob_urls'), default=False,
         help_text='Interpret objects as BLOBs and generate URLs')
 
-    def validate_connection(self):
-        path = Path(self.path)
+    def validate_connection(self):  # type: ignore[no-untyped-def]
+        path = Path(self.path)  # type: ignore[arg-type]
         document_root = Path(settings.LOCAL_FILES_DOCUMENT_ROOT)
         if not path.exists():
             raise ValidationError(f'Path {self.path} does not exist')
@@ -52,14 +52,14 @@ class LocalFilesMixin(models.Model):
                                   'please check docs: https://labelstud.io/guide/storage.html#Local-storage')
 
 
-class LocalFilesImportStorageBase(LocalFilesMixin, ImportStorage):
+class LocalFilesImportStorageBase(LocalFilesMixin, ImportStorage):  # type: ignore[misc]
     url_scheme = 'https'
 
-    def can_resolve_url(self, url):
+    def can_resolve_url(self, url):  # type: ignore[no-untyped-def]
         return False
 
-    def iterkeys(self):
-        path = Path(self.path)
+    def iterkeys(self):  # type: ignore[no-untyped-def]
+        path = Path(self.path)  # type: ignore[arg-type]
         regex = re.compile(str(self.regex_filter)) if self.regex_filter else None
         # For better control of imported tasks, file reading has been changed to ascending order of filenames.
         # In other words, the task IDs are sorted by filename order.
@@ -71,7 +71,7 @@ class LocalFilesImportStorageBase(LocalFilesMixin, ImportStorage):
                     continue
                 yield str(file)
 
-    def get_data(self, key):
+    def get_data(self, key):  # type: ignore[no-untyped-def]
         path = Path(key)
         if self.use_blob_urls:
             # include self-hosted links pointed to local resources via
@@ -92,34 +92,34 @@ class LocalFilesImportStorageBase(LocalFilesMixin, ImportStorage):
             raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
         return value
 
-    def scan_and_create_links(self):
-        return self._scan_and_create_links(LocalFilesImportStorageLink)
+    def scan_and_create_links(self):  # type: ignore[no-untyped-def]
+        return self._scan_and_create_links(LocalFilesImportStorageLink)  # type: ignore[no-untyped-call]
 
     class Meta:
         abstract = True
 
 
-class LocalFilesImportStorage(ProjectStorageMixin, LocalFilesImportStorageBase):
+class LocalFilesImportStorage(ProjectStorageMixin, LocalFilesImportStorageBase):  # type: ignore[misc, misc, misc, misc]
     class Meta:
         abstract = False
 
 
-class LocalFilesExportStorage(LocalFilesMixin, ExportStorage):
+class LocalFilesExportStorage(LocalFilesMixin, ExportStorage):  # type: ignore[misc, misc, misc]
 
-    def save_annotation(self, annotation):
+    def save_annotation(self, annotation):  # type: ignore[no-untyped-def]
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
-        ser_annotation = self._get_serialized_data(annotation)
+        ser_annotation = self._get_serialized_data(annotation)  # type: ignore[no-untyped-call]
 
         # get key that identifies this object in storage
-        key = LocalFilesExportStorageLink.get_key(annotation)
-        key = os.path.join(self.path, f"{key}")
+        key = LocalFilesExportStorageLink.get_key(annotation)  # type: ignore[no-untyped-call]
+        key = os.path.join(self.path, f"{key}")  # type: ignore[arg-type]
 
         # put object into storage
         with open(key, mode='w') as f:
             json.dump(ser_annotation, f, indent=2)
 
         # Create export storage link
-        LocalFilesExportStorageLink.create(annotation, self)
+        LocalFilesExportStorageLink.create(annotation, self)  # type: ignore[no-untyped-call]
 
 
 class LocalFilesImportStorageLink(ImportStorageLink):
@@ -131,7 +131,7 @@ class LocalFilesExportStorageLink(ExportStorageLink):
 
 
 @receiver(post_save, sender=Annotation)
-def export_annotation_to_local_files(sender, instance, **kwargs):
+def export_annotation_to_local_files(sender, instance, **kwargs):  # type: ignore[no-untyped-def]
     project = instance.project
     if hasattr(project, 'io_storages_localfilesexportstorages'):
         for storage in project.io_storages_localfilesexportstorages.all():

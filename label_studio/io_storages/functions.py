@@ -9,7 +9,7 @@ from .redis.api import RedisImportStorageListAPI, RedisExportStorageListAPI
 logger = logging.getLogger(__name__)
 
 
-def get_storage_list():
+def get_storage_list():  # type: ignore[no-untyped-def]
     return [
         {
             'name': 's3',

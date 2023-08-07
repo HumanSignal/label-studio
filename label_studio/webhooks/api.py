@@ -1,10 +1,10 @@
 import logging
 
 from django.utils.decorators import method_decorator
-from django_filters.rest_framework import DjangoFilterBackend
-import django_filters
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from django_filters.rest_framework import DjangoFilterBackend  # type: ignore[import]
+import django_filters  # type: ignore[import]
+from drf_yasg.utils import swagger_auto_schema  # type: ignore[import]
+from drf_yasg import openapi  # type: ignore[import]
 from rest_framework import generics
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -16,7 +16,7 @@ from .serializers import WebhookSerializer, WebhookSerializerForUpdate
 from projects import models as project_models
 
 
-class WebhookFilterSet(django_filters.FilterSet):
+class WebhookFilterSet(django_filters.FilterSet):  # type: ignore[misc]
     project = django_filters.ModelChoiceFilter(
         field_name='project', queryset=project_models.Project.objects.all(), null_label='isnull'
     )
@@ -46,18 +46,18 @@ class WebhookFilterSet(django_filters.FilterSet):
         operation_description="Create a webhook for your organization.",
     ),
 )
-class WebhookListAPI(generics.ListCreateAPIView):
+class WebhookListAPI(generics.ListCreateAPIView):  # type: ignore[type-arg]
     queryset = Webhook.objects.all()
     serializer_class = WebhookSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_class = WebhookFilterSet
 
-    def get_queryset(self):
-        return Webhook.objects.filter(organization=self.request.user.active_organization)
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        return Webhook.objects.filter(organization=self.request.user.active_organization)  # type: ignore[misc, union-attr]
 
-    def perform_create(self, serializer):
-        serializer.save(organization=self.request.user.active_organization)
+    def perform_create(self, serializer):  # type: ignore[no-untyped-def]
+        serializer.save(organization=self.request.user.active_organization)  # type: ignore[union-attr]
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(tags=['Webhooks'], operation_summary='Get webhook info'))
@@ -76,18 +76,18 @@ class WebhookListAPI(generics.ListCreateAPIView):
 @method_decorator(
     name='delete', decorator=swagger_auto_schema(tags=['Webhooks'], operation_summary='Delete webhook info')
 )
-class WebhookAPI(generics.RetrieveUpdateDestroyAPIView):
+class WebhookAPI(generics.RetrieveUpdateDestroyAPIView):  # type: ignore[type-arg]
     queryset = Webhook.objects.all()
     serializer_class = WebhookSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_serializer_class(self):
+    def get_serializer_class(self):  # type: ignore[no-untyped-def]
         if self.request.method in ['PUT', 'PATCH']:
             return WebhookSerializerForUpdate
         return super().get_serializer_class()
 
-    def get_queryset(self):
-        return Webhook.objects.filter(organization=self.request.user.active_organization)
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        return Webhook.objects.filter(organization=self.request.user.active_organization)  # type: ignore[misc, union-attr]
 
 
 @method_decorator(
@@ -110,7 +110,7 @@ class WebhookAPI(generics.RetrieveUpdateDestroyAPIView):
 class WebhookInfoAPI(APIView):
     permission_classes = [AllowAny]
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         result = {
             key: {
                 'name': value['name'],

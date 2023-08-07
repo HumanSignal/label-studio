@@ -20,16 +20,16 @@ logger = logging.getLogger(__name__)
 
 
 @login_required
-def project_list(request):
+def project_list(request):  # type: ignore[no-untyped-def]
     return render(request, 'projects/list.html')
 
 
 @login_required
-def project_settings(request, pk, sub_path):
+def project_settings(request, pk, sub_path):  # type: ignore[no-untyped-def]
     return render(request, 'projects/settings.html')
 
 
-def playground_replacements(request, task_data):
+def playground_replacements(request, task_data):  # type: ignore[no-untyped-def]
     if request.GET.get('playground', '0') == '1':
         for key in task_data:
             if "/samples/time-series.csv" in task_data[key]:
@@ -38,23 +38,23 @@ def playground_replacements(request, task_data):
 
 
 @require_http_methods(['GET', 'POST'])
-def upload_example_using_config(request):
+def upload_example_using_config(request):  # type: ignore[no-untyped-def]
     """ Generate upload data example by config only
     """
     config = request.GET.get('label_config', '')
     if not config:
         config = request.POST.get('label_config', '')
 
-    org_pk = get_organization_from_request(request)
+    org_pk = get_organization_from_request(request)  # type: ignore[no-untyped-call]
     secure_mode = False
     if org_pk is not None:
         org = generics.get_object_or_404(Organization, pk=org_pk)
         secure_mode = org.secure_mode
 
     try:
-        Project.validate_label_config(config)
-        task_data, _, _ = get_sample_task(config, secure_mode)
-        task_data = playground_replacements(request, task_data)
+        Project.validate_label_config(config)  # type: ignore[no-untyped-call]
+        task_data, _, _ = get_sample_task(config, secure_mode)  # type: ignore[no-untyped-call]
+        task_data = playground_replacements(request, task_data)  # type: ignore[no-untyped-call]
     except (ValueError, ValidationError, lxml.etree.Error):
         response = HttpResponse('error while example generating', status=status.HTTP_400_BAD_REQUEST)
     else:

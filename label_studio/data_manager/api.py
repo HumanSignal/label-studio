@@ -2,18 +2,18 @@
 """
 import logging
 
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend  # type: ignore[import]
 from django.utils.decorators import method_decorator
 from rest_framework import viewsets, generics
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema  # type: ignore[import]
+from drf_yasg import openapi  # type: ignore[import]
 from django.conf import settings
 
-from core.utils.common import int_from_request, load_func
+from core.utils.common import int_from_request, load_func  # type: ignore[attr-defined]
 from core.utils.params import bool_from_request
 from core.permissions import all_permissions, ViewClassPermission
 from projects.models import Project
@@ -89,7 +89,7 @@ logger = logging.getLogger(__name__)
             description='View ID'),
     ],
 ))
-class ViewAPI(viewsets.ModelViewSet):
+class ViewAPI(viewsets.ModelViewSet):  # type: ignore[type-arg]
     serializer_class = ViewSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["project"]
@@ -101,7 +101,7 @@ class ViewAPI(viewsets.ModelViewSet):
         DELETE=all_permissions.tasks_delete,
     )
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer):  # type: ignore[no-untyped-def]
         serializer.save(user=self.request.user)
 
     @swagger_auto_schema(
@@ -111,16 +111,16 @@ class ViewAPI(viewsets.ModelViewSet):
         request_body=ViewResetSerializer,
     )
     @action(detail=False, methods=["delete"])
-    def reset(self, request):
+    def reset(self, request):  # type: ignore[no-untyped-def]
         serializer = ViewResetSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=serializer.validated_data['project'].id)
-        queryset = self.filter_queryset(self.get_queryset()).filter(project=project)
+        project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=serializer.validated_data['project'].id)  # type: ignore[no-untyped-call]
+        queryset = self.filter_queryset(self.get_queryset()).filter(project=project)  # type: ignore[no-untyped-call]
         queryset.all().delete()
         return Response(status=204)
 
-    def get_queryset(self):
-        return View.objects.filter(project__organization=self.request.user.active_organization).order_by('id')
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        return View.objects.filter(project__organization=self.request.user.active_organization).order_by('id')  # type: ignore[misc, union-attr]
 
 
 class TaskPagination(PageNumberPagination):
@@ -130,23 +130,23 @@ class TaskPagination(PageNumberPagination):
     total_predictions = 0
     max_page_size = settings.TASK_API_PAGE_SIZE_MAX
 
-    def paginate_queryset(self, queryset, request, view=None):
+    def paginate_queryset(self, queryset, request, view=None):  # type: ignore[no-untyped-def]
         self.total_predictions = Prediction.objects.filter(task_id__in=queryset).count()
         self.total_annotations = Annotation.objects.filter(task_id__in=queryset, was_cancelled=False).count()
         return super().paginate_queryset(queryset, request, view)
 
-    def get_paginated_response(self, data):
+    def get_paginated_response(self, data):  # type: ignore[no-untyped-def]
         return Response(
             {
                 "total_annotations": self.total_annotations,
                 "total_predictions": self.total_predictions,
-                "total": self.page.paginator.count,
+                "total": self.page.paginator.count,  # type: ignore[union-attr]
                 "tasks": data,
             }
         )
 
 
-class TaskListAPI(generics.ListCreateAPIView):
+class TaskListAPI(generics.ListCreateAPIView):  # type: ignore[type-arg]
     task_serializer_class = DataManagerTaskSerializer
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
@@ -157,11 +157,11 @@ class TaskListAPI(generics.ListCreateAPIView):
     )
 
     @staticmethod
-    def get_task_serializer_context(request, project):
+    def get_task_serializer_context(request, project):  # type: ignore[no-untyped-def]
         all_fields = request.GET.get('fields', None) == 'all'  # false by default
 
         return {
-            'resolve_uri': bool_from_request(request.GET, 'resolve_uri', True),
+            'resolve_uri': bool_from_request(request.GET, 'resolve_uri', True),  # type: ignore[no-untyped-call]
             'request': request,
             'project': project,
             'drafts': all_fields,
@@ -169,11 +169,11 @@ class TaskListAPI(generics.ListCreateAPIView):
             'annotations': all_fields
         }
 
-    def get_task_queryset(self, request, prepare_params):
-        return Task.prepared.only_filtered(prepare_params=prepare_params)
+    def get_task_queryset(self, request, prepare_params):  # type: ignore[no-untyped-def]
+        return Task.prepared.only_filtered(prepare_params=prepare_params)  # type: ignore[no-untyped-call]
 
     @staticmethod
-    def prefetch(queryset):
+    def prefetch(queryset):  # type: ignore[no-untyped-def]
         return queryset.prefetch_related(
             'annotations', 'predictions', 'annotations__completed_by', 'project',
             'io_storages_azureblobimportstoragelink',
@@ -184,10 +184,10 @@ class TaskListAPI(generics.ListCreateAPIView):
             'file_upload'
         )
 
-    def get(self, request):
+    def get(self, request):  # type: ignore[no-untyped-def]
         # get project
-        view_pk = int_from_request(request.GET, 'view', 0) or int_from_request(request.data, 'view', 0)
-        project_pk = int_from_request(request.GET, 'project', 0) or int_from_request(request.data, 'project', 0)
+        view_pk = int_from_request(request.GET, 'view', 0) or int_from_request(request.data, 'view', 0)  # type: ignore[no-untyped-call]
+        project_pk = int_from_request(request.GET, 'project', 0) or int_from_request(request.data, 'project', 0)  # type: ignore[no-untyped-call]
         if project_pk:
             project = generics.get_object_or_404(Project, pk=project_pk)
             self.check_object_permissions(request, project)
@@ -198,9 +198,9 @@ class TaskListAPI(generics.ListCreateAPIView):
         else:
             return Response({'detail': 'Neither project nor view id specified'}, status=404)
         # get prepare params (from view or from payload directly)
-        prepare_params = get_prepare_params(request, project)
-        queryset = self.get_task_queryset(request, prepare_params)
-        context = self.get_task_serializer_context(self.request, project)
+        prepare_params = get_prepare_params(request, project)  # type: ignore[no-untyped-call]
+        queryset = self.get_task_queryset(request, prepare_params)  # type: ignore[no-untyped-call]
+        context = self.get_task_serializer_context(self.request, project)  # type: ignore[no-untyped-call]
 
         # paginated tasks
         self.pagination_class = TaskPagination
@@ -208,8 +208,8 @@ class TaskListAPI(generics.ListCreateAPIView):
 
         # get request params
         all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
-        fields_for_evaluation = get_fields_for_evaluation(prepare_params, request.user)
-        review = bool_from_request(self.request.GET, 'review', False)
+        fields_for_evaluation = get_fields_for_evaluation(prepare_params, request.user)  # type: ignore[no-untyped-call]
+        review = bool_from_request(self.request.GET, 'review', False)  # type: ignore[no-untyped-call]
 
         if review:
             fields_for_evaluation = ['annotators', 'reviewed']
@@ -217,8 +217,8 @@ class TaskListAPI(generics.ListCreateAPIView):
         if page is not None:
             ids = [task.id for task in page]  # page is a list already
             tasks = list(
-                self.prefetch(
-                    Task.prepared.annotate_queryset(
+                self.prefetch(  # type: ignore[no-untyped-call]
+                    Task.prepared.annotate_queryset(  # type: ignore[no-untyped-call]
                         Task.objects.filter(id__in=ids),
                         fields_for_evaluation=fields_for_evaluation,
                         all_fields=all_fields,
@@ -233,15 +233,15 @@ class TaskListAPI(generics.ListCreateAPIView):
             # retrieve ML predictions if tasks don't have them
             if not review and project.evaluate_predictions_automatically:
                 tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
-                evaluate_predictions(tasks_for_predictions)
+                evaluate_predictions(tasks_for_predictions)  # type: ignore[no-untyped-call]
                 [tasks_by_ids[_id].refresh_from_db() for _id in ids]
 
             serializer = self.task_serializer_class(page, many=True, context=context)
             return self.get_paginated_response(serializer.data)
         # all tasks
         if project.evaluate_predictions_automatically:
-            evaluate_predictions(queryset.filter(predictions__isnull=True))
-        queryset = Task.prepared.annotate_queryset(
+            evaluate_predictions(queryset.filter(predictions__isnull=True))  # type: ignore[no-untyped-call]
+        queryset = Task.prepared.annotate_queryset(  # type: ignore[no-untyped-call]
             queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields, request=request
         )
         serializer = self.task_serializer_class(queryset, many=True, context=context)
@@ -256,11 +256,11 @@ class TaskListAPI(generics.ListCreateAPIView):
 class ProjectColumnsAPI(APIView):
     permission_required = all_permissions.projects_view
 
-    def get(self, request):
-        pk = int_from_request(request.GET, "project", 1)
+    def get(self, request):  # type: ignore[no-untyped-def]
+        pk = int_from_request(request.GET, "project", 1)  # type: ignore[no-untyped-call]
         project = generics.get_object_or_404(Project, pk=pk)
         self.check_object_permissions(request, project)
-        GET_ALL_COLUMNS = load_func(settings.DATA_MANAGER_GET_ALL_COLUMNS)
+        GET_ALL_COLUMNS = load_func(settings.DATA_MANAGER_GET_ALL_COLUMNS)  # type: ignore[no-untyped-call]
         data = GET_ALL_COLUMNS(project, request.user)
         return Response(data)
 
@@ -273,8 +273,8 @@ class ProjectColumnsAPI(APIView):
 class ProjectStateAPI(APIView):
     permission_required = all_permissions.projects_view
 
-    def get(self, request):
-        pk = int_from_request(request.GET, "project", 1)  # replace 1 to None, it's for debug only
+    def get(self, request):  # type: ignore[no-untyped-def]
+        pk = int_from_request(request.GET, "project", 1)    # type: ignore[no-untyped-call] # replace 1 to None, it's for debug only
         project = generics.get_object_or_404(Project, pk=pk)
         self.check_object_permissions(request, project)
         data = ProjectSerializer(project).data
@@ -288,7 +288,7 @@ class ProjectStateAPI(APIView):
                 "target_syncing": False,
                 "task_count": project.tasks.count(),
                 "annotation_count": Annotation.objects.filter(project=project).count(),
-                'config_has_control_tags': len(project.get_parsed_config()) > 0
+                'config_has_control_tags': len(project.get_parsed_config()) > 0  # type: ignore[no-untyped-call]
             }
         )
         return Response(data)
@@ -310,18 +310,18 @@ class ProjectActionsAPI(APIView):
         POST=all_permissions.projects_view,
     )
 
-    def get(self, request):
-        pk = int_from_request(request.GET, "project", 1)  # replace 1 to None, it's for debug only
+    def get(self, request):  # type: ignore[no-untyped-def]
+        pk = int_from_request(request.GET, "project", 1)    # type: ignore[no-untyped-call] # replace 1 to None, it's for debug only
         project = generics.get_object_or_404(Project, pk=pk)
         self.check_object_permissions(request, project)
-        return Response(get_all_actions(request.user, project))
+        return Response(get_all_actions(request.user, project))  # type: ignore[no-untyped-call]
 
-    def post(self, request):
-        pk = int_from_request(request.GET, "project", None)
+    def post(self, request):  # type: ignore[no-untyped-def]
+        pk = int_from_request(request.GET, "project", None)  # type: ignore[no-untyped-call]
         project = generics.get_object_or_404(Project, pk=pk)
         self.check_object_permissions(request, project)
 
-        queryset = get_prepared_queryset(request, project)
+        queryset = get_prepared_queryset(request, project)  # type: ignore[no-untyped-call]
 
         # wrong action id
         action_id = request.GET.get('id', None)
@@ -331,7 +331,7 @@ class ProjectActionsAPI(APIView):
 
         # perform action and return the result dict
         kwargs = {'request': request}  # pass advanced params to actions
-        result = perform_action(action_id, project, queryset, request.user, **kwargs)
+        result = perform_action(action_id, project, queryset, request.user, **kwargs)  # type: ignore[no-untyped-call]
         code = result.pop('response_code', 200)
 
         return Response(result, status=code)

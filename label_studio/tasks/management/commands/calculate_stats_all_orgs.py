@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 class Command(BaseCommand):
     help = 'Recalculate project stats (total_annotations, etc) for all organizations'
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser):  # type: ignore[no-untyped-def]
         parser.add_argument(
             '--from-scratch',
             dest='from_scratch',
@@ -20,7 +20,7 @@ class Command(BaseCommand):
             help='Use rq workers with redis (async background processing)'
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # type: ignore[no-untyped-def]
         from tasks.functions import calculate_stats_all_orgs
 
-        calculate_stats_all_orgs(from_scratch=options['from_scratch'], redis=options['redis'])
+        calculate_stats_all_orgs(from_scratch=options['from_scratch'], redis=options['redis'])  # type: ignore[no-untyped-call]

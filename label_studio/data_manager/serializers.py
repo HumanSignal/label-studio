@@ -11,16 +11,16 @@ from data_manager.models import View, Filter, FilterGroup
 from tasks.models import Task
 from tasks.serializers import TaskSerializer, AnnotationSerializer, PredictionSerializer, AnnotationDraftSerializer
 from projects.models import Project
-from label_studio.core.utils.common import round_floats
+from label_studio.core.utils.common import round_floats  # type: ignore[import]
 
 
-class FilterSerializer(serializers.ModelSerializer):
+class FilterSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
     class Meta:
         model = Filter
         fields = "__all__"
 
 
-class FilterGroupSerializer(serializers.ModelSerializer):
+class FilterGroupSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
     filters = FilterSerializer(many=True)
 
     class Meta:
@@ -28,14 +28,14 @@ class FilterGroupSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ViewSerializer(serializers.ModelSerializer):
+class ViewSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
     filter_group = FilterGroupSerializer(required=False)
 
     class Meta:
         model = View
         fields = "__all__"
 
-    def to_internal_value(self, data):
+    def to_internal_value(self, data):  # type: ignore[no-untyped-def]
         """
         map old filters structure to models
         "filters": {  ===> FilterGroup model
@@ -79,7 +79,7 @@ class ViewSerializer(serializers.ModelSerializer):
 
         return super().to_internal_value(data)
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # type: ignore[no-untyped-def]
         result = super().to_representation(instance)
         filters = result.pop("filter_group", {})
         if filters:
@@ -108,28 +108,28 @@ class ViewSerializer(serializers.ModelSerializer):
         return result
 
     @staticmethod
-    def _create_filters(filter_group, filters_data):
+    def _create_filters(filter_group, filters_data):  # type: ignore[no-untyped-def]
         filter_index = 0
         for filter_data in filters_data:
             filter_data["index"] = filter_index
             filter_group.filters.add(Filter.objects.create(**filter_data))
             filter_index += 1
 
-    def create(self, validated_data):
+    def create(self, validated_data):  # type: ignore[no-untyped-def]
         with transaction.atomic():
             filter_group_data = validated_data.pop("filter_group", None)
             if filter_group_data:
                 filters_data = filter_group_data.pop("filters", [])
                 filter_group = FilterGroup.objects.create(**filter_group_data)
 
-                self._create_filters(filter_group=filter_group, filters_data=filters_data)
+                self._create_filters(filter_group=filter_group, filters_data=filters_data)  # type: ignore[no-untyped-call]
 
                 validated_data["filter_group_id"] = filter_group.id
             view = self.Meta.model.objects.create(**validated_data)
 
             return view
 
-    def update(self, instance, validated_data):
+    def update(self, instance, validated_data):  # type: ignore[no-untyped-def]
         with transaction.atomic():
             filter_group_data = validated_data.pop("filter_group", None)
             if filter_group_data:
@@ -145,7 +145,7 @@ class ViewSerializer(serializers.ModelSerializer):
                     filter_group.save()
 
                 filter_group.filters.clear()
-                self._create_filters(filter_group=filter_group, filters_data=filters_data)
+                self._create_filters(filter_group=filter_group, filters_data=filters_data)  # type: ignore[no-untyped-call]
 
             ordering = validated_data.pop("ordering", None)
             if ordering and ordering != instance.ordering:
@@ -159,7 +159,7 @@ class ViewSerializer(serializers.ModelSerializer):
             return instance
 
 
-class DataManagerTaskSerializer(TaskSerializer):
+class DataManagerTaskSerializer(TaskSerializer):  # type: ignore[misc]
     predictions = serializers.SerializerMethodField(required=False, read_only=True)
     annotations = AnnotationSerializer(required=False, many=True, default=[], read_only=True)
     drafts = serializers.SerializerMethodField(required=False, read_only=True)
@@ -189,7 +189,7 @@ class DataManagerTaskSerializer(TaskSerializer):
         fields = '__all__'
         expandable_fields = {'annotations': (AnnotationSerializer, {'many': True})}
 
-    def to_representation(self, obj):
+    def to_representation(self, obj):  # type: ignore[no-untyped-def]
         """ Dynamically manage including of some fields in the API result
         """
         ret = super(DataManagerTaskSerializer, self).to_representation(obj)
@@ -199,7 +199,7 @@ class DataManagerTaskSerializer(TaskSerializer):
             ret.pop('predictions', None)
         return ret
 
-    def _pretty_results(self, task, field, unique=False):
+    def _pretty_results(self, task, field, unique=False):  # type: ignore[no-untyped-def]
         if not hasattr(task, field) or getattr(task, field) is None:
             return ''
 
@@ -207,7 +207,7 @@ class DataManagerTaskSerializer(TaskSerializer):
         if isinstance(result, str):
             output = result
             if unique:
-                output = list(set(output.split(',')))
+                output = list(set(output.split(',')))  # type: ignore[assignment]
                 output = ','.join(output)
 
         elif isinstance(result, int):
@@ -221,32 +221,32 @@ class DataManagerTaskSerializer(TaskSerializer):
 
         return output[:self.CHAR_LIMITS].replace(',"', ', "').replace('],[', "] [").replace('"', '')
 
-    def get_annotations_results(self, task):
-        return self._pretty_results(task, 'annotations_results')
+    def get_annotations_results(self, task):  # type: ignore[no-untyped-def]
+        return self._pretty_results(task, 'annotations_results')  # type: ignore[no-untyped-call]
 
-    def get_predictions_results(self, task):
-        return self._pretty_results(task, 'predictions_results')
+    def get_predictions_results(self, task):  # type: ignore[no-untyped-def]
+        return self._pretty_results(task, 'predictions_results')  # type: ignore[no-untyped-call]
 
-    def get_predictions(self, task):
+    def get_predictions(self, task):  # type: ignore[no-untyped-def]
         return PredictionSerializer(task.predictions, many=True, default=[], read_only=True).data
 
     @staticmethod
-    def get_file_upload(task):
+    def get_file_upload(task):  # type: ignore[no-untyped-def]
         if hasattr(task, 'file_upload_field'):
             file_upload = task.file_upload_field
             return os.path.basename(task.file_upload_field) if file_upload else None
         return None
 
     @staticmethod
-    def get_storage_filename(task):
+    def get_storage_filename(task):  # type: ignore[no-untyped-def]
         return task.storage_filename
 
     @staticmethod
-    def get_updated_by(obj):
+    def get_updated_by(obj):  # type: ignore[no-untyped-def]
         return [{"user_id": obj.updated_by_id}] if obj.updated_by_id else []
 
     @staticmethod
-    def get_annotators(obj):
+    def get_annotators(obj):  # type: ignore[no-untyped-def]
         if not hasattr(obj, 'annotators'):
             return []
 
@@ -260,21 +260,21 @@ class DataManagerTaskSerializer(TaskSerializer):
         annotators = [a for a in annotators if a is not None]
         return annotators if hasattr(obj, 'annotators') and annotators else []
 
-    def get_annotations_ids(self, task):
-        return self._pretty_results(task, 'annotations_ids', unique=True)
+    def get_annotations_ids(self, task):  # type: ignore[no-untyped-def]
+        return self._pretty_results(task, 'annotations_ids', unique=True)  # type: ignore[no-untyped-call]
 
-    def get_predictions_model_versions(self, task):
-        return self._pretty_results(task, 'predictions_model_versions', unique=True)
+    def get_predictions_model_versions(self, task):  # type: ignore[no-untyped-def]
+        return self._pretty_results(task, 'predictions_model_versions', unique=True)  # type: ignore[no-untyped-call]
 
-    def get_drafts_serializer(self):
+    def get_drafts_serializer(self):  # type: ignore[no-untyped-def]
         return AnnotationDraftSerializer
 
-    def get_drafts_queryset(self, user, drafts):
+    def get_drafts_queryset(self, user, drafts):  # type: ignore[no-untyped-def]
         """ Get all user's draft
         """
         return drafts.filter(user=user)
 
-    def get_drafts(self, task):
+    def get_drafts(self, task):  # type: ignore[no-untyped-def]
         """Return drafts only for the current user"""
         # it's for swagger documentation
         if not isinstance(task, Task) or not self.context.get('drafts'):
@@ -283,18 +283,18 @@ class DataManagerTaskSerializer(TaskSerializer):
         drafts = task.drafts
         if 'request' in self.context and hasattr(self.context['request'], 'user'):
             user = self.context['request'].user
-            drafts = self.get_drafts_queryset(user, drafts)
+            drafts = self.get_drafts_queryset(user, drafts)  # type: ignore[no-untyped-call]
 
-        serializer_class = self.get_drafts_serializer()
+        serializer_class = self.get_drafts_serializer()  # type: ignore[no-untyped-call]
         return serializer_class(drafts, many=True, read_only=True, default=True, context=self.context).data
 
 
-class SelectedItemsSerializer(serializers.Serializer):
+class SelectedItemsSerializer(serializers.Serializer):  # type: ignore[type-arg]
     all = serializers.BooleanField()
     included = serializers.ListField(child=serializers.IntegerField(), required=False)
     excluded = serializers.ListField(child=serializers.IntegerField(), required=False)
 
-    def validate(self, data):
+    def validate(self, data):  # type: ignore[no-untyped-def]
         if data["all"] is True and data.get("included"):
             raise serializers.ValidationError("included not allowed with all==true")
         if data["all"] is False and data.get("excluded"):
@@ -310,5 +310,5 @@ class SelectedItemsSerializer(serializers.Serializer):
         return data
 
 
-class ViewResetSerializer(serializers.Serializer):
+class ViewResetSerializer(serializers.Serializer):  # type: ignore[type-arg]
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all())

@@ -25,11 +25,11 @@ from .exceptions import InvalidUploadUrlError
 _DIR_APP_NAME = 'label-studio'
 
 
-def good_path(path):
+def good_path(path):  # type: ignore[no-untyped-def]
     return os.path.abspath(os.path.expanduser(path))
 
 
-def find_node(package_name, node_path, node_type):
+def find_node(package_name, node_path, node_type):  # type: ignore[no-untyped-def]
     assert node_type in ('dir', 'file', 'any')
     basedir = pkg_resources.resource_filename(package_name, '')
     node_path = os.path.join(*node_path.split('/'))  # linux to windows compatibility
@@ -55,29 +55,29 @@ def find_node(package_name, node_path, node_type):
         )
 
 
-def find_file(file):
-    return find_node('label_studio', file, 'file')
+def find_file(file):  # type: ignore[no-untyped-def]
+    return find_node('label_studio', file, 'file')  # type: ignore[no-untyped-call]
 
 
-def find_dir(directory):
-    return find_node('label_studio', directory, 'dir')
+def find_dir(directory):  # type: ignore[no-untyped-def]
+    return find_node('label_studio', directory, 'dir')  # type: ignore[no-untyped-call]
 
 
 @contextmanager
-def get_temp_file():
+def get_temp_file():  # type: ignore[no-untyped-def]
     fd, path = mkstemp()
     yield path
     os.close(fd)
 
 
 @contextmanager
-def get_temp_dir():
+def get_temp_dir():  # type: ignore[no-untyped-def]
     dirpath = mkdtemp()
     yield dirpath
     shutil.rmtree(dirpath)
 
 
-def get_config_dir():
+def get_config_dir():  # type: ignore[no-untyped-def]
     config_dir = user_config_dir(appname=_DIR_APP_NAME)
     try:
         os.makedirs(config_dir, exist_ok=True)
@@ -86,31 +86,31 @@ def get_config_dir():
     return config_dir
 
 
-def get_data_dir():
+def get_data_dir():  # type: ignore[no-untyped-def]
     data_dir = user_data_dir(appname=_DIR_APP_NAME)
     os.makedirs(data_dir, exist_ok=True)
     return data_dir
 
 
-def get_cache_dir():
+def get_cache_dir():  # type: ignore[no-untyped-def]
     cache_dir = user_cache_dir(appname=_DIR_APP_NAME)
     os.makedirs(cache_dir, exist_ok=True)
     return cache_dir
 
 
-def delete_dir_content(dirpath):
+def delete_dir_content(dirpath):  # type: ignore[no-untyped-def]
     for f in glob.glob(dirpath + '/*'):
-        remove_file_or_dir(f)
+        remove_file_or_dir(f)  # type: ignore[no-untyped-call]
 
 
-def remove_file_or_dir(path):
+def remove_file_or_dir(path):  # type: ignore[no-untyped-def]
     if os.path.isfile(path):
         os.remove(path)
     elif os.path.isdir(path):
         shutil.rmtree(path)
 
 
-def get_all_files_from_dir(d):
+def get_all_files_from_dir(d):  # type: ignore[no-untyped-def]
     out = []
     for name in os.listdir(d):
         filepath = os.path.join(d, name)
@@ -119,14 +119,14 @@ def get_all_files_from_dir(d):
     return out
 
 
-def iter_files(root_dir, ext):
+def iter_files(root_dir, ext):  # type: ignore[no-untyped-def]
     for root, _, files in os.walk(root_dir):
         for f in files:
             if f.lower().endswith(ext):
                 yield os.path.join(root, f)
 
 
-def json_load(file, int_keys=False):
+def json_load(file, int_keys=False):  # type: ignore[no-untyped-def]
     with io.open(file, encoding='utf8') as f:
         data = json.load(f)
         if int_keys:
@@ -135,20 +135,20 @@ def json_load(file, int_keys=False):
             return data
 
 
-def read_yaml(filepath):
+def read_yaml(filepath):  # type: ignore[no-untyped-def]
     if not os.path.exists(filepath):
-        filepath = find_file(filepath)
+        filepath = find_file(filepath)  # type: ignore[no-untyped-call]
     with io.open(filepath, encoding='utf-8') as f:
         data = yaml.load(f, Loader=yaml.FullLoader)  # nosec
     return data
 
 
-def read_bytes_stream(filepath):
+def read_bytes_stream(filepath):  # type: ignore[no-untyped-def]
     with open(filepath, mode='rb') as f:
         return io.BytesIO(f.read())
 
 
-def get_all_dirs_from_dir(d):
+def get_all_dirs_from_dir(d):  # type: ignore[no-untyped-def]
     out = []
     for name in os.listdir(d):
         filepath = os.path.join(d, name)
@@ -157,21 +157,21 @@ def get_all_dirs_from_dir(d):
     return out
 
 
-class SerializableGenerator(list):
+class SerializableGenerator(list):  # type: ignore[type-arg]
     """Generator that is serializable by JSON"""
 
-    def __init__(self, iterable):
+    def __init__(self, iterable):  # type: ignore[no-untyped-def]
         tmp_body = iter(iterable)
         try:
             self._head = iter([next(tmp_body)])
             self.append(tmp_body)
         except StopIteration:
-            self._head = []
+            self._head = []  # type: ignore[assignment]
 
-    def __iter__(self):
+    def __iter__(self):  # type: ignore[no-untyped-def]
         return itertools.chain(self._head, *self[:1])
 
-def validate_upload_url(url, block_local_urls=True):
+def validate_upload_url(url, block_local_urls=True):  # type: ignore[no-untyped-def]
     """Utility function for defending against SSRF attacks. Raises
         - InvalidUploadUrlError if the url is not HTTP[S], or if block_local_urls is enabled
           and the URL resolves to a local address.
@@ -188,7 +188,7 @@ def validate_upload_url(url, block_local_urls=True):
 
     domain = parsed_url.host
     try:
-        ip = socket.gethostbyname(domain)
+        ip = socket.gethostbyname(domain)  # type: ignore[arg-type]
     except socket.error:
         from core.utils.exceptions import LabelStudioAPIException
         raise LabelStudioAPIException(f"Can't resolve hostname {domain}")

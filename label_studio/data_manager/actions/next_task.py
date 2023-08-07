@@ -12,7 +12,7 @@ from tasks.serializers import NextTaskSerializer
 logger = logging.getLogger(__name__)
 
 
-def next_task(project, queryset, **kwargs):
+def next_task(project, queryset, **kwargs):  # type: ignore[no-untyped-def]
     """ Generate next task for labeling stream
 
     :param project: project
@@ -21,8 +21,8 @@ def next_task(project, queryset, **kwargs):
     """
 
     request = kwargs['request']
-    dm_queue = filters_ordering_selected_items_exist(request.data)
-    next_task, queue_info = get_next_task(request.user, queryset, project, dm_queue)
+    dm_queue = filters_ordering_selected_items_exist(request.data)  # type: ignore[no-untyped-call]
+    next_task, queue_info = get_next_task(request.user, queryset, project, dm_queue)  # type: ignore[no-untyped-call]
 
     if next_task is None:
         raise NotFound(

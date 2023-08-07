@@ -8,7 +8,7 @@ from projects.models import Project
 
 
 @pytest.mark.django_db
-def test_views_tasks_api(business_client, project_id):
+def test_views_tasks_api(business_client, project_id):  # type: ignore[no-untyped-def]
     # create
     payload = dict(project=project_id, data={"test": 1})
     response = business_client.post(
@@ -29,11 +29,11 @@ def test_views_tasks_api(business_client, project_id):
 
     project = Project.objects.get(pk=project_id)
     task_data = {"text": "bbb"}
-    task_id = make_task({"data": task_data}, project).id
+    task_id = make_task({"data": task_data}, project).id  # type: ignore[no-untyped-call]
 
     annotation_result = {"from_name": "my_class", "to_name": "text", "type": "choices", "value": {"choices": ["pos"]}}
-    make_annotation({"result": [annotation_result]}, task_id)
-    make_annotation(
+    make_annotation({"result": [annotation_result]}, task_id)  # type: ignore[no-untyped-call]
+    make_annotation(  # type: ignore[no-untyped-call]
         {
             "result": [annotation_result],
             "was_cancelled": True,
@@ -41,7 +41,7 @@ def test_views_tasks_api(business_client, project_id):
         task_id,
     )
     prediction_result = {"from_name": "my_class", "to_name": "text", "type": "choices", "value": {"choices": ["pos"]}}
-    make_prediction(
+    make_prediction(  # type: ignore[no-untyped-call]
         {
             "result": [prediction_result],
         },
@@ -98,7 +98,7 @@ def test_views_tasks_api(business_client, project_id):
     ],
 )
 @pytest.mark.django_db
-def test_views_total_counters(tasks_count, annotations_count, predictions_count, business_client, project_id):
+def test_views_total_counters(tasks_count, annotations_count, predictions_count, business_client, project_id):  # type: ignore[no-untyped-def]
     # create
     payload = dict(project=project_id, data={"test": 1})
     response = business_client.post(
@@ -112,13 +112,13 @@ def test_views_total_counters(tasks_count, annotations_count, predictions_count,
 
     project = Project.objects.get(pk=project_id)
     for _ in range(0, tasks_count):
-        task_id = make_task({"data": {}}, project).id
+        task_id = make_task({"data": {}}, project).id  # type: ignore[no-untyped-call]
         print('TASK_ID: %s' % task_id)
         for _ in range(0, annotations_count):
-            make_annotation({"result": []}, task_id)
+            make_annotation({"result": []}, task_id)  # type: ignore[no-untyped-call]
 
         for _ in range(0, predictions_count):
-            make_prediction({"result": []}, task_id)
+            make_prediction({"result": []}, task_id)  # type: ignore[no-untyped-call]
 
     response = business_client.get(f"/api/tasks?fields=all&view={view_id}")
 

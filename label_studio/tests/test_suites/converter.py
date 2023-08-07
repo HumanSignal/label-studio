@@ -4,7 +4,7 @@ import yaml
 from collections import OrderedDict
 
 
-def represent_ordereddict(dumper, data):
+def represent_ordereddict(dumper, data):  # type: ignore[no-untyped-def]
     value = []
 
     for item_key, item_value in data.items():
@@ -20,7 +20,7 @@ yaml.add_representer(OrderedDict, represent_ordereddict)
 
 class Regexp(yaml.YAMLObject):
     yaml_tag = u'!re_match'
-    def __init__(self, regexp):
+    def __init__(self, regexp):  # type: ignore[no-untyped-def]
         self.regexp = regexp
     # def __repr__(self):
     #     return "" % (
@@ -87,8 +87,8 @@ with open(old_test) as f:
                     new_stages.append(
                         {
                             'name': 'stage',
-                            'request': request_data,
-                            'response': response_data,
+                            'request': request_data,  # type: ignore[dict-item]
+                            'response': response_data,  # type: ignore[dict-item]
                         }
                     )
 

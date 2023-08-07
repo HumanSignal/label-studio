@@ -9,7 +9,7 @@ from pathlib import Path
 from django.http import (
     FileResponse, Http404, HttpResponseNotModified,
 )
-from ranged_fileresponse import RangedFileResponse
+from ranged_fileresponse import RangedFileResponse  # type: ignore[import]
 
 from django.utils._os import safe_join
 from django.utils.http import http_date
@@ -17,7 +17,7 @@ from django.utils.translation import gettext as _
 from django.views.static import was_modified_since
 
 
-def serve(request, path, document_root=None, show_indexes=False):
+def serve(request, path, document_root=None, show_indexes=False):  # type: ignore[no-untyped-def]
     """
     Serve static files below a given point in the directory structure.
 

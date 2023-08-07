@@ -3,7 +3,7 @@
 from typing import TYPE_CHECKING
 import pytest
 import types
-from core.utils.common import int_from_request
+from core.utils.common import int_from_request  # type: ignore[attr-defined]
 from core.utils.params import bool_from_request
 from core.utils.io import validate_upload_url
 from core.utils.exceptions import InvalidUploadUrlError
@@ -23,14 +23,14 @@ from rest_framework.exceptions import ValidationError
     (None, False)
 ])
 @pytest.mark.django_db
-def test_core_bool_from_request(param, result):
+def test_core_bool_from_request(param, result):  # type: ignore[no-untyped-def]
     params = {'test': param} if param is not None else {}
 
     # incorrect param should call exception
     if result is None:
         error = False
         try:
-            bool_from_request(params, 'test', 0)
+            bool_from_request(params, 'test', 0)  # type: ignore[no-untyped-call]
         except:
             error = True
 
@@ -38,7 +38,7 @@ def test_core_bool_from_request(param, result):
 
     # everything ok
     else:
-        assert bool_from_request(params, 'test', 0) == result
+        assert bool_from_request(params, 'test', 0) == result  # type: ignore[no-untyped-call]
 
 
 @pytest.mark.parametrize('param, result', [
@@ -50,14 +50,14 @@ def test_core_bool_from_request(param, result):
     (None, None)
 ])
 @pytest.mark.django_db
-def test_core_int_from_request(param, result):
+def test_core_int_from_request(param, result):  # type: ignore[no-untyped-def]
     params = {'test': param}
 
     # incorrect param should call exception
     if result is None:
         error = False
         try:
-            int_from_request(params, 'test', 0)
+            int_from_request(params, 'test', 0)  # type: ignore[no-untyped-call]
         except ValidationError:
             error = True
 
@@ -65,20 +65,20 @@ def test_core_int_from_request(param, result):
 
     # everything ok
     else:
-        assert int_from_request(params, 'test', 0) == result
+        assert int_from_request(params, 'test', 0) == result  # type: ignore[no-untyped-call]
 
 
 @pytest.mark.django_db
-def test_user_info(business_client):
+def test_user_info(business_client):  # type: ignore[no-untyped-def]
     if TYPE_CHECKING:
         from server import _get_user_info, _create_user
     else:
         from label_studio.server import _get_user_info, _create_user
 
-    user_data = _get_user_info(business_client.admin.email)
+    user_data = _get_user_info(business_client.admin.email)  # type: ignore[no-untyped-call]
     assert 'token' in user_data
 
-    user_data = _get_user_info(None)
+    user_data = _get_user_info(None)  # type: ignore[no-untyped-call]
     assert user_data is None
 
     class DummyArgs:
@@ -87,12 +87,12 @@ def test_user_info(business_client):
         user_token = 'token12345'
 
     args = DummyArgs()
-    _create_user(args, {})
-    user_data = _get_user_info('tester@x.com')
+    _create_user(args, {})  # type: ignore[no-untyped-call]
+    user_data = _get_user_info('tester@x.com')  # type: ignore[no-untyped-call]
     assert user_data['token'] == 'token12345'
 
     args.user_token, args.username = '123', 'tester2@x.com'
-    user = _create_user(args, {})
+    user = _create_user(args, {})  # type: ignore[no-untyped-call]
     assert user is not None
 
 
@@ -100,60 +100,60 @@ def test_user_info(business_client):
     (['label-studio', 'user', '--username', 'test@test.com', '--password', '12345678'], None),
 ])
 @pytest.mark.django_db
-def test_main(mocker, command_line, result):
+def test_main(mocker, command_line, result):  # type: ignore[no-untyped-def]
     from server import main
 
     mocker.patch(
         "sys.argv",
         command_line
     )
-    output = main()
+    output = main()  # type: ignore[no-untyped-call]
 
     assert output == result
 
 
-def test_string_is_url():
+def test_string_is_url():  # type: ignore[no-untyped-def]
     if TYPE_CHECKING:
         from core.utils.common import string_is_url
     else:
         from label_studio.core.utils.common import string_is_url
 
-    assert string_is_url('http://test.com') is True
-    assert string_is_url('https://test.com') is True
-    assert string_is_url('xyz') is False
+    assert string_is_url('http://test.com') is True  # type: ignore[no-untyped-call]
+    assert string_is_url('https://test.com') is True  # type: ignore[no-untyped-call]
+    assert string_is_url('xyz') is False  # type: ignore[no-untyped-call]
 
 
-def test_get_client_ip():
+def test_get_client_ip():  # type: ignore[no-untyped-def]
     if TYPE_CHECKING:
         from core.utils.common import get_client_ip
     else:
         from label_studio.core.utils.common import get_client_ip
 
-    ip = get_client_ip(types.SimpleNamespace(META={'HTTP_X_FORWARDED_FOR': '127.0.0.1'}))
+    ip = get_client_ip(types.SimpleNamespace(META={'HTTP_X_FORWARDED_FOR': '127.0.0.1'}))  # type: ignore[no-untyped-call]
     assert ip == '127.0.0.1'
 
-    ip = get_client_ip(types.SimpleNamespace(META={'REMOTE_ADDR': '127.0.0.2'}))
+    ip = get_client_ip(types.SimpleNamespace(META={'REMOTE_ADDR': '127.0.0.2'}))  # type: ignore[no-untyped-call]
     assert ip == '127.0.0.2'
 
 
-def test_timestamp_now():
+def test_timestamp_now():  # type: ignore[no-untyped-def]
     if TYPE_CHECKING:
         from core.utils.common import timestamp_now
     else:
         from label_studio.core.utils.common import timestamp_now
 
-    t = timestamp_now()
+    t = timestamp_now()  # type: ignore[no-untyped-call]
     assert t is not None
 
 
-def test_start_browser():
+def test_start_browser():  # type: ignore[no-untyped-def]
     if TYPE_CHECKING:
         from core.utils.common import start_browser
     else:
         from label_studio.core.utils.common import start_browser
 
-    assert start_browser('http://localhost:8080', True) is None
-    assert start_browser('http://localhost:8080', False) is None
+    assert start_browser('http://localhost:8080', True) is None  # type: ignore[no-untyped-call]
+    assert start_browser('http://localhost:8080', False) is None  # type: ignore[no-untyped-call]
 
 @pytest.mark.parametrize('url, block_local_urls, raises_exc', [
     ('http://0.0.0.0', True, InvalidUploadUrlError),
@@ -194,11 +194,11 @@ def test_start_browser():
     ('http://localhost', False, None),
  ])
 @pytest.mark.django_db
-def test_core_validate_upload_url(url, block_local_urls, raises_exc):
+def test_core_validate_upload_url(url, block_local_urls, raises_exc):  # type: ignore[no-untyped-def]
 
     if raises_exc is None:
-        assert validate_upload_url(url, block_local_urls=block_local_urls) is None
+        assert validate_upload_url(url, block_local_urls=block_local_urls) is None  # type: ignore[no-untyped-call]
         return
 
     with pytest.raises(raises_exc) as e:
-        validate_upload_url(url, block_local_urls=block_local_urls)
+        validate_upload_url(url, block_local_urls=block_local_urls)  # type: ignore[no-untyped-call]

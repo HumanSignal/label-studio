@@ -5,10 +5,10 @@ import pandas as pd
 import numpy as np
 
 from uuid import uuid4
-from locust import HttpUser, between, constant, task, tag, events
+from locust import HttpUser, between, constant, task, tag, events  # type: ignore[import]
 
 
-def get_project_id(client):
+def get_project_id(client):  # type: ignore[no-untyped-def]
     with client.get('/api/projects', catch_response=True) as r:
         if r.status_code != 200:
             print(r.status_code)
@@ -22,7 +22,7 @@ def get_project_id(client):
             return random.choice(ids)
 
 
-def signup(client):
+def signup(client):  # type: ignore[no-untyped-def]
     username = str(uuid4())[:8]
     response = client.get('/')
     csrftoken = response.cookies['csrftoken']
@@ -35,12 +35,12 @@ def signup(client):
     return username
 
 
-class Admin(HttpUser):
+class Admin(HttpUser):  # type: ignore[misc]
     weight = 1
     wait_time = constant(10)
 
-    def on_start(self):
-        username = signup(self.client)
+    def on_start(self):  # type: ignore[no-untyped-def]
+        username = signup(self.client)  # type: ignore[no-untyped-call]
         with self.client.post(
             '/api/projects',
             json={
@@ -55,10 +55,10 @@ class Admin(HttpUser):
             print('Get response: ', rdata)
             self.project_id = rdata['id']
             print(f'Project {self.project_id} has been created by user {self.client}')
-            self.import_data()
+            self.import_data()  # type: ignore[no-untyped-call]
 
     @task
-    def view_data_manager(self):
+    def view_data_manager(self):  # type: ignore[no-untyped-def]
         self.client.get(
             f'/projects/{self.project_id}/data',
             name='projects/<pk>/data'
@@ -66,7 +66,7 @@ class Admin(HttpUser):
 
     # @tag('import')
     # @task
-    def import_data(self):
+    def import_data(self):  # type: ignore[no-untyped-def]
         self.client.post(
             '/api/projects/%i/import' % self.project_id,
             name='/api/projects/<pk>/import',
@@ -74,21 +74,21 @@ class Admin(HttpUser):
             # headers={'content-type': 'multipart/form-data'})
 
 
-class Annotator(HttpUser):
-    weight = int(os.environ.get('LOCUST_USERS')) - 1
+class Annotator(HttpUser):  # type: ignore[misc]
+    weight = int(os.environ.get('LOCUST_USERS')) - 1  # type: ignore[arg-type]
     wait_time = between(1, 3)
 
-    def on_start(self):
-        signup(self.client)
+    def on_start(self):  # type: ignore[no-untyped-def]
+        signup(self.client)  # type: ignore[no-untyped-call]
 
     @tag('select project')
     @task(1)
-    def select_project(self):
-        self.project_id = get_project_id(self.client)
+    def select_project(self):  # type: ignore[no-untyped-def]
+        self.project_id = get_project_id(self.client)  # type: ignore[no-untyped-call]
 
     @tag('labeling')
     @task(10)
-    def do_labeling(self):
+    def do_labeling(self):  # type: ignore[no-untyped-def]
         if not hasattr(self, 'project_id') or not self.project_id:
             print('No projects yet...')
             return
@@ -105,14 +105,14 @@ class Annotator(HttpUser):
             )
 
 
-def randomString(stringLength):
+def randomString(stringLength):  # type: ignore[no-untyped-def]
     """Generate a random string of fixed length """
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(stringLength))
 
 
 @events.test_start.add_listener
-def on_test_start(environment, **kwargs):
+def on_test_start(environment, **kwargs):  # type: ignore[no-untyped-def]
     rows = int(os.environ.get('IMPORTED_TASKS', 50000))
     print(f'Generating file with {rows} rows...')
     numbers = np.random.randint(low=0, high=100, size=(rows, 10)).tolist()

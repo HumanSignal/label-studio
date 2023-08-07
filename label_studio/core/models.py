@@ -42,5 +42,5 @@ class AsyncMigrationStatus(models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last updated time')
 
-    def __str__(self):
+    def __str__(self):  # type: ignore[no-untyped-def]
         return f'(id={self.id}) ' + self.name + (' at project ' + str(self.project) if self.project else '')

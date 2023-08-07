@@ -4,10 +4,10 @@ import json
 import random
 import string
 
-from locust import HttpUser, TaskSet, task, between
+from locust import HttpUser, TaskSet, task, between  # type: ignore[import]
 
 
-def randomString(stringLength):
+def randomString(stringLength):  # type: ignore[no-untyped-def]
     """Generate a random string of fixed length """
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(stringLength))
@@ -17,7 +17,7 @@ all_labels = ['Person', 'Organization', 'Fact', 'Money', 'Date', 'Time', 'Ordina
               'Location']
 
 
-def get_result(text):
+def get_result(text):  # type: ignore[no-untyped-def]
     start = random.randint(0, len(text))
     end = min(len(text), start + random.randint(3, 30))
     results = []
@@ -35,38 +35,38 @@ def get_result(text):
     return results
 
 
-class UserWorksWithProject(TaskSet):
+class UserWorksWithProject(TaskSet):  # type: ignore[misc]
 
-    def on_start(self):
+    def on_start(self):  # type: ignore[no-untyped-def]
         r = self.client.get('/api/annotator/projects')
         all_projects = r.json()
         self.project_id = random.choice(all_projects)
 
     @task(100)
-    def complete_task_via_api(self):
+    def complete_task_via_api(self):  # type: ignore[no-untyped-def]
         r = self.client.get('/api/projects/%i/next/' % self.project_id, name='/api/projects/<id>/next')
         task = r.json()
         task_id = task['id']
         task_text = task['data']['text']
-        results = get_result(task_text)
+        results = get_result(task_text)  # type: ignore[no-untyped-call]
         payload = json.dumps({'result': results})
         headers = {'content-type': 'application/json'}
         self.client.post('/api/tasks/%i/annotations' % task_id, payload, headers=headers, name='/api/tasks/<id>/annotations')
 
     @task(1)
-    def stop(self):
+    def stop(self):  # type: ignore[no-untyped-def]
         self.interrupt()
 
 
-class WebsiteUser(HttpUser):
+class WebsiteUser(HttpUser):  # type: ignore[misc]
     wait_time = between(3, 9)
 
     tasks = {UserWorksWithProject: 10}
 
-    def on_start(self):
-        self.login()
+    def on_start(self):  # type: ignore[no-untyped-def]
+        self.login()  # type: ignore[no-untyped-call]
 
-    def login(self):
+    def login(self):  # type: ignore[no-untyped-def]
         response = self.client.get('/')
         csrftoken = response.cookies['csrftoken']
         num_collabs = 100

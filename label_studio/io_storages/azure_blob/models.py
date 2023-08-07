@@ -55,15 +55,15 @@ class AzureBlobStorageMixin(models.Model):
         _('account_key'), null=True, blank=True,
         help_text='Azure Blob account key')
 
-    def get_account_name(self):
-        return str(self.account_name) if self.account_name else get_env('AZURE_BLOB_ACCOUNT_NAME')
+    def get_account_name(self):  # type: ignore[no-untyped-def]
+        return str(self.account_name) if self.account_name else get_env('AZURE_BLOB_ACCOUNT_NAME')  # type: ignore[no-untyped-call]
 
-    def get_account_key(self):
-        return str(self.account_key) if self.account_key else get_env('AZURE_BLOB_ACCOUNT_KEY')
+    def get_account_key(self):  # type: ignore[no-untyped-def]
+        return str(self.account_key) if self.account_key else get_env('AZURE_BLOB_ACCOUNT_KEY')  # type: ignore[no-untyped-call]
 
-    def get_client_and_container(self):
-        account_name = self.get_account_name()
-        account_key = self.get_account_key()
+    def get_client_and_container(self):  # type: ignore[no-untyped-def]
+        account_name = self.get_account_name()  # type: ignore[no-untyped-call]
+        account_key = self.get_account_key()  # type: ignore[no-untyped-call]
         if not account_name or not account_key:
             raise ValueError('Azure account name and key must be set using '
                              'environment variables AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_ACCOUNT_KEY')
@@ -73,13 +73,13 @@ class AzureBlobStorageMixin(models.Model):
         container = client.get_container_client(str(self.container))
         return client, container
 
-    def get_container(self):
-        _, container = self.get_client_and_container()
+    def get_container(self):  # type: ignore[no-untyped-def]
+        _, container = self.get_client_and_container()  # type: ignore[no-untyped-call]
         return container
 
-    def validate_connection(self, **kwargs):
+    def validate_connection(self, **kwargs):  # type: ignore[no-untyped-def]
         logger.debug('Validating Azure Blob Storage connection')
-        client, container = self.get_client_and_container()
+        client, container = self.get_client_and_container()  # type: ignore[no-untyped-call]
 
         try:
             container_properties = container.get_container_properties()
@@ -94,10 +94,10 @@ class AzureBlobStorageMixin(models.Model):
             blobs = list(container.list_blobs(name_starts_with=prefix, results_per_page=1))
 
             if not blobs:
-                raise KeyError(f'{self.url_scheme}://{self.container}/{self.prefix} not found.')
+                raise KeyError(f'{self.url_scheme}://{self.container}/{self.prefix} not found.')  # type: ignore[attr-defined]
 
 
-class AzureBlobImportStorageBase(AzureBlobStorageMixin, ImportStorage):
+class AzureBlobImportStorageBase(AzureBlobStorageMixin, ImportStorage):  # type: ignore[misc]
     url_scheme = 'azure-blob'
 
     presign = models.BooleanField(
@@ -108,8 +108,8 @@ class AzureBlobImportStorageBase(AzureBlobStorageMixin, ImportStorage):
         help_text='Presigned URLs TTL (in minutes)'
     )
 
-    def iterkeys(self):
-        container = self.get_container()
+    def iterkeys(self):  # type: ignore[no-untyped-def]
+        container = self.get_container()  # type: ignore[no-untyped-call]
         prefix = str(self.prefix) if self.prefix else ''
         files = container.list_blobs(name_starts_with=prefix)
         regex = re.compile(str(self.regex_filter)) if self.regex_filter else None
@@ -124,12 +124,12 @@ class AzureBlobImportStorageBase(AzureBlobStorageMixin, ImportStorage):
                 continue
             yield file.name
 
-    def get_data(self, key):
+    def get_data(self, key):  # type: ignore[no-untyped-def]
         if self.use_blob_urls:
             data_key = settings.DATA_UNDEFINED_NAME
             return {data_key: f'{self.url_scheme}://{self.container}/{key}'}
 
-        container = self.get_container()
+        container = self.get_container()  # type: ignore[no-untyped-call]
         blob = container.download_blob(key)
         blob_str = blob.content_as_text()
         value = json.loads(blob_str)
@@ -137,44 +137,44 @@ class AzureBlobImportStorageBase(AzureBlobStorageMixin, ImportStorage):
             raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task")  # noqa
         return value
 
-    def scan_and_create_links(self):
-        return self._scan_and_create_links(AzureBlobImportStorageLink)
+    def scan_and_create_links(self):  # type: ignore[no-untyped-def]
+        return self._scan_and_create_links(AzureBlobImportStorageLink)  # type: ignore[no-untyped-call]
 
-    def generate_http_url(self, url):
+    def generate_http_url(self, url):  # type: ignore[no-untyped-def]
         r = urlparse(url, allow_fragments=False)
         container = r.netloc
         blob = r.path.lstrip('/')
 
         expiry = datetime.utcnow() + timedelta(minutes=self.presign_ttl)
 
-        sas_token = generate_blob_sas(account_name=self.get_account_name(),
+        sas_token = generate_blob_sas(account_name=self.get_account_name(),  # type: ignore[no-untyped-call]
                                       container_name=container,
                                       blob_name=blob,
-                                      account_key=self.get_account_key(),
-                                      permission=BlobSasPermissions(read=True),
+                                      account_key=self.get_account_key(),  # type: ignore[no-untyped-call]
+                                      permission=BlobSasPermissions(read=True),  # type: ignore[no-untyped-call]
                                       expiry=expiry)
-        return 'https://' + self.get_account_name() + '.blob.core.windows.net/' + container + '/' + blob + '?' + sas_token
+        return 'https://' + self.get_account_name() + '.blob.core.windows.net/' + container + '/' + blob + '?' + sas_token  # type: ignore[no-untyped-call]
 
-    def get_blob_metadata(self, key):
-        return AZURE.get_blob_metadata(key, self.container, account_name=self.account_name, account_key=self.account_key)
+    def get_blob_metadata(self, key):  # type: ignore[no-untyped-def]
+        return AZURE.get_blob_metadata(key, self.container, account_name=self.account_name, account_key=self.account_key)  # type: ignore[arg-type, arg-type, arg-type]
 
     class Meta:
         abstract = True
 
 
-class AzureBlobImportStorage(ProjectStorageMixin, AzureBlobImportStorageBase):
+class AzureBlobImportStorage(ProjectStorageMixin, AzureBlobImportStorageBase):  # type: ignore[misc]
     class Meta:
         abstract = False
 
 
-class AzureBlobExportStorage(AzureBlobStorageMixin, ExportStorage):  # note: order is important!
+class AzureBlobExportStorage(AzureBlobStorageMixin, ExportStorage):    # type: ignore[misc] # note: order is important!
 
-    def save_annotation(self, annotation):
-        container = self.get_container()
+    def save_annotation(self, annotation):  # type: ignore[no-untyped-def]
+        container = self.get_container()  # type: ignore[no-untyped-call]
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
-        ser_annotation = self._get_serialized_data(annotation)
+        ser_annotation = self._get_serialized_data(annotation)  # type: ignore[no-untyped-call]
         # get key that identifies this object in storage
-        key = AzureBlobExportStorageLink.get_key(annotation)
+        key = AzureBlobExportStorageLink.get_key(annotation)  # type: ignore[no-untyped-call]
         key = str(self.prefix) + '/' + key if self.prefix else key
 
         # put object into storage
@@ -182,10 +182,10 @@ class AzureBlobExportStorage(AzureBlobStorageMixin, ExportStorage):  # note: ord
         blob.upload_blob(json.dumps(ser_annotation), overwrite=True)
 
         # create link if everything ok
-        AzureBlobExportStorageLink.create(annotation, self)
+        AzureBlobExportStorageLink.create(annotation, self)  # type: ignore[no-untyped-call]
 
 
-def async_export_annotation_to_azure_storages(annotation):
+def async_export_annotation_to_azure_storages(annotation):  # type: ignore[no-untyped-def]
     project = annotation.project
     if hasattr(project, 'io_storages_azureblobexportstorages'):
         for storage in project.io_storages_azureblobexportstorages.all():
@@ -194,10 +194,10 @@ def async_export_annotation_to_azure_storages(annotation):
 
 
 @receiver(post_save, sender=Annotation)
-def export_annotation_to_azure_storages(sender, instance, **kwargs):
+def export_annotation_to_azure_storages(sender, instance, **kwargs):  # type: ignore[no-untyped-def]
     storages = getattr(instance.project, 'io_storages_azureblobexportstorages', None)
     if storages and storages.exists():  # avoid excess jobs in rq
-        start_job_async_or_sync(async_export_annotation_to_azure_storages, instance)
+        start_job_async_or_sync(async_export_annotation_to_azure_storages, instance)  # type: ignore[no-untyped-call]
 
 
 class AzureBlobImportStorageLink(ImportStorageLink):

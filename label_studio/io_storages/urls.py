@@ -63,7 +63,7 @@ _api_urlpatterns = [
     path('export/redis/validate', RedisExportStorageValidateAPI.as_view(), name='export-storage-redis-validate'),
     path('export/redis/form', RedisExportStorageFormLayoutAPI.as_view(), name='export-storage-redis-form'),
 ]
-if settings.ENABLE_LOCAL_FILES_STORAGE:
+if settings.ENABLE_LOCAL_FILES_STORAGE:  # type: ignore[name-defined]
     _api_urlpatterns += [
         # Local files
         path('localfiles/', LocalFilesImportStorageListAPI.as_view(), name='storage-localfiles-list'),

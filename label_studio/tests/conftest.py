@@ -6,15 +6,15 @@ import os
 import pytest
 import mock
 import ujson as json
-import requests_mock
+import requests_mock  # type: ignore[import]
 import re
-import boto3
+import boto3  # type: ignore[import]
 import logging
 import shutil
 import tempfile
 
-from unittest import mock
-from moto import mock_s3
+from unittest import mock  # type: ignore[no-redef]
+from moto import mock_s3  # type: ignore[import]
 from copy import deepcopy
 from pathlib import Path
 from datetime import timedelta
@@ -33,7 +33,7 @@ else:
 
 # if we haven't this package, pytest.ini::env doesn't work 
 try:
-    import pytest_env.plugin
+    import pytest_env.plugin  # type: ignore[import, import]
 except ImportError:
     print('\n\n !!! Please, pip install pytest-env \n\n')
     exit(-100)
@@ -47,35 +47,35 @@ boto3.set_stream_logger('botocore.credentials', logging.DEBUG)
 
 
 @pytest.fixture(autouse=False)
-def enable_csrf():
+def enable_csrf():  # type: ignore[no-untyped-def]
     settings.USE_ENFORCE_CSRF_CHECKS = True
 
 
 @pytest.fixture(autouse=False)
-def label_stream_history_limit():
+def label_stream_history_limit():  # type: ignore[no-untyped-def]
     settings.LABEL_STREAM_HISTORY_LIMIT = 1
 
 
 @pytest.fixture(autouse=True)
-def disable_sentry():
+def disable_sentry():  # type: ignore[no-untyped-def]
     settings.SENTRY_RATE = 0
     settings.SENTRY_DSN = None
 
 
 @pytest.fixture()
-def debug_modal_exceptions_false(settings):
+def debug_modal_exceptions_false(settings):  # type: ignore[no-untyped-def]
     settings.DEBUG_MODAL_EXCEPTIONS = False
 
 
 @pytest.fixture(scope="function")
-def enable_sentry():
+def enable_sentry():  # type: ignore[no-untyped-def]
     settings.SENTRY_RATE = 0
     # it's disabled key, but this is correct
     settings.SENTRY_DSN = 'https://44f7a50de5ab425ca6bc406ef69b2122@o227124.ingest.sentry.io/5820521'
 
 
 @pytest.fixture(scope='function')
-def aws_credentials():
+def aws_credentials():  # type: ignore[no-untyped-def]
     """Mocked AWS Credentials for moto."""
     os.environ['AWS_ACCESS_KEY_ID'] = 'testing'
     os.environ['AWS_SECRET_ACCESS_KEY'] = 'testing'
@@ -84,20 +84,20 @@ def aws_credentials():
 
 
 @pytest.fixture(autouse=True)
-def azure_credentials():
+def azure_credentials():  # type: ignore[no-untyped-def]
     """Mocked Azure credentials"""
     os.environ['AZURE_BLOB_ACCOUNT_NAME'] = 'testing'
     os.environ['AZURE_BLOB_ACCOUNT_KEY'] = 'testing'
 
 
 @pytest.fixture(scope='function')
-def s3(aws_credentials):
+def s3(aws_credentials):  # type: ignore[no-untyped-def]
     with mock_s3():
         yield boto3.client('s3', region_name='us-east-1')
 
 
 @pytest.fixture(autouse=True)
-def s3_with_images(s3):
+def s3_with_images(s3):  # type: ignore[no-untyped-def]
     """
     Bucket structure:
     s3://pytest-s3-images/image1.jpg
@@ -113,7 +113,7 @@ def s3_with_images(s3):
     yield s3
 
 
-def s3_remove_bucket():
+def s3_remove_bucket():  # type: ignore[no-untyped-def]
     """
     Remove pytest-s3-images
     """
@@ -128,7 +128,7 @@ def s3_remove_bucket():
 
 
 @pytest.fixture(autouse=True)
-def s3_with_jsons(s3):
+def s3_with_jsons(s3):  # type: ignore[no-untyped-def]
     bucket_name = 'pytest-s3-jsons'
     s3.create_bucket(Bucket=bucket_name)
     s3.put_object(Bucket=bucket_name, Key='test.json', Body=json.dumps({'image_url': 'http://ggg.com/image.jpg'}))
@@ -136,7 +136,7 @@ def s3_with_jsons(s3):
 
 
 @pytest.fixture(autouse=True)
-def s3_with_hypertext_s3_links(s3):
+def s3_with_hypertext_s3_links(s3):  # type: ignore[no-untyped-def]
     bucket_name = 'pytest-s3-jsons-hypertext'
     s3.create_bucket(Bucket=bucket_name)
     s3.put_object(Bucket=bucket_name, Key='test.json', Body=json.dumps({
@@ -145,7 +145,7 @@ def s3_with_hypertext_s3_links(s3):
     yield s3
 
 @pytest.fixture(autouse=True)
-def s3_with_partially_encoded_s3_links(s3):
+def s3_with_partially_encoded_s3_links(s3):  # type: ignore[no-untyped-def]
     bucket_name = 'pytest-s3-json-partially-encoded'
     s3.create_bucket(Bucket=bucket_name)
     s3.put_object(Bucket=bucket_name, Key='test.json', Body=json.dumps({
@@ -154,7 +154,7 @@ def s3_with_partially_encoded_s3_links(s3):
     yield s3
 
 @pytest.fixture(autouse=True)
-def s3_with_unexisted_links(s3):
+def s3_with_unexisted_links(s3):  # type: ignore[no-untyped-def]
     bucket_name = 'pytest-s3-jsons-unexisted_links'
     s3.create_bucket(Bucket=bucket_name)
     s3.put_object(Bucket=bucket_name, Key='some-existed-image.jpg', Body='qwerty')
@@ -162,14 +162,14 @@ def s3_with_unexisted_links(s3):
 
 
 @pytest.fixture(autouse=True)
-def s3_export_bucket(s3):
+def s3_export_bucket(s3):  # type: ignore[no-untyped-def]
     bucket_name = 'pytest-export-s3-bucket'
     s3.create_bucket(Bucket=bucket_name)
     yield s3
 
 
 @pytest.fixture(autouse=True)
-def s3_export_bucket_sse(s3):
+def s3_export_bucket_sse(s3):  # type: ignore[no-untyped-def]
     bucket_name = 'pytest-export-s3-bucket-with-sse'
     s3.create_bucket(Bucket=bucket_name)
 
@@ -228,44 +228,44 @@ def s3_export_bucket_sse(s3):
 
 
 @pytest.fixture(autouse=True)
-def gcs_client():
+def gcs_client():  # type: ignore[no-untyped-def]
     with gcs_client_mock():
         yield
 
 
 @pytest.fixture(autouse=True)
-def azure_client():
+def azure_client():  # type: ignore[no-untyped-def]
     with azure_client_mock():
         yield
 
 
 @pytest.fixture(autouse=True)
-def redis_client():
+def redis_client():  # type: ignore[no-untyped-def]
     with redis_client_mock():
         yield
 
 
 @pytest.fixture(autouse=True)
-def ml_backend():
+def ml_backend():  # type: ignore[no-untyped-def]
     with ml_backend_mock() as m:
         yield m
 
 
 @pytest.fixture(name='import_from_url')
-def import_from_url():
+def import_from_url():  # type: ignore[no-untyped-def]
     with import_from_url_mock() as m:
         yield m
 
 
 @pytest.fixture(autouse=True)
-def ml_backend_1(ml_backend):
-    register_ml_backend_mock(ml_backend, url='https://test.heartex.mlbackend.com:9090', setup_model_version='Fri Feb 19 17:10:44 2021')
-    register_ml_backend_mock(ml_backend, url='https://test.heartex.mlbackend.com:9091', health_connect_timeout=True)
-    register_ml_backend_mock(ml_backend, url='http://localhost:8999', predictions={'results': []})
+def ml_backend_1(ml_backend):  # type: ignore[no-untyped-def]
+    register_ml_backend_mock(ml_backend, url='https://test.heartex.mlbackend.com:9090', setup_model_version='Fri Feb 19 17:10:44 2021')  # type: ignore[no-untyped-call]
+    register_ml_backend_mock(ml_backend, url='https://test.heartex.mlbackend.com:9091', health_connect_timeout=True)  # type: ignore[no-untyped-call]
+    register_ml_backend_mock(ml_backend, url='http://localhost:8999', predictions={'results': []})  # type: ignore[no-untyped-call]
     yield ml_backend
 
 
-def pytest_configure():
+def pytest_configure():  # type: ignore[no-untyped-def]
     for q in settings.RQ_QUEUES.values():
         q['ASYNC'] = False
 
@@ -273,16 +273,16 @@ def pytest_configure():
 class URLS:
     """ This class keeps urls with api
     """
-    def __init__(self):
+    def __init__(self):  # type: ignore[no-untyped-def]
         self.project_create = '/api/projects/'
         self.task_bulk = None
 
-    def set_project(self, pk):
+    def set_project(self, pk):  # type: ignore[no-untyped-def]
         self.task_bulk = f'/api/projects/{pk}/tasks/bulk/'
         self.plots = f'/projects/{pk}/plots'
 
 
-def project_ranker():
+def project_ranker():  # type: ignore[no-untyped-def]
     label = '''<View>
          <HyperText name="hypertext_markup" value="$markup"></HyperText>
          <List name="ranker" value="$replies" elementValue="$text" elementTag="Text" 
@@ -291,7 +291,7 @@ def project_ranker():
     return {'label_config': label, 'title': 'test'}
 
 
-def project_dialog():
+def project_dialog():  # type: ignore[no-untyped-def]
     """ Simple project with dialog configs
 
     :return: config of project with task
@@ -307,7 +307,7 @@ def project_dialog():
     return {'label_config': label, 'title': 'test'}
 
 
-def project_choices():
+def project_choices():  # type: ignore[no-untyped-def]
     label = """<View>
     <Choices name="animals" toName="xxx" choice="single-radio">
       <Choice value="Cat"></Choice>
@@ -330,7 +330,7 @@ def project_choices():
     return {'label_config': label, 'title': 'test'}
 
 
-def setup_project(client, project_template, do_auth=True):
+def setup_project(client, project_template, do_auth=True):  # type: ignore[no-untyped-def]
     """ Create new test@gmail.com user, login via client, create test project.
     Project configs are thrown over params and automatically grabs from functions names started with 'project_'
 
@@ -341,21 +341,21 @@ def setup_project(client, project_template, do_auth=True):
     client = deepcopy(client)
     email = "test@gmail.com"
     password = "test"
-    urls = URLS()
+    urls = URLS()  # type: ignore[no-untyped-call]
     project_config = project_template()
 
     # we work in empty database, so let's create business user and login
     user = User.objects.create(email=email)
     user.set_password(password)  # set password without hash
 
-    create_business(user)
-    org = Organization.create_organization(created_by=user, title=user.first_name)
+    create_business(user)  # type: ignore[no-untyped-call]
+    org = Organization.create_organization(created_by=user, title=user.first_name)  # type: ignore[no-untyped-call]
     user.active_organization = org
     user.save()
 
     if do_auth:
 
-        assert signin(client, email, password).status_code == 302
+        assert signin(client, email, password).status_code == 302  # type: ignore[no-untyped-call]
         # create project
         with requests_mock.Mocker() as m:
             m.register_uri('POST', re.compile(r'ml\.heartex\.net/\d+/validate'), text=json.dumps({'status': 'ok'}))
@@ -366,8 +366,8 @@ def setup_project(client, project_template, do_auth=True):
 
         # get project id and prepare url
         project = Project.objects.filter(title=project_config['title']).first()
-        urls.set_project(project.pk)
-        print('Project id:', project.id)
+        urls.set_project(project.pk)  # type: ignore[no-untyped-call, union-attr]
+        print('Project id:', project.id)  # type: ignore[union-attr]
 
         client.project = project
 
@@ -379,37 +379,37 @@ def setup_project(client, project_template, do_auth=True):
 
 
 @pytest.fixture
-def setup_project_dialog(client):
-    return setup_project(client, project_dialog)
+def setup_project_dialog(client):  # type: ignore[no-untyped-def]
+    return setup_project(client, project_dialog)  # type: ignore[no-untyped-call]
 
 
 @pytest.fixture
-def setup_project_for_token(client):
-    return setup_project(client, project_dialog, do_auth=False)
+def setup_project_for_token(client):  # type: ignore[no-untyped-def]
+    return setup_project(client, project_dialog, do_auth=False)  # type: ignore[no-untyped-call]
 
 
 @pytest.fixture
-def setup_project_ranker(client):
-    return setup_project(client, project_ranker)
+def setup_project_ranker(client):  # type: ignore[no-untyped-def]
+    return setup_project(client, project_ranker)  # type: ignore[no-untyped-call]
 
 
 @pytest.fixture
-def setup_project_choices(client):
-    return setup_project(client, project_choices)
+def setup_project_choices(client):  # type: ignore[no-untyped-def]
+    return setup_project(client, project_choices)  # type: ignore[no-untyped-call]
 
 
 @pytest.fixture
-def business_client(client):
+def business_client(client):  # type: ignore[no-untyped-def]
     # we work in empty database, so let's create business user and login
     client = deepcopy(client)
     email = 'business@pytest.net'
     password = 'pytest'
     user = User.objects.create(email=email)
     user.set_password(password)  # set password without hash
-    business = create_business(user)
+    business = create_business(user)  # type: ignore[no-untyped-call]
 
     user.save()
-    org = Organization.create_organization(created_by=user, title=user.first_name)
+    org = Organization.create_organization(created_by=user, title=user.first_name)  # type: ignore[no-untyped-call]
     client.business = business if business else SimpleNamespace(admin=user)
     client.team = None if business else SimpleNamespace(id=1)
     client.admin = user
@@ -417,13 +417,13 @@ def business_client(client):
     client.user = user
     client.organization = org
 
-    if signin(client, email, password).status_code != 302:
+    if signin(client, email, password).status_code != 302:  # type: ignore[no-untyped-call]
         print(f'User {user} failed to login!')
     return client
 
 
 @pytest.fixture
-def annotator_client(client):
+def annotator_client(client):  # type: ignore[no-untyped-def]
     # we work in empty database, so let's create business user and login
     client = deepcopy(client)
     email = 'annotator@pytest.net'
@@ -431,9 +431,9 @@ def annotator_client(client):
     user = User.objects.create(email=email)
     user.set_password(password)  # set password without hash
     user.save()
-    business = create_business(user)
-    Organization.create_organization(created_by=user, title=user.first_name)
-    if signin(client, email, password).status_code != 302:
+    business = create_business(user)  # type: ignore[no-untyped-call]
+    Organization.create_organization(created_by=user, title=user.first_name)  # type: ignore[no-untyped-call]
+    if signin(client, email, password).status_code != 302:  # type: ignore[no-untyped-call]
         print(f'User {user} failed to login!')
     client.user = user
     client.annotator = user
@@ -441,7 +441,7 @@ def annotator_client(client):
 
 
 @pytest.fixture
-def annotator2_client(client):
+def annotator2_client(client):  # type: ignore[no-untyped-def]
     # we work in empty database, so let's create business user and login
     client = deepcopy(client)
     email = 'annotator2@pytest.net'
@@ -449,9 +449,9 @@ def annotator2_client(client):
     user = User.objects.create(email=email)
     user.set_password(password)  # set password without hash
     user.save()
-    business = create_business(user)
-    Organization.create_organization(created_by=user, title=user.first_name)
-    if signin(client, email, password).status_code != 302:
+    business = create_business(user)  # type: ignore[no-untyped-call]
+    Organization.create_organization(created_by=user, title=user.first_name)  # type: ignore[no-untyped-call]
+    if signin(client, email, password).status_code != 302:  # type: ignore[no-untyped-call]
         print(f'User {user} failed to login!')
     client.user = user
     client.annotator = user
@@ -459,7 +459,7 @@ def annotator2_client(client):
 
 
 @pytest.fixture(params=['business', 'annotator'])
-def any_client(request, business_client, annotator_client):
+def any_client(request, business_client, annotator_client):  # type: ignore[no-untyped-def]
     if request.param == 'business':
         return business_client
     elif request.param == 'annotator':
@@ -467,7 +467,7 @@ def any_client(request, business_client, annotator_client):
 
 
 @pytest.fixture
-def configured_project(business_client, annotator_client):
+def configured_project(business_client, annotator_client):  # type: ignore[no-untyped-def]
     _project_for_text_choices_onto_A_B_classes = dict(
         title='Test',
         label_config='''
@@ -487,7 +487,7 @@ def configured_project(business_client, annotator_client):
 
     # get user to be owner
     users = User.objects.filter(email='business@pytest.net')  # TODO: @nik: how to get proper email for business here?
-    project = make_project(_project_for_text_choices_onto_A_B_classes, users[0])
+    project = make_project(_project_for_text_choices_onto_A_B_classes, users[0])  # type: ignore[no-untyped-call]
 
     assert project.ml_backends.first().url == 'http://localhost:8999'
 
@@ -496,67 +496,67 @@ def configured_project(business_client, annotator_client):
 
 
 @pytest.fixture(name="django_live_url")
-def get_server_url(live_server):
+def get_server_url(live_server):  # type: ignore[no-untyped-def]
     yield live_server.url
 
 
 @pytest.fixture(name="async_import_off", autouse=True)
-def async_import_off():
-    from core.feature_flags import flag_set
-    def fake_flag_set(*args, **kwargs):
+def async_import_off():  # type: ignore[no-untyped-def]
+    from core.feature_flags import flag_set  # type: ignore[attr-defined]
+    def fake_flag_set(*args, **kwargs):  # type: ignore[no-untyped-def]
         if args[0] == 'fflag_feat_all_lsdv_4915_async_task_import_13042023_short':
             return False
-        return flag_set(*args, **kwargs)
+        return flag_set(*args, **kwargs)  # type: ignore[no-untyped-call]
     with mock.patch('data_import.api.flag_set', wraps=fake_flag_set):
         yield
 
 
 @pytest.fixture(name="fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on")
-def fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on():
-    from core.feature_flags import flag_set
-    def fake_flag_set(*args, **kwargs):
+def fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on():  # type: ignore[no-untyped-def]
+    from core.feature_flags import flag_set  # type: ignore[attr-defined]
+    def fake_flag_set(*args, **kwargs):  # type: ignore[no-untyped-def]
         if args[0] == 'fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short':
             return True
-        return flag_set(*args, **kwargs)
+        return flag_set(*args, **kwargs)  # type: ignore[no-untyped-call]
     with mock.patch('tasks.models.flag_set', wraps=fake_flag_set):
         yield
 
 
 @pytest.fixture(name="fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off")
-def fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off():
-    from core.feature_flags import flag_set
-    def fake_flag_set(*args, **kwargs):
+def fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_off():  # type: ignore[no-untyped-def]
+    from core.feature_flags import flag_set  # type: ignore[attr-defined]
+    def fake_flag_set(*args, **kwargs):  # type: ignore[no-untyped-def]
         if args[0] == 'fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short':
             return False
-        return flag_set(*args, **kwargs)
+        return flag_set(*args, **kwargs)  # type: ignore[no-untyped-call]
     with mock.patch('tasks.models.flag_set', wraps=fake_flag_set):
         yield
 
 
 @pytest.fixture(name="fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short_on")
-def fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short_on():
-    from core.feature_flags import flag_set
-    def fake_flag_set(*args, **kwargs):
+def fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short_on():  # type: ignore[no-untyped-def]
+    from core.feature_flags import flag_set  # type: ignore[attr-defined]
+    def fake_flag_set(*args, **kwargs):  # type: ignore[no-untyped-def]
         if args[0] == 'fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short':
             return True
-        return flag_set(*args, **kwargs)
+        return flag_set(*args, **kwargs)  # type: ignore[no-untyped-call]
     with mock.patch('data_export.api.flag_set', wraps=fake_flag_set):
         yield
 
 
 @pytest.fixture(name="ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short_on")
-def ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short_on():
-    from core.feature_flags import flag_set
-    def fake_flag_set(*args, **kwargs):
+def ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short_on():  # type: ignore[no-untyped-def]
+    from core.feature_flags import flag_set  # type: ignore[attr-defined]
+    def fake_flag_set(*args, **kwargs):  # type: ignore[no-untyped-def]
         if args[0] == 'ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short':
             return True
-        return flag_set(*args, **kwargs)
+        return flag_set(*args, **kwargs)  # type: ignore[no-untyped-call]
     with mock.patch('data_export.api.flag_set', wraps=fake_flag_set):
         yield
 
 
 @pytest.fixture(name="local_files_storage")
-def local_files_storage(settings):
+def local_files_storage(settings):  # type: ignore[no-untyped-def]
     settings.LOCAL_FILES_SERVING_ENABLED = True
     tempdir = Path(tempfile.gettempdir()) / Path('files')
     subdir = tempdir / Path('subdir')
@@ -567,25 +567,25 @@ def local_files_storage(settings):
 
 
 @pytest.fixture(name="local_files_document_root_tempdir")
-def local_files_document_root_tempdir(settings):
+def local_files_document_root_tempdir(settings):  # type: ignore[no-untyped-def]
     tempdir = Path(tempfile.gettempdir())
     settings.LOCAL_FILES_DOCUMENT_ROOT = tempdir.root
 
 
 @pytest.fixture(name="local_files_document_root_subdir")
-def local_files_document_root_subdir(settings):
+def local_files_document_root_subdir(settings):  # type: ignore[no-untyped-def]
     tempdir = Path(tempfile.gettempdir()) / Path('files')
     settings.LOCAL_FILES_DOCUMENT_ROOT = str(tempdir)
 
 
 @pytest.fixture(name="testing_session_timeouts")
-def set_testing_session_timeouts(settings):
+def set_testing_session_timeouts(settings):  # type: ignore[no-untyped-def]
     # TODO: functional tests should not rely on exact timings
-    settings.MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(seconds=6).total_seconds()))
-    settings.MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(seconds=2).total_seconds()))
+    settings.MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(seconds=6).total_seconds()))  # type: ignore[no-untyped-call]
+    settings.MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(seconds=2).total_seconds()))  # type: ignore[no-untyped-call]
 
 @pytest.fixture
-def mock_ml_auto_update(name="mock_ml_auto_update"):
+def mock_ml_auto_update(name="mock_ml_auto_update"):  # type: ignore[no-untyped-def]
     url = 'http://localhost:9090'
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', f'{url}/setup', [
@@ -601,7 +601,7 @@ def mock_ml_auto_update(name="mock_ml_auto_update"):
         yield m
 
 @pytest.fixture(name="mock_ml_backend_auto_update_disabled")
-def mock_ml_backend_auto_update_disabled():
+def mock_ml_backend_auto_update_disabled():  # type: ignore[no-untyped-def]
     with ml_backend_mock(setup_model_version='version1') as m:
         m.register_uri('GET', f'http://localhost:9090/setup', [
             {'json': {'model_version': '', 'status': 'ok'}, 'status_code': 200},

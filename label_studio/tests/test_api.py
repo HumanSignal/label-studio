@@ -2,7 +2,7 @@
 """
 import pytest
 import json
-import requests_mock
+import requests_mock  # type: ignore[import]
 from unittest import mock
 
 from rest_framework.authtoken.models import Token
@@ -15,16 +15,16 @@ from tasks.models import Annotation, Task
 
 
 @pytest.fixture
-def client_and_token(business_client):
+def client_and_token(business_client):  # type: ignore[no-untyped-def]
     token = Token.objects.get(user=business_client.business.admin)
     client = APIClient()
     client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-    client.organization_pk = business_client.organization.pk
+    client.organization_pk = business_client.organization.pk  # type: ignore[attr-defined]
     return client, token
 
 
 @pytest.fixture(params=['business_authorized', 'user_with_token'])
-def any_api_client(request, client_and_token, business_client):
+def any_api_client(request, client_and_token, business_client):  # type: ignore[no-untyped-def]
     client, token = client_and_token
     result = {
         'type': request.param,
@@ -64,7 +64,7 @@ def any_api_client(request, client_and_token, business_client):
     )
 ])
 @pytest.mark.django_db
-def test_create_project(client_and_token, payload, response, status_code):
+def test_create_project(client_and_token, payload, response, status_code):  # type: ignore[no-untyped-def]
     client, token = client_and_token
     payload['organization_pk'] = client.organization_pk
     with ml_backend_mock():
@@ -112,7 +112,7 @@ def test_create_project(client_and_token, payload, response, status_code):
     )
 ])
 @pytest.mark.django_db
-def test_patch_project(client_and_token, configured_project, payload, response, status_code):
+def test_patch_project(client_and_token, configured_project, payload, response, status_code):  # type: ignore[no-untyped-def]
     client, token = client_and_token
     payload['organization_pk'] = client.organization_pk
     r = client.patch(
@@ -134,7 +134,7 @@ def test_patch_project(client_and_token, configured_project, payload, response, 
     (201, 'http://my.super.ai', 4),
 ])
 @pytest.mark.django_db
-def test_creating_activating_new_ml_backend(
+def test_creating_activating_new_ml_backend(  # type: ignore[no-untyped-def]
     mock_validate_upload_url, client_and_token, configured_project, external_status_code,
     current_active_ml_backend_url, ml_backend_call_count, settings
 ):
@@ -169,7 +169,7 @@ def test_creating_activating_new_ml_backend(
 
 
 @pytest.mark.django_db
-def test_delete_annotations(business_client, configured_project):
+def test_delete_annotations(business_client, configured_project):  # type: ignore[no-untyped-def]
     business_client.delete(f'/api/projects/{configured_project.id}/annotations/')
     assert not Annotation.objects.filter(task__project=configured_project.id).exists()
 
@@ -191,7 +191,7 @@ def test_delete_annotations(business_client, configured_project):
     )
 ])
 @pytest.mark.django_db
-def test_get_task(client_and_token, configured_project, response, status_code):
+def test_get_task(client_and_token, configured_project, response, status_code):  # type: ignore[no-untyped-def]
     client, token = client_and_token
     task = configured_project.tasks.order_by('-id').all()[0]
     response['project'] = configured_project.id
@@ -224,7 +224,7 @@ def test_get_task(client_and_token, configured_project, response, status_code):
     )
 ])
 @pytest.mark.django_db
-def test_patch_task(client_and_token, configured_project, payload, response, status_code):
+def test_patch_task(client_and_token, configured_project, payload, response, status_code):  # type: ignore[no-untyped-def]
     client, token = client_and_token
     task = configured_project.tasks.order_by('-updated_at').all()[0]
     payload['project'] = configured_project.id

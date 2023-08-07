@@ -4,7 +4,7 @@ import pytest
 pytestmark = pytest.mark.django_db
 
 
-def _get_columns(business_client, label_config=None):
+def _get_columns(business_client, label_config=None):  # type: ignore[no-untyped-def]
     r = business_client.post(
         "/api/projects/",
         data=json.dumps(
@@ -25,8 +25,8 @@ def _get_columns(business_client, label_config=None):
     return r_json['columns']
 
 
-def test_columns_api_returns_expected_ids(business_client):
-    columns = _get_columns(business_client)
+def test_columns_api_returns_expected_ids(business_client):  # type: ignore[no-untyped-def]
+    columns = _get_columns(business_client)  # type: ignore[no-untyped-call]
 
     assert [c['id'] for c in columns] == [
         'id',
@@ -52,15 +52,15 @@ def test_columns_api_returns_expected_ids(business_client):
     ]
 
 
-def test_columns_api_annotates_default_columns_with_project_defined_false(business_client):
-    columns = _get_columns(business_client)
+def test_columns_api_annotates_default_columns_with_project_defined_false(business_client):  # type: ignore[no-untyped-def]
+    columns = _get_columns(business_client)  # type: ignore[no-untyped-call]
 
     for c in columns:
         assert 'project_defined' in c
         assert c['project_defined'] is False
 
 
-def test_columns_api_annotates_config_defined_columns_with_project_defined_true(business_client):
+def test_columns_api_annotates_config_defined_columns_with_project_defined_true(business_client):  # type: ignore[no-untyped-def]
     config_with_text_column = (
         """
         <View>
@@ -74,7 +74,7 @@ def test_columns_api_annotates_config_defined_columns_with_project_defined_true(
         """
     )
 
-    columns = _get_columns(business_client, config_with_text_column)
+    columns = _get_columns(business_client, config_with_text_column)  # type: ignore[no-untyped-call]
 
     for c in columns:
         assert 'project_defined' in c

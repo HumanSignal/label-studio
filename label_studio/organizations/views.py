@@ -5,9 +5,9 @@ from django.contrib.auth.decorators import login_required
 
 
 @login_required
-def organization_people_list(request):
+def organization_people_list(request):  # type: ignore[no-untyped-def]
     return render(request, 'organizations/people_list.html')
 
 @login_required
-def simple_view(request):
+def simple_view(request):  # type: ignore[no-untyped-def]
     return render(request, 'organizations/people_list.html')

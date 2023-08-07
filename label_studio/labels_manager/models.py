@@ -24,7 +24,7 @@ class Label(models.Model):
     projects = models.ManyToManyField('projects.Project', through='LabelLink')
     organization = models.ForeignKey('organizations.Organization', related_name='labels', on_delete=models.CASCADE)
 
-    def has_permission(self, user):
+    def has_permission(self, user):  # type: ignore[no-untyped-def]
         return self.organization_id == user.active_organization_id
 
     class Meta:
@@ -42,6 +42,6 @@ class LabelLink(models.Model):
             models.UniqueConstraint(fields=['project', 'label'], name='unique_label_project')
         ]
 
-    def has_permission(self, user):
+    def has_permission(self, user):  # type: ignore[no-untyped-def]
         user.project = self.project  # link for activity log
         return self.project.has_permission(user)

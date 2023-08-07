@@ -1,20 +1,20 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import base64
-import rq
+import rq  # type: ignore[import]
 import json
 import logging
-import django_rq
-import rq.exceptions
+import django_rq  # type: ignore[import]
+import rq.exceptions  # type: ignore[import]
 import traceback as tb
 
-from rq.job import Job
+from rq.job import Job  # type: ignore[import]
 from django_rq import job
 from urllib.parse import urljoin
 
 from django.utils import timezone
 from django.db import models, transaction
-from django.shortcuts import reverse
+from django.shortcuts import reverse  # type: ignore[attr-defined]
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.db.models import JSONField
@@ -26,7 +26,7 @@ from tasks.serializers import PredictionSerializer, AnnotationSerializer
 from data_export.serializers import ExportDataSerializer
 from core.redis import is_job_in_queue, redis_connected, is_job_on_worker
 from core.utils.common import load_func
-from core.feature_flags import flag_set
+from core.feature_flags import flag_set  # type: ignore[attr-defined]
 from io_storages.utils import get_uri_via_regex
 
 
@@ -85,11 +85,11 @@ class StorageInfo(models.Model):
         help_text='Meta and debug information about storage processes'
     )
 
-    def info_set_job(self, job_id):
+    def info_set_job(self, job_id):  # type: ignore[no-untyped-def]
         self.last_sync_job = job_id
         self.save(update_fields=['last_sync_job'])
 
-    def info_set_queued(self):
+    def info_set_queued(self):  # type: ignore[no-untyped-def]
         self.last_sync = None
         self.last_sync_count = None
         self.last_sync_job = None
@@ -103,7 +103,7 @@ class StorageInfo(models.Model):
 
         self.save(update_fields=['last_sync_job', 'last_sync', 'last_sync_count', 'status', 'meta'])
 
-    def info_set_in_progress(self):
+    def info_set_in_progress(self):  # type: ignore[no-untyped-def]
         # only QUEUED => IN_PROGRESS transition is possible, because in QUEUED we reset states
         if self.status != self.Status.QUEUED:
             raise ValueError(f'Storage status ({self.status}) must be QUEUED to move it IN_PROGRESS')
@@ -116,10 +116,10 @@ class StorageInfo(models.Model):
         self.save(update_fields=['status', 'meta'])
 
     @property
-    def time_in_progress(self):
+    def time_in_progress(self):  # type: ignore[no-untyped-def]
         return datetime.fromisoformat(self.meta['time_in_progress'])
 
-    def info_set_completed(self, last_sync_count, **kwargs):
+    def info_set_completed(self, last_sync_count, **kwargs):  # type: ignore[no-untyped-def]
         self.status = self.Status.COMPLETED
         self.last_sync = timezone.now()
         self.last_sync_count = last_sync_count
@@ -131,7 +131,7 @@ class StorageInfo(models.Model):
         self.meta.update(kwargs)
         self.save(update_fields=['status', 'meta', 'last_sync', 'last_sync_count'])
 
-    def info_set_failed(self):
+    def info_set_failed(self):  # type: ignore[no-untyped-def]
         self.status = self.Status.FAILED
         self.traceback = str(tb.format_exc())
 
@@ -141,7 +141,7 @@ class StorageInfo(models.Model):
         self.meta['duration'] = (time_failure - self.time_in_progress).total_seconds()
         self.save(update_fields=['status', 'traceback', 'meta'])
 
-    def info_update_progress(self, last_sync_count, **kwargs):
+    def info_update_progress(self, last_sync_count, **kwargs):  # type: ignore[no-untyped-def]
         # update db counter once per 5 seconds to avid db overloads
         now = timezone.now()
         last_ping = datetime.fromisoformat(self.meta['time_last_ping'])
@@ -155,7 +155,7 @@ class StorageInfo(models.Model):
             self.save(update_fields=['last_sync_count', 'meta'])
 
     @staticmethod
-    def ensure_storage_statuses(storages):
+    def ensure_storage_statuses(storages):  # type: ignore[no-untyped-def]
         """Check failed jobs and set storage status as failed if job is failed
 
         :param storages: Import or Export storages
@@ -165,15 +165,15 @@ class StorageInfo(models.Model):
         for storage in storages:
             storage.health_check()
 
-    def health_check(self):
+    def health_check(self):  # type: ignore[no-untyped-def]
         # get duration between last ping time and now
         now = timezone.now()
         last_ping = datetime.fromisoformat(self.meta.get('time_last_ping', str(now)))
         delta = (now - last_ping).total_seconds()
 
         # check redis connection
-        if redis_connected():
-            self.job_health_check()
+        if redis_connected():  # type: ignore[no-untyped-call]
+            self.job_health_check()  # type: ignore[no-untyped-call]
 
         # in progress last ping time, job is not needed here
         if self.status == self.Status.IN_PROGRESS and delta > settings.STORAGE_IN_PROGRESS_TIMER * 2:
@@ -186,7 +186,7 @@ class StorageInfo(models.Model):
             logger.info(f'Storage {self} status moved to `failed` '
                         f'because the job {self.last_sync_job} has too old ping time')
 
-    def job_health_check(self):
+    def job_health_check(self):  # type: ignore[no-untyped-def]
         Status = self.Status
         if self.status not in [Status.IN_PROGRESS, Status.QUEUED]:
             return
@@ -228,7 +228,7 @@ class Storage(StorageInfo):
     description = models.TextField(_('description'), null=True, blank=True, help_text='Cloud storage description')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
 
-    def validate_connection(self, client=None):
+    def validate_connection(self, client=None):  # type: ignore[no-untyped-def]
         raise NotImplementedError('validate_connection is not implemented')
 
     class Meta:
@@ -236,38 +236,38 @@ class Storage(StorageInfo):
 
 
 class ImportStorage(Storage):
-    def iterkeys(self):
+    def iterkeys(self):  # type: ignore[no-untyped-def]
         return iter(())
 
-    def get_data(self, key):
+    def get_data(self, key):  # type: ignore[no-untyped-def]
         raise NotImplementedError
 
-    def generate_http_url(self, url):
+    def generate_http_url(self, url):  # type: ignore[no-untyped-def]
         raise NotImplementedError
 
-    def can_resolve_url(self, url):
+    def can_resolve_url(self, url):  # type: ignore[no-untyped-def]
         # TODO: later check to the full prefix like "url.startswith(self.path_full)"
         # Search of occurrences inside string, e.g. for cases like "gs://bucket/file.pdf" or "<embed src='gs://bucket/file.pdf'/>"  # noqa
-        _, prefix = get_uri_via_regex(url, prefixes=(self.url_scheme,))
+        _, prefix = get_uri_via_regex(url, prefixes=(self.url_scheme,))  # type: ignore[no-untyped-call]
         if prefix == self.url_scheme:
             return True
         # if not found any occurrences - this Storage can't resolve url
         return False
 
-    def resolve_uri(self, uri, task=None):
+    def resolve_uri(self, uri, task=None):  # type: ignore[no-untyped-def]
         #  list of objects
         if isinstance(uri, list):
             resolved = []
             for item in uri:
-                result = self.resolve_uri(item, task)
+                result = self.resolve_uri(item, task)  # type: ignore[no-untyped-call]
                 resolved.append(result if result else item)
             return resolved
 
         # dict of objects
         elif isinstance(uri, dict):
-            resolved = {}
+            resolved = {}  # type: ignore[assignment]
             for key in uri.keys():
-                result = self.resolve_uri(uri[key], task)
+                result = self.resolve_uri(uri[key], task)  # type: ignore[no-untyped-call]
                 resolved[key] = result if result else uri[key]
             return resolved
 
@@ -275,12 +275,12 @@ class ImportStorage(Storage):
         elif isinstance(uri, str):
             try:
                 # extract uri first from task data
-                extracted_uri, extracted_storage = get_uri_via_regex(uri, prefixes=(self.url_scheme,))
+                extracted_uri, extracted_storage = get_uri_via_regex(uri, prefixes=(self.url_scheme,))  # type: ignore[no-untyped-call]
                 if not extracted_storage:
                     logger.debug(f'No storage info found for URI={uri}')
                     return
 
-                if self.presign and task is not None:
+                if self.presign and task is not None:  # type: ignore[attr-defined]
                     proxy_url = urljoin(
                         settings.HOSTNAME,
                         reverse(
@@ -291,13 +291,13 @@ class ImportStorage(Storage):
                     return uri.replace(extracted_uri, proxy_url)
                 else:
                     # resolve uri to url using storages
-                    http_url = self.generate_http_url(extracted_uri)
+                    http_url = self.generate_http_url(extracted_uri)  # type: ignore[no-untyped-call]
 
                 return uri.replace(extracted_uri, http_url)
             except Exception as exc:
                 logger.info(f'Can\'t resolve URI={uri}', exc_info=True)
 
-    def _scan_and_create_links_v2(self):
+    def _scan_and_create_links_v2(self):  # type: ignore[no-untyped-def]
         # Async job execution for batch of objects:
         # e.g. GCS example
         # | "GetKey" >>  --> read file content into label_studio_semantic_search.indexer.RawDataObject repr
@@ -310,7 +310,7 @@ class ImportStorage(Storage):
         raise NotImplementedError
 
     @classmethod
-    def add_task(cls, data, project, maximum_annotations, max_inner_id, storage, key, link_class):
+    def add_task(cls, data, project, maximum_annotations, max_inner_id, storage, key, link_class):  # type: ignore[no-untyped-def]
         # predictions
         predictions = data.get('predictions', [])
         if predictions:
@@ -343,7 +343,7 @@ class ImportStorage(Storage):
             link_class.create(task, key, storage)
             logger.debug(f'Create {storage.__class__.__name__} link with key={key} for task={task}')
 
-            raise_exception = not flag_set('ff_fix_back_dev_3342_storage_scan_with_invalid_annotations',
+            raise_exception = not flag_set('ff_fix_back_dev_3342_storage_scan_with_invalid_annotations',  # type: ignore[no-untyped-call]
                                            user=AnonymousUser())
 
             # add predictions
@@ -363,25 +363,25 @@ class ImportStorage(Storage):
                 annotation_ser.save()
             # FIXME: add_annotation_history / post_process_annotations should be here
 
-    def _scan_and_create_links(self, link_class):
+    def _scan_and_create_links(self, link_class):  # type: ignore[no-untyped-def]
         """
         TODO: deprecate this function and transform it to "pipeline" version  _scan_and_create_links_v2,
         TODO: it must be compatible with opensource, so old version is needed as well
         """
         # set in progress status for storage info
-        self.info_set_in_progress()
+        self.info_set_in_progress()  # type: ignore[no-untyped-call]
 
         tasks_existed = tasks_created = 0
-        maximum_annotations = self.project.maximum_annotations
-        task = self.project.tasks.order_by('-inner_id').first()
+        maximum_annotations = self.project.maximum_annotations  # type: ignore[attr-defined]
+        task = self.project.tasks.order_by('-inner_id').first()  # type: ignore[attr-defined]
         max_inner_id = (task.inner_id + 1) if task else 1
 
-        for key in self.iterkeys():
+        for key in self.iterkeys():  # type: ignore[no-untyped-call]
             # w/o Dataflow
             # pubsub.push(topic, key)
             # -> GF.pull(topic, key) + env -> add_task()
             logger.debug(f'Scanning key {key}')
-            self.info_update_progress(last_sync_count=tasks_created, tasks_existed=tasks_existed)
+            self.info_update_progress(last_sync_count=tasks_created, tasks_existed=tasks_existed)  # type: ignore[no-untyped-call]
 
             # skip if task already exists
             if link_class.exists(key, self):
@@ -391,7 +391,7 @@ class ImportStorage(Storage):
 
             logger.debug(f'{self}: found new key {key}')
             try:
-                data = self.get_data(key)
+                data = self.get_data(key)  # type: ignore[no-untyped-call]
             except (UnicodeDecodeError, json.decoder.JSONDecodeError) as exc:
                 logger.debug(exc, exc_info=True)
                 raise ValueError(
@@ -400,52 +400,52 @@ class ImportStorage(Storage):
                     f'"Treat every bucket object as a source file"'
                 )
 
-            self.add_task(data, self.project, maximum_annotations, max_inner_id, self, key, link_class)
+            self.add_task(data, self.project, maximum_annotations, max_inner_id, self, key, link_class)  # type: ignore[attr-defined, no-untyped-call]
             max_inner_id += 1
 
             # update progress counters for storage info
             tasks_created += 1
 
-        self.project.update_tasks_states(
+        self.project.update_tasks_states(  # type: ignore[attr-defined]
             maximum_annotations_changed=False,
             overlap_cohort_percentage_changed=False,
             tasks_number_changed=True
         )
 
         # sync is finished, set completed status for storage info
-        self.info_set_completed(last_sync_count=tasks_created, tasks_existed=tasks_existed)
+        self.info_set_completed(last_sync_count=tasks_created, tasks_existed=tasks_existed)  # type: ignore[no-untyped-call]
 
-    def scan_and_create_links(self):
+    def scan_and_create_links(self):  # type: ignore[no-untyped-def]
         """This is proto method - you can override it, or just replace ImportStorageLink by your own model"""
-        self._scan_and_create_links(ImportStorageLink)
+        self._scan_and_create_links(ImportStorageLink)  # type: ignore[no-untyped-call]
 
-    def sync(self):
-        if redis_connected():
+    def sync(self):  # type: ignore[no-untyped-def]
+        if redis_connected():  # type: ignore[no-untyped-call]
             queue = django_rq.get_queue('low')
-            meta = {'project': self.project.id, 'storage': self.id}
+            meta = {'project': self.project.id, 'storage': self.id}  # type: ignore[attr-defined, attr-defined]
             if (
-                    not is_job_in_queue(queue, "import_sync_background", meta=meta) and
-                    not is_job_on_worker(job_id=self.last_sync_job, queue_name='low')
+                    not is_job_in_queue(queue, "import_sync_background", meta=meta) and  # type: ignore[no-untyped-call]
+                    not is_job_on_worker(job_id=self.last_sync_job, queue_name='low')  # type: ignore[no-untyped-call]
             ):
-                self.info_set_queued()
+                self.info_set_queued()  # type: ignore[no-untyped-call]
                 sync_job = queue.enqueue(
                     import_sync_background,
                     self.__class__,
-                    self.id,
+                    self.id,  # type: ignore[attr-defined]
                     meta=meta,
-                    project_id=self.project.id,
-                    organization_id=self.project.organization.id,
+                    project_id=self.project.id,  # type: ignore[attr-defined]
+                    organization_id=self.project.organization.id,  # type: ignore[attr-defined]
                     on_failure=storage_background_failure
                 )
-                self.info_set_job(sync_job.id)
+                self.info_set_job(sync_job.id)  # type: ignore[no-untyped-call]
                 logger.info(f'Storage sync background job {sync_job.id} for storage {self} has been started')
         else:
             try:
                 logger.info(f'Start syncing storage {self}')
-                self.info_set_queued()
-                import_sync_background(self.__class__, self.id)
+                self.info_set_queued()  # type: ignore[no-untyped-call]
+                import_sync_background(self.__class__, self.id)  # type: ignore[attr-defined]
             except Exception:
-                storage_background_failure(self)
+                storage_background_failure(self)  # type: ignore[no-untyped-call]
 
     class Meta:
         abstract = True
@@ -459,7 +459,7 @@ class ProjectStorageMixin(models.Model):
         help_text='A unique integer value identifying this project.'
     )
 
-    def has_permission(self, user):
+    def has_permission(self, user):  # type: ignore[no-untyped-def]
         user.project = self.project  # link for activity log
         if self.project.has_permission(user):
             return True
@@ -470,18 +470,18 @@ class ProjectStorageMixin(models.Model):
 
 
 @job('low')
-def import_sync_background(storage_class, storage_id, timeout=settings.RQ_LONG_JOB_TIMEOUT, **kwargs):
+def import_sync_background(storage_class, storage_id, timeout=settings.RQ_LONG_JOB_TIMEOUT, **kwargs):  # type: ignore[no-untyped-def]
     storage = storage_class.objects.get(id=storage_id)
     storage.scan_and_create_links()
 
 
 @job('low', timeout=settings.RQ_LONG_JOB_TIMEOUT)
-def export_sync_background(storage_class, storage_id, **kwargs):
+def export_sync_background(storage_class, storage_id, **kwargs):  # type: ignore[no-untyped-def]
     storage = storage_class.objects.get(id=storage_id)
     storage.save_all_annotations()
 
 
-def storage_background_failure(*args, **kwargs):
+def storage_background_failure(*args, **kwargs):  # type: ignore[no-untyped-def]
     # job is used in rqworker failure, extract storage id from job arguments
     if isinstance(args[0], rq.job.Job):
         sync_job = args[0]
@@ -496,7 +496,7 @@ def storage_background_failure(*args, **kwargs):
     elif isinstance(args[0], Storage):
         # we have to load storage with the last states from DB
         # the current args[0] instance might be outdated
-        storage_id = args[0].id
+        storage_id = args[0].id  # type: ignore[attr-defined]
         storage = args[0].__class__.objects.filter(id=storage_id).first()
     else:
         raise ValueError(f"Unknown storage in {args}")
@@ -508,62 +508,62 @@ def storage_background_failure(*args, **kwargs):
 class ExportStorage(Storage, ProjectStorageMixin):
     can_delete_objects = models.BooleanField(_('can_delete_objects'), null=True, blank=True, help_text='Deletion from storage enabled')
 
-    def _get_serialized_data(self, annotation):
+    def _get_serialized_data(self, annotation):  # type: ignore[no-untyped-def]
         if settings.FUTURE_SAVE_TASK_TO_STORAGE:
             # export task with annotations
             # TODO: we have to rewrite save_all_annotations, because this func will be called for each annotation
             # TODO: instead of each task, however, we have to call it only once per task
             return ExportDataSerializer(annotation.task).data
         else:
-            serializer_class = load_func(settings.STORAGE_ANNOTATION_SERIALIZER)
+            serializer_class = load_func(settings.STORAGE_ANNOTATION_SERIALIZER)  # type: ignore[no-untyped-call]
             # deprecated functionality - save only annotation
             return serializer_class(annotation, context={'project': self.project}).data
 
-    def save_annotation(self, annotation):
+    def save_annotation(self, annotation):  # type: ignore[no-untyped-def]
         raise NotImplementedError
 
-    def save_all_annotations(self):
+    def save_all_annotations(self):  # type: ignore[no-untyped-def]
         annotation_exported = 0
         total_annotations = Annotation.objects.filter(project=self.project).count()
-        self.info_set_in_progress()
+        self.info_set_in_progress()  # type: ignore[no-untyped-call]
 
         for annotation in Annotation.objects.filter(project=self.project):
-            self.save_annotation(annotation)
+            self.save_annotation(annotation)  # type: ignore[no-untyped-call]
 
             # update progress counters
             annotation_exported += 1
-            self.info_update_progress(
+            self.info_update_progress(  # type: ignore[no-untyped-call]
                 last_sync_count=annotation_exported,
                 total_annotations=total_annotations
             )
 
-        self.info_set_completed(
+        self.info_set_completed(  # type: ignore[no-untyped-call]
             last_sync_count=annotation_exported,
             total_annotations=total_annotations
         )
 
-    def sync(self):
-        if redis_connected():
+    def sync(self):  # type: ignore[no-untyped-def]
+        if redis_connected():  # type: ignore[no-untyped-call]
             queue = django_rq.get_queue('low')
-            self.info_set_queued()
+            self.info_set_queued()  # type: ignore[no-untyped-call]
             sync_job = queue.enqueue(
                 export_sync_background,
                 self.__class__,
-                self.id,
+                self.id,  # type: ignore[attr-defined]
                 job_timeout=settings.RQ_LONG_JOB_TIMEOUT,
                 project_id=self.project.id,
-                organization_id=self.project.organization.id,
+                organization_id=self.project.organization.id,  # type: ignore[union-attr]
                 on_failure=storage_background_failure
             )
-            self.info_set_job(sync_job.id)
+            self.info_set_job(sync_job.id)  # type: ignore[no-untyped-call]
             logger.info(f'Storage sync background job {sync_job.id} for storage {self} has been queued')
         else:
             try:
                 logger.info(f'Start syncing storage {self}')
-                self.info_set_queued()
-                export_sync_background(self.__class__, self.id)
+                self.info_set_queued()  # type: ignore[no-untyped-call]
+                export_sync_background(self.__class__, self.id)  # type: ignore[attr-defined]
             except Exception:
-                storage_background_failure(self)
+                storage_background_failure(self)  # type: ignore[no-untyped-call]
 
     class Meta:
         abstract = True
@@ -579,11 +579,11 @@ class ImportStorageLink(models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
 
     @classmethod
-    def exists(cls, key, storage):
+    def exists(cls, key, storage):  # type: ignore[no-untyped-def]
         return cls.objects.filter(key=key, storage=storage.id).exists()
 
     @classmethod
-    def create(cls, task, key, storage):
+    def create(cls, task, key, storage):  # type: ignore[no-untyped-def]
         link, created = cls.objects.get_or_create(task_id=task.id, key=key, storage=storage, object_exists=True)
         return link
 
@@ -603,30 +603,30 @@ class ExportStorageLink(models.Model):
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Update time')
 
     @staticmethod
-    def get_key(annotation):
+    def get_key(annotation):  # type: ignore[no-untyped-def]
         if settings.FUTURE_SAVE_TASK_TO_STORAGE:
             return str(annotation.task.id) + '.json' if settings.FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT else ''
         return str(annotation.id)
 
     @property
-    def key(self):
-        return self.get_key(self.annotation)
+    def key(self):  # type: ignore[no-untyped-def]
+        return self.get_key(self.annotation)  # type: ignore[no-untyped-call]
 
     @classmethod
-    def exists(cls, annotation, storage):
+    def exists(cls, annotation, storage):  # type: ignore[no-untyped-def]
         return cls.objects.filter(annotation=annotation.id, storage=storage.id).exists()
 
     @classmethod
-    def create(cls, annotation, storage):
+    def create(cls, annotation, storage):  # type: ignore[no-untyped-def]
         link, created = cls.objects.get_or_create(annotation=annotation, storage=storage, object_exists=True)
         if not created:
             # update updated_at field
             link.save()
         return link
 
-    def has_permission(self, user):
+    def has_permission(self, user):  # type: ignore[no-untyped-def]
         user.project = self.annotation.project  # link for activity log
-        if self.annotation.has_permission(user):
+        if self.annotation.has_permission(user):  # type: ignore[no-untyped-call]
             return True
         return False
 

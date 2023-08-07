@@ -52,7 +52,7 @@ from django.apps import apps
     ('1', 'majority_vote', '1', 1)
 ])
 @pytest.mark.django_db
-def test_export(
+def test_export(  # type: ignore[no-untyped-def]
         business_client, configured_project, finished, aggregator_type, return_task, num_task_in_result,
         annotation_items, aggregated_class
 ):
@@ -86,11 +86,11 @@ def test_export(
 
     # test whether "id" or full task included in results
     if return_task == '0':
-        task_with_annotation = next((t for t in exports if t['id'] == task.id))
-        assert task_with_annotation['id'] == task.id
+        task_with_annotation = next((t for t in exports if t['id'] == task.id))  # type: ignore[union-attr]
+        assert task_with_annotation['id'] == task.id  # type: ignore[union-attr]
     elif return_task == '1':
-        task_with_annotation = next((t for t in exports if t['id'] == task.id))
-        assert task_with_annotation['data'] == task.data
+        task_with_annotation = next((t for t in exports if t['id'] == task.id))  # type: ignore[union-attr]
+        assert task_with_annotation['data'] == task.data  # type: ignore[union-attr]
     else:
         raise Exception('Incorrect return_task param in test: ' + str(return_task))
 
@@ -104,7 +104,7 @@ def test_export(
             # we expect to see all tasks in exports...
             assert len(exports) == task_query.count()
             # ...as well as task without annotations (with empty results)
-            assert all(len(t['annotations']) == 0 for t in exports if t['id'] != task.id)
+            assert all(len(t['annotations']) == 0 for t in exports if t['id'] != task.id)  # type: ignore[union-attr]
     else:
         assert task_with_annotation['annotations'][0]['result'][0]['value']['choices'][0] == aggregated_class
 
@@ -128,7 +128,7 @@ def test_export(
      ], None),
 ])
 @pytest.mark.django_db
-def test_export_with_predictions(
+def test_export_with_predictions(  # type: ignore[no-untyped-def]
         business_client, configured_project, finished, return_task, aggregator_type, annotation_results, predictions
 ):
     if aggregator_type == 'majority_vote' and not apps.is_installed('businesses'):

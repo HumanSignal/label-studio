@@ -14,7 +14,7 @@ class Filter(BaseModel):
     filter: str
     operator: str
     type: str
-    value: Union[StrictInt, StrictFloat, StrictBool, StrictStr, FilterIn, list]
+    value: Union[StrictInt, StrictFloat, StrictBool, StrictStr, FilterIn, list]  # type: ignore[type-arg]
 
 
 class ConjunctionEnum(Enum):
@@ -38,5 +38,5 @@ class PrepareParams(BaseModel):
     ordering: List[str] = []
     selectedItems: Optional[SelectedItems] = None
     filters: Optional[Filters] = None
-    data: Optional[dict] = None
+    data: Optional[dict] = None  # type: ignore[type-arg]
     request: Optional[Any] = None

@@ -14,13 +14,13 @@ from django.utils._os import safe_join
 from django.conf import settings
 from django.contrib.auth import logout
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotFound
-from django.shortcuts import redirect, reverse
+from django.shortcuts import redirect, reverse  # type: ignore[attr-defined]
 from django.template import loader
-from ranged_fileresponse import RangedFileResponse
+from ranged_fileresponse import RangedFileResponse  # type: ignore[import]
 from django.http import JsonResponse
 from wsgiref.util import FileWrapper
 from rest_framework.views import APIView
-from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.utils import swagger_auto_schema  # type: ignore[import]
 from django.db.models import Value, F, CharField
 
 from core import utils
@@ -28,7 +28,7 @@ from core.utils.io import find_file
 from core.label_config import generate_time_series_json
 from core.utils.common import collect_versions
 from io_storages.localfiles.models import LocalFilesImportStorage
-from core.feature_flags import all_flags, get_feature_file_path
+from core.feature_flags import all_flags, get_feature_file_path  # type: ignore[attr-defined, attr-defined]
 
 
 logger = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 _PARAGRAPH_SAMPLE = None
 
 
-def main(request):
+def main(request):  # type: ignore[no-untyped-def]
     user = request.user
 
     if user.is_authenticated:
@@ -53,14 +53,14 @@ def main(request):
     return redirect(reverse('user-login'))
 
 
-def version_page(request):
+def version_page(request):  # type: ignore[no-untyped-def]
     """ Get platform version
     """
     # update the latest version from pypi response
     # from label_studio.core.utils.common import check_for_the_latest_version
     # check_for_the_latest_version(print_message=False)
     http_page = request.path == '/version/'
-    result = collect_versions(force=http_page)
+    result = collect_versions(force=http_page)  # type: ignore[no-untyped-call]
 
     # html / json response
     if request.path == '/version/':
@@ -76,7 +76,7 @@ def version_page(request):
         return JsonResponse(result)
 
 
-def health(request):
+def health(request):  # type: ignore[no-untyped-def]
     """ System health info """
     logger.debug('Got /health request.')
     return HttpResponse(json.dumps({
@@ -84,7 +84,7 @@ def health(request):
     }))
 
 
-def metrics(request):
+def metrics(request):  # type: ignore[no-untyped-def]
     """ Empty page for metrics evaluation """
     return HttpResponse('')
 
@@ -95,25 +95,25 @@ class TriggerAPIError(APIView):
     permission_classes = ()
 
     @swagger_auto_schema(auto_schema=None)
-    def get(self, request):
+    def get(self, request):  # type: ignore[no-untyped-def]
         raise Exception('test')
 
 
-def editor_files(request):
+def editor_files(request):  # type: ignore[no-untyped-def]
     """ Get last editor files
     """
-    response = utils.common.find_editor_files()
+    response = utils.common.find_editor_files()  # type: ignore[no-untyped-call]
     return HttpResponse(json.dumps(response), status=200)
 
 
-def custom_500(request):
+def custom_500(request):  # type: ignore[no-untyped-def]
     """ Custom 500 page """
     t = loader.get_template('500.html')
     type_, value, tb = sys.exc_info()
     return HttpResponseServerError(t.render({'exception': value}))
 
 
-def samples_time_series(request):
+def samples_time_series(request):  # type: ignore[no-untyped-def]
     """ Generate time series example for preview
     """
     time_column = request.GET.get('time', '')
@@ -137,7 +137,7 @@ def samples_time_series(request):
         max_column_n = max([int(v) for v in value_columns] + [0])
         value_columns = range(1, max_column_n+1)
 
-    ts = generate_time_series_json(time_column, value_columns, time_format)
+    ts = generate_time_series_json(time_column, value_columns, time_format)  # type: ignore[no-untyped-call]
     csv_data = pd.DataFrame.from_dict(ts).to_csv(index=False, header=header, sep=separator).encode('utf-8')
 
     # generate response data as file
@@ -148,13 +148,13 @@ def samples_time_series(request):
     return response
 
 
-def samples_paragraphs(request):
+def samples_paragraphs(request):  # type: ignore[no-untyped-def]
     """ Generate paragraphs example for preview
     """
     global _PARAGRAPH_SAMPLE
 
     if _PARAGRAPH_SAMPLE is None:
-        with open(find_file('paragraphs.json'), encoding='utf-8') as f:
+        with open(find_file('paragraphs.json'), encoding='utf-8') as f:  # type: ignore[no-untyped-call]
             _PARAGRAPH_SAMPLE = json.load(f)
     name_key = request.GET.get('nameKey', 'author')
     text_key = request.GET.get('textKey', 'text')
@@ -166,7 +166,7 @@ def samples_paragraphs(request):
     return HttpResponse(json.dumps(result), content_type='application/json')
 
 
-def localfiles_data(request):
+def localfiles_data(request):  # type: ignore[no-untyped-def]
     """Serving files for LocalFilesImportStorage"""
     user = request.user
     path = request.GET.get('d')
@@ -200,12 +200,12 @@ def localfiles_data(request):
     return HttpResponseForbidden()
 
 
-def static_file_with_host_resolver(path_on_disk, content_type):
+def static_file_with_host_resolver(path_on_disk, content_type):  # type: ignore[no-untyped-def]
     """ Load any file, replace {{HOSTNAME}} => settings.HOSTNAME, send it as http response
     """
     path_on_disk = os.path.join(os.path.dirname(__file__), path_on_disk)
 
-    def serve_file(request):
+    def serve_file(request):  # type: ignore[no-untyped-def]
         with open(path_on_disk, 'r') as f:
             body = f.read()
             body = body.replace('{{HOSTNAME}}', settings.HOSTNAME)
@@ -214,7 +214,7 @@ def static_file_with_host_resolver(path_on_disk, content_type):
             out.write(body)
             out.seek(0)
 
-            wrapper = FileWrapper(out)
+            wrapper = FileWrapper(out)  # type: ignore[arg-type]
             response = HttpResponse(wrapper, content_type=content_type)
             response['Content-Length'] = len(body)
             return response
@@ -222,18 +222,18 @@ def static_file_with_host_resolver(path_on_disk, content_type):
     return serve_file
 
 
-def feature_flags(request):
+def feature_flags(request):  # type: ignore[no-untyped-def]
     user = request.user
     if not user.is_authenticated:
         return HttpResponseForbidden()
 
-    flags = all_flags(request.user)
+    flags = all_flags(request.user)  # type: ignore[no-untyped-call]
     flags['$system'] = {
         'FEATURE_FLAGS_DEFAULT_VALUE': settings.FEATURE_FLAGS_DEFAULT_VALUE,
         'FEATURE_FLAGS_FROM_FILE': settings.FEATURE_FLAGS_FROM_FILE,
-        'FEATURE_FLAGS_FILE': get_feature_file_path(),
+        'FEATURE_FLAGS_FILE': get_feature_file_path(),  # type: ignore[no-untyped-call]
         'VERSION_EDITION': settings.VERSION_EDITION,
-        'CLOUD_INSTANCE': settings.CLOUD_INSTANCE if hasattr(settings, 'CLOUD_INSTANCE') else None
+        'CLOUD_INSTANCE': settings.CLOUD_INSTANCE if hasattr(settings, 'CLOUD_INSTANCE') else None  # type: ignore[misc]
     }
 
     return HttpResponse('<pre>' + json.dumps(flags, indent=4) + '</pre>', status=200)

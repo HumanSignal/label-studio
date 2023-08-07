@@ -11,15 +11,15 @@ from django.db import connections, models
 from django.db.models.sql import UpdateQuery
 
 
-def _get_db_type(field, connection):
+def _get_db_type(field, connection):  # type: ignore[no-untyped-def]
     if isinstance(field, (models.PositiveSmallIntegerField,
                           models.PositiveIntegerField)):
-        return field.db_type(connection).split(' ', 1)[0]
+        return field.db_type(connection).split(' ', 1)[0]  # type: ignore[union-attr]
 
     return field.db_type(connection)
 
 
-def _as_sql(obj, field, query, compiler, connection):
+def _as_sql(obj, field, query, compiler, connection):  # type: ignore[no-untyped-def]
     value = getattr(obj, field.attname)
 
     if hasattr(value, 'resolve_expression'):
@@ -37,7 +37,7 @@ def _as_sql(obj, field, query, compiler, connection):
     return value, placeholder
 
 
-def flatten(l, types=(list, float)):
+def flatten(l, types=(list, float)):  # type: ignore[no-untyped-def]
     """
     Flat nested list of lists into a single list.
     """
@@ -45,7 +45,7 @@ def flatten(l, types=(list, float)):
     return [item for sublist in l for item in sublist]
 
 
-def grouper(iterable, size):
+def grouper(iterable, size):  # type: ignore[no-untyped-def]
     # http://stackoverflow.com/a/8991553
     it = iter(iterable)
     while True:
@@ -55,7 +55,7 @@ def grouper(iterable, size):
         yield chunk
 
 
-def validate_fields(meta, fields):
+def validate_fields(meta, fields):  # type: ignore[no-untyped-def]
 
     fields = frozenset(fields)
     field_names = set()
@@ -76,12 +76,12 @@ def validate_fields(meta, fields):
         )
 
 
-def get_fields(update_fields, exclude_fields, meta, obj=None):
+def get_fields(update_fields, exclude_fields, meta, obj=None):  # type: ignore[no-untyped-def]
 
     deferred_fields = set()
 
     if update_fields is not None:
-        validate_fields(meta, update_fields)
+        validate_fields(meta, update_fields)  # type: ignore[no-untyped-call]
     elif obj:
         deferred_fields = obj.get_deferred_fields()
 
@@ -89,7 +89,7 @@ def get_fields(update_fields, exclude_fields, meta, obj=None):
         exclude_fields = set()
     else:
         exclude_fields = set(exclude_fields)
-        validate_fields(meta, exclude_fields)
+        validate_fields(meta, exclude_fields)  # type: ignore[no-untyped-call]
 
     exclude_fields |= deferred_fields
 
@@ -112,7 +112,7 @@ def get_fields(update_fields, exclude_fields, meta, obj=None):
     return fields
 
 
-def bulk_update(objs, meta=None, update_fields=None, exclude_fields=None,
+def bulk_update(objs, meta=None, update_fields=None, exclude_fields=None,  # type: ignore[no-untyped-def]
                 using='default', batch_size=None, pk_field='pk'):
     assert batch_size is None or batch_size > 0
 
@@ -124,11 +124,11 @@ def bulk_update(objs, meta=None, update_fields=None, exclude_fields=None,
     batch_size = batch_size or len(objs)
 
     if meta:
-        fields = get_fields(update_fields, exclude_fields, meta)
+        fields = get_fields(update_fields, exclude_fields, meta)  # type: ignore[no-untyped-call]
     else:
         meta = objs[0]._meta
         if update_fields is not None:
-            fields = get_fields(update_fields, exclude_fields, meta, objs[0])
+            fields = get_fields(update_fields, exclude_fields, meta, objs[0])  # type: ignore[no-untyped-call]
         else:
             fields = None
 
@@ -149,7 +149,7 @@ def bulk_update(objs, meta=None, update_fields=None, exclude_fields=None,
     case_template = "WHEN %s THEN {} "
 
     lenpks = 0
-    for objs_batch in grouper(objs, batch_size):
+    for objs_batch in grouper(objs, batch_size):  # type: ignore[no-untyped-call]
 
         pks = []
         parameters = defaultdict(list)
@@ -157,14 +157,14 @@ def bulk_update(objs, meta=None, update_fields=None, exclude_fields=None,
 
         for obj in objs_batch:
 
-            pk_value, _ = _as_sql(obj, pk_field, query, compiler, connection)
+            pk_value, _ = _as_sql(obj, pk_field, query, compiler, connection)  # type: ignore[no-untyped-call]
             pks.append(pk_value)
 
-            loaded_fields = fields or get_fields(update_fields, exclude_fields, meta, obj)
+            loaded_fields = fields or get_fields(update_fields, exclude_fields, meta, obj)  # type: ignore[no-untyped-call]
 
             for field in loaded_fields:
-                value, placeholder = _as_sql(obj, field, query, compiler, connection)
-                parameters[field].extend(flatten([pk_value, value], types=tuple))
+                value, placeholder = _as_sql(obj, field, query, compiler, connection)  # type: ignore[no-untyped-call]
+                parameters[field].extend(flatten([pk_value, value], types=tuple))  # type: ignore[no-untyped-call]
                 placeholders[field].append(placeholder)
 
         values = ', '.join(
@@ -172,13 +172,13 @@ def bulk_update(objs, meta=None, update_fields=None, exclude_fields=None,
                 column=field.column,
                 pk_column=pk_field.column,
                 cases=(case_template*len(placeholders[field])).format(*placeholders[field]),
-                type=_get_db_type(field, connection=connection),
+                type=_get_db_type(field, connection=connection),  # type: ignore[no-untyped-call]
             )
             for field in parameters.keys()
         )
 
-        parameters = flatten(parameters.values(), types=list)
-        parameters.extend(pks)
+        parameters = flatten(parameters.values(), types=list)  # type: ignore[no-untyped-call]
+        parameters.extend(pks)  # type: ignore[attr-defined]
 
         n_pks = len(pks)
         del pks

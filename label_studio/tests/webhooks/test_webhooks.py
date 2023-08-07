@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import pytest
 import json
-import requests_mock
+import requests_mock  # type: ignore[import]
 import requests
 from django.urls import reverse
 from organizations.models import Organization
@@ -15,7 +15,7 @@ from webhooks.utils import emit_webhooks, emit_webhooks_for_instance, run_webhoo
 
 
 @pytest.fixture
-def organization_webhook(configured_project):
+def organization_webhook(configured_project):  # type: ignore[no-untyped-def]
     organization = configured_project.organization
     uri = 'http://127.0.0.1:8000/api/organization/'
     return Webhook.objects.create(
@@ -26,7 +26,7 @@ def organization_webhook(configured_project):
 
 
 @pytest.fixture
-def project_webhook(configured_project):
+def project_webhook(configured_project):  # type: ignore[no-untyped-def]
     organization = configured_project.organization
     uri = 'http://127.0.0.1:8000/api/project/'
     return Webhook.objects.create(
@@ -37,11 +37,11 @@ def project_webhook(configured_project):
 
 
 @pytest.mark.django_db
-def test_run_webhook(setup_project_dialog, organization_webhook):
+def test_run_webhook(setup_project_dialog, organization_webhook):  # type: ignore[no-untyped-def]
     webhook = organization_webhook
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', webhook.url)
-        run_webhook(organization_webhook, WebhookAction.PROJECT_CREATED, {'data': 'test'})
+        run_webhook(organization_webhook, WebhookAction.PROJECT_CREATED, {'data': 'test'})  # type: ignore[no-untyped-call]
 
     request_history = m.request_history
     assert len(request_history) == 1
@@ -51,11 +51,11 @@ def test_run_webhook(setup_project_dialog, organization_webhook):
 
 
 @pytest.mark.django_db
-def test_emit_webhooks(setup_project_dialog, organization_webhook):
+def test_emit_webhooks(setup_project_dialog, organization_webhook):  # type: ignore[no-untyped-def]
     webhook = organization_webhook
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', webhook.url)
-        emit_webhooks(webhook.organization, webhook.project, WebhookAction.PROJECT_CREATED, {'data': 'test'})
+        emit_webhooks(webhook.organization, webhook.project, WebhookAction.PROJECT_CREATED, {'data': 'test'})  # type: ignore[no-untyped-call]
 
     request_history = m.request_history
     assert len(request_history) == 1
@@ -65,13 +65,13 @@ def test_emit_webhooks(setup_project_dialog, organization_webhook):
 
 
 @pytest.mark.django_db
-def test_emit_webhooks_for_instance(setup_project_dialog, organization_webhook):
+def test_emit_webhooks_for_instance(setup_project_dialog, organization_webhook):  # type: ignore[no-untyped-def]
     webhook = organization_webhook
     project_title = f'Projects 1'
     project = Project.objects.create(title=project_title)
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', webhook.url)
-        emit_webhooks_for_instance(
+        emit_webhooks_for_instance(  # type: ignore[no-untyped-call]
             webhook.organization, webhook.project, WebhookAction.PROJECT_CREATED, instance=project
         )
     assert len(m.request_history) == 1
@@ -83,17 +83,17 @@ def test_emit_webhooks_for_instance(setup_project_dialog, organization_webhook):
 
 
 @pytest.mark.django_db
-def test_exception_catch(organization_webhook):
+def test_exception_catch(organization_webhook):  # type: ignore[no-untyped-def]
     webhook = organization_webhook
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', webhook.url, exc=requests.exceptions.ConnectTimeout)
-        result = run_webhook(webhook, WebhookAction.PROJECT_CREATED)
+        result = run_webhook(webhook, WebhookAction.PROJECT_CREATED)  # type: ignore[no-untyped-call]
     assert result is None
 
 
 # PROJECT CREATE/UPDATE/DELETE API
 @pytest.mark.django_db
-def test_webhooks_for_projects(configured_project, business_client, organization_webhook):
+def test_webhooks_for_projects(configured_project, business_client, organization_webhook):  # type: ignore[no-untyped-def]
     webhook = organization_webhook
 
     # create/update/delete project through API
@@ -142,7 +142,7 @@ def test_webhooks_for_projects(configured_project, business_client, organization
 # TASK CREATE/DELETE API
 # WE DON'T SUPPORT UPDATE FOR TASK
 @pytest.mark.django_db
-def test_webhooks_for_tasks(configured_project, business_client, organization_webhook):
+def test_webhooks_for_tasks(configured_project, business_client, organization_webhook):  # type: ignore[no-untyped-def]
     webhook = organization_webhook
     # CREATE
     with requests_mock.Mocker(real_http=True) as m:
@@ -183,7 +183,7 @@ def test_webhooks_for_tasks(configured_project, business_client, organization_we
 
 # TASK CREATE on IMPORT
 @pytest.mark.django_db
-def test_webhooks_for_tasks_import(configured_project, business_client, organization_webhook):
+def test_webhooks_for_tasks_import(configured_project, business_client, organization_webhook):  # type: ignore[no-untyped-def]
     from django.core.files.uploadedfile import SimpleUploadedFile
 
     webhook = organization_webhook
@@ -213,7 +213,7 @@ def test_webhooks_for_tasks_import(configured_project, business_client, organiza
 
 # ANNOTATION CREATE/UPDATE/DELETE
 @pytest.mark.django_db
-def test_webhooks_for_annotation(configured_project, business_client, organization_webhook):
+def test_webhooks_for_annotation(configured_project, business_client, organization_webhook):  # type: ignore[no-untyped-def]
 
     webhook = organization_webhook
     task = configured_project.tasks.all().first()
@@ -344,7 +344,7 @@ def test_webhooks_for_action_delete_tasks_annotations(configured_project, busine
 
 
 # ACTION: DELETE TASKS
-@pytest.mark.django_db
+@pytest.mark.django_db  # type: ignore[no-redef]
 def test_webhooks_for_action_delete_tasks_annotations(configured_project, business_client, organization_webhook):
     webhook = organization_webhook
     with requests_mock.Mocker(real_http=True) as m:

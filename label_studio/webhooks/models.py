@@ -67,29 +67,29 @@ class Webhook(models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text=_('Creation time'), db_index=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text=_('Last update time'), db_index=True)
 
-    def get_actions(self):
+    def get_actions(self):  # type: ignore[no-untyped-def]
         return WebhookAction.objects.filter(webhook=self).values_list('action', flat=True)
 
-    def validate_actions(self, actions):
+    def validate_actions(self, actions):  # type: ignore[no-untyped-def]
         actions_meta = [WebhookAction.ACTIONS[action] for action in actions]
         if self.project and any((meta.get('organization-only') for meta in actions_meta)):
             raise ValidationError("Project webhook can't contain organization-only action.")
         return actions
 
-    def set_actions(self, actions):
+    def set_actions(self, actions):  # type: ignore[no-untyped-def]
         if not actions:
             actions = set()
         actions = set(actions)
-        old_actions = set(self.get_actions())
+        old_actions = set(self.get_actions())  # type: ignore[no-untyped-call]
 
         for new_action in list(actions - old_actions):
             WebhookAction.objects.create(webhook=self, action=new_action)
 
         WebhookAction.objects.filter(webhook=self, action__in=(old_actions - actions)).delete()
 
-    def has_permission(self, user):
+    def has_permission(self, user):  # type: ignore[no-untyped-def]
         user.project = self.project  # link for activity log
-        return self.organization.has_user(user)
+        return self.organization.has_user(user)  # type: ignore[no-untyped-call]
 
     class Meta:
         db_table = 'webhook'
@@ -120,7 +120,7 @@ class WebhookAction(models.Model):
             'key': 'project',
             'many': False,
             'model': Project,
-            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['project']),
+            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['project']),  # type: ignore[no-untyped-call]
             'organization-only': True,
         },
         PROJECT_UPDATED: {
@@ -129,7 +129,7 @@ class WebhookAction(models.Model):
             'key': 'project',
             'many': False,
             'model': Project,
-            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['project']),
+            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['project']),  # type: ignore[no-untyped-call]
             'project-field': '__self__',
         },
         PROJECT_DELETED: {
@@ -147,7 +147,7 @@ class WebhookAction(models.Model):
             'key': 'tasks',
             'many': True,
             'model': Task,
-            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),
+            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),  # type: ignore[no-untyped-call]
             'project-field': 'project',
         },
         TASKS_DELETED: {
@@ -165,11 +165,11 @@ class WebhookAction(models.Model):
             'key': 'annotation',
             'many': False,
             'model': Annotation,
-            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['annotation']),
+            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['annotation']),  # type: ignore[no-untyped-call]
             'project-field': 'project',
             'nested-fields': {
                 'task': {
-                    'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),
+                    'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),  # type: ignore[no-untyped-call]
                     'many': False,
                     'field': 'task',
                 },
@@ -181,11 +181,11 @@ class WebhookAction(models.Model):
             'key': 'annotation',
             'many': True,
             'model': Annotation,
-            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['annotation']),
+            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['annotation']),  # type: ignore[no-untyped-call]
             'project-field': 'project',
             'nested-fields': {
                 'task': {
-                    'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),
+                    'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),  # type: ignore[no-untyped-call]
                     'many': True,
                     'field': 'task',
                 },
@@ -197,11 +197,11 @@ class WebhookAction(models.Model):
             'key': 'annotation',
             'many': False,
             'model': Annotation,
-            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['annotation']),
+            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['annotation']),  # type: ignore[no-untyped-call]
             'project-field': 'project',
             'nested-fields': {
                 'task': {
-                    'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),
+                    'serializer': load_func(settings.WEBHOOK_SERIALIZERS['task']),  # type: ignore[no-untyped-call]
                     'many': False,
                     'field': 'task',
                 },
@@ -222,7 +222,7 @@ class WebhookAction(models.Model):
             'key': 'label_link',
             'many': True,
             'model': LabelLink,
-            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['label_link']),
+            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['label_link']),  # type: ignore[no-untyped-call]
             'project-field': 'project',
         },
         LABEL_LINK_UPDATED: {
@@ -231,13 +231,13 @@ class WebhookAction(models.Model):
             'key': 'label_link',
             'many': False,
             'model': LabelLink,
-            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['label_link']),
+            'serializer': load_func(settings.WEBHOOK_SERIALIZERS['label_link']),  # type: ignore[no-untyped-call]
             'project-field': 'project',
             'nested-fields': {
                 'label': {
                     'many': False,
                     'field': 'label',
-                    'serializer': load_func(settings.WEBHOOK_SERIALIZERS['label']),
+                    'serializer': load_func(settings.WEBHOOK_SERIALIZERS['label']),  # type: ignore[no-untyped-call]
                 },
             }
         },
@@ -257,7 +257,7 @@ class WebhookAction(models.Model):
 
     action = models.CharField(
         _('action of webhook'),
-        choices=[[key, value['name']] for key, value in ACTIONS.items()],
+        choices=[[key, value['name']] for key, value in ACTIONS.items()],  # type: ignore[misc]
         max_length=128,
         db_index=True,
         help_text=_('Action value'),

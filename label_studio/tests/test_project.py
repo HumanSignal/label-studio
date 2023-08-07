@@ -5,11 +5,11 @@ from tests.utils import make_project
 
 
 @pytest.mark.django_db
-def test_update_tasks_counters_and_task_states(business_client):
-    project = make_project({}, business_client.user, use_ml_backend=False)
+def test_update_tasks_counters_and_task_states(business_client):  # type: ignore[no-untyped-def]
+    project = make_project({}, business_client.user, use_ml_backend=False)  # type: ignore[no-untyped-call]
 
     # CHECK EMPTY LIST
-    ids = []
+    ids = []  # type: ignore[var-annotated]
     obj = project._update_tasks_counters_and_task_states(ids, True, True, True)
     assert obj == 0
 
@@ -28,6 +28,6 @@ def test_update_tasks_counters_and_task_states(business_client):
     assert obj == 0
 
     # CHECK SET with IDS
-    ids = set(project.tasks.all().values_list('id', flat=True))
+    ids = set(project.tasks.all().values_list('id', flat=True))  # type: ignore[assignment]
     obj = project._update_tasks_counters_and_task_states(ids, True, True, True)
     assert obj == 0

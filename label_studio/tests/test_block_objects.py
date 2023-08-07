@@ -7,7 +7,7 @@ from tasks.models import Task, Annotation, Prediction, bulk_update_stats_project
 
 
 @pytest.mark.django_db
-def test_export(business_client, configured_project):
+def test_export(business_client, configured_project):  # type: ignore[no-untyped-def]
     task_query = Task.objects.filter(project=configured_project.id)
     task_query.update(is_labeled=True)
     if db_is_not_sqlite():
@@ -19,10 +19,10 @@ def test_export(business_client, configured_project):
         assert Task.objects.filter(is_labeled=True).count() == 2
         time.sleep(70)
     assert Task.objects.filter(is_labeled=True).count() == 2
-    bulk_update_stats_project_tasks(task_query)
+    bulk_update_stats_project_tasks(task_query)  # type: ignore[no-untyped-call]
     assert Task.objects.filter(is_labeled=True).count() == 0
 
 
-def worker_change_stats(tasks):
+def worker_change_stats(tasks):  # type: ignore[no-untyped-def]
     tasks = Task.objects.filter(id__in=tasks)
-    bulk_update_stats_project_tasks(tasks)
+    bulk_update_stats_project_tasks(tasks)  # type: ignore[no-untyped-call]

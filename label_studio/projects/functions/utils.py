@@ -1,7 +1,7 @@
 from tasks.models import Task
 
 
-def make_queryset_from_iterable(tasks_list):
+def make_queryset_from_iterable(tasks_list):  # type: ignore[no-untyped-def]
     """
     Make queryset from list/set of int/Tasks
     :param tasks_list: Iterable of Tasks or IDs
