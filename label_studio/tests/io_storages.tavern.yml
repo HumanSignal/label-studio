@@ -228,6 +228,27 @@ stages:
       status: "completed"
       traceback: null
 
+- name: Patch storage with synchronizable false
+  request:
+    headers:
+      content-type: application/json
+    json:
+      synchronizable: false
+    method: PATCH
+    url: '{django_live_url}/api/storages/s3/{storage_pk}'
+  response:
+    status_code: 200
+    json:
+      status: "completed"
+      traceback: null
+
+- name: Try to Sync S3 storage with synchronizable false
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/s3/{storage_pk}/sync'
+  response:
+    status_code: 400
+
 ---
 test_name: test_import_from_s3_storage_recursive_scan
 strict: false
