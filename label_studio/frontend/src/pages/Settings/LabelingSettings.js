@@ -43,7 +43,7 @@ export const LabelingSettings = () => {
   }, [project]);
 
   const onSave = useCallback(async () => {
-    saveConfig();
+    return saveConfig();
   }, [essentialDataChanged, saveConfig]);
 
   const onUpdate = useCallback((config) => {
