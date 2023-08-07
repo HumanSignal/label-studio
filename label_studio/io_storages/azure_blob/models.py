@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from typing import TYPE_CHECKING
 import logging
 import json
 import re
@@ -25,7 +26,10 @@ from io_storages.base_models import (
     ProjectStorageMixin
 )
 
-from label_studio.io_storages.azure_blob.utils import AZURE
+if TYPE_CHECKING:
+    from io_storages.azure_blob.utils import AZURE
+else:
+    from label_studio.io_storages.azure_blob.utils import AZURE
 
 logger = logging.getLogger(__name__)
 logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(logging.WARNING)

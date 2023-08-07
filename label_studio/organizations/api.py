@@ -14,8 +14,8 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.utils.decorators import method_decorator
 
-from label_studio.core.permissions import all_permissions, ViewClassPermission
-from label_studio.core.utils.params import bool_from_request
+from core.permissions import all_permissions, ViewClassPermission
+from core.utils.params import bool_from_request
 
 from organizations.models import Organization
 from organizations.serializers import (

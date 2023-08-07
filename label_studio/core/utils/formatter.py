@@ -1,5 +1,10 @@
+from typing import TYPE_CHECKING
 from pythonjsonlogger import jsonlogger
-from label_studio.core.current_request import get_current_request
+
+if TYPE_CHECKING:
+    from core.current_request import get_current_request
+else:
+    from label_studio.core.current_request import get_current_request
 
 
 class CustomJsonFormatter(jsonlogger.JsonFormatter):

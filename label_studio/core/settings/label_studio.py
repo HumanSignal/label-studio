@@ -1,5 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from typing import TYPE_CHECKING
+
 import os
 import pathlib
 
@@ -40,13 +42,14 @@ FRONTEND_SENTRY_ENVIRONMENT = get_env('FRONTEND_SENTRY_ENVIRONMENT', 'opensource
 
 EDITOR_KEYMAP = json.dumps(get_env("EDITOR_KEYMAP"))
 
-from label_studio import __version__
-from label_studio.core.utils import sentry
-sentry.init_sentry(release_name='label-studio', release_version=__version__)
+if not TYPE_CHECKING:
+    from label_studio import __version__
+    from label_studio.core.utils import sentry
+    sentry.init_sentry(release_name='label-studio', release_version=__version__)
 
-# we should do it after sentry init
-from label_studio.core.utils.common import collect_versions
-versions = collect_versions()
+    # we should do it after sentry init
+    from label_studio.core.utils.common import collect_versions
+    versions = collect_versions()
 
 # in Label Studio Community version, feature flags are always ON
 FEATURE_FLAGS_DEFAULT_VALUE = True

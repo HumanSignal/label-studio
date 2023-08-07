@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from typing import TYPE_CHECKING
 import re
 import logging
 import json
@@ -24,7 +25,10 @@ from io_storages.base_models import (
     ProjectStorageMixin
 )
 
-from label_studio.io_storages.s3.utils import AWS
+if TYPE_CHECKING:
+    from io_storages.s3.utils import AWS
+else:
+    from label_studio.io_storages.s3.utils import AWS
 
 logger = logging.getLogger(__name__)
 logging.getLogger('botocore').setLevel(logging.CRITICAL)

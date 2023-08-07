@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from typing import TYPE_CHECKING
 import logging
 
 from django.conf import settings
@@ -12,7 +13,10 @@ from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from label_studio.core.utils.common import load_func
+if TYPE_CHECKING:
+    from core.utils.common import load_func
+else:
+    from label_studio.core.utils.common import load_func
 from .azure_blob.serializers import AzureBlobImportStorageSerializer
 from .gcs.serializers import GCSImportStorageSerializer
 from .localfiles.api import LocalFilesImportStorageListAPI, LocalFilesExportStorageListAPI

@@ -1,5 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from typing import TYPE_CHECKING
+
 import logging
 import json
 import pandas as pd
@@ -14,10 +16,14 @@ from collections import OrderedDict
 import defusedxml.ElementTree as etree
 from collections import defaultdict
 from django.conf import settings
-from label_studio.core.utils.io import find_file
-from label_studio.core.utils.exceptions import (
-    LabelStudioValidationErrorSentryIgnored, LabelStudioXMLSyntaxErrorSentryIgnored
-)
+
+if TYPE_CHECKING:
+    from core.utils.io import find_file
+    from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
+else:
+    from label_studio.core.utils.io import find_file
+    from label_studio.core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
+
 from label_studio_tools.core import label_config
 
 logger = logging.getLogger(__name__)

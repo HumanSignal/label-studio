@@ -1,5 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from typing import TYPE_CHECKING
+
 import os
 import pytest
 import mock
@@ -24,7 +26,10 @@ from users.models import User
 from organizations.models import Organization
 from types import SimpleNamespace
 
-from label_studio.core.utils.params import get_bool_env, get_env
+if TYPE_CHECKING:
+    from core.utils.params import get_env
+else:
+    from label_studio.core.utils.params import get_env
 
 # if we haven't this package, pytest.ini::env doesn't work 
 try:

@@ -1,5 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from typing import TYPE_CHECKING
+
 import sys
 import logging
 import socket
@@ -15,9 +17,10 @@ if sys.platform == 'win32':
     init(convert=True)
 
 # on windows there will be problems with sqlite and json1 support, so fix it
-from label_studio.core.utils.windows_sqlite_fix import windows_dll_fix
+if not TYPE_CHECKING:
+    from label_studio.core.utils.windows_sqlite_fix import windows_dll_fix
 
-windows_dll_fix()
+    windows_dll_fix()
 
 from django.core.management import call_command
 from django.core.wsgi import get_wsgi_application
@@ -25,8 +28,12 @@ from django.db import connections, DEFAULT_DB_ALIAS, IntegrityError
 from django.db.backends.signals import connection_created
 from django.db.migrations.executor import MigrationExecutor
 
-from label_studio.core.argparser import parse_input_args
-from label_studio.core.utils.params import get_env
+if TYPE_CHECKING:
+    from core.argparser import parse_input_args
+    from core.utils.params import get_env
+else:
+    from label_studio.core.argparser import parse_input_args
+    from label_studio.core.utils.params import get_env
 
 logger = logging.getLogger(__name__)
 
@@ -296,7 +303,10 @@ def main():
     _setup_env()
     _apply_database_migrations()
 
-    from label_studio.core.utils.common import collect_versions
+    if TYPE_CHECKING:
+        from core.utils.common import collect_versions
+    else:
+        from label_studio.core.utils.common import collect_versions
     versions = collect_versions()
 
     if input_args.command == 'reset_password':
@@ -350,7 +360,10 @@ def main():
 
     # start with migrations from old projects, '.' project_name means 'label-studio start' without project name
     elif input_args.command == 'start' and input_args.project_name != '.':
-        from label_studio.core.old_ls_migration import migrate_existing_project
+        if TYPE_CHECKING:
+            from core.old_ls_migration import migrate_existing_project
+        else:
+            from label_studio.core.old_ls_migration import migrate_existing_project
         from projects.models import Project
         sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM,
                         'prediction-score-min': Project.UNCERTAINTY}
@@ -394,7 +407,10 @@ def main():
 
     # on `start` command, launch browser if --no-browser is not specified and start label studio server
     if input_args.command == 'start' or input_args.command is None:
-        from label_studio.core.utils.common import start_browser
+        if TYPE_CHECKING:
+            from core.utils.common import start_browser
+        else:
+            from label_studio.core.utils.common import start_browser
 
         if get_env('USERNAME') and get_env('PASSWORD') or input_args.username:
             _create_user(input_args, config)

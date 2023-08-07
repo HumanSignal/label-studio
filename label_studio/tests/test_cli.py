@@ -3,7 +3,7 @@
 import pytest
 
 from server import _create_user
-from label_studio.core.argparser import parse_input_args
+from core.argparser import parse_input_args
 from tests.utils import make_project, make_task, make_annotation
 
 
