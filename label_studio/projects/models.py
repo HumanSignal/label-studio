@@ -594,13 +594,13 @@ class Project(ProjectMixin, models.Model):
                 continue
 
             def get_label(label):
-                return self.control_weights.get(control_name, {}).get('labels', {}).get(label)
+                label_value = self.control_weights.get(control_name, {}).get('labels', {}).get(label)
+                return label_value if label_value is not None else 1.0
 
             control_weights[control_name] = {
                 'overall': self.control_weights.get(control_name, {}).get('overall') or 1.0,
                 'type': control_type,
-                'labels': {label: get_label(label) if get_label(label) is not None else 1.0 for label in
-                           outputs[control_name].get('labels', [])},
+                'labels': {label: get_label(label) for label in outputs[control_name].get('labels', [])},
             }
         return control_weights
 
