@@ -212,7 +212,9 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
 
         # put object into storage
         additional_params = {}
-        if flag_set('fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short', user='auto'):
+
+        self.cached_user = getattr(self, 'cached_user', annotation.task.project.organization.created_by)
+        if flag_set('fflag_feat_back_lsdv_3958_server_side_encryption_for_target_storage_short', user=self.cached_user):
             if self.aws_sse_kms_key_id:
                 additional_params['SSEKMSKeyId'] = self.aws_sse_kms_key_id
                 additional_params['ServerSideEncryption'] = 'aws:kms'
