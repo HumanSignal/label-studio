@@ -8,17 +8,17 @@ from collections import Counter
 try:
     import ujson as json
 except:
-    import json
+    import json  # type: ignore[no-redef]
 
 from django.db import models
-from core.feature_flags import flag_set
+from core.feature_flags import flag_set  # type: ignore[attr-defined]
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
 
 logger = logging.getLogger(__name__)
 
 
-def upload_name_generator(instance, filename):
+def upload_name_generator(instance, filename):  # type: ignore[no-untyped-def]
     project = str(instance.project_id)
     project_dir = os.path.join(settings.MEDIA_ROOT, settings.UPLOAD_DIR, project)
     os.makedirs(project_dir, exist_ok=True)
@@ -31,18 +31,18 @@ class FileUpload(models.Model):
     project = models.ForeignKey('projects.Project', related_name='file_uploads', on_delete=models.CASCADE)
     file = models.FileField(upload_to=upload_name_generator)
 
-    def has_permission(self, user):
+    def has_permission(self, user):  # type: ignore[no-untyped-def]
         user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
     @property
-    def filepath(self):
+    def filepath(self):  # type: ignore[no-untyped-def]
         return self.file.name
 
     @property
-    def url(self):
+    def url(self):  # type: ignore[no-untyped-def]
         if settings.HOSTNAME and settings.CLOUD_FILE_STORAGE_ENABLED:
-            if flag_set('ff_back_dev_2915_storage_nginx_proxy_26092022_short', self.project.organization.created_by):
+            if flag_set('ff_back_dev_2915_storage_nginx_proxy_26092022_short', self.project.organization.created_by):  # type: ignore[no-untyped-call, union-attr]
                 return self.file.url
             else:
                 return settings.HOSTNAME + self.file.url
@@ -52,7 +52,7 @@ class FileUpload(models.Model):
             return self.file.url
 
     @property
-    def format(self):
+    def format(self):  # type: ignore[no-untyped-def]
         filepath = self.file.name
         file_format = None
         try:
@@ -64,7 +64,7 @@ class FileUpload(models.Model):
         return file_format
 
     @property
-    def content(self):
+    def content(self):  # type: ignore[no-untyped-def]
         # cache file body
         if hasattr(self, '_file_body'):
             body = getattr(self, '_file_body')
@@ -73,22 +73,22 @@ class FileUpload(models.Model):
             setattr(self, '_file_body', body)
         return body
 
-    def read_tasks_list_from_csv(self, sep=','):
+    def read_tasks_list_from_csv(self, sep=','):  # type: ignore[no-untyped-def]
         logger.debug('Read tasks list from CSV file {}'.format(self.file.name))
         tasks = pd.read_csv(self.file.open(), sep=sep).fillna('').to_dict('records')
         tasks = [{'data': task} for task in tasks]
         return tasks
 
-    def read_tasks_list_from_tsv(self):
-        return self.read_tasks_list_from_csv('\t')
+    def read_tasks_list_from_tsv(self):  # type: ignore[no-untyped-def]
+        return self.read_tasks_list_from_csv('\t')  # type: ignore[no-untyped-call]
 
-    def read_tasks_list_from_txt(self):
+    def read_tasks_list_from_txt(self):  # type: ignore[no-untyped-def]
         logger.debug('Read tasks list from text file {}'.format(self.file.name))
         lines = self.content.splitlines()
         tasks = [{'data': {settings.DATA_UNDEFINED_NAME: line}} for line in lines]
         return tasks
 
-    def read_tasks_list_from_json(self):
+    def read_tasks_list_from_json(self):  # type: ignore[no-untyped-def]
         logger.debug('Read tasks list from JSON file {}'.format(self.file.name))
 
         raw_data = self.content
@@ -108,13 +108,13 @@ class FileUpload(models.Model):
             tasks_formatted.append(task)
         return tasks_formatted
 
-    def read_task_from_hypertext_body(self):
+    def read_task_from_hypertext_body(self):  # type: ignore[no-untyped-def]
         logger.debug('Read 1 task from hypertext file {}'.format(self.file.name))
         body = self.content
         tasks = [{'data': {settings.DATA_UNDEFINED_NAME: body}}]
         return tasks
 
-    def read_task_from_uploaded_file(self):
+    def read_task_from_uploaded_file(self):  # type: ignore[no-untyped-def]
         logger.debug('Read 1 task from uploaded file {}'.format(self.file.name))
         if settings.CLOUD_FILE_STORAGE_ENABLED:
             tasks = [{'data': {settings.DATA_UNDEFINED_NAME: self.file.name}}]
@@ -123,21 +123,21 @@ class FileUpload(models.Model):
         return tasks
 
     @property
-    def format_could_be_tasks_list(self):
+    def format_could_be_tasks_list(self):  # type: ignore[no-untyped-def]
         return self.format in ('.csv', '.tsv', '.txt')
 
-    def read_tasks(self, file_as_tasks_list=True):
+    def read_tasks(self, file_as_tasks_list=True):  # type: ignore[no-untyped-def]
         file_format = self.format
         try:
             # file as tasks list
             if file_format == '.csv' and file_as_tasks_list:
-                tasks = self.read_tasks_list_from_csv()
+                tasks = self.read_tasks_list_from_csv()  # type: ignore[no-untyped-call]
             elif file_format == '.tsv' and file_as_tasks_list:
-                tasks = self.read_tasks_list_from_tsv()
+                tasks = self.read_tasks_list_from_tsv()  # type: ignore[no-untyped-call]
             elif file_format == '.txt' and file_as_tasks_list:
-                tasks = self.read_tasks_list_from_txt()
+                tasks = self.read_tasks_list_from_txt()  # type: ignore[no-untyped-call]
             elif file_format == '.json':
-                tasks = self.read_tasks_list_from_json()
+                tasks = self.read_tasks_list_from_json()  # type: ignore[no-untyped-call]
 
             # otherwise - only one object tag should be presented in label config
             elif not self.project.one_object_in_label_config:
@@ -147,19 +147,19 @@ class FileUpload(models.Model):
 
             # file as a single asset
             elif file_format in ('.html', '.htm', '.xml'):
-                tasks = self.read_task_from_hypertext_body()
+                tasks = self.read_task_from_hypertext_body()  # type: ignore[no-untyped-call]
             else:
-                tasks = self.read_task_from_uploaded_file()
+                tasks = self.read_task_from_uploaded_file()  # type: ignore[no-untyped-call]
 
         except Exception as exc:
             raise ValidationError('Failed to parse input file ' + self.file.name + ': ' + str(exc))
         return tasks
 
     @classmethod
-    def load_tasks_from_uploaded_files(cls, project, file_upload_ids=None, formats=None, files_as_tasks_list=True, trim_size=None):
+    def load_tasks_from_uploaded_files(cls, project, file_upload_ids=None, formats=None, files_as_tasks_list=True, trim_size=None):  # type: ignore[no-untyped-def]
         tasks = []
         fileformats = []
-        common_data_fields = set()
+        common_data_fields = set()  # type: ignore[var-annotated]
 
         # scan all files
         file_uploads = FileUpload.objects.filter(project=project)
@@ -169,7 +169,7 @@ class FileUpload(models.Model):
             file_format = file_upload.format
             if formats and file_format not in formats:
                 continue
-            new_tasks = file_upload.read_tasks(files_as_tasks_list)
+            new_tasks = file_upload.read_tasks(files_as_tasks_list)  # type: ignore[no-untyped-call]
             for task in new_tasks:
                 task['file_upload_id'] = file_upload.id
 
@@ -178,7 +178,7 @@ class FileUpload(models.Model):
                 common_data_fields = new_data_fields
             elif not common_data_fields.intersection(new_data_fields):
                 raise ValidationError(
-                    _old_vs_new_data_keys_inconsistency_message(
+                    _old_vs_new_data_keys_inconsistency_message(  # type: ignore[no-untyped-call]
                         new_data_fields, common_data_fields, file_upload.file.name
                     )
                 )
@@ -195,7 +195,7 @@ class FileUpload(models.Model):
         return tasks, dict(Counter(fileformats)), common_data_fields
 
 
-def _old_vs_new_data_keys_inconsistency_message(new_data_keys, old_data_keys, current_file):
+def _old_vs_new_data_keys_inconsistency_message(new_data_keys, old_data_keys, current_file):  # type: ignore[no-untyped-def]
     new_data_keys_list = ','.join(new_data_keys)
     old_data_keys_list = ','.join(old_data_keys)
     common_prefix = "You're trying to import inconsistent data:\n"

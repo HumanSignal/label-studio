@@ -7,12 +7,12 @@ from collections import OrderedDict
 from django.conf import settings
 from rest_framework.generics import get_object_or_404
 
-from core.utils.common import int_from_request
+from core.utils.common import int_from_request  # type: ignore[attr-defined]
 from data_manager.prepare_params import PrepareParams
 from data_manager.models import View
 from tasks.models import Task
 from urllib.parse import unquote
-from core.feature_flags import flag_set
+from core.feature_flags import flag_set  # type: ignore[attr-defined]
 
 TASKS = 'tasks:'
 logger = logging.getLogger(__name__)
@@ -22,16 +22,16 @@ class DataManagerException(Exception):
     pass
 
 
-def get_all_columns(project, *_):
+def get_all_columns(project, *_):  # type: ignore[no-untyped-def]
     """ Make columns info for the frontend data manager
     """
-    result = {'columns': []}
+    result = {'columns': []}  # type: ignore[var-annotated]
 
     # frontend uses MST data model, so we need two directional referencing parent <-> child
     task_data_children = []
     i = 0
 
-    data_types = OrderedDict()
+    data_types = OrderedDict()  # type: ignore[var-annotated]
 
     # add data types from config again
     project_data_types = {}
@@ -94,7 +94,7 @@ def get_all_columns(project, *_):
         }
     ]
 
-    if flag_set('ff_back_2070_inner_id_12052022_short', user=project.organization.created_by):
+    if flag_set('ff_back_2070_inner_id_12052022_short', user=project.organization.created_by):  # type: ignore[no-untyped-call]
         result['columns'] += [{
             'id': 'inner_id',
             'title': "Inner ID",
@@ -323,18 +323,18 @@ def get_all_columns(project, *_):
     return result
 
 
-def get_prepare_params(request, project):
+def get_prepare_params(request, project):  # type: ignore[no-untyped-def]
     """ This function extract prepare_params from
         * view_id if it's inside of request data
         * selectedItems, filters, ordering if they are in request and there is no view id
     """
     # use filters and selected items from view
-    view_id = int_from_request(request.GET, 'view', 0) or int_from_request(request.data, 'view', 0)
+    view_id = int_from_request(request.GET, 'view', 0) or int_from_request(request.data, 'view', 0)  # type: ignore[no-untyped-call]
     if view_id > 0:
         view = get_object_or_404(View, pk=view_id)
         if view.project.pk != project.pk:
             raise DataManagerException('Project and View mismatch')
-        prepare_params = view.get_prepare_tasks_params(add_selected_items=True)
+        prepare_params = view.get_prepare_tasks_params(add_selected_items=True)  # type: ignore[no-untyped-call]
         prepare_params.request = request
 
     # use filters and selected items from request if it's specified
@@ -352,18 +352,18 @@ def get_prepare_params(request, project):
                                        '"excluded | included": [...task_ids...]}')
         filters = data.get('filters', None)
         ordering = data.get('ordering', [])
-        prepare_params = PrepareParams(project=project.id, selectedItems=selected, data=data,
+        prepare_params = PrepareParams(project=project.id, selectedItems=selected, data=data,  # type: ignore[arg-type]
                                        filters=filters, ordering=ordering, request=request)
     return prepare_params
 
 
-def get_prepared_queryset(request, project):
-    prepare_params = get_prepare_params(request, project)
-    queryset = Task.prepared.only_filtered(prepare_params=prepare_params)
+def get_prepared_queryset(request, project):  # type: ignore[no-untyped-def]
+    prepare_params = get_prepare_params(request, project)  # type: ignore[no-untyped-call]
+    queryset = Task.prepared.only_filtered(prepare_params=prepare_params)  # type: ignore[no-untyped-call]
     return queryset
 
 
-def evaluate_predictions(tasks):
+def evaluate_predictions(tasks):  # type: ignore[no-untyped-def]
     """ Call ML backend for prediction evaluation of the task queryset
     """
     if not tasks:
@@ -376,19 +376,19 @@ def evaluate_predictions(tasks):
         ml_backend.predict_tasks(tasks)
 
 
-def filters_ordering_selected_items_exist(data):
+def filters_ordering_selected_items_exist(data):  # type: ignore[no-untyped-def]
     return data.get('filters') or data.get('ordering') or data.get('selectedItems')
 
 
-def custom_filter_expressions(*args, **kwargs):
+def custom_filter_expressions(*args, **kwargs):  # type: ignore[no-untyped-def]
     pass
 
 
-def preprocess_filter(_filter, *_):
+def preprocess_filter(_filter, *_):  # type: ignore[no-untyped-def]
     return _filter
 
 
-def preprocess_field_name(raw_field_name, only_undefined_field=False):
+def preprocess_field_name(raw_field_name, only_undefined_field=False):  # type: ignore[no-untyped-def]
     field_name = raw_field_name.replace("filter:", "")
     field_name = field_name.replace("tasks:", "")
     ascending = False if field_name[0] == '-' else True  # detect direction

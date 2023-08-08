@@ -1,7 +1,7 @@
 from django.conf import *
 
 
-def event_processor(event, hint):
+def event_processor(event, hint):  # type: ignore[no-untyped-def]
     # skip all transactions without errors
     if 'exc_info' not in hint:
         return None
@@ -57,7 +57,7 @@ def event_processor(event, hint):
     return event  # to return all other events
 
 
-def init_sentry(release_name, release_version):
+def init_sentry(release_name, release_version):  # type: ignore[no-untyped-def]
     if settings.SENTRY_DSN:
         import sentry_sdk
         from sentry_sdk.integrations.django import DjangoIntegration

@@ -1,17 +1,18 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+
 import pytest
 import os
 import datetime
 
 from users.models import User
 from projects.models import Project
-from label_studio.tests.test_data.gen_tasks_and_annotations import gen_tasks
+from tests.test_data.gen_tasks_and_annotations import gen_tasks
 from django.conf import settings
 
 
 @pytest.mark.django_db
-def test_load_tasks_and_annotations(business_client, annotator_client, configured_project):
+def test_load_tasks_and_annotations(business_client, annotator_client, configured_project):  # type: ignore[no-untyped-def]
     """
         this test loads tasks_and_annotations.json
         with 1000 tasks and 5000 annotations and recalc accuracy
@@ -39,7 +40,7 @@ def test_load_tasks_and_annotations(business_client, annotator_client, configure
     p.created_by.active_organization.add_user(user)
     p.add_collaborator(user)
 
-    gen_tasks(user.id)
+    gen_tasks(user.id)  # type: ignore[no-untyped-call]
 
     dt1 = datetime.datetime.now()
     filename = 'tasks_and_annotations.json'

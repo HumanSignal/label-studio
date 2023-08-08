@@ -7,7 +7,7 @@ import os
 from unittest import mock
 
 from django.urls import get_resolver
-from django.shortcuts import reverse
+from django.shortcuts import reverse  # type: ignore[attr-defined]
 from django.core.management import call_command
 from tasks.models import Annotation
 from tasks.models import Task
@@ -286,7 +286,7 @@ group_annotator_statuses = {
     '/django-rq/': {'get': 302, 'post': 302, 'put': 302, 'delete': 302}}
 
 
-def build_urls(project_id, task_id, annotation_id):
+def build_urls(project_id, task_id, annotation_id):  # type: ignore[no-untyped-def]
     """ Get all the ulrs from django
     """
     urls = []
@@ -294,7 +294,7 @@ def build_urls(project_id, task_id, annotation_id):
     resolver = get_resolver(None).reverse_dict
     for url_name in resolver:
         if isinstance(url_name, str) and url_name not in exclude_urls:
-            keys = resolver[url_name][0][0][1]
+            keys = resolver[url_name][0][0][1]  # type: ignore[index]
             kwargs = {}
             for key in keys:
                 if 'pk' in key:
@@ -305,7 +305,7 @@ def build_urls(project_id, task_id, annotation_id):
                 elif key in ['token', 'uidb64']:
                     kwargs[key] = 1000
                 elif key in ['key']:
-                    kwargs[key] = '1000'
+                    kwargs[key] = '1000'  # type: ignore[assignment]
 
                 # we need to use really existing project/task/annotation ids from fixture
                 if key == 'project_id' or key == 'project_pk':
@@ -318,8 +318,8 @@ def build_urls(project_id, task_id, annotation_id):
                     kwargs[key] = 1
 
                 if url_name == 'password_reset_confirm':
-                    kwargs['token'] = '1000-1000'
-                    kwargs['uidb64'] = '1000'
+                    kwargs['token'] = '1000-1000'  # type: ignore[assignment]
+                    kwargs['uidb64'] = '1000'  # type: ignore[assignment]
             try:
                 url = reverse(url_name, kwargs=kwargs)
             except django.urls.exceptions.NoReverseMatch as e:
@@ -339,7 +339,7 @@ def build_urls(project_id, task_id, annotation_id):
     return urls
 
 
-def restore_objects(project):
+def restore_objects(project):  # type: ignore[no-untyped-def]
     """ Create task and annotation for URL tests
     """
     # task_db, annotation_db = None, None
@@ -371,12 +371,12 @@ def restore_objects(project):
     return task_db, annotation_db
 
 
-def check_urls(urls, runner, match_statuses, project):
+def check_urls(urls, runner, match_statuses, project):  # type: ignore[no-untyped-def]
     statuses = {}
     for url in urls:
         print('-->', url)
         status = {}
-        restore_objects(project)
+        restore_objects(project)  # type: ignore[no-untyped-call]
 
         r = runner.get(url)
         status['get'] = r.status_code
@@ -404,36 +404,36 @@ def check_urls(urls, runner, match_statuses, project):
     # print(statuses)  # use this to collect urls -> statuses dict
 
 
-def run(owner, runner):
+def run(owner, runner):  # type: ignore[no-untyped-def]
     """ Get all urls from Django and GET/POST/PUT/DELETE them
     """
-    owner.task_db, owner.annotation_db = restore_objects(owner.project)
-    urls = build_urls(owner.project.id, owner.task_db.id, owner.annotation_db.id)
+    owner.task_db, owner.annotation_db = restore_objects(owner.project)  # type: ignore[no-untyped-call]
+    urls = build_urls(owner.project.id, owner.task_db.id, owner.annotation_db.id)  # type: ignore[no-untyped-call]
 
-    check_urls(urls, runner, runner.statuses, owner.project)
+    check_urls(urls, runner, runner.statuses, owner.project)  # type: ignore[no-untyped-call]
 
 
 @pytest.mark.django_db
-def test_all_urls_owner(setup_project_choices):
+def test_all_urls_owner(setup_project_choices):  # type: ignore[no-untyped-def]
     runner = owner = setup_project_choices
     runner.statuses = owner_statuses
     runner.statuses_name = 'owner_statuses'
-    run(owner, runner)
+    run(owner, runner)  # type: ignore[no-untyped-call]
 
 
 @pytest.mark.django_db
-def test_all_urls_other_business(setup_project_choices, business_client):
+def test_all_urls_other_business(setup_project_choices, business_client):  # type: ignore[no-untyped-def]
     business_client.statuses = other_business_statuses
     business_client.statuses_name = 'other_business_statuses'
-    run(setup_project_choices, business_client)
+    run(setup_project_choices, business_client)  # type: ignore[no-untyped-call]
 
 
 @pytest.mark.django_db
-def test_urls_mismatch_with_registered(tmpdir):
+def test_urls_mismatch_with_registered(tmpdir):  # type: ignore[no-untyped-def]
     from core.utils.io import find_file
     from core.utils.params import get_bool_env
 
-    all_urls_file = find_file('all_urls.json')
+    all_urls_file = find_file('all_urls.json')  # type: ignore[no-untyped-call]
     with open(all_urls_file) as f:
         all_urls = json.load(f)
 
@@ -442,7 +442,7 @@ def test_urls_mismatch_with_registered(tmpdir):
 
     f = tmpdir.mkdir("subdir").join('show_urls.json')
     call_command('show_urls', format='pretty-json', stdout=f)
-    filename = os.path.join(f.dirname, f.basename)
+    filename = os.path.join(f.dirname, f.basename)  # type: ignore[attr-defined, attr-defined]
     with open(filename) as f1:
         all_current_urls = json.load(f1)
 

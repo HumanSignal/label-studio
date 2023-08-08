@@ -16,26 +16,26 @@ class AzureBlobImportStorageSerializer(ImportStorageSerializer):
         model = AzureBlobImportStorage
         fields = '__all__'
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # type: ignore[no-untyped-def]
         result = super().to_representation(instance)
         result.pop('account_name')
         result.pop('account_key')
         return result
 
-    def validate(self, data):
+    def validate(self, data):  # type: ignore[no-untyped-def]
         data = super(AzureBlobImportStorageSerializer, self).validate(data)
         storage = AzureBlobImportStorage(**data)
         try:
-            storage.validate_connection()
+            storage.validate_connection()  # type: ignore[no-untyped-call]
         except Exception as exc:
-            raise ValidationError(exc)
+            raise ValidationError(exc)  # type: ignore[arg-type]
         return data
 
 
 class AzureBlobExportStorageSerializer(ExportStorageSerializer):
     type = serializers.ReadOnlyField(default='azure')
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # type: ignore[no-untyped-def]
         result = super().to_representation(instance)
         result.pop('account_name')
         result.pop('account_key')

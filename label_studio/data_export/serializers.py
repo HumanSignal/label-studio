@@ -1,8 +1,8 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from django.conf import settings
-from label_studio_tools.core.label_config import is_video_object_tracking
-from rest_flex_fields import FlexFieldsModelSerializer
+from label_studio_tools.core.label_config import is_video_object_tracking  # type: ignore[import]
+from rest_flex_fields import FlexFieldsModelSerializer  # type: ignore[import]
 from rest_framework import serializers
 
 from core.label_config import replace_task_data_undefined_with_config_field
@@ -13,19 +13,19 @@ from tasks.serializers import AnnotationDraftSerializer, PredictionSerializer
 from users.models import User
 from data_export.models import DataExport
 from users.serializers import UserSimpleSerializer
-from label_studio_tools.postprocessing.video import extract_key_frames
+from label_studio_tools.postprocessing.video import extract_key_frames  # type: ignore[import]
 
 from .models import Export, ConvertedFormat
 
 
-class CompletedBySerializer(serializers.ModelSerializer):
+class CompletedBySerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
     class Meta:
         model = User
         fields = ['id', 'email', 'first_name', 'last_name']
 
 
-class AnnotationSerializer(FlexFieldsModelSerializer):
-    completed_by = serializers.PrimaryKeyRelatedField(read_only=True)
+class AnnotationSerializer(FlexFieldsModelSerializer):  # type: ignore[misc]
+    completed_by = serializers.PrimaryKeyRelatedField(read_only=True)  # type: ignore[var-annotated]
     result = serializers.SerializerMethodField()
 
     class Meta:
@@ -33,7 +33,7 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         fields = '__all__'
         expandable_fields = {'completed_by': (CompletedBySerializer,)}
 
-    def get_result(self, obj):
+    def get_result(self, obj):  # type: ignore[no-untyped-def]
         # run frames extraction on param, result and result type
         if obj.result and self.context.get('interpolate_key_frames', False) and \
                 is_video_object_tracking(parsed_config=obj.project.get_parsed_config()):
@@ -41,14 +41,14 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         return obj.result
 
 
-class BaseExportDataSerializer(FlexFieldsModelSerializer):
+class BaseExportDataSerializer(FlexFieldsModelSerializer):  # type: ignore[misc]
     annotations = AnnotationSerializer(many=True, read_only=True)
     file_upload = serializers.ReadOnlyField(source='file_upload_name')
-    drafts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    predictions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    drafts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)  # type: ignore[var-annotated]
+    predictions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)  # type: ignore[var-annotated]
 
     # resolve $undefined$ key in task data, if any
-    def to_representation(self, task):
+    def to_representation(self, task):  # type: ignore[no-untyped-def]
         # avoid long project initializations
         project = getattr(self, '_project', None)
         if project is None:
@@ -59,7 +59,7 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
         # add interpolate_key_frames param to annotations serializer
         if 'annotations' in self.fields:
             self.fields['annotations'].context['interpolate_key_frames'] = self.context.get('interpolate_key_frames', False)
-        replace_task_data_undefined_with_config_field(data, project)
+        replace_task_data_undefined_with_config_field(data, project)  # type: ignore[no-untyped-call]
 
         return super().to_representation(task)
 
@@ -73,13 +73,13 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
         }
 
 
-class ConvertedFormatSerializer(serializers.ModelSerializer):
+class ConvertedFormatSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
     class Meta:
         model = ConvertedFormat
         fields = ['id', 'status', 'export_type', 'traceback']
 
 
-class ExportSerializer(serializers.ModelSerializer):
+class ExportSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
     class Meta:
         model = Export
         read_only = [
@@ -105,7 +105,7 @@ ONLY_OR_EXCLUDE_CHOICE = [
 ]
 
 
-class TaskFilterOptionsSerializer(serializers.Serializer):
+class TaskFilterOptionsSerializer(serializers.Serializer):  # type: ignore[type-arg]
     view = serializers.IntegerField(
         required=False,
         help_text='Apply filters from the view ID (a tab from the Data Manager)'
@@ -131,7 +131,7 @@ class TaskFilterOptionsSerializer(serializers.Serializer):
     )
 
 
-class AnnotationFilterOptionsSerializer(serializers.Serializer):
+class AnnotationFilterOptionsSerializer(serializers.Serializer):  # type: ignore[type-arg]
     usual = serializers.BooleanField(
         allow_null=True, required=False, default=True,
         help_text='Include not skipped and not ground truth annotations'
@@ -146,8 +146,8 @@ class AnnotationFilterOptionsSerializer(serializers.Serializer):
     )
 
 
-class SerializationOptionsSerializer(serializers.Serializer):
-    class SerializationOption(serializers.Serializer):
+class SerializationOptionsSerializer(serializers.Serializer):  # type: ignore[type-arg]
+    class SerializationOption(serializers.Serializer):  # type: ignore[type-arg]
         only_id = serializers.BooleanField(
             default=False, required=False,
             help_text='Include a full json body or IDs only'
@@ -163,12 +163,12 @@ class SerializationOptionsSerializer(serializers.Serializer):
     )
 
 
-class ExportConvertSerializer(serializers.Serializer):
+class ExportConvertSerializer(serializers.Serializer):  # type: ignore[type-arg]
     export_type = serializers.CharField(help_text='Export file format.')
 
-    def validate_export_type(self, value):
+    def validate_export_type(self, value):  # type: ignore[no-untyped-def]
         project = self.context.get('project')
-        export_formats = [f['name'] for f in DataExport.get_export_formats(project)]
+        export_formats = [f['name'] for f in DataExport.get_export_formats(project)]  # type: ignore[no-untyped-call]
         if value not in export_formats:
             raise serializers.ValidationError(f'{value} is not supported export format')
         return value
@@ -187,7 +187,7 @@ class ExportCreateSerializer(ExportSerializer):
     serialization_options = SerializationOptionsSerializer(required=False, default=None)
 
 
-class ExportParamSerializer(serializers.Serializer):
+class ExportParamSerializer(serializers.Serializer):  # type: ignore[type-arg]
     interpolate_key_frames = serializers.BooleanField(default=settings.INTERPOLATE_KEY_FRAMES,
                                                       help_text='Interpolate video key frames.',
                                                       required=False)
@@ -209,4 +209,4 @@ class BaseExportDataSerializerForInteractive(InteractiveMixin, BaseExportDataSer
     pass
 
 
-ExportDataSerializer = load_func(settings.EXPORT_DATA_SERIALIZER)
+ExportDataSerializer = load_func(settings.EXPORT_DATA_SERIALIZER)  # type: ignore[no-untyped-call]

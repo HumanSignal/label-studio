@@ -15,12 +15,12 @@ from core.utils.contextlog import ContextLog
 from core.utils.common import load_func
 
 
-def hash_upload(instance, filename):
+def hash_upload(instance, filename):  # type: ignore[no-untyped-def]
     filename = str(uuid.uuid4())[0:8] + '-' + filename
     return settings.AVATAR_PATH + '/' + filename
 
 
-def check_avatar(files):
+def check_avatar(files):  # type: ignore[no-untyped-def]
     images = list(files.items())
     if not images:
         return None
@@ -49,7 +49,7 @@ def check_avatar(files):
     return avatar
 
 
-def save_user(request, next_page, user_form):
+def save_user(request, next_page, user_form):  # type: ignore[no-untyped-def]
     """ Save user instance to DB
     """
     user = user_form.save()
@@ -58,9 +58,9 @@ def save_user(request, next_page, user_form):
 
     if Organization.objects.exists():
         org = Organization.objects.first()
-        org.add_user(user)
+        org.add_user(user)  # type: ignore[union-attr]
     else:
-        org = Organization.create_organization(created_by=user, title='Label Studio')
+        org = Organization.create_organization(created_by=user, title='Label Studio')  # type: ignore[no-untyped-call]
     user.active_organization = org
     user.save(update_fields=['active_organization'])
 
@@ -69,20 +69,20 @@ def save_user(request, next_page, user_form):
         'update-notifications': 1, 'new-user': 1
     }
     redirect_url = next_page if next_page else reverse('projects:project-index')
-    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+    login(request, user, backend='django.contrib.auth.backends.ModelBackend')  # type: ignore[no-untyped-call]
     return redirect(redirect_url)
 
 
-def proceed_registration(request, user_form, organization_form, next_page):
+def proceed_registration(request, user_form, organization_form, next_page):  # type: ignore[no-untyped-def]
     """ Register a new user for POST user_signup
     """
     # save user to db
-    save_user = load_func(settings.SAVE_USER)
+    save_user = load_func(settings.SAVE_USER)  # type: ignore[no-untyped-call]
     response = save_user(request, next_page, user_form)
 
     return response
 
 
-def login(request, *args, **kwargs):
+def login(request, *args, **kwargs):  # type: ignore[no-untyped-def]
     request.session['last_login'] = time()
     return auth.login(request, *args, **kwargs)

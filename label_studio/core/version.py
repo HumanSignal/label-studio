@@ -22,7 +22,7 @@ VERSION_OVERRIDE = os.getenv('VERSION_OVERRIDE', '')
 BRANCH_OVERRIDE = os.getenv('BRANCH_OVERRIDE', '')
 
 
-def _write_py(info):
+def _write_py(info):  # type: ignore[no-untyped-def]
     # go to current dir to package __init__.py
     cwd = os.getcwd()
     d = os.path.dirname(__file__)
@@ -39,7 +39,7 @@ def _write_py(info):
                 '\n# Do not include it to git!\n')
 
 
-def _read_py(ls=False):
+def _read_py(ls=False):  # type: ignore[no-untyped-def]
     # go to current dir to package __init__.py
     cwd = os.getcwd()
     d = os.path.dirname(__file__)
@@ -48,18 +48,18 @@ def _read_py(ls=False):
     os.chdir(d)
 
     # read version
-    def import_version_module(file_path):
+    def import_version_module(file_path):  # type: ignore[no-untyped-def]
         try:
             return __import__(os.path.splitext(file_path)[0])
         except ImportError:
             return None
 
     try:
-        version_module = import_version_module(LS_VERSION_FILE if ls else VERSION_FILE)
+        version_module = import_version_module(LS_VERSION_FILE if ls else VERSION_FILE)  # type: ignore[no-untyped-call]
 
         if not version_module and ls:
             logging.warning(f"Can't read version file: {LS_VERSION_FILE}. Fall back to: {VERSION_FILE}")
-            version_module = import_version_module(VERSION_FILE)
+            version_module = import_version_module(VERSION_FILE)  # type: ignore[no-untyped-call]
 
         if version_module:
             return version_module.info
@@ -71,7 +71,7 @@ def _read_py(ls=False):
 
 
 # get commit info: message, date, hash, branch
-def get_git_commit_info(skip_os=True, ls=False):
+def get_git_commit_info(skip_os=True, ls=False):  # type: ignore[no-untyped-def]
 
     cwd = os.getcwd()
     d = os.path.dirname(__file__)
@@ -90,7 +90,7 @@ def get_git_commit_info(skip_os=True, ls=False):
             }
         except CalledProcessError:
             os.chdir(cwd)
-            return _read_py(ls=True)
+            return _read_py(ls=True)  # type: ignore[no-untyped-call]
 
         # create package version
         version = desc.lstrip('v').rstrip().replace('-', '+', 1).replace('-', '.')
@@ -103,7 +103,7 @@ def get_git_commit_info(skip_os=True, ls=False):
                 version += '.' + os_version
         info['version'] = VERSION_OVERRIDE if VERSION_OVERRIDE else version
 
-        _write_py(info)
+        _write_py(info)  # type: ignore[no-untyped-call]
         return info
 
     except Exception as e:
@@ -113,17 +113,17 @@ def get_git_commit_info(skip_os=True, ls=False):
         os.chdir(cwd)  # back current dir
 
 
-def get_git_version(skip_os=True):
-    info = get_git_commit_info(skip_os)
+def get_git_version(skip_os=True):  # type: ignore[no-untyped-def]
+    info = get_git_commit_info(skip_os)  # type: ignore[no-untyped-call]
     return info.get('version', '')
 
 
 # get only tag from git
-def get_short_version():
-    version = get_git_version()
+def get_short_version():  # type: ignore[no-untyped-def]
+    version = get_git_version()  # type: ignore[no-untyped-call]
     return version.split('+')[0]
 
 
 if __name__ == '__main__':
     # init version_.py file
-    get_git_version()
+    get_git_version()  # type: ignore[no-untyped-call]

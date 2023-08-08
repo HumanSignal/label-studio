@@ -29,24 +29,24 @@ class OrganizationMember(models.Model):
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
     @classmethod
-    def find_by_user(cls, user_or_user_pk, organization_pk):
+    def find_by_user(cls, user_or_user_pk, organization_pk):  # type: ignore[no-untyped-def]
         from users.models import User
 
         user_pk = user_or_user_pk.pk if isinstance(user_or_user_pk, User) else user_or_user_pk
         return OrganizationMember.objects.get(user=user_pk, organization=organization_pk)
 
     @property
-    def is_owner(self):
-        return self.user.id == self.organization.created_by.id
+    def is_owner(self):  # type: ignore[no-untyped-def]
+        return self.user.id == self.organization.created_by.id  # type: ignore[union-attr]
 
     class Meta:
         ordering = ['pk']
 
 
-OrganizationMixin = load_func(settings.ORGANIZATION_MIXIN)
+OrganizationMixin = load_func(settings.ORGANIZATION_MIXIN)  # type: ignore[no-untyped-call]
 
 
-class Organization(OrganizationMixin, models.Model):
+class Organization(OrganizationMixin, models.Model):  # type: ignore[misc, valid-type]
     """
     """
     title = models.CharField(_('organization title'), max_length=1000, null=False)
@@ -61,41 +61,41 @@ class Organization(OrganizationMixin, models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
-    def __str__(self):
+    def __str__(self):  # type: ignore[no-untyped-def]
         return self.title + ', id=' + str(self.pk)
 
     @classmethod
-    def create_organization(cls, created_by=None, title='Your Organization'):
-        _create_organization = load_func(settings.CREATE_ORGANIZATION)
+    def create_organization(cls, created_by=None, title='Your Organization'):  # type: ignore[no-untyped-def]
+        _create_organization = load_func(settings.CREATE_ORGANIZATION)  # type: ignore[no-untyped-call]
         return _create_organization(title=title, created_by=created_by)
     
     @classmethod
-    def find_by_user(cls, user):
+    def find_by_user(cls, user):  # type: ignore[no-untyped-def]
         memberships = OrganizationMember.objects.filter(user=user).prefetch_related('organization')
         if not memberships.exists():
             raise ValueError(f'No memberships found for user {user}')
-        return memberships.first().organization
+        return memberships.first().organization  # type: ignore[union-attr]
 
     @classmethod
-    def find_by_invite_url(cls, url):
+    def find_by_invite_url(cls, url):  # type: ignore[no-untyped-def]
         token = url.strip('/').split('/')[-1]
         if len(token):
             return Organization.objects.get(token=token)
         else:
             raise KeyError(f'Can\'t find Organization by welcome URL: {url}')
 
-    def has_user(self, user):
+    def has_user(self, user):  # type: ignore[no-untyped-def]
         return self.users.filter(pk=user.pk).exists()
 
-    def has_project_member(self, user):
+    def has_project_member(self, user):  # type: ignore[no-untyped-def]
         return self.projects.filter(members__user=user).exists()
 
-    def has_permission(self, user):
+    def has_permission(self, user):  # type: ignore[no-untyped-def]
         if self in user.organizations.all():
             return True
         return False
 
-    def add_user(self, user):
+    def add_user(self, user):  # type: ignore[no-untyped-def]
         if self.users.filter(pk=user.pk).exists():
             logger.debug('User already exists in organization.')
             return
@@ -106,31 +106,31 @@ class Organization(OrganizationMixin, models.Model):
 
             return om    
 
-    def remove_user(self, user):
+    def remove_user(self, user):  # type: ignore[no-untyped-def]
         OrganizationMember.objects.filter(user=user, organization=self).delete()
         if user.active_organization_id == self.id:
             user.active_organization = user.organizations.first()
             user.save(update_fields=['active_organization'])
     
-    def reset_token(self):
-        self.token = create_hash()
+    def reset_token(self):  # type: ignore[no-untyped-def]
+        self.token = create_hash()  # type: ignore[no-untyped-call]
         self.save()
 
-    def check_max_projects(self):
+    def check_max_projects(self):  # type: ignore[no-untyped-def]
         """This check raise an exception if the projects limit is hit
         """
         pass
 
-    def projects_sorted_by_created_at(self):
+    def projects_sorted_by_created_at(self):  # type: ignore[no-untyped-def]
         return self.projects.all().order_by('-created_at').annotate(
             tasks_count=Count('tasks'),
             labeled_tasks_count=Count('tasks', filter=Q(tasks__is_labeled=True))
         ).prefetch_related('created_by')
 
-    def created_at_prettify(self):
+    def created_at_prettify(self):  # type: ignore[no-untyped-def]
         return self.created_at.strftime("%d %b %Y %H:%M:%S")
 
-    def per_project_invited_users(self):
+    def per_project_invited_users(self):  # type: ignore[no-untyped-def]
         from users.models import User
 
         invited_ids = self.projects.values_list('members__user__pk', flat=True).distinct()
@@ -138,11 +138,11 @@ class Organization(OrganizationMixin, models.Model):
         return per_project_invited_users
 
     @property
-    def secure_mode(self):
+    def secure_mode(self):  # type: ignore[no-untyped-def]
         return False
 
     @property
-    def members(self):
+    def members(self):  # type: ignore[no-untyped-def]
         return OrganizationMember.objects.filter(organization=self)
 
     class Meta:

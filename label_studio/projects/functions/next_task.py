@@ -5,7 +5,7 @@ from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, V
 from django.db.models.fields import DecimalField
 from django.utils.timezone import now
 from django.conf import settings
-from core.feature_flags import flag_set
+from core.feature_flags import flag_set  # type: ignore[attr-defined]
 import numpy as np
 
 from core.utils.common import conditional_atomic, db_is_not_sqlite
@@ -16,14 +16,14 @@ from projects.functions.stream_history import add_stream_history
 logger = logging.getLogger(__name__)
 
 
-def get_next_task_logging_level(user):
+def get_next_task_logging_level(user):  # type: ignore[no-untyped-def]
     level = logging.DEBUG
-    if flag_set('fflag_fix_back_dev_4185_next_task_additional_logging_long', user=user):
+    if flag_set('fflag_fix_back_dev_4185_next_task_additional_logging_long', user=user):  # type: ignore[no-untyped-call]
         level = logging.INFO
     return level
 
 
-def _get_random_unlocked(task_query, user, upper_limit=None):
+def _get_random_unlocked(task_query, user, upper_limit=None):  # type: ignore[no-untyped-def]
     for task in task_query.order_by('?').only('id')[:settings.RANDOM_NEXT_TASK_SAMPLE_SIZE]:
         try:
             task = Task.objects.select_for_update(skip_locked=True).get(pk=task.id)
@@ -33,7 +33,7 @@ def _get_random_unlocked(task_query, user, upper_limit=None):
             logger.debug('Task with id {} locked'.format(task.id))
 
 
-def _get_first_unlocked(tasks_query, user):
+def _get_first_unlocked(tasks_query, user):  # type: ignore[no-untyped-def]
     # Skip tasks that are locked due to being taken by collaborators
     for task_id in tasks_query.values_list('id', flat=True):
         try:
@@ -45,7 +45,7 @@ def _get_first_unlocked(tasks_query, user):
             logger.debug('Task with id {} locked'.format(task_id))
 
 
-def _try_ground_truth(tasks, project, user):
+def _try_ground_truth(tasks, project, user):  # type: ignore[no-untyped-def]
     """Returns task from ground truth set"""
     ground_truth = Annotation.objects.filter(task=OuterRef('pk'), ground_truth=True)
     not_solved_tasks_with_ground_truths = tasks.annotate(has_ground_truths=Exists(ground_truth)).filter(
@@ -53,11 +53,11 @@ def _try_ground_truth(tasks, project, user):
     )
     if not_solved_tasks_with_ground_truths.exists():
         if project.sampling == project.SEQUENCE:
-            return _get_first_unlocked(not_solved_tasks_with_ground_truths, user)
-        return _get_random_unlocked(not_solved_tasks_with_ground_truths, user)
+            return _get_first_unlocked(not_solved_tasks_with_ground_truths, user)  # type: ignore[no-untyped-call]
+        return _get_random_unlocked(not_solved_tasks_with_ground_truths, user)  # type: ignore[no-untyped-call]
 
 
-def _try_tasks_with_overlap(tasks):
+def _try_tasks_with_overlap(tasks):  # type: ignore[no-untyped-def]
     """Filter out tasks without overlap (doesn't return next task)"""
     tasks_with_overlap = tasks.filter(overlap__gt=1)
     if tasks_with_overlap.exists():
@@ -66,7 +66,7 @@ def _try_tasks_with_overlap(tasks):
         return None, tasks.filter(overlap=1)
 
 
-def _try_breadth_first(tasks, user):
+def _try_breadth_first(tasks, user):  # type: ignore[no-untyped-def]
     """Try to find tasks with maximum amount of annotations, since we are trying to label tasks as fast as possible
     """
 
@@ -89,10 +89,10 @@ def _try_breadth_first(tasks, user):
     )
     if not_solved_tasks_labeling_with_max_annotations.exists():
         # try to complete tasks that are already in progress
-        return _get_random_unlocked(not_solved_tasks_labeling_with_max_annotations, user)
+        return _get_random_unlocked(not_solved_tasks_labeling_with_max_annotations, user)  # type: ignore[no-untyped-call]
 
 
-def _try_uncertainty_sampling(tasks, project, user_solved_tasks_array, user, prepared_tasks):
+def _try_uncertainty_sampling(tasks, project, user_solved_tasks_array, user, prepared_tasks):  # type: ignore[no-untyped-def]
     task_with_current_predictions = tasks.filter(predictions__model_version=project.model_version)
     if task_with_current_predictions.exists():
         logger.debug('Use uncertainty sampling')
@@ -120,22 +120,22 @@ def _try_uncertainty_sampling(tasks, project, user_solved_tasks_array, user, pre
         num_annotators = project.annotators().count()
         if num_annotators > 1 and num_tasks_with_current_predictions > 0:
             # try to randomize tasks to avoid concurrent labeling between several annotators
-            next_task = _get_random_unlocked(
+            next_task = _get_random_unlocked(  # type: ignore[no-untyped-call]
                 possible_next_tasks, user, upper_limit=min(num_annotators + 1, num_tasks_with_current_predictions)
             )
         else:
-            next_task = _get_first_unlocked(possible_next_tasks, user)
+            next_task = _get_first_unlocked(possible_next_tasks, user)  # type: ignore[no-untyped-call]
     else:
         # uncertainty sampling fallback: choose by random sampling
         logger.debug(
             f'Uncertainty sampling fallbacks to random sampling '
             f'(current project.model_version={str(project.model_version)})'
         )
-        next_task = _get_random_unlocked(tasks, user)
+        next_task = _get_random_unlocked(tasks, user)  # type: ignore[no-untyped-call]
     return next_task
 
 
-def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_info):
+def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_info):  # type: ignore[no-untyped-def]
     user_solved_tasks_array = user.annotations.filter(project=project, task__isnull=False)
     user_solved_tasks_array = user_solved_tasks_array.distinct().values_list('task__pk', flat=True)
     not_solved_tasks = prepared_tasks.exclude(pk__in=user_solved_tasks_array)
@@ -150,18 +150,18 @@ def get_not_solved_tasks_qs(user, project, prepared_tasks, assigned_flag, queue_
     if not assigned_flag:
         not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
 
-    if not flag_set('fflag_fix_back_lsdv_4523_show_overlap_first_order_27022023_short'):
+    if not flag_set('fflag_fix_back_lsdv_4523_show_overlap_first_order_27022023_short'):  # type: ignore[no-untyped-call]
         # show tasks with overlap > 1 first
         if project.show_overlap_first:
             # don't output anything - just filter tasks with overlap
             logger.debug(f'User={user} tries overlap first from prepared tasks')
-            _, not_solved_tasks = _try_tasks_with_overlap(not_solved_tasks)
+            _, not_solved_tasks = _try_tasks_with_overlap(not_solved_tasks)  # type: ignore[no-untyped-call]
             queue_info += 'Show overlap first'
 
     return not_solved_tasks, user_solved_tasks_array, queue_info
 
 
-def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_flag):
+def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_flag):  # type: ignore[no-untyped-def]
     next_task = None
     use_task_lock = True
     queue_info = ''
@@ -175,7 +175,7 @@ def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_fla
 
     # If current user has already lock one task - return it (without setting the lock again)
     if not next_task:
-        next_task = Task.get_locked_by(user, tasks=not_solved_tasks)
+        next_task = Task.get_locked_by(user, tasks=not_solved_tasks)  # type: ignore[no-untyped-call]
         if next_task:
             logger.debug(f'User={user} got already locked for them {next_task}')
             use_task_lock = False
@@ -183,43 +183,43 @@ def get_next_task_without_dm_queue(user, project, not_solved_tasks, assigned_fla
 
     if not next_task and project.show_ground_truth_first:
         logger.debug(f'User={user} tries ground truth from prepared tasks')
-        next_task = _try_ground_truth(not_solved_tasks, project, user)
+        next_task = _try_ground_truth(not_solved_tasks, project, user)  # type: ignore[no-untyped-call]
         queue_info += (' & ' if queue_info else '') + 'Ground truth queue'
 
     if not next_task and project.maximum_annotations > 1:
         # if there any tasks in progress (with maximum number of annotations), randomly sampling from them
         logger.debug(f'User={user} tries depth first from prepared tasks')
-        next_task = _try_breadth_first(not_solved_tasks, user)
+        next_task = _try_breadth_first(not_solved_tasks, user)  # type: ignore[no-untyped-call]
         if next_task:
             queue_info += (' & ' if queue_info else '') + 'Breadth first queue'
 
     return next_task, use_task_lock, queue_info
 
 
-def skipped_queue(next_task, prepared_tasks, project, user, queue_info):
+def skipped_queue(next_task, prepared_tasks, project, user, queue_info):  # type: ignore[no-untyped-def]
     if not next_task and project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
         q = Q(project=project, task__isnull=False, was_cancelled=True, task__is_labeled=False)
         skipped_tasks = user.annotations.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
         if skipped_tasks.exists():
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(skipped_tasks)])
             skipped_tasks = prepared_tasks.filter(pk__in=skipped_tasks).order_by(preserved_order)
-            next_task = _get_first_unlocked(skipped_tasks, user)
+            next_task = _get_first_unlocked(skipped_tasks, user)  # type: ignore[no-untyped-call]
             queue_info = 'Skipped queue'
 
     return next_task, queue_info
 
 
-def postponed_queue(next_task, prepared_tasks, project, user, queue_info):
+def postponed_queue(next_task, prepared_tasks, project, user, queue_info):  # type: ignore[no-untyped-def]
     if not next_task:
         q = Q(task__project=project, task__isnull=False, was_postponed=True, task__is_labeled=False)
-        if flag_set('fflag_fix_back_lsdv_1044_check_annotations_24012023_short', user):
+        if flag_set('fflag_fix_back_lsdv_1044_check_annotations_24012023_short', user):  # type: ignore[no-untyped-call]
             q &= ~Q(task__annotations__completed_by=user)
 
         postponed_tasks = user.drafts.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
         if postponed_tasks.exists():
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(postponed_tasks)])
             postponed_tasks = prepared_tasks.filter(pk__in=postponed_tasks).order_by(preserved_order)
-            next_task = _get_first_unlocked(postponed_tasks, user)
+            next_task = _get_first_unlocked(postponed_tasks, user)  # type: ignore[no-untyped-call]
             if next_task is not None:
                 next_task.allow_postpone = False
             queue_info = f'Postponed draft queue'
@@ -227,16 +227,16 @@ def postponed_queue(next_task, prepared_tasks, project, user, queue_info):
     return next_task, queue_info
 
 
-def get_task_from_qs_with_sampling(not_solved_tasks, user_solved_tasks_array, prepared_tasks, user, project, queue_info):
+def get_task_from_qs_with_sampling(not_solved_tasks, user_solved_tasks_array, prepared_tasks, user, project, queue_info):  # type: ignore[no-untyped-def]
     if project.sampling == project.SEQUENCE:
         logger.debug(f'User={user} tries sequence sampling from prepared tasks')
-        next_task = _get_first_unlocked(not_solved_tasks, user)
+        next_task = _get_first_unlocked(not_solved_tasks, user)  # type: ignore[no-untyped-call]
         if next_task:
             queue_info += (' & ' if queue_info else '') + 'Sequence queue'
 
     elif project.sampling == project.UNCERTAINTY:
         logger.debug(f'User={user} tries uncertainty sampling from prepared tasks')
-        next_task = _try_uncertainty_sampling(
+        next_task = _try_uncertainty_sampling(  # type: ignore[no-untyped-call]
             not_solved_tasks, project, user_solved_tasks_array, user, prepared_tasks
         )
         if next_task:
@@ -244,14 +244,14 @@ def get_task_from_qs_with_sampling(not_solved_tasks, user_solved_tasks_array, pr
 
     elif project.sampling == project.UNIFORM:
         logger.debug(f'User={user} tries random sampling from prepared tasks')
-        next_task = _get_random_unlocked(not_solved_tasks, user)
+        next_task = _get_random_unlocked(not_solved_tasks, user)  # type: ignore[no-untyped-call]
         if next_task:
             queue_info += (' & ' if queue_info else '') + 'Uniform random queue'
 
     return next_task, queue_info
 
 
-def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
+def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):  # type: ignore[no-untyped-def]
     logger.debug(f'get_next_task called. user: {user}, project: {project}, dm_queue: {dm_queue}')
 
     with conditional_atomic(predicate=db_is_not_sqlite):
@@ -259,23 +259,23 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
         use_task_lock = True
         queue_info = ''
 
-        not_solved_tasks, user_solved_tasks_array, queue_info = get_not_solved_tasks_qs(
+        not_solved_tasks, user_solved_tasks_array, queue_info = get_not_solved_tasks_qs(  # type: ignore[no-untyped-call]
             user, project, prepared_tasks, assigned_flag, queue_info
         )
 
         if not dm_queue:
-            next_task, use_task_lock, queue_info = get_next_task_without_dm_queue(
+            next_task, use_task_lock, queue_info = get_next_task_without_dm_queue(  # type: ignore[no-untyped-call]
                 user, project, not_solved_tasks, assigned_flag
             )
 
-        if flag_set('fflag_fix_back_lsdv_4523_show_overlap_first_order_27022023_short'):
+        if flag_set('fflag_fix_back_lsdv_4523_show_overlap_first_order_27022023_short'):  # type: ignore[no-untyped-call]
             # show tasks with overlap > 1 first
             if not next_task and project.show_overlap_first:
                 # don't output anything - just filter tasks with overlap
                 logger.debug(f'User={user} tries overlap first from prepared tasks')
-                _, tasks_with_overlap = _try_tasks_with_overlap(not_solved_tasks)
+                _, tasks_with_overlap = _try_tasks_with_overlap(not_solved_tasks)  # type: ignore[no-untyped-call]
                 queue_info += 'Show overlap first'
-                next_task, queue_info = get_task_from_qs_with_sampling(tasks_with_overlap, user_solved_tasks_array, prepared_tasks, user, project, queue_info)
+                next_task, queue_info = get_task_from_qs_with_sampling(tasks_with_overlap, user_solved_tasks_array, prepared_tasks, user, project, queue_info)  # type: ignore[no-untyped-call]
 
         if not next_task:
             if dm_queue:
@@ -284,24 +284,24 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
                 next_task = not_solved_tasks.first()
 
             else:
-                next_task, queue_info = get_task_from_qs_with_sampling(not_solved_tasks, user_solved_tasks_array, prepared_tasks, user, project, queue_info)
+                next_task, queue_info = get_task_from_qs_with_sampling(not_solved_tasks, user_solved_tasks_array, prepared_tasks, user, project, queue_info)  # type: ignore[no-untyped-call]
 
 
-        next_task, queue_info = postponed_queue(next_task, prepared_tasks, project, user, queue_info)
+        next_task, queue_info = postponed_queue(next_task, prepared_tasks, project, user, queue_info)  # type: ignore[no-untyped-call]
 
-        next_task, queue_info = skipped_queue(next_task, prepared_tasks, project, user, queue_info)
+        next_task, queue_info = skipped_queue(next_task, prepared_tasks, project, user, queue_info)  # type: ignore[no-untyped-call]
 
         if next_task and use_task_lock:
             # set lock for the task with TTL 3x time more then current average lead time (or 1 hour by default)
             next_task.set_lock(user)
 
         logger.log(
-            get_next_task_logging_level(user),
+            get_next_task_logging_level(user),  # type: ignore[no-untyped-call]
             f'get_next_task finished. next_task: {next_task}, queue_info: {queue_info}'
         )
 
         # debug for critical overlap issue
-        if next_task and flag_set('fflag_fix_back_dev_4185_next_task_additional_logging_long', user):
+        if next_task and flag_set('fflag_fix_back_dev_4185_next_task_additional_logging_long', user):  # type: ignore[no-untyped-call]
             try:
                 count = next_task.annotations.filter(was_cancelled=False).count()
                 task_overlap_reached = count >= next_task.overlap
@@ -315,7 +315,7 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
                     local.pop('user_solved_tasks_array', None)
                     local.pop('not_solved_tasks', None)
 
-                    task = TaskSimpleSerializer(next_task).data
+                    task = TaskSimpleSerializer(next_task).data  # type: ignore[no-untyped-call]
                     task.pop('data', None)
                     task.pop('predictions', None)
                     for i, a in enumerate(task['annotations']):
@@ -340,7 +340,7 @@ def get_next_task(user, prepared_tasks, project, dm_queue, assigned_flag=None):
                 logger.error(f'get_next_task is_labeled/overlap try/except: {str(e)}')
                 pass
 
-        add_stream_history(next_task, user, project)
+        add_stream_history(next_task, user, project)  # type: ignore[no-untyped-call]
         return next_task, queue_info
 
 

@@ -7,7 +7,7 @@ from .settings.base import EXPORT_DIR
 from .utils.io import find_file
 
 
-def parse_input_args(input_args):
+def parse_input_args(input_args):  # type: ignore[no-untyped-def]
     """ Combine args with json config
 
     :return: config dict
@@ -15,13 +15,13 @@ def parse_input_args(input_args):
     import sys
     import argparse
 
-    def valid_filepath(filepath):
+    def valid_filepath(filepath):  # type: ignore[no-untyped-def]
         path = os.path.abspath(os.path.expanduser(filepath))
         if os.path.exists(path):
             return path
         raise FileNotFoundError(filepath)
 
-    def project_name(raw_name):
+    def project_name(raw_name):  # type: ignore[no-untyped-def]
         """ Remove trailing / and leading ./ from project name"""
         return os.path.normpath(raw_name)
 
@@ -37,7 +37,7 @@ def parse_input_args(input_args):
         '--data-dir', dest='data_dir', help='Directory for storing all application related data'
     )
     root_parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Debug mode', default=False)
-    default_config_path = find_file('default_config.json')
+    default_config_path = find_file('default_config.json')  # type: ignore[no-untyped-call]
     root_parser.add_argument(
         '-c', '--config', dest='config_path', type=valid_filepath, default=default_config_path, help='Server config'
     )

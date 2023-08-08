@@ -10,7 +10,7 @@ from ..utils import project_id
 pytestmark = pytest.mark.django_db
 
 
-def test_views_api(business_client, project_id):
+def test_views_api(business_client, project_id):  # type: ignore[no-untyped-def]
     # create
     payload = dict(project=project_id, data={"test": 1})
     response = business_client.post(
@@ -59,7 +59,7 @@ def test_views_api(business_client, project_id):
     assert response.json() == []
 
 
-def test_views_api_filter_project(business_client):
+def test_views_api_filter_project(business_client):  # type: ignore[no-untyped-def]
     # create project
     response = business_client.post(
         "/api/projects/",
@@ -109,7 +109,7 @@ def test_views_api_filter_project(business_client):
     assert response.json()[0]["project"] == project2_id
 
 
-def test_views_api_filters(business_client, project_id):
+def test_views_api_filters(business_client, project_id):  # type: ignore[no-untyped-def]
     # create
     payload = dict(
         project=project_id,
@@ -190,7 +190,7 @@ def test_views_api_filters(business_client, project_id):
     assert response.json()["data"] == updated_payload["data"]
 
 
-def test_views_ordered_by_id(business_client, project_id):
+def test_views_ordered_by_id(business_client, project_id):  # type: ignore[no-untyped-def]
     views = [{"view_data": 1}, {"view_data": 2}, {"view_data": 3}]
 
     for view in views:

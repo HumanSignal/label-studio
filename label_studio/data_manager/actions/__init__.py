@@ -16,12 +16,12 @@ from django.conf import settings
 from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 
 from data_manager.functions import DataManagerException
-from core.feature_flags import flag_set
+from core.feature_flags import flag_set  # type: ignore[attr-defined]
 
 logger = logging.getLogger('django')
 
 
-def check_permissions(user, action):
+def check_permissions(user, action):  # type: ignore[no-untyped-def]
     """ Actions must have permissions, if only one is in the user role then the action is allowed
     """
     if 'permission' not in action:
@@ -31,7 +31,7 @@ def check_permissions(user, action):
     return user.has_perm(action['permission'])
 
 
-def get_all_actions(user, project):
+def get_all_actions(user, project):  # type: ignore[no-untyped-def]
     """ Return dict with registered actions
 
     :param user: list with user permissions
@@ -44,11 +44,11 @@ def get_all_actions(user, project):
     actions = [
         {key: action[key] for key in action if key != 'entry_point'}
         for action in actions if not action.get('hidden', False)
-        and check_permissions(user, action)
+        and check_permissions(user, action)  # type: ignore[no-untyped-call]
     ]
     # remove experimental features if they are disabled
     if not (
-            flag_set('ff_back_experimental_features', user=project.organization.created_by)
+            flag_set('ff_back_experimental_features', user=project.organization.created_by)  # type: ignore[no-untyped-call]
             or settings.EXPERIMENTAL_FEATURES
     ):
         actions = [action for action in actions if not action.get('experimental', False)]
@@ -62,7 +62,7 @@ def get_all_actions(user, project):
     return actions
 
 
-def register_action(entry_point, title, order, **kwargs):
+def register_action(entry_point, title, order, **kwargs):  # type: ignore[no-untyped-def]
     """ Register action in global _action instance,
         action_id will be automatically extracted from entry_point function name
     """
@@ -79,7 +79,7 @@ def register_action(entry_point, title, order, **kwargs):
     }
 
 
-def register_actions_from_dir(base_module, action_dir):
+def register_actions_from_dir(base_module, action_dir):  # type: ignore[no-untyped-def]
     """ Find all python files nearby this file and try to load 'actions' from them
     """
     for path in os.listdir(action_dir):
@@ -98,11 +98,11 @@ def register_actions_from_dir(base_module, action_dir):
             continue
 
         for action in module_actions:
-            register_action(**action)
+            register_action(**action)  # type: ignore[no-untyped-call]
             logger.debug('Action registered: ' + str(action['entry_point'].__name__))
 
 
-def perform_action(action_id, project, queryset, user, **kwargs):
+def perform_action(action_id, project, queryset, user, **kwargs):  # type: ignore[no-untyped-def]
     """ Perform action using entry point from actions
     """
     if action_id not in settings.DATA_MANAGER_ACTIONS:
@@ -111,7 +111,7 @@ def perform_action(action_id, project, queryset, user, **kwargs):
     action = settings.DATA_MANAGER_ACTIONS[action_id]
 
     # check user permissions for this action
-    if not check_permissions(user, action):
+    if not check_permissions(user, action):  # type: ignore[no-untyped-call]
         raise DRFPermissionDenied(f'Action is not allowed for the current user: {action["id"]}')
 
 
@@ -125,4 +125,4 @@ def perform_action(action_id, project, queryset, user, **kwargs):
     return result
 
 
-register_actions_from_dir('data_manager.actions', os.path.dirname(__file__))
+register_actions_from_dir('data_manager.actions', os.path.dirname(__file__))  # type: ignore[no-untyped-call]

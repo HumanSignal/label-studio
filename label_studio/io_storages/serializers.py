@@ -9,7 +9,7 @@ from tasks.serializers import AnnotationSerializer, TaskSerializer
 from tasks.models import Task
 
 
-class ImportStorageSerializer(serializers.ModelSerializer):
+class ImportStorageSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
 
     class Meta:
@@ -17,7 +17,7 @@ class ImportStorageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ExportStorageSerializer(serializers.ModelSerializer):
+class ExportStorageSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
 
     class Meta:
@@ -25,8 +25,8 @@ class ExportStorageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class StorageTaskSerializer(TaskSerializer):
-    def __init__(self, *args, **kwargs):
+class StorageTaskSerializer(TaskSerializer):  # type: ignore[misc]
+    def __init__(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         # task is nested into the annotation, we don't need annotations in the task again
         kwargs['context'] = {
             'resolve_uri': False
@@ -38,12 +38,12 @@ class StorageTaskSerializer(TaskSerializer):
         fields = '__all__'
 
 
-class StorageCompletedBySerializer(serializers.ModelSerializer):
+class StorageCompletedBySerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
     class Meta:
         model = User
         fields = ('id', 'first_name', 'last_name', 'email')
 
 
 class StorageAnnotationSerializer(AnnotationSerializer):
-    task = StorageTaskSerializer(read_only=True, omit=['annotations'])
-    completed_by = StorageCompletedBySerializer(read_only=True)
+    task = StorageTaskSerializer(read_only=True, omit=['annotations'])  # type: ignore[no-untyped-call]
+    completed_by = StorageCompletedBySerializer(read_only=True)  # type: ignore[assignment]

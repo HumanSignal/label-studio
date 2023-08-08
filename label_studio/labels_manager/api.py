@@ -3,8 +3,8 @@ import logging
 from django.db.models import CharField, Count, F, Q
 from django.db.models.functions import Cast
 from django.utils.decorators import method_decorator
-from django_filters.rest_framework import DjangoFilterBackend
-from drf_yasg.utils import swagger_auto_schema
+from django_filters.rest_framework import DjangoFilterBackend  # type: ignore[import]
+from drf_yasg.utils import swagger_auto_schema  # type: ignore[import]
 from rest_framework import views, viewsets
 from rest_framework import views, viewsets
 from rest_framework.pagination import PageNumberPagination
@@ -68,7 +68,7 @@ logger = logging.getLogger(__name__)
     ),
 )
 @method_decorator(name='update', decorator=swagger_auto_schema(auto_schema=None))
-class LabelAPI(viewsets.ModelViewSet):
+class LabelAPI(viewsets.ModelViewSet):  # type: ignore[type-arg]
     pagination_class = PageNumberPagination
     serializer_class = LabelSerializer
     permission_required = ViewClassPermission(
@@ -78,19 +78,19 @@ class LabelAPI(viewsets.ModelViewSet):
         DELETE=all_permissions.labels_delete,
     )
 
-    def get_serializer(self, *args, **kwargs):
+    def get_serializer(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         '''POST request is bulk by default'''
         if self.action == 'create':
             kwargs['many'] = True
         return super().get_serializer(*args, **kwargs)
 
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user, organization=self.request.user.active_organization)
+    def perform_create(self, serializer):  # type: ignore[no-untyped-def]
+        serializer.save(created_by=self.request.user, organization=self.request.user.active_organization)  # type: ignore[union-attr]
 
-    def get_queryset(self):
-        return Label.objects.filter(organization=self.request.user.active_organization).prefetch_related('links')
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        return Label.objects.filter(organization=self.request.user.active_organization).prefetch_related('links')  # type: ignore[misc, union-attr]
 
-    def get_serializer_class(self):
+    def get_serializer_class(self):  # type: ignore[no-untyped-def]
         if self.request.method == 'POST':
             return LabelCreateSerializer
 
@@ -144,7 +144,7 @@ class LabelAPI(viewsets.ModelViewSet):
     ),
 )
 @method_decorator(name='update', decorator=swagger_auto_schema(auto_schema=None))
-class LabelLinkAPI(viewsets.ModelViewSet):
+class LabelLinkAPI(viewsets.ModelViewSet):  # type: ignore[type-arg]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = {
         'project': ['exact'],
@@ -160,8 +160,8 @@ class LabelLinkAPI(viewsets.ModelViewSet):
         DELETE=all_permissions.labels_delete,
     )
 
-    def get_queryset(self):
-        return LabelLink.objects.filter(label__organization=self.request.user.active_organization).annotate(
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        return LabelLink.objects.filter(label__organization=self.request.user.active_organization).annotate(  # type: ignore[misc, union-attr]
             annotations_count=Count(
                 'project__tasks__annotations',
                 filter=Q(
@@ -170,12 +170,12 @@ class LabelLinkAPI(viewsets.ModelViewSet):
             )
         )
 
-    @api_webhook('LABEL_LINK_UPDATED')
-    def update(self, request, *args, **kwargs):
+    @api_webhook('LABEL_LINK_UPDATED')  # type: ignore[no-untyped-call]
+    def update(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super().update(request, *args, **kwargs)
 
-    @api_webhook_for_delete('LABEL_LINK_DELETED')
-    def destroy(self, request, *args, **kwargs):
+    @api_webhook_for_delete('LABEL_LINK_DELETED')  # type: ignore[no-untyped-call]
+    def destroy(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super().destroy(request, *args, **kwargs)
 
 
@@ -192,17 +192,17 @@ class LabelLinkAPI(viewsets.ModelViewSet):
 class LabelBulkUpdateAPI(views.APIView):
     permission_required = all_permissions.labels_change
 
-    def post(self, request):
+    def post(self, request):  # type: ignore[no-untyped-def]
         serializer = LabelBulkUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         project = serializer.validated_data['project']
         if project is not None:
             self.check_object_permissions(self.request, project)
 
-        updated_count = bulk_update_label(
+        updated_count = bulk_update_label(  # type: ignore[no-untyped-call]
             old_label=serializer.validated_data['old_label'],
             new_label=serializer.validated_data['new_label'],
-            organization=self.request.user.active_organization,
+            organization=self.request.user.active_organization,  # type: ignore[union-attr]
             project=project,
         )
         return Response({'annotations_updated': updated_count})

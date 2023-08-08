@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db.models import JSONField
 from django.core.validators import MinLengthValidator, MaxLengthValidator
 from django.db import transaction, models
-from annoying.fields import AutoOneToOneField
+from annoying.fields import AutoOneToOneField  # type: ignore[import]
 
 from data_manager.managers import TaskQuerySet
 from projects.functions.utils import make_queryset_from_iterable
@@ -34,9 +34,9 @@ from core.label_config import (
     get_annotation_tuple, check_control_in_config_by_regex, check_toname_in_config_by_regex,
     get_original_fromname_by_regex, get_all_types,
 )
-from core.feature_flags import flag_set
+from core.feature_flags import flag_set  # type: ignore[attr-defined]
 from core.bulk_update_utils import bulk_update
-from label_studio_tools.core.label_config import parse_config
+from label_studio_tools.core.label_config import parse_config  # type: ignore[import]
 from projects.functions import (
     annotate_task_number, annotate_finished_task_number, annotate_total_predictions_number,
     annotate_total_annotations_number, annotate_num_tasks_with_annotations,
@@ -48,8 +48,8 @@ from labels_manager.models import Label
 logger = logging.getLogger(__name__)
 
 
-class ProjectManager(models.Manager):
-    def for_user(self, user):
+class ProjectManager(models.Manager):  # type: ignore[type-arg]
+    def for_user(self, user):  # type: ignore[no-untyped-def]
         return self.filter(organization=user.active_organization)
 
     COUNTER_FIELDS = [
@@ -63,11 +63,11 @@ class ProjectManager(models.Manager):
         'skipped_annotations_number',
     ]
 
-    def with_counts(self, fields=None):
-        return self.with_counts_annotate(self, fields=fields)
+    def with_counts(self, fields=None):  # type: ignore[no-untyped-def]
+        return self.with_counts_annotate(self, fields=fields)  # type: ignore[no-untyped-call]
 
     @staticmethod
-    def with_counts_annotate(queryset, fields=None):
+    def with_counts_annotate(queryset, fields=None):  # type: ignore[no-untyped-def]
         available_fields = {
             'task_number': annotate_task_number,
             'finished_task_number': annotate_finished_task_number,
@@ -84,15 +84,15 @@ class ProjectManager(models.Manager):
             to_annotate = {field: available_fields[field] for field in fields if field in available_fields}
 
         for _, annotate_func in to_annotate.items():
-            queryset = annotate_func(queryset)
+            queryset = annotate_func(queryset)  # type: ignore[no-untyped-call]
 
         return queryset
 
 
-ProjectMixin = load_func(settings.PROJECT_MIXIN)
+ProjectMixin = load_func(settings.PROJECT_MIXIN)  # type: ignore[no-untyped-call]
 
 
-class Project(ProjectMixin, models.Model):
+class Project(ProjectMixin, models.Model):  # type: ignore[misc, valid-type]
     class SkipQueue(models.TextChoices):
         # requeue to the end of the same annotator’s queue => annotator gets this task at the end of the queue
         REQUEUE_FOR_ME = 'REQUEUE_FOR_ME', 'Requeue for me'
@@ -238,7 +238,7 @@ class Project(ProjectMixin, models.Model):
 
     pinned_at = models.DateTimeField(_('pinned at'), null=True, default=None, help_text='Pinned date and time')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         super(Project, self).__init__(*args, **kwargs)
         self.__original_label_config = self.label_config
         self.__maximum_annotations = self.maximum_annotations
@@ -248,55 +248,55 @@ class Project(ProjectMixin, models.Model):
         # TODO: once bugfix with incorrect data types in List
         # logging.warning('! Please, remove code below after patching of all projects (extract_data_types)')
         if self.label_config is not None:
-            data_types = extract_data_types(self.label_config)
+            data_types = extract_data_types(self.label_config)  # type: ignore[no-untyped-call]
             if self.data_types != data_types:
                 self.data_types = data_types
 
     @property
-    def num_tasks(self):
+    def num_tasks(self):  # type: ignore[no-untyped-def]
         return self.tasks.count()
 
-    def get_current_predictions(self):
+    def get_current_predictions(self):  # type: ignore[no-untyped-def]
         return Prediction.objects.filter(Q(task__project=self.id) & Q(model_version=self.model_version))
 
     @property
-    def num_predictions(self):
-        return self.get_current_predictions().count()
+    def num_predictions(self):  # type: ignore[no-untyped-def]
+        return self.get_current_predictions().count()  # type: ignore[no-untyped-call]
 
     @property
-    def num_annotations(self):
+    def num_annotations(self):  # type: ignore[no-untyped-def]
         return Annotation.objects.filter(project=self).count()
 
     @property
-    def num_drafts(self):
+    def num_drafts(self):  # type: ignore[no-untyped-def]
         return AnnotationDraft.objects.filter(task__project=self).count()
 
     @property
-    def has_predictions(self):
-        return self.get_current_predictions().exists()
+    def has_predictions(self):  # type: ignore[no-untyped-def]
+        return self.get_current_predictions().exists()  # type: ignore[no-untyped-call]
 
     @property
-    def has_any_predictions(self):
+    def has_any_predictions(self):  # type: ignore[no-untyped-def]
         return Prediction.objects.filter(Q(task__project=self.id)).exists()
 
     @property
-    def business(self):
-        return self.created_by.business
+    def business(self):  # type: ignore[no-untyped-def]
+        return self.created_by.business  # type: ignore[union-attr]
 
     @property
-    def is_private(self):
+    def is_private(self):  # type: ignore[no-untyped-def]
         return None
 
     @property
-    def secure_mode(self):
+    def secure_mode(self):  # type: ignore[no-untyped-def]
         return False
 
     @property
-    def one_object_in_label_config(self):
+    def one_object_in_label_config(self):  # type: ignore[no-untyped-def]
         return len(self.data_types) <= 1
 
     @property
-    def only_undefined_field(self):
+    def only_undefined_field(self):  # type: ignore[no-untyped-def]
         return (
             self.one_object_in_label_config
             and self.summary.common_data_columns
@@ -304,15 +304,15 @@ class Project(ProjectMixin, models.Model):
         )
 
     @property
-    def get_labeled_count(self):
+    def get_labeled_count(self):  # type: ignore[no-untyped-def]
         return self.tasks.filter(is_labeled=True).count()
 
     @property
-    def get_collected_count(self):
+    def get_collected_count(self):  # type: ignore[no-untyped-def]
         return self.tasks.count()
 
     @property
-    def get_total_possible_count(self):
+    def get_total_possible_count(self):  # type: ignore[no-untyped-def]
         """
             Tasks has overlap - how many tc should be accepted
             possible count = sum [ t.overlap for t in tasks]
@@ -324,26 +324,26 @@ class Project(ProjectMixin, models.Model):
         return self.tasks.aggregate(Sum('overlap'))['overlap__sum']
 
     @property
-    def get_available_for_labeling(self):
+    def get_available_for_labeling(self):  # type: ignore[no-untyped-def]
         return self.get_collected_count - self.get_labeled_count
 
     @property
-    def need_annotators(self):
+    def need_annotators(self):  # type: ignore[no-untyped-def]
         return self.maximum_annotations - self.num_annotators
 
     @classmethod
-    def find_by_invite_url(cls, url):
+    def find_by_invite_url(cls, url):  # type: ignore[no-untyped-def]
         token = url.strip('/').split('/')[-1]
         if len(token):
             return Project.objects.get(token=token)
         else:
             raise KeyError(f'Can\'t find Project by invite URL: {url}')
 
-    def reset_token(self):
-        self.token = create_hash()
-        self.save()
+    def reset_token(self):  # type: ignore[no-untyped-def]
+        self.token = create_hash()  # type: ignore[no-untyped-call]
+        self.save()  # type: ignore[no-untyped-call]
 
-    def add_collaborator(self, user):
+    def add_collaborator(self, user):  # type: ignore[no-untyped-def]
         created = False
         with transaction.atomic():
             try:
@@ -355,14 +355,14 @@ class Project(ProjectMixin, models.Model):
                 logger.debug(f'Project membership {self} for user {user} already exists')
         return created
 
-    def has_collaborator(self, user):
+    def has_collaborator(self, user):  # type: ignore[no-untyped-def]
         return ProjectMember.objects.filter(user=user, project=self).exists()
 
-    def has_collaborator_enabled(self, user):
+    def has_collaborator_enabled(self, user):  # type: ignore[no-untyped-def]
         membership = ProjectMember.objects.filter(user=user, project=self)
-        return membership.exists() and membership.first().enabled
+        return membership.exists() and membership.first().enabled  # type: ignore[union-attr]
 
-    def _update_tasks_states(self,
+    def _update_tasks_states(self,  # type: ignore[no-untyped-def]
                              maximum_annotations_changed,
                              overlap_cohort_percentage_changed,
                              tasks_number_changed):
@@ -381,25 +381,25 @@ class Project(ProjectMixin, models.Model):
                 # if there is a part with overlapped tasks, affect only them
                 tasks_with_overlap.update(overlap=self.maximum_annotations)
             elif self.overlap_cohort_percentage < 100:
-                self._rearrange_overlap_cohort()
+                self._rearrange_overlap_cohort()  # type: ignore[no-untyped-call]
             else:
                 # otherwise affect all tasks
                 self.tasks.update(overlap=self.maximum_annotations)
                 tasks_with_overlap = self.tasks.all()
             # update is_labeled after change
-            bulk_update_stats_project_tasks(
+            bulk_update_stats_project_tasks(  # type: ignore[no-untyped-call]
                 tasks_with_overlap, project=self
             )
 
         # if cohort slider is tweaked
         elif overlap_cohort_percentage_changed and self.maximum_annotations > 1:
-            self._rearrange_overlap_cohort()
+            self._rearrange_overlap_cohort()  # type: ignore[no-untyped-call]
 
         # if adding/deleting tasks and cohort settings are applied
         elif tasks_number_changed and self.overlap_cohort_percentage < 100 and self.maximum_annotations > 1:
-            self._rearrange_overlap_cohort()
+            self._rearrange_overlap_cohort()  # type: ignore[no-untyped-call]
 
-    def _rearrange_overlap_cohort(self):
+    def _rearrange_overlap_cohort(self):  # type: ignore[no-untyped-def]
         """
         Rearrange overlap depending on annotation count in tasks
         """
@@ -440,12 +440,12 @@ class Project(ProjectMixin, models.Model):
             ids = list(tasks_with_min_annotations.values_list('id', flat=True))
             all_project_tasks.filter(id__in=ids).update(overlap=1)
         # update is labeled after tasks rearrange overlap
-        bulk_update_stats_project_tasks(all_project_tasks, project=self)
+        bulk_update_stats_project_tasks(all_project_tasks, project=self)  # type: ignore[no-untyped-call]
 
-    def remove_tasks_by_file_uploads(self, file_upload_ids):
+    def remove_tasks_by_file_uploads(self, file_upload_ids):  # type: ignore[no-untyped-def]
         self.tasks.filter(file_upload_id__in=file_upload_ids).delete()
 
-    def advance_onboarding(self):
+    def advance_onboarding(self):  # type: ignore[no-untyped-def]
         """Move project to next onboarding step"""
         po_qs = self.steps_left.order_by('step__order')
         count = po_qs.count()
@@ -457,40 +457,40 @@ class Project(ProjectMixin, models.Model):
 
             return count != 1
 
-    def created_at_prettify(self):
+    def created_at_prettify(self):  # type: ignore[no-untyped-def]
         return self.created_at.strftime("%d %b %Y %H:%M:%S")
 
-    def onboarding_step_finished(self, step):
+    def onboarding_step_finished(self, step):  # type: ignore[no-untyped-def]
         """Mark specific step as finished"""
         pos = ProjectOnboardingSteps.objects.get(code=step)
         po = ProjectOnboarding.objects.get(project=self, step=pos)
         po.finished = True
-        po.save()
+        po.save()  # type: ignore[no-untyped-call]
 
         return po
 
-    def data_types_json(self):
+    def data_types_json(self):  # type: ignore[no-untyped-def]
         return json.dumps(self.data_types)
 
-    def available_data_keys(self):
+    def available_data_keys(self):  # type: ignore[no-untyped-def]
         return sorted(list(self.data_types.keys()))
 
     @classmethod
-    def validate_label_config(cls, config_string):
-        validate_label_config(config_string)
+    def validate_label_config(cls, config_string):  # type: ignore[no-untyped-def]
+        validate_label_config(config_string)  # type: ignore[no-untyped-call]
 
-    def validate_config(self, config_string, strict=False):
-        self.validate_label_config(config_string)
+    def validate_config(self, config_string, strict=False):  # type: ignore[no-untyped-def]
+        self.validate_label_config(config_string)  # type: ignore[no-untyped-call]
         if not hasattr(self, 'summary'):
             return
 
         if self.num_tasks == 0:
             logger.debug(f'Project {self} has no tasks: nothing to validate here. Ensure project summary is empty')
-            self.summary.reset()
+            self.summary.reset()  # type: ignore[no-untyped-call]
             return
 
         # validate data columns consistency
-        fields_from_config = get_all_object_tag_names(config_string)
+        fields_from_config = get_all_object_tag_names(config_string)  # type: ignore[no-untyped-call]
         if not fields_from_config:
             logger.debug(f'Data fields not found in labeling config')
             return
@@ -510,11 +510,11 @@ class Project(ProjectMixin, models.Model):
                 f'Project {self} has no annotations and drafts: nothing to validate here. '
                 f'Ensure annotations-related project summary is empty'
             )
-            self.summary.reset(tasks_data_based=False)
+            self.summary.reset(tasks_data_based=False)  # type: ignore[no-untyped-call]
             return
 
         # validate annotations consistency
-        annotations_from_config = set(get_all_control_tag_tuples(config_string))
+        annotations_from_config = set(get_all_control_tag_tuples(config_string))  # type: ignore[no-untyped-call]
         if not annotations_from_config:
             logger.debug(f'Annotation schema is not found in config')
             return
@@ -526,33 +526,35 @@ class Project(ProjectMixin, models.Model):
                 from_name, to_name, t = ann_tuple.split('|')
                 if t.lower() == 'textarea':  # avoid textarea to_name check (see DEV-1598)
                     continue
-                if not check_control_in_config_by_regex(config_string, from_name) or \
-                not check_toname_in_config_by_regex(config_string, to_name) or \
-                t not in get_all_types(config_string):
+                if (
+                    not check_control_in_config_by_regex(config_string, from_name) or  # type: ignore[no-untyped-call]
+                    not check_toname_in_config_by_regex(config_string, to_name) or  # type: ignore[no-untyped-call]
+                    t not in get_all_types(config_string)  # type: ignore[no-untyped-call]
+                ):
                     diff_str.append(
                         f'{self.summary.created_annotations[ann_tuple]} '
                         f'with from_name={from_name}, to_name={to_name}, type={t}'
                     )
             if len(diff_str) > 0:
-                diff_str = '\n'.join(diff_str)
+                diff_str = '\n'.join(diff_str)  # type: ignore[assignment]
                 raise LabelStudioValidationErrorSentryIgnored(
                     f'Created annotations are incompatible with provided labeling schema, we found:\n{diff_str}'
                 )
 
 
         # validate labels consistency
-        labels_from_config, dynamic_label_from_config = get_all_labels(config_string)
-        created_labels = merge_labels_counters(self.summary.created_labels, self.summary.created_labels_drafts)
+        labels_from_config, dynamic_label_from_config = get_all_labels(config_string)  # type: ignore[no-untyped-call]
+        created_labels = merge_labels_counters(self.summary.created_labels, self.summary.created_labels_drafts)  # type: ignore[no-untyped-call]
         for control_tag_from_data, labels_from_data in created_labels.items():
             # Check if labels created in annotations, and their control tag has been removed
             if labels_from_data and ((control_tag_from_data not in labels_from_config) and (
                     control_tag_from_data not in dynamic_label_from_config)) and \
-                    not check_control_in_config_by_regex(config_string, control_tag_from_data):
+                    not check_control_in_config_by_regex(config_string, control_tag_from_data):  # type: ignore[no-untyped-call]
                 raise LabelStudioValidationErrorSentryIgnored(
                     f'There are {sum(labels_from_data.values(), 0)} annotation(s) created with tag '
                     f'"{control_tag_from_data}", you can\'t remove it'
                 )
-            labels_from_config_by_tag = set(labels_from_config[get_original_fromname_by_regex(config_string, control_tag_from_data)])
+            labels_from_config_by_tag = set(labels_from_config[get_original_fromname_by_regex(config_string, control_tag_from_data)])  # type: ignore[no-untyped-call]
             parsed_config = parse_config(config_string)
             tag_types = [tag_info['type'] for _, tag_info in parsed_config.items()]
             # DEV-1990 Workaround for Video labels as there are no labels in VideoRectangle tag
@@ -566,9 +568,9 @@ class Project(ProjectMixin, models.Model):
             # check if labels from is subset if config labels
             if not set(labels_from_data).issubset(set(labels_from_config_by_tag)):
                 different_labels = list(set(labels_from_data).difference(labels_from_config_by_tag))
-                diff_str = '\n'.join(f'{l} ({labels_from_data[l]} annotations)' for l in different_labels)
+                diff_str = '\n'.join(f'{l} ({labels_from_data[l]} annotations)' for l in different_labels)  # type: ignore[assignment]
                 if (strict is True) and ((control_tag_from_data not in dynamic_label_from_config) and
-                        (not check_control_in_config_by_regex(config_string, control_tag_from_data, filter=dynamic_label_from_config.keys()))):
+                        (not check_control_in_config_by_regex(config_string, control_tag_from_data, filter=dynamic_label_from_config.keys()))):  # type: ignore[no-untyped-call]
                     # raise error if labels not dynamic and not in regex rules
                     raise LabelStudioValidationErrorSentryIgnored(
                         f'These labels still exist in annotations or drafts:\n{diff_str}.'
@@ -576,17 +578,17 @@ class Project(ProjectMixin, models.Model):
                 else:
                     logger.info(f'project_id={self.id} inconsistent labels in config and annotations: {diff_str}')
 
-    def _label_config_has_changed(self):
+    def _label_config_has_changed(self):  # type: ignore[no-untyped-def]
         return self.label_config != self.__original_label_config
 
-    def delete_predictions(self):
+    def delete_predictions(self):  # type: ignore[no-untyped-def]
         predictions = Prediction.objects.filter(task__project=self)
         count = predictions.count()
         predictions.delete()
         return {'deleted_predictions': count}
 
-    def get_updated_weights(self):
-        outputs = self.get_parsed_config(autosave_cache=False)
+    def get_updated_weights(self):  # type: ignore[no-untyped-def]
+        outputs = self.get_parsed_config(autosave_cache=False)  # type: ignore[no-untyped-call]
         control_weights = {}
         exclude_control_types = ('Filter',)
         for control_name in outputs:
@@ -600,18 +602,18 @@ class Project(ProjectMixin, models.Model):
             }
         return control_weights
 
-    def save(self, *args, recalc=True, **kwargs):
+    def save(self, *args, recalc=True, **kwargs):  # type: ignore[no-untyped-def]
         exists = True if self.pk else False
         project_with_config_just_created = not exists and self.label_config
 
-        if self._label_config_has_changed() or project_with_config_just_created:
-            self.data_types = extract_data_types(self.label_config)
+        if self._label_config_has_changed() or project_with_config_just_created:  # type: ignore[no-untyped-call]
+            self.data_types = extract_data_types(self.label_config)  # type: ignore[no-untyped-call]
             self.parsed_label_config = parse_config(self.label_config)
 
-        if self.label_config and (self._label_config_has_changed() or not exists or not self.control_weights):
-            self.control_weights = self.get_updated_weights()
+        if self.label_config and (self._label_config_has_changed() or not exists or not self.control_weights):  # type: ignore[no-untyped-call]
+            self.control_weights = self.get_updated_weights()  # type: ignore[no-untyped-call]
 
-        if self._label_config_has_changed():
+        if self._label_config_has_changed():  # type: ignore[no-untyped-call]
             self.__original_label_config = self.label_config
 
         super(Project, self).save(*args, **kwargs)
@@ -632,18 +634,18 @@ class Project(ProjectMixin, models.Model):
             self.__overlap_cohort_percentage = self.overlap_cohort_percentage
 
         if self.__skip_queue != self.skip_queue:
-            bulk_update_stats_project_tasks(
+            bulk_update_stats_project_tasks(  # type: ignore[no-untyped-call]
                 self.tasks.filter(Q(annotations__isnull=False) & Q(annotations__ground_truth=False))
             )
 
         if hasattr(self, 'summary'):
             # Ensure project.summary is consistent with current tasks / annotations
             if self.num_tasks == 0:
-                self.summary.reset()
+                self.summary.reset()  # type: ignore[no-untyped-call]
             elif self.num_annotations == 0 and self.num_drafts == 0:
-                self.summary.reset(tasks_data_based=False)
+                self.summary.reset(tasks_data_based=False)  # type: ignore[no-untyped-call]
 
-    def get_member_ids(self):
+    def get_member_ids(self):  # type: ignore[no-untyped-def]
         if hasattr(self, 'team_link'):
             # project has defined team scope
             # TODO: avoid checking team but rather add all project members when creating a project
@@ -654,14 +656,14 @@ class Project(ProjectMixin, models.Model):
             # TODO: may want to return all users from organization
             return User.objects.none()
 
-    def has_team_user(self, user):
+    def has_team_user(self, user):  # type: ignore[no-untyped-def]
         return hasattr(self, 'team_link') and self.team_link.team.has_user(user)
 
-    def annotators(self):
+    def annotators(self):  # type: ignore[no-untyped-def]
         """Annotators connected to this project including team members"""
         from users.models import User
 
-        member_ids = self.get_member_ids()
+        member_ids = self.get_member_ids()  # type: ignore[no-untyped-call]
         team_members = User.objects.filter(id__in=member_ids).order_by('email')
 
         # add members from invited projects
@@ -680,37 +682,37 @@ class Project(ProjectMixin, models.Model):
         )
         return annotators
 
-    def annotators_with_annotations(self, min_count=500):
+    def annotators_with_annotations(self, min_count=500):  # type: ignore[no-untyped-def]
         """Annotators with annotation number > min_number
 
         :param min_count: minimal annotation number to leave an annotators
         :return: filtered annotators
         """
-        annotators = self.annotators()
+        annotators = self.annotators()  # type: ignore[no-untyped-call]
         q = Q(annotations__project=self) & Q_task_finished_annotations & Q(annotations__ground_truth=False)
         annotators = annotators.annotate(annotation_count=Count('annotations', filter=q, distinct=True))
         return annotators.filter(annotation_count__gte=min_count)
 
-    def labeled_tasks(self):
+    def labeled_tasks(self):  # type: ignore[no-untyped-def]
         return self.tasks.filter(is_labeled=True)
 
-    def has_annotations(self):
+    def has_annotations(self):  # type: ignore[no-untyped-def]
         from tasks.models import Annotation  # prevent cycling imports
 
         return Annotation.objects.filter(Q(project=self) & Q(ground_truth=False)).count() > 0
 
     # [TODO] this should be a template tag or something like this
     @property
-    def label_config_line(self):
+    def label_config_line(self):  # type: ignore[no-untyped-def]
         c = self.label_config
-        return config_line_stipped(c)
+        return config_line_stipped(c)  # type: ignore[no-untyped-call]
 
-    def get_sample_task(self, label_config=None):
+    def get_sample_task(self, label_config=None):  # type: ignore[no-untyped-def]
         config = label_config or self.label_config
-        task, _, _ = get_sample_task(config)
+        task, _, _ = get_sample_task(config)  # type: ignore[no-untyped-call]
         return task
 
-    def eta(self):
+    def eta(self):  # type: ignore[no-untyped-def]
         """
             Show eta for project to be finished
             eta = avg task annotations finish time * remain annotations
@@ -743,22 +745,22 @@ class Project(ProjectMixin, models.Model):
             return None
         return avg_lead_time * annotations_remain
 
-    def finished(self):
+    def finished(self):  # type: ignore[no-untyped-def]
         return not self.tasks.filter(is_labeled=False).exists()
 
-    def annotations_lead_time(self):
+    def annotations_lead_time(self):  # type: ignore[no-untyped-def]
         annotations = Annotation.objects.filter(Q(project=self.id) & Q(ground_truth=False))
         return annotations.aggregate(avg_lead_time=Avg('lead_time'))['avg_lead_time']
 
     @staticmethod
-    def django_settings():
+    def django_settings():  # type: ignore[no-untyped-def]
         return settings
 
     @staticmethod
-    def max_tasks_file_size():
+    def max_tasks_file_size():  # type: ignore[no-untyped-def]
         return settings.TASKS_MAX_FILE_SIZE
 
-    def get_parsed_config(self, autosave_cache=True):
+    def get_parsed_config(self, autosave_cache=True):  # type: ignore[no-untyped-def]
         if self.parsed_label_config is None:
             self.parsed_label_config = parse_config(self.label_config)
 
@@ -767,7 +769,7 @@ class Project(ProjectMixin, models.Model):
 
         return self.parsed_label_config
 
-    def get_counters(self):
+    def get_counters(self):  # type: ignore[no-untyped-def]
         """Method to get extra counters data from Manager method with_counts()
         """
         result = {}
@@ -777,7 +779,7 @@ class Project(ProjectMixin, models.Model):
                 result[field] = value
         return result
 
-    def get_model_versions(self, with_counters=False):
+    def get_model_versions(self, with_counters=False):  # type: ignore[no-untyped-def]
         """
         Get model_versions from project predictions
         :param with_counters: With count of predictions for each version
@@ -796,24 +798,24 @@ class Project(ProjectMixin, models.Model):
         else:
             return list(output)
 
-    def get_active_ml_backends(self):
+    def get_active_ml_backends(self):  # type: ignore[no-untyped-def]
         from ml.models import MLBackend, MLBackendState
         return MLBackend.objects.filter(project=self, state=MLBackendState.CONNECTED)
 
-    def get_all_storage_objects(self, type_='import'):
+    def get_all_storage_objects(self, type_='import'):  # type: ignore[no-untyped-def]
         from io_storages.models import get_storage_classes
 
         if hasattr(self, '_storage_objects'):
-            return self._storage_objects
+            return self._storage_objects  # type: ignore[has-type]
 
         storage_objects = []
-        for storage_class in get_storage_classes(type_):
+        for storage_class in get_storage_classes(type_):  # type: ignore[no-untyped-call]
             storage_objects += list(storage_class.objects.filter(project=self))
 
         self._storage_objects = storage_objects
         return storage_objects
 
-    def _update_tasks_counters(self, queryset, from_scratch=True):
+    def _update_tasks_counters(self, queryset, from_scratch=True):  # type: ignore[no-untyped-def]
         """
         Update tasks counters
         :param queryset: Tasks to update queryset
@@ -856,12 +858,12 @@ class Project(ProjectMixin, models.Model):
             objs.append(task)
         with conditional_atomic(
             predicate=should_run_bulk_update_in_transaction,
-            predicate_args=[self.organization.created_by],
+            predicate_args=[self.organization.created_by],  # type: ignore[union-attr]
         ):
-            bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
+            bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)  # type: ignore[no-untyped-call]
         return len(objs)
 
-    def _update_tasks_counters_and_is_labeled(self, task_ids, from_scratch=True):
+    def _update_tasks_counters_and_is_labeled(self, task_ids, from_scratch=True):  # type: ignore[no-untyped-def]
         """
         Update tasks counters and is_labeled in batches of size settings.BATCH_SIZE.
         :param task_ids: List of task ids to be updated
@@ -870,7 +872,7 @@ class Project(ProjectMixin, models.Model):
         """
         num_tasks_updated = 0
         page_idx = 0
-        organization_created_by = self.organization.created_by
+        organization_created_by = self.organization.created_by  # type: ignore[union-attr]
 
         while (task_ids_slice := task_ids[page_idx * settings.BATCH_SIZE:(page_idx + 1) * settings.BATCH_SIZE]):
             with conditional_atomic(
@@ -880,13 +882,13 @@ class Project(ProjectMixin, models.Model):
                 # If counters are updated, is_labeled must be updated as well. Hence, if either fails, we
                 # will roll back. NB: as part of LSDV-5289, we are considering eliminating this transaction
                 # behavior for performance reasons (see conditional_atomic call above).
-                queryset = make_queryset_from_iterable(task_ids_slice)
-                num_tasks_updated += self._update_tasks_counters(queryset, from_scratch)
-                bulk_update_stats_project_tasks(queryset, self)
+                queryset = make_queryset_from_iterable(task_ids_slice)  # type: ignore[no-untyped-call]
+                num_tasks_updated += self._update_tasks_counters(queryset, from_scratch)  # type: ignore[no-untyped-call]
+                bulk_update_stats_project_tasks(queryset, self)  # type: ignore[no-untyped-call]
             page_idx += 1
         return num_tasks_updated
 
-    def _update_tasks_counters_and_task_states(self, queryset, maximum_annotations_changed,
+    def _update_tasks_counters_and_task_states(self, queryset, maximum_annotations_changed,  # type: ignore[no-untyped-def]
                                                overlap_cohort_percentage_changed, tasks_number_changed,
                                                from_scratch=True):
         """
@@ -895,12 +897,12 @@ class Project(ProjectMixin, models.Model):
         :param from_scratch: Skip calculated tasks
         :return: Count of updated tasks
         """
-        queryset = make_queryset_from_iterable(queryset)
-        objs = self._update_tasks_counters(queryset, from_scratch)
-        self._update_tasks_states(maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed)
+        queryset = make_queryset_from_iterable(queryset)  # type: ignore[no-untyped-call]
+        objs = self._update_tasks_counters(queryset, from_scratch)  # type: ignore[no-untyped-call]
+        self._update_tasks_states(maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed)  # type: ignore[no-untyped-call]
         return objs
 
-    def __str__(self):
+    def __str__(self):  # type: ignore[no-untyped-def]
         return f'{self.title} (id={self.id})' or _("Business number %d") % self.pk
 
     class Meta:
@@ -949,11 +951,11 @@ class ProjectOnboarding(models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         super(ProjectOnboarding, self).save(*args, **kwargs)
         if ProjectOnboarding.objects.filter(project=self.project, finished=True).count() == 4:
             self.project.skip_onboarding = True
-            self.project.save(recalc=False)
+            self.project.save(recalc=False)  # type: ignore[no-untyped-call]
 
 
 class LabelStreamHistory(models.Model):
@@ -1005,11 +1007,11 @@ class ProjectSummary(models.Model):
     created_labels = JSONField(_('created labels'), null=True, default=dict, help_text='Unique labels')
     created_labels_drafts = JSONField(_('created labels in drafts'), null=True, default=dict, help_text='Unique drafts labels')
 
-    def has_permission(self, user):
+    def has_permission(self, user):  # type: ignore[no-untyped-def]
         user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
-    def reset(self, tasks_data_based=True):
+    def reset(self, tasks_data_based=True):  # type: ignore[no-untyped-def]
         if tasks_data_based:
             self.all_data_columns = {}
             self.common_data_columns = []
@@ -1018,12 +1020,12 @@ class ProjectSummary(models.Model):
         self.created_labels_drafts = {}
         self.save()
 
-    def update_data_columns(self, tasks):
-        common_data_columns = set()
+    def update_data_columns(self, tasks):  # type: ignore[no-untyped-def]
+        common_data_columns = set()  # type: ignore[var-annotated]
         all_data_columns = dict(self.all_data_columns)
         for task in tasks:
             try:
-                task_data = get_attr_or_item(task, 'data')
+                task_data = get_attr_or_item(task, 'data')  # type: ignore[no-untyped-call]
             except KeyError:
                 task_data = task
             task_data_keys = task_data.keys()
@@ -1043,12 +1045,12 @@ class ProjectSummary(models.Model):
         logger.debug(f'summary.common_data_columns = {self.common_data_columns}')
         self.save(update_fields=['all_data_columns', 'common_data_columns'])
 
-    def remove_data_columns(self, tasks):
+    def remove_data_columns(self, tasks):  # type: ignore[no-untyped-def]
         all_data_columns = dict(self.all_data_columns)
         keys_to_remove = []
 
         for task in tasks:
-            task_data = get_attr_or_item(task, 'data')
+            task_data = get_attr_or_item(task, 'data')  # type: ignore[no-untyped-call]
             for key in task_data.keys():
                 if key in all_data_columns:
                     all_data_columns[key] -= 1
@@ -1067,7 +1069,7 @@ class ProjectSummary(models.Model):
         logger.debug(f'summary.common_data_columns = {self.common_data_columns}')
         self.save(update_fields=['all_data_columns', 'common_data_columns', ])
 
-    def _get_annotation_key(self, result):
+    def _get_annotation_key(self, result):  # type: ignore[no-untyped-def]
         result_type = result.get('type', None)
         if result_type in ('relation', 'pairwise', None):
             return None
@@ -1078,10 +1080,10 @@ class ProjectSummary(models.Model):
             )
             return None
         result_from_name = result['from_name']
-        key = get_annotation_tuple(result_from_name, result['to_name'], result_type or '')
+        key = get_annotation_tuple(result_from_name, result['to_name'], result_type or '')  # type: ignore[no-untyped-call]
         return key
 
-    def _get_labels(self, result):
+    def _get_labels(self, result):  # type: ignore[no-untyped-def]
         result_type = result.get('type')
         # DEV-1990 Workaround for Video labels as there are no labels in VideoRectangle tag
         if result_type in ['videorectangle']:
@@ -1100,17 +1102,17 @@ class ProjectSummary(models.Model):
                 labels.append(str(label))
         return labels
 
-    def update_created_annotations_and_labels(self, annotations):
+    def update_created_annotations_and_labels(self, annotations):  # type: ignore[no-untyped-def]
         created_annotations = dict(self.created_annotations)
         labels = dict(self.created_labels)
         for annotation in annotations:
-            results = get_attr_or_item(annotation, 'result') or []
+            results = get_attr_or_item(annotation, 'result') or []  # type: ignore[no-untyped-call]
             if not isinstance(results, list):
                 continue
 
             for result in results:
                 # aggregate annotation types
-                key = self._get_annotation_key(result)
+                key = self._get_annotation_key(result)  # type: ignore[no-untyped-call]
                 if not key:
                     continue
                 created_annotations[key] = created_annotations.get(key, 0) + 1
@@ -1120,7 +1122,7 @@ class ProjectSummary(models.Model):
                 if from_name not in self.created_labels:
                     labels[from_name] = dict()
 
-                for label in self._get_labels(result):
+                for label in self._get_labels(result):  # type: ignore[no-untyped-call]
                     labels[from_name][label] = labels[from_name].get(label, 0) + 1
 
         logger.debug(f'summary.created_annotations = {created_annotations}')
@@ -1129,17 +1131,17 @@ class ProjectSummary(models.Model):
         self.created_labels = labels
         self.save(update_fields=['created_annotations', 'created_labels'])
 
-    def remove_created_annotations_and_labels(self, annotations):
+    def remove_created_annotations_and_labels(self, annotations):  # type: ignore[no-untyped-def]
         created_annotations = dict(self.created_annotations)
         labels = dict(self.created_labels)
         for annotation in annotations:
-            results = get_attr_or_item(annotation, 'result') or []
+            results = get_attr_or_item(annotation, 'result') or []  # type: ignore[no-untyped-call]
             if not isinstance(results, list):
                 continue
 
             for result in results:
                 # reduce annotation counters
-                key = self._get_annotation_key(result)
+                key = self._get_annotation_key(result)  # type: ignore[no-untyped-call]
                 if key in created_annotations:
                     created_annotations[key] -= 1
                     if created_annotations[key] == 0:
@@ -1149,7 +1151,7 @@ class ProjectSummary(models.Model):
                 from_name = result.get('from_name', None)
                 if from_name not in labels:
                     continue
-                for label in self._get_labels(result):
+                for label in self._get_labels(result):  # type: ignore[no-untyped-call]
                     label = str(label)
                     if label in labels[from_name]:
                         labels[from_name][label] -= 1
@@ -1163,10 +1165,10 @@ class ProjectSummary(models.Model):
         self.created_labels = labels
         self.save(update_fields=['created_annotations', 'created_labels'])
 
-    def update_created_labels_drafts(self, drafts):
+    def update_created_labels_drafts(self, drafts):  # type: ignore[no-untyped-def]
         labels = dict(self.created_labels_drafts)
         for draft in drafts:
-            results = get_attr_or_item(draft, 'result') or []
+            results = get_attr_or_item(draft, 'result') or []  # type: ignore[no-untyped-call]
             if not isinstance(results, list):
                 continue
 
@@ -1179,17 +1181,17 @@ class ProjectSummary(models.Model):
                 if from_name not in self.created_labels_drafts:
                     labels[from_name] = dict()
 
-                for label in self._get_labels(result):
+                for label in self._get_labels(result):  # type: ignore[no-untyped-call]
                     labels[from_name][label] = labels[from_name].get(label, 0) + 1
 
         logger.debug(f'summary.created_labels = {labels}')
         self.created_labels_drafts = labels
         self.save(update_fields=['created_labels_drafts'])
 
-    def remove_created_drafts_and_labels(self, drafts):
+    def remove_created_drafts_and_labels(self, drafts):  # type: ignore[no-untyped-def]
         labels = dict(self.created_labels_drafts)
         for draft in drafts:
-            results = get_attr_or_item(draft, 'result') or []
+            results = get_attr_or_item(draft, 'result') or []  # type: ignore[no-untyped-call]
             if not isinstance(results, list):
                 continue
 
@@ -1198,7 +1200,7 @@ class ProjectSummary(models.Model):
                 from_name = result.get('from_name', None)
                 if from_name not in labels:
                     continue
-                for label in self._get_labels(result):
+                for label in self._get_labels(result):  # type: ignore[no-untyped-call]
                     label = str(label)
                     if label in labels[from_name]:
                         labels[from_name][label] -= 1
@@ -1242,8 +1244,8 @@ class ProjectImport(models.Model):
     tasks = models.JSONField(blank=True, null=True)
     task_ids = models.JSONField(default=list)
 
-    def has_permission(self, user):
-        return self.project.has_permission(user)
+    def has_permission(self, user):  # type: ignore[no-untyped-def]
+        return self.project.has_permission(user)  # type: ignore[union-attr]
 
 
 class ProjectReimport(models.Model):
@@ -1268,5 +1270,5 @@ class ProjectReimport(models.Model):
     data_columns = models.JSONField(default=list)
     traceback = models.TextField(null=True, blank=True)
 
-    def has_permission(self, user):
-        return self.project.has_permission(user)
+    def has_permission(self, user):  # type: ignore[no-untyped-def]
+        return self.project.has_permission(user)  # type: ignore[union-attr]

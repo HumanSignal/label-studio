@@ -10,10 +10,10 @@ logger = logging.getLogger(__name__)
 
 class AZURE(object):
     @classmethod
-    def get_client_and_container(cls, container, account_name=None, account_key=None):
+    def get_client_and_container(cls, container, account_name=None, account_key=None):  # type: ignore[no-untyped-def]
         # get account name and key from params or from environment variables
-        account_name = str(account_name) if account_name else get_env('AZURE_BLOB_ACCOUNT_NAME')
-        account_key = str(account_key) if account_key else get_env('AZURE_BLOB_ACCOUNT_KEY')
+        account_name = str(account_name) if account_name else get_env('AZURE_BLOB_ACCOUNT_NAME')  # type: ignore[no-untyped-call]
+        account_key = str(account_key) if account_key else get_env('AZURE_BLOB_ACCOUNT_KEY')  # type: ignore[no-untyped-call]
         # check that both account name and key are set
         if not account_name or not account_key:
             raise ValueError('Azure account name and key must be set using '
@@ -28,8 +28,8 @@ class AZURE(object):
     def get_blob_metadata(cls,
                           url: str,
                           container: str,
-                          account_name: str = None,
-                          account_key: str = None) -> dict:
+                          account_name: str = None,  # type: ignore[assignment]
+                          account_key: str = None) -> dict:  # type: ignore[assignment, type-arg]
         """
         Get blob metadata by url
         :param url: Object key
@@ -38,6 +38,6 @@ class AZURE(object):
         :param account_key: Azure account key
         :return: Object metadata dict("name": "value")
         """
-        _, container = cls.get_client_and_container(container, account_name=account_name, account_key=account_key)
-        blob = container.get_blob_client(url)
+        _, container = cls.get_client_and_container(container, account_name=account_name, account_key=account_key)  # type: ignore[no-untyped-call]
+        blob = container.get_blob_client(url)  # type: ignore[attr-defined]
         return dict(blob.get_blob_properties())

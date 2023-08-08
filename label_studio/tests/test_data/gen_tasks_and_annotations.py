@@ -23,7 +23,7 @@ tc_template = """{"id": %s,"review_result":null,"ground_truth":false,"result":[{
 task_template_end = """],"data":{"text":"Но тут же раздался ужасный голос во мгле", "meta_info":"meta A"},"meta":{},"accuracy":1.0,"created_at":"2020-06-26T12:59:15.457035Z","updated_at":"2020-07-06T10:47:48.997310Z","is_labeled":true,"overlap":2,"project":2}"""
 
 
-def gen_tasks(user_id):
+def gen_tasks(user_id):  # type: ignore[no-untyped-def]
     i = 11
     tasks_n = 1000
 
@@ -48,4 +48,4 @@ def gen_tasks(user_id):
 
 
 if __name__ == '__main__':
-    gen_tasks(3)
+    gen_tasks(3)  # type: ignore[no-untyped-call]

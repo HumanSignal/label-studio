@@ -22,13 +22,13 @@ YEAR_CHOICES = []
 for r in range(YEAR_START, (datetime.datetime.now().year+1)):
     YEAR_CHOICES.append((r, r))
 
-year = models.IntegerField(_('year'), choices=YEAR_CHOICES, default=datetime.datetime.now().year)
+year = models.IntegerField(_('year'), choices=YEAR_CHOICES, default=datetime.datetime.now().year)  # type: ignore[var-annotated]
 
 
-class UserManager(BaseUserManager):
+class UserManager(BaseUserManager):  # type: ignore[type-arg]
     use_in_migrations = True
 
-    def _create_user(self, email, password, **extra_fields):
+    def _create_user(self, email, password, **extra_fields):  # type: ignore[no-untyped-def]
         """
         Create and save a user with the given email and password.
         """
@@ -43,12 +43,12 @@ class UserManager(BaseUserManager):
 
         return user
 
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, email, password=None, **extra_fields):  # type: ignore[no-untyped-def]
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
-        return self._create_user(email, password, **extra_fields)
+        return self._create_user(email, password, **extra_fields)  # type: ignore[no-untyped-call]
 
-    def create_superuser(self, email, password, **extra_fields):
+    def create_superuser(self, email, password, **extra_fields):  # type: ignore[no-untyped-def]
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -57,14 +57,14 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self._create_user(email, password, **extra_fields)
+        return self._create_user(email, password, **extra_fields)  # type: ignore[no-untyped-call]
 
 
 class UserLastActivityMixin(models.Model):
     last_activity = models.DateTimeField(
         _('last activity'), default=timezone.now, editable=False)
 
-    def update_last_activity(self):
+    def update_last_activity(self):  # type: ignore[no-untyped-def]
         self.last_activity = timezone.now()
         self.save(update_fields=["last_activity"])
 
@@ -72,10 +72,10 @@ class UserLastActivityMixin(models.Model):
         abstract = True
 
 
-UserMixin = load_func(settings.USER_MIXIN)
+UserMixin = load_func(settings.USER_MIXIN)  # type: ignore[no-untyped-call]
 
 
-class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin):
+class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin):  # type: ignore[misc, valid-type]
     """
     An abstract base class implementing a fully featured User model with
     admin-compliant permissions.
@@ -119,7 +119,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ()
+    REQUIRED_FIELDS = ()  # type: ignore[assignment]
 
     class Meta:
         db_table = 'htx_user'
@@ -134,60 +134,60 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         ]
 
     @property
-    def avatar_url(self):
+    def avatar_url(self):  # type: ignore[no-untyped-def]
         if self.avatar:
             if settings.CLOUD_FILE_STORAGE_ENABLED:
                 return self.avatar.url
             else:
                 return settings.HOSTNAME + self.avatar.url
 
-    def is_organization_admin(self, org_pk):
+    def is_organization_admin(self, org_pk):  # type: ignore[no-untyped-def]
         return True
 
-    def active_organization_annotations(self):
+    def active_organization_annotations(self):  # type: ignore[no-untyped-def]
         return self.annotations.filter(project__organization=self.active_organization)
 
-    def active_organization_contributed_project_number(self):
-        annotations = self.active_organization_annotations()
+    def active_organization_contributed_project_number(self):  # type: ignore[no-untyped-def]
+        annotations = self.active_organization_annotations()  # type: ignore[no-untyped-call]
         return annotations.values_list('project').distinct().count()
 
     @property
-    def own_organization(self):
+    def own_organization(self):  # type: ignore[no-untyped-def]
         return Organization.objects.get(created_by=self)
 
     @property
-    def has_organization(self):
+    def has_organization(self):  # type: ignore[no-untyped-def]
         return Organization.objects.filter(created_by=self).exists()
 
-    def clean(self):
+    def clean(self):  # type: ignore[no-untyped-def]
         super().clean()
         self.email = self.__class__.objects.normalize_email(self.email)
 
-    def name_or_email(self):
-        name = self.get_full_name()
+    def name_or_email(self):  # type: ignore[no-untyped-def]
+        name = self.get_full_name()  # type: ignore[no-untyped-call]
         if len(name) == 0:
             name = self.email
 
         return name
         
-    def get_full_name(self):
+    def get_full_name(self):  # type: ignore[no-untyped-def]
         """
         Return the first_name and the last_name for a given user with a space in between.
         """
         full_name = '%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
 
-    def get_short_name(self):
+    def get_short_name(self):  # type: ignore[no-untyped-def]
         """Return the short name for the user."""
         return self.first_name
 
-    def reset_token(self):
+    def reset_token(self):  # type: ignore[no-untyped-def]
         token = Token.objects.filter(user=self)
         if token.exists():
             token.delete()
         return Token.objects.create(user=self)
     
-    def get_initials(self):
+    def get_initials(self):  # type: ignore[no-untyped-def]
         initials = '?'
         if not self.first_name and not self.last_name:
             initials = self.email[0:2]
@@ -201,7 +201,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
 
 
 @receiver(post_save, sender=User)
-def init_user(sender, instance=None, created=False, **kwargs):
+def init_user(sender, instance=None, created=False, **kwargs):  # type: ignore[no-untyped-def]
     if created:
         # create token for user
         Token.objects.create(user=instance)

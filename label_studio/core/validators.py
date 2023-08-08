@@ -4,7 +4,7 @@ from django.core.validators import BaseValidator
 
 
 class JSONSchemaValidator(BaseValidator):
-    def compare(self, input, schema):
+    def compare(self, input, schema):  # type: ignore[no-untyped-def]
         try:
             jsonschema.validate(input, schema)
         except jsonschema.exceptions.ValidationError:

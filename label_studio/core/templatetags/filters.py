@@ -12,7 +12,7 @@ register = template.Library()
 
 
 @register.filter
-def initials(val, jn=""):
+def initials(val, jn=""):  # type: ignore[no-untyped-def]
     """ Given a string return its initials join by $jn
     """
     res = []
@@ -30,62 +30,62 @@ def initials(val, jn=""):
         
 
 @register.filter
-def get_at_index(l, index):
+def get_at_index(l, index):  # type: ignore[no-untyped-def]
     return l[index]
 
 
 @register.filter
-def get_item(dictionary, key):
+def get_item(dictionary, key):  # type: ignore[no-untyped-def]
     return dictionary.get(key, None)
 
 
 @register.filter
-def json_dumps_ensure_ascii(dictionary):
+def json_dumps_ensure_ascii(dictionary):  # type: ignore[no-untyped-def]
     return json.dumps(dictionary, ensure_ascii=False)
 
 
 @register.filter
-def json_escape_quote(data):
+def json_escape_quote(data):  # type: ignore[no-untyped-def]
     data_str = json.dumps(data, ensure_ascii=False)
     return data_str.replace("'", "\\'")
 
 
 @register.filter
-def escape_lt_gt(s):
+def escape_lt_gt(s):  # type: ignore[no-untyped-def]
     return s.replace('<', '&lt;').replace('>', '&gt;')
 
 
 @register.filter
-def datetime2str(d):
+def datetime2str(d):  # type: ignore[no-untyped-def]
     if isinstance(d, str):
         return d
     return d.strftime('%Y-%m-%d %H:%M:%S')
 
 
 @register.filter
-def start_zero_padding(number):
+def start_zero_padding(number):  # type: ignore[no-untyped-def]
     return '%5.5i' % number
 
 
 @register.filter
-def collaborator_id_in_url(id_, url):
+def collaborator_id_in_url(id_, url):  # type: ignore[no-untyped-def]
     return ('collaborator_id=' + str(id_)) in url
 
 
 @register.filter
-def date_for_license(date):
+def date_for_license(date):  # type: ignore[no-untyped-def]
     if isinstance(date, str):
         date = datetime.strptime(date, '%Y-%m-%d')
     return date.strftime("%d %b %Y %H:%M")
 
 
 @register.filter
-def current_date(some):
+def current_date(some):  # type: ignore[no-untyped-def]
     return datetime.now()
 
 
 @register.filter
-def is_current_date_greater_than(date):
+def is_current_date_greater_than(date):  # type: ignore[no-untyped-def]
     if date is None:
         return False
     if isinstance(date, str):
@@ -94,12 +94,12 @@ def is_current_date_greater_than(date):
 
 
 @register.filter
-def multiply(value, arg):
+def multiply(value, arg):  # type: ignore[no-untyped-def]
     return value * arg
 
 
 @register.simple_tag
-def custom_autocomplete(key=''):
+def custom_autocomplete(key=''):  # type: ignore[no-untyped-def]
     if settings.LICENSE.get('disable_autocomplete', False):
         if key == 'password':
             return format_html('autocomplete="new-password"')
@@ -109,7 +109,7 @@ def custom_autocomplete(key=''):
 
 
 @register.simple_tag(takes_context=True)
-def var_exists(context, name):
+def var_exists(context, name):  # type: ignore[no-untyped-def]
     dicts = context.dicts  # array of dicts
     if dicts:
         for d in dicts:

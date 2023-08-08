@@ -94,12 +94,12 @@ _project_for_text_choices_onto_A_B_classes = dict(
     )
 ])
 @pytest.mark.django_db
-def test_next_task(
+def test_next_task(  # type: ignore[no-untyped-def]
         business_client, any_client, project_config, tasks, status_code, expected_response_value_set
 ):
-    project = make_project(project_config, business_client.user)
-    if _client_is_annotator(any_client):
-        invite_client_to_project(any_client, project)
+    project = make_project(project_config, business_client.user)  # type: ignore[no-untyped-call]
+    if _client_is_annotator(any_client):  # type: ignore[no-untyped-call]
+        invite_client_to_project(any_client, project)  # type: ignore[no-untyped-call]
 
     # upload tasks with annotations
     r = business_client.post(
@@ -429,26 +429,26 @@ def test_next_task(
     'when some of the tasks are partially labeled, regardless scores sampling operates on depth-first (try to complete all tasks asap)',
 ])
 @pytest.mark.django_db
-def test_next_task_with_active_learning(mocker,
+def test_next_task_with_active_learning(mocker,  # type: ignore[no-untyped-def]
                                         business_client, any_client, annotator2_client, project_config, tasks,
                                         predictions, annotations, num_annotators,
                                         status_code, prelabeling_result
                                         ):
 
-    project = make_project(project_config, business_client.user, use_ml_backend=False)
-    if _client_is_annotator(any_client):
-        invite_client_to_project(any_client, project)
-    if _client_is_annotator(annotator2_client):
-        invite_client_to_project(annotator2_client, project)
+    project = make_project(project_config, business_client.user, use_ml_backend=False)  # type: ignore[no-untyped-call]
+    if _client_is_annotator(any_client):  # type: ignore[no-untyped-call]
+        invite_client_to_project(any_client, project)  # type: ignore[no-untyped-call]
+    if _client_is_annotator(annotator2_client):  # type: ignore[no-untyped-call]
+        invite_client_to_project(annotator2_client, project)  # type: ignore[no-untyped-call]
 
     class MockAnnotatorCount:
-        def count(self):
+        def count(self):  # type: ignore[no-untyped-def]
             return num_annotators
 
     mocker.patch.object(Project, 'annotators', return_value=MockAnnotatorCount())
 
     for task, prediction, annotation in zip(tasks, predictions, annotations):
-        task = make_task(task, project)
+        task = make_task(task, project)  # type: ignore[no-untyped-call]
         Prediction.objects.create(task=task, model_version=project.model_version, **prediction)
         if annotation is not None:
             completed_by = any_client.annotator if num_annotators == 1 else annotator2_client.annotator
@@ -461,7 +461,7 @@ def test_next_task_with_active_learning(mocker,
 
 
 @pytest.mark.django_db
-def test_active_learning_with_uploaded_predictions(business_client):
+def test_active_learning_with_uploaded_predictions(business_client):  # type: ignore[no-untyped-def]
     config = dict(
         title='Test',
         is_published=True,
@@ -475,7 +475,7 @@ def test_active_learning_with_uploaded_predictions(business_client):
               </Choices>
             </View>'''
     )
-    project = make_project(config, business_client.user, use_ml_backend=False)
+    project = make_project(config, business_client.user, use_ml_backend=False)  # type: ignore[no-untyped-call]
     result = [{
         'from_name': 'text_class',
         'to_name': 'text',
@@ -493,7 +493,7 @@ def test_active_learning_with_uploaded_predictions(business_client):
     r = business_client.post(f'/api/projects/{project.id}/tasks/bulk/', data=json.dumps(tasks), content_type="application/json")
     assert r.status_code == 201
 
-    def get_next_task_id_and_complete_it():
+    def get_next_task_id_and_complete_it():  # type: ignore[no-untyped-def]
         r = business_client.get(f'/api/projects/{project.id}/next')
         assert r.status_code == 200
         task = json.loads(r.content)
@@ -507,17 +507,17 @@ def test_active_learning_with_uploaded_predictions(business_client):
     assert project.model_version == ''
 
     # tasks will be shown according to the uploaded scores
-    assert get_next_task_id_and_complete_it() == 'score = 0.1'
-    assert get_next_task_id_and_complete_it() == 'score = 0.2'
-    assert get_next_task_id_and_complete_it() == 'score = 0.3'
-    assert get_next_task_id_and_complete_it() == 'score = 0.4'
-    assert get_next_task_id_and_complete_it() == 'score = 0.5'
+    assert get_next_task_id_and_complete_it() == 'score = 0.1'  # type: ignore[no-untyped-call]
+    assert get_next_task_id_and_complete_it() == 'score = 0.2'  # type: ignore[no-untyped-call]
+    assert get_next_task_id_and_complete_it() == 'score = 0.3'  # type: ignore[no-untyped-call]
+    assert get_next_task_id_and_complete_it() == 'score = 0.4'  # type: ignore[no-untyped-call]
+    assert get_next_task_id_and_complete_it() == 'score = 0.5'  # type: ignore[no-untyped-call]
 
 
-@pytest.mark.skipif(not redis_healthcheck(), reason='Multi user locks only supported with redis enabled')
+@pytest.mark.skipif(not redis_healthcheck(), reason='Multi user locks only supported with redis enabled')  # type: ignore[no-untyped-call]
 @pytest.mark.parametrize('sampling', (Project.UNIFORM, Project.UNCERTAINTY, Project.SEQUENCE))
 @pytest.mark.django_db
-def test_label_races(configured_project, business_client, sampling):
+def test_label_races(configured_project, business_client, sampling):  # type: ignore[no-untyped-def]
     config = dict(
         title='test_label_races',
         is_published=True,
@@ -530,13 +530,13 @@ def test_label_races(configured_project, business_client, sampling):
               </Choices>
             </View>'''
     )
-    project = make_project(config, business_client.user)
+    project = make_project(config, business_client.user)  # type: ignore[no-untyped-call]
     project.sampling = sampling
     project.save()
-    id1 = make_task({'data': {'text': 'aaa'}}, project).id
-    id2 = make_task({'data': {'text': 'bbb'}}, project).id
-    ann1 = make_annotator({'email': 'ann1@testlabelraces.com'}, project, True)
-    ann2 = make_annotator({'email': 'ann2@testlabelraces.com'}, project, True)
+    id1 = make_task({'data': {'text': 'aaa'}}, project).id  # type: ignore[no-untyped-call]
+    id2 = make_task({'data': {'text': 'bbb'}}, project).id  # type: ignore[no-untyped-call]
+    ann1 = make_annotator({'email': 'ann1@testlabelraces.com'}, project, True)  # type: ignore[no-untyped-call]
+    ann2 = make_annotator({'email': 'ann2@testlabelraces.com'}, project, True)  # type: ignore[no-untyped-call]
 
     # ann1 takes task id1
     r = ann1.get(f'/api/projects/{project.id}/next')
@@ -554,10 +554,10 @@ def test_label_races(configured_project, business_client, sampling):
     assert json.loads(r.content)['id'] == id2
 
 
-@pytest.mark.skipif(not redis_healthcheck(), reason='Multi user locks only supported with redis enabled')
+@pytest.mark.skipif(not redis_healthcheck(), reason='Multi user locks only supported with redis enabled')  # type: ignore[no-untyped-call]
 @pytest.mark.parametrize('sampling', (Project.UNIFORM, Project.UNCERTAINTY, Project.SEQUENCE))
 @pytest.mark.django_db
-def test_label_races_after_all_taken(configured_project, business_client, sampling):
+def test_label_races_after_all_taken(configured_project, business_client, sampling):  # type: ignore[no-untyped-def]
     config = dict(
         title='test_label_races',
         is_published=True,
@@ -570,13 +570,13 @@ def test_label_races_after_all_taken(configured_project, business_client, sampli
               </Choices>
             </View>'''
     )
-    project = make_project(config, business_client.user)
+    project = make_project(config, business_client.user)  # type: ignore[no-untyped-call]
     project.sampling = sampling
     project.save()
-    id1 = make_task({'data': {'text': 'aaa'}}, project).id
-    id2 = make_task({'data': {'text': 'bbb'}}, project).id
-    ann1 = make_annotator({'email': 'ann1@testlabelracesalltaken.com'}, project, True)
-    ann2 = make_annotator({'email': 'ann2@testlabelracesalltaken.com'}, project, True)
+    id1 = make_task({'data': {'text': 'aaa'}}, project).id  # type: ignore[no-untyped-call]
+    id2 = make_task({'data': {'text': 'bbb'}}, project).id  # type: ignore[no-untyped-call]
+    ann1 = make_annotator({'email': 'ann1@testlabelracesalltaken.com'}, project, True)  # type: ignore[no-untyped-call]
+    ann2 = make_annotator({'email': 'ann2@testlabelracesalltaken.com'}, project, True)  # type: ignore[no-untyped-call]
 
     # ann1 takes task id1
     r = ann1.get(f'/api/projects/{project.id}/next')
@@ -606,7 +606,7 @@ def test_label_races_after_all_taken(configured_project, business_client, sampli
 
 
 @pytest.mark.django_db
-def test_breadth_first_simple(business_client):
+def test_breadth_first_simple(business_client):  # type: ignore[no-untyped-def]
     config = dict(
         title='test_label_races',
         is_published=True,
@@ -626,13 +626,13 @@ def test_breadth_first_simple(business_client):
         'type': 'choices',
         'value': {'choices': ['class_A']}
     }])
-    project = make_project(config, business_client.user)
+    project = make_project(config, business_client.user)  # type: ignore[no-untyped-call]
     project.sampling = Project.SEQUENCE
     project.save()
-    id1 = make_task({'data': {'text': 'aaa'}}, project).id
-    id2 = make_task({'data': {'text': 'bbb'}}, project).id
-    ann1 = make_annotator({'email': 'ann1@testbreadthfirst.com'}, project, True)
-    ann2 = make_annotator({'email': 'ann2@testbreadthfirst.com'}, project, True)
+    id1 = make_task({'data': {'text': 'aaa'}}, project).id  # type: ignore[no-untyped-call]
+    id2 = make_task({'data': {'text': 'bbb'}}, project).id  # type: ignore[no-untyped-call]
+    ann1 = make_annotator({'email': 'ann1@testbreadthfirst.com'}, project, True)  # type: ignore[no-untyped-call]
+    ann2 = make_annotator({'email': 'ann2@testbreadthfirst.com'}, project, True)  # type: ignore[no-untyped-call]
 
     # ann1 takes first task
     r = ann1.get(f'/api/projects/{project.id}/next')
@@ -664,7 +664,7 @@ def test_breadth_first_simple(business_client):
 
 
 @pytest.mark.django_db
-def test_breadth_first_overlap_3(business_client):
+def test_breadth_first_overlap_3(business_client):  # type: ignore[no-untyped-def]
     config = dict(
         title='test_label_races',
         is_published=True,
@@ -684,41 +684,41 @@ def test_breadth_first_overlap_3(business_client):
         'type': 'choices',
         'value': {'choices': ['class_A']}
     }])
-    project = make_project(config, business_client.user)
+    project = make_project(config, business_client.user)  # type: ignore[no-untyped-call]
     project.sampling = Project.UNIFORM
     project.save()
 
-    def complete_task(annotator):
+    def complete_task(annotator):  # type: ignore[no-untyped-def]
         _r = annotator.get(f'/api/projects/{project.id}/next')
         assert _r.status_code == 200
         task_id = json.loads(_r.content)['id']
         annotator.post(f'/api/tasks/{task_id}/annotations/', data={'task': task_id, 'result': annotation_result})
         return task_id
 
-    id1 = make_task({'data': {'text': 'aaa'}}, project).id
-    id2 = make_task({'data': {'text': 'bbb'}}, project).id
-    id3 = make_task({'data': {'text': 'ccc'}}, project).id
+    id1 = make_task({'data': {'text': 'aaa'}}, project).id  # type: ignore[no-untyped-call]
+    id2 = make_task({'data': {'text': 'bbb'}}, project).id  # type: ignore[no-untyped-call]
+    id3 = make_task({'data': {'text': 'ccc'}}, project).id  # type: ignore[no-untyped-call]
 
-    ann1 = make_annotator({'email': 'ann1@testbreadthfirstoverlap3.com'}, project, True)
-    ann2 = make_annotator({'email': 'ann2@testbreadthfirstoverlap3.com'}, project, True)
-    ann3 = make_annotator({'email': 'ann3@testbreadthfirstoverlap3.com'}, project, True)
+    ann1 = make_annotator({'email': 'ann1@testbreadthfirstoverlap3.com'}, project, True)  # type: ignore[no-untyped-call]
+    ann2 = make_annotator({'email': 'ann2@testbreadthfirstoverlap3.com'}, project, True)  # type: ignore[no-untyped-call]
+    ann3 = make_annotator({'email': 'ann3@testbreadthfirstoverlap3.com'}, project, True)  # type: ignore[no-untyped-call]
 
     # ann1, ann2, ann3 should follow breadth-first scheme: trying to complete the tasks as fast as possible
-    task_id_ann1 = complete_task(ann1)
-    task_id_ann2 = complete_task(ann2)
+    task_id_ann1 = complete_task(ann1)  # type: ignore[no-untyped-call]
+    task_id_ann2 = complete_task(ann2)  # type: ignore[no-untyped-call]
     assert task_id_ann2 == task_id_ann1
-    complete_task(ann1)
-    complete_task(ann1)
-    task_id_ann3 = complete_task(ann3)
+    complete_task(ann1)  # type: ignore[no-untyped-call]
+    complete_task(ann1)  # type: ignore[no-untyped-call]
+    task_id_ann3 = complete_task(ann3)  # type: ignore[no-untyped-call]
     assert task_id_ann2 == task_id_ann3
-    task_id_ann2 = complete_task(ann2)
-    task_id_ann3 = complete_task(ann3)
+    task_id_ann2 = complete_task(ann2)  # type: ignore[no-untyped-call]
+    task_id_ann3 = complete_task(ann3)  # type: ignore[no-untyped-call]
     assert task_id_ann2 == task_id_ann3
 
 
-@pytest.mark.skipif(not redis_healthcheck(), reason='Multi user locks only supported with redis enabled')
+@pytest.mark.skipif(not redis_healthcheck(), reason='Multi user locks only supported with redis enabled')  # type: ignore[no-untyped-call]
 @pytest.mark.django_db
-def test_try_take_last_task_at_the_same_time(business_client):
+def test_try_take_last_task_at_the_same_time(business_client):  # type: ignore[no-untyped-def]
     config = dict(
         title='test_try_take_last_task_at_the_same_time',
         is_published=True,
@@ -738,28 +738,28 @@ def test_try_take_last_task_at_the_same_time(business_client):
         'type': 'choices',
         'value': {'choices': ['class_A']}
     }])
-    project = make_project(config, business_client.user)
+    project = make_project(config, business_client.user)  # type: ignore[no-untyped-call]
     project.sampling = Project.SEQUENCE
     project.save()
 
-    def complete_task(annotator):
+    def complete_task(annotator):  # type: ignore[no-untyped-def]
         _r = annotator.get(f'/api/projects/{project.id}/next')
         assert _r.status_code == 200
         task_id = json.loads(_r.content)['id']
         annotator.post(f'/api/tasks/{task_id}/annotations/', data={'task': task_id, 'result': annotation_result})
         return task_id
 
-    make_task({'data': {'text': 'aaa'}}, project)
-    make_task({'data': {'text': 'bbb'}}, project)
+    make_task({'data': {'text': 'aaa'}}, project)  # type: ignore[no-untyped-call]
+    make_task({'data': {'text': 'bbb'}}, project)  # type: ignore[no-untyped-call]
 
-    ann1 = make_annotator({'email': 'ann1@lasttask.com'}, project, True)
-    ann2 = make_annotator({'email': 'ann2@lasttask.com'}, project, True)
-    ann3 = make_annotator({'email': 'ann3@lasttask.com'}, project, True)
+    ann1 = make_annotator({'email': 'ann1@lasttask.com'}, project, True)  # type: ignore[no-untyped-call]
+    ann2 = make_annotator({'email': 'ann2@lasttask.com'}, project, True)  # type: ignore[no-untyped-call]
+    ann3 = make_annotator({'email': 'ann3@lasttask.com'}, project, True)  # type: ignore[no-untyped-call]
 
     # ann1, ann2 complete first task, then ann3 completes last task
-    complete_task(ann1)
-    complete_task(ann2)
-    complete_task(ann3)
+    complete_task(ann1)  # type: ignore[no-untyped-call]
+    complete_task(ann2)  # type: ignore[no-untyped-call]
+    complete_task(ann3)  # type: ignore[no-untyped-call]
 
     # only one annotator can take the last task
     _r = ann1.get(f'/api/projects/{project.id}/next')
@@ -772,9 +772,9 @@ def test_try_take_last_task_at_the_same_time(business_client):
     assert _r.status_code == 404
 
 
-@pytest.mark.skipif(not redis_healthcheck(), reason='Multi user locks only supported with redis enabled')
+@pytest.mark.skipif(not redis_healthcheck(), reason='Multi user locks only supported with redis enabled')  # type: ignore[no-untyped-call]
 @pytest.mark.django_db
-def test_breadth_first_with_label_race(configured_project, business_client):
+def test_breadth_first_with_label_race(configured_project, business_client):  # type: ignore[no-untyped-def]
     config = dict(
         title='test_label_races',
         is_published=True,
@@ -794,13 +794,13 @@ def test_breadth_first_with_label_race(configured_project, business_client):
         'type': 'choices',
         'value': {'choices': ['class_A']}
     }])
-    project = make_project(config, business_client.user)
+    project = make_project(config, business_client.user)  # type: ignore[no-untyped-call]
     project.sampling = Project.SEQUENCE
     project.save()
-    id1 = make_task({'data': {'text': 'aaa'}}, project).id
-    id2 = make_task({'data': {'text': 'bbb'}}, project).id
-    ann1 = make_annotator({'email': 'ann1@testbreadthlabelraces.com'}, project, True)
-    ann2 = make_annotator({'email': 'ann2@testbreadthlabelraces.com'}, project, True)
+    id1 = make_task({'data': {'text': 'aaa'}}, project).id  # type: ignore[no-untyped-call]
+    id2 = make_task({'data': {'text': 'bbb'}}, project).id  # type: ignore[no-untyped-call]
+    ann1 = make_annotator({'email': 'ann1@testbreadthlabelraces.com'}, project, True)  # type: ignore[no-untyped-call]
+    ann2 = make_annotator({'email': 'ann2@testbreadthlabelraces.com'}, project, True)  # type: ignore[no-untyped-call]
 
     # ann1 takes first task
     r = ann1.get(f'/api/projects/{project.id}/next')
@@ -840,9 +840,9 @@ def test_breadth_first_with_label_race(configured_project, business_client):
     assert json.loads(r.content)['id'] == id2
 
 
-@pytest.mark.skipif(not redis_healthcheck(), reason='Multi user locks only supported with redis enabled')
+@pytest.mark.skipif(not redis_healthcheck(), reason='Multi user locks only supported with redis enabled')  # type: ignore[no-untyped-call]
 @pytest.mark.django_db
-def test_label_race_with_overlap(configured_project, business_client):
+def test_label_race_with_overlap(configured_project, business_client):  # type: ignore[no-untyped-def]
     """
         2 annotators takes and finish annotations one by one
         depending on project settings overlap
@@ -875,12 +875,12 @@ def test_label_race_with_overlap(configured_project, business_client):
         'type': 'choices',
         'value': {'choices': ['class_A']}
     }])
-    project = make_project(config, business_client.user)
+    project = make_project(config, business_client.user)  # type: ignore[no-untyped-call]
     project.sampling = Project.SEQUENCE
     project.save()
 
-    ann1 = make_annotator({'email': 'ann1@testlabelracewithoverlap.com'}, project, True)
-    ann2 = make_annotator({'email': 'ann2@testlabelracewithoverlap.com'}, project, True)
+    ann1 = make_annotator({'email': 'ann1@testlabelracewithoverlap.com'}, project, True)  # type: ignore[no-untyped-call]
+    ann2 = make_annotator({'email': 'ann2@testlabelracewithoverlap.com'}, project, True)  # type: ignore[no-untyped-call]
 
     # create tasks
     tasks = []
@@ -903,8 +903,8 @@ def test_label_race_with_overlap(configured_project, business_client):
     assert t.count() == 1
     t1 = Task.objects.filter(project=project.id).filter(overlap=1)
     assert t1.count() == 1
-    overlap_id = t.first().id
-    other_id = t1.first().id
+    overlap_id = t.first().id  # type: ignore[union-attr]
+    other_id = t1.first().id  # type: ignore[union-attr]
 
     # ann1 takes first task
     r = ann1.get(f'/api/projects/{project.id}/next')
@@ -941,9 +941,9 @@ def test_label_race_with_overlap(configured_project, business_client):
     assert json.loads(r.content)['id'] == other_id
 
 
-@pytest.mark.skipif(not redis_healthcheck(), reason='Multi user locks only supported with redis enabled')
+@pytest.mark.skipif(not redis_healthcheck(), reason='Multi user locks only supported with redis enabled')  # type: ignore[no-untyped-call]
 @pytest.mark.django_db
-def test_label_w_drafts_race_with_overlap(configured_project, business_client):
+def test_label_w_drafts_race_with_overlap(configured_project, business_client):  # type: ignore[no-untyped-def]
     """
         2 annotators takes and leaves with draft annotations one by one
         depending on project settings overlap
@@ -977,12 +977,12 @@ def test_label_w_drafts_race_with_overlap(configured_project, business_client):
         'value': {'choices': ['class_A']}
     }])
 
-    project = make_project(config, business_client.user)
+    project = make_project(config, business_client.user)  # type: ignore[no-untyped-call]
     project.sampling = Project.SEQUENCE
     project.save()
 
-    ann1 = make_annotator({'email': 'ann1@testlabelracewdrafts.com'}, project, True)
-    ann2 = make_annotator({'email': 'ann2@testlabelracewdrafts.com'}, project, True)
+    ann1 = make_annotator({'email': 'ann1@testlabelracewdrafts.com'}, project, True)  # type: ignore[no-untyped-call]
+    ann2 = make_annotator({'email': 'ann2@testlabelracewdrafts.com'}, project, True)  # type: ignore[no-untyped-call]
 
     # create tasks
     tasks = []
@@ -1005,8 +1005,8 @@ def test_label_w_drafts_race_with_overlap(configured_project, business_client):
     assert t.count() == 1
     t1 = Task.objects.filter(project=project.id).filter(overlap=1)
     assert t1.count() == 1
-    overlap_id = t.first().id
-    other_id = t1.first().id
+    overlap_id = t.first().id  # type: ignore[union-attr]
+    other_id = t1.first().id  # type: ignore[union-attr]
 
     annotation_draft_result = {
         'task': overlap_id,
@@ -1062,7 +1062,7 @@ def test_label_w_drafts_race_with_overlap(configured_project, business_client):
 
 
 @pytest.mark.django_db
-def test_fetch_final_taken_task(business_client):
+def test_fetch_final_taken_task(business_client):  # type: ignore[no-untyped-def]
     config = dict(
         title='test_label_races',
         is_published=True,
@@ -1081,12 +1081,12 @@ def test_fetch_final_taken_task(business_client):
         'type': 'choices',
         'value': {'choices': ['class_A']}
     }])
-    project = make_project(config, business_client.user)
+    project = make_project(config, business_client.user)  # type: ignore[no-untyped-call]
     project.sampling = Project.SEQUENCE
     project.save()
 
-    ann1 = make_annotator({'email': 'ann1@testfetchfinal.com'}, project, True)
-    ann2 = make_annotator({'email': 'ann2@testfetchfinal.com'}, project, True)
+    ann1 = make_annotator({'email': 'ann1@testfetchfinal.com'}, project, True)  # type: ignore[no-untyped-call]
+    ann2 = make_annotator({'email': 'ann2@testfetchfinal.com'}, project, True)  # type: ignore[no-untyped-call]
 
     # create tasks
     tasks = []
@@ -1125,9 +1125,9 @@ def test_fetch_final_taken_task(business_client):
         assert json.loads(r.content)['id'] == another_task_id
 
 
-@pytest.mark.skipif(not redis_healthcheck(), reason='Multi user locks only supported with redis enabled')
+@pytest.mark.skipif(not redis_healthcheck(), reason='Multi user locks only supported with redis enabled')  # type: ignore[no-untyped-call]
 @pytest.mark.django_db
-def test_with_bad_annotation_result(business_client):
+def test_with_bad_annotation_result(business_client):  # type: ignore[no-untyped-def]
     config = dict(
         title='test_with_failed_matching_score',
         is_published=True,
@@ -1147,7 +1147,7 @@ def test_with_bad_annotation_result(business_client):
               </View>
             </View>''',
     )
-    project = make_project(config, business_client.user, use_ml_backend=False)
+    project = make_project(config, business_client.user, use_ml_backend=False)  # type: ignore[no-untyped-call]
 
     bad_result = {
         'id': 'Yv_lLEp_8I', 'type': 'polygonlabels', 'value': {'points': [[65.99824119670821, 73.11598603746282]], 'polygonlabels': ['t11']}, 'source': '$image', 'to_name': 'img', 'from_name': 'tag', 'parent_id': None, 'image_rotation': 0, 'original_width': 4032, 'original_height': 3024}
@@ -1249,28 +1249,28 @@ def test_with_bad_annotation_result(business_client):
     num_annotators = 30
     anns = []
     for i in range(num_annotators):
-        anns.append(make_annotator({'email': f'ann{i}@testwithbadannotationresult.com'}, project, True))
+        anns.append(make_annotator({'email': f'ann{i}@testwithbadannotationresult.com'}, project, True))  # type: ignore[no-untyped-call]
 
     # create one heavy task with many annotations - it's statistic recalculation should not be done after completing another task  # noqa
     # turn off statistics calculations for now
     with mock.patch('tasks.models.update_project_summary_annotations_and_is_labeled'):
         for i in range(10):
-            task = make_task({'data': {'image': f'https://data.s3.amazonaws.com/image/{i}.jpg'}}, project)
+            task = make_task({'data': {'image': f'https://data.s3.amazonaws.com/image/{i}.jpg'}}, project)  # type: ignore[no-untyped-call]
             for i in range(num_annotators):
-                make_annotation({'result': [bad_result] * 10 + [good_result] * 10, 'completed_by': anns[i].annotator}, task.id)
+                make_annotation({'result': [bad_result] * 10 + [good_result] * 10, 'completed_by': anns[i].annotator}, task.id)  # type: ignore[no-untyped-call]
 
     # create uncompleted task
-    uncompleted_task = make_task({'data': {'image': f'https://data.s3.amazonaws.com/image/uncompleted.jpg'}}, project)
+    uncompleted_task = make_task({'data': {'image': f'https://data.s3.amazonaws.com/image/uncompleted.jpg'}}, project)  # type: ignore[no-untyped-call]
 
     print('ann1 takes any task with bad annotation and complete it')
     r = anns[0].get(f'/api/projects/{project.id}/next')
     task_id = json.loads(r.content)['id']
     assert task_id == uncompleted_task.id
 
-    def make_async_annotation_submit(new_ann=None):
+    def make_async_annotation_submit(new_ann=None):  # type: ignore[no-untyped-def]
         print('Async annotation submit')
         if new_ann is None:
-            new_ann = make_annotator({'email': f'new_ann@testwithbadannotationresult.com'}, project, True)
+            new_ann = make_annotator({'email': f'new_ann@testwithbadannotationresult.com'}, project, True)  # type: ignore[no-untyped-call]
         new_ann.post(
             f'/api/tasks/{task_id}/annotations/',
             data={'task': task_id, 'result': json.dumps([good_result])},
@@ -1281,7 +1281,7 @@ def test_with_bad_annotation_result(business_client):
     # there is no any additional computational costs implied by statistics
     # recalculation over the entire project
     t = time.time()
-    make_async_annotation_submit(anns[0])
+    make_async_annotation_submit(anns[0])  # type: ignore[no-untyped-call]
     # TODO: measuring response time is not a good way to do that,
     #  but dunno how to emulate async requests or timeouts for Django test client
     assert (time.time() - t) < 1, 'Time of annotation.submit() increases - that might be caused by redundant computations over the rest of the tasks - check that only a single task is affected by /api/tasks/<task_id>/annotations'  # noqa
@@ -1292,7 +1292,7 @@ def test_with_bad_annotation_result(business_client):
 @pytest.mark.parametrize('setup_before_upload', (False, True))
 @pytest.mark.parametrize('show_overlap_first', (False, True))
 @pytest.mark.django_db
-def test_overlap_first(business_client, setup_before_upload, show_overlap_first):
+def test_overlap_first(business_client, setup_before_upload, show_overlap_first):  # type: ignore[no-untyped-def]
     c = business_client
     config = dict(
         title='test_overlap_first',
@@ -1310,7 +1310,7 @@ def test_overlap_first(business_client, setup_before_upload, show_overlap_first)
             </View>'''
     )
 
-    project = make_project(config, business_client.user)
+    project = make_project(config, business_client.user)  # type: ignore[no-untyped-call]
 
     annotation_result = json.dumps([{
         'from_name': 'text_class',
@@ -1353,17 +1353,17 @@ def test_overlap_first(business_client, setup_before_upload, show_overlap_first)
 
     assert Task.objects.filter(Q(project_id=project.id) & Q(overlap__gt=1)).count() == expected_tasks_with_overlap
 
-    def complete_task(annotator):
+    def complete_task(annotator):  # type: ignore[no-untyped-def]
         _r = annotator.get(f'/api/projects/{project.id}/next')
         assert _r.status_code == 200
         task_id = json.loads(_r.content)['id']
         annotator.post(f'/api/tasks/{task_id}/annotations/', data={'task': task_id, 'result': annotation_result})
 
-    ann1 = make_annotator({'email': 'ann1@testoverlapfirst.com'}, project, True)
-    ann2 = make_annotator({'email': 'ann2@testoverlapfirst.com'}, project, True)
+    ann1 = make_annotator({'email': 'ann1@testoverlapfirst.com'}, project, True)  # type: ignore[no-untyped-call]
+    ann2 = make_annotator({'email': 'ann2@testoverlapfirst.com'}, project, True)  # type: ignore[no-untyped-call]
 
     for i in range(expected_tasks_with_overlap):
-        complete_task(ann1), complete_task(ann2)
+        complete_task(ann1), complete_task(ann2)  # type: ignore[no-untyped-call]
 
     all_tasks_with_overlap_are_labeled = all(t.is_labeled for t in Task.objects.filter(Q(project_id=project.id) & Q(overlap__gt=1)))  # noqa
     all_tasks_without_overlap_are_not_labeled = all(not t.is_labeled for t in Task.objects.filter(Q(project_id=project.id) & Q(overlap=1)))  # noqa

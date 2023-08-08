@@ -14,32 +14,32 @@ from projects.models import Project
 @pytest.mark.django_db
 class TestPresignStorageData:
     @pytest.fixture
-    def view(self):
+    def view(self):  # type: ignore[no-untyped-def]
         view = PresignStorageData.as_view()
-        view.authentication_classes = []
-        view.permission_classes = []
+        view.authentication_classes = []  # type: ignore[attr-defined]
+        view.permission_classes = []  # type: ignore[attr-defined]
         return view
 
     @pytest.fixture
-    def project(self):
-        project = Project(pk=1, title="testproject")
+    def project(self):  # type: ignore[no-untyped-def]
+        project = Project(pk=1, title="testproject")  # type: ignore[no-untyped-call]
         project.has_permission = MagicMock()
         return project
 
     @pytest.fixture
-    def task(self, project):
+    def task(self, project):  # type: ignore[no-untyped-def]
         task = Task(pk=1, data={}, project=project)
-        task.resolve_storage_uri = MagicMock()
+        task.resolve_storage_uri = MagicMock()  # type: ignore[method-assign]
         return task
 
     @pytest.fixture
-    def user(self):
-        user = User.objects.create_user(
+    def user(self):  # type: ignore[no-untyped-def]
+        user = User.objects.create_user(  # type: ignore[no-untyped-call]
             username="testuser", email="testuser@email.com", password="testpassword"
         )
         return user
 
-    def test_missing_parameters(self, view, user):
+    def test_missing_parameters(self, view, user):  # type: ignore[no-untyped-def]
         request = APIRequestFactory().get(
             reverse("data_import:storage-data-presign", kwargs={"task_id": 1})
         )
@@ -50,7 +50,7 @@ class TestPresignStorageData:
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_task_not_found(self, view, user):
+    def test_task_not_found(self, view, user):  # type: ignore[no-untyped-def]
         request = APIRequestFactory().get(
             reverse("data_import:storage-data-presign", kwargs={"task_id": 2})
             + "?fileuri=fileuri"
@@ -61,12 +61,12 @@ class TestPresignStorageData:
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_task_not_found(self, view, task, project, user, monkeypatch):
+    def test_task_not_found(self, view, task, project, user, monkeypatch):  # type: ignore[no-untyped-def, no-redef]
         task.resolve_storage_uri.return_value = None
         project.has_permission.return_value = True
         task.project = project
 
-        def mock_task_get(*args, **kwargs):
+        def mock_task_get(*args, **kwargs):  # type: ignore[no-untyped-def]
             if kwargs["pk"] == 1:
                 return task
             else:
@@ -86,7 +86,7 @@ class TestPresignStorageData:
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_file_uri_not_hashed(self, view, task, project, user, monkeypatch):
+    def test_file_uri_not_hashed(self, view, task, project, user, monkeypatch):  # type: ignore[no-untyped-def]
         task.resolve_storage_uri.return_value = dict(
             url="https://presigned-url.com/fileuri",
             presign_ttl=3600,
@@ -94,7 +94,7 @@ class TestPresignStorageData:
         project.has_permission.return_value = True
         task.project = project
 
-        def mock_task_get(*args, **kwargs):
+        def mock_task_get(*args, **kwargs):  # type: ignore[no-untyped-def]
             if kwargs["pk"] == 1:
                 return task
             else:
@@ -116,7 +116,7 @@ class TestPresignStorageData:
         assert response.status_code == status.HTTP_303_SEE_OTHER
         assert response.url == "https://presigned-url.com/fileuri"
 
-    def test_successful_request(self, view, task, project, user, monkeypatch):
+    def test_successful_request(self, view, task, project, user, monkeypatch):  # type: ignore[no-untyped-def]
         task.resolve_storage_uri.return_value = dict(
             url="https://presigned-url.com/fileuri",
             presign_ttl=3600,
@@ -124,7 +124,7 @@ class TestPresignStorageData:
         project.has_permission.return_value = True
         task.project = project
 
-        def mock_task_get(*args, **kwargs):
+        def mock_task_get(*args, **kwargs):  # type: ignore[no-untyped-def]
             if kwargs["pk"] == 1:
                 return task
             else:
@@ -146,7 +146,7 @@ class TestPresignStorageData:
         assert response.status_code == status.HTTP_303_SEE_OTHER
         assert response.url == "https://presigned-url.com/fileuri"
 
-    def test_successful_request_with_long_fileuri(
+    def test_successful_request_with_long_fileuri(  # type: ignore[no-untyped-def]
         self, view, task, project, user, monkeypatch
     ):
         task.resolve_storage_uri.return_value = dict(
@@ -156,7 +156,7 @@ class TestPresignStorageData:
         project.has_permission.return_value = True
         task.project = project
 
-        def mock_task_get(*args, **kwargs):
+        def mock_task_get(*args, **kwargs):  # type: ignore[no-untyped-def]
             if kwargs["pk"] == 1:
                 return task
             else:

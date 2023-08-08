@@ -8,7 +8,7 @@ from tasks.serializers import (
 from .models import FileUpload
 
 
-class ImportApiSerializer(TaskSerializer):
+class ImportApiSerializer(TaskSerializer):  # type: ignore[misc]
     """ Tasks serializer for Import API (TaskBulkCreateAPI)
     """
     annotations = AnnotationSerializer(many=True, default=[])
@@ -20,7 +20,7 @@ class ImportApiSerializer(TaskSerializer):
         exclude = ('is_labeled', 'project')
 
 
-class FileUploadSerializer(serializers.ModelSerializer):
+class FileUploadSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
     file = serializers.FileField(use_url=False)
 
     class Meta:

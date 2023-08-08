@@ -5,16 +5,16 @@ from rest_framework import serializers
 from ml.models import MLBackend
 from core.utils.io import validate_upload_url
 
-class MLBackendSerializer(serializers.ModelSerializer):
-    def validate_url(self, value):
-        validate_upload_url(value, block_local_urls=settings.ML_BLOCK_LOCAL_IP)
+class MLBackendSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
+    def validate_url(self, value):  # type: ignore[no-untyped-def]
+        validate_upload_url(value, block_local_urls=settings.ML_BLOCK_LOCAL_IP)  # type: ignore[no-untyped-call]
 
         return value
 
-    def validate(self, attrs):
+    def validate(self, attrs):  # type: ignore[no-untyped-def]
         attrs = super(MLBackendSerializer, self).validate(attrs)
         url = attrs['url']
-        healthcheck_response = MLBackend.healthcheck_(url)
+        healthcheck_response = MLBackend.healthcheck_(url)  # type: ignore[no-untyped-call]
         if healthcheck_response.is_error:
             raise serializers.ValidationError(
                 f"Can't connect to ML backend {url}, health check failed. "
@@ -23,7 +23,7 @@ class MLBackendSerializer(serializers.ModelSerializer):
                 f' about how to set up an ML backend. Additional info:' + healthcheck_response.error_message
             )
         project = attrs['project']
-        setup_response = MLBackend.setup_(url, project)
+        setup_response = MLBackend.setup_(url, project)  # type: ignore[no-untyped-call]
         if setup_response.is_error:
             raise serializers.ValidationError(
                 f"Successfully connected to {url} but it doesn't look like a valid ML backend. "
@@ -38,12 +38,12 @@ class MLBackendSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class MLInteractiveAnnotatingRequest(serializers.Serializer):
+class MLInteractiveAnnotatingRequest(serializers.Serializer):  # type: ignore[type-arg]
     task = serializers.IntegerField(
         help_text='ID of task to annotate',
         required=True,
     )
-    context = serializers.JSONField(
+    context = serializers.JSONField(  # type: ignore[assignment]
         help_text='Context for ML model',
         allow_null=True,
         default=None,

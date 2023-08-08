@@ -19,7 +19,7 @@ class UserAdminShort(UserAdmin):
         (None, {'fields': ('email', 'password1', 'password2')}),
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         super(UserAdminShort, self).__init__(*args, **kwargs)
 
         self.list_display = ('email', 'username', 'active_organization', 'organization', 'is_staff', 'is_superuser')
@@ -34,8 +34,8 @@ class UserAdminShort(UserAdmin):
                           ('Important dates', {'fields': ('last_login', 'date_joined')}))
 
 
-class AsyncMigrationStatusAdmin(admin.ModelAdmin):
-    def __init__(self, *args, **kwargs):
+class AsyncMigrationStatusAdmin(admin.ModelAdmin):  # type: ignore[type-arg]
+    def __init__(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         super(AsyncMigrationStatusAdmin, self).__init__(*args, **kwargs)
 
         self.list_display = ('id', 'name', 'project', 'status', 'created_at', 'updated_at', 'meta')
@@ -44,8 +44,8 @@ class AsyncMigrationStatusAdmin(admin.ModelAdmin):
         self.ordering = ('id',)
 
 
-class OrganizationMemberAdmin(admin.ModelAdmin):
-    def __init__(self, *args, **kwargs):
+class OrganizationMemberAdmin(admin.ModelAdmin):  # type: ignore[type-arg]
+    def __init__(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         super(OrganizationMemberAdmin, self).__init__(*args, **kwargs)
 
         self.list_display = ('id', 'user', 'organization', 'created_at', 'updated_at')

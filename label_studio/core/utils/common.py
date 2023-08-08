@@ -18,12 +18,12 @@ import pytz
 import pkg_resources
 import ujson as json
 import traceback as tb
-import drf_yasg.openapi as openapi
+import drf_yasg.openapi as openapi  # type: ignore[import, import]
 import contextlib
 
-from label_studio_tools.core.utils.exceptions import LabelStudioXMLSyntaxErrorSentryIgnored
+from label_studio_tools.core.utils.exceptions import LabelStudioXMLSyntaxErrorSentryIgnored  # type: ignore[import]
 
-import label_studio
+import label_studio  # type: ignore[import]
 import re
 
 from django.db import models, transaction
@@ -34,11 +34,11 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.db.utils import OperationalError
 from django.db.models.signals import *
-from rest_framework.views import Response, exception_handler
+from rest_framework.views import Response, exception_handler  # type: ignore[attr-defined]
 from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
-from django_filters.rest_framework import DjangoFilterBackend
-from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
+from django_filters.rest_framework import DjangoFilterBackend  # type: ignore[import]
+from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled  # type: ignore[import]
 from collections import defaultdict
 from django.contrib.postgres.operations import TrigramExtension, BtreeGinExtension
 
@@ -47,7 +47,7 @@ from datetime import datetime
 from functools import wraps
 from pkg_resources import parse_version
 from colorama import Fore
-from boxing import boxing
+from boxing import boxing  # type: ignore[import]
 
 try:
     from sentry_sdk import capture_exception, set_tag
@@ -65,14 +65,14 @@ logger = logging.getLogger(__name__)
 url_validator = URLValidator()
 
 
-def _override_exceptions(exc):
+def _override_exceptions(exc):  # type: ignore[no-untyped-def]
     if isinstance(exc, OperationalError) and 'database is locked' in str(exc):
         return LabelStudioDatabaseLockedException()
 
     return exc
 
 
-def custom_exception_handler(exc, context):
+def custom_exception_handler(exc, context):  # type: ignore[no-untyped-def]
     """ Make custom exception treatment in RestFramework
 
     :param exc: Exception - you can check specific exception
@@ -82,7 +82,7 @@ def custom_exception_handler(exc, context):
     exception_id = uuid.uuid4()
     logger.error('{} {}'.format(exception_id, exc), exc_info=True)
 
-    exc = _override_exceptions(exc)
+    exc = _override_exceptions(exc)  # type: ignore[no-untyped-call]
 
     # error body structure
     response_data = {
@@ -117,7 +117,7 @@ def custom_exception_handler(exc, context):
         logger.debug(exc_tb)
         response_data['detail'] = str(exc)
         if not settings.DEBUG_MODAL_EXCEPTIONS:
-            exc_tb = None
+            exc_tb = None  # type: ignore[assignment]
         response_data['exc_info'] = exc_tb
         if isinstance(exc, LabelStudioXMLSyntaxErrorSentryIgnored):
             response = Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
@@ -127,13 +127,13 @@ def custom_exception_handler(exc, context):
     return response
 
 
-def create_hash():
+def create_hash():  # type: ignore[no-untyped-def]
     """This function generate 40 character long hash"""
     h = hashlib.sha512()
     h.update(str(time.time()).encode('utf-8'))
     return h.hexdigest()[0:16]
 
-def paginator(objects, request, default_page=1, default_size=50):
+def paginator(objects, request, default_page=1, default_size=50):  # type: ignore[no-untyped-def]
     """ DEPRECATED
     TODO: change to standard drf pagination class
 
@@ -150,13 +150,13 @@ def paginator(objects, request, default_page=1, default_size=50):
         page_size = settings.TASK_API_PAGE_SIZE_MAX
 
     if 'start' in request.GET:
-        page = int_from_request(request.GET, 'start', default_page)
+        page = int_from_request(request.GET, 'start', default_page)  # type: ignore[no-untyped-call]
         if page and int(page) > int(page_size) > 0:
             page = int(page / int(page_size)) + 1
         else:
             page += 1
     else:
-        page = int_from_request(request.GET, 'page', default_page)
+        page = int_from_request(request.GET, 'page', default_page)  # type: ignore[no-untyped-call]
 
     if page_size == '-1':
         return objects
@@ -169,7 +169,7 @@ def paginator(objects, request, default_page=1, default_size=50):
         return []
 
 
-def paginator_help(objects_name, tag):
+def paginator_help(objects_name, tag):  # type: ignore[no-untyped-def]
     """ API help for paginator, use it with swagger_auto_schema
 
     :return: dict
@@ -191,7 +191,7 @@ def paginator_help(objects_name, tag):
         })
 
 
-def find_editor_files():
+def find_editor_files():  # type: ignore[no-untyped-def]
     """ Find label studio files
     """
 
@@ -207,7 +207,7 @@ def find_editor_files():
     return {'editor_js': editor_js, 'editor_css': editor_css}
 
 
-def string_is_url(url):
+def string_is_url(url):  # type: ignore[no-untyped-def]
     try:
         url_validator(url)
     except ValidationError:
@@ -216,13 +216,13 @@ def string_is_url(url):
         return True
 
 
-def safe_float(v, default=0):
+def safe_float(v, default=0):  # type: ignore[no-untyped-def]
     if v != v:
         return default
     return v
 
 
-def sample_query(q, sample_size):
+def sample_query(q, sample_size):  # type: ignore[no-untyped-def]
     n = q.count()
     if n == 0:
         raise ValueError('Can\'t sample from empty query')
@@ -231,7 +231,7 @@ def sample_query(q, sample_size):
     return q.filter(id__in=random_ids)
 
 
-def get_client_ip(request):
+def get_client_ip(request):  # type: ignore[no-untyped-def]
     """ Get IP address from django request
 
     :param request: django request
@@ -245,7 +245,7 @@ def get_client_ip(request):
     return ip
 
 
-def get_attr_or_item(obj, key):
+def get_attr_or_item(obj, key):  # type: ignore[no-untyped-def]
     if hasattr(obj, key):
         return getattr(obj, key)
     elif isinstance(obj, dict) and key in obj:
@@ -254,17 +254,17 @@ def get_attr_or_item(obj, key):
         raise KeyError(f"Can't get attribute or dict key '{key}' from {obj}")
 
 
-def datetime_to_timestamp(dt):
+def datetime_to_timestamp(dt):  # type: ignore[no-untyped-def]
     if dt.tzinfo:
         dt = dt.astimezone(pytz.UTC)
     return calendar.timegm(dt.timetuple())
 
 
-def timestamp_now():
-    return datetime_to_timestamp(datetime.utcnow())
+def timestamp_now():  # type: ignore[no-untyped-def]
+    return datetime_to_timestamp(datetime.utcnow())  # type: ignore[no-untyped-call]
 
 
-def find_first_one_to_one_related_field_by_prefix(instance, prefix):
+def find_first_one_to_one_related_field_by_prefix(instance, prefix):  # type: ignore[no-untyped-def]
     if hasattr(instance, '_find_first_one_to_one_related_field_by_prefix_cache'):
         return getattr(instance, '_find_first_one_to_one_related_field_by_prefix_cache')
 
@@ -280,7 +280,7 @@ def find_first_one_to_one_related_field_by_prefix(instance, prefix):
     return result
 
 
-def start_browser(ls_url, no_browser):
+def start_browser(ls_url, no_browser):  # type: ignore[no-untyped-def]
     import threading
     import webbrowser
     if no_browser:
@@ -324,12 +324,12 @@ def conditional_atomic(
         yield
 
 
-def retry_database_locked():
+def retry_database_locked():  # type: ignore[no-untyped-def]
     back_off = 2
 
-    def deco_retry(f):
+    def deco_retry(f):  # type: ignore[no-untyped-def]
         @wraps(f)
-        def f_retry(*args, **kwargs):
+        def f_retry(*args, **kwargs):  # type: ignore[no-untyped-def]
             mtries, mdelay = 10, 3
             while mtries > 0:
                 try:
@@ -346,7 +346,7 @@ def retry_database_locked():
     return deco_retry
 
 
-def get_app_version():
+def get_app_version():  # type: ignore[no-untyped-def]
     version = pkg_resources.get_distribution('label-studio').version
     if isinstance(version, str):
         return version
@@ -354,7 +354,7 @@ def get_app_version():
         return version.get('version') or version.get('latest_version')
 
 
-def get_latest_version():
+def get_latest_version():  # type: ignore[no-untyped-def]
     """ Get version from pypi
     """
     pypi_url = 'https://pypi.org/pypi/%s/json' % label_studio.package_name
@@ -369,13 +369,13 @@ def get_latest_version():
         return {'latest_version': latest_version, 'upload_time': upload_time}
 
 
-def current_version_is_outdated(latest_version):
+def current_version_is_outdated(latest_version):  # type: ignore[no-untyped-def]
     latest_version = parse_version(latest_version)
     current_version = parse_version(label_studio.__version__)
     return current_version < latest_version
 
 
-def check_for_the_latest_version(print_message):
+def check_for_the_latest_version(print_message):  # type: ignore[no-untyped-def]
     """ Check latest pypi version
     """
     if not settings.LATEST_VERSION_CHECK:
@@ -390,13 +390,13 @@ def check_for_the_latest_version(print_message):
         return
     label_studio.__latest_version_check_time__ = current_time
 
-    data = get_latest_version()
+    data = get_latest_version()  # type: ignore[no-untyped-call]
     if not data:
         return
     latest_version = data['latest_version']
-    outdated = latest_version and current_version_is_outdated(latest_version)
+    outdated = latest_version and current_version_is_outdated(latest_version)  # type: ignore[no-untyped-call]
 
-    def update_package_message():
+    def update_package_message():  # type: ignore[no-untyped-def]
         update_command = Fore.CYAN + 'pip install -U ' + label_studio.package_name + Fore.RESET
         return boxing(
             'Update available {curr_version} → {latest_version}\nRun {command}'.format(
@@ -406,7 +406,7 @@ def check_for_the_latest_version(print_message):
             ), style='double')
 
     if outdated and print_message:
-        print(update_package_message())
+        print(update_package_message())  # type: ignore[no-untyped-call]
 
     label_studio.__latest_version__ = latest_version
     label_studio.__latest_version_upload_time__ = data['upload_time']
@@ -416,10 +416,10 @@ def check_for_the_latest_version(print_message):
 # check version ASAP while package loading
 # skip notification for uwsgi, as we're running in production ready mode
 if settings.APP_WEBSERVER != 'uwsgi':
-    check_for_the_latest_version(print_message=True)
+    check_for_the_latest_version(print_message=True)  # type: ignore[no-untyped-call]
 
 
-def collect_versions(force=False):
+def collect_versions(force=False):  # type: ignore[no-untyped-def]
     """ Collect versions for all modules
 
     :return: dict with sub-dicts of version descriptions
@@ -445,7 +445,7 @@ def collect_versions(force=False):
             'current_version_is_outdated': label_studio.__current_version_is_outdated__
         },
         # backend full git info
-        'label-studio-os-backend': version.get_git_commit_info(ls=True)
+        'label-studio-os-backend': version.get_git_commit_info(ls=True)  # type: ignore[no-untyped-call]
     }
 
     # label studio frontend
@@ -466,19 +466,19 @@ def collect_versions(force=False):
 
     # converter
     try:
-        import label_studio_converter
+        import label_studio_converter  # type: ignore[import]
         result['label-studio-converter'] = {'version': label_studio_converter.__version__}
     except Exception as e:
         pass
 
     # ml
     try:
-        import label_studio_ml
+        import label_studio_ml  # type: ignore[import]
         result['label-studio-ml'] = {'version': label_studio_ml.__version__}
     except Exception as e:
         pass
 
-    result.update(settings.COLLECT_VERSIONS(result=result))
+    result.update(settings.COLLECT_VERSIONS(result=result))  # type: ignore[no-untyped-call]
 
     for key in result:
         if 'message' in result[key] and len(result[key]['message']) > 70:
@@ -498,7 +498,7 @@ def collect_versions(force=False):
     return result
 
 
-def get_organization_from_request(request):
+def get_organization_from_request(request):  # type: ignore[no-untyped-def]
     """Helper for backward compatibility with org_pk in session """
     # TODO remove session logic in next release
     user = request.user
@@ -513,7 +513,7 @@ def get_organization_from_request(request):
         return user.active_organization_id
 
 
-def load_func(func_string):
+def load_func(func_string):  # type: ignore[no-untyped-def]
     """
     If the given setting is a string import notation,
     then perform the necessary import or imports.
@@ -521,11 +521,11 @@ def load_func(func_string):
     if func_string is None:
         return None
     elif isinstance(func_string, str):
-        return import_from_string(func_string)
+        return import_from_string(func_string)  # type: ignore[no-untyped-call]
     return func_string
 
 
-def import_from_string(func_string):
+def import_from_string(func_string):  # type: ignore[no-untyped-def]
     """
     Attempt to import a class from a string representation.
     """
@@ -544,20 +544,20 @@ class temporary_disconnect_signal:
                 signals.post_delete, update_is_labeled_after_removing_annotation, Annotation):
                 do_something()
     """
-    def __init__(self, signal, receiver, sender, dispatch_uid=None):
+    def __init__(self, signal, receiver, sender, dispatch_uid=None):  # type: ignore[no-untyped-def]
         self.signal = signal
         self.receiver = receiver
         self.sender = sender
         self.dispatch_uid = dispatch_uid
 
-    def __enter__(self):
+    def __enter__(self):  # type: ignore[no-untyped-def]
         self.signal.disconnect(
             receiver=self.receiver,
             sender=self.sender,
             dispatch_uid=self.dispatch_uid
         )
 
-    def __exit__(self, type_, value, traceback):
+    def __exit__(self, type_, value, traceback):  # type: ignore[no-untyped-def]
         self.signal.connect(
             receiver=self.receiver,
             sender=self.sender,
@@ -566,7 +566,7 @@ class temporary_disconnect_signal:
 
 
 class temporary_disconnect_all_signals(object):
-    def __init__(self, disabled_signals=None):
+    def __init__(self, disabled_signals=None):  # type: ignore[no-untyped-def]
         self.stashed_signals = defaultdict(list)
         self.disabled_signals = disabled_signals or [
             pre_init, post_init,
@@ -575,25 +575,25 @@ class temporary_disconnect_all_signals(object):
             pre_migrate, post_migrate,
         ]
 
-    def __enter__(self):
+    def __enter__(self):  # type: ignore[no-untyped-def]
         for signal in self.disabled_signals:
-            self.disconnect(signal)
+            self.disconnect(signal)  # type: ignore[no-untyped-call]
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb):  # type: ignore[no-untyped-def]
         for signal in list(self.stashed_signals):
-            self.reconnect(signal)
+            self.reconnect(signal)  # type: ignore[no-untyped-call]
 
-    def disconnect(self, signal):
+    def disconnect(self, signal):  # type: ignore[no-untyped-def]
         self.stashed_signals[signal] = signal.receivers
         signal.receivers = []
 
-    def reconnect(self, signal):
+    def reconnect(self, signal):  # type: ignore[no-untyped-def]
         signal.receivers = self.stashed_signals.get(signal, [])
         del self.stashed_signals[signal]
 
 
-class DjangoFilterDescriptionInspector(CoreAPICompatInspector):
-    def get_filter_parameters(self, filter_backend):
+class DjangoFilterDescriptionInspector(CoreAPICompatInspector):  # type: ignore[misc]
+    def get_filter_parameters(self, filter_backend):  # type: ignore[no-untyped-def]
         if isinstance(filter_backend, DjangoFilterBackend):
             result = super(DjangoFilterDescriptionInspector, self).get_filter_parameters(filter_backend)
             for param in result:
@@ -605,19 +605,19 @@ class DjangoFilterDescriptionInspector(CoreAPICompatInspector):
         return NotHandled
 
 
-def batch(iterable, n=1):
+def batch(iterable, n=1):  # type: ignore[no-untyped-def]
     l = len(iterable)
     for ndx in range(0, l, n):
         yield iterable[ndx : min(ndx + n, l)]
 
 
-def round_floats(o):
+def round_floats(o):  # type: ignore[no-untyped-def]
     if isinstance(o, float):
         return round(o, 2)
     if isinstance(o, dict):
-        return {k: round_floats(v) for k, v in o.items()}
+        return {k: round_floats(v) for k, v in o.items()}  # type: ignore[no-untyped-call]
     if isinstance(o, (list, tuple)):
-        return [round_floats(x) for x in o]
+        return [round_floats(x) for x in o]  # type: ignore[no-untyped-call]
     return o
 
 
@@ -630,10 +630,10 @@ class temporary_disconnect_list_signal:
                 ):
                 do_something()
     """
-    def __init__(self, signals):
+    def __init__(self, signals):  # type: ignore[no-untyped-def]
         self.signals = signals
 
-    def __enter__(self):
+    def __enter__(self):  # type: ignore[no-untyped-def]
         for signal in self.signals:
             sig = signal[0]
             receiver = signal[1]
@@ -645,7 +645,7 @@ class temporary_disconnect_list_signal:
                 dispatch_uid=dispatch_uid
             )
 
-    def __exit__(self, type_, value, traceback):
+    def __exit__(self, type_, value, traceback):  # type: ignore[no-untyped-def]
         for signal in self.signals:
             sig = signal[0]
             receiver = signal[1]
@@ -658,12 +658,12 @@ class temporary_disconnect_list_signal:
             )
 
 
-def trigram_migration_operations(next_step):
+def trigram_migration_operations(next_step):  # type: ignore[no-untyped-def]
     ops = [
         TrigramExtension(),
         next_step,
     ]
-    SKIP_TRIGRAM_EXTENSION = get_env('SKIP_TRIGRAM_EXTENSION', None)
+    SKIP_TRIGRAM_EXTENSION = get_env('SKIP_TRIGRAM_EXTENSION', None)  # type: ignore[no-untyped-call]
     if SKIP_TRIGRAM_EXTENSION == '1' or SKIP_TRIGRAM_EXTENSION == 'yes' or SKIP_TRIGRAM_EXTENSION == 'true':
         ops = [
             next_step
@@ -674,12 +674,12 @@ def trigram_migration_operations(next_step):
     return ops
 
 
-def btree_gin_migration_operations(next_step):
+def btree_gin_migration_operations(next_step):  # type: ignore[no-untyped-def]
     ops = [
         BtreeGinExtension(),
         next_step,
     ]
-    SKIP_BTREE_GIN_EXTENSION = get_env('SKIP_BTREE_GIN_EXTENSION', None)
+    SKIP_BTREE_GIN_EXTENSION = get_env('SKIP_BTREE_GIN_EXTENSION', None)  # type: ignore[no-untyped-call]
     if SKIP_BTREE_GIN_EXTENSION == '1' or SKIP_BTREE_GIN_EXTENSION == 'yes' or SKIP_BTREE_GIN_EXTENSION == 'true':
         ops = [
             next_step
@@ -690,7 +690,7 @@ def btree_gin_migration_operations(next_step):
     return ops
 
 
-def merge_labels_counters(dict1, dict2):
+def merge_labels_counters(dict1, dict2):  # type: ignore[no-untyped-def]
     """
     Merge two dictionaries with nested dictionary values into a single dictionary.
 
@@ -724,8 +724,8 @@ def merge_labels_counters(dict1, dict2):
     return result_dict
 
 
-def timeit(func):
-    def wrapper(*args, **kwargs):
+def timeit(func):  # type: ignore[no-untyped-def]
+    def wrapper(*args, **kwargs):  # type: ignore[no-untyped-def]
         start = time.time()
         result = func(*args, **kwargs)
         end = time.time()
@@ -734,5 +734,5 @@ def timeit(func):
     return wrapper
 
 
-def empty(*args, **kwargs):
+def empty(*args, **kwargs):  # type: ignore[no-untyped-def]
     pass

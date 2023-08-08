@@ -6,7 +6,7 @@ register = template.Library()
 
 
 @register.filter(name='seconds_to_pretty_time')
-def seconds_to_pretty_time(value, show_seconds=False):
+def seconds_to_pretty_time(value, show_seconds=False):  # type: ignore[no-untyped-def]
     if value is None:
         return 'N/A'
     if value < 60:

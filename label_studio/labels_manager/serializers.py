@@ -5,19 +5,19 @@ from rest_framework.exceptions import ValidationError
 
 from organizations.models import Organization
 from projects.models import Project
-from rest_flex_fields import FlexFieldsModelSerializer
+from rest_flex_fields import FlexFieldsModelSerializer  # type: ignore[import]
 from users.models import User
 
 from .models import Label, LabelLink
 
 
-class LabelListSerializer(serializers.ListSerializer):
-    def validate(self, items):
+class LabelListSerializer(serializers.ListSerializer):  # type: ignore[type-arg]
+    def validate(self, items):  # type: ignore[no-untyped-def]
         if len(set(item['project'] for item in items)) > 1:
             raise ValidationError('Creating labels for different projects in one request not allowed')
         return items
 
-    def create(self, validated_data):
+    def create(self, validated_data):  # type: ignore[no-untyped-def]
         ''' Bulk creation objects of Label model with related LabelLink
         reusing already existing labels
         '''
@@ -62,8 +62,8 @@ class LabelListSerializer(serializers.ListSerializer):
             for index, label in enumerate(labels):
                 if label.id is None:
                     label = created_labels[label.title]
-                label.project = labels_data[index]['project']
-                label.from_name = labels_data[index]['from_name']
+                label.project = labels_data[index]['project']  # type: ignore[attr-defined]
+                label.from_name = labels_data[index]['from_name']  # type: ignore[attr-defined]
                 result.append(label)
                 links.append(
                     LabelLink(
@@ -78,16 +78,16 @@ class LabelListSerializer(serializers.ListSerializer):
             links = LabelLink.objects.bulk_create(links, ignore_conflicts=True)
             # webhooks processing
             # bulk_create with ignore_conflicts doesn't return ids, reloading links
-            project = labels[0].project
+            project = labels[0].project  # type: ignore[attr-defined]
             label_ids = [label.id for label in result]
-            links = LabelLink.objects.filter(label_id__in=label_ids, project=project).all()
+            links = LabelLink.objects.filter(label_id__in=label_ids, project=project).all()  # type: ignore[assignment]
             if links:
-                emit_webhooks_for_instance(self.context['request'].user.active_organization, links[0].project, 'LABEL_LINK_CREATED', links)
+                emit_webhooks_for_instance(self.context['request'].user.active_organization, links[0].project, 'LABEL_LINK_CREATED', links)  # type: ignore[no-untyped-call]
 
         return result
 
 
-class LabelCreateSerializer(serializers.ModelSerializer):
+class LabelCreateSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
     created_by = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
     organization = serializers.PrimaryKeyRelatedField(queryset=Organization.objects.all(), required=False)
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all())
@@ -99,7 +99,7 @@ class LabelCreateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class LabelLinkSerializer(FlexFieldsModelSerializer):
+class LabelLinkSerializer(FlexFieldsModelSerializer):  # type: ignore[misc]
     annotations_count = serializers.IntegerField(read_only=True)
     class Meta:
         model = LabelLink
@@ -107,8 +107,8 @@ class LabelLinkSerializer(FlexFieldsModelSerializer):
         expandable_fields = {'label': ('labels_manager.serializers.LabelSerializer', {'omit': ['links', 'projects']})}
 
 
-class LabelSerializer(FlexFieldsModelSerializer):
-    links = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+class LabelSerializer(FlexFieldsModelSerializer):  # type: ignore[misc]
+    links = serializers.PrimaryKeyRelatedField(many=True, read_only=True)  # type: ignore[var-annotated]
 
     class Meta:
         model = Label
@@ -116,7 +116,7 @@ class LabelSerializer(FlexFieldsModelSerializer):
         expandable_fields = {'links': ('labels_manager.serializers.LabelLinkSerializer', {'many': True})}
 
 
-class LabelBulkUpdateSerializer(serializers.Serializer):
+class LabelBulkUpdateSerializer(serializers.Serializer):  # type: ignore[type-arg]
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=False, default=None)
     old_label = serializers.JSONField()
     new_label = serializers.JSONField()

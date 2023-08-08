@@ -15,13 +15,13 @@ from ml.api_connector import MLApi
 from projects.models import Project
 from tasks.models import Prediction
 from tasks.serializers import TaskSimpleSerializer, PredictionSerializer
-from webhooks.serializers import WebhookSerializer, Webhook
+from webhooks.serializers import WebhookSerializer, Webhook  # type: ignore[attr-defined]
 
 logger = logging.getLogger(__name__)
 
 MAX_JOBS_PER_PROJECT = 1
 
-InteractiveAnnotatingDataSerializer = load_func(settings.INTERACTIVE_DATA_SERIALIZER)
+InteractiveAnnotatingDataSerializer = load_func(settings.INTERACTIVE_DATA_SERIALIZER)  # type: ignore[no-untyped-call]
 
 
 class MLBackendState(models.TextChoices):
@@ -96,43 +96,43 @@ class MLBackend(models.Model):
         help_text='If false, model version is set by the user, if true - getting latest version from backend.'
     )
 
-    def __str__(self):
+    def __str__(self):  # type: ignore[no-untyped-def]
         return f'{self.title} (id={self.id}, url={self.url})'
 
     @staticmethod
-    def healthcheck_(url):
-        return MLApi(url=url).health()
+    def healthcheck_(url):  # type: ignore[no-untyped-def]
+        return MLApi(url=url).health()  # type: ignore[no-untyped-call, no-untyped-call]
 
-    def has_permission(self, user):
+    def has_permission(self, user):  # type: ignore[no-untyped-def]
         user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
     @staticmethod
-    def setup_(url, project, model_version=None):
-        api = MLApi(url=url)
+    def setup_(url, project, model_version=None):  # type: ignore[no-untyped-def]
+        api = MLApi(url=url)  # type: ignore[no-untyped-call]
         if not isinstance(project, Project):
             project = Project.objects.get(pk=project)
-        return api.setup(project, model_version=model_version)
+        return api.setup(project, model_version=model_version)  # type: ignore[no-untyped-call]
 
-    def healthcheck(self):
-        return self.healthcheck_(self.url)
+    def healthcheck(self):  # type: ignore[no-untyped-def]
+        return self.healthcheck_(self.url)  # type: ignore[no-untyped-call]
 
-    def setup(self):
-        return self.setup_(self.url, self.project, None if self.auto_update else self.model_version)
-
-    @property
-    def api(self):
-        return MLApi(url=self.url, timeout=self.timeout)
+    def setup(self):  # type: ignore[no-untyped-def]
+        return self.setup_(self.url, self.project, None if self.auto_update else self.model_version)  # type: ignore[no-untyped-call]
 
     @property
-    def not_ready(self):
+    def api(self):  # type: ignore[no-untyped-def]
+        return MLApi(url=self.url, timeout=self.timeout)  # type: ignore[no-untyped-call]
+
+    @property
+    def not_ready(self):  # type: ignore[no-untyped-def]
         return self.state in (MLBackendState.DISCONNECTED, MLBackendState.ERROR)
 
-    def update_state(self):
-        if self.healthcheck().is_error:
+    def update_state(self):  # type: ignore[no-untyped-def]
+        if self.healthcheck().is_error:  # type: ignore[no-untyped-call]
             self.state = MLBackendState.DISCONNECTED
         else:
-            setup_response = self.setup()
+            setup_response = self.setup()  # type: ignore[no-untyped-call]
             if setup_response.is_error:
                 logger.info(f'ML backend responds with error: {setup_response.error_message}')
                 self.state = MLBackendState.ERROR
@@ -147,7 +147,7 @@ class MLBackend(models.Model):
                 self.error_message = None
         self.save()
 
-    def train(self):
+    def train(self):  # type: ignore[no-untyped-def]
         train_response = self.api.train(self.project)
         if train_response.is_error:
             self.state = MLBackendState.ERROR
@@ -159,8 +159,8 @@ class MLBackend(models.Model):
                 MLBackendTrainJob.objects.create(job_id=current_train_job, ml_backend=self)
         self.save()
 
-    def predict_tasks(self, tasks):
-        self.update_state()
+    def predict_tasks(self, tasks):  # type: ignore[no-untyped-def]
+        self.update_state()  # type: ignore[no-untyped-call]
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready')
             return
@@ -176,7 +176,7 @@ class MLBackend(models.Model):
         if not tasks.exists():
             logger.debug(f'All tasks already have prediction from model version={self.model_version}')
             return
-        tasks_ser = TaskSimpleSerializer(tasks, many=True).data
+        tasks_ser = TaskSimpleSerializer(tasks, many=True).data  # type: ignore[no-untyped-call]
         ml_api_result = self.api.make_predictions(tasks_ser, self.model_version, self.project)
         if ml_api_result.is_error:
             logger.info(f'Prediction not created for project {self}: {ml_api_result.error_message}')
@@ -199,7 +199,7 @@ class MLBackend(models.Model):
                 f"switched to one-by-one task retrieval"
             )
             for task in tasks:
-                self.predict_one_task(task)
+                self.predict_one_task(task)  # type: ignore[no-untyped-call]
             return
 
         # wrong result number
@@ -227,9 +227,9 @@ class MLBackend(models.Model):
             prediction_ser.is_valid(raise_exception=True)
             prediction_ser.save()
 
-    def predict_one_task(self, task, check_state=True):
+    def predict_one_task(self, task, check_state=True):  # type: ignore[no-untyped-def]
         if check_state:
-            self.update_state()
+            self.update_state()  # type: ignore[no-untyped-call]
             if self.not_ready:
                 logger.debug(f'ML backend {self} is not ready to predict {task}')
                 return
@@ -243,7 +243,7 @@ class MLBackend(models.Model):
             return
         ml_api = self.api
 
-        task_ser = TaskSimpleSerializer(task).data
+        task_ser = TaskSimpleSerializer(task).data  # type: ignore[no-untyped-call]
         ml_api_result = ml_api.make_predictions([task_ser], self.model_version, self.project)
         if ml_api_result.is_error:
             logger.info(f'Prediction not created for project {self}: {ml_api_result.error_message}')
@@ -259,18 +259,18 @@ class MLBackend(models.Model):
         with conditional_atomic(predicate=db_is_not_sqlite):
             prediction = Prediction.objects.create(
                 result=r,
-                score=safe_float(score),
+                score=safe_float(score),  # type: ignore[no-untyped-call]
                 model_version=self.model_version,
                 task_id=task_id,
                 cluster=prediction_response.get('cluster'),
                 neighbors=prediction_response.get('neighbors'),
-                mislabeling=safe_float(prediction_response.get('mislabeling', 0)),
+                mislabeling=safe_float(prediction_response.get('mislabeling', 0)),  # type: ignore[no-untyped-call]
             )
             logger.debug(f'Prediction {prediction} created')
 
         return prediction
 
-    def interactive_annotating(self, task, context=None, user=None):
+    def interactive_annotating(self, task, context=None, user=None):  # type: ignore[no-untyped-def]
         result = {}
         options = {}
         if user:
@@ -312,14 +312,14 @@ class MLBackend(models.Model):
         return result
 
     @staticmethod
-    def get_versions_(url, project):
-        api = MLApi(url=url)
+    def get_versions_(url, project):  # type: ignore[no-untyped-def]
+        api = MLApi(url=url)  # type: ignore[no-untyped-call]
         if not isinstance(project, Project):
             project = Project.objects.get(pk=project)
-        return api.get_versions(project)
+        return api.get_versions(project)  # type: ignore[no-untyped-call]
 
-    def get_versions(self):
-        return self.get_versions_(self.url, self.project)
+    def get_versions(self):  # type: ignore[no-untyped-def]
+        return self.get_versions_(self.url, self.project)  # type: ignore[no-untyped-call]
 
 
 class MLBackendPredictionJob(models.Model):
@@ -350,7 +350,7 @@ class MLBackendTrainJob(models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
-    def get_status(self):
+    def get_status(self):  # type: ignore[no-untyped-def]
         project = self.ml_backend.project
         ml_api = project.get_ml_api()
         if not ml_api:
@@ -368,12 +368,12 @@ class MLBackendTrainJob(models.Model):
         return ml_api_result.response
 
     @property
-    def is_running(self):
-        status = self.get_status()
+    def is_running(self):  # type: ignore[no-untyped-def]
+        status = self.get_status()  # type: ignore[no-untyped-call]
         return status['job_status'] in ('queued', 'started')
 
 
-def _validate_ml_api_result(ml_api_result, tasks, curr_logger):
+def _validate_ml_api_result(ml_api_result, tasks, curr_logger):  # type: ignore[no-untyped-def]
     if ml_api_result.is_error:
         curr_logger.info(ml_api_result.error_message)
         return False
@@ -387,7 +387,7 @@ def _validate_ml_api_result(ml_api_result, tasks, curr_logger):
 
 
 @receiver(post_save, sender=MLBackend)
-def create_ml_webhook(sender, instance, created, **kwargs):
+def create_ml_webhook(sender, instance, created, **kwargs):  # type: ignore[no-untyped-def]
     if not created:
         return
     ml_backend = instance

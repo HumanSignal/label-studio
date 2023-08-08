@@ -8,7 +8,7 @@ from .utils import project_id
 
 
 @pytest.mark.django_db
-def test_custom_exception_handling(business_client, project_id):
+def test_custom_exception_handling(business_client, project_id):  # type: ignore[no-untyped-def]
     payload = dict(project=project_id, data={"test": 1})
     with mock.patch('data_manager.api.ViewAPI.create') as m:
         m.side_effect = Exception('Test')

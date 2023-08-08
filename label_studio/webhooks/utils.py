@@ -9,7 +9,7 @@ from django.db.models import Q
 from .models import Webhook, WebhookAction
 
 
-def run_webhook(webhook, action, payload=None):
+def run_webhook(webhook, action, payload=None):  # type: ignore[no-untyped-def]
     """Run one webhook for action.
 
     This function must not raise any exceptions.
@@ -32,7 +32,7 @@ def run_webhook(webhook, action, payload=None):
         return
 
 
-def get_active_webhooks(organization, project, action):
+def get_active_webhooks(organization, project, action):  # type: ignore[no-untyped-def]
     """Return all active webhooks for organization or project by action.
 
     If project is None - function return only organization hooks
@@ -58,21 +58,21 @@ def get_active_webhooks(organization, project, action):
     ).distinct()
 
 
-def emit_webhooks(organization, project, action, payload):
+def emit_webhooks(organization, project, action, payload):  # type: ignore[no-untyped-def]
     """Run all active webhooks for the action."""
-    webhooks = get_active_webhooks(organization, project, action)
+    webhooks = get_active_webhooks(organization, project, action)  # type: ignore[no-untyped-call]
     if project and payload and webhooks.filter(send_payload=True).exists():
-        payload['project'] = load_func(settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data
+        payload['project'] = load_func(settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data  # type: ignore[no-untyped-call]
     for wh in webhooks:
-        run_webhook(wh, action, payload)
+        run_webhook(wh, action, payload)  # type: ignore[no-untyped-call]
 
 
-def emit_webhooks_for_instance(organization, project, action, instance=None):
+def emit_webhooks_for_instance(organization, project, action, instance=None):  # type: ignore[no-untyped-def]
     """Run all active webhooks for the action using instances as payload.
 
     Be sure WebhookAction.ACTIONS contains all required fields.
     """
-    webhooks = get_active_webhooks(organization, project, action)
+    webhooks = get_active_webhooks(organization, project, action)  # type: ignore[no-untyped-call]
     if not webhooks.exists():
         return
     payload = {}
@@ -84,17 +84,17 @@ def emit_webhooks_for_instance(organization, project, action, instance=None):
         if serializer_class:
             payload[action_meta['key']] = serializer_class(instance=instance, many=action_meta['many']).data
         if project and payload:
-            payload['project'] = load_func(settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data
+            payload['project'] = load_func(settings.WEBHOOK_SERIALIZERS['project'])(instance=project).data  # type: ignore[no-untyped-call]
         if payload and 'nested-fields' in action_meta:
             for key, value in action_meta['nested-fields'].items():
                 payload[key] = value['serializer'](
-                    instance=get_nested_field(instance, value['field']), many=value['many']
+                    instance=get_nested_field(instance, value['field']), many=value['many']  # type: ignore[no-untyped-call]
                 ).data
     for wh in webhooks:
-        run_webhook(wh, action, payload)
+        run_webhook(wh, action, payload)  # type: ignore[no-untyped-call]
 
 
-def api_webhook(action):
+def api_webhook(action):  # type: ignore[no-untyped-def]
     """Decorator emit webhooks for APIView methods: post, put, patch.
 
     Used for simple Create/Update methods.
@@ -108,9 +108,9 @@ def api_webhook(action):
         ```
     """
 
-    def decorator(func):
+    def decorator(func):  # type: ignore[no-untyped-def]
         @wraps(func)
-        def wrap(self, request, *args, **kwargs):
+        def wrap(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
             response = func(self, request, *args, **kwargs)
 
             action_meta = WebhookAction.ACTIONS[action]
@@ -120,8 +120,8 @@ def api_webhook(action):
                 instance = [instance]
             project = None
             if 'project-field' in action_meta:
-                project = get_nested_field(instance, action_meta['project-field'])
-            emit_webhooks_for_instance(
+                project = get_nested_field(instance, action_meta['project-field'])  # type: ignore[no-untyped-call]
+            emit_webhooks_for_instance(  # type: ignore[no-untyped-call]
                 request.user.active_organization,
                 project,
                 action,
@@ -134,7 +134,7 @@ def api_webhook(action):
     return decorator
 
 
-def api_webhook_for_delete(action):
+def api_webhook_for_delete(action):  # type: ignore[no-untyped-def]
     """Decorator emit webhooks for APIView delete method.
 
     The decorator expects authorized request and use get_object() method
@@ -149,23 +149,23 @@ def api_webhook_for_delete(action):
         ```
     """
 
-    def decorator(func):
+    def decorator(func):  # type: ignore[no-untyped-def]
         @wraps(func)
-        def wrap(self, request, *args, **kwargs):
+        def wrap(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
             instance = self.get_object()
             action_meta = WebhookAction.ACTIONS[action]
             many = action_meta['many']
             project = None
             if 'project-field' in action_meta:
-                project = get_nested_field(instance, action_meta['project-field'])
+                project = get_nested_field(instance, action_meta['project-field'])  # type: ignore[no-untyped-call]
 
             obj = {'id': instance.pk}
             if many:
-                obj = [obj]
+                obj = [obj]  # type: ignore[assignment]
 
             response = func(self, request, *args, **kwargs)
 
-            emit_webhooks_for_instance(request.user.active_organization, project, action, obj)
+            emit_webhooks_for_instance(request.user.active_organization, project, action, obj)  # type: ignore[no-untyped-call]
             return response
 
         return wrap
@@ -173,7 +173,7 @@ def api_webhook_for_delete(action):
     return decorator
 
 
-def get_nested_field(value, field):
+def get_nested_field(value, field):  # type: ignore[no-untyped-def]
     """
     Get nested field from list of objects or single instance
     :param value: Single instance or list to look up field

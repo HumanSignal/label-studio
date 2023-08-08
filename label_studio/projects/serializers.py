@@ -1,7 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from rest_framework import serializers
-from rest_flex_fields import FlexFieldsModelSerializer
+from rest_flex_fields import FlexFieldsModelSerializer  # type: ignore[import]
 from rest_framework.serializers import SerializerMethodField
 import bleach
 from users.serializers import UserSimpleSerializer
@@ -14,11 +14,11 @@ from projects.models import Project, ProjectOnboarding, ProjectSummary, ProjectI
 class CreatedByFromContext:
     requires_context = True
 
-    def __call__(self, serializer_field):
+    def __call__(self, serializer_field):  # type: ignore[no-untyped-def]
         return serializer_field.context.get('created_by')
 
 
-class ProjectSerializer(FlexFieldsModelSerializer):
+class ProjectSerializer(FlexFieldsModelSerializer):  # type: ignore[misc]
     """ Serializer get numbers from project queryset annotation,
         make sure, that you use correct one(Project.objects.with_counts())
     """
@@ -54,18 +54,18 @@ class ProjectSerializer(FlexFieldsModelSerializer):
     finished_task_number = serializers.IntegerField(default=None, read_only=True, help_text='Finished tasks')
 
     @staticmethod
-    def get_config_has_control_tags(project):
+    def get_config_has_control_tags(project):  # type: ignore[no-untyped-def]
         return len(project.get_parsed_config()) > 0
 
     @staticmethod
-    def get_parsed_label_config(project):
+    def get_parsed_label_config(project):  # type: ignore[no-untyped-def]
         return project.get_parsed_config()
 
-    def get_start_training_on_annotation_update(self, instance):
+    def get_start_training_on_annotation_update(self, instance):  # type: ignore[no-untyped-def]
         # FIXME: remake this logic with start_training_on_annotation_update
         return True if instance.min_annotations_to_start_training else False
 
-    def to_internal_value(self, data):
+    def to_internal_value(self, data):  # type: ignore[no-untyped-def]
         # FIXME: remake this logic with start_training_on_annotation_update
         initial_data = data
         data = super().to_internal_value(data)
@@ -92,60 +92,60 @@ class ProjectSerializer(FlexFieldsModelSerializer):
                   'config_has_control_tags', 'skip_queue', 'reveal_preannotations_interactively', 'pinned_at',
                   'finished_task_number']
 
-    def validate_label_config(self, value):
+    def validate_label_config(self, value):  # type: ignore[no-untyped-def]
         if self.instance is None:
             # No project created yet
-            Project.validate_label_config(value)
+            Project.validate_label_config(value)  # type: ignore[no-untyped-call]
         else:
             # Existing project is updated
             self.instance.validate_config(value)
         return value
 
 
-class ProjectOnboardingSerializer(serializers.ModelSerializer):
+class ProjectOnboardingSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
     class Meta:
         model = ProjectOnboarding
         fields = '__all__'
 
 
-class ProjectLabelConfigSerializer(serializers.Serializer):
+class ProjectLabelConfigSerializer(serializers.Serializer):  # type: ignore[type-arg]
     label_config = serializers.CharField(help_text=Project.label_config.field.help_text)
 
-    def validate_label_config(self, config):
-        Project.validate_label_config(config)
+    def validate_label_config(self, config):  # type: ignore[no-untyped-def]
+        Project.validate_label_config(config)  # type: ignore[no-untyped-call]
         return config
 
 
-class ProjectSummarySerializer(serializers.ModelSerializer):
+class ProjectSummarySerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
 
     class Meta:
         model = ProjectSummary
         fields = '__all__'
 
 
-class ProjectImportSerializer(serializers.ModelSerializer):
+class ProjectImportSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
 
     class Meta:
         model = ProjectImport
         fields = '__all__'
 
 
-class ProjectReimportSerializer(serializers.ModelSerializer):
+class ProjectReimportSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
 
     class Meta:
         model = ProjectReimport
         fields = '__all__'
 
 
-class GetFieldsSerializer(serializers.Serializer):
+class GetFieldsSerializer(serializers.Serializer):  # type: ignore[type-arg]
     include = serializers.CharField(required=False)
     filter = serializers.CharField(required=False, default='all')
 
-    def validate_include(self, value):
+    def validate_include(self, value):  # type: ignore[no-untyped-def]
         if value is not None:
             value = value.split(',')
         return value
 
-    def validate_filter(self, value):
+    def validate_filter(self, value):  # type: ignore[no-untyped-def]
         if value in ['all', 'pinned_only', 'exclude_pinned']:
             return value

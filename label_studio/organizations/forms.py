@@ -7,7 +7,7 @@ from .models import Organization, OrganizationMember
 from django.forms import Textarea, ModelForm, TextInput, Form, FileField, Select, HiddenInput, CharField
 
 
-class OrganizationForm(ModelForm):
+class OrganizationForm(ModelForm):  # type: ignore[type-arg]
     """
     """
     org_update = CharField(widget=HiddenInput(), required=False)
@@ -17,7 +17,7 @@ class OrganizationForm(ModelForm):
         fields = ('title',)
 
 
-class OrganizationSignupForm(ModelForm):
+class OrganizationSignupForm(ModelForm):  # type: ignore[type-arg]
     """
     """
     class Meta:

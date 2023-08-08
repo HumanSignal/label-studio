@@ -8,9 +8,9 @@ from rest_framework import generics
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
-from drf_yasg import openapi as openapi
+from drf_yasg import openapi as openapi  # type: ignore[import]
 from django.conf import settings
-from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.utils import swagger_auto_schema  # type: ignore[import]
 
 from core.permissions import all_permissions
 from core.utils.io import read_yaml
@@ -20,12 +20,12 @@ from projects.models import Project
 logger = logging.getLogger(__name__)
 
 
-class ImportStorageListAPI(generics.ListCreateAPIView):
+class ImportStorageListAPI(generics.ListCreateAPIView):  # type: ignore[type-arg]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
     serializer_class = ImportStorageSerializer
 
-    def get_queryset(self):
+    def get_queryset(self):  # type: ignore[no-untyped-def]
         project_pk = self.request.query_params.get('project')
         project = generics.get_object_or_404(Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
@@ -33,11 +33,11 @@ class ImportStorageListAPI(generics.ListCreateAPIView):
         storages = StorageClass.objects.filter(project_id=project.id)
 
         # check failed jobs and sync their statuses
-        StorageClass.ensure_storage_statuses(storages)
+        StorageClass.ensure_storage_statuses(storages)  # type: ignore[no-untyped-call]
         return storages
 
 
-class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
+class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):  # type: ignore[type-arg]
     """RUD storage by pk specified in URL"""
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
@@ -45,16 +45,16 @@ class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     permission_required = all_permissions.projects_change
 
     @swagger_auto_schema(auto_schema=None)
-    def put(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super(ImportStorageDetailAPI, self).put(request, *args, **kwargs)
 
 
-class ExportStorageListAPI(generics.ListCreateAPIView):
+class ExportStorageListAPI(generics.ListCreateAPIView):  # type: ignore[type-arg]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
     serializer_class = ExportStorageSerializer
 
-    def get_queryset(self):
+    def get_queryset(self):  # type: ignore[no-untyped-def]
         project_pk = self.request.query_params.get('project')
         project = generics.get_object_or_404(Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
@@ -62,24 +62,24 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
         storages = StorageClass.objects.filter(project_id=project.id)
 
         # check failed jobs and sync their statuses
-        StorageClass.ensure_storage_statuses(storages)
+        StorageClass.ensure_storage_statuses(storages)  # type: ignore[no-untyped-call]
         return storages
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer):  # type: ignore[no-untyped-def]
         # double check: not export storages don't validate connection in serializer,
         # just make another explicit check here, note: in this create API we have credentials in request.data
         instance = serializer.Meta.model(**serializer.validated_data)
         try:
             instance.validate_connection()
         except Exception as exc:
-            raise ValidationError(exc)
+            raise ValidationError(exc)  # type: ignore[arg-type]
 
         storage = serializer.save()
         if settings.SYNC_ON_TARGET_STORAGE_CREATION:
             storage.sync()
 
 
-class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
+class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):  # type: ignore[type-arg]
     """RUD storage by pk specified in URL"""
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
@@ -87,21 +87,21 @@ class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     permission_required = all_permissions.projects_change
 
     @swagger_auto_schema(auto_schema=None)
-    def put(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         return super(ExportStorageDetailAPI, self).put(request, *args, **kwargs)
 
 
-class ImportStorageSyncAPI(generics.GenericAPIView):
+class ImportStorageSyncAPI(generics.GenericAPIView):  # type: ignore[type-arg]
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
     serializer_class = ImportStorageSerializer
 
-    def get_queryset(self):
+    def get_queryset(self):  # type: ignore[no-untyped-def]
         ImportStorageClass = self.serializer_class.Meta.model
         return ImportStorageClass.objects.all()
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         storage = self.get_object()
         # check connectivity & access, raise an exception if not satisfied
         storage.validate_connection()
@@ -110,17 +110,17 @@ class ImportStorageSyncAPI(generics.GenericAPIView):
         return Response(self.serializer_class(storage).data)
 
 
-class ExportStorageSyncAPI(generics.GenericAPIView):
+class ExportStorageSyncAPI(generics.GenericAPIView):  # type: ignore[type-arg]
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
     serializer_class = ExportStorageSerializer
 
-    def get_queryset(self):
+    def get_queryset(self):  # type: ignore[no-untyped-def]
         ExportStorageClass = self.serializer_class.Meta.model
         return ExportStorageClass.objects.all()
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         storage = self.get_object()
         # check connectivity & access, raise an exception if not satisfied
         storage.validate_connection()
@@ -129,15 +129,15 @@ class ExportStorageSyncAPI(generics.GenericAPIView):
         return Response(self.serializer_class(storage).data)
 
 
-class StorageValidateAPI(generics.CreateAPIView):
+class StorageValidateAPI(generics.CreateAPIView):  # type: ignore[type-arg]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         storage_id = request.data.get('id')
         instance = None
         if storage_id:
-            instance = generics.get_object_or_404(self.serializer_class.Meta.model.objects.all(), pk=storage_id)
+            instance = generics.get_object_or_404(self.serializer_class.Meta.model.objects.all(), pk=storage_id)  # type: ignore[union-attr, union-attr]
             if not instance.has_permission(request.user):
                 raise PermissionDenied()
 
@@ -149,17 +149,17 @@ class StorageValidateAPI(generics.CreateAPIView):
         if instance:
             instance = serializer.update(instance, serializer.validated_data)
         else:
-            instance = serializer.Meta.model(**serializer.validated_data)
+            instance = serializer.Meta.model(**serializer.validated_data)  # type: ignore[attr-defined]
 
         # double check: not all storages validate connection in serializer, just make another explicit check here
         try:
             instance.validate_connection()
         except Exception as exc:
-            raise ValidationError(exc)
+            raise ValidationError(exc)  # type: ignore[arg-type]
         return Response()
 
 
-class StorageFormLayoutAPI(generics.RetrieveAPIView):
+class StorageFormLayoutAPI(generics.RetrieveAPIView):  # type: ignore[type-arg]
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
@@ -167,16 +167,16 @@ class StorageFormLayoutAPI(generics.RetrieveAPIView):
     storage_type = None
 
     @swagger_auto_schema(auto_schema=None)
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         form_layout_file = os.path.join(os.path.dirname(inspect.getfile(self.__class__)), 'form_layout.yml')
         if not os.path.exists(form_layout_file):
             raise NotFound(f'"form_layout.yml" is not found for {self.__class__.__name__}')
 
-        form_layout = read_yaml(form_layout_file)
-        form_layout = self.post_process_form(form_layout)
+        form_layout = read_yaml(form_layout_file)  # type: ignore[no-untyped-call]
+        form_layout = self.post_process_form(form_layout)  # type: ignore[no-untyped-call]
         return Response(form_layout[self.storage_type])
 
-    def post_process_form(self, form_layout):
+    def post_process_form(self, form_layout):  # type: ignore[no-untyped-def]
         return form_layout
 
 
@@ -189,8 +189,8 @@ class ExportStorageValidateAPI(StorageValidateAPI):
 
 
 class ImportStorageFormLayoutAPI(StorageFormLayoutAPI):
-    storage_type = 'ImportStorage'
+    storage_type = 'ImportStorage'  # type: ignore[assignment]
 
 
 class ExportStorageFormLayoutAPI(StorageFormLayoutAPI):
-    storage_type = 'ExportStorage'
+    storage_type = 'ExportStorage'  # type: ignore[assignment]

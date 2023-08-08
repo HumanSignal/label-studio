@@ -9,14 +9,14 @@ logger = logging.getLogger(__name__)
 
 
 class DummyModelMixin():
-    def has_permission(self, user):
+    def has_permission(self, user):  # type: ignore[no-untyped-def]
         return True
 
 
 class GetParentObjectMixin:
     parent_queryset = None
 
-    def get_parent_object(self):
+    def get_parent_object(self):  # type: ignore[no-untyped-def]
         """
         The same as get_object method from DRF, but for the parent object
         For example if you want to get project inside /api/projects/ID/tasks handler

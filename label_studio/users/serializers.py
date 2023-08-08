@@ -1,25 +1,25 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from rest_framework import serializers
-from rest_flex_fields import FlexFieldsModelSerializer
+from rest_flex_fields import FlexFieldsModelSerializer  # type: ignore[import]
 from django.conf import settings
 
 from .models import User
 from core.utils.common import load_func
 
 
-class BaseUserSerializer(FlexFieldsModelSerializer):
+class BaseUserSerializer(FlexFieldsModelSerializer):  # type: ignore[misc]
     # short form for user presentation
     initials = serializers.SerializerMethodField(default='?', read_only=True)
     avatar = serializers.SerializerMethodField(read_only=True)
 
-    def get_avatar(self, user):
+    def get_avatar(self, user):  # type: ignore[no-untyped-def]
         return user.avatar_url
 
-    def get_initials(self, user):
+    def get_initials(self, user):  # type: ignore[no-untyped-def]
         return user.get_initials()
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # type: ignore[no-untyped-def]
         """ Returns user with cache, this helps to avoid multiple s3/gcs links resolving for avatars """
 
         uid = instance.id
@@ -60,5 +60,5 @@ class UserSimpleSerializer(BaseUserSerializer):
         fields = ('id', 'first_name', 'last_name', 'email', 'avatar')
 
 
-UserSerializer = load_func(settings.USER_SERIALIZER)
-UserSerializerUpdate = load_func(settings.USER_SERIALIZER_UPDATE)
+UserSerializer = load_func(settings.USER_SERIALIZER)  # type: ignore[no-untyped-call]
+UserSerializerUpdate = load_func(settings.USER_SERIALIZER_UPDATE)  # type: ignore[no-untyped-call]

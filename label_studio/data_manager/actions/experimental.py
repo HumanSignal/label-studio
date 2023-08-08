@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 all_permissions = AllPermissions()
 
 
-def propagate_annotations(project, queryset, **kwargs):
+def propagate_annotations(project, queryset, **kwargs):  # type: ignore[no-untyped-def]
     request = kwargs['request']
     user = request.user
     source_annotation_id = request.data.get('source_annotation_id')
@@ -36,7 +36,7 @@ def propagate_annotations(project, queryset, **kwargs):
 
     tasks = set(queryset.values_list('id', flat=True))
     try:
-        tasks.remove(source_annotation.task.id)
+        tasks.remove(source_annotation.task.id)  # type: ignore[union-attr]
     except KeyError:
         pass
 
@@ -46,22 +46,22 @@ def propagate_annotations(project, queryset, **kwargs):
         body = {
             'task_id': i,
             'completed_by_id': user.id,
-            'result': source_annotation.result,
-            'result_count': source_annotation.result_count,
-            'parent_annotation_id': source_annotation.id,
+            'result': source_annotation.result,  # type: ignore[union-attr]
+            'result_count': source_annotation.result_count,  # type: ignore[union-attr]
+            'parent_annotation_id': source_annotation.id,  # type: ignore[union-attr]
             'project': project,
         }
         body = TaskSerializerBulk.add_annotation_fields(body, user, 'propagated_annotation')
         db_annotations.append(Annotation(**body))
 
-    db_annotations = Annotation.objects.bulk_create(db_annotations, batch_size=settings.BATCH_SIZE)
+    db_annotations = Annotation.objects.bulk_create(db_annotations, batch_size=settings.BATCH_SIZE)  # type: ignore[no-untyped-call]
     TaskSerializerBulk.post_process_annotations(user, db_annotations, 'propagated_annotation')
     # Update counters for tasks and is_labeled. It should be a single operation as counters affect bulk is_labeled update
     project.update_tasks_counters_and_is_labeled(tasks_queryset=Task.objects.filter(id__in=tasks))
     return {'response_code': 200, 'detail': f'Created {len(db_annotations)} annotations'}
 
 
-def propagate_annotations_form(user, project):
+def propagate_annotations_form(user, project):  # type: ignore[no-untyped-def]
     first_annotation = Annotation.objects.filter(project=project).first()
     field = {
         'type': 'number',
@@ -75,7 +75,7 @@ def propagate_annotations_form(user, project):
     }]
 
 
-def remove_duplicates(project, queryset, **kwargs):
+def remove_duplicates(project, queryset, **kwargs):  # type: ignore[no-untyped-def]
     # get io_storage_* links for tasks, we need to copy them
     storages = []
     for field in dir(Task):
@@ -87,7 +87,7 @@ def remove_duplicates(project, queryset, **kwargs):
     ))
     duplicates = defaultdict(list)
     for task in list(tasks):
-        replace_task_data_undefined_with_config_field(task['data'], project)
+        replace_task_data_undefined_with_config_field(task['data'], project)  # type: ignore[no-untyped-call]
         task['data'] = json.dumps(task['data'])
         duplicates[task['data']].append(task)
 
@@ -120,10 +120,10 @@ def remove_duplicates(project, queryset, **kwargs):
             for task in tasks:
                 if task['id'] != source[0]['id']:
                     link_instance = _class.objects.get(id=source[2])
-                    _class.create(
+                    _class.create(  # type: ignore[attr-defined]
                         task=Task.objects.get(id=task['id']),
-                        key=link_instance.key,
-                        storage=link_instance.storage
+                        key=link_instance.key,  # type: ignore[attr-defined]
+                        storage=link_instance.storage  # type: ignore[attr-defined]
                     )
 
     ### remove duplicates ###
@@ -158,11 +158,11 @@ def remove_duplicates(project, queryset, **kwargs):
         f'Remove duplicates failed, operation is not finished: ' \
         f'queryset count {queryset.count()} != removing {len(removing)}'
 
-    delete_tasks(project, queryset)
+    delete_tasks(project, queryset)  # type: ignore[no-untyped-call]
     return {'response_code': 200, 'detail': f'Removed {len(removing)} tasks'}
 
 
-def rename_labels(project, queryset, **kwargs):
+def rename_labels(project, queryset, **kwargs):  # type: ignore[no-untyped-def]
     request = kwargs['request']
 
     old_label_name = request.data.get('old_label_name')
@@ -216,7 +216,7 @@ def rename_labels(project, queryset, **kwargs):
     return {'response_code': 200, 'detail': f'Updated {label_count} labels in {annotation_count}'}
 
 
-def rename_labels_form(user, project):
+def rename_labels_form(user, project):  # type: ignore[no-untyped-def]
     labels = project.get_parsed_config()
 
     old_names = []
@@ -249,7 +249,7 @@ def rename_labels_form(user, project):
     }]
 
 
-def add_data_field(project, queryset, **kwargs):
+def add_data_field(project, queryset, **kwargs):  # type: ignore[no-untyped-def]
     from django.db.models import F, Func, Value, JSONField
 
     request = kwargs['request']
@@ -263,7 +263,7 @@ def add_data_field(project, queryset, **kwargs):
     value = cast[value_type](value)
 
     if value_type == 'Expression':
-        add_expression(queryset, size, value, value_name)
+        add_expression(queryset, size, value, value_name)  # type: ignore[no-untyped-call]
 
     else:
 
@@ -289,7 +289,7 @@ def add_data_field(project, queryset, **kwargs):
     return {'response_code': 200, 'detail': f'Updated {size} tasks'}
 
 
-def process_arrays(params):
+def process_arrays(params):  # type: ignore[no-untyped-def]
     start, end = params.find('['), -1
     while start != end:
         end = start + params[start:].find(']') + 1
@@ -307,10 +307,10 @@ add_data_field_examples = (
 )
 
 
-def add_expression(queryset, size, value, value_name):
+def add_expression(queryset, size, value, value_name):  # type: ignore[no-untyped-def]
     # simple parsing
     command, args = value.split('(')
-    args = process_arrays(args)
+    args = process_arrays(args)  # type: ignore[no-untyped-call]
     args = args.replace(')', '').split(',')
     args = [] if len(args) == 1 and args[0] == '' else args
     # return comma back, convert quotation mark to doubled quotation mark for json parsing
@@ -330,7 +330,7 @@ def add_expression(queryset, size, value, value_name):
     # permutation sampling
     elif command == 'sample':
         assert len(args) == 0, "sample() doesn't have arguments"
-        values = random.sample(range(0, size), size)
+        values = random.sample(range(0, size), size)  # type: ignore[assignment]
         for i, v in enumerate(values):
             tasks[i].data[value_name] = v
 
@@ -346,7 +346,7 @@ def add_expression(queryset, size, value, value_name):
         assert 0 < len(args) < 3, 'choices(values:list, weights:list) ' \
                                   'should have 1 or 2 args: values & weights (default=None)'
         weights = json.loads(args[1]) if len(args) == 2 else None
-        values = random.choices(
+        values = random.choices(  # type: ignore[assignment]
             population=json.loads(args[0]),
             weights=weights,
             k=size
@@ -370,7 +370,7 @@ def add_expression(queryset, size, value, value_name):
     Task.objects.bulk_update(tasks, fields=['data'], batch_size=1000)
 
 
-def add_data_field_form(user, project):
+def add_data_field_form(user, project):  # type: ignore[no-untyped-def]
     return [{
         'columnCount': 1,
         'fields': [

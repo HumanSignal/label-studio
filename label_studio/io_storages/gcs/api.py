@@ -1,8 +1,8 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from django.utils.decorators import method_decorator
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi as openapi
+from drf_yasg.utils import swagger_auto_schema  # type: ignore[import]
+from drf_yasg import openapi as openapi  # type: ignore[import]
 from io_storages.gcs.models import GCSImportStorage, GCSExportStorage
 from io_storages.gcs.serializers import GCSImportStorageSerializer, GCSExportStorageSerializer
 from io_storages.api import (

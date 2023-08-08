@@ -5,8 +5,8 @@ from tests.utils import make_project
 
 
 @pytest.mark.django_db
-def test_gcs_storage_credentials_validation(business_client):
-    project = make_project({}, business_client.user, use_ml_backend=False)
+def test_gcs_storage_credentials_validation(business_client):  # type: ignore[no-untyped-def]
+    project = make_project({}, business_client.user, use_ml_backend=False)  # type: ignore[no-untyped-call]
 
     data = {
         "project": project.id,

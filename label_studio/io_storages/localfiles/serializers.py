@@ -14,14 +14,14 @@ class LocalFilesImportStorageSerializer(ImportStorageSerializer):
         model = LocalFilesImportStorage
         fields = '__all__'
 
-    def validate(self, data):
+    def validate(self, data):  # type: ignore[no-untyped-def]
         # Validate local file path
         data = super(LocalFilesImportStorageSerializer, self).validate(data)
         storage = LocalFilesImportStorage(**data)
         try:
-            storage.validate_connection()
+            storage.validate_connection()  # type: ignore[no-untyped-call]
         except Exception as exc:
-            raise ValidationError(exc)
+            raise ValidationError(exc)  # type: ignore[arg-type]
         return data
 
 
@@ -32,7 +32,7 @@ class LocalFilesExportStorageSerializer(ExportStorageSerializer):
         model = LocalFilesExportStorage
         fields = '__all__'
     
-    def validate(self, data):
+    def validate(self, data):  # type: ignore[no-untyped-def]
         # Validate local file path
         data = super(LocalFilesExportStorageSerializer, self).validate(data)
         return data

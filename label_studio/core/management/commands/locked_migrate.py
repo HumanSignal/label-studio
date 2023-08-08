@@ -11,7 +11,7 @@ DEFAULT_LOCK_ID = getattr(settings, "MIGRATE_LOCK_ID", 1000)
 class Command(MigrateCommand):
     help = "Run Django migrations safely, using a lock"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser):  # type: ignore[no-untyped-def]
         MigrateCommand.add_arguments(self, parser)
         parser.add_argument(
             "--migrate-lock-id",
@@ -20,7 +20,7 @@ class Command(MigrateCommand):
             help="The id of the advisory lock to use",
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # type: ignore[no-untyped-def]
         database = options["database"]
         if not options["skip_checks"]:
             self.check(databases=[database])

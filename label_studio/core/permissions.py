@@ -1,7 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
-import rules
+import rules  # type: ignore[import]
 
 from pydantic import BaseModel
 from typing import Optional
@@ -49,7 +49,7 @@ class ViewClassPermission(BaseModel):
     POST: Optional[str] = None
 
 
-def make_perm(name, pred, overwrite=False):
+def make_perm(name, pred, overwrite=False):  # type: ignore[no-untyped-def]
     if rules.perm_exists(name):
         if overwrite:
             rules.remove_perm(name)
@@ -59,4 +59,4 @@ def make_perm(name, pred, overwrite=False):
 
 
 for _, permission_name in all_permissions:
-    make_perm(permission_name, rules.is_authenticated)
+    make_perm(permission_name, rules.is_authenticated)  # type: ignore[no-untyped-call]

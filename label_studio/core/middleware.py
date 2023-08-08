@@ -20,15 +20,15 @@ from core.utils.contextlog import ContextLog
 logger = logging.getLogger(__name__)
 
 
-def enforce_csrf_checks(func):
+def enforce_csrf_checks(func):  # type: ignore[no-untyped-def]
     """ Enable csrf for specified view func
     """
     # USE_ENFORCE_CSRF_CHECKS=False is for tests
     if settings.USE_ENFORCE_CSRF_CHECKS:
-        def wrapper(request, *args, **kwargs):
+        def wrapper(request, *args, **kwargs):  # type: ignore[no-untyped-def]
             return func(request, *args, **kwargs)
 
-        wrapper._dont_enforce_csrf_checks = False
+        wrapper._dont_enforce_csrf_checks = False  # type: ignore[attr-defined]
         return wrapper
     else:
         return func
@@ -36,7 +36,7 @@ def enforce_csrf_checks(func):
 
 class DisableCSRF(MiddlewareMixin):
     # disable csrf for api requests
-    def process_view(self, request, callback, *args, **kwargs):
+    def process_view(self, request, callback, *args, **kwargs):  # type: ignore[no-untyped-def]
         if hasattr(callback, '_dont_enforce_csrf_checks'):
             setattr(request, '_dont_enforce_csrf_checks', callback._dont_enforce_csrf_checks)
         elif request.GET.get('enforce_csrf_checks'):  # _dont_enforce_csrf_checks is for test
@@ -57,7 +57,7 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
     """
     response_redirect_class = HttpSmartRedirectResponse
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         # create django request resolver
         self.handler = BaseHandler()
 
@@ -71,7 +71,7 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
         settings.MIDDLEWARE = old
         super(CommonMiddlewareAppendSlashWithoutRedirect, self).__init__(*args, **kwargs)
 
-    def get_full_path_with_slash(self, request):
+    def get_full_path_with_slash(self, request):  # type: ignore[no-untyped-def]
         """ Return the full path of the request with a trailing slash appended
             without Exception in Debug mode
         """
@@ -80,7 +80,7 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
         new_path = escape_leading_slashes(new_path)
         return new_path
 
-    def process_response(self, request, response):
+    def process_response(self, request, response):  # type: ignore[no-untyped-def]
         response = super(CommonMiddlewareAppendSlashWithoutRedirect, self).process_response(request, response)
 
         request.editor_keymap = settings.EDITOR_KEYMAP
@@ -100,18 +100,18 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
 
 class SetSessionUIDMiddleware(CommonMiddleware):
 
-    def process_request(self, request):
+    def process_request(self, request):  # type: ignore[no-untyped-def]
         if 'uid' not in request.session:
             request.session['uid'] = str(uuid4())
 
 
 class ContextLogMiddleware(CommonMiddleware):
 
-    def __init__(self, get_response):
+    def __init__(self, get_response):  # type: ignore[no-untyped-def]
         self.get_response = get_response
-        self.log = ContextLog()
+        self.log = ContextLog()  # type: ignore[no-untyped-call]
 
-    def __call__(self, request):
+    def __call__(self, request):  # type: ignore[no-untyped-def]
         body = None
         try:
             body = json.loads(request.body)
@@ -121,7 +121,7 @@ class ContextLogMiddleware(CommonMiddleware):
             except:
                 pass
         response = self.get_response(request)
-        self.log.send(request=request, response=response, body=body)
+        self.log.send(request=request, response=response, body=body)  # type: ignore[no-untyped-call]
         return response
 
 
@@ -129,18 +129,18 @@ class DatabaseIsLockedRetryMiddleware(CommonMiddleware):
     """Workaround for sqlite performance issues
     we wait and retry request if database is locked"""
 
-    def __init__(self, get_response):
+    def __init__(self, get_response):  # type: ignore[no-untyped-def]
         if settings.DJANGO_DB != settings.DJANGO_DB_SQLITE:
             raise MiddlewareNotUsed()
         self.get_response = get_response
 
-    def __call__(self, request):
+    def __call__(self, request):  # type: ignore[no-untyped-def]
         response = self.get_response(request)
         retries_number = 0
         sleep_time = 1
         backoff = 1.5
         while (
-                response.status_code == 500
+                response.status_code == 500  # type: ignore[union-attr,misc]
                 and hasattr(response, 'content')
                 and b'database-is-locked-error' in response.content
                 and retries_number < 15
@@ -148,12 +148,12 @@ class DatabaseIsLockedRetryMiddleware(CommonMiddleware):
             time.sleep(sleep_time)
             response = self.get_response(request)
             retries_number += 1
-            sleep_time *= backoff
+            sleep_time *= backoff  # type: ignore[assignment]
         return response
 
 
 class UpdateLastActivityMiddleware(CommonMiddleware):
-    def process_view(self, request, view_func, view_args, view_kwargs):
+    def process_view(self, request, view_func, view_args, view_kwargs):  # type: ignore[no-untyped-def]
         if hasattr(request, 'user') and request.method not in SAFE_METHODS:
             if request.user.is_authenticated:
                 request.user.update_last_activity()
@@ -164,9 +164,9 @@ class InactivitySessionTimeoutMiddleWare(CommonMiddleware):
      or inactive for too long"""
 
     # paths that don't count as user activity
-    NOT_USER_ACTIVITY_PATHS = []
+    NOT_USER_ACTIVITY_PATHS = []  # type: ignore[var-annotated]
 
-    def process_request(self, request) -> None:
+    def process_request(self, request) -> None:  # type: ignore[no-untyped-def]
         if (
                 not hasattr(request, 'session') or
                 request.session.is_empty() or

@@ -6,12 +6,12 @@ from functools import partial
 import sys
 import redis
 import logging
-import django_rq
+import django_rq  # type: ignore[import]
 
 from django_rq import get_connection
-from rq.registry import StartedJobRegistry
-from rq.command import send_stop_job_command
-from rq.exceptions import InvalidJobOperation
+from rq.registry import StartedJobRegistry  # type: ignore[import]
+from rq.command import send_stop_job_command  # type: ignore[import]
+from rq.exceptions import InvalidJobOperation  # type: ignore[import]
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ except:
     _redis = None
 
 
-def redis_healthcheck():
+def redis_healthcheck():  # type: ignore[no-untyped-def]
     if not _redis:
         return False
     try:
@@ -43,41 +43,41 @@ def redis_healthcheck():
         return True
 
 
-def redis_connected():
-    return redis_healthcheck()
+def redis_connected():  # type: ignore[no-untyped-def]
+    return redis_healthcheck()  # type: ignore[no-untyped-call]
 
 
-def redis_get(key):
-    if not redis_healthcheck():
+def redis_get(key):  # type: ignore[no-untyped-def]
+    if not redis_healthcheck():  # type: ignore[no-untyped-call]
         return
     return _redis.get(key)
 
 
-def redis_hget(key1, key2):
-    if not redis_healthcheck():
+def redis_hget(key1, key2):  # type: ignore[no-untyped-def]
+    if not redis_healthcheck():  # type: ignore[no-untyped-call]
         return
     return _redis.hget(key1, key2)
 
 
-def redis_set(key, value, ttl=None):
-    if not redis_healthcheck():
+def redis_set(key, value, ttl=None):  # type: ignore[no-untyped-def]
+    if not redis_healthcheck():  # type: ignore[no-untyped-call]
         return
     return _redis.set(key, value, ex=ttl)
 
 
-def redis_hset(key1, key2, value):
-    if not redis_healthcheck():
+def redis_hset(key1, key2, value):  # type: ignore[no-untyped-def]
+    if not redis_healthcheck():  # type: ignore[no-untyped-call]
         return
     return _redis.hset(key1, key2, value)
 
 
-def redis_delete(key):
-    if not redis_healthcheck():
+def redis_delete(key):  # type: ignore[no-untyped-def]
+    if not redis_healthcheck():  # type: ignore[no-untyped-call]
         return
     return _redis.delete(key)
 
 
-def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
+def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):  # type: ignore[no-untyped-def]
     """
     Start job async with redis or sync if redis is not connected
     :param job: Job function
@@ -87,7 +87,7 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
     :return: Job or function result
     """
 
-    redis = redis_connected() and kwargs.get('redis', True)
+    redis = redis_connected() and kwargs.get('redis', True)  # type: ignore[no-untyped-call]
     queue_name = kwargs.get("queue_name", "default")
     if 'queue_name' in kwargs:
         del kwargs['queue_name']
@@ -121,7 +121,7 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
             raise
 
 
-def is_job_in_queue(queue, func_name, meta):
+def is_job_in_queue(queue, func_name, meta):  # type: ignore[no-untyped-def]
     """
     Checks if func_name with kwargs[meta] is in queue (doesn't check workers)
     :param queue: queue object
@@ -130,12 +130,12 @@ def is_job_in_queue(queue, func_name, meta):
     :return: True if job in queue
     """
     # get all jobs from Queue
-    jobs = get_jobs_by_meta(queue, func_name, meta)
+    jobs = get_jobs_by_meta(queue, func_name, meta)  # type: ignore[no-untyped-call]
     # check if there is job with meta in list
     return any(jobs)
 
 
-def is_job_on_worker(job_id, queue_name):
+def is_job_on_worker(job_id, queue_name):  # type: ignore[no-untyped-def]
     """
     Checks if job id is on workers
     :param job_id: Job ID
@@ -147,7 +147,7 @@ def is_job_on_worker(job_id, queue_name):
     return job_id in ids
 
 
-def delete_job_by_id(queue, id):
+def delete_job_by_id(queue, id):  # type: ignore[no-untyped-def]
     """
     Delete job by id from queue
     @param queue: Queue on redis to delete from
@@ -173,7 +173,7 @@ def delete_job_by_id(queue, id):
             logger.debug(f"Redis job {id} was not found: {str(e)}")
 
 
-def get_jobs_by_meta(queue, func_name, meta):
+def get_jobs_by_meta(queue, func_name, meta):  # type: ignore[no-untyped-def]
     """
     Get jobs from queue by func_name and meta data
     :param queue: Queue on redis to check in

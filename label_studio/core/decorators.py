@@ -1,7 +1,7 @@
-def permission_required(*permissions, fn=None):
+def permission_required(*permissions, fn=None):  # type: ignore[no-untyped-def]
 
-    def decorator(view):
-        def wrapped_view(self, request, *args, **kwargs):
+    def decorator(view):  # type: ignore[no-untyped-def]
+        def wrapped_view(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
 
             if callable(fn):
                 obj = fn(request, *args, **kwargs)

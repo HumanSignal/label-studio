@@ -8,9 +8,9 @@ from core.version import get_short_version
 
 
 @login_required
-def task_page(request, pk):
+def task_page(request, pk):  # type: ignore[no-untyped-def]
     response = {
-        'version': get_short_version()
+        'version': get_short_version()  # type: ignore[no-untyped-call]
     }
-    response.update(find_editor_files())
+    response.update(find_editor_files())  # type: ignore[no-untyped-call]
     return render(request, 'base.html', response)

@@ -2,7 +2,7 @@
 """
 import pytest
 import json
-import requests_mock
+import requests_mock  # type: ignore[import]
 import math
 
 from django.apps import apps
@@ -13,7 +13,7 @@ from .utils import invite_client_to_project, _client_is_annotator
 
 
 @pytest.fixture
-def configured_project_min_annotations_1(configured_project):
+def configured_project_min_annotations_1(configured_project):  # type: ignore[no-untyped-def]
     p = Project.objects.get(id=configured_project.id)
     p.min_annotations_to_start_training = 1
     # p.agreement_method = p.SINGLE
@@ -26,57 +26,57 @@ def configured_project_min_annotations_1(configured_project):
     (json.dumps([{'from_name': 'text_class', 'to_name': 'text', 'type': 'labels', 'value': {'labels': ['class_A'], 'start': 0, 'end': 1}}]), None, True),
     (json.dumps([]), None, True),
 ])
-def test_create_annotation(caplog, any_client, configured_project_min_annotations_1, result, logtext, ml_upload_called):
+def test_create_annotation(caplog, any_client, configured_project_min_annotations_1, result, logtext, ml_upload_called):  # type: ignore[no-untyped-def]
     task = Task.objects.first()
-    if _client_is_annotator(any_client):
-        assert invite_client_to_project(any_client, task.project).status_code == 200
+    if _client_is_annotator(any_client):  # type: ignore[no-untyped-call]
+        assert invite_client_to_project(any_client, task.project).status_code == 200  # type: ignore[no-untyped-call, union-attr]
     with requests_mock.Mocker() as m:
         m.post('http://localhost:8999/train')
         m.post('http://localhost:8999/webhook')
-        annotation = {'result': result, 'task': task.id, 'lead_time': 2.54}
-        r = any_client.post(f'/api/tasks/{task.id}/annotations/', data=annotation)
+        annotation = {'result': result, 'task': task.id, 'lead_time': 2.54}  # type: ignore[union-attr]
+        r = any_client.post(f'/api/tasks/{task.id}/annotations/', data=annotation)  # type: ignore[union-attr]
         # check that submitted VALID data for task_annotation
         # makes task labeled
-        task.refresh_from_db()
-        assert task.is_labeled is True
+        task.refresh_from_db()  # type: ignore[union-attr]
+        assert task.is_labeled is True  # type: ignore[union-attr]
         assert r.status_code == 201
-        annotation = Annotation.objects.all()
-        assert annotation.count() == 1
-        annotation = annotation.first()
-        assert annotation.task.id == task.id
+        annotation = Annotation.objects.all()  # type: ignore[assignment]
+        assert annotation.count() == 1  # type: ignore[attr-defined]
+        annotation = annotation.first()  # type: ignore[attr-defined]
+        assert annotation.task.id == task.id  # type: ignore[attr-defined, union-attr]
         # annotator client
         if hasattr(any_client, 'annotator') and any_client.annotator is not None:
-            assert annotation.completed_by.id == any_client.user.id
-            assert annotation.updated_by.id == any_client.user.id
+            assert annotation.completed_by.id == any_client.user.id  # type: ignore[attr-defined]
+            assert annotation.updated_by.id == any_client.user.id  # type: ignore[attr-defined]
         # business client
         else:
-            assert annotation.completed_by.id == any_client.business.admin.id
-            assert annotation.updated_by.id == any_client.business.admin.id
+            assert annotation.completed_by.id == any_client.business.admin.id  # type: ignore[attr-defined]
+            assert annotation.updated_by.id == any_client.business.admin.id  # type: ignore[attr-defined]
 
         if apps.is_installed('businesses'):
-            assert annotation.task.accuracy == 1.0
+            assert annotation.task.accuracy == 1.0  # type: ignore[attr-defined]
 
         if logtext:
             assert logtext in caplog.text
 
 
 @pytest.mark.django_db
-def test_create_annotation_with_ground_truth(caplog, any_client, configured_project_min_annotations_1):
+def test_create_annotation_with_ground_truth(caplog, any_client, configured_project_min_annotations_1):  # type: ignore[no-untyped-def]
 
     task = Task.objects.first()
-    client_is_annotator = _client_is_annotator(any_client)
+    client_is_annotator = _client_is_annotator(any_client)  # type: ignore[no-untyped-call]
     if client_is_annotator:
-        assert invite_client_to_project(any_client, task.project).status_code == 200
+        assert invite_client_to_project(any_client, task.project).status_code == 200  # type: ignore[no-untyped-call, union-attr]
 
     webhook_called = not client_is_annotator
     ground_truth = {
-        'task': task.id,
+        'task': task.id,  # type: ignore[union-attr]
         'result': json.dumps([{'from_name': 'text_class', 'to_name': 'text', 'value': {'labels': ['class_A'], 'start': 0, 'end': 1}}]),
         'ground_truth': True
     }
 
     annotation = {
-        'task': task.id,
+        'task': task.id,  # type: ignore[union-attr]
         'result': json.dumps([{'from_name': 'text_class', 'to_name': 'text', 'value': {'labels': ['class_B'], 'start': 0, 'end': 1}}])
     }
 
@@ -85,15 +85,15 @@ def test_create_annotation_with_ground_truth(caplog, any_client, configured_proj
         m.post('http://localhost:8999/train')
 
         # ground_truth doesn't affect statistics & ML backend, webhook is called for admin accounts
-        r = any_client.post('/api/tasks/{}/annotations/'.format(task.id), data=ground_truth)
+        r = any_client.post('/api/tasks/{}/annotations/'.format(task.id), data=ground_truth)  # type: ignore[union-attr]
         assert r.status_code == 201
         assert m.called == webhook_called
 
         # real annotation triggers uploading to ML backend and recalculating accuracy
-        r = any_client.post('/api/tasks/{}/annotations/'.format(task.id), data=annotation)
+        r = any_client.post('/api/tasks/{}/annotations/'.format(task.id), data=annotation)  # type: ignore[union-attr]
         assert r.status_code == 201
         assert m.called
-        task = Task.objects.get(id=task.id)
+        task = Task.objects.get(id=task.id)  # type: ignore[union-attr]
         assert task.annotations.count() == 2
         annotations = Annotation.objects.filter(task=task)
         for a in annotations:
@@ -101,40 +101,40 @@ def test_create_annotation_with_ground_truth(caplog, any_client, configured_proj
 
 
 @pytest.mark.django_db
-def test_delete_annotation(business_client, configured_project):
+def test_delete_annotation(business_client, configured_project):  # type: ignore[no-untyped-def]
     task = Task.objects.first()
     annotation = Annotation.objects.create(task=task, project=configured_project, result=[])
-    assert task.annotations.count() == 1
+    assert task.annotations.count() == 1  # type: ignore[union-attr]
     r = business_client.delete('/api/annotations/{}/'.format(annotation.id))
     assert r.status_code == 204
-    assert task.annotations.count() == 0
+    assert task.annotations.count() == 0  # type: ignore[union-attr]
 
 
 @pytest.fixture
-def annotations():
+def annotations():  # type: ignore[no-untyped-def]
     task = Task.objects.first()
     return {
         'class_A': {
-            'task': task.id,
+            'task': task.id,  # type: ignore[union-attr]
             'result': json.dumps([{'from_name': 'text_class', 'to_name': 'text', 'type': 'labels', 'value': {
                 'labels': ['class_A'], 'start': 0, 'end': 10
             }}])
         },
         'class_B': {
-            'task': task.id,
+            'task': task.id,  # type: ignore[union-attr]
             'result': json.dumps([{'from_name': 'text_class', 'to_name': 'text', 'type': 'labels', 'value': {
                 'labels': ['class_B'], 'start': 0, 'end': 10
             }}])
         },
         'empty': {
-            'task': task.id,
+            'task': task.id,  # type: ignore[union-attr]
             'result': json.dumps([])
         }
     }
 
 
 @pytest.fixture
-def project_with_max_annotations_2(configured_project):
+def project_with_max_annotations_2(configured_project):  # type: ignore[no-untyped-def]
     configured_project.maximum_annotations = 2
     # configured_project.agreement_method = Project.SINGLE
     configured_project.save()
@@ -154,7 +154,7 @@ def project_with_max_annotations_2(configured_project):
     ([('class_A', 'annotator'), ('empty', 'business')], 0.5, True)
 ])
 @pytest.mark.django_db
-def test_accuracy(
+def test_accuracy(  # type: ignore[no-untyped-def]
         business_client, annotator_client, project_with_max_annotations_2, annotations, annotations_sequence,
         accuracy, is_labeled
 ):
@@ -164,7 +164,7 @@ def test_accuracy(
     }
     task_id = next(iter(annotations.values()))['task']
     task = Task.objects.get(id=task_id)
-    invite_client_to_project(annotator_client, task.project)
+    invite_client_to_project(annotator_client, task.project)  # type: ignore[no-untyped-call]
 
     for annotation_key, client_key in annotations_sequence:
         r = client[client_key].post(
@@ -175,7 +175,7 @@ def test_accuracy(
 
 
 @pytest.mark.django_db
-def test_accuracy_on_delete(business_client, project_with_max_annotations_2, annotations):
+def test_accuracy_on_delete(business_client, project_with_max_annotations_2, annotations):  # type: ignore[no-untyped-def]
     task_id = next(iter(annotations.values()))['task']
     for annotation in annotations.values():
         business_client.post(reverse('tasks:api:task-annotations', kwargs={'pk': task_id}), data=annotation)

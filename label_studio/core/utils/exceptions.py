@@ -24,7 +24,7 @@ class LabelStudioDatabaseLockedException(LabelStudioAPIException):
 
 
 class ProjectExistException(LabelStudioAPIException):
-    status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+    status_code = status.HTTP_422_UNPROCESSABLE_ENTITY  # type: ignore[assignment]
     default_detail = 'Project with the same title already exists'
 
 
@@ -46,4 +46,4 @@ class LabelStudioXMLSyntaxErrorSentryIgnored(Exception):
 
 class InvalidUploadUrlError(LabelStudioAPIException):
     default_detail = 'The provided URL was not valid. URLs must begin with http:// or https://, and cannot be local IPs.'
-    status_code = status.HTTP_403_FORBIDDEN
+    status_code = status.HTTP_403_FORBIDDEN  # type: ignore[assignment]

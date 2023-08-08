@@ -5,7 +5,7 @@ import os
 from rest_framework.exceptions import ValidationError
 from rest_framework import serializers
 from rest_framework.mixins import UpdateModelMixin
-from botocore.exceptions import ParamValidationError, ClientError
+from botocore.exceptions import ParamValidationError, ClientError  # type: ignore[import]
 from io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
 from io_storages.s3.models import S3ImportStorage, S3ExportStorage
 
@@ -18,13 +18,13 @@ class S3ImportStorageSerializer(ImportStorageSerializer):
         model = S3ImportStorage
         fields = '__all__'
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # type: ignore[no-untyped-def]
         result = super().to_representation(instance)
         result.pop('aws_access_key_id')
         result.pop('aws_secret_access_key')
         return result
 
-    def validate(self, data):
+    def validate(self, data):  # type: ignore[no-untyped-def]
         data = super(S3ImportStorageSerializer, self).validate(data)
         if not data.get('bucket', None):
             return data
@@ -36,16 +36,16 @@ class S3ImportStorageSerializer(ImportStorageSerializer):
         else:
             storage = S3ImportStorage(**data)
         try:
-            storage.validate_connection()
+            storage.validate_connection()  # type: ignore[union-attr]
         except ParamValidationError:
-            raise ValidationError('Wrong credentials for S3 {bucket_name}'.format(bucket_name=storage.bucket))
+            raise ValidationError('Wrong credentials for S3 {bucket_name}'.format(bucket_name=storage.bucket))  # type: ignore[union-attr]
         except ClientError as e:
             if '403' == e.response.get('Error').get('Code'):
                 raise ValidationError('Cannot connect to S3 {bucket_name} with specified AWS credentials'.format(
-                    bucket_name=storage.bucket))
+                    bucket_name=storage.bucket))  # type: ignore[union-attr]
             if '404' in e.response.get('Error').get('Code'):
                 raise ValidationError('Cannot find bucket {bucket_name} in S3'.format(
-                    bucket_name=storage.bucket))
+                    bucket_name=storage.bucket))  # type: ignore[union-attr]
         except TypeError as e:
             raise ValidationError(f'It seems access keys are incorrect: {e}')
         return data
@@ -54,7 +54,7 @@ class S3ImportStorageSerializer(ImportStorageSerializer):
 class S3ExportStorageSerializer(ExportStorageSerializer):
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # type: ignore[no-untyped-def]
         result = super().to_representation(instance)
         result.pop('aws_access_key_id')
         result.pop('aws_secret_access_key')

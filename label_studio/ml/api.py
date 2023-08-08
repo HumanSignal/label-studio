@@ -1,20 +1,20 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
-import drf_yasg.openapi as openapi
-from drf_yasg.utils import swagger_auto_schema
+import drf_yasg.openapi as openapi  # type: ignore[import, import]
+from drf_yasg.utils import swagger_auto_schema  # type: ignore[import]
 from django.utils.decorators import method_decorator
 from django.conf import settings
 
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend  # type: ignore[import]
 from rest_framework import generics, status
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from core.feature_flags import flag_set
+from core.feature_flags import flag_set  # type: ignore[attr-defined]
 from core.permissions import all_permissions, ViewClassPermission
-from projects.models import Project, Task
+from projects.models import Project, Task  # type: ignore[attr-defined]
 from ml.serializers import MLBackendSerializer, MLInteractiveAnnotatingRequest
 from ml.models import MLBackend
 
@@ -71,7 +71,7 @@ logger = logging.getLogger(__name__)
                 description='Project ID'),
         ],
     ))
-class MLBackendListAPI(generics.ListCreateAPIView):
+class MLBackendListAPI(generics.ListCreateAPIView):  # type: ignore[type-arg]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
         GET=all_permissions.projects_view,
@@ -81,16 +81,16 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["is_interactive"]
 
-    def get_queryset(self):
+    def get_queryset(self):  # type: ignore[no-untyped-def]
         project_pk = self.request.query_params.get('project')
         project = generics.get_object_or_404(Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
         ml_backends = MLBackend.objects.filter(project_id=project.id)
         for mlb in ml_backends:
-            mlb.update_state()
+            mlb.update_state()  # type: ignore[no-untyped-call]
         return ml_backends
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer):  # type: ignore[no-untyped-def]
         ml_backend = serializer.save()
         ml_backend.update_state()
 
@@ -141,18 +141,18 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     ),
 )
 @method_decorator(name='put', decorator=swagger_auto_schema(auto_schema=None))
-class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
+class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):  # type: ignore[type-arg]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = MLBackendSerializer
     permission_required = all_permissions.projects_change
     queryset = MLBackend.objects.all()
 
-    def get_object(self):
+    def get_object(self):  # type: ignore[no-untyped-def]
         ml_backend = super(MLBackendDetailAPI, self).get_object()
         ml_backend.update_state()
         return ml_backend
 
-    def perform_update(self, serializer):
+    def perform_update(self, serializer):  # type: ignore[no-untyped-def]
         ml_backend = serializer.save()
         ml_backend.update_state()
 
@@ -201,11 +201,11 @@ class MLBackendTrainAPI(APIView):
 
     permission_required = all_permissions.projects_change
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)
 
-        ml_backend.train()
+        ml_backend.train()  # type: ignore[no-untyped-call]
         return Response(status=status.HTTP_200_OK)
 
 
@@ -236,7 +236,7 @@ class MLBackendInteractiveAnnotating(APIView):
 
     permission_required = all_permissions.tasks_view
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)
         serializer = MLInteractiveAnnotatingRequest(data=request.data)
@@ -246,11 +246,11 @@ class MLBackendInteractiveAnnotating(APIView):
         task = generics.get_object_or_404(Task, pk=validated_data['task'], project=ml_backend.project)
         context = validated_data.get('context')
 
-        if flag_set('ff_back_dev_2362_project_credentials_060722_short', request.user):
-            context['project_credentials_login'] = task.project.task_data_login
-            context['project_credentials_password'] = task.project.task_data_password
+        if flag_set('ff_back_dev_2362_project_credentials_060722_short', request.user):  # type: ignore[no-untyped-call]
+            context['project_credentials_login'] = task.project.task_data_login  # type: ignore[union-attr]
+            context['project_credentials_password'] = task.project.task_data_password  # type: ignore[union-attr]
 
-        result = ml_backend.interactive_annotating(task, context, user=request.user)
+        result = ml_backend.interactive_annotating(task, context, user=request.user)  # type: ignore[no-untyped-call]
 
         return Response(
             result,
@@ -267,14 +267,14 @@ class MLBackendInteractiveAnnotating(APIView):
         responses={"200": "List of available versions."},
     ),
 )
-class MLBackendVersionsAPI(generics.RetrieveAPIView):
+class MLBackendVersionsAPI(generics.RetrieveAPIView):  # type: ignore[type-arg]
 
     permission_required = all_permissions.projects_change
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)
-        versions_response = ml_backend.get_versions()
+        versions_response = ml_backend.get_versions()  # type: ignore[no-untyped-call]
         if versions_response.status_code == 200:
             result = {'versions': versions_response.response.get("versions", [])}
             return Response(data=result, status=200)

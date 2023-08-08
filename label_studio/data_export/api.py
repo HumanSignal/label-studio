@@ -10,8 +10,8 @@ from django.db import transaction
 from django.http import HttpResponse
 from django.core.files import File
 from django.core.files.storage import FileSystemStorage
-from drf_yasg import openapi as openapi
-from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi as openapi  # type: ignore[import]
+from drf_yasg.utils import swagger_auto_schema  # type: ignore[import]
 from django.utils.decorators import method_decorator
 from rest_framework import status, generics
 from rest_framework.response import Response
@@ -21,14 +21,14 @@ from urllib.parse import urlparse
 
 from core.permissions import all_permissions
 from core.redis import start_job_async_or_sync
-from core.feature_flags import flag_set
+from core.feature_flags import flag_set  # type: ignore[attr-defined]
 from core.utils.common import batch
 from projects.models import Project
 from tasks.models import Task
 from .models import DataExport, Export, ConvertedFormat
 
 from .serializers import ExportDataSerializer, ExportSerializer, ExportCreateSerializer, ExportParamSerializer, ExportConvertSerializer
-from ranged_fileresponse import RangedFileResponse
+from ranged_fileresponse import RangedFileResponse  # type: ignore[import]
 
 logger = logging.getLogger(__name__)
 
@@ -59,15 +59,15 @@ logger = logging.getLogger(__name__)
         },
     ),
 )
-class ExportFormatsListAPI(generics.RetrieveAPIView):
+class ExportFormatsListAPI(generics.RetrieveAPIView):  # type: ignore[type-arg]
     permission_required = all_permissions.projects_view
 
-    def get_queryset(self):
-        return Project.objects.filter(organization=self.request.user.active_organization)
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        return Project.objects.filter(organization=self.request.user.active_organization)  # type: ignore[misc, union-attr]
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         project = self.get_object()
-        formats = DataExport.get_export_formats(project)
+        formats = DataExport.get_export_formats(project)  # type: ignore[no-untyped-call]
         return Response(formats)
 
 
@@ -147,16 +147,16 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
         },
     ),
 )
-class ExportAPI(generics.RetrieveAPIView):
+class ExportAPI(generics.RetrieveAPIView):  # type: ignore[type-arg]
     permission_required = all_permissions.projects_change
 
-    def get_queryset(self):
-        return Project.objects.filter(organization=self.request.user.active_organization)
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        return Project.objects.filter(organization=self.request.user.active_organization)  # type: ignore[misc, union-attr]
 
-    def get_task_queryset(self, queryset):
+    def get_task_queryset(self, queryset):  # type: ignore[no-untyped-def]
         return queryset.select_related('project').prefetch_related('annotations', 'predictions')
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         project = self.get_object()
         query_serializer = ExportParamSerializer(data=request.GET)
         query_serializer.is_valid(raise_exception=True)
@@ -180,14 +180,14 @@ class ExportAPI(generics.RetrieveAPIView):
 
         logger.debug('Serialize tasks for export')
         tasks = []
-        for _task_ids in batch(task_ids, 1000):
+        for _task_ids in batch(task_ids, 1000):  # type: ignore[no-untyped-call]
             tasks += ExportDataSerializer(
-                self.get_task_queryset(query.filter(id__in=_task_ids)), many=True, expand=['drafts'],
+                self.get_task_queryset(query.filter(id__in=_task_ids)), many=True, expand=['drafts'],  # type: ignore[no-untyped-call]
                 context={'interpolate_key_frames': interpolate_key_frames}
             ).data
         logger.debug('Prepare export files')
 
-        export_stream, content_type, filename = DataExport.generate_export_file(
+        export_stream, content_type, filename = DataExport.generate_export_file(  # type: ignore[no-untyped-call]
             project, tasks, export_type, download_resources, request.GET
         )
 
@@ -208,14 +208,14 @@ class ExportAPI(generics.RetrieveAPIView):
         """,
     ),
 )
-class ProjectExportFiles(generics.RetrieveAPIView):
+class ProjectExportFiles(generics.RetrieveAPIView):  # type: ignore[type-arg]
     permission_required = all_permissions.projects_change
     swagger_schema = None  # hide export files endpoint from swagger
 
-    def get_queryset(self):
-        return Project.objects.filter(organization=self.request.user.active_organization)
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        return Project.objects.filter(organization=self.request.user.active_organization)  # type: ignore[misc, union-attr]
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         # project permission check
         self.get_object()
 
@@ -237,7 +237,7 @@ class ProjectExportFilesAuthCheck(APIView):
     http_method_names = ['get']
     permission_required = all_permissions.projects_change
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         """Get export files list"""
         original_url = request.META['HTTP_X_ORIGINAL_URI']
         filename = original_url.replace('/export/', '')
@@ -247,7 +247,7 @@ class ProjectExportFilesAuthCheck(APIView):
         except ValueError:
             return Response({'detail': 'Incorrect filename in export'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-        generics.get_object_or_404(Project.objects.filter(organization=self.request.user.active_organization), pk=pk)
+        generics.get_object_or_404(Project.objects.filter(organization=self.request.user.active_organization), pk=pk)  # type: ignore[misc, union-attr]
         return Response({'detail': 'auth ok'}, status=status.HTTP_200_OK)
 
 
@@ -285,33 +285,33 @@ class ProjectExportFilesAuthCheck(APIView):
         ]
     ),
 )
-class ExportListAPI(generics.ListCreateAPIView):
+class ExportListAPI(generics.ListCreateAPIView):  # type: ignore[type-arg]
     queryset = Export.objects.all().order_by('-created_at')
     project_model = Project
     serializer_class = ExportSerializer
     permission_required = all_permissions.projects_change
 
-    def get_serializer_class(self):
+    def get_serializer_class(self):  # type: ignore[no-untyped-def]
         if self.request.method == 'GET':
             return ExportSerializer
         if self.request.method == 'POST':
             return ExportCreateSerializer
         return super().get_serializer_class()
 
-    def _get_project(self):
+    def _get_project(self):  # type: ignore[no-untyped-def]
         project_pk = self.kwargs.get('pk')
         project = generics.get_object_or_404(
-            self.project_model.objects.for_user(self.request.user),
+            self.project_model.objects.for_user(self.request.user),  # type: ignore[no-untyped-call]
             pk=project_pk,
         )
         return project
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer):  # type: ignore[no-untyped-def]
         task_filter_options = serializer.validated_data.pop('task_filter_options')
         annotation_filter_options = serializer.validated_data.pop('annotation_filter_options')
         serialization_options = serializer.validated_data.pop('serialization_options')
 
-        project = self._get_project()
+        project = self._get_project()  # type: ignore[no-untyped-call]
         serializer.save(project=project, created_by=self.request.user)
         instance = serializer.instance
 
@@ -321,14 +321,14 @@ class ExportListAPI(generics.ListCreateAPIView):
             serialization_options=serialization_options,
         )
 
-    def get_queryset(self):
-        project = self._get_project()
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        project = self._get_project()  # type: ignore[no-untyped-call]
         return super().get_queryset().filter(project=project)
 
-    def filter_queryset(self, queryset):
+    def filter_queryset(self, queryset):  # type: ignore[no-untyped-def]
         queryset = super().filter_queryset(queryset)
 
-        if flag_set('fflag_fix_back_lsdv_4929_limit_exports_10042023_short', user='auto'):
+        if flag_set('fflag_fix_back_lsdv_4929_limit_exports_10042023_short', user='auto'):  # type: ignore[no-untyped-call]
             return queryset.order_by('-created_at')[:100]
         else:
             return queryset
@@ -377,15 +377,15 @@ class ExportListAPI(generics.ListCreateAPIView):
         ]
     ),
 )
-class ExportDetailAPI(generics.RetrieveDestroyAPIView):
+class ExportDetailAPI(generics.RetrieveDestroyAPIView):  # type: ignore[type-arg]
     queryset = Export.objects.all()
     project_model = Project
     serializer_class = ExportSerializer
     lookup_url_kwarg = 'export_pk'
     permission_required = all_permissions.projects_change
 
-    def delete(self, *args, **kwargs):
-        if flag_set('ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short'):
+    def delete(self, *args, **kwargs):  # type: ignore[no-untyped-def]
+        if flag_set('ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short'):  # type: ignore[no-untyped-call]
             try:
                 export = self.get_object()
                 export.file.delete()
@@ -404,16 +404,16 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
 
         return super().delete(*args, **kwargs)
 
-    def _get_project(self):
+    def _get_project(self):  # type: ignore[no-untyped-def]
         project_pk = self.kwargs.get('pk')
         project = generics.get_object_or_404(
-            self.project_model.objects.for_user(self.request.user),
+            self.project_model.objects.for_user(self.request.user),  # type: ignore[no-untyped-call]
             pk=project_pk,
         )
         return project
 
-    def get_queryset(self):
-        project = self._get_project()
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        project = self._get_project()  # type: ignore[no-untyped-call]
         return super().get_queryset().filter(project=project)
 
 
@@ -450,33 +450,33 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
         ],
     ),
 )
-class ExportDownloadAPI(generics.RetrieveAPIView):
+class ExportDownloadAPI(generics.RetrieveAPIView):  # type: ignore[type-arg]
     queryset = Export.objects.all()
     project_model = Project
     serializer_class = None
     lookup_url_kwarg = 'export_pk'
     permission_required = all_permissions.projects_change
 
-    def _get_project(self):
+    def _get_project(self):  # type: ignore[no-untyped-def]
         project_pk = self.kwargs.get('pk')
         project = generics.get_object_or_404(
-            self.project_model.objects.for_user(self.request.user),
+            self.project_model.objects.for_user(self.request.user),  # type: ignore[no-untyped-call]
             pk=project_pk,
         )
         return project
 
-    def get_queryset(self):
-        project = self._get_project()
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        project = self._get_project()  # type: ignore[no-untyped-call]
         return super().get_queryset().filter(project=project)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         snapshot = self.get_object()
         export_type = request.GET.get('exportType')
 
         if snapshot.status != Export.Status.COMPLETED:
             return HttpResponse('Export is not completed', status=404)
 
-        if flag_set('fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short', request.user):
+        if flag_set('fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short', request.user):  # type: ignore[no-untyped-call]
             file = snapshot.file
             if export_type is not None and export_type != 'JSON':
                 converted_file = snapshot.converted_formats.filter(export_type=export_type).first()
@@ -525,7 +525,7 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
             return response
 
 
-def async_convert(converted_format_id, export_type, project, **kwargs):
+def async_convert(converted_format_id, export_type, project, **kwargs):  # type: ignore[no-untyped-def]
     with transaction.atomic():
         try:
             converted_format = ConvertedFormat.objects.get(id=converted_format_id)
@@ -556,7 +556,7 @@ def async_convert(converted_format_id, export_type, project, **kwargs):
     converted_format.save(update_fields=['file', 'status'])
 
 
-def set_convert_background_failure(job, connection, type, value, traceback_obj):
+def set_convert_background_failure(job, connection, type, value, traceback_obj):  # type: ignore[no-untyped-def]
     from data_export.models import ConvertedFormat
 
     convert_id = job.args[0]
@@ -588,12 +588,12 @@ def set_convert_background_failure(job, connection, type, value, traceback_obj):
         ]
     ),
 )
-class ExportConvertAPI(generics.RetrieveAPIView):
+class ExportConvertAPI(generics.RetrieveAPIView):  # type: ignore[type-arg]
     queryset = Export.objects.all()
     lookup_url_kwarg = 'export_pk'
     permission_required = all_permissions.projects_change
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         snapshot = self.get_object()
         serializer = ExportConvertSerializer(data=request.data, context={'project': snapshot.project})
         serializer.is_valid(raise_exception=True)
@@ -607,7 +607,7 @@ class ExportConvertAPI(generics.RetrieveAPIView):
             if not created:
                 raise ValidationError(f'Conversion to {export_type} already started')
 
-        start_job_async_or_sync(
+        start_job_async_or_sync(  # type: ignore[no-untyped-call]
             async_convert,
             converted_format.id,
             export_type,

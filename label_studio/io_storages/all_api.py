@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from typing import TYPE_CHECKING
 import logging
 
 from django.conf import settings
@@ -9,10 +10,13 @@ from core.permissions import all_permissions
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from django.utils.decorators import method_decorator
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema  # type: ignore[import]
+from drf_yasg import openapi  # type: ignore[import]
 
-from label_studio.core.utils.common import load_func
+if TYPE_CHECKING:
+    from core.utils.common import load_func
+else:
+    from label_studio.core.utils.common import load_func
 from .azure_blob.serializers import AzureBlobImportStorageSerializer
 from .gcs.serializers import GCSImportStorageSerializer
 from .localfiles.api import LocalFilesImportStorageListAPI, LocalFilesExportStorageListAPI
@@ -21,10 +25,10 @@ logger = logging.getLogger(__name__)
 # TODO: replace hardcoded apps lists with search over included storage apps
 
 
-get_storage_list = load_func(settings.GET_STORAGE_LIST)
+get_storage_list = load_func(settings.GET_STORAGE_LIST)  # type: ignore[no-untyped-call]
 
 
-def _get_common_storage_list():
+def _get_common_storage_list():  # type: ignore[no-untyped-def]
     storage_list = get_storage_list()
     if settings.ENABLE_LOCAL_FILES_STORAGE:
         storage_list += [{
@@ -37,7 +41,7 @@ def _get_common_storage_list():
     return storage_list
 
 
-_common_storage_list = _get_common_storage_list()
+_common_storage_list = _get_common_storage_list()  # type: ignore[no-untyped-call]
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
@@ -49,7 +53,7 @@ _common_storage_list = _get_common_storage_list()
 class AllImportStorageTypesAPI(APIView):
     permission_required = all_permissions.projects_change
 
-    def get(self, request, **kwargs):
+    def get(self, request, **kwargs):  # type: ignore[no-untyped-def]
         return Response([{'name': s['name'], 'title': s['title']} for s in _common_storage_list])
 
 
@@ -62,7 +66,7 @@ class AllImportStorageTypesAPI(APIView):
 class AllExportStorageTypesAPI(APIView):
     permission_required = all_permissions.projects_change
 
-    def get(self, request, **kwargs):
+    def get(self, request, **kwargs):  # type: ignore[no-untyped-def]
         return Response([{'name': s['name'], 'title': s['title']} for s in _common_storage_list])
 
 
@@ -79,12 +83,12 @@ class AllExportStorageTypesAPI(APIView):
         ],
         responses={200: "List of ImportStorageSerializer"}
     ))
-class AllImportStorageListAPI(generics.ListAPIView):
+class AllImportStorageListAPI(generics.ListAPIView):  # type: ignore[type-arg]
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
 
-    def _get_response(self, api, request, *args, **kwargs):
+    def _get_response(self, api, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         try:
             view = api.as_view()
             response = view(request._request, *args, **kwargs)
@@ -96,9 +100,9 @@ class AllImportStorageListAPI(generics.ListAPIView):
             logger.error(f"Can't process {api.__class__.__name__}", exc_info=True)
             return []
 
-    def list(self, request, *args, **kwargs):
-        list_responses = sum([
-            self._get_response(s['import_list_api'], request, *args, **kwargs) for s in _common_storage_list], [])
+    def list(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
+        list_responses = sum([  # type: ignore[var-annotated]
+            self._get_response(s['import_list_api'], request, *args, **kwargs) for s in _common_storage_list], [])  # type: ignore[no-untyped-call]
         return Response(list_responses)
 
 
@@ -115,17 +119,17 @@ class AllImportStorageListAPI(generics.ListAPIView):
         ],
         responses={200: "List of ExportStorageSerializer"}
     ))
-class AllExportStorageListAPI(generics.ListAPIView):
+class AllExportStorageListAPI(generics.ListAPIView):  # type: ignore[type-arg]
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
 
-    def _get_response(self, api, request, *args, **kwargs):
+    def _get_response(self, api, request, *args, **kwargs):  # type: ignore[no-untyped-def]
         view = api.as_view()
         response = view(request._request, *args, **kwargs)
         return response.data
 
-    def list(self, request, *args, **kwargs):
-        list_responses = sum([
-            self._get_response(s['export_list_api'], request, *args, **kwargs) for s in _common_storage_list], [])
+    def list(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
+        list_responses = sum([  # type: ignore[var-annotated]
+            self._get_response(s['export_list_api'], request, *args, **kwargs) for s in _common_storage_list], [])  # type: ignore[no-untyped-call]
         return Response(list_responses)

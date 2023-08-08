@@ -17,7 +17,7 @@ from .models import FileUpload
 logger = logging.getLogger(__name__)
 
 
-def async_import_background(import_id, user_id, **kwargs):
+def async_import_background(import_id, user_id, **kwargs):  # type: ignore[no-untyped-def]
     with transaction.atomic():
         try:
             project_import = ProjectImport.objects.get(id=import_id)
@@ -37,30 +37,30 @@ def async_import_background(import_id, user_id, **kwargs):
     tasks = None
     # upload files from request, and parse all tasks
     # TODO: Stop passing request to load_tasks function, make all validation before
-    tasks, file_upload_ids, found_formats, data_columns = load_tasks_for_async_import(project_import, user)
+    tasks, file_upload_ids, found_formats, data_columns = load_tasks_for_async_import(project_import, user)  # type: ignore[no-untyped-call]
 
     if project_import.preannotated_from_fields:
         # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]  # noqa
-        tasks = reformat_predictions(tasks, project_import.preannotated_from_fields)
+        tasks = reformat_predictions(tasks, project_import.preannotated_from_fields)  # type: ignore[no-untyped-call]
 
     if project_import.commit_to_project:
         # Immediately create project tasks and update project states and counters
         serializer = ImportApiSerializer(data=tasks, many=True, context={'project': project})
         serializer.is_valid(raise_exception=True)
-        tasks = serializer.save(project_id=project.id)
-        emit_webhooks_for_instance(user.active_organization, project, WebhookAction.TASKS_CREATED, tasks)
+        tasks = serializer.save(project_id=project.id)  # type: ignore[union-attr]
+        emit_webhooks_for_instance(user.active_organization, project, WebhookAction.TASKS_CREATED, tasks)  # type: ignore[no-untyped-call]
 
         task_count = len(tasks)
         annotation_count = len(serializer.db_annotations)
         prediction_count = len(serializer.db_predictions)
         # Update counters (like total_annotations) for new tasks and after bulk update tasks stats. It should be a
         # single operation as counters affect bulk is_labeled update
-        project.update_tasks_counters_and_task_states(tasks_queryset=tasks, maximum_annotations_changed=False,
+        project.update_tasks_counters_and_task_states(tasks_queryset=tasks, maximum_annotations_changed=False,  # type: ignore[union-attr]
                                                       overlap_cohort_percentage_changed=False,
                                                       tasks_number_changed=True)
         logger.info('Tasks bulk_update finished')
 
-        project.summary.update_data_columns(tasks)
+        project.summary.update_data_columns(tasks)  # type: ignore[union-attr]
         # TODO: project.summary.update_created_annotations_and_labels
     else:
         # Do nothing - just output file upload ids for further use
@@ -85,7 +85,7 @@ def async_import_background(import_id, user_id, **kwargs):
 
 
 
-def set_import_background_failure(job, connection, type, value, _):
+def set_import_background_failure(job, connection, type, value, _):  # type: ignore[no-untyped-def]
     import_id = job.args[0]
     ProjectImport.objects.filter(id=import_id).update(
         status=ProjectImport.Status.FAILED,
@@ -94,7 +94,7 @@ def set_import_background_failure(job, connection, type, value, _):
     )
 
 
-def set_reimport_background_failure(job, connection, type, value, _):
+def set_reimport_background_failure(job, connection, type, value, _):  # type: ignore[no-untyped-def]
     reimport_id = job.args[0]
     ProjectReimport.objects.filter(id=reimport_id).update(
         status=ProjectReimport.Status.FAILED,
@@ -103,7 +103,7 @@ def set_reimport_background_failure(job, connection, type, value, _):
     )
 
 
-def reformat_predictions(tasks, preannotated_from_fields):
+def reformat_predictions(tasks, preannotated_from_fields):  # type: ignore[no-untyped-def]
     new_tasks = []
     for task in tasks:
         if 'data' in task:
@@ -115,10 +115,10 @@ def reformat_predictions(tasks, preannotated_from_fields):
         })
     return new_tasks
 
-post_process_reimport = load_func(settings.POST_PROCESS_REIMPORT)
+post_process_reimport = load_func(settings.POST_PROCESS_REIMPORT)  # type: ignore[no-untyped-call]
 
 
-def async_reimport_background(reimport_id, organization_id, user, **kwargs):
+def async_reimport_background(reimport_id, organization_id, user, **kwargs):  # type: ignore[no-untyped-def]
 
     with transaction.atomic():
         try:
@@ -134,25 +134,25 @@ def async_reimport_background(reimport_id, organization_id, user, **kwargs):
 
     project = reimport.project
 
-    tasks, found_formats, data_columns = FileUpload.load_tasks_from_uploaded_files(
+    tasks, found_formats, data_columns = FileUpload.load_tasks_from_uploaded_files(  # type: ignore[no-untyped-call]
         reimport.project, reimport.file_upload_ids,  files_as_tasks_list=reimport.files_as_tasks_list)
 
     with transaction.atomic():
-        project.remove_tasks_by_file_uploads(reimport.file_upload_ids)
+        project.remove_tasks_by_file_uploads(reimport.file_upload_ids)  # type: ignore[union-attr]
         serializer = ImportApiSerializer(data=tasks, many=True, context={'project': project, 'user': user})
         serializer.is_valid(raise_exception=True)
-        tasks = serializer.save(project_id=project.id)
-        emit_webhooks_for_instance(organization_id, project, WebhookAction.TASKS_CREATED, tasks)
+        tasks = serializer.save(project_id=project.id)  # type: ignore[union-attr]
+        emit_webhooks_for_instance(organization_id, project, WebhookAction.TASKS_CREATED, tasks)  # type: ignore[no-untyped-call]
 
     # Update counters (like total_annotations) for new tasks and after bulk update tasks stats. It should be a
     # single operation as counters affect bulk is_labeled update
-    project.update_tasks_counters_and_task_states(
+    project.update_tasks_counters_and_task_states(  # type: ignore[union-attr]
         tasks_queryset=tasks, maximum_annotations_changed=False,
         overlap_cohort_percentage_changed=False,
         tasks_number_changed=True)
     logger.info('Tasks bulk_update finished')
 
-    project.summary.update_data_columns(tasks)
+    project.summary.update_data_columns(tasks)  # type: ignore[union-attr]
     # TODO: project.summary.update_created_annotations_and_labels
 
     reimport.task_count = len(tasks)

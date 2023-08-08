@@ -4,4 +4,4 @@ from core.utils.exceptions import LabelStudioAPIException
 
 
 class LabelBulkUpdateError(LabelStudioAPIException):
-    status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+    status_code = status.HTTP_422_UNPROCESSABLE_ENTITY  # type: ignore[assignment]

@@ -24,7 +24,7 @@ from django.dispatch import receiver, Signal
 from django.core.files.storage import default_storage
 from rest_framework.exceptions import ValidationError
 
-from core.feature_flags import flag_set
+from core.feature_flags import flag_set  # type: ignore[attr-defined]
 from core.redis import start_job_async_or_sync
 from core.utils.common import (
     conditional_atomic,
@@ -45,10 +45,10 @@ from data_import.models import FileUpload
 
 logger = logging.getLogger(__name__)
 
-TaskMixin = load_func(settings.TASK_MIXIN)
+TaskMixin = load_func(settings.TASK_MIXIN)  # type: ignore[no-untyped-call]
 
 
-class Task(TaskMixin, models.Model):
+class Task(TaskMixin, models.Model):  # type: ignore[misc, valid-type]
     """ Business tasks from project
     """
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID', db_index=True)
@@ -113,11 +113,11 @@ class Task(TaskMixin, models.Model):
         ]
 
     @property
-    def file_upload_name(self):
-        return os.path.basename(self.file_upload.file.name)
+    def file_upload_name(self):  # type: ignore[no-untyped-def]
+        return os.path.basename(self.file_upload.file.name)  # type: ignore[union-attr]
 
     @classmethod
-    def get_locked_by(cls, user, project=None, tasks=None):
+    def get_locked_by(cls, user, project=None, tasks=None):  # type: ignore[no-untyped-def, no-untyped-def]
         """ Retrieve the task locked by specified user. Returns None if the specified user didn't lock anything.
         """
         lock = None
@@ -133,16 +133,16 @@ class Task(TaskMixin, models.Model):
         if lock:
             return lock.task
 
-    def has_lock(self, user=None):
+    def has_lock(self, user=None):  # type: ignore[no-untyped-def, no-untyped-def]
         """Check whether current task has been locked by some user"""
         from projects.functions.next_task import get_next_task_logging_level
-        SkipQueue = self.project.SkipQueue
+        SkipQueue = self.project.SkipQueue  # type: ignore[union-attr, union-attr]
 
-        if self.project.skip_queue == SkipQueue.REQUEUE_FOR_ME:
+        if self.project.skip_queue == SkipQueue.REQUEUE_FOR_ME:  # type: ignore[union-attr, union-attr]
             # REQUEUE_FOR_ME means: only my skipped tasks go back to me,
             # alien's skipped annotations are counted as regular annotations
             q = Q(was_cancelled=True) & Q(completed_by=user)
-        elif self.project.skip_queue == SkipQueue.REQUEUE_FOR_OTHERS:
+        elif self.project.skip_queue == SkipQueue.REQUEUE_FOR_OTHERS:  # type: ignore[union-attr]
             # REQUEUE_FOR_OTHERS: my skipped tasks go to others
             # alien's skipped annotations are not counted at all
             q = Q(was_cancelled=True) & ~Q(completed_by=user)
@@ -151,12 +151,12 @@ class Task(TaskMixin, models.Model):
             # alien's and my skipped annotations are counted as regular annotations
             q = Q()
 
-        num_locks = self.num_locks_user(user=user)
+        num_locks = self.num_locks_user(user=user)  # type: ignore[no-untyped-call]
         num_annotations = self.annotations.exclude(q | Q(ground_truth=True)).count()
         num = num_locks + num_annotations
         if num > self.overlap:
             logger.error(
-                f"Num takes={num} > overlap={self.overlap} for task={self.id}, "
+                f"Num takes={num} > overlap={self.overlap} for task={self.id}, "  # type: ignore[union-attr]
                 f"skipped mode {self.project.skip_queue} - it's a bug",
                 extra=dict(
                     lock_ttl=self.locks.values_list('user', 'expire_at'),
@@ -166,33 +166,33 @@ class Task(TaskMixin, models.Model):
             )
         result = bool(num >= self.overlap)
         logger.log(
-            get_next_task_logging_level(user),
-            f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations} '
+            get_next_task_logging_level(user),  # type: ignore[no-untyped-call]
+            f'Task {self} locked: {result}; num_locks: {num_locks} num_annotations: {num_annotations} '  # type: ignore[union-attr]
             f'skipped mode: {self.project.skip_queue}'
         )
         return result
 
     @property
-    def num_locks(self):
+    def num_locks(self):  # type: ignore[no-untyped-def]
         return self.locks.filter(expire_at__gt=now()).count()
 
-    def num_locks_user(self, user):
+    def num_locks_user(self, user):  # type: ignore[no-untyped-def]
         return self.locks.filter(expire_at__gt=now()).exclude(user=user).count()
 
     @property
-    def storage_filename(self):
+    def storage_filename(self):  # type: ignore[no-untyped-def]
         for link_name in settings.IO_STORAGES_IMPORT_LINK_NAMES:
             if hasattr(self, link_name):
                 return getattr(self, link_name).key
 
-    def has_permission(self, user):
+    def has_permission(self, user):  # type: ignore[no-untyped-def]
         user.project = self.project  # link for activity log
-        return self.project.has_permission(user)
+        return self.project.has_permission(user)  # type: ignore[union-attr]
 
-    def clear_expired_locks(self):
+    def clear_expired_locks(self):  # type: ignore[no-untyped-def]
         self.locks.filter(expire_at__lt=now()).delete()
 
-    def set_lock(self, user):
+    def set_lock(self, user):  # type: ignore[no-untyped-def, no-untyped-def]
         """Lock current task by specified user. Lock lifetime is set by `expire_in_secs`"""
         from projects.functions.next_task import get_next_task_logging_level
 
@@ -207,14 +207,14 @@ class Task(TaskMixin, models.Model):
             else:
                 task_lock.expire_at = expire_at
                 task_lock.save()
-            logger.log(get_next_task_logging_level(user), f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')
+            logger.log(get_next_task_logging_level(user), f'User={user} acquires a lock for the task={self} ttl: {lock_ttl}')  # type: ignore[no-untyped-call]
         else:
             logger.error(
                 f"Current number of locks for task {self.id} is {num_locks}, but overlap={self.overlap}: "
                 f"that's a bug because this task should not be taken in a label stream (task should be locked)")
-        self.clear_expired_locks()
+        self.clear_expired_locks()  # type: ignore[no-untyped-call]
 
-    def release_lock(self, user=None):
+    def release_lock(self, user=None):  # type: ignore[no-untyped-def]
         """Release lock for the task.
         If user specified, it checks whether lock is released by the user who previously has locked that task"""
 
@@ -222,39 +222,39 @@ class Task(TaskMixin, models.Model):
             self.locks.filter(user=user).delete()
         else:
             self.locks.all().delete()
-        self.clear_expired_locks()
+        self.clear_expired_locks()  # type: ignore[no-untyped-call]
 
-    def get_storage_link(self):
+    def get_storage_link(self):  # type: ignore[no-untyped-def]
         # TODO: how to get neatly any storage class here?
-        return find_first_one_to_one_related_field_by_prefix(self, '.*io_storages_')
+        return find_first_one_to_one_related_field_by_prefix(self, '.*io_storages_')  # type: ignore[no-untyped-call]
 
     @staticmethod
-    def is_upload_file(filename):
+    def is_upload_file(filename):  # type: ignore[no-untyped-def]
         if not isinstance(filename, str):
             return False
         return filename.startswith(settings.UPLOAD_DIR + '/')
 
     @staticmethod
-    def prepare_filename(filename):
+    def prepare_filename(filename):  # type: ignore[no-untyped-def]
         if isinstance(filename, str):
             return filename.replace(settings.MEDIA_URL, '')
         return filename
 
-    def resolve_storage_uri(self, url, project):
+    def resolve_storage_uri(self, url, project):  # type: ignore[no-untyped-def]
         storage = self.storage
 
         if not storage:
             storage_objects = project.get_all_storage_objects(type_='import')
-            storage = self._get_storage_by_url(url, storage_objects)
+            storage = self._get_storage_by_url(url, storage_objects)  # type: ignore[no-untyped-call]
 
         if storage:
             return { "url": storage.generate_http_url(url), "presign_ttl": storage.presign_ttl }
 
-    def resolve_uri(self, task_data, project):
+    def resolve_uri(self, task_data, project):  # type: ignore[no-untyped-def, no-untyped-def]
         if project.task_data_login and project.task_data_password:
             protected_data = {}
             for key, value in task_data.items():
-                if isinstance(value, str) and string_is_url(value):
+                if isinstance(value, str) and string_is_url(value):  # type: ignore[no-untyped-call, no-untyped-call]
                     path = reverse('projects-file-proxy', kwargs={'pk': project.pk}) + '?url=' + quote(value)
                     value = urljoin(settings.HOSTNAME, path)
                 protected_data[key] = value
@@ -265,16 +265,16 @@ class Task(TaskMixin, models.Model):
             # try resolve URLs via storage associated with that task
             for field in task_data:
                 # file saved in django file storage
-                prepared_filename = self.prepare_filename(task_data[field])
-                if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(prepared_filename):
+                prepared_filename = self.prepare_filename(task_data[field])  # type: ignore[no-untyped-call, no-untyped-call]
+                if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(prepared_filename):  # type: ignore[no-untyped-call, no-untyped-call]
                     # permission check: resolve uploaded files to the project only
                     file_upload = None
                     file_upload = FileUpload.objects.filter(project=project, file=prepared_filename).first()
                     if file_upload is not None:
-                        if flag_set('ff_back_dev_2915_storage_nginx_proxy_26092022_short', self.project.organization.created_by):
+                        if flag_set('ff_back_dev_2915_storage_nginx_proxy_26092022_short', self.project.organization.created_by):  # type: ignore[no-untyped-call, no-untyped-call, union-attr, union-attr, union-attr]
                             task_data[field] = file_upload.url
                         else:
-                            task_data[field] = default_storage.url(name=prepared_filename)
+                            task_data[field] = default_storage.url(name=prepared_filename)  # type: ignore[attr-defined]
                     # it's very rare case, e.g. user tried to reimport exported file from another project
                     # or user wrote his django storage path manually
                     else:
@@ -286,11 +286,11 @@ class Task(TaskMixin, models.Model):
                 # TODO: problem with current approach: it can be used only the first storage that _get_storage_by_url
                 # TODO: returns. However, maybe the second storage will resolve uris properly. 
                 # TODO: resolve_uri() already supports them
-                storage = self.storage or self._get_storage_by_url(task_data[field], storage_objects)
+                storage = self.storage or self._get_storage_by_url(task_data[field], storage_objects)  # type: ignore[no-untyped-call]
                 if storage:
                     try:
                         proxy_task = None
-                        if flag_set('fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short', user='auto'):
+                        if flag_set('fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short', user='auto'):  # type: ignore[no-untyped-call]
                             proxy_task = self
 
                         resolved_uri = storage.resolve_uri(task_data[field], proxy_task)
@@ -301,7 +301,7 @@ class Task(TaskMixin, models.Model):
                         task_data[field] = resolved_uri
             return task_data
 
-    def _get_storage_by_url(self, url, storage_objects):
+    def _get_storage_by_url(self, url, storage_objects):  # type: ignore[no-untyped-def]
         """Find the first compatible storage and returns pre-signed URL"""
         from io_storages.models import get_storage_classes
 
@@ -312,7 +312,7 @@ class Task(TaskMixin, models.Model):
                 return storage_object
 
         # url is list or dict
-        if flag_set('fflag_feat_front_lsdv_4661_full_uri_resolve_15032023_short', user='auto'):
+        if flag_set('fflag_feat_front_lsdv_4661_full_uri_resolve_15032023_short', user='auto'):  # type: ignore[no-untyped-call]
             if isinstance(url, dict) or isinstance(url, list):
                 for storage_object in storage_objects:
                     if storage_object.can_resolve_url(url):
@@ -322,42 +322,42 @@ class Task(TaskMixin, models.Model):
                         return storage_object
 
     @property
-    def storage(self):
+    def storage(self):  # type: ignore[no-untyped-def]
         # maybe task has storage link
-        storage_link = self.get_storage_link()
+        storage_link = self.get_storage_link()  # type: ignore[no-untyped-call]
         if storage_link:
             return storage_link.storage
 
         # or try global storage settings (only s3 for now)
-        elif get_env('USE_DEFAULT_S3_STORAGE', default=False, is_bool=True):
+        elif get_env('USE_DEFAULT_S3_STORAGE', default=False, is_bool=True):  # type: ignore[no-untyped-call]
             # TODO: this is used to access global environment storage settings.
             # We may use more than one and non-default S3 storage (like GCS, Azure)
             from io_storages.s3.models import S3ImportStorage
             return S3ImportStorage()
 
     @property
-    def completed_annotations(self):
+    def completed_annotations(self):  # type: ignore[no-untyped-def]
         """Annotations that we take into account when set completed status to the task"""
-        if self.project.skip_queue == self.project.SkipQueue.IGNORE_SKIPPED:
+        if self.project.skip_queue == self.project.SkipQueue.IGNORE_SKIPPED:  # type: ignore[union-attr, union-attr, union-attr]
             return self.annotations
         else:
             return self.annotations.filter(Q_finished_annotations)
 
-    def increase_project_summary_counters(self):
+    def increase_project_summary_counters(self):  # type: ignore[no-untyped-def]
         if hasattr(self.project, 'summary'):
-            summary = self.project.summary
+            summary = self.project.summary  # type: ignore[union-attr]
             summary.update_data_columns([self])
 
-    def decrease_project_summary_counters(self):
+    def decrease_project_summary_counters(self):  # type: ignore[no-untyped-def]
         if hasattr(self.project, 'summary'):
-            summary = self.project.summary
+            summary = self.project.summary  # type: ignore[union-attr]
             summary.remove_data_columns([self])
 
-    def ensure_unique_groundtruth(self, annotation_id):
+    def ensure_unique_groundtruth(self, annotation_id):  # type: ignore[no-untyped-def]
         self.annotations.exclude(id=annotation_id).update(ground_truth=False)
 
-    def save(self, *args, **kwargs):
-        if flag_set('ff_back_2070_inner_id_12052022_short', AnonymousUser):
+    def save(self, *args, **kwargs):  # type: ignore[no-untyped-def]
+        if flag_set('ff_back_2070_inner_id_12052022_short', AnonymousUser):  # type: ignore[no-untyped-call]
             if self.inner_id == 0:
                 task = Task.objects.filter(project=self.project).order_by("-inner_id").first()
                 max_inner_id = 1
@@ -369,7 +369,7 @@ class Task(TaskMixin, models.Model):
         super().save(*args, **kwargs)
 
     @staticmethod
-    def delete_tasks_without_signals(queryset):
+    def delete_tasks_without_signals(queryset):  # type: ignore[no-untyped-def, no-untyped-def]
         """
         Delete Tasks queryset with switched off signals
         :param queryset: Tasks queryset
@@ -378,23 +378,23 @@ class Task(TaskMixin, models.Model):
             (post_delete, update_all_task_states_after_deleting_task, Task),
             (pre_delete, remove_data_columns, Task)
         ]
-        with temporary_disconnect_list_signal(signals):
+        with temporary_disconnect_list_signal(signals):  # type: ignore[no-untyped-call]
             queryset.delete()
 
     @staticmethod
-    def delete_tasks_without_signals_from_task_ids(task_ids):
+    def delete_tasks_without_signals_from_task_ids(task_ids):  # type: ignore[no-untyped-def]
         queryset = Task.objects.filter(id__in=task_ids)
-        Task.delete_tasks_without_signals(queryset)
+        Task.delete_tasks_without_signals(queryset)  # type: ignore[no-untyped-call]
 
-pre_bulk_create = Signal(providing_args=["objs", "batch_size"])
-post_bulk_create = Signal(providing_args=["objs", "batch_size"])
+pre_bulk_create = Signal(providing_args=["objs", "batch_size"])  # type: ignore[call-arg]
+post_bulk_create = Signal(providing_args=["objs", "batch_size"])  # type: ignore[call-arg]
 
 
-class AnnotationManager(models.Manager):
-    def for_user(self, user):
+class AnnotationManager(models.Manager):  # type: ignore[type-arg]
+    def for_user(self, user):  # type: ignore[no-untyped-def]
         return self.filter(project__organization=user.active_organization)
 
-    def bulk_create(self, objs, batch_size=None):
+    def bulk_create(self, objs, batch_size=None):  # type: ignore[no-untyped-def]
         pre_bulk_create.send(sender=self.model, objs=objs, batch_size=batch_size)
         res = super(AnnotationManager, self).bulk_create(objs, batch_size)
         post_bulk_create.send(sender=self.model, objs=objs, batch_size=batch_size)
@@ -407,7 +407,7 @@ with tt as (
     where task=%(t_id)s and task_annotation=%(tc_id)s
 ) select count( distinct tt.item -> 'id') from tt"""
 
-AnnotationMixin = load_func(settings.ANNOTATION_MIXIN)
+AnnotationMixin = load_func(settings.ANNOTATION_MIXIN)  # type: ignore[no-untyped-call]
 
 
 class Annotation(models.Model):
@@ -486,11 +486,11 @@ class Annotation(models.Model):
             models.Index(fields=['project', 'was_cancelled']),
         ] + AnnotationMixin.Meta.indexes
 
-    def created_ago(self):
+    def created_ago(self):  # type: ignore[no-untyped-def]
         """ Humanize date """
         return timesince(self.created_at)
 
-    def entities_num(self):
+    def entities_num(self):  # type: ignore[no-untyped-def]
         res = self.result
         if isinstance(res, str):
             res = json.loads(res)
@@ -499,66 +499,66 @@ class Annotation(models.Model):
 
         return len(res)
 
-    def has_permission(self, user):
+    def has_permission(self, user):  # type: ignore[no-untyped-def]
         user.project = self.project  # link for activity log
-        return self.project.has_permission(user)
+        return self.project.has_permission(user)  # type: ignore[union-attr]
 
-    def increase_project_summary_counters(self):
+    def increase_project_summary_counters(self):  # type: ignore[no-untyped-def]
         if hasattr(self.project, 'summary'):
             logger.debug(f'Increase project.summary counters from {self}')
-            summary = self.project.summary
+            summary = self.project.summary  # type: ignore[union-attr]
             summary.update_created_annotations_and_labels([self])
 
-    def decrease_project_summary_counters(self):
+    def decrease_project_summary_counters(self):  # type: ignore[no-untyped-def]
         if hasattr(self.project, 'summary'):
             logger.debug(f'Decrease project.summary counters from {self}')
-            summary = self.project.summary
+            summary = self.project.summary  # type: ignore[union-attr]
             summary.remove_created_annotations_and_labels([self])
 
-    def update_task(self):
+    def update_task(self):  # type: ignore[no-untyped-def]
         update_fields = ['updated_at']
 
         # updated_by
-        request = get_current_request()
+        request = get_current_request()  # type: ignore[no-untyped-call]
         if request:
-            self.task.updated_by = request.user
+            self.task.updated_by = request.user  # type: ignore[union-attr]
             update_fields.append('updated_by')
 
-        self.task.save(update_fields=update_fields)
+        self.task.save(update_fields=update_fields)  # type: ignore[union-attr]
 
-    def save(self, *args, **kwargs):
-        request = get_current_request()
+    def save(self, *args, **kwargs):  # type: ignore[no-untyped-def]
+        request = get_current_request()  # type: ignore[no-untyped-call]
         if request:
             self.updated_by = request.user
         result = super().save(*args, **kwargs)
-        self.update_task()
+        self.update_task()  # type: ignore[no-untyped-call]
         return result
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         result = super().delete(*args, **kwargs)
-        self.update_task()
-        self.on_delete_update_counters()
+        self.update_task()  # type: ignore[no-untyped-call]
+        self.on_delete_update_counters()  # type: ignore[no-untyped-call]
         return result
 
-    def on_delete_update_counters(self):
+    def on_delete_update_counters(self):  # type: ignore[no-untyped-def]
         task = self.task
-        logger.debug(f"Start updating counters for task {task.id}.")
+        logger.debug(f"Start updating counters for task {task.id}.")  # type: ignore[union-attr]
         if self.was_cancelled:
-            cancelled = task.annotations.all().filter(was_cancelled=True).count()
-            Task.objects.filter(id=task.id).update(cancelled_annotations=cancelled)
-            logger.debug(f"On delete updated cancelled_annotations for task {task.id}")
+            cancelled = task.annotations.all().filter(was_cancelled=True).count()  # type: ignore[union-attr]
+            Task.objects.filter(id=task.id).update(cancelled_annotations=cancelled)  # type: ignore[misc, union-attr]
+            logger.debug(f"On delete updated cancelled_annotations for task {task.id}")  # type: ignore[union-attr]
         else:
-            total = task.annotations.all().filter(was_cancelled=False).count()
-            Task.objects.filter(id=task.id).update(total_annotations=total)
-            logger.debug(f"On delete updated total_annotations for task {task.id}")
+            total = task.annotations.all().filter(was_cancelled=False).count()  # type: ignore[union-attr]
+            Task.objects.filter(id=task.id).update(total_annotations=total)  # type: ignore[misc, union-attr]
+            logger.debug(f"On delete updated total_annotations for task {task.id}")  # type: ignore[union-attr]
 
         logger.debug(f'Update task stats for task={task}')
-        task.update_is_labeled()
-        Task.objects.filter(id=task.id).update(is_labeled=task.is_labeled)
+        task.update_is_labeled()  # type: ignore[union-attr]
+        Task.objects.filter(id=task.id).update(is_labeled=task.is_labeled)  # type: ignore[misc, union-attr, union-attr]
 
         # remove annotation counters in project summary followed by deleting an annotation
         logger.debug("Remove annotation counters in project summary followed by deleting an annotation")
-        self.decrease_project_summary_counters()
+        self.decrease_project_summary_counters()  # type: ignore[no-untyped-call]
 
 
 class TaskLock(models.Model):
@@ -604,24 +604,24 @@ class AnnotationDraft(models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last update time')
 
-    def created_ago(self):
+    def created_ago(self):  # type: ignore[no-untyped-def]
         """ Humanize date """
         return timesince(self.created_at)
 
-    def has_permission(self, user):
-        user.project = self.task.project  # link for activity log
-        return self.task.project.has_permission(user)
+    def has_permission(self, user):  # type: ignore[no-untyped-def]
+        user.project = self.task.project    # type: ignore[union-attr] # link for activity log
+        return self.task.project.has_permission(user)  # type: ignore[union-attr, union-attr]
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         with transaction.atomic():
             super().save(*args, **kwargs)
-            project = self.task.project
+            project = self.task.project  # type: ignore[union-attr]
             if hasattr(project, 'summary'):
                 project.summary.update_created_labels_drafts([self])
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         with transaction.atomic():
-            project = self.task.project
+            project = self.task.project  # type: ignore[union-attr]
             if hasattr(project, 'summary'):
                 project.summary.remove_created_drafts_and_labels([self])
             super().delete(*args, **kwargs)
@@ -641,16 +641,16 @@ class Prediction(models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
-    def created_ago(self):
+    def created_ago(self):  # type: ignore[no-untyped-def]
         """ Humanize date """
         return timesince(self.created_at)
 
-    def has_permission(self, user):
+    def has_permission(self, user):  # type: ignore[no-untyped-def]
         user.project = self.task.project  # link for activity log
-        return self.task.project.has_permission(user)
+        return self.task.project.has_permission(user)  # type: ignore[union-attr]
 
     @classmethod
-    def prepare_prediction_result(cls, result, project):
+    def prepare_prediction_result(cls, result, project):  # type: ignore[no-untyped-def]
         """
         This function does the following logic of transforming "result" object:
         result is list -> use raw result as is
@@ -694,28 +694,28 @@ class Prediction(models.Model):
         else:
             raise ValidationError(f'Incorrect format {type(result)} for prediction result {result}')
 
-    def update_task(self):
+    def update_task(self):  # type: ignore[no-untyped-def]
         update_fields = ['updated_at']
 
         # updated_by
-        request = get_current_request()
+        request = get_current_request()  # type: ignore[no-untyped-call]
         if request:
             self.task.updated_by = request.user
             update_fields.append('updated_by')
 
-        self.task.save(update_fields=update_fields)
+        self.task.save(update_fields=update_fields)  # type: ignore[no-untyped-call]
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         # "result" data can come in different forms - normalize them to JSON
-        self.result = self.prepare_prediction_result(self.result, self.task.project)
+        self.result = self.prepare_prediction_result(self.result, self.task.project)  # type: ignore[no-untyped-call]
         # set updated_at field of task to now()
-        self.update_task()
+        self.update_task()  # type: ignore[no-untyped-call]
         return super(Prediction, self).save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         result = super().delete(*args, **kwargs)
         # set updated_at field of task to now()
-        self.update_task()
+        self.update_task()  # type: ignore[no-untyped-call]
         return result
 
     class Meta:
@@ -723,7 +723,7 @@ class Prediction(models.Model):
 
 
 @receiver(post_delete, sender=Task)
-def update_all_task_states_after_deleting_task(sender, instance, **kwargs):
+def update_all_task_states_after_deleting_task(sender, instance, **kwargs):  # type: ignore[no-untyped-def]
     """ after deleting_task
         use update_tasks_states for all project
         but call only tasks_number_changed section
@@ -742,20 +742,20 @@ def update_all_task_states_after_deleting_task(sender, instance, **kwargs):
 
 
 @receiver(pre_delete, sender=Task)
-def remove_data_columns(sender, instance, **kwargs):
+def remove_data_columns(sender, instance, **kwargs):  # type: ignore[no-untyped-def]
     """Reduce data column counters after removing task"""
     instance.decrease_project_summary_counters()
 
 
-def _task_data_is_not_updated(update_fields):
+def _task_data_is_not_updated(update_fields):  # type: ignore[no-untyped-def]
     if update_fields and list(update_fields) == ['is_labeled']:
         return True
 
 
 @receiver(pre_save, sender=Task)
-def delete_project_summary_data_columns_before_updating_task(sender, instance, update_fields, **kwargs):
+def delete_project_summary_data_columns_before_updating_task(sender, instance, update_fields, **kwargs):  # type: ignore[no-untyped-def]
     """Before updating task fields - ensure previous info removed from project.summary"""
-    if _task_data_is_not_updated(update_fields):
+    if _task_data_is_not_updated(update_fields):  # type: ignore[no-untyped-call]
         # we don't need to update counters when other than task.data fields are updated
         return
     try:
@@ -767,16 +767,16 @@ def delete_project_summary_data_columns_before_updating_task(sender, instance, u
 
 
 @receiver(post_save, sender=Task)
-def update_project_summary_data_columns(sender, instance, created, update_fields, **kwargs):
+def update_project_summary_data_columns(sender, instance, created, update_fields, **kwargs):  # type: ignore[no-untyped-def]
     """Update task counters in project summary in case when new task has been created"""
-    if _task_data_is_not_updated(update_fields):
+    if _task_data_is_not_updated(update_fields):  # type: ignore[no-untyped-call]
         # we don't need to update counters when other than task.data fields are updated
         return
     instance.increase_project_summary_counters()
 
 
 @receiver(pre_save, sender=Annotation)
-def delete_project_summary_annotations_before_updating_annotation(sender, instance, **kwargs):
+def delete_project_summary_annotations_before_updating_annotation(sender, instance, **kwargs):  # type: ignore[no-untyped-def]
     """Before updating annotation fields - ensure previous info removed from project.summary"""
     try:
         old_annotation = sender.objects.get(id=instance.id)
@@ -804,7 +804,7 @@ def delete_project_summary_annotations_before_updating_annotation(sender, instan
 
 
 @receiver(post_save, sender=Annotation)
-def update_project_summary_annotations_and_is_labeled(sender, instance, created, **kwargs):
+def update_project_summary_annotations_and_is_labeled(sender, instance, created, **kwargs):  # type: ignore[no-untyped-def]
     """Update annotation counters in project summary"""
     instance.increase_project_summary_counters()
 
@@ -821,7 +821,7 @@ def update_project_summary_annotations_and_is_labeled(sender, instance, created,
 
 
 @receiver(pre_delete, sender=Prediction)
-def remove_predictions_from_project(sender, instance, **kwargs):
+def remove_predictions_from_project(sender, instance, **kwargs):  # type: ignore[no-untyped-def]
     """Remove predictions counters"""
     instance.task.total_predictions = instance.task.predictions.all().count() - 1
     instance.task.save(update_fields=['total_predictions'])
@@ -829,7 +829,7 @@ def remove_predictions_from_project(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Prediction)
-def save_predictions_to_project(sender, instance, **kwargs):
+def save_predictions_to_project(sender, instance, **kwargs):  # type: ignore[no-untyped-def]
     """Add predictions counters"""
     instance.task.total_predictions = instance.task.predictions.all().count()
     instance.task.save(update_fields=['total_predictions'])
@@ -839,7 +839,7 @@ def save_predictions_to_project(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Annotation)
-def delete_draft(sender, instance, **kwargs):
+def delete_draft(sender, instance, **kwargs):  # type: ignore[no-untyped-def]
     task = instance.task
     query_args = {'task': task, 'annotation': instance}
     drafts = AnnotationDraft.objects.filter(**query_args)
@@ -849,7 +849,7 @@ def delete_draft(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Annotation)
-def update_ml_backend(sender, instance, **kwargs):
+def update_ml_backend(sender, instance, **kwargs):  # type: ignore[no-untyped-def]
     if instance.ground_truth:
         return
 
@@ -864,7 +864,7 @@ def update_ml_backend(sender, instance, **kwargs):
                 ml_backend.train()
 
 
-def update_task_stats(task, stats=('is_labeled',), save=True):
+def update_task_stats(task, stats=('is_labeled',), save=True):  # type: ignore[no-untyped-def]
     """Update single task statistics:
         accuracy
         is_labeled
@@ -880,7 +880,7 @@ def update_task_stats(task, stats=('is_labeled',), save=True):
         task.save()
 
 
-def bulk_update_stats_project_tasks(tasks, project=None):
+def bulk_update_stats_project_tasks(tasks, project=None):  # type: ignore[no-untyped-def]
     """bulk Task update accuracy
        ex: after change settings
        apply several update queries size of batch
@@ -914,14 +914,14 @@ def bulk_update_stats_project_tasks(tasks, project=None):
         else:
             # update objects without saving if we can't use overlap
             for task in tasks:
-                update_task_stats(task, save=False)
+                update_task_stats(task, save=False)  # type: ignore[no-untyped-call]
             try:
                 # start update query batches
-                bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+                bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)  # type: ignore[no-untyped-call]
             except OperationalError as exp:
                 logger.error("Operational error while updating tasks: {exc}", exc_info=True)
                 # try to update query batches one more time
-                start_job_async_or_sync(bulk_update, tasks, in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
+                start_job_async_or_sync(bulk_update, tasks, in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)  # type: ignore[no-untyped-call]
 
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)

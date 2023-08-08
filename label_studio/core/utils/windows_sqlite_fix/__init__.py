@@ -8,7 +8,7 @@ import requests
 logger = logging.getLogger('main')
 
 
-def start_fix():
+def start_fix():  # type: ignore[no-untyped-def]
     import zipfile
     import platform
 
@@ -39,7 +39,7 @@ def start_fix():
     exit()
 
 
-def windows_dll_fix():
+def windows_dll_fix():  # type: ignore[no-untyped-def]
     """ Copy sqlite.dll to the current directory and use it """
     auto_agree = any([a == '--agree-fix-sqlite' for a in sys.argv])
     force_fix = any([a == '--force-fix-sqlite' for a in sys.argv])

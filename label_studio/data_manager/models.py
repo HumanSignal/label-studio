@@ -31,7 +31,7 @@ class ProjectViewMixin(models.Model):
         "projects.Project", related_name="views", on_delete=models.CASCADE, help_text="Project ID"
     )
 
-    def has_permission(self, user):
+    def has_permission(self, user):  # type: ignore[no-untyped-def]
         user.project = self.project  # link for activity log
         if self.project.organization == user.active_organization:
             return True
@@ -42,7 +42,7 @@ class ProjectViewMixin(models.Model):
 
 
 class View(ViewBaseModel, ProjectViewMixin):
-    def get_prepare_tasks_params(self, add_selected_items=False):
+    def get_prepare_tasks_params(self, add_selected_items=False):  # type: ignore[no-untyped-def]
         # convert filters to PrepareParams structure
         filters = None
         if self.filter_group:
@@ -66,7 +66,7 @@ class View(ViewBaseModel, ProjectViewMixin):
         if add_selected_items and self.selected_items:
             selected_items = self.selected_items
 
-        return PrepareParams(project=self.project_id, ordering=ordering, filters=filters,
+        return PrepareParams(project=self.project_id, ordering=ordering, filters=filters,  # type: ignore[arg-type]
                              data=self.data, selectedItems=selected_items)
 
 

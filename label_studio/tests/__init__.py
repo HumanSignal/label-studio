@@ -2,8 +2,8 @@
 """
 
 try:
-    from requests._internal_utils import HEADER_VALIDATORS
-    from tavern.util.formatted_str import FormattedString
+    from requests._internal_utils import HEADER_VALIDATORS  # type: ignore[import]
+    from tavern.util.formatted_str import FormattedString  # type: ignore[import]
 
     HEADER_VALIDATORS[FormattedString] = HEADER_VALIDATORS[str]
 except ImportError:
