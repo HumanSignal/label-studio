@@ -18,7 +18,7 @@ import { DEFAULT_COLUMN, EMPTY_CONFIG, isEmptyConfig, Template } from './Templat
 import { TemplatesList } from './TemplatesList';
 
 import './codemirror.css';
-import './normal-hint';
+import './config-hint';
 import tags from './schema.json';
 
 const wizardClass = cn("wizard");

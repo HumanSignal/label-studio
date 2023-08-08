@@ -40,7 +40,7 @@ type CMSchemaItem = {
   children?: string[];
 }
 
-type CMHintResult = string | {
+type CMHintResult = {
   text: string;
   name?: string;
   description?: string;
@@ -80,8 +80,9 @@ function richHint(el: Element, self: any, data: CMHintResult) {
 
   if (data.type) {
     const type = document.createElement("span");
+    const value = Array.isArray(data.type) ? data.type.join(" | ") : data.type;
 
-    type.appendChild(document.createTextNode(data.type));
+    type.appendChild(document.createTextNode(value));
     type.className = "CodeMirror-hint-type";
     el.appendChild(document.createTextNode(" "));
     el.appendChild(type);
@@ -105,6 +106,7 @@ function getHints(cm: any, options: CMHintOptions) {
   const matchInMiddle = options && options.matchInMiddle;
 
   if (!tags) return;
+
   const cur: CMCursor = cm.getCursor();
   const token: CMToken = cm.getTokenAt(cur);
 
@@ -115,13 +117,14 @@ function getHints(cm: any, options: CMHintOptions) {
   let inner = CM.innerMode(cm.getMode(), token.state);
 
   if (!inner.mode.xmlCurrentTag) return;
+
   const result: CMHintResult[] = [];
   let replaceToken = false;
   let prefix: string | undefined;
   const tag = /\btag\b/.test(token.type) && !/>$/.test(token.string);
   const tagName = tag && /^\w/.test(token.string);
   let tagStart: number | undefined;
-  let tagType;
+  let tagType: "open" | "close" | null = null;
 
   if (tagName) {
     const before = cm.getLine(cur.line).slice(Math.max(0, token.start - 2), token.start);
@@ -138,9 +141,11 @@ function getHints(cm: any, options: CMHintOptions) {
   const tagInfo = inner.mode.xmlCurrentTag(inner.state);
 
   if (!tag && !tagInfo || tagType) {
-    if (tagName)
+    // Tag name completion
+    if (tagName) {
       prefix = token.string;
-    replaceToken = tagType;
+    }
+    replaceToken = !!tagType;
     const context = inner.mode.xmlCurrentContext ? inner.mode.xmlCurrentContext(inner.state) : [];
 
     inner = context.length && context[context.length - 1];
@@ -161,28 +166,18 @@ function getHints(cm: any, options: CMHintOptions) {
   } else {
     // Attribute completion
     const curTag: CMSchemaItem = tagInfo && tags[tagInfo.name];
-    const globalAttrs = {}; // tags["!attrs"];
-    let attrs = curTag && curTag.attrs;
+    const attrs = curTag && curTag.attrs;
 
-    if (!attrs && !globalAttrs) return;
-    if (!attrs) {
-      attrs = globalAttrs;
-    } else if (globalAttrs) { // Combine tag-local and global attributes
-      const set = {};
-
-      for (const nm in globalAttrs) if (globalAttrs.hasOwnProperty(nm)) set[nm] = globalAttrs[nm];
-      for (const nm in attrs) if (attrs.hasOwnProperty(nm)) set[nm] = attrs[nm];
-      attrs = set;
-    }
-    if (token.type === "string" || token.string === "=") { // A value
+    if (!attrs) return;
+    if (token.type === "string" || token.string === "=") {
+      // Attribute value completion
       const before = cm.getRange(Pos(cur.line, Math.max(0, cur.ch - 60)),
         Pos(cur.line, token.type === "string" ? token.start : token.end));
       const atName = before.match(/([^\s\u00a0=<>"']+)=$/);
       const atValues = atName?.[1] ? attrs[atName[1]]?.type : undefined;
 
-      if (!atName || !attrs.hasOwnProperty(atName[1])) return;
+      if (!atName || !Object.prototype.hasOwnProperty.call(attrs, atName[1])) return;
       if (!atValues || !Array.isArray(atValues)) return;
-      // if (typeof atValues === 'function') atValues = atValues.call(this, cm); // Functions can be used to supply values for autocomplete widget
       if (token.type === "string") {
         prefix = token.string;
         let n = 0;
@@ -212,9 +207,9 @@ function getHints(cm: any, options: CMHintOptions) {
         return returnHints();
       };
 
-      // if (atValues && atValues.then) return atValues.then(returnHintsFromAtValues);
       return returnHintsFromAtValues(atValues);
-    } else { // An attribute name
+    } else {
+      // An attribute name completion
       if (token.type === "attribute") {
         prefix = token.string;
         replaceToken = true;
@@ -223,9 +218,7 @@ function getHints(cm: any, options: CMHintOptions) {
         if (prefix && !matches(attr, prefix, matchInMiddle)) continue;
 
         const name = attrs[attr].required ? attr + "*" : attr;
-        let type = attrs[attr].type;
-
-        if (Array.isArray(type)) type = type.join(" | ");
+        const type = attrs[attr].type;
 
         result.push({ text: attr, name, type, description: attrs[attr].description, render: richHint });
       }
