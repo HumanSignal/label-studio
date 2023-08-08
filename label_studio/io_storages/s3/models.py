@@ -101,11 +101,6 @@ class S3StorageMixin(models.Model):
             logger.debug(f'Test connection to bucket {self.bucket}')
             client.head_bucket(Bucket=self.bucket)
 
-    def validate_aws_sse_kms_key_id(self):
-        if self.aws_sse_kms_key_id:
-            client = self.get_client()
-            client.describe_key(KeyId=self.aws_sse_kms_key_id)
-
     @property
     def path_full(self):
         prefix = self.prefix or ''
