@@ -47,12 +47,12 @@ If the export times out, see how to [export snapshots using the SDK](https://lab
 Use the following command to export data and annotations.
 
 ```shell
-label-studio export <project-id> <export-format> --path=<output-path>
+label-studio export <project-id> <export-format> --export-path=<output-path>
 ```
 
 To enable logs: 
 ```shell
-DEBUG=1 LOG_LEVEL=DEBUG label-studio export <project-id> <export-format> --path=<output-path>
+DEBUG=1 LOG_LEVEL=DEBUG label-studio export <project-id> <export-format> --export-path=<output-path>
 ```
 
 </div>
