@@ -62,7 +62,9 @@ def run_webhook_sync(webhook, action, payload=None):
 
 
 def emit_webhooks_sync(organization, project, action, payload):
-    """Run all active webhooks for the action."""
+    """
+    Run all active webhooks for the action.
+    """
     webhooks = get_active_webhooks(organization, project, action)
     if project and payload and webhooks.filter(send_payload=True).exists():
         payload['project'] = load_func(
@@ -101,6 +103,12 @@ def emit_webhooks_for_instance_sync(organization, project, action, instance=None
 
 
 def run_webhook(webhook, action, payload=None):
+    """Run one webhook for action.
+
+    This function must not raise any exceptions.
+
+    Will run a webhook in an RQ worker.
+    """
     if flag_set("fflag_fix_back_lsdv_4604_excess_sql_queries_in_api_short"):
         start_job_async_or_sync(
             run_webhook_sync,
@@ -118,8 +126,11 @@ def emit_webhooks_for_instance(
         action,
         instance=None
 ):
-    """
-    Emits webhooks in background
+    """Run all active webhooks for the action using instances as payload.
+
+    Be sure WebhookAction.ACTIONS contains all required fields.
+
+    Will run all selected webhooks in an RQ worker.
     """
     if flag_set("fflag_fix_back_lsdv_4604_excess_sql_queries_in_api_short"):
         start_job_async_or_sync(
@@ -135,6 +146,10 @@ def emit_webhooks_for_instance(
 
 
 def emit_webhooks(organization, project, action, payload):
+    """
+    Run all active webhooks for the action.
+    Will run all selected webhooks in an RQ worker.
+    """
     if flag_set("fflag_fix_back_lsdv_4604_excess_sql_queries_in_api_short"):
         start_job_async_or_sync(
             emit_webhooks_sync,
