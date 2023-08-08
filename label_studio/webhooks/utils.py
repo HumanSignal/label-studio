@@ -117,7 +117,7 @@ def run_webhook(webhook, action, payload=None):
             payload,
         )
     else:
-        run_webhook(webhook, action, payload)
+        run_webhook_sync(webhook, action, payload)
 
 
 def emit_webhooks_for_instance(
@@ -148,6 +148,7 @@ def emit_webhooks_for_instance(
 def emit_webhooks(organization, project, action, payload):
     """
     Run all active webhooks for the action.
+
     Will run all selected webhooks in an RQ worker.
     """
     if flag_set("fflag_fix_back_lsdv_4604_excess_sql_queries_in_api_short"):
