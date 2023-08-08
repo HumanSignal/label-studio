@@ -5,8 +5,8 @@ import requests
 from core.utils.common import load_func
 from django.conf import settings
 from django.db.models import Q
-import django_rq
 from core.feature_flags import flag_set
+from core.redis import start_job_async_or_sync
 
 from .models import Webhook, WebhookAction
 
@@ -102,8 +102,7 @@ def emit_webhooks_for_instance_sync(organization, project, action, instance=None
 
 def run_webhook(webhook, action, payload=None):
     if flag_set("fflag_fix_back_lsdv_4604_excess_sql_queries_in_api_short"):
-        queue = django_rq.get_queue('low')
-        queue.enqueue(
+        start_job_async_or_sync(
             run_webhook_sync,
             webhook,
             action,
@@ -123,8 +122,7 @@ def emit_webhooks_for_instance(
     Emits webhooks in background
     """
     if flag_set("fflag_fix_back_lsdv_4604_excess_sql_queries_in_api_short"):
-        queue = django_rq.get_queue('low')
-        queue.enqueue(
+        start_job_async_or_sync(
             emit_webhooks_for_instance_sync,
             organization,
             project,
@@ -138,8 +136,7 @@ def emit_webhooks_for_instance(
 
 def emit_webhooks(organization, project, action, payload):
     if flag_set("fflag_fix_back_lsdv_4604_excess_sql_queries_in_api_short"):
-        queue = django_rq.get_queue('low')
-        queue.enqueue(
+        start_job_async_or_sync(
             emit_webhooks_sync,
             organization,
             project,
