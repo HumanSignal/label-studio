@@ -22,8 +22,10 @@ Use with the following data types: video
 | [height] | <code>number</code> | <code>600</code> | height of the video |
 
 ### Example
+
+Labeling configuration to display a video on the labeling interface
+
 ```html
-<!--Labeling configuration to display a video on the labeling interface-->
 <View>
   <Video name="video" value="$video" />
 </View>

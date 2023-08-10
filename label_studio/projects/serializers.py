@@ -3,10 +3,13 @@
 from rest_framework import serializers
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework.serializers import SerializerMethodField
+import bleach
 from users.serializers import UserSimpleSerializer
 
+from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS
 
 from projects.models import Project, ProjectOnboarding, ProjectSummary
+
 
 
 class CreatedByFromContext:
@@ -49,6 +52,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
                                                                 help_text='Start model training after any annotations are submitted or updated')
     config_has_control_tags = SerializerMethodField(default=None, read_only=True,
                                                     help_text='Flag to detect is project ready for labeling')
+    finished_task_number = serializers.IntegerField(default=None, read_only=True, help_text='Finished tasks')
 
     @staticmethod
     def get_config_has_control_tags(project):
@@ -68,6 +72,10 @@ class ProjectSerializer(FlexFieldsModelSerializer):
         data = super().to_internal_value(data)
         if 'start_training_on_annotation_update' in initial_data:
             data['min_annotations_to_start_training'] = int(initial_data['start_training_on_annotation_update'])
+
+        if 'expert_instruction' in initial_data:
+            data['expert_instruction'] = bleach.clean(initial_data['expert_instruction'], tags=SAFE_HTML_TAGS, attributes=SAFE_HTML_ATTRIBUTES)
+
         return data
 
     class Meta:
@@ -82,7 +90,8 @@ class ProjectSerializer(FlexFieldsModelSerializer):
                   'total_annotations_number', 'total_predictions_number', 'sampling', 'show_ground_truth_first',
                   'show_overlap_first', 'overlap_cohort_percentage', 'task_data_login', 'task_data_password',
                   'control_weights', 'parsed_label_config', 'evaluate_predictions_automatically',
-                  'config_has_control_tags', 'skip_queue', 'reveal_preannotations_interactively', 'pinned_at']
+                  'config_has_control_tags', 'skip_queue', 'reveal_preannotations_interactively', 'pinned_at',
+                  'finished_task_number']
 
     def validate_label_config(self, value):
         if self.instance is None:

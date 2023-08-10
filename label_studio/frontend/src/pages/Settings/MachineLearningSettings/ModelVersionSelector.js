@@ -47,7 +47,7 @@ export const ModelVersionSelector = ({
     }
 
     setLoading(false);
-  }, [api, object?.id, apiName]);
+  }, [object?.id, apiName]);
 
   useEffect(fetchMLVersions, []);
 

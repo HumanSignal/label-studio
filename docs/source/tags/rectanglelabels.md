@@ -56,8 +56,10 @@ Use with the following data types: image
 ```
 
 ### Example
+
+Basic labeling configuration for applying labels to rectangular bounding boxes on an image
+
 ```html
-<!--Basic labeling configuration for applying labels to rectangular bounding boxes on an image -->
 <View>
   <RectangleLabels name="labels" toName="image">
     <Label value="Person" />

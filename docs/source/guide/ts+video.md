@@ -8,6 +8,8 @@ meta_title: Time series video audio labeling
 
 > Note: To use audio instead of video you should replace .mp4 file to mp3/wav/other browser supported audio format.      
 
+> Note: This approach works with Label Studio <b>1.4.1 and lower</b>
+
 ## Step 1: Media hosting
 
 You have to host your CSV and MP4 somewhere (or another video formats supporting by browsers). You can use S3 

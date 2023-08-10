@@ -162,8 +162,8 @@ export const Pagination: FC<PaginationProps> = forwardRef(({
 
     return () => window.removeEventListener('popstate', popStateHandler);
   }, [props.urlParamName]);
-
-  return (totalPages > 1) ? (
+  return (totalPages >= 1) ?
+    (
     <Block name="pagination" mod={{ disabled, size, waiting }} style={props.style}>
       {(props.label && isDefined(pageSize)) && (
         <Elem name="label">

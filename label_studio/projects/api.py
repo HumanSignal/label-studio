@@ -120,7 +120,7 @@ class ProjectFilterSet(FilterSet):
     
     ```bash
     curl -H Content-Type:application/json -H 'Authorization: Token abc123' -X POST '{}/api/projects' \
-    --data "{{\"label_config\": \"<View>[...]</View>\"}}"
+    --data '{{"label_config": "<View>[...]</View>"}}'
     ```
     """.format(settings.HOSTNAME or 'https://localhost:8080')
 ))
@@ -224,9 +224,6 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
                 has_changes = config_essential_data_has_changed(label_config, project.label_config)
             except KeyError:
                 pass
-            else:
-                if has_changes:
-                    View.objects.filter(project=project).all().delete()
 
         return super(ProjectAPI, self).patch(request, *args, **kwargs)
 
@@ -409,7 +406,8 @@ class ProjectTaskListAPI(generics.ListCreateAPIView,
 
     def filter_queryset(self, queryset):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
-        tasks = Task.objects.filter(project=project)
+        # ordering is deprecated here
+        tasks = Task.objects.filter(project=project).order_by('-updated_at')
         page = paginator(tasks, self.request)
         if page:
             return page
@@ -440,6 +438,7 @@ class ProjectTaskListAPI(generics.ListCreateAPIView,
         project = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
         instance = serializer.save(project=project)
         emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])
+        return instance
 
 
 class TemplateListAPI(generics.ListAPIView):

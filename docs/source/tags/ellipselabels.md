@@ -56,8 +56,10 @@ Use with the following data types: image
 ```
 
 ### Example
+
+Basic semantic image segmentation labeling configuration
+
 ```html
-<!--Basic semantic image segmentation labeling configuration-->
 <View>
   <EllipseLabels name="labels" toName="image">
     <Label value="Person" />

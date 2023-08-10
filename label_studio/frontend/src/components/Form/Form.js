@@ -406,7 +406,7 @@ Form.Builder = React.forwardRef(({
       const currentValue = formData?.[field.name] ?? undefined;
       const triggerUpdate = props.autosubmit !== true && field.trigger_form_update === true;
       const getValue = () => {
-        const isProtected = field.skipAutofill && !field.allowEmpty && field.type === 'password';
+        const isProtected = field.skipAutofill && (!field.allowEmpty || field.protectedValue) && field.type === 'password';
 
         if (isProtected) {
           return PASSWORD_PROTECTED_VALUE;

@@ -56,7 +56,7 @@ export const CreateProject = ({ onClose }) => {
   const tabClass = rootClass.elem("tab");
   const steps = {
     name: <span className={tabClass.mod({ disabled: !!error })}>Project Name</span>,
-    import: <span className={tabClass.mod({ disabled: uploadDisabled })}>Data Import</span>,
+    // import: <span className={tabClass.mod({ disabled: uploadDisabled })}>Data Import</span>,
     config: "Labeling Setup",
   };
 
@@ -142,7 +142,7 @@ export const CreateProject = ({ onClose }) => {
           setDescription={setDescription}
           show={step === "name"}
         />
-        <ImportPage project={project} show={step === "import"} {...pageProps} />
+        {/* <ImportPage project={project} show={step === "import"} {...pageProps} /> */}
         <ConfigPage project={project} onUpdate={setConfig} show={step === "config"} columns={columns} disableSaveButton={true} />
       </div>
     </Modal>

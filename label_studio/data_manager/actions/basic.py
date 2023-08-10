@@ -10,7 +10,7 @@ from core.utils.common import load_func
 from projects.models import Project
 
 from tasks.models import (
-    Annotation, Prediction, Task, bulk_update_stats_project_tasks
+    Annotation, Prediction, Task
 )
 from webhooks.utils import emit_webhooks_for_instance
 from webhooks.models import WebhookAction
@@ -84,14 +84,16 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     # take only tasks where annotations were deleted
     real_task_ids = set(list(annotations.values_list('task__id', flat=True)))
     annotations_ids = list(annotations.values('id'))
+    # remove deleted annotations from project.summary
+    project.summary.remove_created_annotations_and_labels(annotations)
     annotations.delete()
     emit_webhooks_for_instance(project.organization, project, WebhookAction.ANNOTATIONS_DELETED, annotations_ids)
-    start_job_async_or_sync(bulk_update_stats_project_tasks, queryset.filter(is_labeled=True))
-    start_job_async_or_sync(project.update_tasks_counters, task_ids)
     request = kwargs['request']
 
     tasks = Task.objects.filter(id__in=real_task_ids)
     tasks.update(updated_at=datetime.now(), updated_by=request.user)
+    # Update tasks counter and is_labeled. It should be a single operation as counters affect bulk is_labeled update
+    project.update_tasks_counters_and_is_labeled(tasks_queryset=real_task_ids)
 
     # LSE postprocess
     postprocess = load_func(settings.DELETE_TASKS_ANNOTATIONS_POSTPROCESS)
@@ -111,9 +113,10 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     """
     task_ids = queryset.values_list('id', flat=True)
     predictions = Prediction.objects.filter(task__id__in=task_ids)
+    real_task_ids = set(list(predictions.values_list('task__id', flat=True)))
     count = predictions.count()
     predictions.delete()
-    start_job_async_or_sync(project.update_tasks_counters, task_ids)
+    project.update_tasks_counters(Task.objects.filter(id__in=real_task_ids))
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
 
 

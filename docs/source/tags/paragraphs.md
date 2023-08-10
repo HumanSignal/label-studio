@@ -52,8 +52,10 @@ Use with the following data types: text
 ```
 
 ### Example
+
+Labeling configuration to label paragraph regions of text containing dialogue
+
 ```html
-<!--Labeling configuration to label paragraph regions of text containing dialogue-->
 <View>
   <Paragraphs name="dialogue-1" value="$dialogue" layout="dialogue" />
   <ParagraphLabels name="importance" toName="dialogue-1">

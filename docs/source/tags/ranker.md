@@ -26,16 +26,20 @@ To see this tag in action:
 | sortedHighlightColor | <code>string</code> |  | Sorted color in HTML color name |
 
 ### Example
+
+Labeling configuration for ranking predicted text output from a model
+
 ```html
-<!--Labeling configuration for ranking predicted text output from a model -->
 <View>
   <Text name="txt-1" value="$text"></Text>
   <Ranker name="ranker-1" toName="txt-1" ranked="true" sortedHighlightColor="red"></Ranker>
 </View>
 ```
 ### Example
-```html
-<!--Example JSON task to use to see the Ranker tag in action -->
+
+Example JSON task to use to see the Ranker tag in action
+
+```json
 [{
   "data": {
     "text": "Some text for the ranker tag"

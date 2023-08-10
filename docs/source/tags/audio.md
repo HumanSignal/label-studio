@@ -42,8 +42,10 @@ Use with the following data types: audio
 ```
 
 ### Example
+
+Play audio on the labeling interface
+
 ```html
-<!--Play audio on the labeling interface-->
 <View>
   <Audio name="audio" value="$audio" />
 </View>

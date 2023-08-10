@@ -23,8 +23,10 @@ Use with the following data types: audio, image, HTML, paragraphs, text
 | lockAxis | <code>x</code> \| <code>y</code> |  | Whether to lock the axis |
 
 ### Example
+
+Labeling configuration for a list of possible reply options that can be ranked
+
 ```html
-<!--Labeling configuration for a list of possible reply options that can be ranked-->
 <View>
  <HyperText name="page" value="$markup"></HyperText>
  <List name="ranker" value="$replies" elementValue="$text" elementTag="Text" ranked="true" sortedHighlightColor="#fcfff5"></List>

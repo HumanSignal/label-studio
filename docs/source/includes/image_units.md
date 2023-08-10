@@ -77,7 +77,7 @@ def convert_to_ls(x, y, width, height, original_width, original_height):
 
 
 # convert from LS
-output = convert_from_ls(task['completions'][0]['result'][0])
+output = convert_from_ls(task['annotations'][0]['result'][0])
 if output is None:
     raise Exception('Wrong convert') 
 pixel_x, pixel_y, pixel_width, pixel_height = output

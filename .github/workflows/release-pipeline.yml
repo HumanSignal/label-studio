@@ -37,7 +37,7 @@ jobs:
     needs:
       - build-pypi
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v2.1.0
 
       - name: DispatchEvent
         uses: actions/github-script@v6

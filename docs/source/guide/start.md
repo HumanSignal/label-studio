@@ -103,7 +103,7 @@ LABEL_STUDIO_PORT = 9001
 
 To run Label Studio on Docker with a port other than the default of 8080, use the port argument when starting Label Studio on Docker. For example, to start Label Studio in a Docker container accessible with port 9001, run the following: 
 ```bash
-docker run -it -p 9001:8080 -v `pwd`/mydata:/label-studio/data heartexlabs/label-studio:latest label-studio
+docker run -it -p 9001:8080 -v $(pwd)/mydata:/label-studio/data heartexlabs/label-studio:latest label-studio
 ```
 
 Or, if you're using Docker Compose, update the `docker-compose.yml` file that you're using to expose a different port for the NGINX server used to proxy the connection to Label Studio. For example, this portion of the [`docker-compose.yml`](https://github.com/heartexlabs/label-studio/blob/master/docker-compose.yml) file exposes port 9001 instead of port 80 for proxying Label Studio:
@@ -130,10 +130,10 @@ To run Label Studio on Docker and reference persistent local storage directories
 
 The following command starts a Docker container with the latest image of Label Studio with port 8080 and an environment variable that allows Label Studio to access local files. In this example, a local directory `./myfiles` is mounted to the `/label-studio/files` location. 
 ```bash
-docker run -it -p 8080:8080 -v `pwd`/mydata:/label-studio/data \
+docker run -it -p 8080:8080 -v $(pwd)/mydata:/label-studio/data \
 --env LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true \ 
 --env LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/label-studio/files \ 
--v `pwd`/myfiles:/label-studio/files \
+-v $(pwd)/myfiles:/label-studio/files \
 heartexlabs/label-studio:latest label-studio
 ```
 

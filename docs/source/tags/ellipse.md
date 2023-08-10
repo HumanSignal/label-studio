@@ -25,8 +25,10 @@ Use with the following data types: image
 | [smartOnly] | <code>boolean</code> |  | Only show smart tool for interactive pre-annotations |
 
 ### Example
+
+Basic image segmentation with ellipses labeling configuration
+
 ```html
-<!--Basic image segmentation with ellipses labeling configuration-->
 <View>
   <Ellipse name="ellipse1-1" toName="img-1" />
   <Image name="img-1" value="$img" />

@@ -27,8 +27,10 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [slider] | <code>boolean</code> | <code>false</code> | Use slider look instead of input; use min and max to add your constraints |
 
 ### Example
+
+Basic labeling configuration for numeric classification of text
+
 ```html
-<!--Basic labeling configuration for numeric classification of text -->
 <View>
   <Text name="txt" value="$text" />
   <Number name="number" toName="txt" max="10" />

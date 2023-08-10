@@ -13,15 +13,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check if the invite link is valid
+        id: invite_link_is_active
         run: |
           ! grep -Eo '(&quot;|")isSharedInviteError(&quot;|")\s*:\s*true' <(
               curl --silent --location ${{ env.INVITE_LINK }} -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:96.0) Gecko/20100101 Firefox/96.0' -H "Accept: application/json"
           )
       - name: Notify to Slack
-        if: ${{ failure() }}
-        uses: slackapi/slack-github-action@v1.22
+        if: always() && steps.invite_link_is_active.outcome == 'failure'
+        uses: slackapi/slack-github-action@v1.23
         with:
           channel-id: '${{ secrets.SLACK_LS_MONITORING_CHANNEL }}'
-          slack-message: "Our <${{ env.INVITE_LINK }}|public invite link> is down and needs to be manually updated:\n1. <https://slack.com/intl/en-es/help/articles/201330256-Invite-new-members-to-your-workspace#share-an-invite-link|Generate a new link> without expiry date; you may need to deactivate the previous one first.\n2. Update the permanent redirect link <https://s3.console.aws.amazon.com/s3/bucket/slack.labelstudio.heartex.com/property/website/edit?region=us-east-1|on the S3 dashboard> with newly generated link WITHOUT URL SCHEME."
+          slack-message: "Our <${{ env.INVITE_LINK }}|public invite link> has expired and needs to be manually updated:\n1. <https://slack.com/intl/en-es/help/articles/201330256-Invite-new-members-to-your-workspace#share-an-invite-link|Generate a new link> without expiry date; you may need to deactivate the previous one first.\n2. Update the permanent redirect link <https://s3.console.aws.amazon.com/s3/bucket/slack.labelstudio.heartex.com/property/website/edit?region=us-east-1|on the S3 dashboard> with newly generated link WITHOUT URL SCHEME."
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_LS_BOT_TOKEN }}
+
+      - name: Check if the invite link has teamDomains arg
+        id: invite_link_has_teamdomains
+        run: |
+          grep -Eo '(&quot;|")teamSignupDomains(&quot;|")\s*:\s*\[\]' <(
+              curl --silent --location ${{ env.INVITE_LINK }} -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:96.0) Gecko/20100101 Firefox/96.0' -H "Accept: application/json"
+          )
+      - name: Notify to Slack
+        if: always() && steps.invite_link_has_teamdomains.outcome == 'failure'
+        uses: slackapi/slack-github-action@v1.23
+        with:
+          channel-id: '${{ secrets.SLACK_LS_MONITORING_CHANNEL }}'
+          slack-message: "Our <${{ env.INVITE_LINK }}|public invite link> was configured to allow signups only from a list of allowed domains:\n1. Go to <https://label-studio.slack.com/admin/settings|Workspace settings>, next to `Joining This Workspace`, click `Expand`.\n2. Delete all domains from the list, select `Allow invitations` and click `Save`."
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_LS_BOT_TOKEN }}

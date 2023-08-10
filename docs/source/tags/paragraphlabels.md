@@ -21,8 +21,10 @@ Use with the following data types: paragraphs
 | [showInline] | <code>boolean</code> | <code>true</code> | Show labels in the same visual line |
 
 ### Example
+
+Basic labeling configuration to label paragraphs
+
 ```html
-<!--Basic labeling configuration to label paragraphs -->
 <View>
   <ParagraphLabels name="labels" toName="prg">
     <Label value="Statement" />

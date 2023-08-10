@@ -49,7 +49,7 @@ export const ProjectModelVersionSelector = ({
     }
 
     setLoading(false);
-  }, [api, project?.id, apiName]);
+  }, [project?.id, apiName]);
 
   useEffect(fetchMLVersions, [fetchMLVersions]);
 

@@ -1,0 +1,34 @@
+name: deploy:docs
+
+on:
+  push:
+    branches: [ 'ht/add-new-theme' ]
+    paths:
+      - 'docs/**'
+
+jobs:
+  deploy_docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules-enterprise
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Install Dependencies
+        run: cd docs && npm install
+
+      - name: Publish docs
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DOCS_DEPLOY_ENTERPRISE_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DOCS_DEPLOY_ENTERPRISE_AWS_SECRET_ACCESS_KEY }}
+        run: cd docs && touch db.json && npm run publish:enterprise

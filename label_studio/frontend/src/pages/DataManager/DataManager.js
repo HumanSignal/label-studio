@@ -3,6 +3,7 @@ import { generatePath, useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { Spinner } from '../../components';
 import { Button } from '../../components/Button/Button';
+import { FileUpload } from '../../components/FileUpload/FileUpload';
 import { modal } from '../../components/Modal/Modal';
 import { Space } from '../../components/Space/Space';
 import { useAPI } from '../../providers/ApiProvider';
@@ -19,6 +20,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import "./DataManager.styl";
 import getWebhookUrl from '../../webhooks';
+import { AnnotationsUpload } from '../../components/FileUpload/AnnotationsUpload';
 
 const initializeDataManager = async (root, props, params) => {
   if (!window.LabelStudio) throw Error("Label Studio Frontend doesn't exist on the page");
@@ -198,6 +200,32 @@ DataManagerPage.context = ({ dmRef }) => {
     '/settings': 'Settings',
   };
 
+  const handleClick = (event) => {
+    const hiddenFileInput = useRef(null);
+
+    hiddenFileInput.current.click();
+    console.log(image);
+  };
+  async function blobToBase64(blob) {
+    return new Promise((resolve, _) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  }
+  async function addImage() {
+    if (hiddenFileInput) {
+      console.log("GOT A FILE!");
+      if (typeof image != "undefined") {
+        URL.revokeObjectURL(image);
+        // let base64 = getBase64FromUrl(image);
+        // console.log('base64')
+        // console.log(base64)
+      }
+
+      setImage(URL.createObjectURL(hiddenFileInput.current.files[0]));
+    }
+  }
   const updateCrumbs = (currentMode) => {
     const isExplorer = currentMode === 'explorer';
     const dmPath = location.pathname.replace(DataManagerPage.path, '');
@@ -236,37 +264,61 @@ DataManagerPage.context = ({ dmRef }) => {
     updateCrumbs(currentMode);
     showLabelingInstruction(currentMode);
   };
-  const importAnnotations = () => {
+  
+  const exportData = async () => {
     const webhook_url = getWebhookUrl();
-
-    console.log('Import Annotations')
-
-    Swal.fire({
-      title: 'Attention',
-      text: "We will import annotations from the annotations folder in your project local directory, please make sure to add them there!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, Import them!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        axios.post(webhook_url + '/import_annotations?id='+project.id)
-          .then(response => {
-            let number_of_annotations = response.data.annotations;
-            let project_id = response.data.project_id;
-            Swal.fire({
-              title: 'Annotations are imported',
-              text: number_of_annotations + " annotations are imported for project id " + project_id,
-              icon: 'success'
+    console.log("Exporting data");
+    await axios.get(webhook_url + "/export_options?id=" + project.id).then((response) => {
+      console.log(response);
+      if(response.data.options){
+        const { value: option } = Swal.fire({
+          title: 'Select an export option',
+          input: 'select',
+          inputOptions: response.data.options,
+          inputPlaceholder: 'Select an option',
+          showCancelButton: true,
+          inputValidator: (value) => {
+            return new Promise(async (resolve) => {
+              console.log("export data");
+              resolve();
+              await axios.post(webhook_url +"/export_data?id="+ project.id + "&export_type=" + value)
+              .then((response) => {
+                if (response.data.message) {
+                  Swal.fire("Error", response.data.message, 'error');
+                } else {
+                  console.log(response.data.data);
+                  const decodedData = atob(response.data.data);
+                  const arrayBuffer = new ArrayBuffer(decodedData.length);
+                  const uint8Array = new Uint8Array(arrayBuffer);
+                  for (let i = 0; i < decodedData.length; i++) {
+                    uint8Array[i] = decodedData.charCodeAt(i);
+                  }
+                  const blob = new Blob([arrayBuffer], { type: 'application/zip' });
+                  const url = URL.createObjectURL(blob);
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.download = 'exported_data_project_id_' + project.id + '.zip';
+                  link.click();
+                }
+              })
+              .catch((error) => {
+                console.error('Export error');
+                console.error(error);
+                Swal.fire('Error', 'Failed to export the data', 'error');
+              });
             })
-          }).catch(err => {
-              console.log(err)
-              return null
-          })
+          }
+        })   
       }
-    })
+      else{
+        Swal.fire("Error", "Error retrieving options from the backend, please make sure that the webhook server is on", "error");
+      }
+
+    });
+
   }
+
+  
   useEffect(() => {
     if (dmRef) {
       dmRef.on('modeChanged', onDMModeChanged);
@@ -279,7 +331,9 @@ DataManagerPage.context = ({ dmRef }) => {
 
   return project && project.id ? (
     <Space size="small">
-      <Button size = "compact" onClick={() => importAnnotations()}>Import Annotations</Button>
+      <FileUpload project={project}></FileUpload>
+      <AnnotationsUpload project={project}></AnnotationsUpload>
+      <Button size = "compact" onClick={() => exportData()}>Export Data</Button>
       {(project.expert_instruction && mode !== 'explorer') && (
         <Button size="compact" onClick={() => {
           modal({

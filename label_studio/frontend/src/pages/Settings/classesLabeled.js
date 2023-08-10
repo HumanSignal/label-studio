@@ -9,16 +9,20 @@ import { useAPI } from "../../providers/ApiProvider";
 import { useProject } from "../../providers/ProjectProvider";
 import axios from 'axios'
 import getWebhookUrl from "../../webhooks";
+import Swal from "sweetalert2";
 export const ClassesLabeled = () => {
   const webhook_url = getWebhookUrl();
   const {project} = useProject();
   const api = useAPI();
   const history = useHistory();
   const [labels, setLabels] = useState([]);
-    useEffect(() => {
-        getNbOfLabelsPerClass();
-      console.log('rerendering');
-    }, [project]);
+  useEffect(() => {
+    if (project.id) {
+      console.log(project.id);
+      console.log('re-rendering in number of labels per class');
+      getNbOfLabelsPerClass();
+    }
+  }, [project]);
   const tableStyle = { 'border': '1px solid black', 'alignContent': 'left', 'fontSize': 20, 'textAlign': 'center', 'padding': 10 };
   function getNbOfLabelsPerClass() {
       if(project.id !== undefined)
@@ -28,6 +32,9 @@ export const ClassesLabeled = () => {
             const labels = response.data.nb_of_labels;
             let list = Object.entries(labels);
             setLabels(list);
+            if (list.length == 0) {
+              Swal.fire('Warning', 'It seems that the number of labels per class is not computed. Currently counting ... (if there is any)', 'warning')
+            }
           })
           .catch((error) => {
               console.log(error);
@@ -53,6 +60,7 @@ export const ClassesLabeled = () => {
         </tr>
       ))}
       </table>
+      {labels.length  == 0 ?<p style={{color: 'red'}}>Please wait until we compute the number of labels per class in the project</p>:<div></div>}
       </div>
       
   );

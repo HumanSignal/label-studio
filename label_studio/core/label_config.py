@@ -62,8 +62,16 @@ def _fix_choices(config):
     workaround for single choice
     https://github.com/heartexlabs/label-studio/issues/1259
     '''
-    if 'Choices' in config and 'Choice' in config['Choices'] and not isinstance(config['Choices']['Choice'], list):
-        config['Choices']['Choice'] = [config['Choices']['Choice']]
+    if 'Choices' in config:
+        # for single Choices tag in View
+        if 'Choice' in config['Choices'] and not isinstance(config['Choices']['Choice'], list):
+            config['Choices']['Choice'] = [config['Choices']['Choice']]
+        # for several Choices tags in View
+        elif isinstance(config['Choices'], list) and all('Choice' in tag_choices for tag_choices in config['Choices']):
+            for n in range(len(config['Choices'])):
+                # check that Choices tag has only 1 choice
+                if not isinstance(config['Choices'][n]['Choice'], list):
+                    config['Choices'][n]['Choice'] = [config['Choices'][n]['Choice']]
     if 'View' in config:
         if isinstance(config['View'], OrderedDict):
             config['View'] = _fix_choices(config['View'])

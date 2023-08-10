@@ -5,8 +5,8 @@ services:
     build: .
     image: heartexlabs/label-studio:latest
     ports:
-      - "8080:80"
-      - "8081:443"
+      - "8080:8085"
+      - "8081:8086"
     depends_on:
       - app
     environment:
@@ -28,7 +28,7 @@ services:
     build: .
     image: heartexlabs/label-studio:latest
     expose:
-      - "8080"
+      - "8000"
     depends_on:
       - db
     environment:

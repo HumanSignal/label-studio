@@ -14,6 +14,7 @@ import re
 import logging
 import json
 
+from datetime import timedelta
 from label_studio.core.utils.params import get_bool_env, get_env
 
 formatter = 'standard'
@@ -384,6 +385,13 @@ SESSION_COOKIE_SECURE = bool(int(get_env('SESSION_COOKIE_SECURE', False)))
 CSRF_COOKIE_SECURE = bool(int(get_env('CSRF_COOKIE_SECURE', SESSION_COOKIE_SECURE)))
 CSRF_COOKIE_HTTPONLY = bool(int(get_env('CSRF_COOKIE_HTTPONLY', SESSION_COOKIE_SECURE)))
 
+# Inactivity user sessions
+INACTIVITY_SESSION_TIMEOUT_ENABLED = bool(int(get_env('INACTIVITY_SESSION_TIMEOUT_ENABLED', True)))
+# The most time a login will last, regardless of activity
+MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(days=14).total_seconds()))
+# The most time that can elapse between activity with the server before the user is logged out
+MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(days=5).total_seconds()))
+
 SSRF_PROTECTION_ENABLED = get_bool_env('SSRF_PROTECTION_ENABLED', False)
 
 # user media files
@@ -425,6 +433,8 @@ LOCAL_FILES_SERVING_ENABLED = get_bool_env('LOCAL_FILES_SERVING_ENABLED', defaul
 LOCAL_FILES_DOCUMENT_ROOT = get_env('LOCAL_FILES_DOCUMENT_ROOT', default=os.path.abspath(os.sep))
 
 SYNC_ON_TARGET_STORAGE_CREATION = get_bool_env('SYNC_ON_TARGET_STORAGE_CREATION', default=True)
+
+ALLOW_IMPORT_TASKS_WITH_UNKNOWN_EMAILS = get_bool_env('ALLOW_IMPORT_TASKS_WITH_UNKNOWN_EMAILS', default=False)
 
 """ React Libraries: do not forget to change this dir in /etc/nginx/nginx.conf """
 # EDITOR = label-studio-frontend repository
@@ -473,7 +483,7 @@ DATA_MANAGER_ACTIONS = {}
 DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS = 'data_manager.functions.custom_filter_expressions'
 DATA_MANAGER_PREPROCESS_FILTER = 'data_manager.functions.preprocess_filter'
 USER_LOGIN_FORM = 'users.forms.LoginForm'
-PROJECT_MIXIN = 'core.mixins.DummyModelMixin'
+PROJECT_MIXIN = 'projects.mixins.ProjectMixin'
 TASK_MIXIN = 'tasks.mixins.TaskMixin'
 ANNOTATION_MIXIN = 'tasks.mixins.AnnotationMixin'
 ORGANIZATION_MIXIN = 'organizations.mixins.OrganizationMixin'
@@ -544,3 +554,48 @@ ML_BLOCK_LOCAL_IP = get_bool_env('ML_BLOCK_LOCAL_IP', False)
 RQ_LONG_JOB_TIMEOUT = int(get_env('RQ_LONG_JOB_TIMEOUT', 36000))
 
 APP_WEBSERVER = get_env('APP_WEBSERVER', 'django')
+
+BATCH_JOB_RETRY_TIMEOUT = int(get_env('BATCH_JOB_RETRY_TIMEOUT', 60))
+
+if get_env('MINIO_STORAGE_ENDPOINT') and not get_bool_env('MINIO_SKIP', False):
+    CLOUD_FILE_STORAGE_ENABLED = True
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    AWS_STORAGE_BUCKET_NAME = get_env('MINIO_STORAGE_BUCKET_NAME')
+    AWS_ACCESS_KEY_ID = get_env('MINIO_STORAGE_ACCESS_KEY')
+    AWS_SECRET_ACCESS_KEY = get_env('MINIO_STORAGE_SECRET_KEY')
+    AWS_S3_ENDPOINT_URL = get_env('MINIO_STORAGE_ENDPOINT')
+    AWS_QUERYSTRING_AUTH = False
+    # make domain for FileUpload.file
+    AWS_S3_SECURE_URLS = False
+    AWS_S3_URL_PROTOCOL = 'http:' if HOSTNAME.startswith('http://') else 'https:'
+    AWS_S3_CUSTOM_DOMAIN = HOSTNAME.replace('http://', '').replace('https://', '') + '/data'
+
+if get_env('STORAGE_TYPE') == "s3":
+    CLOUD_FILE_STORAGE_ENABLED = True
+    DEFAULT_FILE_STORAGE = 'core.storage.CustomS3Boto3Storage'
+    if get_env('STORAGE_AWS_ACCESS_KEY_ID'):
+        AWS_ACCESS_KEY_ID = get_env('STORAGE_AWS_ACCESS_KEY_ID')
+    if get_env('STORAGE_AWS_SECRET_ACCESS_KEY'):
+        AWS_SECRET_ACCESS_KEY = get_env('STORAGE_AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = get_env('STORAGE_AWS_BUCKET_NAME')
+    AWS_S3_REGION_NAME = get_env('STORAGE_AWS_REGION_NAME', None)
+    AWS_QUERYSTRING_EXPIRE = int(get_env('STORAGE_AWS_X_AMZ_EXPIRES', '86400'))
+    AWS_LOCATION = get_env('STORAGE_AWS_FOLDER', default='')
+
+if get_env('STORAGE_TYPE') == "azure":
+    CLOUD_FILE_STORAGE_ENABLED = True
+    DEFAULT_FILE_STORAGE = 'core.storage.CustomAzureStorage'
+    AZURE_ACCOUNT_NAME = get_env('STORAGE_AZURE_ACCOUNT_NAME')
+    AZURE_ACCOUNT_KEY = get_env('STORAGE_AZURE_ACCOUNT_KEY')
+    AZURE_CONTAINER = get_env('STORAGE_AZURE_CONTAINER_NAME')
+    AZURE_URL_EXPIRATION_SECS = int(get_env('STORAGE_AZURE_URL_EXPIRATION_SECS', '86400'))
+    AZURE_LOCATION = get_env('STORAGE_AZURE_FOLDER', default='')
+
+if get_env('STORAGE_TYPE') == "gcs":
+    CLOUD_FILE_STORAGE_ENABLED = True
+    # DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+    DEFAULT_FILE_STORAGE = 'core.storage.AlternativeGoogleCloudStorage'
+    GS_PROJECT_ID = get_env('STORAGE_GCS_PROJECT_ID')
+    GS_BUCKET_NAME = get_env('STORAGE_GCS_BUCKET_NAME')
+    GS_EXPIRATION = timedelta(seconds=int(get_env('STORAGE_GCS_EXPIRATION_SECS', '86400')))
+    GS_LOCATION = get_env('STORAGE_GCS_FOLDER', default='')

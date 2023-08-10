@@ -1,0 +1,32 @@
+details
+  background-color #f6f6f6 !important
+  border-radius 4px
+  margin-top 10px
+
+  & > div > p:first-child
+    display none
+
+  summary
+    font-size 16px
+    background-color #efefef
+    color #3c3c3c
+    display flex
+    align-items center
+    cursor pointer
+
+    &::before
+      content "+"
+      width 24px
+      font-size 22px
+      font-weight bold
+      display inline-block
+      text-align center
+
+    &::marker,
+    &::after
+      display none
+      content ""
+
+  &[open] summary
+    &::before
+      content "–"

@@ -8,6 +8,8 @@ import { LabelingSettings } from './LabelingSettings';
 import { MachineLearningSettings } from './MachineLearningSettings/MachineLearningSettings';
 import { StorageSettings } from './StorageSettings/StorageSettings';
 import { DisplayLogs } from './DisplayLogs';
+import { ClassesLabeled } from './classesLabeled';
+import { ChangeLabelName } from './ChangeLabelName';
 
 export const MenuLayout = ({children, ...routeProps}) => {
   return (
@@ -19,8 +21,11 @@ export const MenuLayout = ({children, ...routeProps}) => {
         MachineLearningSettings,
         StorageSettings,
         WebhookPage,
+        DisplayLogs,
+        ClassesLabeled,
+        ChangeLabelName,
         DangerZone,
-        DisplayLogs
+
       ]}
       path={routeProps.match.url}
       children={children}
@@ -40,7 +45,9 @@ export const SettingsPage = {
     MachineLearningSettings,
     StorageSettings,
     WebhookPage,
+    DisplayLogs, 
+    ClassesLabeled,
+    ChangeLabelName,
     DangerZone,
-    DisplayLogs
   },
 };

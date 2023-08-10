@@ -26,4 +26,5 @@ urlpatterns = [
 
     # special endpoints for serving imported files
     path('data/upload/<path:filename>', api.UploadedFileResponse.as_view(), name='data-upload'),
+    path('storage-data/uploaded/', api.DownloadStorageData.as_view(), name='storage-data-upload'),
 ]

@@ -42,15 +42,16 @@ def propagate_annotations(project, queryset, **kwargs):
             'completed_by_id': user.id,
             'result': source_annotation.result,
             'result_count': source_annotation.result_count,
-            'parent_annotation_id': source_annotation.id
+            'parent_annotation_id': source_annotation.id,
+            'project': project,
         }
         body = TaskSerializerBulk.add_annotation_fields(body, user, 'propagated_annotation')
         db_annotations.append(Annotation(**body))
 
     db_annotations = Annotation.objects.bulk_create(db_annotations, batch_size=settings.BATCH_SIZE)
     TaskSerializerBulk.post_process_annotations(user, db_annotations, 'propagated_annotation')
-
-    start_job_async_or_sync(project.update_tasks_counters, Task.objects.filter(id__in=tasks))
+    # Update counters for tasks and is_labeled. It should be a single operation as counters affect bulk is_labeled update
+    project.update_tasks_counters_and_is_labeled(tasks_queryset=Task.objects.filter(id__in=tasks))
     return {'response_code': 200, 'detail': f'Created {len(db_annotations)} annotations'}
 
 
@@ -127,9 +128,14 @@ def rename_labels(project, queryset, **kwargs):
     label_type = labels[control_tag]['type'].lower()
 
     annotations = Annotation.objects.filter(task__project=project)
-    annotations = annotations \
-        .filter(result__contains=[{'from_name': control_tag}]) \
-        .filter(result__contains=[{'value': {label_type: [old_label_name]}}])
+    if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
+        annotations = annotations \
+            .filter(result__icontains=control_tag) \
+            .filter(result__icontains=old_label_name)
+    else:
+        annotations = annotations \
+            .filter(result__contains=[{'from_name': control_tag}]) \
+            .filter(result__contains=[{'value': {label_type: [old_label_name]}}])
 
     label_count = 0
     annotation_count = 0

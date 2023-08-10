@@ -52,8 +52,10 @@ Use with the following data types: image
 ```
 
 ### Example
+
+Basic keypoint image labeling configuration for multiple regions
+
 ```html
-<!--Basic keypoint image labeling configuration for multiple regions-->
 <View>
   <KeyPointLabels name="kp-1" toName="img-1">
     <Label value="Face" />

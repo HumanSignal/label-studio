@@ -5,15 +5,7 @@ set -e ${DEBUG:+-x}
 # Redirect all scripts output + leaving stdout to container payload.
 exec 3>&1
 
-ENTRYPOINT_PATH=/label-studio/deploy
-
-uid_entrypoint() {
-  if ! whoami 2>/dev/null; then
-    if [ -w /etc/passwd ]; then
-      echo "labelstudio::$(id -u):0:labelstudio user:${HOME}:/bin/bash" >>/etc/passwd
-    fi
-  fi
-}
+ENTRYPOINT_PATH=/label-studio/deploy/docker-entrypoint.d
 
 exec_entrypoint() {
   if /usr/bin/find -L "$1" -mindepth 1 -maxdepth 1 -type f -print -quit 2>/dev/null | read v; then
@@ -41,15 +33,30 @@ exec_entrypoint() {
   fi
 }
 
-uid_entrypoint
+source_inject_envvars() {
+  if [ -n "${ENV_INJECT_SOURCES:-}" ]; then
+    IFS=","
+    for env_file in $ENV_INJECT_SOURCES; do
+       if [ -f "$env_file" ]; then
+         . $env_file
+       fi
+    done
+  fi
+}
+
+source_inject_envvars
 
 if [ "$1" = "nginx" ]; then
-  exec_entrypoint "$ENTRYPOINT_PATH/nginx/scripts/"
-  exec nginx -c /etc/nginx/nginx.conf
+  # in this mode we're running in a separate container
+  export APP_HOST=${APP_HOST:=app}
+  exec_entrypoint "$ENTRYPOINT_PATH/nginx/"
+  exec nginx -c $OPT_DIR/nginx/nginx.conf -e /dev/stderr
 elif [ "$1" = "label-studio-uwsgi" ]; then
-  exec_entrypoint "$ENTRYPOINT_PATH/docker-entrypoint.d/"
+  exec_entrypoint "$ENTRYPOINT_PATH/app/"
   exec uwsgi --ini /label-studio/deploy/uwsgi.ini
+elif [ "$1" = "label-studio-migrate" ]; then
+  exec_entrypoint "$ENTRYPOINT_PATH/app-init/"
+  exec python3 /label-studio/label_studio/manage.py migrate >&3
 else
-  exec_entrypoint "$ENTRYPOINT_PATH/docker-entrypoint.d/"
   exec "$@"
 fi

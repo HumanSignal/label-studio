@@ -36,14 +36,16 @@ class UserSerializerWithProjects(UserSerializer):
         if not self.context.get('contributed_to_projects', False):
             return None
 
-        return user.created_projects.filter(organization=user.active_organization).values('id', 'title')
+        current_user = self.context['request'].user
+        return user.created_projects.filter(organization=current_user.active_organization).values('id', 'title')
 
     def get_contributed_to_projects(self, user):
         if not self.context.get('contributed_to_projects', False):
             return None
 
+        current_user = self.context['request'].user
         projects = user.annotations\
-            .filter(task__project__organization=user.active_organization)\
+            .filter(task__project__organization=current_user.active_organization)\
             .values('task__project__id', 'task__project__title')
         contributed_to = [(json.dumps({'id': p['task__project__id'], 'title': p['task__project__title']}), 0)
                           for p in projects]

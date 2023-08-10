@@ -1,15 +1,15 @@
 ---
-title: Set up persistent storage 
+title: Set up persistent storage
 badge: <i class='ent'/></i>
 type: guide
 order: 211
 meta_title: Set up persistent storage with Label Studio Enterprise
-meta_description: Configure persistent storage with Label Studio Enterprise hosted in the cloud to store uploaded data such as task data, user images, and more. 
+meta_description: Configure persistent storage with Label Studio Enterprise hosted in the cloud to store uploaded data such as task data, user images, and more.
 ---
 
 If you host Label Studio Enterprise in the cloud, you want to set up persistent storage for uploaded task data, user images, and more in the same cloud service as your deployment.
 
-Follow the steps relevant for your deployment. If you use Docker Compose, select the cloud service you want to use as persistent storage: 
+Follow the steps relevant for your deployment. If you use Docker Compose, select the cloud service you want to use as persistent storage:
 * [Set up Amazon S3](#Set-up-Amazon-S3) for Label Studio Enterprise deployments in Amazon Web Services (AWS).
 * [Set up Google Cloud Storage (GCS)](#Set-up-Google-Cloud-Storage) for Label Studio Enterprise deployments in Google Cloud Platform.
 * [Set up Microsoft Azure Storage](#Set-up-Microsoft-Azure-Storage) for Label Studio Enterprise deployments in Microsoft Azure.
@@ -22,7 +22,7 @@ Set up Amazon S3 as the persistent storage for Label Studio Enterprise hosted in
 
 Start by [creating an S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/create-bucket-overview.html) following the Amazon Simple Storage Service User Guide steps.
 
-> If you want to secure the data stored in the S3 bucket at rest, you can [set up default server-side encryption for Amazon S3 buckets](https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-encryption.html) following the steps in the Amazon Simple Storage Service User Guide. 
+> If you want to secure the data stored in the S3 bucket at rest, you can [set up default server-side encryption for Amazon S3 buckets](https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-encryption.html) following the steps in the Amazon Simple Storage Service User Guide.
 
 ### Optional: Configure CORS for the S3 bucket
 
@@ -61,9 +61,9 @@ After you create an S3 bucket, set up the necessary IAM permissions to grant Lab
 - Set up an **IAM role** with an OIDC provider (**recommended**).
 - Use **access keys**.
 - Set up an **IAM role** without an OIDC provider.
-- Use **access keys with Docker Compose**. 
+- Use **access keys with Docker Compose**.
 
-Select the relevant tab and follow the steps for your desired option: 
+Select the relevant tab and follow the steps for your desired option:
 
 <div class="code-tabs">
   <div data-name="IAM role (OIDC)">
@@ -135,7 +135,7 @@ rqworker:
 
   <div data-name="Access keys">
 
-1. Create an IAM user with **Programmatic access**. See [Creating an IAM user in your AWS account](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) in the AWS Identity and Access Management User Guide. 
+1. Create an IAM user with **Programmatic access**. See [Creating an IAM user in your AWS account](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) in the AWS Identity and Access Management User Guide.
 2. When creating the user, for the **Set permissions** option, choose to **Attach existing policies directly**.
 3. Select **Create policy** and attach the following policy, replacing `<YOUR_S3_BUCKET>` with the name of your bucket:
 
@@ -317,18 +317,18 @@ STORAGE_AWS_FOLDER=""
 
 Set up Google Cloud Storage (GCS) as the persistent storage for Label Studio Enterprise hosted in Google Cloud Platform (GCP) or Docker Compose.
 
-### Create a GCS bucket 
+### Create a GCS bucket
 
 1. Start by creating a bucket. See [Creating storage buckets](https://cloud.google.com/storage/docs/creating-buckets) in the Google Cloud Storage guide. For example, a bucket called `heartex-example-bucket-123456`.
-2. When choosing the [access control method for the bucket](https://cloud.google.com/storage/docs/access-control), choose **uniform access control**. 
-3. Create an IAM Service Account. See [Creating and managing service accounts](https://cloud.google.com/iam/docs/creating-managing-service-accounts) in the Google Cloud Storage guide. 
+2. When choosing the [access control method for the bucket](https://cloud.google.com/storage/docs/access-control), choose **uniform access control**.
+3. Create an IAM Service Account. See [Creating and managing service accounts](https://cloud.google.com/iam/docs/creating-managing-service-accounts) in the Google Cloud Storage guide.
 4. Select the predefined **Storage Object Admin** IAM role to add to the service account so that the account can create, access, and delete objects in the bucket.
 5. Add a condition to the role that restricts the role to access only objects that belong to the bucket you created. You can add a condition in one of two ways:
     - Select **Add Condition** when setting up the service account IAM role, then use the **Condition Builder** to specify the following values:
       - Condition type: `Name`
       - Operator: `Starts with`
       - Value: `projects/_/buckets/heartex-example-bucket-123456`
-    - Or, **use a Common Expression Language** (CEL) to specify an IAM condition. For example, set the following: `resource.name.startsWith('projects/_/buckets/heartex-example-bucket-123456')`. See [CEL for Conditions in Overview of IAM Conditions](https://cloud.google.com/iam/docs/conditions-overview#cel) in the Google Cloud Storage guide. 
+    - Or, **use a Common Expression Language** (CEL) to specify an IAM condition. For example, set the following: `resource.name.startsWith('projects/_/buckets/heartex-example-bucket-123456')`. See [CEL for Conditions in Overview of IAM Conditions](https://cloud.google.com/iam/docs/conditions-overview#cel) in the Google Cloud Storage guide.
 
 ### Optional: Configure CORS for the GCS bucket
 
@@ -357,8 +357,8 @@ You can connect Label Studio Enterprise to your GCS bucket using **Workload Iden
 
 After you create a bucket and set up IAM permissions, connect Label Studio Enterprise to your GCS bucket. There are three ways that you can connect to your bucket:
 - Use Workload Identity to allow workloads in GKE to access your GCS bucket by impersonating the service account you created (**recommended**).
-- Create a service account key to use the service account outside Google Cloud.  
-- Create a service account key to use with Docker Compose. 
+- Create a service account key to use the service account outside Google Cloud.
+- Create a service account key to use with Docker Compose.
 
 <div class="code-tabs">
 <div data-name="Workload Identity">
@@ -414,7 +414,7 @@ rqworker:
 You can use a service account key that you create, or if you already have a Kubernetes secret and key, follow [the steps below](#Use-an-existing-Kubernetes-secret-and-key) to use those.
 
 #### Create a new service account key
-1. Create a service account key from the UI and download the JSON. Follow the steps for [Creating and managing service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) in the Google Cloud Identity and Access Management guide. 
+1. Create a service account key from the UI and download the JSON. Follow the steps for [Creating and managing service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) in the Google Cloud Identity and Access Management guide.
 2. After downloading the JSON for the service account key, update or create references to the JSON, your projectID, and your bucket in your `lse-values.yaml` file.
    Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
 
@@ -509,13 +509,13 @@ Set up CORS access to your bucket. See [Configuring cross-origin resource sharin
 
 ```xml
 <Cors>
-    <CorsRule>  
-        <AllowedOrigins>*</AllowedOrigins>  
-        <AllowedMethods>GET,POST,PATCH,PUT,DELETE,OPTIONS</AllowedMethods>  
-        <AllowedHeaders>x-ms-blob-content-type</AllowedHeaders>  
-        <ExposedHeaders>x-ms-*</ExposedHeaders>  
-        <MaxAgeInSeconds>3600</MaxAgeInSeconds>  
-    </CorsRule>  
+    <CorsRule>
+        <AllowedOrigins>*</AllowedOrigins>
+        <AllowedMethods>GET,POST,PATCH,PUT,DELETE,OPTIONS</AllowedMethods>
+        <AllowedHeaders>x-ms-blob-content-type</AllowedHeaders>
+        <ExposedHeaders>x-ms-*</ExposedHeaders>
+        <MaxAgeInSeconds>3600</MaxAgeInSeconds>
+    </CorsRule>
 <Cors>
 ```
 
@@ -542,7 +542,7 @@ global:
         folder: ""
 ```
 
-If you have an existing key, you can use that instead to create a Kubernetes secret. 
+If you have an existing key, you can use that instead to create a Kubernetes secret.
 1. Create a Kubernetes secret with your Azure access key:
 
 ```shell

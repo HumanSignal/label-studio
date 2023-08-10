@@ -25,8 +25,10 @@ Use with the following data types: time series
 | [strokeWidth] | <code>number</code> | <code>1</code> | Width of the stroke |
 
 ### Example
+
+Basic labeling configuration to apply labels to identified regions of a time series with one channel
+
 ```html
-<!--Basic labeling configuration to apply labels to identified regions of a time series with one channel -->
 <View>
   <TimeSeriesLabels name="label" toName="ts">
       <Label value="Run"/>

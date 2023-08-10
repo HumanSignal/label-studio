@@ -102,6 +102,7 @@ If the offsets for exported HTML labels don't match your expected output, such a
 To prevent the HTML files from being minified, you can use a different import method. See [Import HTML data](tasks.html#Import-HTML-data) for more.
 
 If you want to correct existing annotations, you can minify your source HTML files in the same way that Label Studio does. The minification is performed with the following script:
+
 ```python
 import htmlmin
 

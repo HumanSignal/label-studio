@@ -88,15 +88,16 @@ In this case, you must provide the Label Studio hostname before running ML backe
 ## Other parameters
 
 You can also specify other parameters when you start this ML backend to fit your use case or environment.
+Addionaly check our [Quickstart](ml.html#Quickstart-with-an-example-ML-backend).
 
 #### GPU support
-If you have a GPU available, you can specify that with `device=gpu:0` when you start the ML backend to significantly speed up pre-annotation of images. For example:
+If you have a GPU available, you can specify that with `device=cuda:0` when you start the ML backend to significantly speed up pre-annotation of images. For example:
 
  ```bash
    label-studio-ml start coco-detector --with \
    config_file=mmdetection/configs/faster_rcnn/faster_rcnn_r50_fpn_1x_coco.py \
    checkpoint_file=/absolute/path/to/downloaded/checkpoint.pth \
-   device=gpu:0
+   device=cuda:0
    ```
 
 #### Bounding box thresholding

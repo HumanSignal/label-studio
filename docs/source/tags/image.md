@@ -37,8 +37,10 @@ When you annotate image regions with this tag, the annotations are saved as perc
 | [defaultZoom] | <code>string</code> | <code>&quot;\&quot;fit\&quot;&quot;</code> | Specify the initial zoom of the image within the viewport while preserving it’s ratio. Can be one of "auto", "original" or "fit" |
 
 ### Example
+
+Labeling configuration to display an image on the labeling interface
+
 ```html
-<!--Labeling configuration to display an image on the labeling interface-->
 <View>
   <!-- Retrieve the image url from the url field in JSON or column in CSV -->
   <Image name="image" value="$url" rotateControl="true" zoomControl="true"></Image>

@@ -47,8 +47,10 @@ Use with the following data types: text
 ```
 
 ### Example
+
+Labeling configuration to label text for NER tasks with a word-level granularity
+
 ```html
-<!--Labeling configuration to label text for NER tasks with a word-level granularity -->
 <View>
   <Text name="text-1" value="$text" granularity="word" highlightColor="#ff0000" />
   <Labels name="ner" toName="text-1">

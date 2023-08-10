@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-3485: Regions is selectable when annotation history is selected",
-  "commit": "23fda9630effeff74c6291fb3e20aed77675775e",
+  "message": "fix: DEV-3896: Fix closed polygon undoing by hotkey",
+  "commit": "25580365ef5a016748664f8cde2c97712a5686fa",
   "branch": "master",
-  "date": "2022/10/06 13:06:59"
+  "date": "2022/12/30 17:04:27"
 }

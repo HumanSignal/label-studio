@@ -19,8 +19,10 @@ Use with the following data types: video
 | toName | <code>string</code> | Name of the element to control (video) |
 
 ### Example
+
+Video Object Tracking
+
 ```html
-<!--Video Object Tracking-->
 <View>
   <Header>Label the video:</Header>
   <Video name="video" value="$video" />

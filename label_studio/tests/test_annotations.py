@@ -47,9 +47,11 @@ def test_create_annotation(caplog, any_client, configured_project_min_annotation
         # annotator client
         if hasattr(any_client, 'annotator') and any_client.annotator is not None:
             assert annotation.completed_by.id == any_client.user.id
+            assert annotation.updated_by.id == any_client.user.id
         # business client
         else:
             assert annotation.completed_by.id == any_client.business.admin.id
+            assert annotation.updated_by.id == any_client.business.admin.id
 
         if apps.is_installed('businesses'):
             assert annotation.task.accuracy == 1.0
@@ -93,6 +95,9 @@ def test_create_annotation_with_ground_truth(caplog, any_client, configured_proj
         assert m.called
         task = Task.objects.get(id=task.id)
         assert task.annotations.count() == 2
+        annotations = Annotation.objects.filter(task=task)
+        for a in annotations:
+            assert a.updated_by.id == any_client.user.id
 
 
 @pytest.mark.django_db

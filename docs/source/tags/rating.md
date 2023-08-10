@@ -26,8 +26,10 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [perRegion] | <code>boolean</code> |  | Use this tag to rate regions instead of the whole object |
 
 ### Example
+
+Basic labeling configuration to rate the content of a text passage
+
 ```html
-<!--Basic labeling configuration to rate the content of a text passage -->
 <View>
   <Text name="txt" value="$text" />
   <Rating name="rating" toName="txt" maxRating="10" icon="star" size="medium" />

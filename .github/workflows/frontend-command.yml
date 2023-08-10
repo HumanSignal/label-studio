@@ -27,7 +27,7 @@ jobs:
 
       - name: Get npm cache directory
         id: npm-cache-dir
-        run: echo "::set-output name=dir::$(npm config get cache)"
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
 
       - uses: actions/cache@v3
         name: Configure npm cache
@@ -61,7 +61,7 @@ jobs:
             grep 'Build link:' /tmp/output | cut -d":" -f2- >> /tmp/info_commit_msg 
           fi
           
-          echo "::set-output name=commit_msg_file::$(cat /tmp/info_commit_msg)"
+          echo "commit_msg_file=$(cat /tmp/info_commit_msg)" >> $GITHUB_OUTPUT
           echo "COMMIT_MSG_FILE<<EOF" >> $GITHUB_ENV
           echo "$(cat /tmp/info_commit_msg)" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
@@ -80,7 +80,7 @@ jobs:
           git add -A
           git status -s
           if git diff-index --quiet HEAD; then
-            echo "::set-output name=changes::no"
+            echo "changes=no" >> $GITHUB_OUTPUT
             exit 0
           else 
             git commit -m "[frontend] Get build ${REPO}"

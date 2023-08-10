@@ -100,7 +100,8 @@ class OrganizationMemberListAPI(generics.ListAPIView):
 
     def get_serializer_context(self):
         return {
-            'contributed_to_projects': bool_from_request(self.request.GET, 'contributed_to_projects', False)
+            'contributed_to_projects': bool_from_request(self.request.GET, 'contributed_to_projects', False),
+            'request': self.request
         }
 
     def get_queryset(self):
