@@ -590,11 +590,18 @@ class Project(ProjectMixin, models.Model):
         control_weights = {}
         exclude_control_types = ('Filter',)
 
-        def get_value(key, subkey=None):
-            value = self.control_weights.get(control_name, {}).get(key, {})
-            if subkey:
-                value = value.get(subkey)
-            return value if value is not None else 1.0
+        def get_label(label):
+            label_value = self.control_weights.get(control_name, {}).get('labels', {}).get(label)
+            return label_value if label_value is not None else 1.0
+
+        def get_overall(name):
+            weights = self.control_weights.get(name, None)
+            if not weights:
+                return 1.0
+            else:
+                weight = weights.get('overall', None)
+                return weight if weight is not None else 1.0
+
 
         for control_name in outputs:
             control_type = outputs[control_name]['type']
@@ -602,9 +609,9 @@ class Project(ProjectMixin, models.Model):
                 continue
 
             control_weights[control_name] = {
-                'overall': get_value('overall'),
+                'overall': get_overall(control_name),
                 'type': control_type,
-                'labels': {label: get_value('labels', label) for label in outputs[control_name].get('labels', [])},
+                'labels': {label: get_label(label) for label in outputs[control_name].get('labels', [])},
             }
         return control_weights
 
